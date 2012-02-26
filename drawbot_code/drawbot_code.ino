@@ -39,10 +39,6 @@
 // Distance between stepper shaft centers.
 #define X_SEPARATION    (28.0)
 
-// distance from pen center to string ends
-#define PLOTX           (2.8)
-#define PLOTY           (1.9)
-
 // Distance from center of the drawing area up to the line between the two 
 // steppers.  The plotter cannot physically reach this line - it would 
 // require infinite tensile strength.
@@ -50,6 +46,10 @@
 
 // Distance from center to bottom of drawing area.
 #define LIMYMAX         (30.0)
+
+// distance from pen center to string ends
+#define PLOTX           (2.8)
+#define PLOTY           (1.9)
 
 // which motor is on which pin?
 #define M1_PIN          (2)
