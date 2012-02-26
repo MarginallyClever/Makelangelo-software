@@ -4,34 +4,28 @@ Drawbot is intended to teach students about programming, physics, trigonometry, 
 Drawbot is scalable to suit your wall size.
 
 *The hardware*
-- An Arduino Mega 2560
-- one USB cable to connect the Mega to your PC
-- one Adafruit stepper motor shield
-- two NEMA17 stepper motors
-- one 12 volt, 2 amp power supply
-- two sewing machine bobbins
-- >=10m of sewing thread.  I used nylon and most anything will work.
-- one 9g servo
+* An Arduino Mega 2560
+* one USB cable to connect the Mega to your PC
+* one Adafruit stepper motor shield
+* two NEMA17 stepper motors
+* one 12 volt, 2 amp power supply
+* two sewing machine bobbins
+* >=10m of sewing thread.  I used nylon and most anything will work.
+* one 9g servo
 
 *Setup*
-1. The two stepper motors should be mounted horizontally at the top of your drawing area.  Stepper 1 should be mounted on the left.  Stepper 1 is connected to M1 (red & green) and M2 (blue & yellow) on the Adafruit shield.  Repeat for M3 & M4.  Attach the shield to the Arduino Mega.
-2. Put the bobbins on the stepper shafts.  A small piece of tape around the stepper shafts will make a tight fit.
-3. Attach the string to the bobbins.  Use loadSpool() in setup() to wind 5m of thread onto your bobbin.  You can alter this to load more or less depending on your needs.
-4. Attach the plotter to the other end of the strings.
-5. Gently turn the bobbins until the plotter is halfway between the steppers and halfway between the top and bottom of the area you will draw in.  I recommend you only do this with the power off.
-6. Measure the distance (in centimeters) from the center of stepper shaft 1 to stepper shaft 2.  This will be the X_SEPARATION value at the top of your code.
-7. Measure the distance (in centimeters) from the plotter center up to the line between the shafts.  This will be your LIMYMIN.
-8. Measure the distance (in centimeters) from the plotter center down to the bottom of the drawing area.  This will be your LIMYMAX.
-9. Plug in your Arduino.  Plug in your Adafruit 12v power supply.
-10. Use the Arduino programming environment to update your configuration.  Look for the following lines:
-
-#define X_SEPARATION    (28.0)
-#define LIMYMIN         (-21.5)
-#define LIMYMAX         (30.0)
-
-11. Upload your changes to the Mega.  Open the Arduino Serial Interface.  You should see "== HELLO WORLD ==" followed by instructions.
-12. Follow the on-screen prompts.
-
+# The two stepper motors should be mounted horizontally at the top of your drawing area.  Stepper 1 should be mounted on the left.  Stepper 1 is connected to M1 (red & green) and M2 (blue & yellow) on the Adafruit shield.  Repeat for M3 & M4.  Attach the shield to the Arduino Mega.
+# Put the bobbins on the stepper shafts.  A small piece of tape around the stepper shafts will make a tight fit.
+# Attach the string to the bobbins.  Use loadSpool() in setup() to wind 5m of thread onto your bobbin.  You can alter this to load more or less depending on your needs.
+# Attach the plotter to the other end of the strings.
+# Gently turn the bobbins until the plotter is halfway between the steppers and halfway between the top and bottom of the area you will draw in.  I recommend you only do this with the power off.
+# Measure the distance (in centimeters) from the center of stepper shaft 1 to stepper shaft 2.  This will be the X_SEPARATION value at the top of your code.
+# Measure the distance (in centimeters) from the plotter center up to the line between the shafts.  This will be your LIMYMIN.
+# Measure the distance (in centimeters) from the plotter center down to the bottom of the drawing area.  This will be your LIMYMAX.
+# Plug in your Arduino.  Plug in your Adafruit 12v power supply.
+# Use the Arduino programming environment to update your configuration.  Look for the following lines: X_SEPARATION, LIMYMIN, and LIMYMAX
+# Upload your changes to the Mega.  Open the Arduino Serial Interface.  You should see "== HELLO WORLD ==" followed by instructions.
+# Follow the on-screen prompts.
 
 h1. FAQ
 
@@ -73,7 +67,7 @@ should be reversed.  See the example in the previous question.
 
 h3. Where can I find more info about DrawBot?
 
-http://www.marginallyclever.com/
+"Marginally Clever":http://www.marginallyclever.com/
 
 Thanks for reading!
 Dan
