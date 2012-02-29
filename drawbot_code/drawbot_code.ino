@@ -3,6 +3,9 @@
 // dan@marginallycelver.com 2012 feb 11
 //------------------------------------------------------------------------------
 // Copyright at end of file.
+
+
+
 //------------------------------------------------------------------------------
 // PARTS
 //------------------------------------------------------------------------------
@@ -14,11 +17,17 @@
 // 1 - binder clip to hold plotter
 // Stepper motors M1 and M2 should be mounted parallel.
 // M1 is expected to be on the left.
+
+
+
 //------------------------------------------------------------------------------
 // COORDINATE SYSTEM:
 //------------------------------------------------------------------------------
 // (0,0) is center of drawing surface.  -y is up.  -x is left.
 // All lengths are in cm unless otherwise stated.
+
+
+
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
@@ -34,7 +43,6 @@
 //------------------------------------------------------------------------------
 // Comment out this line to silence most serial output.
 //#define VERBOSE         (1)
-
 
 // Distance between stepper shaft centers.
 #define X_SEPARATION    (28.0)
@@ -59,16 +67,17 @@
 #define REEL_IN         FORWARD
 #define REEL_OUT        BACKWARD
 
-
 // NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
 // then it is 2.5132741228718345 circumference, and
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
-// adafruit can handle ~1500RPM.  The Mega's inner loop for calculating
-// when to move motors can't keep up at that speed and movement gets stupid.
-// A faster microprocessor could take full advantage of the machine.
+// adafruit can handle ~250RPM.  The Mega's inner loop for calculating
+// when to move motors can't run that fast and steps are lost.
+// A faster microprocessor could take full advantage of the adafruit.
+// These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
-#define RPM             (30.0)
+#define RPM             (100.0)
+
 // how fast can the plotter accelerate in a straight line?
 #define ACCELERATION    (3.50)  // cm/s/s
 
@@ -76,22 +85,21 @@
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
 // *****************************************************************************
-// define only one of these options
+
+// The step mode controls how the Adafruit driver moves a stepper.
+// options are SINGLE, DOUBLE, INTERLEAVE, and MICROSTEP.
 #define STEP_MODE       SINGLE
-//#define STEP_MODE       DOUBLE
-//#define STEP_MODE       INTERLEAVE
-//#define STEP_MODE       MICROSTEP
 
 // servo angles for pen control
 #define PEN_UP_ANGLE    (90)
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 
 #define SPOOL_CIRC      (SPOOL_DIAMETER*PI)  // circumference
-#define TPS             (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
+#define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
 // if the plotter were hanging from a single stepper and the stepper turned at
-// max RPM, how fast would the plotter move?  all other motions are 
-// cos(theta)*MAXVELOCITY, where theta is the angle between the direction of
-// motion and a line from the plotter to the stepper.
+// max RPM, how fast would the plotter move up/down?  All other motions are 
+// cos(theta)*MAXVELOCITY, where theta is the angle between the desired
+// direction of motion and a line from the plotter to the stepper.
 #define MAXVELOCITY     (RPM*SPOOL_CIRC/60.0)  // cm/s
 
 // limits plotter can move.
@@ -287,20 +295,20 @@ static float interpolateTrapezoid(float p0,float p3,float t,float t1,float t2,fl
 // nlen1 & nlen2 are the new string lengths.
 static void adjustStringLengths(float &len1,float &len2,float nlen1,float nlen2) {
   // is the change in length > one step?
-  if(nlen1<=len1-TPS) {  // it is shorter.
+  if(nlen1<=len1-THREADPERSTEP) {  // it is shorter.
     m1.step(1,REEL_IN,STEP_MODE);
-    len1-=TPS;
-  } else if(nlen1>=len1+TPS) {  // it is longer.
+    len1-=THREADPERSTEP;
+  } else if(nlen1>=len1+THREADPERSTEP) {  // it is longer.
     m1.step(1,REEL_OUT,STEP_MODE);
-    len1+=TPS;
+    len1+=THREADPERSTEP;
   }
   // is the change in length > one step?
-  if(nlen2<=len2-TPS) {  // it is shorter.
+  if(nlen2<=len2-THREADPERSTEP) {  // it is shorter.
     m2.step(1,REEL_IN,STEP_MODE);
-    len2-=TPS;
-  } else if(nlen2>=len2+TPS) {  // it is longer.
+    len2-=THREADPERSTEP;
+  } else if(nlen2>=len2+THREADPERSTEP) {  // it is longer.
     m2.step(1,REEL_OUT,STEP_MODE);
-    len2+=TPS;
+    len2+=THREADPERSTEP;
   }
 }
 
@@ -671,12 +679,14 @@ static void testArcs() {
 //------------------------------------------------------------------------------
 // loads 5m onto a spool.
 static void loadspools() {
+  float len=500.0;
+  float amnt=len/THREADPERSTEP;
   Serial.print("== LOAD ");
-  Serial.print(500.0/TPS);
+  Serial.print(len);
   Serial.print(" ==");
   // uncomment the motor you want to load
-  m1.step(500.0/TPS,REEL_IN);
-  //m2.step(500.0/TPS,REEL_IN);
+  m1.step(amnt,REEL_IN);
+  //m2.step(amnt,REEL_IN);
 }
 
 
@@ -920,18 +930,19 @@ static void halftone(float size,float fill) {
 
 //------------------------------------------------------------------------------
 static void help() {
-  Serial.println("== DRAWBOT - 2012 Feb 15 - dan@marginallyclever.com ==");
+  Serial.println("== DRAWBOT - 2012 Feb 28 - dan@marginallyclever.com ==");
   Serial.println("All commands end with a semi-colon.");
   Serial.println("help; - display this message");
   Serial.println("where; - display current virtual coordinates");
   Serial.println("limits; - display maximum distance plotter can move");
   Serial.println("demo; - run a hardcoded script");
-  Serial.print("teleport; - move the virtual plotter,");
-  Serial.println(" don't move the physical plotter.");
-  Serial.println("pen (0|1); - pen down|up");
-  Serial.println("line [x(float)] [y(float)]; - draw line to x,y");
-  Serial.print("arc a(float) b(float) [x(float)] [y(float)] [d(-1|1)];");
-  Serial.println(" - draw an arc around a,b to x,y. d is counter|clockwise");
+  Serial.println("teleport [Xx.xx] [Yx.xx]; - move the virtual plotter.");
+  Serial.println("G00 [Xx.xx] [Yx.xx]; - draw line to x,y");
+  Serial.println("G01 [Xx.xx] [Yx.xx]; - draw line to x,y");
+  Serial.println("G02 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a clockwise arc around i,j to x,y.");
+  Serial.println("G03 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a counterclockwise arc around i,j to x,y.");
+  Serial.println("Fx.xx; - set feed rate (max speed). Can be done on the same line as a G command.");
+  Serial.println("Zx.xx; - set pen height.  Can be done on the same line as a G command.");
   Serial.print("> ");
 }
 
@@ -978,9 +989,8 @@ static void processCommand() {
     }
 
     teleportSafe(xx,yy);
-  } else if(!strncmp(buffer,"line",4)
-         || !strncmp(buffer,"G1",2)
-         || !strncmp(buffer,"G0",2)) {
+  } else if(!strncmp(buffer,"G01",3)
+         || !strncmp(buffer,"G00",3)) {
     // several optional float parameters.
     // then calls a method to do something with those parameters.
     float xx=posx;
@@ -1003,9 +1013,8 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(lineSafe(xx,yy));
-  } else if(!strncmp(buffer,"arc",3) 
-         || !strncmp(buffer,"G2",2) 
-         || !strncmp(buffer,"G3",2)) {
+  } else if(!strncmp(buffer,"G02",3) 
+         || !strncmp(buffer,"G03",3)) {
     // several optional float parameters.
     // then calls a method to do something with those parameters.
     float xx=posx;
@@ -1016,9 +1025,7 @@ static void processCommand() {
     float ff=maxvel;
     char found_i=0;
     char found_j=0;
-    float dd=1;
-
-    if(!strncmp(buffer,"G3",2)) dd=-1;
+    float dd= (!strncmp(buffer,"G02",3)) ? 1 : -1;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1030,7 +1037,6 @@ static void processCommand() {
       case 'x': case 'X': xx=atof(ptr+1);  break;
       case 'y': case 'Y': yy=atof(ptr+1);  break;
       case 'z': case 'Z': zz=atof(ptr+1);  break;
-      case 'd': case 'D': dd=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1069,8 +1075,8 @@ void setup() {
 //  testKinematics( 5, 0);
 //  testKinematics( 0, 5);
 //  testKinematics(-5,-5);
+//  testInterpolateTrapezoid();
 //  testFullCircle();
-  testInterpolateTrapezoid();
 //  testAcceleration();
 //  testMaxVel();
 //  testArcs();
@@ -1133,3 +1139,4 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
+
