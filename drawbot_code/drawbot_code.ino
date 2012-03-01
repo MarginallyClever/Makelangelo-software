@@ -1023,16 +1023,14 @@ static void processCommand() {
     float ii=0;
     float jj=0;
     float ff=maxvel;
-    char found_i=0;
-    char found_j=0;
     float dd= (!strncmp(buffer,"G02",3)) ? 1 : -1;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'i': case 'I': ii=atof(ptr+1);  found_i=1; break;
-      case 'j': case 'J': jj=atof(ptr+1);  found_j=1; break;
+      case 'i': case 'I': ii=atof(ptr+1);  break;
+      case 'j': case 'J': jj=atof(ptr+1);  break;
       case 'f': case 'F': ff=atof(ptr+1);  break;
       case 'x': case 'X': xx=atof(ptr+1);  break;
       case 'y': case 'Y': yy=atof(ptr+1);  break;
@@ -1041,13 +1039,9 @@ static void processCommand() {
       }
     }
 
-    if(found_i==1 && found_j==1) {
-      maxvel=ff;
-      pen(zz);
-      error(arcSafe(ii,jj,xx,yy,dd));
-    } else {
-      Serial.println("Error: Center (i,j) must be specified.");
-    }
+    maxvel=ff;
+    pen(zz);
+    error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
   }
 }
 
@@ -1101,7 +1095,7 @@ void loop() {
   // if we hit a semi-colon, assume end of instruction.
   if(sofar>0 && buffer[sofar-1]==';') {
     // what if message fails/garbled?
- 
+
     // echo confirmation
     buffer[sofar]=0;
     Serial.println(buffer);
@@ -1139,4 +1133,6 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
+
+
 
