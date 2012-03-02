@@ -44,6 +44,9 @@
 // Comment out this line to silence most serial output.
 //#define VERBOSE         (1)
 
+// Uncomment this line to compile for smaller boards
+#define SMALL_FOOTPRINT (1)
+
 // Distance between stepper shaft centers.
 #define X_SEPARATION    (28.0)
 
@@ -154,21 +157,6 @@ int sofar;             // Serial buffer progress
 //------------------------------------------------------------------------------
 
 
-
-//------------------------------------------------------------------------------
-static void showLimits() {
-  Serial.print("(");
-  Serial.print(LIMXMIN);
-  Serial.print(",");
-  Serial.print(LIMYMIN);
-  Serial.print(") - {");
-  Serial.print(LIMXMAX);
-  Serial.print(",");
-  Serial.print(LIMYMAX);
-  Serial.println(")");
-}
-
-
 //------------------------------------------------------------------------------
 static void error(int r) {
   if(r!=0) {
@@ -187,6 +175,17 @@ static void tick() {
 }
 
 
+
+//------------------------------------------------------------------------------
+// returns angle of dy/dx as a value from 0...2PI
+static float atan3(float dy,float dx) {
+  float a=atan2(dy,dx);
+  if(a<0) a=(PI*2.0)+a;
+  return a;
+}
+
+
+#ifndef SMALL_FOOTPRINT
 //------------------------------------------------------------------------------
 // returns 0 if inside limits
 // returns non-zero if outside limits.
@@ -196,6 +195,7 @@ static int outsideLimits(float x,float y) {
         |((y<LIMYMIN)<<2)
         |((y>LIMYMAX)<<3);
 }
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -384,7 +384,9 @@ static void line(float x,float y) {
 //------------------------------------------------------------------------------
 // checks against the robot limits before attempting to move
 static int lineSafe(float x,float y) {
+#ifndef SMALL_FOOTPRINT
   if(outsideLimits(x,y)) return 1;
+#endif
   
   line(x,y);
   return 0;
@@ -483,12 +485,9 @@ static void arc(float cx,float cy,float x,float y,float dir) {
 }
 
 
-//------------------------------------------------------------------------------
-static float atan3(float dy,float dx) {
-  float a=atan2(dy,dx);
-  if(a<0) a=(PI*2.0)+a;
-  return a;
-}
+
+#ifndef SMALL_FOOTPRINT
+
 
 
 //------------------------------------------------------------------------------
@@ -532,7 +531,7 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
 // ...checks against the envelope limits
 static int canArc(float cx,float cy,float x,float y,float dir) {
 #ifdef VERBOSE  
-  showLimits();
+  limits();
   Serial.print("end=");  Serial.print(x);
   Serial.print(",");     Serial.println(y);
 #endif
@@ -598,17 +597,29 @@ static int canArc(float cx,float cy,float x,float y,float dir) {
 }
 
 
+
+#endif  // SMALL_FOOTPRINT
+
+
+
 //------------------------------------------------------------------------------
 // before attempting to move...
 // ...checks start & end radius match
 // ...checks against the envelope limits
 static int arcSafe(float cx,float cy,float x,float y,float dir) {
+#ifndef SMALL_FOOTPRINT
   int r=canArc(cx,cy,x,y,dir);
-  if(r==0) {
-    arc(cx,cy,x,y,dir);
-  }
-  return r;
+  if(r!=0) return r;
+#endif
+  
+  arc(cx,cy,x,y,dir);
+  return 0;
 }
+
+
+
+#ifndef SMALL_FOOTPRINT
+
 
 
 //------------------------------------------------------------------------------
@@ -673,73 +684,6 @@ static void testArcs() {
   Serial.println("CW avoids LIMYMIN (should not fail)");    teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
   Serial.println("CW through LIMYMIN (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
   Serial.println("CCW avoids LIMYMIN (should not fail)");   teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-}
-
-
-//------------------------------------------------------------------------------
-// loads 5m onto a spool.
-static void loadspools() {
-  float len=500.0;
-  float amnt=len/THREADPERSTEP;
-  Serial.print("== LOAD ");
-  Serial.print(len);
-  Serial.print(" ==");
-  // uncomment the motor you want to load
-  m1.step(amnt,REEL_IN);
-  //m2.step(amnt,REEL_IN);
-}
-
-
-//------------------------------------------------------------------------------
-// Show off line and arc movement.  This is the test pattern.
-static void demo() {
-  // square
-  Serial.println("> L 0,-2");              line( 0,-2);
-  Serial.println("> L-2,-2");              line(-2,-2);
-  Serial.println("> L-2, 2");              line(-2, 2);
-  Serial.println("> L 2, 2");              line( 2, 2);
-  Serial.println("> L 2,-2");              line( 2,-2);
-  Serial.println("> L 0,-2");              line( 0,-2);
-  // arc
-  Serial.println("> A 0,-4,0,-6,ARC_CW");  arc(0,-4,0,-6,ARC_CW);
-  Serial.println("> A 0,-4,0,-2,ARC_CCW"); arc(0,-4,0,-2,ARC_CCW);
-  // square
-  Serial.println("> L 0,-4");              line( 0,-4);
-  Serial.println("> L 4,-4");              line( 4,-4);
-  Serial.println("> L 4, 4");              line( 4, 4);
-  Serial.println("> L-4, 4");              line(-4, 4);
-  Serial.println("> L-4,-4");              line(-4,-4);
-  Serial.println("> L 0,-4");              line( 0,-4);
-  // square
-  Serial.println("> L 0,-6");              line( 0,-6);
-  Serial.println("> L-6,-6");              line(-6,-6);
-  Serial.println("> L-6, 6");              line(-6, 6);
-  Serial.println("> L 6, 6");              line( 6, 6);
-  Serial.println("> L 6,-6");              line( 6,-6);
-  Serial.println("> L 0,-6");              line( 0,-6);
-  // large circle
-  Serial.println("> A 0,0,0, 6,ARC_CW");   arc(0,0, 0, 6,ARC_CW);
-  Serial.println("> A 0,0,0,-6,ARC_CW");   arc(0,0, 0,-6,ARC_CW);
-
-  // triangle
-  Serial.println("> L  5.196, 3");         line( 5.196, 3);
-  Serial.println("> L -5.196, 3");         line(-5.196, 3);
-  Serial.println("> L 0,-6");              line( 0,-6);
-
-  // halftones
-  Serial.println("> L -6,-6");             line(-6,-6);
-  Serial.println("> L -6, 8");             line(-6, 8);
-
-  int i;
-  for(i=0;i<12;++i) {
-    Serial.print("> H 1, ");
-    Serial.println((float)i/11.0);
-    halftone(1,(float)i/11.0);
-  }
-
-  // return to origin
-  //Serial.println("> L 6, 6");              line( 6, 6);
-  Serial.println("> CENTER");              line( 0, 0);
 }
 
 
@@ -862,6 +806,73 @@ static void testMaxVel() {
 
 
 //------------------------------------------------------------------------------
+// loads 5m onto a spool.
+static void loadspools() {
+  float len=500.0;
+  float amnt=len/THREADPERSTEP;
+  Serial.print("== LOAD ");
+  Serial.print(len);
+  Serial.print(" ==");
+  // uncomment the motor you want to load
+  m1.step(amnt,REEL_IN);
+  //m2.step(amnt,REEL_IN);
+}
+
+
+//------------------------------------------------------------------------------
+// Show off line and arc movement.  This is the test pattern.
+static void demo() {
+  // square
+  Serial.println("> L 0,-2");              line( 0,-2);
+  Serial.println("> L-2,-2");              line(-2,-2);
+  Serial.println("> L-2, 2");              line(-2, 2);
+  Serial.println("> L 2, 2");              line( 2, 2);
+  Serial.println("> L 2,-2");              line( 2,-2);
+  Serial.println("> L 0,-2");              line( 0,-2);
+  // arc
+  Serial.println("> A 0,-4,0,-6,ARC_CW");  arc(0,-4,0,-6,ARC_CW);
+  Serial.println("> A 0,-4,0,-2,ARC_CCW"); arc(0,-4,0,-2,ARC_CCW);
+  // square
+  Serial.println("> L 0,-4");              line( 0,-4);
+  Serial.println("> L 4,-4");              line( 4,-4);
+  Serial.println("> L 4, 4");              line( 4, 4);
+  Serial.println("> L-4, 4");              line(-4, 4);
+  Serial.println("> L-4,-4");              line(-4,-4);
+  Serial.println("> L 0,-4");              line( 0,-4);
+  // square
+  Serial.println("> L 0,-6");              line( 0,-6);
+  Serial.println("> L-6,-6");              line(-6,-6);
+  Serial.println("> L-6, 6");              line(-6, 6);
+  Serial.println("> L 6, 6");              line( 6, 6);
+  Serial.println("> L 6,-6");              line( 6,-6);
+  Serial.println("> L 0,-6");              line( 0,-6);
+  // large circle
+  Serial.println("> A 0,0,0, 6,ARC_CW");   arc(0,0, 0, 6,ARC_CW);
+  Serial.println("> A 0,0,0,-6,ARC_CW");   arc(0,0, 0,-6,ARC_CW);
+
+  // triangle
+  Serial.println("> L  5.196, 3");         line( 5.196, 3);
+  Serial.println("> L -5.196, 3");         line(-5.196, 3);
+  Serial.println("> L 0,-6");              line( 0,-6);
+
+  // halftones
+  Serial.println("> L -6,-6");             line(-6,-6);
+  Serial.println("> L -6, 8");             line(-6, 8);
+
+  int i;
+  for(i=0;i<12;++i) {
+    Serial.print("> H 1, ");
+    Serial.println((float)i/11.0);
+    halftone(1,(float)i/11.0);
+  }
+
+  // return to origin
+  //Serial.println("> L 6, 6");              line( 6, 6);
+  Serial.println("> CENTER");              line( 0, 0);
+}
+
+
+//------------------------------------------------------------------------------
 // instantly move the virtual plotter position
 // does not validate if the move is valid
 static void teleport(float x,float y) {
@@ -875,6 +886,7 @@ static void teleport(float x,float y) {
 // checks against the robot limits before attempting to move
 static int teleportSafe(float x,float y) {
   if(outsideLimits(x,y)) return 1;
+  
   teleport(x,y);
   return 0;
 }
@@ -960,20 +972,35 @@ static void where() {
 
 
 //------------------------------------------------------------------------------
+static void limits() {
+  Serial.print("(");
+  Serial.print(LIMXMIN);
+  Serial.print(",");
+  Serial.print(LIMYMIN);
+  Serial.print(") - {");
+  Serial.print(LIMXMAX);
+  Serial.print(",");
+  Serial.print(LIMYMAX);
+  Serial.println(")");
+}
+
+
+
+#endif
+
+
+
+//------------------------------------------------------------------------------
 static void processCommand() {
+#ifndef SMALL_FOOTPRINT
   if(!strncmp(buffer,"help",4)) {
     help();
   } else if(!strncmp(buffer,"where",5)) {
     where();
   } else if(!strncmp(buffer,"limits",6)) {
-    showLimits();
+    limits();
   } else if(!strncmp(buffer,"demo",4)) {
     demo();
-  } else if(!strncmp(buffer,"f",1)) {
-    char *ptr=buffer+1;
-    if(ptr<buffer+sofar) {
-      maxvel=atof(ptr);
-    }
   } else if(!strncmp(buffer,"teleport",8)) {
     float xx=posx;
     float yy=posy;
@@ -989,6 +1016,13 @@ static void processCommand() {
     }
 
     teleportSafe(xx,yy);
+  } else 
+#endif
+  if(!strncmp(buffer,"f",1)) {
+    char *ptr=buffer+1;
+    if(ptr<buffer+sofar) {
+      maxvel=atof(ptr);
+    }
   } else if(!strncmp(buffer,"G01",3)
          || !strncmp(buffer,"G00",3)) {
     // several optional float parameters.
@@ -1061,6 +1095,7 @@ void setup() {
   // servo should be on SER1, pin 10.
   s1.attach(10);
 
+#ifndef SMALL_FOOTPRINT
   // load string onto spool.  Only needed when the robot is being built.
 //  loadspool();
 
@@ -1075,11 +1110,14 @@ void setup() {
 //  testMaxVel();
 //  testArcs();
 
-  // initialize the plotter position.
-  teleport(0,0);
-  pen(PEN_UP_ANGLE);
   // display the help at startup.
   help();  
+#endif  // SMALL_FOOTPRINT
+
+  // initialize the plotter position.
+  posx=0;
+  posy=0;
+  pen(PEN_UP_ANGLE);
 }
 
 
@@ -1133,6 +1171,3 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
-
-
-
