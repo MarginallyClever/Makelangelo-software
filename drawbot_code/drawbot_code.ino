@@ -45,7 +45,10 @@
 //#define VERBOSE         (1)
 
 // Uncomment this line to compile for smaller boards
-#define SMALL_FOOTPRINT (1)
+//#define SMALL_FOOTPRINT (1)
+
+// Uncomment this line to use a more sophisticated motion profile
+#define TRAPEZOID       (1)
 
 // Distance between stepper shaft centers.
 #define X_SEPARATION    (28.0)
@@ -59,7 +62,7 @@
 #define LIMYMAX         (30.0)
 
 // distance from pen center to string ends
-#define PLOTX           (2.8)
+#define PLOTX           (2.4)
 #define PLOTY           (1.9)
 
 // which motor is on which pin?
@@ -73,16 +76,17 @@
 // NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
 // then it is 2.5132741228718345 circumference, and
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
-// adafruit can handle ~250RPM.  The Mega's inner loop for calculating
-// when to move motors can't run that fast and steps are lost.
-// A faster microprocessor could take full advantage of the adafruit.
+// NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
-#define RPM             (100.0)
+#define MAX_RPM         (2000.0)
 
-// how fast can the plotter accelerate in a straight line?
-#define ACCELERATION    (3.50)  // cm/s/s
+// What is the default speed?
+#define RPM             (200.0)
+
+// how fast can the plotter accelerate?
+#define ACCELERATION    (5.00)  // cm/s/s
 
 
 // *****************************************************************************
@@ -129,8 +133,11 @@ AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 Servo s1;
 
 // plotter position.
-static float posx;
-static float posy;
+static float posx, velx, accelx;
+static float posy, vely, accely;
+
+// motor position
+static long laststep1, laststep2;
 
 // acceleration.
 static float accel=ACCELERATION;
@@ -140,6 +147,7 @@ static float maxvel=MAXVELOCITY;
 static int ps;
 
 // time values
+static long  t_millis;
 static float t;   // since board power on
 static float dt;  // since last tick
 
@@ -157,6 +165,7 @@ int sofar;             // Serial buffer progress
 //------------------------------------------------------------------------------
 
 
+
 //------------------------------------------------------------------------------
 static void error(int r) {
   if(r!=0) {
@@ -169,11 +178,14 @@ static void error(int r) {
 //------------------------------------------------------------------------------
 // increment internal clock
 static void tick() {
-  float nt=((float)millis())*0.001;
-  dt = nt-t;  // time since last tick, in seconds
-  t=nt;
-}
+  long nt_millis=millis();
+  long dt_millis=nt_millis-t_millis;
 
+  t_millis=nt_millis;
+
+  dt=(float)dt_millis*0.001;  // time since last tick, in seconds
+  t=(float)nt_millis*0.001;
+}
 
 
 //------------------------------------------------------------------------------
@@ -210,14 +222,14 @@ static void pen(float pen_angle) {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-static void IK(float x,float y,float &l1, float &l2) {
+static void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
   float dy = y - PLOTY - LIMYMIN;
   float dx = x - PLOTX - LIMXMIN;
-  l1 = sqrt(dx*dx+dy*dy);
+  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
   // find length to M2
   dx = LIMXMAX - (x + PLOTX);
-  l2 = sqrt(dx*dx+dy*dy);
+  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
 }
 
 
@@ -228,9 +240,9 @@ static void IK(float x,float y,float &l1, float &l2) {
 // to find angle between M1M2 and M1P
 // where P is the plotter position
 static void FK(float l1, float l2,float &x,float &y) {
-  float a=l1;
+  float a=l1 * THREADPERSTEP;
   float b=X_SEPARATION - PLOTX*2;
-  float c=l2;
+  float c=l2 * THREADPERSTEP;
   
   // slow, uses trig
   float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
@@ -240,7 +252,10 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 
 //------------------------------------------------------------------------------
-static void timeTrapezoid(float len,float vstart,float vend,float &t1,float &t2,float &t3) {
+static void travelTime(float len,float vstart,float vend,float &t1,float &t2,float &t3) {
+  
+#ifdef TRAPEZOID
+
   t1 = (maxvel-vstart) / accel;
   t2 = (maxvel-vend) / accel;
   float d1 = vstart * t1 + 0.5 * accel * t1*t1;
@@ -259,33 +274,50 @@ static void timeTrapezoid(float len,float vstart,float vend,float &t1,float &t2,
     t2 = t1;
     t3 = t1 +( -vend + sqrt( 2*accel*(len-brake_distance) + vend*vend ) ) / accel;
   }
+  
+#else  // TRAPEZOID
+
+  t3=len/maxvel;
+  t1=t3/3;
+  t2=t1*2;
+  
+#endif  // TRAPEZOID
+
 }
 
 
 //------------------------------------------------------------------------------
-static float interpolateTrapezoid(float p0,float p3,float t,float t1,float t2,float t3,float len) {
+static float interpolate(float p0,float p3,float t,float t1,float t2,float t3,float len) {
   if(t<=0) return p0;
-    
+
+#ifdef TRAPEZOID
+ 
   float s = (p3-p0)/len;
-   
+  
   if(t<t1) {
     float d1 = 0.5 * accel * t * t;
     return p0 + (d1)*s;
-  }
-  if(t<t2) {
+  } else if(t<t2) {
     float d1 = 0.5 * accel * t1 * t1;
     float d2 = maxvel * (t-t1);
     return p0 + (d1+d2)*s;
-  }
-  if(t<t3) {
+  } else if(t<t3) {
     float t4 = t-t2;
     float d1 = 0.5 * accel * t1 * t1;
-    float d2 = maxvel * (t-t1);
-    float d3 = 0.5 * accel * t4 * t4;
-    return p0 + (d1+d2-d3)*s;
+    float d2 = maxvel * (t2-t1);
+    float v2 = accel*t1;
+    float d3 = v2 * t4 - 0.5 * accel * t4 * t4;
+    return p0 + (d1+d2+d3)*s;
   }
   
   return p3;
+
+#else  // TRAPEZOID
+
+  return p0 + (p3-p0) *(t/t3);
+
+#endif  // TRAPEZOID
+
 }
 
 
@@ -293,22 +325,85 @@ static float interpolateTrapezoid(float p0,float p3,float t,float t1,float t2,fl
 // Turns the motors so that the real robot strings match our simulation.
 // len1 & len2 are the current string lengths.
 // nlen1 & nlen2 are the new string lengths.
-static void adjustStringLengths(float &len1,float &len2,float nlen1,float nlen2) {
-  // is the change in length > one step?
-  if(nlen1<=len1-THREADPERSTEP) {  // it is shorter.
-    m1.step(1,REEL_IN,STEP_MODE);
-    len1-=THREADPERSTEP;
-  } else if(nlen1>=len1+THREADPERSTEP) {  // it is longer.
-    m1.step(1,REEL_OUT,STEP_MODE);
-    len1+=THREADPERSTEP;
+static void adjustStringLengths(long nlen1,long nlen2) {
+  // is the change in length >= one step?
+  long steps=nlen1-laststep1;
+  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+  
+  // is the change in length >= one step?
+  steps=nlen2-laststep2;
+  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+  
+  laststep1=nlen1;
+  laststep2=nlen2;
+}
+
+
+//------------------------------------------------------------------------------
+static float test_count=0;
+
+static void jogStep() {
+  long nlen1;
+  long nlen2;
+
+  tick();
+  
+  // automatic slowdown when key is released.  
+  if(velx!=0 && accelx==0) {
+    if(abs(velx)<accel*dt) velx=0;
+    else if(velx<0)        velx+=accel*dt;
+    else                   vely-=accel*dt;
   }
-  // is the change in length > one step?
-  if(nlen2<=len2-THREADPERSTEP) {  // it is shorter.
-    m2.step(1,REEL_IN,STEP_MODE);
-    len2-=THREADPERSTEP;
-  } else if(nlen2>=len2+THREADPERSTEP) {  // it is longer.
-    m2.step(1,REEL_OUT,STEP_MODE);
-    len2+=THREADPERSTEP;
+  if(vely!=0 && accely==0) {
+    if(abs(vely)<accel*dt) vely=0;
+    else if(vely<0)        vely+=accel*dt;
+    else                   vely-=accel*dt;
+  }
+
+  if( velx!=0 || vely!=0 ) {
+    test_count+=dt;
+    float interval=0.25;
+    if(test_count>interval) {
+      Serial.print(velx);
+      Serial.print(",");
+      Serial.print(vely);
+      Serial.print("\t");
+      Serial.print(accelx);
+      Serial.print(",");
+      Serial.println(accely);
+      test_count-=interval;
+    }
+    
+    velx+=accelx*dt;
+    vely+=accely*dt;
+    float vtotal = sqrt(velx*velx+vely*vely);
+    if(vtotal>maxvel) {
+      float scale = maxvel/vtotal;
+      velx*=scale;
+      vely*=scale;
+    }
+    posx+=velx*dt;
+    posy+=vely*dt;
+  }
+  
+  IK(posx,posy,nlen1,nlen2);
+  adjustStringLengths(nlen1,nlen2);
+}
+
+
+//------------------------------------------------------------------------------
+// change the acceleration (for drive-by kb or joystick)
+static void jog(float x,float y) {
+  accelx=x*accel;
+  accely=y*accel;
+
+  float atotal = sqrt(accelx*accelx+accely*accely);
+  if(atotal>accel) {
+    float scale = accel/atotal;
+    accelx*=scale;
+    accely*=scale;
   }
 }
 
@@ -322,56 +417,70 @@ static void line(float x,float y) {
   float t1;
   float t2;
   float time;
-  float tsum = 0;
-  float len1,nlen1,nx;
-  float len2,nlen2,ny;
+  float tsum;
+  float nx,ny;
+  long nlen1,nlen2;
   char did_step;
 
   // get travel time
-  timeTrapezoid(len,0,0,t1,t2,time);
-   
-  IK(posx,posy,len1,len2);
-  
+  travelTime(len,0,0,t1,t2,time);
+
+  IK(x,y,nlen1,nlen2);
+    
 #ifdef VERBOSE
-  Serial.print("x=");       Serial.println(x);
-  Serial.print("y=");       Serial.println(y);
-  Serial.print("posx=");    Serial.println(posx);
-  Serial.print("posy=");    Serial.println(posy);
-  Serial.print("len1=");    Serial.println(len1);
-  Serial.print("len2=");    Serial.println(len2);
-  Serial.print("dx=");      Serial.println(dx);
-  Serial.print("dy=");      Serial.println(dy);
-  Serial.print("len=");     Serial.println(len);
-  Serial.print("maxvel=");  Serial.println(maxvel);
-  Serial.print("time=");    Serial.println(time);
+  Serial.print("x=");           Serial.println(x);
+  Serial.print("y=");           Serial.println(y);
+  Serial.print("posx=");        Serial.println(posx);
+  Serial.print("posy=");        Serial.println(posy);
+  Serial.print("start len1=");  Serial.println(laststep1);
+  Serial.print("start len2=");  Serial.println(laststep2);
+  Serial.print("end len1=");    Serial.println(nlen1);
+  Serial.print("end len2=");    Serial.println(nlen2);
+  Serial.print("dx=");          Serial.println(dx);
+  Serial.print("dy=");          Serial.println(dy);
+  Serial.print("len=");         Serial.println(len);
+  Serial.print("time=");        Serial.println(time);
 #endif
   
   tick();
   float tstart=t;
   
+  long cnt=0;
+  long a=micros();
+  
   do {
     tick();
     tsum = t-tstart;
+    if(tsum>time) tsum=time;
 
     // find where the plotter will be at tsum seconds
-    nx = interpolateTrapezoid(posx,x,tsum,t1,t2,time,len);
-    ny = interpolateTrapezoid(posy,y,tsum,t1,t2,time,len);
+    nx = interpolate(posx,x,tsum,t1,t2,time,len);
+    ny = interpolate(posy,y,tsum,t1,t2,time,len);
        
     // get the new string lengths
     IK(nx,ny,nlen1,nlen2);
-
-    adjustStringLengths(len1,len2,nlen1,nlen2);
+    adjustStringLengths(nlen1,nlen2);
 
 #ifdef VERBOSE
-    Serial.print(tsum);    Serial.print('\t');
-    Serial.print(nx);      Serial.print(',');
-    Serial.print(ny);      Serial.print('\t');
-    Serial.print(len1);    Serial.print(',');
-    Serial.print(len2);    Serial.print('\n');
+         if(tsum<t1  ) Serial.print("A\t");
+    else if(tsum<t2  ) Serial.print("B\t");
+    else if(tsum<time) Serial.print("C\t");
+    else               Serial.print("D\t");
+    Serial.print(tsum);       Serial.print('\t');
+    Serial.print(t_millis);   Serial.print('\t');
+    Serial.print(nx);         Serial.print('\t');
+    Serial.print(ny);         Serial.print('\t');
+    Serial.print(nlen1);      Serial.print('\t');
+    Serial.print(nlen2);      Serial.print('\t');
+    Serial.print(laststep1);  Serial.print('\t');
+    Serial.print(laststep2);  Serial.print('\n');
 #endif
-
+    ++cnt;
   } while(tsum<time);
 
+  long b=micros();
+  Serial.print((float)(b-a)/(float)cnt);
+  Serial.println(" microseconds/loop average");
   posx=x;
   posy=y;
 
@@ -421,12 +530,12 @@ static void arc(float cx,float cy,float x,float y,float dir) {
   // float len=theta*circ/(PI*2.0);
   // simplifies to
   float len = abs(theta) * radius;
-
+  
   // get travel time
   float t1;
   float t2;
   float time;
-  timeTrapezoid(len,0,0,t1,t2,time);
+  travelTime(len,0,0,t1,t2,time);
   
 #ifdef VERBOSE
   Serial.print("a1=");      Serial.println(angle1);
@@ -441,21 +550,21 @@ static void arc(float cx,float cy,float x,float y,float dir) {
   Serial.print("time=");    Serial.println(time);
 #endif
 
-  float len1,nlen1,nx;
-  float len2,nlen2,ny;
+  float nx,ny;
+  long nlen1,nlen2;
   char did_step;
   float tsum;
 
-  IK(posx,posy,len1,len2);
   tick();
   float tstart=t;
  
   do {
     tick();
     tsum=t-tstart;
+    if(tsum>time) tsum=time;
 
     // find where the plotter will be at tsum seconds
-    float angle3 = interpolateTrapezoid(angle1,angle2,tsum,t1,t2,time,len);
+    float angle3 = interpolate(angle1,angle2,tsum,t1,t2,time,len);
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
 
@@ -463,15 +572,17 @@ static void arc(float cx,float cy,float x,float y,float dir) {
 
     // get the new string lengths
     IK(nx,ny,nlen1,nlen2);
-
-    adjustStringLengths(len1,len2,nlen1,nlen2);
+    adjustStringLengths(nlen1,nlen2);
     
 #ifdef VERBOSE
+         if(tsum<t1  ) Serial.print("A\t");
+    else if(tsum<t2  ) Serial.print("B\t");
+    else if(tsum<time) Serial.print("C\t");
     Serial.print(tsum);    Serial.print('\t');
-    Serial.print(nx);      Serial.print(',');
+    Serial.print(nx);      Serial.print('\t');
     Serial.print(ny);      Serial.print('\t');
-    Serial.print(len1);    Serial.print(',');
-    Serial.print(len2);    Serial.print('\n');
+    Serial.print(nlen1);   Serial.print('\t');
+    Serial.print(nlen2);   Serial.print('\n');
 #endif
 
   } while(tsum < time);
@@ -688,10 +799,23 @@ static void testArcs() {
 
 
 //------------------------------------------------------------------------------
+static void testClock() {
+  for(int i=0;i<100;++i) {
+    tick();
+    Serial.print(t_millis);    Serial.print("\t");
+    Serial.print(t);           Serial.print("\t");
+    Serial.print(dt);          Serial.print("\n");
+    delay(25);
+  }
+}
+
+
+//------------------------------------------------------------------------------
 static void testKinematics(float x,float y) {
   Serial.println("-- TEST KINEMATICS --");
   teleport(x,y);
-  float a,b,xx,yy;
+  float xx,yy;
+  long a,b;
   IK(posx,posy,a,b);
   FK(a,b,xx,yy);
   Serial.print("x=");  Serial.print(x);
@@ -708,20 +832,47 @@ static void testFullCircle() {
   Serial.println("-- TEST FULL CIRCLE --");
 
   int i;
+  long a,b;
   
+  a=micros();
+  for(i=0;i<STEPS_PER_TURN;++i) {
+    m1.step(1,REEL_OUT,STEP_MODE);  // reel out
+  }
+  for(i=0;i<STEPS_PER_TURN;++i) {
+    m2.step(1,REEL_OUT,STEP_MODE);  // reel out
+  }
+  b=micros();
+  Serial.println((b-a)/STEPS_PER_TURN);
+
+  a=micros();
+  for(i=0;i<STEPS_PER_TURN;++i) {
+    m1.step(1,REEL_IN,STEP_MODE);  // reel out
+  }
+  for(i=0;i<STEPS_PER_TURN;++i) {
+    m2.step(1,REEL_IN,STEP_MODE);  // reel out
+  }
+  b=micros();
+  Serial.println((b-a)/STEPS_PER_TURN);
+  
+  a=micros();
   for(i=0;i<STEPS_PER_TURN;++i) {
     m1.step(1,REEL_OUT,STEP_MODE);  // reel out
     m2.step(1,REEL_OUT,STEP_MODE);  // reel out
   }
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m1.step(1,REEL_IN,STEP_MODE);   // reel in
-    m2.step(1,REEL_IN,STEP_MODE);   // reel in
+  b=micros();
+  Serial.println((b-a)/STEPS_PER_TURN);
+  a=micros();
+  for(i=0;i<STEPS_PER_TURN/2;++i) {
+    m1.step(2,REEL_IN,STEP_MODE);   // reel in
+    m2.step(2,REEL_IN,STEP_MODE);   // reel in
   }
+  b=micros();
+  Serial.println((b-a)/STEPS_PER_TURN);
 }
 
 
 //------------------------------------------------------------------------------
-static void testInterpolateTrapezoid() {
+static void testInterpolation() {
   Serial.println("-- TEST INTERPOLATE2 --");
   float start=0;
   float end=1;
@@ -729,9 +880,30 @@ static void testInterpolateTrapezoid() {
   float oldv=0,v;
   
   Serial.println("dist=1");
-  timeTrapezoid(end-start,0,0,t1,t2,t3);
+  travelTime(end-start,0,0,t1,t2,t3);
+  Serial.print("t1=");  Serial.println(t1);
+  Serial.print("t2=");  Serial.println(t2);
+  Serial.print("t3=");  Serial.println(t3);
   for(float t=0;t<t3;t+=0.1) {
-    v=interpolateTrapezoid(start,end,t,t1,t2,t3,end-start);
+    v=interpolate(start,end,t,t1,t2,t3,end-start);
+    if(t<t1) Serial.print("A\t");
+    else if(t<t2) Serial.print("B\t");
+    else if(t<t3) Serial.print("C\t");
+    Serial.print(v);
+    Serial.print("\t");
+    Serial.println(v-oldv);
+    oldv=v;
+  }
+
+  oldv=0;
+  Serial.println("dist=5");
+  end=5;
+  travelTime(end-start,0,0,t1,t2,t3);
+  Serial.print("t1=");  Serial.println(t1);
+  Serial.print("t2=");  Serial.println(t2);
+  Serial.print("t3=");  Serial.println(t3);
+  for(float t=0;t<t3;t+=0.1) {
+    v=interpolate(start,end,t,t1,t2,t3,end-start);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -744,9 +916,12 @@ static void testInterpolateTrapezoid() {
   oldv=0;
   Serial.println("dist=15");
   end=15;
-  timeTrapezoid(end-start,0,0,t1,t2,t3);
+  travelTime(end-start,0,0,t1,t2,t3);
+  Serial.print("t1=");  Serial.println(t1);
+  Serial.print("t2=");  Serial.println(t2);
+  Serial.print("t3=");  Serial.println(t3);
   for(float t=0;t<t3;t+=0.1) {
-    v=interpolateTrapezoid(start,end,t,t1,t2,t3,end-start);
+    v=interpolate(start,end,t,t1,t2,t3,end-start);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -878,6 +1053,7 @@ static void demo() {
 static void teleport(float x,float y) {
   posx=x;
   posy=y;
+  IK(posx,posy,laststep1,laststep2);
 }
 
 
@@ -944,15 +1120,16 @@ static void halftone(float size,float fill) {
 static void help() {
   Serial.println("== DRAWBOT - 2012 Feb 28 - dan@marginallyclever.com ==");
   Serial.println("All commands end with a semi-colon.");
-  Serial.println("help; - display this message");
-  Serial.println("where; - display current virtual coordinates");
-  Serial.println("limits; - display maximum distance plotter can move");
-  Serial.println("demo; - run a hardcoded script");
-  Serial.println("teleport [Xx.xx] [Yx.xx]; - move the virtual plotter.");
-  Serial.println("G00 [Xx.xx] [Yx.xx]; - draw line to x,y");
-  Serial.println("G01 [Xx.xx] [Yx.xx]; - draw line to x,y");
-  Serial.println("G02 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a clockwise arc around i,j to x,y.");
-  Serial.println("G03 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a counterclockwise arc around i,j to x,y.");
+  
+  Serial.println("HELP; - display this message");
+  Serial.println("WHERE; - display current virtual coordinates");
+  Serial.println("LIMITS; - display maximum distance plotter can move");
+  Serial.println("DEMO; - draw a test pattern");
+  Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
+  Serial.println("G00 [Xx.xx] [Yx.xx]; - draw line to X,Y");
+  Serial.println("G01 [Xx.xx] [Yx.xx]; - draw line to X,Y");
+  Serial.println("G02 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a clockwise arc around I,J to X,Y.");
+  Serial.println("G03 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a counterclockwise arc around I,J to X,Y.");
   Serial.println("Fx.xx; - set feed rate (max speed). Can be done on the same line as a G command.");
   Serial.println("Zx.xx; - set pen height.  Can be done on the same line as a G command.");
   Serial.print("> ");
@@ -982,6 +1159,9 @@ static void limits() {
   Serial.print(",");
   Serial.print(LIMYMAX);
   Serial.println(")");
+
+  Serial.print("F");  Serial.println(MAXVELOCITY);
+  Serial.print("A");  Serial.println(ACCELERATION);
 }
 
 
@@ -993,15 +1173,15 @@ static void limits() {
 //------------------------------------------------------------------------------
 static void processCommand() {
 #ifndef SMALL_FOOTPRINT
-  if(!strncmp(buffer,"help",4)) {
+  if(!strncmp(buffer,"HELP",4)) {
     help();
-  } else if(!strncmp(buffer,"where",5)) {
+  } else if(!strncmp(buffer,"WHERE",5)) {
     where();
-  } else if(!strncmp(buffer,"limits",6)) {
+  } else if(!strncmp(buffer,"LIMITS",6)) {
     limits();
-  } else if(!strncmp(buffer,"demo",4)) {
+  } else if(!strncmp(buffer,"DEMO",4)) {
     demo();
-  } else if(!strncmp(buffer,"teleport",8)) {
+  } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
     float yy=posy;
   
@@ -1009,8 +1189,8 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'x': case 'X': xx=atof(ptr+1);  break;
-      case 'y': case 'Y': yy=atof(ptr+1);  break;
+      case 'X': xx=atof(ptr+1);  break;
+      case 'Y': yy=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1023,10 +1203,8 @@ static void processCommand() {
     if(ptr<buffer+sofar) {
       maxvel=atof(ptr);
     }
-  } else if(!strncmp(buffer,"G01",3)
-         || !strncmp(buffer,"G00",3)) {
-    // several optional float parameters.
-    // then calls a method to do something with those parameters.
+  } else if(!strncmp(buffer,"G00",3) || !strncmp(buffer,"G01",3)) {
+    // line
     float xx=posx;
     float yy=posy;
     float zz=ps;
@@ -1036,10 +1214,10 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'x': case 'X': xx=atof(ptr+1);  break;
-      case 'y': case 'Y': yy=atof(ptr+1);  break;
-      case 'z': case 'Z': zz=atof(ptr+1);  break;
-      case 'f': case 'F': ff=atof(ptr+1);  break;
+      case 'X': xx=atof(ptr+1);  break;
+      case 'Y': yy=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1047,10 +1225,8 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(lineSafe(xx,yy));
-  } else if(!strncmp(buffer,"G02",3) 
-         || !strncmp(buffer,"G03",3)) {
-    // several optional float parameters.
-    // then calls a method to do something with those parameters.
+  } else if(!strncmp(buffer,"G02",3) || !strncmp(buffer,"G03",3)) {
+    // arc
     float xx=posx;
     float yy=posy;
     float zz=ps;
@@ -1063,12 +1239,12 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'i': case 'I': ii=atof(ptr+1);  break;
-      case 'j': case 'J': jj=atof(ptr+1);  break;
-      case 'f': case 'F': ff=atof(ptr+1);  break;
-      case 'x': case 'X': xx=atof(ptr+1);  break;
-      case 'y': case 'Y': yy=atof(ptr+1);  break;
-      case 'z': case 'Z': zz=atof(ptr+1);  break;
+      case 'I': ii=atof(ptr+1);  break;
+      case 'J': jj=atof(ptr+1);  break;
+      case 'X': xx=atof(ptr+1);  break;
+      case 'Y': yy=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1076,6 +1252,31 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
+  } else if(!strncmp(buffer,"J00",3)) {
+    // jog
+    float xx=0;
+    float yy=0;
+    float zz=ps;
+    float ff=maxvel;
+
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'X': xx=atof(ptr+1);  break;
+      case 'Y': yy=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': ff=atof(ptr+1);  break;
+      default: ptr=0; break;
+      }
+    }
+
+    maxvel=ff;
+    pen(zz);
+    jog(xx,yy);
+  } else {
+    Serial.print("Invalid command: ");
+    Serial.println(buffer);
   }
 }
 
@@ -1085,13 +1286,12 @@ void setup() {
   // start communications
   Serial.begin(BAUD);
   Serial.println("== HELLO WORLD ==");
-  Serial.print("maxvel=");  Serial.println(MAXVELOCITY);
-  Serial.print("accel =");  Serial.println(ACCELERATION);
+  limits();
   sofar=0;
 
   // set the stepper speed
-  m1.setSpeed(RPM);
-  m2.setSpeed(RPM);
+  m1.setSpeed(MAX_RPM);
+  m2.setSpeed(MAX_RPM);
   // servo should be on SER1, pin 10.
   s1.attach(10);
 
@@ -1100,11 +1300,12 @@ void setup() {
 //  loadspool();
 
   // test suite
+//  testClock();
 //  testKinematics( 0, 0);
 //  testKinematics( 5, 0);
 //  testKinematics( 0, 5);
 //  testKinematics(-5,-5);
-//  testInterpolateTrapezoid();
+//  testInterpolation();
 //  testFullCircle();
 //  testAcceleration();
 //  testMaxVel();
@@ -1115,8 +1316,9 @@ void setup() {
 #endif  // SMALL_FOOTPRINT
 
   // initialize the plotter position.
-  posx=0;
-  posy=0;
+  posx=velx=accelx=0;
+  posy=velx=accelx=0;
+  IK(posx,posy,laststep1,laststep2);
   pen(PEN_UP_ANGLE);
 }
 
@@ -1147,6 +1349,8 @@ void loop() {
     // echo completion
     Serial.print("> ");
   }
+  
+  jogStep();
 }
 
 
