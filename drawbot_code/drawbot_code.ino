@@ -33,6 +33,7 @@
 //------------------------------------------------------------------------------
 // Adafruit motor driver library
 #include <AFMotor.h>
+
 // Default servo library
 #include <Servo.h> 
 
@@ -1203,7 +1204,8 @@ static void processCommand() {
     if(ptr<buffer+sofar) {
       maxvel=atof(ptr);
     }
-  } else if(!strncmp(buffer,"G00",3) || !strncmp(buffer,"G01",3)) {
+  } else if(!strncmp(buffer,"G00",3) || !strncmp(buffer,"G01",3)
+         || !strncmp(buffer,"G0" ,2) || !strncmp(buffer,"G1" ,2) ) {
     // line
     float xx=posx;
     float yy=posy;
@@ -1225,7 +1227,8 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(lineSafe(xx,yy));
-  } else if(!strncmp(buffer,"G02",3) || !strncmp(buffer,"G03",3)) {
+  } else if(!strncmp(buffer,"G02",3) || !strncmp(buffer,"G03",3)
+         || !strncmp(buffer,"G2" ,2) || !strncmp(buffer,"G3" ,2)) {
     // arc
     float xx=posx;
     float yy=posy;
@@ -1233,7 +1236,7 @@ static void processCommand() {
     float ii=0;
     float jj=0;
     float ff=maxvel;
-    float dd= (!strncmp(buffer,"G02",3)) ? 1 : -1;
+    float dd= ((!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
