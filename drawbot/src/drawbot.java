@@ -298,16 +298,6 @@ public class drawbot extends JFrame implements KeyListener, ActionListener {
 			e.printStackTrace();
 		}
 
-		try {
-			out.close();
-			in.close();
-			inFile.close();
-		}
-		catch(IOException e) {
-			System.err.println("IO error:"+e.getMessage());
-			e.printStackTrace();
-		}
-
 		System.out.println("\n** FINISHED **");
 	}
 }

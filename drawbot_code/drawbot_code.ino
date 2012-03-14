@@ -441,13 +441,13 @@ static void line(float x,float y) {
   Serial.print("dy=");          Serial.println(dy);
   Serial.print("len=");         Serial.println(len);
   Serial.print("time=");        Serial.println(time);
+  long cnt=0;
+  long a=micros();
+  
 #endif
   
   tick();
   float tstart=t;
-  
-  long cnt=0;
-  long a=micros();
   
   do {
     tick();
@@ -475,17 +475,17 @@ static void line(float x,float y) {
     Serial.print(nlen2);      Serial.print('\t');
     Serial.print(laststep1);  Serial.print('\t');
     Serial.print(laststep2);  Serial.print('\n');
-#endif
     ++cnt;
+#endif
   } while(tsum<time);
 
-  long b=micros();
-  Serial.print((float)(b-a)/(float)cnt);
-  Serial.println(" microseconds/loop average");
   posx=x;
   posy=y;
 
 #ifdef VERBOSE  
+  long b=micros();
+  Serial.print((float)(b-a)/(float)cnt);
+  Serial.println(" microseconds/loop average");
   Serial.println("Done.");
 #endif
 }
@@ -1236,7 +1236,7 @@ static void processCommand() {
     float ii=0;
     float jj=0;
     float ff=maxvel;
-    float dd= ((!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
+    float dd= (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
