@@ -14,9 +14,8 @@ Drawbot is scalable to suit your wall size.
 
 *Setup*
 Picture the L(left) stepper and the R(right) stepper are at the ends of a line LR.  LR runs horizontally across the top of the rectangular drawing area that measures W*H.  Halfway between L & R is point P.  Halfway between P and the bottom of the drawing area is point O, which should be in the middle of the board. The computer thinks O is at (0,0), L is at (-W/2,H/2).  It thinks P is at (0,H/2).
-
+# Attach the shield to the Arduino. !https://github.com/i-make-robots/DrawBot/blob/master/wiring.jpg?raw=true(Drawbot Wiring Example)!
 # Stepper L is connected to M1 (red & green) and M2 (blue & yellow) on the Adafruit shield.  Stepper R is attached to M3 & M4 in the same way.  If your wire colors differ, see the FAQ.
-# Attach the shield to the Arduino.  <b>needs picture here</b>
 # Put the bobbins on the stepper shafts.  A small piece of tape around the stepper shafts will make a tight fit.
 # Attach the string to the bobbins.
 # Use loadSpool() in setup() to wind 5m of thread onto your bobbin.  You can alter this to load more or less depending on your needs.
