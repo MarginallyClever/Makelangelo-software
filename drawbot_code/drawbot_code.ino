@@ -57,10 +57,10 @@
 // Distance from center of the drawing area up to the line between the two 
 // steppers.  The plotter cannot physically reach this line - it would 
 // require infinite tensile strength.
-#define LIMYMIN         (-21.5)
+#define LIMYMAX         (21.5)
 
 // Distance from center to bottom of drawing area.
-#define LIMYMAX         (30.0)
+#define LIMYMIN         (-30.0)
 
 // distance from pen center to string ends
 #define PLOTX           (2.4)
@@ -226,7 +226,7 @@ static void pen(float pen_angle) {
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
-  float dy = y - PLOTY - LIMYMIN;
+  float dy = y - LIMYMAX - PLOTY;
   float dx = x - PLOTX - LIMXMIN;
   l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
   // find length to M2
@@ -249,7 +249,7 @@ static void FK(float l1, float l2,float &x,float &y) {
   // slow, uses trig
   float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
   x = cos(theta)*l1 + LIMXMIN + PLOTX;
-  y = sin(theta)*l1 + LIMYMIN + PLOTY;
+  y = sin(theta)*l1 + LIMYMAX - PLOTY;
 }
 
 
@@ -746,7 +746,7 @@ static void testArcs() {
   Serial.println(atan3(-1, 1)*180.0/PI);
   
   x=LIMXMAX*0.75;
-  y=LIMYMIN*0.50;
+  y=LIMYMAX*0.50;
 
   Serial.println("arcs inside limits, center inside limits (should not fail)");
   teleport(x,0);
@@ -764,39 +764,39 @@ static void testArcs() {
   error(canArc(0,0, x,0,ARC_CW));
 
   x=LIMXMAX*0.75;
-  y=LIMYMIN*0.50;
+  y=LIMYMAX*0.50;
   Serial.println("arcs outside limits, arc center outside limits (should fail)");
   teleport(x,y);
   error(canArc(x,0,-x,y,ARC_CW));
 
   // LIMXMAX boundary test
   x=LIMXMAX*0.75;
-  y=LIMYMIN*0.50;
+  y=LIMYMAX*0.50;
   Serial.println("CCW through LIMXMAX (should fail)");      teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
   Serial.println("CW avoids LIMXMAX (should not fail)");    teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
   Serial.println("CW through LIMXMAX (should fail)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
   Serial.println("CCW avoids LIMXMAX (should not fail)");   teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
   // LIMXMIN boundary test
   x=LIMXMIN*0.75;
-  y=LIMYMIN*0.50;
+  y=LIMYMAX*0.50;
   Serial.println("CW through LIMXMIN (should fail)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
   Serial.println("CCW avoids LIMXMIN (should not fail)");   teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
   Serial.println("CCW through LIMXMIN (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
   Serial.println("CW avoids LIMXMIN (should not fail)");    teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  // LIMYMAX boundary test
-  x=LIMXMAX*0.50;
-  y=LIMYMAX*0.75;
-  Serial.println("CW through LIMYMAX (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMAX (should not fail)");   teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CCW through LIMYMAX (should fail)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMAX (should not fail)");    teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
   // LIMYMIN boundary test
   x=LIMXMAX*0.50;
   y=LIMYMIN*0.75;
-  Serial.println("CCW through LIMYMIN (should fail)");      teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMIN (should not fail)");    teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CW through LIMYMIN (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMIN (should not fail)");   teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
+  Serial.println("CW through LIMYMIN (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
+  Serial.println("CCW avoids LIMYMIN (should not fail)");   teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
+  Serial.println("CCW through LIMYMIN (should fail)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
+  Serial.println("CW avoids LIMYMIN (should not fail)");    teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
+  // LIMYMAX boundary test
+  x=LIMXMAX*0.50;
+  y=LIMYMAX*0.75;
+  Serial.println("CCW through LIMYMAX (should fail)");      teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
+  Serial.println("CW avoids LIMYMAX (should not fail)");    teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
+  Serial.println("CW through LIMYMAX (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
+  Serial.println("CCW avoids LIMYMAX (should not fail)");   teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
 }
 
 
@@ -1207,9 +1207,9 @@ static void processCommand() {
     if(ptr<buffer+sofar) {
       maxvel=atof(ptr);
     }
-  } else if(!strncmp(buffer,"G90")) {
+  } else if(!strncmp(buffer,"G90",3)) {
     absolute_mode=1;
-  } else if(!strncmp(buffer,"G91")) {
+  } else if(!strncmp(buffer,"G91",3)) {
     absolute_mode=0;  
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
@@ -1251,7 +1251,7 @@ static void processCommand() {
          || !strncmp(buffer,"G2 " ,3) || !strncmp(buffer,"G3 " ,3)) {
     // arc
     float xx, yy, zz, ff=maxvel;
-    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
+    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
     float ii = 0;
     float jj = 0;
     
@@ -1292,7 +1292,7 @@ static void processCommand() {
     // jog
     float xx=0;
     float yy=0;
-    float zz=ps;
+    float zz=posz;
     float ff=maxvel;
 
     char *ptr=buffer;
@@ -1411,3 +1411,5 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
+
+
