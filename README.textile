@@ -1,6 +1,6 @@
 h1. DrawBot - A mural drawing robot for students
-Drawbot is intended to teach students about programming, physics, trigonometry, and electronics in a fun, goal-oriented way.
-Drawbot is scalable to suit your wall size.
+
+Drawbot is intended to teach students about programming, physics, trigonometry, and electronics in a fun, goal-oriented way.  Drawbot is scalable: our test models have ranged from 30cm^2 to 300cm^2.
 
 *The hardware*
 * An Arduino Mega 2560
@@ -31,16 +31,20 @@ Picture the L(left) stepper and the R(right) stepper are at the ends of a line L
 
 h1. FAQ
 h3. My code won't upload.
+
 Assuming you don't have a programming error, check that Tools->Board = Arduino Mega 2560 or Mega ADK and that Tools->Serial Port is on the correct COM port.
 
 h3. I open the serial interface but there's only garbled text.
+
 Change the baud rate to 57600.
 
 h3. My steppers make a grinding sound and/or don't move right.
+
 a) There is one or more loose or incorrect connection(s) between the Adafruit shield and the steppers.  Screw terminals and Molex connectors are often the culprit.
 b) Crimping wires together is not as good as soldering.
 
 h3. I run "demo" and my picture is small on top, big on the bottom.
+
 Your motors are turning the wrong way and your picture is upside down.
 
 #define REEL_IN         FORWARD
@@ -54,12 +58,15 @@ should be reversed
 like so.
 
 h3. I run "demo" and my pictures are tall & thin / short & fat
+
 LIMYMIN is not quite right.  Remeasure distance PO.
 
 h3. I run "demo" and my pictures are skewed to one side.
+
 The pen must start at O.  Even a little to one side and the simulation will not match reality.
 
 h3. I tried "line x5" and the plotter moved to the left.
+
 Motor 1 is wired to M3M4 and motor 2 is wired to M1M2.  They're backwards.
 
 #define M1_PIN          (2)
@@ -68,6 +75,7 @@ Motor 1 is wired to M3M4 and motor 2 is wired to M1M2.  They're backwards.
 should be reversed.  See the example in the previous question.
 
 h3. Where can I find more info about DrawBot?
+
 "Marginally Clever":http://www.marginallyclever.com/
 
 Thanks for reading!
