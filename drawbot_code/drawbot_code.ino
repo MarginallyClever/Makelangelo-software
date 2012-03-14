@@ -136,6 +136,7 @@ Servo s1;
 // plotter position.
 static float posx, velx, accelx;
 static float posy, vely, accely;
+static float posz;  // pen state
 
 // motor position
 static long laststep1, laststep2;
@@ -144,8 +145,8 @@ static long laststep1, laststep2;
 static float accel=ACCELERATION;
 static float maxvel=MAXVELOCITY;
 
-// pen state
-static int ps;
+// absolute or incremental programming mode?
+static char absolute_mode=1;
 
 // time values
 static long  t_millis;
@@ -214,10 +215,10 @@ static int outsideLimits(float x,float y) {
 //------------------------------------------------------------------------------
 // Change pen state.
 static void pen(float pen_angle) {
-  ps=pen_angle;
-  if(pen_angle<PEN_DOWN_ANGLE) ps=PEN_DOWN_ANGLE;
-  if(pen_angle>PEN_UP_ANGLE  ) ps=PEN_UP_ANGLE;
-  s1.write(ps);
+  posz=pen_angle;
+  if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
+  if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
+  s1.write(posz);
 }
 
 
@@ -1133,6 +1134,8 @@ static void help() {
   Serial.println("G03 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a counterclockwise arc around I,J to X,Y.");
   Serial.println("Fx.xx; - set feed rate (max speed). Can be done on the same line as a G command.");
   Serial.println("Zx.xx; - set pen height.  Can be done on the same line as a G command.");
+  Serial.println("G90 - set absolute coordinates mode (default)");
+  Serial.println("G91 - set relative coordinates mode");
   Serial.print("> ");
 }
 
@@ -1144,7 +1147,7 @@ static void where() {
   Serial.print(",");
   Serial.print(posy);
   Serial.print(",");
-  Serial.print(ps);
+  Serial.print(posz);
   Serial.println(")");
 }
 
@@ -1204,13 +1207,24 @@ static void processCommand() {
     if(ptr<buffer+sofar) {
       maxvel=atof(ptr);
     }
-  } else if(!strncmp(buffer,"G00",3) || !strncmp(buffer,"G01",3)
-         || !strncmp(buffer,"G0" ,2) || !strncmp(buffer,"G1" ,2) ) {
+  } else if(!strncmp(buffer,"G90")) {
+    absolute_mode=1;
+  } else if(!strncmp(buffer,"G91")) {
+    absolute_mode=0;  
+  } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
+         || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
-    float xx=posx;
-    float yy=posy;
-    float zz=ps;
-    float ff=maxvel;
+    float xx, yy, zz, ff=maxvel;
+    
+    if(absolute_mode==1) {
+      xx=posx;
+      yy=posy;
+      zz=posz;
+    } else {
+      xx=0;
+      yy=0;
+      zz=0;
+    }
   
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1224,20 +1238,33 @@ static void processCommand() {
       }
     }
  
+    if(absolute_mode==0) {
+      xx+=posx;
+      yy+=posy;
+      zz+=posz;
+    }
+    
     maxvel=ff;
     pen(zz);
     error(lineSafe(xx,yy));
-  } else if(!strncmp(buffer,"G02",3) || !strncmp(buffer,"G03",3)
-         || !strncmp(buffer,"G2" ,2) || !strncmp(buffer,"G3" ,2)) {
+  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G03 ",4)
+         || !strncmp(buffer,"G2 " ,3) || !strncmp(buffer,"G3 " ,3)) {
     // arc
-    float xx=posx;
-    float yy=posy;
-    float zz=ps;
-    float ii=0;
-    float jj=0;
-    float ff=maxvel;
-    float dd= (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
-
+    float xx, yy, zz, ff=maxvel;
+    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? 1 : -1;
+    float ii = 0;
+    float jj = 0;
+    
+    if(absolute_mode==1) {
+      xx=posx;
+      yy=posy;
+      zz=posz;
+    } else {
+      xx=0;
+      yy=0;
+      zz=0;
+    }
+    
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
@@ -1250,6 +1277,12 @@ static void processCommand() {
       case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
+    }
+ 
+    if(absolute_mode==0) {
+      xx+=posx;
+      yy+=posy;
+      zz+=posz;
     }
 
     maxvel=ff;
