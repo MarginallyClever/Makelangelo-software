@@ -81,10 +81,9 @@
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
-#define MAX_RPM         (2000.0)
-
-// What is the default speed?
-#define RPM             (200.0)
+#define MAX_RATED_RPM   (3000.0)
+#define MAX_RPM         (250.0)
+#define DEFAULT_RPM     (200.0)
 
 // how fast can the plotter accelerate?
 #define ACCELERATION    (5.00)  // cm/s/s
@@ -101,14 +100,20 @@
 // servo angles for pen control
 #define PEN_UP_ANGLE    (90)
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
+#define PEN_DELAY       (150)  // in ms
 
+// calculate some numbers to help us find maxvel
 #define SPOOL_CIRC      (SPOOL_DIAMETER*PI)  // circumference
 #define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
+
 // if the plotter were hanging from a single stepper and the stepper turned at
 // max RPM, how fast would the plotter move up/down?  All other motions are 
-// cos(theta)*MAXVELOCITY, where theta is the angle between the desired
+// cos(theta)*MAX_VEL, where theta is the angle between the desired
 // direction of motion and a line from the plotter to the stepper.
-#define MAXVELOCITY     (RPM*SPOOL_CIRC/60.0)  // cm/s
+#define MAX_VEL         (MAX_RPM*SPOOL_CIRC/60.0)  // cm/s
+
+// max vel is only theoretical.  We have to run slower for accuracy.
+#define DEFAULT_VEL     (DEFAULT_RPM*SPOOL_CIRC/60.0)  // cm/s
 
 // limits plotter can move.
 #define LIMXMAX         ( X_SEPARATION*0.5)
@@ -128,10 +133,10 @@
 // VARIABLES
 //------------------------------------------------------------------------------
 // Initialize Adafruit stepper controller
-AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
-AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
+static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
+static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 
-Servo s1;
+static Servo s1;
 
 // plotter position.
 static float posx, velx, accelx;
@@ -143,7 +148,7 @@ static long laststep1, laststep2;
 
 // acceleration.
 static float accel=ACCELERATION;
-static float maxvel=MAXVELOCITY;
+static float maxvel=DEFAULT_VEL;
 
 // absolute or incremental programming mode?
 static char absolute_mode=1;
@@ -157,8 +162,8 @@ static float dt;  // since last tick
 static float tool_diameter=0.05;  
 
 // Serial comm reception
-char buffer[MAX_BUF];  // Serial buffer
-int sofar;             // Serial buffer progress
+static char buffer[MAX_BUF];  // Serial buffer
+static int sofar;             // Serial buffer progress
 
 
 
@@ -219,6 +224,7 @@ static void pen(float pen_angle) {
   if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
   if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
   s1.write(posz);
+  delay(PEN_DELAY);
 }
 
 
@@ -960,7 +966,7 @@ static void testAcceleration() {
 static void testMaxVel() {
   Serial.println("-- TEST MAX VELOCITY --");
   Serial.print("ACCEL=");  Serial.println(ACCELERATION);
-  Serial.print("MAXVELOCITY=");  Serial.println(MAXVELOCITY);
+  Serial.print("MAX_VEL=");  Serial.println(MAX_VEL);
 
   float i;
   float a=10;
@@ -969,7 +975,7 @@ static void testMaxVel() {
 
   line(b,0);
 
-  for(i=5;i<MAXVELOCITY;i+=1) {
+  for(i=5;i<MAX_VEL;i+=1) {
     delay(2000);
     maxvel=i;
     Serial.println(maxvel);
@@ -1164,8 +1170,8 @@ static void limits() {
   Serial.print(LIMYMAX);
   Serial.println(")");
 
-  Serial.print("F");  Serial.println(MAXVELOCITY);
-  Serial.print("A");  Serial.println(ACCELERATION);
+  Serial.print("F");  Serial.println(maxvel);
+  Serial.print("A");  Serial.println(accel);
 }
 
 
@@ -1326,8 +1332,8 @@ void setup() {
   sofar=0;
 
   // set the stepper speed
-  m1.setSpeed(MAX_RPM);
-  m2.setSpeed(MAX_RPM);
+  m1.setSpeed(MAX_RATED_RPM);
+  m2.setSpeed(MAX_RATED_RPM);
   // servo should be on SER1, pin 10.
   s1.attach(10);
 
@@ -1411,5 +1417,3 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
-
-

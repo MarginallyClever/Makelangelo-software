@@ -18,18 +18,19 @@ Picture the L(left) stepper and the R(right) stepper are at the ends of a line L
 # Stepper L is connected to M1 (red & green) and M2 (blue & yellow) on the Adafruit shield.  Stepper R is attached to M3 & M4 in the same way.  If your wire colors differ, see the FAQ.
 # Put the bobbins on the stepper shafts.  A small piece of tape around the stepper shafts will make a tight fit.
 # Attach the string to the bobbins.
-# Use loadSpool() in setup() to wind 5m of thread onto your bobbin.  You can alter this to load more or less depending on your needs.
 # Attach the plotter to the other end of the strings.  A slip knot will be easy to remove and never let go at the wrong moment.
-# Gently turn the bobbins until the plotter is halfway between the steppers and halfway between the top and bottom of the area you will draw in.  I recommend you only do this with the power off.
-# Measure the distance (cm) from the center of stepper shaft 1 to stepper shaft 2.  This will be the X_SEPARATION value at the top of your code.
-# Measure the distance (cm) from the plotter center up to the line between the shafts.  This will be your LIMYMIN.
-# Measure the distance (cm) from the plotter center down to the bottom of the drawing area.  This will be your LIMYMAX.
+# Center the plotter: gently turn the bobbins until the plotter is halfway between the steppers and halfway between the top and bottom of the area you will draw in.  I recommend you only do this with the power off.  Later versions will be self-centering.
+# Measure the distance (cm) R-L.  This will be the X_SEPARATION value at the top of the arduino_code.ino file.
+# Measure the distance (cm) P-O.  This will be the LIMYMAX value.
+# Measure the distance (cm) LIMYMAX-H.  This will be the LIMYMIN value.
 # Plug in your Arduino.  Plug in your Adafruit 12v power supply.
 # Use the Arduino programming environment to update your configuration.  Look for the following lines: X_SEPARATION, LIMYMIN, and LIMYMAX.
-# Upload your changes to the Mega.  Open the Arduino Serial Interface.  You should see "== HELLO WORLD ==" followed by instructions.
+# Use loadSpool() in setup() to wind 5m of thread onto your bobbin.  You can alter this to load more or less depending on your needs.
+# Upload your changes to the Mega.  Open the Arduino Serial Interface.  You should see "== HELLO WORLD ==" followed by the minimum - maximum limits, the feed rate, and the acceleration, followed by instructions.
 # Follow the on-screen prompts.
 
 h1. FAQ
+
 h3. My code won't upload.
 
 Assuming you don't have a programming error, check that Tools->Board = Arduino Mega 2560 or Mega ADK and that Tools->Serial Port is on the correct COM port.
@@ -72,7 +73,7 @@ Motor 1 is wired to M3M4 and motor 2 is wired to M1M2.  They're backwards.
 #define M1_PIN          (2)
 #define M2_PIN          (1)
 
-should be reversed.  See the example in the previous question.
+should be reversed.
 
 h3. Where can I find more info about DrawBot?
 
