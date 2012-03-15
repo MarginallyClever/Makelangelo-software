@@ -37,6 +37,10 @@
 // Default servo library
 #include <Servo.h> 
 
+// Timer interrupt libraries
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
 
 
 //------------------------------------------------------------------------------
@@ -128,6 +132,11 @@
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
+// timer stuff
+#define INIT_TIMER_COUNT (6)
+#define RESET_TIMER2     (TCNT2 = INIT_TIMER_COUNT)
+
+
 
 //------------------------------------------------------------------------------
 // VARIABLES
@@ -170,6 +179,42 @@ static int sofar;             // Serial buffer progress
 //------------------------------------------------------------------------------
 // METHODS
 //------------------------------------------------------------------------------
+
+
+#ifdef TIMER
+//------------------------------------------------------------------------------
+// Aruino runs at 16 Mhz, so we have 1000 Overflows per second...
+// 1/ ((16000000 / 64) / 256) = 1 / 1000
+//------------------------------------------------------------------------------
+static int int_counter=0;
+static int second=0;
+static int old_second=0;
+
+ISR(TIMER2_OVF_vect) {
+  RESET_TIMER2;
+  int_counter += 1;
+  if (int_counter == 1000) {
+    second+=1;
+    int_counter = 0;
+  }
+}
+
+
+//------------------------------------------------------------------------------
+void setup_timer() {
+  //Timer2 Settings: Timer Prescaler /64,
+  TCCR2 |= ((1<<CS22);
+  TCCR2 &= ~((1<<CS21) | (1<<CS20));
+  // Use normal mode
+  TCCR2 &= ~((1<<WGM21) | (1<<WGM20));
+  // Use internal clock - external clock not used in Arduino
+  ASSR &= ~(1<<AS2);
+  TIMSK |= (1<<TOIE2);
+  TIMSK &= ~(1<<OCIE2);	  //Timer2 Overflow Interrupt Enable
+  RESET_TIMER2;
+  sei();
+}
+#endif  // TIMER
 
 
 
@@ -350,11 +395,12 @@ static void adjustStringLengths(long nlen1,long nlen2) {
 
 
 //------------------------------------------------------------------------------
-static float test_count=0;
+#ifdef VERBOSE
+static float jog_test_count=0;
+#endif
 
 static void jogStep() {
-  long nlen1;
-  long nlen2;
+  long nlen1, nlen2;
 
   tick();
   
@@ -362,7 +408,7 @@ static void jogStep() {
   if(velx!=0 && accelx==0) {
     if(abs(velx)<accel*dt) velx=0;
     else if(velx<0)        velx+=accel*dt;
-    else                   vely-=accel*dt;
+    else                   velx-=accel*dt;
   }
   if(vely!=0 && accely==0) {
     if(abs(vely)<accel*dt) vely=0;
@@ -370,10 +416,22 @@ static void jogStep() {
     else                   vely-=accel*dt;
   }
 
+  velx+=accelx*dt;
+  vely+=accely*dt;
+  float vtotal = sqrt(velx*velx+vely*vely);
+  if(vtotal>maxvel) {
+    float scale = maxvel/vtotal;
+    velx*=scale;
+    vely*=scale;
+  }
+  posx+=velx*dt;
+  posy+=vely*dt;
+  
+#ifdef VERBOSE
   if( velx!=0 || vely!=0 ) {
-    test_count+=dt;
+    jog_test_count+=dt;
     float interval=0.25;
-    if(test_count>interval) {
+    if(jog_test_count>interval) {
       Serial.print(velx);
       Serial.print(",");
       Serial.print(vely);
@@ -381,20 +439,10 @@ static void jogStep() {
       Serial.print(accelx);
       Serial.print(",");
       Serial.println(accely);
-      test_count-=interval;
+      jog_test_count-=interval;
     }
-    
-    velx+=accelx*dt;
-    vely+=accely*dt;
-    float vtotal = sqrt(velx*velx+vely*vely);
-    if(vtotal>maxvel) {
-      float scale = maxvel/vtotal;
-      velx*=scale;
-      vely*=scale;
-    }
-    posx+=velx*dt;
-    posy+=vely*dt;
   }
+#endif
   
   IK(posx,posy,nlen1,nlen2);
   adjustStringLengths(nlen1,nlen2);
@@ -450,7 +498,6 @@ static void line(float x,float y) {
   Serial.print("time=");        Serial.println(time);
   long cnt=0;
   long a=micros();
-  
 #endif
   
   tick();
@@ -1362,6 +1409,10 @@ void setup() {
   posy=velx=accelx=0;
   IK(posx,posy,laststep1,laststep2);
   pen(PEN_UP_ANGLE);
+  
+#ifdef TIMER
+  setup_timer();
+#endif  // TIMER
 }
 
 
@@ -1393,6 +1444,13 @@ void loop() {
   }
   
   jogStep();
+
+#ifdef TIMER
+  if(old_second!=second) {
+    Serial.println(second);
+    old_second=second;
+  }
+#endif  // TIMER
 }
 
 
@@ -1417,3 +1475,4 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
+
