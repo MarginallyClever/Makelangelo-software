@@ -3,14 +3,13 @@ h1. DrawBot - A mural drawing robot for students
 Drawbot is intended to teach students about programming, physics, trigonometry, and electronics in a fun, goal-oriented way.  Drawbot is scalable: our test models have ranged from 30cm^2 to 300cm^2.
 
 *The hardware*
-* An Arduino Mega 2560
-* one USB cable to connect the Mega to your PC
-* one Adafruit stepper motor shield
-* two NEMA17 stepper motors
-* one 12 volt, 2 amp power supply
-* two sewing machine bobbins
+* An Arduino Duemilanova 328 or better ($30)
+* one USB cable to connect the Arduino to your PC ($1)
+* one Adafruit stepper motor shield ($20)
+* two NEMA17 stepper motors ($30)
+* one 12 volt, 2 amp power supply ($15)
+* two sewing machine bobbins ($1)
 * >=10m of sewing thread.  I used nylon and most anything will work.
-* one 9g servo
 
 *Setup*
 Picture the L(left) stepper and the R(right) stepper are at the ends of a line LR.  LR runs horizontally across the top of the rectangular drawing area that measures W*H.  Halfway between L & R is point P.  Halfway between P and the bottom of the drawing area is point O, which should be in the middle of the board. The computer thinks O is at (0,0), L is at (-W/2,H/2).  It thinks P is at (0,H/2).

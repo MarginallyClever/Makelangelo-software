@@ -452,15 +452,18 @@ static void jogStep() {
 //------------------------------------------------------------------------------
 // change the acceleration (for drive-by kb or joystick)
 static void jog(float x,float y) {
-  accelx=x*accel;
-  accely=y*accel;
+  float ax=x*accel;
+  float ay=y*accel;
 
-  float atotal = sqrt(accelx*accelx+accely*accely);
+  float atotal = sqrt(ax*ax+ay*ay);
   if(atotal>accel) {
     float scale = accel/atotal;
-    accelx*=scale;
-    accely*=scale;
+    ax*=scale;
+    ay*=scale;
   }
+
+  accelx=ax;
+  accely=ay;
 }
 
 
