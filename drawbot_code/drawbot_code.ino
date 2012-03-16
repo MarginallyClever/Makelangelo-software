@@ -52,8 +52,11 @@
 // Uncomment this line to compile for smaller boards
 //#define SMALL_FOOTPRINT (1)
 
-// Uncomment this line to use a more sophisticated motion profile
+// Uncomment this line to use a more sophisticated motion profile.
 #define TRAPEZOID       (1)
+
+// Uncomment this line to use a more sophisticated timing system.
+//#define NEW_TIMER
 
 // Distance between stepper shaft centers.
 #define X_SEPARATION    (28.0)
@@ -180,8 +183,8 @@ static int sofar;             // Serial buffer progress
 // METHODS
 //------------------------------------------------------------------------------
 
-
-#ifdef TIMER
+/*
+#ifdef NEW_TIMER
 //------------------------------------------------------------------------------
 // Aruino runs at 16 Mhz, so we have 1000 Overflows per second...
 // 1/ ((16000000 / 64) / 256) = 1 / 1000
@@ -214,8 +217,8 @@ void setup_timer() {
   RESET_TIMER2;
   sei();
 }
-#endif  // TIMER
-
+#endif  // NEW_TIMER
+*/
 
 
 //------------------------------------------------------------------------------
@@ -1178,20 +1181,13 @@ static void halftone(float size,float fill) {
 static void help() {
   Serial.println("== DRAWBOT - 2012 Feb 28 - dan@marginallyclever.com ==");
   Serial.println("All commands end with a semi-colon.");
-  
   Serial.println("HELP; - display this message");
   Serial.println("WHERE; - display current virtual coordinates");
   Serial.println("LIMITS; - display maximum distance plotter can move");
   Serial.println("DEMO; - draw a test pattern");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
-  Serial.println("G00 [Xx.xx] [Yx.xx]; - draw line to X,Y");
-  Serial.println("G01 [Xx.xx] [Yx.xx]; - draw line to X,Y");
-  Serial.println("G02 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a clockwise arc around I,J to X,Y.");
-  Serial.println("G03 Ix.xx Jx.xx [Xx.xx] [Yx.xx]; - draw a counterclockwise arc around I,J to X,Y.");
-  Serial.println("Fx.xx; - set feed rate (max speed). Can be done on the same line as a G command.");
-  Serial.println("Zx.xx; - set pen height.  Can be done on the same line as a G command.");
-  Serial.println("G90 - set absolute coordinates mode (default)");
-  Serial.println("G91 - set relative coordinates mode");
+  Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
+  Serial.println("G01-G04,G20,G21,G90,G91");
   Serial.print("> ");
 }
 
@@ -1344,6 +1340,22 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
+  } else if(!strncmp(buffer,"G04",3) || !strncmp(buffer,"G4",2)) {
+    // dwell
+    long xx=0;
+
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'X': 
+      case 'U': 
+      case 'P': xx=atoi(ptr+1);  break;
+      default: ptr=0; break;
+      }
+    }
+
+    delay(xx);
   } else if(!strncmp(buffer,"J00",3)) {
     // jog
     float xx=0;
@@ -1413,7 +1425,7 @@ void setup() {
   IK(posx,posy,laststep1,laststep2);
   pen(PEN_UP_ANGLE);
   
-#ifdef TIMER
+#ifdef NEW_TIMER
   setup_timer();
 #endif  // TIMER
 }

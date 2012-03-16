@@ -9,16 +9,13 @@
  * @version 1.00 2012/2/28
  */
 import java.io.*;
-//import java.util.*;
-//import java.awt.Container;
-
+import java.util.*;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
 
 public class drawbot {
-	static BufferedReader commandLine;
 	static BufferedReader inFile;
 	static CommPortIdentifier portIdentifier;
 	static CommPort commPort;
@@ -39,11 +36,12 @@ public class drawbot {
 		catch(Exception e) {
 			System.err.println("Ports could not be identified:"+e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		if ( portIdentifier.isCurrentlyOwned() ) {
     	    System.out.println("Error: Port is currently in use");
-    	    return;
+			System.exit(1);
 		}
 
 		// open the port
@@ -53,11 +51,12 @@ public class drawbot {
 		catch(Exception e) {
 			System.err.println("Port could not be opened:"+e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 	    if ( ( commPort instanceof SerialPort ) == false ) {
 			System.out.println("Error: Only serial ports are handled by this example.");
-			return;
+			System.exit(1);
 		}
 
 		// set the port parameters (like baud rate)
@@ -68,6 +67,7 @@ public class drawbot {
 		catch(Exception e) {
 			System.err.println("Port could not be configured:"+e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		try {
@@ -77,41 +77,40 @@ public class drawbot {
 		catch(Exception e) {
 			System.err.println("Streams could not be opened:"+e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
 
 	public static void main(String[] args) {
 	    // start listening to the command line
-	    commandLine = new BufferedReader(new InputStreamReader(System.in));
+		Console cons = System.console();
+		if(cons==null) {
+			System.err.println("Console could not be created?");
+			System.exit(1);
+		}
+		
+	    // read filename
+		String fileName = cons.readLine("Enter the filename: ");
 
-		// read filename
-	    String fileName="";
 		try {
-			System.out.println("Enter the filename:");
-			fileName = commandLine.readLine();
 			inFile =  new BufferedReader(new FileReader(fileName));
 			System.out.println("File "+fileName+" opened...");
 		}
 		catch (IOException e){
 			System.err.println("File operation failed:"+e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 	    // Read in the port name
-	    try {
-			System.out.println("Enter the port:");
-			portName = commandLine.readLine();
-	    }
-	    catch (IOException e){
-			System.err.println("User input read failed:"+e.getMessage());
-			e.printStackTrace();
-	    }
+		portName = cons.readLine("Enter the port: ");
 
 	    OpenPort();
 
 		String line,line2,line3="";
 		boolean eof_reached=false;
+		boolean ready_to_send=false;
 		byte[] buffer = new byte[1024];
 		int len = -1;
 
@@ -126,19 +125,39 @@ public class drawbot {
 					line3+=line2;
 					// wait for the cue ("> ") to send another command
 					if(line3.lastIndexOf(cue)!=-1) {
-						line3="";
-						// are there any more commands?
-						line=inFile.readLine();
-						if(line==null) {
-							// no more lines to read
-							eof_reached=true;
+						ready_to_send=true;
+					}
+				}
+				
+				if(ready_to_send==true) {
+					// are there any more commands?
+					line=inFile.readLine();
+					if(line==null) {
+						// no more lines to read
+						eof_reached=true;
+					} else {
+						String [] tokens = line.split("\\s");
+						if(Arrays.asList(tokens).contains("M06") || 
+						   Arrays.asList(tokens).contains("M6")) {
+							// tool change
+							for(int i=0;i<tokens.length;++i) {
+								if(tokens[i].startsWith("T")) {
+									cons.readLine("Please change to tool #"+tokens[i].substring(1)+" and press enter. ");
+								}
+							}
+							// ready_to_send will still be true here.  We didn't talk to the arduino.
+						} else if(tokens[0]=="M02" || tokens[0]=="M2") {
+							// end of program
+							break;
 						} else {
 							// send the command to the robot
 							line+=eol;
 							System.out.println(line);
 							out.write(line.getBytes());
+							ready_to_send=false;
 						}
 					}
+					
 				}
 			} while(eof_reached!=true);
 		}
@@ -148,5 +167,6 @@ public class drawbot {
 		}
 
 		System.out.println("\n** FINISHED **");
+		System.exit(0);
 	}
 }
