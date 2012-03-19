@@ -9,13 +9,14 @@
  * @version 1.00 2012/2/28
  */
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
 
-public class drawbot {
+public class Drawbot {
 	static BufferedReader inFile;
 	static CommPortIdentifier portIdentifier;
 	static CommPort commPort;
@@ -28,7 +29,7 @@ public class drawbot {
 	static final long serialVersionUID=1;
 
 	
-	public static void OpenPort() {
+	public void OpenPort() {
 		// find the port
 		try {
 			portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
@@ -81,8 +82,27 @@ public class drawbot {
 		}
 	}
 
-
-	public static void main(String[] args) {
+	
+	public int countLines(String filename) throws IOException {
+	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        while ((readChars = is.read(c)) != -1) {
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n')
+	                    ++count;
+	            }
+	        }
+	        return count;
+	    } finally {
+	        is.close();
+	    }
+	}
+	
+	
+	public Drawbot() {
 	    // start listening to the command line
 		Console cons = System.console();
 		if(cons==null) {
@@ -92,10 +112,12 @@ public class drawbot {
 		
 	    // read filename
 		String fileName = cons.readLine("Enter the filename: ");
+		float numLines=1;
 
 		try {
 			inFile =  new BufferedReader(new FileReader(fileName));
 			System.out.println("File "+fileName+" opened...");
+			numLines=countLines(fileName);
 		}
 		catch (IOException e){
 			System.err.println("File operation failed:"+e.getMessage());
@@ -113,6 +135,9 @@ public class drawbot {
 		boolean ready_to_send=false;
 		byte[] buffer = new byte[1024];
 		int len = -1;
+		int numErrors=0;
+		float linesRead=0;
+		DecimalFormat fmt = new DecimalFormat("#.##");
 
 		try {
 			// as long as there are lines in the file to read
@@ -123,19 +148,26 @@ public class drawbot {
 					line2 = new String(buffer,0,len);
 					System.out.print(line2);
 					line3+=line2;
+					if(line3.contains("error")) {
+						++numErrors;
+					}
 					// wait for the cue ("> ") to send another command
 					if(line3.lastIndexOf(cue)!=-1) {
 						ready_to_send=true;
+						line3="";
 					}
 				}
 				
 				if(ready_to_send==true) {
 					// are there any more commands?
 					line=inFile.readLine();
+					++linesRead;
+					float percentage = linesRead*100.0f/numLines;
 					if(line==null) {
 						// no more lines to read
 						eof_reached=true;
 					} else {
+						line.trim();
 						String [] tokens = line.split("\\s");
 						if(Arrays.asList(tokens).contains("M06") || 
 						   Arrays.asList(tokens).contains("M6")) {
@@ -145,16 +177,31 @@ public class drawbot {
 									cons.readLine("Please change to tool #"+tokens[i].substring(1)+" and press enter. ");
 								}
 							}
-							// ready_to_send will still be true here.  We didn't talk to the arduino.
+							// still ready_to_send
 						} else if(tokens[0]=="M02" || tokens[0]=="M2") {
 							// end of program
+							System.out.println("("+fmt.format(percentage)+"%) "+line);
 							break;
+						} else if(tokens[0].startsWith("M")) {
+							// ignore
+							System.out.println("("+fmt.format(percentage)+"%) "+line+" ignored.");
 						} else {
+ 							int index=line.indexOf('(');
+							if(index!=-1) {
+								String comment=line.substring(index+1,line.lastIndexOf(')'));
+								line=line.substring(0,index).trim();
+								System.out.println("\n* "+comment);
+								if(line.length()==0) continue;  // still ready_to_send
+							}
 							// send the command to the robot
-							line+=eol;
-							System.out.println(line);
-							out.write(line.getBytes());
 							ready_to_send=false;
+							line+=eol;
+							System.out.println("("+fmt.format(percentage)+"%) "+line);
+							out.write(line.getBytes());
+							//try {
+							//	Thread.sleep(50);
+							//}
+							//catch(InterruptedException e) {}
 						}
 					}
 					
@@ -167,6 +214,12 @@ public class drawbot {
 		}
 
 		System.out.println("\n** FINISHED **");
+		if(numErrors>0) System.out.println(numErrors+" errors.");
 		System.exit(0);
+	}
+
+	
+	public static void main(String[] args) {
+		Drawbot robot = new Drawbot();
 	}
 }

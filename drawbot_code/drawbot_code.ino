@@ -674,10 +674,10 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
   Serial.print("=");   Serial.println(angle3*180.0/PI);
 #endif
 
-  if(dir==ARC_CW) {
+  if(dir==ARC_CCW) {
     if(angle1<angle2) angle1+=PI*2;
 #ifdef VERBOSE 
-  Serial.print("CW");
+  Serial.print("CCW");
   Serial.print(angle1*180.0/PI);  Serial.print(" < ");
   Serial.print(angle3*180.0/PI);  Serial.print(" < ");
   Serial.print(angle2*180.0/PI);  Serial.println("?");
@@ -686,7 +686,7 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
   } else {
     if(angle2<angle1) angle2+=PI*2;
 #ifdef VERBOSE 
-  Serial.print("CCW");
+  Serial.print("CW");
   Serial.print(angle2*180.0/PI);  Serial.print(" > ");
   Serial.print(angle3*180.0/PI);  Serial.print(" > ");
   Serial.print(angle1*180.0/PI);  Serial.println("?");
@@ -719,7 +719,6 @@ static int canArc(float cx,float cy,float x,float y,float dir) {
   if( abs(r1-r2) > 0.001 ) {
     Serial.print("r1=");  Serial.println(r1);
     Serial.print("r2=");  Serial.println(r2);
-
     return 2;  // radii don't match
   }
   
