@@ -220,6 +220,6 @@ public class Drawbot {
 
 	
 	public static void main(String[] args) {
-		Drawbot robot = new Drawbot();
+		new Drawbot();
 	}
 }

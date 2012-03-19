@@ -1,1 +1,1 @@
-java.exe -cp ./classes/;./RXTXcomm.jar drawbot
+java.exe -cp ./classes/;./RXTXcomm.jar Drawbot

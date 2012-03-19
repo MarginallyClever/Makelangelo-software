@@ -151,27 +151,27 @@ static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 static Servo s1;
 
 // plotter position.
-static float posx, velx, accelx;
-static float posy, vely, accely;
-static float posz;  // pen state
+static double posx, velx, accelx;
+static double posy, vely, accely;
+static double posz;  // pen state
 
 // motor position
 static long laststep1, laststep2;
 
-// acceleration.
-static float accel=ACCELERATION;
-static float maxvel=DEFAULT_VEL;
+// speeds, feeds, and delta-vs.
+static double accel=ACCELERATION;
+static double maxvel=DEFAULT_VEL;
 
-// absolute or incremental programming mode?
-static char absolute_mode=1;
+static char absolute_mode=1;  // absolute or incremental programming mode?
+static double mode_scale=1;    // mm or inches?
 
 // time values
 static long  t_millis;
-static float t;   // since board power on
-static float dt;  // since last tick
+static double t;   // since board power on
+static double dt;  // since last tick
 
 // Diameter of line made by plotter
-static float tool_diameter=0.05;  
+static double tool_diameter=0.05;  
 
 // Serial comm reception
 static char buffer[MAX_BUF];  // Serial buffer
@@ -238,15 +238,15 @@ static void tick() {
 
   t_millis=nt_millis;
 
-  dt=(float)dt_millis*0.001;  // time since last tick, in seconds
-  t=(float)nt_millis*0.001;
+  dt=(double)dt_millis*0.001;  // time since last tick, in seconds
+  t=(double)nt_millis*0.001;
 }
 
 
 //------------------------------------------------------------------------------
 // returns angle of dy/dx as a value from 0...2PI
-static float atan3(float dy,float dx) {
-  float a=atan2(dy,dx);
+static double atan3(double dy,double dx) {
+  double a=atan2(dy,dx);
   if(a<0) a=(PI*2.0)+a;
   return a;
 }
@@ -256,7 +256,7 @@ static float atan3(float dy,float dx) {
 //------------------------------------------------------------------------------
 // returns 0 if inside limits
 // returns non-zero if outside limits.
-static int outsideLimits(float x,float y) {
+static int outsideLimits(double x,double y) {
   return ((x<LIMXMIN)<<0)
         |((x>LIMXMAX)<<1)
         |((y<LIMYMIN)<<2)
@@ -267,7 +267,7 @@ static int outsideLimits(float x,float y) {
 
 //------------------------------------------------------------------------------
 // Change pen state.
-static void pen(float pen_angle) {
+static void pen(double pen_angle) {
   posz=pen_angle;
   if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
   if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
@@ -278,10 +278,10 @@ static void pen(float pen_angle) {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-static void IK(float x, float y, long &l1, long &l2) {
+static void IK(double x, double y, long &l1, long &l2) {
   // find length to M1
-  float dy = y - LIMYMAX - PLOTY;
-  float dx = x - PLOTX - LIMXMIN;
+  double dy = y - LIMYMAX - PLOTY;
+  double dx = x - PLOTX - LIMXMIN;
   l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
   // find length to M2
   dx = LIMXMAX - (x + PLOTX);
@@ -295,35 +295,35 @@ static void IK(float x, float y, long &l1, long &l2) {
 // theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P
 // where P is the plotter position
-static void FK(float l1, float l2,float &x,float &y) {
-  float a=l1 * THREADPERSTEP;
-  float b=X_SEPARATION - PLOTX*2;
-  float c=l2 * THREADPERSTEP;
+static void FK(double l1, double l2,double &x,double &y) {
+  double a=l1 * THREADPERSTEP;
+  double b=X_SEPARATION - PLOTX*2;
+  double c=l2 * THREADPERSTEP;
   
   // slow, uses trig
-  float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
+  double theta = acos((a*a+b*b-c*c)/(2.0*a*b));
   x = cos(theta)*l1 + LIMXMIN + PLOTX;
   y = sin(theta)*l1 + LIMYMAX - PLOTY;
 }
 
 
 //------------------------------------------------------------------------------
-static void travelTime(float len,float vstart,float vend,float &t1,float &t2,float &t3) {
+static void travelTime(double len,double vstart,double vend,double &t1,double &t2,double &t3) {
   
 #ifdef TRAPEZOID
 
   t1 = (maxvel-vstart) / accel;
   t2 = (maxvel-vend) / accel;
-  float d1 = vstart * t1 + 0.5 * accel * t1*t1;
-  float d2 = vend * t2 + 0.5 * accel * t2*t2;
-  float a = d1+d2;
+  double d1 = vstart * t1 + 0.5 * accel * t1*t1;
+  double d2 = vend * t2 + 0.5 * accel * t2*t2;
+  double a = d1+d2;
   
   if(len>a) {
     t3 = t1+t2 + (len-a) / maxvel;
     t2 = t3-t2;
   } else {
     // http://wikipedia.org/wiki/Classical_mechanics#1-Dimensional_Kinematics
-    float brake_distance=(2*accel*len-vstart*vstart+vend*vend) / (4*accel);
+    double brake_distance=(2*accel*len-vstart*vstart+vend*vend) / (4*accel);
     // and we also know d=v0*t + att/2
     // so 
     t1 = ( -vstart + sqrt( 2*accel*brake_distance + vstart*vstart ) ) / accel;
@@ -343,26 +343,26 @@ static void travelTime(float len,float vstart,float vend,float &t1,float &t2,flo
 
 
 //------------------------------------------------------------------------------
-static float interpolate(float p0,float p3,float t,float t1,float t2,float t3,float len) {
+static double interpolate(double p0,double p3,double t,double t1,double t2,double t3,double len) {
   if(t<=0) return p0;
 
 #ifdef TRAPEZOID
  
-  float s = (p3-p0)/len;
+  double s = (p3-p0)/len;
   
   if(t<t1) {
-    float d1 = 0.5 * accel * t * t;
+    double d1 = 0.5 * accel * t * t;
     return p0 + (d1)*s;
   } else if(t<t2) {
-    float d1 = 0.5 * accel * t1 * t1;
-    float d2 = maxvel * (t-t1);
+    double d1 = 0.5 * accel * t1 * t1;
+    double d2 = maxvel * (t-t1);
     return p0 + (d1+d2)*s;
   } else if(t<t3) {
-    float t4 = t-t2;
-    float d1 = 0.5 * accel * t1 * t1;
-    float d2 = maxvel * (t2-t1);
-    float v2 = accel*t1;
-    float d3 = v2 * t4 - 0.5 * accel * t4 * t4;
+    double t4 = t-t2;
+    double d1 = 0.5 * accel * t1 * t1;
+    double d2 = maxvel * (t2-t1);
+    double v2 = accel*t1;
+    double d3 = v2 * t4 - 0.5 * accel * t4 * t4;
     return p0 + (d1+d2+d3)*s;
   }
   
@@ -399,7 +399,7 @@ static void adjustStringLengths(long nlen1,long nlen2) {
 
 //------------------------------------------------------------------------------
 #ifdef VERBOSE
-static float jog_test_count=0;
+static double jog_test_count=0;
 #endif
 
 static void jogStep() {
@@ -421,9 +421,9 @@ static void jogStep() {
 
   velx+=accelx*dt;
   vely+=accely*dt;
-  float vtotal = sqrt(velx*velx+vely*vely);
+  double vtotal = sqrt(velx*velx+vely*vely);
   if(vtotal>maxvel) {
-    float scale = maxvel/vtotal;
+    double scale = maxvel/vtotal;
     velx*=scale;
     vely*=scale;
   }
@@ -433,7 +433,7 @@ static void jogStep() {
 #ifdef VERBOSE
   if( velx!=0 || vely!=0 ) {
     jog_test_count+=dt;
-    float interval=0.25;
+    double interval=0.25;
     if(jog_test_count>interval) {
       Serial.print(velx);
       Serial.print(",");
@@ -454,13 +454,13 @@ static void jogStep() {
 
 //------------------------------------------------------------------------------
 // change the acceleration (for drive-by kb or joystick)
-static void jog(float x,float y) {
-  float ax=x*accel;
-  float ay=y*accel;
+static void jog(double x,double y) {
+  double ax=x*accel;
+  double ay=y*accel;
 
-  float atotal = sqrt(ax*ax+ay*ay);
+  double atotal = sqrt(ax*ax+ay*ay);
   if(atotal>accel) {
-    float scale = accel/atotal;
+    double scale = accel/atotal;
     ax*=scale;
     ay*=scale;
   }
@@ -472,15 +472,15 @@ static void jog(float x,float y) {
 
 //------------------------------------------------------------------------------
 // This method assumes the limits have already been checked.
-static void line(float x,float y) {
-  float dx = x - posx;  // delta
-  float dy = y - posy;
-  float len = sqrt(dx*dx+dy*dy);
-  float t1;
-  float t2;
-  float time;
-  float tsum;
-  float nx,ny;
+static void line(double x,double y) {
+  double dx = x - posx;  // delta
+  double dy = y - posy;
+  double len = sqrt(dx*dx+dy*dy);
+  double t1;
+  double t2;
+  double time;
+  double tsum;
+  double nx,ny;
   long nlen1,nlen2;
   char did_step;
 
@@ -507,7 +507,7 @@ static void line(float x,float y) {
 #endif
   
   tick();
-  float tstart=t;
+  double tstart=t;
   
   do {
     tick();
@@ -544,7 +544,7 @@ static void line(float x,float y) {
 
 #ifdef VERBOSE  
   long b=micros();
-  Serial.print((float)(b-a)/(float)cnt);
+  Serial.print((double)(b-a)/(double)cnt);
   Serial.println(" microseconds/loop average");
   Serial.println("Done.");
 #endif
@@ -553,7 +553,7 @@ static void line(float x,float y) {
 
 //------------------------------------------------------------------------------
 // checks against the robot limits before attempting to move
-static int lineSafe(float x,float y) {
+static int lineSafe(double x,double y) {
 #ifndef SMALL_FOOTPRINT
   if(outsideLimits(x,y)) return 1;
 #endif
@@ -570,16 +570,16 @@ static int lineSafe(float x,float y) {
 // cx/cy - center of circle
 // x/y - end position
 // dir - ARC_CW or ARC_CCW to control direction of arc
-static void arc(float cx,float cy,float x,float y,float dir) {
+static void arc(double cx,double cy,double x,double y,double dir) {
   // get radius
-  float dx = posx - cx;
-  float dy = posy - cy;
-  float radius=sqrt(dx*dx+dy*dy);
+  double dx = posx - cx;
+  double dy = posy - cy;
+  double radius=sqrt(dx*dx+dy*dy);
 
   // find angle of arc (sweep)
-  float angle1=atan3(dy,dx);
-  float angle2=atan3(y-cy,x-cx);
-  float theta=angle2-angle1;
+  double angle1=atan3(dy,dx);
+  double angle2=atan3(y-cy,x-cx);
+  double theta=angle2-angle1;
   
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
@@ -587,15 +587,15 @@ static void arc(float cx,float cy,float x,float y,float dir) {
   theta=angle2-angle1;
   
   // get length of arc
-  // float circ=PI*2.0*radius;
-  // float len=theta*circ/(PI*2.0);
+  // double circ=PI*2.0*radius;
+  // double len=theta*circ/(PI*2.0);
   // simplifies to
-  float len = abs(theta) * radius;
+  double len = abs(theta) * radius;
   
   // get travel time
-  float t1;
-  float t2;
-  float time;
+  double t1;
+  double t2;
+  double time;
   travelTime(len,0,0,t1,t2,time);
   
 #ifdef VERBOSE
@@ -611,13 +611,13 @@ static void arc(float cx,float cy,float x,float y,float dir) {
   Serial.print("time=");    Serial.println(time);
 #endif
 
-  float nx,ny;
+  double nx,ny;
   long nlen1,nlen2;
   char did_step;
-  float tsum;
+  double tsum;
 
   tick();
-  float tstart=t;
+  double tstart=t;
  
   do {
     tick();
@@ -625,7 +625,7 @@ static void arc(float cx,float cy,float x,float y,float dir) {
     if(tsum>time) tsum=time;
 
     // find where the plotter will be at tsum seconds
-    float angle3 = interpolate(angle1,angle2,tsum,t1,t2,time,len);
+    double angle3 = interpolate(angle1,angle2,tsum,t1,t2,time,len);
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
 
@@ -665,8 +665,8 @@ static void arc(float cx,float cy,float x,float y,float dir) {
 //------------------------------------------------------------------------------
 // is the point (dx,dy) in the arc segment subtended by angle1,angle2?
 // return 0 if it is not.
-static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
-  float angle3=atan3(-dy,dx);  // atan2 expects +y to be up, so flip the sign
+static int pointInArc(double dx,double dy,double angle1,double angle2,double dir) {
+  double angle3=atan3(-dy,dx);  // atan2 expects +y to be up, so flip the sign
   
 #ifdef VERBOSE 
   Serial.print("C:");  Serial.print(dx);
@@ -674,10 +674,10 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
   Serial.print("=");   Serial.println(angle3*180.0/PI);
 #endif
 
-  if(dir==ARC_CCW) {
+  if(dir==ARC_CW) {
     if(angle1<angle2) angle1+=PI*2;
 #ifdef VERBOSE 
-  Serial.print("CCW");
+  Serial.print("CW");
   Serial.print(angle1*180.0/PI);  Serial.print(" < ");
   Serial.print(angle3*180.0/PI);  Serial.print(" < ");
   Serial.print(angle2*180.0/PI);  Serial.println("?");
@@ -686,7 +686,7 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
   } else {
     if(angle2<angle1) angle2+=PI*2;
 #ifdef VERBOSE 
-  Serial.print("CW");
+  Serial.print("CCW");
   Serial.print(angle2*180.0/PI);  Serial.print(" > ");
   Serial.print(angle3*180.0/PI);  Serial.print(" > ");
   Serial.print(angle1*180.0/PI);  Serial.println("?");
@@ -701,20 +701,15 @@ static int pointInArc(float dx,float dy,float angle1,float angle2,float dir) {
 //------------------------------------------------------------------------------
 // ...checks start & end radius match
 // ...checks against the envelope limits
-static int canArc(float cx,float cy,float x,float y,float dir) {
-#ifdef VERBOSE  
-  limits();
-  Serial.print("end=");  Serial.print(x);
-  Serial.print(",");     Serial.println(y);
-#endif
+static int canArc(double cx,double cy,double x,double y,double dir) {
   if(outsideLimits(x,y)) return 1;
 
-  float a=x-cx;
-  float b=y-cy;
-  float c=posx-cx;
-  float d=posy-cy;
-  float r1=sqrt(a*a+b*b);
-  float r2=sqrt(c*c+d*d);
+  double a=x-cx;
+  double b=y-cy;
+  double c=posx-cx;
+  double d=posy-cy;
+  double r1=sqrt(a*a+b*b);
+  double r2=sqrt(c*c+d*d);
   
   if( abs(r1-r2) > 0.001 ) {
     Serial.print("r1=");  Serial.println(r1);
@@ -722,8 +717,8 @@ static int canArc(float cx,float cy,float x,float y,float dir) {
     return 2;  // radii don't match
   }
   
-  float angle1=atan3(d,c);
-  float angle2=atan3(b,a);
+  double angle1=atan3(d,c);
+  double angle2=atan3(b,a);
 
 #ifdef VERBOSE
   Serial.print("A:");  Serial.print(c);
@@ -737,29 +732,29 @@ static int canArc(float cx,float cy,float x,float y,float dir) {
 
   if(cx+r1>LIMXMAX) {
     // find the two points of intersection, see if they are inside the arc
-    float dx=LIMXMAX-cx;
-    float dy=sqrt(r1*r1-dx*dx);
+    double dx=LIMXMAX-cx;
+    double dy=sqrt(r1*r1-dx*dx);
     if(pointInArc(dx, dy,angle1,angle2,dir)) return 3;
     if(pointInArc(dx,-dy,angle1,angle2,dir)) return 4;
   }
   if(cx-r1<LIMXMIN) {
     // find the two points of intersection, see if they are inside the arc
-    float dx=LIMXMIN-cx;
-    float dy=sqrt(r1*r1-dx*dx);
+    double dx=LIMXMIN-cx;
+    double dy=sqrt(r1*r1-dx*dx);
     if(pointInArc(dx, dy,angle1,angle2,dir)) return 5;
     if(pointInArc(dx,-dy,angle1,angle2,dir)) return 6;
   }
   if(cy+r1>LIMYMAX) {
     // find the two points of intersection, see if they are inside the arc
-    float dy=LIMYMAX-cy;
-    float dx=sqrt(r1*r1-dy*dy);
+    double dy=LIMYMAX-cy;
+    double dx=sqrt(r1*r1-dy*dy);
     if(pointInArc( dx,dy,angle1,angle2,dir)) return 7;
     if(pointInArc(-dx,dy,angle1,angle2,dir)) return 8;
   }
   if(cy-r1<LIMYMIN) {
     // find the two points of intersection, see if they are inside the arc
-    float dy=LIMYMIN-cy;
-    float dx=sqrt(r1*r1-dy*dy);
+    double dy=LIMYMIN-cy;
+    double dx=sqrt(r1*r1-dy*dy);
     if(pointInArc( dx,dy,angle1,angle2,dir)) return 9;
     if(pointInArc(-dx,dy,angle1,angle2,dir)) return 10;
   }
@@ -777,7 +772,7 @@ static int canArc(float cx,float cy,float x,float y,float dir) {
 // before attempting to move...
 // ...checks start & end radius match
 // ...checks against the envelope limits
-static int arcSafe(float cx,float cy,float x,float y,float dir) {
+static int arcSafe(double cx,double cy,double x,double y,double dir) {
 #ifndef SMALL_FOOTPRINT
   int r=canArc(cx,cy,x,y,dir);
   if(r!=0) return r;
@@ -796,7 +791,7 @@ static int arcSafe(float cx,float cy,float x,float y,float dir) {
 //------------------------------------------------------------------------------
 static void testArcs() {
   int r;
-  float x,y;
+  double x,y;
   
   Serial.println(atan3( 1, 1)*180.0/PI);
   Serial.println(atan3( 1,-1)*180.0/PI);
@@ -806,7 +801,7 @@ static void testArcs() {
   x=LIMXMAX*0.75;
   y=LIMYMAX*0.50;
 
-  Serial.println("arcs inside limits, center inside limits (should not fail)");
+  Serial.println("arcs inside limits, center inside limits (should pass)");    
   teleport(x,0);
   error(canArc(0,0,-x,0,ARC_CCW));
   error(canArc(0,0, x,0,ARC_CCW));
@@ -831,30 +826,30 @@ static void testArcs() {
   x=LIMXMAX*0.75;
   y=LIMYMAX*0.50;
   Serial.println("CCW through LIMXMAX (should fail)");      teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
-  Serial.println("CW avoids LIMXMAX (should not fail)");    teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
+  Serial.println("CW avoids LIMXMAX (should pass)");        teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
   Serial.println("CW through LIMXMAX (should fail)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  Serial.println("CCW avoids LIMXMAX (should not fail)");   teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
+  Serial.println("CCW avoids LIMXMAX (should pass)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
   // LIMXMIN boundary test
   x=LIMXMIN*0.75;
   y=LIMYMAX*0.50;
   Serial.println("CW through LIMXMIN (should fail)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
-  Serial.println("CCW avoids LIMXMIN (should not fail)");   teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
+  Serial.println("CCW avoids LIMXMIN (should pass)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
   Serial.println("CCW through LIMXMIN (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
-  Serial.println("CW avoids LIMXMIN (should not fail)");    teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
+  Serial.println("CW avoids LIMXMIN (should pass)");        teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
   // LIMYMIN boundary test
   x=LIMXMAX*0.50;
   y=LIMYMIN*0.75;
   Serial.println("CW through LIMYMIN (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMIN (should not fail)");   teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
+  Serial.println("CCW avoids LIMYMIN (should pass)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
   Serial.println("CCW through LIMYMIN (should fail)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMIN (should not fail)");    teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
+  Serial.println("CW avoids LIMYMIN (should pass)");        teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
   // LIMYMAX boundary test
   x=LIMXMAX*0.50;
   y=LIMYMAX*0.75;
   Serial.println("CCW through LIMYMAX (should fail)");      teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMAX (should not fail)");    teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
+  Serial.println("CW avoids LIMYMAX (should pass)");        teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
   Serial.println("CW through LIMYMAX (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMAX (should not fail)");   teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
+  Serial.println("CCW avoids LIMYMAX (should pass)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
 }
 
 
@@ -871,10 +866,10 @@ static void testClock() {
 
 
 //------------------------------------------------------------------------------
-static void testKinematics(float x,float y) {
+static void testKinematics(double x,double y) {
   Serial.println("-- TEST KINEMATICS --");
   teleport(x,y);
-  float xx,yy;
+  double xx,yy;
   long a,b;
   IK(posx,posy,a,b);
   FK(a,b,xx,yy);
@@ -934,17 +929,17 @@ static void testFullCircle() {
 //------------------------------------------------------------------------------
 static void testInterpolation() {
   Serial.println("-- TEST INTERPOLATE2 --");
-  float start=0;
-  float end=1;
-  float t1,t2,t3;
-  float oldv=0,v;
+  double start=0;
+  double end=1;
+  double t1,t2,t3;
+  double oldv=0,v;
   
   Serial.println("dist=1");
   travelTime(end-start,0,0,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
-  for(float t=0;t<t3;t+=0.1) {
+  for(double t=0;t<t3;t+=0.1) {
     v=interpolate(start,end,t,t1,t2,t3,end-start);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
@@ -962,7 +957,7 @@ static void testInterpolation() {
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
-  for(float t=0;t<t3;t+=0.1) {
+  for(double t=0;t<t3;t+=0.1) {
     v=interpolate(start,end,t,t1,t2,t3,end-start);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
@@ -980,7 +975,7 @@ static void testInterpolation() {
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
-  for(float t=0;t<t3;t+=0.1) {
+  for(double t=0;t<t3;t+=0.1) {
     v=interpolate(start,end,t,t1,t2,t3,end-start);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
@@ -998,10 +993,10 @@ static void testAcceleration() {
   Serial.println("-- TEST ACCELERATION --");
   Serial.print("maxvel=");  Serial.println(maxvel);
 
-  float i;
-  float a=10;
-  float b=0;
-  float c;
+  double i;
+  double a=10;
+  double b=0;
+  double c;
   for(i=3;i<maxvel;i+=0.5) {
     delay(2000);
     accel=i;
@@ -1020,10 +1015,10 @@ static void testMaxVel() {
   Serial.print("ACCEL=");  Serial.println(ACCELERATION);
   Serial.print("MAX_VEL=");  Serial.println(MAX_VEL);
 
-  float i;
-  float a=10;
-  float b=-10;
-  float c;
+  double i;
+  double a=10;
+  double b=-10;
+  double c;
 
   line(b,0);
 
@@ -1043,8 +1038,8 @@ static void testMaxVel() {
 //------------------------------------------------------------------------------
 // loads 5m onto a spool.
 static void loadspools() {
-  float len=500.0;
-  float amnt=len/THREADPERSTEP;
+  double len=500.0;
+  double amnt=len/THREADPERSTEP;
   Serial.print("== LOAD ");
   Serial.print(len);
   Serial.print(" ==");
@@ -1097,8 +1092,8 @@ static void demo() {
   int i;
   for(i=0;i<12;++i) {
     Serial.print("> H 1, ");
-    Serial.println((float)i/11.0);
-    halftone(1,(float)i/11.0);
+    Serial.println((double)i/11.0);
+    halftone(1,(double)i/11.0);
   }
 
   // return to origin
@@ -1110,7 +1105,7 @@ static void demo() {
 //------------------------------------------------------------------------------
 // instantly move the virtual plotter position
 // does not validate if the move is valid
-static void teleport(float x,float y) {
+static void teleport(double x,double y) {
   posx=x;
   posy=y;
   IK(posx,posy,laststep1,laststep2);
@@ -1120,7 +1115,7 @@ static void teleport(float x,float y) {
 //------------------------------------------------------------------------------
 // instantly move the virtual plotter position
 // checks against the robot limits before attempting to move
-static int teleportSafe(float x,float y) {
+static int teleportSafe(double x,double y) {
   if(outsideLimits(x,y)) return 1;
   
   teleport(x,y);
@@ -1137,11 +1132,11 @@ static int teleportSafe(float x,float y) {
 //
 // plotter will travel left to right filling area from (x1,y1-size/2) to
 // (x1+size,y1+size/2) with zigzags.
-static void halftone(float size,float fill) {
-  float ymin=posy-(size*0.5);
-  float ymax=posy+(size*0.5);
+static void halftone(double size,double fill) {
+  double ymin=posy-(size*0.5);
+  double ymax=posy+(size*0.5);
   
-  float max_lines = size / tool_diameter;
+  double max_lines = size / tool_diameter;
   int infill = floor( max_lines * fill );
 
 #ifdef VERBOSE
@@ -1152,17 +1147,17 @@ static void halftone(float size,float fill) {
 #endif
 
   // Save starting location because line() changes posx,posy!
-  float ox=posx;
-  float oy=posy;
+  double ox=posx;
+  double oy=posy;
   
   if(infill>1) {
-    float step = size / (float)(infill);
+    double step = size / (double)(infill);
 #ifdef VERBOSE
     Serial.print("step=");          Serial.println(step);
 #endif
     
-    float x2=ox;
-    float y2=oy;
+    double x2=ox;
+    double y2=oy;
     
     for( int i=0; i<infill; ++i ) {
       x2 += step;
@@ -1237,11 +1232,11 @@ static void processCommand() {
   } else if(!strncmp(buffer,"DEMO",4)) {
     demo();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
-    float xx=posx;
-    float yy=posy;
+    double xx=posx;
+    double yy=posy;
   
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(*ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'X': xx=atof(ptr+1);  break;
@@ -1265,7 +1260,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
-    float xx, yy, zz, ff=maxvel;
+    double xx, yy, zz, ff=maxvel;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1281,10 +1276,10 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'X': xx=atof(ptr+1);  break;
-      case 'Y': yy=atof(ptr+1);  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'X': xx=atof(ptr+1)*mode_scale;  break;
+      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
+      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1)*mode_scale;  break;
       default: ptr=0; break;
       }
     }
@@ -1298,13 +1293,13 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(lineSafe(xx,yy));
-  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G03 ",4)
-         || !strncmp(buffer,"G2 " ,3) || !strncmp(buffer,"G3 " ,3)) {
+  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
+         || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
-    float xx, yy, zz, ff=maxvel;
-    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
-    float ii = 0;
-    float jj = 0;
+    double xx, yy, zz, ff=maxvel;
+    double dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
+    double ii = 0;
+    double jj = 0;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1320,12 +1315,12 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'I': ii=atof(ptr+1);  break;
-      case 'J': jj=atof(ptr+1);  break;
-      case 'X': xx=atof(ptr+1);  break;
-      case 'Y': yy=atof(ptr+1);  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'I': ii=atof(ptr+1)*mode_scale;  break;
+      case 'J': jj=atof(ptr+1)*mode_scale;  break;
+      case 'X': xx=atof(ptr+1)*mode_scale;  break;
+      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
+      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1)*mode_scale;  break;
       default: ptr=0; break;
       }
     }
@@ -1339,7 +1334,7 @@ static void processCommand() {
     maxvel=ff;
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
-  } else if(!strncmp(buffer,"G04",3) || !strncmp(buffer,"G4",2)) {
+  } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
     // dwell
     long xx=0;
 
@@ -1355,21 +1350,21 @@ static void processCommand() {
     }
 
     delay(xx);
-  } else if(!strncmp(buffer,"J00",3)) {
+  } else if(!strncmp(buffer,"J00 ",4)) {
     // jog
-    float xx=0;
-    float yy=0;
-    float zz=posz;
-    float ff=maxvel;
+    double xx=0;
+    double yy=0;
+    double zz=posz;
+    double ff=maxvel;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'X': xx=atof(ptr+1);  break;
-      case 'Y': yy=atof(ptr+1);  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'X': xx=atof(ptr+1)*mode_scale;  break;
+      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
+      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1)*mode_scale;  break;
       default: ptr=0; break;
       }
     }
@@ -1378,8 +1373,21 @@ static void processCommand() {
     pen(zz);
     jog(xx,yy);
   } else {
-    Serial.print("Invalid command: ");
-    Serial.println(buffer);
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      if(!strncmp(ptr,"G20",3)) {
+        mode_scale=0.0393700787;
+        Serial.println("scale: inches.");
+      } else if(!strncmp(ptr,"G21",3)) {
+        mode_scale=1.0;
+        Serial.println("scale: millimeters.");
+      } else if(ptr) {
+        Serial.print("Invalid command: ");
+        Serial.println(ptr);
+        break;
+      }
+    }
   }
 }
 
