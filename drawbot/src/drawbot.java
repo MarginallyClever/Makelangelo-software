@@ -23,10 +23,10 @@ public class Drawbot {
 	static SerialPort serialPort;
 	static InputStream in;
 	static OutputStream out;
-	static String portName="COM9";
 	static String cue=new String("> ");
 	static String eol=new String(";");
 	static final long serialVersionUID=1;
+	static String portName="COM9";
 
 	
 	public void OpenPort() {
@@ -130,6 +130,8 @@ public class Drawbot {
 
 	    OpenPort();
 
+	    long start = System.currentTimeMillis();
+	    
 		String line,line2,line3="";
 		boolean eof_reached=false;
 		boolean ready_to_send=false;
@@ -204,7 +206,6 @@ public class Drawbot {
 							//catch(InterruptedException e) {}
 						}
 					}
-					
 				}
 			} while(eof_reached!=true);
 		}
@@ -213,7 +214,10 @@ public class Drawbot {
 			e.printStackTrace();
 		}
 
+		long end = System.currentTimeMillis();
+		
 		System.out.println("\n** FINISHED **");
+		System.out.println(((end-start)*0.001)+"s elapsed.");
 		if(numErrors>0) System.out.println(numErrors+" errors.");
 		System.exit(0);
 	}

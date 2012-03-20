@@ -1377,7 +1377,7 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       if(!strncmp(ptr,"G20",3)) {
-        mode_scale=0.0393700787;
+        mode_scale=2.54;
         Serial.println("scale: inches.");
       } else if(!strncmp(ptr,"G21",3)) {
         mode_scale=1.0;
