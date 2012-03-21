@@ -351,9 +351,7 @@ public class DrawbotGUI
 				// tool change
 				for(int i=0;i<tokens.length;++i) {
 					if(tokens[i].startsWith("T")) {
-						JOptionPane.showConfirmDialog(null,"Please change to tool #"+tokens[i].substring(1)+" and click OK.",
-								"Tool Change",
-								JOptionPane.OK_OPTION);
+						JOptionPane.showMessageDialog(null,"Please change to tool #"+tokens[i].substring(1)+" and click OK.");
 					}
 				}
 				// still ready to send
