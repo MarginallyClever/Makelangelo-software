@@ -394,7 +394,7 @@ public class DrawbotGUI
 		}
 
 		if( subject == buttonStart ) {
-			if(fileOpened) FileOpen(recentFiles[0]);
+			if(fileOpened) OpenFile(recentFiles[0]);
 			paused=false;
 			running=true;
 			Log("** START **"+NL);
@@ -598,7 +598,7 @@ public class DrawbotGUI
         // open the file
 		GetRecentFiles();
 		if(recentFiles[0].length()>0) {
-			Log("Opening file "+filename+"..."+NL);
+			Log("Opening file "+recentFiles[0]+"..."+NL);
 			OpenFile(recentFiles[0]);
 		}
 		
