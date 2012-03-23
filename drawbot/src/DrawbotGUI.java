@@ -27,10 +27,8 @@ import gnu.io.SerialPortEventListener;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 // preferences
@@ -45,7 +43,7 @@ public class DrawbotGUI
 	static private final String cue = "> ";
 	static private final String eol = ";";
 	static private final String NL = System.getProperty("line.separator");;
-	final long serialVersionUID=1;
+	static final long serialVersionUID=1;
 
 	Preferences prefs = Preferences.userRoot().node("DrawBot");
 	
@@ -63,7 +61,7 @@ public class DrawbotGUI
 	
 	// GUI elements
     JMenuBar menuBar;
-    JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt;
+    JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt, buttonDrive, buttonAbout;
     JMenuItem [] buttonRecent = new JMenuItem[10];
     JMenuItem [] buttonPorts;
     
@@ -82,6 +80,7 @@ public class DrawbotGUI
 	boolean fileOpened=false;
 	boolean portOpened=false;
 	boolean running=false;
+	boolean drawing=false;
 
 	// reading file
     Scanner scanner;
@@ -91,6 +90,8 @@ public class DrawbotGUI
 
 	
 	public class StatusBar extends JLabel {
+		static final long serialVersionUID=1;
+		
 	    /** Creates a new instance of StatusBar */
 	    public StatusBar() {
 	        super();
@@ -103,7 +104,9 @@ public class DrawbotGUI
 	    }        
 	    
 	    public void SetProgress(long sofar,long total,String msg) {
-		   	statusBar.SetMessage(fmt.format(sofar/total)+"% ("+sofar+"/"+total+") "+msg);
+	    	float progress=0;
+	    	if(total>0) progress = 100.0f*(float)sofar/(float)total;
+		   	statusBar.SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+msg);
 	    }
 	}
 	
@@ -204,7 +207,7 @@ public class DrawbotGUI
 	
 	
 	public String[] ListSerialPorts() {
-	    Enumeration ports = CommPortIdentifier.getPortIdentifiers();
+	    Enumeration<CommPortIdentifier> ports = (Enumeration<CommPortIdentifier>)CommPortIdentifier.getPortIdentifiers();
 	    ArrayList<String> portList = new ArrayList<String>();
 	    while (ports.hasMoreElements()) {
 	        CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
@@ -299,7 +302,6 @@ public class DrawbotGUI
 
 	    fileOpened=true;
 	    paused=true;
-	    Log("PAUSE ON");
 	    linesProcessed=0;
 	    statusBar.SetProgress(linesProcessed,linesTotal,"");
 	}
@@ -310,13 +312,11 @@ public class DrawbotGUI
 	 * If you didn't cancel it opens that file.
 	 */
 	public void OpenFileDialog() {
-		JFileChooser chooser = new JFileChooser();
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
 		JFileChooser fc = new JFileChooser(new File(filename));
-
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	Log("Opening file "+filename+"..."+NL);
 	    	OpenFile(fc.getSelectedFile().getAbsolutePath());
@@ -368,6 +368,7 @@ public class DrawbotGUI
 				if(index!=-1) {
 					String comment=line.substring(index+1,line.lastIndexOf(')'));
 					line=line.substring(0,index).trim();
+					Log("* "+comment);
 					if(line.length()==0) continue;  // still ready to send
 				}
 				// send the command to the robot
@@ -395,28 +396,41 @@ public class DrawbotGUI
 			if(fileOpened) OpenFile(recentFiles[0]);
 			paused=false;
 			running=true;
-			Log("** START **"+NL);
+			drawing=false;
 			SendCommand();
+			return;
 		}
 		if( subject == buttonPause ) {
 			if(running) {
 				if(paused==true) {
 					paused=false;
-					Log("** RESUME **"+NL);
 					SendCommand();
 				} else {
 					paused=true;
-					Log("** PAUSED **"+NL);
 				}
 			}
+			return;
+		}
+		if( subject == buttonDrive ) {
+			CloseFile();
+			running=false;
+			paused=true;
+			drawing=true;
+			return;
 		}
 		if( subject == buttonHalt ) {
 			CloseFile();
 			running=false;
 			paused=true;
-			Log("** HALT **"+NL);
+			return;
 		}
 		
+		if(subject == buttonAbout ) {
+			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
+					+"Find out more at http://www.marginallyclever.com/"+NL
+					+"Join the project http://github.com/i-make-robots/DrawBot/");
+			return;
+		}
 		if(subject == buttonExit) {
 			System.exit(0);  // @TODO: be more graceful?
 			return;
@@ -475,9 +489,7 @@ public class DrawbotGUI
 
 	
 	public void UpdateMenuBar() {
-		JMenu menu, submenu;
-        JMenuItem menuItem;
-        JCheckBoxMenuItem cbMenuItem;
+		JMenu menu;
         int i;
 
         menuBar.removeAll();
@@ -553,14 +565,25 @@ public class DrawbotGUI
         buttonHalt.addActionListener(this);
         menu.add(buttonHalt);
 
+        menu.addSeparator();
+
+        buttonDrive = new JMenuItem("Drive",KeyEvent.VK_R);
+        buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
+        buttonDrive.addActionListener(this);
+        menu.add(buttonDrive);
+
         menuBar.add(menu);
         
         //Build second menu in the menu bar.
-        menu = new JMenu("About");
-        menu.setMnemonic(KeyEvent.VK_A);
+        menu = new JMenu("Help");
+        menu.setMnemonic(KeyEvent.VK_H);
+        menu.getAccessibleContext().setAccessibleDescription("Get help");
+
+        buttonAbout = new JMenuItem("About",KeyEvent.VK_A);
         menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
-        menu.addActionListener(this);
-        
+        buttonAbout.addActionListener(this);
+        menu.add(buttonAbout);
+
         menuBar.add(menu);
 
         // finish
@@ -602,7 +625,10 @@ public class DrawbotGUI
 		
 		// connect to the last port
 		GetRecentPort();
-		OpenPort(recentPort);
+		ListSerialPorts();
+		if(Arrays.asList(portsDetected).contains(recentPort)) {
+			OpenPort(recentPort);
+		}
 		
         return contentPane;
     }
