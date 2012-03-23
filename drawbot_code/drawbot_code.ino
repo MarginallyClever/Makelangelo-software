@@ -41,6 +41,10 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+// Saving config
+#include <EEPROM.h>
+#include <Arduino.h>  // for type definitions
+
 
 
 //------------------------------------------------------------------------------
@@ -57,17 +61,6 @@
 
 // Uncomment this line to use a more sophisticated timing system.
 //#define NEW_TIMER
-
-// Distance between stepper shaft centers.
-#define X_SEPARATION    (28.0)
-
-// Distance from center of the drawing area up to the line between the two 
-// steppers.  The plotter cannot physically reach this line - it would 
-// require infinite tensile strength.
-#define LIMYMAX         (21.5)
-
-// Distance from center to bottom of drawing area.
-#define LIMYMIN         (-30.0)
 
 // distance from pen center to string ends
 #define PLOTX           (2.4)
@@ -90,7 +83,7 @@
 #define SPOOL_DIAMETER  (0.85)
 #define MAX_RATED_RPM   (3000.0)
 #define MAX_RPM         (250.0)
-#define DEFAULT_RPM     (200.0)
+#define DEFAULT_RPM     (125.0)
 
 // how fast can the plotter accelerate?
 #define ACCELERATION    (5.00)  // cm/s/s
@@ -122,10 +115,6 @@
 // max vel is only theoretical.  We have to run slower for accuracy.
 #define DEFAULT_VEL     (DEFAULT_RPM*SPOOL_CIRC/60.0)  // cm/s
 
-// limits plotter can move.
-#define LIMXMAX         ( X_SEPARATION*0.5)
-#define LIMXMIN         (-X_SEPARATION*0.5)
-
 // for arc directions
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
@@ -135,10 +124,13 @@
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
+/*
+#ifdef NEW_TIMER
 // timer stuff
 #define INIT_TIMER_COUNT (6)
 #define RESET_TIMER2     (TCNT2 = INIT_TIMER_COUNT)
-
+#endif
+*/
 
 
 //------------------------------------------------------------------------------
@@ -149,6 +141,14 @@ static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
 static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 
 static Servo s1;
+
+// plotter limits
+// all distances are relative to the calibration point of the plotter.
+// (normally this is the center of the drawing area)
+static double limit_top = 21.5;  // distance to top of drawing area.
+static double limit_bottom =-30.0;  // Distance to bottom of drawing area.
+static double limit_right = 14.0;  // Distance to right of drawing area.
+static double limit_left =-14.0;  // Distance to left of drawing area.
 
 // plotter position.
 static double posx, velx, accelx;
@@ -257,10 +257,10 @@ static double atan3(double dy,double dx) {
 // returns 0 if inside limits
 // returns non-zero if outside limits.
 static int outsideLimits(double x,double y) {
-  return ((x<LIMXMIN)<<0)
-        |((x>LIMXMAX)<<1)
-        |((y<LIMYMIN)<<2)
-        |((y>LIMYMAX)<<3);
+  return ((x<limit_left)<<0)
+        |((x>limit_right)<<1)
+        |((y<limit_bottom)<<2)
+        |((y>limit_top)<<3);
 }
 #endif
 
@@ -280,30 +280,28 @@ static void pen(double pen_angle) {
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(double x, double y, long &l1, long &l2) {
   // find length to M1
-  double dy = y - LIMYMAX - PLOTY;
-  double dx = x - PLOTX - LIMXMIN;
+  double dy = y - limit_top - PLOTY;
+  double dx = x - PLOTX - limit_left;
   l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
   // find length to M2
-  dx = LIMXMAX - (x + PLOTX);
+  dx = limit_right - (x + PLOTX);
   l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
 }
 
 
 //------------------------------------------------------------------------------
 // Forward Kinematics - turns L1,L2 lengths into XY coordinates
-// use law of cosines,
-// theta = acos((a*a+b*b-c*c)/(2*a*b));
-// to find angle between M1M2 and M1P
-// where P is the plotter position
+// use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
+// to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(double l1, double l2,double &x,double &y) {
-  double a=l1 * THREADPERSTEP;
-  double b=X_SEPARATION - PLOTX*2;
-  double c=l2 * THREADPERSTEP;
+  double a = l1 * THREADPERSTEP;
+  double b = (limit_right-limit_left) - PLOTX*2;
+  double c = l2 * THREADPERSTEP;
   
   // slow, uses trig
   double theta = acos((a*a+b*b-c*c)/(2.0*a*b));
-  x = cos(theta)*l1 + LIMXMIN + PLOTX;
-  y = sin(theta)*l1 + LIMYMAX - PLOTY;
+  x = cos(theta)*l1 + limit_left + PLOTX;
+  y = sin(theta)*l1 + limit_top - PLOTY;
 }
 
 
@@ -730,30 +728,30 @@ static int canArc(double cx,double cy,double x,double y,double dir) {
   Serial.print("r=");  Serial.println(r1);
 #endif
 
-  if(cx+r1>LIMXMAX) {
+  if(cx+r1>limit_right) {
     // find the two points of intersection, see if they are inside the arc
-    double dx=LIMXMAX-cx;
+    double dx=limit_right-cx;
     double dy=sqrt(r1*r1-dx*dx);
     if(pointInArc(dx, dy,angle1,angle2,dir)) return 3;
     if(pointInArc(dx,-dy,angle1,angle2,dir)) return 4;
   }
-  if(cx-r1<LIMXMIN) {
+  if(cx-r1<limit_left) {
     // find the two points of intersection, see if they are inside the arc
-    double dx=LIMXMIN-cx;
+    double dx=limit_left-cx;
     double dy=sqrt(r1*r1-dx*dx);
     if(pointInArc(dx, dy,angle1,angle2,dir)) return 5;
     if(pointInArc(dx,-dy,angle1,angle2,dir)) return 6;
   }
-  if(cy+r1>LIMYMAX) {
+  if(cy+r1>limit_top) {
     // find the two points of intersection, see if they are inside the arc
-    double dy=LIMYMAX-cy;
+    double dy=limit_top-cy;
     double dx=sqrt(r1*r1-dy*dy);
     if(pointInArc( dx,dy,angle1,angle2,dir)) return 7;
     if(pointInArc(-dx,dy,angle1,angle2,dir)) return 8;
   }
-  if(cy-r1<LIMYMIN) {
+  if(cy-r1<limit_bottom) {
     // find the two points of intersection, see if they are inside the arc
-    double dy=LIMYMIN-cy;
+    double dy=limit_bottom-cy;
     double dx=sqrt(r1*r1-dy*dy);
     if(pointInArc( dx,dy,angle1,angle2,dir)) return 9;
     if(pointInArc(-dx,dy,angle1,angle2,dir)) return 10;
@@ -798,8 +796,8 @@ static void testArcs() {
   Serial.println(atan3(-1,-1)*180.0/PI);
   Serial.println(atan3(-1, 1)*180.0/PI);
   
-  x=LIMXMAX*0.75;
-  y=LIMYMAX*0.50;
+  x=limit_right*0.75;
+  y=limit_top*0.50;
 
   Serial.println("arcs inside limits, center inside limits (should pass)");    
   teleport(x,0);
@@ -816,40 +814,40 @@ static void testArcs() {
   error(canArc(0,0,-x,0,ARC_CW));
   error(canArc(0,0, x,0,ARC_CW));
 
-  x=LIMXMAX*0.75;
-  y=LIMYMAX*0.50;
+  x=limit_right*0.75;
+  y=limit_top*0.50;
   Serial.println("arcs outside limits, arc center outside limits (should fail)");
   teleport(x,y);
   error(canArc(x,0,-x,y,ARC_CW));
 
-  // LIMXMAX boundary test
-  x=LIMXMAX*0.75;
-  y=LIMYMAX*0.50;
-  Serial.println("CCW through LIMXMAX (should fail)");      teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
-  Serial.println("CW avoids LIMXMAX (should pass)");        teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
-  Serial.println("CW through LIMXMAX (should fail)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  Serial.println("CCW avoids LIMXMAX (should pass)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
-  // LIMXMIN boundary test
-  x=LIMXMIN*0.75;
-  y=LIMYMAX*0.50;
-  Serial.println("CW through LIMXMIN (should fail)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
-  Serial.println("CCW avoids LIMXMIN (should pass)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
-  Serial.println("CCW through LIMXMIN (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
-  Serial.println("CW avoids LIMXMIN (should pass)");        teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  // LIMYMIN boundary test
-  x=LIMXMAX*0.50;
-  y=LIMYMIN*0.75;
-  Serial.println("CW through LIMYMIN (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMIN (should pass)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CCW through LIMYMIN (should fail)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMIN (should pass)");        teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  // LIMYMAX boundary test
-  x=LIMXMAX*0.50;
-  y=LIMYMAX*0.75;
-  Serial.println("CCW through LIMYMAX (should fail)");      teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CW avoids LIMYMAX (should pass)");        teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CW through LIMYMAX (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  Serial.println("CCW avoids LIMYMAX (should pass)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
+  // limit_right boundary test
+  x=limit_right*0.75;
+  y=limit_top*0.50;
+  Serial.println("CCW through limit_right (should fail)");      teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
+  Serial.println("CW avoids limit_right (should pass)");        teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
+  Serial.println("CW through limit_right (should fail)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
+  Serial.println("CCW avoids limit_right (should pass)");       teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
+  // limit_left boundary test
+  x=limit_left*0.75;
+  y=limit_top*0.50;
+  Serial.println("CW through limit_left (should fail)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
+  Serial.println("CCW avoids limit_left (should pass)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
+  Serial.println("CCW through limit_left (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
+  Serial.println("CW avoids limit_left (should pass)");        teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
+  // limit_bottom boundary test
+  x=limit_right*0.50;
+  y=limit_bottom*0.75;
+  Serial.println("CW through limit_bottom (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
+  Serial.println("CCW avoids limit_bottom (should pass)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
+  Serial.println("CCW through limit_bottom (should fail)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
+  Serial.println("CW avoids limit_bottom (should pass)");        teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
+  // limit_top boundary test
+  x=limit_right*0.50;
+  y=limit_top*0.75;
+  Serial.println("CCW through limit_top (should fail)");      teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
+  Serial.println("CW avoids limit_top (should pass)");        teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
+  Serial.println("CW through limit_top (should fail)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
+  Serial.println("CCW avoids limit_top (should pass)");       teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
 }
 
 
@@ -1175,10 +1173,11 @@ static void halftone(double size,double fill) {
 static void help() {
   Serial.println("== DRAWBOT - 2012 Feb 28 - dan@marginallyclever.com ==");
   Serial.println("All commands end with a semi-colon.");
-  Serial.println("HELP; - display this message");
+  Serial.println("HELP;  - display this message");
+  Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
+  Serial.println("       - display/update this robot's configuration.");
   Serial.println("WHERE; - display current virtual coordinates");
-  Serial.println("LIMITS; - display maximum distance plotter can move");
-  Serial.println("DEMO; - draw a test pattern");
+  Serial.println("DEMO;  - draw a test pattern");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
   Serial.println("G01-G04,G20,G21,G90,G91");
@@ -1199,15 +1198,15 @@ static void where() {
 
 
 //------------------------------------------------------------------------------
-static void limits() {
+static void printConfig() {
   Serial.print("(");
-  Serial.print(LIMXMIN);
+  Serial.print(limit_left);
   Serial.print(",");
-  Serial.print(LIMYMIN);
+  Serial.print(limit_bottom);
   Serial.print(") - {");
-  Serial.print(LIMXMAX);
+  Serial.print(limit_right);
   Serial.print(",");
-  Serial.print(LIMYMAX);
+  Serial.print(limit_top);
   Serial.println(")");
 
   Serial.print("F");  Serial.println(maxvel);
@@ -1215,9 +1214,47 @@ static void limits() {
 }
 
 
-
 #endif
 
+
+//------------------------------------------------------------------------------
+// from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
+void EEPROM_writeDouble(int ee, double value) {
+  byte* p = (byte*)(void*)&value;
+  for (int i = 0; i < sizeof(value); i++)
+  EEPROM.write(ee++, *p++);
+}
+
+double EEPROM_readDouble(int ee) {
+  double value = 0.0;
+  byte* p = (byte*)(void*)&value;
+  for (int i = 0; i < sizeof(value); i++)
+  *p++ = EEPROM.read(ee++);
+  return value;
+}
+
+
+//------------------------------------------------------------------------------
+static void loadConfig() {
+  char version=EEPROM.read(0);
+  if(version==1) {
+    limit_top   =EEPROM_readDouble(1);
+    limit_bottom=EEPROM_readDouble(5);
+    limit_right =EEPROM_readDouble(9);
+    limit_left  =EEPROM_readDouble(13);
+  }
+}
+
+
+//------------------------------------------------------------------------------
+static void saveConfig() {
+  char version=1;
+  EEPROM.write( 0,version);
+  EEPROM_writeDouble( 1,limit_top);
+  EEPROM_writeDouble( 5,limit_bottom);
+  EEPROM_writeDouble( 9,limit_right);
+  EEPROM_writeDouble(13,limit_left);
+}
 
 
 //------------------------------------------------------------------------------
@@ -1227,10 +1264,34 @@ static void processCommand() {
     help();
   } else if(!strncmp(buffer,"WHERE",5)) {
     where();
-  } else if(!strncmp(buffer,"LIMITS",6)) {
-    limits();
   } else if(!strncmp(buffer,"DEMO",4)) {
     demo();
+  } else if(!strncmp(buffer,"CONFIG",6)) {
+    double tt=limit_top;
+    double bb=limit_bottom;
+    double rr=limit_right;
+    double ll=limit_left;
+    
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'T': tt=atof(ptr+1)*mode_scale;  break;
+      case 'B': bb=atof(ptr+1)*mode_scale;  break;
+      case 'R': rr=atof(ptr+1)*mode_scale;  break;
+      case 'L': ll=atof(ptr+1)*mode_scale;  break;
+      default: ptr=0; break;
+      }
+    }
+    
+    // @TODO: check t>b, r>l ?
+    limit_top=tt;
+    limit_bottom=bb;
+    limit_right=rr;
+    limit_left=ll;
+    
+    saveConfig();
+    printConfig();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     double xx=posx;
     double yy=posy;
@@ -1397,7 +1458,8 @@ void setup() {
   // start communications
   Serial.begin(BAUD);
   Serial.println("== HELLO WORLD ==");
-  limits();
+  loadConfig();
+  printConfig();
   sofar=0;
 
   // set the stepper speed
