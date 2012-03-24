@@ -61,7 +61,7 @@ public class DrawbotGUI
 	
 	// GUI elements
     JMenuBar menuBar;
-    JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt, buttonDrive, buttonAbout;
+    JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt, buttonDrive, buttonAbout, buttonConfig, buttonRescan;
     JMenuItem [] buttonRecent = new JMenuItem[10];
     JMenuItem [] buttonPorts;
     
@@ -109,23 +109,6 @@ public class DrawbotGUI
 		   	statusBar.SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+msg);
 	    }
 	}
-	
-	
-	
-	public void ClosePort() {
-	    if (serialPort != null) {
-	        try {
-	            // close the i/o streams.
-	            out.close();
-	            in.close();
-	        } catch (IOException ex) {
-	            // don't care
-	        }
-	        // Close the port.
-	        serialPort.close();
-	    }
-		portOpened=false;
-	}
 	  
 	
 	
@@ -136,10 +119,31 @@ public class DrawbotGUI
 	
 	
 	
+	public void ClosePort() {
+		portOpened=false;
+		
+	    if (serialPort != null) {
+	        try {
+		        // Close the port.
+		        serialPort.removeEventListener();
+		        serialPort.close();
+	            // Close the I/O streams.
+	            out.close();
+	            in.close();
+	        } catch (IOException e) {
+	            // Don't care
+	        }
+	    }
+	}
+	
+	
+	
 	public int OpenPort(String portName) {
+		if(portOpened && portName==recentPort) return 0;
+		
 		ClosePort();
 		
-		Log("Connecting to "+portName+"..."+NL);
+		//Log("Connecting to "+portName+"..."+NL);
 		
 		// find the port
 		try {
@@ -152,26 +156,27 @@ public class DrawbotGUI
 		}
 
 		if ( portIdentifier.isCurrentlyOwned() ) {
-    	    System.out.println("Error: Port is currently in use");
+    	    Log("Error: Another program is currently using this port."+NL);
 			return 2;
 		}
 
 		// open the port
 		try {
-		    commPort = portIdentifier.open("drawbot",2000);
+		    commPort = portIdentifier.open("DrawbotGUI",2000);
 		}
 		catch(Exception e) {
 			Log("Port could not be opened:"+e.getMessage()+NL);
+			e.printStackTrace();
 			return 3;
 		}
 
-	    if ( ( commPort instanceof SerialPort ) == false ) {
+	    if( ( commPort instanceof SerialPort ) == false ) {
 			Log("Error: Only serial ports are handled by this example."+NL);
 			return 4;
 		}
 
 		// set the port parameters (like baud rate)
-		serialPort = (SerialPort) commPort;
+		serialPort = (SerialPort)commPort;
 		try {
 			serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
 		}
@@ -198,7 +203,7 @@ public class DrawbotGUI
 			return 7;
 		}
 
-		prefs.put("recent-port", portName);
+		SetRecentPort(portName);
 		portOpened=true;
 		
 		return 0;
@@ -219,49 +224,21 @@ public class DrawbotGUI
 	    return portsDetected;
 	}
 	
-
-	
-	/* changes the order of the recent files list in the File submenu 
-	 * also refreshes the menus.
-	 */
-	public void UpdateRecentFiles(String filename) {
-		int i;
-		for(i=0;i<recentFiles.length-1;++i) {
-			if(recentFiles[i]==filename) {
-				break;
-			}
-		}
-		
-		for(--i;i>=0;--i) {
-			recentFiles[i+1]=recentFiles[i];
-		}
-		recentFiles[0]=filename;
-
-		for(i=0;i<recentFiles.length;++i) {
-			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
-		}
-		
-		//Log("Recent files updated."+NL);
-		UpdateMenuBar();
-	}
-	
-	
-	
-	public void GetRecentFiles() {
-		int i;
-		for(i=0;i<recentFiles.length;++i) {
-			recentFiles[i] = prefs.get("recent-files-"+i, recentFiles[i]);
-		}
-	}
-	
 	
 	
 	public void GetRecentPort() {
 		recentPort = prefs.get("recent-port", portsDetected[0]);
 	}
+
 	
+	
+	public void SetRecentPort(String portName) {
+		prefs.put("recent-port", portName);
+		recentPort=portName;
+	}
 	
 
+	
 	public void CloseFile() {
 		if(fileOpened==true) scanner.close();
 		linesProcessed=0;
@@ -308,6 +285,41 @@ public class DrawbotGUI
 	
 	
 	
+	/* changes the order of the recent files list in the File submenu 
+	 * also refreshes the menus.
+	 */
+	public void UpdateRecentFiles(String filename) {
+		int i;
+		for(i=0;i<recentFiles.length-1;++i) {
+			if(recentFiles[i]==filename) {
+				break;
+			}
+		}
+		
+		for(--i;i>=0;--i) {
+			recentFiles[i+1]=recentFiles[i];
+		}
+		recentFiles[0]=filename;
+
+		for(i=0;i<recentFiles.length;++i) {
+			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+		}
+		
+		//Log("Recent files updated."+NL);
+		UpdateMenuBar();
+	}
+	
+	
+	
+	public void GetRecentFiles() {
+		int i;
+		for(i=0;i<recentFiles.length;++i) {
+			recentFiles[i] = prefs.get("recent-files-"+i, recentFiles[i]);
+		}
+	}	
+	
+	
+
 	/* creates a file open dialog.  
 	 * If you didn't cancel it opens that file.
 	 */
@@ -321,6 +333,44 @@ public class DrawbotGUI
 	    	Log("Opening file "+filename+"..."+NL);
 	    	OpenFile(fc.getSelectedFile().getAbsolutePath());
 	    }
+	}
+	
+	
+	
+	public void UpdateConfig() {
+		// open a connection to the robot, if there is none
+		GetRecentPort();
+		if(OpenPort(recentPort)!=0) {
+			JOptionPane.showMessageDialog(null, "I could not connect to the Drawbot.", "Config", JOptionPane.PLAIN_MESSAGE);
+			return;
+		}
+
+		JTextField top = new JTextField();
+		JTextField bottom = new JTextField();
+		JTextField left = new JTextField();
+		JTextField right = new JTextField();
+		final JComponent[] inputs = new JComponent[] {
+						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
+		                new JLabel("Top"), 		top,
+		                new JLabel("Bottom"),	bottom,
+		                new JLabel("Left"), 	left,
+		                new JLabel("Right"), 	right
+		};
+		JOptionPane.showMessageDialog(null, inputs, "Config", JOptionPane.PLAIN_MESSAGE);
+
+		if(left.getText().trim()!="" || right.getText().trim()!="" ||
+			top.getText().trim()!="" || bottom.getText().trim()!="") {
+			// Send a command to the robot with new configuration values
+			String line="CONFIG T"+top.getText()+" B"+bottom.getText()+" L"+left.getText()+" R"+right.getText()+";";
+			Log(line);
+
+			try {
+				out.write(line.getBytes());
+			}
+			catch(IOException e) {}
+		}
+
+		ClosePort();				
 	}
 	
 	
@@ -397,7 +447,8 @@ public class DrawbotGUI
 			paused=false;
 			running=true;
 			drawing=false;
-			SendCommand();
+			ClosePort();
+			OpenPort(recentPort);
 			return;
 		}
 		if( subject == buttonPause ) {
@@ -413,6 +464,8 @@ public class DrawbotGUI
 		}
 		if( subject == buttonDrive ) {
 			CloseFile();
+			ClosePort();
+			OpenPort(recentPort);
 			running=false;
 			paused=true;
 			drawing=true;
@@ -420,11 +473,21 @@ public class DrawbotGUI
 		}
 		if( subject == buttonHalt ) {
 			CloseFile();
+			ClosePort();
 			running=false;
 			paused=true;
 			return;
 		}
-		
+		if( subject == buttonRescan ) {
+			ListSerialPorts();
+			UpdateMenuBar();
+			return;
+			
+		}
+		if( subject == buttonConfig ) {
+			UpdateConfig();
+			return;
+		}		
 		if(subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
 					+"Find out more at http://www.marginallyclever.com/"+NL
@@ -491,7 +554,7 @@ public class DrawbotGUI
 	public void UpdateMenuBar() {
 		JMenu menu;
         int i;
-
+        
         menuBar.removeAll();
         
         //Build the first menu.
@@ -529,9 +592,13 @@ public class DrawbotGUI
         menuBar.add(menu);
 
         //a group of radio button menu items
-        menu = new JMenu("Port");
-        menu.setMnemonic(KeyEvent.VK_P);
-        menu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
+        menu = new JMenu("Settings");
+        menu.setMnemonic(KeyEvent.VK_T);
+        menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
+        
+        JMenu subMenu = new JMenu("Port");
+        subMenu.setMnemonic(KeyEvent.VK_P);
+        subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
@@ -541,8 +608,23 @@ public class DrawbotGUI
             if(i==0) buttonPorts[i].setSelected(true);
             buttonPorts[i].addActionListener(this);
             group.add(buttonPorts[i]);
-            menu.add(buttonPorts[i]);
+            subMenu.add(buttonPorts[i]);
         }
+
+        subMenu.addSeparator();
+
+        buttonRescan = new JMenuItem("Rescan",KeyEvent.VK_N);
+        buttonRescan.getAccessibleContext().setAccessibleDescription("Rescan the available ports.");
+        buttonRescan.addActionListener(this);
+        subMenu.add(buttonRescan);
+
+        menu.add(subMenu);
+
+        buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
+        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot configuration.");
+        buttonConfig.addActionListener(this);
+        menu.add(buttonConfig);
+
         menuBar.add(menu);
 
         // run menu
@@ -587,7 +669,7 @@ public class DrawbotGUI
         menuBar.add(menu);
 
         // finish
-        menuBar.repaint();
+        menuBar.updateUI();
     }
 	
 	

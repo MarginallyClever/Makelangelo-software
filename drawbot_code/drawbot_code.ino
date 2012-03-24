@@ -67,8 +67,8 @@
 #define PLOTY           (1.9)
 
 // which motor is on which pin?
-#define M1_PIN          (2)
-#define M2_PIN          (1)
+#define M1_PIN          (1)
+#define M2_PIN          (2)
 
 // which way are the spools wound, relative to motor movement?
 #define REEL_IN         FORWARD
@@ -1559,4 +1559,5 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
+
 
