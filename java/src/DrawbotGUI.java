@@ -89,6 +89,12 @@ public class DrawbotGUI
 	// parsing input from drawbot
 	String line3="";
 
+	// preview pane
+	DrawPanel previewPane;
+	float previewScale=10;
+	float steps_per_degree=10;
+	
+	
 	
 	public class StatusBar extends JLabel {
 		static final long serialVersionUID=1;
@@ -111,6 +117,115 @@ public class DrawbotGUI
 	    }
 	}
 	  
+	
+
+	// Custom drawing panel written as an inner class to access the instance variables.
+	public class DrawPanel extends JPanel {
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);    // paint background
+			setBackground(Color.WHITE);
+			Graphics2D g2d = (Graphics2D)g;
+		   
+			int w = this.getWidth();
+			int h = this.getHeight();
+			int cx = w/2;
+			int cy = h/2;
+			
+
+
+			g2d.setColor(Color.BLACK);
+			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_top*previewScale));
+			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_bottom*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_bottom*previewScale));
+
+			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_left*previewScale),cy-(int)(limit_bottom*previewScale));
+			g2d.drawLine(cx+(int)(limit_right*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_bottom*previewScale));
+			
+			
+			String[] instructions = ngcfile.getText().split("\\r?\\n");
+			float px=0,py=0,pz=90;
+			int i,j;
+
+			for(i=0;i<instructions.length;++i) {
+				if(instructions[i].startsWith("G00 ") || instructions[i].startsWith("G0 ") || 
+					instructions[i].startsWith("G01 ") || instructions[i].startsWith("G1 ")) {
+					// draw a line
+					float x=px;
+					float y=py;
+					float z=pz;
+					String[] tokens = instructions[i].split("\\s");
+					for(j=0;j<tokens.length;++j) {
+						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));
+					}
+
+					g2d.setColor( z<45 ? Color.BLUE : Color.PINK);
+					g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(x*previewScale),cy-(int)(y*previewScale));
+					px=x;
+					py=y;
+					pz=z;
+				} else if(instructions[i].startsWith("G02 ") || instructions[i].startsWith("G2 ") ||
+					instructions[i].startsWith("G03 ") || instructions[i].startsWith("G3 ")) {
+					// draw an arc
+					float x=px;
+					float y=py;
+					float z=pz;
+					float ai=px;
+					float aj=py;
+					String[] tokens = instructions[i].split("\\s");
+					for(j=0;j<tokens.length;++j) {
+						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1));
+					}
+
+					g2d.setColor( z<45 ? Color.GREEN : Color.PINK);
+
+					double dx=px - ai;
+					double dy=py - aj;
+					double radius=Math.sqrt(dx*dx+dy*dy);
+
+					// find angle of arc (sweep)
+					double angle1=atan3(dy,dx);
+					double angle2=atan3(y-aj,x-ai);
+					double theta=angle2-angle1;
+
+					int dir = (instructions[i].startsWith("G02 ") || instructions[i].startsWith("G2 ")) ? -1 : 1;
+					if(dir>0 && theta<0) angle2+=2.0*Math.PI;
+					else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
+
+					theta=angle2-angle1;
+
+					for(int k=0;k<=theta*steps_per_degree;++k) {
+						double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
+						float nx = (float)(ai + Math.cos(angle3) * radius);
+					    float ny = (float)(aj + Math.sin(angle3) * radius);
+
+					    g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(nx*previewScale),cy-(int)(ny*previewScale));
+						px=nx;
+						py=ny;
+					}
+				    g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(x*previewScale),cy-(int)(y*previewScale));
+					px=x;
+					py=y;
+					pz=z;
+				}
+			}
+		}
+	}
+	
+	
+	
+	// returns angle of dy/dx as a value from 0...2PI
+	public double atan3(double dy,double dx) {
+	  double a=Math.atan2(dy,dx);
+	  if(a<0) a=(Math.PI*2.0)+a;
+	  return a;
+	}
+	
 	
 	
 	public void Log(String msg) {
@@ -289,6 +404,7 @@ public class DrawbotGUI
 	    fileOpened=true;
 	    paused=true;
 	    statusBar.SetProgress(linesProcessed,linesTotal,"");
+	    previewPane.repaint();
 	}
 	
 	
@@ -720,7 +836,6 @@ public class DrawbotGUI
     }
 	
 	
-	
     public Container CreateContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
@@ -735,7 +850,10 @@ public class DrawbotGUI
         ngcfile = new JTextArea();
         ngcfile.setEditable(false);
         filePane = new JScrollPane(ngcfile);
+        previewPane = new DrawPanel();
+        
 
+        tabs.add("Preview",previewPane);
         tabs.add("File",filePane);
         tabs.add("Log",logPane);
         
