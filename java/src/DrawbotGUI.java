@@ -168,6 +168,7 @@ public class DrawbotGUI
 				} else if(instructions[i].startsWith("G02 ") || instructions[i].startsWith("G2 ") ||
 					instructions[i].startsWith("G03 ") || instructions[i].startsWith("G3 ")) {
 					// draw an arc
+					int dir = (instructions[i].startsWith("G02") || instructions[i].startsWith("G2")) ? -1 : 1;
 					float x=px;
 					float y=py;
 					float z=pz;
@@ -193,11 +194,10 @@ public class DrawbotGUI
 					double angle2=atan3(y-aj,x-ai);
 					double theta=angle2-angle1;
 
-					int dir = (instructions[i].startsWith("G02 ") || instructions[i].startsWith("G2 ")) ? -1 : 1;
 					if(dir>0 && theta<0) angle2+=2.0*Math.PI;
 					else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
 
-					theta=angle2-angle1;
+					theta=Math.abs(angle2-angle1);
 
 					for(int k=0;k<=theta*steps_per_degree;++k) {
 						double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
