@@ -1199,16 +1199,10 @@ static void where() {
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print("(");
-  Serial.print(limit_left);
-  Serial.print(",");
-  Serial.print(limit_bottom);
-  Serial.print(") - {");
-  Serial.print(limit_right);
-  Serial.print(",");
-  Serial.print(limit_top);
-  Serial.println(")");
-
+  Serial.print("T");  Serial.println(limit_top);
+  Serial.print("B");  Serial.println(limit_bottom);
+  Serial.print("L");  Serial.println(limit_left);
+  Serial.print("R");  Serial.println(limit_right);
   Serial.print("F");  Serial.println(maxvel);
   Serial.print("A");  Serial.println(accel);
 }

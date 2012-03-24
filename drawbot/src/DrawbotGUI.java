@@ -52,6 +52,7 @@ public class DrawbotGUI
 	OutputStream out;
 	String[] portsDetected;
 	boolean portOpened=false;
+	boolean portConfirmed=false;
 	
 	// stored in preferences
 	String[] recentFiles = {"","","","","","","","","",""};
@@ -76,6 +77,9 @@ public class DrawbotGUI
 	boolean running=false;
 	boolean drawing=false;
 
+	// config
+	double limit_top, limit_bottom, limit_left, limit_right;
+	
 	// reading file
     Scanner scanner;
 	long linesTotal=0;
@@ -118,6 +122,7 @@ public class DrawbotGUI
 	
 	public void ClosePort() {
 		portOpened=false;
+		portConfirmed=false;
 		log.setText("");
 		
 	    if (serialPort != null) {
@@ -363,17 +368,10 @@ public class DrawbotGUI
 	
 	
 	public void UpdateConfig() {
-		// open a connection to the robot, if there is none
-		GetRecentPort();
-		if(OpenPort(recentPort)!=0) {
-			JOptionPane.showMessageDialog(null, "I could not connect to the Drawbot.", "Config", JOptionPane.PLAIN_MESSAGE);
-			return;
-		}
-
-		JTextField top = new JTextField();
-		JTextField bottom = new JTextField();
-		JTextField left = new JTextField();
-		JTextField right = new JTextField();
+		JTextField top = new JTextField(String.valueOf(limit_top));
+		JTextField bottom = new JTextField(String.valueOf(limit_bottom));
+		JTextField left = new JTextField(String.valueOf(limit_left));
+		JTextField right = new JTextField(String.valueOf(limit_right));
 		final JComponent[] inputs = new JComponent[] {
 						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
 		                new JLabel("Top"), 		top,
@@ -394,8 +392,6 @@ public class DrawbotGUI
 			}
 			catch(IOException e) {}
 		}
-
-		ClosePort();				
 	}
 	
 	
@@ -403,7 +399,7 @@ public class DrawbotGUI
 	public void SendCommand() {
 		if(paused==true) return;
 		if(fileOpened==false) return;
-		if(portOpened==false) return;
+		if(portConfirmed==false) return;
 		if(linesProcessed>=linesTotal) return;
 		
 		do {			
@@ -540,6 +536,23 @@ public class DrawbotGUI
 		}
 	}
 	
+
+	
+	public boolean ConfirmPort() {
+		if(portConfirmed==true) return true;
+		if(line3.startsWith("== HELLO WORLD ==")==true) {
+			String[] lines = line3.split("\\r?\\n");
+
+			limit_top = Float.parseFloat(lines[1].substring(1));
+			limit_bottom = Float.parseFloat(lines[2].substring(1));
+			limit_left = Float.parseFloat(lines[3].substring(1));
+			limit_right = Float.parseFloat(lines[4].substring(1));
+			portConfirmed=true;
+			UpdateMenuBar();
+		}
+		return portConfirmed;
+	}
+	
 	
 	
 	public void serialEvent(SerialPortEvent events) {
@@ -554,8 +567,10 @@ public class DrawbotGUI
 						line3+=line2;
 						// wait for the cue ("> ") to send another command
 						if(line3.lastIndexOf(cue)!=-1) {
-							line3="";
-							SendCommand();
+							if(ConfirmPort()) {
+								line3="";
+								SendCommand();
+							}
 						}
 					}
 	            } catch (IOException e) {}
@@ -649,6 +664,7 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot configuration.");
         buttonConfig.addActionListener(this);
+        buttonConfig.setEnabled(portConfirmed);
         menu.add(buttonConfig);
 
         menuBar.add(menu);
@@ -657,24 +673,24 @@ public class DrawbotGUI
         menu = new JMenu("Draw");
         menu.setMnemonic(KeyEvent.VK_D);
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
-        menu.setEnabled(portOpened);
+        menu.setEnabled(portConfirmed);
 
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
         buttonStart.addActionListener(this);
-    	buttonStart.setEnabled(portOpened);
+    	buttonStart.setEnabled(portConfirmed);
         menu.add(buttonStart);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");
         buttonPause.addActionListener(this);
-        buttonPause.setEnabled(portOpened);
+        buttonPause.setEnabled(portConfirmed);
         menu.add(buttonPause);
 
         buttonHalt = new JMenuItem("Halt",KeyEvent.VK_H);
         buttonHalt.getAccessibleContext().setAccessibleDescription("Halt sending g-code");
         buttonHalt.addActionListener(this);
-        buttonHalt.setEnabled(portOpened);
+        buttonHalt.setEnabled(portConfirmed);
         menu.add(buttonHalt);
 
         menu.addSeparator();
@@ -682,7 +698,7 @@ public class DrawbotGUI
         buttonDrive = new JMenuItem("Drive",KeyEvent.VK_R);
         buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
         buttonDrive.addActionListener(this);
-        buttonDrive.setEnabled(portOpened);
+        buttonDrive.setEnabled(portConfirmed);
         menu.add(buttonDrive);
 
         menuBar.add(menu);
