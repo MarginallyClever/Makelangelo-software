@@ -139,7 +139,7 @@ public class DrawbotGUI
 	
 	
 	public int OpenPort(String portName) {
-		if(portOpened && portName==recentPort) return 0;
+		if(portOpened && portName.equals(recentPort)) return 0;
 		
 		ClosePort();
 		
@@ -235,23 +235,21 @@ public class DrawbotGUI
 	public void SetRecentPort(String portName) {
 		prefs.put("recent-port", portName);
 		recentPort=portName;
+		UpdateMenuBar();
 	}
 	
 
 	
 	public void CloseFile() {
-		if(fileOpened==true) scanner.close();
+		if(fileOpened==true && scanner != null) scanner.close();
 		linesProcessed=0;
+	   	fileOpened=false;
 	}
 	
 	
 	
 	public void OpenFile(String filename) {
 		CloseFile();
-		
-	   	UpdateRecentFiles(filename);
-	   	
-	   	fileOpened=false;
 
 	   	// load contents into file pane
 	   	StringBuilder text = new StringBuilder();
@@ -275,11 +273,14 @@ public class DrawbotGUI
 	    }
 	    catch(IOException e) {
 	    	Log("File could not be opened."+NL);
+	    	RemoveRecentFile(filename);
+	    	return;
 	    }
+		
+	   	UpdateRecentFiles(filename);
 
 	    fileOpened=true;
 	    paused=true;
-	    linesProcessed=0;
 	    statusBar.SetProgress(linesProcessed,linesTotal,"");
 	}
 	
@@ -301,11 +302,33 @@ public class DrawbotGUI
 		}
 		recentFiles[0]=filename;
 
+		// update prefs
 		for(i=0;i<recentFiles.length;++i) {
 			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
 		}
 		
-		//Log("Recent files updated."+NL);
+		UpdateMenuBar();
+	}
+	
+	
+	
+	public void RemoveRecentFile(String filename) {
+		int i;
+		for(i=0;i<recentFiles.length-1;++i) {
+			if(recentFiles[i]==filename) {
+				break;
+			}
+		}
+		for(;i<recentFiles.length-1;++i) {
+			recentFiles[i]=recentFiles[i+1];
+		}
+		recentFiles[recentFiles.length-1]="";
+
+		// update prefs
+		for(i=0;i<recentFiles.length;++i) {
+			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+		}
+		
 		UpdateMenuBar();
 	}
 	
@@ -602,10 +625,11 @@ public class DrawbotGUI
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
+        GetRecentPort();
         buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
         for(i=0;i<portsDetected.length;++i) {
         	buttonPorts[i] = new JRadioButtonMenuItem(portsDetected[i]);
-            if(i==0) buttonPorts[i].setSelected(true);
+            if(recentPort.equals(portsDetected[i])) buttonPorts[i].setSelected(true);
             buttonPorts[i].addActionListener(this);
             group.add(buttonPorts[i]);
             subMenu.add(buttonPorts[i]);
