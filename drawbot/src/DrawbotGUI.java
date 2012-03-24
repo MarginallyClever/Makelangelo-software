@@ -27,9 +27,6 @@ import gnu.io.SerialPortEventListener;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.JTabbedPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 // preferences
 import java.util.prefs.Preferences;
@@ -54,6 +51,7 @@ public class DrawbotGUI
 	InputStream in;
 	OutputStream out;
 	String[] portsDetected;
+	boolean portOpened=false;
 	
 	// stored in preferences
 	String[] recentFiles = {"","","","","","","","","",""};
@@ -74,16 +72,15 @@ public class DrawbotGUI
 	DecimalFormat fmt = new DecimalFormat("#.##");
 	
 	// progress & run control
-	long linesTotal=0;
-	long linesProcessed=0;
 	boolean paused=true;
-	boolean fileOpened=false;
-	boolean portOpened=false;
 	boolean running=false;
 	boolean drawing=false;
 
 	// reading file
     Scanner scanner;
+	long linesTotal=0;
+	long linesProcessed=0;
+	boolean fileOpened=false;
 
 	// parsing input from drawbot
 	String line3="";
@@ -121,6 +118,7 @@ public class DrawbotGUI
 	
 	public void ClosePort() {
 		portOpened=false;
+		log.setText("");
 		
 	    if (serialPort != null) {
 	        try {
@@ -134,6 +132,8 @@ public class DrawbotGUI
 	            // Don't care
 	        }
 	    }
+	    
+		UpdateMenuBar();
 	}
 	
 	
@@ -205,6 +205,7 @@ public class DrawbotGUI
 
 		SetRecentPort(portName);
 		portOpened=true;
+		UpdateMenuBar();
 		
 		return 0;
 	}
@@ -241,6 +242,7 @@ public class DrawbotGUI
 
 	
 	public void CloseFile() {
+		ngcfile.setText("");
 		if(fileOpened==true && scanner != null) scanner.close();
 		linesProcessed=0;
 	   	fileOpened=false;
@@ -655,20 +657,24 @@ public class DrawbotGUI
         menu = new JMenu("Draw");
         menu.setMnemonic(KeyEvent.VK_D);
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
+        menu.setEnabled(portOpened);
 
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
         buttonStart.addActionListener(this);
+    	buttonStart.setEnabled(portOpened);
         menu.add(buttonStart);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");
         buttonPause.addActionListener(this);
+        buttonPause.setEnabled(portOpened);
         menu.add(buttonPause);
 
         buttonHalt = new JMenuItem("Halt",KeyEvent.VK_H);
         buttonHalt.getAccessibleContext().setAccessibleDescription("Halt sending g-code");
         buttonHalt.addActionListener(this);
+        buttonHalt.setEnabled(portOpened);
         menu.add(buttonHalt);
 
         menu.addSeparator();
@@ -676,6 +682,7 @@ public class DrawbotGUI
         buttonDrive = new JMenuItem("Drive",KeyEvent.VK_R);
         buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
         buttonDrive.addActionListener(this);
+        buttonDrive.setEnabled(portOpened);
         menu.add(buttonDrive);
 
         menuBar.add(menu);
