@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JLayeredPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -146,13 +147,15 @@ public class DrawbotGUI
 	// Custom drawing panel written as an inner class to access the instance variables.
 	public class DrawPanel extends JPanel implements MouseListener, MouseInputListener  {
 		static final long serialVersionUID=2;
-		float steps_per_degree=10;
+		double steps_per_degree=10;
 		boolean mouseIn=false;
 		int buttonPressed=MouseEvent.NOBUTTON;
 		int oldx, oldy;
-		int offsetx=0,offsety=0;
-		float previewScale=20;
+		double offsetx=0,offsety=0;
+		double previewScale=20;
+		int cx,cy;
 
+		
 		
 		public DrawPanel() {
 			super();
@@ -176,8 +179,8 @@ public class DrawbotGUI
 	    	int x=e.getX();
 	    	int y=e.getY();
 	    	if(buttonPressed==MouseEvent.BUTTON1) {
-		    	offsetx+=x-oldx;
-		    	offsety+=y-oldy;
+		    	offsetx-=(x-oldx)/previewScale;
+		    	offsety+=(y-oldy)/previewScale;
 	    	} else if(buttonPressed==MouseEvent.BUTTON3) {
 	    		float amnt = (y-oldy)*0.1f;
 	    		previewScale += amnt;
@@ -190,23 +193,27 @@ public class DrawbotGUI
 	    public void mouseMoved(MouseEvent e) {}
 	    
 		
+	    public int TX(double a) {
+	    	return cx+(int)((a-offsetx)*previewScale);
+	    }
+	    public int TY(double a) {
+	    	return cy-(int)((a-offsety)*previewScale);
+	    }
+	    
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);    // paint background
 			setBackground(Color.WHITE);
 			Graphics2D g2d = (Graphics2D)g;
 		   
-			int w = this.getWidth();
-			int h = this.getHeight();
-			int cx = offsetx + w/2;
-			int cy = offsety + h/2;
+			cx = this.getWidth()/2;
+			cy = this.getHeight()/2;
 
 			g2d.setColor(Color.BLACK);
-			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_top*previewScale));
-			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_bottom*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_bottom*previewScale));
-
-			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_left*previewScale),cy-(int)(limit_bottom*previewScale));
-			g2d.drawLine(cx+(int)(limit_right*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_bottom*previewScale));
+			g2d.drawLine(TX(limit_left ),TY(limit_top   ),TX(limit_right),TY(limit_top   ));
+			g2d.drawLine(TX(limit_left ),TY(limit_bottom),TX(limit_right),TY(limit_bottom));
+			g2d.drawLine(TX(limit_left ),TY(limit_top   ),TX(limit_left ),TY(limit_bottom));
+			g2d.drawLine(TX(limit_right),TY(limit_top   ),TX(limit_right),TY(limit_bottom));
 			
 			
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
@@ -228,7 +235,7 @@ public class DrawbotGUI
 					}
 
 					g2d.setColor( z<45 ? Color.BLUE : Color.PINK);
-					g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(x*previewScale),cy-(int)(y*previewScale));
+					g2d.drawLine(TX(px),TY(py),TX(x),TY(y));
 					px=x;
 					py=y;
 					pz=z;
@@ -271,11 +278,11 @@ public class DrawbotGUI
 						float nx = (float)(ai + Math.cos(angle3) * radius);
 					    float ny = (float)(aj + Math.sin(angle3) * radius);
 
-					    g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(nx*previewScale),cy-(int)(ny*previewScale));
+					    g2d.drawLine(TX(px),TY(py),TX(nx),TY(ny));
 						px=nx;
 						py=ny;
 					}
-				    g2d.drawLine(cx+(int)(px*previewScale),cy-(int)(py*previewScale),cx+(int)(x*previewScale),cy-(int)(y*previewScale));
+				    g2d.drawLine(TX(px),TY(py),TX(x),TY(y));
 					px=x;
 					py=y;
 					pz=z;
