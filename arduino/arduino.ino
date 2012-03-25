@@ -1197,6 +1197,9 @@ static void where() {
 }
 
 
+#endif  // SMALL_FOOTPRINT
+
+
 //------------------------------------------------------------------------------
 static void printConfig() {
   Serial.print("T");  Serial.println(limit_top);
@@ -1206,9 +1209,6 @@ static void printConfig() {
   Serial.print("F");  Serial.println(maxvel);
   Serial.print("A");  Serial.println(accel);
 }
-
-
-#endif
 
 
 //------------------------------------------------------------------------------

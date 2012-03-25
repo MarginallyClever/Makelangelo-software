@@ -121,6 +121,8 @@ public class DrawbotGUI
 
 	// Custom drawing panel written as an inner class to access the instance variables.
 	public class DrawPanel extends JPanel {
+		static final long serialVersionUID=1;
+		
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);    // paint background
@@ -551,7 +553,7 @@ public class DrawbotGUI
 				// other machine code to ignore?
 				continue;
 			} else {
-					int index=line.indexOf('(');
+				int index=line.indexOf('(');
 				if(index!=-1) {
 					String comment=line.substring(index+1,line.lastIndexOf(')'));
 					line=line.substring(0,index).trim();
@@ -665,6 +667,7 @@ public class DrawbotGUI
 			limit_right = Float.parseFloat(lines[4].substring(1));
 			portConfirmed=true;
 			UpdateMenuBar();
+			previewPane.repaint();
 		}
 		return portConfirmed;
 	}
@@ -885,7 +888,7 @@ public class DrawbotGUI
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         //Create and set up the window.
-    	JFrame frame = new JFrame("Drawbot GUI v2012-03-20");
+    	JFrame frame = new JFrame("Drawbot GUI v2012-03-25");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.
