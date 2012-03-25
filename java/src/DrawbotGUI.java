@@ -8,28 +8,50 @@
 
 
 // io functions
-import java.io.*;
-// nicely formated float log
-import java.text.DecimalFormat;
-// ??
-import java.util.*;
-
-// service manager
-
-// Serial communications
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
-// Swing (GUI) components
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-// preferences
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Scanner;
+import java.util.TooManyListenersException;
 import java.util.prefs.Preferences;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 
 
@@ -91,11 +113,11 @@ public class DrawbotGUI
 
 	// preview pane
 	DrawPanel previewPane;
-	float previewScale=10;
+	float previewScale=20;
 	float steps_per_degree=10;
 	
 	
-	
+	// manages the status bar at the bottom of the application window
 	public class StatusBar extends JLabel {
 		static final long serialVersionUID=1;
 		
@@ -230,6 +252,7 @@ public class DrawbotGUI
 	
 	
 	
+	// spits a message out to the log tab 
 	public void Log(String msg) {
 		log.append(msg);
 		log.setCaretPosition(log.getText().length());	
@@ -260,6 +283,7 @@ public class DrawbotGUI
 	
 	
 	
+	// open a serial connection to a device.  We won't know it's the robot until  
 	public int OpenPort(String portName) {
 		if(portOpened && portName.equals(recentPort)) return 0;
 		
@@ -332,9 +356,29 @@ public class DrawbotGUI
 		return 0;
 	}
 
+
+	// complete the handshake, update the menu, repaint the preview with the limits.
+	public boolean ConfirmPort() {
+		if(portConfirmed==true) return true;
+		if(line3.startsWith("== HELLO WORLD ==")==true) {
+			String[] lines = line3.split("\\r?\\n");
+
+			limit_top = Float.parseFloat(lines[1].substring(1));
+			limit_bottom = Float.parseFloat(lines[2].substring(1));
+			limit_left = Float.parseFloat(lines[3].substring(1));
+			limit_right = Float.parseFloat(lines[4].substring(1));
+			portConfirmed=true;
+			UpdateMenuBar();
+			previewPane.repaint();
+		}
+		return portConfirmed;
+	}
 	
 	
+	
+	// find all available serial ports for the settings->ports menu.
 	public String[] ListSerialPorts() {
+		@SuppressWarnings("unchecked")
 	    Enumeration<CommPortIdentifier> ports = (Enumeration<CommPortIdentifier>)CommPortIdentifier.getPortIdentifiers();
 	    ArrayList<String> portList = new ArrayList<String>();
 	    while (ports.hasMoreElements()) {
@@ -349,12 +393,15 @@ public class DrawbotGUI
 	
 	
 	
+	// pull the last connected port from prefs
 	public void GetRecentPort() {
 		recentPort = prefs.get("recent-port", portsDetected[0]);
 	}
 
 	
 	
+	// update the prefs with the last port connected and refreshes the menus.
+	// @TODO: only update when the port is confirmed?
 	public void SetRecentPort(String portName) {
 		prefs.put("recent-port", portName);
 		recentPort=portName;
@@ -363,6 +410,7 @@ public class DrawbotGUI
 	
 
 	
+	// close the file, clear the preview tab
 	public void CloseFile() {
 		ngcfile.setText("");
 		if(fileOpened==true && scanner != null) scanner.close();
@@ -372,6 +420,8 @@ public class DrawbotGUI
 	
 	
 	
+	// Opens the file.  If the file can be opened, repaint the preview tab.
+	// @TODO: check this file is gcode?
 	public void OpenFile(String filename) {
 		CloseFile();
 
@@ -411,9 +461,8 @@ public class DrawbotGUI
 	
 	
 	
-	/* changes the order of the recent files list in the File submenu 
-	 * also refreshes the menus.
-	 */
+	// changes the order of the recent files list in the File submenu,
+	// saves the updated prefs, and refreshes the menus.
 	public void UpdateRecentFiles(String filename) {
 		int i;
 		for(i=0;i<recentFiles.length-1;++i) {
@@ -436,7 +485,8 @@ public class DrawbotGUI
 	}
 	
 	
-	
+
+	// A file failed to load.  Remove it from recent files, refresh the menu bar.
 	public void RemoveRecentFile(String filename) {
 		int i;
 		for(i=0;i<recentFiles.length-1;++i) {
@@ -459,6 +509,7 @@ public class DrawbotGUI
 	
 	
 	
+	// Load recent files from prefs
 	public void GetRecentFiles() {
 		int i;
 		for(i=0;i<recentFiles.length;++i) {
@@ -468,9 +519,7 @@ public class DrawbotGUI
 	
 	
 
-	/* creates a file open dialog.  
-	 * If you didn't cancel it opens that file.
-	 */
+	// creates a file open dialog. If you don't cancel it opens that file.
 	public void OpenFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
@@ -485,6 +534,7 @@ public class DrawbotGUI
 	
 	
 	
+	// Open the config dialog, send the config update to the robot, refresh the preview tab.
 	public void UpdateConfig() {
 		JTextField top = new JTextField(String.valueOf(limit_top));
 		JTextField bottom = new JTextField(String.valueOf(limit_bottom));
@@ -509,11 +559,18 @@ public class DrawbotGUI
 				out.write(line.getBytes());
 			}
 			catch(IOException e) {}
+			
+			limit_top = Float.valueOf(top.getText());
+			limit_bottom = Float.valueOf(bottom.getText());
+			limit_right = Float.valueOf(right.getText());
+			limit_left = Float.valueOf(left.getText());
+			previewPane.repaint();
 		}
 	}
 	
 	
 	
+	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendCommand() {
 		if(paused==true) return;
 		if(fileOpened==false) return;
@@ -572,7 +629,7 @@ public class DrawbotGUI
 	}
 	
 	
-	
+	// The user has done something.  respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
@@ -588,6 +645,11 @@ public class DrawbotGUI
 			drawing=false;
 			ClosePort();
 			OpenPort(recentPort);
+			buttonStart.setEnabled(false);
+			buttonPause.setEnabled(true);
+			buttonHalt.setEnabled(true);
+			buttonDrive.setEnabled(false);
+			buttonConfig.setEnabled(false);
 			return;
 		}
 		if( subject == buttonPause ) {
@@ -603,7 +665,6 @@ public class DrawbotGUI
 		}
 		if( subject == buttonDrive ) {
 			CloseFile();
-			ClosePort();
 			OpenPort(recentPort);
 			running=false;
 			paused=true;
@@ -612,9 +673,13 @@ public class DrawbotGUI
 		}
 		if( subject == buttonHalt ) {
 			CloseFile();
-			ClosePort();
 			running=false;
 			paused=true;
+			buttonStart.setEnabled(true);
+			buttonPause.setEnabled(false);
+			buttonHalt.setEnabled(false);
+			buttonDrive.setEnabled(true);
+			buttonConfig.setEnabled(true);
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -652,24 +717,6 @@ public class DrawbotGUI
 				return;
 			}
 		}
-	}
-	
-
-	
-	public boolean ConfirmPort() {
-		if(portConfirmed==true) return true;
-		if(line3.startsWith("== HELLO WORLD ==")==true) {
-			String[] lines = line3.split("\\r?\\n");
-
-			limit_top = Float.parseFloat(lines[1].substring(1));
-			limit_bottom = Float.parseFloat(lines[2].substring(1));
-			limit_left = Float.parseFloat(lines[3].substring(1));
-			limit_right = Float.parseFloat(lines[4].substring(1));
-			portConfirmed=true;
-			UpdateMenuBar();
-			previewPane.repaint();
-		}
-		return portConfirmed;
 	}
 	
 	
