@@ -22,7 +22,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import javax.swing.event.MouseInputListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -113,8 +116,7 @@ public class DrawbotGUI
 
 	// preview pane
 	DrawPanel previewPane;
-	float previewScale=20;
-	float steps_per_degree=10;
+	
 	
 	
 	// manages the status bar at the bottom of the application window
@@ -142,8 +144,51 @@ public class DrawbotGUI
 	
 
 	// Custom drawing panel written as an inner class to access the instance variables.
-	public class DrawPanel extends JPanel {
-		static final long serialVersionUID=1;
+	public class DrawPanel extends JPanel implements MouseListener, MouseInputListener  {
+		static final long serialVersionUID=2;
+		float steps_per_degree=10;
+		boolean mouseIn=false;
+		int buttonPressed=MouseEvent.NOBUTTON;
+		int oldx, oldy;
+		int offsetx=0,offsety=0;
+		float previewScale=20;
+
+		
+		public DrawPanel() {
+			super();
+	        addMouseMotionListener(this);
+	        addMouseListener(this);
+		}
+		
+		
+		public void mousePressed(MouseEvent e) {
+			buttonPressed=e.getButton();
+	    	oldx=e.getX();
+	    	oldy=e.getY();
+		}
+	    public void mouseReleased(MouseEvent e) {
+	    	buttonPressed=MouseEvent.NOBUTTON;
+	    }
+	    public void mouseClicked(MouseEvent e) {}
+	    public void mouseEntered(MouseEvent e) {}
+	    public void mouseExited(MouseEvent e) {}
+	    public void mouseDragged(MouseEvent e) {
+	    	int x=e.getX();
+	    	int y=e.getY();
+	    	if(buttonPressed==MouseEvent.BUTTON1) {
+		    	offsetx+=x-oldx;
+		    	offsety+=y-oldy;
+	    	} else if(buttonPressed==MouseEvent.BUTTON3) {
+	    		float amnt = (y-oldy)*0.1f;
+	    		previewScale += amnt;
+	    		if(previewScale<0.1) previewScale=0.1f;
+	    	}
+	    	oldx=x;
+	    	oldy=y;
+	    	repaint();
+	    }
+	    public void mouseMoved(MouseEvent e) {}
+	    
 		
 		@Override
 		public void paintComponent(Graphics g) {
@@ -153,10 +198,8 @@ public class DrawbotGUI
 		   
 			int w = this.getWidth();
 			int h = this.getHeight();
-			int cx = w/2;
-			int cy = h/2;
-			
-
+			int cx = offsetx + w/2;
+			int cy = offsety + h/2;
 
 			g2d.setColor(Color.BLACK);
 			g2d.drawLine(cx+(int)(limit_left*previewScale),cy-(int)(limit_top*previewScale),cx+(int)(limit_right*previewScale),cy-(int)(limit_top*previewScale));
@@ -645,11 +688,7 @@ public class DrawbotGUI
 			drawing=false;
 			ClosePort();
 			OpenPort(recentPort);
-			buttonStart.setEnabled(false);
-			buttonPause.setEnabled(true);
-			buttonHalt.setEnabled(true);
-			buttonDrive.setEnabled(false);
-			buttonConfig.setEnabled(false);
+			UpdateMenuBar();
 			return;
 		}
 		if( subject == buttonPause ) {
@@ -669,17 +708,14 @@ public class DrawbotGUI
 			running=false;
 			paused=true;
 			drawing=true;
+			UpdateMenuBar();
 			return;
 		}
 		if( subject == buttonHalt ) {
 			CloseFile();
 			running=false;
 			paused=true;
-			buttonStart.setEnabled(true);
-			buttonPause.setEnabled(false);
-			buttonHalt.setEnabled(false);
-			buttonDrive.setEnabled(true);
-			buttonConfig.setEnabled(true);
+			UpdateMenuBar();
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -721,6 +757,7 @@ public class DrawbotGUI
 	
 	
 	
+	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
         switch (events.getEventType()) {
             case SerialPortEvent.DATA_AVAILABLE:
@@ -745,7 +782,7 @@ public class DrawbotGUI
     }
 	
 	
-	
+
 	public JMenuBar CreateMenuBar() {
         // If the menu bar exists, empty it.  If it doesn't exist, create it.
         menuBar = new JMenuBar();
@@ -756,7 +793,8 @@ public class DrawbotGUI
 	}
 	
 
-	
+
+	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
 		JMenu menu;
         int i;
@@ -805,6 +843,7 @@ public class DrawbotGUI
         JMenu subMenu = new JMenu("Port");
         subMenu.setMnemonic(KeyEvent.VK_P);
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
+        subMenu.setEnabled(!running && !drawing);
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
@@ -830,7 +869,7 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot configuration.");
         buttonConfig.addActionListener(this);
-        buttonConfig.setEnabled(portConfirmed);
+        buttonConfig.setEnabled(portConfirmed && !running && !drawing);
         menu.add(buttonConfig);
 
         menuBar.add(menu);
@@ -844,19 +883,19 @@ public class DrawbotGUI
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
         buttonStart.addActionListener(this);
-    	buttonStart.setEnabled(portConfirmed);
+    	buttonStart.setEnabled(portConfirmed && !running && !drawing);
         menu.add(buttonStart);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");
         buttonPause.addActionListener(this);
-        buttonPause.setEnabled(portConfirmed);
+        buttonPause.setEnabled(portConfirmed && running && !drawing);
         menu.add(buttonPause);
 
         buttonHalt = new JMenuItem("Halt",KeyEvent.VK_H);
         buttonHalt.getAccessibleContext().setAccessibleDescription("Halt sending g-code");
         buttonHalt.addActionListener(this);
-        buttonHalt.setEnabled(portConfirmed);
+        buttonHalt.setEnabled(portConfirmed && running && !drawing);
         menu.add(buttonHalt);
 
         menu.addSeparator();
@@ -864,7 +903,7 @@ public class DrawbotGUI
         buttonDrive = new JMenuItem("Drive",KeyEvent.VK_R);
         buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
         buttonDrive.addActionListener(this);
-        buttonDrive.setEnabled(portConfirmed);
+        buttonDrive.setEnabled(portConfirmed && !running);
         menu.add(buttonDrive);
 
         menuBar.add(menu);
@@ -886,6 +925,7 @@ public class DrawbotGUI
     }
 	
 	
+	
     public Container CreateContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
@@ -902,7 +942,6 @@ public class DrawbotGUI
         filePane = new JScrollPane(ngcfile);
         previewPane = new DrawPanel();
         
-
         tabs.add("Preview",previewPane);
         tabs.add("File",filePane);
         tabs.add("Log",logPane);
