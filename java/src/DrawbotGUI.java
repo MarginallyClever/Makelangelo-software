@@ -44,6 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JSplitPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -145,6 +146,19 @@ public class DrawbotGUI
 	  
 	
 
+	// manages the vertical split in the GUI
+	public class Splitter extends JSplitPane {
+		static final long serialVersionUID=1;
+		
+		public Splitter(int split_direction) {
+			super(split_direction);
+			setResizeWeight(0.8);
+			setDividerLocation(0.8);
+		}
+	}
+	
+	
+	
 	// Custom drawing panel written as an inner class to access the instance variables.
 	public class DrawPanel extends JPanel implements MouseListener, MouseInputListener  {
 		static final long serialVersionUID=2;
@@ -181,7 +195,7 @@ public class DrawbotGUI
 	    	drivexview=0;    
 	    	driveyview=0;
     		driveOn=false;
-			SendLineToRobot("J00 X0 Y0");
+    		if(driving) SendLineToRobot("J00 X0 Y0");
 		}
 		
 		public void mousePressed(MouseEvent e) {
@@ -1052,27 +1066,33 @@ public class DrawbotGUI
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setOpaque(true);
- 
-        JTabbedPane tabs = new JTabbedPane();
-
-        //Create a scrolled text area.
+        
+        // the log panel
         log = new JTextArea();
         log.setEditable(false);
         logPane = new JScrollPane(log);
+        // the file panel
         ngcfile = new JTextArea();
         ngcfile.setEditable(false);
         filePane = new JScrollPane(ngcfile);
+        // the preview panel
         previewPane = new DrawPanel();
         
+        // the tabs
+        JTabbedPane tabs = new JTabbedPane();
         tabs.add("Preview",previewPane);
         tabs.add("File",filePane);
-        tabs.add("Log",logPane);
-        
-        contentPane.add(tabs, BorderLayout.CENTER);
-
         // status bar
         statusBar = new StatusBar();
-        contentPane.add(statusBar, BorderLayout.SOUTH);
+
+        // layout
+        Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
+        split.add(tabs);
+        split.add(logPane);
+        split.setDividerSize(3);
+        
+        contentPane.add(split,BorderLayout.CENTER);
+        contentPane.add(statusBar,BorderLayout.SOUTH);
 
         // open the file
 		GetRecentFiles();
@@ -1096,7 +1116,7 @@ public class DrawbotGUI
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         //Create and set up the window.
-    	JFrame frame = new JFrame("Drawbot GUI v2012-03-25");
+    	JFrame frame = new JFrame("Drawbot GUI v2012-03-26");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.
