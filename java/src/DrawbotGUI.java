@@ -52,7 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JLayeredPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -70,7 +69,7 @@ public class DrawbotGUI
 
 	Preferences prefs = Preferences.userRoot().node("DrawBot");
 	
-	// Serial connection stuff
+	// Serial connection
 	CommPortIdentifier portIdentifier;
 	CommPort commPort;
 	SerialPort serialPort;
@@ -79,44 +78,46 @@ public class DrawbotGUI
 	String[] portsDetected;
 	boolean portOpened=false;
 	boolean portConfirmed=false;
+	boolean readyToReceive=false;
 	
 	// stored in preferences
 	String[] recentFiles = {"","","","","","","","","",""};
 	String recentPort;
+	
+	// robot config
+	double limit_top, limit_bottom, limit_left, limit_right;
 	
 	// GUI elements
     JMenuBar menuBar;
     JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt, buttonDrive, buttonAbout, buttonConfig, buttonRescan;
     JMenuItem [] buttonRecent = new JMenuItem[10];
     JMenuItem [] buttonPorts;
-    
-    
+
+    // tabs
 	JTextArea log,ngcfile;
 	JScrollPane logPane,filePane;
+	DrawPanel previewPane;
 
-	// status bar junk
+	// status bar
 	StatusBar statusBar;
 	DecimalFormat fmt = new DecimalFormat("#.##");
 	
-	// progress & run control
-	boolean paused=true;
-	boolean running=false;
-	boolean drawing=false;
+	// parsing input from drawbot
+	String line3="";
 
-	// config
-	double limit_top, limit_bottom, limit_left, limit_right;
-	
 	// reading file
+	boolean running=false;
+	boolean paused=true;
     Scanner scanner;
 	long linesTotal=0;
 	long linesProcessed=0;
 	boolean fileOpened=false;
 
-	// parsing input from drawbot
-	String line3="";
-
-	// preview pane
-	DrawPanel previewPane;
+	// driving controls
+	boolean driving=false;
+	double driveScale=100;
+	double deadZone=20;
+	double maxZone=100;
 	
 	
 	
@@ -147,14 +148,25 @@ public class DrawbotGUI
 	// Custom drawing panel written as an inner class to access the instance variables.
 	public class DrawPanel extends JPanel implements MouseListener, MouseInputListener  {
 		static final long serialVersionUID=2;
+
+		// arc smoothness - increase to make more smooth and run slower.
 		double steps_per_degree=10;
+
+		// motion control
 		boolean mouseIn=false;
 		int buttonPressed=MouseEvent.NOBUTTON;
 		int oldx, oldy;
+
+		// scale + position
+		int cx,cy;
 		double offsetx=0,offsety=0;
 		double previewScale=20;
-		int cx,cy;
 
+		// driving controls
+		public boolean driveOn=false;
+		public double drivex=0, drivey=0;
+		public double drivexview=0, driveyview=0;
+		
 		
 		
 		public DrawPanel() {
@@ -162,44 +174,83 @@ public class DrawbotGUI
 	        addMouseMotionListener(this);
 	        addMouseListener(this);
 		}
-		
+
+		public void StopDriving() {
+	    	drivex=0;
+	    	drivey=0;
+	    	drivexview=0;    
+	    	driveyview=0;
+    		driveOn=false;
+			SendLineToRobot("J00 X0 Y0");
+		}
 		
 		public void mousePressed(MouseEvent e) {
 			buttonPressed=e.getButton();
 	    	oldx=e.getX();
 	    	oldy=e.getY();
+	    	if(driving && e.getButton()==MouseEvent.BUTTON1) {
+	    		driveOn=true;
+	    	}
 		}
 	    public void mouseReleased(MouseEvent e) {
 	    	buttonPressed=MouseEvent.NOBUTTON;
+	    	if(e.getButton()==MouseEvent.BUTTON1) StopDriving();
 	    }
 	    public void mouseClicked(MouseEvent e) {}
 	    public void mouseEntered(MouseEvent e) {}
-	    public void mouseExited(MouseEvent e) {}
+	    public void mouseExited(MouseEvent e) {
+	    	StopDriving();
+	    }
 	    public void mouseDragged(MouseEvent e) {
 	    	int x=e.getX();
 	    	int y=e.getY();
 	    	if(buttonPressed==MouseEvent.BUTTON1) {
-		    	offsetx-=(x-oldx)/previewScale;
-		    	offsety+=(y-oldy)/previewScale;
+	    		if(driving) {
+	    			drivexview=(x-oldx);
+		    		driveyview=(y-oldy);
+		    		double len=Math.sqrt(drivexview*drivexview+driveyview*driveyview);
+	    			if(len>maxZone) {
+	    				drivexview*=maxZone/len;
+	    				driveyview*=maxZone/len;
+	    				len=maxZone;
+	    			}
+	    			double f=len-deadZone;
+		    		if(f>0) {
+		    			// this scales f to [0....1] so length of (drivex,drivey) will <= 1
+		    			f=f/(maxZone-deadZone);
+		    			drivex=drivexview*f/len;
+		    			drivey=driveyview*f/len;
+		    		} else {
+		    			drivex=0;
+		    			drivey=0;
+		    		}
+		    		if(readyToReceive) {
+		    			SendLineToRobot("J00 X"+drivex+" Y"+drivey);
+		    		}
+	    		} else {
+		    		double dx=(x-oldx)/previewScale;
+		    		double dy=(y-oldy)/previewScale;
+			    	oldx=x;
+			    	oldy=y;
+			    	offsetx-=dx;
+			    	offsety+=dy;
+	    		}
 	    	} else if(buttonPressed==MouseEvent.BUTTON3) {
 	    		float amnt = (y-oldy)*0.1f;
 	    		previewScale += amnt;
 	    		if(previewScale<0.1) previewScale=0.1f;
+		    	oldy=y;
 	    	}
-	    	oldx=x;
-	    	oldy=y;
 	    	repaint();
 	    }
 	    public void mouseMoved(MouseEvent e) {}
-	    
-		
+
 	    public int TX(double a) {
 	    	return cx+(int)((a-offsetx)*previewScale);
 	    }
 	    public int TY(double a) {
 	    	return cy-(int)((a-offsety)*previewScale);
 	    }
-	    
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);    // paint background
@@ -209,13 +260,20 @@ public class DrawbotGUI
 			cx = this.getWidth()/2;
 			cy = this.getHeight()/2;
 
-			g2d.setColor(Color.BLACK);
-			g2d.drawLine(TX(limit_left ),TY(limit_top   ),TX(limit_right),TY(limit_top   ));
-			g2d.drawLine(TX(limit_left ),TY(limit_bottom),TX(limit_right),TY(limit_bottom));
-			g2d.drawLine(TX(limit_left ),TY(limit_top   ),TX(limit_left ),TY(limit_bottom));
-			g2d.drawLine(TX(limit_right),TY(limit_top   ),TX(limit_right),TY(limit_bottom));
-			
-			
+			if(!portConfirmed) {			
+				setBackground(Color.WHITE);
+			} else {
+				setBackground(Color.GRAY);
+				g2d.setColor(Color.WHITE);
+				g2d.fillRect(TX(limit_left),TY(limit_top),
+						(int)((limit_right-limit_left)*previewScale),
+						(int)((limit_top-limit_bottom)*previewScale));
+
+				g2d.setColor(Color.GRAY);
+				g2d.drawLine(TX(-0.25),TY(0),TX(0.25),TY(0));
+				g2d.drawLine(TX(0),TY(-0.25),TX(0),TY(0.25));
+			}
+						
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
 			float px=0,py=0,pz=90;
 			int i,j;
@@ -273,6 +331,7 @@ public class DrawbotGUI
 
 					theta=Math.abs(angle2-angle1);
 
+					// draw the arc from a lot of little line segments.
 					for(int k=0;k<=theta*steps_per_degree;++k) {
 						double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
 						float nx = (float)(ai + Math.cos(angle3) * radius);
@@ -287,6 +346,29 @@ public class DrawbotGUI
 					py=y;
 					pz=z;
 				}
+			}  // for ( each instruction )
+			
+			if(driveOn) {
+				double x=oldx;
+				double y=oldy;
+				g2d.setColor(Color.BLACK);
+				// action line
+				g2d.drawLine( (int)x, (int)y, (int)(x+drivexview), (int)(y+driveyview) );
+				// action limits
+				g2d.setColor(Color.RED);
+				g2d.drawArc((int)(x-maxZone), 
+						(int)(y-maxZone),
+						(int)(maxZone*2),
+						(int)(maxZone*2),
+						0,
+						360);
+				g2d.setColor(Color.GREEN);
+				g2d.drawArc((int)(x-deadZone), 
+							(int)(y-deadZone),
+							(int)(deadZone*2),
+							(int)(deadZone*2),
+							0,
+							360);
 			}
 		}
 	}
@@ -621,62 +703,93 @@ public class DrawbotGUI
 	
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
-	public void SendCommand() {
+	public void SendFileCommand() {
 		if(paused==true) return;
 		if(fileOpened==false) return;
 		if(portConfirmed==false) return;
 		if(linesProcessed>=linesTotal) return;
 		
+		String line;
 		do {			
 			// are there any more commands?
-			String line=scanner.nextLine();
+			line=scanner.nextLine().trim();
 			++linesProcessed;
-			if(linesProcessed==linesTotal) {
-				paused=true;
-				CloseFile();
-			}
-	
-			line.trim();
 			statusBar.SetProgress(linesProcessed, linesTotal, line+NL);
 			Log(line);
-			
-			// tool change request?
-			String [] tokens = line.split("\\s");
-			if(Arrays.asList(tokens).contains("M06") || 
-			   Arrays.asList(tokens).contains("M6")) {
-				// tool change
-				for(int i=0;i<tokens.length;++i) {
-					if(tokens[i].startsWith("T")) {
-						JOptionPane.showMessageDialog(null,"Please change to tool #"+tokens[i].substring(1)+" and click OK.");
-					}
-				}
-				// still ready to send
-				continue;
-			} else if(tokens[0]=="M02" || tokens[0]=="M2") {
-				// end of program?
-				running=false;
-				CloseFile();
-			} else if(tokens[0].startsWith("M")) {
-				// other machine code to ignore?
-				continue;
-			} else {
-				int index=line.indexOf('(');
-				if(index!=-1) {
-					String comment=line.substring(index+1,line.lastIndexOf(')'));
-					line=line.substring(0,index).trim();
-					Log("* "+comment);
-					if(line.length()==0) continue;  // still ready to send
-				}
-				// send the command to the robot
-				line+=eol;
-				try {
-					out.write(line.getBytes());
-				}
-				catch(IOException e) {}
-				break;
-			}
-		} while(true);
+			// loop until we find a line that gets sent to the robot, at which point we'll
+			// pause for the robot to respond.  Also stop at end of file.
+		} while(!SendLineToRobot(line) && linesProcessed<linesTotal);
+		
+		if(linesProcessed==linesTotal) {
+			// end of file
+			Halt();
+		}
 	}
+	
+	
+	// processes a single instruction meant for the robot.  Could be anything.
+	// return true if the command is sent to the robot.
+	// return false if it is not.
+	public boolean SendLineToRobot(String line) {
+		// tool change request?
+		String [] tokens = line.split("\\s");
+
+		// tool change?
+		if(Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
+			for(int i=0;i<tokens.length;++i) {
+				if(tokens[i].startsWith("T")) {
+					JOptionPane.showMessageDialog(null,"Please change to tool #"+tokens[i].substring(1)+" and click OK.");
+				}
+			}
+			// still ready to send
+			return false;
+		}
+		
+		// end of program?
+		if(tokens[0]=="M02" || tokens[0]=="M2") {
+			running=false;
+			CloseFile();
+			return false;
+		}
+		
+		// other machine code to ignore?
+		if(tokens[0].startsWith("M")) {
+			return false;
+		} 
+
+		// contains a comment?  if so remove it
+		int index=line.indexOf('(');
+		if(index!=-1) {
+			String comment=line.substring(index+1,line.lastIndexOf(')'));
+			line=line.substring(0,index).trim();
+			Log("* "+comment);
+			if(line.length()==0) {
+				// entire line was a comment.
+				return false;  // still ready to send
+			}
+		}
+
+		// send relevant part of line to the robot
+		line+=eol;
+		try {
+			readyToReceive=false;
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+		
+		return true;
+	}
+	
+	
+	
+	public void Halt() {
+		CloseFile();
+		OpenFile(recentFiles[0]);
+		running=false;
+		paused=true;
+		UpdateMenuBar();
+	}
+	
 	
 	
 	// The user has done something.  respond to it.
@@ -692,7 +805,7 @@ public class DrawbotGUI
 			if(fileOpened) OpenFile(recentFiles[0]);
 			paused=false;
 			running=true;
-			drawing=false;
+			driving=false;
 			ClosePort();
 			OpenPort(recentPort);
 			UpdateMenuBar();
@@ -702,7 +815,8 @@ public class DrawbotGUI
 			if(running) {
 				if(paused==true) {
 					paused=false;
-					SendCommand();
+					// @TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
+					SendFileCommand();
 				} else {
 					paused=true;
 				}
@@ -710,19 +824,19 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonDrive ) {
-			CloseFile();
-			OpenPort(recentPort);
-			running=false;
-			paused=true;
-			drawing=true;
+			if(driving==true) {
+				driving=false;
+			} else {
+				OpenPort(recentPort);
+				running=false;
+				paused=true;
+				driving=true;
+			}
 			UpdateMenuBar();
 			return;
 		}
 		if( subject == buttonHalt ) {
-			CloseFile();
-			running=false;
-			paused=true;
-			UpdateMenuBar();
+			Halt();
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -779,7 +893,8 @@ public class DrawbotGUI
 						if(line3.lastIndexOf(cue)!=-1) {
 							if(ConfirmPort()) {
 								line3="";
-								SendCommand();
+								readyToReceive=true;
+								SendFileCommand();
 							}
 						}
 					}
@@ -850,7 +965,7 @@ public class DrawbotGUI
         JMenu subMenu = new JMenu("Port");
         subMenu.setMnemonic(KeyEvent.VK_P);
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
-        subMenu.setEnabled(!running && !drawing);
+        subMenu.setEnabled(!running && !driving);
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
@@ -876,7 +991,7 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot configuration.");
         buttonConfig.addActionListener(this);
-        buttonConfig.setEnabled(portConfirmed && !running && !drawing);
+        buttonConfig.setEnabled(portConfirmed && !running && !driving);
         menu.add(buttonConfig);
 
         menuBar.add(menu);
@@ -890,24 +1005,24 @@ public class DrawbotGUI
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
         buttonStart.addActionListener(this);
-    	buttonStart.setEnabled(portConfirmed && !running && !drawing);
+    	buttonStart.setEnabled(portConfirmed && !running && !driving);
         menu.add(buttonStart);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");
         buttonPause.addActionListener(this);
-        buttonPause.setEnabled(portConfirmed && running && !drawing);
+        buttonPause.setEnabled(portConfirmed && running && !driving);
         menu.add(buttonPause);
 
         buttonHalt = new JMenuItem("Halt",KeyEvent.VK_H);
         buttonHalt.getAccessibleContext().setAccessibleDescription("Halt sending g-code");
         buttonHalt.addActionListener(this);
-        buttonHalt.setEnabled(portConfirmed && running && !drawing);
+        buttonHalt.setEnabled(portConfirmed && running && !driving);
         menu.add(buttonHalt);
 
         menu.addSeparator();
 
-        buttonDrive = new JMenuItem("Drive",KeyEvent.VK_R);
+        buttonDrive = new JMenuItem((driving?"Stop":"Start") + " Driving",KeyEvent.VK_R);
         buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
         buttonDrive.addActionListener(this);
         buttonDrive.setEnabled(portConfirmed && !running);
