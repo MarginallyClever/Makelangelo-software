@@ -114,23 +114,24 @@
 #define DEFAULT_VEL     (DEFAULT_RPM*SPOOL_CIRC/60.0)  // cm/s
 
 // the maximum speed of the timer interrupt
-#define TIMER_FREQUENCY (2*STEPS_PER_TURN*MAX_RPM/60)  // microseconds/step
+#define TIMER_FREQUENCY (4*STEPS_PER_TURN*MAX_RPM/60)  // microseconds/step
 
 
 // for arc directions
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
+// Arcs are split into many line segments.  How long are the segments?
+#define CM_PER_SEGMENT   (0.1)
 
 // Serial communication bitrate
 #define BAUD            (57600)
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
-// planning
+// look-ahead planning
 #define MAX_BLOCKS       (16)
 #define NEXT_BLOCK(x)    ((x+1)%MAX_BLOCKS)
 #define PREV_BLOCK(x)    ((x+MAX_BLOCKS-1)%MAX_BLOCKS)
-#define MM_PER_SEGMENT   (1)
 
 
 
@@ -392,17 +393,17 @@ static double interpolate(double p0,double p3,double t,double t1,double t2,doubl
 static void adjustStringLengths(long nlen1,long nlen2) {
   // is the change in length >= one step?
   long steps=nlen1-laststep1;
-//  if(steps<0)      m1.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m1.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+  if(steps<0)      m1.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m1.onestep(REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+//  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
   
   // is the change in length >= one step?
   steps=nlen2-laststep2;
-//  if(steps<0)      m2.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m2.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+  if(steps<0)      m2.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m2.onestep(REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+//  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
   
   laststep1=nlen1;
   laststep2=nlen2;
@@ -527,11 +528,6 @@ static void planner_recalculate() {
   block *curr, *next, *prev;
 
   // reverse pass
-//  Serial.print("REVERSE");
-//  Serial.print(block_head);
-//  Serial.print("-");
-//  Serial.println(block_tail);
-  
   prev=curr=next=NULL;
   int bi = block_head;
   while(bi != block_tail ) {
@@ -549,16 +545,10 @@ static void planner_recalculate() {
     } else {
       curr->startv = curr->maxstartv;
     }
-//    Serial.println(curr->startv);
     curr->touched=1;
   }
   
   // forward pass
-//  Serial.print("FORWARD");
-//  Serial.print(block_tail);
-//  Serial.print("-");
-//  Serial.println(block_head);
-
   prev=curr=next=NULL;
   bi = block_tail;
   while(bi != block_head ) {
@@ -577,16 +567,10 @@ static void planner_recalculate() {
         curr->touched=1;
       }
     }
-//    Serial.println(curr->startv);
     curr->touched=1;
   }
   
   // recalculate trapezoids
-//  Serial.print("RECALC ");
-//  Serial.print(block_tail);
-//  Serial.print("-");
-//  Serial.println(block_head);
-
   prev=curr=next=NULL;
   bi = block_tail;
   while(bi != block_head ) {
@@ -598,15 +582,11 @@ static void planner_recalculate() {
 
     if( curr->touched==1 || next->touched==1 ) {
       curr->endv=next->startv;
-//      Serial.print(" ");
-//      Serial.print(PREV_BLOCK(PREV_BLOCK(bi)));
       travelTime(curr->len,curr->startv,curr->endv,curr->topv,curr->t1,curr->t2,curr->time);
       curr->touched=0;
     }
   }
   // last item in queue
-//  Serial.print("*");
-//  Serial.print(PREV_BLOCK(bi));
   next->endv=0;
   travelTime(next->len,next->startv,next->endv,next->topv,next->t1,next->t2,next->time);
   next->touched=0;
@@ -618,6 +598,8 @@ static void planner_recalculate() {
 // It adds each line segment to a ring buffer.  Then it plans a route so that
 // if lines are in the same direction the robot doesn't have to slow down.
 static void line(double x,double y) {
+  Serial.println("A");
+
   int next_head=NEXT_BLOCK(block_head);
   // while there is no room in the queue, wait.
   while(block_tail==next_head) sleep_mode();
@@ -635,6 +617,8 @@ static void line(double x,double y) {
   new_block->topv=maxvel;
   new_block->len = sqrt(dx*dx+dy*dy);
 
+  Serial.println("B");
+  
   // Find the maximum speed around the corner from the previous line to this line.
   double maxjunctionv = 0.0;
 
@@ -651,16 +635,6 @@ static void line(double x,double y) {
     double y2 = ( next->ey - next->sy ) / next->len;
     double dotproduct = x1*x2+y1*y2;
 
-//    Serial.print(x1);
-//    Serial.print("*");
-//    Serial.print(x2);
-//    Serial.print("+");
-//    Serial.print(y1);
-//    Serial.print("*");
-//    Serial.print(y2);
-//    Serial.print("=");
-//    Serial.println(dotproduct);
-
     // Close enought to straight (>=0.95) we don't slow down.
     // Anything more than 90 is a full stop guaranteed.
     if( dotproduct >=0.95 ) {
@@ -670,6 +644,8 @@ static void line(double x,double y) {
     }
   }
   new_block->maxstartv = maxjunctionv;
+
+  Serial.println("C");
   
   double allowablev = max_allowable_speed(-accel,0,new_block->len);
 
@@ -692,8 +668,12 @@ static void line(double x,double y) {
   posy=y;
   previous_topv=new_block->topv;
   
+  Serial.println("C");
   planner_recalculate();
+  Serial.println("D");
   planner_wakeup();
+  
+  Serial.println("Z");
 }
 
 
@@ -738,16 +718,38 @@ static void arc(double cx,double cy,double x,double y,double dir) {
   // simplifies to
   double len = abs(theta) * radius;
 
-  int segments = len / MM_PER_SEGMENT;
+  int segments = floor( len / CM_PER_SEGMENT );
  
+  double nx, ny, angle3;
+/*
+  Serial.println(cx);
+  Serial.println(cy);
+  Serial.println(x);
+  Serial.println(y);
+  Serial.println(dir);
+  Serial.println(len);
+  Serial.println(len / CM_PER_SEGMENT);
+  Serial.println(segments);
+*/
   for(int i=0;i<=segments;++i) {
     // interpolate around the arc
-    double angle3 = theta * ((float)i/(float)segments) + angle1;
-    double nx = cx + cos(angle3) * radius;
-    double ny = cy + sin(angle3) * radius;
+    angle3 = theta * ((float)i/(float)segments) + angle1;
+    nx = cx + cos(angle3) * radius;
+    ny = cy + sin(angle3) * radius;
+/*
+    Serial.print(i);
+    Serial.print("\t");
+    Serial.print(angle3);
+    Serial.print("\t");
+    Serial.print(nx);
+    Serial.print("\t");
+    Serial.println(ny);
+*/
     // send it to the planner
     line(nx,ny);
   }
+  
+  line(x,y);
 }
 
 
@@ -1408,10 +1410,32 @@ static void processCommand() {
 #ifndef SMALL_FOOTPRINT
   if(!strncmp(buffer,"HELP",4)) {
     help();
-  } else if(!strncmp(buffer,"WHERE",5)) {
-    where();
   } else if(!strncmp(buffer,"DEMO",4)) {
     demo();
+  } else if(!strncmp(buffer,"TELEPORT",8)) {
+    double xx=posx;
+    double yy=posy;
+  
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'X': xx=atof(ptr+1)*mode_scale;  break;
+      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
+      default: ptr=0; break;
+      }
+    }
+
+    teleportSafe(xx,yy);
+  } else if(!strncmp(buffer,"F",1)) {
+    char *ptr=buffer+1;
+    if(ptr<buffer+sofar) {
+      maxvel=atof(ptr);
+    }
+  } else 
+#endif
+  if(!strncmp(buffer,"WHERE",5)) {
+    where();
   } else if(!strncmp(buffer,"CONFIG",6)) {
     double tt=limit_top;
     double bb=limit_bottom;
@@ -1438,32 +1462,6 @@ static void processCommand() {
     
     saveConfig();
     printConfig();
-  } else if(!strncmp(buffer,"TELEPORT",8)) {
-    double xx=posx;
-    double yy=posy;
-  
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      default: ptr=0; break;
-      }
-    }
-
-    teleportSafe(xx,yy);
-  } else 
-#endif
-  if(!strncmp(buffer,"f",1)) {
-    char *ptr=buffer+1;
-    if(ptr<buffer+sofar) {
-      maxvel=atof(ptr);
-    }
-  } else if(!strncmp(buffer,"G90",3)) {
-    absolute_mode=1;
-  } else if(!strncmp(buffer,"G91",3)) {
-    absolute_mode=0;  
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
@@ -1597,6 +1595,10 @@ static void processCommand() {
       } else if(!strncmp(ptr,"G21",3)) {
         mode_scale=1.0;
         Serial.println("scale: millimeters.");
+      } else if(!strncmp(ptr,"G90",3)) {
+        absolute_mode=1;
+      } else if(!strncmp(ptr,"G91",3)) {
+        absolute_mode=0;  
       } else if(ptr) {
         Serial.print("Invalid command: ");
         Serial.println(ptr);
