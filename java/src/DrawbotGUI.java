@@ -195,7 +195,7 @@ public class DrawbotGUI
 	    	drivexview=0;    
 	    	driveyview=0;
     		driveOn=false;
-    		if(driving) SendLineToRobot("J00 X0 Y0");
+    		if(driving) SendLineToRobot("J02 X0 Y0");
 		}
 		
 		public void mousePressed(MouseEvent e) {
@@ -220,28 +220,32 @@ public class DrawbotGUI
 	    	int y=e.getY();
 	    	if(buttonPressed==MouseEvent.BUTTON1) {
 	    		if(driving) {
+	    			// drive the plotter around
 	    			drivexview=(x-oldx);
 		    		driveyview=(y-oldy);
 		    		double len=Math.sqrt(drivexview*drivexview+driveyview*driveyview);
+		    		// cap the max velocity
 	    			if(len>maxZone) {
 	    				drivexview*=maxZone/len;
 	    				driveyview*=maxZone/len;
 	    				len=maxZone;
 	    			}
+	    			// add a deadzone in the center
 	    			double f=len-deadZone;
 		    		if(f>0) {
 		    			// this scales f to [0....1] so length of (drivex,drivey) will <= 1
 		    			f=f/(maxZone-deadZone);
 		    			drivex=drivexview*f/len;
-		    			drivey=driveyview*f/len;
+		    			drivey=-driveyview*f/len;
 		    		} else {
 		    			drivex=0;
 		    			drivey=0;
 		    		}
 		    		if(readyToReceive) {
-		    			SendLineToRobot("J00 X"+drivex+" Y"+drivey);
+		    			SendLineToRobot("J02 X"+drivex+" Y"+drivey);
 		    		}
 	    		} else {
+	    			// scroll the gcode preview
 		    		double dx=(x-oldx)/previewScale;
 		    		double dy=(y-oldy)/previewScale;
 			    	oldx=x;
@@ -729,7 +733,6 @@ public class DrawbotGUI
 			line=scanner.nextLine().trim();
 			++linesProcessed;
 			statusBar.SetProgress(linesProcessed, linesTotal, line+NL);
-			Log(line);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
 		} while(!SendLineToRobot(line) && linesProcessed<linesTotal);
@@ -763,11 +766,13 @@ public class DrawbotGUI
 		if(tokens[0]=="M02" || tokens[0]=="M2") {
 			running=false;
 			CloseFile();
+			Log(line+NL);
 			return false;
 		}
 		
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
+			Log(line+NL);
 			return false;
 		} 
 
@@ -776,7 +781,7 @@ public class DrawbotGUI
 		if(index!=-1) {
 			String comment=line.substring(index+1,line.lastIndexOf(')'));
 			line=line.substring(0,index).trim();
-			Log("* "+comment);
+			Log("* "+comment+NL);
 			if(line.length()==0) {
 				// entire line was a comment.
 				return false;  // still ready to send
@@ -785,6 +790,7 @@ public class DrawbotGUI
 
 		// send relevant part of line to the robot
 		line+=eol;
+		Log(line+NL);
 		try {
 			readyToReceive=false;
 			out.write(line.getBytes());
@@ -840,11 +846,13 @@ public class DrawbotGUI
 		if( subject == buttonDrive ) {
 			if(driving==true) {
 				driving=false;
+				SendLineToRobot("J00");
 			} else {
 				OpenPort(recentPort);
 				running=false;
 				paused=true;
 				driving=true;
+				SendLineToRobot("J01");
 			}
 			UpdateMenuBar();
 			return;
@@ -1089,7 +1097,7 @@ public class DrawbotGUI
         Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
         split.add(tabs);
         split.add(logPane);
-        split.setDividerSize(3);
+        split.setDividerSize(2);
         
         contentPane.add(split,BorderLayout.CENTER);
         contentPane.add(statusBar,BorderLayout.SOUTH);
