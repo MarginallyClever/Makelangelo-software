@@ -77,7 +77,6 @@
 #define SPOOL_DIAMETER  (0.85)
 #define MAX_RATED_RPM   (3000.0)
 #define MAX_RPM         (300.0)
-#define DEFAULT_RPM     (75.0)
 
 // how fast can the plotter accelerate?
 #define ACCELERATION    (5.00)  // cm/s/s
