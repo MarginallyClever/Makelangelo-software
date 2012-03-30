@@ -60,10 +60,6 @@
 // Uncomment this line to compile for smaller boards
 //#define SMALL_FOOTPRINT (1)
 
-// distance from pen center to string ends
-#define PLOTX           (2.4)
-#define PLOTY           (1.9)
-
 // which motor is on which pin?
 #define M1_PIN          (1)
 #define M2_PIN          (2)
@@ -104,17 +100,17 @@
 #define SPOOL_CIRC      (SPOOL_DIAMETER*PI)  // circumference
 #define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
 
-// if the plotter were hanging from a single stepper and the stepper turned at
-// max RPM, how fast would the plotter move up/down?  All other motions are 
-// cos(theta)*MAX_VEL, where theta is the angle between the desired
-// direction of motion and a line from the plotter to the stepper.
-#define MAX_VEL         (MAX_RPM*SPOOL_CIRC/60.0)  // cm/s
+// Speed of the timer interrupt
+#define TIMER_FREQUENCY (4*STEPS_PER_TURN*MAX_RPM/60)  // microseconds/step
+
+// The interrupt makes calls to move the stepper.
+// the maximum speed cannot be faster than the timer interrupt.
+#define TIMER_S         (1000000.0/(float)TIMER_FREQUENCY)
+#define MAX_VEL         (TIMER_S * THREADPERSTEP)  // cm/s
 
 // max vel is only theoretical.  We have to run slower for accuracy.
 #define DEFAULT_VEL     (DEFAULT_RPM*SPOOL_CIRC/60.0)  // cm/s
 
-// the maximum speed of the timer interrupt
-#define TIMER_FREQUENCY (4*STEPS_PER_TURN*MAX_RPM/60)  // microseconds/step
 
 
 // for arc directions
@@ -320,13 +316,13 @@ static void IK(double x, double y, long &l1, long &l2) {
 // to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(double l1, double l2,double &x,double &y) {
   double a = l1 * THREADPERSTEP;
-  double b = (limit_right-limit_left) - PLOTX*2;
+  double b = (limit_right-limit_left);
   double c = l2 * THREADPERSTEP;
   
   // slow, uses trig
   double theta = acos((a*a+b*b-c*c)/(2.0*a*b));
-  x = cos(theta)*l1 + limit_left + PLOTX;
-  y = sin(theta)*l1 + limit_top - PLOTY;
+  x = cos(theta)*l1 + limit_left;
+  y = sin(theta)*l1 + limit_top;
 }
 
 
