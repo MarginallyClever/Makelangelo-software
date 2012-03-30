@@ -63,14 +63,13 @@ public class DrawbotGUI
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
 {
+	static final long serialVersionUID=1;
 	static private final String cue = "> ";
 	static private final String eol = ";";
 	static private final String NL = System.getProperty("line.separator");;
-	static final long serialVersionUID=1;
 
-	Preferences prefs = Preferences.userRoot().node("DrawBot");
-	
 	// Serial connection
+	static int BAUD_RATE = 9600;
 	CommPortIdentifier portIdentifier;
 	CommPort commPort;
 	SerialPort serialPort;
@@ -81,11 +80,12 @@ public class DrawbotGUI
 	boolean portConfirmed=false;
 	boolean readyToReceive=false;
 	
-	// stored in preferences
+	// Preferences
+	Preferences prefs = Preferences.userRoot().node("DrawBot");
 	String[] recentFiles = {"","","","","","","","","",""};
 	String recentPort;
 	
-	// robot config
+	// Robot config
 	double limit_top, limit_bottom, limit_left, limit_right;
 	
 	// GUI elements
@@ -474,7 +474,7 @@ public class DrawbotGUI
 		// set the port parameters (like baud rate)
 		serialPort = (SerialPort)commPort;
 		try {
-			serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+			serialPort.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
 		}
 		catch(Exception e) {
 			Log("Port could not be configured:"+e.getMessage()+NL);
@@ -823,12 +823,13 @@ public class DrawbotGUI
 
 		if( subject == buttonStart ) {
 			if(fileOpened) OpenFile(recentFiles[0]);
-			paused=false;
-			running=true;
-			driving=false;
-			ClosePort();
-			OpenPort(recentPort);
-			UpdateMenuBar();
+			if(fileOpened) {
+				paused=false;
+				running=true;
+				driving=false;
+				UpdateMenuBar();
+				SendFileCommand();
+			}
 			return;
 		}
 		if( subject == buttonPause ) {

@@ -96,20 +96,19 @@
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (150)  // in ms
 
-// calculate some numbers to help us find maxvel
+// calculate some numbers to help us find feed_rate
 #define SPOOL_CIRC      (SPOOL_DIAMETER*PI)  // circumference
 #define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
 
 // Speed of the timer interrupt
-#define TIMER_FREQUENCY (4*STEPS_PER_TURN*MAX_RPM/60)  // microseconds/step
+#define STEPS_S         (STEPS_PER_TURN*MAX_RPM/60)  // steps/s
+#define TIMER_FREQUENCY (1000000.0/(float)STEPS_S)  // microseconds/step
 
 // The interrupt makes calls to move the stepper.
 // the maximum speed cannot be faster than the timer interrupt.
-#define TIMER_S         (1000000.0/(float)TIMER_FREQUENCY)
-#define MAX_VEL         (TIMER_S * THREADPERSTEP)  // cm/s
-
-// max vel is only theoretical.  We have to run slower for accuracy.
-#define DEFAULT_VEL     (DEFAULT_RPM*SPOOL_CIRC/60.0)  // cm/s
+#define MAX_VEL         (STEPS_S * THREADPERSTEP)  // cm/s
+#define MIN_VEL         (0.001) // cm/s
+#define DEFAULT_VEL     (MAX_VEL/2)  // cm/s
 
 
 
@@ -120,7 +119,7 @@
 #define CM_PER_SEGMENT   (0.1)
 
 // Serial communication bitrate
-#define BAUD            (57600)
+#define BAUD            (9600)
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
@@ -175,7 +174,7 @@ static volatile long laststep1, laststep2;
 
 // speeds, feeds, and delta-vs.
 static double accel=ACCELERATION;
-static double maxvel=DEFAULT_VEL;
+static double feed_rate=DEFAULT_VEL;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
 static double mode_scale=1;   // mm or inches?
@@ -279,6 +278,16 @@ static void tick() {
 
 
 //------------------------------------------------------------------------------
+static void setFeedRate(double v) {
+  feed_rate=v;
+  if(feed_rate>MAX_VEL) feed_rate=MAX_VEL;
+  if(feed_rate<MIN_VEL) feed_rate=MIN_VEL;
+  Serial.print("F=");
+  Serial.println(feed_rate);
+}
+
+
+//------------------------------------------------------------------------------
 // returns angle of dy/dx as a value from 0...2PI
 static double atan3(double dy,double dx) {
   double a=atan2(dy,dx);
@@ -346,12 +355,15 @@ static void travelTime(double len,double v1,double v3,double v2,double &t1,doubl
     t2 = t1;
     t3 = t1 + ( -v3 + sqrt( 2.0*accel*(len-brake_distance) + v3*v3 ) ) / accel;
   }
-
-//  Serial.print("\tv1=");  Serial.print(v1);
-//  Serial.print("\tv3=");  Serial.print(v3);
-//  Serial.print("\tt1=");  Serial.print(t1);
-//  Serial.print("\tt2=");  Serial.print(t2);
-//  Serial.print("\tt3=");  Serial.println(t3);
+/*
+  Serial.print("\tlen=");  Serial.print(len);
+  Serial.print("\taccel=");  Serial.print(accel);
+  Serial.print("\tv1=");  Serial.print(v1);
+  Serial.print("\tv3=");  Serial.print(v3);
+  Serial.print("\tt1=");  Serial.print(t1);
+  Serial.print("\tt2=");  Serial.print(t2);
+  Serial.print("\tt3=");  Serial.println(t3);
+*/
 }
 
 
@@ -428,8 +440,8 @@ static void jog_step() {
   velx+=accelx*dt;
   vely+=accely*dt;
   double vtotal = sqrt(velx*velx+vely*vely);
-  if(vtotal>maxvel) {
-    double scale = maxvel/vtotal;
+  if(vtotal>feed_rate) {
+    double scale = feed_rate/vtotal;
     velx*=scale;
     vely*=scale;
   }
@@ -465,22 +477,26 @@ void plan_step() {
   if(planner_busy==1) return;
   planner_busy=1;
 
+  sei();
+
   tick();
   
   if(current_block==NULL) {
     if(block_tail!=block_head) {
+//      Serial.print("s");
+//      Serial.println(block_tail);
       current_block=&blocks[block_tail];
       current_block->tstart=t;
     }
     if(current_block==NULL) {
-      planner_busy=0;
       planner_idle();
+      planner_busy=0;
       return;
     }
   }
   
   if(current_block!=NULL) {
-    current_block->tsum=t - current_block->tstart;
+    current_block->tsum = t - current_block->tstart;
     if(current_block->tsum > current_block->time) {
       current_block->tsum = current_block->time;
     }
@@ -497,10 +513,12 @@ void plan_step() {
     adjustStringLengths(nlen1,nlen2);
 
     // is this block finished?    
-    if(current_block->tsum>=current_block->time) {
-      // get next block
+    if(current_block->tsum >= current_block->time) {
+//      Serial.print("e");
+//      Serial.println(block_tail);
       current_block=NULL;
       if(block_tail!=block_head) {
+        // get next block
         block_tail=NEXT_BLOCK(block_tail);
       }
     }
@@ -594,15 +612,44 @@ static void planner_recalculate() {
 // It adds each line segment to a ring buffer.  Then it plans a route so that
 // if lines are in the same direction the robot doesn't have to slow down.
 static void line(double x,double y) {
-  Serial.println("A");
+/*
+  Serial.print("A");
+  Serial.print(block_tail);
+  Serial.print(" ");
+  Serial.print(block_head);
+  
+  Serial.print("x ");
+  Serial.println(x);
+  Serial.print("y ");
+  Serial.println(y);
+
+  if(current_block) {
+    Serial.print(" ");
+    Serial.print(current_block->tsum);
+    Serial.print(" ");
+    Serial.print(current_block->time);
+  }
+  Serial.println(planner_busy?" busy":" idle");
+*/
 
   int next_head=NEXT_BLOCK(block_head);
   // while there is no room in the queue, wait.
   while(block_tail==next_head) sleep_mode();
-  
+    
   // set up the new block in the queue.
-  float dx=x-posx;
-  float dy=y-posy;
+  double dx=x-posx;
+  double dy=y-posy;
+/*
+  Serial.print("posx ");
+  Serial.println(posx);
+  Serial.print("posy ");
+  Serial.println(posy);
+  
+  Serial.print("dx ");
+  Serial.println(dx);
+  Serial.print("dy ");
+  Serial.println(dy);
+*/  
   block *new_block=&blocks[block_head];
   new_block->sx=posx;
   new_block->sy=posy;
@@ -610,10 +657,11 @@ static void line(double x,double y) {
   new_block->ey=y;
   new_block->startv=0;
   new_block->endv=0;
-  new_block->topv=maxvel;
+  new_block->topv=feed_rate;
   new_block->len = sqrt(dx*dx+dy*dy);
+  new_block->tsum=0;
 
-  Serial.println("B");
+  if(new_block->len==0) return;
   
   // Find the maximum speed around the corner from the previous line to this line.
   double maxjunctionv = 0.0;
@@ -640,8 +688,6 @@ static void line(double x,double y) {
     }
   }
   new_block->maxstartv = maxjunctionv;
-
-  Serial.println("C");
   
   double allowablev = max_allowable_speed(-accel,0,new_block->len);
 
@@ -656,6 +702,12 @@ static void line(double x,double y) {
   // make sure the trapezoid is calculated for this block
   new_block->touched = 1;
   
+/*
+  Serial.print("B");
+  Serial.print(block_tail);
+  Serial.print(" ");
+  Serial.println(next_head);
+*/
   // the line is now ready to be queued.
   // move the head
   block_head=next_head;
@@ -664,12 +716,8 @@ static void line(double x,double y) {
   posy=y;
   previous_topv=new_block->topv;
   
-  Serial.println("C");
   planner_recalculate();
-  Serial.println("D");
   planner_wakeup();
-  
-  Serial.println("Z");
 }
 
 
@@ -716,29 +764,38 @@ static void arc(double cx,double cy,double x,double y,double dir) {
 
   int segments = floor( len / CM_PER_SEGMENT );
  
-  double nx, ny, angle3;
+  double nx, ny, angle3, scale;
 /*
+  Serial.print("cx ");
   Serial.println(cx);
+  Serial.print("cy ");
   Serial.println(cy);
-  Serial.println(x);
-  Serial.println(y);
-  Serial.println(dir);
-  Serial.println(len);
-  Serial.println(len / CM_PER_SEGMENT);
+    
+  Serial.print("a1 ");
+  Serial.println(angle1);
+  Serial.print("a2 ");
+  Serial.println(angle2);
+
+  Serial.print("radius ");
+  Serial.println(radius);
+  Serial.print("segments ");
   Serial.println(segments);
 */
-  for(int i=0;i<=segments;++i) {
+  for(int i=0;i<segments;++i) {
     // interpolate around the arc
-    angle3 = theta * ((float)i/(float)segments) + angle1;
+    scale = ((double)i)/((double)segments);
+    
+    angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
-/*
-    Serial.print(i);
-    Serial.print("\t");
-    Serial.print(angle3);
-    Serial.print("\t");
-    Serial.print(nx);
-    Serial.print("\t");
+/*    
+    Serial.print("s ");
+    Serial.println(scale);
+    Serial.print("a3 ");
+    Serial.println(angle3);
+    Serial.print("nx ");
+    Serial.println(nx);
+    Serial.print("ny ");
     Serial.println(ny);
 */
     // send it to the planner
@@ -1037,12 +1094,12 @@ static void testInterpolation() {
   double oldv=0,v;
   
   Serial.println("dist=1, full stop");
-  travelTime(end-start,0,0,maxvel,t1,t2,t3);
+  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
   for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,maxvel);
+    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -1055,12 +1112,12 @@ static void testInterpolation() {
   oldv=0;
   Serial.println("dist=5, full stop");
   end=5;
-  travelTime(end-start,0,0,maxvel,t1,t2,t3);
+  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
   for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,maxvel);
+    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -1073,12 +1130,12 @@ static void testInterpolation() {
   oldv=0;
   Serial.println("dist=15, full stop");
   end=15;
-  travelTime(end-start,0,0,maxvel,t1,t2,t3);
+  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
   for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,maxvel);
+    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -1091,12 +1148,12 @@ static void testInterpolation() {
   oldv=0;
   Serial.println("dist=5, keep going");
   end=5;
-  travelTime(end-start,0,maxvel,maxvel,t1,t2,t3);
+  travelTime(end-start,0,feed_rate,feed_rate,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
   for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,maxvel);
+    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -1109,12 +1166,12 @@ static void testInterpolation() {
   oldv=0;
   Serial.println("dist=5, slow to stop");
   end=5;
-  travelTime(end-start,maxvel,0,maxvel,t1,t2,t3);
+  travelTime(end-start,feed_rate,0,feed_rate,t1,t2,t3);
   Serial.print("t1=");  Serial.println(t1);
   Serial.print("t2=");  Serial.println(t2);
   Serial.print("t3=");  Serial.println(t3);
   for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,maxvel);
+    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
     if(t<t1) Serial.print("A\t");
     else if(t<t2) Serial.print("B\t");
     else if(t<t3) Serial.print("C\t");
@@ -1129,13 +1186,13 @@ static void testInterpolation() {
 //------------------------------------------------------------------------------
 static void testAcceleration() {
   Serial.println("-- TEST ACCELERATION --");
-  Serial.print("maxvel=");  Serial.println(maxvel);
+  Serial.print("feed_rate=");  Serial.println(feed_rate);
 
   double i;
   double a=10;
   double b=0;
   double c;
-  for(i=3;i<maxvel;i+=0.5) {
+  for(i=3;i<feed_rate;i+=0.5) {
     delay(2000);
     accel=i;
     Serial.println(accel);
@@ -1148,7 +1205,7 @@ static void testAcceleration() {
 
 
 //------------------------------------------------------------------------------
-static void testMaxVel() {
+static void testfeed_rate() {
   Serial.println("-- TEST MAX VELOCITY --");
   Serial.print("ACCEL=");  Serial.println(ACCELERATION);
   Serial.print("MAX_VEL=");  Serial.println(MAX_VEL);
@@ -1162,8 +1219,8 @@ static void testMaxVel() {
 
   for(i=5;i<MAX_VEL;i+=1) {
     delay(2000);
-    maxvel=i;
-    Serial.println(maxvel);
+    setFeedRate(i);
+    Serial.println(feed_rate);
     line(a,0);
     c=b;
     b=a;
@@ -1190,6 +1247,8 @@ static void loadspools() {
 //------------------------------------------------------------------------------
 // Show off line and arc movement.  This is the test pattern.
 static void demo() {
+  setFeedRate(1.0);
+  
   // square
   Serial.println("> L 0,-2");              line( 0,-2);
   Serial.println("> L-2,-2");              line(-2,-2);
@@ -1353,7 +1412,7 @@ static void printConfig() {
   Serial.print("B");  Serial.println(limit_bottom);
   Serial.print("L");  Serial.println(limit_left);
   Serial.print("R");  Serial.println(limit_right);
-  Serial.print("F");  Serial.println(maxvel);
+  Serial.print("F");  Serial.println(feed_rate);
   Serial.print("A");  Serial.println(accel);
 }
 
@@ -1426,7 +1485,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"F",1)) {
     char *ptr=buffer+1;
     if(ptr<buffer+sofar) {
-      maxvel=atof(ptr);
+      setFeedRate(atof(ptr));
     }
   } else 
 #endif
@@ -1461,7 +1520,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
-    double xx, yy, zz, ff=maxvel;
+    double xx, yy, zz, ff=feed_rate;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1491,13 +1550,13 @@ static void processCommand() {
       zz+=posz;
     }
     
-    maxvel=ff;
+    setFeedRate(ff);
     pen(zz);
     error(lineSafe(xx,yy));
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
-    double xx, yy, zz, ff=maxvel;
+    double xx, yy, zz, ff=feed_rate;
     double dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
     double ii = 0;
     double jj = 0;
@@ -1532,7 +1591,7 @@ static void processCommand() {
       zz+=posz;
     }
 
-    maxvel=ff;
+    setFeedRate(ff);
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
   } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
@@ -1564,7 +1623,7 @@ static void processCommand() {
     double xx=0;
     double yy=0;
     double zz=posz;
-    double ff=maxvel;
+    double ff=feed_rate;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1578,7 +1637,7 @@ static void processCommand() {
       }
     }
 
-    maxvel=ff;
+    setFeedRate(ff);
     pen(zz);
     jog(xx,yy);
   } else {
@@ -1633,7 +1692,7 @@ void setup() {
 //  testInterpolation();
 //  testFullCircle();
 //  testAcceleration();
-//  testMaxVel();
+//  testfeed_rate();
 //  testArcs();
 
   // display the help at startup.
