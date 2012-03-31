@@ -76,7 +76,7 @@
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
 #define MAX_RATED_RPM   (3000.0)
-#define MAX_RPM         (300.0)
+#define MAX_RPM         (200.0)
 
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
@@ -275,13 +275,22 @@ static void tick() {
 
 
 //------------------------------------------------------------------------------
-// feed rate is given in cm/s
+// feed rate is given in units/min and converted to cm/s
 static void setFeedRate(double v) {
+  v *= mode_scale/60.0;
   if( feed_rate != v ) {
     feed_rate=v;
     if(feed_rate>MAX_VEL) feed_rate=MAX_VEL;
     if(feed_rate<MIN_VEL) feed_rate=MIN_VEL;
   }
+}
+
+
+//------------------------------------------------------------------------------
+static void printFeedRate() {
+  Serial.print(feed_rate*60.0/mode_scale);
+  Serial.print(mode_name);
+  Serial.print("/min");
 }
 
 
@@ -1202,7 +1211,7 @@ static void testfeed_rate() {
 
   line(b,0);
 
-  for(i=MIN_VEL;i<MAX_VEL;i+=1) {
+  for(i=MIN_VEL;i<MAX_VEL;++i) {
     delay(2000);
     setFeedRate(i);
     Serial.println(feed_rate);
@@ -1232,7 +1241,10 @@ static void loadspools() {
 //------------------------------------------------------------------------------
 // Show off line and arc movement.  This is the test pattern.
 static void demo() {
-  setFeedRate(1.0);  // 1cm/s = 600mm/min
+  // Set speed to 1m/min
+  mode_scale=0.1;
+  strcpy(mode_name,"mm");
+  setFeedRate(1000.0);
   
   // square
   Serial.println("> L 0,-2");              line( 0,-2);
@@ -1380,14 +1392,6 @@ static void help() {
 
 
 //------------------------------------------------------------------------------
-static void showFeedRate() {
-  Serial.print(feed_rate*60.0/mode_scale);
-  Serial.print(mode_name);
-  Serial.print("/min");
-}
-
-
-//------------------------------------------------------------------------------
 static void where() {
   Serial.print("(");
   Serial.print(posx);
@@ -1396,19 +1400,19 @@ static void where() {
   Serial.print(",");
   Serial.print(posz);
   Serial.print(") F=");
-  showFeedRate();
+  printFeedRate();
   Serial.print("\n");
 }
 
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print("T");  Serial.println(limit_top);
-  Serial.print("B");  Serial.println(limit_bottom);
-  Serial.print("L");  Serial.println(limit_left);
-  Serial.print("R");  Serial.println(limit_right);
-  Serial.print("F");  showFeedRate();
-  Serial.print("A");  Serial.println(accel);
+  Serial.print("T");    Serial.println(limit_top);
+  Serial.print("B");    Serial.println(limit_bottom);
+  Serial.print("L");    Serial.println(limit_left);
+  Serial.print("R");    Serial.println(limit_right);
+  Serial.print("F");    printFeedRate();
+  Serial.print("\nA");  Serial.println(accel);
 }
 
 
@@ -1529,7 +1533,7 @@ static void processCommand() {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
       case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1540,7 +1544,7 @@ static void processCommand() {
       zz+=posz;
     }
     
-    setFeedRate(ff*60.0);  // cm/min -> cm/s
+    setFeedRate(ff);
     pen(zz);
     error(lineSafe(xx,yy));
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
@@ -1570,7 +1574,7 @@ static void processCommand() {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
       case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1581,7 +1585,7 @@ static void processCommand() {
       zz+=posz;
     }
 
-    setFeedRate(ff*60.0);  // cm/min -> cm/s
+    setFeedRate(ff);
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
   } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
@@ -1622,12 +1626,12 @@ static void processCommand() {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
       case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1)*mode_scale;  break;
+      case 'F': ff=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
 
-    setFeedRate(ff*60.0);  // cm/min -> cm/s
+    setFeedRate(ff);
     pen(zz);
     jog(xx,yy);
   } else {
@@ -1664,6 +1668,10 @@ void setup() {
   // start communications
   Serial.begin(BAUD);
   Serial.println("== HELLO WORLD ==");
+
+  strcpy(mode_name,"mm");
+  mode_scale=0.1;
+  
   loadConfig();
   printConfig();
   sofar=0;
@@ -1698,9 +1706,6 @@ void setup() {
   posx=velx=accelx=0;
   posy=velx=accelx=0;
 
-  strcpy(mode_name,"mm");
-  mode_scale=0.1;
-  
   long L1,L2;
   IK(posx,posy,L1,L2);
   laststep1=L1;
