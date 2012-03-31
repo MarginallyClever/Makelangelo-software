@@ -1362,7 +1362,7 @@ static void halftone(double size,double fill) {
 
 //------------------------------------------------------------------------------
 static void help() {
-  Serial.println("== DRAWBOT - 2012 Feb 28 - dan@marginallyclever.com ==");
+  Serial.println("== DRAWBOT - http://github.com/i-make-robots/Drawbot/ ==");
   Serial.println("All commands end with a semi-colon.");
   Serial.println("HELP;  - display this message");
   Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
@@ -1380,6 +1380,14 @@ static void help() {
 
 
 //------------------------------------------------------------------------------
+static void showFeedRate() {
+  Serial.print(feed_rate*60.0/mode_scale);
+  Serial.print(mode_name);
+  Serial.print("/min");
+}
+
+
+//------------------------------------------------------------------------------
 static void where() {
   Serial.print("(");
   Serial.print(posx);
@@ -1388,9 +1396,8 @@ static void where() {
   Serial.print(",");
   Serial.print(posz);
   Serial.print(") F=");
-  Serial.print(feed_rate*60.0/mode_scale);
-  Serial.print(mode_name);
-  Serial.println("/min");
+  showFeedRate();
+  Serial.print("\n");
 }
 
 
@@ -1400,7 +1407,7 @@ static void printConfig() {
   Serial.print("B");  Serial.println(limit_bottom);
   Serial.print("L");  Serial.println(limit_left);
   Serial.print("R");  Serial.println(limit_right);
-  Serial.print("F");  Serial.println(feed_rate);
+  Serial.print("F");  showFeedRate();
   Serial.print("A");  Serial.println(accel);
 }
 
@@ -1624,11 +1631,8 @@ static void processCommand() {
     pen(zz);
     jog(xx,yy);
   } else {
-    char *ptr=buffer, *ptr2;
+    char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
-      ptr2=strchr(ptr,' ')+1;
-      if(!ptr2) ptr2=strchr(ptr,';')+1;
-      ptr=ptr2;
       if(!strncmp(ptr,"G20",3)) {
         mode_scale=0.393700787;  // inches -> cm
         strcpy(mode_name,"in");
@@ -1642,10 +1646,14 @@ static void processCommand() {
       } else if(!strncmp(ptr,"G91",3)) {
         absolute_mode=0;
       } else if(ptr) {
-        Serial.print("Invalid command: ");
-        Serial.println(ptr);
+        if(strlen(ptr)>0) {
+          Serial.print("Invalid command: '");
+          Serial.print(ptr);
+          Serial.println("'");
+        }
         break;
       }
+      ptr=strchr(ptr,' ')+1;
     }
   }
 }
