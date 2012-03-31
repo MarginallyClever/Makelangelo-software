@@ -1388,7 +1388,7 @@ static void where() {
   Serial.print(",");
   Serial.print(posz);
   Serial.print(") F=");
-  Serial.print(feed_rate);
+  Serial.print(feed_rate*60.0/mode_scale);
   Serial.print(mode_name);
   Serial.println("/min");
 }
@@ -1624,9 +1624,11 @@ static void processCommand() {
     pen(zz);
     jog(xx,yy);
   } else {
-    char *ptr=buffer;
+    char *ptr=buffer, *ptr2;
     while(ptr && ptr<buffer+sofar) {
-      ptr=strchr(ptr,' ')+1;
+      ptr2=strchr(ptr,' ')+1;
+      if(!ptr2) ptr2=strchr(ptr,';')+1;
+      ptr=ptr2;
       if(!strncmp(ptr,"G20",3)) {
         mode_scale=0.393700787;  // inches -> cm
         strcpy(mode_name,"in");
