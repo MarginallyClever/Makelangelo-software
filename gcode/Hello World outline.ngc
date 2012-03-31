@@ -1,13 +1,14 @@
 ( Made using CamBam - http://www.cambam.co.uk )
 ( Hello World 2012-03-28 4:26:42 PM )
 ( T0 : 0.0 )
-G0 Z90.0
+G21 G90 G64 G40
+G0 F1.0 Z90.0
 ( T0 : 0.0 )
 T0 M6
 ( Engrave1 )
 G0 X4.7335 Y-0.4759
 G1 F1.0 Z10.0
-G1 F3.0 X4.9966 Y0.7624
+G1 F1.0 X4.9966 Y0.7624
 G1 X4.6574 Y0.7165
 G1 X4.5454 Y0.1891
 G1 X4.5241 Y0.0929

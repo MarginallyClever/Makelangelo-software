@@ -69,7 +69,7 @@ public class DrawbotGUI
 	static private final String NL = System.getProperty("line.separator");;
 
 	// Serial connection
-	static int BAUD_RATE = 9600;
+	static int BAUD_RATE = 57600;
 	CommPortIdentifier portIdentifier;
 	CommPort commPort;
 	SerialPort serialPort;

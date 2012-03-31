@@ -78,10 +78,6 @@
 #define MAX_RATED_RPM   (3000.0)
 #define MAX_RPM         (300.0)
 
-// how fast can the plotter accelerate?
-#define ACCELERATION    (5.00)  // cm/s/s
-
-
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
 // *****************************************************************************
@@ -109,7 +105,8 @@
 #define MIN_VEL         (0.001) // cm/s
 #define DEFAULT_VEL     (MAX_VEL/2)  // cm/s
 
-
+// How fast can the plotter accelerate?
+#define ACCELERATION    (DEFAULT_VEL)  // cm/s/s
 
 // for arc directions
 #define ARC_CW          (1)
@@ -118,7 +115,7 @@
 #define CM_PER_SEGMENT   (0.1)
 
 // Serial communication bitrate
-#define BAUD            (9600)
+#define BAUD            (57600)
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
@@ -176,7 +173,8 @@ static double accel=ACCELERATION;
 static double feed_rate=DEFAULT_VEL;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
-static double mode_scale=1;   // mm or inches?
+static double mode_scale;   // mm or inches?
+static char mode_name[3];
 
 // time values
 static long  t_millis;
@@ -277,12 +275,13 @@ static void tick() {
 
 
 //------------------------------------------------------------------------------
+// feed rate is given in cm/s
 static void setFeedRate(double v) {
-  feed_rate=v;
-  if(feed_rate>MAX_VEL) feed_rate=MAX_VEL;
-  if(feed_rate<MIN_VEL) feed_rate=MIN_VEL;
-  Serial.print("F=");
-  Serial.println(feed_rate);
+  if( feed_rate != v ) {
+    feed_rate=v;
+    if(feed_rate>MAX_VEL) feed_rate=MAX_VEL;
+    if(feed_rate<MIN_VEL) feed_rate=MIN_VEL;
+  }
 }
 
 
@@ -400,17 +399,17 @@ static double interpolate(double p0,double p3,double t,double t1,double t2,doubl
 static void adjustStringLengths(long nlen1,long nlen2) {
   // is the change in length >= one step?
   long steps=nlen1-laststep1;
-  if(steps<0)      m1.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m1.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-//  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m1.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
+//  else if(steps>0) m1.onestep(REEL_OUT,STEP_MODE);  // it is longer.
+  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
   
   // is the change in length >= one step?
   steps=nlen2-laststep2;
-  if(steps<0)      m2.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m2.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-//  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m2.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
+//  else if(steps>0) m2.onestep(REEL_OUT,STEP_MODE);  // it is longer.
+  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
+  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
   
   laststep1=nlen1;
   laststep2=nlen2;
@@ -482,8 +481,6 @@ void plan_step() {
   
   if(current_block==NULL) {
     if(block_tail!=block_head) {
-//      Serial.print("s");
-//      Serial.println(block_tail);
       current_block=&blocks[block_tail];
       current_block->tstart=t;
     }
@@ -513,8 +510,6 @@ void plan_step() {
 
     // is this block finished?    
     if(current_block->tsum >= current_block->time) {
-//      Serial.print("e");
-//      Serial.println(block_tail);
       current_block=NULL;
       if(block_tail!=block_head) {
         // get next block
@@ -630,7 +625,6 @@ static void line(double x,double y) {
   }
   Serial.println(planner_busy?" busy":" idle");
 */
-
   int next_head=NEXT_BLOCK(block_head);
   // while there is no room in the queue, wait.
   while(block_tail==next_head) sleep_mode();
@@ -1048,22 +1042,14 @@ static void testFullCircle() {
   long a,b;
   
   a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m1.step(1,REEL_OUT,STEP_MODE);  // reel out
-  }
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m2.step(1,REEL_OUT,STEP_MODE);  // reel out
-  }
+  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_OUT,STEP_MODE);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_OUT,STEP_MODE);  // reel out
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
 
   a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m1.step(1,REEL_IN,STEP_MODE);  // reel out
-  }
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m2.step(1,REEL_IN,STEP_MODE);  // reel out
-  }
+  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_IN,STEP_MODE);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_IN,STEP_MODE);  // reel out
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
   
@@ -1216,7 +1202,7 @@ static void testfeed_rate() {
 
   line(b,0);
 
-  for(i=5;i<MAX_VEL;i+=1) {
+  for(i=MIN_VEL;i<MAX_VEL;i+=1) {
     delay(2000);
     setFeedRate(i);
     Serial.println(feed_rate);
@@ -1246,7 +1232,7 @@ static void loadspools() {
 //------------------------------------------------------------------------------
 // Show off line and arc movement.  This is the test pattern.
 static void demo() {
-  setFeedRate(1.0);
+  setFeedRate(1.0);  // 1cm/s = 600mm/min
   
   // square
   Serial.println("> L 0,-2");              line( 0,-2);
@@ -1385,7 +1371,7 @@ static void help() {
   Serial.println("DEMO;  - draw a test pattern");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
-  Serial.println("G01-G04,G20,G21,G90,G91");
+  Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91");
 }
 
 
@@ -1401,7 +1387,10 @@ static void where() {
   Serial.print(posy);
   Serial.print(",");
   Serial.print(posz);
-  Serial.println(")");
+  Serial.print(") F=");
+  Serial.print(feed_rate);
+  Serial.print(mode_name);
+  Serial.println("/min");
 }
 
 
@@ -1481,11 +1470,6 @@ static void processCommand() {
     }
 
     teleportSafe(xx,yy);
-  } else if(!strncmp(buffer,"F",1)) {
-    char *ptr=buffer+1;
-    if(ptr<buffer+sofar) {
-      setFeedRate(atof(ptr));
-    }
   } else 
 #endif
   if(!strncmp(buffer,"WHERE",5)) {
@@ -1549,7 +1533,7 @@ static void processCommand() {
       zz+=posz;
     }
     
-    setFeedRate(ff);
+    setFeedRate(ff*60.0);  // cm/min -> cm/s
     pen(zz);
     error(lineSafe(xx,yy));
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
@@ -1590,7 +1574,7 @@ static void processCommand() {
       zz+=posz;
     }
 
-    setFeedRate(ff);
+    setFeedRate(ff*60.0);  // cm/min -> cm/s
     pen(zz);
     error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
   } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
@@ -1636,7 +1620,7 @@ static void processCommand() {
       }
     }
 
-    setFeedRate(ff);
+    setFeedRate(ff*60.0);  // cm/min -> cm/s
     pen(zz);
     jog(xx,yy);
   } else {
@@ -1644,15 +1628,17 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       if(!strncmp(ptr,"G20",3)) {
-        mode_scale=2.54;
+        mode_scale=0.393700787;  // inches -> cm
+        strcpy(mode_name,"in");
         Serial.println("scale: inches.");
       } else if(!strncmp(ptr,"G21",3)) {
-        mode_scale=1.0;
+        mode_scale=0.1;  // mm -> cm
+        strcpy(mode_name,"mm");
         Serial.println("scale: millimeters.");
       } else if(!strncmp(ptr,"G90",3)) {
         absolute_mode=1;
       } else if(!strncmp(ptr,"G91",3)) {
-        absolute_mode=0;  
+        absolute_mode=0;
       } else if(ptr) {
         Serial.print("Invalid command: ");
         Serial.println(ptr);
@@ -1702,6 +1688,9 @@ void setup() {
   posx=velx=accelx=0;
   posy=velx=accelx=0;
 
+  strcpy(mode_name,"mm");
+  mode_scale=0.1;
+  
   long L1,L2;
   IK(posx,posy,L1,L2);
   laststep1=L1;
@@ -1731,7 +1720,7 @@ void loop() {
 
     // echo confirmation
     buffer[sofar]=0;
-    Serial.println(buffer);
+//    Serial.println(buffer);
  
     // do something with the command
     processCommand();
