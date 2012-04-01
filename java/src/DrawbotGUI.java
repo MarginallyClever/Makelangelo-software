@@ -175,6 +175,7 @@ public class DrawbotGUI
 		int cx,cy;
 		double offsetx=0,offsety=0;
 		double previewScale=20;
+		float drawScale=0.1f;
 
 		// driving controls
 		public boolean driveOn=false;
@@ -297,7 +298,11 @@ public class DrawbotGUI
 			int i,j;
 
 			for(i=0;i<instructions.length;++i) {
-				if(instructions[i].startsWith("G00 ") || instructions[i].startsWith("G0 ") || 
+				if(instructions[i].contains("G20")) {
+					drawScale=0.393700787f;
+				} else if(instructions[i].contains("G21")) {
+					drawScale=0.1f;
+				} else if(instructions[i].startsWith("G00 ") || instructions[i].startsWith("G0 ") || 
 					instructions[i].startsWith("G01 ") || instructions[i].startsWith("G1 ")) {
 					// draw a line
 					float x=px;
@@ -305,12 +310,12 @@ public class DrawbotGUI
 					float z=pz;
 					String[] tokens = instructions[i].split("\\s");
 					for(j=0;j<tokens.length;++j) {
-						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					}
 
-					g2d.setColor( z<45 ? Color.BLUE : Color.PINK);
+					g2d.setColor( z<45 * drawScale ? Color.BLUE : Color.PINK);
 					g2d.drawLine(TX(px),TY(py),TX(x),TY(y));
 					px=x;
 					py=y;
@@ -326,14 +331,14 @@ public class DrawbotGUI
 					float aj=py;
 					String[] tokens = instructions[i].split("\\s");
 					for(j=0;j<tokens.length;++j) {
-						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1));
-						if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1));
+						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
+						if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
 					}
 
-					g2d.setColor( z<45 ? Color.GREEN : Color.PINK);
+					g2d.setColor( z<45 * drawScale ? Color.GREEN : Color.PINK);
 
 					double dx=px - ai;
 					double dy=py - aj;

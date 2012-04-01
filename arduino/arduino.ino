@@ -35,7 +35,7 @@
 #include <AFMotor.h>
 
 // Default servo library
-#include <Servo.h> 
+#include <ServoTimer2.h> 
 
 // Timer interrupt libraries
 #include <FrequencyTimer2.h>
@@ -132,8 +132,8 @@
 
 // based on https://github.com/grbl/grbl/ planner
 typedef struct {
-  double sx, sy;
-  double ex, ey;
+  double sx, sy, sz;
+  double ex, ey, ez;
   double t1, t2, time, tsum, tstart;
   double startv,endv,topv,maxstartv;
   double len;
@@ -150,7 +150,7 @@ typedef struct {
 static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
 static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 
-static Servo s1;
+static ServoTimer2 s1;
 
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
@@ -305,11 +305,14 @@ static double atan3(double dy,double dx) {
 
 //------------------------------------------------------------------------------
 // Change pen state.
-static void pen(double pen_angle) {
-  posz=pen_angle;
-  if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
-  if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
-  s1.write(posz);
+static void pen(int pen_angle) {
+  if(posz!=pen_angle) {
+    posz=pen_angle;
+    if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
+    if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
+
+    s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( pen_angle / 180.0f )) + MIN_PULSE_WIDTH );
+  }
 }
 
 
@@ -509,6 +512,7 @@ void plan_step() {
     // find where the plotter will be at tsum seconds
     double nx = interpolate(current_block->sx,current_block->ex,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
     double ny = interpolate(current_block->sy,current_block->ey,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
+    double nz = interpolate(current_block->sz,current_block->ez,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
 
     // get the new string lengths
     long nlen1,nlen2;
@@ -516,6 +520,9 @@ void plan_step() {
 
     // move the motors
     adjustStringLengths(nlen1,nlen2);
+    
+    // move the pen
+    pen(nz);
 
     // is this block finished?    
     if(current_block->tsum >= current_block->time) {
@@ -614,8 +621,8 @@ static void planner_recalculate() {
 // This method assumes the limits have already been checked.
 // It adds each line segment to a ring buffer.  Then it plans a route so that
 // if lines are in the same direction the robot doesn't have to slow down.
-static void line(double x,double y) {
-/*
+static void line(double x,double y,double z) {
+#ifdef VERBOSE
   Serial.print("A");
   Serial.print(block_tail);
   Serial.print(" ");
@@ -633,7 +640,8 @@ static void line(double x,double y) {
     Serial.print(current_block->time);
   }
   Serial.println(planner_busy?" busy":" idle");
-*/
+#endif
+
   int next_head=NEXT_BLOCK(block_head);
   // while there is no room in the queue, wait.
   while(block_tail==next_head) sleep_mode();
@@ -641,7 +649,9 @@ static void line(double x,double y) {
   // set up the new block in the queue.
   double dx=x-posx;
   double dy=y-posy;
-/*
+  double dz=z-posz;
+
+#ifdef VERBOSE
   Serial.print("posx ");
   Serial.println(posx);
   Serial.print("posy ");
@@ -651,16 +661,19 @@ static void line(double x,double y) {
   Serial.println(dx);
   Serial.print("dy ");
   Serial.println(dy);
-*/  
+#endif
+
   block *new_block=&blocks[block_head];
   new_block->sx=posx;
   new_block->sy=posy;
+  new_block->sz=posz;
   new_block->ex=x;
   new_block->ey=y;
+  new_block->ez=z;
   new_block->startv=0;
   new_block->endv=0;
   new_block->topv=feed_rate;
-  new_block->len = sqrt(dx*dx+dy*dy);
+  new_block->len = sqrt(dx*dx + dy*dy + dz*dz);
   new_block->tsum=0;
 
   if(new_block->len==0) return;
@@ -677,9 +690,11 @@ static void line(double x,double y) {
     // dot product the two vectors to get the cos(theta) of their angle.
     double x1 = ( curr->ex - curr->sx ) / curr->len;
     double y1 = ( curr->ey - curr->sy ) / curr->len;
+    double z1 = ( curr->ez - curr->sz ) / curr->len;
     double x2 = ( next->ex - next->sx ) / next->len;
     double y2 = ( next->ey - next->sy ) / next->len;
-    double dotproduct = x1*x2+y1*y2;
+    double z2 = ( curr->ez - curr->sz ) / curr->len;
+    double dotproduct = x1*x2 + y1*y2 + z1*z2;
 
     // Close enought to straight (>=0.95) we don't slow down.
     // Anything more than 90 is a full stop guaranteed.
@@ -697,19 +712,22 @@ static void line(double x,double y) {
   // no matter at what speed we start, is this line long enough to reach top speed?
   new_block->nominal_length = ( new_block->topv < allowablev );
 
-//  Serial.print("maxstartv=");   Serial.println(maxjunctionv);
-//  Serial.print("allowablev=");  Serial.println(allowablev);
-//  Serial.print("startv=");      Serial.println(new_block->startv);
+#ifdef VERBOSE
+  Serial.print("maxstartv=");   Serial.println(maxjunctionv);
+  Serial.print("allowablev=");  Serial.println(allowablev);
+  Serial.print("startv=");      Serial.println(new_block->startv);
+#endif
 
   // make sure the trapezoid is calculated for this block
   new_block->touched = 1;
   
-/*
+#ifdef VERBOSE
   Serial.print("B");
   Serial.print(block_tail);
   Serial.print(" ");
   Serial.println(next_head);
-*/
+#endif
+
   // the line is now ready to be queued.
   // move the head
   block_head=next_head;
@@ -725,12 +743,12 @@ static void line(double x,double y) {
 
 //------------------------------------------------------------------------------
 // checks against the robot limits before attempting to move
-static int lineSafe(double x,double y) {
+static int lineSafe(double x,double y,double z) {
 #ifndef SMALL_FOOTPRINT
   if(outsideLimits(x,y)) return 1;
 #endif
   
-  line(x,y);
+  line(x,y,z);
   return 0;
 }
 
@@ -742,7 +760,7 @@ static int lineSafe(double x,double y) {
 // cx/cy - center of circle
 // x/y - end position
 // dir - ARC_CW or ARC_CCW to control direction of arc
-static void arc(double cx,double cy,double x,double y,double dir) {
+static void arc(double cx,double cy,double x,double y,double z,double dir) {
   // get radius
   double dx = posx - cx;
   double dy = posy - cy;
@@ -766,7 +784,7 @@ static void arc(double cx,double cy,double x,double y,double dir) {
 
   int segments = floor( len / CM_PER_SEGMENT );
  
-  double nx, ny, angle3, scale;
+  double nx, ny, nz, angle3, scale;
 /*
   Serial.print("cx ");
   Serial.println(cx);
@@ -790,6 +808,7 @@ static void arc(double cx,double cy,double x,double y,double dir) {
     angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
+    nz = ( z - posz ) * scale + posz;
 /*    
     Serial.print("s ");
     Serial.println(scale);
@@ -801,10 +820,10 @@ static void arc(double cx,double cy,double x,double y,double dir) {
     Serial.println(ny);
 */
     // send it to the planner
-    line(nx,ny);
+    line(nx,ny,nz);
   }
   
-  line(x,y);
+  line(x,y,z);
 }
 
 
@@ -933,13 +952,13 @@ static int canArc(double cx,double cy,double x,double y,double dir) {
 // before attempting to move...
 // ...checks start & end radius match
 // ...checks against the envelope limits
-static int arcSafe(double cx,double cy,double x,double y,double dir) {
+static int arcSafe(double cx,double cy,double x,double y,double z,double dir) {
 #ifndef SMALL_FOOTPRINT
   int r=canArc(cx,cy,x,y,dir);
   if(r!=0) return r;
 #endif
   
-  arc(cx,cy,x,y,dir);
+  arc(cx,cy,x,y,z,dir);
   return 0;
 }
 
@@ -1190,7 +1209,7 @@ static void testAcceleration() {
     delay(2000);
     accel=i;
     Serial.println(accel);
-    line(a,0);
+    line(a,0,0);
     c=b;
     b=a;
     a=c;
@@ -1209,18 +1228,18 @@ static void testfeed_rate() {
   double b=-10;
   double c;
 
-  line(b,0);
+  line(b,0,0);
 
   for(i=MIN_VEL;i<MAX_VEL;++i) {
     delay(2000);
     setFeedRate(i);
     Serial.println(feed_rate);
-    line(a,0);
+    line(a,0,0);
     c=b;
     b=a;
     a=c;
   }
-  line(0,0);
+  line(0,0,0);
 }
 
 
@@ -1247,42 +1266,44 @@ static void demo() {
   setFeedRate(1000.0);
   
   // square
-  Serial.println("> L 0,-2");              line( 0,-2);
-  Serial.println("> L-2,-2");              line(-2,-2);
-  Serial.println("> L-2, 2");              line(-2, 2);
-  Serial.println("> L 2, 2");              line( 2, 2);
-  Serial.println("> L 2,-2");              line( 2,-2);
-  Serial.println("> L 0,-2");              line( 0,-2);
+  Serial.println("> G01 0,-2");       line( 0,-2,0);
+  Serial.println("> G01-2,-2");       line(-2,-2,0);
+  Serial.println("> G01-2, 2");       line(-2, 2,0);
+  Serial.println("> G01 2, 2");       line( 2, 2,0);
+  Serial.println("> G01 2,-2");       line( 2,-2,0);
+  Serial.println("> G01 0,-2");       line( 0,-2,0);
   // arc
-  Serial.println("> A 0,-4,0,-6,ARC_CW");  arc(0,-4,0,-6,ARC_CW);
-  Serial.println("> A 0,-4,0,-2,ARC_CCW"); arc(0,-4,0,-2,ARC_CCW);
+  Serial.println("> G02 0,-4,0,-6");  arc(0,-4,0,-6,ARC_CW);
+  Serial.println("> G03 0,-4,0,-2");  arc(0,-4,0,-2,ARC_CCW);
   // square
-  Serial.println("> L 0,-4");              line( 0,-4);
-  Serial.println("> L 4,-4");              line( 4,-4);
-  Serial.println("> L 4, 4");              line( 4, 4);
-  Serial.println("> L-4, 4");              line(-4, 4);
-  Serial.println("> L-4,-4");              line(-4,-4);
-  Serial.println("> L 0,-4");              line( 0,-4);
+  Serial.println("> G01 0,-4");       line( 0,-4,0);
+  Serial.println("> G01 4,-4");       line( 4,-4,0);
+  Serial.println("> G01 4, 4");       line( 4, 4,0);
+  Serial.println("> G01-4, 4");       line(-4, 4,0);
+  Serial.println("> G01-4,-4");       line(-4,-4,0);
+  Serial.println("> G01 0,-4");       line( 0,-4,0);
   // square
-  Serial.println("> L 0,-6");              line( 0,-6);
-  Serial.println("> L-6,-6");              line(-6,-6);
-  Serial.println("> L-6, 6");              line(-6, 6);
-  Serial.println("> L 6, 6");              line( 6, 6);
-  Serial.println("> L 6,-6");              line( 6,-6);
-  Serial.println("> L 0,-6");              line( 0,-6);
+  Serial.println("> G01 0,-6");       line( 0,-6,0);
+  Serial.println("> G01-6,-6");       line(-6,-6,0);
+  Serial.println("> G01-6, 6");       line(-6, 6,0);
+  Serial.println("> G01 6, 6");       line( 6, 6,0);
+  Serial.println("> G01 6,-6");       line( 6,-6,0);
+  Serial.println("> G01 0,-6");       line( 0,-6,0);
   // large circle
-  Serial.println("> A 0,0,0, 6,ARC_CW");   arc(0,0, 0, 6,ARC_CW);
-  Serial.println("> A 0,0,0,-6,ARC_CW");   arc(0,0, 0,-6,ARC_CW);
+  Serial.println("> G03 0,0,0, 6");   arc(0,0, 0, 6,ARC_CCW);
+  Serial.println("> G03 0,0,0,-6");   arc(0,0, 0,-6,ARC_CCW);
 
   // triangle
-  Serial.println("> L  5.196, 3");         line( 5.196, 3);
-  Serial.println("> L -5.196, 3");         line(-5.196, 3);
-  Serial.println("> L 0,-6");              line( 0,-6);
+  Serial.println("> G01  5.196, 3");  line( 5.196, 3,0);
+  Serial.println("> G01 -5.196, 3");  line(-5.196, 3,0);
+  Serial.println("> G01 0,-6");       line( 0,-6,0);
+
+  // prepare for halftones
+  Serial.println("> G01 0,-6,90");     line( 0,-6,90);
+  Serial.println("> G01 -6,8,90");     line(-6, 8,90);
+  Serial.println("> G01 -6,8,0");      line(-6, 8,0);
 
   // halftones
-  Serial.println("> L -6,-6");             line(-6,-6);
-  Serial.println("> L -6, 8");             line(-6, 8);
-
   int i;
   for(i=0;i<12;++i) {
     Serial.print("> H 1, ");
@@ -1291,8 +1312,8 @@ static void demo() {
   }
 
   // return to origin
-  //Serial.println("> L 6, 6");              line( 6, 6);
-  Serial.println("> CENTER");              line( 0, 0);
+  Serial.println("> G01 6,8,90");     line( 6, 8,90);
+  Serial.println("> G01 0,0,0");      line( 0, 0,90);
 }
 
 
@@ -1363,12 +1384,12 @@ static void halftone(double size,double fill) {
     for( int i=0; i<infill; ++i ) {
       x2 += step;
       y2 = (i%2)? ymin : ymax;  // the zig-zag effect
-      line(x2,y2);  
+      line(x2,y2,0);  
     }
   }
 
   // return to the middle of the other side of the halftone square
-  line(ox+size,oy);
+  line(ox+size,oy,0);
 }
 
 
@@ -1384,6 +1405,25 @@ static void help() {
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
   Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91");
+}
+
+
+//------------------------------------------------------------------------------
+static void testServo() {
+  float i;
+  int j;
+  
+  for(j=0;j<5;++j) {
+    for(i=0;i<180;++i) {
+      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( i / 180.0f )) + MIN_PULSE_WIDTH );
+      delay(50);
+    }
+    
+    for(i=180;i>0;--i) {
+      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( i / 180.0f )) + MIN_PULSE_WIDTH );
+      delay(50);
+    }
+  }
 }
 
 
@@ -1514,7 +1554,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
-    double xx, yy, zz, ff=feed_rate;
+    double xx, yy, zz;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1532,8 +1572,8 @@ static void processCommand() {
       switch(*ptr) {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': setFeedRate(atof(ptr+1));  break;
       default: ptr=0; break;
       }
     }
@@ -1544,13 +1584,11 @@ static void processCommand() {
       zz+=posz;
     }
     
-    setFeedRate(ff);
-    pen(zz);
-    error(lineSafe(xx,yy));
+    error(lineSafe(xx,yy,zz));
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
-    double xx, yy, zz, ff=feed_rate;
+    double xx, yy, zz;
     double dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
     double ii = 0;
     double jj = 0;
@@ -1573,8 +1611,8 @@ static void processCommand() {
       case 'J': jj=atof(ptr+1)*mode_scale;  break;
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': setFeedRate(atof(ptr+1));  break;
       default: ptr=0; break;
       }
     }
@@ -1585,9 +1623,7 @@ static void processCommand() {
       zz+=posz;
     }
 
-    setFeedRate(ff);
-    pen(zz);
-    error(arcSafe(posx+ii,posy+jj,xx,yy,dd));
+    error(arcSafe(posx+ii,posy+jj,xx,yy,zz,dd));
   } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
     // dwell
     long xx=0;
@@ -1617,7 +1653,6 @@ static void processCommand() {
     double xx=0;
     double yy=0;
     double zz=posz;
-    double ff=feed_rate;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1625,13 +1660,12 @@ static void processCommand() {
       switch(*ptr) {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1)*mode_scale;  break;
-      case 'F': ff=atof(ptr+1);  break;
+      case 'Z': zz=atof(ptr+1);  break;
+      case 'F': setFeedRate(atof(ptr+1));  break;
       default: ptr=0; break;
       }
     }
 
-    setFeedRate(ff);
     pen(zz);
     jog(xx,yy);
   } else {
@@ -1697,6 +1731,7 @@ void setup() {
 //  testAcceleration();
 //  testfeed_rate();
 //  testArcs();
+//  testServo();
 
   // display the help at startup.
   help();  
