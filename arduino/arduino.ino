@@ -35,7 +35,7 @@
 #include <AFMotor.h>
 
 // Default servo library
-#include <ServoTimer2.h> 
+#include <Servo.h> 
 
 // Timer interrupt libraries
 #include <FrequencyTimer2.h>
@@ -150,7 +150,7 @@ typedef struct {
 static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
 static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 
-static ServoTimer2 s1;
+static Servo s1;
 
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
@@ -164,6 +164,9 @@ static double limit_left =-14.0;  // Distance to left of drawing area.
 static double posx, velx, accelx;
 static double posy, vely, accely;
 static double posz;  // pen state
+
+// old pen position
+static int old_pen_angle=-1;
 
 // motor position
 static volatile long laststep1, laststep2;
@@ -305,13 +308,16 @@ static double atan3(double dy,double dx) {
 
 //------------------------------------------------------------------------------
 // Change pen state.
-static void pen(int pen_angle) {
-  if(posz!=pen_angle) {
-    posz=pen_angle;
-    if(pen_angle<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
-    if(pen_angle>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
+static void setPenAngle(int pen_angle) {
+  if(old_pen_angle!=pen_angle) {
+    old_pen_angle=pen_angle;
+    
+    if(old_pen_angle<PEN_DOWN_ANGLE) old_pen_angle=PEN_DOWN_ANGLE;
+    if(old_pen_angle>PEN_UP_ANGLE  ) old_pen_angle=PEN_UP_ANGLE;
 
-    s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( pen_angle / 180.0f )) + MIN_PULSE_WIDTH );
+//    Serial.println( old_pen_angle );
+    
+    s1.write( old_pen_angle );
   }
 }
 
@@ -495,6 +501,7 @@ void plan_step() {
     if(block_tail!=block_head) {
       current_block=&blocks[block_tail];
       current_block->tstart=t;
+      current_block->tsum=0;
     }
     if(current_block==NULL) {
       planner_idle();
@@ -504,7 +511,8 @@ void plan_step() {
   }
   
   if(current_block!=NULL) {
-    current_block->tsum = t - current_block->tstart;
+//    current_block->tsum = t - current_block->tstart;
+    current_block->tsum += dt;
     if(current_block->tsum > current_block->time) {
       current_block->tsum = current_block->time;
     }
@@ -512,7 +520,7 @@ void plan_step() {
     // find where the plotter will be at tsum seconds
     double nx = interpolate(current_block->sx,current_block->ex,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
     double ny = interpolate(current_block->sy,current_block->ey,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
-    double nz = interpolate(current_block->sz,current_block->ez,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
+    //double nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
 
     // get the new string lengths
     long nlen1,nlen2;
@@ -522,7 +530,7 @@ void plan_step() {
     adjustStringLengths(nlen1,nlen2);
     
     // move the pen
-    pen(nz);
+    setPenAngle(current_block->ez);
 
     // is this block finished?    
     if(current_block->tsum >= current_block->time) {
@@ -652,15 +660,12 @@ static void line(double x,double y,double z) {
   double dz=z-posz;
 
 #ifdef VERBOSE
-  Serial.print("posx ");
-  Serial.println(posx);
-  Serial.print("posy ");
-  Serial.println(posy);
-  
-  Serial.print("dx ");
-  Serial.println(dx);
-  Serial.print("dy ");
-  Serial.println(dy);
+  Serial.print("posx ");  Serial.println(posx);
+  Serial.print("posy ");  Serial.println(posy);
+  Serial.print("posz ");  Serial.println(posz);
+  Serial.print("dx ");    Serial.println(dx);
+  Serial.print("dy ");    Serial.println(dy);
+  Serial.print("dz ");    Serial.println(dz);
 #endif
 
   block *new_block=&blocks[block_head];
@@ -673,10 +678,11 @@ static void line(double x,double y,double z) {
   new_block->startv=0;
   new_block->endv=0;
   new_block->topv=feed_rate;
-  new_block->len = sqrt(dx*dx + dy*dy + dz*dz);
+  new_block->len = sqrt(dx*dx + dy*dy);// + dz*dz);
   new_block->tsum=0;
 
-  if(new_block->len==0) return;
+  //if(new_block->len==0) return;
+  if( sqrt(dx*dx + dy*dy + dz*dz) == 0 ) return;
   
   // Find the maximum speed around the corner from the previous line to this line.
   double maxjunctionv = 0.0;
@@ -690,11 +696,11 @@ static void line(double x,double y,double z) {
     // dot product the two vectors to get the cos(theta) of their angle.
     double x1 = ( curr->ex - curr->sx ) / curr->len;
     double y1 = ( curr->ey - curr->sy ) / curr->len;
-    double z1 = ( curr->ez - curr->sz ) / curr->len;
+    //double z1 = ( curr->ez - curr->sz ) / curr->len;
     double x2 = ( next->ex - next->sx ) / next->len;
     double y2 = ( next->ey - next->sy ) / next->len;
-    double z2 = ( curr->ez - curr->sz ) / curr->len;
-    double dotproduct = x1*x2 + y1*y2 + z1*z2;
+    //double z2 = ( curr->ez - curr->sz ) / curr->len;
+    double dotproduct = x1*x2 + y1*y2;// + z1*z2;
 
     // Close enought to straight (>=0.95) we don't slow down.
     // Anything more than 90 is a full stop guaranteed.
@@ -722,10 +728,8 @@ static void line(double x,double y,double z) {
   new_block->touched = 1;
   
 #ifdef VERBOSE
-  Serial.print("B");
-  Serial.print(block_tail);
-  Serial.print(" ");
-  Serial.println(next_head);
+  Serial.print("B");  Serial.print(block_tail);
+  Serial.print(" ");  Serial.println(next_head);
 #endif
 
   // the line is now ready to be queued.
@@ -734,6 +738,7 @@ static void line(double x,double y,double z) {
 
   posx=x;
   posy=y;
+  posz=z;
   previous_topv=new_block->topv;
   
   planner_recalculate();
@@ -1273,8 +1278,8 @@ static void demo() {
   Serial.println("> G01 2,-2");       line( 2,-2,0);
   Serial.println("> G01 0,-2");       line( 0,-2,0);
   // arc
-  Serial.println("> G02 0,-4,0,-6");  arc(0,-4,0,-6,ARC_CW);
-  Serial.println("> G03 0,-4,0,-2");  arc(0,-4,0,-2,ARC_CCW);
+  Serial.println("> G02 0,-4,0,-6");  arc(0,-4,0,-6,0,ARC_CW);
+  Serial.println("> G03 0,-4,0,-2");  arc(0,-4,0,-2,0,ARC_CCW);
   // square
   Serial.println("> G01 0,-4");       line( 0,-4,0);
   Serial.println("> G01 4,-4");       line( 4,-4,0);
@@ -1290,8 +1295,8 @@ static void demo() {
   Serial.println("> G01 6,-6");       line( 6,-6,0);
   Serial.println("> G01 0,-6");       line( 0,-6,0);
   // large circle
-  Serial.println("> G03 0,0,0, 6");   arc(0,0, 0, 6,ARC_CCW);
-  Serial.println("> G03 0,0,0,-6");   arc(0,0, 0,-6,ARC_CCW);
+  Serial.println("> G03 0,0,0, 6");   arc(0,0, 0, 6,0,ARC_CCW);
+  Serial.println("> G03 0,0,0,-6");   arc(0,0, 0,-6,0,ARC_CCW);
 
   // triangle
   Serial.println("> G01  5.196, 3");  line( 5.196, 3,0);
@@ -1415,13 +1420,13 @@ static void testServo() {
   
   for(j=0;j<5;++j) {
     for(i=0;i<180;++i) {
-      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( i / 180.0f )) + MIN_PULSE_WIDTH );
-      delay(50);
+      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( (float)i / 180.0f )) + MIN_PULSE_WIDTH );
+      delay(10);
     }
     
     for(i=180;i>0;--i) {
-      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( i / 180.0f )) + MIN_PULSE_WIDTH );
-      delay(50);
+      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( (float)i / 180.0f )) + MIN_PULSE_WIDTH );
+      delay(10);
     }
   }
 }
@@ -1666,7 +1671,7 @@ static void processCommand() {
       }
     }
 
-    pen(zz);
+    setPenAngle(zz);
     jog(xx,yy);
   } else {
     char *ptr=buffer;
@@ -1740,14 +1745,14 @@ void setup() {
   // initialize the plotter position.
   posx=velx=accelx=0;
   posy=velx=accelx=0;
+  posz=PEN_UP_ANGLE;
+  setPenAngle(PEN_UP_ANGLE);
 
   long L1,L2;
   IK(posx,posy,L1,L2);
   laststep1=L1;
   laststep2=L2;
-  
-  pen(PEN_UP_ANGLE);
-  
+
   // start the timer interrupt
   setup_planner();
 
