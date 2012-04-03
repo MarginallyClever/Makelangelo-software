@@ -76,7 +76,7 @@
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
 #define MAX_RATED_RPM   (3000.0)
-#define MAX_RPM         (200.0)
+#define MAX_RPM         (100.0)
 
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
@@ -123,6 +123,9 @@
 #define MAX_BLOCKS       (16)
 #define NEXT_BLOCK(x)    ((x+1)%MAX_BLOCKS)
 #define PREV_BLOCK(x)    ((x+MAX_BLOCKS-1)%MAX_BLOCKS)
+
+// servo pin differs based on device
+#define SERVO_PIN        ( (FREQUENCYTIMER2_PIN) == 10 ? 9 : 10 )
 
 
 
@@ -1719,7 +1722,9 @@ void setup() {
   m1.setSpeed(MAX_RATED_RPM);
   m2.setSpeed(MAX_RATED_RPM);
   // servo should be on SER1, pin 10.
-  s1.attach(10);
+  s1.attach(SERVO_PIN);
+  Serial.print("Servo on pin ");
+  Serial.println(SERVO_PIN);
 
 #ifndef SMALL_FOOTPRINT
   // load string onto spool.  Only needed when the robot is being built.
