@@ -120,12 +120,20 @@
 #define MAX_BUF         (64)
 
 // look-ahead planning
+#ifdef __AVR_ATmega2560__
 #define MAX_BLOCKS       (16)
+#else
+#define MAX_BLOCKS       (5)
+#endif
 #define NEXT_BLOCK(x)    ((x+1)%MAX_BLOCKS)
 #define PREV_BLOCK(x)    ((x+MAX_BLOCKS-1)%MAX_BLOCKS)
 
 // servo pin differs based on device
-#define SERVO_PIN        ( (FREQUENCYTIMER2_PIN) == 10 ? 9 : 10 )
+#ifdef __AVR_ATmega2560__
+#define SERVO_PIN        50
+#else
+#define SERVO_PIN        9
+#endif
 
 
 
@@ -514,8 +522,8 @@ void plan_step() {
   }
   
   if(current_block!=NULL) {
-//    current_block->tsum = t - current_block->tstart;
-    current_block->tsum += dt;
+    current_block->tsum = t - current_block->tstart;
+//    current_block->tsum += dt;
     if(current_block->tsum > current_block->time) {
       current_block->tsum = current_block->time;
     }
@@ -523,7 +531,7 @@ void plan_step() {
     // find where the plotter will be at tsum seconds
     double nx = interpolate(current_block->sx,current_block->ex,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
     double ny = interpolate(current_block->sy,current_block->ey,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
-    //double nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
+//    double nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
 
     // get the new string lengths
     long nlen1,nlen2;
@@ -531,9 +539,8 @@ void plan_step() {
 
     // move the motors
     adjustStringLengths(nlen1,nlen2);
-    
     // move the pen
-    setPenAngle(current_block->ez);
+//    setPenAngle(current_block->ez);
 
     // is this block finished?    
     if(current_block->tsum >= current_block->time) {
@@ -553,12 +560,11 @@ void plan_step() {
 // if you must reach target_vel within distance and you speed up by acceleration
 // then what must your minimum velocity be?
 static double max_allowable_speed(double acceleration,double target_vel,double distance) {
-  return sqrt( target_vel * target_vel - 2 * acceleration * distance );
+  return sqrt( target_vel * target_vel - 2.0 * acceleration * distance );
 }
 
 
 //------------------------------------------------------------------------------
-// 
 static void planner_recalculate() {
   block *curr, *next, *prev;
 
@@ -621,6 +627,7 @@ static void planner_recalculate() {
       curr->touched=0;
     }
   }
+  
   // last item in queue
   next->endv=0;
   travelTime(next->len,next->startv,next->endv,next->topv,next->t1,next->t2,next->time);
@@ -1269,59 +1276,60 @@ static void loadspools() {
 // Show off line and arc movement.  This is the test pattern.
 static void demo() {
   // Set speed to 1m/min
+  float s=0.5;
   mode_scale=0.1;
   strcpy(mode_name,"mm");
   setFeedRate(1000.0);
   
   // square
-  Serial.println("> G01 0,-2");       line( 0,-2,0);
-  Serial.println("> G01-2,-2");       line(-2,-2,0);
-  Serial.println("> G01-2, 2");       line(-2, 2,0);
-  Serial.println("> G01 2, 2");       line( 2, 2,0);
-  Serial.println("> G01 2,-2");       line( 2,-2,0);
-  Serial.println("> G01 0,-2");       line( 0,-2,0);
+  line( 0*s,-2*s,0);
+  line(-2*s,-2*s,0);
+  line(-2*s, 2*s,0);
+  line( 2*s, 2*s,0);
+  line( 2*s,-2*s,0);
+  line( 0*s,-2*s,0);
   // arc
-  Serial.println("> G02 0,-4,0,-6");  arc(0,-4,0,-6,0,ARC_CW);
-  Serial.println("> G03 0,-4,0,-2");  arc(0,-4,0,-2,0,ARC_CCW);
+  arc(0,-4*s,0,-6*s,0,ARC_CW );
+  arc(0,-4*s,0,-2*s,0,ARC_CCW);
   // square
-  Serial.println("> G01 0,-4");       line( 0,-4,0);
-  Serial.println("> G01 4,-4");       line( 4,-4,0);
-  Serial.println("> G01 4, 4");       line( 4, 4,0);
-  Serial.println("> G01-4, 4");       line(-4, 4,0);
-  Serial.println("> G01-4,-4");       line(-4,-4,0);
-  Serial.println("> G01 0,-4");       line( 0,-4,0);
+  line( 0*s,-4*s,0);
+  line( 4*s,-4*s,0);
+  line( 4*s, 4*s,0);
+  line(-4*s, 4*s,0);
+  line(-4*s,-4*s,0);
+  line( 0*s,-4*s,0);
   // square
-  Serial.println("> G01 0,-6");       line( 0,-6,0);
-  Serial.println("> G01-6,-6");       line(-6,-6,0);
-  Serial.println("> G01-6, 6");       line(-6, 6,0);
-  Serial.println("> G01 6, 6");       line( 6, 6,0);
-  Serial.println("> G01 6,-6");       line( 6,-6,0);
-  Serial.println("> G01 0,-6");       line( 0,-6,0);
+  line( 0*s,-6*s,0);
+  line(-6*s,-6*s,0);
+  line(-6*s, 6*s,0);
+  line( 6*s, 6*s,0);
+  line( 6*s,-6*s,0);
+  line( 0*s,-6*s,0);
   // large circle
-  Serial.println("> G03 0,0,0, 6");   arc(0,0, 0, 6,0,ARC_CCW);
-  Serial.println("> G03 0,0,0,-6");   arc(0,0, 0,-6,0,ARC_CCW);
+  arc(0,0, 0, 6*s,0,ARC_CCW);
+  arc(0,0, 0,-6*s,0,ARC_CCW);
 
   // triangle
-  Serial.println("> G01  5.196, 3");  line( 5.196, 3,0);
-  Serial.println("> G01 -5.196, 3");  line(-5.196, 3,0);
-  Serial.println("> G01 0,-6");       line( 0,-6,0);
+  line( 5.196*s, 3*s,0);
+  line(-5.196*s, 3*s,0);
+  line( 0      ,-6*s,0);
 
+/*
   // prepare for halftones
-  Serial.println("> G01 0,-6,90");     line( 0,-6,90);
-  Serial.println("> G01 -6,8,90");     line(-6, 8,90);
-  Serial.println("> G01 -6,8,0");      line(-6, 8,0);
-
+  line( 0,-6,90);
+  line(-6, 8,90);
+  line(-6, 8,0 );
   // halftones
   int i;
   for(i=0;i<12;++i) {
-    Serial.print("> H 1, ");
-    Serial.println((double)i/11.0);
     halftone(1,(double)i/11.0);
   }
 
   // return to origin
-  Serial.println("> G01 6,8,90");     line( 6, 8,90);
-  Serial.println("> G01 0,0,0");      line( 0, 0,90);
+  line( 6, 8,90);
+*/
+  line( 0, 0,90);
+
 }
 
 

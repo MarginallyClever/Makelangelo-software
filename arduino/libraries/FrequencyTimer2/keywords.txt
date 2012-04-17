@@ -1,0 +1,24 @@
+#######################################
+# Syntax Coloring Map FrequencyTimer2
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+FrequencyTimer2  KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+setPeriod KEYWORD2
+getPeriod KEYWORD2
+enable KEYWORD2
+disable KEYWORD2
+setOnOverflow KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+FREQUENCYTIMER2_PIN	LITERAL1
