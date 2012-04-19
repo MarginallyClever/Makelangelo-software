@@ -63,8 +63,10 @@ public class DrawbotGUI
     JMenuItem [] buttonPorts;
 
     // tabs
-	JTextArea log,ngcfile;
-	JScrollPane logPane,filePane;
+	JTextArea log;
+	JScrollPane logPane;
+	JTextArea ngcfile;
+	//JScrollPane filePane;
 	DrawPanel previewPane;
 
 	// status bar
@@ -292,10 +294,13 @@ public class DrawbotGUI
 						(int)((limit_right-limit_left)*cameraZoom),
 						(int)((limit_top-limit_bottom)*cameraZoom));
 
-				g2d.setColor(Color.GRAY);
-				g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
-				g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 			}
+
+			g2d.setColor(Color.RED);
+			g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
+			g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
+
+			g2d.setColor(Color.BLACK);
 			
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
 			double px=0,py=0,pz=90;
@@ -1107,11 +1112,13 @@ public class DrawbotGUI
         // the log panel
         log = new JTextArea();
         log.setEditable(false);
+        log.setForeground(Color.WHITE);
+        log.setBackground(Color.BLACK);
         logPane = new JScrollPane(log);
         // the file panel
         ngcfile = new JTextArea();
         ngcfile.setEditable(false);
-        filePane = new JScrollPane(ngcfile);
+        //filePane = new JScrollPane(ngcfile);
         // the preview panel
         previewPane = new DrawPanel();
         
