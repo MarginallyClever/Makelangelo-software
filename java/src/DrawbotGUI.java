@@ -1116,15 +1116,16 @@ public class DrawbotGUI
         previewPane = new DrawPanel();
         
         // the tabs
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Preview",previewPane);
-        tabs.add("File",filePane);
+        //JTabbedPane tabs = new JTabbedPane();
+        //tabs.add("Preview",previewPane);
+        //tabs.add("File",filePane);
         // status bar
         statusBar = new StatusBar();
 
         // layout
         Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
-        split.add(tabs);
+        //split.add(tabs);
+        split.add(previewPane);
         split.add(logPane);
         split.setDividerSize(2);
         
