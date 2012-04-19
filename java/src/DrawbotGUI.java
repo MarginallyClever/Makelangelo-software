@@ -154,7 +154,7 @@ public class DrawbotGUI
 
 		// scale + position
 		int cx,cy;
-		double offsetx=0,offsety=0;
+		double cameraOffsetX=0,cameraOffsetY=0;
 		double cameraZoom=20;
 		float drawScale=0.1f;
 
@@ -210,8 +210,8 @@ public class DrawbotGUI
     			// scroll the gcode preview
 	    		double dx=(x-oldx)/cameraZoom;
 	    		double dy=(y-oldy)/cameraZoom;
-		    	offsetx-=dx;
-		    	offsety+=dy;
+		    	cameraOffsetX-=dx;
+		    	cameraOffsetY+=dy;
     		}
 		}
 		public void MoveImage(int x,int y) {
@@ -265,10 +265,10 @@ public class DrawbotGUI
 	    public void mouseMoved(MouseEvent e) {}
 
 	    public double TX(double a) {
-	    	return cx+(int)((a-offsetx)*cameraZoom);
+	    	return cx+(int)((a-cameraOffsetX)*cameraZoom);
 	    }
 	    public double TY(double a) {
-	    	return cy-(int)((a-offsety)*cameraZoom);
+	    	return cy-(int)((a-cameraOffsetY)*cameraZoom);
 	    }
 	    public double ITX(double a) {
 	    	return TX(a*imageScale-imageOffsetX);
@@ -296,14 +296,16 @@ public class DrawbotGUI
 
 			}
 
+			// draw calibration point
 			g2d.setColor(Color.RED);
 			g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 			g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 
+			// draw image
 			g2d.setColor(Color.BLACK);
 			
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
-			double px=0,py=0,pz=90;
+			double px=TX(0),py=TY(0),pz=90;
 			int i,j;
 
 			for(i=0;i<instructions.length;++i) {
@@ -620,9 +622,6 @@ public class DrawbotGUI
 	    paused=true;
 	    statusBar.SetProgress(linesProcessed,linesTotal,"");
 
-		imageScale=1;
-		imageOffsetX=0;
-		imageOffsetY=0;
 	    previewPane.repaint();
 	}
 	
@@ -686,6 +685,17 @@ public class DrawbotGUI
 	
 	
 
+	// User has asked that a file be opened.
+	public void OpenFileOnDemand(String filename) {
+		Log("Opening file "+recentFiles[0]+"..."+NL);
+		imageScale=1;
+		imageOffsetX=0;
+		imageOffsetY=0;
+		OpenFile(filename);
+	}
+
+	
+	
 	// creates a file open dialog. If you don't cancel it opens that file.
 	public void OpenFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
@@ -694,8 +704,7 @@ public class DrawbotGUI
 
 		JFileChooser fc = new JFileChooser(new File(filename));
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-	    	Log("Opening file "+filename+"..."+NL);
-	    	OpenFile(fc.getSelectedFile().getAbsolutePath());
+	    	OpenFileOnDemand(fc.getSelectedFile().getAbsolutePath());
 	    }
 	}
 	
@@ -761,6 +770,32 @@ public class DrawbotGUI
 	}
 	
 	
+	// last minute scale & translate the image 
+	public String ProcessLine(String line) {
+/*
+ 		String newLine = "";
+		String first="";
+		
+		double f;
+		String[] tokens = line.split("\\s");
+		int j;
+		for(j=0;j<tokens.length;++j) {
+			newLine+=first;
+			     if(tokens[j].startsWith("X")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale)-imageOffsetX;  newLine+="X"+f;  }
+			else if(tokens[j].startsWith("Y")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale)-imageOffsetY;  newLine+="Y"+f;  }
+			else if(tokens[j].startsWith("Z")) {  f =  Float.valueOf(tokens[j].substring(1));                           newLine+="Z"+f;  }
+			else if(tokens[j].startsWith("I")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale);               newLine+="I"+f;  }
+			else if(tokens[j].startsWith("J")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale);               newLine+="J"+f;  }
+			else newLine+=tokens[j];
+			first=" ";
+		}
+		return newLine;
+*/
+		return line;
+	}
+	
+	
+	
 	// processes a single instruction meant for the robot.  Could be anything.
 	// return true if the command is sent to the robot.
 	// return false if it is not.
@@ -806,7 +841,7 @@ public class DrawbotGUI
 		}
 
 		// send relevant part of line to the robot
-		line+=eol;
+		line=ProcessLine(line)+eol;
 		Log(line+NL);
 		try {
 			readyToReceive=false;
@@ -903,7 +938,7 @@ public class DrawbotGUI
 		int i;
 		for(i=0;i<10;++i) {
 			if(subject == buttonRecent[i]) {
-				OpenFile(recentFiles[i]);
+				OpenFileOnDemand(recentFiles[i]);
 				return;
 			}
 		}
@@ -1041,15 +1076,16 @@ public class DrawbotGUI
         menu.add(buttonConfig);
 
         menuBar.add(menu);
-
+/*
         // Image menu
         menu = new JMenu("Image");
         menu.getAccessibleContext().setAccessibleDescription("Change the image");
 
         buttonMoveImage = new JCheckBoxMenuItem("Move & Scale");
         buttonMoveImage.addActionListener(this);
+        buttonMoveImage.setState(movementMode==MODE_MOVE_IMAGE);
         menu.add(buttonMoveImage);
-
+*/
         menuBar.add(menu);
 
         // Draw menu
@@ -1112,7 +1148,7 @@ public class DrawbotGUI
         // the log panel
         log = new JTextArea();
         log.setEditable(false);
-        log.setForeground(Color.WHITE);
+        log.setForeground(Color.GREEN);
         log.setBackground(Color.BLACK);
         logPane = new JScrollPane(log);
         // the file panel
@@ -1142,8 +1178,7 @@ public class DrawbotGUI
         // open the file
 		GetRecentFiles();
 		if(recentFiles[0].length()>0) {
-			Log("Opening file "+recentFiles[0]+"..."+NL);
-			OpenFile(recentFiles[0]);
+			OpenFileOnDemand(recentFiles[0]);
 		}
 		
 		// connect to the last port
