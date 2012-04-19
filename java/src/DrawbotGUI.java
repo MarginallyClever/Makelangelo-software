@@ -8,54 +8,17 @@
 
 
 // io functions
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
+import gnu.io.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.event.MouseInputListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Scanner;
-import java.util.TooManyListenersException;
+import java.util.*;
 import java.util.prefs.Preferences;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JSplitPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 
 
@@ -90,7 +53,12 @@ public class DrawbotGUI
 	
 	// GUI elements
     JMenuBar menuBar;
-    JMenuItem buttonOpenFile, buttonExit, buttonStart, buttonPause, buttonHalt, buttonDrive, buttonAbout, buttonConfig, buttonRescan;
+    JMenuItem buttonOpenFile, buttonExit;
+    JMenuItem buttonConfig, buttonRescan;
+    JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
+    JCheckBoxMenuItem buttonMoveImage;
+    JMenuItem buttonAbout;
+    
     JMenuItem [] buttonRecent = new JMenuItem[10];
     JMenuItem [] buttonPorts;
 
@@ -114,6 +82,17 @@ public class DrawbotGUI
 	long linesProcessed=0;
 	boolean fileOpened=false;
 
+	// movement style
+	final int MODE_MOVE_CAMERA = 0; 
+	final int MODE_MOVE_IMAGE  = 1;
+
+	int movementMode=MODE_MOVE_CAMERA;
+	
+	// scale image to fit machine
+	double imageScale=1;
+	double imageOffsetX=0;
+	double imageOffsetY=0;
+	
 	// driving controls
 	boolean driving=false;
 	double driveScale=100;
@@ -174,7 +153,7 @@ public class DrawbotGUI
 		// scale + position
 		int cx,cy;
 		double offsetx=0,offsety=0;
-		double previewScale=20;
+		double cameraZoom=20;
 		float drawScale=0.1f;
 
 		// driving controls
@@ -198,7 +177,58 @@ public class DrawbotGUI
     		driveOn=false;
     		if(driving) SendLineToRobot("J02 X0 Y0");
 		}
-		
+
+		public void MoveCamera(int x,int y) {
+    		if(driving) {
+    			// drive the plotter around
+    			drivexview=(x-oldx);
+	    		driveyview=(y-oldy);
+	    		double len=Math.sqrt(drivexview*drivexview+driveyview*driveyview);
+	    		// cap the max velocity
+    			if(len>maxZone) {
+    				drivexview*=maxZone/len;
+    				driveyview*=maxZone/len;
+    				len=maxZone;
+    			}
+    			// add a deadzone in the center
+    			double f=len-deadZone;
+	    		if(f>0) {
+	    			// this scales f to [0....1] so length of (drivex,drivey) will <= 1
+	    			f=f/(maxZone-deadZone);
+	    			drivex=drivexview*f/len;
+	    			drivey=-driveyview*f/len;
+	    		} else {
+	    			drivex=0;
+	    			drivey=0;
+	    		}
+	    		if(readyToReceive) {
+	    			SendLineToRobot("J02 X"+drivex+" Y"+drivey);
+	    		}
+    		} else {
+    			// scroll the gcode preview
+	    		double dx=(x-oldx)/cameraZoom;
+	    		double dy=(y-oldy)/cameraZoom;
+		    	offsetx-=dx;
+		    	offsety+=dy;
+    		}
+		}
+		public void MoveImage(int x,int y) {
+			// scroll the gcode preview
+    		double dx=(x-oldx)/cameraZoom;
+    		double dy=(y-oldy)/cameraZoom;
+	    	imageOffsetX-=dx;
+	    	imageOffsetY+=dy;
+		}
+		public void ScaleImage(int x,int y) {
+			double amnt = (double)(y-oldy)*0.01;
+			imageScale += amnt;
+			if(imageScale<0.01) imageScale=0.01f;
+		}
+		public void ZoomCamera(int x,int y) {
+			double amnt = (double)(y-oldy)*0.01;
+			cameraZoom += amnt;
+			if(cameraZoom<0.1) cameraZoom=0.1f;
+		}
 		public void mousePressed(MouseEvent e) {
 			buttonPressed=e.getButton();
 	    	oldx=e.getX();
@@ -220,55 +250,29 @@ public class DrawbotGUI
 	    	int x=e.getX();
 	    	int y=e.getY();
 	    	if(buttonPressed==MouseEvent.BUTTON1) {
-	    		if(driving) {
-	    			// drive the plotter around
-	    			drivexview=(x-oldx);
-		    		driveyview=(y-oldy);
-		    		double len=Math.sqrt(drivexview*drivexview+driveyview*driveyview);
-		    		// cap the max velocity
-	    			if(len>maxZone) {
-	    				drivexview*=maxZone/len;
-	    				driveyview*=maxZone/len;
-	    				len=maxZone;
-	    			}
-	    			// add a deadzone in the center
-	    			double f=len-deadZone;
-		    		if(f>0) {
-		    			// this scales f to [0....1] so length of (drivex,drivey) will <= 1
-		    			f=f/(maxZone-deadZone);
-		    			drivex=drivexview*f/len;
-		    			drivey=-driveyview*f/len;
-		    		} else {
-		    			drivex=0;
-		    			drivey=0;
-		    		}
-		    		if(readyToReceive) {
-		    			SendLineToRobot("J02 X"+drivex+" Y"+drivey);
-		    		}
-	    		} else {
-	    			// scroll the gcode preview
-		    		double dx=(x-oldx)/previewScale;
-		    		double dy=(y-oldy)/previewScale;
-			    	oldx=x;
-			    	oldy=y;
-			    	offsetx-=dx;
-			    	offsety+=dy;
-	    		}
+	    		if(movementMode==MODE_MOVE_IMAGE) MoveImage(x,y);
+	    		else MoveCamera(x,y);
 	    	} else if(buttonPressed==MouseEvent.BUTTON3) {
-	    		float amnt = (y-oldy)*0.1f;
-	    		previewScale += amnt;
-	    		if(previewScale<0.1) previewScale=0.1f;
-		    	oldy=y;
+	    		if(movementMode==MODE_MOVE_IMAGE) ScaleImage(x,y);
+	    		else ZoomCamera(x,y);
 	    	}
+	    	oldx=x;
+	    	oldy=y;
 	    	repaint();
 	    }
 	    public void mouseMoved(MouseEvent e) {}
 
-	    public int TX(double a) {
-	    	return cx+(int)((a-offsetx)*previewScale);
+	    public double TX(double a) {
+	    	return cx+(int)((a-offsetx)*cameraZoom);
 	    }
-	    public int TY(double a) {
-	    	return cy-(int)((a-offsety)*previewScale);
+	    public double TY(double a) {
+	    	return cy-(int)((a-offsety)*cameraZoom);
+	    }
+	    public double ITX(double a) {
+	    	return TX(a*imageScale-imageOffsetX);
+	    }
+	    public double ITY(double a) {
+	    	return TY(a*imageScale-imageOffsetY);
 	    }
 		@Override
 		public void paintComponent(Graphics g) {
@@ -284,17 +288,17 @@ public class DrawbotGUI
 			} else {
 				setBackground(Color.GRAY);
 				g2d.setColor(Color.WHITE);
-				g2d.fillRect(TX(limit_left),TY(limit_top),
-						(int)((limit_right-limit_left)*previewScale),
-						(int)((limit_top-limit_bottom)*previewScale));
+				g2d.fillRect((int)TX(limit_left),(int)TY(limit_top),
+						(int)((limit_right-limit_left)*cameraZoom),
+						(int)((limit_top-limit_bottom)*cameraZoom));
 
 				g2d.setColor(Color.GRAY);
-				g2d.drawLine(TX(-0.25),TY(0),TX(0.25),TY(0));
-				g2d.drawLine(TX(0),TY(-0.25),TX(0),TY(0.25));
+				g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
+				g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 			}
-						
+			
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
-			float px=0,py=0,pz=90;
+			double px=0,py=0,pz=90;
 			int i,j;
 
 			for(i=0;i<instructions.length;++i) {
@@ -305,9 +309,9 @@ public class DrawbotGUI
 				} else if(instructions[i].startsWith("G00 ") || instructions[i].startsWith("G0 ") || 
 					instructions[i].startsWith("G01 ") || instructions[i].startsWith("G1 ")) {
 					// draw a line
-					float x=px;
-					float y=py;
-					float z=pz;
+					double x=px;
+					double y=py;
+					double z=pz;
 					String[] tokens = instructions[i].split("\\s");
 					for(j=0;j<tokens.length;++j) {
 						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
@@ -315,8 +319,7 @@ public class DrawbotGUI
 						if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					}
 
-					g2d.setColor( z<45 * drawScale ? Color.BLUE : Color.PINK);
-					g2d.drawLine(TX(px),TY(py),TX(x),TY(y));
+					if(z<5) g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
 					px=x;
 					py=y;
 					pz=z;
@@ -324,11 +327,11 @@ public class DrawbotGUI
 					instructions[i].startsWith("G03 ") || instructions[i].startsWith("G3 ")) {
 					// draw an arc
 					int dir = (instructions[i].startsWith("G02") || instructions[i].startsWith("G2")) ? -1 : 1;
-					float x=px;
-					float y=py;
-					float z=pz;
-					float ai=px;
-					float aj=py;
+					double x=px;
+					double y=py;
+					double z=pz;
+					double ai=px;
+					double aj=py;
 					String[] tokens = instructions[i].split("\\s");
 					for(j=0;j<tokens.length;++j) {
 						if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
@@ -338,33 +341,33 @@ public class DrawbotGUI
 						if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
 					}
 
-					g2d.setColor( z<45 * drawScale ? Color.GREEN : Color.PINK);
-
-					double dx=px - ai;
-					double dy=py - aj;
-					double radius=Math.sqrt(dx*dx+dy*dy);
-
-					// find angle of arc (sweep)
-					double angle1=atan3(dy,dx);
-					double angle2=atan3(y-aj,x-ai);
-					double theta=angle2-angle1;
-
-					if(dir>0 && theta<0) angle2+=2.0*Math.PI;
-					else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
-
-					theta=Math.abs(angle2-angle1);
-
-					// draw the arc from a lot of little line segments.
-					for(int k=0;k<=theta*steps_per_degree;++k) {
-						double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
-						float nx = (float)(ai + Math.cos(angle3) * radius);
-					    float ny = (float)(aj + Math.sin(angle3) * radius);
-
-					    g2d.drawLine(TX(px),TY(py),TX(nx),TY(ny));
-						px=nx;
-						py=ny;
+					if(z<5) {
+						double dx=px - ai;
+						double dy=py - aj;
+						double radius=Math.sqrt(dx*dx+dy*dy);
+	
+						// find angle of arc (sweep)
+						double angle1=atan3(dy,dx);
+						double angle2=atan3(y-aj,x-ai);
+						double theta=angle2-angle1;
+	
+						if(dir>0 && theta<0) angle2+=2.0*Math.PI;
+						else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
+	
+						theta=Math.abs(angle2-angle1);
+	
+						// Draw the arc from a lot of little line segments.
+						for(int k=0;k<=theta*steps_per_degree;++k) {
+							double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
+							float nx = (float)(ai + Math.cos(angle3) * radius);
+						    float ny = (float)(aj + Math.sin(angle3) * radius);
+	
+						    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(nx),(int)ITY(ny));
+							px=nx;
+							py=ny;
+						}
+					    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
 					}
-				    g2d.drawLine(TX(px),TY(py),TX(x),TY(y));
 					px=x;
 					py=y;
 					pz=z;
@@ -611,6 +614,10 @@ public class DrawbotGUI
 	    fileOpened=true;
 	    paused=true;
 	    statusBar.SetProgress(linesProcessed,linesTotal,"");
+
+		imageScale=1;
+		imageOffsetX=0;
+		imageOffsetY=0;
 	    previewPane.repaint();
 	}
 	
@@ -902,6 +909,12 @@ public class DrawbotGUI
 				return;
 			}
 		}
+		
+		if(subject == buttonMoveImage) {
+			movementMode  = (movementMode != MODE_MOVE_IMAGE) ? MODE_MOVE_IMAGE : MODE_MOVE_CAMERA;
+			
+			buttonMoveImage.setState(movementMode==MODE_MOVE_IMAGE);
+		}
 	}
 	
 	
@@ -1024,7 +1037,17 @@ public class DrawbotGUI
 
         menuBar.add(menu);
 
-        // run menu
+        // Image menu
+        menu = new JMenu("Image");
+        menu.getAccessibleContext().setAccessibleDescription("Change the image");
+
+        buttonMoveImage = new JCheckBoxMenuItem("Move & Scale");
+        buttonMoveImage.addActionListener(this);
+        menu.add(buttonMoveImage);
+
+        menuBar.add(menu);
+
+        // Draw menu
         menu = new JMenu("Draw");
         menu.setMnemonic(KeyEvent.VK_D);
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
@@ -1057,8 +1080,8 @@ public class DrawbotGUI
         menu.add(buttonDrive);
 
         menuBar.add(menu);
-        
-        //Build second menu in the menu bar.
+
+        //Build in the menu bar.
         menu = new JMenu("Help");
         menu.setMnemonic(KeyEvent.VK_H);
         menu.getAccessibleContext().setAccessibleDescription("Get help");

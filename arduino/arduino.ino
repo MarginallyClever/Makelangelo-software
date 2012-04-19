@@ -1279,7 +1279,7 @@ static void demo() {
   float s=0.5;
   mode_scale=0.1;
   strcpy(mode_name,"mm");
-  setFeedRate(1000.0);
+  setFeedRate(500.0);
   
   // square
   line( 0*s,-2*s,0);
