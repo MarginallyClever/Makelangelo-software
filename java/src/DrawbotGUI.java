@@ -426,24 +426,26 @@ public class DrawbotGUI
 	
 	
 	public void ClosePort() {
-		portOpened=false;
-		portConfirmed=false;
-		log.setText("");
-		
-	    if (serialPort != null) {
-	        try {
-		        // Close the port.
-		        serialPort.removeEventListener();
-		        serialPort.close();
-	            // Close the I/O streams.
-	            out.close();
-	            in.close();
-	        } catch (IOException e) {
-	            // Don't care
-	        }
-	    }
-	    
-		UpdateMenuBar();
+		if(portOpened) {
+		    if (serialPort != null) {
+		        try {
+		            // Close the I/O streams.
+		            out.close();
+		            in.close();
+			        // Close the port.
+			        serialPort.removeEventListener();
+			        serialPort.close();
+		        } catch (IOException e) {
+		            // Don't care
+		        }
+		    }
+		    
+			portOpened=false;
+			portConfirmed=false;
+			log.setText("");
+			
+			UpdateMenuBar();
+		}
 	}
 	
 	
