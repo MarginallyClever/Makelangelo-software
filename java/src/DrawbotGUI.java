@@ -54,7 +54,7 @@ public class DrawbotGUI
 	// GUI elements
     JMenuBar menuBar;
     JMenuItem buttonOpenFile, buttonExit;
-    JMenuItem buttonConfig, buttonRescan;
+    JMenuItem buttonConfig, buttonRescan, buttonHome;
     JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     JCheckBoxMenuItem buttonMoveImage;
     JMenuItem buttonAbout;
@@ -712,6 +712,19 @@ public class DrawbotGUI
 	
 	
 	
+	public void GoHome() {
+		String line="HOME;";
+		Log(line+NL);
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+
+		readyToReceive=false;
+	}
+	
+	
+	
 	// Open the config dialog, send the config update to the robot, refresh the preview tab.
 	public void UpdateConfig() {
 		JTextField top = new JTextField(String.valueOf(limit_top));
@@ -731,7 +744,7 @@ public class DrawbotGUI
 			top.getText().trim()!="" || bottom.getText().trim()!="") {
 			// Send a command to the robot with new configuration values
 			String line="CONFIG T"+top.getText()+" B"+bottom.getText()+" L"+left.getText()+" R"+right.getText()+";";
-			Log(line);
+			Log(line+NL);
 
 			try {
 				out.write(line.getBytes());
@@ -926,6 +939,10 @@ public class DrawbotGUI
 			UpdateConfig();
 			return;
 		}		
+		if( subject == buttonHome ) {
+			GoHome();
+			return;
+		}		
 		if(subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
 					+"Find out more at http://www.marginallyclever.com/"+NL
@@ -1040,7 +1057,6 @@ public class DrawbotGUI
 
         menuBar.add(menu);
 
-        //a group of radio button menu items
         menu = new JMenu("Settings");
         menu.setMnemonic(KeyEvent.VK_T);
         menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
@@ -1076,6 +1092,12 @@ public class DrawbotGUI
         buttonConfig.addActionListener(this);
         buttonConfig.setEnabled(portConfirmed && !running && !driving);
         menu.add(buttonConfig);
+
+        buttonHome = new JMenuItem("Home",KeyEvent.VK_O);
+        buttonHome.getAccessibleContext().setAccessibleDescription("Recenter the plotter");
+        buttonHome.addActionListener(this);
+        buttonHome.setEnabled(portConfirmed && !running && !driving);
+        menu.add(buttonHome);
 
         menuBar.add(menu);
 /*
