@@ -7,28 +7,6 @@
 
 
 //------------------------------------------------------------------------------
-// PARTS
-//------------------------------------------------------------------------------
-// 1 - Arduino UNO, Duemilanove, or MEGA 2560
-// 1 - Adafruit motor shield
-// 2 - NEMA17 stepper motors
-// 2 - sewing machine bobbins
-// 1 - 5v2a power supply
-// 1 - binder clip to hold plotter
-// Stepper motors M1 and M2 should be mounted parallel.
-// M1 is expected to be on the left.
-
-
-
-//------------------------------------------------------------------------------
-// COORDINATE SYSTEM:
-//------------------------------------------------------------------------------
-// (0,0) is center of drawing surface.  -y is up.  -x is left.
-// All lengths are in cm unless otherwise stated.
-
-
-
-//------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
 // Adafruit motor driver library
@@ -64,6 +42,10 @@
 #define M1_PIN          (1)
 #define M2_PIN          (2)
 
+// which limit switch is on which pin?
+#define S1_PIN          (3)
+#define S2_PIN          (5)
+
 // which way are the spools wound, relative to motor movement?
 #define REEL_IN         FORWARD
 #define REEL_OUT        BACKWARD
@@ -85,6 +67,9 @@
 // The step mode controls how the Adafruit driver moves a stepper.
 // options are SINGLE, DOUBLE, INTERLEAVE, and MICROSTEP.
 #define STEP_MODE       SINGLE
+
+// switch sensitivity
+#define SWITCH_HALF     (512)
 
 // servo angles for pen control
 #define PEN_UP_ANGLE    (90)
@@ -178,6 +163,10 @@ static double posz;  // pen state
 
 // old pen position
 static int old_pen_angle=-1;
+
+// switch state
+static char switch1;
+static char switch2;
 
 // motor position
 static volatile long laststep1, laststep2;
@@ -505,6 +494,14 @@ void plan_step() {
   planner_busy=1;
 
   sei();
+
+  readSwitches();
+
+  if(!switch1 || !switch2) {
+    // Emergency stop, switch hit unexpectedly.
+    planner_busy=0;
+    return;
+  }
 
   tick();
   
@@ -1416,6 +1413,7 @@ static void help() {
   Serial.println("HELP;  - display this message");
   Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
   Serial.println("       - display/update this robot's configuration.");
+  Serial.println("HOME;  - recalibrate and move to 0,0");
   Serial.println("WHERE; - display current virtual coordinates");
   Serial.println("DEMO;  - draw a test pattern");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
@@ -1445,6 +1443,65 @@ static void testServo() {
 
 #endif  // SMALL_FOOTPRINT
 
+
+//------------------------------------------------------------------------------
+static void readSwitches() {
+  // get the current switch state
+  switch1=analogRead(S1_PIN) > SWITCH_HALF;
+  switch2=analogRead(S2_PIN) > SWITCH_HALF;
+}
+
+//------------------------------------------------------------------------------
+// find the current robot position and 
+static void goHome() {
+  Serial.println("Homing...");
+  readSwitches();
+  
+  if(!switch1 || !switch2) {
+    Serial.println("** ERROR **");
+    Serial.println("Problem: Plotter is already touching switches.");
+    Serial.println("Solution: Please unwind the strings a bit and try again.");
+    return;
+  }
+
+  // set the stepper speed
+  m1.setSpeed(MAX_RPM);
+  m2.setSpeed(MAX_RPM);
+  
+  // reel in the left motor until contact is made.
+  do {
+    m1.step(1,REEL_IN ,STEP_MODE);
+    m2.step(1,REEL_OUT,STEP_MODE);
+    readSwitches();
+  } while(switch1==1);
+
+  Serial.println("Found left...");
+  laststep1=0;
+
+  
+  // reel in the right motor until contact is made
+  do {
+    m2.step(1,REEL_IN ,STEP_MODE);
+    m1.step(1,REEL_OUT,STEP_MODE);
+    laststep1++;
+    readSwitches();
+  } while(switch2==1);
+
+  Serial.println("Found right...");
+  laststep2=0;
+  
+  Serial.println("Calculating IK...");
+  // center the robot
+  long L1,L2;
+  IK(0,0,L1,L2);
+
+  Serial.println("Centering...");
+  adjustStringLengths(L1,L2);
+
+  // set the stepper speed
+  m1.setSpeed(MAX_RATED_RPM);
+  m2.setSpeed(MAX_RATED_RPM);
+}
 
 
 //------------------------------------------------------------------------------
@@ -1522,6 +1579,8 @@ static void processCommand() {
     help();
   } else if(!strncmp(buffer,"DEMO",4)) {
     demo();
+  } else if(!strncmp(buffer,"HOME",4)) {
+    goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     double xx=posx;
     double yy=posy;
@@ -1551,10 +1610,10 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'T': tt=atof(ptr+1)*mode_scale;  break;
-      case 'B': bb=atof(ptr+1)*mode_scale;  break;
-      case 'R': rr=atof(ptr+1)*mode_scale;  break;
-      case 'L': ll=atof(ptr+1)*mode_scale;  break;
+      case 'T': tt=atof(ptr+1);  break;
+      case 'B': bb=atof(ptr+1);  break;
+      case 'R': rr=atof(ptr+1);  break;
+      case 'L': ll=atof(ptr+1);  break;
       default: ptr=0; break;
       }
     }
@@ -1719,21 +1778,24 @@ void setup() {
   Serial.begin(BAUD);
   Serial.println("== HELLO WORLD ==");
 
+  // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
+  // load the EEPROM values
   loadConfig();
   printConfig();
+  
+  // initialize the read buffer
   sofar=0;
+  
+  // servo should be on SER1, pin 10.
+  s1.attach(SERVO_PIN);
 
   // set the stepper speed
   m1.setSpeed(MAX_RATED_RPM);
   m2.setSpeed(MAX_RATED_RPM);
-  // servo should be on SER1, pin 10.
-  s1.attach(SERVO_PIN);
-  Serial.print("Servo on pin ");
-  Serial.println(SERVO_PIN);
-
+  
 #ifndef SMALL_FOOTPRINT
   // load string onto spool.  Only needed when the robot is being built.
 //  loadspool();
@@ -1760,11 +1822,8 @@ void setup() {
   posy=velx=accelx=0;
   posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
-
-  long L1,L2;
-  IK(posx,posy,L1,L2);
-  laststep1=L1;
-  laststep2=L2;
+  
+  goHome();
 
   // start the timer interrupt
   setup_planner();
