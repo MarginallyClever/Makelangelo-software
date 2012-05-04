@@ -10,7 +10,7 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 // Adafruit motor driver library
-#include <AFMotor.h>
+#include <AFMotorDrawbot.h>
 
 // Default servo library
 #include <Servo.h> 
@@ -58,15 +58,11 @@
 #define STEPS_PER_TURN  (200.0)
 #define SPOOL_DIAMETER  (0.85)
 #define MAX_RATED_RPM   (3000.0)
-#define MAX_RPM         (100.0)
+#define MAX_RPM         (200.0)
 
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
 // *****************************************************************************
-
-// The step mode controls how the Adafruit driver moves a stepper.
-// options are SINGLE, DOUBLE, INTERLEAVE, and MICROSTEP.
-#define STEP_MODE       SINGLE
 
 // switch sensitivity
 #define SWITCH_HALF     (512)
@@ -81,8 +77,8 @@
 #define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
 
 // Speed of the timer interrupt
-#define STEPS_S         (STEPS_PER_TURN*MAX_RPM/60)  // steps/s
-#define TIMER_FREQUENCY (1000000.0/(float)STEPS_S)  // microseconds/step
+#define STEPS_S         (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
+#define TIMER_FREQUENCY (1000000.0/STEPS_S)  // microseconds/step
 
 // The interrupt makes calls to move the stepper.
 // the maximum speed cannot be faster than the timer interrupt.
@@ -417,17 +413,17 @@ static double interpolate(double p0,double p3,double t,double t1,double t2,doubl
 static void adjustStringLengths(long nlen1,long nlen2) {
   // is the change in length >= one step?
   long steps=nlen1-laststep1;
-//  if(steps<0)      m1.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m1.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-  if(steps<0)      m1.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m1.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m1.onestep(REEL_IN );  // it is shorter.
+//  else if(steps>0) m1.onestep(REEL_OUT);  // it is longer.
+  if(steps<0)      m1.step(-steps,REEL_IN );  // it is shorter.
+  else if(steps>0) m1.step( steps,REEL_OUT);  // it is longer.
   
   // is the change in length >= one step?
   steps=nlen2-laststep2;
-//  if(steps<0)      m2.onestep(REEL_IN ,STEP_MODE);  // it is shorter.
-//  else if(steps>0) m2.onestep(REEL_OUT,STEP_MODE);  // it is longer.
-  if(steps<0)      m2.step(-steps,REEL_IN ,STEP_MODE);  // it is shorter.
-  else if(steps>0) m2.step( steps,REEL_OUT,STEP_MODE);  // it is longer.
+//  if(steps<0)      m2.onestep(REEL_IN );  // it is shorter.
+//  else if(steps>0) m2.onestep(REEL_OUT);  // it is longer.
+  if(steps<0)      m2.step(-steps,REEL_IN );  // it is shorter.
+  else if(steps>0) m2.step( steps,REEL_OUT);  // it is longer.
   
   laststep1=nlen1;
   laststep2=nlen2;
@@ -1082,28 +1078,28 @@ static void testFullCircle() {
   long a,b;
   
   a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_OUT,STEP_MODE);  // reel out
-  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_OUT,STEP_MODE);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_OUT);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_OUT);  // reel out
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
 
   a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_IN,STEP_MODE);  // reel out
-  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_IN,STEP_MODE);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_IN);  // reel out
+  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_IN);  // reel out
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
   
   a=micros();
   for(i=0;i<STEPS_PER_TURN;++i) {
-    m1.step(1,REEL_OUT,STEP_MODE);  // reel out
-    m2.step(1,REEL_OUT,STEP_MODE);  // reel out
+    m1.step(1,REEL_OUT);  // reel out
+    m2.step(1,REEL_OUT);  // reel out
   }
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
   a=micros();
   for(i=0;i<STEPS_PER_TURN/2;++i) {
-    m1.step(2,REEL_IN,STEP_MODE);   // reel in
-    m2.step(2,REEL_IN,STEP_MODE);   // reel in
+    m1.step(2,REEL_IN);   // reel in
+    m2.step(2,REEL_IN);   // reel in
   }
   b=micros();
   Serial.println((b-a)/STEPS_PER_TURN);
@@ -1470,8 +1466,8 @@ static void goHome() {
   
   // reel in the left motor until contact is made.
   do {
-    m1.step(1,REEL_IN ,STEP_MODE);
-    m2.step(1,REEL_OUT,STEP_MODE);
+    m1.step(1,REEL_IN );
+    m2.step(1,REEL_OUT);
     readSwitches();
   } while(switch1==1);
 
@@ -1481,8 +1477,8 @@ static void goHome() {
   
   // reel in the right motor until contact is made
   do {
-    m2.step(1,REEL_IN ,STEP_MODE);
-    m1.step(1,REEL_OUT,STEP_MODE);
+    m2.step(1,REEL_IN );
+    m1.step(1,REEL_OUT);
     laststep1++;
     readSwitches();
   } while(switch2==1);
@@ -1823,8 +1819,6 @@ void setup() {
   posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
   
-  goHome();
-
   // start the timer interrupt
   setup_planner();
 
