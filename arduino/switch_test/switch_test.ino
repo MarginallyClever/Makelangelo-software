@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Draw robot
-// dan@marginallycelver.com 2012 feb 11
+// Draw robot - switch test
+// dan@marginallycelver.com 2012 may 06
 //------------------------------------------------------------------------------
 // Copyright at end of file.
 // please see http://www.github.com/i-make-robots/Drawbot for more information.

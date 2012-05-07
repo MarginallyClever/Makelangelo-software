@@ -12,13 +12,13 @@ import gnu.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
 
 
 
@@ -632,20 +632,23 @@ public class DrawbotGUI
 	// changes the order of the recent files list in the File submenu,
 	// saves the updated prefs, and refreshes the menus.
 	public void UpdateRecentFiles(String filename) {
-		int i;
-		for(i=0;i<recentFiles.length-1;++i) {
-			if(recentFiles[i]==filename) {
-				break;
+		int cnt = recentFiles.length;
+		String [] newFiles = new String[cnt];
+		
+		newFiles[0]=filename;
+		
+		int i,j=1;
+		for(i=0;i<cnt;++i) {
+			if(!filename.equals(recentFiles[i]) && recentFiles[i] != "") {
+				newFiles[j++] = recentFiles[i];
+				if(j == cnt ) break;
 			}
 		}
-		
-		for(--i;i>=0;--i) {
-			recentFiles[i+1]=recentFiles[i];
-		}
-		recentFiles[0]=filename;
+
+		recentFiles=newFiles;
 
 		// update prefs
-		for(i=0;i<recentFiles.length;++i) {
+		for(i=0;i<cnt;++i) {
 			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
 		}
 		
