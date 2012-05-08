@@ -1209,8 +1209,8 @@ public class DrawbotGUI
 		}
 		
 		// connect to the last port
-		GetRecentPort();
 		ListSerialPorts();
+		GetRecentPort();
 		if(Arrays.asList(portsDetected).contains(recentPort)) {
 			OpenPort(recentPort);
 		}
