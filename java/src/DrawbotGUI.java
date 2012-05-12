@@ -12,8 +12,14 @@ import gnu.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -101,6 +107,7 @@ public class DrawbotGUI
 	double deadZone=20;
 	double maxZone=100;
 	
+	BufferedImage img = null;
 	
 	
 	// manages the status bar at the bottom of the application window
@@ -284,7 +291,8 @@ public class DrawbotGUI
 		   
 			cx = this.getWidth()/2;
 			cy = this.getHeight()/2;
-
+			
+			// draw background
 			if(!portConfirmed) {			
 				setBackground(Color.WHITE);
 			} else {
@@ -300,6 +308,16 @@ public class DrawbotGUI
 			g2d.setColor(Color.RED);
 			g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 			g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
+
+			if(img!=null) {
+				int w=img.getWidth();
+				int h=img.getHeight();
+				g.drawImage(img, 
+						(int)ITX(-w/2), (int)ITY(h/2), (int)ITX(w/2), (int)ITY(-h/2), 
+						0, 0, w, h,
+						null);
+				return;
+			}
 
 			// draw image
 			g2d.setColor(Color.BLACK);
@@ -407,6 +425,113 @@ public class DrawbotGUI
 	}
 	
 	
+	// http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29
+	// http://www.home.unix-ag.org/simon/gimp/fsdither.c
+	public class DitherFloydSteinberg {
+		float max_intensity, min_intensity;
+		float max_threshold, min_threshold;
+		
+		
+		private int decode(int pixel) {
+			//pixel=(int)( Math.min(Math.max(pixel, 0),255) );
+			float r = ((pixel>>16)&0xff);
+			float g = ((pixel>> 8)&0xff);
+			float b = ((pixel    )&0xff);
+			return (int)( (r+g+b)/3 );
+		}
+		
+		
+		private int encode(int i) {
+			return (0xff<<24) | (i<<16) | (i<< 8) | i;
+		}
+		
+		
+		private int QuantizeColor(int original) {
+			int i=(int)Math.min(Math.max(original, 0),255);
+			return ( i > 127 ) ? 255 : 0;
+		}
+		
+		
+		private void DitherDirection(BufferedImage img,int y,int[] error,int[] nexterror,int direction) {
+			int w = img.getWidth();
+			int oldPixel, newPixel, quant_error;
+			int start, end, x;
+
+			for(x=0;x<w;++x) nexterror[x]=0;
+			
+			if(direction>0) {
+				start=0;
+				end=w;
+			} else {
+				start=w-1;
+				end=-1;
+			}
+			
+			// for each x from left to right
+			for(x=start;x!=end;x+=direction) {
+				// oldpixel := pixel[x][y]
+				oldPixel = decode(img.getRGB(x, y)) + error[x];
+				// newpixel := find_closest_palette_color(oldpixel)
+				newPixel = QuantizeColor(oldPixel);
+				// pixel[x][y] := newpixel
+				img.setRGB(x, y, encode(newPixel));
+				// quant_error := oldpixel - newpixel
+				quant_error = oldPixel - newPixel;
+				// pixel[x+1][y  ] := pixel[x+1][y  ] + 7/16 * quant_error
+				// pixel[x-1][y+1] := pixel[x-1][y+1] + 3/16 * quant_error
+				// pixel[x  ][y+1] := pixel[x  ][y+1] + 5/16 * quant_error
+				// pixel[x+1][y+1] := pixel[x+1][y+1] + 1/16 * quant_error
+					nexterror[x          ] += 5.0/16.0 * quant_error;
+				if(x+direction>=0 && x+direction < w) {
+					    error[x+direction] += 7.0/16.0 * quant_error;
+					nexterror[x+direction] += 1.0/16.0 * quant_error;
+				}
+				if(x-direction>=0 && x-direction < w) {
+					nexterror[x-direction] += 3.0/16.0 * quant_error;
+				}
+			}
+		}
+		
+		
+		// Floyd-Steinberg dithering
+		public void Process(BufferedImage img) {
+			int y;
+			int h = img.getHeight();
+			int w = img.getWidth();
+			int direction=1;
+			int[] error=new int[w];
+			int[] nexterror=new int[w];
+			
+			for(y=0;y<w;++y) {
+				error[y]=nexterror[y]=0;
+			}
+
+			// for each y from top to bottom
+			for(y=0;y<h;++y) {
+				DitherDirection(img,y,error,nexterror,direction);
+				
+				direction = direction> 0 ? -1 : 1;
+				int [] tmp = error;
+				error=nexterror;
+				nexterror=tmp;
+			}
+		}
+	}
+	
+	
+	
+	public void LoadImage(String filename) {
+		try {
+			img = ImageIO.read(new File(filename));
+		}
+		catch(IOException e) {}
+
+		DitherFloydSteinberg filter = new DitherFloydSteinberg();
+		filter.Process(img);
+	   	UpdateRecentFiles(filename);
+	}
+	
+	
 	
 	// returns angle of dy/dx as a value from 0...2PI
 	public double atan3(double dy,double dx) {
@@ -422,6 +547,8 @@ public class DrawbotGUI
 		log.append(msg);
 		log.setCaretPosition(log.getText().length());	
 	}
+	
+	
 	
 	
 	
@@ -696,7 +823,13 @@ public class DrawbotGUI
 		imageScale=1;
 		imageOffsetX=0;
 		imageOffsetY=0;
-		OpenFile(filename);
+		
+		String ext=filename.substring(filename.lastIndexOf('.'));
+    	if(ext.equalsIgnoreCase(".ngc")) {
+    		OpenFile(filename);
+    	} else {
+    		LoadImage(filename);
+    	}
 	}
 
 	
@@ -707,11 +840,18 @@ public class DrawbotGUI
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
+		FileFilter filterJPEG  = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
+		FileFilter filterGCODE = new FileNameExtensionFilter("GCODE file", "ngc");
+		 
 		JFileChooser fc = new JFileChooser(new File(filename));
+		fc.addChoosableFileFilter(filterJPEG);
+		fc.addChoosableFileFilter(filterGCODE);
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	OpenFileOnDemand(fc.getSelectedFile().getAbsolutePath());
 	    }
 	}
+	
+	
 	
 	
 	
@@ -786,6 +926,7 @@ public class DrawbotGUI
 			Halt();
 		}
 	}
+	
 	
 	
 	// last minute scale & translate the image 
@@ -869,6 +1010,8 @@ public class DrawbotGUI
 		
 		return true;
 	}
+	
+	
 	
 	
 	
@@ -1005,6 +1148,8 @@ public class DrawbotGUI
                 break;
         }
     }
+	
+	
 	
 	
 
@@ -1164,6 +1309,7 @@ public class DrawbotGUI
         // finish
         menuBar.updateUI();
     }
+	
 	
 	
 	
