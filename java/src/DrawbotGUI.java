@@ -60,7 +60,7 @@ public class DrawbotGUI
 	// GUI elements
     JMenuBar menuBar;
     JMenuItem buttonOpenFile, buttonExit;
-    JMenuItem buttonConfig, buttonRescan, buttonHome;
+    JMenuItem buttonConfig, buttonRescan, buttonLoad, buttonHome;
     JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     JCheckBoxMenuItem buttonMoveImage;
     JMenuItem buttonAbout;
@@ -79,7 +79,7 @@ public class DrawbotGUI
 	StatusBar statusBar;
 	DecimalFormat fmt = new DecimalFormat("#.##");
 	
-	// parsing input from drawbot
+	// parsing input from Drawbot
 	String line3="";
 
 	// reading file
@@ -108,6 +108,7 @@ public class DrawbotGUI
 	double maxZone=100;
 	
 	BufferedImage img = null;
+	
 	
 	
 	// manages the status bar at the bottom of the application window
@@ -308,7 +309,7 @@ public class DrawbotGUI
 			g2d.setColor(Color.RED);
 			g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 			g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
-
+/*
 			if(img!=null) {
 				int w=img.getWidth();
 				int h=img.getHeight();
@@ -317,7 +318,7 @@ public class DrawbotGUI
 						0, 0, w, h,
 						null);
 				return;
-			}
+			}*/
 
 			// draw image
 			g2d.setColor(Color.BLACK);
@@ -425,14 +426,13 @@ public class DrawbotGUI
 	}
 	
 	
-	// http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29
-	// http://www.home.unix-ag.org/simon/gimp/fsdither.c
-	public class DitherFloydSteinberg {
-		float max_intensity, min_intensity;
-		float max_threshold, min_threshold;
-		
-		
-		private int decode(int pixel) {
+	
+	/**
+	 * A base class for image filtering
+	 * @author Dan
+	 */
+	public class Filter {
+		protected int decode(int pixel) {
 			//pixel=(int)( Math.min(Math.max(pixel, 0),255) );
 			float r = ((pixel>>16)&0xff);
 			float g = ((pixel>> 8)&0xff);
@@ -441,11 +441,62 @@ public class DrawbotGUI
 		}
 		
 		
-		private int encode(int i) {
+		protected int encode(int i) {
 			return (0xff<<24) | (i<<16) | (i<< 8) | i;
+		}		
+	}
+	
+	
+	/**
+	 * Converts an image to black & white, reduces contrast (washes it out)
+	 * @author Dan
+	 *
+	 */
+	public class Filter_BlackAndWhiteContrast extends Filter {
+		float max_intensity, min_intensity;
+		float max_threshold, min_threshold;
+
+		public BufferedImage Process(BufferedImage img) {
+			int h = img.getHeight();
+			int w = img.getWidth();
+			int x,y,i;
+
+			max_intensity=-1000;
+			min_intensity=1000;
+			for(y=0;y<h;++y) {
+				for(x=0;x<w;++x) {
+					i=decode(img.getRGB(x, y));
+					if(max_intensity<i) max_intensity=i;
+					if(min_intensity>i) min_intensity=i;
+					img.setRGB(x, y, encode(i));
+				}
+			}
+			System.out.println("min_intensity="+min_intensity);
+			System.out.println("max_intensity="+max_intensity);
+			
+			for(y=0;y<h;++y) {
+				for(x=0;x<w;++x) {
+					i=decode(img.getRGB(x, y));
+					
+					float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
+					int b = (int)( a * 56.0f + 200.0f );
+					//System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
+					img.setRGB(x, y, encode(b));
+				}
+			}
+			
+			return img;
 		}
-		
-		
+	}
+	
+	
+	/**
+	 * Floyd/Steinberg dithering
+	 * @author Dan
+	 * @see {@link http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29}<br>
+	 * {@link http://www.home.unix-ag.org/simon/gimp/fsdither.c}
+	 */
+	public class Filter_DitherFloydSteinberg extends Filter {
 		private int QuantizeColor(int original) {
 			int i=(int)Math.min(Math.max(original, 0),255);
 			return ( i > 127 ) ? 255 : 0;
@@ -493,8 +544,7 @@ public class DrawbotGUI
 		}
 		
 		
-		// Floyd-Steinberg dithering
-		public void Process(BufferedImage img) {
+		public BufferedImage Process(BufferedImage img) {
 			int y;
 			int h = img.getHeight();
 			int w = img.getWidth();
@@ -515,6 +565,246 @@ public class DrawbotGUI
 				error=nexterror;
 				nexterror=tmp;
 			}
+			
+			return img;
+		}
+	}
+	
+	
+	
+	/**
+	 * Reduces any picture to a more manageable size
+	 * @author Dan
+	 */
+	public class Filter_Resize {
+		protected BufferedImage scaleImage(BufferedImage img, int width, int height, Color background) {
+		    int imgWidth = img.getWidth();
+		    int imgHeight = img.getHeight();
+		    if (imgWidth*height < imgHeight*width) {
+		        width = imgWidth*height/imgHeight;
+		    } else {
+		        height = imgHeight*width/imgWidth;
+		    }
+		    BufferedImage newImage = new BufferedImage(width, height,
+		            BufferedImage.TYPE_INT_RGB);
+		    Graphics2D g = newImage.createGraphics();
+		    try {
+		        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+		                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		        g.setBackground(background);
+		        g.clearRect(0, 0, width, height);
+		        g.drawImage(img, 0, 0, width, height, null);
+		    } finally {
+		        g.dispose();
+		    }
+		    return newImage;
+		}
+
+
+		public BufferedImage Process(BufferedImage img) {
+			int w = img.getWidth();
+			int h = img.getHeight();
+			int max_w=500;
+			int max_h=500;
+			
+			if(w>max_w) {
+				h*=(float)max_w/(float)w;
+				w=max_w;
+			}
+			if(h>max_h) {
+				w*=(float)max_h/(float)h;
+				h=max_h;
+			}
+			return scaleImage(img, w,h,Color.WHITE);
+		}
+	}
+	
+	
+	/**
+	 * Generate a Gcode file from the BufferedImage supplied.<br>
+	 * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
+	 * @author Dan
+	 */
+	class Filter_TSPGcodeGenerator extends Filter {
+		public class Point {
+			int x, y;
+			
+			public Point(int _x,int _y) {
+				x=_x;
+				y=_y;
+			}
+		}
+		
+		
+		String dest;
+		Point[] points = null;
+		int numPoints;
+		int[] solution = null;
+		int scount;
+
+		
+		Filter_TSPGcodeGenerator(String _dest) {
+			dest=_dest;
+		}
+
+		protected long CalculateWeight(int a,int b) {
+			long x = points[a].x - points[b].x;
+			long y = points[a].y - points[b].y;
+			return x*x+y*y;
+		}
+
+		private void GenerateTSP() {
+			Log("Generating greedy TSP solution...\n");
+
+			GreedyTour();
+			long len=GetTourLength(solution);
+			long len2;
+			
+			int[] solution2 = new int[numPoints];
+			
+			int start,end,j;
+			
+			Log("0:"+len+"\n");
+
+			for(int i=0;i<4000000;++i) {
+				// pick start and end points
+				start = (int)(Math.random()*numPoints);
+				end = (int)(Math.random()*(numPoints-start));
+
+				for(j=0;j<numPoints;++j) {
+					solution2[j]=solution[j];
+				}
+				for(j=0;j<end;++j) {
+					solution2[start+j]=solution[start+end-j];
+				}
+				len2=GetTourLength(solution2);
+				if(len2<len) {
+					Log(i+":"+len2+"\n");
+					for(j=0;j<numPoints;++j) {
+						solution[j]=solution2[j];
+						len=len2;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Get the length of a tour
+		 * @param list an array of indexes into the point list.  the order forms the tour sequence.
+		 * @return the length of the tour
+		 */
+		private long GetTourLength(int[] list) {
+			long w=0;
+			for(int i=0;i<numPoints-1;++i) {
+				w+=CalculateWeight(list[i],list[i+1]);
+			}
+			return w;
+		}
+
+		
+		/**
+		 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
+		 */
+		private void GreedyTour() {
+			int i;
+			long w, bestw;
+			int besti;
+			
+			// put all the points in the solution in no particular order.
+			for(i=0;i<numPoints;++i) {
+				solution[i]=i;
+			}
+			scount=1;
+			
+			do {
+				// Find the nearest point not already in the line.
+				// Any solution[n] where n>scount is not in the line.
+				bestw=CalculateWeight(solution[scount],solution[scount-1]);
+				besti=solution[scount];
+				for( i=scount; i<numPoints; ++i ) {
+					w=CalculateWeight(solution[i],solution[scount-1]);
+					if( w < bestw ) {
+						bestw=w;
+						besti=i;
+					}
+				}
+				i=solution[scount];
+				solution[scount]=solution[besti];
+				solution[besti]=i;
+				scount++;
+			} while(scount<numPoints);
+		}
+		
+		/**
+		 * Open a file and write out the edge list as a set of GCode commands.
+		 * Since all the points are connected in a single loop, start at point 0 and go around until you get back to point 0.
+		 */
+		private void ConvertAndSaveToGCode(int width, int height) {
+			Log("Converting to gcode and saving "+dest+"\n");
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+
+				int w2=width/2;
+				int h2=height/2;
+				
+				out.write("G00 Z90\n");
+				out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+				out.write("G00 Z10\n");
+
+				int i;
+				for(i=1;i<numPoints;++i) {
+					out.write("G01 X" + (points[solution[i]].x-w2) + " Y" + (h2-points[solution[i]].y) + "\n");
+				}
+				out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+				out.write("G00 Z90\n");
+				out.write("G00 X0 Y0\n");
+				out.close();
+			}
+			catch(IOException e) {
+				Log("Error saving "+dest+": "+e.getMessage());
+			}
+			Log("Completed.\n");
+		}
+		
+		/**
+		 * The main entry point
+		 * @param img the image to convert.
+		 */
+		public void Process(BufferedImage img) {
+			System.out.println("Processing...");
+			int h = img.getHeight();
+			int w = img.getWidth();
+			int x,y,i;
+			
+			// count the points
+			numPoints=0;
+			for(y=0;y<h;++y) {
+				for(x=0;x<w;++x) {
+					i=decode(img.getRGB(x,y));
+					if(i==0) {
+						++numPoints;
+					}
+				}
+			}
+			
+			Log(numPoints + " points\n");
+			points = new Point[numPoints];
+
+			// collect the point data
+			numPoints=0;
+			for(y=0;y<h;++y) {
+				for(x=0;x<w;++x) {
+					i=decode(img.getRGB(x,y));
+					if(i==0) {
+						points[numPoints++]=new Point(x,y);
+					}
+				}
+			}
+			
+			solution = new int[numPoints];
+			
+			GenerateTSP();
+			ConvertAndSaveToGCode(w,h);
 		}
 	}
 	
@@ -526,9 +816,16 @@ public class DrawbotGUI
 		}
 		catch(IOException e) {}
 
-		DitherFloydSteinberg filter = new DitherFloydSteinberg();
-		filter.Process(img);
-	   	UpdateRecentFiles(filename);
+		//Filter_Resize rs = new Filter_Resize(); 
+		//img = rs.Process(img);
+		Filter_BlackAndWhiteContrast bwc = new Filter_BlackAndWhiteContrast(); 
+		img = bwc.Process(img);
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		img = dither.Process(img);
+
+		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+		Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair);
+		tsp.Process(img);
 	}
 	
 	
@@ -542,16 +839,15 @@ public class DrawbotGUI
 	
 	
 	
-	// spits a message out to the log tab 
+	// appends a message to the log tab and system out.
 	public void Log(String msg) {
 		log.append(msg);
-		log.setCaretPosition(log.getText().length());	
+		log.setCaretPosition(log.getText().length());
+		System.out.print(msg);
 	}
 	
 	
-	
-	
-	
+		
 	public void ClosePort() {
 		if(portOpened) {
 		    if (serialPort != null) {
@@ -715,7 +1011,6 @@ public class DrawbotGUI
 	
 	
 	// Opens the file.  If the file can be opened, repaint the preview tab.
-	// @TODO: check this file is gcode?
 	public void OpenFile(String filename) {
 		CloseFile();
 
@@ -825,11 +1120,15 @@ public class DrawbotGUI
 		imageOffsetY=0;
 		
 		String ext=filename.substring(filename.lastIndexOf('.'));
-    	if(ext.equalsIgnoreCase(".ngc")) {
-    		OpenFile(filename);
-    	} else {
-    		LoadImage(filename);
+    	if(!ext.equalsIgnoreCase(".ngc")) {
+    		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+    		if(!(new File(ngcPair)).exists()) {
+    			LoadImage(filename);
+    			filename=ngcPair;
+    		}
     	}
+    	
+		OpenFile(filename);
 	}
 
 	
@@ -853,8 +1152,6 @@ public class DrawbotGUI
 	
 	
 	
-	
-	
 	public void GoHome() {
 		String line="HOME;";
 		Log(line+NL);
@@ -868,7 +1165,35 @@ public class DrawbotGUI
 	
 	
 	
-	// Open the config dialog, send the config update to the robot, refresh the preview tab.
+	/**
+	 * Open the load dialog, load the spools.
+	 */
+	public void UpdateLoad() {
+		JTextField left = new JTextField("500");
+		JTextField right = new JTextField("500");
+		final JComponent[] inputs = new JComponent[] {
+						new JLabel("Measurements are in cm.  Positive value winds in."),
+		                new JLabel("Left"), 	left,
+		                new JLabel("Right"), 	right
+		};
+		JOptionPane.showMessageDialog(null, inputs, "Load Bobbins", JOptionPane.PLAIN_MESSAGE);
+
+		String line="LOAD";
+		if(left.getText().trim() !="") line+=" L"+left.getText().trim();
+		if(right.getText().trim()!="") line+=" R"+right.getText().trim();
+		line+=";";
+		Log(line+NL);
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+	}
+
+	
+	
+	/**
+	 * Open the config dialog, send the config update to the robot, refresh the preview tab.
+	 */
 	public void UpdateConfig() {
 		JTextField top = new JTextField(String.valueOf(limit_top));
 		JTextField bottom = new JTextField(String.valueOf(limit_bottom));
@@ -901,7 +1226,7 @@ public class DrawbotGUI
 			previewPane.repaint();
 		}
 	}
-	
+
 	
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
@@ -1014,7 +1339,10 @@ public class DrawbotGUI
 	
 	
 	
-	
+	/**
+	 * stop sending commands to the robot.
+	 * @todo add an e-stop command?
+	 */
 	public void Halt() {
 		CloseFile();
 		OpenFile(recentFiles[0]);
@@ -1084,7 +1412,11 @@ public class DrawbotGUI
 		if( subject == buttonConfig ) {
 			UpdateConfig();
 			return;
-		}		
+		}
+		if( subject == buttonLoad ) {
+			UpdateLoad();
+			return;
+		}	
 		if( subject == buttonHome ) {
 			GoHome();
 			return;
@@ -1148,8 +1480,6 @@ public class DrawbotGUI
                 break;
         }
     }
-	
-	
 	
 	
 
@@ -1232,7 +1562,7 @@ public class DrawbotGUI
         buttonRescan.getAccessibleContext().setAccessibleDescription("Rescan the available ports.");
         buttonRescan.addActionListener(this);
         subMenu.add(buttonRescan);
-
+        
         menu.add(subMenu);
 
         buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
@@ -1240,6 +1570,12 @@ public class DrawbotGUI
         buttonConfig.addActionListener(this);
         buttonConfig.setEnabled(portConfirmed && !running && !driving);
         menu.add(buttonConfig);
+
+        buttonLoad = new JMenuItem("Load bobbins");
+        buttonLoad.getAccessibleContext().setAccessibleDescription("Load string onto the bobbin.");
+        buttonLoad.addActionListener(this);
+        buttonLoad.setEnabled(portConfirmed && !running && !driving);
+        menu.add(buttonLoad);
 
         buttonHome = new JMenuItem("Home",KeyEvent.VK_O);
         buttonHome.getAccessibleContext().setAccessibleDescription("Recenter the plotter");
@@ -1309,7 +1645,6 @@ public class DrawbotGUI
         // finish
         menuBar.updateUI();
     }
-	
 	
 	
 	
