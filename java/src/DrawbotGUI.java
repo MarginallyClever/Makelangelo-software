@@ -27,7 +27,6 @@ import java.util.prefs.Preferences;
 
 
 
-
 public class DrawbotGUI
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
@@ -55,12 +54,21 @@ public class DrawbotGUI
 	String recentPort;
 	
 	// Robot config
-	double limit_top, limit_bottom, limit_left, limit_right;
+	double limit_top=10;
+	double limit_bottom=-10;
+	double limit_left=-10;
+	double limit_right=10;
+	
+	// paper area (stock material
+	double paper_top=10;
+	double paper_bottom=-10;
+	double paper_left=-10;
+	double paper_right=10;
 	
 	// GUI elements
     JMenuBar menuBar;
     JMenuItem buttonOpenFile, buttonExit;
-    JMenuItem buttonConfig, buttonRescan, buttonLoad, buttonHome;
+    JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad, buttonHome;
     JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     JCheckBoxMenuItem buttonMoveImage;
     JMenuItem buttonAbout;
@@ -287,7 +295,6 @@ public class DrawbotGUI
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);    // paint background
-			setBackground(Color.WHITE);
 			Graphics2D g2d = (Graphics2D)g;
 		   
 			cx = this.getWidth()/2;
@@ -298,10 +305,14 @@ public class DrawbotGUI
 				setBackground(Color.WHITE);
 			} else {
 				setBackground(Color.GRAY);
-				g2d.setColor(Color.WHITE);
+				g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
 				g2d.fillRect((int)TX(limit_left),(int)TY(limit_top),
 						(int)((limit_right-limit_left)*cameraZoom),
 						(int)((limit_top-limit_bottom)*cameraZoom));
+				g2d.setColor(Color.WHITE);
+				g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
+						(int)((paper_right-paper_left)*cameraZoom),
+						(int)((paper_top-paper_bottom)*cameraZoom));
 
 			}
 
@@ -479,8 +490,9 @@ public class DrawbotGUI
 					i=decode(img.getRGB(x, y));
 					
 					float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
-					int b = (int)( a * 56.0f + 200.0f );
-					//System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
+					int b = (int)( a * 60.0f + 210.0f );
+					if(b>255) b=255;
+					//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
 					img.setRGB(x, y, encode(b));
 				}
 			}
@@ -604,9 +616,18 @@ public class DrawbotGUI
 		public BufferedImage Process(BufferedImage img) {
 			int w = img.getWidth();
 			int h = img.getHeight();
-			int max_w=500;
-			int max_h=500;
+			int max_w=(int)((paper_right-paper_left)*8.0);  // *10 for mm, *0.8 for margin
+			int max_h=(int)((paper_top-paper_bottom)*8.0);
 			
+			if(w<max_w && h<max_h) {
+				if(w>h) {
+					h*=(float)max_w/(float)w;
+					w=max_w;
+				} else {
+					w*=(float)max_h/(float)h;
+					h=max_h;
+				}
+			}
 			if(w>max_w) {
 				h*=(float)max_w/(float)w;
 				w=max_w;
@@ -666,11 +687,12 @@ public class DrawbotGUI
 			
 			Log("0:"+len+"\n");
 
-			for(int i=0;i<4000000;++i) {
-				// pick start and end points
+			for(int i=0;i<1000000;++i) {
+				// pick start and end points to flip
 				start = (int)(Math.random()*numPoints);
 				end = (int)(Math.random()*(numPoints-start));
 
+				// 
 				for(j=0;j<numPoints;++j) {
 					solution2[j]=solution[j];
 				}
@@ -816,8 +838,8 @@ public class DrawbotGUI
 		}
 		catch(IOException e) {}
 
-		//Filter_Resize rs = new Filter_Resize(); 
-		//img = rs.Process(img);
+		Filter_Resize rs = new Filter_Resize(); 
+		img = rs.Process(img);
 		Filter_BlackAndWhiteContrast bwc = new Filter_BlackAndWhiteContrast(); 
 		img = bwc.Process(img);
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
@@ -931,14 +953,15 @@ public class DrawbotGUI
 		}
 		
 		try {
-		serialPort.addEventListener(this);
-		serialPort.notifyOnDataAvailable(true);
+			serialPort.addEventListener(this);
+			serialPort.notifyOnDataAvailable(true);
 		}
 		catch(TooManyListenersException e) {
 			Log("Streams could not be opened:"+e.getMessage()+NL);
 			return 7;
 		}
 
+		Log("Opened.\n");
 		SetRecentPort(portName);
 		portOpened=true;
 		UpdateMenuBar();
@@ -950,16 +973,19 @@ public class DrawbotGUI
 	// complete the handshake, update the menu, repaint the preview with the limits.
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		if(line3.startsWith("== HELLO WORLD ==")==true) {
-			String[] lines = line3.split("\\r?\\n");
-
-			limit_top = Float.parseFloat(lines[1].substring(1));
-			limit_bottom = Float.parseFloat(lines[2].substring(1));
-			limit_left = Float.parseFloat(lines[3].substring(1));
-			limit_right = Float.parseFloat(lines[4].substring(1));
-			portConfirmed=true;
-			UpdateMenuBar();
-			previewPane.repaint();
+		int found=line3.lastIndexOf("== HELLO WORLD ==");
+		if(found >= 0) {
+			String[] lines = line3.substring(found).split("\\r?\\n");
+			try {
+				limit_top = Float.parseFloat(lines[1].substring(1));
+				limit_bottom = Float.parseFloat(lines[2].substring(1));
+				limit_left = Float.parseFloat(lines[3].substring(1));
+				limit_right = Float.parseFloat(lines[4].substring(1));
+				portConfirmed=true;
+				UpdateMenuBar();
+				previewPane.repaint();
+			}
+			catch(NumberFormatException e) {}
 		}
 		return portConfirmed;
 	}
@@ -999,6 +1025,25 @@ public class DrawbotGUI
 	}
 	
 
+	
+	// save paper limits
+	public void SetRecentPaperSize() {
+		prefs.putDouble("paper_left", paper_left);
+		prefs.putDouble("paper_right", paper_right);
+		prefs.putDouble("paper_top", paper_top);
+		prefs.putDouble("paper_bottom", paper_bottom);
+	}
+
+	
+	
+	public void GetRecentPaperSize() {
+		paper_left=Double.parseDouble(prefs.get("paper_left","-10"));
+		paper_right=Double.parseDouble(prefs.get("paper_right","10"));
+		paper_top=Double.parseDouble(prefs.get("paper_top","10"));
+		paper_bottom=Double.parseDouble(prefs.get("paper_bottom","-10"));
+	}
+
+	
 	
 	// close the file, clear the preview tab
 	public void CloseFile() {
@@ -1206,7 +1251,7 @@ public class DrawbotGUI
 		                new JLabel("Left"), 	left,
 		                new JLabel("Right"), 	right
 		};
-		JOptionPane.showMessageDialog(null, inputs, "Config", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(null, inputs, "Config machine limits", JOptionPane.PLAIN_MESSAGE);
 
 		if(left.getText().trim()!="" || right.getText().trim()!="" ||
 			top.getText().trim()!="" || bottom.getText().trim()!="") {
@@ -1223,6 +1268,36 @@ public class DrawbotGUI
 			limit_bottom = Float.valueOf(bottom.getText());
 			limit_right = Float.valueOf(right.getText());
 			limit_left = Float.valueOf(left.getText());
+			previewPane.repaint();
+		}
+	}
+
+	
+	
+	/**
+	 * Open the config dialog, update the paper size, refresh the preview tab.
+	 */
+	public void UpdatePaper() {
+		JTextField top = new JTextField(String.valueOf(limit_top));
+		JTextField bottom = new JTextField(String.valueOf(limit_bottom));
+		JTextField left = new JTextField(String.valueOf(limit_left));
+		JTextField right = new JTextField(String.valueOf(limit_right));
+		final JComponent[] inputs = new JComponent[] {
+						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
+		                new JLabel("Top"), 		top,
+		                new JLabel("Bottom"),	bottom,
+		                new JLabel("Left"), 	left,
+		                new JLabel("Right"), 	right
+		};
+		JOptionPane.showMessageDialog(null, inputs, "Config paper limits", JOptionPane.PLAIN_MESSAGE);
+
+		if(left.getText().trim()!="" || right.getText().trim()!="" ||
+			top.getText().trim()!="" || bottom.getText().trim()!="") {
+			paper_top = Float.valueOf(top.getText());
+			paper_bottom = Float.valueOf(bottom.getText());
+			paper_right = Float.valueOf(right.getText());
+			paper_left = Float.valueOf(left.getText());
+			SetRecentPaperSize();
 			previewPane.repaint();
 		}
 	}
@@ -1413,6 +1488,10 @@ public class DrawbotGUI
 			UpdateConfig();
 			return;
 		}
+		if( subject == buttonPaper ) {
+			UpdatePaper();
+			return;
+		}
 		if( subject == buttonLoad ) {
 			UpdateLoad();
 			return;
@@ -1565,11 +1644,17 @@ public class DrawbotGUI
         
         menu.add(subMenu);
 
-        buttonConfig = new JMenuItem("Config",KeyEvent.VK_C);
-        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot configuration.");
+        buttonConfig = new JMenuItem("Configure machine limits",KeyEvent.VK_C);
+        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot shape.");
         buttonConfig.addActionListener(this);
         buttonConfig.setEnabled(portConfirmed && !running && !driving);
         menu.add(buttonConfig);
+
+        buttonPaper = new JMenuItem("Paperure paper limits",KeyEvent.VK_C);
+        buttonPaper.getAccessibleContext().setAccessibleDescription("Adjust the paper shape.");
+        buttonPaper.addActionListener(this);
+        buttonPaper.setEnabled(portConfirmed && !running && !driving);
+        menu.add(buttonPaper);
 
         buttonLoad = new JMenuItem("Load bobbins");
         buttonLoad.getAccessibleContext().setAccessibleDescription("Load string onto the bobbin.");
@@ -1695,6 +1780,8 @@ public class DrawbotGUI
 		if(Arrays.asList(portsDetected).contains(recentPort)) {
 			OpenPort(recentPort);
 		}
+		
+		GetRecentPaperSize();
 		
         return contentPane;
     }

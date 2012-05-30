@@ -35,16 +35,13 @@
 // Comment out this line to silence most serial output.
 //#define VERBOSE         (1)
 
-// Uncomment this line to compile for smaller boards
-//#define SMALL_FOOTPRINT (1)
-
 // which motor is on which pin?
 #define M1_PIN          (1)
 #define M2_PIN          (2)
 
 // which limit switch is on which pin?
-#define S1_PIN          (3)
-#define S2_PIN          (5)
+#define S1_PIN          (A3)
+#define S2_PIN          (A5)
 
 // which way are the spools wound, relative to motor movement?
 #define REEL_IN         FORWARD
@@ -205,7 +202,7 @@ static char planner_awake=0;
 
 
 //------------------------------------------------------------------------------
-void setup_planner() {
+void planner_setup() {
   FrequencyTimer2::disable();
   block_head=0;
   block_tail=0;
@@ -522,8 +519,26 @@ void plan_step() {
     }
 
     // find where the plotter will be at tsum seconds
-    double nx = interpolate(current_block->sx,current_block->ex,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
-    double ny = interpolate(current_block->sy,current_block->ey,current_block->tsum,current_block->t1,current_block->t2,current_block->time,current_block->len,current_block->startv,current_block->endv,current_block->topv);
+    double nx = interpolate(current_block->sx,
+                            current_block->ex,
+                            current_block->tsum,
+                            current_block->t1,
+                            current_block->t2,
+                            current_block->time,
+                            current_block->len,
+                            current_block->startv,
+                            current_block->endv,
+                            current_block->topv);
+    double ny = interpolate(current_block->sy,
+                            current_block->ey,
+                            current_block->tsum,
+                            current_block->t1,
+                            current_block->t2,
+                            current_block->time,
+                            current_block->len,
+                            current_block->startv,
+                            current_block->endv,
+                            current_block->topv);
 //    double nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
 
     // get the new string lengths
@@ -749,16 +764,6 @@ static void line(double x,double y,double z) {
 }
 
 
-//------------------------------------------------------------------------------
-// checks against the robot limits before attempting to move
-static int lineSafe(double x,double y,double z) {
-#ifndef SMALL_FOOTPRINT
-  if(outsideLimits(x,y)) return 1;
-#endif
-  
-  line(x,y,z);
-  return 0;
-}
 
 
 //------------------------------------------------------------------------------
@@ -835,422 +840,6 @@ static void arc(double cx,double cy,double x,double y,double z,double dir) {
 }
 
 
-
-#ifndef SMALL_FOOTPRINT
-
-
-//------------------------------------------------------------------------------
-// returns 0 if inside limits
-// returns non-zero if outside limits.
-static int outsideLimits(double x,double y) {
-  return ((x<limit_left)<<0)
-        |((x>limit_right)<<1)
-        |((y<limit_bottom)<<2)
-        |((y>limit_top)<<3);
-}
-
-
-//------------------------------------------------------------------------------
-// is the point (dx,dy) in the arc segment subtended by angle1,angle2?
-// return 0 if it is not.
-static int pointInArc(double dx,double dy,double angle1,double angle2,double dir) {
-  double angle3=atan3(-dy,dx);  // atan2 expects +y to be up, so flip the sign
-  
-#ifdef VERBOSE 
-  Serial.print("C:");  Serial.print(dx);
-  Serial.print(",");   Serial.print(dy);
-  Serial.print("=");   Serial.println(angle3*180.0/PI);
-#endif
-
-  if(dir==ARC_CW) {
-    if(angle1<angle2) angle1+=PI*2;
-#ifdef VERBOSE 
-  Serial.print("CW");
-  Serial.print(angle1*180.0/PI);  Serial.print(" < ");
-  Serial.print(angle3*180.0/PI);  Serial.print(" < ");
-  Serial.print(angle2*180.0/PI);  Serial.println("?");
-#endif
-    if(angle2<=angle3 && angle3<=angle1) return 1;
-  } else {
-    if(angle2<angle1) angle2+=PI*2;
-#ifdef VERBOSE 
-  Serial.print("CCW");
-  Serial.print(angle2*180.0/PI);  Serial.print(" > ");
-  Serial.print(angle3*180.0/PI);  Serial.print(" > ");
-  Serial.print(angle1*180.0/PI);  Serial.println("?");
-#endif
-    if(angle1<=angle3 && angle3<=angle2) return 2;
-  }
-
-  return 0;
-}
-
-
-//------------------------------------------------------------------------------
-// ...checks start & end radius match
-// ...checks against the envelope limits
-static int canArc(double cx,double cy,double x,double y,double dir) {
-  if(outsideLimits(x,y)) return 1;
-
-  double a=x-cx;
-  double b=y-cy;
-  double c=posx-cx;
-  double d=posy-cy;
-  double r1=sqrt(a*a+b*b);
-  double r2=sqrt(c*c+d*d);
-  
-  if( abs(r1-r2) > 0.001 ) {
-    Serial.print("r1=");  Serial.println(r1);
-    Serial.print("r2=");  Serial.println(r2);
-    return 2;  // radii don't match
-  }
-  
-  double angle1=atan3(d,c);
-  double angle2=atan3(b,a);
-
-#ifdef VERBOSE
-  Serial.print("A:");  Serial.print(c);
-  Serial.print(",");   Serial.print(d);
-  Serial.print("=");   Serial.println(angle1*180.0/PI);
-  Serial.print("B:");  Serial.print(a);
-  Serial.print(",");   Serial.print(b);
-  Serial.print("=");   Serial.println(angle2*180.0/PI);
-  Serial.print("r=");  Serial.println(r1);
-#endif
-
-  if(cx+r1>limit_right) {
-    // find the two points of intersection, see if they are inside the arc
-    double dx=limit_right-cx;
-    double dy=sqrt(r1*r1-dx*dx);
-    if(pointInArc(dx, dy,angle1,angle2,dir)) return 3;
-    if(pointInArc(dx,-dy,angle1,angle2,dir)) return 4;
-  }
-  if(cx-r1<limit_left) {
-    // find the two points of intersection, see if they are inside the arc
-    double dx=limit_left-cx;
-    double dy=sqrt(r1*r1-dx*dx);
-    if(pointInArc(dx, dy,angle1,angle2,dir)) return 5;
-    if(pointInArc(dx,-dy,angle1,angle2,dir)) return 6;
-  }
-  if(cy+r1>limit_top) {
-    // find the two points of intersection, see if they are inside the arc
-    double dy=limit_top-cy;
-    double dx=sqrt(r1*r1-dy*dy);
-    if(pointInArc( dx,dy,angle1,angle2,dir)) return 7;
-    if(pointInArc(-dx,dy,angle1,angle2,dir)) return 8;
-  }
-  if(cy-r1<limit_bottom) {
-    // find the two points of intersection, see if they are inside the arc
-    double dy=limit_bottom-cy;
-    double dx=sqrt(r1*r1-dy*dy);
-    if(pointInArc( dx,dy,angle1,angle2,dir)) return 9;
-    if(pointInArc(-dx,dy,angle1,angle2,dir)) return 10;
-  }
-
-  return 0;
-}
-
-
-
-#endif  // SMALL_FOOTPRINT
-
-
-
-//------------------------------------------------------------------------------
-// before attempting to move...
-// ...checks start & end radius match
-// ...checks against the envelope limits
-static int arcSafe(double cx,double cy,double x,double y,double z,double dir) {
-#ifndef SMALL_FOOTPRINT
-  int r=canArc(cx,cy,x,y,dir);
-  if(r!=0) return r;
-#endif
-  
-  arc(cx,cy,x,y,z,dir);
-  return 0;
-}
-
-
-
-#ifndef SMALL_FOOTPRINT
-
-
-
-//------------------------------------------------------------------------------
-static void testArcs() {
-  int r;
-  double x,y;
-  
-  Serial.println(atan3( 1, 1)*180.0/PI);
-  Serial.println(atan3( 1,-1)*180.0/PI);
-  Serial.println(atan3(-1,-1)*180.0/PI);
-  Serial.println(atan3(-1, 1)*180.0/PI);
-  
-  x=limit_right*0.75;
-  y=limit_top*0.50;
-
-  Serial.println("arcs inside limits, center inside limits (should pass)");    
-  teleport(x,0);
-  error(canArc(0,0,-x,0,ARC_CCW));
-  error(canArc(0,0, x,0,ARC_CCW));
-  error(canArc(0,0,-x,0,ARC_CW));
-  error(canArc(0,0, x,0,ARC_CW));
-
-  Serial.println("arcs outside limits, center inside limits (should fail)");
-  x=x*5;
-  teleport(x,0);
-  error(canArc(0,0,-x,0,ARC_CCW));
-  error(canArc(0,0, x,0,ARC_CCW));
-  error(canArc(0,0,-x,0,ARC_CW));
-  error(canArc(0,0, x,0,ARC_CW));
-
-  x=limit_right*0.75;
-  y=limit_top*0.50;
-  Serial.println("arcs outside limits, arc center outside limits (should fail)");
-  teleport(x,y);
-  error(canArc(x,0,-x,y,ARC_CW));
-
-  // limit_right boundary test
-  x=limit_right*0.75;
-  y=limit_top*0.50;
-  Serial.println("CCW through limit_right (should fail)");     teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
-  Serial.println("CW avoids limit_right (should pass)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
-  Serial.println("CW through limit_right (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  Serial.println("CCW avoids limit_right (should pass)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
-  // limit_left boundary test
-  x=limit_left*0.75;
-  y=limit_top*0.50;
-  Serial.println("CW through limit_left (should fail)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CW));
-  Serial.println("CCW avoids limit_left (should pass)");       teleport(x, y);  error(canArc(x,0, x,-y, ARC_CCW));
-  Serial.println("CCW through limit_left (should fail)");      teleport(x,-y);  error(canArc(x,0, x, y, ARC_CCW));
-  Serial.println("CW avoids limit_left (should pass)");        teleport(x,-y);  error(canArc(x,0, x, y, ARC_CW));
-  // limit_bottom boundary test
-  x=limit_right*0.50;
-  y=limit_bottom*0.75;
-  Serial.println("CW through limit_bottom (should fail)");     teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CCW avoids limit_bottom (should pass)");     teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CCW through limit_bottom (should fail)");    teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-  Serial.println("CW avoids limit_bottom (should pass)");      teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  // limit_top boundary test
-  x=limit_right*0.50;
-  y=limit_top*0.75;
-  Serial.println("CCW through limit_top (should fail)");       teleport( x,y);  error(canArc(0,y,-x, y, ARC_CCW));
-  Serial.println("CW avoids limit_top (should pass)");         teleport( x,y);  error(canArc(0,y,-x, y, ARC_CW));
-  Serial.println("CW through limit_top (should fail)");        teleport(-x,y);  error(canArc(0,y, x, y, ARC_CW));
-  Serial.println("CCW avoids limit_top (should pass)");        teleport(-x,y);  error(canArc(0,y, x, y, ARC_CCW));
-}
-
-
-//------------------------------------------------------------------------------
-static void testClock() {
-  for(int i=0;i<100;++i) {
-    tick();
-    Serial.print(t_millis);    Serial.print("\t");
-    Serial.print(t);           Serial.print("\t");
-    Serial.print(dt);          Serial.print("\n");
-    delay(25);
-  }
-}
-
-
-//------------------------------------------------------------------------------
-static void testKinematics(double x,double y) {
-  Serial.println("-- TEST KINEMATICS --");
-  teleport(x,y);
-  double xx,yy;
-  long a,b;
-  IK(posx,posy,a,b);
-  FK(a,b,xx,yy);
-  Serial.print("x=");  Serial.print(x);
-  Serial.print("\ty=");  Serial.print(y);
-  Serial.print("\ta=");  Serial.print(a);
-  Serial.print("\tb=");  Serial.print(b);
-  Serial.print("\txx=");  Serial.print(xx);
-  Serial.print("\tyy=");  Serial.println(yy);
-}
-
-
-//------------------------------------------------------------------------------
-static void testFullCircle() {
-  Serial.println("-- TEST FULL CIRCLE --");
-
-  int i;
-  long a,b;
-  
-  a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_OUT);  // reel out
-  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_OUT);  // reel out
-  b=micros();
-  Serial.println((b-a)/STEPS_PER_TURN);
-
-  a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) m1.step(1,REEL_IN);  // reel out
-  for(i=0;i<STEPS_PER_TURN;++i) m2.step(1,REEL_IN);  // reel out
-  b=micros();
-  Serial.println((b-a)/STEPS_PER_TURN);
-  
-  a=micros();
-  for(i=0;i<STEPS_PER_TURN;++i) {
-    m1.step(1,REEL_OUT);  // reel out
-    m2.step(1,REEL_OUT);  // reel out
-  }
-  b=micros();
-  Serial.println((b-a)/STEPS_PER_TURN);
-  a=micros();
-  for(i=0;i<STEPS_PER_TURN/2;++i) {
-    m1.step(2,REEL_IN);   // reel in
-    m2.step(2,REEL_IN);   // reel in
-  }
-  b=micros();
-  Serial.println((b-a)/STEPS_PER_TURN);
-}
-
-
-//------------------------------------------------------------------------------
-static void testInterpolation() {
-  Serial.println("-- TEST INTERPOLATE2 --");
-  double start=0;
-  double end=1;
-  double t1,t2,t3;
-  double oldv=0,v;
-  
-  Serial.println("dist=1, full stop");
-  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
-  Serial.print("t1=");  Serial.println(t1);
-  Serial.print("t2=");  Serial.println(t2);
-  Serial.print("t3=");  Serial.println(t3);
-  for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
-    if(t<t1) Serial.print("A\t");
-    else if(t<t2) Serial.print("B\t");
-    else if(t<t3) Serial.print("C\t");
-    Serial.print(v);
-    Serial.print("\t");
-    Serial.println(v-oldv);
-    oldv=v;
-  }
-
-  oldv=0;
-  Serial.println("dist=5, full stop");
-  end=5;
-  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
-  Serial.print("t1=");  Serial.println(t1);
-  Serial.print("t2=");  Serial.println(t2);
-  Serial.print("t3=");  Serial.println(t3);
-  for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
-    if(t<t1) Serial.print("A\t");
-    else if(t<t2) Serial.print("B\t");
-    else if(t<t3) Serial.print("C\t");
-    Serial.print(v);
-    Serial.print("\t");
-    Serial.println(v-oldv);
-    oldv=v;
-  }
-
-  oldv=0;
-  Serial.println("dist=15, full stop");
-  end=15;
-  travelTime(end-start,0,0,feed_rate,t1,t2,t3);
-  Serial.print("t1=");  Serial.println(t1);
-  Serial.print("t2=");  Serial.println(t2);
-  Serial.print("t3=");  Serial.println(t3);
-  for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
-    if(t<t1) Serial.print("A\t");
-    else if(t<t2) Serial.print("B\t");
-    else if(t<t3) Serial.print("C\t");
-    Serial.print(v);
-    Serial.print("\t");
-    Serial.println(v-oldv);
-    oldv=v;
-  }
-
-  oldv=0;
-  Serial.println("dist=5, keep going");
-  end=5;
-  travelTime(end-start,0,feed_rate,feed_rate,t1,t2,t3);
-  Serial.print("t1=");  Serial.println(t1);
-  Serial.print("t2=");  Serial.println(t2);
-  Serial.print("t3=");  Serial.println(t3);
-  for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
-    if(t<t1) Serial.print("A\t");
-    else if(t<t2) Serial.print("B\t");
-    else if(t<t3) Serial.print("C\t");
-    Serial.print(v);
-    Serial.print("\t");
-    Serial.println(v-oldv);
-    oldv=v;
-  }
-
-  oldv=0;
-  Serial.println("dist=5, slow to stop");
-  end=5;
-  travelTime(end-start,feed_rate,0,feed_rate,t1,t2,t3);
-  Serial.print("t1=");  Serial.println(t1);
-  Serial.print("t2=");  Serial.println(t2);
-  Serial.print("t3=");  Serial.println(t3);
-  for(double t=0;t<t3;t+=0.1) {
-    v=interpolate(start,end,t,t1,t2,t3,end-start,0,0,feed_rate);
-    if(t<t1) Serial.print("A\t");
-    else if(t<t2) Serial.print("B\t");
-    else if(t<t3) Serial.print("C\t");
-    Serial.print(v);
-    Serial.print("\t");
-    Serial.println(v-oldv);
-    oldv=v;
-  }
-}
-
-
-//------------------------------------------------------------------------------
-static void testAcceleration() {
-  Serial.println("-- TEST ACCELERATION --");
-  Serial.print("feed_rate=");  Serial.println(feed_rate);
-
-  double i;
-  double a=10;
-  double b=0;
-  double c;
-  for(i=3;i<feed_rate;i+=0.5) {
-    delay(2000);
-    accel=i;
-    Serial.println(accel);
-    line(a,0,0);
-    c=b;
-    b=a;
-    a=c;
-  }
-}
-
-
-//------------------------------------------------------------------------------
-static void testfeed_rate() {
-  Serial.println("-- TEST MAX VELOCITY --");
-  Serial.print("ACCEL=");  Serial.println(ACCELERATION);
-  Serial.print("MAX_VEL=");  Serial.println(MAX_VEL);
-
-  double i;
-  double a=10;
-  double b=-10;
-  double c;
-
-  line(b,0,0);
-
-  for(i=MIN_VEL;i<MAX_VEL;++i) {
-    delay(2000);
-    setFeedRate(i);
-    Serial.println(feed_rate);
-    line(a,0,0);
-    c=b;
-    b=a;
-    a=c;
-  }
-  line(0,0,0);
-}
-
-
 //------------------------------------------------------------------------------
 // loads 5m onto a spool.
 static void loadspools() {
@@ -1262,67 +851,6 @@ static void loadspools() {
   // uncomment the motor you want to load
   m1.step(amnt,REEL_IN);
   //m2.step(amnt,REEL_IN);
-}
-
-
-//------------------------------------------------------------------------------
-// Show off line and arc movement.  This is the test pattern.
-static void demo() {
-  // Set speed to 1m/min
-  float s=0.5;
-  mode_scale=0.1;
-  strcpy(mode_name,"mm");
-  setFeedRate(500.0);
-  
-  // square
-  line( 0*s,-2*s,0);
-  line(-2*s,-2*s,0);
-  line(-2*s, 2*s,0);
-  line( 2*s, 2*s,0);
-  line( 2*s,-2*s,0);
-  line( 0*s,-2*s,0);
-  // arc
-  arc(0,-4*s,0,-6*s,0,ARC_CW );
-  arc(0,-4*s,0,-2*s,0,ARC_CCW);
-  // square
-  line( 0*s,-4*s,0);
-  line( 4*s,-4*s,0);
-  line( 4*s, 4*s,0);
-  line(-4*s, 4*s,0);
-  line(-4*s,-4*s,0);
-  line( 0*s,-4*s,0);
-  // square
-  line( 0*s,-6*s,0);
-  line(-6*s,-6*s,0);
-  line(-6*s, 6*s,0);
-  line( 6*s, 6*s,0);
-  line( 6*s,-6*s,0);
-  line( 0*s,-6*s,0);
-  // large circle
-  arc(0,0, 0, 6*s,0,ARC_CCW);
-  arc(0,0, 0,-6*s,0,ARC_CCW);
-
-  // triangle
-  line( 5.196*s, 3*s,0);
-  line(-5.196*s, 3*s,0);
-  line( 0      ,-6*s,0);
-
-/*
-  // prepare for halftones
-  line( 0,-6,90);
-  line(-6, 8,90);
-  line(-6, 8,0 );
-  // halftones
-  int i;
-  for(i=0;i<12;++i) {
-    halftone(1,(double)i/11.0);
-  }
-
-  // return to origin
-  line( 6, 8,90);
-*/
-  line( 0, 0,90);
-
 }
 
 
@@ -1344,65 +872,6 @@ static void teleport(double x,double y) {
 
 
 //------------------------------------------------------------------------------
-// instantly move the virtual plotter position
-// checks against the robot limits before attempting to move
-static int teleportSafe(double x,double y) {
-  if(outsideLimits(x,y)) return 1;
-  
-  teleport(x,y);
-  return 0;
-}
-
-
-//------------------------------------------------------------------------------
-// halftone generator
-// This method assumes the limits have already been checked.
-// This method assumes posx, posy is in the middle left of the halftone area
-// size - width and height of area to fill.
-// fill - [0...1], 0 being least fill and 1 being most fill
-//
-// plotter will travel left to right filling area from (x1,y1-size/2) to
-// (x1+size,y1+size/2) with zigzags.
-static void halftone(double size,double fill) {
-  double ymin=posy-(size*0.5);
-  double ymax=posy+(size*0.5);
-  
-  double max_lines = size / tool_diameter;
-  int infill = floor( max_lines * fill );
-
-#ifdef VERBOSE
-  Serial.print("size=");        Serial.println(size);
-  Serial.print("fill=");        Serial.println(fill);
-  Serial.print("max_lines=");   Serial.println(max_lines);
-  Serial.print("infill=");      Serial.println(infill);
-#endif
-
-  // Save starting location because line() changes posx,posy!
-  double ox=posx;
-  double oy=posy;
-  
-  if(infill>1) {
-    double step = size / (double)(infill);
-#ifdef VERBOSE
-    Serial.print("step=");          Serial.println(step);
-#endif
-    
-    double x2=ox;
-    double y2=oy;
-    
-    for( int i=0; i<infill; ++i ) {
-      x2 += step;
-      y2 = (i%2)? ymin : ymax;  // the zig-zag effect
-      line(x2,y2,0);  
-    }
-  }
-
-  // return to the middle of the other side of the halftone square
-  line(ox+size,oy,0);
-}
-
-
-//------------------------------------------------------------------------------
 static void help() {
   Serial.println("== DRAWBOT - http://github.com/i-make-robots/Drawbot/ ==");
   Serial.println("All commands end with a semi-colon.");
@@ -1419,33 +888,12 @@ static void help() {
 
 
 //------------------------------------------------------------------------------
-static void testServo() {
-  float i;
-  int j;
-  
-  for(j=0;j<5;++j) {
-    for(i=0;i<180;++i) {
-      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( (float)i / 180.0f )) + MIN_PULSE_WIDTH );
-      delay(10);
-    }
-    
-    for(i=180;i>0;--i) {
-      s1.write( (int)((float)( MAX_PULSE_WIDTH - MIN_PULSE_WIDTH ) * ( (float)i / 180.0f )) + MIN_PULSE_WIDTH );
-      delay(10);
-    }
-  }
-}
-
-
-#endif  // SMALL_FOOTPRINT
-
-
-//------------------------------------------------------------------------------
 static void readSwitches() {
   // get the current switch state
   switch1=analogRead(S1_PIN) > SWITCH_HALF;
   switch2=analogRead(S2_PIN) > SWITCH_HALF;
 }
+
 
 //------------------------------------------------------------------------------
 // find the current robot position and 
@@ -1573,8 +1021,6 @@ static void processCommand() {
 #ifndef SMALL_FOOTPRINT
   if(!strncmp(buffer,"HELP",4)) {
     help();
-  } else if(!strncmp(buffer,"DEMO",4)) {
-    demo();
   } else if(!strncmp(buffer,"HOME",4)) {
     goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
@@ -1591,7 +1037,7 @@ static void processCommand() {
       }
     }
 
-    teleportSafe(xx,yy);
+    teleport(xx,yy);
   } else 
 #endif
   if(!strncmp(buffer,"WHERE",5)) {
@@ -1655,7 +1101,7 @@ static void processCommand() {
       zz+=posz;
     }
     
-    error(lineSafe(xx,yy,zz));
+    line(xx,yy,zz);
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
@@ -1694,7 +1140,7 @@ static void processCommand() {
       zz+=posz;
     }
 
-    error(arcSafe(posx+ii,posy+jj,xx,yy,zz,dd));
+    arc(posx+ii,posy+jj,xx,yy,zz,dd);
   } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
     // dwell
     long xx=0;
@@ -1713,7 +1159,7 @@ static void processCommand() {
     delay(xx);
   } else if(!strncmp(buffer,"J00",3)) {
     // start jog mode
-    setup_planner();
+    planner_setup();
     Serial.println("Planner on");
   } else if(!strncmp(buffer,"J01",3)) {
     // end jog mode
@@ -1788,6 +1234,10 @@ void setup() {
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
 
+  // turn on the pull up resistor
+  digitalWrite(S1_PIN,HIGH);
+  digitalWrite(S2_PIN,HIGH);
+  
   // set the stepper speed
   m1.setSpeed(MAX_RATED_RPM);
   m2.setSpeed(MAX_RATED_RPM);
@@ -1820,7 +1270,7 @@ void setup() {
   setPenAngle(PEN_UP_ANGLE);
   
   // start the timer interrupt
-  setup_planner();
+  planner_setup();
 
   Serial.print("> ");
 }
