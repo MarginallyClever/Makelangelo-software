@@ -490,7 +490,7 @@ public class DrawbotGUI
 					i=decode(img.getRGB(x, y));
 					
 					float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
-					int b = (int)( a * 60.0f + 210.0f );
+					int b = (int)( a * 55.0f + 210.0f );
 					if(b>255) b=255;
 					//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
 					img.setRGB(x, y, encode(b));
@@ -616,8 +616,8 @@ public class DrawbotGUI
 		public BufferedImage Process(BufferedImage img) {
 			int w = img.getWidth();
 			int h = img.getHeight();
-			int max_w=(int)((paper_right-paper_left)*8.0);  // *10 for mm, *0.8 for margin
-			int max_h=(int)((paper_top-paper_bottom)*8.0);
+			int max_w=(int)((paper_right-paper_left)*14);  // *10 for cm->mm, *0.7 for margin, * 2 for resolution (gets divided again when saving out to gcode)
+			int max_h=(int)((paper_top-paper_bottom)*14);
 			
 			if(w<max_w && h<max_h) {
 				if(w>h) {
@@ -658,9 +658,10 @@ public class DrawbotGUI
 		
 		
 		String dest;
-		Point[] points = null;
 		int numPoints;
+		Point[] points = null;
 		int[] solution = null;
+		int[] solution2 = null;
 		int scount;
 
 		
@@ -675,50 +676,71 @@ public class DrawbotGUI
 		}
 
 		private void GenerateTSP() {
-			Log("Generating greedy TSP solution...\n");
+			Log("Generating TSP...\n");
 
 			GreedyTour();
-			long len=GetTourLength(solution);
-			long len2;
-			
-			int[] solution2 = new int[numPoints];
-			
-			int start,end,j;
-			
-			Log("0:"+len+"\n");
+			double len=GetTourLength(solution);
 
-			for(int i=0;i<1000000;++i) {
-				// pick start and end points to flip
-				start = (int)(Math.random()*numPoints);
-				end = (int)(Math.random()*(numPoints-start));
+			Log("Running Lin/Kerighan optimization...\n");
+			
+			int start, end, i, j, once;
+			
+			long t_start = System.currentTimeMillis();
+			long t_now=0;
+			
+			DecimalFormat flen=new DecimalFormat("#.##");
+			DecimalFormat ftime=new DecimalFormat("#.###");
+			
+			Log(len+"mm @ "+t_start+"ms\n");
 
-				// 
-				for(j=0;j<numPoints;++j) {
-					solution2[j]=solution[j];
-				}
-				for(j=0;j<end;++j) {
-					solution2[start+j]=solution[start+end-j];
-				}
-				len2=GetTourLength(solution2);
-				if(len2<len) {
-					Log(i+":"+len2+"\n");
-					for(j=0;j<numPoints;++j) {
-						solution[j]=solution2[j];
-						len=len2;
+			do {
+				once=0;
+				for(start=0;start<numPoints-1;++start) {
+					for(end=start+2;end<=numPoints;++end) {
+						// segments that change before the flip
+						long a=CalculateWeight(solution[start],solution[start+1]);
+						long b=CalculateWeight(solution[end  ],solution[end  -1]);
+						// segments that change after the flip
+						long c=CalculateWeight(solution[start],solution[end  -1]);
+						long d=CalculateWeight(solution[end  ],solution[start+1]);
+						
+						if(a+b>c+d) {
+							// do the flip
+							i=0;
+							for(j=start+1;j<end;++j) {
+								solution2[i]=solution[j];
+								++i;
+							}
+							for(j=start+1;j<end;++j) {
+								--i;
+								solution[j]=solution2[i];
+							}
+							// find the new tour length
+							len-=(Math.sqrt(a)+Math.sqrt(b)) - (Math.sqrt(c)+Math.sqrt(d));
+							t_now=System.currentTimeMillis()-t_start;
+							Log(flen.format(len)+"mm @ "+ftime.format(t_now/1000.0)+"ms: "+start+"\t"+end+"\n");
+							once = 1;
+						}
 					}
 				}
-			}
+			} while(once==1 && t_now<600*1000);  // 10 minutes
 		}
 
+		private double CalculateLength(int a,int b) {
+			return Math.sqrt(CalculateWeight(a,b));
+		}
+		
 		/**
-		 * Get the length of a tour
+		 * Get the length of a tour segment
 		 * @param list an array of indexes into the point list.  the order forms the tour sequence.
+		 * @param start the index of the first point of the tour segment
+		 * @param end the index of the last point of the tour segment
 		 * @return the length of the tour
 		 */
-		private long GetTourLength(int[] list) {
-			long w=0;
+		private double GetTourLength(int[] list) {
+			double w=0;
 			for(int i=0;i<numPoints-1;++i) {
-				w+=CalculateWeight(list[i],list[i+1]);
+				w+=CalculateLength(list[i],list[i+1]);
 			}
 			return w;
 		}
@@ -728,6 +750,8 @@ public class DrawbotGUI
 		 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 		 */
 		private void GreedyTour() {
+			Log("Finding greedy tour solution...\n");
+
 			int i;
 			long w, bestw;
 			int besti;
@@ -737,6 +761,8 @@ public class DrawbotGUI
 				solution[i]=i;
 			}
 			scount=1;
+			
+			solution[numPoints]=solution[0];
 			
 			do {
 				// Find the nearest point not already in the line.
@@ -759,10 +785,35 @@ public class DrawbotGUI
 		
 		/**
 		 * Open a file and write out the edge list as a set of GCode commands.
-		 * Since all the points are connected in a single loop, start at point 0 and go around until you get back to point 0.
+		 * Since all the points are connected in a single loop,
+		 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 		 */
 		private void ConvertAndSaveToGCode(int width, int height) {
 			Log("Converting to gcode and saving "+dest+"\n");
+			
+			float tspscale=0.5f;
+			
+			// find the tsp point closest to the calibration point
+			int i;
+			int besti=-1;
+			int bestw=1000000;
+			for(i=0;i<numPoints;++i) {
+				int w=points[i].x*points[i].x+points[i].y*points[i].y;
+				if(w<bestw) {
+					bestw=w;
+					besti=i;
+				}
+			}
+			// rearrange the tsp point list so that the drawing starts at the nearest tsp point
+			for(i=besti;i<numPoints;++i) {
+				solution2[i-besti]=solution[i];
+			}
+			for(i=0;i<besti;++i) {
+				solution2[i+(numPoints-besti)]=solution[i];
+			}
+
+			solution=solution2;
+			
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 
@@ -770,14 +821,13 @@ public class DrawbotGUI
 				int h2=height/2;
 				
 				out.write("G00 Z90\n");
-				out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+				out.write("G01 X" + (points[solution[0]].x-w2)*tspscale + " Y" + (h2-points[solution[0]].y)*tspscale + "\n");
 				out.write("G00 Z10\n");
 
-				int i;
 				for(i=1;i<numPoints;++i) {
-					out.write("G01 X" + (points[solution[i]].x-w2) + " Y" + (h2-points[solution[i]].y) + "\n");
+					out.write("G01 X" + (points[solution[i]].x-w2)*tspscale + " Y" + (h2-points[solution[i]].y)*tspscale + "\n");
 				}
-				out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+				out.write("G01 X" + (points[solution[0]].x-w2)*tspscale + " Y" + (h2-points[solution[0]].y)*tspscale + "\n");
 				out.write("G00 Z90\n");
 				out.write("G00 X0 Y0\n");
 				out.close();
@@ -810,7 +860,9 @@ public class DrawbotGUI
 			}
 			
 			Log(numPoints + " points\n");
-			points = new Point[numPoints];
+			points = new Point[numPoints+1];
+			solution = new int[numPoints+1];
+			solution2 = new int[numPoints+1];
 
 			// collect the point data
 			numPoints=0;
@@ -823,7 +875,6 @@ public class DrawbotGUI
 				}
 			}
 			
-			solution = new int[numPoints];
 			
 			GenerateTSP();
 			ConvertAndSaveToGCode(w,h);

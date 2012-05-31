@@ -880,7 +880,6 @@ static void help() {
   Serial.println("       - display/update this robot's configuration.");
   Serial.println("HOME;  - recalibrate and move to 0,0");
   Serial.println("WHERE; - display current virtual coordinates");
-  Serial.println("DEMO;  - draw a test pattern");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
   Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91");
@@ -1218,7 +1217,7 @@ static void processCommand() {
 void setup() {
   // start communications
   Serial.begin(BAUD);
-  Serial.println("== HELLO WORLD ==");
+  Serial.println("\n\n== HELLO WORLD ==");
 
   // initialize the scale
   strcpy(mode_name,"mm");
