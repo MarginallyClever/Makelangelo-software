@@ -13,6 +13,8 @@ import gnu.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -66,6 +68,7 @@ public class DrawbotGUI
 	double paper_right=10;
 	
 	// GUI elements
+	static JFrame mainframe;
     JMenuBar menuBar;
     JMenuItem buttonOpenFile, buttonExit;
     JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad, buttonHome;
@@ -115,7 +118,27 @@ public class DrawbotGUI
 	double deadZone=20;
 	double maxZone=100;
 	
+	// TSP resoltion magic
+	double tspSaveScale=1.0;
+	
+	// timing
+	long t_draw_start;
 	BufferedImage img = null;
+	
+	
+	
+	public String formatTime(long millis) {
+    	String elapsed="";
+    	long s=millis/1000;
+    	long m=s/60;
+    	long h=m/60;
+    	m%=60;
+    	s%=60;
+    	if(h>0) elapsed+=h+"h";
+    	if(h>0||m>0) elapsed+=m+"m";
+    	elapsed+=s+"s ";
+    	return elapsed;
+	}
 	
 	
 	
@@ -136,8 +159,14 @@ public class DrawbotGUI
 	    
 	    public void SetProgress(long sofar,long total,String msg) {
 	    	float progress=0;
-	    	if(total>0) progress = 100.0f*(float)sofar/(float)total;
-		   	statusBar.SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+msg);
+	    	String elapsed="";
+	    	if(total>0) {
+	    		progress = 100.0f*(float)sofar/(float)total;
+	    		
+	    		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_draw_start : 0;
+	    		elapsed=formatTime(t_draw_now);
+	    	}
+		   	statusBar.SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+elapsed+msg);
 	    }
 	}
 	  
@@ -490,7 +519,7 @@ public class DrawbotGUI
 					i=decode(img.getRGB(x, y));
 					
 					float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
-					int b = (int)( a * 55.0f + 210.0f );
+					int b = (int)( a * 95.0f + 190.0f );
 					if(b>255) b=255;
 					//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
 					img.setRGB(x, y, encode(b));
@@ -616,8 +645,10 @@ public class DrawbotGUI
 		public BufferedImage Process(BufferedImage img) {
 			int w = img.getWidth();
 			int h = img.getHeight();
-			int max_w=(int)((paper_right-paper_left)*14);  // *10 for cm->mm, *0.7 for margin, * 2 for resolution (gets divided again when saving out to gcode)
-			int max_h=(int)((paper_top-paper_bottom)*14);
+			float cm_to_mm=10.0f;
+			float margin=0.9f;
+			int max_w=(int)((paper_right-paper_left)*cm_to_mm*margin/tspSaveScale);
+			int max_h=(int)((paper_top-paper_bottom)*cm_to_mm*margin/tspSaveScale);
 			
 			if(w<max_w && h<max_h) {
 				if(w>h) {
@@ -646,7 +677,7 @@ public class DrawbotGUI
 	 * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
 	 * @author Dan
 	 */
-	class Filter_TSPGcodeGenerator extends Filter {
+	class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
 		public class Point {
 			int x, y;
 			
@@ -656,13 +687,148 @@ public class DrawbotGUI
 			}
 		}
 		
-		
+		private class TSPOptimizer extends SwingWorker<Void,Void> {
+			@Override
+			public Void doInBackground() {
+				int start, end, i, j, once;
+				
+				setProgress(0);
+
+				double len=GetTourLength(solution);
+				DecimalFormat flen=new DecimalFormat("#.##");
+				Log(flen.format(len)+"mm @ 0s\n");
+
+				long t_elapsed=0;
+				long t_start = System.currentTimeMillis();
+
+				do {
+					once=0;
+					for(start=0;start<numPoints-1;++start) {
+						for(end=start+2;end<=numPoints;++end) {
+							// we have s1,s2...e-1,e
+							// check if s1,e-1,...s2,e is shorter
+							// before
+							long a=CalculateWeight(solution[start],solution[start+1]);
+							long b=CalculateWeight(solution[end  ],solution[end  -1]);
+							// after
+							long c=CalculateWeight(solution[start],solution[end  -1]);
+							long d=CalculateWeight(solution[end  ],solution[start+1]);
+							
+							if(a+b>c+d) {
+								once = 1;
+								// do the flip
+								i=0;
+								for(j=start+1;j<end;++j) {
+									solution2[i]=solution[j];
+									++i;
+								}
+								for(j=start+1;j<end;++j) {
+									--i;
+									solution[j]=solution2[i];
+								}
+								t_elapsed=System.currentTimeMillis()-t_start;
+								// find the new tour length
+								len-=(Math.sqrt(a)+Math.sqrt(b)) - (Math.sqrt(c)+Math.sqrt(d));
+								
+								Log(flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
+								setProgress((int)((float)t_elapsed/(float)time_limit));
+							}
+						}
+					}
+					// check if moving a point to another part of the tour makes the tour shorter
+					for(start=0;start<numPoints-1;++start) {
+						for(end=start+2;end<=numPoints;++end) {
+							if(end>=start && end<start+3) continue;
+							
+							// we have points s1,s2,...e-2,e-1,e.
+							// check if s1,e-1,s2,...e-2,e is shorter
+							// before
+							long a=CalculateWeight(solution[start],solution[start+1]);
+							long b=CalculateWeight(solution[end  ],solution[end  -1]);
+							long c=CalculateWeight(solution[end-1],solution[end  -2]);
+							// after
+							long d=CalculateWeight(solution[start],solution[end  -1]);
+							long e=CalculateWeight(solution[end-1],solution[start+1]);
+							long f=CalculateWeight(solution[end  ],solution[end  -2]);
+							
+							if(a+b+c>d+e+f) {
+								once = 1;
+								// do move
+								i=solution[end-1];
+								for(j=end-1;j>start+1;--j) {
+									solution[j]=solution[j-1];
+								}
+								solution[j]=i;
+								t_elapsed=System.currentTimeMillis()-t_start;
+								// find the new tour length
+								len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
+								
+								Log(flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
+								setProgress((int)(100.0f*(float)t_elapsed/(float)time_limit));
+							}
+						}
+					}
+					// check if moving a point to another part of the tour makes the tour shorter
+					for(start=0;start<numPoints-2;++start) {
+						for(end=start+2;end<=numPoints;++end) {
+							if(end>=start && end<start+3) continue;
+							
+							// we have points s1,s2,s3,...e-1,e.
+							// check if s1,s3,...e-2,s2,e is shorter
+							// before
+							long a=CalculateWeight(solution[start  ],solution[start+1]);
+							long b=CalculateWeight(solution[start+1],solution[start+2]);
+							long c=CalculateWeight(solution[end  -1],solution[end    ]);
+							// after
+							long d=CalculateWeight(solution[start  ],solution[start+2]);
+							long e=CalculateWeight(solution[end  -1],solution[start+1]);
+							long f=CalculateWeight(solution[start+1],solution[end    ]);
+							
+							if(a+b+c>d+e+f) {
+								once = 1;
+								// do move
+								i=solution[start+1];
+								for(j=start+1;j<end-1;++j) {
+									solution[j]=solution[j+1];
+								}
+								solution[j]=i;
+								t_elapsed=System.currentTimeMillis()-t_start;
+								// find the new tour length
+								len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
+								
+								Log(flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
+								setProgress((int)(100.0f*(float)t_elapsed/(float)time_limit));
+							}
+						}
+					}
+				} while(once==1 && t_elapsed<time_limit && !isCancelled());
+				
+				return null;
+			}
+			
+			//@override
+			public void done() {
+	            Toolkit.getDefaultToolkit().beep();
+	            pm.setProgress(0);
+	            pm.close();
+				int h = img.getHeight();
+				int w = img.getWidth();
+				ConvertAndSaveToGCode(w,h);
+
+        		String ngcPair = dest.substring(0, dest.lastIndexOf('.')) + ".ngc";
+        		OpenFile(ngcPair);
+			}
+		}
+
+		long time_limit=10*60*1000;  // 10 minutes
 		String dest;
 		int numPoints;
 		Point[] points = null;
 		int[] solution = null;
 		int[] solution2 = null;
 		int scount;
+		ProgressMonitor pm;
+		TSPOptimizer task;
 
 		
 		Filter_TSPGcodeGenerator(String _dest) {
@@ -676,56 +842,40 @@ public class DrawbotGUI
 		}
 
 		private void GenerateTSP() {
-			Log("Generating TSP...\n");
-
 			GreedyTour();
-			double len=GetTourLength(solution);
 
 			Log("Running Lin/Kerighan optimization...\n");
-			
-			int start, end, i, j, once;
-			
-			long t_start = System.currentTimeMillis();
-			long t_now=0;
-			
-			DecimalFormat flen=new DecimalFormat("#.##");
-			DecimalFormat ftime=new DecimalFormat("#.###");
-			
-			Log(len+"mm @ "+t_start+"ms\n");
 
-			do {
-				once=0;
-				for(start=0;start<numPoints-1;++start) {
-					for(end=start+2;end<=numPoints;++end) {
-						// segments that change before the flip
-						long a=CalculateWeight(solution[start],solution[start+1]);
-						long b=CalculateWeight(solution[end  ],solution[end  -1]);
-						// segments that change after the flip
-						long c=CalculateWeight(solution[start],solution[end  -1]);
-						long d=CalculateWeight(solution[end  ],solution[start+1]);
-						
-						if(a+b>c+d) {
-							// do the flip
-							i=0;
-							for(j=start+1;j<end;++j) {
-								solution2[i]=solution[j];
-								++i;
-							}
-							for(j=start+1;j<end;++j) {
-								--i;
-								solution[j]=solution2[i];
-							}
-							// find the new tour length
-							len-=(Math.sqrt(a)+Math.sqrt(b)) - (Math.sqrt(c)+Math.sqrt(d));
-							t_now=System.currentTimeMillis()-t_start;
-							Log(flen.format(len)+"mm @ "+ftime.format(t_now/1000.0)+"ms: "+start+"\t"+end+"\n");
-							once = 1;
-						}
-					}
-				}
-			} while(once==1 && t_now<600*1000);  // 10 minutes
+			pm = new ProgressMonitor(DrawbotGUI.this, "Optimizing path...", "", 0, 100);
+			pm.setProgress(0);
+			pm.setMillisToPopup(0);
+			task=new TSPOptimizer();
+			task.addPropertyChangeListener(this);
+			task.execute();
 		}
 
+	    /**
+	     * Invoked when task's progress property changes.
+	     */
+	    public void propertyChange(PropertyChangeEvent evt) {
+	        if ("progress" == evt.getPropertyName() ) {
+	            int progress = (Integer) evt.getNewValue();
+	            pm.setProgress(progress);
+	            String message = String.format("Completed %d%%.\n", progress);
+	            pm.setNote(message);
+	            if (pm.isCanceled() || task.isDone()) {
+	                Toolkit.getDefaultToolkit().beep();
+	                if (pm.isCanceled()) {
+	                    task.cancel(true);
+	                    Log("Task canceled.\n");
+	                } else {
+	                	Log("Task completed.\n");
+	                }
+	            }
+	        }
+	 
+	    }
+	    
 		private double CalculateLength(int a,int b) {
 			return Math.sqrt(CalculateWeight(a,b));
 		}
@@ -791,14 +941,20 @@ public class DrawbotGUI
 		private void ConvertAndSaveToGCode(int width, int height) {
 			Log("Converting to gcode and saving "+dest+"\n");
 			
-			float tspscale=0.5f;
+			float tspscale=(float)tspSaveScale;
+
+			int w2=width/2;
+			int h2=height/2;
 			
 			// find the tsp point closest to the calibration point
 			int i;
 			int besti=-1;
 			int bestw=1000000;
+			int x,y,w;
 			for(i=0;i<numPoints;++i) {
-				int w=points[i].x*points[i].x+points[i].y*points[i].y;
+				x=points[solution[i]].x-w2;
+				y=points[solution[i]].y-h2;
+				w=x*x+y*y;
 				if(w<bestw) {
 					bestw=w;
 					besti=i;
@@ -816,10 +972,8 @@ public class DrawbotGUI
 			
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter(dest));
-
-				int w2=width/2;
-				int h2=height/2;
-				
+				out.write("G00 F200\n");
+				out.write("M06 T0\n");
 				out.write("G00 Z90\n");
 				out.write("G01 X" + (points[solution[0]].x-w2)*tspscale + " Y" + (h2-points[solution[0]].y)*tspscale + "\n");
 				out.write("G00 Z10\n");
@@ -877,7 +1031,6 @@ public class DrawbotGUI
 			
 			
 			GenerateTSP();
-			ConvertAndSaveToGCode(w,h);
 		}
 	}
 	
@@ -916,7 +1069,7 @@ public class DrawbotGUI
 	public void Log(String msg) {
 		log.append(msg);
 		log.setCaretPosition(log.getText().length());
-		System.out.print(msg);
+		//System.out.print(msg);
 	}
 	
 	
@@ -1217,14 +1370,13 @@ public class DrawbotGUI
 		
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	if(!ext.equalsIgnoreCase(".ngc")) {
-    		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-    		if(!(new File(ngcPair)).exists()) {
+//    		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+//    		if(!(new File(ngcPair)).exists()) {
     			LoadImage(filename);
-    			filename=ngcPair;
-    		}
+//    		}
+    	} else {
+    		OpenFile(filename);
     	}
-    	
-		OpenFile(filename);
 	}
 
 	
@@ -1235,11 +1387,11 @@ public class DrawbotGUI
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
-		FileFilter filterJPEG  = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
-		FileFilter filterGCODE = new FileNameExtensionFilter("GCODE file", "ngc");
+		FileFilter filterImage  = new FileNameExtensionFilter("Images (jpg/bmp/png/gif)", "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+		FileFilter filterGCODE = new FileNameExtensionFilter("GCODE files (ngc)", "ngc");
 		 
 		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterJPEG);
+		fc.addChoosableFileFilter(filterImage);
 		fc.addChoosableFileFilter(filterGCODE);
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	OpenFileOnDemand(fc.getSelectedFile().getAbsolutePath());
@@ -1495,6 +1647,7 @@ public class DrawbotGUI
 				running=true;
 				driving=false;
 				UpdateMenuBar();
+				t_draw_start=System.currentTimeMillis();
 				SendFileCommand();
 			}
 			return;
@@ -1842,17 +1995,17 @@ public class DrawbotGUI
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         //Create and set up the window.
-    	JFrame frame = new JFrame("Drawbot GUI v2012-03-26");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	mainframe = new JFrame("Drawbot GUI v2012-03-26");
+        mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.
         DrawbotGUI demo = new DrawbotGUI();
-        frame.setJMenuBar(demo.CreateMenuBar());
-        frame.setContentPane(demo.CreateContentPane());
+        mainframe.setJMenuBar(demo.CreateMenuBar());
+        mainframe.setContentPane(demo.CreateContentPane());
  
         //Display the window.
-        frame.setSize(500,700);
-        frame.setVisible(true);
+        mainframe.setSize(500,700);
+        mainframe.setVisible(true);
     }
     
     
