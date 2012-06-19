@@ -119,7 +119,7 @@ public class DrawbotGUI
 	double maxZone=100;
 	
 	// TSP resoltion magic
-	double tspSaveScale=1.0;
+	double tspSaveScale=0.8;
 	
 	// timing
 	long t_draw_start;
@@ -361,13 +361,19 @@ public class DrawbotGUI
 			}*/
 
 			// draw image
-			g2d.setColor(Color.BLACK);
-			
 			String[] instructions = ngcfile.getText().split("\\r?\\n");
 			double px=TX(0),py=TY(0),pz=90;
 			int i,j;
 
 			for(i=0;i<instructions.length;++i) {
+				if(i<linesProcessed) {
+					g2d.setColor( Color.RED );
+				} else if(i==linesProcessed) {
+					g2d.setColor( Color.GREEN );
+				} else {
+					g2d.setColor( Color.BLACK );
+				}
+				
 				if(instructions[i].contains("G20")) {
 					drawScale=0.393700787f;
 				} else if(instructions[i].contains("G21")) {
@@ -703,7 +709,7 @@ public class DrawbotGUI
 
 				do {
 					once=0;
-					for(start=0;start<numPoints-1;++start) {
+					for(start=0;start<numPoints-1 && !isCancelled();++start) {
 						for(end=start+2;end<=numPoints;++end) {
 							// we have s1,s2...e-1,e
 							// check if s1,e-1,...s2,e is shorter
@@ -736,62 +742,67 @@ public class DrawbotGUI
 						}
 					}
 					// check if moving a point to another part of the tour makes the tour shorter
-					for(start=0;start<numPoints-1;++start) {
-						for(end=start+2;end<=numPoints;++end) {
-							if(end>=start && end<start+3) continue;
-							
-							// we have points s1,s2,...e-2,e-1,e.
-							// check if s1,e-1,s2,...e-2,e is shorter
+					for(start=0;start<numPoints-2 && !isCancelled();++start) {
+						for(end=start+4;end<=numPoints;++end) {
+							// we have points s1,s2,s3,...e-1,e.
+							// check if s1,s3,...e-2,s2,e is shorter
 							// before
-							long a=CalculateWeight(solution[start],solution[start+1]);
-							long b=CalculateWeight(solution[end  ],solution[end  -1]);
-							long c=CalculateWeight(solution[end-1],solution[end  -2]);
+							int p1=solution[start  ];
+							int p2=solution[start+1];
+							int p3=solution[start+2];
+							int p4=solution[end  -1];
+							int p5=solution[end    ];
+							long a=CalculateWeight(p1,p2);
+							long b=CalculateWeight(p2,p3);
+							long c=CalculateWeight(p4,p5);
 							// after
-							long d=CalculateWeight(solution[start],solution[end  -1]);
-							long e=CalculateWeight(solution[end-1],solution[start+1]);
-							long f=CalculateWeight(solution[end  ],solution[end  -2]);
+							long d=CalculateWeight(p1,p3);
+							long e=CalculateWeight(p4,p2);
+							long f=CalculateWeight(p2,p5);
 							
 							if(a+b+c>d+e+f) {
 								once = 1;
 								// do move
-								i=solution[end-1];
-								for(j=end-1;j>start+1;--j) {
-									solution[j]=solution[j-1];
+								for(j=start+1;j<end-1;++j) {
+									solution[j]=solution[j+1];
 								}
-								solution[j]=i;
+								solution[j]=p2;
 								t_elapsed=System.currentTimeMillis()-t_start;
 								// find the new tour length
 								len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
 								
 								Log(flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
 								setProgress((int)(100.0f*(float)t_elapsed/(float)time_limit));
+								if(end>1) end--;
 							}
 						}
 					}
 					// check if moving a point to another part of the tour makes the tour shorter
-					for(start=0;start<numPoints-2;++start) {
-						for(end=start+2;end<=numPoints;++end) {
-							if(end>=start && end<start+3) continue;
-							
+					for(start=0;start<numPoints-2 && !isCancelled();++start) {
+						for(end=start+4;end<=numPoints;++end) {
 							// we have points s1,s2,s3,...e-1,e.
 							// check if s1,s3,...e-2,s2,e is shorter
 							// before
-							long a=CalculateWeight(solution[start  ],solution[start+1]);
-							long b=CalculateWeight(solution[start+1],solution[start+2]);
-							long c=CalculateWeight(solution[end  -1],solution[end    ]);
+							int p1=solution[start  ];
+							int p2=solution[start+1];
+							int p3=solution[end  -2];
+							int p4=solution[end  -1];
+							int p5=solution[end    ];
+							long a=CalculateWeight(p1,p2);
+							long b=CalculateWeight(p3,p4);
+							long c=CalculateWeight(p4,p5);
 							// after
-							long d=CalculateWeight(solution[start  ],solution[start+2]);
-							long e=CalculateWeight(solution[end  -1],solution[start+1]);
-							long f=CalculateWeight(solution[start+1],solution[end    ]);
+							long d=CalculateWeight(p1,p4);
+							long e=CalculateWeight(p4,p2);
+							long f=CalculateWeight(p3,p5);
 							
 							if(a+b+c>d+e+f) {
 								once = 1;
 								// do move
-								i=solution[start+1];
-								for(j=start+1;j<end-1;++j) {
-									solution[j]=solution[j+1];
+								for(j=end-1;j>start+1;--j) {
+									solution[j]=solution[j-1];
 								}
-								solution[j]=i;
+								solution[j]=p4;
 								t_elapsed=System.currentTimeMillis()-t_start;
 								// find the new tour length
 								len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
@@ -801,6 +812,7 @@ public class DrawbotGUI
 							}
 						}
 					}
+					//len=GetTourLength(solution);
 				} while(once==1 && t_elapsed<time_limit && !isCancelled());
 				
 				return null;
@@ -1519,6 +1531,7 @@ public class DrawbotGUI
 			// are there any more commands?
 			line=scanner.nextLine().trim();
 			++linesProcessed;
+			if((linesProcessed%10)==0) previewPane.repaint();
 			statusBar.SetProgress(linesProcessed, linesTotal, line+NL);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
