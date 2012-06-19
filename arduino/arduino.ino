@@ -53,7 +53,7 @@
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
-#define SPOOL_DIAMETER  (0.85)
+#define SPOOL_DIAMETER  (1.102)
 #define MAX_RATED_RPM   (3000.0)
 #define MAX_RPM         (200.0)
 
@@ -121,11 +121,15 @@
 
 // based on https://github.com/grbl/grbl/ planner
 typedef struct {
-  double sx, sy, sz;
-  double ex, ey, ez;
-  double t1, t2, time, tsum, tstart;
-  double startv,endv,topv,maxstartv;
-  double len;
+  long m1s, m1e, m1total, m1o;
+  long m2s, m2e, m2total, m2o;
+  long step_count;
+  int m1dir,m2dir;
+
+  float sz, ez;
+  float t1, t2, time, tsum, tstart;
+  float startv,endv,topv,maxstartv;
+  float len;
   char touched;
   char nominal_length;
 } block;
@@ -144,15 +148,15 @@ static Servo s1;
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
 // (normally this is the center of the drawing area)
-static double limit_top = 21.5;  // distance to top of drawing area.
-static double limit_bottom =-30.0;  // Distance to bottom of drawing area.
-static double limit_right = 14.0;  // Distance to right of drawing area.
-static double limit_left =-14.0;  // Distance to left of drawing area.
+static float limit_top = 21.5;  // distance to top of drawing area.
+static float limit_bottom =-30.0;  // Distance to bottom of drawing area.
+static float limit_right = 14.0;  // Distance to right of drawing area.
+static float limit_left =-14.0;  // Distance to left of drawing area.
 
 // plotter position.
-static double posx, velx, accelx;
-static double posy, vely, accely;
-static double posz;  // pen state
+static float posx, velx, accelx;
+static float posy, vely, accely;
+static float posz;  // pen state
 
 // old pen position
 static int old_pen_angle=-1;
@@ -165,20 +169,20 @@ static char switch2;
 static volatile long laststep1, laststep2;
 
 // speeds, feeds, and delta-vs.
-static double accel=ACCELERATION;
-static double feed_rate=DEFAULT_VEL;
+static float accel=ACCELERATION;
+static float feed_rate=DEFAULT_VEL;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
-static double mode_scale;   // mm or inches?
+static float mode_scale;   // mm or inches?
 static char mode_name[3];
 
 // time values
 static long  t_millis;
-static double t;   // since board power on
-static double dt;  // since last tick
+static float t;   // since board power on
+static float dt;  // since last tick
 
 // Diameter of line made by plotter
-static double tool_diameter=0.05;
+static float tool_diameter=0.05;
 
 // Serial comm reception
 static char buffer[MAX_BUF];  // Serial buffer
@@ -188,7 +192,7 @@ static int sofar;             // Serial buffer progress
 static block blocks[MAX_BLOCKS];
 static volatile int block_head, block_tail;
 static block *current_block=NULL;
-static double previous_topv;
+static float previous_topv;
 
 // timer interrupt blocking
 static char planner_busy=0;
@@ -199,6 +203,36 @@ static char planner_awake=0;
 // METHODS
 //------------------------------------------------------------------------------
 
+
+
+//------------------------------------------------------------------------------
+// increment internal clock
+static void tick() {
+  long nt_millis=millis();
+  long dt_millis=nt_millis-t_millis;
+
+  t_millis=nt_millis;
+
+  dt=(float)dt_millis*0.001;  // time since last tick, in seconds
+  t=(float)nt_millis*0.001;
+}
+
+
+//------------------------------------------------------------------------------
+// returns angle of dy/dx as a value from 0...2PI
+static float atan3(float dy,float dx) {
+  float a=atan2(dy,dx);
+  if(a<0) a=(PI*2.0)+a;
+  return a;
+}
+
+
+//------------------------------------------------------------------------------
+static void readSwitches() {
+  // get the current switch state
+  switch1=analogRead(S1_PIN) > SWITCH_HALF;
+  switch2=analogRead(S2_PIN) > SWITCH_HALF;
+}
 
 
 //------------------------------------------------------------------------------
@@ -249,30 +283,8 @@ void setup_jogger() {
 
 
 //------------------------------------------------------------------------------
-static void error(int r) {
-  if(r!=0) {
-    Serial.print("Error: code ");
-    Serial.println(r);
-  }
-}
-
-
-//------------------------------------------------------------------------------
-// increment internal clock
-static void tick() {
-  long nt_millis=millis();
-  long dt_millis=nt_millis-t_millis;
-
-  t_millis=nt_millis;
-
-  dt=(double)dt_millis*0.001;  // time since last tick, in seconds
-  t=(double)nt_millis*0.001;
-}
-
-
-//------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
-static void setFeedRate(double v) {
+static void setFeedRate(float v) {
   v *= mode_scale/60.0;
   if( feed_rate != v ) {
     feed_rate=v;
@@ -287,15 +299,6 @@ static void printFeedRate() {
   Serial.print(feed_rate*60.0/mode_scale);
   Serial.print(mode_name);
   Serial.print("/min");
-}
-
-
-//------------------------------------------------------------------------------
-// returns angle of dy/dx as a value from 0...2PI
-static double atan3(double dy,double dx) {
-  double a=atan2(dy,dx);
-  if(a<0) a=(PI*2.0)+a;
-  return a;
 }
 
 
@@ -317,10 +320,10 @@ static void setPenAngle(int pen_angle) {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-static void IK(double x, double y, long &l1, long &l2) {
+static void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
-  double dy = y - limit_top;
-  double dx = x - limit_left;
+  float dy = y - limit_top;
+  float dx = x - limit_left;
   l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
   // find length to M2
   dx = limit_right - x;
@@ -332,74 +335,20 @@ static void IK(double x, double y, long &l1, long &l2) {
 // Forward Kinematics - turns L1,L2 lengths into XY coordinates
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
-static void FK(double l1, double l2,double &x,double &y) {
-  double a = l1 * THREADPERSTEP;
-  double b = (limit_right-limit_left);
-  double c = l2 * THREADPERSTEP;
+static void FK(float l1, float l2,float &x,float &y) {
+  float a = l1 * THREADPERSTEP;
+  float b = (limit_right-limit_left);
+  float c = l2 * THREADPERSTEP;
   
   // slow, uses trig
-  double theta = acos((a*a+b*b-c*c)/(2.0*a*b));
-  x = cos(theta)*l1 + limit_left;
-  y = sin(theta)*l1 + limit_top;
-}
-
-
-//------------------------------------------------------------------------------
-static void travelTime(double len,double v1,double v3,double v2,double &t1,double &t2,double &t3) {
-  t1 = (v2-v1) / accel;
-  t2 = (v2-v3) / accel;
-  double d1 = v1 * t1 + 0.5 * accel * t1*t1;
-  double d2 = v3 * t2 + 0.5 * accel * t2*t2;
-  double a = d1+d2;
-  
-  if(len>a) {
-    t3 = t1+t2 + (len-a) / v2;
-    t2 = t3-t2;
-  } else {
-    // http://wikipedia.org/wiki/Classical_mechanics#1-Dimensional_Kinematics
-    double brake_distance=(2.0*accel*len-v1*v1+v3*v3) / (4.0*accel);
-    // and we also know d=v0*t + att/2
-    // so 
-    t1 =      ( -v1 + sqrt( 2.0*accel*brake_distance       + v1*v1 ) ) / accel;
-    t2 = t1;
-    t3 = t1 + ( -v3 + sqrt( 2.0*accel*(len-brake_distance) + v3*v3 ) ) / accel;
-  }
-/*
-  Serial.print("\tlen=");  Serial.print(len);
-  Serial.print("\taccel=");  Serial.print(accel);
-  Serial.print("\tv1=");  Serial.print(v1);
-  Serial.print("\tv3=");  Serial.print(v3);
-  Serial.print("\tt1=");  Serial.print(t1);
-  Serial.print("\tt2=");  Serial.print(t2);
-  Serial.print("\tt3=");  Serial.println(t3);
-*/
-}
-
-
-//------------------------------------------------------------------------------
-static double interpolate(double p0,double p3,double t,double t1,double t2,double t3,double len,double v0,double v3,double v2) {
-  if(t<=0) return p0;
- 
-  double s = (p3-p0)/len;
-  
-  if(t<t1) {
-    double d1 = v0 * t + 0.5 * accel * t * t;
-    return p0 + (d1)*s;
-  } else if(t<t2) {
-    double d1 = v0 * t1 + 0.5 * accel * t1 * t1;
-    double d2 = v2 * (t-t1);
-    return p0 + (d1+d2)*s;
-  } else if(t<t3) {
-    double d1 = v0 * t1 + 0.5 * accel * t1 * t1;
-    double d2 = v2 * (t2-t1);
-
-    double t4 = t-t2;
-    //double v2 = accel*t1;
-    double d3 = v2 * t4 - 0.5 * accel * t4 * t4;
-    return p0 + (d1+d2+d3)*s;
-  }
-  
-  return p3;
+  //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
+  //x = cos(theta)*l1 + limit_left;
+  //y = sin(theta)*l1 + limit_top;
+  // but we know that cos(acos(i)) = i
+  // and we know that sin(acos(i)) = sqrt(1-i*i)
+  float i=(a*a+b*b-c*c)/(2.0*a*b);
+  x = i * l1 + limit_left;
+  y = sqrt(1.0 - i*i)*l1 + limit_top;
 }
 
 
@@ -428,6 +377,62 @@ static void adjustStringLengths(long nlen1,long nlen2) {
 
 
 //------------------------------------------------------------------------------
+static void travelTime(float len,float vstart,float vend,float vtop,float &t1,float &t2,float &t3) {
+  t1 = (vtop-vstart) / accel;
+  t2 = (vtop-vend) / accel;
+  float d1 = vstart * t1 + 0.5 * accel * t1*t1;
+  float d2 = vend * t2 + 0.5 * accel * t2*t2;
+  float a = d1+d2;
+  
+  if(len>a) {
+    t3 = t1+t2 + (len-a) / vtop;
+    t2 = t3-t2;
+  } else {
+    // http://wikipedia.org/wiki/Classical_mechanics#1-Dimensional_Kinematics
+    float brake_distance=(2.0*accel*len-vstart*vstart+vend*vend) / (4.0*accel);
+    // and we also know d=v0*t + att/2
+    // so 
+    t2 = t1 = ( -vstart + sqrt( 2.0*accel*brake_distance       + vstart*vstart ) ) / accel;
+    t3 = t1 + ( -vend   + sqrt( 2.0*accel*(len-brake_distance) + vend*vend     ) ) / accel;
+  }
+/*
+  Serial.print("\tlen=");  Serial.print(len);
+  Serial.print("\taccel=");  Serial.print(accel);
+  Serial.print("\tvstart=");  Serial.print(vstart);
+  Serial.print("\tvend=");  Serial.print(vend);
+  Serial.print("\tt1=");  Serial.print(t1);
+  Serial.print("\tt2=");  Serial.print(t2);
+  Serial.print("\tt3=");  Serial.println(t3);
+*/
+}
+
+
+//------------------------------------------------------------------------------
+static float interpolate(float p0,float p3,float t,float t1,float t2,float t3,float vstart,float vtop,float vend,float len) {
+  if(t<=0) return p0;
+ 
+  float s = (p3-p0)/len;
+  
+  if(t<t1) {
+    float d1 = vstart * t + 0.5 * accel * t * t;
+    return p0 + (d1)*s;
+  } else if(t < t2) {
+    float d1 = vstart * t1 + 0.5 * accel * t1 * t1;
+    float d2 = vtop * ( t - t1 );
+    return p0 + (d1+d2)*s;
+  } else if(t < t3) {
+    float d1 = vstart * t1 + 0.5 * accel * t1 * t1;
+    float d2 = vtop * ( t2 - t1 );
+    float t4 = t - t2;
+    float d3 = vtop * t4 - 0.5 * accel * t4 * t4;
+    return p0 + (d1+d2+d3)*s;
+  }
+  
+  return p3;
+}
+
+
+//------------------------------------------------------------------------------
 // called by the timer interrupt when in jog mode
 static void jog_step() {
   long nlen1, nlen2;
@@ -448,9 +453,9 @@ static void jog_step() {
 
   velx+=accelx*dt;
   vely+=accely*dt;
-  double vtotal = sqrt(velx*velx+vely*vely);
+  float vtotal = sqrt(velx*velx+vely*vely);
   if(vtotal>feed_rate) {
-    double scale = feed_rate/vtotal;
+    float scale = feed_rate/vtotal;
     velx*=scale;
     vely*=scale;
   }
@@ -464,13 +469,13 @@ static void jog_step() {
 
 //------------------------------------------------------------------------------
 // change the acceleration (for drive-by kb or joystick)
-static void jog(double x,double y) {
-  double ax=x*accel;
-  double ay=y*accel;
+static void jog(float x,float y) {
+  float ax=x*accel;
+  float ay=y*accel;
 
-  double atotal = sqrt(ax*ax+ay*ay);
+  float atotal = sqrt(ax*ax+ay*ay);
   if(atotal>accel) {
-    double scale = accel/atotal;
+    float scale = accel/atotal;
     ax*=scale;
     ay*=scale;
   }
@@ -513,42 +518,25 @@ void plan_step() {
   
   if(current_block!=NULL) {
     current_block->tsum = t - current_block->tstart;
-//    current_block->tsum += dt;
     if(current_block->tsum > current_block->time) {
       current_block->tsum = current_block->time;
     }
 
-    // find where the plotter will be at tsum seconds
-    double nx = interpolate(current_block->sx,
-                            current_block->ex,
-                            current_block->tsum,
-                            current_block->t1,
-                            current_block->t2,
-                            current_block->time,
-                            current_block->len,
-                            current_block->startv,
-                            current_block->endv,
-                            current_block->topv);
-    double ny = interpolate(current_block->sy,
-                            current_block->ey,
-                            current_block->tsum,
-                            current_block->t1,
-                            current_block->t2,
-                            current_block->time,
-                            current_block->len,
-                            current_block->startv,
-                            current_block->endv,
-                            current_block->topv);
-//    double nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
-
-    // get the new string lengths
     long nlen1,nlen2;
-    IK(nx,ny,nlen1,nlen2);
+    // Find where the plotter will be at tsum seconds
+    //float nx = interpolate(current_block->sx, current_block->ex, current_block);
+    //float ny = interpolate(current_block->sy, current_block->ey, current_block);
+    //float nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
 
-    // move the motors
+    // update motors
+    //IK(nx,ny,nlen1,nlen2);
+
+    long l1 = interpolate( current_block->m1s, current_block->m1e, current_block->tsum, current_block->t1, current_block->t2, current_block->time, current_block->startv, current_block->topv, current_block->endv, current_block->len );
+    long l2 = interpolate( current_block->m2s, current_block->m2e, current_block->tsum, current_block->t1, current_block->t2, current_block->time, current_block->startv, current_block->topv, current_block->endv, current_block->len );
+
     adjustStringLengths(nlen1,nlen2);
     // move the pen
-//    setPenAngle(current_block->ez);
+    //setPenAngle(current_block->ez);
 
     // is this block finished?    
     if(current_block->tsum >= current_block->time) {
@@ -565,9 +553,9 @@ void plan_step() {
 
 
 //------------------------------------------------------------------------------
-// if you must reach target_vel within distance and you speed up by acceleration
-// then what must your minimum velocity be?
-static double max_allowable_speed(double acceleration,double target_vel,double distance) {
+// if you must reach target_vel at distance and you speed up by acceleration
+// then what must your starting velocity be?
+static float max_allowable_speed(float acceleration,float target_vel,float distance) {
   return sqrt( target_vel * target_vel - 2.0 * acceleration * distance );
 }
 
@@ -589,8 +577,7 @@ static void planner_recalculate() {
     // already cruising at top speed?
     if(curr->startv == curr->maxstartv ) continue;
     if(!curr->nominal_length && curr->maxstartv > next->startv ) {
-      curr->startv = min(curr->maxstartv,
-                        max_allowable_speed( -accel, next->startv, curr->len ) );
+      curr->startv = min(curr->maxstartv, max_allowable_speed( -accel, next->startv, curr->len ) );
     } else {
       curr->startv = curr->maxstartv;
     }
@@ -610,7 +597,7 @@ static void planner_recalculate() {
     if( prev->nominal_length ) continue;
     
     if(!prev->startv > curr->startv ) {
-      double startv = min(curr->startv, max_allowable_speed( -accel, prev->startv, prev->len ) );
+      float startv = min(curr->startv, max_allowable_speed( -accel, prev->startv, prev->len ) );
       if( curr->startv != startv ) {
         curr->startv = startv;
         curr->touched=1;
@@ -647,23 +634,16 @@ static void planner_recalculate() {
 // This method assumes the limits have already been checked.
 // It adds each line segment to a ring buffer.  Then it plans a route so that
 // if lines are in the same direction the robot doesn't have to slow down.
-static void line(double x,double y,double z) {
+static void line_queue(float x,float y,float z) {
 #ifdef VERBOSE
-  Serial.print("A");
-  Serial.print(block_tail);
-  Serial.print(" ");
-  Serial.print(block_head);
-  
-  Serial.print("x ");
-  Serial.println(x);
-  Serial.print("y ");
-  Serial.println(y);
+  Serial.print("A");  Serial.print(block_tail);
+  Serial.print(" ");  Serial.print(block_head);
+  Serial.print(" x");  Serial.print(x);
+  Serial.print(" y");  Serial.print(y);
 
   if(current_block) {
-    Serial.print(" ");
-    Serial.print(current_block->tsum);
-    Serial.print(" ");
-    Serial.print(current_block->time);
+    Serial.print(" ");  Serial.print(current_block->tsum);
+    Serial.print(" ");  Serial.print(current_block->time);
   }
   Serial.println(planner_busy?" busy":" idle");
 #endif
@@ -673,25 +653,31 @@ static void line(double x,double y,double z) {
   while(block_tail==next_head) sleep_mode();
     
   // set up the new block in the queue.
-  double dx=x-posx;
-  double dy=y-posy;
-  double dz=z-posz;
+  float dx=x-posx;
+  float dy=y-posy;
+  float dz=z-posz;
 
 #ifdef VERBOSE
-  Serial.print("posx ");  Serial.println(posx);
-  Serial.print("posy ");  Serial.println(posy);
-  Serial.print("posz ");  Serial.println(posz);
-  Serial.print("dx ");    Serial.println(dx);
-  Serial.print("dy ");    Serial.println(dy);
-  Serial.print("dz ");    Serial.println(dz);
+  Serial.print("px ");  Serial.print(posx);
+  Serial.print("py ");  Serial.print(posy);
+  Serial.print("pz ");  Serial.print(posz);
+  Serial.print("dx ");  Serial.print(dx);
+  Serial.print("dy ");  Serial.print(dy);
+  Serial.print("dz ");  Serial.println(dz);
 #endif
 
   block *new_block=&blocks[block_head];
-  new_block->sx=posx;
-  new_block->sy=posy;
+  IK(posx,posy,new_block->m1s,new_block->m2s);
+  IK(   x,   y,new_block->m1e,new_block->m2e);
+  new_block->m1total=abs(new_block->m1e-new_block->m1s);
+  new_block->m2total=abs(new_block->m2e-new_block->m2s);
+  new_block->step_count=max(new_block->m1total,new_block->m2total);
+  new_block->m1dir = new_block->m1e > new_block->m1s ? 1 : -1;
+  new_block->m2dir = new_block->m2e > new_block->m2s ? 1 : -1;
+  new_block->m1o=0;
+  new_block->m2o=0;
+
   new_block->sz=posz;
-  new_block->ex=x;
-  new_block->ey=y;
   new_block->ez=z;
   new_block->startv=0;
   new_block->endv=0;
@@ -703,8 +689,7 @@ static void line(double x,double y,double z) {
   if( sqrt(dx*dx + dy*dy + dz*dz) == 0 ) return;
   
   // Find the maximum speed around the corner from the previous line to this line.
-  double maxjunctionv = 0.0;
-
+  float maxjunctionv = 0.0;
   block *curr,*next;
   if( block_head != block_tail ) {
     // there is a previous line to compare to
@@ -712,25 +697,22 @@ static void line(double x,double y,double z) {
     curr=&blocks[PREV_BLOCK(block_head)];
 
     // dot product the two vectors to get the cos(theta) of their angle.
-    double x1 = ( curr->ex - curr->sx ) / curr->len;
-    double y1 = ( curr->ey - curr->sy ) / curr->len;
-    //double z1 = ( curr->ez - curr->sz ) / curr->len;
-    double x2 = ( next->ex - next->sx ) / next->len;
-    double y2 = ( next->ey - next->sy ) / next->len;
-    //double z2 = ( curr->ez - curr->sz ) / curr->len;
-    double dotproduct = x1*x2 + y1*y2;// + z1*z2;
+    float x1 = ( curr->m1e - curr->m1s ) / curr->len;
+    float y1 = ( curr->m2e - curr->m2s ) / curr->len;
+    //float z1 = ( curr->ez - curr->sz ) / curr->len;
+    float x2 = ( next->m1s - next->m1s ) / next->len;
+    float y2 = ( next->m2e - next->m2s ) / next->len;
+    //float z2 = ( curr->ez - curr->sz ) / curr->len;
+    float dotproduct = x1*x2 + y1*y2;// + z1*z2;
 
-    // Close enought to straight (>=0.95) we don't slow down.
     // Anything more than 90 is a full stop guaranteed.
-    if( dotproduct >=0.95 ) {
-      maxjunctionv = min( previous_topv, curr->topv );
-    } else if( dotproduct > 0 ) {
+    if( dotproduct > 0 ) {
       maxjunctionv = min( curr->topv * dotproduct, next->topv * dotproduct );
     }
   }
   new_block->maxstartv = maxjunctionv;
   
-  double allowablev = max_allowable_speed(-accel,0,new_block->len);
+  float allowablev = max_allowable_speed(-accel,0,new_block->len);
 
   new_block->startv = min( maxjunctionv, allowablev );
   // no matter at what speed we start, is this line long enough to reach top speed?
@@ -764,6 +746,52 @@ static void line(double x,double y,double z) {
 }
 
 
+//------------------------------------------------------------------------------
+static void line(float x,float y,float z) {
+  long l1,l2;
+  IK(x,y,l1,l2);
+  long d1 = l1 - laststep1;
+  long d2 = l2 - laststep2;
+
+  long ad1=abs(d1);
+  long ad2=abs(d2);
+  int dir1=d1<0?REEL_IN:REEL_OUT;
+  int dir2=d2<0?REEL_IN:REEL_OUT;
+  long overflow=0;
+  long i;
+
+  int step_delay=5;
+
+  // bresenham's line algorithm.
+  if(ad1>ad2) {
+    for(i=0;i<ad1;++i) {
+      m1.onestep(dir1);
+      delay(step_delay);
+      overflow+=ad2;
+      if(overflow>=ad1) {
+        overflow-=ad1;
+        m2.onestep(dir2);
+        delay(step_delay);
+      }
+    }
+  } else {
+    for(i=0;i<ad2;++i) {
+      m2.onestep(dir2);
+      delay(step_delay);
+      overflow+=ad1;
+      if(overflow>=ad2) {
+        overflow-=ad2;
+        m1.onestep(dir1);
+        delay(step_delay);
+      }
+    }
+  }
+
+  laststep1=l1;
+  laststep2=l2;
+  posx=x;
+  posy=y;
+}
 
 
 //------------------------------------------------------------------------------
@@ -773,16 +801,16 @@ static void line(double x,double y,double z) {
 // cx/cy - center of circle
 // x/y - end position
 // dir - ARC_CW or ARC_CCW to control direction of arc
-static void arc(double cx,double cy,double x,double y,double z,double dir) {
+static void arc(float cx,float cy,float x,float y,float z,float dir) {
   // get radius
-  double dx = posx - cx;
-  double dy = posy - cy;
-  double radius=sqrt(dx*dx+dy*dy);
+  float dx = posx - cx;
+  float dy = posy - cy;
+  float radius=sqrt(dx*dx+dy*dy);
 
   // find angle of arc (sweep)
-  double angle1=atan3(dy,dx);
-  double angle2=atan3(y-cy,x-cx);
-  double theta=angle2-angle1;
+  float angle1=atan3(dy,dx);
+  float angle2=atan3(y-cy,x-cx);
+  float theta=angle2-angle1;
   
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
@@ -790,48 +818,23 @@ static void arc(double cx,double cy,double x,double y,double z,double dir) {
   theta=angle2-angle1;
   
   // get length of arc
-  // double circ=PI*2.0*radius;
-  // double len=theta*circ/(PI*2.0);
+  // float circ=PI*2.0*radius;
+  // float len=theta*circ/(PI*2.0);
   // simplifies to
-  double len = abs(theta) * radius;
+  float len = abs(theta) * radius;
 
-  int segments = floor( len / CM_PER_SEGMENT );
+  int i, segments = floor( len / CM_PER_SEGMENT );
  
-  double nx, ny, nz, angle3, scale;
-/*
-  Serial.print("cx ");
-  Serial.println(cx);
-  Serial.print("cy ");
-  Serial.println(cy);
-    
-  Serial.print("a1 ");
-  Serial.println(angle1);
-  Serial.print("a2 ");
-  Serial.println(angle2);
+  float nx, ny, nz, angle3, scale;
 
-  Serial.print("radius ");
-  Serial.println(radius);
-  Serial.print("segments ");
-  Serial.println(segments);
-*/
-  for(int i=0;i<segments;++i) {
+  for(i=0;i<segments;++i) {
     // interpolate around the arc
-    scale = ((double)i)/((double)segments);
+    scale = ((float)i)/((float)segments);
     
     angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
-/*    
-    Serial.print("s ");
-    Serial.println(scale);
-    Serial.print("a3 ");
-    Serial.println(angle3);
-    Serial.print("nx ");
-    Serial.println(nx);
-    Serial.print("ny ");
-    Serial.println(ny);
-*/
     // send it to the planner
     line(nx,ny,nz);
   }
@@ -843,8 +846,8 @@ static void arc(double cx,double cy,double x,double y,double z,double dir) {
 //------------------------------------------------------------------------------
 // loads 5m onto a spool.
 static void loadspools() {
-  double len=500.0;
-  double amnt=len/THREADPERSTEP;
+  float len=500.0;
+  float amnt=len/THREADPERSTEP;
   Serial.print("== LOAD ");
   Serial.print(len);
   Serial.print(" ==");
@@ -857,7 +860,7 @@ static void loadspools() {
 //------------------------------------------------------------------------------
 // instantly move the virtual plotter position
 // does not validate if the move is valid
-static void teleport(double x,double y) {
+static void teleport(float x,float y) {
   posx=x;
   posy=y;
   
@@ -866,8 +869,6 @@ static void teleport(double x,double y) {
   IK(posx,posy,L1,L2);
   laststep1=L1;
   laststep2=L2;
-
-  where();
 }
 
 
@@ -887,14 +888,6 @@ static void help() {
 
 
 //------------------------------------------------------------------------------
-static void readSwitches() {
-  // get the current switch state
-  switch1=analogRead(S1_PIN) > SWITCH_HALF;
-  switch2=analogRead(S2_PIN) > SWITCH_HALF;
-}
-
-
-//------------------------------------------------------------------------------
 // find the current robot position and 
 static void goHome() {
   Serial.println("Homing...");
@@ -906,44 +899,30 @@ static void goHome() {
     Serial.println("Solution: Please unwind the strings a bit and try again.");
     return;
   }
-
-  // set the stepper speed
-  m1.setSpeed(MAX_RPM);
-  m2.setSpeed(MAX_RPM);
   
   // reel in the left motor until contact is made.
+  Serial.println("Find left...");
   do {
     m1.step(1,REEL_IN );
     m2.step(1,REEL_OUT);
     readSwitches();
   } while(switch1==1);
-
-  Serial.println("Found left...");
   laststep1=0;
-
   
   // reel in the right motor until contact is made
+  Serial.println("Find right...");
   do {
     m2.step(1,REEL_IN );
     m1.step(1,REEL_OUT);
     laststep1++;
     readSwitches();
   } while(switch2==1);
-
-  Serial.println("Found right...");
   laststep2=0;
   
-  Serial.println("Calculating IK...");
-  // center the robot
+  Serial.println("Centering...");
   long L1,L2;
   IK(0,0,L1,L2);
-
-  Serial.println("Centering...");
   adjustStringLengths(L1,L2);
-
-  // set the stepper speed
-  m1.setSpeed(MAX_RATED_RPM);
-  m2.setSpeed(MAX_RATED_RPM);
 }
 
 
@@ -955,7 +934,7 @@ static void where() {
   Serial.print(posy);
   Serial.print(",");
   Serial.print(posz);
-  Serial.print(") F=");
+  Serial.print(")@");
   printFeedRate();
   Serial.print("\n");
 }
@@ -974,7 +953,7 @@ static void printConfig() {
 
 //------------------------------------------------------------------------------
 // from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-void EEPROM_writeDouble(int ee, double value) {
+void EEPROM_writeDouble(int ee, float value) {
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
   EEPROM.write(ee++, *p++);
@@ -983,8 +962,8 @@ void EEPROM_writeDouble(int ee, double value) {
 
 //------------------------------------------------------------------------------
 // from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-double EEPROM_readDouble(int ee) {
-  double value = 0.0;
+float EEPROM_readDouble(int ee) {
+  float value = 0.0;
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
   *p++ = EEPROM.read(ee++);
@@ -1023,8 +1002,8 @@ static void processCommand() {
   } else if(!strncmp(buffer,"HOME",4)) {
     goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
-    double xx=posx;
-    double yy=posy;
+    float xx=posx;
+    float yy=posy;
   
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1042,10 +1021,10 @@ static void processCommand() {
   if(!strncmp(buffer,"WHERE",5)) {
     where();
   } else if(!strncmp(buffer,"CONFIG",6)) {
-    double tt=limit_top;
-    double bb=limit_bottom;
-    double rr=limit_right;
-    double ll=limit_left;
+    float tt=limit_top;
+    float bb=limit_bottom;
+    float rr=limit_right;
+    float ll=limit_left;
     
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1070,7 +1049,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
-    double xx, yy, zz;
+    float xx, yy, zz;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1104,10 +1083,10 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
-    double xx, yy, zz;
-    double dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
-    double ii = 0;
-    double jj = 0;
+    float xx, yy, zz;
+    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
+    float ii = 0;
+    float jj = 0;
     
     if(absolute_mode==1) {
       xx=posx;
@@ -1166,9 +1145,9 @@ static void processCommand() {
     Serial.println("Jog on");
   } else if(!strncmp(buffer,"J02 ",4)) {
     // jog
-    double xx=0;
-    double yy=0;
-    double zz=posz;
+    float xx=0;
+    float yy=0;
+    float zz=posz;
 
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1237,34 +1216,16 @@ void setup() {
   digitalWrite(S1_PIN,HIGH);
   digitalWrite(S2_PIN,HIGH);
   
-  // set the stepper speed
-  m1.setSpeed(MAX_RATED_RPM);
-  m2.setSpeed(MAX_RATED_RPM);
-  
-#ifndef SMALL_FOOTPRINT
   // load string onto spool.  Only needed when the robot is being built.
-//  loadspool();
-
-  // test suite
-//  testClock();
-//  testKinematics( 0, 0);
-//  testKinematics( 5, 0);
-//  testKinematics( 0, 5);
-//  testKinematics(-5,-5);
-//  testInterpolation();
-//  testFullCircle();
-//  testAcceleration();
-//  testfeed_rate();
-//  testArcs();
-//  testServo();
-
+//  loadspools();
+  
   // display the help at startup.
-  help();  
-#endif  // SMALL_FOOTPRINT
+  help();
 
   // initialize the plotter position.
-  posx=velx=accelx=0;
-  posy=velx=accelx=0;
+  teleport(0,0);
+  velx=accelx=0;
+  velx=accelx=0;
   posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
   
@@ -1325,5 +1286,4 @@ void loop() {
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
-
 
