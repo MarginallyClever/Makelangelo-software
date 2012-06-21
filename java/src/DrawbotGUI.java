@@ -112,14 +112,8 @@ public class DrawbotGUI
 	double imageOffsetX=0;
 	double imageOffsetY=0;
 	
-	// driving controls
-	boolean driving=false;
-	double driveScale=100;
-	double deadZone=20;
-	double maxZone=100;
-	
-	// TSP resoltion magic
-	double tspSaveScale=0.8;
+	// TSP resolution magic
+	double tspSaveScale=0.9;
 	
 	// timing
 	long t_draw_start;
@@ -202,12 +196,6 @@ public class DrawbotGUI
 		double cameraOffsetX=0,cameraOffsetY=0;
 		double cameraZoom=20;
 		float drawScale=0.1f;
-
-		// driving controls
-		public boolean driveOn=false;
-		public double drivex=0, drivey=0;
-		public double drivexview=0, driveyview=0;
-		
 		
 		
 		public DrawPanel() {
@@ -216,48 +204,13 @@ public class DrawbotGUI
 	        addMouseListener(this);
 		}
 
-		public void StopDriving() {
-	    	drivex=0;
-	    	drivey=0;
-	    	drivexview=0;    
-	    	driveyview=0;
-    		driveOn=false;
-    		if(driving) SendLineToRobot("J02 X0 Y0");
-		}
 
 		public void MoveCamera(int x,int y) {
-    		if(driving) {
-    			// drive the plotter around
-    			drivexview=(x-oldx);
-	    		driveyview=(y-oldy);
-	    		double len=Math.sqrt(drivexview*drivexview+driveyview*driveyview);
-	    		// cap the max velocity
-    			if(len>maxZone) {
-    				drivexview*=maxZone/len;
-    				driveyview*=maxZone/len;
-    				len=maxZone;
-    			}
-    			// add a deadzone in the center
-    			double f=len-deadZone;
-	    		if(f>0) {
-	    			// this scales f to [0....1] so length of (drivex,drivey) will <= 1
-	    			f=f/(maxZone-deadZone);
-	    			drivex=drivexview*f/len;
-	    			drivey=-driveyview*f/len;
-	    		} else {
-	    			drivex=0;
-	    			drivey=0;
-	    		}
-	    		if(readyToReceive) {
-	    			SendLineToRobot("J02 X"+drivex+" Y"+drivey);
-	    		}
-    		} else {
-    			// scroll the gcode preview
-	    		double dx=(x-oldx)/cameraZoom;
-	    		double dy=(y-oldy)/cameraZoom;
-		    	cameraOffsetX-=dx;
-		    	cameraOffsetY+=dy;
-    		}
+			// scroll the gcode preview
+    		double dx=(x-oldx)/cameraZoom;
+    		double dy=(y-oldy)/cameraZoom;
+	    	cameraOffsetX-=dx;
+	    	cameraOffsetY+=dy;
 		}
 		public void MoveImage(int x,int y) {
 			// scroll the gcode preview
@@ -280,19 +233,13 @@ public class DrawbotGUI
 			buttonPressed=e.getButton();
 	    	oldx=e.getX();
 	    	oldy=e.getY();
-	    	if(driving && e.getButton()==MouseEvent.BUTTON1) {
-	    		driveOn=true;
-	    	}
 		}
 	    public void mouseReleased(MouseEvent e) {
 	    	buttonPressed=MouseEvent.NOBUTTON;
-	    	if(e.getButton()==MouseEvent.BUTTON1) StopDriving();
 	    }
 	    public void mouseClicked(MouseEvent e) {}
 	    public void mouseEntered(MouseEvent e) {}
-	    public void mouseExited(MouseEvent e) {
-	    	StopDriving();
-	    }
+	    public void mouseExited(MouseEvent e) {}
 	    public void mouseDragged(MouseEvent e) {
 	    	int x=e.getX();
 	    	int y=e.getY();
@@ -368,7 +315,7 @@ public class DrawbotGUI
 			for(i=0;i<instructions.length;++i) {
 				if(i<linesProcessed) {
 					g2d.setColor( Color.RED );
-				} else if(i==linesProcessed) {
+				} else if(i>linesProcessed && i<=linesProcessed+10) {
 					g2d.setColor( Color.GREEN );
 				} else {
 					g2d.setColor( Color.BLACK );
@@ -445,29 +392,6 @@ public class DrawbotGUI
 					pz=z;
 				}
 			}  // for ( each instruction )
-			
-			if(driveOn) {
-				double x=oldx;
-				double y=oldy;
-				g2d.setColor(Color.BLACK);
-				// action line
-				g2d.drawLine( (int)x, (int)y, (int)(x+drivexview), (int)(y+driveyview) );
-				// action limits
-				g2d.setColor(Color.RED);
-				g2d.drawArc((int)(x-maxZone), 
-						(int)(y-maxZone),
-						(int)(maxZone*2),
-						(int)(maxZone*2),
-						0,
-						360);
-				g2d.setColor(Color.GREEN);
-				g2d.drawArc((int)(x-deadZone), 
-							(int)(y-deadZone),
-							(int)(deadZone*2),
-							(int)(deadZone*2),
-							0,
-							360);
-			}
 		}
 	}
 	
@@ -525,7 +449,7 @@ public class DrawbotGUI
 					i=decode(img.getRGB(x, y));
 					
 					float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
-					int b = (int)( a * 95.0f + 190.0f );
+					int b = (int)( a * 90.0f + 200.0f );
 					if(b>255) b=255;
 					//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
 					img.setRGB(x, y, encode(b));
@@ -1265,7 +1189,6 @@ public class DrawbotGUI
 	public void CloseFile() {
 		ngcfile.setText("");
 		if(fileOpened==true && scanner != null) scanner.close();
-		linesProcessed=0;
 	   	fileOpened=false;
 	}
 	
@@ -1305,7 +1228,6 @@ public class DrawbotGUI
 
 	    fileOpened=true;
 	    paused=true;
-	    statusBar.SetProgress(linesProcessed,linesTotal,"");
 
 	    previewPane.repaint();
 	}
@@ -1658,8 +1580,8 @@ public class DrawbotGUI
 			if(fileOpened) {
 				paused=false;
 				running=true;
-				driving=false;
 				UpdateMenuBar();
+				linesProcessed=0;
 				t_draw_start=System.currentTimeMillis();
 				SendFileCommand();
 			}
@@ -1678,17 +1600,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonDrive ) {
-			if(driving==true) {
-				driving=false;
-				SendLineToRobot("J00");
-			} else {
-				OpenPort(recentPort);
-				running=false;
-				paused=true;
-				driving=true;
-				SendLineToRobot("J01");
-			}
-			UpdateMenuBar();
+			Drive();
 			return;
 		}
 		if( subject == buttonHalt ) {
@@ -1790,6 +1702,82 @@ public class DrawbotGUI
 	
 
 
+	
+	
+	/**
+	 * Open the config dialog, update the paper size, refresh the preview tab.
+	 */
+	public void Drive() {
+		JDialog driver = new JDialog(mainframe,"Manual Control",true);
+		driver.setLayout(new GridBagLayout());
+		
+		JButton up1 = new JButton("Y1");
+		JButton up10 = new JButton("Y10");
+		JButton up100 = new JButton("Y100");
+		
+		JButton down1 = new JButton("Y-1");
+		JButton down10 = new JButton("Y-10");
+		JButton down100 = new JButton("Y-100");
+		
+		JButton left1 = new JButton("X-1");
+		JButton left10 = new JButton("X-10");
+		JButton left100 = new JButton("X-100");
+		
+		JButton right1 = new JButton("X1");
+		JButton right10 = new JButton("X10");
+		JButton right100 = new JButton("X100");
+		
+		JButton center = new JButton("CENTERED");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=3;	c.gridy=0;	driver.add(up100,c);
+		c.gridx=3;	c.gridy=1;	driver.add(up10,c);
+		c.gridx=3;	c.gridy=2;	driver.add(up1,c);
+		c.gridx=3;	c.gridy=4;	driver.add(down1,c);
+		c.gridx=3;	c.gridy=5;	driver.add(down10,c);
+		c.gridx=3;	c.gridy=6;	driver.add(down100,c);
+
+		c.gridx=3;	c.gridy=3;	driver.add(center,c);
+		
+		c.gridx=0;	c.gridy=3;	driver.add(left100,c);
+		c.gridx=1;	c.gridy=3;	driver.add(left10,c);
+		c.gridx=2;	c.gridy=3;	driver.add(left1,c);
+		c.gridx=4;	c.gridy=3;	driver.add(right1,c);
+		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
+		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
+
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					JButton b = (JButton)subject;
+					String t=b.getText();
+					if(t=="CENTERED") {
+						SendLineToRobot("TELEPORT XO YO");
+					} else {
+						SendLineToRobot("G91");
+						SendLineToRobot("G00 "+b.getText());
+						SendLineToRobot("G90");
+					}
+			  }
+			};
+		
+		up1.addActionListener(driveButtons);
+		up10.addActionListener(driveButtons);
+		up100.addActionListener(driveButtons);
+		down1.addActionListener(driveButtons);
+		down10.addActionListener(driveButtons);
+		down100.addActionListener(driveButtons);
+		left1.addActionListener(driveButtons);
+		left10.addActionListener(driveButtons);
+		left100.addActionListener(driveButtons);
+		right1.addActionListener(driveButtons);
+		right10.addActionListener(driveButtons);
+		right100.addActionListener(driveButtons);
+		center.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+	}
+
 	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
 		JMenu menu;
@@ -1838,7 +1826,7 @@ public class DrawbotGUI
         JMenu subMenu = new JMenu("Port");
         subMenu.setMnemonic(KeyEvent.VK_P);
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
-        subMenu.setEnabled(!running && !driving);
+        subMenu.setEnabled(!running);
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
@@ -1864,25 +1852,25 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Configure machine limits",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot shape.");
         buttonConfig.addActionListener(this);
-        buttonConfig.setEnabled(portConfirmed && !running && !driving);
+        buttonConfig.setEnabled(portConfirmed && !running);
         menu.add(buttonConfig);
 
         buttonPaper = new JMenuItem("Paperure paper limits",KeyEvent.VK_C);
         buttonPaper.getAccessibleContext().setAccessibleDescription("Adjust the paper shape.");
         buttonPaper.addActionListener(this);
-        buttonPaper.setEnabled(portConfirmed && !running && !driving);
+        buttonPaper.setEnabled(portConfirmed && !running);
         menu.add(buttonPaper);
 
         buttonLoad = new JMenuItem("Load bobbins");
         buttonLoad.getAccessibleContext().setAccessibleDescription("Load string onto the bobbin.");
         buttonLoad.addActionListener(this);
-        buttonLoad.setEnabled(portConfirmed && !running && !driving);
+        buttonLoad.setEnabled(portConfirmed && !running);
         menu.add(buttonLoad);
 
         buttonHome = new JMenuItem("Home",KeyEvent.VK_O);
         buttonHome.getAccessibleContext().setAccessibleDescription("Recenter the plotter");
         buttonHome.addActionListener(this);
-        buttonHome.setEnabled(portConfirmed && !running && !driving);
+        buttonHome.setEnabled(portConfirmed && !running);
         menu.add(buttonHome);
 
         menuBar.add(menu);
@@ -1907,24 +1895,24 @@ public class DrawbotGUI
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
         buttonStart.addActionListener(this);
-    	buttonStart.setEnabled(portConfirmed && !running && !driving);
+    	buttonStart.setEnabled(portConfirmed && !running);
         menu.add(buttonStart);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");
         buttonPause.addActionListener(this);
-        buttonPause.setEnabled(portConfirmed && running && !driving);
+        buttonPause.setEnabled(portConfirmed && running);
         menu.add(buttonPause);
 
         buttonHalt = new JMenuItem("Halt",KeyEvent.VK_H);
         buttonHalt.getAccessibleContext().setAccessibleDescription("Halt sending g-code");
         buttonHalt.addActionListener(this);
-        buttonHalt.setEnabled(portConfirmed && running && !driving);
+        buttonHalt.setEnabled(portConfirmed && running);
         menu.add(buttonHalt);
 
         menu.addSeparator();
 
-        buttonDrive = new JMenuItem((driving?"Stop":"Start") + " Driving",KeyEvent.VK_R);
+        buttonDrive = new JMenuItem("Drive Manually",KeyEvent.VK_R);
         buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
         buttonDrive.addActionListener(this);
         buttonDrive.setEnabled(portConfirmed && !running);
@@ -2017,7 +2005,7 @@ public class DrawbotGUI
         mainframe.setContentPane(demo.CreateContentPane());
  
         //Display the window.
-        mainframe.setSize(500,700);
+        mainframe.setSize(800,700);
         mainframe.setVisible(true);
     }
     
