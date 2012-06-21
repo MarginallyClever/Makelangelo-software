@@ -6,6 +6,7 @@
 // please see http://www.github.com/i-make-robots/Drawbot for more information.
 
 
+
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
@@ -14,14 +15,6 @@
 
 // Default servo library
 #include <Servo.h> 
-
-// Timer interrupt libraries
-#include <FrequencyTimer2.h>
-
-// For sleep_mode().  See http://www.engblaze.com/hush-little-microprocessor-avr-and-arduino-sleep-mode-basics/
-#include <avr/interrupt.h>
-#include <avr/power.h>
-#include <avr/sleep.h>
 
 // Saving config
 #include <EEPROM.h>
@@ -53,9 +46,11 @@
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
-#define SPOOL_DIAMETER  (1.102)
-#define MAX_RATED_RPM   (3000.0)
+#define SPOOL_DIAMETER  (0.950)
 #define MAX_RPM         (200.0)
+
+// delay between steps, in microseconds.
+#define STEP_DELAY      (5200)  // = 3.5ms
 
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
@@ -75,16 +70,10 @@
 
 // Speed of the timer interrupt
 #define STEPS_S         (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
-#define TIMER_FREQUENCY (1000000.0/STEPS_S)  // microseconds/step
 
-// The interrupt makes calls to move the stepper.
-// the maximum speed cannot be faster than the timer interrupt.
 #define MAX_VEL         (STEPS_S * THREADPERSTEP)  // cm/s
 #define MIN_VEL         (0.001) // cm/s
-#define DEFAULT_VEL     (MAX_VEL/2)  // cm/s
-
-// How fast can the plotter accelerate?
-#define ACCELERATION    (DEFAULT_VEL)  // cm/s/s
+#define ACCELERATION    (MAX_VEL)  // cm/s/s
 
 // for arc directions
 #define ARC_CW          (1)
@@ -170,7 +159,7 @@ static volatile long laststep1, laststep2;
 
 // speeds, feeds, and delta-vs.
 static float accel=ACCELERATION;
-static float feed_rate=DEFAULT_VEL;
+static float feed_rate=0;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
 static float mode_scale;   // mm or inches?
@@ -236,53 +225,6 @@ static void readSwitches() {
 
 
 //------------------------------------------------------------------------------
-void planner_setup() {
-  FrequencyTimer2::disable();
-  block_head=0;
-  block_tail=0;
-  previous_topv=0;
-  current_block=NULL;
-  planner_idle();
-}
-
-
-//------------------------------------------------------------------------------
-void planner_idle() {
-  if(planner_awake) {
-    FrequencyTimer2::setPeriod(TIMER_FREQUENCY);  // microseconds
-    FrequencyTimer2::setOnOverflow(plan_step);
-    FrequencyTimer2::disable();
-    m1.release();
-    m2.release();
-    planner_awake=0;
-  }
-}
-
-
-//------------------------------------------------------------------------------
-void planner_wakeup() {
-  if(!planner_awake) {
-    FrequencyTimer2::setPeriod(TIMER_FREQUENCY);  // microseconds
-    FrequencyTimer2::setOnOverflow(plan_step);
-    FrequencyTimer2::enable();
-    planner_awake=1;
-  }
-}
-
-
-//------------------------------------------------------------------------------
-void setup_jogger() {
-  FrequencyTimer2::disable();
-  block_head=0;
-  block_tail=0;
-  current_block=NULL;
-  FrequencyTimer2::setPeriod(TIMER_FREQUENCY);  // microseconds
-  FrequencyTimer2::setOnOverflow(jog_step);
-  FrequencyTimer2::enable();
-}
-
-
-//------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
 static void setFeedRate(float v) {
   v *= mode_scale/60.0;
@@ -297,6 +239,16 @@ static void setFeedRate(float v) {
 //------------------------------------------------------------------------------
 static void printFeedRate() {
   Serial.print(feed_rate*60.0/mode_scale);
+  Serial.print(mode_name);
+  Serial.print("/min");
+
+  Serial.print(" (");
+  Serial.print((feed_rate/THREADPERSTEP));
+  Serial.print(" steps/s) ");
+  Serial.print((MAX_VEL*60.0/mode_scale));
+  Serial.print(mode_name);
+  Serial.print("/min ");
+  Serial.print((MIN_VEL*60.0/mode_scale));
   Serial.print(mode_name);
   Serial.print("/min");
 }
@@ -353,400 +305,6 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 
 //------------------------------------------------------------------------------
-// Turns the motors so that the real robot strings match our simulation.
-// len1 & len2 are the current string lengths.
-// nlen1 & nlen2 are the new string lengths.
-static void adjustStringLengths(long nlen1,long nlen2) {
-  // is the change in length >= one step?
-  long steps=nlen1-laststep1;
-//  if(steps<0)      m1.onestep(REEL_IN );  // it is shorter.
-//  else if(steps>0) m1.onestep(REEL_OUT);  // it is longer.
-  if(steps<0)      m1.step(-steps,REEL_IN );  // it is shorter.
-  else if(steps>0) m1.step( steps,REEL_OUT);  // it is longer.
-  
-  // is the change in length >= one step?
-  steps=nlen2-laststep2;
-//  if(steps<0)      m2.onestep(REEL_IN );  // it is shorter.
-//  else if(steps>0) m2.onestep(REEL_OUT);  // it is longer.
-  if(steps<0)      m2.step(-steps,REEL_IN );  // it is shorter.
-  else if(steps>0) m2.step( steps,REEL_OUT);  // it is longer.
-  
-  laststep1=nlen1;
-  laststep2=nlen2;
-}
-
-
-//------------------------------------------------------------------------------
-static void travelTime(float len,float vstart,float vend,float vtop,float &t1,float &t2,float &t3) {
-  t1 = (vtop-vstart) / accel;
-  t2 = (vtop-vend) / accel;
-  float d1 = vstart * t1 + 0.5 * accel * t1*t1;
-  float d2 = vend * t2 + 0.5 * accel * t2*t2;
-  float a = d1+d2;
-  
-  if(len>a) {
-    t3 = t1+t2 + (len-a) / vtop;
-    t2 = t3-t2;
-  } else {
-    // http://wikipedia.org/wiki/Classical_mechanics#1-Dimensional_Kinematics
-    float brake_distance=(2.0*accel*len-vstart*vstart+vend*vend) / (4.0*accel);
-    // and we also know d=v0*t + att/2
-    // so 
-    t2 = t1 = ( -vstart + sqrt( 2.0*accel*brake_distance       + vstart*vstart ) ) / accel;
-    t3 = t1 + ( -vend   + sqrt( 2.0*accel*(len-brake_distance) + vend*vend     ) ) / accel;
-  }
-/*
-  Serial.print("\tlen=");  Serial.print(len);
-  Serial.print("\taccel=");  Serial.print(accel);
-  Serial.print("\tvstart=");  Serial.print(vstart);
-  Serial.print("\tvend=");  Serial.print(vend);
-  Serial.print("\tt1=");  Serial.print(t1);
-  Serial.print("\tt2=");  Serial.print(t2);
-  Serial.print("\tt3=");  Serial.println(t3);
-*/
-}
-
-
-//------------------------------------------------------------------------------
-static float interpolate(float p0,float p3,float t,float t1,float t2,float t3,float vstart,float vtop,float vend,float len) {
-  if(t<=0) return p0;
- 
-  float s = (p3-p0)/len;
-  
-  if(t<t1) {
-    float d1 = vstart * t + 0.5 * accel * t * t;
-    return p0 + (d1)*s;
-  } else if(t < t2) {
-    float d1 = vstart * t1 + 0.5 * accel * t1 * t1;
-    float d2 = vtop * ( t - t1 );
-    return p0 + (d1+d2)*s;
-  } else if(t < t3) {
-    float d1 = vstart * t1 + 0.5 * accel * t1 * t1;
-    float d2 = vtop * ( t2 - t1 );
-    float t4 = t - t2;
-    float d3 = vtop * t4 - 0.5 * accel * t4 * t4;
-    return p0 + (d1+d2+d3)*s;
-  }
-  
-  return p3;
-}
-
-
-//------------------------------------------------------------------------------
-// called by the timer interrupt when in jog mode
-static void jog_step() {
-  long nlen1, nlen2;
-
-  tick();
-  
-  // automatic slowdown when key is released.  
-  if(velx!=0 && accelx==0) {
-    if(abs(velx)<accel*dt) velx=0;
-    else if(velx<0)        velx+=accel*dt;
-    else                   velx-=accel*dt;
-  }
-  if(vely!=0 && accely==0) {
-    if(abs(vely)<accel*dt) vely=0;
-    else if(vely<0)        vely+=accel*dt;
-    else                   vely-=accel*dt;
-  }
-
-  velx+=accelx*dt;
-  vely+=accely*dt;
-  float vtotal = sqrt(velx*velx+vely*vely);
-  if(vtotal>feed_rate) {
-    float scale = feed_rate/vtotal;
-    velx*=scale;
-    vely*=scale;
-  }
-  posx+=velx*dt;
-  posy+=vely*dt;
-  
-  IK(posx,posy,nlen1,nlen2);
-  adjustStringLengths(nlen1,nlen2);
-}
-
-
-//------------------------------------------------------------------------------
-// change the acceleration (for drive-by kb or joystick)
-static void jog(float x,float y) {
-  float ax=x*accel;
-  float ay=y*accel;
-
-  float atotal = sqrt(ax*ax+ay*ay);
-  if(atotal>accel) {
-    float scale = accel/atotal;
-    ax*=scale;
-    ay*=scale;
-  }
-
-  accelx=ax;
-  accely=ay;
-}
-
-
-//------------------------------------------------------------------------------
-// called by the timer interrupt when in plan mode.
-void plan_step() {
-  if(planner_busy==1) return;
-  planner_busy=1;
-
-  sei();
-
-  readSwitches();
-
-  if(!switch1 || !switch2) {
-    // Emergency stop, switch hit unexpectedly.
-    planner_busy=0;
-    return;
-  }
-
-  tick();
-  
-  if(current_block==NULL) {
-    if(block_tail!=block_head) {
-      current_block=&blocks[block_tail];
-      current_block->tstart=t;
-      current_block->tsum=0;
-    }
-    if(current_block==NULL) {
-      planner_idle();
-      planner_busy=0;
-      return;
-    }
-  }
-  
-  if(current_block!=NULL) {
-    current_block->tsum = t - current_block->tstart;
-    if(current_block->tsum > current_block->time) {
-      current_block->tsum = current_block->time;
-    }
-
-    long nlen1,nlen2;
-    // Find where the plotter will be at tsum seconds
-    //float nx = interpolate(current_block->sx, current_block->ex, current_block);
-    //float ny = interpolate(current_block->sy, current_block->ey, current_block);
-    //float nz = (current_block->ez - current_block->sz) * (current_block->tsum / current_block->time) + current_block->sz;
-
-    // update motors
-    //IK(nx,ny,nlen1,nlen2);
-
-    long l1 = interpolate( current_block->m1s, current_block->m1e, current_block->tsum, current_block->t1, current_block->t2, current_block->time, current_block->startv, current_block->topv, current_block->endv, current_block->len );
-    long l2 = interpolate( current_block->m2s, current_block->m2e, current_block->tsum, current_block->t1, current_block->t2, current_block->time, current_block->startv, current_block->topv, current_block->endv, current_block->len );
-
-    adjustStringLengths(nlen1,nlen2);
-    // move the pen
-    //setPenAngle(current_block->ez);
-
-    // is this block finished?    
-    if(current_block->tsum >= current_block->time) {
-      current_block=NULL;
-      if(block_tail!=block_head) {
-        // get next block
-        block_tail=NEXT_BLOCK(block_tail);
-      }
-    }
-  }
-  
-  planner_busy=0;
-}
-
-
-//------------------------------------------------------------------------------
-// if you must reach target_vel at distance and you speed up by acceleration
-// then what must your starting velocity be?
-static float max_allowable_speed(float acceleration,float target_vel,float distance) {
-  return sqrt( target_vel * target_vel - 2.0 * acceleration * distance );
-}
-
-
-//------------------------------------------------------------------------------
-static void planner_recalculate() {
-  block *curr, *next, *prev;
-
-  // reverse pass
-  prev=curr=next=NULL;
-  int bi = block_head;
-  while(bi != block_tail ) {
-    bi=PREV_BLOCK(bi);
-    next=curr;
-    curr=prev;
-    prev=&blocks[bi];
-    
-    if( !curr || !next ) continue;
-    // already cruising at top speed?
-    if(curr->startv == curr->maxstartv ) continue;
-    if(!curr->nominal_length && curr->maxstartv > next->startv ) {
-      curr->startv = min(curr->maxstartv, max_allowable_speed( -accel, next->startv, curr->len ) );
-    } else {
-      curr->startv = curr->maxstartv;
-    }
-    curr->touched=1;
-  }
-  
-  // forward pass
-  prev=curr=next=NULL;
-  bi = block_tail;
-  while(bi != block_head ) {
-    prev=curr;
-    curr=next;
-    next=&blocks[bi];
-    bi=NEXT_BLOCK(bi);
-    
-    if( !prev ) continue;
-    if( prev->nominal_length ) continue;
-    
-    if(!prev->startv > curr->startv ) {
-      float startv = min(curr->startv, max_allowable_speed( -accel, prev->startv, prev->len ) );
-      if( curr->startv != startv ) {
-        curr->startv = startv;
-        curr->touched=1;
-      }
-    }
-    curr->touched=1;
-  }
-  
-  // recalculate trapezoids
-  prev=curr=next=NULL;
-  bi = block_tail;
-  while(bi != block_head ) {
-    curr=next;
-    next=&blocks[bi];
-    bi=NEXT_BLOCK(bi);
-    
-    if( !curr ) continue;
-
-    if( curr->touched==1 || next->touched==1 ) {
-      curr->endv=next->startv;
-      travelTime(curr->len,curr->startv,curr->endv,curr->topv,curr->t1,curr->t2,curr->time);
-      curr->touched=0;
-    }
-  }
-  
-  // last item in queue
-  next->endv=0;
-  travelTime(next->len,next->startv,next->endv,next->topv,next->t1,next->t2,next->time);
-  next->touched=0;
-}
-
-
-//------------------------------------------------------------------------------
-// This method assumes the limits have already been checked.
-// It adds each line segment to a ring buffer.  Then it plans a route so that
-// if lines are in the same direction the robot doesn't have to slow down.
-static void line_queue(float x,float y,float z) {
-#ifdef VERBOSE
-  Serial.print("A");  Serial.print(block_tail);
-  Serial.print(" ");  Serial.print(block_head);
-  Serial.print(" x");  Serial.print(x);
-  Serial.print(" y");  Serial.print(y);
-
-  if(current_block) {
-    Serial.print(" ");  Serial.print(current_block->tsum);
-    Serial.print(" ");  Serial.print(current_block->time);
-  }
-  Serial.println(planner_busy?" busy":" idle");
-#endif
-
-  int next_head=NEXT_BLOCK(block_head);
-  // while there is no room in the queue, wait.
-  while(block_tail==next_head) sleep_mode();
-    
-  // set up the new block in the queue.
-  float dx=x-posx;
-  float dy=y-posy;
-  float dz=z-posz;
-
-#ifdef VERBOSE
-  Serial.print("px ");  Serial.print(posx);
-  Serial.print("py ");  Serial.print(posy);
-  Serial.print("pz ");  Serial.print(posz);
-  Serial.print("dx ");  Serial.print(dx);
-  Serial.print("dy ");  Serial.print(dy);
-  Serial.print("dz ");  Serial.println(dz);
-#endif
-
-  block *new_block=&blocks[block_head];
-  IK(posx,posy,new_block->m1s,new_block->m2s);
-  IK(   x,   y,new_block->m1e,new_block->m2e);
-  new_block->m1total=abs(new_block->m1e-new_block->m1s);
-  new_block->m2total=abs(new_block->m2e-new_block->m2s);
-  new_block->step_count=max(new_block->m1total,new_block->m2total);
-  new_block->m1dir = new_block->m1e > new_block->m1s ? 1 : -1;
-  new_block->m2dir = new_block->m2e > new_block->m2s ? 1 : -1;
-  new_block->m1o=0;
-  new_block->m2o=0;
-
-  new_block->sz=posz;
-  new_block->ez=z;
-  new_block->startv=0;
-  new_block->endv=0;
-  new_block->topv=feed_rate;
-  new_block->len = sqrt(dx*dx + dy*dy);// + dz*dz);
-  new_block->tsum=0;
-
-  //if(new_block->len==0) return;
-  if( sqrt(dx*dx + dy*dy + dz*dz) == 0 ) return;
-  
-  // Find the maximum speed around the corner from the previous line to this line.
-  float maxjunctionv = 0.0;
-  block *curr,*next;
-  if( block_head != block_tail ) {
-    // there is a previous line to compare to
-    next = new_block;
-    curr=&blocks[PREV_BLOCK(block_head)];
-
-    // dot product the two vectors to get the cos(theta) of their angle.
-    float x1 = ( curr->m1e - curr->m1s ) / curr->len;
-    float y1 = ( curr->m2e - curr->m2s ) / curr->len;
-    //float z1 = ( curr->ez - curr->sz ) / curr->len;
-    float x2 = ( next->m1s - next->m1s ) / next->len;
-    float y2 = ( next->m2e - next->m2s ) / next->len;
-    //float z2 = ( curr->ez - curr->sz ) / curr->len;
-    float dotproduct = x1*x2 + y1*y2;// + z1*z2;
-
-    // Anything more than 90 is a full stop guaranteed.
-    if( dotproduct > 0 ) {
-      maxjunctionv = min( curr->topv * dotproduct, next->topv * dotproduct );
-    }
-  }
-  new_block->maxstartv = maxjunctionv;
-  
-  float allowablev = max_allowable_speed(-accel,0,new_block->len);
-
-  new_block->startv = min( maxjunctionv, allowablev );
-  // no matter at what speed we start, is this line long enough to reach top speed?
-  new_block->nominal_length = ( new_block->topv < allowablev );
-
-#ifdef VERBOSE
-  Serial.print("maxstartv=");   Serial.println(maxjunctionv);
-  Serial.print("allowablev=");  Serial.println(allowablev);
-  Serial.print("startv=");      Serial.println(new_block->startv);
-#endif
-
-  // make sure the trapezoid is calculated for this block
-  new_block->touched = 1;
-  
-#ifdef VERBOSE
-  Serial.print("B");  Serial.print(block_tail);
-  Serial.print(" ");  Serial.println(next_head);
-#endif
-
-  // the line is now ready to be queued.
-  // move the head
-  block_head=next_head;
-
-  posx=x;
-  posy=y;
-  posz=z;
-  previous_topv=new_block->topv;
-  
-  planner_recalculate();
-  planner_wakeup();
-}
-
-
-//------------------------------------------------------------------------------
 static void line(float x,float y,float z) {
   long l1,l2;
   IK(x,y,l1,l2);
@@ -757,33 +315,31 @@ static void line(float x,float y,float z) {
   long ad2=abs(d2);
   int dir1=d1<0?REEL_IN:REEL_OUT;
   int dir2=d2<0?REEL_IN:REEL_OUT;
-  long overflow=0;
+  long over=0;
   long i;
-
-  int step_delay=5;
-
+  
+  int step_delay=1000000.0/(feed_rate/THREADPERSTEP);
+  
   // bresenham's line algorithm.
   if(ad1>ad2) {
     for(i=0;i<ad1;++i) {
       m1.onestep(dir1);
-      delay(step_delay);
-      overflow+=ad2;
-      if(overflow>=ad1) {
-        overflow-=ad1;
+      over+=ad2;
+      if(over>=ad1) {
+        over-=ad1;
         m2.onestep(dir2);
-        delay(step_delay);
       }
+      delayMicroseconds(step_delay);
     }
   } else {
     for(i=0;i<ad2;++i) {
       m2.onestep(dir2);
-      delay(step_delay);
-      overflow+=ad1;
-      if(overflow>=ad2) {
-        overflow-=ad2;
+      over+=ad1;
+      if(over>=ad2) {
+        over-=ad2;
         m1.onestep(dir1);
-        delay(step_delay);
       }
+      delayMicroseconds(step_delay);
     }
   }
 
@@ -920,9 +476,7 @@ static void goHome() {
   laststep2=0;
   
   Serial.println("Centering...");
-  long L1,L2;
-  IK(0,0,L1,L2);
-  adjustStringLengths(L1,L2);
+  line(0,0,90);
 }
 
 
@@ -1135,34 +689,6 @@ static void processCommand() {
     }
 
     delay(xx);
-  } else if(!strncmp(buffer,"J00",3)) {
-    // start jog mode
-    planner_setup();
-    Serial.println("Planner on");
-  } else if(!strncmp(buffer,"J01",3)) {
-    // end jog mode
-    setup_jogger();
-    Serial.println("Jog on");
-  } else if(!strncmp(buffer,"J02 ",4)) {
-    // jog
-    float xx=0;
-    float yy=0;
-    float zz=posz;
-
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
-      default: ptr=0; break;
-      }
-    }
-
-    setPenAngle(zz);
-    jog(xx,yy);
   } else {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -1202,6 +728,8 @@ void setup() {
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
+  setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
+  
   // load the EEPROM values
   loadConfig();
   printConfig();
@@ -1229,9 +757,6 @@ void setup() {
   posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
   
-  // start the timer interrupt
-  planner_setup();
-
   Serial.print("> ");
 }
 
