@@ -1,0 +1,78 @@
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+
+
+/**
+ * Reduces any picture to a more manageable size
+ * @author Dan
+ */
+public class Filter_Resize {
+	final double cm_to_mm=10.0f;
+	
+	double dots_per_cm=5;
+	double margin=0.9f;
+	double paper_top, paper_bottom, paper_left, paper_right;
+	
+	
+	public Filter_Resize(double t,double b,double l,double r,double dpc,double m) {
+		paper_top=t;
+		paper_bottom=b;
+		paper_left=l;
+		paper_right=r;
+		dots_per_cm=dpc;
+		margin=m;
+	}
+	
+	
+	protected BufferedImage scaleImage(BufferedImage img, int width, int height, Color background) {
+	    int imgWidth = img.getWidth();
+	    int imgHeight = img.getHeight();
+	    if (imgWidth*height < imgHeight*width) {
+	        width = imgWidth*height/imgHeight;
+	    } else {
+	        height = imgHeight*width/imgWidth;
+	    }
+	    BufferedImage newImage = new BufferedImage(width, height,
+	            BufferedImage.TYPE_INT_RGB);
+	    Graphics2D g = newImage.createGraphics();
+	    try {
+	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+	                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+	        g.setBackground(background);
+	        g.clearRect(0, 0, width, height);
+	        g.drawImage(img, 0, 0, width, height, null);
+	    } finally {
+	        g.dispose();
+	    }
+	    return newImage;
+	}
+
+
+	public BufferedImage Process(BufferedImage img) {
+		int w = img.getWidth();
+		int h = img.getHeight();
+		int max_w=(int)((paper_right-paper_left)*dots_per_cm*cm_to_mm*margin);
+		int max_h=(int)((paper_top-paper_bottom)*dots_per_cm*cm_to_mm*margin);
+		
+		if(w<max_w && h<max_h) {
+			if(w>h) {
+				h*=(float)max_w/(float)w;
+				w=max_w;
+			} else {
+				w*=(float)max_h/(float)h;
+				h=max_h;
+			}
+		}
+		if(w>max_w) {
+			h*=(float)max_w/(float)w;
+			w=max_w;
+		}
+		if(h>max_h) {
+			w*=(float)max_h/(float)h;
+			h=max_h;
+		}
+		return scaleImage(img, w,h,Color.WHITE);
+	}
+}
