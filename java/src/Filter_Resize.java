@@ -9,11 +9,10 @@ import java.awt.image.BufferedImage;
  * @author Dan
  */
 public class Filter_Resize {
-	final double cm_to_mm=10.0f;
-	
-	double dots_per_cm=5;
-	double margin=0.9f;
-	double paper_top, paper_bottom, paper_left, paper_right;
+	private final double cm_to_mm=10.0f;
+	private	double dots_per_cm=1;
+	private double margin=0.9f;
+	private double paper_top, paper_bottom, paper_left, paper_right;
 	
 	
 	public Filter_Resize(double t,double b,double l,double r,double dpc,double m) {

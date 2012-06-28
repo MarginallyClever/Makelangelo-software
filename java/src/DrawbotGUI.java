@@ -68,7 +68,7 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad, buttonHome;
+    private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     private JMenuItem buttonAbout;
     
@@ -129,11 +129,11 @@ public class DrawbotGUI
 		try {
 			img = ImageIO.read(new File(filename));
 
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,5,0.9f); 
-			img = rs.Process(img);
-			
 			Filter_BlackAndWhite bwc = new Filter_BlackAndWhite(); 
 			img = bwc.Process(img);
+			
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,1,0.9f); 
+			img = rs.Process(img);
 			
 			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 			img = dither.Process(img);
@@ -141,8 +141,6 @@ public class DrawbotGUI
 			String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
 			Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair);
 			tsp.Process(img);
-	
-			OpenFile(ngcPair);
 		}
 		catch(IOException e) {}
 	}
@@ -264,17 +262,19 @@ public class DrawbotGUI
 		int found=line3.lastIndexOf("== HELLO WORLD ==");
 		if(found >= 0) {
 			String[] lines = line3.substring(found).split("\\r?\\n");
-			try {
-				limit_top = Float.parseFloat(lines[1].substring(1));
-				limit_bottom = Float.parseFloat(lines[2].substring(1));
-				limit_left = Float.parseFloat(lines[3].substring(1));
-				limit_right = Float.parseFloat(lines[4].substring(1));
-				portConfirmed=true;
-				UpdateMenuBar();
-				previewPane.setConnected(true);
-				previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			if(lines.length>=4) {
+				try {
+					limit_top = Float.parseFloat(lines[1].substring(1));
+					limit_bottom = Float.parseFloat(lines[2].substring(1));
+					limit_left = Float.parseFloat(lines[3].substring(1));
+					limit_right = Float.parseFloat(lines[4].substring(1));
+					portConfirmed=true;
+					UpdateMenuBar();
+					previewPane.setConnected(true);
+					previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+				}
+				catch(NumberFormatException e) {}
 			}
-			catch(NumberFormatException e) {}
 		}
 		return portConfirmed;
 	}
@@ -376,7 +376,7 @@ public class DrawbotGUI
 	    fileOpened=true;
 	    paused=true;
 	    linesProcessed=0;
-
+	    previewPane.setLinesProcessed(linesProcessed);
 	    previewPane.repaint();
 	}
 	
@@ -655,6 +655,7 @@ public class DrawbotGUI
 		// end of program?
 		if(tokens[0]=="M02" || tokens[0]=="M2") {
 			running=false;
+			previewPane.setRunning(running);
 			CloseFile();
 			Log(line+NL);
 			return false;
@@ -700,6 +701,7 @@ public class DrawbotGUI
 		CloseFile();
 		OpenFile(recentFiles[0]);
 		running=false;
+		previewPane.setRunning(running);
 		paused=true;
 		UpdateMenuBar();
 	}
@@ -722,6 +724,8 @@ public class DrawbotGUI
 				running=true;
 				UpdateMenuBar();
 				linesProcessed=0;
+				previewPane.setRunning(running);
+				previewPane.setLinesProcessed(linesProcessed);
 				statusBar.Start();
 				SendFileCommand();
 			}
@@ -767,10 +771,6 @@ public class DrawbotGUI
 			UpdateLoad();
 			return;
 		}	
-		if( subject == buttonHome ) {
-			GoHome();
-			return;
-		}		
 		if(subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
 					+"Find out more at http://www.marginallyclever.com/"+NL
@@ -844,6 +844,8 @@ public class DrawbotGUI
 		JDialog driver = new JDialog(mainframe,"Manual Control",true);
 		driver.setLayout(new GridBagLayout());
 		
+		JButton home = new JButton("Home");
+		
 		JButton up1 = new JButton("Y1");
 		JButton up10 = new JButton("Y10");
 		JButton up100 = new JButton("Y100");
@@ -879,11 +881,16 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
+		c.gridx=6;  c.gridy=0;  driver.add(home,c);
+		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					JButton b = (JButton)subject;
 					String t=b.getText();
+					if(t=="HOME") {
+						GoHome();
+					}
 					if(t=="CENTERED") {
 						SendLineToRobot("TELEPORT XO YO");
 					} else {
@@ -1001,12 +1008,6 @@ public class DrawbotGUI
         buttonLoad.addActionListener(this);
         buttonLoad.setEnabled(portConfirmed && !running);
         menu.add(buttonLoad);
-
-        buttonHome = new JMenuItem("Home",KeyEvent.VK_O);
-        buttonHome.getAccessibleContext().setAccessibleDescription("Recenter the plotter");
-        buttonHome.addActionListener(this);
-        buttonHome.setEnabled(portConfirmed && !running);
-        menu.add(buttonHome);
 
         menuBar.add(menu);
 
