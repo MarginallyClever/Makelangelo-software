@@ -86,43 +86,12 @@
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
-// look-ahead planning
-#ifdef __AVR_ATmega2560__
-#define MAX_BLOCKS       (16)
-#else
-#define MAX_BLOCKS       (5)
-#endif
-#define NEXT_BLOCK(x)    ((x+1)%MAX_BLOCKS)
-#define PREV_BLOCK(x)    ((x+MAX_BLOCKS-1)%MAX_BLOCKS)
-
 // servo pin differs based on device
 #ifdef __AVR_ATmega2560__
 #define SERVO_PIN        50
 #else
 #define SERVO_PIN        9
 #endif
-
-
-
-//------------------------------------------------------------------------------
-// STRUCTURES
-//------------------------------------------------------------------------------
-
-// based on https://github.com/grbl/grbl/ planner
-typedef struct {
-  long m1s, m1e, m1total, m1o;
-  long m2s, m2e, m2total, m2o;
-  long step_count;
-  int m1dir,m2dir;
-
-  float sz, ez;
-  float t1, t2, time, tsum, tstart;
-  float startv,endv,topv,maxstartv;
-  float len;
-  char touched;
-  char nominal_length;
-} block;
-
 
 
 //------------------------------------------------------------------------------
@@ -155,7 +124,7 @@ static char switch1;
 static char switch2;
 
 // motor position
-static volatile long laststep1, laststep2;
+static long laststep1, laststep2;
 
 // speeds, feeds, and delta-vs.
 static float accel=ACCELERATION;
@@ -170,22 +139,9 @@ static long  t_millis;
 static float t;   // since board power on
 static float dt;  // since last tick
 
-// Diameter of line made by plotter
-static float tool_diameter=0.05;
-
 // Serial comm reception
 static char buffer[MAX_BUF];  // Serial buffer
 static int sofar;             // Serial buffer progress
-
-// look-ahead ring buffer
-static block blocks[MAX_BLOCKS];
-static volatile int block_head, block_tail;
-static block *current_block=NULL;
-static float previous_topv;
-
-// timer interrupt blocking
-static char planner_busy=0;
-static char planner_awake=0;
 
 
 //------------------------------------------------------------------------------
