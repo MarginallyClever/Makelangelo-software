@@ -93,6 +93,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		cameraZoom += amnt;
 		if(cameraZoom<0.1) cameraZoom=0.1f;
 	}
+	public void ZoomIn() {
+		cameraZoom*=4.0/3.0;
+    	repaint();
+	}
+	public void ZoomOut() {
+		cameraZoom*=3.0/4.0;
+    	repaint();
+	}
 	
 	public void mousePressed(MouseEvent e) {
 		buttonPressed=e.getButton();

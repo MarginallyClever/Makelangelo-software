@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -70,6 +72,7 @@ public class DrawbotGUI
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
+    private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
@@ -449,10 +452,7 @@ public class DrawbotGUI
 		
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	if(!ext.equalsIgnoreCase(".ngc")) {
-//    		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-//    		if(!(new File(ngcPair)).exists()) {
-    			LoadImage(filename);
-//    		}
+   			LoadImage(filename);
     	} else {
     		OpenFile(filename);
     	}
@@ -712,6 +712,16 @@ public class DrawbotGUI
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
+		if(subject == buttonZoomIn) {
+			System.out.println("A");
+			previewPane.ZoomIn();
+			return;
+		}
+		if(subject == buttonZoomOut) {
+			System.out.println("B");
+			previewPane.ZoomOut();
+			return;
+		}
 		if(subject == buttonOpenFile) {
 			OpenFileDialog();
 			return;
@@ -770,7 +780,7 @@ public class DrawbotGUI
 		if( subject == buttonLoad ) {
 			UpdateLoad();
 			return;
-		}	
+		}
 		if(subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
 					+"Find out more at http://www.marginallyclever.com/"+NL
@@ -947,8 +957,10 @@ public class DrawbotGUI
         	for(i=0;i<recentFiles.length;++i) {
         		if(recentFiles[i].length()==0) break;
             	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-            	buttonRecent[i].addActionListener(this);
-            	menu.add(buttonRecent[i]);
+            	if(buttonRecent[i]!=null) {
+            		buttonRecent[i].addActionListener(this);
+            		menu.add(buttonRecent[i]);
+            	}
         	}
         	if(i!=0) menu.addSeparator();
         }
@@ -1044,7 +1056,21 @@ public class DrawbotGUI
         menu.add(buttonDrive);
 
         menuBar.add(menu);
-
+        
+        // tools menu
+        menu = new JMenu("Tools");
+        buttonZoomOut = new JMenuItem("Zoom -");
+        buttonZoomOut.addActionListener(this);
+        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
+        menu.add(buttonZoomOut);
+        
+        buttonZoomIn = new JMenuItem("Zoom +",KeyEvent.VK_EQUALS);
+        buttonZoomIn.addActionListener(this);
+        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
+        menu.add(buttonZoomIn);
+        
+        menuBar.add(menu);
+        
         //Build in the menu bar.
         menu = new JMenu("Help");
         menu.setMnemonic(KeyEvent.VK_H);
@@ -1080,16 +1106,20 @@ public class DrawbotGUI
         
         // status bar
         statusBar = new StatusBar();
+        Font f = statusBar.getFont();
+        statusBar.setFont(f.deriveFont(Font.BOLD,15));
+        Dimension d=statusBar.getMinimumSize();
+        d.setSize(d.getWidth(), d.getHeight()+30);
+        statusBar.setMinimumSize(d);
 
         // layout
         Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
-        //split.add(tabs);
         split.add(previewPane);
         split.add(logPane);
-        split.setDividerSize(2);
-        
-        contentPane.add(split,BorderLayout.CENTER);
+        split.setDividerSize(8);
+
         contentPane.add(statusBar,BorderLayout.SOUTH);
+        contentPane.add(split,BorderLayout.CENTER);
 
         // open the file
 		GetRecentFiles();
