@@ -3,6 +3,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+//import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -14,7 +15,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	static final long serialVersionUID=2;
 
 	// arc smoothness - increase to make more smooth and run slower.
-	double steps_per_degree=10;
+	public static final double STEPS_PER_DEGREE=10;
 	double paper_left,paper_right,paper_top,paper_bottom;
 	double limit_left,limit_right,limit_top,limit_bottom;
 
@@ -33,12 +34,21 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	double cameraOffsetX=0,cameraOffsetY=0;
 	double cameraZoom=20;
 	float drawScale=0.1f;
+
+	ArrayList<String> instructions;
 	
 	
 	public DrawPanel() {
 		super();
         addMouseMotionListener(this);
         addMouseListener(this);
+	}
+	
+	
+	public void setGCode(ArrayList<String> gcode) {
+		instructions = gcode;
+		// process the image into a buffer once rather than re-reading the gcode over and over again?
+	    repaint();
 	}
 	
 	
@@ -171,7 +181,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// draw calibration point
 		g2d.setColor(Color.RED);
 		g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
-		g2d.drawLine((int)TX(0),    (int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
+		g2d.drawLine((int)TX( 0.00),(int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 /*
 		if(img!=null) {
 			int w=img.getWidth();
@@ -181,17 +191,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					0, 0, w, h,
 					null);
 			return;
-		}*/
-
+		}
+*/
 		// draw image
-		ArrayList<String> instructions = DrawbotGUI.getSingleton().getGcode();
 		if(instructions==null) return;
 		
 		double px=TX(0),py=TY(0),pz=90;
 		int i,j;
 
 		for(i=0;i<instructions.size();++i) {
-			if(running && i<linesProcessed) {
+			if(running && i<=linesProcessed) {
 				g2d.setColor( Color.RED );
 			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
 				g2d.setColor( Color.GREEN );
@@ -200,19 +209,24 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			}
 			
 			String line=instructions.get(i);
+			String[] pieces=line.split(";");
+			if(pieces.length==0) continue;
 			
-			if(line.contains("G20")) {
-				drawScale=0.393700787f;
-			} else if(line.contains("G21")) {
-				drawScale=0.1f;
-			} else if(line.startsWith("G00 ") || line.startsWith("G0 ") || 
-				line.startsWith("G01 ") || line.startsWith("G1 ")) {
+			String[] tokens = pieces[0].split("\\s");
+			if(tokens.length==0) continue;
+
+			for(j=0;j<tokens.length;++j) {
+					 if(tokens[j].equals("G20")) drawScale=0.393700787f;
+				else if(tokens[j].equals("G21")) drawScale=0.1f;
+			}
+			
+			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
+			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line
 				double x=px;
 				double y=py;
 				double z=pz;
-				String[] tokens = line.split("\\s");
-				for(j=0;j<tokens.length;++j) {
+				for(j=1;j<tokens.length;++j) {
 					if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
@@ -222,17 +236,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				px=x;
 				py=y;
 				pz=z;
-			} else if(line.startsWith("G02 ") || line.startsWith("G2 ") ||
-				line.startsWith("G03 ") || line.startsWith("G3 ")) {
+			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
+					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
 				// draw an arc
-				int dir = (line.startsWith("G02") || line.startsWith("G2")) ? -1 : 1;
+				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
 				double x=px;
 				double y=py;
 				double z=pz;
 				double ai=px;
 				double aj=py;
-				String[] tokens = line.split("\\s");
-				for(j=0;j<tokens.length;++j) {
+				for(j=1;j<tokens.length;++j) {
 					if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
@@ -256,8 +269,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					theta=Math.abs(angle2-angle1);
 
 					// Draw the arc from a lot of little line segments.
-					for(int k=0;k<=theta*steps_per_degree;++k) {
-						double angle3 = (angle2-angle1) * ((double)k/(theta*steps_per_degree)) + angle1;
+					for(int k=0;k<=theta*STEPS_PER_DEGREE;++k) {
+						double angle3 = (angle2-angle1) * ((double)k/(theta*STEPS_PER_DEGREE)) + angle1;
 						float nx = (float)(ai + Math.cos(angle3) * radius);
 					    float ny = (float)(aj + Math.sin(angle3) * radius);
 

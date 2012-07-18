@@ -17,16 +17,6 @@ import javax.swing.SwingWorker;
  * @author Dan
  */
 class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
-	public class Point {
-		int x, y;
-		
-		public Point(int _x,int _y) {
-			x=_x;
-			y=_y;
-		}
-	}
-	
-	
 	public String formatTime(long millis) {
     	String elapsed="";
     	long s=millis/1000;
@@ -62,11 +52,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 						// we have s1,s2...e-1,e
 						// check if s1,e-1,...s2,e is shorter
 						// before
-						long a=CalculateWeight(solution[start],solution[start+1]);
-						long b=CalculateWeight(solution[end  ],solution[end  -1]);
+						float a=CalculateWeight(solution[start],solution[start+1]);
+						float b=CalculateWeight(solution[end  ],solution[end  -1]);
 						// after
-						long c=CalculateWeight(solution[start],solution[end  -1]);
-						long d=CalculateWeight(solution[end  ],solution[start+1]);
+						float c=CalculateWeight(solution[start],solution[end  -1]);
+						float d=CalculateWeight(solution[end  ],solution[start+1]);
 						
 						if(a+b>c+d) {
 							once = 1;
@@ -103,13 +93,13 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 						int p3=solution[start+2];
 						int p4=solution[end  -1];
 						int p5=solution[end    ];
-						long a=CalculateWeight(p1,p2);
-						long b=CalculateWeight(p2,p3);
-						long c=CalculateWeight(p4,p5);
+						float a=CalculateWeight(p1,p2);
+						float b=CalculateWeight(p2,p3);
+						float c=CalculateWeight(p4,p5);
 						// after
-						long d=CalculateWeight(p1,p3);
-						long e=CalculateWeight(p4,p2);
-						long f=CalculateWeight(p2,p5);
+						float d=CalculateWeight(p1,p3);
+						float e=CalculateWeight(p4,p2);
+						float f=CalculateWeight(p2,p5);
 						
 						if(a+b+c>d+e+f) {
 							once = 1;
@@ -139,13 +129,13 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 						int p3=solution[end  -2];
 						int p4=solution[end  -1];
 						int p5=solution[end    ];
-						long a=CalculateWeight(p1,p2);
-						long b=CalculateWeight(p3,p4);
-						long c=CalculateWeight(p4,p5);
+						float a=CalculateWeight(p1,p2);
+						float b=CalculateWeight(p3,p4);
+						float c=CalculateWeight(p4,p5);
 						// after
-						long d=CalculateWeight(p1,p4);
-						long e=CalculateWeight(p4,p2);
-						long f=CalculateWeight(p3,p5);
+						float d=CalculateWeight(p1,p4);
+						float e=CalculateWeight(p4,p2);
+						float f=CalculateWeight(p3,p5);
 						
 						if(a+b+c>d+e+f) {
 							once = 1;
@@ -184,7 +174,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	long time_limit=10*60*1000;  // 10 minutes
 	String dest;
 	int numPoints;
-	Point[] points = null;
+	Point2D[] points = null;
 	int[] solution = null;
 	int[] solution2 = null;
 	int image_width, image_height;
@@ -198,9 +188,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 
 	
-	protected long CalculateWeight(int a,int b) {
-		long x = points[a].x - points[b].x;
-		long y = points[a].y - points[b].y;
+	protected float CalculateWeight(int a,int b) {
+		float x = points[a].x - points[b].x;
+		float y = points[a].y - points[b].y;
 		return x*x+y*y;
 	}
 
@@ -270,7 +260,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		DrawbotGUI.getSingleton().Log("Finding greedy tour solution...\n");
 
 		int i;
-		long w, bestw;
+		float w, bestw;
 		int besti;
 		
 		// put all the points in the solution in no particular order.
@@ -315,8 +305,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		// find the tsp point closest to the calibration point
 		int i;
 		int besti=-1;
-		int bestw=1000000;
-		int x,y,w;
+		float bestw=1000000;
+		float x,y,w;
 		for(i=0;i<numPoints;++i) {
 			x=points[solution[i]].x-w2;
 			y=points[solution[i]].y-h2;
@@ -380,7 +370,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		}
 		
 		DrawbotGUI.getSingleton().Log(numPoints + " points\n");
-		points = new Point[numPoints+1];
+		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 		solution2 = new int[numPoints+1];
 
@@ -390,7 +380,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			for(x=0;x<image_width;++x) {
 				i=decode(img.getRGB(x,y));
 				if(i==0) {
-					points[numPoints++]=new Point(x,y);
+					points[numPoints++]=new Point2D(x,y);
 				}
 			}
 		}

@@ -693,13 +693,13 @@ static void processCommand() {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       if(!strncmp(ptr,"G20",3)) {
-        mode_scale=0.393700787;  // inches -> cm
+        mode_scale=24.5/10.0;  // inches -> cm
         strcpy(mode_name,"in");
-        Serial.println("scale: inches.");
+        printFeedRate();
       } else if(!strncmp(ptr,"G21",3)) {
         mode_scale=0.1;  // mm -> cm
         strcpy(mode_name,"mm");
-        Serial.println("scale: millimeters.");
+        printFeedRate();
       } else if(!strncmp(ptr,"G90",3)) {
         absolute_mode=1;
       } else if(!strncmp(ptr,"G91",3)) {
