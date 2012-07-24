@@ -134,13 +134,16 @@ static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 
 static Servo s1;
 
+// robot UID
+long robot_uid=0;
+
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
 // (normally this is the center of the drawing area)
-static float limit_top = 21.5;  // distance to top of drawing area.
-static float limit_bottom =-30.0;  // Distance to bottom of drawing area.
-static float limit_right = 14.0;  // Distance to right of drawing area.
-static float limit_left =-14.0;  // Distance to left of drawing area.
+static float limit_top = 0;  // distance to top of drawing area.
+static float limit_bottom = 0;  // Distance to bottom of drawing area.
+static float limit_right = 0;  // Distance to right of drawing area.
+static float limit_left = 0;  // Distance to left of drawing area.
 
 // plotter position.
 static float posx, velx, accelx;
@@ -507,7 +510,7 @@ static void printConfig() {
 
 //------------------------------------------------------------------------------
 // from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-void EEPROM_writeDouble(int ee, float value) {
+void EEPROM_writeLong(int ee, long value) {
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
   EEPROM.write(ee++, *p++);
@@ -516,8 +519,8 @@ void EEPROM_writeDouble(int ee, float value) {
 
 //------------------------------------------------------------------------------
 // from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-float EEPROM_readDouble(int ee) {
-  float value = 0.0;
+float EEPROM_readLong(int ee) {
+  long value = 0;
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
   *p++ = EEPROM.read(ee++);
@@ -526,25 +529,27 @@ float EEPROM_readDouble(int ee) {
 
 
 //------------------------------------------------------------------------------
-static void loadConfig() {
+static void LoadConfig() {
   char version=EEPROM.read(0);
   if(version==1) {
-    limit_top   =EEPROM_readDouble(1);
-    limit_bottom=EEPROM_readDouble(5);
-    limit_right =EEPROM_readDouble(9);
-    limit_left  =EEPROM_readDouble(13);
+    // update the version number
+    robot_uid=0;
+    EEPROM.write(0,2);
+    SaveUID();
+  } else if(version==2) {
+    robot_uid=EEPROM_readLong(1);
+  } else {
+    // update the version number
+    robot_uid=0;
+    EEPROM.write(0,2);
+    SaveUID();
   }
 }
 
 
 //------------------------------------------------------------------------------
-static void saveConfig() {
-  char version=1;
-  EEPROM.write( 0,version);
-  EEPROM_writeDouble( 1,limit_top);
-  EEPROM_writeDouble( 5,limit_bottom);
-  EEPROM_writeDouble( 9,limit_right);
-  EEPROM_writeDouble(13,limit_left);
+static void SaveUID() {
+  EEPROM_writeLong(1,robot_uid);
 }
 
 
@@ -553,6 +558,9 @@ static void processCommand() {
 #ifndef SMALL_FOOTPRINT
   if(!strncmp(buffer,"HELP",4)) {
     help();
+  } else if(!strncmp(buffer,"UID",3)) {
+    robot_uid=atol(strchr(buffer,' ')+1);
+    SaveUID();
   } else if(!strncmp(buffer,"HOME",4)) {
     goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
@@ -598,7 +606,6 @@ static void processCommand() {
     limit_right=rr;
     limit_left=ll;
     
-    saveConfig();
     printConfig();
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
@@ -720,19 +727,18 @@ static void processCommand() {
 
 //------------------------------------------------------------------------------
 void setup() {
+  LoadConfig();
+  
   // start communications
   Serial.begin(BAUD);
-  Serial.println("\n\n== HELLO WORLD ==");
+  Serial.print("\n\nHELLO WORLD! I AM DRAWBOT #");
+  Serial.println(robot_uid);
 
   // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
   setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
-  
-  // load the EEPROM values
-  loadConfig();
-  printConfig();
   
   // initialize the read buffer
   sofar=0;

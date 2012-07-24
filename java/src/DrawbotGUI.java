@@ -20,6 +20,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.prefs.Preferences;
 
@@ -53,6 +55,9 @@ public class DrawbotGUI
 	private String recentPort;
 	
 	// Robot config
+	private long   robot_uid=0;
+	private boolean new_robot_uid=false;
+	
 	private double limit_top=10;
 	private double limit_bottom=-10;
 	private double limit_left=-10;
@@ -95,7 +100,10 @@ public class DrawbotGUI
 	
 	
 	// Singleton stuff
-	private DrawbotGUI() {}
+	private DrawbotGUI() {
+		LoadConfig();
+	}
+	
 	
 	public static DrawbotGUI getSingleton() {
 		if(singletonObject==null) {
@@ -266,27 +274,81 @@ public class DrawbotGUI
 
 	
 
-	// complete the handshake, update the menu, repaint the preview with the limits.
+	/**
+	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
+	 * @return true if handshake succeeds.
+	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		int found=line3.lastIndexOf("== HELLO WORLD ==");
+		String hello = "HELLO WORLD! I AM DRAWBOT #";
+		int found=line3.lastIndexOf(hello);
 		if(found >= 0) {
-			String[] lines = line3.substring(found).split("\\r?\\n");
-			if(lines.length>=4) {
+			// get the UID reported by the robot
+			String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
+			if(lines.length>0) {
 				try {
-					limit_top = Float.parseFloat(lines[1].substring(1));
-					limit_bottom = Float.parseFloat(lines[2].substring(1));
-					limit_left = Float.parseFloat(lines[3].substring(1));
-					limit_right = Float.parseFloat(lines[4].substring(1));
-					portConfirmed=true;
-					UpdateMenuBar();
-					previewPane.setConnected(true);
-					previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+					robot_uid = Long.parseLong(lines[0]);
 				}
 				catch(NumberFormatException e) {}
 			}
+			
+			// new robots have UID=0
+			if(robot_uid==0) {
+				// Try to set a new one
+				GetNewRobotUID();
+			}
+			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid));
+
+			// load machine specific config
+			LoadConfig();
+			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
+				UpdateConfig();
+			} else {
+				SendConfig();
+			}
+			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			
+			// load last known paper for this machine
+			GetRecentPaperSize();
+			if(paper_top==0 && paper_bottom==0 && paper_left==0 && paper_right==0) {
+				UpdatePaper();
+			}
+
+			portConfirmed=true;
+			UpdateMenuBar();
+			previewPane.setConnected(true);
 		}
 		return portConfirmed;
+	}
+	
+
+	
+	/**
+	 * based on http://www.exampledepot.com/egs/java.net/Post.html
+	 */
+	private void GetNewRobotUID() {
+		try {
+		    // Send data
+			URL url = new URL("http://marginallyclever.com/drawbot_getuid.php");
+		    URLConnection conn = url.openConnection();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    robot_uid = Long.parseLong(rd.readLine());
+		    rd.close();
+		} catch (Exception e) {}
+
+		// did read go ok?
+		if(robot_uid!=0) {
+			// yes!
+			new_robot_uid=true;
+	
+			// send new value to robot
+			String line="UID "+robot_uid+";";
+			Log(line+NL);
+			try {
+				out.write(line.getBytes());
+			}
+			catch(IOException e) {}
+		}
 	}
 	
 	
@@ -327,20 +389,29 @@ public class DrawbotGUI
 	
 	// save paper limits
 	public void SetRecentPaperSize() {
-		prefs.putDouble("paper_left", paper_left);
-		prefs.putDouble("paper_right", paper_right);
-		prefs.putDouble("paper_top", paper_top);
-		prefs.putDouble("paper_bottom", paper_bottom);
+		String id=Long.toString(robot_uid);
+		prefs.putDouble(id+"_paper_left", paper_left);
+		prefs.putDouble(id+"_paper_right", paper_right);
+		prefs.putDouble(id+"_paper_top", paper_top);
+		prefs.putDouble(id+"_paper_bottom", paper_bottom);
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 
 	
 	
 	public void GetRecentPaperSize() {
-		paper_left=Double.parseDouble(prefs.get("paper_left","-10"));
-		paper_right=Double.parseDouble(prefs.get("paper_right","10"));
-		paper_top=Double.parseDouble(prefs.get("paper_top","10"));
-		paper_bottom=Double.parseDouble(prefs.get("paper_bottom","-10"));
+		if(new_robot_uid) {
+			String id = Long.toString(robot_uid);
+			paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
+			paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
+			paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
+			paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
+		} else {
+			paper_left=Double.parseDouble(prefs.get("paper_left","0"));
+			paper_right=Double.parseDouble(prefs.get("paper_right","0"));
+			paper_top=Double.parseDouble(prefs.get("paper_top","0"));
+			paper_bottom=Double.parseDouble(prefs.get("paper_bottom","0"));
+		}
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 
@@ -460,7 +531,10 @@ public class DrawbotGUI
 	}
 	
 	
-	// Opens the file.  If the file can be opened, repaint the preview tab.
+	/**
+	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
+	 * @param filename what file to open
+	 */
 	public void OpenFile(String filename) {
 		CloseFile();
 
@@ -494,8 +568,10 @@ public class DrawbotGUI
 	
 	
 	
-	// changes the order of the recent files list in the File submenu,
-	// saves the updated prefs, and refreshes the menus.
+	/**
+	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
+	 * @param filename the file to push to the top of the list.
+	 */
 	public void UpdateRecentFiles(String filename) {
 		int cnt = recentFiles.length;
 		String [] newFiles = new String[cnt];
@@ -628,7 +704,7 @@ public class DrawbotGUI
 	
 	
 	/**
-	 * Open the config dialog, send the config update to the robot, refresh the preview tab.
+	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
 	public void UpdateConfig() {
 		JTextField top = new JTextField(String.valueOf(limit_top));
@@ -636,30 +712,67 @@ public class DrawbotGUI
 		JTextField left = new JTextField(String.valueOf(limit_left));
 		JTextField right = new JTextField(String.valueOf(limit_right));
 		final JComponent[] inputs = new JComponent[] {
-						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
-		                new JLabel("Top"), 		top,
-		                new JLabel("Bottom"),	bottom,
-		                new JLabel("Left"), 	left,
-		                new JLabel("Right"), 	right
+			new JLabel("Please see https://github.com/i-make-robots/DrawBot/wiki/Using-the-Software for an explanation."),
+            new JLabel("Top"), 		top,
+            new JLabel("Bottom"),	bottom,
+            new JLabel("Left"), 	left,
+            new JLabel("Right"), 	right
 		};
-		JOptionPane.showMessageDialog(null, inputs, "Config machine limits", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(null, inputs, "Configure machine limits", JOptionPane.PLAIN_MESSAGE);
 
 		if(left.getText().trim()!="" || right.getText().trim()!="" ||
 			top.getText().trim()!="" || bottom.getText().trim()!="") {
-			// Send a command to the robot with new configuration values
-			String line="CONFIG T"+top.getText()+" B"+bottom.getText()+" L"+left.getText()+" R"+right.getText()+";";
-			Log(line+NL);
-
-			try {
-				out.write(line.getBytes());
-			}
-			catch(IOException e) {}
-			
 			limit_top = Float.valueOf(top.getText());
 			limit_bottom = Float.valueOf(bottom.getText());
 			limit_right = Float.valueOf(right.getText());
 			limit_left = Float.valueOf(left.getText());
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			SaveConfig();
+			SendConfig();
+		}
+	}
+	
+	
+
+	void SaveConfig() {
+		String id=Long.toString(robot_uid);
+		prefs.put(id+"_limit_top", Double.toString(limit_top));
+		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
+		prefs.put(id+"_limit_right", Double.toString(limit_right));
+		prefs.put(id+"_limit_left", Double.toString(limit_left));
+	}
+	
+	
+	
+	void SendConfig() {
+		// Send a command to the robot with new configuration values
+		String line="CONFIG T"+limit_top
+				   +" B"+limit_bottom
+				   +" L"+limit_left
+				   +" R"+limit_right
+				   +";";
+		Log(line+NL);
+
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+	}
+	
+	
+	
+	void LoadConfig() {
+		if(new_robot_uid) {
+			String id=Long.toString(robot_uid);
+			limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
+			limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
+			limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
+			limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
+		} else {
+			limit_top = Double.valueOf(prefs.get("limit_top", "0"));
+			limit_bottom = Double.valueOf(prefs.get("limit_bottom", "0"));
+			limit_left = Double.valueOf(prefs.get("limit_left", "0"));
+			limit_right = Double.valueOf(prefs.get("limit_right", "0"));
 		}
 	}
 
@@ -696,7 +809,7 @@ public class DrawbotGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
+		if(running==false || paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
 		
 		String line;
 		do {			
