@@ -1206,7 +1206,9 @@ public class DrawbotGUI
         buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
         for(i=0;i<portsDetected.length;++i) {
         	buttonPorts[i] = new JRadioButtonMenuItem(portsDetected[i]);
-            if(recentPort.equals(portsDetected[i])) buttonPorts[i].setSelected(true);
+            if(recentPort.equals(portsDetected[i]) && portOpened) {
+            	buttonPorts[i].setSelected(true);
+            }
             buttonPorts[i].addActionListener(this);
             group.add(buttonPorts[i]);
             subMenu.add(buttonPorts[i]);
