@@ -20,6 +20,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.prefs.Preferences;
 
@@ -53,6 +55,9 @@ public class DrawbotGUI
 	private String recentPort;
 	
 	// Robot config
+	private long   robot_uid=0;
+	private boolean new_robot_uid=false;
+	
 	private double limit_top=10;
 	private double limit_bottom=-10;
 	private double limit_left=-10;
@@ -70,6 +75,7 @@ public class DrawbotGUI
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
+    private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
@@ -86,15 +92,18 @@ public class DrawbotGUI
 	// reading file
 	private boolean running=false;
 	private boolean paused=true;
-	private Scanner scanner;
     private long linesTotal=0;
 	private long linesProcessed=0;
 	private boolean fileOpened=false;
 	private ArrayList<String> gcode;
+	private float estimated_time=0;
 	
 	
 	// Singleton stuff
-	private DrawbotGUI() {}
+	private DrawbotGUI() {
+		LoadConfig();
+	}
+	
 	
 	public static DrawbotGUI getSingleton() {
 		if(singletonObject==null) {
@@ -143,6 +152,15 @@ public class DrawbotGUI
 			tsp.Process(img);
 		}
 		catch(IOException e) {}
+	}
+
+
+	
+	// returns angle of dy/dx as a value from 0...2PI
+	private double atan3(double dy,double dx) {
+	  double a=Math.atan2(dy,dx);
+	  if(a<0) a=(Math.PI*2.0)+a;
+	  return a;
 	}
 	
 	
@@ -256,27 +274,81 @@ public class DrawbotGUI
 
 	
 
-	// complete the handshake, update the menu, repaint the preview with the limits.
+	/**
+	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
+	 * @return true if handshake succeeds.
+	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		int found=line3.lastIndexOf("== HELLO WORLD ==");
+		String hello = "HELLO WORLD! I AM DRAWBOT #";
+		int found=line3.lastIndexOf(hello);
 		if(found >= 0) {
-			String[] lines = line3.substring(found).split("\\r?\\n");
-			if(lines.length>=4) {
+			// get the UID reported by the robot
+			String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
+			if(lines.length>0) {
 				try {
-					limit_top = Float.parseFloat(lines[1].substring(1));
-					limit_bottom = Float.parseFloat(lines[2].substring(1));
-					limit_left = Float.parseFloat(lines[3].substring(1));
-					limit_right = Float.parseFloat(lines[4].substring(1));
-					portConfirmed=true;
-					UpdateMenuBar();
-					previewPane.setConnected(true);
-					previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+					robot_uid = Long.parseLong(lines[0]);
 				}
 				catch(NumberFormatException e) {}
 			}
+			
+			// new robots have UID=0
+			if(robot_uid==0) {
+				// Try to set a new one
+				GetNewRobotUID();
+			}
+			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid));
+
+			// load machine specific config
+			LoadConfig();
+			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
+				UpdateConfig();
+			} else {
+				SendConfig();
+			}
+			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			
+			// load last known paper for this machine
+			GetRecentPaperSize();
+			if(paper_top==0 && paper_bottom==0 && paper_left==0 && paper_right==0) {
+				UpdatePaper();
+			}
+
+			portConfirmed=true;
+			UpdateMenuBar();
+			previewPane.setConnected(true);
 		}
 		return portConfirmed;
+	}
+	
+
+	
+	/**
+	 * based on http://www.exampledepot.com/egs/java.net/Post.html
+	 */
+	private void GetNewRobotUID() {
+		try {
+		    // Send data
+			URL url = new URL("http://marginallyclever.com/drawbot_getuid.php");
+		    URLConnection conn = url.openConnection();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    robot_uid = Long.parseLong(rd.readLine());
+		    rd.close();
+		} catch (Exception e) {}
+
+		// did read go ok?
+		if(robot_uid!=0) {
+			// yes!
+			new_robot_uid=true;
+	
+			// send new value to robot
+			String line="UID "+robot_uid+";";
+			Log(line+NL);
+			try {
+				out.write(line.getBytes());
+			}
+			catch(IOException e) {}
+		}
 	}
 	
 	
@@ -317,20 +389,29 @@ public class DrawbotGUI
 	
 	// save paper limits
 	public void SetRecentPaperSize() {
-		prefs.putDouble("paper_left", paper_left);
-		prefs.putDouble("paper_right", paper_right);
-		prefs.putDouble("paper_top", paper_top);
-		prefs.putDouble("paper_bottom", paper_bottom);
+		String id=Long.toString(robot_uid);
+		prefs.putDouble(id+"_paper_left", paper_left);
+		prefs.putDouble(id+"_paper_right", paper_right);
+		prefs.putDouble(id+"_paper_top", paper_top);
+		prefs.putDouble(id+"_paper_bottom", paper_bottom);
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 
 	
 	
 	public void GetRecentPaperSize() {
-		paper_left=Double.parseDouble(prefs.get("paper_left","-10"));
-		paper_right=Double.parseDouble(prefs.get("paper_right","10"));
-		paper_top=Double.parseDouble(prefs.get("paper_top","10"));
-		paper_bottom=Double.parseDouble(prefs.get("paper_bottom","-10"));
+		if(new_robot_uid) {
+			String id = Long.toString(robot_uid);
+			paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
+			paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
+			paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
+			paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
+		} else {
+			paper_left=Double.parseDouble(prefs.get("paper_left","0"));
+			paper_right=Double.parseDouble(prefs.get("paper_right","0"));
+			paper_top=Double.parseDouble(prefs.get("paper_top","0"));
+			paper_bottom=Double.parseDouble(prefs.get("paper_bottom","0"));
+		}
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 
@@ -338,18 +419,127 @@ public class DrawbotGUI
 	
 	// close the file, clear the preview tab
 	public void CloseFile() {
-		if(fileOpened==true && scanner != null) scanner.close();
-	   	fileOpened=false;
+		if(fileOpened==true) {
+			fileOpened=false;
+		}
 	}
 	
 	
+	void EstimateDrawTime() {
+		int i,j;
+		
+		float drawScale=1.0f;
+		double px=0,py=0,pz=0;
+		float feed_rate=1.0f;
+		
+		estimated_time=0;
+		float estimated_length=0;
+		int estimate_count=0;
+		
+		for(i=0;i<gcode.size();++i) {
+			String line=gcode.get(i);
+			String[] pieces=line.split(";");
+			if(pieces.length==0) continue;
+			
+			String[] tokens = pieces[0].split("\\s");
+			if(tokens.length==0) continue;
+
+			for(j=0;j<tokens.length;++j) {
+				if(tokens[j].equals("G20")) drawScale=0.393700787f;
+				if(tokens[j].equals("G21")) drawScale=0.1f;
+				if(tokens[j].startsWith("F")) {
+					feed_rate=Float.valueOf(tokens[j].substring(1)) * drawScale;
+					Log("feed rate="+feed_rate+"\n");
+					feed_rate*=1;
+				}
+			}
+			
+			double x=px;
+			double y=py;
+			double z=pz;
+			double ai=px;
+			double aj=py;
+			for(j=1;j<tokens.length;++j) {
+				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
+			}
+			
+			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
+			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
+				// draw a line
+				double ddx=x-px;
+				double ddy=y-py;
+				double dd=Math.sqrt(ddx*ddx+ddy*ddy);
+				estimated_time+=dd/feed_rate;
+				estimated_length+=dd;
+				++estimate_count;
+				px=x;
+				py=y;
+				pz=z;
+			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
+					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
+				// draw an arc
+				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
+				double dx=px - ai;
+				double dy=py - aj;
+				double radius=Math.sqrt(dx*dx+dy*dy);
+
+				// find angle of arc (sweep)
+				double angle1=atan3(dy,dx);
+				double angle2=atan3(y-aj,x-ai);
+				double theta=angle2-angle1;
+
+				if(dir>0 && theta<0) angle2+=2.0*Math.PI;
+				else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
+
+				theta=Math.abs(angle2-angle1);
+
+				// Draw the arc from a lot of little line segments.
+				for(int k=0;k<=theta*DrawPanel.STEPS_PER_DEGREE;++k) {
+					double angle3 = (angle2-angle1) * ((double)k/(theta*DrawPanel.STEPS_PER_DEGREE)) + angle1;
+					float nx = (float)(ai + Math.cos(angle3) * radius);
+				    float ny = (float)(aj + Math.sin(angle3) * radius);
+
+
+					double ddx=nx-px;
+					double ddy=ny-py;
+					double dd=Math.sqrt(ddx*ddx+ddy*ddy);
+					estimated_time+=dd/feed_rate;
+					estimated_length+=dd;
+					++estimate_count;
+					px=nx;
+					py=ny;
+				}
+				double ddx=x-px;
+				double ddy=y-py;
+				double dd=Math.sqrt(ddx*ddx+ddy*ddy);
+				estimated_time+=dd/feed_rate;
+				estimated_length+=dd;
+				++estimate_count;
+				px=x;
+				py=y;
+				pz=z;
+			}
+		}  // for ( each instruction )
+	   	Log(estimate_count + " line segments.\n");
+	   	Log(estimated_length+ "cm of line.\n");
+	   	estimated_time += estimate_count * 0.007617845117845f;
+	   	Log("Estimated "+statusBar.formatTime((long)(estimated_time*10000))+"s to draw.\n");
+	}
 	
-	// Opens the file.  If the file can be opened, repaint the preview tab.
+	
+	/**
+	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
+	 * @param filename what file to open
+	 */
 	public void OpenFile(String filename) {
 		CloseFile();
 
 	    try {
-	    	scanner = new Scanner(new FileInputStream(filename));
+	    	Scanner scanner = new Scanner(new FileInputStream(filename));
 	    	linesTotal=0;
 	    	gcode = new ArrayList<String>();
 		    try {
@@ -361,29 +551,27 @@ public class DrawbotGUI
 		    finally{
 		      scanner.close();
 		    }
-
-    		scanner = new Scanner(new FileInputStream(filename));
 	    }
 	    catch(IOException e) {
 	    	Log("File could not be opened."+NL);
 	    	RemoveRecentFile(filename);
 	    	return;
 	    }
-		
-	   	UpdateRecentFiles(filename);
-
-	   	Log(linesTotal + " lines.\n");
+	    
+	    previewPane.setGCode(gcode);
 	    fileOpened=true;
-	    paused=true;
-	    linesProcessed=0;
-	    previewPane.setLinesProcessed(linesProcessed);
-	    previewPane.repaint();
+
+	   	EstimateDrawTime();
+	   	UpdateRecentFiles(filename);
+	    Halt();
 	}
 	
 	
 	
-	// changes the order of the recent files list in the File submenu,
-	// saves the updated prefs, and refreshes the menus.
+	/**
+	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
+	 * @param filename the file to push to the top of the list.
+	 */
 	public void UpdateRecentFiles(String filename) {
 		int cnt = recentFiles.length;
 		String [] newFiles = new String[cnt];
@@ -402,7 +590,9 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<cnt;++i) {
-			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+			if(!recentFiles[i].isEmpty()) {
+				prefs.put("recent-files-"+i, recentFiles[i]);
+			}
 		}
 		
 		UpdateMenuBar();
@@ -425,7 +615,9 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<recentFiles.length;++i) {
-			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+			if(!recentFiles[i].isEmpty()) {
+				prefs.put("recent-files-"+i, recentFiles[i]);
+			}
 		}
 		
 		UpdateMenuBar();
@@ -449,10 +641,7 @@ public class DrawbotGUI
 		
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	if(!ext.equalsIgnoreCase(".ngc")) {
-//    		String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-//    		if(!(new File(ngcPair)).exists()) {
-    			LoadImage(filename);
-//    		}
+   			LoadImage(filename);
     	} else {
     		OpenFile(filename);
     	}
@@ -519,7 +708,7 @@ public class DrawbotGUI
 	
 	
 	/**
-	 * Open the config dialog, send the config update to the robot, refresh the preview tab.
+	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
 	public void UpdateConfig() {
 		JTextField top = new JTextField(String.valueOf(limit_top));
@@ -527,30 +716,75 @@ public class DrawbotGUI
 		JTextField left = new JTextField(String.valueOf(limit_left));
 		JTextField right = new JTextField(String.valueOf(limit_right));
 		final JComponent[] inputs = new JComponent[] {
-						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
-		                new JLabel("Top"), 		top,
-		                new JLabel("Bottom"),	bottom,
-		                new JLabel("Left"), 	left,
-		                new JLabel("Right"), 	right
+			new JLabel("Please see https://github.com/i-make-robots/DrawBot/wiki/Using-the-Software for an explanation."),
+            new JLabel("Top"), 		top,
+            new JLabel("Bottom"),	bottom,
+            new JLabel("Left"), 	left,
+            new JLabel("Right"), 	right
 		};
-		JOptionPane.showMessageDialog(null, inputs, "Config machine limits", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(null, inputs, "Configure machine limits", JOptionPane.PLAIN_MESSAGE);
 
 		if(left.getText().trim()!="" || right.getText().trim()!="" ||
 			top.getText().trim()!="" || bottom.getText().trim()!="") {
-			// Send a command to the robot with new configuration values
-			String line="CONFIG T"+top.getText()+" B"+bottom.getText()+" L"+left.getText()+" R"+right.getText()+";";
-			Log(line+NL);
-
-			try {
-				out.write(line.getBytes());
-			}
-			catch(IOException e) {}
-			
 			limit_top = Float.valueOf(top.getText());
 			limit_bottom = Float.valueOf(bottom.getText());
 			limit_right = Float.valueOf(right.getText());
 			limit_left = Float.valueOf(left.getText());
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			SaveConfig();
+			SendConfig();
+		}
+	}
+	
+	
+
+	void SaveConfig() {
+		String id=Long.toString(robot_uid);
+		prefs.put(id+"_limit_top", Double.toString(limit_top));
+		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
+		prefs.put(id+"_limit_right", Double.toString(limit_right));
+		prefs.put(id+"_limit_left", Double.toString(limit_left));
+	}
+	
+	
+	
+	void SendConfig() {
+		// Send a command to the robot with new configuration values
+		String line="CONFIG T"+limit_top
+				   +" B"+limit_bottom
+				   +" L"+limit_left
+				   +" R"+limit_right
+				   +";";
+		Log(line+NL);
+
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+
+		line="TELEPORT X0 Y0 Z0;";
+		Log(line+NL);
+
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+	}
+	
+	
+	
+	void LoadConfig() {
+		if(new_robot_uid) {
+			String id=Long.toString(robot_uid);
+			limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
+			limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
+			limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
+			limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
+		} else {
+			limit_top = Double.valueOf(prefs.get("limit_top", "0"));
+			limit_bottom = Double.valueOf(prefs.get("limit_bottom", "0"));
+			limit_left = Double.valueOf(prefs.get("limit_left", "0"));
+			limit_right = Double.valueOf(prefs.get("limit_right", "0"));
 		}
 	}
 
@@ -587,13 +821,12 @@ public class DrawbotGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
+		if(running==false || paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
 		
 		String line;
 		do {			
 			// are there any more commands?
-			line=scanner.nextLine().trim();
-			++linesProcessed;
+			line=gcode.get((int)linesProcessed++).trim();
 			previewPane.setLinesProcessed(linesProcessed);
 			statusBar.SetProgress(linesProcessed, linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
@@ -654,10 +887,7 @@ public class DrawbotGUI
 		
 		// end of program?
 		if(tokens[0]=="M02" || tokens[0]=="M2") {
-			running=false;
-			previewPane.setRunning(running);
-			CloseFile();
-			Log(line+NL);
+			Halt();
 			return false;
 		}
 		
@@ -698,11 +928,11 @@ public class DrawbotGUI
 	 * @todo add an e-stop command?
 	 */
 	public void Halt() {
-		CloseFile();
-		OpenFile(recentFiles[0]);
 		running=false;
+		paused=false;
+	    linesProcessed=0;
+	    previewPane.setLinesProcessed(0);
 		previewPane.setRunning(running);
-		paused=true;
 		UpdateMenuBar();
 	}
 	
@@ -712,13 +942,23 @@ public class DrawbotGUI
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
+		if(subject == buttonZoomIn) {
+			System.out.println("A");
+			previewPane.ZoomIn();
+			return;
+		}
+		if(subject == buttonZoomOut) {
+			System.out.println("B");
+			previewPane.ZoomOut();
+			return;
+		}
 		if(subject == buttonOpenFile) {
 			OpenFileDialog();
 			return;
 		}
 
 		if( subject == buttonStart ) {
-			if(fileOpened) OpenFile(recentFiles[0]);
+			//if(fileOpened) OpenFile(recentFiles[0]);
 			if(fileOpened) {
 				paused=false;
 				running=true;
@@ -770,7 +1010,7 @@ public class DrawbotGUI
 		if( subject == buttonLoad ) {
 			UpdateLoad();
 			return;
-		}	
+		}
 		if(subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
 					+"Find out more at http://www.marginallyclever.com/"+NL
@@ -881,7 +1121,7 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
-		c.gridx=6;  c.gridy=0;  driver.add(home,c);
+		//c.gridx=6;  c.gridy=0;  driver.add(home,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -947,8 +1187,10 @@ public class DrawbotGUI
         	for(i=0;i<recentFiles.length;++i) {
         		if(recentFiles[i].length()==0) break;
             	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-            	buttonRecent[i].addActionListener(this);
-            	menu.add(buttonRecent[i]);
+            	if(buttonRecent[i]!=null) {
+            		buttonRecent[i].addActionListener(this);
+            		menu.add(buttonRecent[i]);
+            	}
         	}
         	if(i!=0) menu.addSeparator();
         }
@@ -976,7 +1218,9 @@ public class DrawbotGUI
         buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
         for(i=0;i<portsDetected.length;++i) {
         	buttonPorts[i] = new JRadioButtonMenuItem(portsDetected[i]);
-            if(recentPort.equals(portsDetected[i])) buttonPorts[i].setSelected(true);
+            if(recentPort.equals(portsDetected[i]) && portOpened) {
+            	buttonPorts[i].setSelected(true);
+            }
             buttonPorts[i].addActionListener(this);
             group.add(buttonPorts[i]);
             subMenu.add(buttonPorts[i]);
@@ -1044,7 +1288,21 @@ public class DrawbotGUI
         menu.add(buttonDrive);
 
         menuBar.add(menu);
-
+        
+        // tools menu
+        menu = new JMenu("Tools");
+        buttonZoomOut = new JMenuItem("Zoom -");
+        buttonZoomOut.addActionListener(this);
+        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
+        menu.add(buttonZoomOut);
+        
+        buttonZoomIn = new JMenuItem("Zoom +",KeyEvent.VK_EQUALS);
+        buttonZoomIn.addActionListener(this);
+        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
+        menu.add(buttonZoomIn);
+        
+        menuBar.add(menu);
+        
         //Build in the menu bar.
         menu = new JMenu("Help");
         menu.setMnemonic(KeyEvent.VK_H);
@@ -1080,16 +1338,20 @@ public class DrawbotGUI
         
         // status bar
         statusBar = new StatusBar();
+        Font f = statusBar.getFont();
+        statusBar.setFont(f.deriveFont(Font.BOLD,15));
+        Dimension d=statusBar.getMinimumSize();
+        d.setSize(d.getWidth(), d.getHeight()+30);
+        statusBar.setMinimumSize(d);
 
         // layout
         Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
-        //split.add(tabs);
         split.add(previewPane);
         split.add(logPane);
-        split.setDividerSize(2);
-        
-        contentPane.add(split,BorderLayout.CENTER);
+        split.setDividerSize(8);
+
         contentPane.add(statusBar,BorderLayout.SOUTH);
+        contentPane.add(split,BorderLayout.CENTER);
 
         // open the file
 		GetRecentFiles();
