@@ -161,6 +161,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// draw background
 		if(!connected) {			
 			setBackground(Color.GRAY);
+			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
+			g2d.drawRect((int)TX(limit_left),(int)TY(limit_top),
+					(int)((limit_right-limit_left)*cameraZoom),
+					(int)((limit_top-limit_bottom)*cameraZoom));
 			g2d.setColor(Color.WHITE);
 			g2d.drawRect((int)TX(paper_left),(int)TY(paper_top),
 					(int)((paper_right-paper_left)*cameraZoom),
