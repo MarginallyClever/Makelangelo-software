@@ -590,7 +590,9 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<cnt;++i) {
-			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+			if(!recentFiles[i].isEmpty()) {
+				prefs.put("recent-files-"+i, recentFiles[i]);
+			}
 		}
 		
 		UpdateMenuBar();
@@ -613,7 +615,9 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<recentFiles.length;++i) {
-			if(recentFiles[i] != null) prefs.put("recent-files-"+i, recentFiles[i]);
+			if(!recentFiles[i].isEmpty()) {
+				prefs.put("recent-files-"+i, recentFiles[i]);
+			}
 		}
 		
 		UpdateMenuBar();
@@ -751,6 +755,14 @@ public class DrawbotGUI
 				   +" L"+limit_left
 				   +" R"+limit_right
 				   +";";
+		Log(line+NL);
+
+		try {
+			out.write(line.getBytes());
+		}
+		catch(IOException e) {}
+
+		line="TELEPORT X0 Y0 Z0;";
 		Log(line+NL);
 
 		try {
@@ -946,7 +958,7 @@ public class DrawbotGUI
 		}
 
 		if( subject == buttonStart ) {
-			if(fileOpened) OpenFile(recentFiles[0]);
+			//if(fileOpened) OpenFile(recentFiles[0]);
 			if(fileOpened) {
 				paused=false;
 				running=true;
@@ -1109,7 +1121,7 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
-		c.gridx=6;  c.gridy=0;  driver.add(home,c);
+		//c.gridx=6;  c.gridy=0;  driver.add(home,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
