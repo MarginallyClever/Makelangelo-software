@@ -68,12 +68,14 @@ public class DrawbotGUI
 	private double paper_bottom=-10;
 	private double paper_left=-10;
 	private double paper_right=10;
+	private boolean m1invert=false;
+	private boolean m2invert=false;
 	
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonLoad;
+    private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonJogMotors;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout;
@@ -104,7 +106,6 @@ public class DrawbotGUI
 		LoadConfig();
 	}
 	
-	
 	public static DrawbotGUI getSingleton() {
 		if(singletonObject==null) {
 			singletonObject = new DrawbotGUI();
@@ -112,12 +113,10 @@ public class DrawbotGUI
 		return singletonObject;
 	}
 	
-	
 	//  data access
 	public ArrayList<String> getGcode() {
 		return gcode;
 	}
-	
 
 	// manages the vertical split in the GUI
 	public class Splitter extends JSplitPane {
@@ -129,8 +128,6 @@ public class DrawbotGUI
 			setDividerLocation(0.9);
 		}
 	}
-	
-	
 	
 	public void LoadImage(String filename) {
 		BufferedImage img;
@@ -154,8 +151,6 @@ public class DrawbotGUI
 		catch(IOException e) {}
 	}
 
-
-	
 	// returns angle of dy/dx as a value from 0...2PI
 	private double atan3(double dy,double dx) {
 	  double a=Math.atan2(dy,dx);
@@ -163,15 +158,11 @@ public class DrawbotGUI
 	  return a;
 	}
 	
-	
-	
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
 		log.append(msg);
 		log.setCaretPosition(log.getText().length());
 	}
-	
-	
 		
 	public void ClosePort() {
 		if(portOpened) {
@@ -195,8 +186,6 @@ public class DrawbotGUI
 			UpdateMenuBar();
 		}
 	}
-	
-	
 	
 	// open a serial connection to a device.  We won't know it's the robot until  
 	public int OpenPort(String portName) {
@@ -272,8 +261,6 @@ public class DrawbotGUI
 		return 0;
 	}
 
-	
-
 	/**
 	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
 	 * @return true if handshake succeeds.
@@ -297,7 +284,7 @@ public class DrawbotGUI
 				// Try to set a new one
 				GetNewRobotUID();
 			}
-			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid));
+			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid)+" connected");
 
 			// load machine specific config
 			LoadConfig();
@@ -320,8 +307,6 @@ public class DrawbotGUI
 		}
 		return portConfirmed;
 	}
-	
-
 	
 	/**
 	 * based on http://www.exampledepot.com/egs/java.net/Post.html
@@ -351,8 +336,6 @@ public class DrawbotGUI
 		}
 	}
 	
-	
-	
 	// find all available serial ports for the settings->ports menu.
 	public String[] ListSerialPorts() {
 		@SuppressWarnings("unchecked")
@@ -368,14 +351,10 @@ public class DrawbotGUI
 	    return portsDetected;
 	}
 	
-	
-	
 	// pull the last connected port from prefs
 	public void GetRecentPort() {
 		recentPort = prefs.get("recent-port", portsDetected[0]);
 	}
-
-	
 	
 	// update the prefs with the last port connected and refreshes the menus.
 	// @TODO: only update when the port is confirmed?
@@ -384,8 +363,6 @@ public class DrawbotGUI
 		recentPort=portName;
 		UpdateMenuBar();
 	}
-	
-
 	
 	// save paper limits
 	public void SetRecentPaperSize() {
@@ -396,8 +373,6 @@ public class DrawbotGUI
 		prefs.putDouble(id+"_paper_bottom", paper_bottom);
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
-
-	
 	
 	public void GetRecentPaperSize() {
 		if(new_robot_uid) {
@@ -414,8 +389,6 @@ public class DrawbotGUI
 		}
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
-
-	
 	
 	// close the file, clear the preview tab
 	public void CloseFile() {
@@ -423,7 +396,6 @@ public class DrawbotGUI
 			fileOpened=false;
 		}
 	}
-	
 	
 	void EstimateDrawTime() {
 		int i,j;
@@ -530,7 +502,6 @@ public class DrawbotGUI
 	   	Log("Estimated "+statusBar.formatTime((long)(estimated_time*10000))+"s to draw.\n");
 	}
 	
-	
 	/**
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
@@ -566,8 +537,6 @@ public class DrawbotGUI
 	    Halt();
 	}
 	
-	
-	
 	/**
 	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
 	 * @param filename the file to push to the top of the list.
@@ -598,8 +567,6 @@ public class DrawbotGUI
 		UpdateMenuBar();
 	}
 	
-	
-
 	// A file failed to load.  Remove it from recent files, refresh the menu bar.
 	public void RemoveRecentFile(String filename) {
 		int i;
@@ -623,8 +590,6 @@ public class DrawbotGUI
 		UpdateMenuBar();
 	}
 	
-	
-	
 	// Load recent files from prefs
 	public void GetRecentFiles() {
 		int i;
@@ -633,8 +598,6 @@ public class DrawbotGUI
 		}
 	}	
 	
-	
-
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
 		Log("Opening file "+recentFiles[0]+"..."+NL);
@@ -649,8 +612,6 @@ public class DrawbotGUI
     	statusBar.Clear();
 	}
 
-	
-	
 	// creates a file open dialog. If you don't cancel it opens that file.
 	public void OpenFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
@@ -668,8 +629,6 @@ public class DrawbotGUI
 	    }
 	}
 	
-	
-	
 	public void GoHome() {
 		String line="HOME;";
 		Log(line+NL);
@@ -678,34 +637,6 @@ public class DrawbotGUI
 		}
 		catch(IOException e) {}
 	}
-	
-	
-	
-	/**
-	 * Open the load dialog, load the spools.
-	 */
-	public void UpdateLoad() {
-		JTextField left = new JTextField("500");
-		JTextField right = new JTextField("500");
-		final JComponent[] inputs = new JComponent[] {
-						new JLabel("Measurements are in cm.  Positive value winds in."),
-		                new JLabel("Left"), 	left,
-		                new JLabel("Right"), 	right
-		};
-		JOptionPane.showMessageDialog(null, inputs, "Load Bobbins", JOptionPane.PLAIN_MESSAGE);
-
-		String line="LOAD";
-		if(left.getText().trim() !="") line+=" L"+left.getText().trim();
-		if(right.getText().trim()!="") line+=" R"+right.getText().trim();
-		line+=";";
-		Log(line+NL);
-		try {
-			out.write(line.getBytes());
-		}
-		catch(IOException e) {}
-	}
-
-	
 	
 	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
@@ -735,44 +666,7 @@ public class DrawbotGUI
 			SendConfig();
 		}
 	}
-	
-	
 
-	void SaveConfig() {
-		String id=Long.toString(robot_uid);
-		prefs.put(id+"_limit_top", Double.toString(limit_top));
-		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
-		prefs.put(id+"_limit_right", Double.toString(limit_right));
-		prefs.put(id+"_limit_left", Double.toString(limit_left));
-	}
-	
-	
-	
-	void SendConfig() {
-		// Send a command to the robot with new configuration values
-		String line="CONFIG T"+limit_top
-				   +" B"+limit_bottom
-				   +" L"+limit_left
-				   +" R"+limit_right
-				   +";";
-		Log(line+NL);
-
-		try {
-			out.write(line.getBytes());
-		}
-		catch(IOException e) {}
-
-		line="TELEPORT X0 Y0 Z0;";
-		Log(line+NL);
-
-		try {
-			out.write(line.getBytes());
-		}
-		catch(IOException e) {}
-	}
-	
-	
-	
 	void LoadConfig() {
 		if(new_robot_uid) {
 			String id=Long.toString(robot_uid);
@@ -780,15 +674,41 @@ public class DrawbotGUI
 			limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
 			limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
 			limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
+			m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
+			m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
 		} else {
 			limit_top = Double.valueOf(prefs.get("limit_top", "0"));
 			limit_bottom = Double.valueOf(prefs.get("limit_bottom", "0"));
 			limit_left = Double.valueOf(prefs.get("limit_left", "0"));
 			limit_right = Double.valueOf(prefs.get("limit_right", "0"));
+			m1invert=Boolean.parseBoolean(prefs.get("m1invert", "false"));
+			m2invert=Boolean.parseBoolean(prefs.get("m2invert", "false"));
 		}
 	}
 
+	void SaveConfig() {
+		String id=Long.toString(robot_uid);
+		prefs.put(id+"_limit_top", Double.toString(limit_top));
+		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
+		prefs.put(id+"_limit_right", Double.toString(limit_right));
+		prefs.put(id+"_limit_left", Double.toString(limit_left));
+		prefs.put(id+"_m1invert",Boolean.toString(m1invert));
+		prefs.put(id+"_m2invert",Boolean.toString(m2invert));
+	}
 	
+	void SendConfig() {
+		if(!portConfirmed) return;
+		
+		// Send a command to the robot with new configuration values
+		String line="CONFIG T"+limit_top
+				   +" B"+limit_bottom
+				   +" L"+limit_left
+				   +" R"+limit_right
+                   +" I"+(m1invert?"-1":"1")
+                   +" J"+(m2invert?"-1":"1");
+		SendLineToRobot(line);
+		SendLineToRobot("TELEPORT X0 Y0 Z0");
+	}
 	
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
@@ -817,8 +737,6 @@ public class DrawbotGUI
 		}
 	}
 
-	
-	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
 		if(running==false || paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
@@ -831,7 +749,7 @@ public class DrawbotGUI
 			statusBar.SetProgress(linesProcessed, linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while(!SendLineToRobot(line) && linesProcessed<linesTotal);
+		} while(ProcessLine(line) && linesProcessed<linesTotal);
 		
 		if(linesProcessed==linesTotal) {
 			// end of file
@@ -839,38 +757,12 @@ public class DrawbotGUI
 		}
 	}
 	
-	
-	
-	// last minute scale & translate the image 
-	public String ProcessLine(String line) {
-/*
- 		String newLine = "";
-		String first="";
-		
-		double f;
-		String[] tokens = line.split("\\s");
-		int j;
-		for(j=0;j<tokens.length;++j) {
-			newLine+=first;
-			     if(tokens[j].startsWith("X")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale)-imageOffsetX;  newLine+="X"+f;  }
-			else if(tokens[j].startsWith("Y")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale)-imageOffsetY;  newLine+="Y"+f;  }
-			else if(tokens[j].startsWith("Z")) {  f =  Float.valueOf(tokens[j].substring(1));                           newLine+="Z"+f;  }
-			else if(tokens[j].startsWith("I")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale);               newLine+="I"+f;  }
-			else if(tokens[j].startsWith("J")) {  f = (Float.valueOf(tokens[j].substring(1))*imageScale);               newLine+="J"+f;  }
-			else newLine+=tokens[j];
-			first=" ";
-		}
-		return newLine;
-*/
-		return line;
-	}
-	
-	
-	
-	// processes a single instruction meant for the robot.  Could be anything.
-	// return true if the command is sent to the robot.
-	// return false if it is not.
-	public boolean SendLineToRobot(String line) {
+	/**
+	 * removes comments, processes commands drawbot shouldn't have to handle.
+	 * @param line command to send
+	 * @return true if the robot is ready for another command to be sent.
+	 */
+	public boolean ProcessLine(String line) {
 		// tool change request?
 		String [] tokens = line.split("\\s");
 
@@ -882,7 +774,7 @@ public class DrawbotGUI
 				}
 			}
 			// still ready to send
-			return false;
+			return true;
 		}
 		
 		// end of program?
@@ -894,7 +786,7 @@ public class DrawbotGUI
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
 			Log(line+NL);
-			return false;
+			return true;
 		} 
 
 		// contains a comment?  if so remove it
@@ -905,23 +797,31 @@ public class DrawbotGUI
 			Log("* "+comment+NL);
 			if(line.length()==0) {
 				// entire line was a comment.
-				return false;  // still ready to send
+				return true;  // still ready to send
 			}
 		}
 
 		// send relevant part of line to the robot
-		line=ProcessLine(line)+eol;
+		SendLineToRobot(line);
+		
+		return false;
+	}
+	
+	/**
+	 * processes a single instruction meant for the robot.  Could be anything.
+	 * @param line command to send.
+	 * @return true means the command is sent.  false means it was not.
+	 */
+	public void SendLineToRobot(String line) {
+		if(!portConfirmed) return;
+		
+		line+=eol;
 		Log(line+NL);
 		try {
 			out.write(line.getBytes());
 		}
 		catch(IOException e) {}
-		
-		return true;
 	}
-	
-	
-	
 	
 	/**
 	 * stop sending commands to the robot.
@@ -935,8 +835,6 @@ public class DrawbotGUI
 		previewPane.setRunning(running);
 		UpdateMenuBar();
 	}
-	
-	
 	
 	// The user has done something.  respond to it.
 	public void actionPerformed(ActionEvent e) {
@@ -1007,8 +905,8 @@ public class DrawbotGUI
 			UpdatePaper();
 			return;
 		}
-		if( subject == buttonLoad ) {
-			UpdateLoad();
+		if( subject == buttonJogMotors ) {
+			JogMotors();
 			return;
 		}
 		if(subject == buttonAbout ) {
@@ -1038,8 +936,6 @@ public class DrawbotGUI
 		}
 	}
 	
-	
-	
 	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
         switch (events.getEventType()) {
@@ -1063,20 +959,7 @@ public class DrawbotGUI
                 break;
         }
     }
-	
-	
 
-	public JMenuBar CreateMenuBar() {
-        // If the menu bar exists, empty it.  If it doesn't exist, create it.
-        menuBar = new JMenuBar();
-
-        UpdateMenuBar();
-        
-        return menuBar;
-	}
-
-	
-	
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
@@ -1084,7 +967,7 @@ public class DrawbotGUI
 		JDialog driver = new JDialog(mainframe,"Manual Control",true);
 		driver.setLayout(new GridBagLayout());
 		
-		JButton home = new JButton("Home");
+		//JButton home = new JButton("Home");
 		
 		JButton up1 = new JButton("Y1");
 		JButton up10 = new JButton("Y10");
@@ -1157,8 +1040,74 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
-
 	
+	protected void JogMotors() {
+		JDialog driver = new JDialog(mainframe,"Jog Motors",true);
+		driver.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		final JButton buttonAneg = new JButton("IN");
+		final JButton buttonApos = new JButton("OUT");
+		final JCheckBox m1i = new JCheckBox("Invert",m1invert);
+		
+		final JButton buttonBneg = new JButton("IN");
+		final JButton buttonBpos = new JButton("OUT");
+		final JCheckBox m2i = new JCheckBox("Invert",m2invert);
+
+		c.gridx=0;	c.gridy=0;	driver.add(new JLabel("L"),c);
+		c.gridx=0;	c.gridy=1;	driver.add(new JLabel("R"),c);
+		
+		c.gridx=1;	c.gridy=0;	driver.add(buttonAneg,c);
+		c.gridx=1;	c.gridy=1;	driver.add(buttonBneg,c);
+		
+		c.gridx=2;	c.gridy=0;	driver.add(buttonApos,c);
+		c.gridx=2;	c.gridy=1;	driver.add(buttonBpos,c);
+
+		c.gridx=3;	c.gridy=0;	driver.add(m1i,c);
+		c.gridx=3;	c.gridy=1;	driver.add(m2i,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				if(subject == buttonApos) SendLineToRobot("D00 L100");
+				if(subject == buttonAneg) SendLineToRobot("D00 L-100");
+				
+				if(subject == buttonBpos) SendLineToRobot("D00 R100");
+				if(subject == buttonBneg) SendLineToRobot("D00 R-100");
+			}
+		};
+
+		ActionListener invertButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				m1invert = m1i.isSelected();
+				m2invert = m2i.isSelected();
+				
+				SaveConfig();
+				SendConfig();
+			}
+		};
+		
+		buttonApos.addActionListener(driveButtons);
+		buttonAneg.addActionListener(driveButtons);
+		
+		buttonBpos.addActionListener(driveButtons);
+		buttonBneg.addActionListener(driveButtons);
+		
+		m1i.addActionListener(invertButtons);
+		m2i.addActionListener(invertButtons);
+		
+		driver.pack();
+		driver.setVisible(true);
+	}
+	
+	public JMenuBar CreateMenuBar() {
+        // If the menu bar exists, empty it.  If it doesn't exist, create it.
+        menuBar = new JMenuBar();
+
+        UpdateMenuBar();
+        
+        return menuBar;
+	}
 	
 	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
@@ -1238,7 +1187,7 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Configure machine limits",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot shape.");
         buttonConfig.addActionListener(this);
-        buttonConfig.setEnabled(portConfirmed && !running);
+        //buttonConfig.setEnabled(portConfirmed && !running);
         menu.add(buttonConfig);
 
         buttonPaper = new JMenuItem("Configure paper limits",KeyEvent.VK_C);
@@ -1247,11 +1196,9 @@ public class DrawbotGUI
         buttonPaper.setEnabled(!running);
         menu.add(buttonPaper);
 
-        buttonLoad = new JMenuItem("Load bobbins");
-        buttonLoad.getAccessibleContext().setAccessibleDescription("Load string onto the bobbin.");
-        buttonLoad.addActionListener(this);
-        buttonLoad.setEnabled(portConfirmed && !running);
-        menu.add(buttonLoad);
+        buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
+        buttonJogMotors.addActionListener(this);
+        menu.add(buttonJogMotors);
 
         menuBar.add(menu);
 
@@ -1259,7 +1206,6 @@ public class DrawbotGUI
         menu = new JMenu("Draw");
         menu.setMnemonic(KeyEvent.VK_D);
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
-        menu.setEnabled(portConfirmed);
 
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);
         buttonStart.getAccessibleContext().setAccessibleDescription("Start sending g-code");
@@ -1319,8 +1265,6 @@ public class DrawbotGUI
         menuBar.updateUI();
     }
 	
-	
-	
     public Container CreateContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
@@ -1371,12 +1315,10 @@ public class DrawbotGUI
         return contentPane;
     }
     
-    
-    
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         //Create and set up the window.
-    	mainframe = new JFrame("Drawbot GUI");
+    	mainframe = new JFrame("No Drawbot Connected");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.
@@ -1388,8 +1330,6 @@ public class DrawbotGUI
         mainframe.setSize(800,700);
         mainframe.setVisible(true);
     }
-    
-    
     
     public static void main(String[] args) {
 	    //Schedule a job for the event-dispatching thread:

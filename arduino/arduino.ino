@@ -36,10 +36,6 @@
 #define S1_PIN          (A3)
 #define S2_PIN          (A5)
 
-// which way are the spools wound, relative to motor movement?
-#define REEL_IN         FORWARD
-#define REEL_OUT        BACKWARD
-
 // NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
 // then it is 2.5132741228718345 circumference, and
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
@@ -73,7 +69,6 @@
 
 #define MAX_VEL         (STEPS_S * THREADPERSTEP)  // cm/s
 #define MIN_VEL         (0.001) // cm/s
-#define ACCELERATION    (MAX_VEL)  // cm/s/s
 
 // for arc directions
 #define ARC_CW          (1)
@@ -114,24 +109,30 @@ static float limit_bottom = 0;  // Distance to bottom of drawing area.
 static float limit_right = 0;  // Distance to right of drawing area.
 static float limit_left = 0;  // Distance to left of drawing area.
 
+// what are the motors called?
+char m1d='L';
+char m2d='R';
+
+// which way are the spools wound, relative to motor movement?
+int M1_REEL_IN  = FORWARD;
+int M1_REEL_OUT = BACKWARD;
+int M2_REEL_IN  = FORWARD;
+int M2_REEL_OUT = BACKWARD;
+
 // plotter position.
-static float posx, velx, accelx;
-static float posy, vely, accely;
+static float posx, velx;
+static float posy, vely;
 static float posz;  // pen state
+static float feed_rate=0;
 
 // old pen position
 static int old_pen_angle=-1;
 
 // switch state
-static char switch1;
-static char switch2;
+static char switch1, switch2;
 
 // motor position
 static long laststep1, laststep2;
-
-// speeds, feeds, and delta-vs.
-static float accel=ACCELERATION;
-static float feed_rate=0;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
 static float mode_scale;   // mm or inches?
@@ -272,8 +273,8 @@ static void line(float x,float y,float z) {
 
   long ad1=abs(d1);
   long ad2=abs(d2);
-  int dir1=d1<0?REEL_IN:REEL_OUT;
-  int dir2=d2<0?REEL_IN:REEL_OUT;
+  int dir1=d1<0?M1_REEL_IN:M1_REEL_OUT;
+  int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
   long over=0;
   long i;
   
@@ -359,20 +360,6 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
 
 
 //------------------------------------------------------------------------------
-// loads 5m onto a spool.
-static void loadspools() {
-  float len=500.0;
-  float amnt=len/THREADPERSTEP;
-  Serial.print("== LOAD ");
-  Serial.print(len);
-  Serial.print(" ==");
-  // uncomment the motor you want to load
-  m1.step(amnt,REEL_IN);
-  //m2.step(amnt,REEL_IN);
-}
-
-
-//------------------------------------------------------------------------------
 // instantly move the virtual plotter position
 // does not validate if the move is valid
 static void teleport(float x,float y) {
@@ -418,8 +405,8 @@ static void goHome() {
   // reel in the left motor until contact is made.
   Serial.println("Find left...");
   do {
-    m1.step(1,REEL_IN );
-    m2.step(1,REEL_OUT);
+    m1.step(1,M1_REEL_IN );
+    m2.step(1,M2_REEL_OUT);
     readSwitches();
   } while(switch1==1);
   laststep1=0;
@@ -427,8 +414,8 @@ static void goHome() {
   // reel in the right motor until contact is made
   Serial.println("Find right...");
   do {
-    m2.step(1,REEL_IN );
-    m1.step(1,REEL_OUT);
+    m2.step(1,M1_REEL_IN );
+    m1.step(1,M2_REEL_OUT);
     laststep1++;
     readSwitches();
   } while(switch2==1);
@@ -455,12 +442,14 @@ static void where() {
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print("T");    Serial.println(limit_top);
-  Serial.print("B");    Serial.println(limit_bottom);
-  Serial.print("L");    Serial.println(limit_left);
-  Serial.print("R");    Serial.println(limit_right);
-  Serial.print("F");    printFeedRate();
-  Serial.print("\nA");  Serial.println(accel);
+  Serial.print(m1d);          Serial.print("=");  
+  Serial.print(limit_top);    Serial.print(",");
+  Serial.print(limit_left);   Serial.print("\n");
+  Serial.print(m2d);          Serial.print("=");  
+  Serial.print(limit_top);    Serial.print(",");
+  Serial.print(limit_right);  Serial.print("\n");
+  Serial.print("Bottom=");    Serial.println(limit_bottom);
+  Serial.print("Feed rate=");    printFeedRate();
 }
 
 
@@ -544,6 +533,9 @@ static void processCommand() {
     float rr=limit_right;
     float ll=limit_left;
     
+    char gg=m1d;
+    char hh=m2d;
+    
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
@@ -552,6 +544,26 @@ static void processCommand() {
       case 'B': bb=atof(ptr+1);  break;
       case 'R': rr=atof(ptr+1);  break;
       case 'L': ll=atof(ptr+1);  break;
+      case 'G': gg=*(ptr+1);  break;
+      case 'H': hh=*(ptr+1);  break;
+      case 'I': {
+        if(atoi(ptr+1)>0) {
+          M1_REEL_IN=FORWARD;
+          M1_REEL_OUT=BACKWARD;
+        } else {
+          M1_REEL_IN=BACKWARD;
+          M1_REEL_OUT=FORWARD;
+        }
+      }  break;
+      case 'J':  {
+        if(atoi(ptr+1)>0) {
+          M2_REEL_IN=FORWARD;
+          M2_REEL_OUT=BACKWARD;
+        } else {
+          M2_REEL_IN=BACKWARD;
+          M2_REEL_OUT=FORWARD;
+        }
+      }  break;
       default: ptr=0; break;
       }
     }
@@ -561,7 +573,10 @@ static void processCommand() {
     limit_bottom=bb;
     limit_right=rr;
     limit_left=ll;
+    m1d=gg;
+    m2d=hh;
     
+    teleport(0,0);
     printConfig();
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
@@ -652,6 +667,20 @@ static void processCommand() {
     }
 
     delay(xx);
+  } else if(!strncmp(buffer,"D00 ",4) || !strncmp(buffer,"D0 ",3)) {
+    // move one motor
+    char *ptr=strchr(buffer,' ')+1;
+    int amount = atoi(ptr+1);
+    int i, dir;
+    if(*ptr == m1d) {
+      dir = amount < 0 ? M1_REEL_IN : M1_REEL_OUT;
+      amount=abs(amount);
+      for(i=0;i<amount;++i) {  m1.step(1,dir);  delay(2);  }
+    } else if(*ptr == m2d) {
+      dir = amount < 0 ? M2_REEL_IN : M2_REEL_OUT;
+      amount = abs(amount);
+      for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
+    }
   } else {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -706,16 +735,13 @@ void setup() {
   digitalWrite(S1_PIN,HIGH);
   digitalWrite(S2_PIN,HIGH);
   
-  // load string onto spool.  Only needed when the robot is being built.
-//  loadspools();
-  
   // display the help at startup.
   help();
 
   // initialize the plotter position.
   teleport(0,0);
-  velx=accelx=0;
-  velx=accelx=0;
+  velx=0;
+  velx=0;
   posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
   
