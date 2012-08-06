@@ -25,8 +25,6 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-
-
 public class DrawbotGUI
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
@@ -353,7 +351,7 @@ public class DrawbotGUI
 	
 	// pull the last connected port from prefs
 	public void GetRecentPort() {
-		recentPort = prefs.get("recent-port", portsDetected[0]);
+		recentPort = prefs.get("recent-port", "");
 	}
 	
 	// update the prefs with the last port connected and refreshes the menus.
