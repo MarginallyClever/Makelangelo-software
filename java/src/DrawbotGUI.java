@@ -54,7 +54,6 @@ public class DrawbotGUI
 	
 	// Robot config
 	private long   robot_uid=0;
-	private boolean new_robot_uid=false;
 	
 	private double limit_top=10;
 	private double limit_bottom=-10;
@@ -278,10 +277,8 @@ public class DrawbotGUI
 			}
 			
 			// new robots have UID=0
-			if(robot_uid==0) {
-				// Try to set a new one
-				GetNewRobotUID();
-			}
+			if(robot_uid==0) GetNewRobotUID();
+			
 			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid)+" connected");
 
 			// load machine specific config
@@ -321,16 +318,7 @@ public class DrawbotGUI
 
 		// did read go ok?
 		if(robot_uid!=0) {
-			// yes!
-			new_robot_uid=true;
-	
-			// send new value to robot
-			String line="UID "+robot_uid+";";
-			Log(line+NL);
-			try {
-				out.write(line.getBytes());
-			}
-			catch(IOException e) {}
+			SendLineToRobot("UID "+robot_uid);
 		}
 	}
 	
@@ -373,18 +361,11 @@ public class DrawbotGUI
 	}
 	
 	public void GetRecentPaperSize() {
-		if(new_robot_uid) {
-			String id = Long.toString(robot_uid);
-			paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
-			paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
-			paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
-			paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
-		} else {
-			paper_left=Double.parseDouble(prefs.get("paper_left","0"));
-			paper_right=Double.parseDouble(prefs.get("paper_right","0"));
-			paper_top=Double.parseDouble(prefs.get("paper_top","0"));
-			paper_bottom=Double.parseDouble(prefs.get("paper_bottom","0"));
-		}
+		String id = Long.toString(robot_uid);
+		paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
+		paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
+		paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
+		paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
 		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 	
@@ -666,22 +647,13 @@ public class DrawbotGUI
 	}
 
 	void LoadConfig() {
-		if(new_robot_uid) {
-			String id=Long.toString(robot_uid);
-			limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
-			limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
-			limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
-			limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
-			m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
-			m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-		} else {
-			limit_top = Double.valueOf(prefs.get("limit_top", "0"));
-			limit_bottom = Double.valueOf(prefs.get("limit_bottom", "0"));
-			limit_left = Double.valueOf(prefs.get("limit_left", "0"));
-			limit_right = Double.valueOf(prefs.get("limit_right", "0"));
-			m1invert=Boolean.parseBoolean(prefs.get("m1invert", "false"));
-			m2invert=Boolean.parseBoolean(prefs.get("m2invert", "false"));
-		}
+		String id=Long.toString(robot_uid);
+		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
+		limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
+		limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
+		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
+		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
+		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
 	}
 
 	void SaveConfig() {
@@ -1185,17 +1157,18 @@ public class DrawbotGUI
         buttonConfig = new JMenuItem("Configure machine limits",KeyEvent.VK_C);
         buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot shape.");
         buttonConfig.addActionListener(this);
-        //buttonConfig.setEnabled(portConfirmed && !running);
+        buttonConfig.setEnabled(portConfirmed && !running);
         menu.add(buttonConfig);
 
         buttonPaper = new JMenuItem("Configure paper limits",KeyEvent.VK_C);
         buttonPaper.getAccessibleContext().setAccessibleDescription("Adjust the paper shape.");
         buttonPaper.addActionListener(this);
-        buttonPaper.setEnabled(!running);
+        buttonPaper.setEnabled(portConfirmed && !running);
         menu.add(buttonPaper);
 
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
+        buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
 
         menuBar.add(menu);
