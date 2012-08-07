@@ -19,6 +19,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -166,7 +167,8 @@ public class DrawbotGUI
 	public void Log(String msg) {
 		try {
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
-			log.setCaretPosition(log.getText().length());
+			int over_length = doc.getLength() - msg.length() - 5000;
+			doc.remove(0, over_length);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -1279,6 +1281,8 @@ public class DrawbotGUI
         doc = new HTMLDocument();
         log.setEditorKit(kit);
         log.setDocument(doc);
+        DefaultCaret c = (DefaultCaret)log.getCaret();
+        c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         ClearLog();
         
         // the preview panel
