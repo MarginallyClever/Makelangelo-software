@@ -18,6 +18,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 import java.io.*;
 import java.net.URL;
@@ -80,8 +84,11 @@ public class DrawbotGUI
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
-    private JTextArea log;
+    private JTextPane log;
     private JScrollPane logPane;
+    HTMLEditorKit kit;
+    HTMLDocument doc;
+    
     private DrawPanel previewPane;
 	private StatusBar statusBar;
 	
@@ -157,10 +164,31 @@ public class DrawbotGUI
 	
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
-		log.append(msg);
-		log.setCaretPosition(log.getText().length());
+		try {
+			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+			log.setCaretPosition(log.getText().length());
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
 	}
-		
+	
+	public void ClearLog() {
+		try {
+			doc.replace(0, doc.getLength(), "", null);
+			kit.insertHTML(doc, 0, "", 0,0,null);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+	}
+	
 	public void ClosePort() {
 		if(portOpened) {
 		    if (serialPort != null) {
@@ -176,7 +204,7 @@ public class DrawbotGUI
 		        }
 		    }
 
-			log.setText("");
+		    ClearLog();
 			portOpened=false;
 			portConfirmed=false;
 			previewPane.setConnected(false);
@@ -190,20 +218,20 @@ public class DrawbotGUI
 		
 		ClosePort();
 		
-		//Log("Connecting to "+portName+"..."+NL);
+		Log("<font color='green'>Connecting to "+portName+"...</font>\n");
 		
 		// find the port
 		try {
 			portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 		}
 		catch(Exception e) {
-			Log("Ports could not be identified:"+e.getMessage()+NL);
+			Log("<span style='color:red'>Ports could not be identified:"+e.getMessage()+"</span>\n");
 			e.printStackTrace();
 			return 1;
 		}
 
 		if ( portIdentifier.isCurrentlyOwned() ) {
-    	    Log("Error: Another program is currently using this port."+NL);
+    	    Log("<span style='color:red'>Error: Another program is currently using this port."+"</span>\n");
 			return 2;
 		}
 
@@ -218,7 +246,7 @@ public class DrawbotGUI
 		}
 
 	    if( ( commPort instanceof SerialPort ) == false ) {
-			Log("Error: Only serial ports are handled by this example."+NL);
+			Log("<span style='color:red'>Only serial ports are handled by this example."+"</span>\n");
 			return 4;
 		}
 
@@ -228,7 +256,7 @@ public class DrawbotGUI
 			serialPort.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
 		}
 		catch(Exception e) {
-			Log("Port could not be configured:"+e.getMessage()+NL);
+			Log("<span style='color:red'>Port could not be configured:"+e.getMessage()+"</span>\n");
 			return 5;
 		}
 
@@ -237,7 +265,7 @@ public class DrawbotGUI
 			out = serialPort.getOutputStream();
 		}
 		catch(Exception e) {
-			Log("Streams could not be opened:"+e.getMessage()+NL);
+			Log("<span style='color:red'>Streams could not be opened:"+e.getMessage()+"</span>\n");
 			return 6;
 		}
 		
@@ -246,11 +274,11 @@ public class DrawbotGUI
 			serialPort.notifyOnDataAvailable(true);
 		}
 		catch(TooManyListenersException e) {
-			Log("Streams could not be opened:"+e.getMessage()+NL);
+			Log("<span style='color:red'>Streams could not be opened:"+e.getMessage()+"</span>\n");
 			return 7;
 		}
 
-		Log("Opened.\n");
+		Log("<span style='green'>Opened.</span>\n");
 		SetRecentPort(portName);
 		portOpened=true;
 		UpdateMenuBar();
@@ -267,6 +295,10 @@ public class DrawbotGUI
 		String hello = "HELLO WORLD! I AM DRAWBOT #";
 		int found=line3.lastIndexOf(hello);
 		if(found >= 0) {
+			portConfirmed=true;
+			
+			Log("<span color='yellow'>Confirmed.</span>\n");
+			
 			// get the UID reported by the robot
 			String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
 			if(lines.length>0) {
@@ -285,10 +317,11 @@ public class DrawbotGUI
 			LoadConfig();
 			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
 				UpdateConfig();
-			} else {
-				SendConfig();
 			}
+
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			Log("<span color='yellow'>Sending config...</span>\n");
+			SendConfig();
 			
 			// load last known paper for this machine
 			GetRecentPaperSize();
@@ -296,7 +329,7 @@ public class DrawbotGUI
 				UpdatePaper();
 			}
 
-			portConfirmed=true;
+			
 			UpdateMenuBar();
 			previewPane.setConnected(true);
 		}
@@ -400,7 +433,7 @@ public class DrawbotGUI
 				if(tokens[j].equals("G21")) drawScale=0.1f;
 				if(tokens[j].startsWith("F")) {
 					feed_rate=Float.valueOf(tokens[j].substring(1)) * drawScale;
-					Log("feed rate="+feed_rate+"\n");
+					Log("<span style='color:green'>feed rate="+feed_rate+"</span>\n");
 					feed_rate*=1;
 				}
 			}
@@ -475,10 +508,10 @@ public class DrawbotGUI
 				pz=z;
 			}
 		}  // for ( each instruction )
-	   	Log(estimate_count + " line segments.\n");
-	   	Log(estimated_length+ "cm of line.\n");
 	   	estimated_time += estimate_count * 0.007617845117845f;
-	   	Log("Estimated "+statusBar.formatTime((long)(estimated_time*10000))+"s to draw.\n");
+	   	
+	   	Log("<font color='green'>"+estimate_count + " line segments.\n"+estimated_length+ "cm of line.\n" +
+	   		"Estimated "+statusBar.formatTime((long)(estimated_time*10000))+"s to draw.</font>\n");
 	}
 	
 	/**
@@ -503,7 +536,7 @@ public class DrawbotGUI
 		    }
 	    }
 	    catch(IOException e) {
-	    	Log("File could not be opened."+NL);
+	    	Log("<span style='color:red'>File could not be opened.</span>\n");
 	    	RemoveRecentFile(filename);
 	    	return;
 	    }
@@ -579,7 +612,7 @@ public class DrawbotGUI
 	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
-		Log("Opening file "+recentFiles[0]+"..."+NL);
+		Log("<font color='green'>Opening file "+recentFiles[0]+"...</font>\n");
 		
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	if(!ext.equalsIgnoreCase(".ngc")) {
@@ -609,12 +642,7 @@ public class DrawbotGUI
 	}
 	
 	public void GoHome() {
-		String line="HOME;";
-		Log(line+NL);
-		try {
-			out.write(line.getBytes());
-		}
-		catch(IOException e) {}
+		SendLineToRobot("G00 X0 Y0 Z0");
 	}
 	
 	/**
@@ -755,7 +783,7 @@ public class DrawbotGUI
 		
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
-			Log(line+NL);
+			Log("<font color='pink'>"+line+"</font>\n");
 			return true;
 		} 
 
@@ -764,7 +792,7 @@ public class DrawbotGUI
 		if(index!=-1) {
 			String comment=line.substring(index+1,line.lastIndexOf(')'));
 			line=line.substring(0,index).trim();
-			Log("* "+comment+NL);
+			Log("<font color='grey'>* "+comment+"</font\n");
 			if(line.length()==0) {
 				// entire line was a comment.
 				return true;  // still ready to send
@@ -786,7 +814,7 @@ public class DrawbotGUI
 		if(!portConfirmed) return;
 		
 		line+=eol;
-		Log(line+NL);
+		Log("<font color='white'>"+line+"</font>");
 		try {
 			out.write(line.getBytes());
 		}
@@ -880,8 +908,8 @@ public class DrawbotGUI
 			return;
 		}
 		if(subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com)."+NL+NL
-					+"Find out more at http://www.marginallyclever.com/"+NL
+			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com).\n\n"
+					+"Find out more at http://www.marginallyclever.com/\n"
 					+"Get the latest version and read the documentation online @ http://github.com/i-make-robots/DrawBot/");
 			return;
 		}
@@ -915,7 +943,7 @@ public class DrawbotGUI
 					int len = in.read(buffer);
 					if( len>0 ) {
 						String line2 = new String(buffer,0,len);
-						Log(line2);
+						Log("<font color='#FFA500'>"+line2+"</font>");
 						line3+=line2;
 						// wait for the cue ("> ") to send another command
 						if(line3.lastIndexOf(cue)!=-1) {
@@ -937,7 +965,7 @@ public class DrawbotGUI
 		JDialog driver = new JDialog(mainframe,"Manual Control",true);
 		driver.setLayout(new GridBagLayout());
 		
-		//JButton home = new JButton("Home");
+		JButton home = new JButton("GO HOME");
 		
 		JButton up1 = new JButton("Y1");
 		JButton up10 = new JButton("Y10");
@@ -955,7 +983,7 @@ public class DrawbotGUI
 		JButton right10 = new JButton("X10");
 		JButton right100 = new JButton("X100");
 		
-		JButton center = new JButton("CENTERED");
+		JButton center = new JButton("THIS IS HOME");
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=3;	c.gridy=0;	driver.add(up100,c);
@@ -974,17 +1002,17 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
-		//c.gridx=6;  c.gridy=0;  driver.add(home,c);
+		c.gridx=6;  c.gridy=0;  driver.add(home,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					JButton b = (JButton)subject;
 					String t=b.getText();
-					if(t=="HOME") {
+					if(t=="GO HOME") {
 						GoHome();
 					}
-					if(t=="CENTERED") {
+					if(t=="THIS IS HOME") {
 						SendLineToRobot("TELEPORT XO YO");
 					} else {
 						SendLineToRobot("G91");
@@ -1007,6 +1035,7 @@ public class DrawbotGUI
 		right10.addActionListener(driveButtons);
 		right100.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
+		home.addActionListener(driveButtons);
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1242,11 +1271,15 @@ public class DrawbotGUI
         contentPane.setOpaque(true);
         
         // the log panel
-        log = new JTextArea();
+        log = new JTextPane();
         log.setEditable(false);
-        log.setForeground(Color.GREEN);
         log.setBackground(Color.BLACK);
         logPane = new JScrollPane(log);
+        kit = new HTMLEditorKit();
+        doc = new HTMLDocument();
+        log.setEditorKit(kit);
+        log.setDocument(doc);
+        ClearLog();
         
         // the preview panel
         previewPane = new DrawPanel();

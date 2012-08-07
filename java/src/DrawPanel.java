@@ -77,6 +77,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	
 	public void setConnected(boolean state) {
 		connected=state;
+		repaint();
 	}
 	
 	public void setRunning(boolean state) {
