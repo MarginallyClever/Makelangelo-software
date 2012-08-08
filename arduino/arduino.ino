@@ -201,7 +201,7 @@ static void printFeedRate() {
   Serial.print(feed_rate*60.0/mode_scale);
   Serial.print(mode_name);
   Serial.print("/min");
-
+/*
   Serial.print(" (");
   Serial.print((feed_rate/THREADPERSTEP));
   Serial.print(" steps/s) ");
@@ -211,6 +211,7 @@ static void printFeedRate() {
   Serial.print((MIN_VEL*60.0/mode_scale));
   Serial.print(mode_name);
   Serial.print("/min");
+*/
 }
 
 
@@ -382,10 +383,9 @@ static void help() {
   Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
   Serial.println("       - display/update this robot's configuration.");
   Serial.println("HOME;  - recalibrate and move to 0,0");
-  Serial.println("WHERE; - display current virtual coordinates");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
-  Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91");
+  Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91,M114");
 }
 
 
@@ -428,13 +428,13 @@ static void goHome() {
 
 //------------------------------------------------------------------------------
 static void where() {
-  Serial.print("(");
+  Serial.print("X");
   Serial.print(posx);
-  Serial.print(",");
+  Serial.print(" Y");
   Serial.print(posy);
-  Serial.print(",");
+  Serial.print(" Z");
   Serial.print(posz);
-  Serial.print(")@");
+  Serial.print(" F");
   printFeedRate();
   Serial.print("\n");
 }
@@ -525,7 +525,7 @@ static void processCommand() {
     teleport(xx,yy);
   } else 
 #endif
-  if(!strncmp(buffer,"WHERE",5)) {
+  if(!strncmp(buffer,"M114",4)) {
     where();
   } else if(!strncmp(buffer,"CONFIG",6)) {
     float tt=limit_top;

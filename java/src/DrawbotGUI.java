@@ -299,8 +299,6 @@ public class DrawbotGUI
 		if(found >= 0) {
 			portConfirmed=true;
 			
-			Log("<span color='yellow'>Confirmed.</span>\n");
-			
 			// get the UID reported by the robot
 			String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
 			if(lines.length>0) {
@@ -322,7 +320,6 @@ public class DrawbotGUI
 			}
 
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-			Log("<span color='yellow'>Sending config...</span>\n");
 			SendConfig();
 			
 			// load last known paper for this machine
@@ -945,7 +942,7 @@ public class DrawbotGUI
 					int len = in.read(buffer);
 					if( len>0 ) {
 						String line2 = new String(buffer,0,len);
-						Log("<font color='#FFA500'>"+line2+"</font>");
+						Log("<span style='color:#FFA500'>"+line2.replace("\n","<br>")+"</span>");
 						line3+=line2;
 						// wait for the cue ("> ") to send another command
 						if(line3.lastIndexOf(cue)!=-1) {
@@ -1013,6 +1010,7 @@ public class DrawbotGUI
 					String t=b.getText();
 					if(t=="GO HOME") {
 						GoHome();
+						SendLineToRobot("M114");
 					}
 					if(t=="THIS IS HOME") {
 						SendLineToRobot("TELEPORT XO YO");
@@ -1020,6 +1018,7 @@ public class DrawbotGUI
 						SendLineToRobot("G91");
 						SendLineToRobot("G00 "+b.getText());
 						SendLineToRobot("G90");
+						SendLineToRobot("M114");
 					}
 			  }
 			};
@@ -1038,6 +1037,7 @@ public class DrawbotGUI
 		right100.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
+		SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1075,6 +1075,7 @@ public class DrawbotGUI
 				
 				if(subject == buttonBpos) SendLineToRobot("D00 R100");
 				if(subject == buttonBneg) SendLineToRobot("D00 R-100");
+				SendLineToRobot("M114");
 			}
 		};
 
@@ -1096,7 +1097,8 @@ public class DrawbotGUI
 		
 		m1i.addActionListener(invertButtons);
 		m2i.addActionListener(invertButtons);
-		
+
+		SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}
