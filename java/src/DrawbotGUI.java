@@ -565,7 +565,7 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<cnt;++i) {
-			if(!recentFiles[i].isEmpty()) {
+			if( recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
 				prefs.put("recent-files-"+i, recentFiles[i]);
 			}
 		}
@@ -588,7 +588,7 @@ public class DrawbotGUI
 
 		// update prefs
 		for(i=0;i<recentFiles.length;++i) {
-			if(!recentFiles[i].isEmpty()) {
+			if(recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
 				prefs.put("recent-files-"+i, recentFiles[i]);
 			}
 		}
@@ -602,7 +602,7 @@ public class DrawbotGUI
 		
 		int i;
 		for(i=0;i<recentFiles.length;++i) {
-			recentFiles[i] = prefs.get("recent-files-"+i, recentFiles[i]);
+			recentFiles[i] = prefs.get("recent-files-"+i, "");
 		}
 	}	
 	
