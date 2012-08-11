@@ -1165,7 +1165,7 @@ public class DrawbotGUI
         if(recentFiles != null && recentFiles.length>0) {
         	// list files here
         	for(i=0;i<recentFiles.length;++i) {
-        		if(recentFiles[i].length()==0) break;
+        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
             	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
             	if(buttonRecent[i]!=null) {
             		buttonRecent[i].addActionListener(this);
