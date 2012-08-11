@@ -1162,7 +1162,7 @@ public class DrawbotGUI
         menu.addSeparator();
 
         // list recent files
-        if(recentFiles.length>0) {
+        if(recentFiles != null && recentFiles.length>0) {
         	// list files here
         	for(i=0;i<recentFiles.length;++i) {
         		if(recentFiles[i].length()==0) break;
