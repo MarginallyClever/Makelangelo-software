@@ -40,10 +40,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 
 			double len=GetTourLength(solution);
 			DecimalFormat flen=new DecimalFormat("#.##");
-			DrawbotGUI.getSingleton().Log(flen.format(len)+"mm @ 0s\n");
+			DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ 0s</font>\n");
 
 			long t_elapsed=0;
 			long t_start = System.currentTimeMillis();
+			int progress=0;
 
 			do {
 				once=0;
@@ -77,8 +78,12 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							assert(newlen>len);
 							len=newlen;
 							
-							DrawbotGUI.getSingleton().Log(flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
-							setProgress((int)((float)t_elapsed/(float)time_limit));
+							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
+							int new_progress=(int)((float)t_elapsed/(float)time_limit);
+							if(new_progress != progress ) {
+								progress = new_progress;
+								setProgress(progress);
+							}
 						}
 					}
 				}
@@ -112,8 +117,12 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							// find the new tour length
 							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
 							
-							DrawbotGUI.getSingleton().Log(flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
-							setProgress((int)(100.0f*(float)t_elapsed/(float)time_limit));
+							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
+							int new_progress=(int)((float)t_elapsed/(float)time_limit);
+							if(new_progress != progress ) {
+								progress = new_progress;
+								setProgress(progress);
+							}
 							if(end>1) end--;
 						}
 					}
@@ -148,8 +157,12 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							// find the new tour length
 							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
 							
-							DrawbotGUI.getSingleton().Log(flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"\n");
-							setProgress((int)(100.0f*(float)t_elapsed/(float)time_limit));
+							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
+							int new_progress=(int)((float)t_elapsed/(float)time_limit);
+							if(new_progress != progress ) {
+								progress = new_progress;
+								setProgress(progress);
+							}
 						}
 					}
 				}
@@ -198,7 +211,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	private void GenerateTSP() {
 		GreedyTour();
 
-		DrawbotGUI.getSingleton().Log("Running Lin/Kerighan optimization...\n");
+		DrawbotGUI.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
 		pm = new ProgressMonitor(null, "Optimizing path...", "", 0, 100);
 		pm.setProgress(0);
@@ -222,9 +235,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
                 Toolkit.getDefaultToolkit().beep();
                 if (pm.isCanceled()) {
                     task.cancel(true);
-                    DrawbotGUI.getSingleton().Log("Task canceled.\n");
+                    DrawbotGUI.getSingleton().Log("<font color='green'>Task canceled.</font>\n");
                 } else {
-                	DrawbotGUI.getSingleton().Log("Task completed.\n");
+                	DrawbotGUI.getSingleton().Log("<font color='green'>Task completed.</font>\n");
                 }
             }
         }
@@ -257,7 +270,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void GreedyTour() {
-		DrawbotGUI.getSingleton().Log("Finding greedy tour solution...\n");
+		DrawbotGUI.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
 
 		int i;
 		float w, bestw;
@@ -297,7 +310,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
 	private void ConvertAndSaveToGCode() {
-		DrawbotGUI.getSingleton().Log("Converting to gcode and saving "+dest+"\n");
+		DrawbotGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		
 		int w2=image_width/2;
 		int h2=image_height/2;
@@ -342,9 +355,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			out.close();
 		}
 		catch(IOException e) {
-			DrawbotGUI.getSingleton().Log("Error saving "+dest+": "+e.getMessage());
+			DrawbotGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
-		DrawbotGUI.getSingleton().Log("Completed.\n");
+		DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
 	}
 	
 	
@@ -353,7 +366,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) {
-		System.out.println("Processing...");
 		image_height = img.getHeight();
 		image_width = img.getWidth();
 		int x,y,i;
@@ -369,7 +381,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			}
 		}
 		
-		DrawbotGUI.getSingleton().Log(numPoints + " points\n");
+		DrawbotGUI.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 		solution2 = new int[numPoints+1];

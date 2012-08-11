@@ -20,7 +20,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
-import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -54,7 +53,7 @@ public class DrawbotGUI
 	
 	// Preferences
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
-	private String[] recentFiles = {"","","","","","","","","",""};
+	private String[] recentFiles;
 	private String recentPort;
 	
 	// Robot config
@@ -77,10 +76,10 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfig, buttonPaper, buttonRescan, buttonJogMotors;
+    private JMenuItem buttonConfig, buttonRescan, buttonJogMotors;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
     private JMenuItem buttonZoomIn,buttonZoomOut;
-    private JMenuItem buttonAbout;
+    private JMenuItem buttonAbout,buttonCheckForUpdate;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
@@ -109,6 +108,9 @@ public class DrawbotGUI
 	// Singleton stuff
 	private DrawbotGUI() {
 		LoadConfig();
+        GetRecentFiles();
+		GetRecentPaperSize();
+        GetRecentPort();
 	}
 	
 	public static DrawbotGUI getSingleton() {
@@ -314,6 +316,7 @@ public class DrawbotGUI
 			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid)+" connected");
 
 			// load machine specific config
+			GetRecentPaperSize();
 			LoadConfig();
 			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
 				UpdateConfig();
@@ -321,13 +324,6 @@ public class DrawbotGUI
 
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
 			SendConfig();
-			
-			// load last known paper for this machine
-			GetRecentPaperSize();
-			if(paper_top==0 && paper_bottom==0 && paper_left==0 && paper_right==0) {
-				UpdatePaper();
-			}
-
 			
 			UpdateMenuBar();
 			previewPane.setConnected(true);
@@ -517,7 +513,7 @@ public class DrawbotGUI
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
 	 */
-	public void OpenFile(String filename) {
+	public void LoadGCode(String filename) {
 		CloseFile();
 
 	    try {
@@ -603,6 +599,8 @@ public class DrawbotGUI
 	
 	// Load recent files from prefs
 	public void GetRecentFiles() {
+		recentFiles = new String[10];
+		
 		int i;
 		for(i=0;i<recentFiles.length;++i) {
 			recentFiles[i] = prefs.get("recent-files-"+i, recentFiles[i]);
@@ -617,7 +615,7 @@ public class DrawbotGUI
     	if(!ext.equalsIgnoreCase(".ngc")) {
    			LoadImage(filename);
     	} else {
-    		OpenFile(filename);
+    		LoadGCode(filename);
     	}
 
     	statusBar.Clear();
@@ -648,29 +646,76 @@ public class DrawbotGUI
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
 	public void UpdateConfig() {
-		JTextField top = new JTextField(String.valueOf(limit_top));
-		JTextField bottom = new JTextField(String.valueOf(limit_bottom));
-		JTextField left = new JTextField(String.valueOf(limit_left));
-		JTextField right = new JTextField(String.valueOf(limit_right));
-		final JComponent[] inputs = new JComponent[] {
-			new JLabel("Please see https://github.com/i-make-robots/DrawBot/wiki/Using-the-Software for an explanation."),
-            new JLabel("Top"), 		top,
-            new JLabel("Bottom"),	bottom,
-            new JLabel("Left"), 	left,
-            new JLabel("Right"), 	right
-		};
-		JOptionPane.showMessageDialog(null, inputs, "Configure machine limits", JOptionPane.PLAIN_MESSAGE);
+		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
+		driver.setLayout(new GridBagLayout());
 
-		if(left.getText().trim()!="" || right.getText().trim()!="" ||
-			top.getText().trim()!="" || bottom.getText().trim()!="") {
-			limit_top = Float.valueOf(top.getText());
-			limit_bottom = Float.valueOf(bottom.getText());
-			limit_right = Float.valueOf(right.getText());
-			limit_left = Float.valueOf(left.getText());
-			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-			SaveConfig();
-			SendConfig();
-		}
+		final JTextField mtop = new JTextField(String.valueOf(limit_top));
+		final JTextField mbottom = new JTextField(String.valueOf(limit_bottom));
+		final JTextField mleft = new JTextField(String.valueOf(limit_left));
+		final JTextField mright = new JTextField(String.valueOf(limit_right));
+		
+		final JTextField ptop = new JTextField(String.valueOf(paper_top));
+		final JTextField pbottom = new JTextField(String.valueOf(paper_bottom));
+		final JTextField pleft = new JTextField(String.valueOf(paper_left));
+		final JTextField pright = new JTextField(String.valueOf(paper_right));
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=3;	c.gridy=0;	driver.add(mtop,c);
+		c.gridx=3;	c.gridy=5;	driver.add(mbottom,c);
+		c.gridx=0;	c.gridy=3;	driver.add(mleft,c);
+		c.gridx=5;	c.gridy=3;	driver.add(mright,c);
+
+		c.gridx=3;	c.gridy=1;	driver.add(ptop,c);
+		c.gridx=3;	c.gridy=4;	driver.add(pbottom,c);
+		c.gridx=1;	c.gridy=3;	driver.add(pleft,c);
+		c.gridx=4;	c.gridy=3;	driver.add(pright,c);
+
+		c.gridx=4;  c.gridy=6;  driver.add(save,c);
+		c.gridx=5;  c.gridy=6;  driver.add(cancel,c);
+
+		Dimension s=ptop.getPreferredSize();
+		s.width=80;
+		ptop.setPreferredSize(s);
+		pbottom.setPreferredSize(s);
+		pleft.setPreferredSize(s);
+		pright.setPreferredSize(s);
+		mtop.setPreferredSize(s);
+		mbottom.setPreferredSize(s);
+		mleft.setPreferredSize(s);
+		mright.setPreferredSize(s);
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						paper_top = Float.valueOf(ptop.getText());
+						paper_bottom = Float.valueOf(pbottom.getText());
+						paper_right = Float.valueOf(pright.getText());
+						paper_left = Float.valueOf(pleft.getText());
+						limit_top = Float.valueOf(mtop.getText());
+						limit_bottom = Float.valueOf(mbottom.getText());
+						limit_right = Float.valueOf(mright.getText());
+						limit_left = Float.valueOf(mleft.getText());
+						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+						SetRecentPaperSize();
+						SaveConfig();
+						SendConfig();
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+			};
+		
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		SendLineToRobot("M114");  // "where" command
+		driver.pack();
+		driver.setVisible(true);
 	}
 
 	void LoadConfig() {
@@ -705,33 +750,6 @@ public class DrawbotGUI
                    +" J"+(m2invert?"-1":"1");
 		SendLineToRobot(line);
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
-	}
-	
-	/**
-	 * Open the config dialog, update the paper size, refresh the preview tab.
-	 */
-	public void UpdatePaper() {
-		JTextField top = new JTextField(String.valueOf(paper_top));
-		JTextField bottom = new JTextField(String.valueOf(paper_bottom));
-		JTextField left = new JTextField(String.valueOf(paper_left));
-		JTextField right = new JTextField(String.valueOf(paper_right));
-		final JComponent[] inputs = new JComponent[] {
-						new JLabel("Measurements are from your calibration point, in cm.  Left and Bottom should be negative."),
-		                new JLabel("Top"), 		top,
-		                new JLabel("Bottom"),	bottom,
-		                new JLabel("Left"), 	left,
-		                new JLabel("Right"), 	right
-		};
-		JOptionPane.showMessageDialog(null, inputs, "Config paper limits", JOptionPane.PLAIN_MESSAGE);
-
-		if(left.getText().trim()!="" || right.getText().trim()!="" ||
-			top.getText().trim()!="" || bottom.getText().trim()!="") {
-			paper_top = Float.valueOf(top.getText());
-			paper_bottom = Float.valueOf(bottom.getText());
-			paper_right = Float.valueOf(right.getText());
-			paper_left = Float.valueOf(left.getText());
-			SetRecentPaperSize();
-		}
 	}
 
 	// Take the next line from the file and send it to the robot, if permitted. 
@@ -805,7 +823,7 @@ public class DrawbotGUI
 	}
 	
 	/**
-	 * processes a single instruction meant for the robot.  Could be anything.
+	 * Sends a single command the robot.  Could be anything.
 	 * @param line command to send.
 	 * @return true means the command is sent.  false means it was not.
 	 */
@@ -821,7 +839,7 @@ public class DrawbotGUI
 	}
 	
 	/**
-	 * stop sending commands to the robot.
+	 * stop sending file commands to the robot.
 	 * @todo add an e-stop command?
 	 */
 	public void Halt() {
@@ -838,12 +856,10 @@ public class DrawbotGUI
 		Object subject = e.getSource();
 		
 		if(subject == buttonZoomIn) {
-			System.out.println("A");
 			previewPane.ZoomIn();
 			return;
 		}
 		if(subject == buttonZoomOut) {
-			System.out.println("B");
 			previewPane.ZoomOut();
 			return;
 		}
@@ -853,7 +869,6 @@ public class DrawbotGUI
 		}
 
 		if( subject == buttonStart ) {
-			//if(fileOpened) OpenFile(recentFiles[0]);
 			if(fileOpened) {
 				paused=false;
 				running=true;
@@ -898,21 +913,21 @@ public class DrawbotGUI
 			UpdateConfig();
 			return;
 		}
-		if( subject == buttonPaper ) {
-			UpdatePaper();
-			return;
-		}
 		if( subject == buttonJogMotors ) {
 			JogMotors();
 			return;
 		}
-		if(subject == buttonAbout ) {
+		if( subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com).\n\n"
 					+"Find out more at http://www.marginallyclever.com/\n"
 					+"Get the latest version and read the documentation online @ http://github.com/i-make-robots/DrawBot/");
 			return;
 		}
-		if(subject == buttonExit) {
+		if( subject == buttonCheckForUpdate ) {
+			CheckForUpdate();
+			return;
+		}
+		if( subject == buttonExit ) {
 			System.exit(0);  // @TODO: be more graceful?
 			return;
 		}
@@ -957,6 +972,21 @@ public class DrawbotGUI
         }
     }
 
+	public void CheckForUpdate() {
+		/*
+		try {
+		    // Send data
+			URL url = new URL("http://marginallyclever.com/drawbot_get.php");
+		    URLConnection conn = url.openConnection();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    robot_uid = Long.parseLong(rd.readLine());
+		    rd.close();
+		} catch (Exception e) {}
+		 */
+		// TODO Get latest version
+		// TODO Offer to download latest version?
+	}
+	
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
@@ -1072,7 +1102,6 @@ public class DrawbotGUI
 				Object subject = e.getSource();
 				if(subject == buttonApos) SendLineToRobot("D00 L100");
 				if(subject == buttonAneg) SendLineToRobot("D00 L-100");
-				
 				if(subject == buttonBpos) SendLineToRobot("D00 R100");
 				if(subject == buttonBneg) SendLineToRobot("D00 R-100");
 				SendLineToRobot("M114");
@@ -1133,7 +1162,6 @@ public class DrawbotGUI
         menu.addSeparator();
 
         // list recent files
-        GetRecentFiles();
         if(recentFiles.length>0) {
         	// list files here
         	for(i=0;i<recentFiles.length;++i) {
@@ -1166,7 +1194,6 @@ public class DrawbotGUI
         ButtonGroup group = new ButtonGroup();
 
         ListSerialPorts();
-        GetRecentPort();
         buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
         for(i=0;i<portsDetected.length;++i) {
         	buttonPorts[i] = new JRadioButtonMenuItem(portsDetected[i]);
@@ -1187,22 +1214,22 @@ public class DrawbotGUI
         
         menu.add(subMenu);
 
-        buttonConfig = new JMenuItem("Configure machine limits",KeyEvent.VK_C);
-        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot shape.");
+        buttonConfig = new JMenuItem("Configure limits",KeyEvent.VK_L);
+        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
         buttonConfig.addActionListener(this);
         buttonConfig.setEnabled(portConfirmed && !running);
         menu.add(buttonConfig);
-
-        buttonPaper = new JMenuItem("Configure paper limits",KeyEvent.VK_C);
-        buttonPaper.getAccessibleContext().setAccessibleDescription("Adjust the paper shape.");
-        buttonPaper.addActionListener(this);
-        buttonPaper.setEnabled(portConfirmed && !running);
-        menu.add(buttonPaper);
 
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
         buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
+
+        buttonDrive = new JMenuItem("Drive Manually",KeyEvent.VK_R);
+        buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
+        buttonDrive.addActionListener(this);
+        buttonDrive.setEnabled(portConfirmed && !running);
+        menu.add(buttonDrive);
 
         menuBar.add(menu);
 
@@ -1229,14 +1256,6 @@ public class DrawbotGUI
         buttonHalt.setEnabled(portConfirmed && running);
         menu.add(buttonHalt);
 
-        menu.addSeparator();
-
-        buttonDrive = new JMenuItem("Drive Manually",KeyEvent.VK_R);
-        buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
-        buttonDrive.addActionListener(this);
-        buttonDrive.setEnabled(portConfirmed && !running);
-        menu.add(buttonDrive);
-
         menuBar.add(menu);
         
         // tools menu
@@ -1253,7 +1272,7 @@ public class DrawbotGUI
         
         menuBar.add(menu);
         
-        //Build in the menu bar.
+        // Help menu
         menu = new JMenu("Help");
         menu.setMnemonic(KeyEvent.VK_H);
         menu.getAccessibleContext().setAccessibleDescription("Get help");
@@ -1262,6 +1281,12 @@ public class DrawbotGUI
         menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
         buttonAbout.addActionListener(this);
         menu.add(buttonAbout);
+
+        buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
+        menu.getAccessibleContext().setAccessibleDescription("Is there a newer version available?");
+        buttonCheckForUpdate.addActionListener(this);
+        buttonCheckForUpdate.setEnabled(false);
+        menu.add(buttonCheckForUpdate);
 
         menuBar.add(menu);
 
@@ -1308,19 +1333,15 @@ public class DrawbotGUI
         contentPane.add(split,BorderLayout.CENTER);
 
         // open the file
-		GetRecentFiles();
 		if(recentFiles[0].length()>0) {
 			OpenFileOnDemand(recentFiles[0]);
 		}
 		
 		// connect to the last port
 		ListSerialPorts();
-		GetRecentPort();
 		if(Arrays.asList(portsDetected).contains(recentPort)) {
 			OpenPort(recentPort);
 		}
-		
-		GetRecentPaperSize();
 		
         return contentPane;
     }
