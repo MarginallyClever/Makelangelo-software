@@ -394,7 +394,6 @@ public class DrawbotGUI
 		paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
 		paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
 		paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
-		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 	}
 	
 	// close the file, clear the preview tab
@@ -700,6 +699,7 @@ public class DrawbotGUI
 						limit_right = Float.valueOf(mright.getText());
 						limit_left = Float.valueOf(mleft.getText());
 						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+						previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 						SetRecentPaperSize();
 						SaveConfig();
 						SendConfig();
@@ -1314,6 +1314,7 @@ public class DrawbotGUI
         
         // the preview panel
         previewPane = new DrawPanel();
+        previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
         
         // status bar
         statusBar = new StatusBar();

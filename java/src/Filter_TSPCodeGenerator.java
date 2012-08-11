@@ -179,7 +179,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
             pm.close();
 			ConvertAndSaveToGCode();
 
-			DrawbotGUI.getSingleton().OpenFile(dest);
+			DrawbotGUI.getSingleton().LoadGCode(dest);
 		}
 	}
 
