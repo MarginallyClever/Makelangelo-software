@@ -5,7 +5,7 @@ while [ -h "$SOURCE" ]
 do 
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-  DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
