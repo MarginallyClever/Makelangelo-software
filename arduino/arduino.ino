@@ -33,8 +33,8 @@
 #define M2_PIN          (2)
 
 // which limit switch is on which pin?
-#define S1_PIN          (A3)
-#define S2_PIN          (A5)
+#define L_PIN          (A3)
+#define R_PIN          (A5)
 
 // NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
 // then it is 2.5132741228718345 circumference, and
@@ -42,11 +42,11 @@
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
-#define SPOOL_DIAMETER  (0.950)
-#define MAX_RPM         (200.0)
+#define MAX_RPM         (2000.0)
 
 // delay between steps, in microseconds.
 #define STEP_DELAY      (5200)  // = 3.5ms
+
 
 // *****************************************************************************
 // *** Don't change the constants below unless you know what you're doing.   ***
@@ -60,14 +60,8 @@
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (150)  // in ms
 
-// calculate some numbers to help us find feed_rate
-#define SPOOL_CIRC      (SPOOL_DIAMETER*PI)  // circumference
-#define THREADPERSTEP   (SPOOL_CIRC/STEPS_PER_TURN)  // thread per step
+#define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
 
-// Speed of the timer interrupt
-#define STEPS_S         (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
-
-#define MAX_VEL         (STEPS_S * THREADPERSTEP)  // cm/s
 #define MIN_VEL         (0.001) // cm/s
 
 // for arc directions
@@ -119,6 +113,12 @@ int M1_REEL_OUT = BACKWARD;
 int M2_REEL_IN  = FORWARD;
 int M2_REEL_OUT = BACKWARD;
 
+// calculate some numbers to help us find feed_rate
+float SPOOL_DIAMETER = 0.950;
+float SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
+float THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
+float MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
+
 // plotter position.
 static float posx, velx;
 static float posy, vely;
@@ -155,6 +155,16 @@ static int sofar;             // Serial buffer progress
 
 
 //------------------------------------------------------------------------------
+// calculate max velocity, threadperstep.
+static void adjustSpoolDiameter(float dia) {
+  SPOOL_DIAMETER = dia;
+  SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
+  THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
+  MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
+}
+
+
+//------------------------------------------------------------------------------
 // increment internal clock
 static void tick() {
   long nt_millis=millis();
@@ -177,10 +187,12 @@ static float atan3(float dy,float dx) {
 
 
 //------------------------------------------------------------------------------
-static void readSwitches() {
+static char readSwitches() {
   // get the current switch state
-  switch1=analogRead(S1_PIN) > SWITCH_HALF;
-  switch2=analogRead(S2_PIN) > SWITCH_HALF;
+  switch1=analogRead(L_PIN) < SWITCH_HALF;
+  switch2=analogRead(R_PIN) < SWITCH_HALF;
+  
+  return ( switch1 | switch2 );
 }
 
 
@@ -291,6 +303,7 @@ static void line(float x,float y,float z) {
         m2.onestep(dir2);
       }
       delayMicroseconds(step_delay);
+      if(readSwitches()) return;
     }
   } else {
     for(i=0;i<ad2;++i) {
@@ -301,6 +314,7 @@ static void line(float x,float y,float z) {
         m1.onestep(dir1);
       }
       delayMicroseconds(step_delay);
+      if(readSwitches()) return;
     }
   }
 
@@ -382,10 +396,9 @@ static void help() {
   Serial.println("HELP;  - display this message");
   Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
   Serial.println("       - display/update this robot's configuration.");
-  Serial.println("HOME;  - recalibrate and move to 0,0");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
-  Serial.println("G00,G01,G02,G03,G04,G20,G21,G90,G91,M114");
+  Serial.println("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M114");
 }
 
 
@@ -395,31 +408,49 @@ static void goHome() {
   Serial.println("Homing...");
   readSwitches();
   
-  if(!switch1 || !switch2) {
+  if(switch1 || switch2) {
     Serial.println("** ERROR **");
     Serial.println("Problem: Plotter is already touching switches.");
     Serial.println("Solution: Please unwind the strings a bit and try again.");
     return;
   }
   
+  int step_delay=3;
+  int safe_out=400;
+  
   // reel in the left motor until contact is made.
   Serial.println("Find left...");
   do {
     m1.step(1,M1_REEL_IN );
     m2.step(1,M2_REEL_OUT);
-    readSwitches();
-  } while(switch1==1);
+    delay(step_delay);
+  } while(!readSwitches());
   laststep1=0;
+  
+  // back off so we don't get a false positive on the next motor
+  int i;
+  for(i=0;i<safe_out;++i) {
+    m1.step(1,M1_REEL_OUT);
+    delay(step_delay);
+  }
+  laststep1=safe_out;
   
   // reel in the right motor until contact is made
   Serial.println("Find right...");
   do {
-    m2.step(1,M1_REEL_IN );
-    m1.step(1,M2_REEL_OUT);
+    m1.step(1,M1_REEL_OUT);
+    m2.step(1,M2_REEL_IN );
+    delay(step_delay);
     laststep1++;
-    readSwitches();
-  } while(switch2==1);
+  } while(!readSwitches());
   laststep2=0;
+  
+  // back off so we don't get a false positive that kills line()
+  for(i=0;i<safe_out;++i) {
+    m2.step(1,M2_REEL_OUT);
+    delay(step_delay);
+  }
+  laststep2=safe_out;
   
   Serial.println("Centering...");
   line(0,0,90);
@@ -506,7 +537,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"UID",3)) {
     robot_uid=atol(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"HOME",4)) {
+  } else if(!strncmp(buffer,"G28",4)) {
     goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
@@ -667,7 +698,7 @@ static void processCommand() {
     }
 
     delay(xx);
-  } else if(!strncmp(buffer,"D00 ",4) || !strncmp(buffer,"D0 ",3)) {
+  } else if(!strncmp(buffer,"D00 ",4)) {
     // move one motor
     char *ptr=strchr(buffer,' ')+1;
     int amount = atoi(ptr+1);
@@ -681,6 +712,11 @@ static void processCommand() {
       amount = abs(amount);
       for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
     }
+  }  else if(!strncmp(buffer,"D01 ",4)) {
+    // move one motor
+    char *ptr=strchr(buffer,' ')+1;
+    float amount = atof(ptr+1);
+    adjustSpoolDiameter(amount);
   } else {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -723,6 +759,7 @@ void setup() {
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
+  adjustSpoolDiameter(0.950);
   setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
   
   // initialize the read buffer
@@ -732,8 +769,8 @@ void setup() {
   s1.attach(SERVO_PIN);
 
   // turn on the pull up resistor
-  digitalWrite(S1_PIN,HIGH);
-  digitalWrite(S2_PIN,HIGH);
+  digitalWrite(L_PIN,HIGH);
+  digitalWrite(R_PIN,HIGH);
   
   // display the help at startup.
   help();

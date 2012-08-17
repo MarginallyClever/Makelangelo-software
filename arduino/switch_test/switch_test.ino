@@ -38,22 +38,29 @@ void ps() {
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(57600);
+  
+  digitalWrite(A0,HIGH);
+  digitalWrite(A1,HIGH);
+  digitalWrite(A2,HIGH);
+  digitalWrite(A3,HIGH);
+  digitalWrite(A4,HIGH);
+  
   Serial.print("T");
   Serial.print("\t");
   Serial.print("L");
   Serial.print("\t");
   Serial.println("R");
 
-  a=analogRead(3)>CUTOFF;
-  b=analogRead(5)>CUTOFF;
+  a=analogRead(3)<CUTOFF;
+  b=analogRead(5)<CUTOFF;
   ps();
 }
 
 
 //------------------------------------------------------------------------------
 void loop() {
-  char a1=analogRead(3)>CUTOFF;
-  char b1=analogRead(5)>CUTOFF;
+  char a1=analogRead(3)<CUTOFF;
+  char b1=analogRead(5)<CUTOFF;
   
   if(a1!=a){
     a=a1;

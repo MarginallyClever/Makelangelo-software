@@ -993,8 +993,10 @@ public class DrawbotGUI
 	public void Drive() {
 		JDialog driver = new JDialog(mainframe,"Manual Control",true);
 		driver.setLayout(new GridBagLayout());
-		
+
+		JButton find = new JButton("FIND HOME");
 		JButton home = new JButton("GO HOME");
+		JButton center = new JButton("THIS IS HOME");
 		
 		JButton up1 = new JButton("Y1");
 		JButton up10 = new JButton("Y10");
@@ -1012,8 +1014,6 @@ public class DrawbotGUI
 		JButton right10 = new JButton("X10");
 		JButton right100 = new JButton("X100");
 		
-		JButton center = new JButton("THIS IS HOME");
-		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=3;	c.gridy=0;	driver.add(up100,c);
 		c.gridx=3;	c.gridy=1;	driver.add(up10,c);
@@ -1022,8 +1022,6 @@ public class DrawbotGUI
 		c.gridx=3;	c.gridy=5;	driver.add(down10,c);
 		c.gridx=3;	c.gridy=6;	driver.add(down100,c);
 
-		c.gridx=3;	c.gridy=3;	driver.add(center,c);
-		
 		c.gridx=0;	c.gridy=3;	driver.add(left100,c);
 		c.gridx=1;	c.gridy=3;	driver.add(left10,c);
 		c.gridx=2;	c.gridy=3;	driver.add(left1,c);
@@ -1031,7 +1029,9 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
-		c.gridx=6;  c.gridy=0;  driver.add(home,c);
+		c.gridx=3;	c.gridy=3;	driver.add(home,c);
+		c.gridx=6;  c.gridy=0;  driver.add(center,c);
+		c.gridx=6;  c.gridy=1;  driver.add(find,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -1041,8 +1041,9 @@ public class DrawbotGUI
 					if(t=="GO HOME") {
 						GoHome();
 						SendLineToRobot("M114");
-					}
-					if(t=="THIS IS HOME") {
+					} else if(t=="FIND HOME") {
+						SendLineToRobot("G28");
+					} else if(t=="THIS IS HOME") {
 						SendLineToRobot("TELEPORT XO YO");
 					} else {
 						SendLineToRobot("G91");
@@ -1067,6 +1068,7 @@ public class DrawbotGUI
 		right100.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
+		find.addActionListener(driveButtons);
 		SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
