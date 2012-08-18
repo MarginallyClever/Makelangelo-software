@@ -797,6 +797,12 @@ public class DrawbotGUI
 			Halt();
 			return false;
 		}
+
+		if(Arrays.asList(tokens).contains("M18")) {
+		  // Handle M18 (disable motors)
+		  SendLineToRobot(line);
+		  return true;
+                }
 		
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
@@ -817,6 +823,7 @@ public class DrawbotGUI
 		}
 
 		// send relevant part of line to the robot
+
 		SendLineToRobot(line);
 		
 		return false;
