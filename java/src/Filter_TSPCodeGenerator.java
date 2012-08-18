@@ -352,6 +352,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
 			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
+			// Unpower Steppers
+			out.write("M18\n");
 			out.close();
 		}
 		catch(IOException e) {
