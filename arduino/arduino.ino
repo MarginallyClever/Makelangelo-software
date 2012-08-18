@@ -577,6 +577,10 @@ static void processCommand() {
 #endif
   if(!strncmp(buffer,"M114",4)) {
     where();
+  } else if(!strncmp(buffer,"M18",3)) {
+    // disable motors
+    m1.release();
+    m2.release();
   } else if(!strncmp(buffer,"CONFIG",6)) {
     float tt=limit_top;
     float bb=limit_bottom;
