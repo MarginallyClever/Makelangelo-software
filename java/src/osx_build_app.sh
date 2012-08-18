@@ -8,6 +8,16 @@ rm -rf RXTXcomm.jar
 
 cp ../RXTXcomm.jar .
 
+if [ $1 == "clean" ] 
+then
+  rm -rf DrawbotGUI.app
+  rm -rf build.xml
+  rm -rf DrawbotGUI.jar
+  rm -rf RXTXcomm.jar
+  exit 0
+fi
+
+
 
 javac -g -sourcepath . -classpath ./classes Filter.java 
 javac -g -sourcepath . -classpath ./classes Filter_BlackAndWhite.java 
