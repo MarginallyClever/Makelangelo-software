@@ -42,7 +42,7 @@
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
 #define STEPS_PER_TURN  (200.0)
-#define MAX_RPM         (2000.0)
+#define MAX_RPM         (200.0)
 
 // delay between steps, in microseconds.
 #define STEP_DELAY      (5200)  // = 3.5ms
@@ -81,6 +81,15 @@
 #else
 #define SERVO_PIN        9
 #endif
+
+
+//------------------------------------------------------------------------------
+// EEPROM MEMORY MAP
+//------------------------------------------------------------------------------
+#define EEPROM_VERSION   3             // Increment EEPROM_VERSION when adding new variables
+#define ADDR_VERSION     0             // address of the version number (one byte)
+#define ADDR_UUID        1             // address of the UUID (long - 4 bytes)
+#define ADDR_SPOOL_DIA   5             // address of the spool diameter (float - 4 bytes)
 
 
 //------------------------------------------------------------------------------
@@ -161,6 +170,7 @@ static void adjustSpoolDiameter(float dia) {
   SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
   THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
   MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
+  // Serial.print("SpoolDiameter = "); Serial.println(SPOOL_DIAMETER,3);
 }
 
 
@@ -506,26 +516,35 @@ float EEPROM_readLong(int ee) {
 
 //------------------------------------------------------------------------------
 static void LoadConfig() {
-  char version=EEPROM.read(0);
-  if(version==1) {
-    // update the version number
+  char version=EEPROM.read(ADDR_VERSION);
+  if(version<EEPROM_VERSION || version>EEPROM_VERSION) {
+    // If not the cuurent EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
+    // Update the version number
+    EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
+    // Update robot uuid
     robot_uid=0;
-    EEPROM.write(0,2);
     SaveUID();
-  } else if(version==2) {
-    robot_uid=EEPROM_readLong(1);
+    // Update spool diameter variables
+    SaveSpoolDia();
+  } else if(version==EEPROM_VERSION) {
+    // Retrieve Stored Configuration
+    robot_uid=EEPROM_readLong(ADDR_UUID);
+    SPOOL_DIAMETER=EEPROM_readLong(ADDR_SPOOL_DIA)/10000;   //3 decimal places of percision is enough   
   } else {
-    // update the version number
-    robot_uid=0;
-    EEPROM.write(0,2);
-    SaveUID();
+    // Code should not get here if it does we should display some meaningful error message
+    Serial.println("An Error Occurred during LoadConfig");
   }
 }
 
 
 //------------------------------------------------------------------------------
 static void SaveUID() {
-  EEPROM_writeLong(1,robot_uid);
+  EEPROM_writeLong(ADDR_UUID,robot_uid);
+}
+
+//------------------------------------------------------------------------------
+static void SaveSpoolDia () {
+  EEPROM_writeLong(ADDR_SPOOL_DIA,SPOOL_DIAMETER*10000);
 }
 
 
@@ -713,10 +732,12 @@ static void processCommand() {
       for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
     }
   }  else if(!strncmp(buffer,"D01 ",4)) {
-    // move one motor
+    // adjust spool diameter
     char *ptr=strchr(buffer,' ')+1;
-    float amount = atof(ptr+1);
+    float amount = atof(ptr);
     adjustSpoolDiameter(amount);
+    // Update EEPROM
+    SaveSpoolDia();
   } else {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
@@ -754,12 +775,12 @@ void setup() {
   Serial.begin(BAUD);
   Serial.print("\n\nHELLO WORLD! I AM DRAWBOT #");
   Serial.println(robot_uid);
-
+  
   // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
-  adjustSpoolDiameter(0.950);
+  adjustSpoolDiameter(SPOOL_DIAMETER); 
   setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
   
   // initialize the read buffer
