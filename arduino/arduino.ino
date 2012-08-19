@@ -550,7 +550,9 @@ static void SaveSpoolDiameter () {
 
 //------------------------------------------------------------------------------
 static void processCommand() {
-#ifndef SMALL_FOOTPRINT
+  // blank lines
+  if(strlen(buffer)==0) return;
+  
   if(!strncmp(buffer,"HELP",4)) {
     help();
   } else if(!strncmp(buffer,"UID",3)) {
@@ -574,7 +576,6 @@ static void processCommand() {
 
     teleport(xx,yy);
   } else 
-#endif
   if(!strncmp(buffer,"M114",4)) {
     where();
   } else if(!strncmp(buffer,"M18",3)) {
