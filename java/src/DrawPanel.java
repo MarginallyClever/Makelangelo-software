@@ -112,6 +112,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		cameraZoom*=3.0/4.0;
     	repaint();
 	}
+	public void ZoomToFitPaper() {
+		float w=(float)this.getWidth();
+		float h=(float)this.getHeight();
+		// which one do we have to zoom more to fit the picture in the component?
+		float wzoom=w/(float)(paper_right-paper_left);
+		float hzoom=h/(float)(paper_top-paper_bottom);
+		cameraZoom = wzoom > hzoom ? wzoom : hzoom;
+		
+		repaint();
+	}
 	
 	public void mousePressed(MouseEvent e) {
 		buttonPressed=e.getButton();

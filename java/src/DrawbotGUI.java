@@ -616,6 +616,8 @@ public class DrawbotGUI
     	} else {
     		LoadGCode(filename);
     	}
+    	
+    	previewPane.ZoomToFitPaper();
 
     	statusBar.Clear();
 	}
@@ -1357,17 +1359,6 @@ public class DrawbotGUI
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
         contentPane.add(split,BorderLayout.CENTER);
-
-        // open the file
-		if(recentFiles[0].length()>0) {
-			OpenFileOnDemand(recentFiles[0]);
-		}
-		
-		// connect to the last port
-		ListSerialPorts();
-		if(Arrays.asList(portsDetected).contains(recentPort)) {
-			OpenPort(recentPort);
-		}
 		
         return contentPane;
     }
@@ -1386,6 +1377,18 @@ public class DrawbotGUI
         //Display the window.
         mainframe.setSize(800,700);
         mainframe.setVisible(true);
+
+        DrawbotGUI s=getSingleton();
+        // open the file
+		if(s.recentFiles[0].length()>0) {
+			s.OpenFileOnDemand(s.recentFiles[0]);
+		}
+		
+		// connect to the last port
+		s.ListSerialPorts();
+		if(Arrays.asList(s.portsDetected).contains(s.recentPort)) {
+			s.OpenPort(s.recentPort);
+		}
     }
     
     public static void main(String[] args) {
