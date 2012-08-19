@@ -677,9 +677,10 @@ public class DrawbotGUI
 		c.gridx=4;  c.gridy=7;  driver.add(save,c);
 		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
 
-		c.gridx=0;  c.gridy=6;  c.gridwidth=4;  c.gridheight=2;
-		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size.\n"+
-								"The bottom and left values should be negative."),c);
+		c.gridx=0;  c.gridy=5;  c.gridwidth=4;  c.gridheight=1;
+		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size."),c);
+		c.gridx=0;  c.gridy=6;  c.gridwidth=4;  c.gridheight=1;
+		driver.add(new JLabel("The bottom and left values should be negative."),c);
 
 		Dimension s=ptop.getPreferredSize();
 		s.width=80;
@@ -705,7 +706,7 @@ public class DrawbotGUI
 						limit_right = Float.valueOf(mright.getText());
 						limit_left = Float.valueOf(mleft.getText());
 						boolean data_is_sane=true;
-						if( limit_right >= limit_left ) data_is_sane=false;
+						if( limit_right <= limit_left ) data_is_sane=false;
 						if( limit_top <= limit_bottom ) data_is_sane=false;
 						if( paper_right <= paper_left ) data_is_sane=false;
 						if( paper_top <= paper_bottom ) data_is_sane=false;
