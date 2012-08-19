@@ -165,8 +165,8 @@ static int sofar;             // Serial buffer progress
 
 //------------------------------------------------------------------------------
 // calculate max velocity, threadperstep.
-static void adjustSpoolDiameter(float dia) {
-  SPOOL_DIAMETER = dia;
+static void adjustSpoolDiameter(float diameter) {
+  SPOOL_DIAMETER = diameter;
   SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
   THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
   MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
@@ -525,11 +525,11 @@ static void LoadConfig() {
     robot_uid=0;
     SaveUID();
     // Update spool diameter variables
-    SaveSpoolDia();
+    SaveSpoolDiameter();
   } else if(version==EEPROM_VERSION) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    SPOOL_DIAMETER=EEPROM_readLong(ADDR_SPOOL_DIA)/10000;   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA)/10000.0f);   //3 decimal places of percision is enough   
   } else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println("An Error Occurred during LoadConfig");
@@ -543,7 +543,7 @@ static void SaveUID() {
 }
 
 //------------------------------------------------------------------------------
-static void SaveSpoolDia () {
+static void SaveSpoolDiameter () {
   EEPROM_writeLong(ADDR_SPOOL_DIA,SPOOL_DIAMETER*10000);
 }
 
@@ -741,7 +741,7 @@ static void processCommand() {
     float amount = atof(ptr);
     adjustSpoolDiameter(amount);
     // Update EEPROM
-    SaveSpoolDia();
+    SaveSpoolDiameter();
   } else {
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
