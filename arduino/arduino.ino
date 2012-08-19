@@ -551,7 +551,7 @@ static void SaveSpoolDiameter () {
 //------------------------------------------------------------------------------
 static void processCommand() {
   // blank lines
-  if(strlen(buffer)==0) return;
+  if(buffer[0]==';') return;
   
   if(!strncmp(buffer,"HELP",4)) {
     help();
