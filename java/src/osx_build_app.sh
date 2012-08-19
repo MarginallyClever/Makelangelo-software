@@ -8,7 +8,7 @@ rm -rf RXTXcomm.jar
 
 cp ../RXTXcomm.jar .
 
-if [ $1 == "clean" ] 
+if [ "$1" == "clean" ]
 then
   rm -rf DrawbotGUI.app
   rm -rf build.xml
