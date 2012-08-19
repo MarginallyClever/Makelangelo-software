@@ -677,9 +677,9 @@ public class DrawbotGUI
 		c.gridx=4;  c.gridy=7;  driver.add(save,c);
 		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
 
-		c.gridx=0;  c.gridy=5;  c.gridwidth=4;  c.gridheight=1;
+		c.gridx=0;  c.gridy=6;  c.gridwidth=6;  c.gridheight=1;
 		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size."),c);
-		c.gridx=0;  c.gridy=6;  c.gridwidth=4;  c.gridheight=1;
+		c.gridx=0;  c.gridy=7;  c.gridwidth=4;  c.gridheight=1;
 		driver.add(new JLabel("The bottom and left values should be negative."),c);
 
 		Dimension s=ptop.getPreferredSize();
