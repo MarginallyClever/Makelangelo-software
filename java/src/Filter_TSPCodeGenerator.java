@@ -341,15 +341,20 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+			// change to tool 0
 			out.write("M06 T0\n");
-			out.write("G00 F300 Z90\n");
+			// lift pen and set a default feed rate
+			out.write("G00 F1000 Z90\n");
+			// move to the first point
 			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+			// lower the pen
 			out.write("G00 Z10\n");
 
 			for(i=1;i<numPoints;++i) {
 				out.write("G01 X" + (points[solution[i]].x-w2) + " Y" + (h2-points[solution[i]].y) + "\n");
 			}
 			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+			// lift pen and return to home
 			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
 			// Unpower Steppers

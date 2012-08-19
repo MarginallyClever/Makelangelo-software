@@ -76,8 +76,8 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfig, buttonRescan, buttonJogMotors;
-    private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDrive;
+    private JMenuItem buttonConfigureLimits, buttonRescan, buttonJogMotors;
+    private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
     
@@ -319,7 +319,7 @@ public class DrawbotGUI
 			GetRecentPaperSize();
 			LoadConfig();
 			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
-				UpdateConfig();
+				ConfigureLimits();
 			}
 
 			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
@@ -644,7 +644,7 @@ public class DrawbotGUI
 	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
-	public void UpdateConfig() {
+	public void ConfigureLimits() {
 		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
 		driver.setLayout(new GridBagLayout());
 
@@ -672,8 +672,12 @@ public class DrawbotGUI
 		c.gridx=1;	c.gridy=3;	driver.add(pleft,c);
 		c.gridx=4;	c.gridy=3;	driver.add(pright,c);
 
-		c.gridx=4;  c.gridy=6;  driver.add(save,c);
-		c.gridx=5;  c.gridy=6;  driver.add(cancel,c);
+		c.gridx=4;  c.gridy=7;  driver.add(save,c);
+		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
+
+		c.gridx=0;  c.gridy=6;  c.gridwidth=4;  c.gridheight=2;
+		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size.\n"+
+								"The bottom and left values should be negative."),c);
 
 		Dimension s=ptop.getPreferredSize();
 		s.width=80;
@@ -698,12 +702,19 @@ public class DrawbotGUI
 						limit_bottom = Float.valueOf(mbottom.getText());
 						limit_right = Float.valueOf(mright.getText());
 						limit_left = Float.valueOf(mleft.getText());
-						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-						previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-						SetRecentPaperSize();
-						SaveConfig();
-						SendConfig();
-						driver.dispose();
+						boolean data_is_sane=true;
+						if( limit_right >= limit_left ) data_is_sane=false;
+						if( limit_top <= limit_bottom ) data_is_sane=false;
+						if( paper_right <= paper_left ) data_is_sane=false;
+						if( paper_top <= paper_bottom ) data_is_sane=false;
+						if(data_is_sane) {
+							previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+							previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
+							SetRecentPaperSize();
+							SaveConfig();
+							SendConfig();
+							driver.dispose();
+						}
 					}
 					if(subject == cancel) {
 						driver.dispose();
@@ -772,6 +783,11 @@ public class DrawbotGUI
 		}
 	}
 	
+	
+	private void ChangeToTool(String toolName) {
+		JOptionPane.showMessageDialog(null,"Please change to tool "+toolName+" and click OK.");
+	}
+	
 	/**
 	 * removes comments, processes commands drawbot shouldn't have to handle.
 	 * @param line command to send
@@ -785,7 +801,7 @@ public class DrawbotGUI
 		if(Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
 			for(int i=0;i<tokens.length;++i) {
 				if(tokens[i].startsWith("T")) {
-					JOptionPane.showMessageDialog(null,"Please change to tool #"+tokens[i].substring(1)+" and click OK.");
+					ChangeToTool(tokens[i].substring(1));
 				}
 			}
 			// still ready to send
@@ -793,7 +809,7 @@ public class DrawbotGUI
 		}
 		
 		// end of program?
-		if(tokens[0]=="M02" || tokens[0]=="M2") {
+		if(tokens[0]=="M02" || tokens[0]=="M2" || tokens[0]=="M30") {
 			Halt();
 			return false;
 		}
@@ -802,7 +818,7 @@ public class DrawbotGUI
 		  // Handle M18 (disable motors)
 		  SendLineToRobot(line);
 		  return true;
-                }
+        }
 		
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
@@ -902,7 +918,7 @@ public class DrawbotGUI
 			}
 			return;
 		}
-		if( subject == buttonDrive ) {
+		if( subject == buttonDriveManually ) {
 			Drive();
 			return;
 		}
@@ -916,8 +932,8 @@ public class DrawbotGUI
 			return;
 			
 		}
-		if( subject == buttonConfig ) {
-			UpdateConfig();
+		if( subject == buttonConfigureLimits ) {
+			ConfigureLimits();
 			return;
 		}
 		if( subject == buttonJogMotors ) {
@@ -1223,22 +1239,22 @@ public class DrawbotGUI
         
         menu.add(subMenu);
 
-        buttonConfig = new JMenuItem("Configure limits",KeyEvent.VK_L);
-        buttonConfig.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
-        buttonConfig.addActionListener(this);
-        buttonConfig.setEnabled(portConfirmed && !running);
-        menu.add(buttonConfig);
+        buttonConfigureLimits = new JMenuItem("Configure limits",KeyEvent.VK_L);
+        buttonConfigureLimits.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
+        buttonConfigureLimits.addActionListener(this);
+        buttonConfigureLimits.setEnabled(portConfirmed && !running);
+        menu.add(buttonConfigureLimits);
 
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
         buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
 
-        buttonDrive = new JMenuItem("Drive Manually",KeyEvent.VK_R);
-        buttonDrive.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
-        buttonDrive.addActionListener(this);
-        buttonDrive.setEnabled(portConfirmed && !running);
-        menu.add(buttonDrive);
+        buttonDriveManually = new JMenuItem("Drive Manually",KeyEvent.VK_R);
+        buttonDriveManually.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
+        buttonDriveManually.addActionListener(this);
+        buttonDriveManually.setEnabled(portConfirmed && !running);
+        menu.add(buttonDriveManually);
 
         menuBar.add(menu);
 
