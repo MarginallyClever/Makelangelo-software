@@ -195,8 +195,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 		// draw calibration point
 		g2d.setColor(Color.RED);
-		g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
+		g2d.drawLine((int)TX(limit_left),(int)TY(limit_top), (int)TX(0.25),(int)TY(0.00));
 		g2d.drawLine((int)TX( 0.00),(int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
+		
+		// draw left motor
+		
+		// draw right motor
+		
+		// draw arduino + connection status
+		
 /*
 		if(img!=null) {
 			int w=img.getWidth();

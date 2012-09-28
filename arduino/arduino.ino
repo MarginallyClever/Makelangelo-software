@@ -408,7 +408,7 @@ static void help() {
   Serial.println("       - display/update this robot's configuration.");
   Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
   Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
-  Serial.println("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M114");
+  Serial.println("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M18,M114");
 }
 
 
@@ -558,7 +558,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"UID",3)) {
     robot_uid=atol(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"G28",4)) {
+  } else if(!strncmp(buffer,"G28",3)) {
     goHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;

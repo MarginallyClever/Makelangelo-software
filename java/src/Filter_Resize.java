@@ -15,13 +15,13 @@ public class Filter_Resize {
 	private double paper_top, paper_bottom, paper_left, paper_right;
 	
 	
-	public Filter_Resize(double t,double b,double l,double r,double dpc,double m) {
+	public Filter_Resize(double t,double b,double l,double r,double _dots_per_cm,double _margin) {
 		paper_top=t;
 		paper_bottom=b;
 		paper_left=l;
 		paper_right=r;
-		dots_per_cm=dpc;
-		margin=m;
+		dots_per_cm=_dots_per_cm;
+		margin=_margin;
 	}
 	
 	

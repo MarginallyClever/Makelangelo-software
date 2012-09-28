@@ -64,6 +64,8 @@ public class DrawbotGUI
 	private double limit_left=-10;
 	private double limit_right=10;
 	
+	private int image_dpi;
+	
 	// paper area (stock material
 	private double paper_top=10;
 	private double paper_bottom=-10;
@@ -76,7 +78,7 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfigureLimits, buttonRescan, buttonJogMotors;
+    private JMenuItem buttonConfigureLimits, buttonRescan, buttonJogMotors, buttonImageProcessing;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -142,11 +144,11 @@ public class DrawbotGUI
 		try {
 			img = ImageIO.read(new File(filename));
 
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,(double)image_dpi/100.0,0.9f); 
+			img = rs.Process(img);
+			
 			Filter_BlackAndWhite bwc = new Filter_BlackAndWhite(); 
 			img = bwc.Process(img);
-			
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,1,0.9f); 
-			img = rs.Process(img);
 			
 			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 			img = dither.Process(img);
@@ -642,6 +644,7 @@ public class DrawbotGUI
 	public void GoHome() {
 		SendLineToRobot("G00 X0 Y0 Z0");
 	}
+<<<<<<< HEAD
 	
 	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
@@ -733,6 +736,8 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
+=======
+>>>>>>> Added printable parts for version control
 
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
@@ -742,6 +747,7 @@ public class DrawbotGUI
 		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
 		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
 		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
+		image_dpi=Integer.parseInt(prefs.get(id+"_image_dpi","100"));
 	}
 
 	void SaveConfig() {
@@ -787,7 +793,6 @@ public class DrawbotGUI
 			Halt();
 		}
 	}
-	
 	
 	private void ChangeToTool(String toolName) {
 		JOptionPane.showMessageDialog(null,"Please change to tool "+toolName+" and click OK.");
@@ -927,6 +932,10 @@ public class DrawbotGUI
 			Drive();
 			return;
 		}
+		if( subject == buttonImageProcessing ) {
+			ImageProcessing();
+			return;
+		}
 		if( subject == buttonHalt ) {
 			Halt();
 			return;
@@ -1003,7 +1012,7 @@ public class DrawbotGUI
 	public void CheckForUpdate() {
 		/*
 		try {
-		    // Send data
+		    // Ping github for the latest version.
 			URL url = new URL("http://marginallyclever.com/drawbot_get.php");
 		    URLConnection conn = url.openConnection();
 		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -1013,6 +1022,95 @@ public class DrawbotGUI
 		 */
 		// TODO Get latest version
 		// TODO Offer to download latest version?
+	}
+
+	/**
+	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+	 */
+	public void ConfigureLimits() {
+		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
+		driver.setLayout(new GridBagLayout());
+
+		final JTextField mtop = new JTextField(String.valueOf(limit_top));
+		final JTextField mbottom = new JTextField(String.valueOf(limit_bottom));
+		final JTextField mleft = new JTextField(String.valueOf(limit_left));
+		final JTextField mright = new JTextField(String.valueOf(limit_right));
+		
+		final JTextField ptop = new JTextField(String.valueOf(paper_top));
+		final JTextField pbottom = new JTextField(String.valueOf(paper_bottom));
+		final JTextField pleft = new JTextField(String.valueOf(paper_left));
+		final JTextField pright = new JTextField(String.valueOf(paper_right));
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=3;	c.gridy=0;	driver.add(mtop,c);
+		c.gridx=3;	c.gridy=5;	driver.add(mbottom,c);
+		c.gridx=0;	c.gridy=3;	driver.add(mleft,c);
+		c.gridx=5;	c.gridy=3;	driver.add(mright,c);
+
+		c.gridx=3;	c.gridy=1;	driver.add(ptop,c);
+		c.gridx=3;	c.gridy=4;	driver.add(pbottom,c);
+		c.gridx=1;	c.gridy=3;	driver.add(pleft,c);
+		c.gridx=4;	c.gridy=3;	driver.add(pright,c);
+
+		c.gridx=4;  c.gridy=7;  driver.add(save,c);
+		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
+
+		c.gridx=0;  c.gridy=6;  c.gridwidth=6;  c.gridheight=1;
+		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size."),c);
+		c.gridx=0;  c.gridy=7;  c.gridwidth=4;  c.gridheight=1;
+		driver.add(new JLabel("The bottom and left values should be negative."),c);
+
+		Dimension s=ptop.getPreferredSize();
+		s.width=80;
+		ptop.setPreferredSize(s);
+		pbottom.setPreferredSize(s);
+		pleft.setPreferredSize(s);
+		pright.setPreferredSize(s);
+		mtop.setPreferredSize(s);
+		mbottom.setPreferredSize(s);
+		mleft.setPreferredSize(s);
+		mright.setPreferredSize(s);
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						paper_top = Float.valueOf(ptop.getText());
+						paper_bottom = Float.valueOf(pbottom.getText());
+						paper_right = Float.valueOf(pright.getText());
+						paper_left = Float.valueOf(pleft.getText());
+						limit_top = Float.valueOf(mtop.getText());
+						limit_bottom = Float.valueOf(mbottom.getText());
+						limit_right = Float.valueOf(mright.getText());
+						limit_left = Float.valueOf(mleft.getText());
+						boolean data_is_sane=true;
+						if( limit_right <= limit_left ) data_is_sane=false;
+						if( limit_top <= limit_bottom ) data_is_sane=false;
+						if( paper_right <= paper_left ) data_is_sane=false;
+						if( paper_top <= paper_bottom ) data_is_sane=false;
+						if(data_is_sane) {
+							previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+							previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
+							SetRecentPaperSize();
+							SaveConfig();
+							SendConfig();
+							driver.dispose();
+						}
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+			};
+		
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		SendLineToRobot("M114");  // "where" command
+		driver.pack();
+		driver.setVisible(true);
 	}
 	
 	/**
@@ -1098,6 +1196,51 @@ public class DrawbotGUI
 		home.addActionListener(driveButtons);
 		find.addActionListener(driveButtons);
 		SendLineToRobot("M114");
+		driver.pack();
+		driver.setVisible(true);
+	}
+	
+	/**
+	 * open the Image Processing dialog, update automatic image processing.  Could be expanded into a live preview of the dithered image?
+	 */
+	public void ImageProcessing() {
+		final JDialog driver = new JDialog(mainframe,"Image Processing",true);
+		driver.setLayout(new GridBagLayout());
+
+		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 1, 100, image_dpi);
+		input_image_dpi.setMajorTickSpacing(25);
+		input_image_dpi.setMinorTickSpacing(5);
+		input_image_dpi.setPaintTicks(true);
+		input_image_dpi.setPaintLabels(true);
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=0;  c.gridy=0;  driver.add(new JLabel("Image conversion DPI (Default: xxx)"));
+		c.gridx=1;	c.gridy=0;	driver.add(input_image_dpi,c);
+		c.gridx=2;  c.gridy=2;  driver.add(save,c);
+		c.gridx=3;  c.gridy=2;  driver.add(cancel,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						int image_dpi2 = input_image_dpi.getValue();
+						boolean data_is_sane=true;
+						if( image_dpi2 < 1 || image_dpi2 > 64 ) data_is_sane=false;
+						if(data_is_sane) {
+							image_dpi=image_dpi2;
+							driver.dispose();
+						}
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+				}
+			};
+		
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1216,7 +1359,7 @@ public class DrawbotGUI
         menu = new JMenu("Settings");
         menu.setMnemonic(KeyEvent.VK_T);
         menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
-        
+
         JMenu subMenu = new JMenu("Port");
         subMenu.setMnemonic(KeyEvent.VK_P);
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
@@ -1260,6 +1403,12 @@ public class DrawbotGUI
         buttonDriveManually.addActionListener(this);
         buttonDriveManually.setEnabled(portConfirmed && !running);
         menu.add(buttonDriveManually);
+
+        menu.addSeparator();
+
+        buttonImageProcessing = new JMenuItem("Image Processing");
+        buttonImageProcessing.addActionListener(this);
+        menu.add(buttonImageProcessing);
 
         menuBar.add(menu);
 
