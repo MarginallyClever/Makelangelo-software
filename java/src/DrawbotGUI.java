@@ -608,15 +608,19 @@ public class DrawbotGUI
 		}
 	}	
 	
+	public boolean IsFileGcode(String filename) {
+		String ext=filename.substring(filename.lastIndexOf('.'));
+    	return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
+	}
+	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
 		Log("<font color='green'>Opening file "+recentFiles[0]+"...</font>\n");
 		
-		String ext=filename.substring(filename.lastIndexOf('.'));
-    	if(!ext.equalsIgnoreCase(".ngc")) {
-   			LoadImage(filename);
+		if(IsFileGcode(filename)) {
+			LoadGCode(filename);
     	} else {
-    		LoadGCode(filename);
+    		LoadImage(filename);
     	}
     	
     	previewPane.ZoomToFitPaper();
@@ -637,14 +641,21 @@ public class DrawbotGUI
 		fc.addChoosableFileFilter(filterImage);
 		fc.addChoosableFileFilter(filterGCODE);
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-	    	OpenFileOnDemand(fc.getSelectedFile().getAbsolutePath());
+	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
+	    	if(!IsFileGcode(selectedFile)) {
+	    		// if machine is not yet calibrated
+	    		if(paper_top<=paper_bottom || paper_right<=paper_left) {
+	    			JOptionPane.showMessageDialog(null,"Please set a paper size before importing an image.  Paper size is set in Settings > Configure Limits.");
+	    			return;
+	    		}
+	    	}
+	    	OpenFileOnDemand(selectedFile);
 	    }
 	}
 	
 	public void GoHome() {
 		SendLineToRobot("G00 X0 Y0 Z0");
 	}
-<<<<<<< HEAD
 	
 	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
@@ -736,8 +747,6 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
-=======
->>>>>>> Added printable parts for version control
 
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
@@ -1023,95 +1032,6 @@ public class DrawbotGUI
 		// TODO Get latest version
 		// TODO Offer to download latest version?
 	}
-
-	/**
-	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	 */
-	public void ConfigureLimits() {
-		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
-		driver.setLayout(new GridBagLayout());
-
-		final JTextField mtop = new JTextField(String.valueOf(limit_top));
-		final JTextField mbottom = new JTextField(String.valueOf(limit_bottom));
-		final JTextField mleft = new JTextField(String.valueOf(limit_left));
-		final JTextField mright = new JTextField(String.valueOf(limit_right));
-		
-		final JTextField ptop = new JTextField(String.valueOf(paper_top));
-		final JTextField pbottom = new JTextField(String.valueOf(paper_bottom));
-		final JTextField pleft = new JTextField(String.valueOf(paper_left));
-		final JTextField pright = new JTextField(String.valueOf(paper_right));
-
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Save");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=3;	c.gridy=0;	driver.add(mtop,c);
-		c.gridx=3;	c.gridy=5;	driver.add(mbottom,c);
-		c.gridx=0;	c.gridy=3;	driver.add(mleft,c);
-		c.gridx=5;	c.gridy=3;	driver.add(mright,c);
-
-		c.gridx=3;	c.gridy=1;	driver.add(ptop,c);
-		c.gridx=3;	c.gridy=4;	driver.add(pbottom,c);
-		c.gridx=1;	c.gridy=3;	driver.add(pleft,c);
-		c.gridx=4;	c.gridy=3;	driver.add(pright,c);
-
-		c.gridx=4;  c.gridy=7;  driver.add(save,c);
-		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
-
-		c.gridx=0;  c.gridy=6;  c.gridwidth=6;  c.gridheight=1;
-		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size."),c);
-		c.gridx=0;  c.gridy=7;  c.gridwidth=4;  c.gridheight=1;
-		driver.add(new JLabel("The bottom and left values should be negative."),c);
-
-		Dimension s=ptop.getPreferredSize();
-		s.width=80;
-		ptop.setPreferredSize(s);
-		pbottom.setPreferredSize(s);
-		pleft.setPreferredSize(s);
-		pright.setPreferredSize(s);
-		mtop.setPreferredSize(s);
-		mbottom.setPreferredSize(s);
-		mleft.setPreferredSize(s);
-		mright.setPreferredSize(s);
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						paper_top = Float.valueOf(ptop.getText());
-						paper_bottom = Float.valueOf(pbottom.getText());
-						paper_right = Float.valueOf(pright.getText());
-						paper_left = Float.valueOf(pleft.getText());
-						limit_top = Float.valueOf(mtop.getText());
-						limit_bottom = Float.valueOf(mbottom.getText());
-						limit_right = Float.valueOf(mright.getText());
-						limit_left = Float.valueOf(mleft.getText());
-						boolean data_is_sane=true;
-						if( limit_right <= limit_left ) data_is_sane=false;
-						if( limit_top <= limit_bottom ) data_is_sane=false;
-						if( paper_right <= paper_left ) data_is_sane=false;
-						if( paper_top <= paper_bottom ) data_is_sane=false;
-						if(data_is_sane) {
-							previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-							previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-							SetRecentPaperSize();
-							SaveConfig();
-							SendConfig();
-							driver.dispose();
-						}
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-			  }
-			};
-		
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		SendLineToRobot("M114");  // "where" command
-		driver.pack();
-		driver.setVisible(true);
-	}
 	
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
@@ -1390,7 +1310,7 @@ public class DrawbotGUI
         buttonConfigureLimits = new JMenuItem("Configure limits",KeyEvent.VK_L);
         buttonConfigureLimits.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
         buttonConfigureLimits.addActionListener(this);
-        buttonConfigureLimits.setEnabled(portConfirmed && !running);
+        //buttonConfigureLimits.setEnabled(portConfirmed && !running);
         menu.add(buttonConfigureLimits);
 
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
