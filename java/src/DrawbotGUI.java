@@ -678,25 +678,30 @@ public class DrawbotGUI
 		final JButton save = new JButton("Save");
 
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=3;	c.gridy=0;	driver.add(mtop,c);
-		c.gridx=3;	c.gridy=5;	driver.add(mbottom,c);
-		c.gridx=0;	c.gridy=3;	driver.add(mleft,c);
-		c.gridx=5;	c.gridy=3;	driver.add(mright,c);
-
-		c.gridx=3;	c.gridy=3;	driver.add(new JLabel("(cm)"),c);
+		c.gridx=0;  c.gridy=1;  driver.add(new JLabel("Top"),c);
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Bottom"),c);
+		c.gridx=0;  c.gridy=3;  driver.add(new JLabel("Left"),c);
+		c.gridx=0;  c.gridy=4;  driver.add(new JLabel("Right"),c);
 		
-		c.gridx=3;	c.gridy=1;	driver.add(ptop,c);
-		c.gridx=3;	c.gridy=4;	driver.add(pbottom,c);
-		c.gridx=1;	c.gridy=3;	driver.add(pleft,c);
-		c.gridx=4;	c.gridy=3;	driver.add(pright,c);
+		c.gridx=1;  c.gridy=0;  driver.add(new JLabel("Machine size"),c);
+		c.gridx=1;	c.gridy=1;	driver.add(mtop,c);
+		c.gridx=1;	c.gridy=2;	driver.add(mbottom,c);
+		c.gridx=1;	c.gridy=3;	driver.add(mleft,c);
+		c.gridx=1;	c.gridy=4;	driver.add(mright,c);
+		
+		c.gridx=2;  c.gridy=0;  driver.add(new JLabel("Paper size"),c);
+		c.gridx=2;	c.gridy=1;	driver.add(ptop,c);
+		c.gridx=2;	c.gridy=2;	driver.add(pbottom,c);
+		c.gridx=2;	c.gridy=3;	driver.add(pleft,c);
+		c.gridx=2;	c.gridy=4;	driver.add(pright,c);
 
-		c.gridx=4;  c.gridy=7;  driver.add(save,c);
-		c.gridx=5;  c.gridy=7;  driver.add(cancel,c);
+		c.gridx=0;  c.gridy=6;  c.gridwidth=5;  c.gridheight=1;
+		driver.add(new JLabel("The bottom and left values should be negative."),c);
+		c.gridx=0;  c.gridy=7;  c.gridwidth=2;
+		driver.add(new JLabel("All values in cm."),c);
 
-		c.gridx=0;  c.gridy=6;  c.gridwidth=6;  c.gridheight=1;
-		driver.add(new JLabel("The inside four values are for paper size.  The outside are for machine size."),c);
-		c.gridx=0;  c.gridy=7;  c.gridwidth=4;  c.gridheight=1;
-		driver.add(new JLabel("The bottom and left values should be negative." ),c);
+		c.gridx=2;  c.gridy=7;  driver.add(save,c);
+		c.gridx=3;  c.gridy=7;  driver.add(cancel,c);
 
 		Dimension s=ptop.getPreferredSize();
 		s.width=80;
@@ -938,7 +943,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonDriveManually ) {
-			Drive();
+			DriveManually();
 			return;
 		}
 		if( subject == buttonImageProcessing ) {
@@ -1036,7 +1041,7 @@ public class DrawbotGUI
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
-	public void Drive() {
+	public void DriveManually() {
 		JDialog driver = new JDialog(mainframe,"Manual Control",true);
 		driver.setLayout(new GridBagLayout());
 
@@ -1060,7 +1065,18 @@ public class DrawbotGUI
 		JButton right10 = new JButton("X10");
 		JButton right100 = new JButton("X100");
 		
+		JButton TL = new JButton("GO TL");
+		JButton TR = new JButton("GO TR");
+		JButton BL = new JButton("GO BL");
+		JButton BR = new JButton("GO BR");
+		
+		
 		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
+		c.gridx=5;  c.gridy=1;  driver.add(TR,c);
+		c.gridx=1;  c.gridy=5;  driver.add(BL,c);
+		c.gridx=5;  c.gridy=5;  driver.add(BR,c);
+		
 		c.gridx=3;	c.gridy=0;	driver.add(up100,c);
 		c.gridx=3;	c.gridy=1;	driver.add(up10,c);
 		c.gridx=3;	c.gridy=2;	driver.add(up1,c);
@@ -1076,8 +1092,8 @@ public class DrawbotGUI
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
 		c.gridx=3;	c.gridy=3;	driver.add(home,c);
-		c.gridx=6;  c.gridy=0;  driver.add(center,c);
-		c.gridx=6;  c.gridy=1;  driver.add(find,c);
+		c.gridx=7;  c.gridy=0;  driver.add(center,c);
+		c.gridx=7;  c.gridy=1;  driver.add(find,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -1087,6 +1103,14 @@ public class DrawbotGUI
 					if(t=="GO HOME") {
 						GoHome();
 						SendLineToRobot("M114");
+					} else if(t=="GO TL") { 
+						SendLineToRobot("G00 X"+(paper_left *10)+" Y"+(paper_top*10));
+					} else if(t=="GO TR") { 
+						SendLineToRobot("G00 X"+(paper_right*10)+" Y"+(paper_top*10));
+					} else if(t=="GO BL") { 
+						SendLineToRobot("G00 X"+(paper_left *10)+" Y"+(paper_bottom*10));
+					} else if(t=="GO BR") { 
+						SendLineToRobot("G00 X"+(paper_right*10)+" Y"+(paper_bottom*10));
 					} else if(t=="FIND HOME") {
 						SendLineToRobot("G28");
 					} else if(t=="THIS IS HOME") {
@@ -1115,6 +1139,10 @@ public class DrawbotGUI
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
 		find.addActionListener(driveButtons);
+		TL.addActionListener(driveButtons);
+		TR.addActionListener(driveButtons);
+		BL.addActionListener(driveButtons);
+		BR.addActionListener(driveButtons);
 		SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
@@ -1323,13 +1351,13 @@ public class DrawbotGUI
         buttonDriveManually.addActionListener(this);
         buttonDriveManually.setEnabled(portConfirmed && !running);
         menu.add(buttonDriveManually);
-
+/*
         menu.addSeparator();
 
         buttonImageProcessing = new JMenuItem("Image Processing");
         buttonImageProcessing.addActionListener(this);
         menu.add(buttonImageProcessing);
-
+*/
         menuBar.add(menu);
 
         // Draw menu
@@ -1413,6 +1441,7 @@ public class DrawbotGUI
         
         // the preview panel
         previewPane = new DrawPanel();
+		previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
         previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
         
         // status bar

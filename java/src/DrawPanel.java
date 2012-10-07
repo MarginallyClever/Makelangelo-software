@@ -168,20 +168,21 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	   
 		cx = this.getWidth()/2;
 		cy = this.getHeight()/2;
-		
+
 		// draw background
-		if(!connected) {			
-			setBackground(Color.GRAY);
+		setBackground(Color.GRAY);
+		
+		// draw limits
+		if(!connected) {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
 			g2d.drawRect((int)TX(limit_left),(int)TY(limit_top),
 					(int)((limit_right-limit_left)*cameraZoom),
 					(int)((limit_top-limit_bottom)*cameraZoom));
 			g2d.setColor(Color.WHITE);
-			g2d.drawRect((int)TX(paper_left),(int)TY(paper_top),
+			g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
 					(int)((paper_right-paper_left)*cameraZoom),
 					(int)((paper_top-paper_bottom)*cameraZoom));
 		} else {
-			setBackground(Color.GRAY);
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
 			g2d.fillRect((int)TX(limit_left),(int)TY(limit_top),
 					(int)((limit_right-limit_left)*cameraZoom),
@@ -195,7 +196,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 		// draw calibration point
 		g2d.setColor(Color.RED);
-		g2d.drawLine((int)TX(limit_left),(int)TY(limit_top), (int)TX(0.25),(int)TY(0.00));
+		g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 		g2d.drawLine((int)TX( 0.00),(int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 		
 		// draw left motor
