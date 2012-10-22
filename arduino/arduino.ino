@@ -41,7 +41,7 @@
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
-#define STEPS_PER_TURN  (200.0)
+#define STEPS_PER_TURN  (400.0)
 #define MAX_RPM         (200.0)
 
 // delay between steps, in microseconds.
@@ -86,10 +86,11 @@
 //------------------------------------------------------------------------------
 // EEPROM MEMORY MAP
 //------------------------------------------------------------------------------
-#define EEPROM_VERSION   3             // Increment EEPROM_VERSION when adding new variables
+#define EEPROM_VERSION   4             // Increment EEPROM_VERSION when adding new variables
 #define ADDR_VERSION     0             // address of the version number (one byte)
 #define ADDR_UUID        1             // address of the UUID (long - 4 bytes)
-#define ADDR_SPOOL_DIA   5             // address of the spool diameter (float - 4 bytes)
+#define ADDR_SPOOL_DIA1  5             // address of the spool diameter (float - 4 bytes)
+#define ADDR_SPOOL_DIA2  9             // address of the spool diameter (float - 4 bytes)
 
 
 //------------------------------------------------------------------------------
@@ -123,16 +124,24 @@ int M2_REEL_IN  = FORWARD;
 int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
-float SPOOL_DIAMETER = 0.950;
-float SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
-float THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-float MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
+float SPOOL_DIAMETER1 = 0.950;
+float SPOOL_CIRC1     = SPOOL_DIAMETER1*PI;  // circumference
+float THREADPERSTEP1  = SPOOL_CIRC1/STEPS_PER_TURN;  // thread per step
+
+float SPOOL_DIAMETER2 = 0.950;
+float SPOOL_CIRC2     = SPOOL_DIAMETER2*PI;  // circumference
+float THREADPERSTEP2  = SPOOL_CIRC2/STEPS_PER_TURN;  // thread per step
+
+float MAX_VEL         = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
+
 
 // plotter position.
 static float posx, velx;
 static float posy, vely;
 static float posz;  // pen state
-static float feed_rate=0;
+static float feed_rate1=0;
+static float feed_rate2=0;
+static int step_delay;
 
 // old pen position
 static int old_pen_angle=-1;
@@ -165,12 +174,21 @@ static int sofar;             // Serial buffer progress
 
 //------------------------------------------------------------------------------
 // calculate max velocity, threadperstep.
-static void adjustSpoolDiameter(float diameter) {
-  SPOOL_DIAMETER = diameter;
-  SPOOL_CIRC     = SPOOL_DIAMETER*PI;  // circumference
-  THREADPERSTEP  = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-  MAX_VEL        = MAX_STEPS_S * THREADPERSTEP;  // cm/s
-  // Serial.print("SpoolDiameter = "); Serial.println(SPOOL_DIAMETER,3);
+static void adjustSpoolDiameter(float diameter1,float diameter2) {
+  SPOOL_DIAMETER1 = diameter1;
+  SPOOL_CIRC1     = SPOOL_DIAMETER1*PI;  // circumference
+  THREADPERSTEP1  = SPOOL_CIRC1/STEPS_PER_TURN;  // thread per step
+  
+  SPOOL_DIAMETER2 = diameter2;
+  SPOOL_CIRC2     = SPOOL_DIAMETER2*PI;  // circumference
+  THREADPERSTEP2  = SPOOL_CIRC2/STEPS_PER_TURN;  // thread per step
+  
+  float MAX_VEL1        = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
+  float MAX_VEL2        = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
+  MAX_VEL = MAX_VEL1 > MAX_VEL2 ? MAX_VEL1 : MAX_VEL2;
+
+  // Serial.print("SpoolDiameter1 = "); Serial.println(SPOOL_DIAMETER1,3);
+  // Serial.print("SpoolDiameter2 = "); Serial.println(SPOOL_DIAMETER2,3);
 }
 
 
@@ -209,18 +227,35 @@ static char readSwitches() {
 //------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
 static void setFeedRate(float v) {
-  v *= mode_scale/60.0;
-  if( feed_rate != v ) {
-    feed_rate=v;
-    if(feed_rate>MAX_VEL) feed_rate=MAX_VEL;
-    if(feed_rate<MIN_VEL) feed_rate=MIN_VEL;
+  float v1 = v * mode_scale/60.0;
+  if( feed_rate1 != v1 ) {
+    feed_rate1 = v1;
+    if(feed_rate1 > MAX_VEL) feed_rate1=MAX_VEL;
+    if(feed_rate1 < MIN_VEL) feed_rate1=MIN_VEL;
   }
+
+  float v2 = v * mode_scale/60.0;
+  if( feed_rate2 != v2 ) {
+    feed_rate2 = v2;
+    if(feed_rate2 > MAX_VEL) feed_rate2=MAX_VEL;
+    if(feed_rate2 < MIN_VEL) feed_rate2=MIN_VEL;
+  }
+  
+  int step_delay1=1000000.0/(feed_rate1/THREADPERSTEP1);
+  int step_delay2=1000000.0/(feed_rate2/THREADPERSTEP2);
+  step_delay = (step_delay1>step_delay2) ? step_delay1 : step_delay2;
 }
 
 
 //------------------------------------------------------------------------------
 static void printFeedRate() {
-  Serial.print(feed_rate*60.0/mode_scale);
+  Serial.print("f1=");
+  Serial.print(feed_rate1*60.0/mode_scale);
+  Serial.print(mode_name);
+  Serial.print("/min");
+  
+  Serial.print("f2=");
+  Serial.print(feed_rate2*60.0/mode_scale);
   Serial.print(mode_name);
   Serial.print("/min");
 /*
@@ -259,10 +294,10 @@ static void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
+  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP1 );
   // find length to M2
   dx = limit_right - x;
-  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP );
+  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
 }
 
 
@@ -271,9 +306,9 @@ static void IK(float x, float y, long &l1, long &l2) {
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(float l1, float l2,float &x,float &y) {
-  float a = l1 * THREADPERSTEP;
+  float a = l1 * THREADPERSTEP1;
   float b = (limit_right-limit_left);
-  float c = l2 * THREADPERSTEP;
+  float c = l2 * THREADPERSTEP2;
   
   // slow, uses trig
   //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
@@ -300,8 +335,6 @@ static void line(float x,float y,float z) {
   int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
   long over=0;
   long i;
-  
-  int step_delay=1000000.0/(feed_rate/THREADPERSTEP);
   
   // bresenham's line algorithm.
   if(ad1>ad2) {
@@ -516,9 +549,9 @@ float EEPROM_readLong(int ee) {
 
 //------------------------------------------------------------------------------
 static void LoadConfig() {
-  char version=EEPROM.read(ADDR_VERSION);
-  if(version<EEPROM_VERSION || version>EEPROM_VERSION) {
-    // If not the cuurent EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
+  char version_number=EEPROM.read(ADDR_VERSION);
+  if(version_number<3 || version_number>EEPROM_VERSION) {
+    // If not the current EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
     // Update the version number
     EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
     // Update robot uuid
@@ -526,10 +559,21 @@ static void LoadConfig() {
     SaveUID();
     // Update spool diameter variables
     SaveSpoolDiameter();
-  } else if(version==EEPROM_VERSION) {
+  }
+  if(version_number==3) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA)/10000.0f);   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
+                        (float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
+    // save the new data so the next load doesn't screw up one bobbin size
+    SaveSpoolDiameter();
+    // update the EEPROM version
+    EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
+  } else if(version_number==EEPROM_VERSION) {
+    // Retrieve Stored Configuration
+    robot_uid=EEPROM_readLong(ADDR_UUID);
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
+                        (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
   } else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println("An Error Occurred during LoadConfig");
@@ -543,8 +587,9 @@ static void SaveUID() {
 }
 
 //------------------------------------------------------------------------------
-static void SaveSpoolDiameter () {
-  EEPROM_writeLong(ADDR_SPOOL_DIA,SPOOL_DIAMETER*10000);
+static void SaveSpoolDiameter() {
+  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER1*10000);
+  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER2*10000);
 }
 
 
@@ -737,13 +782,30 @@ static void processCommand() {
       for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
     }
   }  else if(!strncmp(buffer,"D01 ",4)) {
-    // adjust spool diameter
-    char *ptr=strchr(buffer,' ')+1;
-    float amount = atof(ptr);
-    adjustSpoolDiameter(amount);
+    // adjust spool diameters
+    float amountL=SPOOL_DIAMETER1;
+    float amountR=SPOOL_DIAMETER2;
+    
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'L': amountL=atof(ptr+1)*mode_scale;  break;
+      case 'R': amountR=atof(ptr+1)*mode_scale;  break;
+      default: ptr=0; break;
+      }
+    }
+
+    adjustSpoolDiameter(amountL,amountR);
     // Update EEPROM
     SaveSpoolDiameter();
+  } else if(!strncmp(buffer,"D02 ",4)) {
+    Serial.print("L");
+    Serial.print(SPOOL_DIAMETER1);
+    Serial.print(" R");
+    Serial.println(SPOOL_DIAMETER2);
   } else {
+    // these are not being parsed correctly according to GCODE syntax rules.
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       if(!strncmp(ptr,"G20",3)) {
@@ -776,6 +838,8 @@ static void processCommand() {
 void setup() {
   LoadConfig();
   
+  // initialize the read buffer
+  sofar=0;
   // start communications
   Serial.begin(BAUD);
   Serial.print("\n\nHELLO WORLD! I AM DRAWBOT #");
@@ -785,11 +849,7 @@ void setup() {
   strcpy(mode_name,"mm");
   mode_scale=0.1;
   
-  adjustSpoolDiameter(SPOOL_DIAMETER); 
   setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
-  
-  // initialize the read buffer
-  sofar=0;
   
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);

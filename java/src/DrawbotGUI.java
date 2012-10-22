@@ -29,6 +29,10 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.prefs.Preferences;
 
+//@todo in-app gcode editing with immediate visusal feedback - only while not drawing
+//@todo image processing options - cutoff, exposure, resolution
+//@todo vector output?
+
 public class DrawbotGUI
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
@@ -37,6 +41,7 @@ public class DrawbotGUI
 	static private final String cue = "> ";
 	static private final String eol = ";";
 	static private final String NL = System.getProperty("line.separator");
+	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
 
 	private static DrawbotGUI singletonObject;
 	
@@ -74,11 +79,14 @@ public class DrawbotGUI
 	private boolean m1invert=false;
 	private boolean m2invert=false;
 	
+	private double bobbin1_diameter=0.95;
+	private double bobbin2_diameter=0.95;
+	
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfigureLimits, buttonRescan, buttonJogMotors, buttonImageProcessing;
+    private JMenuItem buttonConfigureLimits, buttonConfigureBobbins, buttonRescan, buttonJogMotors, buttonImageProcessing;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -298,22 +306,11 @@ public class DrawbotGUI
 	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		String hello = "HELLO WORLD! I AM DRAWBOT #";
 		int found=line3.lastIndexOf(hello);
 		if(found >= 0) {
 			portConfirmed=true;
 			
-			// get the UID reported by the robot
-			String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
-			if(lines.length>0) {
-				try {
-					robot_uid = Long.parseLong(lines[0]);
-				}
-				catch(NumberFormatException e) {}
-			}
-			
-			// new robots have UID=0
-			if(robot_uid==0) GetNewRobotUID();
+			GetRobotUID(line3);
 			
 			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid)+" connected");
 
@@ -331,6 +328,22 @@ public class DrawbotGUI
 			previewPane.setConnected(true);
 		}
 		return portConfirmed;
+	}
+	
+	private void GetRobotUID(String line3) {
+		int found=line3.lastIndexOf(hello);
+		
+		// get the UID reported by the robot
+		String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
+		if(lines.length>0) {
+			try {
+				robot_uid = Long.parseLong(lines[0]);
+			}
+			catch(NumberFormatException e) {}
+		}
+		
+		// new robots have UID=0
+		if(robot_uid==0) GetNewRobotUID();
 	}
 	
 	/**
@@ -752,6 +765,65 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
+	
+	/**
+	 * Open the config dialog, send the config update to the robot, and save it for future.
+	 */
+	public void ConfigureBobbins() {
+		final JDialog driver = new JDialog(mainframe,"Configure Bobbins",true);
+		driver.setLayout(new GridBagLayout());
+
+		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin1_diameter));
+		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin2_diameter));
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx=0;  c.gridy=1;  driver.add(new JLabel("Left"),c);
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Right"),c);
+		
+		c.gridx=1;  c.gridy=0;  driver.add(new JLabel("Diameter"),c);
+		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
+		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
+
+		c.gridx=0;  c.gridy=3;  c.gridwidth=2;
+		driver.add(new JLabel("All values in cm."),c);
+
+		c.gridx=1;  c.gridy=4;  driver.add(save,c);
+		c.gridx=2;  c.gridy=4;  driver.add(cancel,c);
+
+		Dimension s=mBobbin1.getPreferredSize();
+		s.width=80;
+		mBobbin1.setPreferredSize(s);
+		mBobbin2.setPreferredSize(s);
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						bobbin1_diameter = Float.valueOf(mBobbin1.getText());
+						bobbin2_diameter = Float.valueOf(mBobbin2.getText());
+						boolean data_is_sane=true;
+						if( bobbin1_diameter <= 0 ) data_is_sane=false;
+						if( bobbin2_diameter <= 0 ) data_is_sane=false;
+						if(data_is_sane) {
+							SaveConfig();
+							SendConfig();
+							driver.dispose();
+						}
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+			};
+		
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+	}
 
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
@@ -762,6 +834,8 @@ public class DrawbotGUI
 		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
 		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
 		image_dpi=Integer.parseInt(prefs.get(id+"_image_dpi","100"));
+		bobbin1_diameter=Double.valueOf(prefs.get(id+"_bobbin1_diameter", "0.95"));
+		bobbin2_diameter=Double.valueOf(prefs.get(id+"_bobbin2_diameter", "0.95"));
 	}
 
 	void SaveConfig() {
@@ -772,6 +846,8 @@ public class DrawbotGUI
 		prefs.put(id+"_limit_left", Double.toString(limit_left));
 		prefs.put(id+"_m1invert",Boolean.toString(m1invert));
 		prefs.put(id+"_m2invert",Boolean.toString(m2invert));
+		prefs.put(id+"_bobbin1_diameter", Double.toString(bobbin1_diameter));
+		prefs.put(id+"_bobbin2_diameter", Double.toString(bobbin2_diameter));
 	}
 	
 	void SendConfig() {
@@ -962,6 +1038,10 @@ public class DrawbotGUI
 		}
 		if( subject == buttonConfigureLimits ) {
 			ConfigureLimits();
+			return;
+		}
+		if( subject == buttonConfigureBobbins ) {
+			ConfigureBobbins();
 			return;
 		}
 		if( subject == buttonJogMotors ) {
@@ -1338,9 +1418,16 @@ public class DrawbotGUI
         buttonConfigureLimits = new JMenuItem("Configure limits",KeyEvent.VK_L);
         buttonConfigureLimits.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
         buttonConfigureLimits.addActionListener(this);
-        //buttonConfigureLimits.setEnabled(portConfirmed && !running);
+        buttonConfigureLimits.setEnabled(!running);
         menu.add(buttonConfigureLimits);
 
+        buttonConfigureBobbins = new JMenuItem("Configure bobbins",KeyEvent.VK_B);
+        buttonConfigureBobbins.getAccessibleContext().setAccessibleDescription("Adjust the bobbin sizes.");
+        buttonConfigureBobbins.addActionListener(this);
+        buttonConfigureBobbins.setEnabled(!running);
+        menu.add(buttonConfigureBobbins);
+
+        
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
         buttonJogMotors.setEnabled(portConfirmed && !running);
