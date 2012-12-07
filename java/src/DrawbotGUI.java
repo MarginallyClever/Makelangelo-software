@@ -312,7 +312,7 @@ public class DrawbotGUI
 			
 			GetRobotUID(line3);
 			
-			mainframe.setTitle("Drawbot #"+Long.toString(robot_uid)+" connected");
+			mainframe.setTitle("Makelangelo #"+Long.toString(robot_uid)+" connected");
 
 			// load machine specific config
 			GetRecentPaperSize();
@@ -438,8 +438,8 @@ public class DrawbotGUI
 			if(tokens.length==0) continue;
 
 			for(j=0;j<tokens.length;++j) {
-				if(tokens[j].equals("G20")) drawScale=0.393700787f;
-				if(tokens[j].equals("G21")) drawScale=0.1f;
+				if(tokens[j].equals("G20")) drawScale=2.54f;  // in->cm
+				if(tokens[j].equals("G21")) drawScale=0.10f;  // mm->cm
 				if(tokens[j].startsWith("F")) {
 					feed_rate=Float.valueOf(tokens[j].substring(1)) * drawScale;
 					Log("<span style='color:green'>feed rate="+feed_rate+"</span>\n");
@@ -667,7 +667,7 @@ public class DrawbotGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 X0 Y0 Z0");
+		SendLineToRobot("G00 X0 Y0 Z90");
 	}
 	
 	/**
@@ -1149,7 +1149,9 @@ public class DrawbotGUI
 		JButton TR = new JButton("GO TR");
 		JButton BL = new JButton("GO BL");
 		JButton BR = new JButton("GO BR");
-		
+
+		JButton z90 = new JButton("Z90");
+		JButton z0  = new JButton("Z0");
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
@@ -1174,6 +1176,8 @@ public class DrawbotGUI
 		c.gridx=3;	c.gridy=3;	driver.add(home,c);
 		c.gridx=7;  c.gridy=0;  driver.add(center,c);
 		c.gridx=7;  c.gridy=1;  driver.add(find,c);
+		c.gridx=7;  c.gridy=3;  driver.add(z90,c);
+		c.gridx=7;  c.gridy=4;  driver.add(z0,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -1195,9 +1199,11 @@ public class DrawbotGUI
 						SendLineToRobot("G28");
 					} else if(t=="THIS IS HOME") {
 						SendLineToRobot("TELEPORT XO YO");
+					} else if(t=="Z90" || t=="Z0") {
+						SendLineToRobot("G00 "+b.getText());
 					} else {
 						SendLineToRobot("G91");
-						SendLineToRobot("G00 "+b.getText());
+						SendLineToRobot("G00 G21 "+b.getText());
 						SendLineToRobot("G90");
 						SendLineToRobot("M114");
 					}
@@ -1216,6 +1222,8 @@ public class DrawbotGUI
 		right1.addActionListener(driveButtons);
 		right10.addActionListener(driveButtons);
 		right100.addActionListener(driveButtons);
+		z90.addActionListener(driveButtons);
+		z0.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
 		find.addActionListener(driveButtons);
@@ -1554,7 +1562,7 @@ public class DrawbotGUI
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         //Create and set up the window.
-    	mainframe = new JFrame("No Drawbot Connected");
+    	mainframe = new JFrame("Makelangelo not connected");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.

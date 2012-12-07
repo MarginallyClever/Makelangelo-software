@@ -219,7 +219,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// draw image
 		if(instructions==null) return;
 		
-		double px=TX(0),py=TY(0),pz=90;
+		double px=0,py=0,pz=90;
 		int i,j;
 
 		for(i=0;i<instructions.size();++i) {
@@ -228,7 +228,12 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
 				g2d.setColor( Color.GREEN );
 			} else {
-				g2d.setColor( Color.BLACK );
+				// is pen up or down?
+				if(pz<5) {
+					g2d.setColor( Color.BLACK );
+				} else {
+					g2d.setColor( Color.BLUE );
+				}
 			}
 			
 			String line=instructions.get(i);
@@ -239,8 +244,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			if(tokens.length==0) continue;
 
 			for(j=0;j<tokens.length;++j) {
-					 if(tokens[j].equals("G20")) drawScale=0.393700787f;
-				else if(tokens[j].equals("G21")) drawScale=0.1f;
+				 if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
+				 if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
 			}
 			
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
@@ -255,7 +260,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				}
 
-				if(z<5) g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
+				g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
 				px=x;
 				py=y;
 				pz=z;
@@ -276,33 +281,31 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
 				}
 
-				if(z<5) {
-					double dx=px - ai;
-					double dy=py - aj;
-					double radius=Math.sqrt(dx*dx+dy*dy);
+				double dx=px - ai;
+				double dy=py - aj;
+				double radius=Math.sqrt(dx*dx+dy*dy);
 
-					// find angle of arc (sweep)
-					double angle1=atan3(dy,dx);
-					double angle2=atan3(y-aj,x-ai);
-					double theta=angle2-angle1;
+				// find angle of arc (sweep)
+				double angle1=atan3(dy,dx);
+				double angle2=atan3(y-aj,x-ai);
+				double theta=angle2-angle1;
 
-					if(dir>0 && theta<0) angle2+=2.0*Math.PI;
-					else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
+				if(dir>0 && theta<0) angle2+=2.0*Math.PI;
+				else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
 
-					theta=Math.abs(angle2-angle1);
+				theta=Math.abs(angle2-angle1);
 
-					// Draw the arc from a lot of little line segments.
-					for(int k=0;k<=theta*STEPS_PER_DEGREE;++k) {
-						double angle3 = (angle2-angle1) * ((double)k/(theta*STEPS_PER_DEGREE)) + angle1;
-						float nx = (float)(ai + Math.cos(angle3) * radius);
-					    float ny = (float)(aj + Math.sin(angle3) * radius);
+				// Draw the arc from a lot of little line segments.
+				for(int k=0;k<=theta*STEPS_PER_DEGREE;++k) {
+					double angle3 = (angle2-angle1) * ((double)k/(theta*STEPS_PER_DEGREE)) + angle1;
+					float nx = (float)(ai + Math.cos(angle3) * radius);
+				    float ny = (float)(aj + Math.sin(angle3) * radius);
 
-					    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(nx),(int)ITY(ny));
-						px=nx;
-						py=ny;
-					}
-				    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
+				    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(nx),(int)ITY(ny));
+					px=nx;
+					py=ny;
 				}
+			    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
 				px=x;
 				py=y;
 				pz=z;

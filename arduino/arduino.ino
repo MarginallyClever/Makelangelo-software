@@ -6,27 +6,14 @@
 // please see http://www.github.com/i-make-robots/Drawbot for more information.
 
 
-
-//------------------------------------------------------------------------------
-// INCLUDES
-//------------------------------------------------------------------------------
-// Adafruit motor driver library
-#include <AFMotorDrawbot.h>
-
-// Default servo library
-#include <Servo.h> 
-
-// Saving config
-#include <EEPROM.h>
-#include <Arduino.h>  // for type definitions
-
-
-
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
 // Comment out this line to silence most serial output.
 //#define VERBOSE         (1)
+
+// Comment out this line to disable SD cards.
+//#define USE_SD_CARD     (1)
 
 // which motor is on which pin?
 #define M1_PIN          (1)
@@ -76,10 +63,10 @@
 #define MAX_BUF         (64)
 
 // servo pin differs based on device
-#ifdef __AVR_ATmega2560__
-#define SERVO_PIN        50
-#else
-#define SERVO_PIN        9
+#define SERVO_PIN        10
+
+#ifndef USE_SD_CARD
+#define File int
 #endif
 
 
@@ -91,6 +78,25 @@
 #define ADDR_UUID        1             // address of the UUID (long - 4 bytes)
 #define ADDR_SPOOL_DIA1  5             // address of the spool diameter (float - 4 bytes)
 #define ADDR_SPOOL_DIA2  9             // address of the spool diameter (float - 4 bytes)
+
+
+//------------------------------------------------------------------------------
+// INCLUDES
+//------------------------------------------------------------------------------
+// Adafruit motor driver library
+#include <AFMotorDrawbot.h>
+
+// Default servo library
+#include <Servo.h> 
+
+// SD card library
+#ifdef USE_SD_CARD
+#include <SD.h>
+#endif
+
+// Saving config
+#include <EEPROM.h>
+#include <Arduino.h>  // for type definitions
 
 
 //------------------------------------------------------------------------------
@@ -142,9 +148,6 @@ static float posz;  // pen state
 static float feed_rate1=0;
 static float feed_rate2=0;
 static int step_delay;
-
-// old pen position
-static int old_pen_angle=-1;
 
 // switch state
 static char switch1, switch2;
@@ -275,15 +278,14 @@ static void printFeedRate() {
 //------------------------------------------------------------------------------
 // Change pen state.
 static void setPenAngle(int pen_angle) {
-  if(old_pen_angle!=pen_angle) {
-    old_pen_angle=pen_angle;
+  if(posz!=pen_angle) {
+    posz=pen_angle;
     
-    if(old_pen_angle<PEN_DOWN_ANGLE) old_pen_angle=PEN_DOWN_ANGLE;
-    if(old_pen_angle>PEN_UP_ANGLE  ) old_pen_angle=PEN_UP_ANGLE;
+    if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
+    if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
 
-//    Serial.println( old_pen_angle );
-    
-    s1.write( old_pen_angle );
+    s1.write( (int)posz );
+    delay(150);
   }
 }
 
@@ -335,6 +337,8 @@ static void line(float x,float y,float z) {
   int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
   long over=0;
   long i;
+  
+  setPenAngle((int)z);
   
   // bresenham's line algorithm.
   if(ad1>ad2) {
@@ -593,6 +597,106 @@ static void SaveSpoolDiameter() {
 }
 
 
+#ifdef USE_SD_CARD
+//------------------------------------------------------------------------------
+void SD_PrintDirectory(File dir, int numTabs) {
+   while(true) {
+
+     File entry =  dir.openNextFile();
+     if (! entry) {
+       // no more files
+       Serial.println("**nomorefiles**");
+     }
+     for (uint8_t i=0; i<numTabs; i++) {
+       Serial.print('\t');
+     }
+     Serial.print(entry.name());
+     if (entry.isDirectory()) {
+       Serial.println("/");
+       SD_PrintDirectory(entry, numTabs+1);
+     } else {
+       // files have sizes, directories do not
+       Serial.print("\t\t");
+       Serial.println(entry.size(), DEC);
+     }
+   }
+}
+#endif // USE_SD_CARD
+
+
+//------------------------------------------------------------------------------
+static void SD_ListFiles() {
+#ifdef USE_SD_CARD
+  File f = SD.open("/");
+  SD_PrintDirectory(f,0);
+#endif // USE_SD_CARD
+}
+
+
+//------------------------------------------------------------------------------
+static void SD_ProcessFile(char *filename) {
+#ifdef USE_SD_CARD
+  File f=SD.open(filename);
+  if(!f) {
+    Serial.print("File ");
+    Serial.print(filename);
+    Serial.println(" not found.");
+    return;
+  }
+  
+  int c;
+  while(f.peek() != -1) {
+    c=f.read();
+    if(c=='\n' || c=='\r') continue;
+    buffer[sofar++]=c;
+    if(buffer[sofar]==';') {
+      // end string
+      buffer[sofar]=0;
+      // print for our benefit
+      Serial.println(buffer);
+      // process command
+      processCommand();
+      // reset buffer for next line
+      sofar=0;
+    }
+  }
+  
+  f.close();
+#endif // USE_SD_CARD
+}
+
+
+//------------------------------------------------------------------------------
+static int processSubcommand() {
+  int found=0;
+  
+  char *ptr=buffer;
+  while(ptr && ptr<buffer+sofar && strlen(ptr)) {
+    if(!strncmp(ptr,"G20",3)) {
+      mode_scale=2.54f;  // inches -> cm
+      strcpy(mode_name,"in");
+      printFeedRate();
+      found=1;
+    } else if(!strncmp(ptr,"G21",3)) {
+      mode_scale=0.1;  // mm -> cm
+      strcpy(mode_name,"mm");
+      printFeedRate();
+      found=1;
+    } else if(!strncmp(ptr,"G90",3)) {
+      absolute_mode=1;
+      found=1;
+    } else if(!strncmp(ptr,"G91",3)) {
+      absolute_mode=0;
+      found=1;
+    }
+    ptr=strchr(ptr,' ')+1;
+  }
+  
+  Serial.println("done");
+  return found;
+}
+
+
 //------------------------------------------------------------------------------
 static void processCommand() {
   // blank lines
@@ -637,7 +741,7 @@ static void processCommand() {
     char hh=m2d;
     
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'T': tt=atof(ptr+1);  break;
@@ -664,7 +768,6 @@ static void processCommand() {
           M2_REEL_OUT=FORWARD;
         }
       }  break;
-      default: ptr=0; break;
       }
     }
     
@@ -681,27 +784,26 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
          || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
+    processSubcommand();
     float xx, yy, zz;
     
+      zz=posz;
     if(absolute_mode==1) {
       xx=posx;
       yy=posy;
-      zz=posz;
     } else {
       xx=0;
       yy=0;
-      zz=0;
     }
   
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'X': xx=atof(ptr+1)*mode_scale;  break;
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
       case 'Z': zz=atof(ptr+1);  break;
       case 'F': setFeedRate(atof(ptr+1));  break;
-      default: ptr=0; break;
       }
     }
  
@@ -715,6 +817,7 @@ static void processCommand() {
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
+    processSubcommand();
     float xx, yy, zz;
     float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
     float ii = 0;
@@ -731,7 +834,7 @@ static void processCommand() {
     }
     
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'I': ii=atof(ptr+1)*mode_scale;  break;
@@ -740,7 +843,6 @@ static void processCommand() {
       case 'Y': yy=atof(ptr+1)*mode_scale;  break;
       case 'Z': zz=atof(ptr+1);  break;
       case 'F': setFeedRate(atof(ptr+1));  break;
-      default: ptr=0; break;
       }
     }
  
@@ -756,13 +858,12 @@ static void processCommand() {
     long xx=0;
 
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'X': 
       case 'U': 
       case 'P': xx=atoi(ptr+1);  break;
-      default: ptr=0; break;
       }
     }
 
@@ -787,12 +888,11 @@ static void processCommand() {
     float amountR=SPOOL_DIAMETER2;
     
     char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
       case 'L': amountL=atof(ptr+1)*mode_scale;  break;
       case 'R': amountR=atof(ptr+1)*mode_scale;  break;
-      default: ptr=0; break;
       }
     }
 
@@ -804,35 +904,20 @@ static void processCommand() {
     Serial.print(SPOOL_DIAMETER1);
     Serial.print(" R");
     Serial.println(SPOOL_DIAMETER2);
+  } else if(!strncmp(buffer,"D03 ",4)) {
+    // read directory
+    SD_ListFiles();
+  } else if(!strncmp(buffer,"D04 ",4)) {
+    // read file
+    SD_ProcessFile(strchr(buffer,' ')+1);
   } else {
-    // these are not being parsed correctly according to GCODE syntax rules.
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
-      if(!strncmp(ptr,"G20",3)) {
-        mode_scale=24.5/10.0;  // inches -> cm
-        strcpy(mode_name,"in");
-        printFeedRate();
-      } else if(!strncmp(ptr,"G21",3)) {
-        mode_scale=0.1;  // mm -> cm
-        strcpy(mode_name,"mm");
-        printFeedRate();
-      } else if(!strncmp(ptr,"G90",3)) {
-        absolute_mode=1;
-      } else if(!strncmp(ptr,"G91",3)) {
-        absolute_mode=0;
-      } else if(ptr) {
-        if(strlen(ptr)>0) {
-          Serial.print("Invalid command: '");
-          Serial.print(ptr);
-          Serial.println("'");
-        }
-        break;
-      }
-      ptr=strchr(ptr,' ')+1;
+    if(processSubcommand()==0) {
+      Serial.print("Invalid command '");
+      Serial.print(buffer);
+      Serial.println("'");
     }
   }
 }
-
 
 //------------------------------------------------------------------------------
 void setup() {
@@ -845,6 +930,11 @@ void setup() {
   Serial.print("\n\nHELLO WORLD! I AM DRAWBOT #");
   Serial.println(robot_uid);
   
+#ifdef USE_SD_CARD
+  SD.begin();
+  SD_ListFiles();
+#endif
+
   // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
@@ -853,7 +943,7 @@ void setup() {
   
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
-
+  
   // turn on the pull up resistor
   digitalWrite(L_PIN,HIGH);
   digitalWrite(R_PIN,HIGH);
@@ -865,7 +955,6 @@ void setup() {
   teleport(0,0);
   velx=0;
   velx=0;
-  posz=PEN_UP_ANGLE;
   setPenAngle(PEN_UP_ANGLE);
   
   Serial.print("> ");
@@ -883,10 +972,9 @@ void loop() {
  
   // if we hit a semi-colon, assume end of instruction.
   if(sofar>0 && buffer[sofar-1]==';') {
-    // what if message fails/garbled?
-
-    // echo confirmation
     buffer[sofar]=0;
+    
+    // echo confirmation
 //    Serial.println(buffer);
  
     // do something with the command
