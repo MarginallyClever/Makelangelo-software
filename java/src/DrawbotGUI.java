@@ -1049,9 +1049,10 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"Created by Dan Royer (dan@marginallyclever.com).\n\n"
-					+"Find out more at http://www.marginallyclever.com/\n"
-					+"Get the latest version and read the documentation online @ http://github.com/i-make-robots/DrawBot/");
+			JOptionPane.showMessageDialog(null,"Makelangelo v149\n\n"
+					+"Created by Dan Royer (dan@marginallyclever.com).\n\n"
+					+"Get the latest version and read the documentation @ http://github.com/i-make-robots/DrawBot/\n"
+					+"Find out more at http://www.marginallyclever.com/\n");
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
