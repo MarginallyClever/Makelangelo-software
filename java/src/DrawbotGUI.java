@@ -690,31 +690,44 @@ public class DrawbotGUI
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
 
+		BufferedImage myPicture = null;
+		try {
+			myPicture = ImageIO.read(new File("limits.png"));
+		}
+		catch(IOException e) {}
+		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
+		
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=0;  c.gridy=1;  driver.add(new JLabel("Top"),c);
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Bottom"),c);
-		c.gridx=0;  c.gridy=3;  driver.add(new JLabel("Left"),c);
-		c.gridx=0;  c.gridy=4;  driver.add(new JLabel("Right"),c);
-		
-		c.gridx=1;  c.gridy=0;  driver.add(new JLabel("Machine size"),c);
-		c.gridx=1;	c.gridy=1;	driver.add(mtop,c);
-		c.gridx=1;	c.gridy=2;	driver.add(mbottom,c);
-		c.gridx=1;	c.gridy=3;	driver.add(mleft,c);
-		c.gridx=1;	c.gridy=4;	driver.add(mright,c);
-		
-		c.gridx=2;  c.gridy=0;  driver.add(new JLabel("Paper size"),c);
-		c.gridx=2;	c.gridy=1;	driver.add(ptop,c);
-		c.gridx=2;	c.gridy=2;	driver.add(pbottom,c);
-		c.gridx=2;	c.gridy=3;	driver.add(pleft,c);
-		c.gridx=2;	c.gridy=4;	driver.add(pright,c);
+		GridBagConstraints d = new GridBagConstraints();
 
-		c.gridx=0;  c.gridy=6;  c.gridwidth=5;  c.gridheight=1;
-		driver.add(new JLabel("The bottom and left values should be negative."),c);
-		c.gridx=0;  c.gridy=7;  c.gridwidth=2;
+		c.weightx=0.25;
+		c.gridx=0;  c.gridy=0;  c.gridwidth=4;  c.gridheight=4; c.anchor=GridBagConstraints.CENTER;  driver.add( picLabel,c );
+		
+		c.gridheight=1; c.gridwidth=1;  c.anchor=GridBagConstraints.EAST;
+		d.anchor=GridBagConstraints.WEST;
+		
+		c.gridx=0;  c.gridy=5;  driver.add(new JLabel("A"),c);		d.gridx=1;	d.gridy=5;	driver.add(mtop,d);
+		c.gridx=0;  c.gridy=6;  driver.add(new JLabel("B"),c);		d.gridx=1;	d.gridy=6;	driver.add(mright,d);
+		c.gridx=0;  c.gridy=7;  driver.add(new JLabel("C"),c);		d.gridx=1;	d.gridy=7;	driver.add(mbottom,d);
+		c.gridx=0;  c.gridy=8;  driver.add(new JLabel("D"),c);		d.gridx=1;	d.gridy=8;	driver.add(mleft,d);
+		c.gridx=2;  c.gridy=5;  driver.add(new JLabel("E"),c);		d.gridx=3;	d.gridy=5;	driver.add(ptop,d);
+		c.gridx=2;  c.gridy=6;  driver.add(new JLabel("F"),c);		d.gridx=3;	d.gridy=6;	driver.add(pright,d);
+		c.gridx=2;  c.gridy=7;  driver.add(new JLabel("G"),c);		d.gridx=3;	d.gridy=7;	driver.add(pbottom,d);
+		c.gridx=2;  c.gridy=8;  driver.add(new JLabel("H"),c);		d.gridx=3;	d.gridy=8;	driver.add(pleft,d);
+
+		c.anchor=GridBagConstraints.WEST;
+		c.gridx=0;  c.gridy=9;  c.gridwidth=4;  c.gridheight=1;
+		driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
+		c.gridx=0;  c.gridy=10;  c.gridwidth=4;  c.gridheight=1;
+		driver.add(new JLabel("C, D, G, and H should probably be negative."),c);
+		c.gridx=0;  c.gridy=11;  c.gridwidth=4;  c.gridheight=1;
 		driver.add(new JLabel("All values in cm."),c);
 
-		c.gridx=2;  c.gridy=7;  driver.add(save,c);
-		c.gridx=3;  c.gridy=7;  driver.add(cancel,c);
+		
+		c.anchor=GridBagConstraints.EAST;
+		c.gridy=12;
+		c.gridx=3;  c.gridwidth=1;  driver.add(cancel,c);
+		c.gridx=2;  c.gridwidth=1;  driver.add(save,c);
 
 		Dimension s=ptop.getPreferredSize();
 		s.width=80;
