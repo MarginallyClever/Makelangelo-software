@@ -45,7 +45,7 @@
 // servo angles for pen control
 #define PEN_UP_ANGLE    (90)
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
-#define PEN_DELAY       (150)  // in ms
+#define PEN_DELAY       (250)  // in ms
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
 
@@ -285,7 +285,7 @@ static void setPenAngle(int pen_angle) {
     if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
 
     s1.write( (int)posz );
-    delay(150);
+    delay(PEN_DELAY);
   }
 }
 

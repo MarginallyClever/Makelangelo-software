@@ -38,13 +38,11 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	static final long serialVersionUID=1;
-	static private final String cue = "> ";
-	static private final String eol = ";";
-	static private final String NL = System.getProperty("line.separator");
-	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
-
+	
 	private static DrawbotGUI singletonObject;
 	
+	private static String OS = System.getProperty("os.name").toLowerCase();
+	   
 	// Serial connection
 	private static int BAUD_RATE = 57600;
 	private CommPortIdentifier portIdentifier;
@@ -55,6 +53,12 @@ public class DrawbotGUI
 	private String[] portsDetected;
 	private boolean portOpened=false;
 	private boolean portConfirmed=false;
+	
+	// Serial communication
+	static private final String cue = "> ";
+	static private final String eol = ";";
+	static private final String NL = System.getProperty("line.separator");
+	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
 	
 	// Preferences
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
@@ -1427,7 +1431,7 @@ public class DrawbotGUI
             group.add(buttonPorts[i]);
             subMenu.add(buttonPorts[i]);
         }
-
+ 
         subMenu.addSeparator();
 
         buttonRescan = new JMenuItem("Rescan",KeyEvent.VK_N);
@@ -1606,6 +1610,28 @@ public class DrawbotGUI
 	    //creating and showing this application's GUI.
 	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
+	        	/*
+	            String workingDirectory=System.getProperty("user.dir");
+	            System.out.println(workingDirectory);
+	            
+	            System.out.println(OS);
+	            // is this Windows?
+	            if(OS.indexOf("win") >= 0) {
+	            	// is 64 bit?
+	            	if(System.getenv("ProgramFiles(x86)") != null) {
+	            		// 64 bit
+	            		System.load(workingDirectory+"/64/rxtxSerial.dll");
+	            	} else {
+	            		// 32 bit
+	            		System.load(workingDirectory+"/32/rxtxSerial.dll");
+	            	}
+	            } else {
+	            	// is this OSX?
+	    	        if(OS.indexOf("mac") >= 0) {
+	    	    		System.load(workingDirectory+"/librxtxSerial.jnilib");
+	    	        }
+	            }
+	    		*/
 	            CreateAndShowGUI();
 	        }
 	    });
