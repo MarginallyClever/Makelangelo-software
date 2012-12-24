@@ -8,14 +8,16 @@ import java.util.prefs.Preferences;
  *
  */
 public class DistanceMetric {
-	static int robot_id=0;
+	static long robot_id=0;
 	static float total_distance=0;
 	static String query="";
 
 	private Preferences prefs = Preferences.userRoot().node("DistanceMetric");
 	
 	
-	DistanceMetric(int robot_uid) {
+	DistanceMetric() {}
+	
+	public void SetUID(long robot_uid) {
 		robot_id=robot_uid;
 		query="http://marginallyclever.com/drawbot_distance.php?uid="+robot_uid+"&len=";
 		Load();
@@ -26,7 +28,7 @@ public class DistanceMetric {
 	}
 	
 	public void Load() {
-		total_distance=Float.parseFloat(prefs.get("total_distance","0"));
+		total_distance=Float.parseFloat(prefs.get("total_distance_"+robot_id,"0"));
 	}
 	
 	public void SetDistance(float distance) {

@@ -22,6 +22,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.tools.JavaFileManager.Location;
 
 import java.io.*;
 import java.net.URL;
@@ -66,6 +67,7 @@ public class DrawbotGUI
 	
 	// Metrics
 	PublishImage reportImage = new PublishImage();
+	DistanceMetric reportDistance = new DistanceMetric();
 	
 	// Robot config
 	private long   robot_uid=0;
@@ -114,12 +116,8 @@ public class DrawbotGUI
 	// reading file
 	private boolean running=false;
 	private boolean paused=true;
-    private long linesTotal=0;
-	private long linesProcessed=0;
-	private boolean fileOpened=false;
-	private ArrayList<String> gcode;
-	private float estimated_time=0;
 	
+	GCodeFile gcode = new GCodeFile();
 	
 	// Singleton stuff
 	private DrawbotGUI() {
@@ -138,7 +136,7 @@ public class DrawbotGUI
 	
 	//  data access
 	public ArrayList<String> getGcode() {
-		return gcode;
+		return gcode.lines;
 	}
 
 	// manages the vertical split in the GUI
@@ -174,13 +172,6 @@ public class DrawbotGUI
 		catch(IOException e) {}
 	}
 
-	// returns angle of dy/dx as a value from 0...2PI
-	private double atan3(double dy,double dx) {
-	  double a=Math.atan2(dy,dx);
-	  if(a<0) a=(Math.PI*2.0)+a;
-	  return a;
-	}
-	
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
 		try {
@@ -352,6 +343,12 @@ public class DrawbotGUI
 		
 		// new robots have UID=0
 		if(robot_uid==0) GetNewRobotUID();
+
+		// did read go ok?
+		if(robot_uid!=0) {
+			reportDistance.SetUID(robot_uid);
+		}
+
 	}
 	
 	/**
@@ -419,149 +416,25 @@ public class DrawbotGUI
 		paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
 	}
 	
-	// close the file, clear the preview tab
-	public void CloseFile() {
-		if(fileOpened==true) {
-			fileOpened=false;
-		}
-	}
-	
-	void EstimateDrawTime() {
-		int i,j;
-		
-		float drawScale=1.0f;
-		double px=0,py=0,pz=0;
-		float feed_rate=1.0f;
-		
-		estimated_time=0;
-		float estimated_length=0;
-		int estimate_count=0;
-		
-		for(i=0;i<gcode.size();++i) {
-			String line=gcode.get(i);
-			String[] pieces=line.split(";");
-			if(pieces.length==0) continue;
-			
-			String[] tokens = pieces[0].split("\\s");
-			if(tokens.length==0) continue;
-
-			for(j=0;j<tokens.length;++j) {
-				if(tokens[j].equals("G20")) drawScale=2.54f;  // in->cm
-				if(tokens[j].equals("G21")) drawScale=0.10f;  // mm->cm
-				if(tokens[j].startsWith("F")) {
-					feed_rate=Float.valueOf(tokens[j].substring(1)) * drawScale;
-					Log("<span style='color:green'>feed rate="+feed_rate+"</span>\n");
-					feed_rate*=1;
-				}
-			}
-			
-			double x=px;
-			double y=py;
-			double z=pz;
-			double ai=px;
-			double aj=py;
-			for(j=1;j<tokens.length;++j) {
-				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
-			}
-			
-			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
-			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
-				// draw a line
-				double ddx=x-px;
-				double ddy=y-py;
-				double dd=Math.sqrt(ddx*ddx+ddy*ddy);
-				estimated_time+=dd/feed_rate;
-				estimated_length+=dd;
-				++estimate_count;
-				px=x;
-				py=y;
-				pz=z;
-			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
-					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
-				// draw an arc
-				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
-				double dx=px - ai;
-				double dy=py - aj;
-				double radius=Math.sqrt(dx*dx+dy*dy);
-
-				// find angle of arc (sweep)
-				double angle1=atan3(dy,dx);
-				double angle2=atan3(y-aj,x-ai);
-				double theta=angle2-angle1;
-
-				if(dir>0 && theta<0) angle2+=2.0*Math.PI;
-				else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
-
-				theta=Math.abs(angle2-angle1);
-
-				// Draw the arc from a lot of little line segments.
-				for(int k=0;k<=theta*DrawPanel.STEPS_PER_DEGREE;++k) {
-					double angle3 = (angle2-angle1) * ((double)k/(theta*DrawPanel.STEPS_PER_DEGREE)) + angle1;
-					float nx = (float)(ai + Math.cos(angle3) * radius);
-				    float ny = (float)(aj + Math.sin(angle3) * radius);
-
-
-					double ddx=nx-px;
-					double ddy=ny-py;
-					double dd=Math.sqrt(ddx*ddx+ddy*ddy);
-					estimated_time+=dd/feed_rate;
-					estimated_length+=dd;
-					++estimate_count;
-					px=nx;
-					py=ny;
-				}
-				double ddx=x-px;
-				double ddy=y-py;
-				double dd=Math.sqrt(ddx*ddx+ddy*ddy);
-				estimated_time+=dd/feed_rate;
-				estimated_length+=dd;
-				++estimate_count;
-				px=x;
-				py=y;
-				pz=z;
-			}
-		}  // for ( each instruction )
-	   	estimated_time += estimate_count * 0.007617845117845f;
-	   	
-	   	Log("<font color='green'>"+estimate_count + " line segments.\n"+estimated_length+ "cm of line.\n" +
-	   		"Estimated "+statusBar.formatTime((long)(estimated_time*10000))+"s to draw.</font>\n");
-	}
-	
 	/**
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
 	 */
 	public void LoadGCode(String filename) {
-		CloseFile();
-
-	    try {
-	    	Scanner scanner = new Scanner(new FileInputStream(filename));
-	    	linesTotal=0;
-	    	gcode = new ArrayList<String>();
-		    try {
-		      while (scanner.hasNextLine()) {
-		    	  gcode.add(scanner.nextLine());
-		    	  ++linesTotal;
-		      }
-		    }
-		    finally{
-		      scanner.close();
-		    }
+		try {
+			gcode.Load(filename);
+			gcode.EstimateDrawTime();
+		   	Log("<font color='green'>"+gcode.estimate_count + " line segments.\n"+gcode.estimated_length+ "cm of line.\n" +
+			   		"Estimated "+statusBar.formatTime((long)(gcode.estimated_time))+"s to draw.</font>\n");
+			
 	    }
 	    catch(IOException e) {
-	    	Log("<span style='color:red'>File could not be opened.</span>\n");
+	    	Log("<span style='color:red'>File "+filename+" could not be opened.</span>\n");
 	    	RemoveRecentFile(filename);
 	    	return;
 	    }
 	    
-	    previewPane.setGCode(gcode);
-	    fileOpened=true;
-
-	   	EstimateDrawTime();
+	    previewPane.setGCode(gcode.lines);
 	   	UpdateRecentFiles(filename);
 	    Halt();
 	}
@@ -747,7 +620,8 @@ public class DrawbotGUI
 
 		BufferedImage myPicture = null;
 		try {
-			myPicture = ImageIO.read(new File("limits.png"));
+			
+			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
 		}
 		catch(IOException e) {}
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
@@ -934,19 +808,20 @@ public class DrawbotGUI
 
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || fileOpened==false || portConfirmed==false || linesProcessed>=linesTotal) return;
+		if(running==false || paused==true || gcode.fileOpened==false || portConfirmed==false || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
 			// are there any more commands?
-			line=gcode.get((int)linesProcessed++).trim();
-			previewPane.setLinesProcessed(linesProcessed);
-			statusBar.SetProgress(linesProcessed, linesTotal);
+			// @TODO: find out how far the pen moved each line and add it to the distance total.
+			line=gcode.lines.get((int)gcode.linesProcessed++).trim();
+			previewPane.setLinesProcessed(gcode.linesProcessed);
+			statusBar.SetProgress(gcode.linesProcessed, gcode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while(ProcessLine(line) && linesProcessed<linesTotal);
+		} while(ProcessLine(line) && gcode.linesProcessed<gcode.linesTotal);
 		
-		if(linesProcessed==linesTotal) {
+		if(gcode.linesProcessed==gcode.linesTotal) {
 			// end of file
 			Halt();
 		}
@@ -1012,7 +887,6 @@ public class DrawbotGUI
 		
 		return false;
 	}
-	
 	/**
 	 * Sends a single command the robot.  Could be anything.
 	 * @param line command to send.
@@ -1036,7 +910,7 @@ public class DrawbotGUI
 	public void Halt() {
 		running=false;
 		paused=false;
-	    linesProcessed=0;
+		gcode.linesProcessed=0;
 	    previewPane.setLinesProcessed(0);
 		previewPane.setRunning(running);
 		UpdateMenuBar();
@@ -1060,13 +934,13 @@ public class DrawbotGUI
 		}
 
 		if( subject == buttonStart ) {
-			if(fileOpened) {
+			if(gcode.fileOpened) {
 				paused=false;
 				running=true;
 				UpdateMenuBar();
-				linesProcessed=0;
+				gcode.linesProcessed=0;
 				previewPane.setRunning(running);
-				previewPane.setLinesProcessed(linesProcessed);
+				previewPane.setLinesProcessed(gcode.linesProcessed);
 				statusBar.Start();
 				SendFileCommand();
 			}

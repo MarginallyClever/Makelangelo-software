@@ -219,6 +219,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// draw image
 		if(instructions==null) return;
 		
+		drawScale=0.1f;
+		
 		double px=0,py=0,pz=90;
 		int i,j;
 
