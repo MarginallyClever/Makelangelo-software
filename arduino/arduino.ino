@@ -692,7 +692,6 @@ static int processSubcommand() {
     ptr=strchr(ptr,' ')+1;
   }
   
-  Serial.println("done");
   return found;
 }
 

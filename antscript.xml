@@ -8,11 +8,13 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="DrawbotGUI"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ RXTXcomm.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ RXTXcomm.jar twitter4j-core-3.0.2.jar twitter4j-media-support-3.0.2.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="/Users/danroyer/Documents/workspace/DrawBot/java/classes"/>
             <zipfileset dir="/Users/danroyer/Documents/workspace/DrawBot/java" includes="RXTXcomm.jar"/>
+            <zipfileset dir="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/lib" includes="twitter4j-core-3.0.2.jar"/>
+            <zipfileset dir="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/lib" includes="twitter4j-media-support-3.0.2.jar"/>
         </jar>
     </target>
 </project>

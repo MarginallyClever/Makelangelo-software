@@ -40,8 +40,6 @@ public class DrawbotGUI
 	static final long serialVersionUID=1;
 	
 	private static DrawbotGUI singletonObject;
-	
-	private static String OS = System.getProperty("os.name").toLowerCase();
 	   
 	// Serial connection
 	private static int BAUD_RATE = 57600;
@@ -64,6 +62,10 @@ public class DrawbotGUI
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
 	private String recentPort;
+	private boolean allowMetrics=true;
+	
+	// Metrics
+	PublishImage reportImage = new PublishImage();
 	
 	// Robot config
 	private long   robot_uid=0;
@@ -90,7 +92,7 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfigureLimits, buttonConfigureBobbins, buttonRescan, buttonJogMotors, buttonImageProcessing;
+    private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, buttonRescan, buttonJogMotors, buttonImageProcessing;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -185,6 +187,7 @@ public class DrawbotGUI
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
 			int over_length = doc.getLength() - msg.length() - 5000;
 			doc.remove(0, over_length);
+			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -198,6 +201,7 @@ public class DrawbotGUI
 		try {
 			doc.replace(0, doc.getLength(), "", null);
 			kit.insertHTML(doc, 0, "", 0,0,null);
+			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -675,6 +679,53 @@ public class DrawbotGUI
 	}
 	
 	/**
+	 * Adjust preferences
+	 */
+	public void ConfigurePreferences() {
+		final JDialog driver = new JDialog(mainframe,"Preferences",true);
+		driver.setLayout(new GridBagLayout());
+		
+		final JTextField allow_metrics = new JTextField(String.valueOf(allowMetrics));
+		final JTextField twitter_name = new JTextField(String.valueOf(reportImage.GetName()));
+		final JPasswordField twitter_pass = new JPasswordField(String.valueOf(reportImage.GetPass()));
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth=3;  
+		c.gridx=0;  c.gridy=0;  driver.add(new JLabel("Can I add the distance drawn to the global total?"),c);
+		c.gridwidth=1;
+		c.gridx=0;  c.gridy=1;  driver.add(allow_metrics);
+		c.gridx=1;  c.gridy=1;  driver.add(new JLabel("Yes, please!"),c);
+		
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Can I tweet the converted pictures?"),c);
+		
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Twitter account"),c);
+		c.gridx=0;  c.gridy=3;  driver.add(new JLabel("Twitter password"),c);
+		c.gridx=2;  c.gridy=4; driver.add(cancel,c);
+		c.gridx=1;  c.gridy=4; driver.add(save,c);
+
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						allowMetrics = Boolean.parseBoolean(allow_metrics.getText());
+						reportImage.SetTwitter(twitter_name.getText(),new String(twitter_pass.getPassword()));
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+			};
+		
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+	}
+	
+	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
 	public void ConfigureLimits() {
@@ -1053,6 +1104,10 @@ public class DrawbotGUI
 			return;
 			
 		}
+		if( subject == buttonConfigurePreferences ) {
+			ConfigurePreferences();
+			return;
+		}
 		if( subject == buttonConfigureLimits ) {
 			ConfigureLimits();
 			return;
@@ -1415,7 +1470,6 @@ public class DrawbotGUI
         menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
 
         JMenu subMenu = new JMenu("Port");
-        subMenu.setMnemonic(KeyEvent.VK_P);
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
         subMenu.setEnabled(!running);
         ButtonGroup group = new ButtonGroup();
@@ -1464,6 +1518,13 @@ public class DrawbotGUI
         buttonDriveManually.addActionListener(this);
         buttonDriveManually.setEnabled(portConfirmed && !running);
         menu.add(buttonDriveManually);
+/*
+        buttonConfigurePreferences = new JMenuItem("Preferences");
+        buttonConfigurePreferences.getAccessibleContext().setAccessibleDescription("Adjust miscelaneous preferences.");
+        buttonConfigurePreferences.addActionListener(this);
+        buttonConfigurePreferences.setEnabled(!running);
+        menu.add(buttonConfigurePreferences);
+*/
 /*
         menu.addSeparator();
 
@@ -1611,6 +1672,7 @@ public class DrawbotGUI
 	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
 	        	/*
+	        	String OS = System.getProperty("os.name").toLowerCase();
 	            String workingDirectory=System.getProperty("user.dir");
 	            System.out.println(workingDirectory);
 	            

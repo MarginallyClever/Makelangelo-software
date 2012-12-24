@@ -7,5 +7,15 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Drawbot/src/rxtxnative/Mac_OS_X"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/lib/twitter4j-core-3.0.2.jar" sourcepath="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/twitter4j-core/twitter4j-core-3.0.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/twitter4j-core/twitter4j-core-3.0.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/lib/twitter4j-media-support-3.0.2.jar" sourcepath="/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/twitter4j-media-support/twitter4j-media-support-3.0.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/danroyer/Documents/workspace/DrawBot/java/twitter4j-3.0.2/twitter4j-media-support/twitter4j-media-support-3.0.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
