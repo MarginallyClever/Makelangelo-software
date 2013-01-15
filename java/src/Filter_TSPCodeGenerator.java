@@ -78,7 +78,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							assert(newlen>len);
 							len=newlen;
 							
-							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
+							//DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 							int new_progress=(int)((float)t_elapsed/(float)time_limit);
 							if(new_progress != progress ) {
 								progress = new_progress;

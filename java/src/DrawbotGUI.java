@@ -22,17 +22,17 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.tools.JavaFileManager.Location;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-//@todo in-app gcode editing with immediate visusal feedback - only while not drawing
-//@todo image processing options - cutoff, exposure, resolution
-//@todo vector output?
+//@TODO: in-app gcode editing with immediate visusal feedback - only while not drawing
+//@TODO: image processing options - cutoff, exposure, resolution
+//@TODO: vector output?
 
 public class DrawbotGUI
 		extends JPanel
@@ -102,10 +102,12 @@ public class DrawbotGUI
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
+    // logging
     private JTextPane log;
     private JScrollPane logPane;
     HTMLEditorKit kit;
     HTMLDocument doc;
+    PrintWriter logToFile;
     
     private DrawPanel previewPane;
 	private StatusBar statusBar;
@@ -119,12 +121,35 @@ public class DrawbotGUI
 	
 	GCodeFile gcode = new GCodeFile();
 	
-	// Singleton stuff
 	private DrawbotGUI() {
+		StartLog();
 		LoadConfig();
         GetRecentFiles();
 		GetRecentPaperSize();
         GetRecentPort();
+	}
+	
+	protected void finalize() throws Throwable
+	{
+		//do finalization here
+		EndLog();
+		super.finalize(); //not necessary if extending Object.
+	} 
+
+	private void StartLog() {
+		try {
+			logToFile = new PrintWriter(new FileWriter("log.html"));
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			logToFile.write("<h3>"+sdf.format(cal.getTime())+"</h3>\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void EndLog() {
+		logToFile.close();
 	}
 	
 	public static DrawbotGUI getSingleton() {
@@ -175,6 +200,9 @@ public class DrawbotGUI
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
 		try {
+			msg=msg.replace("\n", "<br>\n");
+			logToFile.write(msg);
+			logToFile.flush();
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
 			int over_length = doc.getLength() - msg.length() - 5000;
 			doc.remove(0, over_length);
