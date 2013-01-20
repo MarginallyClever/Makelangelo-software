@@ -44,7 +44,7 @@
 
 // servo angles for pen control
 #define PEN_UP_ANGLE    (90)
-#define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
+#define PEN_DOWN_ANGLE  (65)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
@@ -109,7 +109,7 @@ static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
 static Servo s1;
 
 // robot UID
-long robot_uid=0;
+int robot_uid=0;
 
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
@@ -131,29 +131,23 @@ int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
 float SPOOL_DIAMETER1 = 0.950;
-float SPOOL_CIRC1     = SPOOL_DIAMETER1*PI;  // circumference
-float THREADPERSTEP1  = SPOOL_CIRC1/STEPS_PER_TURN;  // thread per step
+float THREADPERSTEP1;  // thread per step
 
 float SPOOL_DIAMETER2 = 0.950;
-float SPOOL_CIRC2     = SPOOL_DIAMETER2*PI;  // circumference
-float THREADPERSTEP2  = SPOOL_CIRC2/STEPS_PER_TURN;  // thread per step
+float THREADPERSTEP2;  // thread per step
 
-float MAX_VEL         = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
+float MAX_VEL = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
 
 
 // plotter position.
 static float posx, velx;
 static float posy, vely;
 static float posz;  // pen state
-static float feed_rate1=0;
-static float feed_rate2=0;
+static float feed_rate=0;
 static int step_delay;
 
-// switch state
-static char switch1, switch2;
-
 // motor position
-static long laststep1, laststep2;
+static int laststep1, laststep2;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
 static float mode_scale;   // mm or inches?
@@ -179,19 +173,19 @@ static int sofar;             // Serial buffer progress
 // calculate max velocity, threadperstep.
 static void adjustSpoolDiameter(float diameter1,float diameter2) {
   SPOOL_DIAMETER1 = diameter1;
-  SPOOL_CIRC1     = SPOOL_DIAMETER1*PI;  // circumference
-  THREADPERSTEP1  = SPOOL_CIRC1/STEPS_PER_TURN;  // thread per step
+  float SPOOL_CIRC = SPOOL_DIAMETER1*PI;  // circumference
+  THREADPERSTEP1 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
   
   SPOOL_DIAMETER2 = diameter2;
-  SPOOL_CIRC2     = SPOOL_DIAMETER2*PI;  // circumference
-  THREADPERSTEP2  = SPOOL_CIRC2/STEPS_PER_TURN;  // thread per step
+  SPOOL_CIRC = SPOOL_DIAMETER2*PI;  // circumference
+  THREADPERSTEP2 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
   
-  float MAX_VEL1        = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
-  float MAX_VEL2        = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
+  float MAX_VEL1 = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
+  float MAX_VEL2 = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
   MAX_VEL = MAX_VEL1 > MAX_VEL2 ? MAX_VEL1 : MAX_VEL2;
 
-  // Serial.print("SpoolDiameter1 = "); Serial.println(SPOOL_DIAMETER1,3);
-  // Serial.print("SpoolDiameter2 = "); Serial.println(SPOOL_DIAMETER2,3);
+  // Serial.print(F("SpoolDiameter1 = "); Serial.println(F(SPOOL_DIAMETER1,3));
+  // Serial.print(F("SpoolDiameter2 = "); Serial.println(F(SPOOL_DIAMETER2,3));
 }
 
 
@@ -220,10 +214,7 @@ static float atan3(float dy,float dx) {
 //------------------------------------------------------------------------------
 static char readSwitches() {
   // get the current switch state
-  switch1=analogRead(L_PIN) < SWITCH_HALF;
-  switch2=analogRead(R_PIN) < SWITCH_HALF;
-  
-  return ( switch1 | switch2 );
+  return ( (analogRead(L_PIN) < SWITCH_HALF) | (analogRead(R_PIN) < SWITCH_HALF) );
 }
 
 
@@ -231,47 +222,24 @@ static char readSwitches() {
 // feed rate is given in units/min and converted to cm/s
 static void setFeedRate(float v) {
   float v1 = v * mode_scale/60.0;
-  if( feed_rate1 != v1 ) {
-    feed_rate1 = v1;
-    if(feed_rate1 > MAX_VEL) feed_rate1=MAX_VEL;
-    if(feed_rate1 < MIN_VEL) feed_rate1=MIN_VEL;
-  }
-
-  float v2 = v * mode_scale/60.0;
-  if( feed_rate2 != v2 ) {
-    feed_rate2 = v2;
-    if(feed_rate2 > MAX_VEL) feed_rate2=MAX_VEL;
-    if(feed_rate2 < MIN_VEL) feed_rate2=MIN_VEL;
+  if( feed_rate != v1 ) {
+    feed_rate = v1;
+    if(feed_rate > MAX_VEL) feed_rate=MAX_VEL;
+    if(feed_rate < MIN_VEL) feed_rate=MIN_VEL;
   }
   
-  int step_delay1=1000000.0/(feed_rate1/THREADPERSTEP1);
-  int step_delay2=1000000.0/(feed_rate2/THREADPERSTEP2);
+  int step_delay1=1000000.0/(feed_rate/THREADPERSTEP1);
+  int step_delay2=1000000.0/(feed_rate/THREADPERSTEP2);
   step_delay = (step_delay1>step_delay2) ? step_delay1 : step_delay2;
 }
 
 
 //------------------------------------------------------------------------------
 static void printFeedRate() {
-  Serial.print("f1=");
-  Serial.print(feed_rate1*60.0/mode_scale);
+  Serial.print(F("f1="));
+  Serial.print(feed_rate*60.0/mode_scale);
   Serial.print(mode_name);
-  Serial.print("/min");
-  
-  Serial.print("f2=");
-  Serial.print(feed_rate2*60.0/mode_scale);
-  Serial.print(mode_name);
-  Serial.print("/min");
-/*
-  Serial.print(" (");
-  Serial.print((feed_rate/THREADPERSTEP));
-  Serial.print(" steps/s) ");
-  Serial.print((MAX_VEL*60.0/mode_scale));
-  Serial.print(mode_name);
-  Serial.print("/min ");
-  Serial.print((MIN_VEL*60.0/mode_scale));
-  Serial.print(mode_name);
-  Serial.print("/min");
-*/
+  Serial.print(F("/min"));
 }
 
 
@@ -438,27 +406,26 @@ static void teleport(float x,float y) {
 
 //------------------------------------------------------------------------------
 static void help() {
-  Serial.println("== DRAWBOT - http://github.com/i-make-robots/Drawbot/ ==");
-  Serial.println("All commands end with a semi-colon.");
-  Serial.println("HELP;  - display this message");
-  Serial.println("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];");
-  Serial.println("       - display/update this robot's configuration.");
-  Serial.println("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter.");
-  Serial.println("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):");
-  Serial.println("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M18,M114");
+  Serial.println(F("== DRAWBOT - http://github.com/i-make-robots/Drawbot/ =="));
+  Serial.println(F("All commands end with a semi-colon."));
+  Serial.println(F("HELP;  - display this message"));
+  Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
+  Serial.println(F("       - display/update this robot's configuration."));
+  Serial.println(F("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter."));
+  Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
+  Serial.println(F("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M18,M114"));
 }
 
 
 //------------------------------------------------------------------------------
 // find the current robot position and 
 static void goHome() {
-  Serial.println("Homing...");
-  readSwitches();
+  Serial.println(F("Homing..."));
   
-  if(switch1 || switch2) {
-    Serial.println("** ERROR **");
-    Serial.println("Problem: Plotter is already touching switches.");
-    Serial.println("Solution: Please unwind the strings a bit and try again.");
+  if(readSwitches()) {
+    Serial.println(F("** ERROR **"));
+    Serial.println(F("Problem: Plotter is already touching switches."));
+    Serial.println(F("Solution: Please unwind the strings a bit and try again."));
     return;
   }
   
@@ -466,7 +433,7 @@ static void goHome() {
   int safe_out=400;
   
   // reel in the left motor until contact is made.
-  Serial.println("Find left...");
+  Serial.println(F("Find left..."));
   do {
     m1.step(1,M1_REEL_IN );
     m2.step(1,M2_REEL_OUT);
@@ -483,7 +450,7 @@ static void goHome() {
   laststep1=safe_out;
   
   // reel in the right motor until contact is made
-  Serial.println("Find right...");
+  Serial.println(F("Find right..."));
   do {
     m1.step(1,M1_REEL_OUT);
     m2.step(1,M2_REEL_IN );
@@ -499,35 +466,35 @@ static void goHome() {
   }
   laststep2=safe_out;
   
-  Serial.println("Centering...");
-  line(0,0,90);
+  Serial.println(F("Centering..."));
+  line(0,0,posz);
 }
 
 
 //------------------------------------------------------------------------------
 static void where() {
-  Serial.print("X");
+  Serial.print(F("X"));
   Serial.print(posx);
-  Serial.print(" Y");
+  Serial.print(F(" Y"));
   Serial.print(posy);
-  Serial.print(" Z");
+  Serial.print(F(" Z"));
   Serial.print(posz);
-  Serial.print(" F");
+  Serial.print(F(" F"));
   printFeedRate();
-  Serial.print("\n");
+  Serial.print(F("\n"));
 }
 
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print(m1d);          Serial.print("=");  
-  Serial.print(limit_top);    Serial.print(",");
-  Serial.print(limit_left);   Serial.print("\n");
-  Serial.print(m2d);          Serial.print("=");  
-  Serial.print(limit_top);    Serial.print(",");
-  Serial.print(limit_right);  Serial.print("\n");
-  Serial.print("Bottom=");    Serial.println(limit_bottom);
-  Serial.print("Feed rate=");    printFeedRate();
+  Serial.print(m1d);              Serial.print(F("="));  
+  Serial.print(limit_top);        Serial.print(F(","));
+  Serial.print(limit_left);       Serial.print(F("\n"));
+  Serial.print(m2d);              Serial.print(F("="));  
+  Serial.print(limit_top);        Serial.print(F(","));
+  Serial.print(limit_right);      Serial.print(F("\n"));
+  Serial.print(F("Bottom="));     Serial.println(limit_bottom);
+  Serial.print(F("Feed rate="));  printFeedRate();
 }
 
 
@@ -580,14 +547,14 @@ static void LoadConfig() {
                         (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
   } else {
     // Code should not get here if it does we should display some meaningful error message
-    Serial.println("An Error Occurred during LoadConfig");
+    Serial.println(F("An Error Occurred during LoadConfig"));
   }
 }
 
 
 //------------------------------------------------------------------------------
 static void SaveUID() {
-  EEPROM_writeLong(ADDR_UUID,robot_uid);
+  EEPROM_writeLong(ADDR_UUID,(long)robot_uid);
 }
 
 //------------------------------------------------------------------------------
@@ -605,18 +572,18 @@ void SD_PrintDirectory(File dir, int numTabs) {
      File entry =  dir.openNextFile();
      if (! entry) {
        // no more files
-       Serial.println("**nomorefiles**");
+       Serial.println(F("**nomorefiles**"));
      }
      for (uint8_t i=0; i<numTabs; i++) {
        Serial.print('\t');
      }
      Serial.print(entry.name());
      if (entry.isDirectory()) {
-       Serial.println("/");
+       Serial.println(F("/"));
        SD_PrintDirectory(entry, numTabs+1);
      } else {
        // files have sizes, directories do not
-       Serial.print("\t\t");
+       Serial.print(F("\t\t"));
        Serial.println(entry.size(), DEC);
      }
    }
@@ -638,9 +605,9 @@ static void SD_ProcessFile(char *filename) {
 #ifdef USE_SD_CARD
   File f=SD.open(filename);
   if(!f) {
-    Serial.print("File ");
+    Serial.print(F("File "));
     Serial.print(filename);
-    Serial.println(" not found.");
+    Serial.println(F(" not found."));
     return;
   }
   
@@ -683,9 +650,11 @@ static int processSubcommand() {
       printFeedRate();
       found=1;
     } else if(!strncmp(ptr,"G90",3)) {
+      // absolute mode
       absolute_mode=1;
       found=1;
     } else if(!strncmp(ptr,"G91",3)) {
+      // relative mode
       absolute_mode=0;
       found=1;
     }
@@ -704,7 +673,7 @@ static void processCommand() {
   if(!strncmp(buffer,"HELP",4)) {
     help();
   } else if(!strncmp(buffer,"UID",3)) {
-    robot_uid=atol(strchr(buffer,' ')+1);
+    robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
   } else if(!strncmp(buffer,"G28",3)) {
     goHome();
@@ -735,7 +704,6 @@ static void processCommand() {
     float bb=limit_bottom;
     float rr=limit_right;
     float ll=limit_left;
-    
     char gg=m1d;
     char hh=m2d;
     
@@ -749,7 +717,7 @@ static void processCommand() {
       case 'L': ll=atof(ptr+1);  break;
       case 'G': gg=*(ptr+1);  break;
       case 'H': hh=*(ptr+1);  break;
-      case 'I': {
+      case 'I':
         if(atoi(ptr+1)>0) {
           M1_REEL_IN=FORWARD;
           M1_REEL_OUT=BACKWARD;
@@ -757,8 +725,8 @@ static void processCommand() {
           M1_REEL_IN=BACKWARD;
           M1_REEL_OUT=FORWARD;
         }
-      }  break;
-      case 'J':  {
+        break;
+      case 'J':
         if(atoi(ptr+1)>0) {
           M2_REEL_IN=FORWARD;
           M2_REEL_OUT=BACKWARD;
@@ -766,7 +734,7 @@ static void processCommand() {
           M2_REEL_IN=BACKWARD;
           M2_REEL_OUT=FORWARD;
         }
-      }  break;
+        break;
       }
     }
     
@@ -786,13 +754,14 @@ static void processCommand() {
     processSubcommand();
     float xx, yy, zz;
     
-      zz=posz;
     if(absolute_mode==1) {
       xx=posx;
       yy=posy;
+      zz=posz;
     } else {
       xx=0;
       yy=0;
+      zz=0;
     }
   
     char *ptr=buffer;
@@ -812,7 +781,21 @@ static void processCommand() {
       zz+=posz;
     }
     
-    line(xx,yy,zz);
+    //line(xx,yy,zz);
+    /*
+    Serial.print(F("line ");
+    Serial.print(posx);
+    Serial.print('\t');
+    Serial.print(posy);
+    Serial.print('\t');
+    Serial.println(posz);
+    Serial.print(F("to "));
+    Serial.print(xx);
+    Serial.print('\t');
+    Serial.print(yy);
+    Serial.print('\t');
+    Serial.println(zz);
+    */
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
@@ -899,9 +882,9 @@ static void processCommand() {
     // Update EEPROM
     SaveSpoolDiameter();
   } else if(!strncmp(buffer,"D02 ",4)) {
-    Serial.print("L");
+    Serial.print('L');
     Serial.print(SPOOL_DIAMETER1);
-    Serial.print(" R");
+    Serial.print(F(" R"));
     Serial.println(SPOOL_DIAMETER2);
   } else if(!strncmp(buffer,"D03 ",4)) {
     // read directory
@@ -911,12 +894,13 @@ static void processCommand() {
     SD_ProcessFile(strchr(buffer,' ')+1);
   } else {
     if(processSubcommand()==0) {
-      Serial.print("Invalid command '");
+      Serial.print(F("Invalid command '"));
       Serial.print(buffer);
-      Serial.println("'");
+      Serial.println(F("'"));
     }
   }
 }
+
 
 //------------------------------------------------------------------------------
 void setup() {
@@ -926,7 +910,7 @@ void setup() {
   sofar=0;
   // start communications
   Serial.begin(BAUD);
-  Serial.print("\n\nHELLO WORLD! I AM DRAWBOT #");
+  Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
   
 #ifdef USE_SD_CARD
@@ -956,7 +940,7 @@ void setup() {
   velx=0;
   setPenAngle(PEN_UP_ANGLE);
   
-  Serial.print("> ");
+  Serial.print(F("> "));
 }
 
 
@@ -974,7 +958,7 @@ void loop() {
     buffer[sofar]=0;
     
     // echo confirmation
-//    Serial.println(buffer);
+//    Serial.println(F(buffer));
  
     // do something with the command
     processCommand();
@@ -983,7 +967,7 @@ void loop() {
     sofar=0;
  
     // echo completion
-    Serial.print("> ");
+    Serial.print(F("> "));
   }
 }
 

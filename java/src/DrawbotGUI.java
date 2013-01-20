@@ -79,22 +79,25 @@ public class DrawbotGUI
 	
 	private int image_dpi;
 	
-	// paper area (stock material
+	// paper area
 	private double paper_top=10;
 	private double paper_bottom=-10;
 	private double paper_left=-10;
 	private double paper_right=10;
+
+	// machine settings
 	private boolean m1invert=false;
 	private boolean m2invert=false;
-	
 	private double bobbin1_diameter=0.95;
 	private double bobbin2_diameter=0.95;
+	private long penUpNumber, penDownNumber;
 	
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
-    private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, buttonRescan, buttonJogMotors, buttonImageProcessing;
+    private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
+    					buttonRescan, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -120,6 +123,15 @@ public class DrawbotGUI
 	private boolean paused=true;
 	
 	GCodeFile gcode = new GCodeFile();
+	
+	
+	public String getPenUp() {
+		return Long.toString(penUpNumber);
+	}
+	public String getPenDown() {
+		return Long.toString(penDownNumber);
+	}
+	
 	
 	private DrawbotGUI() {
 		StartLog();
@@ -348,8 +360,9 @@ public class DrawbotGUI
 				ConfigureLimits();
 			}
 
-			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
 			SendConfig();
+			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
 			
 			UpdateMenuBar();
 			previewPane.setConnected(true);
@@ -576,7 +589,7 @@ public class DrawbotGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 X0 Y0 Z90");
+		SendLineToRobot("G00 X0 Y0");
 	}
 	
 	/**
@@ -750,6 +763,7 @@ public class DrawbotGUI
 		final JButton save = new JButton("Save");
 
 		GridBagConstraints c = new GridBagConstraints();
+		c.weightx=50;
 		c.gridx=0;  c.gridy=1;  driver.add(new JLabel("Left"),c);
 		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Right"),c);
 		
@@ -757,11 +771,11 @@ public class DrawbotGUI
 		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
 		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
 
-		c.gridx=0;  c.gridy=3;  c.gridwidth=2;
+		c.gridx=0;  c.gridy=3;  driver.add(save,c);
+		c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
+		
+		c.gridx=0;  c.gridy=4;  c.gridwidth=2;  c.gridheight=2;
 		driver.add(new JLabel("All values in cm."),c);
-
-		c.gridx=1;  c.gridy=4;  driver.add(save,c);
-		c.gridx=2;  c.gridy=4;  driver.add(cancel,c);
 
 		Dimension s=mBobbin1.getPreferredSize();
 		s.width=80;
@@ -806,6 +820,8 @@ public class DrawbotGUI
 		image_dpi=Integer.parseInt(prefs.get(id+"_image_dpi","100"));
 		bobbin1_diameter=Double.valueOf(prefs.get(id+"_bobbin1_diameter", "0.95"));
 		bobbin2_diameter=Double.valueOf(prefs.get(id+"_bobbin2_diameter", "0.95"));
+		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
+		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 	}
 
 	void SaveConfig() {
@@ -818,6 +834,8 @@ public class DrawbotGUI
 		prefs.put(id+"_m2invert",Boolean.toString(m2invert));
 		prefs.put(id+"_bobbin1_diameter", Double.toString(bobbin1_diameter));
 		prefs.put(id+"_bobbin2_diameter", Double.toString(bobbin2_diameter));
+		prefs.put(id+"_penUp", Long.toString(penUpNumber));
+		prefs.put(id+"_penDown", Long.toString(penDownNumber));
 	}
 	
 	void SendConfig() {
@@ -1018,6 +1036,10 @@ public class DrawbotGUI
 			ConfigureBobbins();
 			return;
 		}
+		if( subject == buttonAdjustZ ) {
+			AdjustZ();
+			return;
+		}
 		if( subject == buttonJogMotors ) {
 			JogMotors();
 			return;
@@ -1125,8 +1147,8 @@ public class DrawbotGUI
 		JButton BL = new JButton("GO BL");
 		JButton BR = new JButton("GO BR");
 
-		JButton z90 = new JButton("Z90");
-		JButton z0  = new JButton("Z0");
+		JButton z90 = new JButton("Pen Up");
+		JButton z0  = new JButton("Pen Down");
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
@@ -1174,8 +1196,10 @@ public class DrawbotGUI
 						SendLineToRobot("G28");
 					} else if(t=="THIS IS HOME") {
 						SendLineToRobot("TELEPORT XO YO");
-					} else if(t=="Z90" || t=="Z0") {
-						SendLineToRobot("G00 "+b.getText());
+					} else if(t=="Pen Up") {
+						SendLineToRobot("G00 Z"+getPenUp());
+					} else if(t=="Pen Down") {
+						SendLineToRobot("G00 Z"+getPenDown());
 					} else {
 						SendLineToRobot("G91");
 						SendLineToRobot("G00 G21 "+b.getText());
@@ -1256,6 +1280,82 @@ public class DrawbotGUI
 		driver.setVisible(true);
 	}
 	
+	/**
+	 * dialog to adjust the pen up & pen down values
+	 */
+	protected void AdjustZ() {
+		final JDialog driver = new JDialog(mainframe,"Adjust Z",true);
+		driver.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		final JTextField penUp   = new JTextField(Long.toString(penUpNumber),5);
+		final JTextField penDown = new JTextField(Long.toString(penDownNumber),5);
+		final JButton buttonTestUp = new JButton("Test up");
+		final JButton buttonTestDown = new JButton("Test down");
+		final JButton buttonSave = new JButton("Save");
+		final JButton buttonCancel = new JButton("Cancel");
+
+
+		c.gridx=0;	c.gridy=0;	driver.add(new JLabel("Up"),c);
+		c.gridx=1;	c.gridy=0;	driver.add(new JLabel("Down"),c);
+
+		c.anchor=GridBagConstraints.WEST;
+		c.fill=GridBagConstraints.HORIZONTAL;
+		c.weightx=50;
+		c.gridx=0;	c.gridy=1;	driver.add(penUp,c);
+		c.gridx=1;	c.gridy=1;	driver.add(penDown,c);
+		
+		c.gridx=0;	c.gridy=2;	driver.add(buttonTestUp,c);
+		c.gridx=1;	c.gridy=2;	driver.add(buttonTestDown,c);
+
+		c.gridx=0;	c.gridy=3;	driver.add(buttonSave,c);
+		c.gridx=1;	c.gridy=3;	driver.add(buttonCancel,c);
+
+		c.gridwidth=2;
+		c.insets=new Insets(0,5,5,5);
+		c.anchor=GridBagConstraints.WEST;
+		
+		c.gridheight=4;
+		c.gridx=0;  c.gridy=4;
+		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
+								 "raise and lower the pen.  After changes\n" +
+								 "you will need to reprocess images to\n" +
+								 "use the updated numbers."),c);
+		
+		
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				
+				if(subject == buttonTestUp) {
+					SendLineToRobot("G00 Z"+Long.valueOf(penUp.getText()));
+				}
+				if(subject == buttonTestDown) {
+					SendLineToRobot("G00 Z"+Long.valueOf(penDown.getText()));
+				}
+				if(subject == buttonSave) {
+					penUpNumber = Long.valueOf(penUp.getText());
+					penDownNumber = Long.valueOf(penDown.getText());
+					SaveConfig();
+					driver.dispose();
+				}
+				if(subject == buttonCancel) {
+					driver.dispose();
+				}
+			}
+		};
+		
+		buttonTestUp.addActionListener(driveButtons);
+		buttonTestDown.addActionListener(driveButtons);
+		
+		buttonSave.addActionListener(driveButtons);
+		buttonCancel.addActionListener(driveButtons);
+
+		SendLineToRobot("M114");
+		driver.pack();
+		driver.setVisible(true);
+	}
+	
 	protected void JogMotors() {
 		JDialog driver = new JDialog(mainframe,"Jog Motors",true);
 		driver.setLayout(new GridBagLayout());
@@ -1280,6 +1380,7 @@ public class DrawbotGUI
 
 		c.gridx=3;	c.gridy=0;	driver.add(m1i,c);
 		c.gridx=3;	c.gridy=1;	driver.add(m2i,c);
+		
 		
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1409,6 +1510,11 @@ public class DrawbotGUI
         buttonConfigureBobbins.setEnabled(!running);
         menu.add(buttonConfigureBobbins);
 
+        buttonAdjustZ = new JMenuItem("Adjust Z",KeyEvent.VK_B);
+        buttonAdjustZ.getAccessibleContext().setAccessibleDescription("Adjust the Z axis.");
+        buttonAdjustZ.addActionListener(this);
+        buttonAdjustZ.setEnabled(!running);
+        menu.add(buttonAdjustZ);
         
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
