@@ -223,19 +223,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		
 		double px=0,py=0,pz=90;
 		int i,j;
+		
+		float penDown = Float.parseFloat(DrawbotGUI.getSingleton().getPenDown());
+		float penUp = Float.parseFloat(DrawbotGUI.getSingleton().getPenUp());
 
 		for(i=0;i<instructions.size();++i) {
 			if(running && i<=linesProcessed) {
 				g2d.setColor( Color.RED );
 			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
 				g2d.setColor( Color.GREEN );
-			} else {
-				// is pen up or down?
-				if(pz<5) {
-					g2d.setColor( Color.BLACK );
-				} else {
-					g2d.setColor( Color.BLUE );
-				}
 			}
 			
 			String line=instructions.get(i);
@@ -245,23 +241,39 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			String[] tokens = pieces[0].split("\\s");
 			if(tokens.length==0) continue;
 
+			// have we changed scale?
 			for(j=0;j<tokens.length;++j) {
 				 if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
 				 if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
 			}
 			
+			// what are our coordinates?
+			double x=px;
+			double y=py;
+			double z=pz;
+			double ai=px;
+			double aj=py;
+			for(j=1;j<tokens.length;++j) {
+				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));// * drawScale;
+				if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
+			}
+			
+			// is pen up or down?
+			if(Math.abs(z-penDown)<0.01) {
+				g2d.setColor( Color.BLACK );
+			} else if(Math.abs(z-penUp)<0.01) {
+				g2d.setColor( Color.BLUE );
+			} else {
+				g2d.setColor( Color.ORANGE );
+			}
+			
+			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line
-				double x=px;
-				double y=py;
-				double z=pz;
-				for(j=1;j<tokens.length;++j) {
-					if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
-				}
-
 				g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
 				px=x;
 				py=y;
@@ -269,19 +281,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
 					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
 				// draw an arc
+				
+				// clockwise or counter-clockwise?
 				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
-				double x=px;
-				double y=py;
-				double z=pz;
-				double ai=px;
-				double aj=py;
-				for(j=1;j<tokens.length;++j) {
-					if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
-					if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
-				}
 
 				double dx=px - ai;
 				double dy=py - aj;
