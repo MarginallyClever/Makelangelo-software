@@ -781,7 +781,7 @@ static void processCommand() {
       zz+=posz;
     }
     
-    //line(xx,yy,zz);
+    line(xx,yy,zz);
     /*
     Serial.print(F("line ");
     Serial.print(posx);
