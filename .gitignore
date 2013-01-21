@@ -2,3 +2,5 @@
 *.DS_Store
 
 java/DrawbotGUI.jar
+
+java/log.html
