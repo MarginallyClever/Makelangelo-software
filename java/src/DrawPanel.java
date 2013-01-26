@@ -228,11 +228,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		float penUp = Float.parseFloat(DrawbotGUI.getSingleton().getPenUp());
 
 		for(i=0;i<instructions.size();++i) {
-			if(running && i<=linesProcessed) {
-				g2d.setColor( Color.RED );
-			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
-				g2d.setColor( Color.GREEN );
-			}
 			
 			String line=instructions.get(i);
 			String[] pieces=line.split(";");
@@ -262,7 +257,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			}
 			
 			// is pen up or down?
-			if(Math.abs(z-penDown)<0.01) {
+			if(running && i<=linesProcessed) {
+				g2d.setColor( Color.RED );
+			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
+				g2d.setColor( Color.GREEN );
+			} else if(Math.abs(z-penDown)<0.01) {
 				g2d.setColor( Color.BLACK );
 			} else if(Math.abs(z-penUp)<0.01) {
 				g2d.setColor( Color.BLUE );

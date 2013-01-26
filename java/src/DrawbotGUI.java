@@ -1045,7 +1045,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"Makelangelo v149\n\n"
+			JOptionPane.showMessageDialog(null,"Makelangelo v0.8.6e\n\n"
 					+"Created by Dan Royer (dan@marginallyclever.com).\n\n"
 					+"Get the latest version and read the documentation @ http://github.com/i-make-robots/DrawBot/\n"
 					+"Find out more at http://www.marginallyclever.com/\n");

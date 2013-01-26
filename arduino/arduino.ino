@@ -43,8 +43,8 @@
 #define SWITCH_HALF     (512)
 
 // servo angles for pen control
-#define PEN_UP_ANGLE    (90)
-#define PEN_DOWN_ANGLE  (65)  // Some steppers don't like 0 degrees
+#define PEN_UP_ANGLE    (170)
+#define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
@@ -293,6 +293,35 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 
 //------------------------------------------------------------------------------
+static void line_safe(float x,float y,float z) {
+  // split up long lines to make them straighter?
+  float dx=x-posx;
+  float dy=y-posy;
+
+  float len=sqrt(dx*dx+dy*dy);
+  
+  if(len<=CM_PER_SEGMENT) {
+    line(x,y,z);
+    return;
+  }
+  
+  // too long!
+  long pieces=ceil(len/CM_PER_SEGMENT);
+  float x0=posx;
+  float y0=posy;
+  float z0=posz;
+  float a;
+  for(long j=0;j<=pieces;++j) {
+    a=(float)j/(float)pieces;
+
+    line((x-x0)*a+x0,
+         (y-y0)*a+y0,
+         (z-z0)*a+z0);
+  }
+}
+
+
+//------------------------------------------------------------------------------
 static void line(float x,float y,float z) {
   long l1,l2;
   IK(x,y,l1,l2);
@@ -382,10 +411,10 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line(nx,ny,nz);
+    line_safe(nx,ny,nz);
   }
   
-  line(x,y,z);
+  line_safe(x,y,z);
 }
 
 
@@ -781,21 +810,7 @@ static void processCommand() {
       zz+=posz;
     }
     
-    line(xx,yy,zz);
-    /*
-    Serial.print(F("line ");
-    Serial.print(posx);
-    Serial.print('\t');
-    Serial.print(posy);
-    Serial.print('\t');
-    Serial.println(posz);
-    Serial.print(F("to "));
-    Serial.print(xx);
-    Serial.print('\t');
-    Serial.print(yy);
-    Serial.print('\t');
-    Serial.println(zz);
-    */
+    line_safe(xx,yy,zz);
   } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
          || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
