@@ -15,6 +15,9 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -38,6 +41,9 @@ public class DrawbotGUI
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
 {
+	// software version
+	static final String version="0.8.7";
+	
 	static final long serialVersionUID=1;
 	
 	private static DrawbotGUI singletonObject;
@@ -97,7 +103,7 @@ public class DrawbotGUI
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
-    					buttonRescan, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
+    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
     private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -176,6 +182,37 @@ public class DrawbotGUI
 		return gcode.lines;
 	}
 
+	private void PlaySound(String url) {
+		if(url.isEmpty()) return;
+		
+		try {
+			Clip clip = AudioSystem.getClip();
+			FileInputStream x = new FileInputStream(url);
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(x);
+			clip.open(inputStream);
+			clip.start(); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+		}
+	}
+	
+	private void PlayConnectSound() {
+		PlaySound(prefs.get("sound_connect", ""));
+	}
+	
+	private void PlayDisconnectSound() {
+		PlaySound(prefs.get("sound_disconnect", ""));
+	}
+	
+	public void PlayConversionFinishedSound() {
+		PlaySound(prefs.get("sound_conversion_finished", ""));
+	}
+	
+	private void PlayDawingFinishedSound() {
+		PlaySound(prefs.get("sound_drawing_finished", ""));
+	}
+		
 	// manages the vertical split in the GUI
 	public class Splitter extends JSplitPane {
 		static final long serialVersionUID=1;
@@ -262,6 +299,7 @@ public class DrawbotGUI
 			portConfirmed=false;
 			previewPane.setConnected(false);
 			UpdateMenuBar();
+			PlayDisconnectSound();
 		}
 	}
 	
@@ -335,6 +373,7 @@ public class DrawbotGUI
 		SetRecentPort(portName);
 		portOpened=true;
 		UpdateMenuBar();
+		PlayConnectSound();
 		
 		return 0;
 	}
@@ -592,6 +631,18 @@ public class DrawbotGUI
 		SendLineToRobot("G00 X0 Y0");
 	}
 	
+	private String SelectFile() {
+		JFileChooser choose = new JFileChooser();
+	    int returnVal = choose.showOpenDialog(this);
+	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+	        File file = choose.getSelectedFile();
+	        return file.getAbsolutePath();
+	    } else {
+	        System.out.println("File access cancelled by user.");
+	    }
+	    return "";
+	}
+	
 	/**
 	 * Adjust preferences
 	 */
@@ -599,53 +650,74 @@ public class DrawbotGUI
 		final JDialog driver = new JDialog(mainframe,"Preferences",true);
 		driver.setLayout(new GridBagLayout());
 		
-		final JTextField allow_metrics = new JTextField(String.valueOf(allowMetrics));
-		final JTextField twitter_name = new JTextField(String.valueOf(reportImage.GetName()));
-		final JPasswordField twitter_pass = new JPasswordField(String.valueOf(reportImage.GetPass()));
+		final JTextField sound_connect = new JTextField(prefs.get("sound_connect",""),32);
+		final JTextField sound_disconnect = new JTextField(prefs.get("sound_disconnect", ""),32);
+		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""),32);
+		final JTextField sound_drawing_finished = new JTextField(prefs.get("sound_drawing_finished", ""),32);
+
+		final JButton change_sound_connect = new JButton("Connect sound");
+		final JButton change_sound_disconnect = new JButton("Disconnect sound");
+		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
+		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
+		
+		final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the global total"));
+		allow_metrics.setSelected(allowMetrics);
 
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
 		
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=3;  
-		c.gridx=0;  c.gridy=0;  driver.add(new JLabel("Can I add the distance drawn to the global total?"),c);
-		c.gridwidth=1;
-		c.gridx=0;  c.gridy=1;  driver.add(allow_metrics);
-		c.gridx=1;  c.gridy=1;  driver.add(new JLabel("Yes, please!"),c);
+		c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+
+		c.gridwidth=1;	c.gridx=0;  c.gridy=3;  driver.add(change_sound_connect,c);				c.gridwidth=3;	c.gridx=1;  c.gridy=3;  driver.add(sound_connect,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);			c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
 		
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Can I tweet the converted pictures?"),c);
-		
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Twitter account"),c);
-		c.gridx=0;  c.gridy=3;  driver.add(new JLabel("Twitter password"),c);
-		c.gridx=2;  c.gridy=4; driver.add(cancel,c);
-		c.gridx=1;  c.gridy=4; driver.add(save,c);
+		c.gridwidth=1;	c.gridx=2;  c.gridy=8;  driver.add(cancel,c);
+		c.gridwidth=1;	c.gridx=1;  c.gridy=8;  driver.add(save,c);
 
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
+					if(subject == change_sound_connect) sound_connect.setText(SelectFile());
+					if(subject == change_sound_disconnect) sound_disconnect.setText(SelectFile());
+					if(subject == change_sound_conversion_finished) sound_conversion_finished.setText(SelectFile());
+					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
+
 					if(subject == save) {
-						allowMetrics = Boolean.parseBoolean(allow_metrics.getText());
-						reportImage.SetTwitter(twitter_name.getText(),new String(twitter_pass.getPassword()));
+						allowMetrics = allow_metrics.isSelected();
+						prefs.put("sound_connect",sound_connect.getText());
+						prefs.put("sound_disconnect",sound_disconnect.getText());
+						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
+						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
+						driver.dispose();
 					}
 					if(subject == cancel) {
 						driver.dispose();
 					}
 			  }
-			};
-		
+		};
+
+		change_sound_connect.addActionListener(driveButtons);
+		change_sound_disconnect.addActionListener(driveButtons);
+		change_sound_conversion_finished.addActionListener(driveButtons);
+		change_sound_drawing_finished.addActionListener(driveButtons);
+			
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
 		driver.pack();
 		driver.setVisible(true);
 	}
 	
+	
 	/**
-	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	 */
+	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+	*/
 	public void ConfigureLimits() {
 		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
 		driver.setLayout(new GridBagLayout());
-
+		
 		final JTextField mtop = new JTextField(String.valueOf(limit_top));
 		final JTextField mbottom = new JTextField(String.valueOf(limit_bottom));
 		final JTextField mleft = new JTextField(String.valueOf(limit_left));
@@ -655,13 +727,13 @@ public class DrawbotGUI
 		final JTextField pbottom = new JTextField(String.valueOf(paper_bottom));
 		final JTextField pleft = new JTextField(String.valueOf(paper_left));
 		final JTextField pright = new JTextField(String.valueOf(paper_right));
-
+		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
-
+		
 		BufferedImage myPicture = null;
 		try {
-			
+		
 			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
 		}
 		catch(IOException e) {}
@@ -669,36 +741,35 @@ public class DrawbotGUI
 		
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
-
-		c.weightx=0.25;
-		c.gridx=0;  c.gridy=0;  c.gridwidth=4;  c.gridheight=4; c.anchor=GridBagConstraints.CENTER;  driver.add( picLabel,c );
 		
-		c.gridheight=1; c.gridwidth=1;  c.anchor=GridBagConstraints.EAST;
+		c.weightx=0.25;
+		c.gridx=0; c.gridy=0; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
+		
+		c.gridheight=1; c.gridwidth=1; c.anchor=GridBagConstraints.EAST;
 		d.anchor=GridBagConstraints.WEST;
 		
-		c.gridx=0;  c.gridy=5;  driver.add(new JLabel("A"),c);		d.gridx=1;	d.gridy=5;	driver.add(mtop,d);
-		c.gridx=0;  c.gridy=6;  driver.add(new JLabel("B"),c);		d.gridx=1;	d.gridy=6;	driver.add(mright,d);
-		c.gridx=0;  c.gridy=7;  driver.add(new JLabel("C"),c);		d.gridx=1;	d.gridy=7;	driver.add(mbottom,d);
-		c.gridx=0;  c.gridy=8;  driver.add(new JLabel("D"),c);		d.gridx=1;	d.gridy=8;	driver.add(mleft,d);
-		c.gridx=2;  c.gridy=5;  driver.add(new JLabel("E"),c);		d.gridx=3;	d.gridy=5;	driver.add(ptop,d);
-		c.gridx=2;  c.gridy=6;  driver.add(new JLabel("F"),c);		d.gridx=3;	d.gridy=6;	driver.add(pright,d);
-		c.gridx=2;  c.gridy=7;  driver.add(new JLabel("G"),c);		d.gridx=3;	d.gridy=7;	driver.add(pbottom,d);
-		c.gridx=2;  c.gridy=8;  driver.add(new JLabel("H"),c);		d.gridx=3;	d.gridy=8;	driver.add(pleft,d);
-
+		c.gridx=0; c.gridy=5; driver.add(new JLabel("A"),c);	d.gridx=1;	d.gridy=5;	driver.add(mtop,d);
+		c.gridx=0; c.gridy=6; driver.add(new JLabel("B"),c);	d.gridx=1;	d.gridy=6;	driver.add(mright,d);
+		c.gridx=0; c.gridy=7; driver.add(new JLabel("C"),c);	d.gridx=1;	d.gridy=7;	driver.add(mbottom,d);
+		c.gridx=0; c.gridy=8; driver.add(new JLabel("D"),c);	d.gridx=1;	d.gridy=8;	driver.add(mleft,d);
+		c.gridx=2; c.gridy=5; driver.add(new JLabel("E"),c);	d.gridx=3;	d.gridy=5;	driver.add(ptop,d);
+		c.gridx=2; c.gridy=6; driver.add(new JLabel("F"),c);	d.gridx=3;	d.gridy=6;	driver.add(pright,d);
+		c.gridx=2; c.gridy=7; driver.add(new JLabel("G"),c);	d.gridx=3;	d.gridy=7;	driver.add(pbottom,d);
+		c.gridx=2; c.gridy=8; driver.add(new JLabel("H"),c);	d.gridx=3;	d.gridy=8;	driver.add(pleft,d);
+		
 		c.anchor=GridBagConstraints.WEST;
-		c.gridx=0;  c.gridy=9;  c.gridwidth=4;  c.gridheight=1;
+		c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
 		driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
-		c.gridx=0;  c.gridy=10;  c.gridwidth=4;  c.gridheight=1;
+		c.gridx=0; c.gridy=10; c.gridwidth=4; c.gridheight=1;
 		driver.add(new JLabel("C, D, G, and H should probably be negative."),c);
-		c.gridx=0;  c.gridy=11;  c.gridwidth=4;  c.gridheight=1;
+		c.gridx=0; c.gridy=11; c.gridwidth=4; c.gridheight=1;
 		driver.add(new JLabel("All values in cm."),c);
-
 		
 		c.anchor=GridBagConstraints.EAST;
 		c.gridy=12;
-		c.gridx=3;  c.gridwidth=1;  driver.add(cancel,c);
-		c.gridx=2;  c.gridwidth=1;  driver.add(save,c);
-
+		c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
+		c.gridx=2; c.gridwidth=1; driver.add(save,c);
+		
 		Dimension s=ptop.getPreferredSize();
 		s.width=80;
 		ptop.setPreferredSize(s);
@@ -709,48 +780,48 @@ public class DrawbotGUI
 		mbottom.setPreferredSize(s);
 		mleft.setPreferredSize(s);
 		mright.setPreferredSize(s);
-		
+	
 		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						paper_top = Float.valueOf(ptop.getText());
-						paper_bottom = Float.valueOf(pbottom.getText());
-						paper_right = Float.valueOf(pright.getText());
-						paper_left = Float.valueOf(pleft.getText());
-						limit_top = Float.valueOf(mtop.getText());
-						limit_bottom = Float.valueOf(mbottom.getText());
-						limit_right = Float.valueOf(mright.getText());
-						limit_left = Float.valueOf(mleft.getText());
-						boolean data_is_sane=true;
-						if( limit_right <= limit_left ) data_is_sane=false;
-						if( limit_top <= limit_bottom ) data_is_sane=false;
-						if( paper_right <= paper_left ) data_is_sane=false;
-						if( paper_top <= paper_bottom ) data_is_sane=false;
-						if(data_is_sane) {
-							previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-							previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-							SetRecentPaperSize();
-							SaveConfig();
-							SendConfig();
-							driver.dispose();
-						}
-					}
-					if(subject == cancel) {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				if(subject == save) {
+					paper_top = Float.valueOf(ptop.getText());
+					paper_bottom = Float.valueOf(pbottom.getText());
+					paper_right = Float.valueOf(pright.getText());
+					paper_left = Float.valueOf(pleft.getText());
+					limit_top = Float.valueOf(mtop.getText());
+					limit_bottom = Float.valueOf(mbottom.getText());
+					limit_right = Float.valueOf(mright.getText());
+					limit_left = Float.valueOf(mleft.getText());
+					boolean data_is_sane=true;
+					if( limit_right <= limit_left ) data_is_sane=false;
+					if( limit_top <= limit_bottom ) data_is_sane=false;
+					if( paper_right <= paper_left ) data_is_sane=false;
+					if( paper_top <= paper_bottom ) data_is_sane=false;
+					if(data_is_sane) {
+						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+						previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
+						SetRecentPaperSize();
+						SaveConfig();
+						SendConfig();
 						driver.dispose();
 					}
-			  }
-			};
-		
+				}
+				if(subject == cancel) {
+					driver.dispose();
+				}
+			}
+		};
+	
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
-		SendLineToRobot("M114");  // "where" command
+		SendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
 	}
-	
+
 	/**
-	 * Open the config dialog, send the config update to the robot, and save it for future.
+	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	 */
 	public void ConfigureBobbins() {
 		final JDialog driver = new JDialog(mainframe,"Configure Bobbins",true);
@@ -824,6 +895,7 @@ public class DrawbotGUI
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 	}
 
+
 	void SaveConfig() {
 		String id=Long.toString(robot_uid);
 		prefs.put(id+"_limit_top", Double.toString(limit_top));
@@ -838,6 +910,7 @@ public class DrawbotGUI
 		prefs.put(id+"_penDown", Long.toString(penDownNumber));
 	}
 	
+	
 	void SendConfig() {
 		if(!portConfirmed) return;
 		
@@ -851,6 +924,7 @@ public class DrawbotGUI
 		SendLineToRobot(line);
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
+	
 
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
@@ -869,6 +943,7 @@ public class DrawbotGUI
 		
 		if(gcode.linesProcessed==gcode.linesTotal) {
 			// end of file
+			PlayDawingFinishedSound();
 			Halt();
 		}
 	}
@@ -877,6 +952,7 @@ public class DrawbotGUI
 		JOptionPane.showMessageDialog(null,"Please change to tool "+toolName+" and click OK.");
 	}
 	
+
 	/**
 	 * removes comments, processes commands drawbot shouldn't have to handle.
 	 * @param line command to send
@@ -899,6 +975,7 @@ public class DrawbotGUI
 		
 		// end of program?
 		if(tokens[0]=="M02" || tokens[0]=="M2" || tokens[0]=="M30") {
+			PlayDawingFinishedSound();
 			Halt();
 			return false;
 		}
@@ -933,6 +1010,7 @@ public class DrawbotGUI
 		
 		return false;
 	}
+
 	/**
 	 * Sends a single command the robot.  Could be anything.
 	 * @param line command to send.
@@ -949,6 +1027,7 @@ public class DrawbotGUI
 		catch(IOException e) {}
 	}
 	
+
 	/**
 	 * stop sending file commands to the robot.
 	 * @todo add an e-stop command?
@@ -1022,7 +1101,10 @@ public class DrawbotGUI
 			ListSerialPorts();
 			UpdateMenuBar();
 			return;
-			
+		}
+		if( subject == buttonDisconnect ) {
+			ClosePort();
+			return;
 		}
 		if( subject == buttonConfigurePreferences ) {
 			ConfigurePreferences();
@@ -1045,7 +1127,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"Makelangelo v0.8.6e\n\n"
+			JOptionPane.showMessageDialog(null,"Makelangelo v"+version+"\n\n"
 					+"Created by Dan Royer (dan@marginallyclever.com).\n\n"
 					+"Get the latest version and read the documentation @ http://github.com/i-make-robots/DrawBot/\n"
 					+"Find out more at http://www.marginallyclever.com/\n");
@@ -1075,6 +1157,7 @@ public class DrawbotGUI
 			}
 		}
 	}
+	
 	
 	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
@@ -1235,9 +1318,7 @@ public class DrawbotGUI
 		driver.setVisible(true);
 	}
 	
-	/**
-	 * open the Image Processing dialog, update automatic image processing.  Could be expanded into a live preview of the dithered image?
-	 */
+
 	public void ImageProcessing() {
 		final JDialog driver = new JDialog(mainframe,"Image Processing",true);
 		driver.setLayout(new GridBagLayout());
@@ -1425,7 +1506,7 @@ public class DrawbotGUI
         
         return menuBar;
 	}
-	
+
 	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
 		JMenu menu;
@@ -1495,6 +1576,11 @@ public class DrawbotGUI
         buttonRescan.getAccessibleContext().setAccessibleDescription("Rescan the available ports.");
         buttonRescan.addActionListener(this);
         subMenu.add(buttonRescan);
+
+        buttonDisconnect = new JMenuItem("Disconnect",KeyEvent.VK_D);
+        buttonDisconnect.addActionListener(this);
+        buttonDisconnect.setEnabled(portOpened);
+        subMenu.add(buttonDisconnect);
         
         menu.add(subMenu);
 
@@ -1526,13 +1612,13 @@ public class DrawbotGUI
         buttonDriveManually.addActionListener(this);
         buttonDriveManually.setEnabled(portConfirmed && !running);
         menu.add(buttonDriveManually);
-/*
+
         buttonConfigurePreferences = new JMenuItem("Preferences");
         buttonConfigurePreferences.getAccessibleContext().setAccessibleDescription("Adjust miscelaneous preferences.");
         buttonConfigurePreferences.addActionListener(this);
         buttonConfigurePreferences.setEnabled(!running);
         menu.add(buttonConfigurePreferences);
-*/
+
 /*
         menu.addSeparator();
 
@@ -1544,7 +1630,6 @@ public class DrawbotGUI
 
         // Draw menu
         menu = new JMenu("Draw");
-        menu.setMnemonic(KeyEvent.VK_D);
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
 
         buttonStart = new JMenuItem("Start",KeyEvent.VK_S);

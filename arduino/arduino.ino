@@ -13,7 +13,10 @@
 //#define VERBOSE         (1)
 
 // Comment out this line to disable SD cards.
-//#define USE_SD_CARD     (1)
+//#define USE_SD_CARD       (1)
+// Comment out this line to disable findHome and limit switches
+//#define USE_LIMIT_SWITCH  (1)
+
 
 // which motor is on which pin?
 #define M1_PIN          (1)
@@ -55,7 +58,7 @@
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
 // Arcs are split into many line segments.  How long are the segments?
-#define CM_PER_SEGMENT   (0.1)
+#define CM_PER_SEGMENT   (0.2)
 
 // Serial communication bitrate
 #define BAUD            (57600)
@@ -144,7 +147,7 @@ static float posx, velx;
 static float posy, vely;
 static float posz;  // pen state
 static float feed_rate=0;
-static int step_delay;
+static long step_delay;
 
 // motor position
 static int laststep1, laststep2;
@@ -213,8 +216,12 @@ static float atan3(float dy,float dx) {
 
 //------------------------------------------------------------------------------
 static char readSwitches() {
+#ifdef USE_LIMIT_SWITCH
   // get the current switch state
   return ( (analogRead(L_PIN) < SWITCH_HALF) | (analogRead(R_PIN) < SWITCH_HALF) );
+#else
+  return 0;
+#endif  // USE_LIMIT_SWITCH
 }
 
 
@@ -228,9 +235,12 @@ static void setFeedRate(float v) {
     if(feed_rate < MIN_VEL) feed_rate=MIN_VEL;
   }
   
-  int step_delay1=1000000.0/(feed_rate/THREADPERSTEP1);
-  int step_delay2=1000000.0/(feed_rate/THREADPERSTEP2);
-  step_delay = (step_delay1>step_delay2) ? step_delay1 : step_delay2;
+  long step_delay1 = 1000000.0 / (feed_rate/THREADPERSTEP1);
+  long step_delay2 = 1000000.0 / (feed_rate/THREADPERSTEP2);
+  step_delay = step_delay1 > step_delay2 ? step_delay1 : step_delay2;
+  
+  Serial.print(F("step_delay="));
+  Serial.println(step_delay);
 }
 
 
@@ -306,7 +316,7 @@ static void line_safe(float x,float y,float z) {
   }
   
   // too long!
-  long pieces=ceil(len/CM_PER_SEGMENT);
+  long pieces=floor(len/CM_PER_SEGMENT);
   float x0=posx;
   float y0=posy;
   float z0=posz;
@@ -318,6 +328,7 @@ static void line_safe(float x,float y,float z) {
          (y-y0)*a+y0,
          (z-z0)*a+z0);
   }
+  line(x,y,z);
 }
 
 
@@ -411,10 +422,10 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line_safe(nx,ny,nz);
+    line(nx,ny,nz);
   }
   
-  line_safe(x,y,z);
+  line(x,y,z);
 }
 
 
@@ -448,7 +459,8 @@ static void help() {
 
 //------------------------------------------------------------------------------
 // find the current robot position and 
-static void goHome() {
+static void FindHome() {
+#ifdef USE_LIMIT_SWITCH
   Serial.println(F("Homing..."));
   
   if(readSwitches()) {
@@ -459,7 +471,7 @@ static void goHome() {
   }
   
   int step_delay=3;
-  int safe_out=400;
+  int safe_out=50;
   
   // reel in the left motor until contact is made.
   Serial.println(F("Find left..."));
@@ -497,6 +509,7 @@ static void goHome() {
   
   Serial.println(F("Centering..."));
   line(0,0,posz);
+#endif // USE_LIMIT_SWITCH
 }
 
 
@@ -705,7 +718,7 @@ static void processCommand() {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
   } else if(!strncmp(buffer,"G28",3)) {
-    goHome();
+    FindHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
     float yy=posy;

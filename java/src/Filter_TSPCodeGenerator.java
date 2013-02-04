@@ -10,7 +10,6 @@ import java.text.DecimalFormat;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
@@ -182,7 +181,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		}
 	}
 
-	
 	long time_limit=10*60*1000;  // 10 minutes
 	String dest;
 	int numPoints;
@@ -194,18 +192,15 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	ProgressMonitor pm;
 	TSPOptimizer task;
 	
-	
 	Filter_TSPGcodeGenerator(String _dest) {
 		dest=_dest;
 	}
 
-	
 	protected float CalculateWeight(int a,int b) {
 		float x = points[a].x - points[b].x;
 		float y = points[a].y - points[b].y;
 		return x*x+y*y;
 	}
-
 	
 	private void GenerateTSP() {
 		GreedyTour();
@@ -220,7 +215,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		task.execute();
 	}
 
-	
     /**
      * Invoked when task's progress property changes.
      */
@@ -240,14 +234,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
                 }
             }
         }
- 
     }
-    
     
 	private double CalculateLength(int a,int b) {
 		return Math.sqrt(CalculateWeight(a,b));
 	}
-	
 	
 	/**
 	 * Get the length of a tour segment
@@ -264,7 +255,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		return w;
 	}
 
-	
 	/**
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
@@ -301,7 +291,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			scount++;
 		} while(scount<numPoints);
 	}
-	
 	
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
@@ -365,9 +354,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		catch(IOException e) {
 			DrawbotGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
+		
+		// @TODO: Move to DrawbotGUI.getSingleton().ConversionFinished() ?
 		DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
+		DrawbotGUI.getSingleton().PlayConversionFinishedSound();
 	}
-	
 	
 	/**
 	 * The main entry point
