@@ -42,7 +42,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.8.7";
+	static final String version="0.8.9";
 	
 	static final long serialVersionUID=1;
 	
@@ -104,7 +104,7 @@ public class DrawbotGUI
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
     					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
-    private JMenuItem buttonStart, buttonPause, buttonHalt, buttonDriveManually;
+    private JMenuItem buttonStart, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
     
@@ -118,8 +118,10 @@ public class DrawbotGUI
     HTMLDocument doc;
     PrintWriter logToFile;
     
+    // panels
     private DrawPanel previewPane;
 	private StatusBar statusBar;
+	private JPanel drivePane;
 	
 	// parsing input from Drawbot
 	private String line3="";
@@ -628,7 +630,7 @@ public class DrawbotGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 X0 Y0");
+		SendLineToRobot("G00 F2000 X0 Y0");
 	}
 	
 	private String SelectFile() {
@@ -1085,10 +1087,6 @@ public class DrawbotGUI
 			}
 			return;
 		}
-		if( subject == buttonDriveManually ) {
-			DriveManually();
-			return;
-		}
 		if( subject == buttonImageProcessing ) {
 			ImageProcessing();
 			return;
@@ -1201,39 +1199,40 @@ public class DrawbotGUI
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
-	public void DriveManually() {
-		JDialog driver = new JDialog(mainframe,"Manual Control",true);
+	public JPanel DriveManually() {
+		JPanel driver = new JPanel();
 		driver.setLayout(new GridBagLayout());
 
-		JButton find = new JButton("FIND HOME");
-		JButton home = new JButton("GO HOME");
-		JButton center = new JButton("THIS IS HOME");
+		final JButton find = new JButton("FIND HOME");
+		final JButton home = new JButton("GO HOME");
+		final JButton center = new JButton("THIS IS HOME");
 		
-		JButton up1 = new JButton("Y1");
-		JButton up10 = new JButton("Y10");
-		JButton up100 = new JButton("Y100");
+		final JButton up1 = new JButton("Y1");  		up1.setPreferredSize(new Dimension(60,20));
+		final JButton up10 = new JButton("Y10");  		up10.setPreferredSize(new Dimension(60,20));
+		final JButton up100 = new JButton("Y100");  	up100.setPreferredSize(new Dimension(60,20));
 		
-		JButton down1 = new JButton("Y-1");
-		JButton down10 = new JButton("Y-10");
-		JButton down100 = new JButton("Y-100");
+		final JButton down1 = new JButton("Y-1");		down1.setPreferredSize(new Dimension(60,20));
+		final JButton down10 = new JButton("Y-10");		down10.setPreferredSize(new Dimension(60,20));
+		final JButton down100 = new JButton("Y-100");	down100.setPreferredSize(new Dimension(60,20));
 		
-		JButton left1 = new JButton("X-1");
-		JButton left10 = new JButton("X-10");
-		JButton left100 = new JButton("X-100");
+		final JButton left1 = new JButton("X-1");		left1.setPreferredSize(new Dimension(60,20));
+		final JButton left10 = new JButton("X-10");		left10.setPreferredSize(new Dimension(60,20));
+		final JButton left100 = new JButton("X-100");	left100.setPreferredSize(new Dimension(60,20));
 		
-		JButton right1 = new JButton("X1");
-		JButton right10 = new JButton("X10");
-		JButton right100 = new JButton("X100");
+		final JButton right1 = new JButton("X1");		right1.setPreferredSize(new Dimension(60,20));
+		final JButton right10 = new JButton("X10");		right10.setPreferredSize(new Dimension(60,20));
+		final JButton right100 = new JButton("X100");	right100.setPreferredSize(new Dimension(60,20));
 		
-		JButton TL = new JButton("GO TL");
-		JButton TR = new JButton("GO TR");
-		JButton BL = new JButton("GO BL");
-		JButton BR = new JButton("GO BR");
+		final JButton TL = new JButton("TL");			TL.setPreferredSize(new Dimension(60,20));
+		final JButton TR = new JButton("TR");			TR.setPreferredSize(new Dimension(60,20));
+		final JButton BL = new JButton("BL");			BL.setPreferredSize(new Dimension(60,20));
+		final JButton BR = new JButton("BR");			BR.setPreferredSize(new Dimension(60,20));
 
-		JButton z90 = new JButton("Pen Up");
-		JButton z0  = new JButton("Pen Down");
+		final JButton z90 = new JButton("Pen Up");
+		final JButton z0  = new JButton("Pen Down");
 		
 		GridBagConstraints c = new GridBagConstraints();
+		//c.fill=GridBagConstraints.BOTH; 
 		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
 		c.gridx=5;  c.gridy=1;  driver.add(TR,c);
 		c.gridx=1;  c.gridy=5;  driver.add(BL,c);
@@ -1253,39 +1252,39 @@ public class DrawbotGUI
 		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
-		c.gridx=3;	c.gridy=3;	driver.add(home,c);
-		c.gridx=7;  c.gridy=0;  driver.add(center,c);
-		c.gridx=7;  c.gridy=1;  driver.add(find,c);
-		c.gridx=7;  c.gridy=3;  driver.add(z90,c);
-		c.gridx=7;  c.gridy=4;  driver.add(z0,c);
+		//c.gridx=3;	c.gridy=3;	driver.add(home,c);
+		c.gridx=6;  c.gridy=0;  driver.add(center,c);
+		c.gridx=6;  c.gridy=1;  driver.add(home,c);  //driver.add(find,c);
+		c.gridx=6;  c.gridy=5;  driver.add(z90,c);
+		c.gridx=6;  c.gridy=6;  driver.add(z0,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					JButton b = (JButton)subject;
-					String t=b.getText();
-					if(t=="GO HOME") {
+					if(running) return;
+					if(b==home) {
 						GoHome();
 						SendLineToRobot("M114");
-					} else if(t=="GO TL") { 
-						SendLineToRobot("G00 X"+(paper_left *10)+" Y"+(paper_top*10));
-					} else if(t=="GO TR") { 
-						SendLineToRobot("G00 X"+(paper_right*10)+" Y"+(paper_top*10));
-					} else if(t=="GO BL") { 
-						SendLineToRobot("G00 X"+(paper_left *10)+" Y"+(paper_bottom*10));
-					} else if(t=="GO BR") { 
-						SendLineToRobot("G00 X"+(paper_right*10)+" Y"+(paper_bottom*10));
-					} else if(t=="FIND HOME") {
+					} else if(b==TL) { 
+						SendLineToRobot("G00 F2000 X"+(paper_left *10)+" Y"+(paper_top*10));
+					} else if(b==TR) { 
+						SendLineToRobot("G00 F2000 X"+(paper_right*10)+" Y"+(paper_top*10));
+					} else if(b==BL) { 
+						SendLineToRobot("G00 F2000 X"+(paper_left *10)+" Y"+(paper_bottom*10));
+					} else if(b==BR) { 
+						SendLineToRobot("G00 F2000 X"+(paper_right*10)+" Y"+(paper_bottom*10));
+					} else if(b==find) {
 						SendLineToRobot("G28");
-					} else if(t=="THIS IS HOME") {
+					} else if(b==center) {
 						SendLineToRobot("TELEPORT XO YO");
-					} else if(t=="Pen Up") {
+					} else if(b==z90) {
 						SendLineToRobot("G00 Z"+getPenUp());
-					} else if(t=="Pen Down") {
+					} else if(b==z0) {
 						SendLineToRobot("G00 Z"+getPenDown());
 					} else {
 						SendLineToRobot("G91");
-						SendLineToRobot("G00 G21 "+b.getText());
+						SendLineToRobot("G00 G21 F2000 "+b.getText());
 						SendLineToRobot("G90");
 						SendLineToRobot("M114");
 					}
@@ -1313,9 +1312,8 @@ public class DrawbotGUI
 		TR.addActionListener(driveButtons);
 		BL.addActionListener(driveButtons);
 		BR.addActionListener(driveButtons);
-		SendLineToRobot("M114");
-		driver.pack();
-		driver.setVisible(true);
+		
+		return driver;
 	}
 	
 
@@ -1607,12 +1605,8 @@ public class DrawbotGUI
         buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
 
-        buttonDriveManually = new JMenuItem("Drive Manually",KeyEvent.VK_R);
-        buttonDriveManually.getAccessibleContext().setAccessibleDescription("Etch-a-sketch style driving");
-        buttonDriveManually.addActionListener(this);
-        buttonDriveManually.setEnabled(portConfirmed && !running);
-        menu.add(buttonDriveManually);
-
+        menu.addSeparator();
+        
         buttonConfigurePreferences = new JMenuItem("Preferences");
         buttonConfigurePreferences.getAccessibleContext().setAccessibleDescription("Adjust miscelaneous preferences.");
         buttonConfigurePreferences.addActionListener(this);
@@ -1620,8 +1614,6 @@ public class DrawbotGUI
         menu.add(buttonConfigurePreferences);
 
 /*
-        menu.addSeparator();
-
         buttonImageProcessing = new JMenuItem("Image Processing");
         buttonImageProcessing.addActionListener(this);
         menu.add(buttonImageProcessing);
@@ -1711,6 +1703,9 @@ public class DrawbotGUI
 		previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
         previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
         
+        // the drive panel
+        drivePane = DriveManually();
+        
         // status bar
         statusBar = new StatusBar();
         Font f = statusBar.getFont();
@@ -1720,9 +1715,15 @@ public class DrawbotGUI
         statusBar.setMinimumSize(d);
 
         // layout
+        Splitter drive_and_preview = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+        drive_and_preview.add(logPane);
+        drive_and_preview.add(drivePane);
+        drive_and_preview.setDividerSize(8);
+        drive_and_preview.setDividerLocation(-100);
+        
         Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
         split.add(previewPane);
-        split.add(logPane);
+        split.add(drive_and_preview);
         split.setDividerSize(8);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
@@ -1743,7 +1744,7 @@ public class DrawbotGUI
         mainframe.setContentPane(demo.CreateContentPane());
  
         //Display the window.
-        mainframe.setSize(800,700);
+        mainframe.setSize(1200,700);
         mainframe.setVisible(true);
 
         DrawbotGUI s=getSingleton();
