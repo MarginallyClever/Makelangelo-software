@@ -29,6 +29,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -76,13 +77,11 @@ public class DrawbotGUI
 	DistanceMetric reportDistance = new DistanceMetric();
 	
 	// Robot config
-	private long   robot_uid=0;
-	
+	private long robot_uid=0;
 	private double limit_top=10;
 	private double limit_bottom=-10;
 	private double limit_left=-10;
 	private double limit_right=10;
-	
 	private int image_dpi;
 	
 	// paper area
@@ -97,6 +96,7 @@ public class DrawbotGUI
 	private double bobbin1_diameter=0.95;
 	private double bobbin2_diameter=0.95;
 	private long penUpNumber, penDownNumber;
+	private double feed_rate;
 	
 	// GUI elements
 	private static JFrame mainframe;
@@ -630,7 +630,7 @@ public class DrawbotGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 F2000 X0 Y0");
+		SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
 	}
 	
 	private String SelectFile() {
@@ -895,6 +895,7 @@ public class DrawbotGUI
 		bobbin2_diameter=Double.valueOf(prefs.get(id+"_bobbin2_diameter", "0.95"));
 		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
+		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 	}
 
 
@@ -910,6 +911,7 @@ public class DrawbotGUI
 		prefs.put(id+"_bobbin2_diameter", Double.toString(bobbin2_diameter));
 		prefs.put(id+"_penUp", Long.toString(penUpNumber));
 		prefs.put(id+"_penDown", Long.toString(penDownNumber));
+		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
 	}
 	
 	
@@ -1231,6 +1233,10 @@ public class DrawbotGUI
 		final JButton z90 = new JButton("Pen Up");
 		final JButton z0  = new JButton("Pen Down");
 		
+		final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(60,20));
+		feedRate.setText(Double.toString(feed_rate));
+		final JButton setFeedRate = new JButton("Set");	setFeedRate.setPreferredSize(new Dimension(60,20));
+		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.fill=GridBagConstraints.BOTH; 
 		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
@@ -1258,6 +1264,13 @@ public class DrawbotGUI
 		c.gridx=6;  c.gridy=5;  driver.add(z90,c);
 		c.gridx=6;  c.gridy=6;  driver.add(z0,c);
 		
+		
+		c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Speed:"),c);
+		c.gridx=1;  c.gridy=8;  driver.add(feedRate,c);
+		c.gridx=2;  c.gridy=8;  driver.add(new JLabel("mm/min"),c);
+		c.gridx=3;  c.gridy=8;  driver.add(setFeedRate,c);
+		
+		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
@@ -1267,13 +1280,13 @@ public class DrawbotGUI
 						GoHome();
 						SendLineToRobot("M114");
 					} else if(b==TL) { 
-						SendLineToRobot("G00 F2000 X"+(paper_left *10)+" Y"+(paper_top*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_left *10)+" Y"+(paper_top*10));
 					} else if(b==TR) { 
-						SendLineToRobot("G00 F2000 X"+(paper_right*10)+" Y"+(paper_top*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_right*10)+" Y"+(paper_top*10));
 					} else if(b==BL) { 
-						SendLineToRobot("G00 F2000 X"+(paper_left *10)+" Y"+(paper_bottom*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_left *10)+" Y"+(paper_bottom*10));
 					} else if(b==BR) { 
-						SendLineToRobot("G00 F2000 X"+(paper_right*10)+" Y"+(paper_bottom*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_right*10)+" Y"+(paper_bottom*10));
 					} else if(b==find) {
 						SendLineToRobot("G28");
 					} else if(b==center) {
@@ -1282,9 +1295,14 @@ public class DrawbotGUI
 						SendLineToRobot("G00 Z"+getPenUp());
 					} else if(b==z0) {
 						SendLineToRobot("G00 Z"+getPenDown());
+					} else if(b==setFeedRate) {
+						feed_rate = Double.parseDouble(feedRate.getText());
+						if(feed_rate<1) feed_rate=1;
+						if(feed_rate>2000) feed_rate=20000;
+						feedRate.setText(Double.toString(feed_rate));
 					} else {
 						SendLineToRobot("G91");
-						SendLineToRobot("G00 G21 F2000 "+b.getText());
+						SendLineToRobot("G00 G21 F"+feed_rate+" "+b.getText());
 						SendLineToRobot("G90");
 						SendLineToRobot("M114");
 					}
@@ -1312,6 +1330,7 @@ public class DrawbotGUI
 		TR.addActionListener(driveButtons);
 		BL.addActionListener(driveButtons);
 		BR.addActionListener(driveButtons);
+		feedRate.addActionListener(driveButtons);
 		
 		return driver;
 	}

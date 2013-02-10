@@ -7,8 +7,9 @@ REG.exe Query %RegQry% > checkOS.txt
 Find /i "x86" < CheckOS.txt > StringCheck.txt
  
 If %ERRORLEVEL% == 0 (
-    java -classpath RXTXcomm.jar -Djava.library.path=..\classes\rxtxnative\Windows\i368-mingw32 -jar DrawbotGUI.jar
+    java -classpath RXTXcomm.jar -Djava.library.path=32 -jar DrawbotGUI.jar
 ) ELSE (
-    java -classpath RXTXcomm.jar -Djava.library.path=..\classes\rxtxnative\Windows\windows-x64 -jar DrawbotGUI.jar
+    java -classpath RXTXcomm.jar -Djava.library.path=64 -jar DrawbotGUI.jar
 )
 
+@pause
