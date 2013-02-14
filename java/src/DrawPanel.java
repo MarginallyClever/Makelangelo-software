@@ -224,9 +224,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		double px=0,py=0,pz=90;
 		int i,j;
 		
-		float penDown = Float.parseFloat(DrawbotGUI.getSingleton().getPenDown());
-		float penUp = Float.parseFloat(DrawbotGUI.getSingleton().getPenUp());
-
 		for(i=0;i<instructions.size();++i) {
 			
 			String line=instructions.get(i);
@@ -261,9 +258,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				g2d.setColor( Color.RED );
 			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
 				g2d.setColor( Color.GREEN );
-			} else if(Math.abs(z-penDown)<0.01) {
+			} else if(z<0.01) {
 				g2d.setColor( Color.BLACK );
-			} else if(Math.abs(z-penUp)<0.01) {
+			} else if(z>89.99) {
 				g2d.setColor( Color.BLUE );
 			} else {
 				g2d.setColor( Color.ORANGE );

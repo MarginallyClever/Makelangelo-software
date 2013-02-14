@@ -134,10 +134,11 @@ public class DrawbotGUI
 	GCodeFile gcode = new GCodeFile();
 	
 	
-	public String getPenUp() {
+	private String getPenUp() {
 		return Long.toString(penUpNumber);
 	}
-	public String getPenDown() {
+	
+	private String getPenDown() {
 		return Long.toString(penDownNumber);
 	}
 
@@ -145,6 +146,7 @@ public class DrawbotGUI
 		SendLineToRobot("G00 Z"+getPenUp());
 		penIsUp=true;
 	}
+	
 	private void LowerPen() {
 		SendLineToRobot("G00 Z"+getPenDown());
 		penIsUp=false;
@@ -407,7 +409,7 @@ public class DrawbotGUI
 			GetRecentPaperSize();
 			LoadConfig();
 			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
-				ConfigureLimits();
+				ConfigureLimits2();
 			}
 
 			SendConfig();
@@ -828,6 +830,104 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
+	
+	/**
+	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+	*/
+	public void ConfigureLimits2() {
+		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
+		driver.setLayout(new GridBagLayout());
+		
+		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
+		final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
+		final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
+		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+		
+		BufferedImage myPicture = null;
+		try {
+			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
+		}
+		catch(IOException e) {}
+		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
+		
+		GridBagConstraints c = new GridBagConstraints();
+		GridBagConstraints d = new GridBagConstraints();
+		
+		c.weightx=0.25;
+		c.gridx=0; c.gridy=0; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
+		
+		c.gridheight=1; c.gridwidth=1; c.anchor=GridBagConstraints.EAST;
+		d.anchor=GridBagConstraints.WEST;
+		
+		c.gridx=0; c.gridy=5; driver.add(new JLabel("Machine width"),c);	d.gridx=1;	d.gridy=5;	driver.add(mw,d);
+		c.gridx=2; c.gridy=5; driver.add(new JLabel("Machine height"),c);	d.gridx=3;	d.gridy=5;	driver.add(mh,d);
+		c.gridx=0; c.gridy=6; driver.add(new JLabel("Paper width"),c);		d.gridx=1;	d.gridy=6;	driver.add(pw,d);
+		c.gridx=2; c.gridy=6; driver.add(new JLabel("Paper height"),c);		d.gridx=3;	d.gridy=6;	driver.add(ph,d);
+		
+		c.anchor=GridBagConstraints.WEST;
+		//c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
+		//driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
+		c.gridx=0; c.gridy=11; c.gridwidth=4; c.gridheight=1;
+		driver.add(new JLabel("All values in millimeters."),c);
+		
+		c.anchor=GridBagConstraints.EAST;
+		c.gridy=12;
+		c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
+		c.gridx=2; c.gridwidth=1; driver.add(save,c);
+		
+		Dimension s=ph.getPreferredSize();
+		s.width=80;
+		mw.setPreferredSize(s);
+		mh.setPreferredSize(s);
+		pw.setPreferredSize(s);
+		ph.setPreferredSize(s);;
+	
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				if(subject == save) {
+					float pwf = Float.valueOf(pw.getText());
+					float phf = Float.valueOf(ph.getText());
+					float mwf = Float.valueOf(mw.getText());
+					float mhf = Float.valueOf(mh.getText());
+					
+					paper_top = phf/2.0f;
+					paper_bottom = -phf/2.0f;
+					paper_right = pwf/2.0f;
+					paper_left = -pwf/2.0f;
+					limit_top = mhf/2.0f;
+					limit_bottom = -mhf/2.0f;
+					limit_right = mwf/2.0f;
+					limit_left = -mwf/2.0f;
+					boolean data_is_sane=true;
+					if( limit_right <= limit_left ) data_is_sane=false;
+					if( limit_top <= limit_bottom ) data_is_sane=false;
+					if( paper_right <= paper_left ) data_is_sane=false;
+					if( paper_top <= paper_bottom ) data_is_sane=false;
+					if(data_is_sane) {
+						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+						previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
+						SetRecentPaperSize();
+						SaveConfig();
+						SendConfig();
+						driver.dispose();
+					}
+				}
+				if(subject == cancel) {
+					driver.dispose();
+				}
+			}
+		};
+	
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		SendLineToRobot("M114"); // "where" command
+		driver.pack();
+		driver.setVisible(true);
+	}
 
 	/**
 	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
@@ -1132,7 +1232,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonConfigureLimits ) {
-			ConfigureLimits();
+			ConfigureLimits2();
 			return;
 		}
 		if( subject == buttonConfigureBobbins ) {

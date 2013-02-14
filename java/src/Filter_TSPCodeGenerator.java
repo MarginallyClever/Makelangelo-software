@@ -334,18 +334,18 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			// set absolute coordinates
 			out.write("G00 G90.0\n");
 			// lift pen and set a default feed rate
-			out.write("G00 F1000 Z"+DrawbotGUI.getSingleton().getPenUp()+"\n");
+			out.write("G00 F1000 Z90\n");
 			// move to the first point
 			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
 			// lower the pen
-			out.write("G00 Z"+DrawbotGUI.getSingleton().getPenDown()+"\n");
+			out.write("G00 Z0\n");
 
 			for(i=1;i<numPoints;++i) {
 				out.write("G01 X" + (points[solution[i]].x-w2) + " Y" + (h2-points[solution[i]].y) + "\n");
 			}
 			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
 			// lift pen and return to home
-			out.write("G00 Z"+DrawbotGUI.getSingleton().getPenUp()+"\n");
+			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
 			// Unpower Steppers
 			out.write("M18\n");
