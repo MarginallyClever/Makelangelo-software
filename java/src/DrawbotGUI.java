@@ -735,7 +735,6 @@ public class DrawbotGUI
 		
 		BufferedImage myPicture = null;
 		try {
-		
 			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
 		}
 		catch(IOException e) {}
@@ -1205,9 +1204,9 @@ public class DrawbotGUI
 		JPanel driver = new JPanel();
 		driver.setLayout(new GridBagLayout());
 
-		final JButton find = new JButton("FIND HOME");
-		final JButton home = new JButton("GO HOME");
-		final JButton center = new JButton("THIS IS HOME");
+		final JButton find = new JButton("FIND HOME");		find.setPreferredSize(new Dimension(100,20));
+		final JButton home = new JButton("GO HOME");		home.setPreferredSize(new Dimension(100,20));
+		final JButton center = new JButton("THIS IS HOME");	center.setPreferredSize(new Dimension(100,20));
 		
 		final JButton up1 = new JButton("Y1");  		up1.setPreferredSize(new Dimension(60,20));
 		final JButton up10 = new JButton("Y10");  		up10.setPreferredSize(new Dimension(60,20));
@@ -1230,8 +1229,8 @@ public class DrawbotGUI
 		final JButton BL = new JButton("BL");			BL.setPreferredSize(new Dimension(60,20));
 		final JButton BR = new JButton("BR");			BR.setPreferredSize(new Dimension(60,20));
 
-		final JButton z90 = new JButton("Pen Up");
-		final JButton z0  = new JButton("Pen Down");
+		final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
+		final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
 		
 		final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(60,20));
 		feedRate.setText(Double.toString(feed_rate));
@@ -1259,16 +1258,16 @@ public class DrawbotGUI
 		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
 
 		//c.gridx=3;	c.gridy=3;	driver.add(home,c);
-		c.gridx=6;  c.gridy=0;  driver.add(center,c);
-		c.gridx=6;  c.gridy=1;  driver.add(home,c);  //driver.add(find,c);
-		c.gridx=6;  c.gridy=5;  driver.add(z90,c);
-		c.gridx=6;  c.gridy=6;  driver.add(z0,c);
+		c.gridx=7;  c.gridy=0;  driver.add(center,c);
+		c.gridx=7;  c.gridy=1;  driver.add(home,c);  //driver.add(find,c);
+		c.gridx=7;  c.gridy=5;  driver.add(z90,c);
+		c.gridx=7;  c.gridy=6;  driver.add(z0,c);
 		
 		
-		c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Speed:"),c);
-		c.gridx=1;  c.gridy=8;  driver.add(feedRate,c);
-		c.gridx=2;  c.gridy=8;  driver.add(new JLabel("mm/min"),c);
-		c.gridx=3;  c.gridy=8;  driver.add(setFeedRate,c);
+		c.gridx=3;  c.gridy=8;  driver.add(new JLabel("Speed:"),c);
+		c.gridx=4;  c.gridy=8;  driver.add(feedRate,c);
+		c.gridx=5;  c.gridy=8;  driver.add(new JLabel("mm/min"),c);
+		c.gridx=6;  c.gridy=8;  driver.add(setFeedRate,c);
 		
 		
 		ActionListener driveButtons = new ActionListener() {
