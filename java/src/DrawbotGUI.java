@@ -97,6 +97,7 @@ public class DrawbotGUI
 	private double bobbin2_diameter=0.95;
 	private long penUpNumber, penDownNumber;
 	private double feed_rate;
+	private boolean penIsUp,penIsUpBeforePause;
 	
 	// GUI elements
 	private static JFrame mainframe;
@@ -139,7 +140,15 @@ public class DrawbotGUI
 	public String getPenDown() {
 		return Long.toString(penDownNumber);
 	}
-	
+
+	private void RaisePen() {
+		SendLineToRobot("G00 Z"+getPenUp());
+		penIsUp=true;
+	}
+	private void LowerPen() {
+		SendLineToRobot("G00 Z"+getPenDown());
+		penIsUp=false;
+	}
 	
 	private DrawbotGUI() {
 		StartLog();
@@ -508,7 +517,6 @@ public class DrawbotGUI
 			gcode.EstimateDrawTime();
 		   	Log("<font color='green'>"+gcode.estimate_count + " line segments.\n"+gcode.estimated_length+ "cm of line.\n" +
 			   		"Estimated "+statusBar.formatTime((long)(gcode.estimated_time))+"s to draw.</font>\n");
-			
 	    }
 	    catch(IOException e) {
 	    	Log("<span style='color:red'>File "+filename+" could not be opened.</span>\n");
@@ -897,7 +905,6 @@ public class DrawbotGUI
 		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 	}
 
-
 	void SaveConfig() {
 		String id=Long.toString(robot_uid);
 		prefs.put(id+"_limit_top", Double.toString(limit_top));
@@ -913,7 +920,6 @@ public class DrawbotGUI
 		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
 	}
 	
-	
 	void SendConfig() {
 		if(!portConfirmed) return;
 		
@@ -928,7 +934,6 @@ public class DrawbotGUI
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
 	
-
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
 		if(running==false || paused==true || gcode.fileOpened==false || portConfirmed==false || gcode.linesProcessed>=gcode.linesTotal) return;
@@ -1006,6 +1011,20 @@ public class DrawbotGUI
 				return true;  // still ready to send
 			}
 		}
+		
+		// contains a pen-up command?
+		index=line.indexOf("Z90");
+		if(index!=-1) {
+			line.replace("Z90", "Z"+getPenUp());
+			penIsUp=true;
+		}
+		
+		// contains a pen-down command?
+		index=line.indexOf("Z0");
+		if(index!=-1) {
+			line.replace("Z0", "Z"+getPenDown());
+			penIsUp=false;
+		}
 
 		// send relevant part of line to the robot
 
@@ -1048,15 +1067,15 @@ public class DrawbotGUI
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
-		if(subject == buttonZoomIn) {
+		if( subject == buttonZoomIn ) {
 			previewPane.ZoomIn();
 			return;
 		}
-		if(subject == buttonZoomOut) {
+		if( subject == buttonZoomOut ) {
 			previewPane.ZoomOut();
 			return;
 		}
-		if(subject == buttonOpenFile) {
+		if( subject == buttonOpenFile ) {
 			OpenFileDialog();
 			return;
 		}
@@ -1077,11 +1096,14 @@ public class DrawbotGUI
 		if( subject == buttonPause ) {
 			if(running) {
 				if(paused==true) {
+					penIsUpBeforePause=penIsUp;
+					RaisePen();
 					buttonPause.setText("Pause");
 					paused=false;
 					// @TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					SendFileCommand();
 				} else {
+					if(!penIsUpBeforePause) LowerPen();
 					buttonPause.setText("Unpause");
 					paused=true;
 				}
@@ -1291,9 +1313,9 @@ public class DrawbotGUI
 					} else if(b==center) {
 						SendLineToRobot("TELEPORT XO YO");
 					} else if(b==z90) {
-						SendLineToRobot("G00 Z"+getPenUp());
+						RaisePen();
 					} else if(b==z0) {
-						SendLineToRobot("G00 Z"+getPenDown());
+						LowerPen();
 					} else if(b==setFeedRate) {
 						feed_rate = Double.parseDouble(feedRate.getText());
 						if(feed_rate<1) feed_rate=1;
@@ -1334,7 +1356,6 @@ public class DrawbotGUI
 		return driver;
 	}
 	
-
 	public void ImageProcessing() {
 		final JDialog driver = new JDialog(mainframe,"Image Processing",true);
 		driver.setLayout(new GridBagLayout());
