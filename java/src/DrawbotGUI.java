@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.8.9";
+	static final String version="0.9.2";
 	
 	static final long serialVersionUID=1;
 	
@@ -722,7 +722,6 @@ public class DrawbotGUI
 		driver.setVisible(true);
 	}
 	
-	
 	/**
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
@@ -862,6 +861,7 @@ public class DrawbotGUI
 		c.gridheight=1; c.gridwidth=1; c.anchor=GridBagConstraints.EAST;
 		d.anchor=GridBagConstraints.WEST;
 		
+		c.ipadx=3;
 		c.gridx=0; c.gridy=5; driver.add(new JLabel("Machine width"),c);	d.gridx=1;	d.gridy=5;	driver.add(mw,d);
 		c.gridx=2; c.gridy=5; driver.add(new JLabel("Machine height"),c);	d.gridx=3;	d.gridy=5;	driver.add(mh,d);
 		c.gridx=0; c.gridy=6; driver.add(new JLabel("Paper width"),c);		d.gridx=1;	d.gridy=6;	driver.add(pw,d);
@@ -1060,7 +1060,6 @@ public class DrawbotGUI
 		JOptionPane.showMessageDialog(null,"Please change to tool "+toolName+" and click OK.");
 	}
 	
-
 	/**
 	 * removes comments, processes commands drawbot shouldn't have to handle.
 	 * @param line command to send
@@ -1149,7 +1148,6 @@ public class DrawbotGUI
 		catch(IOException e) {}
 	}
 	
-
 	/**
 	 * stop sending file commands to the robot.
 	 * @todo add an e-stop command?
@@ -1278,7 +1276,6 @@ public class DrawbotGUI
 			}
 		}
 	}
-	
 	
 	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
