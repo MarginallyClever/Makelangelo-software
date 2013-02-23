@@ -150,7 +150,7 @@ static float feed_rate=0;
 static long step_delay;
 
 // motor position
-static int laststep1, laststep2;
+static long laststep1, laststep2;
 
 static char absolute_mode=1;  // absolute or incremental programming mode?
 static float mode_scale;   // mm or inches?
