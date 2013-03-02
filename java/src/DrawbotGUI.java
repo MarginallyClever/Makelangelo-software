@@ -35,8 +35,8 @@ import java.util.*;
 import java.util.prefs.Preferences;
 
 //@TODO: in-app gcode editing with immediate visusal feedback - only while not drawing
-//@TODO: image processing options - cutoff, exposure, resolution
-//@TODO: vector output?
+//@TODO: image processing options - cutoff, exposure, resolution, voronoi stipples?
+//@TODO: vector output?  stl input?
 
 public class DrawbotGUI
 		extends JPanel
@@ -889,10 +889,10 @@ public class DrawbotGUI
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
 				if(subject == save) {
-					float pwf = Float.valueOf(pw.getText());
-					float phf = Float.valueOf(ph.getText());
-					float mwf = Float.valueOf(mw.getText());
-					float mhf = Float.valueOf(mh.getText());
+					float pwf = Float.valueOf(pw.getText())/10;
+					float phf = Float.valueOf(ph.getText())/10;
+					float mwf = Float.valueOf(mw.getText())/10;
+					float mhf = Float.valueOf(mh.getText())/10;
 					
 					paper_top = phf/2.0f;
 					paper_bottom = -phf/2.0f;
