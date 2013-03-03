@@ -4,4 +4,4 @@ Makelangelo is a polargraph mural drawing robot.  It is intended to teach studen
 
 Please visit "the Makelangelo homepage":http://www.marginallyclever.com/drawbot/ for the accompanying hardware kit.
 
-Please visit "the wiki":https://github.com/i-make-robots/DrawBot/wiki for installation, troubleshooting, and more.
+Please visit "the wiki":https://github.com/MarginallyClever/Makelangelo/wiki for installation, troubleshooting, and more.
