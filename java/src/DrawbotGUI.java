@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.9.2";
+	static final String version="0.9.2e";
 	
 	static final long serialVersionUID=1;
 	
@@ -1057,7 +1057,7 @@ public class DrawbotGUI
 	}
 	
 	private void ChangeToTool(String toolName) {
-		JOptionPane.showMessageDialog(null,"Please change to tool "+toolName+" and click OK.");
+		JOptionPane.showMessageDialog(null,"Please change to "+toolName+" and click OK.");
 	}
 	
 	/**
@@ -1301,21 +1301,6 @@ public class DrawbotGUI
         }
     }
 
-	public void CheckForUpdate() {
-		/*
-		try {
-		    // Ping github for the latest version.
-			URL url = new URL("http://marginallyclever.com/drawbot_get.php");
-		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		    robot_uid = Long.parseLong(rd.readLine());
-		    rd.close();
-		} catch (Exception e) {}
-		 */
-		// TODO Get latest version
-		// TODO Offer to download latest version?
-	}
-	
 	/**
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
@@ -1640,6 +1625,23 @@ public class DrawbotGUI
         
         return menuBar;
 	}
+	
+	public void CheckForUpdate() {
+		try {
+		    // Get Github info
+			URL github = new URL("http://www.marginallyclever.com/other/makelangelo-version.php");
+	        BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
+
+	        String inputLine;
+	        if((inputLine = in.readLine()) != null) {
+	        	if( inputLine.compareTo(version) !=0 ) {
+	        		JOptionPane.showMessageDialog(null,"A new version of this software is available.  The latest version is "+inputLine+"\n"
+	        											+"Please visit http://bit.ly/13DrlLK to get the new hotness.");
+	        	}
+	        }
+	        in.close();
+		} catch (Exception e) {}
+	}
 
 	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
@@ -1894,6 +1896,8 @@ public class DrawbotGUI
 		if(Arrays.asList(s.portsDetected).contains(s.recentPort)) {
 			s.OpenPort(s.recentPort);
 		}
+		
+		s.CheckForUpdate();
     }
     
     public static void main(String[] args) {
