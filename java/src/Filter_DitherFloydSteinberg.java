@@ -9,9 +9,11 @@ import java.awt.image.BufferedImage;
  * {@link http://www.home.unix-ag.org/simon/gimp/fsdither.c}
  */
 public class Filter_DitherFloydSteinberg extends Filter {
+	private long tone;
+	
 	private int QuantizeColor(int original) {
 		int i=(int)Math.min(Math.max(original, 0),255);
-		return ( i > 127 ) ? 255 : 0;
+		return ( i > tone ) ? 255 : 0;
 	}
 	
 	
@@ -57,7 +59,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 	
 	
 	public BufferedImage Process(BufferedImage img) {
-		int y;
+		int y,x;
 		int h = img.getHeight();
 		int w = img.getWidth();
 		int direction=1;
@@ -67,7 +69,17 @@ public class Filter_DitherFloydSteinberg extends Filter {
 		for(y=0;y<w;++y) {
 			error[y]=nexterror[y]=0;
 		}
-
+		
+		// find the average color of the system
+		for(y=0;y<h;++y) {
+			for(x=0;x<w;++x) {
+				tone+=decode(img.getRGB(x,y));
+			}
+		}
+		
+		tone /= (w*h);
+		
+		
 		// for each y from top to bottom
 		for(y=0;y<h;++y) {
 			DitherDirection(img,y,error,nexterror,direction);

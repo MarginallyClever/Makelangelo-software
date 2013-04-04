@@ -190,10 +190,12 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	int image_width, image_height;
 	int scount;
 	ProgressMonitor pm;
+	double scale;
 	TSPOptimizer task;
 	
-	Filter_TSPGcodeGenerator(String _dest) {
+	Filter_TSPGcodeGenerator(String _dest,double _scale) {
 		dest=_dest;
+		scale=_scale;
 	}
 
 	protected float CalculateWeight(int a,int b) {
@@ -292,6 +294,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		} while(scount<numPoints);
 	}
 	
+	
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
 	 * Since all the points are connected in a single loop,
@@ -302,6 +305,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		
 		int w2=image_width/2;
 		int h2=image_height/2;
+		
+		double iscale=1.0/scale;
 		
 		// find the tsp point closest to the calibration point
 		int i;
@@ -336,14 +341,14 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			// lift pen and set a default feed rate
 			out.write("G00 F1000 Z90\n");
 			// move to the first point
-			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+			out.write("G01 X" + ((points[solution[0]].x-w2)*iscale) + " Y" + ((h2-points[solution[0]].y)*iscale) + "\n");
 			// lower the pen
 			out.write("G00 Z0\n");
 
 			for(i=1;i<numPoints;++i) {
-				out.write("G01 X" + (points[solution[i]].x-w2) + " Y" + (h2-points[solution[i]].y) + "\n");
+				out.write("G01 X" + ((points[solution[i]].x-w2)*iscale) + " Y" + ((h2-points[solution[i]].y)*iscale) + "\n");
 			}
-			out.write("G01 X" + (points[solution[0]].x-w2) + " Y" + (h2-points[solution[0]].y) + "\n");
+			out.write("G01 X" + ((points[solution[0]].x-w2)*iscale) + " Y" + ((h2-points[solution[0]].y)*iscale) + "\n");
 			// lift pen and return to home
 			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
@@ -359,6 +364,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
 		DrawbotGUI.getSingleton().PlayConversionFinishedSound();
 	}
+	
 	
 	/**
 	 * The main entry point

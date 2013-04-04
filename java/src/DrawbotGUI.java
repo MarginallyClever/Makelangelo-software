@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.9.2e";
+	static final String version="0.9.4";
 	
 	static final long serialVersionUID=1;
 	
@@ -140,6 +140,10 @@ public class DrawbotGUI
 	
 	private String getPenDown() {
 		return Long.toString(penDownNumber);
+	}
+	
+	public double getScale() {
+		return image_dpi/100.0;
 	}
 
 	private void RaisePen() {
@@ -242,8 +246,8 @@ public class DrawbotGUI
 		
 		try {
 			img = ImageIO.read(new File(filename));
-
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,(double)image_dpi/100.0,0.9f); 
+			
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),0.9f); 
 			img = rs.Process(img);
 			
 			Filter_BlackAndWhite bwc = new Filter_BlackAndWhite(); 
@@ -253,7 +257,7 @@ public class DrawbotGUI
 			img = dither.Process(img);
 	
 			String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-			Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair);
+			Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair,getScale());
 			tsp.Process(img);
 		}
 		catch(IOException e) {}
@@ -672,6 +676,12 @@ public class DrawbotGUI
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
 		
+		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 50, 500, image_dpi);
+		input_image_dpi.setMajorTickSpacing(100);
+		input_image_dpi.setMinorTickSpacing(50);
+		input_image_dpi.setPaintTicks(true);
+		input_image_dpi.setPaintLabels(true);
+		
 		final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the global total"));
 		allow_metrics.setSelected(allowMetrics);
 
@@ -685,10 +695,13 @@ public class DrawbotGUI
 		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);			c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		
-		c.gridwidth=1;	c.gridx=2;  c.gridy=8;  driver.add(cancel,c);
-		c.gridwidth=1;	c.gridx=1;  c.gridy=8;  driver.add(save,c);
 
+		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image Resolution"));
+		c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+
+		c.gridwidth=1;	c.gridx=2;  c.gridy=9;  driver.add(cancel,c);
+		c.gridwidth=1;	c.gridx=1;  c.gridy=9;  driver.add(save,c);
+		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
@@ -698,6 +711,8 @@ public class DrawbotGUI
 					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
 
 					if(subject == save) {
+						image_dpi=input_image_dpi.getValue();
+						
 						allowMetrics = allow_metrics.isSelected();
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
@@ -1208,10 +1223,6 @@ public class DrawbotGUI
 			}
 			return;
 		}
-		if( subject == buttonImageProcessing ) {
-			ImageProcessing();
-			return;
-		}
 		if( subject == buttonHalt ) {
 			Halt();
 			return;
@@ -1438,48 +1449,7 @@ public class DrawbotGUI
 		return driver;
 	}
 	
-	public void ImageProcessing() {
-		final JDialog driver = new JDialog(mainframe,"Image Processing",true);
-		driver.setLayout(new GridBagLayout());
 
-		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 1, 100, image_dpi);
-		input_image_dpi.setMajorTickSpacing(25);
-		input_image_dpi.setMinorTickSpacing(5);
-		input_image_dpi.setPaintTicks(true);
-		input_image_dpi.setPaintLabels(true);
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Save");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=0;  c.gridy=0;  driver.add(new JLabel("Image conversion DPI (Default: xxx)"));
-		c.gridx=1;	c.gridy=0;	driver.add(input_image_dpi,c);
-		c.gridx=2;  c.gridy=2;  driver.add(save,c);
-		c.gridx=3;  c.gridy=2;  driver.add(cancel,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						int image_dpi2 = input_image_dpi.getValue();
-						boolean data_is_sane=true;
-						if( image_dpi2 < 1 || image_dpi2 > 64 ) data_is_sane=false;
-						if(data_is_sane) {
-							image_dpi=image_dpi2;
-							driver.dispose();
-						}
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-				}
-			};
-		
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		driver.pack();
-		driver.setVisible(true);
-	}
-	
 	/**
 	 * dialog to adjust the pen up & pen down values
 	 */
@@ -1750,12 +1720,7 @@ public class DrawbotGUI
         buttonConfigurePreferences.addActionListener(this);
         buttonConfigurePreferences.setEnabled(!running);
         menu.add(buttonConfigurePreferences);
-
-/*
-        buttonImageProcessing = new JMenuItem("Image Processing");
-        buttonImageProcessing.addActionListener(this);
-        menu.add(buttonImageProcessing);
-*/
+        
         menuBar.add(menu);
 
         // Draw menu

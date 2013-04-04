@@ -26,19 +26,11 @@ public class Filter_Resize {
 	
 	
 	protected BufferedImage scaleImage(BufferedImage img, int width, int height, Color background) {
-	    int imgWidth = img.getWidth();
-	    int imgHeight = img.getHeight();
-	    if (imgWidth*height < imgHeight*width) {
-	        width = imgWidth*height/imgHeight;
-	    } else {
-	        height = imgHeight*width/imgWidth;
-	    }
-	    BufferedImage newImage = new BufferedImage(width, height,
-	            BufferedImage.TYPE_INT_RGB);
+	    BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	    Graphics2D g = newImage.createGraphics();
 	    try {
 	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-	                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+	                           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 	        g.setBackground(background);
 	        g.clearRect(0, 0, width, height);
 	        g.drawImage(img, 0, 0, width, height, null);
@@ -55,6 +47,7 @@ public class Filter_Resize {
 		int max_w=(int)((paper_right-paper_left)*dots_per_cm*cm_to_mm*margin);
 		int max_h=(int)((paper_top-paper_bottom)*dots_per_cm*cm_to_mm*margin);
 		
+		// adjust up
 		if(w<max_w && h<max_h) {
 			if(w>h) {
 				h*=(float)max_w/(float)w;
@@ -64,6 +57,7 @@ public class Filter_Resize {
 				h=max_h;
 			}
 		}
+		// adjust down
 		if(w>max_w) {
 			h*=(float)max_w/(float)w;
 			w=max_w;
@@ -72,6 +66,7 @@ public class Filter_Resize {
 			w*=(float)max_h/(float)h;
 			h=max_h;
 		}
+		// now scale the image
 		return scaleImage(img, w,h,Color.WHITE);
 	}
 }
