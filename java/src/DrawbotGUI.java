@@ -263,23 +263,48 @@ public class DrawbotGUI
 		catch(IOException e) {}
 	}
 
+
+  private static final class HTMLLogEdit implements Runnable {
+    private final HTMLEditorKit kit; 
+    private JScrollPane logPane;
+    private final HTMLDocument doc;
+    private final String msg;
+
+    public HTMLLogEdit (HTMLEditorKit kit, JScrollPane pane, 
+                        HTMLDocument doc, String msg) {
+      this.doc =doc;
+      this.msg = msg;
+      this.kit = kit;
+      this.logPane = pane;
+    }
+
+    public void run() {
+      try {
+        kit.insertHTML(doc, doc.getLength(), msg, 0,0,null);
+        int over_length = doc.getLength() - msg.length() - 5000;
+        doc.remove(0, over_length);
+        logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
+      } catch (BadLocationException e) {
+        System.err.println("Error updating log pane.");
+        e.printStackTrace();
+      } catch (IOException e) {
+        System.err.println("Error updating log pane.");
+        e.printStackTrace();
+      }
+    }
+  }
+
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
-		try {
-			msg=msg.replace("\n", "<br>\n");
-			logToFile.write(msg);
-			logToFile.flush();
-			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
-			int over_length = doc.getLength() - msg.length() - 5000;
-			doc.remove(0, over_length);
-			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
+    msg=msg.replace("\n", "<br>\n");
+    logToFile.write(msg);
+    logToFile.flush();
+    try {
+      javax.swing.SwingUtilities.invokeAndWait(new HTMLLogEdit(kit, logPane, doc, msg));
+    } catch (Exception e) {
+      System.err.println("Error updating log pane.");
+      e.printStackTrace();
+    }
 	}
 	
 	public void ClearLog() {
