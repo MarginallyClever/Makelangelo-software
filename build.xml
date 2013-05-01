@@ -37,6 +37,7 @@
 
     <jar destfile="${jarfile}">
       <fileset dir="${classes}" />
+      <fileset dir="${resources}" />
       <manifest>
         <attribute name="Main-Class" value="DrawbotGUI"/>
         <attribute name="Class-Path" value="${jarlib}"/>
