@@ -113,11 +113,11 @@ public class DrawbotGUI
     private JMenuItem [] buttonPorts;
 
     // logging
-    private JTextPane log;
-    private JScrollPane logPane;
-    HTMLEditorKit kit;
-    HTMLDocument doc;
-    PrintWriter logToFile;
+    private final JTextPane log = new JTextPane();;
+    private final JScrollPane logPane = new JScrollPane(log);
+    private final HTMLEditorKit kit = new HTMLEditorKit();
+    private final HTMLDocument doc = new HTMLDocument();
+    private PrintWriter logToFile;
     
     // panels
     private DrawPanel previewPane;
@@ -264,26 +264,28 @@ public class DrawbotGUI
 	}
 
 
-  private static final class HTMLLogEdit implements Runnable {
-    private final HTMLEditorKit kit; 
-    private JScrollPane logPane;
-    private final HTMLDocument doc;
+  private final class HTMLLogEdit implements Runnable {
     private final String msg;
+    private final boolean clear;
 
-    public HTMLLogEdit (HTMLEditorKit kit, JScrollPane pane, 
-                        HTMLDocument doc, String msg) {
-      this.doc =doc;
+    public HTMLLogEdit (String msg, boolean clear) {
       this.msg = msg;
-      this.kit = kit;
-      this.logPane = pane;
+      this.clear = clear;
     }
 
     public void run() {
       try {
-        kit.insertHTML(doc, doc.getLength(), msg, 0,0,null);
-        int over_length = doc.getLength() - msg.length() - 5000;
-        doc.remove(0, over_length);
-        logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
+        if (clear) {
+          doc.replace(0, doc.getLength(), "", null);
+          kit.insertHTML(doc, 0, "", 0,0,null);
+          logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
+        }
+        if (!msg.trim().equals("")) {
+          kit.insertHTML(doc, doc.getLength(), msg, 0,0,null);
+          int over_length = doc.getLength() - msg.length() - 5000;
+          doc.remove(0, over_length);
+          logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
+        }
       } catch (BadLocationException e) {
         System.err.println("Error updating log pane.");
         e.printStackTrace();
@@ -300,27 +302,26 @@ public class DrawbotGUI
     logToFile.write(msg);
     logToFile.flush();
     try {
-      javax.swing.SwingUtilities.invokeAndWait(new HTMLLogEdit(kit, logPane, doc, msg));
+      HTMLLogEdit edit = new HTMLLogEdit(msg, false);
+      if (javax.swing.SwingUtilities.isEventDispatchThread()) {edit.run();}
+      else {javax.swing.SwingUtilities.invokeAndWait(edit);}
     } catch (Exception e) {
       System.err.println("Error updating log pane.");
       e.printStackTrace();
     }
 	}
 	
-	public void ClearLog() {
-		try {
-			doc.replace(0, doc.getLength(), "", null);
-			kit.insertHTML(doc, 0, "", 0,0,null);
-			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
+  public void ClearLog() {
+    try {
+      HTMLLogEdit edit = new HTMLLogEdit("", true);
+      if (javax.swing.SwingUtilities.isEventDispatchThread()) {edit.run();}
+      else {javax.swing.SwingUtilities.invokeAndWait(edit);}
+    } catch (Exception e) {
+      System.err.println("Error updating log pane.");
+      e.printStackTrace();
+    }
 	}
-	
+
 	public void ClosePort() {
 		if(portOpened) {
 		    if (serialPort != null) {
@@ -1814,12 +1815,8 @@ public class DrawbotGUI
         contentPane.setOpaque(true);
         
         // the log panel
-        log = new JTextPane();
         log.setEditable(false);
         log.setBackground(Color.BLACK);
-        logPane = new JScrollPane(log);
-        kit = new HTMLEditorKit();
-        doc = new HTMLDocument();
         log.setEditorKit(kit);
         log.setDocument(doc);
         DefaultCaret c = (DefaultCaret)log.getCaret();
