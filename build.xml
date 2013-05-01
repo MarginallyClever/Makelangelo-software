@@ -79,7 +79,7 @@
     <copy todir="${target}/arduino/">
       <fileset dir="./arduino">
         <include name="*.ino" />
-        <include name="libraries/**" />
+        <include name="AFMotorDrawbot/**" />
       </fileset>
     </copy>
     <copy file="${jarfile}" todir="${target}" />
