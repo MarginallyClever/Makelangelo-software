@@ -104,7 +104,7 @@ public class DrawbotGUI
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
-    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
+    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors;
     private JMenuItem buttonStart, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="jar" name="Create Runnable Jar for Project Drawbot">
-  <property name="classes" location="./java/classes/" />
+<project default="jar" name="DrawbotGUI">
+  <description>GUI build and deploy for Makelangelo 2 drawbot.</description>
+
+  <property name="classes" location="./java/bin/" />
   <property name="sources" location="./java/src/" />
   <property name="lib" location="./java/lib/" />
   <property name="resources" location="./java/resources/" />
