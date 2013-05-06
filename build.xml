@@ -47,7 +47,7 @@
     </jar>
   </target>
 
-  <target name="deploy" depends="jar">
+  <target name="deploy" depends="clean,jar">
     <!-- Create the necessary directory sturctures for each of the major OS's.
          Put the freshly compiled jar, common files and platform-speciifc files into appropriate locations.-->
     <delete dir="${deploy}" />
@@ -80,7 +80,7 @@
     </copy>
     <copy todir="${target}/arduino/">
       <fileset dir="./arduino">
-        <include name="*.ino" />
+        <include name="makelangelo/**" />
         <include name="AFMotorDrawbot/**" />
       </fileset>
     </copy>
