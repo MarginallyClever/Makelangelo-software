@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="jar" name="DrawbotGUI">
+  <description>GUI build and deploy for Makelangelo 2 drawbot.</description>
+
+  <property name="classes" location="./java/bin/" />
+  <property name="sources" location="./java/src/" />
+  <property name="lib" location="./java/lib/" />
+  <property name="resources" location="./java/resources/" />
+  <property name="deploy" location="./deploy/" />
+  <property name="deployOSRsc" location="./OSFiles/" />
+
+  <property name="jarfile" value="./java/DrawbotGUI.jar" />
+ 
+  <target name="compile">
+    <!-- Compile the source files into the classes directory (recursively)-->
+    <mkdir dir="${classes}" />
+    <javac srcdir="${sources}" destdir="${classes}" includeantruntime="false" source="1.6">
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <!-- Package the source files into a jar.  Include required resources.
+         Classpath is set to the same directory as the resulting jar.-->
+    <delete file="${jarfile}" />
+    
+    <pathconvert property="jarlib" pathsep=" " dirsep="/">
+      <map from="${lib}" to="."/>
+      <path id="lib.classpath">
+        <fileset dir="${lib}">
+          <include name="*.jar" />
+        </fileset>
+      </path>
+    </pathconvert>
+
+    <jar destfile="${jarfile}">
+      <fileset dir="${classes}" />
+      <fileset dir="${resources}" />
+      <manifest>
+        <attribute name="Main-Class" value="DrawbotGUI"/>
+        <attribute name="Class-Path" value="${jarlib}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="deploy" depends="clean,jar">
+    <!-- Create the necessary directory sturctures for each of the major OS's.
+         Put the freshly compiled jar, common files and platform-speciifc files into appropriate locations.-->
+    <delete dir="${deploy}" />
+    <mkdir dir="${deploy}" />
+
+    <antcall target="deploy-one">
+      <param name="OS" value="OSX"/>
+    </antcall>
+    
+    <antcall target="deploy-one">
+      <param name="OS" value="Windows"/>
+    </antcall>
+
+  </target>
+
+  <target name="deploy-one">
+    <!-- Called from deploy to handle items for a specific OS.
+         Expects the paramter "OS" to have the OS-name -->
+    <echo message="Deploying for ${OS}" />
+    <property name="target" location="${deploy}/${OS}/" />
+    <mkdir dir="${target}" />
+    <copy todir="${target}">
+      <fileset dir="${deployOSRsc}/${OS}"/>
+    </copy>
+    <copy todir="${target}">
+      <fileset dir="${lib}" includes="*.jar" />
+    </copy>
+    <copy todir="${target}/gcode/">
+      <fileset dir="./gcode"/>
+    </copy>
+    <copy todir="${target}/arduino/">
+      <fileset dir="./arduino">
+        <include name="makelangelo/**" />
+        <include name="AFMotorDrawbot/**" />
+      </fileset>
+    </copy>
+    <copy file="${jarfile}" todir="${target}" />
+  </target>
+
+  <target name="clean" >
+    <delete dir="${deploy}" />
+    <delete dir="${classes}" />
+    <delete file="${jarfile}" />
+  </target>
+</project>
