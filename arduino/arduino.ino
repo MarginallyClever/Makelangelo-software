@@ -10,7 +10,7 @@
 // CONSTANTS
 //------------------------------------------------------------------------------
 // Comment out this line to silence most serial output.
-//#define VERBOSE         (1)
+#define VERBOSE         (1)
 
 // Comment out this line to disable SD cards.
 //#define USE_SD_CARD       (1)
@@ -46,8 +46,6 @@
 #define SWITCH_HALF     (512)
 
 // servo angles for pen control
-#define PEN_UP_ANGLE    (170)
-#define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
@@ -76,11 +74,13 @@
 //------------------------------------------------------------------------------
 // EEPROM MEMORY MAP
 //------------------------------------------------------------------------------
-#define EEPROM_VERSION   4             // Increment EEPROM_VERSION when adding new variables
+#define EEPROM_VERSION   5             // Increment EEPROM_VERSION when adding new variables
 #define ADDR_VERSION     0             // address of the version number (one byte)
 #define ADDR_UUID        1             // address of the UUID (long - 4 bytes)
 #define ADDR_SPOOL_DIA1  5             // address of the spool diameter (float - 4 bytes)
 #define ADDR_SPOOL_DIA2  9             // address of the spool diameter (float - 4 bytes)
+#define ADDR_SERVO_UP    13            // address of the servo up value (long - 4 bytes)
+#define ADDR_SERVO_DOWN  15            // address of the servo down value (long - 4 bytes)
 
 
 //------------------------------------------------------------------------------
@@ -141,12 +141,17 @@ float THREADPERSTEP2;  // thread per step
 
 float MAX_VEL = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
 
+//PEN ANGLES
+long PEN_UP_ANGLE=170;
+long PEN_DOWN_ANGLE=10; // Some steppers don't like 0 degrees
+
+
 
 // plotter position.
 static float posx, velx;
 static float posy, vely;
 static float posz;  // pen state
-static float feed_rate=0;
+static float feed_rate=500.0;
 static long step_delay;
 
 // motor position
@@ -259,9 +264,13 @@ static void setPenAngle(int pen_angle) {
   if(posz!=pen_angle) {
     posz=pen_angle;
     
-    if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
-    if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
-
+    if (PEN_DOWN_ANGLE < PEN_UP_ANGLE ) {
+      if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
+      if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
+    } else {
+      if(posz>PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
+      if(posz<PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
+    }
     s1.write( (int)posz );
     delay(PEN_DELAY);
   }
@@ -529,14 +538,20 @@ static void where() {
 
 //------------------------------------------------------------------------------
 static void printConfig() {
+  Serial.print(F("UID = "));        Serial.print(robot_uid);Serial.print(F("\n"));
+  Serial.print(F("FW$# = "));    Serial.print(EEPROM_VERSION); Serial.print(F("\n"));
   Serial.print(m1d);              Serial.print(F("="));  
   Serial.print(limit_top);        Serial.print(F(","));
   Serial.print(limit_left);       Serial.print(F("\n"));
   Serial.print(m2d);              Serial.print(F("="));  
   Serial.print(limit_top);        Serial.print(F(","));
   Serial.print(limit_right);      Serial.print(F("\n"));
-  Serial.print(F("Bottom="));     Serial.println(limit_bottom);
-  Serial.print(F("Feed rate="));  printFeedRate();
+  Serial.print(F("Bottom="));     Serial.print(limit_bottom); Serial.print(F("\n"));
+  Serial.print(F("Feed rate="));  printFeedRate(); Serial.print(F("\n"));
+  Serial.print(F("Bobbins L = ")); Serial.print(SPOOL_DIAMETER1); 
+  Serial.print(F("R = ")); Serial.print(SPOOL_DIAMETER2); Serial.print(F("\n"));
+  Serial.print(F("PEN POS UP = ")); Serial.print(PEN_UP_ANGLE);
+  Serial.print(F(" DOWN = ")); Serial.print(PEN_DOWN_ANGLE); Serial.print(F("\n"));
 }
 
 
@@ -564,32 +579,44 @@ float EEPROM_readLong(int ee) {
 static void LoadConfig() {
   char version_number=EEPROM.read(ADDR_VERSION);
   if(version_number<3 || version_number>EEPROM_VERSION) {
+    
+    Serial.println(F("Initializing EEPROM"));
+    
     // If not the current EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
     // Update the version number
     EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
+    version_number=EEPROM_VERSION;
     // Update robot uuid
     robot_uid=0;
     SaveUID();
     // Update spool diameter variables
     SaveSpoolDiameter();
+    SavePenAngles();
   }
-  if(version_number==3) {
+  if(version_number==3 || version_number==4 ) {
+    //Serial.println(F("Updated EEPROM Version"));
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
     adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
                         (float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
     // save the new data so the next load doesn't screw up one bobbin size
     SaveSpoolDiameter();
+    SavePenAngles();
     // update the EEPROM version
     EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
+    version_number=EEPROM_VERSION;
   } else if(version_number==EEPROM_VERSION) {
+    //Serial.println(F("Loading config from EEPROM"));   
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
     adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
                         (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
+    PEN_UP_ANGLE=EEPROM_readLong(ADDR_SERVO_UP);
+    PEN_DOWN_ANGLE=EEPROM_readLong(ADDR_SERVO_DOWN);
   } else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println(F("An Error Occurred during LoadConfig"));
+    Serial.print(F("Reteived Version Number = ")); Serial.println(version_number);
   }
 }
 
@@ -603,6 +630,13 @@ static void SaveUID() {
 static void SaveSpoolDiameter() {
   EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER1*10000);
   EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER2*10000);
+}
+
+//------------------------------------------------------------------------------
+static void SavePenAngles() {
+
+  EEPROM_writeLong(ADDR_SERVO_UP,PEN_UP_ANGLE);
+  EEPROM_writeLong(ADDR_SERVO_DOWN,PEN_DOWN_ANGLE);
 }
 
 
@@ -909,6 +943,7 @@ static void processCommand() {
     adjustSpoolDiameter(amountL,amountR);
     // Update EEPROM
     SaveSpoolDiameter();
+    printConfig();
   } else if(!strncmp(buffer,"D02 ",4)) {
     Serial.print('L');
     Serial.print(SPOOL_DIAMETER1);
@@ -920,6 +955,25 @@ static void processCommand() {
   } else if(!strncmp(buffer,"D04 ",4)) {
     // read file
     SD_ProcessFile(strchr(buffer,' ')+1);
+  } else if(!strncmp(buffer,"D05 ",4)) {
+    // read file
+    long pu=PEN_UP_ANGLE;
+    long pd=PEN_DOWN_ANGLE;
+    
+    char *ptr=buffer;
+    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
+      ptr=strchr(ptr,' ')+1;
+      switch(*ptr) {
+      case 'U': pu=atoi(ptr+1);  break;
+      case 'D': pd=atoi(ptr+1);  break;
+      }
+    }
+    PEN_UP_ANGLE=pu;
+    PEN_DOWN_ANGLE=pd;
+    SavePenAngles();
+    printConfig();
+
+   
   } else {
     if(processSubcommand()==0) {
       Serial.print(F("Invalid command '"));
@@ -932,14 +986,19 @@ static void processCommand() {
 
 //------------------------------------------------------------------------------
 void setup() {
-  LoadConfig();
   
   // initialize the read buffer
   sofar=0;
   // start communications
   Serial.begin(BAUD);
+  LoadConfig();
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
-  Serial.println(robot_uid);
+  Serial.print(robot_uid);
+  
+  
+  // initialize the read buffer
+  sofar=0;
+  printConfig();
   
 #ifdef USE_SD_CARD
   SD.begin();

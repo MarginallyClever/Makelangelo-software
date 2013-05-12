@@ -104,7 +104,7 @@ public class DrawbotGUI
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
-    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors, buttonImageProcessing;
+    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors;
     private JMenuItem buttonStart, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -1046,6 +1046,10 @@ public class DrawbotGUI
                    +" I"+(m1invert?"-1":"1")
                    +" J"+(m2invert?"-1":"1");
 		SendLineToRobot(line);
+		line = "D01 L"+bobbin1_diameter+" R"+bobbin2_diameter;
+		SendLineToRobot(line);
+		line = "D05 U"+penUpNumber+" D"+penDownNumber;
+		SendLineToRobot(line);
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
 	
@@ -1208,17 +1212,17 @@ public class DrawbotGUI
 		}
 		if( subject == buttonPause ) {
 			if(running) {
-				if(paused==true) {
+				if(paused==false) {
 					penIsUpBeforePause=penIsUp;
 					RaisePen();
+					buttonPause.setText("Unpause");
+					paused=true;
+				} else {
+					if(!penIsUpBeforePause) LowerPen();
 					buttonPause.setText("Pause");
 					paused=false;
 					// @TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					SendFileCommand();
-				} else {
-					if(!penIsUpBeforePause) LowerPen();
-					buttonPause.setText("Unpause");
-					paused=true;
 				}
 			}
 			return;
@@ -1307,7 +1311,9 @@ public class DrawbotGUI
 							}
 						}
 					}
-	            } catch (IOException e) {}
+	            } catch (IOException e) {
+	            	Log("<span style='color:#FF0000'>Exception Reading from Serial</span><br>");
+	            }
                 break;
         }
     }
@@ -1507,6 +1513,7 @@ public class DrawbotGUI
 					penUpNumber = Long.valueOf(penUp.getText());
 					penDownNumber = Long.valueOf(penDown.getText());
 					SaveConfig();
+					SendConfig();
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {
