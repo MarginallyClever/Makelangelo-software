@@ -901,14 +901,18 @@ static void processCommand() {
     while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'L': amountL=atof(ptr+1)*mode_scale;  break;
-      case 'R': amountR=atof(ptr+1)*mode_scale;  break;
+      case 'L': amountL=atof(ptr+1);  break;
+      case 'R': amountR=atof(ptr+1);  break;
       }
     }
 
+    float tps1=THREADPERSTEP1;
+    float tps2=THREADPERSTEP2;
     adjustSpoolDiameter(amountL,amountR);
-    // Update EEPROM
-    SaveSpoolDiameter();
+    if(THREADPERSTEP1 != tps1 || THREADPERSTEP2 != tps2) {
+      // Update EEPROM
+      SaveSpoolDiameter();
+    }
   } else if(!strncmp(buffer,"D02 ",4)) {
     Serial.print('L');
     Serial.print(SPOOL_DIAMETER1);
