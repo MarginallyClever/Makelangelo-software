@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.9.4";
+	static final String version="0.9.6";
 	
 	static final long serialVersionUID=1;
 	
@@ -256,12 +256,14 @@ public class DrawbotGUI
 			
 			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 			img = dither.Process(img);
-	
-			String ngcPair = filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+
+	        String workingDirectory=System.getProperty("user.dir");
+			String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
 			Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair,getScale());
 			tsp.Process(img);
 		}
 		catch(IOException e) {}
+
 	}
 
 	// appends a message to the log tab and system out.
@@ -532,7 +534,6 @@ public class DrawbotGUI
 	    }
 	    
 	    previewPane.setGCode(gcode.lines);
-	   	UpdateRecentFiles(filename);
 	    Halt();
 	}
 	
@@ -613,7 +614,8 @@ public class DrawbotGUI
     	} else {
     		LoadImage(filename);
     	}
-    	
+
+	   	UpdateRecentFiles(filename);
     	previewPane.ZoomToFitPaper();
 
     	statusBar.Clear();
@@ -677,10 +679,10 @@ public class DrawbotGUI
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
 		
-		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 50, 500, image_dpi);
+		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 50, 300, image_dpi);
 		//input_image_dpi.setSize(250,input_image_dpi.getSize().height);
 		input_image_dpi.setMajorTickSpacing(100);
-		input_image_dpi.setMinorTickSpacing(50);
+		input_image_dpi.setMinorTickSpacing(25);
 		input_image_dpi.setPaintTicks(true);
 		input_image_dpi.setPaintLabels(true);
 		
@@ -718,6 +720,7 @@ public class DrawbotGUI
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
+						prefs.put("image_dpi",Integer.toString(image_dpi));
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -806,10 +809,10 @@ public class DrawbotGUI
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
 				if(subject == save) {
-					float pwf = Float.valueOf(pw.getText())/10;
-					float phf = Float.valueOf(ph.getText())/10;
-					float mwf = Float.valueOf(mw.getText())/10;
-					float mhf = Float.valueOf(mh.getText())/10;
+					float pwf = Math.round( Float.valueOf(pw.getText()) * 100 ) / (100 * 10);
+					float phf = Math.round( Float.valueOf(ph.getText()) * 100 ) / (100 * 10);
+					float mwf = Math.round( Float.valueOf(mw.getText()) * 100 ) / (100 * 10);
+					float mhf = Math.round( Float.valueOf(mh.getText()) * 100 ) / (100 * 10);
 					
 					boolean data_is_sane=true;
 					if( pwf<=0 ) data_is_sane=false;
@@ -960,8 +963,8 @@ public class DrawbotGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
-						bobbin_left_diameter = Float.valueOf(mBobbin1.getText());
-						bobbin_right_diameter = Float.valueOf(mBobbin2.getText());
+						bobbin_left_diameter = Double.valueOf(mBobbin1.getText());
+						bobbin_right_diameter = Double.valueOf(mBobbin2.getText());
 						boolean data_is_sane=true;
 						if( bobbin_left_diameter <= 0 ) data_is_sane=false;
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
@@ -998,6 +1001,7 @@ public class DrawbotGUI
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
+		image_dpi= Integer.valueOf(prefs.get("image_dpi", "100"));
 	}
 
 	void SaveConfig() {
@@ -1014,6 +1018,7 @@ public class DrawbotGUI
 		prefs.put(id+"_penDown", Long.toString(penDownNumber));
 		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
 		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
+		prefs.put("image_dpi",Integer.toString(image_dpi));
 	}
 	
 	void SendConfig() {
@@ -1395,6 +1400,7 @@ public class DrawbotGUI
 						if(feed_rate<1) feed_rate=1;
 						if(feed_rate>2000) feed_rate=20000;
 						feedRate.setText(Double.toString(feed_rate));
+						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {
 						SendLineToRobot("G91");
 						SendLineToRobot("G00 G21 F"+feed_rate+" "+b.getText());
@@ -1830,10 +1836,14 @@ public class DrawbotGUI
         mainframe.setVisible(true);
 
         DrawbotGUI s=getSingleton();
+        /*
+        // if the default file being opened in a g-code file, this is ok.
+        // else load time is long and it feels like the app has crashed on load to new users.
         // open the file
 		if(s.recentFiles[0].length()>0) {
 			s.OpenFileOnDemand(s.recentFiles[0]);
 		}
+		*/
 		
 		// connect to the last port
 		s.ListSerialPorts();
