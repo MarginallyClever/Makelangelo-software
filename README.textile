@@ -5,3 +5,5 @@ Makelangelo is a polargraph mural drawing robot.  It is intended to teach studen
 Please visit "the Makelangelo homepage":http://www.marginallyclever.com/drawbot/ for the accompanying hardware kit.
 
 Please visit "the wiki":https://github.com/MarginallyClever/Makelangelo/wiki for installation, troubleshooting, and more.
+
+Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
