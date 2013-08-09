@@ -295,6 +295,10 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 	
 	
+	private double RoundOff(double value) {
+		return Math.round(value * 1000) / 1000;
+	}
+	
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
 	 * Since all the points are connected in a single loop,
@@ -341,14 +345,14 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			// lift pen and set a default feed rate
 			out.write("G00 F1000 Z90\n");
 			// move to the first point
-			out.write("G01 X" + ((points[solution[0]].x-w2)*iscale) + " Y" + ((h2-points[solution[0]].y)*iscale) + "\n");
+			out.write("G01 X" + RoundOff((points[solution[0]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[0]].y)*iscale) + "\n");
 			// lower the pen
 			out.write("G00 Z0\n");
 
 			for(i=1;i<numPoints;++i) {
-				out.write("G01 X" + ((points[solution[i]].x-w2)*iscale) + " Y" + ((h2-points[solution[i]].y)*iscale) + "\n");
+				out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + "\n");
 			}
-			out.write("G01 X" + ((points[solution[0]].x-w2)*iscale) + " Y" + ((h2-points[solution[0]].y)*iscale) + "\n");
+			out.write("G01 X" + RoundOff((points[solution[0]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[0]].y)*iscale) + "\n");
 			// lift pen and return to home
 			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
