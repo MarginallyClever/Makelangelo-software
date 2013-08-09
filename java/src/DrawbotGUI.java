@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.9.6";
+	static final String version="0.9.9";
 	
 	static final long serialVersionUID=1;
 	
