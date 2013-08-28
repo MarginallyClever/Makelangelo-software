@@ -1,20 +1,32 @@
+//------------------------------------------------------------------------------
+// servo movement test
+// dan@marginallycelver.com 2012 may 06
+//------------------------------------------------------------------------------
+// Copyright at end of file.
+// please see http://www.github.com/MarginallyClever/Makelangelo for more information.
 
-public class Point3D {
-	float x, y, z;
-	
-	public Point3D(float xx,float yy,float zz) {
-		set(xx,yy,zz);
-	}
-	public Point3D(double xx,double yy,double zz) {
-		set((float)xx,(float)yy,(float)zz);
-	}
-	
-	public void set(float xx,float yy,float zz) {
-		x=xx;
-		y=yy;
-		z=zz;
-	}
+// Adafruit motor driver library
+#include <AFMotorDrawbot.h>
+
+// Default servo library
+#include <Servo.h> 
+
+static Servo s1;
+
+
+void setup() {
+  s1.attach(10);
+  s1.write(0);
+  delay(2000);
 }
+
+void loop() {
+    s1.write( 0 );
+    delay(750);
+    s1.write( 180 );
+    delay(750);
+}
+
 
 /**
  * This file is part of DrawbotGUI.

@@ -43,7 +43,7 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="0.9.9";
+	static final String version="1";
 	
 	static final long serialVersionUID=1;
 	
@@ -776,7 +776,7 @@ public class DrawbotGUI
 		d.anchor=GridBagConstraints.WEST;
 
 		c.gridx=0; c.gridy=5; c.gridwidth=4; c.gridheight=1;
-		driver.add(new JLabel("All values in millimeters."),c);
+		driver.add(new JLabel("All values in mm."),c);
 		c.gridwidth=1;
 		
 		c.ipadx=3;
@@ -933,8 +933,8 @@ public class DrawbotGUI
 		final JDialog driver = new JDialog(mainframe,"Configure Bobbins",true);
 		driver.setLayout(new GridBagLayout());
 
-		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter));
-		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter));
+		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
+		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter*10));
 
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
@@ -948,12 +948,12 @@ public class DrawbotGUI
 		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
 		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
 
+		c.gridx=2;  c.gridy=1;  driver.add(new JLabel("mm"),c);
+		c.gridx=2;  c.gridy=2;  driver.add(new JLabel("mm"),c);
+
 		c.gridx=0;  c.gridy=3;  driver.add(save,c);
 		c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
 		
-		c.gridx=0;  c.gridy=4;  c.gridwidth=2;  c.gridheight=2;
-		driver.add(new JLabel("All values in cm."),c);
-
 		Dimension s=mBobbin1.getPreferredSize();
 		s.width=80;
 		mBobbin1.setPreferredSize(s);
@@ -963,8 +963,8 @@ public class DrawbotGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
-						bobbin_left_diameter = Double.valueOf(mBobbin1.getText());
-						bobbin_right_diameter = Double.valueOf(mBobbin2.getText());
+						bobbin_left_diameter = Double.valueOf(mBobbin1.getText())/10.0;
+						bobbin_right_diameter = Double.valueOf(mBobbin2.getText())/10.0;
 						boolean data_is_sane=true;
 						if( bobbin_left_diameter <= 0 ) data_is_sane=false;
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
@@ -1245,8 +1245,8 @@ public class DrawbotGUI
 		if( subject == buttonAbout ) {
 			JOptionPane.showMessageDialog(null,"Makelangelo v"+version+"\n\n"
 					+"Created by Dan Royer (dan@marginallyclever.com).\n\n"
-					+"Get the latest version and read the documentation @ http://github.com/i-make-robots/DrawBot/\n"
-					+"Find out more at http://www.marginallyclever.com/\n");
+					+"Get the latest version and read the documentation @ https://github.com/MarginallyClever/Makelangelo\n"
+					+"Find out more at http://www.makelangelo.com/\n");
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1887,3 +1887,21 @@ public class DrawbotGUI
 	    });
     }
 }
+
+
+/**
+ * This file is part of DrawbotGUI.
+ *
+ * DrawbotGUI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * DrawbotGUI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */

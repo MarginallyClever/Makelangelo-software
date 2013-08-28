@@ -2,8 +2,8 @@
 // Draw robot
 // dan@marginallycelver.com 2012 feb 11
 //------------------------------------------------------------------------------
-// Copyright at end of file.
-// please see http://www.github.com/i-make-robots/Drawbot for more information.
+// Copyright at end of file.  Please see
+// http://www.github.com/MarginallyClever/Makelangelo for more information.
 
 
 //------------------------------------------------------------------------------
@@ -333,6 +333,13 @@ static void line_safe(float x,float y,float z) {
 
 
 //------------------------------------------------------------------------------
+void pause(long ms) {
+  delay(ms/1000);
+  delayMicroseconds(ms%1000);
+}
+
+
+//------------------------------------------------------------------------------
 static void line(float x,float y,float z) {
   long l1,l2;
   IK(x,y,l1,l2);
@@ -357,7 +364,7 @@ static void line(float x,float y,float z) {
         over-=ad1;
         m2.onestep(dir2);
       }
-      delayMicroseconds(step_delay);
+      pause(step_delay);
       if(readSwitches()) return;
     }
   } else {
@@ -368,7 +375,7 @@ static void line(float x,float y,float z) {
         over-=ad2;
         m1.onestep(dir1);
       }
-      delayMicroseconds(step_delay);
+      pause(step_delay);
       if(readSwitches()) return;
     }
   }
@@ -1004,25 +1011,19 @@ void loop() {
 }
 
 
-
-//------------------------------------------------------------------------------
-// Copyright (C) 2012 Dan Royer (dan@marginallyclever.com)
-// Permission is hereby granted, free of charge, to any person obtaining a 
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation 
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-//------------------------------------------------------------------------------
-
+/**
+ * This file is part of DrawbotGUI.
+ *
+ * DrawbotGUI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * DrawbotGUI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */
