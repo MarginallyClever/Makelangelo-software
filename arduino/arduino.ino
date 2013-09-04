@@ -87,7 +87,7 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 // Adafruit motor driver library
-#include <AFMotorDrawbot.h>
+#include <AccelStepper.h>
 
 // Default servo library
 #include <Servo.h> 
@@ -105,9 +105,9 @@
 //------------------------------------------------------------------------------
 // VARIABLES
 //------------------------------------------------------------------------------
-// Initialize Adafruit stepper controller
-static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
-static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
+// Initialize ULN2003 stepper driver
+static AccelStepper m1(4,2,4,3,5); //first number is type of stepper motor, and ULN2003 stepper driver flips the middle 2 pins 
+static AccelStepper m2(4,6,8,7,9);
 
 static Servo s1;
 
@@ -127,6 +127,8 @@ char m1d='L';
 char m2d='R';
 
 // which way are the spools wound, relative to motor movement?
+#define FORWARD 1
+#define BACKWARD -1
 int M1_REEL_IN  = FORWARD;
 int M1_REEL_OUT = BACKWARD;
 int M2_REEL_IN  = FORWARD;
@@ -178,11 +180,11 @@ static void adjustSpoolDiameter(float diameter1,float diameter2) {
   SPOOL_DIAMETER1 = diameter1;
   float SPOOL_CIRC = SPOOL_DIAMETER1*PI;  // circumference
   THREADPERSTEP1 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-  
+
   SPOOL_DIAMETER2 = diameter2;
   SPOOL_CIRC = SPOOL_DIAMETER2*PI;  // circumference
   THREADPERSTEP2 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-  
+
   float MAX_VEL1 = MAX_STEPS_S * THREADPERSTEP1;  // cm/s
   float MAX_VEL2 = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
   MAX_VEL = MAX_VEL1 > MAX_VEL2 ? MAX_VEL1 : MAX_VEL2;
@@ -234,11 +236,11 @@ static void setFeedRate(float v) {
     if(feed_rate > MAX_VEL) feed_rate=MAX_VEL;
     if(feed_rate < MIN_VEL) feed_rate=MIN_VEL;
   }
-  
+
   long step_delay1 = 1000000.0 / (feed_rate/THREADPERSTEP1);
   long step_delay2 = 1000000.0 / (feed_rate/THREADPERSTEP2);
   step_delay = step_delay1 > step_delay2 ? step_delay1 : step_delay2;
-  
+
   Serial.print(F("step_delay="));
   Serial.println(step_delay);
 }
@@ -258,7 +260,7 @@ static void printFeedRate() {
 static void setPenAngle(int pen_angle) {
   if(posz!=pen_angle) {
     posz=pen_angle;
-    
+
     if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
     if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
 
@@ -289,7 +291,7 @@ static void FK(float l1, float l2,float &x,float &y) {
   float a = l1 * THREADPERSTEP1;
   float b = (limit_right-limit_left);
   float c = l2 * THREADPERSTEP2;
-  
+
   // slow, uses trig
   //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
   //x = cos(theta)*l1 + limit_left;
@@ -309,12 +311,12 @@ static void line_safe(float x,float y,float z) {
   float dy=y-posy;
 
   float len=sqrt(dx*dx+dy*dy);
-  
+
   if(len<=CM_PER_SEGMENT) {
     line(x,y,z);
     return;
   }
-  
+
   // too long!
   long pieces=floor(len/CM_PER_SEGMENT);
   float x0=posx;
@@ -325,8 +327,8 @@ static void line_safe(float x,float y,float z) {
     a=(float)j/(float)pieces;
 
     line((x-x0)*a+x0,
-         (y-y0)*a+y0,
-         (z-z0)*a+z0);
+    (y-y0)*a+y0,
+    (z-z0)*a+z0);
   }
   line(x,y,z);
 }
@@ -352,28 +354,29 @@ static void line(float x,float y,float z) {
   int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
   long over=0;
   long i;
-  
+
   setPenAngle((int)z);
-  
+
   // bresenham's line algorithm.
   if(ad1>ad2) {
     for(i=0;i<ad1;++i) {
-      m1.onestep(dir1);
+      m1.move(dir1);m1.run();
       over+=ad2;
       if(over>=ad1) {
         over-=ad1;
-        m2.onestep(dir2);
+        m2.move(dir2);m2.run();
       }
       pause(step_delay);
       if(readSwitches()) return;
     }
-  } else {
+  } 
+  else {
     for(i=0;i<ad2;++i) {
-      m2.onestep(dir2);
+      m2.move(dir2);m2.run();
       over+=ad1;
       if(over>=ad2) {
         over-=ad2;
-        m1.onestep(dir1);
+        m1.move(dir1);m1.run();
       }
       pause(step_delay);
       if(readSwitches()) return;
@@ -404,12 +407,12 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
   float angle1=atan3(dy,dx);
   float angle2=atan3(y-cy,x-cx);
   float theta=angle2-angle1;
-  
+
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
-  
+
   theta=angle2-angle1;
-  
+
   // get length of arc
   // float circ=PI*2.0*radius;
   // float len=theta*circ/(PI*2.0);
@@ -417,13 +420,13 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
   float len = abs(theta) * radius;
 
   int i, segments = floor( len / CM_PER_SEGMENT );
- 
+
   float nx, ny, nz, angle3, scale;
 
   for(i=0;i<segments;++i) {
     // interpolate around the arc
     scale = ((float)i)/((float)segments);
-    
+
     angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
@@ -431,7 +434,7 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
     // send it to the planner
     line(nx,ny,nz);
   }
-  
+
   line(x,y,z);
 }
 
@@ -442,7 +445,7 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
 static void teleport(float x,float y) {
   posx=x;
   posy=y;
-  
+
   // @TODO: posz?
   long L1,L2;
   IK(posx,posy,L1,L2);
@@ -469,51 +472,53 @@ static void help() {
 static void FindHome() {
 #ifdef USE_LIMIT_SWITCH
   Serial.println(F("Homing..."));
-  
+
   if(readSwitches()) {
     Serial.println(F("** ERROR **"));
     Serial.println(F("Problem: Plotter is already touching switches."));
     Serial.println(F("Solution: Please unwind the strings a bit and try again."));
     return;
   }
-  
+
   int step_delay=3;
   int safe_out=50;
-  
+
   // reel in the left motor until contact is made.
   Serial.println(F("Find left..."));
   do {
-    m1.step(1,M1_REEL_IN );
-    m2.step(1,M2_REEL_OUT);
+    m1.move(M1_REEL_IN );m1.run();
+    m2.move(1*M2_REEL_OUT);m2.run();
     delay(step_delay);
-  } while(!readSwitches());
+  } 
+  while(!readSwitches());
   laststep1=0;
-  
+
   // back off so we don't get a false positive on the next motor
   int i;
   for(i=0;i<safe_out;++i) {
-    m1.step(1,M1_REEL_OUT);
+    m1.move(M1_REEL_OUT);m1.run();
     delay(step_delay);
   }
   laststep1=safe_out;
-  
+
   // reel in the right motor until contact is made
   Serial.println(F("Find right..."));
   do {
-    m1.step(1,M1_REEL_OUT);
-    m2.step(1,M2_REEL_IN );
+    m1.move(M1_REEL_OUT);run();
+    m2.move(M2_REEL_IN );run();
     delay(step_delay);
     laststep1++;
-  } while(!readSwitches());
+  } 
+  while(!readSwitches());
   laststep2=0;
-  
+
   // back off so we don't get a false positive that kills line()
   for(i=0;i<safe_out;++i) {
-    m2.step(1,M2_REEL_OUT);
+    m2.move(M2_REEL_OUT);run();
     delay(step_delay);
   }
   laststep2=safe_out;
-  
+
   Serial.println(F("Centering..."));
   line(0,0,posz);
 #endif // USE_LIMIT_SWITCH
@@ -536,14 +541,22 @@ static void where() {
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print(m1d);              Serial.print(F("="));  
-  Serial.print(limit_top);        Serial.print(F(","));
-  Serial.print(limit_left);       Serial.print(F("\n"));
-  Serial.print(m2d);              Serial.print(F("="));  
-  Serial.print(limit_top);        Serial.print(F(","));
-  Serial.print(limit_right);      Serial.print(F("\n"));
-  Serial.print(F("Bottom="));     Serial.println(limit_bottom);
-  Serial.print(F("Feed rate="));  printFeedRate();
+  Serial.print(m1d);              
+  Serial.print(F("="));  
+  Serial.print(limit_top);        
+  Serial.print(F(","));
+  Serial.print(limit_left);       
+  Serial.print(F("\n"));
+  Serial.print(m2d);              
+  Serial.print(F("="));  
+  Serial.print(limit_top);        
+  Serial.print(F(","));
+  Serial.print(limit_right);      
+  Serial.print(F("\n"));
+  Serial.print(F("Bottom="));     
+  Serial.println(limit_bottom);
+  Serial.print(F("Feed rate="));  
+  printFeedRate();
 }
 
 
@@ -552,7 +565,7 @@ static void printConfig() {
 void EEPROM_writeLong(int ee, long value) {
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
-  EEPROM.write(ee++, *p++);
+    EEPROM.write(ee++, *p++);
 }
 
 
@@ -562,7 +575,7 @@ float EEPROM_readLong(int ee) {
   long value = 0;
   byte* p = (byte*)(void*)&value;
   for (int i = 0; i < sizeof(value); i++)
-  *p++ = EEPROM.read(ee++);
+    *p++ = EEPROM.read(ee++);
   return value;
 }
 
@@ -584,17 +597,19 @@ static void LoadConfig() {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
     adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
-                        (float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
+    (float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
     // save the new data so the next load doesn't screw up one bobbin size
     SaveSpoolDiameter();
     // update the EEPROM version
     EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
-  } else if(version_number==EEPROM_VERSION) {
+  } 
+  else if(version_number==EEPROM_VERSION) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
     adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
-                        (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
-  } else {
+    (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
+  } 
+  else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println(F("An Error Occurred during LoadConfig"));
   }
@@ -616,26 +631,27 @@ static void SaveSpoolDiameter() {
 #ifdef USE_SD_CARD
 //------------------------------------------------------------------------------
 void SD_PrintDirectory(File dir, int numTabs) {
-   while(true) {
+  while(true) {
 
-     File entry =  dir.openNextFile();
-     if (! entry) {
-       // no more files
-       Serial.println(F("**nomorefiles**"));
-     }
-     for (uint8_t i=0; i<numTabs; i++) {
-       Serial.print('\t');
-     }
-     Serial.print(entry.name());
-     if (entry.isDirectory()) {
-       Serial.println(F("/"));
-       SD_PrintDirectory(entry, numTabs+1);
-     } else {
-       // files have sizes, directories do not
-       Serial.print(F("\t\t"));
-       Serial.println(entry.size(), DEC);
-     }
-   }
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      Serial.println(F("**nomorefiles**"));
+    }
+    for (uint8_t i=0; i<numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println(F("/"));
+      SD_PrintDirectory(entry, numTabs+1);
+    } 
+    else {
+      // files have sizes, directories do not
+      Serial.print(F("\t\t"));
+      Serial.println(entry.size(), DEC);
+    }
+  }
 }
 #endif // USE_SD_CARD
 
@@ -659,7 +675,7 @@ static void SD_ProcessFile(char *filename) {
     Serial.println(F(" not found."));
     return;
   }
-  
+
   int c;
   while(f.peek() != -1) {
     c=f.read();
@@ -676,7 +692,7 @@ static void SD_ProcessFile(char *filename) {
       sofar=0;
     }
   }
-  
+
   f.close();
 #endif // USE_SD_CARD
 }
@@ -685,7 +701,7 @@ static void SD_ProcessFile(char *filename) {
 //------------------------------------------------------------------------------
 static int processSubcommand() {
   int found=0;
-  
+
   char *ptr=buffer;
   while(ptr && ptr<buffer+sofar && strlen(ptr)) {
     if(!strncmp(ptr,"G20",3)) {
@@ -693,23 +709,26 @@ static int processSubcommand() {
       strcpy(mode_name,"in");
       printFeedRate();
       found=1;
-    } else if(!strncmp(ptr,"G21",3)) {
+    } 
+    else if(!strncmp(ptr,"G21",3)) {
       mode_scale=0.1;  // mm -> cm
       strcpy(mode_name,"mm");
       printFeedRate();
       found=1;
-    } else if(!strncmp(ptr,"G90",3)) {
+    } 
+    else if(!strncmp(ptr,"G90",3)) {
       // absolute mode
       absolute_mode=1;
       found=1;
-    } else if(!strncmp(ptr,"G91",3)) {
+    } 
+    else if(!strncmp(ptr,"G91",3)) {
       // relative mode
       absolute_mode=0;
       found=1;
     }
     ptr=strchr(ptr,' ')+1;
   }
-  
+
   return found;
 }
 
@@ -718,59 +737,84 @@ static int processSubcommand() {
 static void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
-  
+
   if(!strncmp(buffer,"HELP",4)) {
     help();
-  } else if(!strncmp(buffer,"UID",3)) {
+  } 
+  else if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"G28",3)) {
+  } 
+  else if(!strncmp(buffer,"G28",3)) {
     FindHome();
-  } else if(!strncmp(buffer,"TELEPORT",8)) {
+  } 
+  else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
     float yy=posy;
-  
+
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      default: ptr=0; break;
+      case 'X': 
+        xx=atof(ptr+1)*mode_scale;  
+        break;
+      case 'Y': 
+        yy=atof(ptr+1)*mode_scale;  
+        break;
+      default: 
+        ptr=0; 
+        break;
       }
     }
 
     teleport(xx,yy);
-  } else 
-  if(!strncmp(buffer,"M114",4)) {
+  } 
+  else 
+    if(!strncmp(buffer,"M114",4)) {
     where();
-  } else if(!strncmp(buffer,"M18",3)) {
+  } 
+  else if(!strncmp(buffer,"M18",3)) {
     // disable motors
-    m1.release();
-    m2.release();
-  } else if(!strncmp(buffer,"CONFIG",6)) {
+    m1.disableOutputs ();
+    m2.disableOutputs();
+  } 
+  else if(!strncmp(buffer,"CONFIG",6)) {
     float tt=limit_top;
     float bb=limit_bottom;
     float rr=limit_right;
     float ll=limit_left;
     char gg=m1d;
     char hh=m2d;
-    
+
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'T': tt=atof(ptr+1);  break;
-      case 'B': bb=atof(ptr+1);  break;
-      case 'R': rr=atof(ptr+1);  break;
-      case 'L': ll=atof(ptr+1);  break;
-      case 'G': gg=*(ptr+1);  break;
-      case 'H': hh=*(ptr+1);  break;
+      case 'T': 
+        tt=atof(ptr+1);  
+        break;
+      case 'B': 
+        bb=atof(ptr+1);  
+        break;
+      case 'R': 
+        rr=atof(ptr+1);  
+        break;
+      case 'L': 
+        ll=atof(ptr+1);  
+        break;
+      case 'G': 
+        gg=*(ptr+1);  
+        break;
+      case 'H': 
+        hh=*(ptr+1);  
+        break;
       case 'I':
         if(atoi(ptr+1)>0) {
           M1_REEL_IN=FORWARD;
           M1_REEL_OUT=BACKWARD;
-        } else {
+        } 
+        else {
           M1_REEL_IN=BACKWARD;
           M1_REEL_OUT=FORWARD;
         }
@@ -779,14 +823,15 @@ static void processCommand() {
         if(atoi(ptr+1)>0) {
           M2_REEL_IN=FORWARD;
           M2_REEL_OUT=BACKWARD;
-        } else {
+        } 
+        else {
           M2_REEL_IN=BACKWARD;
           M2_REEL_OUT=FORWARD;
         }
         break;
       }
     }
-    
+
     // @TODO: check t>b, r>l ?
     limit_top=tt;
     limit_bottom=bb;
@@ -794,75 +839,99 @@ static void processCommand() {
     limit_left=ll;
     m1d=gg;
     m2d=hh;
-    
+
     teleport(0,0);
     printConfig();
-  } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
-         || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
+  } 
+  else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
+    || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
     // line
     processSubcommand();
     float xx, yy, zz;
-    
+
     if(absolute_mode==1) {
       xx=posx;
       yy=posy;
       zz=posz;
-    } else {
+    } 
+    else {
       xx=0;
       yy=0;
       zz=0;
     }
-  
+
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
+      case 'X': 
+        xx=atof(ptr+1)*mode_scale;  
+        break;
+      case 'Y': 
+        yy=atof(ptr+1)*mode_scale;  
+        break;
+      case 'Z': 
+        zz=atof(ptr+1);  
+        break;
+      case 'F': 
+        setFeedRate(atof(ptr+1));  
+        break;
       }
     }
- 
+
     if(absolute_mode==0) {
       xx+=posx;
       yy+=posy;
       zz+=posz;
     }
-    
+
     line_safe(xx,yy,zz);
-  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
-         || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
+  } 
+  else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
+    || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
     // arc
     processSubcommand();
     float xx, yy, zz;
     float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
     float ii = 0;
     float jj = 0;
-    
+
     if(absolute_mode==1) {
       xx=posx;
       yy=posy;
       zz=posz;
-    } else {
+    } 
+    else {
       xx=0;
       yy=0;
       zz=0;
     }
-    
+
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'I': ii=atof(ptr+1)*mode_scale;  break;
-      case 'J': jj=atof(ptr+1)*mode_scale;  break;
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
+      case 'I': 
+        ii=atof(ptr+1)*mode_scale;  
+        break;
+      case 'J': 
+        jj=atof(ptr+1)*mode_scale;  
+        break;
+      case 'X': 
+        xx=atof(ptr+1)*mode_scale;  
+        break;
+      case 'Y': 
+        yy=atof(ptr+1)*mode_scale;  
+        break;
+      case 'Z': 
+        zz=atof(ptr+1);  
+        break;
+      case 'F': 
+        setFeedRate(atof(ptr+1));  
+        break;
       }
     }
- 
+
     if(absolute_mode==0) {
       xx+=posx;
       yy+=posy;
@@ -870,7 +939,8 @@ static void processCommand() {
     }
 
     arc(posx+ii,posy+jj,xx,yy,zz,dd);
-  } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
+  } 
+  else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
     // dwell
     long xx=0;
 
@@ -880,12 +950,15 @@ static void processCommand() {
       switch(*ptr) {
       case 'X': 
       case 'U': 
-      case 'P': xx=atoi(ptr+1);  break;
+      case 'P': 
+        xx=atoi(ptr+1);  
+        break;
       }
     }
 
     delay(xx);
-  } else if(!strncmp(buffer,"D00 ",4)) {
+  } 
+  else if(!strncmp(buffer,"D00 ",4)) {
     // move one motor
     char *ptr=strchr(buffer,' ')+1;
     int amount = atoi(ptr+1);
@@ -893,23 +966,35 @@ static void processCommand() {
     if(*ptr == m1d) {
       dir = amount < 0 ? M1_REEL_IN : M1_REEL_OUT;
       amount=abs(amount);
-      for(i=0;i<amount;++i) {  m1.step(1,dir);  delay(2);  }
-    } else if(*ptr == m2d) {
+      for(i=0;i<amount;++i) {  
+        m1.move(dir); m1.run();
+        delay(2);  
+      }
+    } 
+    else if(*ptr == m2d) {
       dir = amount < 0 ? M2_REEL_IN : M2_REEL_OUT;
       amount = abs(amount);
-      for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
+      for(i=0;i<amount;++i) {  
+        m2.move(dir);  m2.run();
+        delay(2);  
+      }
     }
-  }  else if(!strncmp(buffer,"D01 ",4)) {
+  }  
+  else if(!strncmp(buffer,"D01 ",4)) {
     // adjust spool diameters
     float amountL=SPOOL_DIAMETER1;
     float amountR=SPOOL_DIAMETER2;
-    
+
     char *ptr=buffer;
     while(ptr && ptr<buffer+sofar && strlen(ptr)) {
       ptr=strchr(ptr,' ')+1;
       switch(*ptr) {
-      case 'L': amountL=atof(ptr+1);  break;
-      case 'R': amountR=atof(ptr+1);  break;
+      case 'L': 
+        amountL=atof(ptr+1);  
+        break;
+      case 'R': 
+        amountR=atof(ptr+1);  
+        break;
       }
     }
 
@@ -920,18 +1005,22 @@ static void processCommand() {
       // Update EEPROM
       SaveSpoolDiameter();
     }
-  } else if(!strncmp(buffer,"D02 ",4)) {
+  } 
+  else if(!strncmp(buffer,"D02 ",4)) {
     Serial.print('L');
     Serial.print(SPOOL_DIAMETER1);
     Serial.print(F(" R"));
     Serial.println(SPOOL_DIAMETER2);
-  } else if(!strncmp(buffer,"D03 ",4)) {
+  } 
+  else if(!strncmp(buffer,"D03 ",4)) {
     // read directory
     SD_ListFiles();
-  } else if(!strncmp(buffer,"D04 ",4)) {
+  } 
+  else if(!strncmp(buffer,"D04 ",4)) {
     // read file
     SD_ProcessFile(strchr(buffer,' ')+1);
-  } else {
+  } 
+  else {
     if(processSubcommand()==0) {
       Serial.print(F("Invalid command '"));
       Serial.print(buffer);
@@ -944,14 +1033,17 @@ static void processCommand() {
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
-  
+  m1.setMaxSpeed(50000);
+  m1.setAcceleration(30000);
+  m2.setMaxSpeed(50000);
+  m2.setAcceleration(30000);
   // initialize the read buffer
   sofar=0;
   // start communications
   Serial.begin(BAUD);
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
-  
+
 #ifdef USE_SD_CARD
   SD.begin();
   SD_ListFiles();
@@ -960,16 +1052,16 @@ void setup() {
   // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
-  
+
   setFeedRate(MAX_VEL*30/mode_scale);  // *30 because i also /2
-  
+
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
-  
+
   // turn on the pull up resistor
   digitalWrite(L_PIN,HIGH);
   digitalWrite(R_PIN,HIGH);
-  
+
   // display the help at startup.
   help();
 
@@ -978,7 +1070,7 @@ void setup() {
   velx=0;
   velx=0;
   setPenAngle(PEN_UP_ANGLE);
-  
+
   Serial.print(F("> "));
 }
 
@@ -991,20 +1083,20 @@ void loop() {
     buffer[sofar++]=Serial.read();
     if(buffer[sofar-1]==';') break;  // in case there are multiple instructions
   }
- 
+
   // if we hit a semi-colon, assume end of instruction.
   if(sofar>0 && buffer[sofar-1]==';') {
     buffer[sofar]=0;
-    
+
     // echo confirmation
-//    Serial.println(F(buffer));
- 
+    //    Serial.println(F(buffer));
+
     // do something with the command
     processCommand();
- 
+
     // reset the buffer
     sofar=0;
- 
+
     // echo completion
     Serial.print(F("> "));
   }
