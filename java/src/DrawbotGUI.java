@@ -248,9 +248,12 @@ public class DrawbotGUI
 		try {
 			img = ImageIO.read(new File(filename));
 			
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),0.9f); 
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),0.85f); 
 			img = rs.Process(img);
-			
+/*
+			Filter_Translate t = new Filter_Translate(); 
+			img = t.Process(img);
+*/
 			Filter_BlackAndWhite bwc = new Filter_BlackAndWhite(); 
 			img = bwc.Process(img);
 			

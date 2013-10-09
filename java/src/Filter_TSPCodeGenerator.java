@@ -9,8 +9,8 @@ import java.text.DecimalFormat;
 
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-
 /**
+
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
@@ -76,9 +76,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							assert(newlen>len);
 							len=newlen;
 							
-							//DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 							int new_progress=(int)((float)t_elapsed/(float)time_limit);
 							if(new_progress != progress ) {
+								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @1 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 								progress = new_progress;
 								setProgress(progress);
 							}
@@ -115,9 +115,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							// find the new tour length
 							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
 							
-							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 							int new_progress=(int)((float)t_elapsed/(float)time_limit);
 							if(new_progress != progress ) {
+								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 								progress = new_progress;
 								setProgress(progress);
 							}
@@ -154,10 +154,10 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 							t_elapsed=System.currentTimeMillis()-t_start;
 							// find the new tour length
 							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
-							
-							DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
+
 							int new_progress=(int)((float)t_elapsed/(float)time_limit);
 							if(new_progress != progress ) {
+								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
 								progress = new_progress;
 								setProgress(progress);
 							}
