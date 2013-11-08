@@ -84,19 +84,20 @@ public class DrawbotGUI
 	private double limit_right=10;
 	private int image_dpi;
 	private int startingPositionIndex;
+	private boolean m1invert=false;
+	private boolean m2invert=false;
+	private double bobbin_left_diameter=0.95;
+	private double bobbin_right_diameter=0.95;
+	private long penUpNumber, penDownNumber;
 	
 	// paper area
 	private double paper_top=10;
 	private double paper_bottom=-10;
 	private double paper_left=-10;
 	private double paper_right=10;
+	private double paper_margin=0.85;
 
-	// machine settings
-	private boolean m1invert=false;
-	private boolean m2invert=false;
-	private double bobbin_left_diameter=0.95;
-	private double bobbin_right_diameter=0.95;
-	private long penUpNumber, penDownNumber;
+	// machine settings while running
 	private double feed_rate;
 	private boolean penIsUp,penIsUpBeforePause;
 	
@@ -243,27 +244,42 @@ public class DrawbotGUI
 	}
 	
 	public void LoadImage(String filename) {
-		BufferedImage img;
-		
 		try {
-			img = ImageIO.read(new File(filename));
-			
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),0.85f); 
-			img = rs.Process(img);
 /*
-			Filter_Translate t = new Filter_Translate(); 
-			img = t.Process(img);
-*/
-			Filter_BlackAndWhite bwc = new Filter_BlackAndWhite(); 
-			img = bwc.Process(img);
+			BufferedImage img = ImageIO.read(new File(filename));
+			
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
+			img = rs.Process(img);
+
+//			Filter_Translate t = new Filter_Translate(); 
+//			img = t.Process(img);
+
+			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(1); 
+			img = bw.Process(img);
 			
 			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 			img = dither.Process(img);
 
 	        String workingDirectory=System.getProperty("user.dir");
 			String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-			Filter_TSPGcodeGenerator tsp = new Filter_TSPGcodeGenerator(ngcPair,getScale());
-			tsp.Process(img);
+			Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(ngcPair,getScale());
+			generator.Process(img);
+/*/
+			BufferedImage img = ImageIO.read(new File(filename));
+			
+			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
+			img = rs.Process(img);
+			
+			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(10); 
+			img = bw.Process(img);
+
+	        String workingDirectory=System.getProperty("user.dir");
+			String ngcPair = workingDirectory+"temp.ngc";
+			Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(ngcPair,getScale(),paper_margin);
+			generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+			generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
+			generator.Process(img);
+//*/
 		}
 		catch(IOException e) {}
 
@@ -1004,7 +1020,8 @@ public class DrawbotGUI
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
-		image_dpi= Integer.valueOf(prefs.get("image_dpi", "100"));
+		image_dpi= Integer.valueOf(prefs.get(id+"image_dpi", "100"));
+		paper_margin = Double.valueOf(prefs.get(id+"_paper_margin","0.85"));
 	}
 
 	void SaveConfig() {
@@ -1021,7 +1038,8 @@ public class DrawbotGUI
 		prefs.put(id+"_penDown", Long.toString(penDownNumber));
 		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
 		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
-		prefs.put("image_dpi",Integer.toString(image_dpi));
+		prefs.put(id+"image_dpi",Integer.toString(image_dpi));
+		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
 	}
 	
 	void SendConfig() {

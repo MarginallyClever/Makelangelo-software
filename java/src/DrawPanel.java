@@ -215,7 +215,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					null);
 			return;
 		}
-*/
+//*/
 		// draw image
 		if(instructions==null) return;
 		
@@ -270,7 +270,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line
-				g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
+				if(z<0.01) {
+					g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));					
+				}
 				px=x;
 				py=y;
 				pz=z;

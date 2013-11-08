@@ -2,27 +2,34 @@ import java.awt.image.BufferedImage;
 
 	
 /**
- * Converts an image to black & white, reduces contrast (washes it out)
+ * Converts an image to a fixed number of black & white levels - eg shades of grey.
  * @author Dan
  *
  */
 public class Filter_BlackAndWhite extends Filter {
-	float max_intensity, min_intensity;
-	float max_threshold, min_threshold;
+	int levels=2;
 
+	Filter_BlackAndWhite(int _levels) {
+		levels = _levels-1;
+	}
+	
 	public BufferedImage Process(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();
 		int x,y,i;
 
-		max_intensity=-1000;
-		min_intensity=1000;
+		double max_intensity=-1000;
+		double min_intensity=1000;
+		double ilevels;
+		
+		if( levels != 0 ) ilevels = 1.0 / levels;
+		else ilevels = 1;
+		
 		for(y=0;y<h;++y) {
 			for(x=0;x<w;++x) {
 				i=decode(img.getRGB(x, y));
 				if(max_intensity<i) max_intensity=i;
 				if(min_intensity>i) min_intensity=i;
-				img.setRGB(x, y, encode(i));
 			}
 		}
 		System.out.println("min_intensity="+min_intensity);
@@ -32,9 +39,11 @@ public class Filter_BlackAndWhite extends Filter {
 			for(x=0;x<w;++x) {
 				i=decode(img.getRGB(x, y));
 				
-				float a = (float)(i - min_intensity) / (float)(max_intensity - min_intensity);
-				int b = (int)( a * 95.0f + 200.0f );
+				double a = (double)(i - min_intensity) / (float)(max_intensity - min_intensity);
+				double c = Math.floor( a * levels ) * ilevels;
+				int b = (int)( c * 255.0 );
 				if(b>255) b=255;
+				if(b<0) b=0;
 				//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
 				img.setRGB(x, y, encode(b));
 			}

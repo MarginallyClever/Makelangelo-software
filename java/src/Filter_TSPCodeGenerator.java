@@ -164,7 +164,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 						}
 					}
 				}
-				//len=GetTourLength(solution);
+				len=GetTourLength(solution);
 			} while(once==1 && t_elapsed<time_limit && !isCancelled());
 			
 			return null;
@@ -296,7 +296,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	
 	
 	private double RoundOff(double value) {
-		return Math.round(value * 1000) / 1000;
+		return Math.floor(value * 1000) / 1000;
 	}
 	
 	/**
