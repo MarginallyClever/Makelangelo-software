@@ -702,8 +702,14 @@ public class DrawbotGUI
 		//input_image_dpi.setSize(250,input_image_dpi.getSize().height);
 		input_image_dpi.setMajorTickSpacing(100);
 		input_image_dpi.setMinorTickSpacing(25);
-		input_image_dpi.setPaintTicks(true);
+		input_image_dpi.setPaintTicks(false);
 		input_image_dpi.setPaintLabels(true);
+		
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(paper_margin*100));
+		input_paper_margin.setMajorTickSpacing(20);
+		input_paper_margin.setMinorTickSpacing(5);
+		input_paper_margin.setPaintTicks(false);
+		input_paper_margin.setPaintLabels(true);
 		
 		final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the global total"));
 		allow_metrics.setSelected(allowMetrics);
@@ -718,7 +724,8 @@ public class DrawbotGUI
 		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);			c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image Resolution"),c);	c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);	c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
 
 		c.gridwidth=1;	c.gridx=2;  c.gridy=9;  driver.add(cancel,c);
 		c.gridwidth=1;	c.gridx=1;  c.gridy=9;  driver.add(save,c);
@@ -733,13 +740,14 @@ public class DrawbotGUI
 
 					if(subject == save) {
 						image_dpi=input_image_dpi.getValue();
+						paper_margin=(100-input_paper_margin.getValue())*0.01;
 						
 						allowMetrics = allow_metrics.isSelected();
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
-						prefs.put("image_dpi",Integer.toString(image_dpi));
+						SaveConfig();
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -1005,6 +1013,9 @@ public class DrawbotGUI
 		driver.setVisible(true);
 	}
 
+	/**
+	 * Load the machine configuration
+	 */
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
 		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
@@ -1020,10 +1031,14 @@ public class DrawbotGUI
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
-		image_dpi= Integer.valueOf(prefs.get(id+"image_dpi", "100"));
+		// @TODO: move these values to TSP filter preferences
+		image_dpi= Integer.valueOf(prefs.get(id+"_image_dpi", "100"));
 		paper_margin = Double.valueOf(prefs.get(id+"_paper_margin","0.85"));
 	}
 
+	/**
+	 * Save the machine configuration
+	 */
 	void SaveConfig() {
 		String id=Long.toString(robot_uid);
 		prefs.put(id+"_limit_top", Double.toString(limit_top));
@@ -1038,10 +1053,14 @@ public class DrawbotGUI
 		prefs.put(id+"_penDown", Long.toString(penDownNumber));
 		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
 		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
-		prefs.put(id+"image_dpi",Integer.toString(image_dpi));
+		// @TODO: move these values to TSP filter preferences
+		prefs.put(id+"_image_dpi",Integer.toString(image_dpi));
 		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
 	}
 	
+	/**
+	 * Send the machine configuration to the robot
+	 */
 	void SendConfig() {
 		if(!portConfirmed) return;
 		

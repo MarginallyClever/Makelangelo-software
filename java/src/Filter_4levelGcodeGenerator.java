@@ -21,17 +21,6 @@ class Filter_4levelGcodeGenerator extends Filter {
 	ProgressMonitor pm;
 	double scale,iscale;
 	double margin;
-
-	// paper area
-	private double paper_top=10;
-	private double paper_bottom=-10;
-	private double paper_left=-10;
-	private double paper_right=10;
-	// machine settings
-	private double limit_top=10;
-	private double limit_bottom=-10;
-	private double limit_left=-10;
-	private double limit_right=10;
 	
 	
 	Filter_4levelGcodeGenerator(String _dest,double _scale,double _margin) {
@@ -41,31 +30,19 @@ class Filter_4levelGcodeGenerator extends Filter {
 	}
 	
 	
-	public void SetPaperLimits(double _paper_top, double _paper_bottom, double _paper_left, double _paper_right) {
-		paper_top=_paper_top;
-		paper_bottom=_paper_bottom;
-		paper_left=_paper_left;
-		paper_right=_paper_right;
-	}
-	
-	public void SetMachineLimits(double _limit_top, double _limit_bottom, double _limit_left, double _limit_right) {
-		limit_top=_limit_top;
-		limit_bottom=_limit_bottom;
-		limit_left=_limit_left;
-		limit_right=_limit_right;
-	}
+	public void SetPaperLimits(double _paper_top, double _paper_bottom, double _paper_left, double _paper_right) {}
+	public void SetMachineLimits(double _limit_top, double _limit_bottom, double _limit_left, double _limit_right) {}
 
+	
 	private double RoundOff(double value) {
 		return value;//Math.round(value * 1000) / 1000;
 	}
 	
 	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
-		boolean changed=false;
 		if(lastup!=up) {
 			lastup=up;
 			if(up) out.write("G00 Z90\n");
 			else   out.write("G00 Z0\n");			
-			changed=true;
 		}
 		out.write("G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+"\n");
 	}

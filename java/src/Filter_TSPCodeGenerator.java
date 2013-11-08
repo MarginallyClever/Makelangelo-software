@@ -9,8 +9,9 @@ import java.text.DecimalFormat;
 
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-/**
 
+
+/**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
