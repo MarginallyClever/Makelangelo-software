@@ -24,6 +24,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	boolean connected=false;
 	boolean running=false;
 
+	// config
+	boolean show_pen_up=false;
+	
 	// motion control
 	boolean mouseIn=false;
 	int buttonPressed=MouseEvent.NOBUTTON;
@@ -67,6 +70,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		limit_left=l;
 		limit_right=r;
 		repaint();
+	}
+	
+	
+	public void setShowPenUp(boolean state) {
+		show_pen_up=state;
+	}
+	
+	public boolean getShowPenUp() {
+		return show_pen_up;
 	}
 	
 	
@@ -225,7 +237,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		int i,j;
 		
 		for(i=0;i<instructions.size();++i) {
-			
 			String line=instructions.get(i);
 			String[] pieces=line.split(";");
 			if(pieces.length==0) continue;
@@ -256,12 +267,12 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			// is pen up or down?
 			if(running && i<=linesProcessed) {
 				g2d.setColor( Color.RED );
-			} else if(running && i>linesProcessed && i<=linesProcessed+20) {
+			} else if(running && i>linesProcessed && i<=linesProcessed+50) {
 				g2d.setColor( Color.GREEN );
-			} else if(z<0.01) {
-				g2d.setColor( Color.BLACK );
-			} else if(z>89.99) {
+			} else if(z>45.0) {
 				g2d.setColor( Color.BLUE );
+			} else if(z<45.0) {
+				g2d.setColor( Color.BLACK );
 			} else {
 				g2d.setColor( Color.ORANGE );
 			}
@@ -270,7 +281,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line
-				if(z<0.01) {
+				if(show_pen_up || z<45) {
 					g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));					
 				}
 				px=x;

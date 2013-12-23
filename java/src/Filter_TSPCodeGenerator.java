@@ -17,6 +17,13 @@ import javax.swing.SwingWorker;
  * @author Dan
  */
 class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
+	long t_elapsed,t_start;
+	double progress;
+	double old_len,len;
+
+	int w2,h2;
+	double iscale;
+	
 	public String formatTime(long millis) {
     	String elapsed="";
     	long s=millis/1000;
@@ -31,142 +38,189 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 	
 	private class TSPOptimizer extends SwingWorker<Void,Void> {
+		
+		public void UpdateProgress(double len,int color) {
+			t_elapsed=System.currentTimeMillis()-t_start;
+			double new_progress = 100.0 * (double)t_elapsed / (double)time_limit;
+			if( new_progress > progress + 0.1 ) {
+				// find the new tour length
+				len=GetTourLength(solution);
+				if( old_len > len ) {
+					old_len=len;
+					DecimalFormat flen=new DecimalFormat("#.##");
+					String c="white";
+					if(color==0) c="yellow";
+					if(color==1) c="blue";
+					if(color==2) c="red";
+					DrawbotGUI.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
+				}
+				progress = new_progress;
+				setProgress((int)progress);
+			}
+		}
+
+		// does moving a point to somewhere else in the series shorten the series?
+		// @TODO: Debug, it doesn't seem to work.
+		// we have s1,s2,s3...e-1,e
+		// check if s1,s3,...e-1,s2,e is shorter
+		private int transposeForwardTest() {
+			int start, end, j, once=0;
+			
+			for(start=0;start<numPoints-4 && !isCancelled();++start) {
+				float a=CalculateWeight(solution[start],solution[start+1]);  // s1->s2
+				float b=CalculateWeight(solution[start+1],solution[start+2]);  // s2->s3
+				float d=CalculateWeight(solution[start],solution[start+2]);  // s1->s3
+				// a+b > d always true, the line gets shorter at this end
+				//assert(a+b>d);
+				float abd=a+b-d;
+
+				int best_end=-1;
+				double best_diff=0;
+				
+				for(end=start+4;end<numPoints && !isCancelled();++end) {
+					// before
+					float c=CalculateWeight(solution[end-1],solution[end]);  // e-1->e
+					// after
+					float e=CalculateWeight(solution[end-1],solution[start+1]);  // e-1->s2
+					float f=CalculateWeight(solution[start+1],solution[end]);  // s2->e
+					// e+f > c always true, the line gets longer at this end
+					//assert(e+f>c);
+					float efc = e+f-c;
+
+					float temp_diff = abd-efc;
+					if( best_diff < temp_diff ) {
+						best_diff = temp_diff;
+						best_end=end;
+						//DrawbotGUI.getSingleton().Log("<font color='red'>"+best_diff+"</font>\n");
+					}
+				}
+				
+				if(best_end != -1 && !isCancelled()) {
+					once = 1;
+					// move start+1 to just before end
+					int temp=solution[start+1];
+					for(j=start+1;j<best_end-1;++j) {
+						solution[j]=solution[j+1];
+					}
+					solution[best_end-1]=temp;
+
+					UpdateProgress(len,0);
+				}
+			}
+			return once;
+		}
+
+		// does moving a point to somewhere else in the series shorten the series?
+		// @TODO: Debug, it doesn't seem to work.
+		// we have s1,s2...e-2,e-1,e
+		// check if s1,e-1,s2...e-2,e is shorter
+		private int transposeBackwardTest() {
+			int start, end, j, once=0;
+			
+			for(start=0;start<numPoints-4 && !isCancelled();++start) {
+				float a=CalculateWeight(solution[start],solution[start+1]);  // s1->s2
+
+				int best_end=-1;
+				double best_diff=0;
+				
+				for(end=start+4;end<numPoints && !isCancelled();++end) {
+					float b=CalculateWeight(solution[end-2],solution[end-1]);  // e2->e1
+					float c=CalculateWeight(solution[end-1],solution[end]);  // e1->e
+					float f=CalculateWeight(solution[end-2],solution[end]);  // e2->e
+					// b+c > f, this end is getting shorter
+					assert(b+c>f);
+					float bcf=b+c-f;
+					
+					float d=CalculateWeight(solution[start],solution[end-1]);  // s1->e1
+					float e=CalculateWeight(solution[end-1],solution[start+1]);  // e1->s2
+					// d+e>a, this end is getting longer
+					assert(d+e>a);
+					float dea=d+e-a;
+
+					float temp_diff = bcf-dea;
+					if( best_diff < temp_diff ) {
+						best_diff = temp_diff;
+						best_end=end;
+					}
+				}
+				
+				if(best_end != -1 && !isCancelled()) {
+					once = 1;
+					// move best_end-1 to just after start
+					int temp=solution[best_end-1];
+					for(j=best_end-1;j>start+1;--j) {
+						solution[j]=solution[j-1];
+					}
+					solution[start+1]=temp;
+
+					UpdateProgress(len,3);
+				}
+			}
+			return once;
+		}
+
+		// we have s1,s2...e-1,e
+		// check if s1,e-1,...s2,e is shorter
+		public int flipTests() {
+			int start, end, j, once=0;
+			
+			for(start=0;start<numPoints-2 && !isCancelled();++start) {
+				float a=CalculateWeight(solution[start],solution[start+1]);
+				int best_end=-1;
+				double best_diff=0;
+				
+				for(end=start+2;end<=numPoints && !isCancelled();++end) {
+					// before
+					float b=CalculateWeight(solution[end  ],solution[end  -1]);
+					// after
+					float c=CalculateWeight(solution[start],solution[end  -1]);
+					float d=CalculateWeight(solution[end  ],solution[start+1]);
+					
+					double temp_diff=(a+b)-(c+d);
+					if(best_diff < temp_diff) {
+						best_diff = temp_diff;
+						best_end=end;
+					}
+				}
+				
+				if(best_end != -1 && !isCancelled()) {
+					once = 1;
+					// do the flip
+					int begin=start+1;
+					int finish=best_end;
+					int half=(finish-begin)/2;
+					int temp;
+					//DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
+					for(j=0;j<half;++j) {
+						temp = solution[begin+j];
+						solution[begin+j]=solution[finish-1-j];
+						solution[finish-1-j]=temp;
+					}
+					UpdateProgress(len,1);
+				}
+			}
+			return once;
+		}
+		
 		@Override
 		public Void doInBackground() {
-			int start, end, i, j, once;
+			len=GetTourLength(solution);
+			old_len=len;
 			
-			setProgress(0);
+			t_elapsed=0;
+			t_start = System.currentTimeMillis();
+			progress=0;
+			UpdateProgress(len,2);
 
-			double len=GetTourLength(solution);
-			DecimalFormat flen=new DecimalFormat("#.##");
-			DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @ 0s</font>\n");
-
-			long t_elapsed=0;
-			long t_start = System.currentTimeMillis();
-			int progress=0;
-
-			do {
+			int once=1;
+			while(once==1 && t_elapsed<time_limit && !isCancelled()) {
 				once=0;
-				for(start=0;start<numPoints-1 && !isCancelled();++start) {
-					for(end=start+2;end<=numPoints;++end) {
-						// we have s1,s2...e-1,e
-						// check if s1,e-1,...s2,e is shorter
-						// before
-						float a=CalculateWeight(solution[start],solution[start+1]);
-						float b=CalculateWeight(solution[end  ],solution[end  -1]);
-						// after
-						float c=CalculateWeight(solution[start],solution[end  -1]);
-						float d=CalculateWeight(solution[end  ],solution[start+1]);
-						
-						if(a+b>c+d) {
-							once = 1;
-							// do the flip
-							i=0;
-							for(j=start+1;j<end;++j) {
-								solution2[i]=solution[j];
-								++i;
-							}
-							for(j=start+1;j<end;++j) {
-								--i;
-								solution[j]=solution2[i];
-							}
-							t_elapsed=System.currentTimeMillis()-t_start;
-							// find the new tour length
-							double diff=(Math.sqrt(a)+Math.sqrt(b)) - (Math.sqrt(c)+Math.sqrt(d));
-							double newlen=len-diff;
-							assert(newlen>len);
-							len=newlen;
-							
-							int new_progress=(int)((float)t_elapsed/(float)time_limit);
-							if(new_progress != progress ) {
-								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @1 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
-								progress = new_progress;
-								setProgress(progress);
-							}
-						}
-					}
-				}
-				// check if moving a point to another part of the tour makes the tour shorter
-				for(start=0;start<numPoints-2 && !isCancelled();++start) {
-					for(end=start+4;end<=numPoints;++end) {
-						// we have points s1,s2,s3,...e-1,e.
-						// check if s1,s3,...e-2,s2,e is shorter
-						// before
-						int p1=solution[start  ];
-						int p2=solution[start+1];
-						int p3=solution[start+2];
-						int p4=solution[end  -1];
-						int p5=solution[end    ];
-						float a=CalculateWeight(p1,p2);
-						float b=CalculateWeight(p2,p3);
-						float c=CalculateWeight(p4,p5);
-						// after
-						float d=CalculateWeight(p1,p3);
-						float e=CalculateWeight(p4,p2);
-						float f=CalculateWeight(p2,p5);
-						
-						if(a+b+c>d+e+f) {
-							once = 1;
-							// do move
-							for(j=start+1;j<end-1;++j) {
-								solution[j]=solution[j+1];
-							}
-							solution[j]=p2;
-							t_elapsed=System.currentTimeMillis()-t_start;
-							// find the new tour length
-							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
-							
-							int new_progress=(int)((float)t_elapsed/(float)time_limit);
-							if(new_progress != progress ) {
-								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @2 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
-								progress = new_progress;
-								setProgress(progress);
-							}
-							if(end>1) end--;
-						}
-					}
-				}
-				// check if moving a point to another part of the tour makes the tour shorter
-				for(start=0;start<numPoints-2 && !isCancelled();++start) {
-					for(end=start+4;end<=numPoints;++end) {
-						// we have points s1,s2,s3,...e-1,e.
-						// check if s1,s3,...e-2,s2,e is shorter
-						// before
-						int p1=solution[start  ];
-						int p2=solution[start+1];
-						int p3=solution[end  -2];
-						int p4=solution[end  -1];
-						int p5=solution[end    ];
-						float a=CalculateWeight(p1,p2);
-						float b=CalculateWeight(p3,p4);
-						float c=CalculateWeight(p4,p5);
-						// after
-						float d=CalculateWeight(p1,p4);
-						float e=CalculateWeight(p4,p2);
-						float f=CalculateWeight(p3,p5);
-						
-						if(a+b+c>d+e+f) {
-							once = 1;
-							// do move
-							for(j=end-1;j>start+1;--j) {
-								solution[j]=solution[j-1];
-							}
-							solution[j]=p4;
-							t_elapsed=System.currentTimeMillis()-t_start;
-							// find the new tour length
-							len-=(Math.sqrt(a)+Math.sqrt(b)+Math.sqrt(c)) - (Math.sqrt(d)+Math.sqrt(e)+Math.sqrt(f));
-
-							int new_progress=(int)((float)t_elapsed/(float)time_limit);
-							if(new_progress != progress ) {
-								DrawbotGUI.getSingleton().Log("<font color='green'>"+flen.format(len)+"mm @3 "+formatTime(t_elapsed)+": "+start+"\t"+end+"</font>\n");
-								progress = new_progress;
-								setProgress(progress);
-							}
-						}
-					}
-				}
-				len=GetTourLength(solution);
-			} while(once==1 && t_elapsed<time_limit && !isCancelled());
+				//@TODO: make these optional for the very thorough people
+				//once|=transposeForwardTest();
+				//once|=transposeBackwardTest();
+				once|=flipTests();
+				UpdateProgress(len,2);
+			}
 			
 			return null;
 		}
@@ -187,7 +241,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	int numPoints;
 	Point2D[] points = null;
 	int[] solution = null;
-	int[] solution2 = null;
 	int image_width, image_height;
 	int scount;
 	ProgressMonitor pm;
@@ -210,7 +263,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 
 		DrawbotGUI.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
-		pm = new ProgressMonitor(null, "Optimizing path...", "", 0, 100);
+		pm = new ProgressMonitor(null, "Optimizing path.  Press Cancel when you've had enough...", "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		task=new TSPOptimizer();
@@ -231,7 +284,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
                 Toolkit.getDefaultToolkit().beep();
                 if (pm.isCanceled()) {
                     task.cancel(true);
-                    DrawbotGUI.getSingleton().Log("<font color='green'>Task canceled.</font>\n");
+                    DrawbotGUI.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
                 } else {
                 	DrawbotGUI.getSingleton().Log("<font color='green'>Task completed.</font>\n");
                 }
@@ -299,6 +352,10 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	private double RoundOff(double value) {
 		return Math.floor(value * 1000) / 1000;
 	}
+
+	private void MoveTo(BufferedWriter out,int i,boolean up) throws IOException {
+		out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + "\n");
+	}
 	
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
@@ -308,10 +365,10 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	private void ConvertAndSaveToGCode() {
 		DrawbotGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		
-		int w2=image_width/2;
-		int h2=image_height/2;
+		w2=image_width/2;
+		h2=image_height/2;
 		
-		double iscale=1.0/scale;
+		iscale=1.0/scale;
 		
 		// find the tsp point closest to the calibration point
 		int i;
@@ -327,15 +384,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 				besti=i;
 			}
 		}
-		// rearrange the tsp point list so that the drawing starts at the nearest tsp point
-		for(i=besti;i<numPoints;++i) {
-			solution2[i-besti]=solution[i];
-		}
-		for(i=0;i<besti;++i) {
-			solution2[i+(numPoints-besti)]=solution[i];
-		}
-
-		solution=solution2;
 		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
@@ -346,14 +394,14 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			// lift pen and set a default feed rate
 			out.write("G00 F1000 Z90\n");
 			// move to the first point
-			out.write("G01 X" + RoundOff((points[solution[0]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[0]].y)*iscale) + "\n");
+			MoveTo(out,besti,false);
 			// lower the pen
 			out.write("G00 Z0\n");
 
 			for(i=1;i<numPoints;++i) {
-				out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + "\n");
+				MoveTo(out,(besti+i)%numPoints,false);
 			}
-			out.write("G01 X" + RoundOff((points[solution[0]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[0]].y)*iscale) + "\n");
+			MoveTo(out,besti,false);
 			// lift pen and return to home
 			out.write("G00 Z90\n");
 			out.write("G00 X0 Y0\n");
@@ -394,8 +442,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		DrawbotGUI.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
-		solution2 = new int[numPoints+1];
-
+	
 		// collect the point data
 		numPoints=0;
 		for(y=0;y<image_height;++y) {

@@ -21,6 +21,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	ProgressMonitor pm;
 	double scale,iscale;
 	double margin;
+	String previous_command;
 	
 	
 	Filter_4levelGcodeGenerator(String _dest,double _scale,double _margin) {
@@ -39,12 +40,23 @@ class Filter_4levelGcodeGenerator extends Filter {
 	}
 	
 	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
+		String command="G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+"\n";
+		if(up) {
+			previous_command=command;
+		}
 		if(lastup!=up) {
 			lastup=up;
-			if(up) out.write("G00 Z90\n");
-			else   out.write("G00 Z0\n");			
+			if(up) {
+				// go faster with pen up
+				out.write("G00 Z90 F2000\n");
+			} else {
+				out.write(previous_command);
+				out.write("G00 Z0 F1000\n");
+			}
 		}
-		out.write("G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+"\n");
+		if(!up) {
+			out.write(command);
+		}
 	}
 	
 	/**
@@ -60,7 +72,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 		w2=image_width/2;
 		h2=image_height/2;
 		double leveladd = 255.0/5.0;
-		double level=0;
+		double level=leveladd;
 		int z=0;
 		
 		DrawbotGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
@@ -76,6 +88,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 			// lift pen
 			out.write("G00 Z90\n");
 			lastup=true;
+			previous_command="";
 			//*
 			DrawbotGUI.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
 			// create horizontal lines across the image
@@ -87,14 +100,14 @@ class Filter_4levelGcodeGenerator extends Filter {
 					MoveTo(out,(float)          0,(float)y,true);
 					for(x=0;x<image_width;++x) {
 						z=decode(img.getRGB(x,y));
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)image_width,(float)y,true);
 				} else {
 					MoveTo(out,(float)image_width,(float)y,true);
 					for(x=image_width-1;x>=0;--x) {
 						z=decode(img.getRGB(x,y));
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)          0,(float)y,true);
 				}
@@ -114,14 +127,14 @@ class Filter_4levelGcodeGenerator extends Filter {
 					MoveTo(out,(float)x,(float)0           ,true);
 					for(y=0;y<image_height;++y) {
 						z=decode(img.getRGB(x,y));
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)x,(float)image_height,true);
 				} else {
 					MoveTo(out,(float)x,(float)image_height,true);
 					for(y=image_height-1;y>=0;--y) {
 						z=decode(img.getRGB(x,y));
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)x,(float)0           ,true);
 				}
@@ -147,7 +160,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 					MoveTo(out,(float)0,(float)y           ,true);
 					for(j=0;j<endx;++j) {
 						z=decode(img.getRGB(j,y+j));
-						MoveTo(out,(float)j,(float)(y+j),( z > level ) );
+						MoveTo(out,(float)j,(float)(y+j),( z >= level ) );
 					}
 					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
@@ -160,7 +173,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 					MoveTo(out,(float)endx,(float)endy,true);
 					for(j=endx-1;j>=0;--j) {
 						z=decode(img.getRGB(j,y+j));
-						MoveTo(out,(float)j,(float)(y+j),( z > level ) );
+						MoveTo(out,(float)j,(float)(y+j),( z >= level ) );
 					}
 					MoveTo(out,(float)0,(float)y           ,true);				
 				}
@@ -182,7 +195,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 						catch(Exception e) {
 							DrawbotGUI.getSingleton().Log(e.getMessage());
 						}
-						MoveTo(out,(float)(x+j),(float)j,( z > level ) );
+						MoveTo(out,(float)(x+j),(float)j,( z >= level ) );
 					}
 					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
@@ -200,7 +213,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 						catch(Exception e) {
 							DrawbotGUI.getSingleton().Log(e.getMessage());
 						}
-						MoveTo(out,(float)(x+j),(float)j,( z > level ) );
+						MoveTo(out,(float)(x+j),(float)j,( z >= level ) );
 					}
 					MoveTo(out,(float)x,(float)0           ,true);
 				}
@@ -279,7 +292,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 			
 			// lift pen and return to home
 			out.write("G00 Z90\n");
-			//out.write("G00 X0 Y0\n");
+			out.write("G00 X0 Y0\n");
 			// Unpower Steppers
 			out.write("M18\n");
 			out.close();

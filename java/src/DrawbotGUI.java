@@ -43,14 +43,14 @@ public class DrawbotGUI
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="1";
+	static final String version="2";
 	
 	static final long serialVersionUID=1;
 	
 	private static DrawbotGUI singletonObject;
 	   
 	// Serial connection
-	private static int BAUD_RATE = 57600;
+	private static final int BAUD_RATE = 57600;
 	private CommPortIdentifier portIdentifier;
 	private CommPort commPort;
 	private SerialPort serialPort;
@@ -67,10 +67,16 @@ public class DrawbotGUI
 	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
 	
 	// Preferences
+	private static final int IMAGE_TSP=0;
+	private static final int IMAGE_SPIRAL=1;
+	private static final int IMAGE_4LEVEL=2;
+	private int draw_style=IMAGE_TSP;
+	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
 	private String recentPort;
 	private boolean allowMetrics=true;
+	private int image_style=IMAGE_TSP;
 	
 	// Metrics
 	PublishImage reportImage = new PublishImage();
@@ -245,44 +251,68 @@ public class DrawbotGUI
 	
 	public void LoadImage(String filename) {
 		try {
-/*
-			BufferedImage img = ImageIO.read(new File(filename));
-			
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
-			img = rs.Process(img);
-
-//			Filter_Translate t = new Filter_Translate(); 
-//			img = t.Process(img);
-
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(1); 
-			img = bw.Process(img);
-			
-			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
-			img = dither.Process(img);
-
-	        String workingDirectory=System.getProperty("user.dir");
-			String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-			Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(ngcPair,getScale());
-			generator.Process(img);
-/*/
-			BufferedImage img = ImageIO.read(new File(filename));
-			
-			Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
-			img = rs.Process(img);
-			
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(10); 
-			img = bw.Process(img);
-
-	        String workingDirectory=System.getProperty("user.dir");
-			String ngcPair = workingDirectory+"temp.ngc";
-			Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(ngcPair,getScale(),paper_margin);
-			generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-			generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
-			generator.Process(img);
-//*/
+			switch(draw_style) {
+			case DrawbotGUI.IMAGE_TSP:		LoadImageTSP(filename);		break;
+			case DrawbotGUI.IMAGE_SPIRAL:	LoadImageSpiral(filename);  break;
+			case DrawbotGUI.IMAGE_4LEVEL:	LoadImage4Level(filename);	break;
+			}
 		}
 		catch(IOException e) {}
+	}
 
+	
+	private void LoadImageTSP(String filename) throws IOException {
+		BufferedImage img = ImageIO.read(new File(filename));
+		
+		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
+		img = rs.Process(img);
+
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(3);
+		img = bw.Process(img);
+		
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		img = dither.Process(img);
+
+        String workingDirectory=System.getProperty("user.dir");
+		String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(ngcPair,getScale());
+		generator.Process(img);
+	}
+	
+	
+	private void LoadImage4Level(String filename) throws IOException {
+		BufferedImage img = ImageIO.read(new File(filename));
+		
+		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
+		img = rs.Process(img);
+		
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
+		img = bw.Process(img);
+
+        String workingDirectory=System.getProperty("user.dir");
+		String ngcPair = workingDirectory+"temp.ngc";
+		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(ngcPair,getScale(),paper_margin);
+		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
+		generator.Process(img);
+	}
+	
+	
+	private void LoadImageSpiral(String filename) throws IOException {
+		BufferedImage img = ImageIO.read(new File(filename));
+		
+		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
+		img = rs.Process(img);
+		
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
+		img = bw.Process(img);
+
+        String workingDirectory=System.getProperty("user.dir");
+		String ngcPair = workingDirectory+"temp.ngc";
+		Filter_Spiral generator = new Filter_Spiral(ngcPair,getScale(),paper_margin);
+		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
+		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
+		generator.Process(img);
 	}
 
 	// appends a message to the log tab and system out.
@@ -698,9 +728,9 @@ public class DrawbotGUI
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
 		
-		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 50, 300, image_dpi);
+		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 25, 200, image_dpi);
 		//input_image_dpi.setSize(250,input_image_dpi.getSize().height);
-		input_image_dpi.setMajorTickSpacing(100);
+		input_image_dpi.setMajorTickSpacing(50);
 		input_image_dpi.setMinorTickSpacing(25);
 		input_image_dpi.setPaintTicks(false);
 		input_image_dpi.setPaintLabels(true);
@@ -713,22 +743,31 @@ public class DrawbotGUI
 		
 		final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the global total"));
 		allow_metrics.setSelected(allowMetrics);
+		
+		final JCheckBox show_pen_up = new JCheckBox(String.valueOf("Show pen up moves"));
+		show_pen_up.setSelected(previewPane.getShowPenUp());
 
+		String [] styles= { "Single Line TSP", "Spiral", "Cross hatching" };
+		final JComboBox input_draw_style = new JComboBox(styles);
+		input_draw_style.setSelectedIndex(draw_style);
+		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
-		c.gridwidth=1;	c.gridx=0;  c.gridy=3;  driver.add(change_sound_connect,c);				c.gridwidth=3;	c.gridx=1;  c.gridy=3;  driver.add(sound_connect,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);			c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);	c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=3;  driver.add(change_sound_connect,c);								c.gridwidth=3;	c.gridx=1;  c.gridy=3;  driver.add(sound_connect,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);					c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(show_pen_up,c);										c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
+		
 
-		c.gridwidth=1;	c.gridx=2;  c.gridy=9;  driver.add(cancel,c);
-		c.gridwidth=1;	c.gridx=1;  c.gridy=9;  driver.add(save,c);
+		c.gridwidth=1;	c.gridx=2;  c.gridy=10;  driver.add(cancel,c);
+		c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(save,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -743,6 +782,8 @@ public class DrawbotGUI
 						paper_margin=(100-input_paper_margin.getValue())*0.01;
 						
 						allowMetrics = allow_metrics.isSelected();
+						previewPane.setShowPenUp(show_pen_up.isSelected());
+						draw_style=input_draw_style.getSelectedIndex();
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
@@ -1436,9 +1477,11 @@ public class DrawbotGUI
 					} else if(b==z0) {
 						LowerPen();
 					} else if(b==setFeedRate) {
-						feed_rate = Double.parseDouble(feedRate.getText());
+						String fr=feedRate.getText();
+						fr=fr.replaceAll("[ ,]","");
+						feed_rate = Double.parseDouble(fr);
 						if(feed_rate<1) feed_rate=1;
-						if(feed_rate>2000) feed_rate=20000;
+						if(feed_rate>2000) feed_rate=2000;
 						feedRate.setText(Double.toString(feed_rate));
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {
@@ -1471,7 +1514,7 @@ public class DrawbotGUI
 		TR.addActionListener(driveButtons);
 		BL.addActionListener(driveButtons);
 		BR.addActionListener(driveButtons);
-		feedRate.addActionListener(driveButtons);
+		setFeedRate.addActionListener(driveButtons);
 		
 		return driver;
 	}
@@ -1887,9 +1930,11 @@ public class DrawbotGUI
 		
 		// connect to the last port
 		s.ListSerialPorts();
+		/*
 		if(Arrays.asList(s.portsDetected).contains(s.recentPort)) {
 			s.OpenPort(s.recentPort);
 		}
+		*/
 		
 		s.CheckForUpdate();
     }

@@ -714,6 +714,36 @@ static int processSubcommand() {
 }
 
 
+void disable_motors() {
+  m1.release();
+  m2.release();
+}
+
+
+void activate_motors() {
+  m1.step(1,1);  m1.step(1,-1);
+  m2.step(1,1);  m2.step(1,-1);
+}
+
+
+/**
+ * Look for character /code/ in the buffer and read the float that immediately follows it.
+ * @return the value found.  If nothing is found, /val/ is returned.
+ * @input code the character to look for.
+ * @input val the return value if /code/ is not found.
+ **/
+float parsenumber(char code,float val) {
+  char *ptr=buffer;
+  while(ptr && *ptr && ptr<buffer+sofar) {
+    if(*ptr==code) {
+      return atof(ptr+1);
+    }
+    ptr=strchr(ptr,' ')+1;
+  }
+  return val;
+}
+
+
 //------------------------------------------------------------------------------
 static void processCommand() {
   // blank lines
@@ -724,8 +754,6 @@ static void processCommand() {
   } else if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"G28",3)) {
-    FindHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
     float yy=posy;
@@ -741,13 +769,6 @@ static void processCommand() {
     }
 
     teleport(xx,yy);
-  } else 
-  if(!strncmp(buffer,"M114",4)) {
-    where();
-  } else if(!strncmp(buffer,"M18",3)) {
-    // disable motors
-    m1.release();
-    m2.release();
   } else if(!strncmp(buffer,"CONFIG",6)) {
     float tt=limit_top;
     float bb=limit_bottom;
@@ -797,8 +818,20 @@ static void processCommand() {
     
     teleport(0,0);
     printConfig();
-  } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
-         || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
+  } 
+
+  int cmd=parsenumber('M',-1);
+  switch(cmd) {
+  case 114:  where();  break;
+  case 18:  disable_motors();  break;
+  case 17:  activate_motors();  break;
+  }
+
+  cmd=parsenumber('G',-1);
+  switch(cmd) {
+  case 28:  FindHome();  break;
+  case 0:
+  case 1: {
     // line
     processSubcommand();
     float xx, yy, zz;
@@ -813,16 +846,10 @@ static void processCommand() {
       zz=0;
     }
   
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
-      }
-    }
+    xx=parsenumber('X',xx)*mode_scale;
+    yy=parsenumber('Y',yy)*mode_scale;
+    zz=parsenumber('Z',zz);
+    setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
       xx+=posx;
@@ -831,8 +858,10 @@ static void processCommand() {
     }
     
     line_safe(xx,yy,zz);
-  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
-         || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
+  }
+    break;
+  case 2:
+  case 3: {
     // arc
     processSubcommand();
     float xx, yy, zz;
@@ -850,18 +879,12 @@ static void processCommand() {
       zz=0;
     }
     
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'I': ii=atof(ptr+1)*mode_scale;  break;
-      case 'J': jj=atof(ptr+1)*mode_scale;  break;
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
-      }
-    }
+    ii=parsenumber('I',ii)*mode_scale;
+    jj=parsenumber('J',jj)*mode_scale;
+    xx=parsenumber('X',xx)*mode_scale;
+    yy=parsenumber('Y',yy)*mode_scale;
+    zz=parsenumber('Z',zz);
+    setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
       xx+=posx;
@@ -870,22 +893,14 @@ static void processCommand() {
     }
 
     arc(posx+ii,posy+jj,xx,yy,zz,dd);
-  } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
-    // dwell
-    long xx=0;
+  }
+    break;
+  case 4:  delay(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
+  }
 
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': 
-      case 'U': 
-      case 'P': xx=atoi(ptr+1);  break;
-      }
-    }
-
-    delay(xx);
-  } else if(!strncmp(buffer,"D00 ",4)) {
+  cmd=parsenumber('D',-1);
+  switch(cmd) {
+  case 0: {
     // move one motor
     char *ptr=strchr(buffer,' ')+1;
     int amount = atoi(ptr+1);
@@ -899,19 +914,12 @@ static void processCommand() {
       amount = abs(amount);
       for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
     }
-  }  else if(!strncmp(buffer,"D01 ",4)) {
+  }
+    break;
+  case 1: {
     // adjust spool diameters
-    float amountL=SPOOL_DIAMETER1;
-    float amountR=SPOOL_DIAMETER2;
-    
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'L': amountL=atof(ptr+1);  break;
-      case 'R': amountR=atof(ptr+1);  break;
-      }
-    }
+    float amountL=parsenumber('L',SPOOL_DIAMETER1);
+    float amountR=parsenumber('R',SPOOL_DIAMETER2);
 
     float tps1=THREADPERSTEP1;
     float tps2=THREADPERSTEP2;
@@ -920,23 +928,14 @@ static void processCommand() {
       // Update EEPROM
       SaveSpoolDiameter();
     }
-  } else if(!strncmp(buffer,"D02 ",4)) {
-    Serial.print('L');
-    Serial.print(SPOOL_DIAMETER1);
-    Serial.print(F(" R"));
-    Serial.println(SPOOL_DIAMETER2);
-  } else if(!strncmp(buffer,"D03 ",4)) {
-    // read directory
-    SD_ListFiles();
-  } else if(!strncmp(buffer,"D04 ",4)) {
-    // read file
-    SD_ProcessFile(strchr(buffer,' ')+1);
-  } else {
-    if(processSubcommand()==0) {
-      Serial.print(F("Invalid command '"));
-      Serial.print(buffer);
-      Serial.println(F("'"));
-    }
+  }
+    break;
+  case 2:
+    Serial.print('L');  Serial.print(SPOOL_DIAMETER1);
+    Serial.print(F(" R"));   Serial.println(SPOOL_DIAMETER2);
+    break;
+  case 3:  SD_ListFiles();  break;    // read directory
+  case 4:  SD_ProcessFile(strchr(buffer,' ')+1);  break;  // read file
   }
 }
 
