@@ -122,6 +122,7 @@ class Filter_Spiral extends Filter {
 					fy = hh + (Math.sin(Math.PI*2.0*f)*(d-f));
 					x = (int)fx;
 					y = (int)fy;
+					// clip to image boundaries
 					if( x>=0 && x<image_width && y>=0 && y<image_height ) {
 						z=decode(img.getRGB(x,y));
 						MoveTo(out,fx,fy,( z >= level ));

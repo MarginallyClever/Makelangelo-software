@@ -5,6 +5,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 //import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.awt.*;
+import java.awt.geom.Line2D;
+import javax.swing.*;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
@@ -267,7 +270,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			// is pen up or down?
 			if(running && i<=linesProcessed) {
 				g2d.setColor( Color.RED );
-			} else if(running && i>linesProcessed && i<=linesProcessed+50) {
+			} else if(running && i>linesProcessed && i<=linesProcessed+500) {
 				g2d.setColor( Color.GREEN );
 			} else if(z>45.0) {
 				g2d.setColor( Color.BLUE );
@@ -276,6 +279,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			} else {
 				g2d.setColor( Color.ORANGE );
 			}
+			
+			g2d.setStroke(new BasicStroke(2));
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||

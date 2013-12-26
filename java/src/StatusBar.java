@@ -10,7 +10,7 @@ public class StatusBar extends JLabel {
 	
 	long t_start;
 
-	DecimalFormat fmt = new DecimalFormat("#.##");
+	DecimalFormat fmt = new DecimalFormat("#0.#00");
 	
 	
 	public String formatTime(long millis) {
@@ -52,8 +52,10 @@ public class StatusBar extends JLabel {
     		progress = 100.0f*(float)sofar/(float)total;
     		
     		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
-    		elapsed=formatTime(t_draw_now);
+        	long remaining = (long)( (float)t_draw_now * ((float)total / (float)sofar) );
+    		elapsed="so far: "+formatTime(t_draw_now) + " remaining: "+formatTime(remaining);
     	}
+
 	   	SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+elapsed);
     }
 }

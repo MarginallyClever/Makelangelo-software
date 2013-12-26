@@ -69,6 +69,11 @@ public class GCodeFile {
 				if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
 			}
 			
+			if(z!=pz) {
+				// pen up/down action
+				estimated_time+=0.020;  // seconds?
+			}
+			
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line

@@ -89,7 +89,8 @@ class Filter_4levelGcodeGenerator extends Filter {
 			out.write("G00 Z90\n");
 			lastup=true;
 			previous_command="";
-			//*
+
+			
 			DrawbotGUI.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
 			// create horizontal lines across the image
 			// raise and lower the pen to darken the appropriate areas
@@ -113,10 +114,8 @@ class Filter_4levelGcodeGenerator extends Filter {
 				}
 			}
 			level+=leveladd;
-			//*/
-			
-			
-			//*
+
+
 			DrawbotGUI.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
 			// create vertical lines across the image
 			// raise and lower the pen to darken the appropriate areas
@@ -140,155 +139,86 @@ class Filter_4levelGcodeGenerator extends Filter {
 				}
 			}
 			level+=leveladd;
-			//*/
-			
-			
-			//*
+
+
 			DrawbotGUI.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
 			// create diagonal \ lines across the image
 			// raise and lower the pen to darken the appropriate areas
 			i=0;
-			for(y=image_height - (image_height%steps);y>=0;y-=steps) {
-				++i;
-				if((i%2)==0) {
-					int endx=image_height-y;
-					int endy=image_height;
-					if(endx > image_width) {
-						endy -= endx-image_width;
-						endx = image_width;
-					}
-					MoveTo(out,(float)0,(float)y           ,true);
-					for(j=0;j<endx;++j) {
-						z=decode(img.getRGB(j,y+j));
-						MoveTo(out,(float)j,(float)(y+j),( z >= level ) );
-					}
-					MoveTo(out,(float)endx,(float)endy,true);
-				} else {
-					int endx=image_height-y;
-					int endy=image_height;
-					if(endx > image_width) {
-						endy -= endx-image_width;
-						endx = image_width;
-					}
-					MoveTo(out,(float)endx,(float)endy,true);
-					for(j=endx-1;j>=0;--j) {
-						z=decode(img.getRGB(j,y+j));
-						MoveTo(out,(float)j,(float)(y+j),( z >= level ) );
-					}
-					MoveTo(out,(float)0,(float)y           ,true);				
+			for(x=-image_height;x<image_width;x+=steps) {
+				int endx=image_height+x;
+				int endy=image_height-1;
+				if(endx >= image_width) {
+					endy -= endx - (image_width-1);
+					endx = image_width-1;
 				}
-			}
-
-			for(x=0;x<image_width;x+=steps) {
+				int startx=x;
+				int starty=0;
+				if( startx < 0 ) {
+					starty -= startx;
+					startx=0;
+				}
+				int delta=endy-starty;
+				
 				if((i%2)==0) {
-					int endx=image_height+x;
-					int endy=image_height;
-					if(endx > image_width) {
-						endy -= endx-image_width;
-						endx = image_width;
-					}
-					MoveTo(out,(float)x,(float)0           ,true);
-					for(j=0;j<endy;++j) {
-						try {
-							z=decode(img.getRGB(x+j,j));
-						}
-						catch(Exception e) {
-							DrawbotGUI.getSingleton().Log(e.getMessage());
-						}
-						MoveTo(out,(float)(x+j),(float)j,( z >= level ) );
+					MoveTo(out,(float)startx,(float)starty,true);
+					for(j=0;j<delta;++j) {
+						z=decode(img.getRGB(startx+j,starty+j));
+						MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
 					}
 					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
-					int endx=image_height+x;
-					int endy=image_height;
-					if(endx > image_width) {
-						endy -= endx-image_width;
-						endx = image_width;
-					}
 					MoveTo(out,(float)endx,(float)endy,true);
-					for(j=endy-1;j>=0;--j) {
-						try {
-							z=decode(img.getRGB(x+j,j));
-						}
-						catch(Exception e) {
-							DrawbotGUI.getSingleton().Log(e.getMessage());
-						}
-						MoveTo(out,(float)(x+j),(float)j,( z >= level ) );
+					for(j=0;j<delta;++j) {
+						z=decode(img.getRGB(endx-j,endy-j));
+						MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
 					}
-					MoveTo(out,(float)x,(float)0           ,true);
+					MoveTo(out,(float)startx,(float)starty,true);
 				}
 				++i;
 			}
 			level+=leveladd;
-			//*/
 
-			//*
+
 			DrawbotGUI.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
 			// create diagonal / lines across the image
 			// raise and lower the pen to darken the appropriate areas
 			i=0;
-			for(x=0;x<image_width;x+=steps) {
+			for(x=0;x<image_width+image_height;x+=steps) {
 				int endx=0;
 				int endy=x;
-				if( endy > image_height ) {
-					endx += endy - image_height;
-					endy = image_height;
-				}
-				++i;
-				if((i%2)==0) {
-					MoveTo(out,(float)x,(float)0           ,true);
-					for(j=0;j<endy;++j) {
-						z=decode(img.getRGB(x-j,j));
-						MoveTo(out,(float)(x-j),(float)j,( z > level ) );
-					}
-					MoveTo(out,(float)endx,(float)endy     ,true);
-				} else {
-					MoveTo(out,(float)endx,(float)endy     ,true);
-					for(j=endy-1;j>=0;--j) {
-						try {
-							z=decode(img.getRGB(x-j,j));
-						}
-						catch(Exception e) {
-							DrawbotGUI.getSingleton().Log(e.getMessage());
-						}
-						MoveTo(out,(float)(x-j),(float)j,( z > level ) );
-					}
-					MoveTo(out,(float)x,(float)0           ,true);
-				}
-			}
-			for(y=x-image_width;y<image_height;y+=steps) {
-				int endx=0;
-				int endy=y+image_width;
-				if( endy > image_height ) {
-					endx += endy - image_height;
+				if( endy >= image_height ) {
+					endx += endy - (image_height-1);
 					endy = image_height-1;
 				}
+				int startx=x;
+				int starty=0;
+				if( startx >= image_width ) {
+					starty += startx - (image_width-1);
+					startx=image_width-1;
+				}
+				int delta=endy-starty;
+				
+				assert( (startx-endx) == (starty-endy) );
+
 				++i;
 				if((i%2)==0) {
-					MoveTo(out,(float)image_width-1,(float)y,true);
-					for(j=0;j<(endy-y);++j) {
-						z=decode(img.getRGB(image_width-1-j,y+j));
-						MoveTo(out,(float)(image_width-1-j),(float)(y+j),( z > level ) );
-
+					MoveTo(out,(float)startx,(float)starty,true);
+					for(j=0;j<delta;++j) {
+						z=decode(img.getRGB(startx-j,starty+j));
+						MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
 					}
-					MoveTo(out,(float)endx,(float)endy      ,true);
+					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
-					MoveTo(out,(float)endx,(float)endy      ,true);
-					for(j=0;j<(endy-y);++j) {
-						try {
-							z=decode(img.getRGB(endx+j,endy-1-j));
-						}
-						catch(Exception e) {
-							DrawbotGUI.getSingleton().Log(e.getMessage());
-						}
-						MoveTo(out,(float)(endx+j),(float)(endy-1-j),( z > level ) );
+					MoveTo(out,(float)endx,(float)endy,true);
+					for(j=0;j<delta;++j) {
+						z=decode(img.getRGB(endx+j,endy-j));
+						MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
 					}
-					MoveTo(out,(float)image_width-1,(float)y,true);
+					MoveTo(out,(float)startx,(float)starty,true);
 				}
 			}
-			level+=leveladd;
-			//*/
-			
+
 			
 			// lift pen and return to home
 			out.write("G00 Z90\n");
