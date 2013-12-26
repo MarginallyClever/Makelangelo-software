@@ -76,7 +76,6 @@ public class DrawbotGUI
 	private String[] recentFiles;
 	private String recentPort;
 	private boolean allowMetrics=true;
-	private int image_style=IMAGE_TSP;
 	
 	// Metrics
 	PublishImage reportImage = new PublishImage();
@@ -110,16 +109,18 @@ public class DrawbotGUI
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
-    private JMenuItem buttonOpenFile, buttonExit;
+    private JMenuItem buttonOpenFile, buttonSaveFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
     					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors;
-    private JMenuItem buttonStart, buttonPause, buttonHalt;
+    private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
+    public boolean dialog_result=false;
+    
     // logging
     private JTextPane log;
     private JScrollPane logPane;
@@ -656,7 +657,7 @@ public class DrawbotGUI
 	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
-		Log("<font color='green'>Opening file "+recentFiles[0]+"...</font>\n");
+		Log("<font color='green'>Opening file "+filename+"...</font>\n");
 		
 		if(IsFileGcode(filename)) {
 			LoadGCode(filename);
@@ -692,6 +693,32 @@ public class DrawbotGUI
 	    		}
 	    	}
 	    	OpenFileOnDemand(selectedFile);
+	    }
+	}
+	
+	private void SaveFileDialog() {
+	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
+	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
+		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
+
+		FileFilter filterGCODE = new FileNameExtensionFilter("GCODE files (ngc)", "ngc");
+		
+		JFileChooser fc = new JFileChooser(new File(filename));
+		fc.addChoosableFileFilter(filterGCODE);
+	    if(fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
+
+			if(!selectedFile.toLowerCase().endsWith(".ngc")) {
+				selectedFile+=".ngc";
+			}
+
+	    	try {
+	    		gcode.Save(selectedFile);
+	    	}
+		    catch(IOException e) {
+		    	Log("<span style='color:red'>File "+filename+" could not be saved: "+e.getMessage()+"</span>\n");
+		    	return;
+		    }
 	    }
 	}
 	
@@ -1139,6 +1166,9 @@ public class DrawbotGUI
 	}
 	
 	private void ChangeToTool(String toolName) {
+		int i=Integer.parseInt(toolName);
+		String names[] = { "Black (tool 0)", "Red (tool 1)", "Green (tool 2)", "Blue (tool 3)" };
+		toolName = names[i];
 		JOptionPane.showMessageDialog(null,"Please change to "+toolName+" and click OK.");
 	}
 	
@@ -1242,6 +1272,58 @@ public class DrawbotGUI
 		previewPane.setRunning(running);
 		UpdateMenuBar();
 	}
+
+	/**
+	 * open a dialog to ask for the line number.
+	 * @return true if "ok" is pressed, false if the window is closed any other way.
+	 */
+	private boolean getStartingLineNumber() {
+		dialog_result=false;
+		
+		final JDialog driver = new JDialog(mainframe,"Start at",true);
+		driver.setLayout(new GridBagLayout());		
+		final JTextField starting_line = new JTextField("0",8);
+		final JButton cancel = new JButton("Cancel");
+		final JButton start = new JButton("Start");
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel("Skip to line #"),c);
+		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  driver.add(starting_line,c);
+		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  driver.add(cancel,c);
+		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  driver.add(start,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					
+					if(subject == start) {
+						gcode.linesProcessed=Long.parseLong(starting_line.getText());
+						dialog_result=true;
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						dialog_result=false;
+						driver.dispose();
+					}
+			  }
+		};
+
+		start.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);  // modal
+		
+		return dialog_result;
+	}
+
+	private void StartDrawing() {
+		paused=false;
+		running=true;
+		UpdateMenuBar();
+		previewPane.setRunning(running);
+		previewPane.setLinesProcessed(gcode.linesProcessed);
+		statusBar.Start();
+		SendFileCommand();
+	}
 	
 	// The user has done something.  respond to it.
 	public void actionPerformed(ActionEvent e) {
@@ -1261,17 +1343,21 @@ public class DrawbotGUI
 		}
 
 		if( subject == buttonStart ) {
-			if(gcode.fileOpened) {
-				paused=false;
-				running=true;
-				UpdateMenuBar();
+			if(gcode.fileOpened && !running) {
 				gcode.linesProcessed=0;
-				previewPane.setRunning(running);
-				previewPane.setLinesProcessed(gcode.linesProcessed);
-				statusBar.Start();
-				SendFileCommand();
+				StartDrawing();
 			}
 			return;
+		}
+		if( subject == buttonStartAt ) {
+			if(gcode.fileOpened && !running) {
+				gcode.linesProcessed=0;
+				if(getStartingLineNumber()) {
+					StartDrawing();
+				}
+			}
+			return;
+			
 		}
 		if( subject == buttonPause ) {
 			if(running) {
@@ -1334,6 +1420,12 @@ public class DrawbotGUI
 			CheckForUpdate();
 			return;
 		}
+		
+		if( subject == buttonSaveFile ) {
+			SaveFileDialog();
+			return;
+		}
+		
 		if( subject == buttonExit ) {
 			System.exit(0);  // @TODO: be more graceful?
 			return;
@@ -1683,23 +1775,21 @@ public class DrawbotGUI
 
 	// Rebuild the contents of the menu based on current program state
 	public void UpdateMenuBar() {
-		JMenu menu;
+		JMenu menu, subMenu;
+		ButtonGroup group;
         int i;
         
         menuBar.removeAll();
         
-        //Build the first menu.
+        // File menu
         menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
- 
-        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
-        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
-        buttonOpenFile.addActionListener(this);
-        menu.add(buttonOpenFile);
 
-        menu.addSeparator();
+        subMenu = new JMenu("Open...");
+        subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+        subMenu.setEnabled(!running);
+        group = new ButtonGroup();
 
         // list recent files
         if(recentFiles != null && recentFiles.length>0) {
@@ -1709,11 +1799,26 @@ public class DrawbotGUI
             	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
             	if(buttonRecent[i]!=null) {
             		buttonRecent[i].addActionListener(this);
-            		menu.add(buttonRecent[i]);
+            		subMenu.add(buttonRecent[i]);
             	}
         	}
-        	if(i!=0) menu.addSeparator();
+        	if(i!=0) subMenu.addSeparator();
         }
+        
+        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
+        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+        buttonOpenFile.addActionListener(this);
+        subMenu.add(buttonOpenFile);
+        
+        menu.add(subMenu);
+
+        buttonSaveFile = new JMenuItem("Save GCODE as...");
+        buttonSaveFile.getAccessibleContext().setAccessibleDescription("Save the current g-code file...");
+        buttonSaveFile.addActionListener(this);
+        menu.add(buttonSaveFile);
+
+        menu.addSeparator();
 
         buttonExit = new JMenuItem("Exit",KeyEvent.VK_Q);
         buttonExit.getAccessibleContext().setAccessibleDescription("Goodbye...");
@@ -1727,10 +1832,10 @@ public class DrawbotGUI
         menu.setMnemonic(KeyEvent.VK_T);
         menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
 
-        JMenu subMenu = new JMenu("Port");
+        subMenu = new JMenu("Port");
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
         subMenu.setEnabled(!running);
-        ButtonGroup group = new ButtonGroup();
+        group = new ButtonGroup();
 
         ListSerialPorts();
         buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
@@ -1800,6 +1905,12 @@ public class DrawbotGUI
         buttonStart.addActionListener(this);
     	buttonStart.setEnabled(portConfirmed && !running);
         menu.add(buttonStart);
+
+        buttonStartAt = new JMenuItem("Start at line...");
+        buttonStartAt.getAccessibleContext().setAccessibleDescription("Start sending g-code");
+        buttonStartAt.addActionListener(this);
+        buttonStartAt.setEnabled(portConfirmed && !running);
+        menu.add(buttonStartAt);
 
         buttonPause = new JMenuItem("Pause",KeyEvent.VK_P);
         buttonPause.getAccessibleContext().setAccessibleDescription("Pause sending g-code");

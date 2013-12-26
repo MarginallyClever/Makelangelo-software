@@ -51,7 +51,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 				out.write("G00 Z90 F2000\n");
 			} else {
 				out.write(previous_command);
-				out.write("G00 Z0 F1000\n");
+				out.write("G00 Z0 F2000\n");
 			}
 		}
 		if(!up) {

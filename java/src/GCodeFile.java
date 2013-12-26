@@ -1,4 +1,5 @@
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -125,10 +126,12 @@ public class GCodeFile {
 		}
 	}
 	
+	
 	public void Load(String filename) throws IOException {
 		CloseFile();
 
     	Scanner scanner = new Scanner(new FileInputStream(filename));
+    	
     	linesTotal=0;
     	lines = new ArrayList<String>();
 	    try {
@@ -142,6 +145,20 @@ public class GCodeFile {
 	    }
 	    fileOpened=true;
 	    EstimateDrawTime();
+	}
+	
+	
+	public void Save(String filename) throws IOException {
+		FileOutputStream out = new FileOutputStream(filename);
+		String temp;
+		
+		for(int i=0;i<linesTotal;++i) {
+			temp = lines.get(i) + ";\n";
+			out.write(temp.getBytes());
+		}
+
+		out.flush();
+		out.close();
 	}
 }
 

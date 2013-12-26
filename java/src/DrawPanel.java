@@ -6,8 +6,6 @@ import java.awt.event.MouseListener;
 //import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.awt.*;
-import java.awt.geom.Line2D;
-import javax.swing.*;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;

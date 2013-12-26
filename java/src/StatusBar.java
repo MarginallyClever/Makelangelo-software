@@ -10,7 +10,7 @@ public class StatusBar extends JLabel {
 	
 	long t_start;
 
-	DecimalFormat fmt = new DecimalFormat("#0.#00");
+	DecimalFormat fmt = new DecimalFormat("#0.00");
 	
 	
 	public String formatTime(long millis) {
