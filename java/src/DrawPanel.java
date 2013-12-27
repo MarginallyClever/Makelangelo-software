@@ -278,7 +278,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				g2d.setColor( Color.ORANGE );
 			}
 			
-			g2d.setStroke(new BasicStroke((float)cameraZoom/10.0f));
+			g2d.setStroke(new BasicStroke((float)cameraZoom/10.0f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||

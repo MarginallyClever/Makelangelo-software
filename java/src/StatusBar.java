@@ -52,7 +52,8 @@ public class StatusBar extends JLabel {
     		progress = 100.0f*(float)sofar/(float)total;
     		
     		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
-        	long remaining = (long)( (float)t_draw_now * ((float)total / (float)sofar) );
+    		long total_time = (long)( (float)t_draw_now * (float)total / (float)sofar );
+        	long remaining = total_time - t_draw_now;
     		elapsed="so far: "+formatTime(t_draw_now) + " remaining: "+formatTime(remaining);
     	}
 
