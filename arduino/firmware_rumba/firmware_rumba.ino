@@ -15,10 +15,6 @@
 // Default servo library
 #include <Servo.h> 
 
-// Saving config
-#include <EEPROM.h>
-#include <Arduino.h>  // for type definitions
-
 
 //------------------------------------------------------------------------------
 // GLOBALS
@@ -62,13 +58,6 @@ float feed_rate=0;
 volatile long laststep[NUM_AXIES];
 
 char absolute_mode=1;  // absolute or incremental programming mode?
-float mode_scale;   // mm or inches?
-char mode_name[3];
-
-// time values
-long  t_millis;
-float t;   // since board power on
-float dt;  // since last tick
 
 // Serial comm reception
 char buffer[MAX_BUF];  // Serial buffer
@@ -79,26 +68,12 @@ int sofar;             // Serial buffer progress
 //------------------------------------------------------------------------------
 
 
-
 //------------------------------------------------------------------------------
 // calculate max velocity, threadperstep.
 void adjustSpoolDiameter(float diameter1) {
   SPOOL_DIAMETER = diameter1;
   float SPOOL_CIRC = SPOOL_DIAMETER*PI;  // circumference
   THREAD_PER_STEP = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-}
-
-
-//------------------------------------------------------------------------------
-// increment internal clock
-void tick() {
-  long nt_millis=millis();
-  long dt_millis=nt_millis-t_millis;
-
-  t_millis=nt_millis;
-
-  dt=(float)dt_millis*0.001;  // time since last tick, in seconds
-  t=(float)nt_millis*0.001;
 }
 
 
@@ -127,13 +102,16 @@ char readSwitches() {
 void setFeedRate(float v1) {
   if( feed_rate != v1 ) {
     feed_rate = v1;
-    if(feed_rate > MAX_FEEDRATE) {
-      feed_rate = MAX_FEEDRATE;
-    }
-    if(feed_rate < MIN_FEEDRATE) {
-      feed_rate = MIN_FEEDRATE;
-    }
+    if(feed_rate > MAX_FEEDRATE) feed_rate = MAX_FEEDRATE;
+    if(feed_rate < MIN_FEEDRATE) feed_rate = MIN_FEEDRATE;
   }
+}
+
+
+//------------------------------------------------------------------------------
+void pause(long ms) {
+  delay(ms / 1000);
+  delayMicroseconds(ms % 1000);
 }
 
 
@@ -162,19 +140,19 @@ void setPenAngle(int pen_angle) {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-void IK(float x, float y, long &l1, long &l2) {
+void IK(float x, float y, float &l1, float &l2) {
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
   l1 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
   // find length to M2
-  dx = limit_right - x;
+  dx = x - limit_right;
   l2 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
 }
 
 
 //------------------------------------------------------------------------------
-// HIGH Kinematics - turns L1,L2 lengths into XY coordinates
+// Forward Kinematics - turns L1,L2 lengths into XY coordinates
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 void FK(float l1, float l2,float &x,float &y) {
@@ -183,14 +161,75 @@ void FK(float l1, float l2,float &x,float &y) {
   float c = l2 * THREAD_PER_STEP;
   
   // slow, uses trig
-  //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
+  // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
+  // or cc - aa - bb = -2ab * cos( theta )
+  // or ( aa + bb - cc ) / ( 2ab ) = cos( theta );
+  // or theta = acos((aa+bb-cc)/(2ab));
   //x = cos(theta)*l1 + limit_left;
   //y = sin(theta)*l1 + limit_top;
-  // but we know that cos(acos(i)) = i
+  // and we know that cos(acos(i)) = i
   // and we know that sin(acos(i)) = sqrt(1-i*i)
-  float i=(a*a+b*b-c*c)/(2.0*a*b);
-  x = i * l1 + limit_left;
-  y = sqrt(1.0 - i*i)*l1 + limit_top;
+  float theta = ((a*a+b*b-c*c)/(2.0*a*b));
+  x = theta * a + limit_left;
+  y = limit_top - (sqrt( 1.0 - theta * theta ) * a);
+}
+
+
+//------------------------------------------------------------------------------
+void processConfig() {
+  limit_top=parsenumber('T',limit_top);
+  limit_bottom=parsenumber('B',limit_bottom);
+  limit_right=parsenumber('R',limit_right);
+  limit_left=parsenumber('L',limit_left);
+  
+  char gg=parsenumber('G',m1d);
+  char hh=parsenumber('H',m2d);
+  char i=parsenumber('I',-1);
+  char j=parsenumber('J',-1);
+  if(i!=-1) {
+    if(i>0) {
+      M1_REEL_IN=HIGH;
+      M1_REEL_OUT=LOW;
+    } else {
+      M1_REEL_IN=LOW;
+      M1_REEL_OUT=HIGH;
+    }
+  }
+  if(j!=-1) {
+    if(j>0) {
+      M2_REEL_IN=HIGH;
+      M2_REEL_OUT=LOW;
+    } else {
+      M2_REEL_IN=LOW;
+      M2_REEL_OUT=HIGH;
+    }
+  }
+  
+  // @TODO: check t>b, r>l ?
+  printConfig();
+  
+  teleport(0,0);
+
+  //test_kinematics(0,0);
+  //test_kinematics(10,0);
+  //test_kinematics(10,10);
+  //test_kinematics(0,10);
+}
+
+
+// test FK(IK(x,y))=x,y
+void test_kinematics(float x,float y) {
+  float A, B, C, D;
+  IK(x,y,A,B);
+  FK(A,B,C,D);
+  Serial.print(F(" before x="));  Serial.print(x);
+  Serial.print(F(" before y="));  Serial.print(y);
+  //Serial.print(F(" A="));  Serial.print(A);
+  //Serial.print(F(" B="));  Serial.print(B);
+  //Serial.print(F(" C="));  Serial.print(C);
+  //Serial.print(F(" D="));  Serial.print(D);
+  Serial.print(F(" after x="));  Serial.print(C-x);
+  Serial.print(F(" after y="));  Serial.println(D-y);
 }
 
 
@@ -225,17 +264,12 @@ void line_safe(float x,float y,float z) {
 
 
 //------------------------------------------------------------------------------
-void pause(long ms) {
-  delay(ms / 1000);
-  delayMicroseconds(ms % 1000);
-}
-
-
-//------------------------------------------------------------------------------
 void polargraph_line(float x,float y,float z) {
-  long l1,l2;
+  float l1,l2;
   IK(x,y,l1,l2);
-  
+  posx=x;
+  posy=y;
+  posz=z;
   motor_line(l1,l2,z,feed_rate);
 }
 
@@ -282,10 +316,10 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line_safe(nx,ny,nz);
+    polargraph_line(nx,ny,nz);
   }
   
-  line_safe(x,y,z);
+  polargraph_line(x,y,z);
 }
 
 
@@ -297,7 +331,7 @@ void teleport(float x,float y) {
   posy=y;
   
   // @TODO: posz?
-  long L1,L2;
+  float L1,L2;
   IK(posx,posy,L1,L2);
   laststep[0]=L1;
   laststep[1]=L2;
@@ -308,14 +342,14 @@ void teleport(float x,float y) {
 void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
-  Serial.println(F("== DRAWBOT - http://github.com/i-make-robots/Drawbot/ =="));
+  Serial.println(F("== DRAWBOT - http://www.makelangelo.com/ =="));
   Serial.println(F("All commands end with a semi-colon."));
   Serial.println(F("HELP;  - display this message"));
   Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
   Serial.println(F("       - display/update this robot's configuration."));
   Serial.println(F("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter."));
   Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
-  Serial.println(F("G00,G01,G02,G03,G04,G20,G21,G28,G90,G91,M18,M114"));
+  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,M18,M114"));
 }
 
 
@@ -401,78 +435,10 @@ void where() {
 
 //------------------------------------------------------------------------------
 void printConfig() {
-  Serial.print(m1d);              Serial.print(F("="));  
-  Serial.print(limit_top);        Serial.print(F(","));
-  Serial.print(limit_left);       Serial.print(F("\n"));
-  Serial.print(m2d);              Serial.print(F("="));  
-  Serial.print(limit_top);        Serial.print(F(","));
-  Serial.print(limit_right);      Serial.print(F("\n"));
-  Serial.print(F("Bottom="));     Serial.println(limit_bottom);
-  Serial.print(F(" "));  printFeedRate();
-}
-
-
-//------------------------------------------------------------------------------
-// from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-void EEPROM_writeLong(int ee, long value) {
-  byte* p = (byte*)(void*)&value;
-  for (int i = 0; i < sizeof(value); i++)
-  EEPROM.write(ee++, *p++);
-}
-
-
-//------------------------------------------------------------------------------
-// from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234477290/3
-float EEPROM_readLong(int ee) {
-  long value = 0;
-  byte* p = (byte*)(void*)&value;
-  for (int i = 0; i < sizeof(value); i++)
-  *p++ = EEPROM.read(ee++);
-  return value;
-}
-
-
-//------------------------------------------------------------------------------
-void LoadConfig() {
-  char version_number=EEPROM.read(ADDR_VERSION);
-  if(version_number<3 || version_number>EEPROM_VERSION) {
-    // If not the current EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
-    // Update the version number
-    EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
-    // Update robot uuid
-    robot_uid=0;
-    SaveUID();
-    // Update spool diameter variables
-    SaveSpoolDiameter();
-  }
-  if(version_number==3) {
-    // Retrieve Stored Configuration
-    robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
-    // save the new data so the next load doesn't screw up one bobbin size
-    SaveSpoolDiameter();
-    // update the EEPROM version
-    EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
-  } else if(version_number==4) {
-    // Retrieve Stored Configuration
-    robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
-  } else {
-    // Code should not get here if it does we should display some meaningful error message
-    Serial.println(F("An Error Occurred during LoadConfig"));
-  }
-}
-
-
-//------------------------------------------------------------------------------
-void SaveUID() {
-  EEPROM_writeLong(ADDR_UUID,(long)robot_uid);
-}
-
-//------------------------------------------------------------------------------
-void SaveSpoolDiameter() {
-  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER*10000);
-  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER*10000);
+  Serial.print(limit_left);       Serial.print(F(","));
+  Serial.print(limit_top);        Serial.print(F(" - "));
+  Serial.print(limit_right);     Serial.print(F(","));
+  Serial.print(limit_bottom);      Serial.print(F("\n"));
 }
 
 
@@ -508,36 +474,7 @@ void processCommand() {
     teleport(parsenumber('X',posx),
              parsenumber('Y',posy));
   } else if(!strncmp(buffer,"CONFIG",6)) {
-    float tt=parsenumber('T',limit_top);
-    float bb=parsenumber('B',limit_bottom);
-    float rr=parsenumber('R',limit_right);
-    float ll=parsenumber('L',limit_left);
-    char gg=parsenumber('G',m1d);
-    char hh=parsenumber('H',m2d);
-    char i = parsenumber('I',-1);
-    if(i!=-1) {
-        if(1>0) {
-          M1_REEL_IN=HIGH;
-          M1_REEL_OUT=LOW;
-        } else {
-          M1_REEL_IN=LOW;
-          M1_REEL_OUT=HIGH;
-        }
-    }
-    char j = parsenumber('J',-1);
-    if(j!=-1) {
-        if(j>0) {
-          M2_REEL_IN=HIGH;
-          M2_REEL_OUT=LOW;
-        } else {
-          M2_REEL_IN=LOW;
-          M2_REEL_OUT=HIGH;
-        }
-    }
-    
-    // @TODO: check t>b, r>l ?
-    teleport(0,0);
-    printConfig();
+    processConfig();
   } 
 
   int cmd=parsenumber('M',-1);
@@ -564,10 +501,10 @@ void processCommand() {
       zz=0;
     }
   
-    xx=parsenumber('X',xx)*mode_scale;
-    yy=parsenumber('Y',yy)*mode_scale;
+    xx=parsenumber('X',xx);
+    yy=parsenumber('Y',yy);
     zz=parsenumber('Z',zz);
-    setFeedRate(parsenumber('F',feed_rate/mode_scale)*mode_scale);
+    setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
       xx+=posx;
@@ -575,7 +512,7 @@ void processCommand() {
       zz+=posz;
     }
     
-    line_safe(xx,yy,zz);
+    polargraph_line(xx,yy,zz);
   }
     break;
   case 2:
@@ -594,11 +531,11 @@ void processCommand() {
       xx=yy=zz=ii=jj=0;
     }
     
-    ii=parsenumber('I',ii)*mode_scale;
-    jj=parsenumber('J',jj)*mode_scale;
-    xx=parsenumber('X',xx)*mode_scale;
-    yy=parsenumber('Y',yy)*mode_scale;
-    zz=parsenumber('Z',zz);
+    ii=parsenumber('I',ii)*0.1;
+    jj=parsenumber('J',jj)*0.1;
+    xx=parsenumber('X',xx)*0.1;
+    yy=parsenumber('Y',yy)*0.1;
+    zz=parsenumber('Z',zz)*0.1;
     setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
@@ -613,16 +550,6 @@ void processCommand() {
   }
     break;
   case 4:  pause(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
-  case 20:
-    mode_scale=2.54f;  // inches -> cm
-    strcpy(mode_name,"in");
-    printFeedRate();
-    break;
-  case 21:
-    mode_scale=0.1;  // mm -> cm
-    strcpy(mode_name,"mm");
-    printFeedRate();
-    break;
   case 28:  FindHome();  break;
   case 90:  absolute_mode=1;  break;  // absolute mode
   case 91:  absolute_mode=0;  break;  // relative mode
@@ -677,7 +604,7 @@ void processCommand() {
  */
 void ready() {
   sofar=0;  // clear input buffer
-  Serial.print(F("> "));  // signal ready to receive input
+  Serial.print(F("\n> "));  // signal ready to receive input
 }
 
 
@@ -696,14 +623,11 @@ void setup() {
   
   SD_init();
   LCD_init();
-
-  // initialize the scale
-  strcpy(mode_name,"mm");
-  mode_scale=0.1;
   
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
   
+  // @TODO: just for testing
   pinMode(13,OUTPUT);
   
   // initialize the plotter position.

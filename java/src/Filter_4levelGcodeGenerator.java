@@ -40,7 +40,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	}
 	
 	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
-		String command="G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+"\n";
+		String command="G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+";\n";
 		if(up) {
 			previous_command=command;
 		}
@@ -48,10 +48,10 @@ class Filter_4levelGcodeGenerator extends Filter {
 			lastup=up;
 			if(up) {
 				// go faster with pen up
-				out.write("G00 Z90 F2000\n");
+				out.write("G00 Z90 F2000;\n");
 			} else {
 				out.write(previous_command);
-				out.write("G00 Z0 F2000\n");
+				out.write("G00 Z0 F2000;\n");
 			}
 		}
 		if(!up) {
@@ -80,13 +80,13 @@ class Filter_4levelGcodeGenerator extends Filter {
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 			// change to tool 0
-			out.write("M06 T0\n");
+			out.write("M06 T0;\n");
 			// set absolute coordinates
-			out.write("G00 G90\n");
+			out.write("G00 G90;\n");
 			// set a default feed rate
-			out.write("G00 F1000\n");
+			out.write("G00 F1000;\n");
 			// lift pen
-			out.write("G00 Z90\n");
+			out.write("G00 Z90;\n");
 			lastup=true;
 			previous_command="";
 
@@ -221,10 +221,10 @@ class Filter_4levelGcodeGenerator extends Filter {
 
 			
 			// lift pen and return to home
-			out.write("G00 Z90\n");
-			out.write("G00 X0 Y0\n");
+			out.write("G00 Z90;\n");
+			out.write("G00 X0 Y0;\n");
 			// Unpower Steppers
-			out.write("M18\n");
+			out.write("M18;\n");
 			out.close();
 		}
 		catch(IOException e) {

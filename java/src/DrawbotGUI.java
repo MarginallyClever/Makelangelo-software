@@ -1256,7 +1256,9 @@ public class DrawbotGUI
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		
-		line+=eol;
+		if(!line.endsWith(";")) {
+			line+=eol;
+		}
 		Log("<font color='white'>"+line+"</font>");
 		try {
 			out.write(line.getBytes());

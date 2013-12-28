@@ -354,7 +354,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 
 	private void MoveTo(BufferedWriter out,int i,boolean up) throws IOException {
-		out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + "\n");
+		out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + ";\n");
 	}
 	
 	/**
@@ -388,25 +388,25 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 			// change to tool 0
-			out.write("M06 T0\n");
+			out.write("M06 T0;\n");
 			// set absolute coordinates
-			out.write("G00 G90\n");
+			out.write("G00 G90;\n");
 			// lift pen and set a default feed rate
-			out.write("G00 F1000 Z90\n");
+			out.write("G00 F1000 Z90;\n");
 			// move to the first point
 			MoveTo(out,besti,false);
 			// lower the pen
-			out.write("G00 Z0\n");
+			out.write("G00 Z0;\n");
 
 			for(i=1;i<numPoints;++i) {
 				MoveTo(out,(besti+i)%numPoints,false);
 			}
 			MoveTo(out,besti,false);
 			// lift pen and return to home
-			out.write("G00 Z90\n");
-			out.write("G00 X0 Y0\n");
+			out.write("G00 Z90;\n");
+			out.write("G00 X0 Y0;\n");
 			// Unpower Steppers
-			out.write("M18\n");
+			out.write("M18;\n");
 			out.close();
 		}
 		catch(IOException e) {

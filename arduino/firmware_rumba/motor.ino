@@ -191,7 +191,7 @@ ISR(TIMER2_COMPA_vect) {
     
     a.over += a.absdelta;
     if(a.over >= seg.steps) {
-      laststep[j] += ( a.dir == HIGH ? 1 : -1 );
+      laststep[j]+= a.dir;
       digitalWrite(motors[j].step_pin,LOW);
       a.over -= seg.steps;
       digitalWrite(motors[j].step_pin,HIGH);
@@ -206,7 +206,7 @@ ISR(TIMER2_COMPA_vect) {
 /**
  * Uses bresenham's line algorithm to move both motors
  **/
-void motor_line(int n0,int n1,int n2,float new_feed_rate) {
+void motor_line(long n0,long n1,long n2,float new_feed_rate) {
   int next_segment = get_next_segment(last_segment);
   while( next_segment == current_segment ) {
     // the buffer is full, we are way ahead of the motion system
@@ -217,17 +217,16 @@ void motor_line(int n0,int n1,int n2,float new_feed_rate) {
   new_seg.a[0].step_count = n0;
   new_seg.a[1].step_count = n1;
   new_seg.a[2].step_count = n2;
+  new_seg.steps=0;
+  new_seg.feed_rate=new_feed_rate;
   
-  int i;
-
   Segment &old_seg = line_segments[get_prev_segment(last_segment)];
   new_seg.a[0].delta = n0 - old_seg.a[0].step_count;
   new_seg.a[1].delta = n1 - old_seg.a[1].step_count;
   new_seg.a[2].delta = n2 - old_seg.a[2].step_count;
 
-  new_seg.steps=0;
-  new_seg.feed_rate=new_feed_rate;
 
+  int i;
   for(i=0;i<NUM_AXIES;++i) {
     new_seg.a[i].over = 0;
     new_seg.a[i].dir = (new_seg.a[i].delta > 0 ? LOW:HIGH);

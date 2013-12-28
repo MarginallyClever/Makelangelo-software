@@ -17,47 +17,27 @@
 //#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
 
 
-// which motor is on which pin?
-#define M1_PIN          (1)
-#define M2_PIN          (2)
-
-// which limit switch is on which pin?
-#define L_PIN          (A3)
-#define R_PIN          (A5)
-
-// NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
-// then it is 2.5132741228718345 circumference, and
-// 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
-// NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
-// These numbers directly affect the maximum velocity.
-#define STEPS_PER_TURN  (400.0)
-#define MAX_RPM         (200.0)
-
-// delay between steps, in microseconds.
-#define STEP_DELAY      (150)
-
-
-// *****************************************************************************
-// *** Don't change the constants below unless you know what you're doing.   ***
-// *****************************************************************************
-
 
 // servo angles for pen control
 #define PEN_UP_ANGLE    (80)
 #define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
+// for serial comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 
-#define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
+
+#define MICROSTEPS           (16)  // microstepping on this microcontroller
+#define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
 #define MAX_FEEDRATE         (200)
 #define MIN_FEEDRATE         (0.01)
 
-#define STEP_DELAY           (200)  // microseconds between steps when homing, jogging each motor.
+#define STEP_DELAY           (150)  // delay between steps, in microseconds.
 
 #define NUM_AXIES            (2)
 
+// for timer interrupt control
 #define CLOCK_FREQ           (16000000L)
 #define MAX_COUNTER          (65536L)
 #define MAX_SEGMENTS         (32)
@@ -105,11 +85,11 @@
 //------------------------------------------------------------------------------
 // EEPROM MEMORY MAP
 //------------------------------------------------------------------------------
-#define EEPROM_VERSION   4             // Increment EEPROM_VERSION when adding new variables
-#define ADDR_VERSION     0             // address of the version number (one byte)
-#define ADDR_UUID        1             // address of the UUID (long - 4 bytes)
-#define ADDR_SPOOL_DIA1  5             // address of the spool diameter (float - 4 bytes)
-#define ADDR_SPOOL_DIA2  9             // address of the spool diameter (float - 4 bytes)
+#define EEPROM_VERSION   4                         // Increment EEPROM_VERSION when adding new variables
+#define ADDR_VERSION     0                         // address of the version number (one byte)
+#define ADDR_UUID        (ADDR_VERSION+1)          // address of the UUID (long - 4 bytes)
+#define ADDR_SPOOL_DIA1  (ADDR_UUID+4)             // address of the spool diameter (float - 4 bytes)
+#define ADDR_SPOOL_DIA2  (ADDR_SPOOL_DIA1+4)       // address of the spool diameter (float - 4 bytes)
 
 
 //------------------------------------------------------------------------------
