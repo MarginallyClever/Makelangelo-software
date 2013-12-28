@@ -117,9 +117,9 @@ void pause(long ms) {
 
 //------------------------------------------------------------------------------
 void printFeedRate() {
-  Serial.print(F("F="));
+  Serial.print(F("F"));
   Serial.print(feed_rate);
-  Serial.print(F("steps/min"));
+  Serial.print(F("steps/s"));
 }
 
 
@@ -210,10 +210,13 @@ void processConfig() {
   
   teleport(0,0);
 
-  //test_kinematics(0,0);
-  //test_kinematics(10,0);
-  //test_kinematics(10,10);
-  //test_kinematics(0,10);
+  test_kinematics(0,0);
+  test_kinematics(10,0);
+  test_kinematics(10,10);
+  test_kinematics(0,10);
+  test_kinematics(-6,0);
+  test_kinematics(-8,-3);
+  test_kinematics(0,-7);
 }
 
 
@@ -224,12 +227,12 @@ void test_kinematics(float x,float y) {
   FK(A,B,C,D);
   Serial.print(F(" before x="));  Serial.print(x);
   Serial.print(F(" before y="));  Serial.print(y);
-  //Serial.print(F(" A="));  Serial.print(A);
-  //Serial.print(F(" B="));  Serial.print(B);
-  //Serial.print(F(" C="));  Serial.print(C);
-  //Serial.print(F(" D="));  Serial.print(D);
-  Serial.print(F(" after x="));  Serial.print(C-x);
-  Serial.print(F(" after y="));  Serial.println(D-y);
+  Serial.print(F(" A="));  Serial.print(A);
+  Serial.print(F(" B="));  Serial.print(B);
+  Serial.print(F(" C="));  Serial.print(C);
+  Serial.print(F(" D="));  Serial.print(D);
+  Serial.print(F(" dx="));  Serial.print(C-x);
+  Serial.print(F(" dy="));  Serial.println(D-y);
 }
 
 
@@ -325,7 +328,7 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
 
 //------------------------------------------------------------------------------
 // instantly move the virtual plotter position
-// does not validate if the move is valid
+// does not check if the move is valid
 void teleport(float x,float y) {
   posx=x;
   posy=y;
@@ -333,8 +336,8 @@ void teleport(float x,float y) {
   // @TODO: posz?
   float L1,L2;
   IK(posx,posy,L1,L2);
-  laststep[0]=L1;
-  laststep[1]=L2;
+  
+  motor_set_step_count(L1,L2,0);
 }
 
 

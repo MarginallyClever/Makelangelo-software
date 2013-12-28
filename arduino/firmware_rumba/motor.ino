@@ -67,6 +67,24 @@ void motor_setup() {
     pinMode(motors[i].limit_switch_pin,INPUT);
     digitalWrite(motors[i].limit_switch_pin,HIGH);
   }
+  
+  current_segment=0;
+  last_segment=0;
+  
+  motor_set_step_count(0,0,0);
+}
+
+
+void motor_set_step_count(long a0,long a1,long a2) {  
+  if( current_segment==last_segment ) {
+    Segment &old_seg = line_segments[get_prev_segment(last_segment)];
+    old_seg.a[0].step_count=a0;
+    old_seg.a[1].step_count=a1;
+    old_seg.a[2].step_count=a2;
+    laststep[0]=a0;
+    laststep[1]=a1;
+    laststep[2]=a2;
+  }
 }
 
 
@@ -231,6 +249,10 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
     new_seg.a[i].over = 0;
     new_seg.a[i].dir = (new_seg.a[i].delta > 0 ? LOW:HIGH);
     new_seg.a[i].absdelta = abs(new_seg.a[i].delta);
+    Serial.print(i);
+    Serial.print(F(" IS "));  Serial.print(new_seg.a[i].step_count);
+    Serial.print(F("-"));  Serial.print(old_seg.a[i].step_count);
+    Serial.print(F("="));  Serial.println(new_seg.a[i].delta);
     if( new_seg.steps < new_seg.a[i].absdelta ) {
       new_seg.steps = new_seg.a[i].absdelta;
     }
@@ -244,11 +266,11 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
     timer_set_frequency(new_feed_rate);
   }
   
-#ifdef VERBOSE
+//#ifdef VERBOSE
   Serial.print(F("At "));  Serial.println(current_segment);
-  Serial.print(F("Adding "));  Serial.println(last_segment);
+  Serial.print(F("Adding "));  Serial.println(next_segment);
   Serial.print(F("Steps= "));  Serial.println(new_seg.steps_left);
-#endif
+//#endif
   last_segment = next_segment;
 }
 

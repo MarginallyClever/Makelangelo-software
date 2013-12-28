@@ -35,7 +35,7 @@
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds.
 
-#define NUM_AXIES            (2)
+#define NUM_AXIES            (3)
 
 // for timer interrupt control
 #define CLOCK_FREQ           (16000000L)
