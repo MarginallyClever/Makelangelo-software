@@ -401,13 +401,13 @@ public class DrawbotGUI
 		    commPort = portIdentifier.open("DrawbotGUI",2000);
 		}
 		catch(Exception e) {
-			Log("Port could not be opened:"+e.getMessage()+NL);
+			Log("<span style='color:red'>Port could not be opened:"+e.getMessage()+"</span>\n");
 			e.printStackTrace();
 			return 3;
 		}
 
 	    if( ( commPort instanceof SerialPort ) == false ) {
-			Log("<span style='color:red'>Only serial ports are handled by this example."+"</span>\n");
+			Log("<span style='color:red'>This is not a SerialPort.</span>\n");
 			return 4;
 		}
 
@@ -439,7 +439,7 @@ public class DrawbotGUI
 			return 7;
 		}
 
-		Log("<span style='green'>Opened.</span>\n");
+		Log("<span style='color:green'>Opened.</span>\n");
 		SetRecentPort(portName);
 		portOpened=true;
 		UpdateMenuBar();
@@ -1166,8 +1166,12 @@ public class DrawbotGUI
 	}
 	
 	private void ChangeToTool(String toolName) {
-		int i=Integer.parseInt(toolName);
+		int i=Integer.parseInt(toolName.replace(";",""));
 		String names[] = { "Black (tool 0)", "Red (tool 1)", "Green (tool 2)", "Blue (tool 3)" };
+		if(i>names.length) {
+			Log("<span style='color:red'>Invalid tool "+i+" requested.</span>");
+			i=0;
+		}
 		toolName = names[i];
 		JOptionPane.showMessageDialog(null,"Please change to "+toolName+" and click OK.");
 	}
@@ -1207,7 +1211,7 @@ public class DrawbotGUI
 		
 		// other machine code to ignore?
 		if(tokens[0].startsWith("M")) {
-			Log("<font color='pink'>"+line+"</font>\n");
+			Log("<span style='color:pink'>"+line+"</span>\n");
 			return true;
 		} 
 

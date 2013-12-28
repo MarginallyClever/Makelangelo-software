@@ -56,14 +56,18 @@ void LCD_where() {
   long t=millis();
   if(lcd_delay<t+200) {
     lcd_delay=t;
+    float d1=laststep[0];
+    float d2=laststep[1];
+    float px,py;
+    FK(d1,d2,px,py);
     lcd.setCursor(0, 0);    lcd.print("                ");
-    lcd.setCursor(0, 0);    lcd.print('X');  lcd.print((long)posx);
+    lcd.setCursor(0, 0);    lcd.print('X');  lcd.print(px);
     lcd.setCursor(0, 1);    lcd.print("                ");
-    lcd.setCursor(0, 1);    lcd.print('Y');  lcd.print((long)posy);
+    lcd.setCursor(0, 1);    lcd.print('Y');  lcd.print(py);
     lcd.setCursor(0, 2);    lcd.print("                ");
-    lcd.setCursor(0, 2);    lcd.print('Z');  lcd.print((long)posz);
+    lcd.setCursor(0, 2);    lcd.print('Z');  lcd.print(posz);
     lcd.setCursor(0, 3);    lcd.print("                ");
-    lcd.setCursor(0, 3);    lcd.print('F');  lcd.print((long)feed_rate);
+    lcd.setCursor(0, 3);    lcd.print('F');  lcd.print(feed_rate);
   }
 #endif
 }

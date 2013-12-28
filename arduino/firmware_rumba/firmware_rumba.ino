@@ -57,10 +57,9 @@ float THREAD_PER_STEP=0;
 // plotter position.
 float posx, posy, posz;  // pen state
 float feed_rate=0;
-long step_delay;
 
 // motor position
-long laststep1, laststep2;
+volatile long laststep[NUM_AXIES];
 
 char absolute_mode=1;  // absolute or incremental programming mode?
 float mode_scale;   // mm or inches?
@@ -125,8 +124,7 @@ char readSwitches() {
 
 //------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
-void setFeedRate(float v) {
-  float v1 = v * mode_scale/60.0;
+void setFeedRate(float v1) {
   if( feed_rate != v1 ) {
     feed_rate = v1;
     if(feed_rate > MAX_FEEDRATE) {
@@ -136,20 +134,14 @@ void setFeedRate(float v) {
       feed_rate = MIN_FEEDRATE;
     }
   }
-  
-  step_delay = (1000.0/(float)feed_rate);
-  
-  Serial.print(F("step_delay="));
-  Serial.println(step_delay);
 }
 
 
 //------------------------------------------------------------------------------
 void printFeedRate() {
-  Serial.print(F("f1="));
-  Serial.print(feed_rate*60.0/mode_scale);
-  Serial.print(mode_name);
-  Serial.print(F("/min"));
+  Serial.print(F("F="));
+  Serial.print(feed_rate);
+  Serial.print(F("steps/min"));
 }
 
 
@@ -211,7 +203,7 @@ void line_safe(float x,float y,float z) {
   float len=sqrt(dx*dx+dy*dy);
   
   if(len<=CM_PER_SEGMENT) {
-    line(x,y,z);
+    polargraph_line(x,y,z);
     return;
   }
   
@@ -224,11 +216,11 @@ void line_safe(float x,float y,float z) {
   for(long j=0;j<=pieces;++j) {
     a=(float)j/(float)pieces;
 
-    line((x-x0)*a+x0,
+    polargraph_line((x-x0)*a+x0,
          (y-y0)*a+y0,
          (z-z0)*a+z0);
   }
-  line(x,y,z);
+  polargraph_line(x,y,z);
 }
 
 
@@ -240,57 +232,11 @@ void pause(long ms) {
 
 
 //------------------------------------------------------------------------------
-void line(float x,float y,float z) {
+void polargraph_line(float x,float y,float z) {
   long l1,l2;
   IK(x,y,l1,l2);
-  long d1 = l1 - laststep1;
-  long d2 = l2 - laststep2;
-
-  long ad1=abs(d1);
-  long ad2=abs(d2);
-  int dir1=d1<0?M1_REEL_IN:M1_REEL_OUT;
-  int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
-  long over=0;
-  long i;
   
-  setPenAngle((int)z);
-  
-  // bresenham's line algorithm.
-  digitalWrite(motors[0].dir_pin,dir1);
-  digitalWrite(motors[1].dir_pin,dir2);
-  
-  if(ad1>ad2) {
-    for(i=0;i<ad1;++i) {
-      digitalWrite(motors[0].step_pin,HIGH);
-      digitalWrite(motors[0].step_pin,LOW);
-      over+=ad2;
-      if(over>=ad1) {
-        over-=ad1;
-        digitalWrite(motors[1].step_pin,HIGH);
-        digitalWrite(motors[1].step_pin,LOW);
-      }
-      pause(step_delay);
-      if(readSwitches()) return;
-    }
-  } else {
-    for(i=0;i<ad2;++i) {
-      digitalWrite(motors[1].step_pin,HIGH);
-      digitalWrite(motors[1].step_pin,LOW);
-      over+=ad1;
-      if(over>=ad2) {
-        over-=ad2;
-        digitalWrite(motors[0].step_pin,HIGH);
-        digitalWrite(motors[0].step_pin,LOW);
-      }
-      pause(step_delay);
-      if(readSwitches()) return;
-    }
-  }
-
-  laststep1=l1;
-  laststep2=l2;
-  posx=x;
-  posy=y;
+  motor_line(l1,l2,z,feed_rate);
 }
 
 
@@ -336,10 +282,10 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line(nx,ny,nz);
+    line_safe(nx,ny,nz);
   }
   
-  line(x,y,z);
+  line_safe(x,y,z);
 }
 
 
@@ -353,8 +299,8 @@ void teleport(float x,float y) {
   // @TODO: posz?
   long L1,L2;
   IK(posx,posy,L1,L2);
-  laststep1=L1;
-  laststep2=L2;
+  laststep[0]=L1;
+  laststep[1]=L2;
 }
 
 
@@ -387,7 +333,7 @@ void FindHome() {
   }
   
   int safe_out=50;
-  
+
   // reel in the left motor until contact is made.
   Serial.println(F("Find left..."));
   digitalWrite(motors[0].dir_pin,HIGH);
@@ -397,7 +343,7 @@ void FindHome() {
     digitalWrite(motors[0].step_pin,LOW);
     digitalWrite(motors[1].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
-    pause(step_delay);
+    pause(STEP_DELAY);
   } while(!readSwitches());
   laststep1=0;
   
@@ -407,7 +353,7 @@ void FindHome() {
   for(i=0;i<safe_out;++i) {
     digitalWrite(motors[0].step_pin,HIGH);
     digitalWrite(motors[0].step_pin,LOW);
-    pause(step_delay);
+    pause(STEP_DELAY);
   }
   laststep1=safe_out;
   
@@ -420,7 +366,7 @@ void FindHome() {
     digitalWrite(motors[0].step_pin,LOW);
     digitalWrite(motors[1].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
-    pause(step_delay);
+    pause(STEP_DELAY);
     laststep1++;
   } while(!readSwitches());
   laststep2=0;
@@ -430,7 +376,7 @@ void FindHome() {
   for(i=0;i<safe_out;++i) {
     digitalWrite(motors[1].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
-    pause(step_delay);
+    pause(STEP_DELAY);
   }
   laststep2=safe_out;
   
@@ -448,9 +394,8 @@ void where() {
   Serial.print(posy);
   Serial.print(F(" Z"));
   Serial.print(posz);
-  Serial.print(F(" F"));
+  Serial.print(F(" "));
   printFeedRate();
-  Serial.print(F("\n"));
 }
 
 
@@ -463,7 +408,7 @@ void printConfig() {
   Serial.print(limit_top);        Serial.print(F(","));
   Serial.print(limit_right);      Serial.print(F("\n"));
   Serial.print(F("Bottom="));     Serial.println(limit_bottom);
-  Serial.print(F("Feed rate="));  printFeedRate();
+  Serial.print(F(" "));  printFeedRate();
 }
 
 
@@ -508,7 +453,7 @@ void LoadConfig() {
     SaveSpoolDiameter();
     // update the EEPROM version
     EEPROM.write(ADDR_VERSION,EEPROM_VERSION);
-  } else if(version_number==EEPROM_VERSION) {
+  } else if(version_number==4) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
     adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
@@ -560,67 +505,37 @@ void processCommand() {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
-    float xx=posx;
-    float yy=posy;
-  
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      default: ptr=0; break;
-      }
-    }
-
-    teleport(xx,yy);
+    teleport(parsenumber('X',posx),
+             parsenumber('Y',posy));
   } else if(!strncmp(buffer,"CONFIG",6)) {
-    float tt=limit_top;
-    float bb=limit_bottom;
-    float rr=limit_right;
-    float ll=limit_left;
-    char gg=m1d;
-    char hh=m2d;
-    
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'T': tt=atof(ptr+1);  break;
-      case 'B': bb=atof(ptr+1);  break;
-      case 'R': rr=atof(ptr+1);  break;
-      case 'L': ll=atof(ptr+1);  break;
-      case 'G': gg=*(ptr+1);  break;
-      case 'H': hh=*(ptr+1);  break;
-      case 'I':
-        if(atoi(ptr+1)>0) {
+    float tt=parsenumber('T',limit_top);
+    float bb=parsenumber('B',limit_bottom);
+    float rr=parsenumber('R',limit_right);
+    float ll=parsenumber('L',limit_left);
+    char gg=parsenumber('G',m1d);
+    char hh=parsenumber('H',m2d);
+    char i = parsenumber('I',-1);
+    if(i!=-1) {
+        if(1>0) {
           M1_REEL_IN=HIGH;
           M1_REEL_OUT=LOW;
         } else {
           M1_REEL_IN=LOW;
           M1_REEL_OUT=HIGH;
         }
-        break;
-      case 'J':
-        if(atoi(ptr+1)>0) {
+    }
+    char j = parsenumber('J',-1);
+    if(j!=-1) {
+        if(j>0) {
           M2_REEL_IN=HIGH;
           M2_REEL_OUT=LOW;
         } else {
           M2_REEL_IN=LOW;
           M2_REEL_OUT=HIGH;
         }
-        break;
-      }
     }
     
     // @TODO: check t>b, r>l ?
-    limit_top=tt;
-    limit_bottom=bb;
-    limit_right=rr;
-    limit_left=ll;
-    m1d=gg;
-    m2d=hh;
-    
     teleport(0,0);
     printConfig();
   } 
@@ -652,7 +567,7 @@ void processCommand() {
     xx=parsenumber('X',xx)*mode_scale;
     yy=parsenumber('Y',yy)*mode_scale;
     zz=parsenumber('Z',zz);
-    setFeedRate(parsenumber('F',feed_rate));
+    setFeedRate(parsenumber('F',feed_rate/mode_scale)*mode_scale);
  
     if(absolute_mode==0) {
       xx+=posx;
@@ -666,19 +581,17 @@ void processCommand() {
   case 2:
   case 3: {
     // arc
-    float xx, yy, zz;
+    float xx, yy, zz,ii,jj;
     float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
-    float ii = 0;
-    float jj = 0;
     
     if(absolute_mode==1) {
       xx=posx;
       yy=posy;
       zz=posz;
+      ii=posx;
+      jj=posz;
     } else {
-      xx=0;
-      yy=0;
-      zz=0;
+      xx=yy=zz=ii=jj=0;
     }
     
     ii=parsenumber('I',ii)*mode_scale;
@@ -692,12 +605,14 @@ void processCommand() {
       xx+=posx;
       yy+=posy;
       zz+=posz;
+      ii+=posx;
+      jj+=posy;
     }
 
-    arc(posx+ii,posy+jj,xx,yy,zz,dd);
+    arc(ii,jj,xx,yy,zz,dd);
   }
     break;
-  case 4:  delay(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
+  case 4:  pause(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
   case 20:
     mode_scale=2.54f;  // inches -> cm
     strcpy(mode_name,"in");
@@ -717,25 +632,22 @@ void processCommand() {
   switch(cmd) {
   case 0: {
     // move one motor
-    char *ptr=strchr(buffer,' ')+1;
-    int amount = atoi(ptr+1);
-    int i, dir;
-    if(*ptr == m1d) {
-      digitalWrite(motors[0].dir_pin,amount < 0 ? M1_REEL_IN : M1_REEL_OUT);
-      amount=abs(amount);
-      for(i=0;i<amount;++i) {
-        digitalWrite(motors[0].step_pin,HIGH);
-        digitalWrite(motors[0].step_pin,LOW);
-        pause(step_delay);
-      }
-    } else if(*ptr == m2d) {
-      digitalWrite(motors[1].dir_pin,amount < 0 ? M2_REEL_IN : M2_REEL_OUT);
-      amount = abs(amount);
-      for(i=0;i<amount;++i) {
-        digitalWrite(motors[1].step_pin,HIGH);
-        digitalWrite(motors[1].step_pin,LOW);
-        pause(step_delay);
-      }
+    int i,amount=parsenumber(m1d,0);
+    digitalWrite(motors[0].dir_pin,amount < 0 ? M1_REEL_IN : M1_REEL_OUT);
+    amount=abs(amount);
+    for(i=0;i<amount;++i) {
+      digitalWrite(motors[0].step_pin,HIGH);
+      digitalWrite(motors[0].step_pin,LOW);
+      pause(STEP_DELAY);
+    }
+    
+    amount=parsenumber(m2d,0);
+    digitalWrite(motors[1].dir_pin,amount < 0 ? M2_REEL_IN : M2_REEL_OUT);
+    amount = abs(amount);
+    for(i=0;i<amount;++i) {
+      digitalWrite(motors[1].step_pin,HIGH);
+      digitalWrite(motors[1].step_pin,LOW);
+      pause(STEP_DELAY);
     }
   }
     break;
@@ -765,7 +677,7 @@ void processCommand() {
  */
 void ready() {
   sofar=0;  // clear input buffer
-  Serial.print(F(">"));  // signal ready to receive input
+  Serial.print(F("> "));  // signal ready to receive input
 }
 
 
@@ -791,6 +703,8 @@ void setup() {
   
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
+  
+  pinMode(13,OUTPUT);
   
   // initialize the plotter position.
   teleport(0,0);

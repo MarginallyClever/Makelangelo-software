@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-//#define VERBOSE              (1)  // add to get a lot more serial output.
+//#define VERBOSE           (1)  // add to get a lot more serial output.
 #define HAS_SD  // comment this out if there is no SD card
 #define HAS_LCD  // comment this out if there is no SMART LCD controller
 //#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
@@ -53,6 +53,8 @@
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
 #define MAX_FEEDRATE         (200)
 #define MIN_FEEDRATE         (0.01)
+
+#define STEP_DELAY           (200)  // microseconds between steps when homing, jogging each motor.
 
 #define NUM_AXIES            (2)
 
