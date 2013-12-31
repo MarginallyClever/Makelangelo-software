@@ -70,7 +70,7 @@ public class DrawbotGUI
 	private static final int IMAGE_TSP=0;
 	private static final int IMAGE_SPIRAL=1;
 	private static final int IMAGE_4LEVEL=2;
-	private int draw_style=IMAGE_TSP;
+	private int draw_style=IMAGE_SPIRAL;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;

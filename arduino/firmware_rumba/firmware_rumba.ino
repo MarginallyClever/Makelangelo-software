@@ -209,14 +209,13 @@ void processConfig() {
   printConfig();
   
   teleport(0,0);
-
-  test_kinematics(0,0);
-  test_kinematics(10,0);
-  test_kinematics(10,10);
-  test_kinematics(0,10);
-  test_kinematics(-6,0);
-  test_kinematics(-8,-3);
-  test_kinematics(0,-7);
+  //test_kinematics(0,0);
+  //test_kinematics(10,0);
+  //test_kinematics(10,10);
+  //test_kinematics(0,10);
+  //test_kinematics(-6,0);
+  //test_kinematics(-8,-3);
+  //test_kinematics(0,-7);
 }
 
 
@@ -225,8 +224,8 @@ void test_kinematics(float x,float y) {
   float A, B, C, D;
   IK(x,y,A,B);
   FK(A,B,C,D);
-  Serial.print(F(" before x="));  Serial.print(x);
-  Serial.print(F(" before y="));  Serial.print(y);
+  Serial.print(F(" x="));  Serial.print(x);
+  Serial.print(F(" y="));  Serial.print(y);
   Serial.print(F(" A="));  Serial.print(A);
   Serial.print(F(" B="));  Serial.print(B);
   Serial.print(F(" C="));  Serial.print(C);
@@ -630,9 +629,6 @@ void setup() {
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
   
-  // @TODO: just for testing
-  pinMode(13,OUTPUT);
-  
   // initialize the plotter position.
   teleport(0,0);
   setPenAngle(PEN_UP_ANGLE);
@@ -663,7 +659,7 @@ void loop() {
   }
   
   SD_check();
-  LCD_where();
+  LCD_menu();
 }
 
 

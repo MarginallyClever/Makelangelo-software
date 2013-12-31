@@ -15,10 +15,10 @@ Axis atemp;  // for line()
 Motor motors[NUM_AXIES];
 
 Segment line_segments[MAX_SEGMENTS];
-volatile int current_segment;
-volatile int last_segment;
+volatile int current_segment=0;
+volatile int last_segment=0;
+long old_feed_rate=0;
 
-int led_state=HIGH;
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -68,9 +68,6 @@ void motor_setup() {
     digitalWrite(motors[i].limit_switch_pin,HIGH);
   }
   
-  current_segment=0;
-  last_segment=0;
-  
   motor_set_step_count(0,0,0);
 }
 
@@ -101,14 +98,16 @@ int get_prev_segment(int i) {
 /**
  * Set the clock 2 timer frequency.
  * @input desired_freq_hz the desired frequency
+ * Source: http://letsmakerobots.com/node/28278
+ * Different clock sources can be selected for each timer independently. 
+ * To calculate the timer frequency (for example 2Hz using timer1) you will need:
  */
 void timer_set_frequency(long desired_freq_hz) {
-  // Source: http://letsmakerobots.com/node/28278
-  // Different clock sources can be selected for each timer independently. 
-  // To calculate the timer frequency (for example 2Hz using timer1) you will need:
+  if(old_feed_rate==desired_freq_hz) return;
+  old_feed_rate=desired_freq_hz;
   
-  //  CPU frequency 16Mhz for Arduino
-  //  maximum timer counter value (256 for 8bit, 65536 for 16bit timer)
+  // CPU frequency 16Mhz for Arduino
+  // maximum timer counter value (256 for 8bit, 65536 for 16bit timer)
   int prescaler_index=-1;
   int prescalers[] = {1,8,64,256,1024};
   long counter_value;
@@ -119,40 +118,82 @@ void timer_set_frequency(long desired_freq_hz) {
     //  Divide result through the desired frequency (62500 / 2Hz = 31250)
     counter_value /= desired_freq_hz;
     //  Verify counter_value < maximum timer. if fail, choose bigger prescaler.
-  } while(counter_value > MAX_COUNTER && prescaler_index<4);
+  } while(counter_value > MAX_COUNTER && prescaler_index < TIMER_PRESCALER_COUNT );
   
-  if( prescaler_index>=5 ) {
+  if( prescaler_index >= TIMER_PRESCALER_COUNT ) {
+    // @TODO: Serial.print() from inside the timer interrupt will probably crash the board.
     Serial.println(F("Timer could not be set: Desired frequency out of bounds."));
     return;
   }
 
 #ifdef VERBOSE
-  Serial.print(F("counter_value  ="));  Serial.print(counter_value);
+  Serial.print(F("desired_freq_hz="));  Serial.println(desired_freq_hz);
+  Serial.print(F("counter_value="));  Serial.println(counter_value);
   Serial.print(F(" prescaler_index="));  Serial.print(prescaler_index);
-  Serial.print(F(" = "));  Serial.print(((prescaler_index&0x1)   ));
-  Serial.print(F("/"));  Serial.print(((prescaler_index&0x2)>>1));
-  Serial.print(F("/"));  Serial.println(((prescaler_index&0x4)>>2));
+  Serial.print(F(" > "));  Serial.print(  ((prescaler_index&0x1)   ));
+  Serial.print(F("/"));    Serial.print(  ((prescaler_index&0x2)>>1));
+  Serial.print(F("/"));    Serial.println(((prescaler_index&0x4)>>2));
 #endif
 
   // disable global interrupts
   noInterrupts();
   
+#if USE_TIMER == 0
+  // set entire TCCR1A register to 0
+  TCCR0A = 0;
+  // set entire TCCR1B register to 0
+  TCCR0B = 0;
+  // set the overflow clock TCNT1 to 0
+  TCNT0  = 0;
+  // set OCR1A compare match register to desired timer count
+  OCR0A = counter_value;
+  // turn on CTC mode
+  TCCR0A |= (1 << WGM02);  // this might be the wrong wgm.
+  // Set CS10, CS11, and CS12 bits for prescaler
+  TCCR0B |= ( (( prescaler_index&0x1 )   ) << CS00);
+  TCCR0B |= ( (( prescaler_index&0x2 )>>1) << CS01);
+  TCCR0B |= ( (( prescaler_index&0x4 )>>2) << CS02);
+  // enable timer compare interrupt
+  TIMSK0 |= (1 << OCIE0A);
+#endif
+#if USE_TIMER == 1
+  // set entire TCCR1A register to 0
+  TCCR1A = 0;
+  // set entire TCCR1B register to 0
+  TCCR1B = 0;
+  // set the overflow clock TCNT1 to 0
+  TCNT1  = 0;
+  // set OCR1A compare match register to desired timer count
+  OCR1A = counter_value;
+  // turn on CTC mode
+  TCCR1A |= (1 << WGM12);
+  // Set CS10, CS11, and CS12 bits for prescaler
+  TCCR1B |= ( (( prescaler_index&0x1 )   ) << CS10);
+  TCCR1B |= ( (( prescaler_index&0x2 )>>1) << CS11);
+  TCCR1B |= ( (( prescaler_index&0x4 )>>2) << CS12);
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+#endif
+#if USE_TIMER == 2
+  //ASSR &= ~(1 << AS2); // Use system clock for Timer/Counter2
+
   // set entire TCCR1A register to 0
   TCCR2A = 0;
   // set entire TCCR1B register to 0
   TCCR2B = 0;
-  // set the overflow clock to 0
+  // set the overflow clock TCNT1 to 0
   TCNT2  = 0;
-  // set compare match register to desired timer count
+  // set OCR1A compare match register to desired timer count
   OCR2A = counter_value;
   // turn on CTC mode
-  TCCR2B |= (1 << WGM21);
+  TCCR2A |= (1 << WGM21);
   // Set CS10, CS11, and CS12 bits for prescaler
   TCCR2B |= ( (( prescaler_index&0x1 )   ) << CS20);
   TCCR2B |= ( (( prescaler_index&0x2 )>>1) << CS21);
   TCCR2B |= ( (( prescaler_index&0x4 )>>2) << CS22);
   // enable timer compare interrupt
   TIMSK2 |= (1 << OCIE2A);
+#endif
 
   interrupts();  // enable global interrupts
 }
@@ -197,7 +238,7 @@ ISR(TIMER2_COMPA_vect) {
       digitalWrite( motors[j].dir_pin, line_segments[current_segment].a[j].dir );
     }
     // set frequency to segment feed rate
-    timer_set_frequency(seg.feed_rate);
+    timer_set_frequency(1000.0/(float)seg.feed_rate);
   }
 
   // make a step
@@ -209,15 +250,12 @@ ISR(TIMER2_COMPA_vect) {
     
     a.over += a.absdelta;
     if(a.over >= seg.steps) {
-      laststep[j]+= a.dir;
+      laststep[j] += (a.dir==HIGH?-1:1);
       digitalWrite(motors[j].step_pin,LOW);
       a.over -= seg.steps;
       digitalWrite(motors[j].step_pin,HIGH);
     }
   }
-  
-  led_state = led_state==HIGH? LOW:HIGH;
-  digitalWrite(13, led_state);
 }
 
 
@@ -249,10 +287,13 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
     new_seg.a[i].over = 0;
     new_seg.a[i].dir = (new_seg.a[i].delta > 0 ? LOW:HIGH);
     new_seg.a[i].absdelta = abs(new_seg.a[i].delta);
+#ifdef VERBOSE
     Serial.print(i);
     Serial.print(F(" IS "));  Serial.print(new_seg.a[i].step_count);
     Serial.print(F("-"));  Serial.print(old_seg.a[i].step_count);
     Serial.print(F("="));  Serial.println(new_seg.a[i].delta);
+    Serial.print(F("F"));  Serial.println(new_feed_rate);
+#endif
     if( new_seg.steps < new_seg.a[i].absdelta ) {
       new_seg.steps = new_seg.a[i].absdelta;
     }
@@ -263,14 +304,14 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
   new_seg.steps_left = new_seg.steps;
   
   if( current_segment==last_segment ) {
-    timer_set_frequency(new_feed_rate);
+    timer_set_frequency(1000.0/(float)new_feed_rate);
   }
   
-//#ifdef VERBOSE
+#ifdef VERBOSE
   Serial.print(F("At "));  Serial.println(current_segment);
   Serial.print(F("Adding "));  Serial.println(next_segment);
   Serial.print(F("Steps= "));  Serial.println(new_seg.steps_left);
-//#endif
+#endif
   last_segment = next_segment;
 }
 

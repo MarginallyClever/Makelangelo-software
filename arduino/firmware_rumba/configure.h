@@ -33,19 +33,16 @@
 #define MAX_FEEDRATE         (200)
 #define MIN_FEEDRATE         (0.01)
 
-#define STEP_DELAY           (150)  // delay between steps, in microseconds.
+#define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
 
-#define NUM_AXIES            (3)
-
-// for timer interrupt control
-#define CLOCK_FREQ           (16000000L)
-#define MAX_COUNTER          (65536L)
-#define MAX_SEGMENTS         (32)
+#define NUM_AXIES            (3)  // x,y,z
+#define MAX_SEGMENTS         (32)  // number of line segments to buffer ahead
 
 // for arc directions
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
 #define CM_PER_SEGMENT  (0.2)  // Arcs are split into many line segments.  How long are the segments?
+
 
 // servo pin differs based on device
 #define SERVO_PIN        10
@@ -90,6 +87,28 @@
 #define ADDR_UUID        (ADDR_VERSION+1)          // address of the UUID (long - 4 bytes)
 #define ADDR_SPOOL_DIA1  (ADDR_UUID+4)             // address of the spool diameter (float - 4 bytes)
 #define ADDR_SPOOL_DIA2  (ADDR_SPOOL_DIA1+4)       // address of the spool diameter (float - 4 bytes)
+
+
+//------------------------------------------------------------------------------
+// TIMERS
+//------------------------------------------------------------------------------
+// for timer interrupt control
+#define CLOCK_FREQ           (16000000L)
+#define MAX_COUNTER          (65536L)
+
+#define USE_TIMER            (2)
+
+#if USE_TIMER == 0
+#define TIMER_PRESCALER_COUNT (5)
+#endif
+
+#if USE_TIMER == 1
+#define TIMER_PRESCALER_COUNT (5)
+#endif
+
+#if USE_TIMER == 2
+#define TIMER_PRESCALER_COUNT (4)
+#endif
 
 
 //------------------------------------------------------------------------------
