@@ -44,20 +44,22 @@ class Filter_Spiral extends Filter {
 		if(up) {
 			previous_command=command;
 		}
-		if(lastup!=up) {
-			lastup=up;
-			if(up) {
-				out.write("G00 Z90 F100;\n");  // slowly lower the pen.
-				out.write("G00 F2000;\n");
-			} else {
-				out.write(previous_command);
-				out.write("G00 Z0 F100;\n");  // slowly raise the pen.
-				out.write("G00 F2000;\n");
-			}
+		if(lastup!=up && !up) {
+			out.write(previous_command);
 		}
 		if(!up) {
 			out.write(command);
 		}
+		if(lastup!=up) {
+			if(up) {
+				out.write("G00 Z90 F90;\n");  // slowly raise the pen.
+				out.write("G00 F1250;\n");
+			} else {
+				out.write("G00 Z0 F90;\n");  // slowly lower the pen.
+				out.write("G00 F1250;\n");
+			}
+		}
+		lastup=up;
 	}
 	
 	/**
@@ -114,10 +116,12 @@ class Filter_Spiral extends Filter {
 				level = leveladd*j;
 				// find circumference of current circle
 				double circumference=Math.floor(((d+d-1)*Math.PI)/2);
-				for(i=0;i<circumference;++i) {
+				for(i=0;i<=circumference;++i) {
 					f = i/circumference;
-					fx = hw + (Math.cos(Math.PI*2.0*f)*(d-f));
-					fy = hh + (Math.sin(Math.PI*2.0*f)*(d-f));
+					//fx = hw + (Math.cos(Math.PI*2.0*f)*(d-f));
+					fx = hw + (Math.cos(Math.PI*2.0*f)*d);
+					//fy = hh + (Math.sin(Math.PI*2.0*f)*(d-f));
+					fy = hh + (Math.sin(Math.PI*2.0*f)*d);
 					x = (int)fx;
 					y = (int)fy;
 					// clip to image boundaries

@@ -44,20 +44,22 @@ class Filter_4levelGcodeGenerator extends Filter {
 		if(up) {
 			previous_command=command;
 		}
-		if(lastup!=up) {
-			lastup=up;
-			if(up) {
-				out.write("G00 Z90 F100;\n");  // slowly lower the pen.
-				out.write("G00 F2000;\n");
-			} else {
-				out.write(previous_command);
-				out.write("G00 Z0 F100;\n");  // slowly raise the pen.
-				out.write("G00 F2000;\n");
-			}
+		if(lastup!=up && !up) {
+			out.write(previous_command);
 		}
 		if(!up) {
 			out.write(command);
 		}
+		if(lastup!=up) {
+			if(up) {
+				out.write("G00 Z90 F90;\n");  // slowly raise the pen.
+				out.write("G00 F1250;\n");
+			} else {
+				out.write("G00 Z0 F90;\n");  // slowly lower the pen.
+				out.write("G00 F1250;\n");
+			}
+		}
+		lastup=up;
 	}
 	
 	/**
