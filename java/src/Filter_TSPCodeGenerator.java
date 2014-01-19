@@ -389,10 +389,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 			// change to tool 0
 			out.write("M06 T0;\n");
-			// set absolute coordinates
-			out.write("G00 G90;\n");
-			// lift pen and set a default feed rate
-			out.write("G00 F1000 Z90;\n");
+			// set absolute coordinates, lift pen and set a default feed rate
+			out.write("G00 G90 F2000 Z90;\n");
 			// move to the first point
 			MoveTo(out,besti,false);
 			// lower the pen

@@ -47,11 +47,12 @@ class Filter_Spiral extends Filter {
 		if(lastup!=up) {
 			lastup=up;
 			if(up) {
-				// go faster for pen up
-				out.write("G00 Z90 F2000;\n");
+				out.write("G00 Z90 F100;\n");  // slowly lower the pen.
+				out.write("G00 F2000;\n");
 			} else {
 				out.write(previous_command);
-				out.write("G00 Z0 F1000;\n");
+				out.write("G00 Z0 F100;\n");  // slowly raise the pen.
+				out.write("G00 F2000;\n");
 			}
 		}
 		if(!up) {
@@ -82,11 +83,8 @@ class Filter_Spiral extends Filter {
 			// change to tool 0
 			out.write("M06 T0;\n");
 			// set absolute coordinates
-			out.write("G00 G90;\n");
-			// set a default feed rate
-			out.write("G00 F1000;\n");
 			// lift pen
-			out.write("G00 Z90;\n");
+			out.write("G00 G90 Z90;\n");
 			lastup=true;
 			previous_command="";
 			//*

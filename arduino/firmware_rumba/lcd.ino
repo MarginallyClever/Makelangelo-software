@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Draw robot - supports raprapdiscount RUMBA controller
+// Makelangelo - supports raprapdiscount RUMBA controller
 // dan@marginallycelver.com 2013-12-26
 // RUMBA should be treated like a MEGA 2560 Arduino.
 //------------------------------------------------------------------------------
@@ -13,28 +13,81 @@
 #include <LiquidCrystal.h>
 
 
-#define LCD_STATUS_MENU   (0)
-#define LCD_MAIN_MENU     (1)
+#define LCD_DRAW_DELAY           (150)
 
-#define LCD_TIMEOUT_DELAY        (3000)
-#define LCD_DRAW_DELAY           (50)
-#define LCD_STEPS_PER_MENU_ITEM  (5)
 
+// Convenience macros that make it easier to generate menus
+
+#define MENU_START \
+  int menu_position=0, screen_position=0, num_menu_items=0, ty, screen_end; \
+  lcd.clear(); \
+  do { \
+    LCD_read(); \
+    if( lcd_turn ) { \
+      menu_position += lcd_turn > 0 ? 1 : -1; \
+      digitalWrite(13,state); \
+      state=(state==HIGH?LOW:HIGH); \
+      lcd_turn=0; \
+      lcd.clear(); \
+    } \
+    if(menu_position>num_menu_items-1) menu_position=num_menu_items-1; \
+    if(menu_position<0) menu_position=0; \
+    if(screen_position>menu_position) screen_position=menu_position; \
+    if(screen_position<menu_position-(LCD_HEIGHT-1)) screen_position=menu_position-(LCD_HEIGHT-1); \
+    screen_end=screen_position+LCD_HEIGHT; \
+    ty=0;
+
+#define MENU_END \
+    num_menu_items=ty; \
+  } while(1);
+  
+#define MENU_ITEM_START(key) \
+    if(ty>=screen_position && ty<screen_end) { \
+      lcd.setCursor(0,ty-screen_position); \
+      lcd.print((menu_position==ty)?'>':' '); \
+      lcd.print(key); \
+
+#define MENU_ITEM_END() \
+    } \
+    ++ty;
+    
+    
+#define MENU_BACK() \
+      MENU_ITEM_START("Back") \
+      if(menu_position==ty && lcd_click_now) break; \
+      MENU_ITEM_END()
+
+#define MENU_SUBMENU(menu_label,menu_method) \
+      MENU_ITEM_START(menu_label) \
+      if(menu_position==ty && lcd_click_now) LCD_main_menu(); \
+      MENU_ITEM_END()
+      
+#define MENU_ACTION(menu_label,menu_method) MENU_SUBMENU(menu_label,menu_method)
+
+#define MENU_LONG(key,value) \
+      MENU_ITEM_START(key) \
+      LCD_print_long(value); \
+      if(menu_position==ty && lcd_click_now) LCD_update_long(key,value); \
+      MENU_ITEM_END()
+
+#define MENU_FLOAT(key,value) \
+      MENU_ITEM_START(key) \
+      LCD_print_float(value); \
+      if(menu_position==ty && lcd_click_now) LCD_update_float(key,value); \
+      MENU_ITEM_END()
+      
+      
 //------------------------------------------------------------------------------
 // GLOBALS
 //------------------------------------------------------------------------------
 LiquidCrystal lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5, LCD_PINS_D6, LCD_PINS_D7);
 long lcd_draw_delay = 0;
-int lcd_menu = LCD_STATUS_MENU;
-int lcd_menu_opt = 0;
 
 int lcd_rot_old=0;
-char lcd_click_old=LOW;
-
 int lcd_turn = 0;
+char lcd_click_old=LOW;
 char lcd_click_now = false;
-long lcd_timeout;
-int lcd_turn_sum=0;
+
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -42,7 +95,7 @@ int lcd_turn_sum=0;
 
 // initialize the Smart controller LCD panel
 void LCD_init() {
-  lcd.begin(LCD_WIDTH, LCD_HEIGHT);
+  lcd.begin(LCD_HEIGHT,LCD_WIDTH);
   pinMode(BTN_EN1,INPUT);
   pinMode(BTN_EN2,INPUT);
   pinMode(BTN_ENC,INPUT);
@@ -87,78 +140,125 @@ void LCD_read() {
 }
 
 
-void LCD_menu() {
-  LCD_read();
+float c=0.1;
+float d=100.2;
+long e=500;
+long aa=1;
+int state=HIGH;
 
-  // menu display
-  char draw_now=0;
-  if( millis() > lcd_draw_delay) {
-    lcd_draw_delay=millis() + LCD_DRAW_DELAY;
-    draw_now=1;
-  }
-  
-  // menu logic
-  switch(lcd_menu) {
-  case 0: LCD_status(draw_now);  break;
-  case 1: LCD_main_menu(draw_now);  break;
-  }
+
+void LCD_menu() {
+  MENU_START
+    MENU_BACK();
+    MENU_SUBMENU("main menu",LCD_main_menu);
+    MENU_SUBMENU("status menu",LCD_status_menu);
+    MENU_LONG("A",aa);
+    MENU_FLOAT("C",c);
+    MENU_FLOAT("D",d);
+    MENU_LONG("E",e);
+  MENU_END
 }
 
 
 // display the current machine position and feedrate on the LCD.
-void LCD_status( char draw_now ) {
-  if( lcd_click_now ) {
-    lcd_menu = LCD_MAIN_MENU;
-    lcd_menu_opt=0;
-    lcd_timeout=millis() + LCD_TIMEOUT_DELAY;
-  }
-  
-  lcd_turn_sum += lcd_turn;
-  lcd_turn=0;
-  
-  if( draw_now != 0 ) {
-    float d1=laststep[0];
-    float d2=laststep[1];
-    float px,py;
-    FK(d1,d2,px,py);
-    lcd.setCursor(0, 0);  lcd.print("                    ");
-    lcd.setCursor(0, 1);  lcd.print("                    ");
-    lcd.setCursor(0, 2);  lcd.print("                    ");
-    lcd.setCursor(0, 3);  lcd.print("                    ");
+void LCD_status_menu() {
+  MENU_START
     
-    lcd.setCursor( 0, 0);  lcd.print('X');  lcd.print(px);
-    lcd.setCursor(10, 0);  lcd.print('Y');  lcd.print(py);
-    lcd.setCursor( 0, 1);  lcd.print('Z');  lcd.print(posz);
-    lcd.setCursor(10, 1);  lcd.print('F');  lcd.print(feed_rate);
-  }
-}
-
-
-void LCD_main_menu( char draw_now ) {
-  if( lcd_turn ) {
-    lcd_timeout = millis() + LCD_TIMEOUT_DELAY;
-    lcd_menu_opt += lcd_turn;
-    if( lcd_menu_opt<0 ) lcd_menu_opt=0;
-    if( lcd_menu_opt>3*LCD_STEPS_PER_MENU_ITEM ) lcd_menu_opt=3*LCD_STEPS_PER_MENU_ITEM;
-    lcd_turn=0;
-  }
-  if( lcd_click_now ) {
-    lcd_timeout = millis() + LCD_TIMEOUT_DELAY;
-    switch(lcd_menu_opt/LCD_STEPS_PER_MENU_ITEM) {
-    }
-  }
-  if( millis() > lcd_timeout ) {
-    lcd_menu = LCD_STATUS_MENU;
-  }
+    if( millis() > lcd_draw_delay) {
+      lcd_draw_delay=millis() + LCD_DRAW_DELAY;
+      
+      float d1=laststep[0];
+      float d2=laststep[1];
+      float px,py;
+      FK(d1,d2,px,py);
+      px*=10;
+      py*=10;
   
-  if( draw_now != 0 ) {
-    lcd.setCursor(0, 0);  lcd.print(" Pause              ");
-    lcd.setCursor(0, 1);  lcd.print(" Stop               ");
-    lcd.setCursor(0, 2);  lcd.print(" Start              ");
-    lcd.setCursor(0, 3);  lcd.print(" Drive              ");
-    lcd.setCursor(0, lcd_menu_opt/LCD_STEPS_PER_MENU_ITEM);  lcd.print('>');
-  }
+      lcd.clear();
+      lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(px);
+      lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(py);
+      lcd.setCursor( 0, 1);  lcd.print('Z');  LCD_print_float(posz);
+      lcd.setCursor(10, 1);  lcd.print('F');  LCD_print_float(feed_rate);
+    }
+  MENU_END
 }
+
+
+void LCD_main_menu() {
+  MENU_START
+    //if(not_started) {
+    //MENU_SUBMENU("Start",LCD_start_menu);
+    //} else {
+    //MENU_ACTION("Pause",LCD_pause);
+    //MENU_ACTION("Stop",LCD_stop);
+    //}
+    //MENU_SUBMENU("Drive",LCD_drive_menu);
+  MENU_END
+}
+
+
+void LCD_update_long(char *name,long &value) {
+  lcd.clear();
+  do {
+    LCD_read();
+    if( lcd_turn ) {
+      value+=lcd_turn>0?1:-1;
+      lcd_turn=0;
+    }
+    lcd.setCursor(0,0);
+    lcd.print(name);
+    lcd.setCursor(0,1);
+    LCD_print_long(value);
+  } while( !lcd_click_now );
+}
+
+
+void LCD_update_float(char *name,float &value) {
+  lcd.clear();
+  do {
+    LCD_read();
+    if( lcd_turn ) {
+      value += lcd_turn > 0 ? 0.01 : -0.01;
+      lcd_turn=0;
+    }
+    lcd.setCursor(0,0);
+    lcd.print(name);
+    lcd.setCursor(0,1);
+    LCD_print_float(value);
+  } while( !lcd_click_now );
+}
+
+
+void LCD_print_long(long v) {
+  long av=abs(v);
+  int x=1000;
+  while(x>av && x>1) {
+    lcd.print(' ');
+    x/=10;
+  };
+  if(v>0) lcd.print(' ');
+  lcd.print(v);
+}
+
+
+
+void LCD_print_float(float v) {
+  int left = abs(v);
+  int right = (int)(v*100)%100;
+
+  int x=1000;
+  while(x>left && x>1) {
+    lcd.print(' ');
+    x/=10;
+  };
+  if(v>0) lcd.print(' ');
+  lcd.print(left);
+  lcd.print('.');
+
+  if(right<10) lcd.print('0');
+  lcd.print(right);
+}
+
 
 #else
 void LCD_init() {}

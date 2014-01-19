@@ -1579,7 +1579,7 @@ public class DrawbotGUI
 						fr=fr.replaceAll("[ ,]","");
 						feed_rate = Double.parseDouble(fr);
 						if(feed_rate<1) feed_rate=1;
-						if(feed_rate>2000) feed_rate=2000;
+						//if(feed_rate>10000) feed_rate=2000;
 						feedRate.setText(Double.toString(feed_rate));
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {

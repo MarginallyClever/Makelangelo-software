@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Draw robot - supports raprapdiscount RUMBA controller
+// Makelangelo - supports raprapdiscount RUMBA controller
 // dan@marginallycelver.com 2013-12-26
 // RUMBA should be treated like a MEGA 2560 Arduino.
 //------------------------------------------------------------------------------
@@ -12,15 +12,10 @@
 //------------------------------------------------------------------------------
 #include "configure.h"
 
-// Default servo library
-#include <Servo.h> 
-
 
 //------------------------------------------------------------------------------
 // GLOBALS
 //------------------------------------------------------------------------------
-
-Servo s1;
 
 // robot UID
 int robot_uid=0;
@@ -36,12 +31,6 @@ float limit_left = 0;  // Distance to left of drawing area.
 // what are the motors called?
 char m1d='L';
 char m2d='R';
-
-// which way are the spools wound, relative to motor movement?
-int M1_REEL_IN  = HIGH;
-int M1_REEL_OUT = LOW;
-int M2_REEL_IN  = HIGH;
-int M2_REEL_OUT = LOW;
 
 // calculate some numbers to help us find feed_rate
 float SPOOL_DIAMETER = 3.2;  // cm
@@ -104,6 +93,10 @@ void setFeedRate(float v1) {
     feed_rate = v1;
     if(feed_rate > MAX_FEEDRATE) feed_rate = MAX_FEEDRATE;
     if(feed_rate < MIN_FEEDRATE) feed_rate = MIN_FEEDRATE;
+#ifdef VERBOSE
+    Serial.print(F("F="));
+    Serial.println(feed_rate);
+#endif
   }
 }
 
@@ -120,21 +113,6 @@ void printFeedRate() {
   Serial.print(F("F"));
   Serial.print(feed_rate);
   Serial.print(F("steps/s"));
-}
-
-
-//------------------------------------------------------------------------------
-// Change pen state.
-void setPenAngle(int pen_angle) {
-  if(posz!=pen_angle) {
-    posz=pen_angle;
-    
-    if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
-    if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
-
-    s1.write( (int)posz );
-    delay(PEN_DELAY);
-  }
 }
 
 
@@ -184,24 +162,24 @@ void processConfig() {
   
   char gg=parsenumber('G',m1d);
   char hh=parsenumber('H',m2d);
-  char i=parsenumber('I',-1);
-  char j=parsenumber('J',-1);
-  if(i!=-1) {
+  char i=parsenumber('I',0);
+  char j=parsenumber('J',0);
+  if(i!=0) {
     if(i>0) {
-      M1_REEL_IN=HIGH;
-      M1_REEL_OUT=LOW;
+      motors[0].reel_in  = HIGH;
+      motors[0].reel_out = LOW;
     } else {
-      M1_REEL_IN=LOW;
-      M1_REEL_OUT=HIGH;
+      motors[0].reel_in  = LOW;
+      motors[0].reel_out = HIGH;
     }
   }
-  if(j!=-1) {
+  if(j!=0) {
     if(j>0) {
-      M2_REEL_IN=HIGH;
-      M2_REEL_OUT=LOW;
+      motors[1].reel_in  = HIGH;
+      motors[1].reel_out = LOW;
     } else {
-      M2_REEL_IN=LOW;
-      M2_REEL_OUT=HIGH;
+      motors[1].reel_in  = LOW;
+      motors[1].reel_out = HIGH;
     }
   }
   
@@ -209,13 +187,17 @@ void processConfig() {
   printConfig();
   
   teleport(0,0);
-  //test_kinematics(0,0);
-  //test_kinematics(10,0);
-  //test_kinematics(10,10);
-  //test_kinematics(0,10);
-  //test_kinematics(-6,0);
-  //test_kinematics(-8,-3);
-  //test_kinematics(0,-7);
+/*
+  test_kinematics(0,0);
+  test_kinematics(10,0);
+  test_kinematics(-10,0);
+  test_kinematics(0,10);
+  test_kinematics(0,-10);
+  test_kinematics(10,10);
+  test_kinematics(-6.2,0.41);
+  test_kinematics(-8,-3);
+  test_kinematics(9.24,-7.55);
+*/
 }
 
 
@@ -224,14 +206,14 @@ void test_kinematics(float x,float y) {
   float A, B, C, D;
   IK(x,y,A,B);
   FK(A,B,C,D);
-  Serial.print(F(" x="));  Serial.print(x);
-  Serial.print(F(" y="));  Serial.print(y);
-  Serial.print(F(" A="));  Serial.print(A);
-  Serial.print(F(" B="));  Serial.print(B);
-  Serial.print(F(" C="));  Serial.print(C);
-  Serial.print(F(" D="));  Serial.print(D);
-  Serial.print(F(" dx="));  Serial.print(C-x);
-  Serial.print(F(" dy="));  Serial.println(D-y);
+  Serial.print(F("\tx="));  Serial.print(x);
+  Serial.print(F("\ty="));  Serial.print(y);
+  Serial.print(F("\tL="));  Serial.print(A);
+  Serial.print(F("\tR="));  Serial.print(B);
+  Serial.print(F("\tx'="));  Serial.print(C);
+  Serial.print(F("\ty'="));  Serial.print(D);
+  Serial.print(F("\tdx="));  Serial.print(C-x);
+  Serial.print(F("\tdy="));  Serial.println(D-y);
 }
 
 
@@ -489,67 +471,21 @@ void processCommand() {
   cmd=parsenumber('G',-1);
   switch(cmd) {
   case 0:
-  case 1: {
-    // line
-    float xx, yy, zz;
-    
-    if(absolute_mode==1) {
-      xx=posx;
-      yy=posy;
-      zz=posz;
-    } else {
-      xx=0;
-      yy=0;
-      zz=0;
-    }
-  
-    xx=parsenumber('X',xx);
-    yy=parsenumber('Y',yy);
-    zz=parsenumber('Z',zz);
+  case 1:  // line
     setFeedRate(parsenumber('F',feed_rate));
- 
-    if(absolute_mode==0) {
-      xx+=posx;
-      yy+=posy;
-      zz+=posz;
-    }
-    
-    polargraph_line(xx,yy,zz);
-  }
+    polargraph_line( parsenumber('X',(absolute_mode?posx:0)*10)*0.1 + (absolute_mode?0:posx),
+                     parsenumber('Y',(absolute_mode?posy:0)*10)*0.1 + (absolute_mode?0:posy),
+                     parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz) );
     break;
   case 2:
-  case 3: {
-    // arc
-    float xx, yy, zz,ii,jj;
-    float dd = (!strncmp(buffer,"G02",3) || !strncmp(buffer,"G2",2)) ? -1 : 1;
-    
-    if(absolute_mode==1) {
-      xx=posx;
-      yy=posy;
-      zz=posz;
-      ii=posx;
-      jj=posz;
-    } else {
-      xx=yy=zz=ii=jj=0;
-    }
-    
-    ii=parsenumber('I',ii)*0.1;
-    jj=parsenumber('J',jj)*0.1;
-    xx=parsenumber('X',xx)*0.1;
-    yy=parsenumber('Y',yy)*0.1;
-    zz=parsenumber('Z',zz)*0.1;
+  case 3:  // arc
     setFeedRate(parsenumber('F',feed_rate));
- 
-    if(absolute_mode==0) {
-      xx+=posx;
-      yy+=posy;
-      zz+=posz;
-      ii+=posx;
-      jj+=posy;
-    }
-
-    arc(ii,jj,xx,yy,zz,dd);
-  }
+    arc(parsenumber('I',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
+        parsenumber('J',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
+        parsenumber('X',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
+        parsenumber('Y',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
+        parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz),
+        (cmd==2) ? -1 : 1);
     break;
   case 4:  pause(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
   case 28:  FindHome();  break;
@@ -560,37 +496,37 @@ void processCommand() {
   cmd=parsenumber('D',-1);
   switch(cmd) {
   case 0: {
-    // move one motor
-    int i,amount=parsenumber(m1d,0);
-    digitalWrite(motors[0].dir_pin,amount < 0 ? M1_REEL_IN : M1_REEL_OUT);
-    amount=abs(amount);
-    for(i=0;i<amount;++i) {
-      digitalWrite(motors[0].step_pin,HIGH);
-      digitalWrite(motors[0].step_pin,LOW);
-      pause(STEP_DELAY);
+      // move one motor
+      int i,amount=parsenumber(m1d,0);
+      digitalWrite(motors[0].dir_pin,amount < 0 ? motors[0].reel_in : motors[0].reel_out);
+      amount=abs(amount);
+      for(i=0;i<amount;++i) {
+        digitalWrite(motors[0].step_pin,HIGH);
+        digitalWrite(motors[0].step_pin,LOW);
+        pause(STEP_DELAY);
+      }
+      
+      amount=parsenumber(m2d,0);
+      digitalWrite(motors[1].dir_pin,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
+      amount = abs(amount);
+      for(i=0;i<amount;++i) {
+        digitalWrite(motors[1].step_pin,HIGH);
+        digitalWrite(motors[1].step_pin,LOW);
+        pause(STEP_DELAY);
+      }
     }
-    
-    amount=parsenumber(m2d,0);
-    digitalWrite(motors[1].dir_pin,amount < 0 ? M2_REEL_IN : M2_REEL_OUT);
-    amount = abs(amount);
-    for(i=0;i<amount;++i) {
-      digitalWrite(motors[1].step_pin,HIGH);
-      digitalWrite(motors[1].step_pin,LOW);
-      pause(STEP_DELAY);
-    }
-  }
     break;
   case 1: {
-    // adjust spool diameters
-    float amountL=parsenumber('L',SPOOL_DIAMETER);
-
-    float tps1=STEPS_PER_TURN;
-    adjustSpoolDiameter(amountL);
-    if(STEPS_PER_TURN != tps1) {
-      // Update EEPROM
-      SaveSpoolDiameter();
+      // adjust spool diameters
+      float amountL=parsenumber('L',SPOOL_DIAMETER);
+  
+      float tps1=STEPS_PER_TURN;
+      adjustSpoolDiameter(amountL);
+      if(STEPS_PER_TURN != tps1) {
+        // Update EEPROM
+        SaveSpoolDiameter();
+      }
     }
-  }
     break;
   case 2:
     Serial.print('L');  Serial.print(SPOOL_DIAMETER);
@@ -623,11 +559,9 @@ void setup() {
   motor_setup();
   motor_enable();
   
+  //easyPWM_init();
   SD_init();
   LCD_init();
-  
-  // servo should be on SER1, pin 10.
-  s1.attach(SERVO_PIN);
   
   // initialize the plotter position.
   teleport(0,0);
@@ -659,7 +593,7 @@ void loop() {
   }
   
   SD_check();
-  LCD_menu();
+  //LCD_menu();
 }
 
 

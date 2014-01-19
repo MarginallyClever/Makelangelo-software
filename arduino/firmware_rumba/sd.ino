@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Draw robot - supports raprapdiscount RUMBA controller
+// Makelangelo - supports raprapdiscount RUMBA controller
 // dan@marginallycelver.com 2013-12-26
 // RUMBA should be treated like a MEGA 2560 Arduino.
 //------------------------------------------------------------------------------

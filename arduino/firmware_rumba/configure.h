@@ -1,7 +1,7 @@
 #ifndef CONFIGURE_H
 #define CONFIGURE_H
 //------------------------------------------------------------------------------
-// Draw robot - supports raprapdiscount RUMBA controller
+// Makelangelo - supports raprapdiscount RUMBA controller
 // dan@marginallycelver.com 2013-12-26
 // RUMBA should be treated like a MEGA 2560 Arduino.
 //------------------------------------------------------------------------------
@@ -28,9 +28,9 @@
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 
 
-#define MICROSTEPS           (16)  // microstepping on this microcontroller
+#define MICROSTEPS           (16.0)  // microstepping on this microcontroller
 #define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
-#define MAX_FEEDRATE         (200)
+#define MAX_FEEDRATE         (6250)
 #define MIN_FEEDRATE         (0.01)
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
@@ -42,10 +42,6 @@
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
 #define CM_PER_SEGMENT  (0.2)  // Arcs are split into many line segments.  How long are the segments?
-
-
-// servo pin differs based on device
-#define SERVO_PIN        10
 
 
 #ifdef HAS_LCD
@@ -64,8 +60,8 @@
 #define LCD_PINS_D5        38 
 #define LCD_PINS_D6        41
 #define LCD_PINS_D7        40
-#define LCD_HEIGHT         20
-#define LCD_WIDTH          4
+#define LCD_HEIGHT         4
+#define LCD_WIDTH          20
 // Encoder rotation values
 #define BTN_EN1            11
 #define BTN_EN2            12
@@ -77,6 +73,10 @@
 #define encrot1 2
 #define encrot2 3
 #define encrot3 1
+
+#define NUM_SERVOS (1)
+#define SERVO0_PIN (5)
+#define SERVO1_PIN (4)
 
 
 //------------------------------------------------------------------------------
@@ -96,19 +96,7 @@
 #define CLOCK_FREQ           (16000000L)
 #define MAX_COUNTER          (65536L)
 
-#define USE_TIMER            (2)
-
-#if USE_TIMER == 0
 #define TIMER_PRESCALER_COUNT (5)
-#endif
-
-#if USE_TIMER == 1
-#define TIMER_PRESCALER_COUNT (5)
-#endif
-
-#if USE_TIMER == 2
-#define TIMER_PRESCALER_COUNT (4)
-#endif
 
 
 //------------------------------------------------------------------------------
@@ -130,6 +118,8 @@ typedef struct {
   int enable_pin;
   int limit_switch_pin;
   int limit_switch_state;
+  int reel_in;
+  int reel_out;
 } Motor;
 
 
