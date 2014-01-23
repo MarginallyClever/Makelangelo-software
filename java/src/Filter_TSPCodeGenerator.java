@@ -246,12 +246,16 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	ProgressMonitor pm;
 	double scale;
 	TSPOptimizer task;
+	String bobbin_line, config_line;
 	
 	Filter_TSPGcodeGenerator(String _dest,double _scale) {
 		dest=_dest;
 		scale=_scale;
 	}
 
+	public void SetConfigLine(String str) { config_line=str; }
+	public void SetBobbinLine(String str) { bobbin_line=str; }
+	
 	protected float CalculateWeight(int a,int b) {
 		float x = points[a].x - points[b].x;
 		float y = points[a].y - points[b].y;
@@ -387,6 +391,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+			out.write(config_line+";\n");
+			out.write(bobbin_line+";\n");
 			// change to tool 0
 			out.write("M06 T0;\n");
 			// set absolute coordinates, lift pen and set a default feed rate

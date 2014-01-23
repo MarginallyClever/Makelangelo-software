@@ -11,82 +11,67 @@
 //------------------------------------------------------------------------------
 #ifdef HAS_LCD
 #include <LiquidCrystal.h>
+#include "sdcard.h"
 
 
-#define LCD_DRAW_DELAY           (150)
+#define LCD_DRAW_DELAY    (150)
+#define LCD_TURN_PER_MENU (5)
 
 
 // Convenience macros that make it easier to generate menus
 
 #define MENU_START \
-  int menu_position=0, screen_position=0, num_menu_items=0, ty, screen_end; \
-  lcd.clear(); \
-  do { \
-    LCD_read(); \
-    if( lcd_turn ) { \
-      menu_position += lcd_turn > 0 ? 1 : -1; \
-      digitalWrite(13,state); \
-      state=(state==HIGH?LOW:HIGH); \
-      lcd_turn=0; \
-      lcd.clear(); \
-    } \
-    if(menu_position>num_menu_items-1) menu_position=num_menu_items-1; \
-    if(menu_position<0) menu_position=0; \
-    if(screen_position>menu_position) screen_position=menu_position; \
-    if(screen_position<menu_position-(LCD_HEIGHT-1)) screen_position=menu_position-(LCD_HEIGHT-1); \
-    screen_end=screen_position+LCD_HEIGHT; \
-    ty=0;
+  ty=0;
 
 #define MENU_END \
-    num_menu_items=ty; \
-  } while(1);
+  num_menu_items=ty; \
   
 #define MENU_ITEM_START(key) \
-    if(ty>=screen_position && ty<screen_end) { \
-      lcd.setCursor(0,ty-screen_position); \
-      lcd.print((menu_position==ty)?'>':' '); \
-      lcd.print(key); \
+  if(ty>=screen_position && ty<screen_end) { \
+    lcd.setCursor(0,ty-screen_position); \
+    lcd.print((menu_position==ty)?'>':' '); \
+    lcd.print(key); \
 
 #define MENU_ITEM_END() \
-    } \
-    ++ty;
-    
-    
-#define MENU_BACK() \
-      MENU_ITEM_START("Back") \
-      if(menu_position==ty && lcd_click_now) break; \
-      MENU_ITEM_END()
+  } \
+  ++ty;
+
+#define MENU_GOTO(new_menu) {  lcd_click_now=false;  lcd.clear();  num_menu_items=screen_position=menu_position=menu_position_sum=0;  current_menu=new_menu; return;  }
 
 #define MENU_SUBMENU(menu_label,menu_method) \
-      MENU_ITEM_START(menu_label) \
-      if(menu_position==ty && lcd_click_now) LCD_main_menu(); \
-      MENU_ITEM_END()
-      
+    MENU_ITEM_START(menu_label) \
+    if(menu_position==ty && lcd_click_now) MENU_GOTO(menu_method); \
+    MENU_ITEM_END()
+    
 #define MENU_ACTION(menu_label,menu_method) MENU_SUBMENU(menu_label,menu_method)
 
 #define MENU_LONG(key,value) \
-      MENU_ITEM_START(key) \
-      LCD_print_long(value); \
-      if(menu_position==ty && lcd_click_now) LCD_update_long(key,value); \
-      MENU_ITEM_END()
+    MENU_ITEM_START(key) \
+    LCD_print_long(value); \
+    if(menu_position==ty && lcd_click_now) LCD_update_long(key,value); \
+    MENU_ITEM_END()
 
 #define MENU_FLOAT(key,value) \
-      MENU_ITEM_START(key) \
-      LCD_print_float(value); \
-      if(menu_position==ty && lcd_click_now) LCD_update_float(key,value); \
-      MENU_ITEM_END()
-      
-      
+    MENU_ITEM_START(key) \
+    LCD_print_float(value); \
+    if(menu_position==ty && lcd_click_now) LCD_update_float(key,value); \
+    MENU_ITEM_END()
+
+
 //------------------------------------------------------------------------------
 // GLOBALS
 //------------------------------------------------------------------------------
 LiquidCrystal lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5, LCD_PINS_D6, LCD_PINS_D7);
 long lcd_draw_delay = 0;
 
-int lcd_rot_old=0;
-int lcd_turn = 0;
-char lcd_click_old=LOW;
+int lcd_rot_old  = 0;
+int lcd_turn     = 0;
+char lcd_click_old = HIGH;
 char lcd_click_now = false;
+
+int menu_position_sum=0, menu_position=0, screen_position=0, num_menu_items=0, ty, screen_end;
+
+void (*current_menu)();
 
 
 //------------------------------------------------------------------------------
@@ -102,6 +87,7 @@ void LCD_init() {
   digitalWrite(BTN_EN1,HIGH);
   digitalWrite(BTN_EN2,HIGH);
   digitalWrite(BTN_ENC,HIGH);
+  current_menu=LCD_status_menu;
 }
 
 
@@ -130,55 +116,67 @@ void LCD_read() {
   lcd_rot_old = rot;
   
   // find click state
-  lcd_click_now=false;
-  
   int btn = digitalRead(BTN_ENC);
-  if( btn != lcd_click_old && btn == LOW ) {
+  if( btn != lcd_click_old && btn == HIGH ) {
     lcd_click_now=true;
   }
   lcd_click_old = btn;
 }
 
 
-float c=0.1;
-float d=100.2;
-long e=500;
-long aa=1;
-int state=HIGH;
+void LCD_update() {
+  LCD_read();
+ 
+  if(millis() >= lcd_draw_delay ) {
+    lcd_draw_delay = millis() + LCD_DRAW_DELAY;
 
+    if( lcd_turn ) {
+      int op = menu_position_sum / LCD_TURN_PER_MENU;
+      menu_position_sum += lcd_turn;
+      lcd_turn=0;
+      
+      if(num_menu_items>0) {
+        if( menu_position_sum > (num_menu_items-1) * LCD_TURN_PER_MENU ) menu_position_sum = (num_menu_items-1) * LCD_TURN_PER_MENU;
+      }
+      
+      menu_position = menu_position_sum / LCD_TURN_PER_MENU;
+      if(op != menu_position) lcd.clear();
+    }
+    
+    if(menu_position>num_menu_items-1) menu_position=num_menu_items-1;
+    if(menu_position<0) menu_position=0;
+    if(screen_position>menu_position) screen_position=menu_position;
+    if(screen_position<menu_position-(LCD_HEIGHT-1)) screen_position=menu_position-(LCD_HEIGHT-1);
+    screen_end=screen_position+LCD_HEIGHT;
 
-void LCD_menu() {
-  MENU_START
-    MENU_BACK();
-    MENU_SUBMENU("main menu",LCD_main_menu);
-    MENU_SUBMENU("status menu",LCD_status_menu);
-    MENU_LONG("A",aa);
-    MENU_FLOAT("C",c);
-    MENU_FLOAT("D",d);
-    MENU_LONG("E",e);
-  MENU_END
+    (*current_menu)();
+  }
 }
 
 
 // display the current machine position and feedrate on the LCD.
 void LCD_status_menu() {
   MENU_START
-    
-    if( millis() > lcd_draw_delay) {
-      lcd_draw_delay=millis() + LCD_DRAW_DELAY;
-      
-      float d1=laststep[0];
-      float d2=laststep[1];
-      float px,py;
-      FK(d1,d2,px,py);
-      px*=10;
-      py*=10;
-  
-      lcd.clear();
-      lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(px);
-      lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(py);
-      lcd.setCursor( 0, 1);  lcd.print('Z');  LCD_print_float(posz);
-      lcd.setCursor(10, 1);  lcd.print('F');  LCD_print_float(feed_rate);
+    // on click go to the main menu
+    if(lcd_click_now) MENU_GOTO(LCD_main_menu);
+
+    // update the current status
+    float d1=laststep[0];
+    float d2=laststep[1];
+    float px,py;
+    FK(d1,d2,px,py);
+    px*=10;
+    py*=10;
+
+    //lcd.clear();
+    lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(px);
+    lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(py);
+    lcd.setCursor( 0, 1);  lcd.print('Z');  LCD_print_float(posz);
+    lcd.setCursor(10, 1);  lcd.print('F');  LCD_print_float(feed_rate);
+    lcd.setCursor( 0, 2);  lcd.print("Makelangelo.com");
+    if(sd_printing_now==true && sd_printing_paused==false) {
+      lcd.setCursor(0,3);  LCD_print_float(sd_percent_complete);
+      lcd.print('%');
     }
   MENU_END
 }
@@ -186,13 +184,60 @@ void LCD_status_menu() {
 
 void LCD_main_menu() {
   MENU_START
-    //if(not_started) {
-    //MENU_SUBMENU("Start",LCD_start_menu);
-    //} else {
-    //MENU_ACTION("Pause",LCD_pause);
-    //MENU_ACTION("Stop",LCD_stop);
-    //}
+    MENU_SUBMENU("Back",LCD_status_menu);
+    if(!sd_printing_now) {
+      if(sd_inserted) {
+        MENU_SUBMENU("Start from file...",LCD_start_menu);
+      }
+    } else {
+      if(sd_printing_paused) {
+        MENU_ACTION("Unpause",LCD_pause);
+      } else {
+        MENU_ACTION("Pause",LCD_pause);
+      }
+      MENU_ACTION("Stop",LCD_stop);
+    }
     //MENU_SUBMENU("Drive",LCD_drive_menu);
+  MENU_END
+}
+
+
+void LCD_pause() {
+  sd_printing_paused = (sd_printing_paused==true?false:true);
+  MENU_GOTO(LCD_main_menu);
+}
+
+
+void LCD_stop() {
+  sd_printing_now=false;
+  MENU_GOTO(LCD_main_menu);
+}
+
+
+void LCD_start_menu() {
+  if(!sd_inserted) MENU_GOTO(LCD_main_menu);
+
+  MENU_START
+    MENU_SUBMENU("Back",LCD_main_menu);
+    
+    root.rewindDirectory();
+    while(1) {
+      File entry =  root.openNextFile();
+      if (!entry) {
+        // no more files, return to the first file in the directory
+        break;
+      }
+      if (!entry.isDirectory() && entry.name()[0]!='_') {
+        MENU_ITEM_START(entry.name())
+        if(menu_position==ty && lcd_click_now) {
+          lcd_click_now=false;
+          SD_StartPrintingFile(entry.name());
+          MENU_GOTO(LCD_status_menu);
+        }
+        MENU_ITEM_END()
+      }
+      entry.close();
+    }
   MENU_END
 }
 
@@ -244,17 +289,15 @@ void LCD_print_long(long v) {
 
 void LCD_print_float(float v) {
   int left = abs(v);
-  int right = (int)(v*100)%100;
+  int right = abs((int)(v*100)%100);
 
-  int x=1000;
-  while(x>left && x>1) {
-    lcd.print(' ');
-    x/=10;
-  };
-  if(v>0) lcd.print(' ');
+  if(left<1000) lcd.print(' ');
+  if(left<100) lcd.print(' ');
+  if(left<10) lcd.print(' ');
+  if(v<0) lcd.print('-');
+  else lcd.print(' ');
   lcd.print(left);
   lcd.print('.');
-
   if(right<10) lcd.print('0');
   lcd.print(right);
 }

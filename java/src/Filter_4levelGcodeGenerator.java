@@ -22,6 +22,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	double scale,iscale;
 	double margin;
 	String previous_command;
+	String bobbin_line, config_line;
 	
 	
 	Filter_4levelGcodeGenerator(String _dest,double _scale,double _margin) {
@@ -31,6 +32,8 @@ class Filter_4levelGcodeGenerator extends Filter {
 	}
 	
 	
+	public void SetConfigLine(String str) { config_line=str; }
+	public void SetBobbinLine(String str) { bobbin_line=str; }
 	public void SetPaperLimits(double _paper_top, double _paper_bottom, double _paper_left, double _paper_right) {}
 	public void SetMachineLimits(double _limit_top, double _limit_bottom, double _limit_left, double _limit_right) {}
 
@@ -41,25 +44,89 @@ class Filter_4levelGcodeGenerator extends Filter {
 	
 	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
 		String command="G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+";\n";
-		if(up) {
+		if(up==lastup) {
 			previous_command=command;
-		}
-		if(lastup!=up && !up) {
+		} else {
 			out.write(previous_command);
-		}
-		if(!up) {
 			out.write(command);
-		}
-		if(lastup!=up) {
 			if(up) {
-				out.write("G00 Z90 F90;\n");  // slowly raise the pen.
-				out.write("G00 F1250;\n");
+				out.write("G00 Z90 F80;\n");  // slowly raise the pen.
+				out.write("G00 F3000;\n");
 			} else {
-				out.write("G00 Z0 F90;\n");  // slowly lower the pen.
-				out.write("G00 F1250;\n");
+				out.write("G00 Z0 F80;\n");  // slowly lower the pen.
+				out.write("G00 F3000;\n");
 			}
 		}
 		lastup=up;
+	}
+	
+	private int TakeImageSample(BufferedImage img,int x,int y) {
+		image_height = img.getHeight();
+		image_width = img.getWidth();
+		
+		// point sampling
+		//return decode(img.getRGB(x,y));
+
+		// 3x3 sampling
+		int c=0;
+		int values[]=new int[9];
+		int weights[]=new int[9];
+		if(y>0) {
+			if(x>0) {
+				values[c]=decode(img.getRGB(x-1, y-1));
+				weights[c]=1;
+				c++;
+			}
+			values[c]=decode(img.getRGB(x, y-1));
+			weights[c]=2;
+			c++;
+
+			if(x<image_width-1) {
+				values[c]=decode(img.getRGB(x+1, y-1));
+				weights[c]=1;
+				c++;
+			}
+		}
+
+		if(x>0) {
+			values[c]=decode(img.getRGB(x-1, y));
+			weights[c]=2;
+			c++;
+		}
+		values[c]=decode(img.getRGB(x, y));
+		weights[c]=4;
+		c++;
+		if(x<image_width-1) {
+			values[c]=decode(img.getRGB(x+1, y));
+			weights[c]=2;
+			c++;
+		}
+
+		if(y<image_height-1) {
+			if(x>0) {
+				values[c]=decode(img.getRGB(x-1, y+1));
+				weights[c]=1;
+				c++;
+			}
+			values[c]=decode(img.getRGB(x, y+1));
+			weights[c]=2;
+			c++;
+	
+			if(x<image_width-1) {
+				values[c]=decode(img.getRGB(x+1, y+1));
+				weights[c]=1;
+				c++;
+			}
+		}
+		
+		int value=0,j;
+		int sum=0;
+		for(j=0;j<c;++j) {
+			value+=values[j]*weights[j];
+			sum+=weights[j];
+		}
+		
+		return value/sum;
 	}
 	
 	/**
@@ -74,7 +141,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 		iscale=1.0/scale;
 		w2=image_width/2;
 		h2=image_height/2;
-		double leveladd = 255.0/5.0;
+		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		int z=0;
 		
@@ -82,12 +149,15 @@ class Filter_4levelGcodeGenerator extends Filter {
 		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+			out.write(config_line+";\n");
+			out.write(bobbin_line+";\n");
+			
 			// change to tool 0
 			out.write("M06 T0;\n");
 			// set absolute coordinates
 			out.write("G00 G90;\n");
 			// set a default feed rate
-			out.write("G00 F1000;\n");
+			out.write("G00 F3000;\n");
 			// lift pen
 			out.write("G00 Z90;\n");
 			lastup=true;
@@ -103,14 +173,14 @@ class Filter_4levelGcodeGenerator extends Filter {
 				if((i%2)==0) {
 					MoveTo(out,(float)          0,(float)y,true);
 					for(x=0;x<image_width;++x) {
-						z=decode(img.getRGB(x,y));
+						z=TakeImageSample(img,x,y);
 						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)image_width,(float)y,true);
 				} else {
 					MoveTo(out,(float)image_width,(float)y,true);
 					for(x=image_width-1;x>=0;--x) {
-						z=decode(img.getRGB(x,y));
+						z=TakeImageSample(img,x,y);
 						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)          0,(float)y,true);
@@ -128,14 +198,14 @@ class Filter_4levelGcodeGenerator extends Filter {
 				if((i%2)==0) {
 					MoveTo(out,(float)x,(float)0           ,true);
 					for(y=0;y<image_height;++y) {
-						z=decode(img.getRGB(x,y));
+						z=TakeImageSample(img,x,y);
 						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)x,(float)image_height,true);
 				} else {
 					MoveTo(out,(float)x,(float)image_height,true);
 					for(y=image_height-1;y>=0;--y) {
-						z=decode(img.getRGB(x,y));
+						z=TakeImageSample(img,x,y);
 						MoveTo(out,(float)x,(float)y,( z >= level ));
 					}
 					MoveTo(out,(float)x,(float)0           ,true);
@@ -148,8 +218,8 @@ class Filter_4levelGcodeGenerator extends Filter {
 			// create diagonal \ lines across the image
 			// raise and lower the pen to darken the appropriate areas
 			i=0;
-			for(x=-image_height;x<image_width;x+=steps) {
-				int endx=image_height+x;
+			for(x=-(image_height-1);x<image_width;x+=steps) {
+				int endx=image_height-1+x;
 				int endy=image_height-1;
 				if(endx >= image_width) {
 					endy -= endx - (image_width-1);
@@ -163,17 +233,18 @@ class Filter_4levelGcodeGenerator extends Filter {
 				}
 				int delta=endy-starty;
 				
-				if((i%2)==0) {
+				if((i%2)==0)
+				{
 					MoveTo(out,(float)startx,(float)starty,true);
-					for(j=0;j<delta;++j) {
-						z=decode(img.getRGB(startx+j,starty+j));
+					for(j=0;j<=delta;++j) {
+						z=TakeImageSample(img,startx+j,starty+j);
 						MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
 					}
 					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
 					MoveTo(out,(float)endx,(float)endy,true);
-					for(j=0;j<delta;++j) {
-						z=decode(img.getRGB(endx-j,endy-j));
+					for(j=0;j<=delta;++j) {
+						z=TakeImageSample(img,endx-j,endy-j);
 						MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
 					}
 					MoveTo(out,(float)startx,(float)starty,true);
@@ -207,15 +278,15 @@ class Filter_4levelGcodeGenerator extends Filter {
 				++i;
 				if((i%2)==0) {
 					MoveTo(out,(float)startx,(float)starty,true);
-					for(j=0;j<delta;++j) {
-						z=decode(img.getRGB(startx-j,starty+j));
+					for(j=0;j<=delta;++j) {
+						z=TakeImageSample(img,startx-j,starty+j);
 						MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
 					}
 					MoveTo(out,(float)endx,(float)endy,true);
 				} else {
 					MoveTo(out,(float)endx,(float)endy,true);
 					for(j=0;j<delta;++j) {
-						z=decode(img.getRGB(endx+j,endy-j));
+						z=TakeImageSample(img,endx+j,endy-j);
 						MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
 					}
 					MoveTo(out,(float)startx,(float)starty,true);

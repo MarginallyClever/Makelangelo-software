@@ -38,6 +38,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	double cameraOffsetX=0,cameraOffsetY=0;
 	double cameraZoom=20;
 	float drawScale=0.1f;
+	final float extraScale=100;
 
 	ArrayList<String> instructions;
 	
@@ -107,10 +108,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 	private void MoveCamera(int x,int y) {
 		// scroll the gcode preview
-		double dx=(x-oldx)/cameraZoom;
-		double dy=(y-oldy)/cameraZoom;
+		double dx=(x-oldx);
+		double dy=(y-oldy);
     	cameraOffsetX-=dx;
-    	cameraOffsetY+=dy;
+    	cameraOffsetY-=dy;
 	}
 	private void ZoomCamera(int x,int y) {
 		double amnt = (double)(y-oldy)*0.01;
@@ -131,8 +132,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// which one do we have to zoom more to fit the picture in the component?
 		float wzoom=w/(float)(paper_right-paper_left);
 		float hzoom=h/(float)(paper_top-paper_bottom);
-		cameraZoom = wzoom < hzoom ? wzoom : hzoom;
-		
+		cameraZoom = (wzoom < hzoom ? wzoom : hzoom) / extraScale;
 		repaint();
 	}
 	
@@ -163,10 +163,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
     
     private double TX(double a) {
-    	return cx+(int)((a-cameraOffsetX)*cameraZoom);
+    	return cx+(a*extraScale);
     }
     private double TY(double a) {
-    	return cy-(int)((a-cameraOffsetY)*cameraZoom);
+    	return cy-(a*extraScale);
     }
     private double ITX(double a) {
     	return TX(a); // TX(a*imageScale-imageOffsetX);
@@ -178,10 +178,13 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);    // paint background
 		Graphics2D g2d = (Graphics2D)g;
-	   
+
 		cx = this.getWidth()/2;
 		cy = this.getHeight()/2;
-
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.translate(-cameraOffsetX, -cameraOffsetY);
+		g2d.scale(cameraZoom, cameraZoom);
+		
 		// draw background
 		setBackground(Color.GRAY);
 		
@@ -189,21 +192,21 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		if(!connected) {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
 			g2d.drawRect((int)TX(limit_left),(int)TY(limit_top),
-					(int)((limit_right-limit_left)*cameraZoom),
-					(int)((limit_top-limit_bottom)*cameraZoom));
+					(int)((limit_right-limit_left)*extraScale),
+					(int)((limit_top-limit_bottom)*extraScale));
 			g2d.setColor(Color.WHITE);
 			g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
-					(int)((paper_right-paper_left)*cameraZoom),
-					(int)((paper_top-paper_bottom)*cameraZoom));
+					(int)((paper_right-paper_left)*extraScale),
+					(int)((paper_top-paper_bottom)*extraScale));
 		} else {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
 			g2d.fillRect((int)TX(limit_left),(int)TY(limit_top),
-					(int)((limit_right-limit_left)*cameraZoom),
-					(int)((limit_top-limit_bottom)*cameraZoom));
+					(int)((limit_right-limit_left)*extraScale),
+					(int)((limit_top-limit_bottom)*extraScale));
 			g2d.setColor(Color.WHITE);
 			g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
-					(int)((paper_right-paper_left)*cameraZoom),
-					(int)((paper_top-paper_bottom)*cameraZoom));
+					(int)((paper_right-paper_left)*extraScale),
+					(int)((paper_top-paper_bottom)*extraScale));
 
 		}
 
@@ -212,23 +215,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 		g2d.drawLine((int)TX( 0.00),(int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 		
-		// draw left motor
-		
-		// draw right motor
-		
-		// draw arduino + connection status
-		
-/*
-		if(img!=null) {
-			int w=img.getWidth();
-			int h=img.getHeight();
-			g.drawImage(img, 
-					(int)ITX(-w/2), (int)ITY(h/2), (int)ITX(w/2), (int)ITY(-h/2), 
-					0, 0, w, h,
-					null);
-			return;
-		}
-//*/
+		// @TODO: draw left motor
+		// @TODO: draw right motor
+		// @TODO: draw arduino + connection status
+
 		// draw image
 		if(instructions==null) return;
 		
@@ -278,7 +268,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				g2d.setColor( Color.ORANGE );
 			}
 			
-			g2d.setStroke(new BasicStroke((float)cameraZoom/10.0f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+			g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||

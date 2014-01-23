@@ -532,7 +532,7 @@ void processCommand() {
     Serial.print('L');  Serial.print(SPOOL_DIAMETER);
     Serial.print(F(" R"));   Serial.println(SPOOL_DIAMETER);
     break;
-  case 4:  SD_ProcessFile(strchr(buffer,' ')+1);  break;  // read file
+  case 4:  SD_StartPrintingFile(strchr(buffer,' ')+1);  break;  // read file
   }
 }
 
@@ -593,7 +593,7 @@ void loop() {
   }
   
   SD_check();
-  //LCD_menu();
+  LCD_update();
 }
 
 

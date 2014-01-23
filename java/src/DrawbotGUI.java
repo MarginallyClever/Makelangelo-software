@@ -277,9 +277,10 @@ public class DrawbotGUI
         String workingDirectory=System.getProperty("user.dir");
 		String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
 		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(ngcPair,getScale());
+		generator.SetConfigLine(GetConfigLine());
+		generator.SetBobbinLine(GetBobbinLine());
 		generator.Process(img);
 	}
-	
 	
 	private void LoadImage4Level(String filename) throws IOException {
 		BufferedImage img = ImageIO.read(new File(filename));
@@ -287,7 +288,7 @@ public class DrawbotGUI
 		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
 		img = rs.Process(img);
 		
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
         String workingDirectory=System.getProperty("user.dir");
@@ -295,6 +296,8 @@ public class DrawbotGUI
 		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(ngcPair,getScale(),paper_margin);
 		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
 		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
+		generator.SetConfigLine(GetConfigLine());
+		generator.SetBobbinLine(GetBobbinLine());
 		generator.Process(img);
 	}
 	
@@ -305,7 +308,7 @@ public class DrawbotGUI
 		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
 		img = rs.Process(img);
 		
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
         String workingDirectory=System.getProperty("user.dir");
@@ -313,6 +316,8 @@ public class DrawbotGUI
 		Filter_Spiral generator = new Filter_Spiral(ngcPair,getScale(),paper_margin);
 		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
 		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
+		generator.SetConfigLine(GetConfigLine());
+		generator.SetBobbinLine(GetBobbinLine());
 		generator.Process(img);
 	}
 
@@ -1126,6 +1131,21 @@ public class DrawbotGUI
 		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
 	}
 	
+	
+	private String GetBobbinLine() {
+		return new String("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
+	}
+
+	private String GetConfigLine() {
+		return new String("CONFIG T"+limit_top
+		+" B"+limit_bottom
+		+" L"+limit_left
+		+" R"+limit_right
+		+" I"+(m1invert?"-1":"1")
+		+" J"+(m2invert?"-1":"1"));
+	}
+
+	
 	/**
 	 * Send the machine configuration to the robot
 	 */
@@ -1133,13 +1153,8 @@ public class DrawbotGUI
 		if(!portConfirmed) return;
 		
 		// Send a command to the robot with new configuration values
-		SendLineToRobot("CONFIG T"+limit_top
-						+" B"+limit_bottom
-						+" L"+limit_left
-						+" R"+limit_right
-						+" I"+(m1invert?"-1":"1")
-						+" J"+(m2invert?"-1":"1"));
-		SendLineToRobot("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
+		SendLineToRobot(GetConfigLine());
+		SendLineToRobot(GetBobbinLine());
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
 	

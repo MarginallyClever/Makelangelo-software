@@ -286,6 +286,12 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
+char segment_buffer_full() {
+  int next_segment = get_next_segment(last_segment);
+  return (next_segment == current_segment);
+}
+
+
 /**
  * Uses bresenham's line algorithm to move both motors
  **/
