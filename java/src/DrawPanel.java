@@ -16,9 +16,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	static final long serialVersionUID=2;
 
 	// arc smoothness - increase to make more smooth and run slower.
-	public static final double STEPS_PER_DEGREE=10;
-	double paper_left,paper_right,paper_top,paper_bottom;
-	double limit_left,limit_right,limit_top,limit_bottom;
+	public static final double STEPS_PER_DEGREE=1;
 
 	// progress
 	long linesProcessed=0;
@@ -57,20 +55,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	}
 	
 	
-	public void setPaperSize(double t,double b,double l,double r) {
-		paper_top=t;
-		paper_bottom=b;
-		paper_left=l;
-		paper_right=r;
-		repaint();
-	}
-	
-	
-	public void setMachineLimits(double t,double b,double l,double r) {
-		limit_top=t;
-		limit_bottom=b;
-		limit_left=l;
-		limit_right=r;
+	public void updateMachineConfig() {
 		repaint();
 	}
 	
@@ -127,11 +112,13 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
     	repaint();
 	}
 	public void ZoomToFitPaper() {
+		MachineConfiguration mc=MachineConfiguration.getSingleton();
+		
 		float w=(float)this.getWidth();
 		float h=(float)this.getHeight();
 		// which one do we have to zoom more to fit the picture in the component?
-		float wzoom=w/(float)(paper_right-paper_left);
-		float hzoom=h/(float)(paper_top-paper_bottom);
+		float wzoom=w/(float)(mc.paper_right-mc.paper_left);
+		float hzoom=h/(float)(mc.paper_top-mc.paper_bottom);
 		cameraZoom = (wzoom < hzoom ? wzoom : hzoom) / extraScale;
 		repaint();
 	}
@@ -187,26 +174,28 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		
 		// draw background
 		setBackground(Color.GRAY);
+
+		MachineConfiguration mc=MachineConfiguration.getSingleton();
 		
 		// draw limits
 		if(!connected) {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
-			g2d.drawRect((int)TX(limit_left),(int)TY(limit_top),
-					(int)((limit_right-limit_left)*extraScale),
-					(int)((limit_top-limit_bottom)*extraScale));
+			g2d.drawRect((int)TX(mc.limit_left),(int)TY(mc.limit_top),
+					(int)((mc.limit_right-mc.limit_left)*extraScale),
+					(int)((mc.limit_top-mc.limit_bottom)*extraScale));
 			g2d.setColor(Color.WHITE);
-			g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
-					(int)((paper_right-paper_left)*extraScale),
-					(int)((paper_top-paper_bottom)*extraScale));
+			g2d.fillRect((int)TX(mc.paper_left),(int)TY(mc.paper_top),
+					(int)((mc.paper_right-mc.paper_left)*extraScale),
+					(int)((mc.paper_top-mc.paper_bottom)*extraScale));
 		} else {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
-			g2d.fillRect((int)TX(limit_left),(int)TY(limit_top),
-					(int)((limit_right-limit_left)*extraScale),
-					(int)((limit_top-limit_bottom)*extraScale));
+			g2d.fillRect((int)TX(mc.limit_left),(int)TY(mc.limit_top),
+					(int)((mc.limit_right-mc.limit_left)*extraScale),
+					(int)((mc.limit_top-mc.limit_bottom)*extraScale));
 			g2d.setColor(Color.WHITE);
-			g2d.fillRect((int)TX(paper_left),(int)TY(paper_top),
-					(int)((paper_right-paper_left)*extraScale),
-					(int)((paper_top-paper_bottom)*extraScale));
+			g2d.fillRect((int)TX(mc.paper_left),(int)TY(mc.paper_top),
+					(int)((mc.paper_right-mc.paper_left)*extraScale),
+					(int)((mc.paper_top-mc.paper_bottom)*extraScale));
 
 		}
 
@@ -215,9 +204,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		g2d.drawLine((int)TX(-0.25),(int)TY( 0.00), (int)TX(0.25),(int)TY(0.00));
 		g2d.drawLine((int)TX( 0.00),(int)TY(-0.25), (int)TX(0.00),(int)TY(0.25));
 		
-		// @TODO: draw left motor
-		// @TODO: draw right motor
-		// @TODO: draw arduino + connection status
+		// TODO draw left motor
+		// TODO draw right motor
+		// TODO draw arduino + connection status
 
 		// draw image
 		if(instructions==null) return;
@@ -225,22 +214,30 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		drawScale=0.1f;
 		
 		double px=0,py=0,pz=90;
-		int i,j;
+		int i,j, tool=0;
+		String tool_change="M06 T";
 		
 		for(i=0;i<instructions.size();++i) {
 			String line=instructions.get(i);
 			String[] pieces=line.split(";");
 			if(pieces.length==0) continue;
+
+			if(line.startsWith(tool_change)) {
+				String numberOnly= line.substring(tool_change.length()).replaceAll("[^0-9]", "");
+				tool = (int)Integer.valueOf(numberOnly, 10);
+				
+				switch(tool) {
+				case 0: g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));	break;  // sharpie/pen
+				case 1: g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));	break;  // LED
+				case 2: g2d.setStroke(new BasicStroke(0.2f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));		break;  // spray paint
+				}
+				// TODO set size & color from config
+			}
 			
 			String[] tokens = pieces[0].split("\\s");
 			if(tokens.length==0) continue;
-
-			// have we changed scale?
-			for(j=0;j<tokens.length;++j) {
-				 if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
-				 if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
-			}
 			
+			// have we changed scale?
 			// what are our coordinates?
 			double x=px;
 			double y=py;
@@ -248,38 +245,45 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			double ai=px;
 			double aj=py;
 			for(j=1;j<tokens.length;++j) {
+				if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
+				if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
 				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));// * drawScale;
-				if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
 			}
 			
 			// is pen up or down?
-			if(running && i<=linesProcessed) {
-				g2d.setColor( Color.RED );
-			} else if(running && i>linesProcessed && i<=linesProcessed+500) {
-				g2d.setColor( Color.GREEN );
-			} else if(z>45.0) {
+			boolean is_up=false;
+			if(z==MachineConfiguration.getSingleton().penUpNumber) {
+				if(show_pen_up==false) {
+					px=x;
+					py=y;
+					pz=z;
+					continue;
+				}
+				is_up=true;
 				g2d.setColor( Color.BLUE );
-			} else if(z<45.0) {
+			} else if(z==MachineConfiguration.getSingleton().penDownNumber) {
 				g2d.setColor( Color.BLACK );
 			} else {
 				g2d.setColor( Color.ORANGE );
 			}
 			
-			g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+			if(is_up==false) {
+				if(running && i<=linesProcessed) {
+					g2d.setColor( Color.RED );
+				} else if(running && i>linesProcessed && i<=linesProcessed+500) {
+					g2d.setColor( Color.GREEN );
+				}
+			}
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				// draw a line
-				if(show_pen_up || z<45) {
-					g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));					
-				}
-				px=x;
-				py=y;
-				pz=z;
+				g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));	
 			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
 					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
 				// draw an arc
@@ -312,10 +316,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					py=ny;
 				}
 			    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
-				px=x;
-				py=y;
-				pz=z;
 			}
+			
+			px=x;
+			py=y;
+			pz=z;
 		}  // for ( each instruction )
 	}
 }

@@ -187,8 +187,11 @@ static void adjustSpoolDiameter(float diameter1,float diameter2) {
   float MAX_VEL2 = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
   MAX_VEL = MAX_VEL1 > MAX_VEL2 ? MAX_VEL1 : MAX_VEL2;
 
-  // Serial.print(F("SpoolDiameter1 = "); Serial.println(F(SPOOL_DIAMETER1,3));
-  // Serial.print(F("SpoolDiameter2 = "); Serial.println(F(SPOOL_DIAMETER2,3));
+//  Serial.print(F("SpoolDiameter1 = "));  Serial.println(SPOOL_DIAMETER1,3);
+//  Serial.print(F("SpoolDiameter2 = "));  Serial.println(SPOOL_DIAMETER2,3);
+//  Serial.print(F("THREADPERSTEP1="));  Serial.println(THREADPERSTEP1,3);
+//  Serial.print(F("THREADPERSTEP2="));  Serial.println(THREADPERSTEP2,3);
+//  Serial.print(F("MAX_VEL="));  Serial.println(MAX_VEL,3);
 }
 
 
@@ -228,19 +231,20 @@ static char readSwitches() {
 //------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
 static void setFeedRate(float v) {
-  float v1 = v * mode_scale/60.0;
-  if( feed_rate != v1 ) {
-    feed_rate = v1;
-    if(feed_rate > MAX_VEL) feed_rate=MAX_VEL;
-    if(feed_rate < MIN_VEL) feed_rate=MIN_VEL;
-  }
+  if(feed_rate==v) return;
+  feed_rate=v;
   
-  long step_delay1 = 1000000.0 / (feed_rate/THREADPERSTEP1);
-  long step_delay2 = 1000000.0 / (feed_rate/THREADPERSTEP2);
+  float v1 = v * mode_scale/60.0;
+  
+  if(v1 > MAX_VEL) v1=MAX_VEL;
+  if(v1 < MIN_VEL) v1=MIN_VEL;
+  
+  long step_delay1 = 1000000.0 / (v1/THREADPERSTEP1);
+  long step_delay2 = 1000000.0 / (v1/THREADPERSTEP2);
   step_delay = step_delay1 > step_delay2 ? step_delay1 : step_delay2;
   
-  Serial.print(F("step_delay="));
-  Serial.println(step_delay);
+//  Serial.print(F("feed_rate="));  Serial.println(feed_rate);
+  Serial.print(F("step_delay="));  Serial.println(step_delay);
 }
 
 
@@ -384,6 +388,7 @@ static void line(float x,float y,float z) {
   laststep2=l2;
   posx=x;
   posy=y;
+  posz=z;
 }
 
 
@@ -856,7 +861,7 @@ static void processCommand() {
       yy+=posy;
       zz+=posz;
     }
-    
+
     line_safe(xx,yy,zz);
   }
     break;
@@ -895,6 +900,18 @@ static void processCommand() {
     arc(posx+ii,posy+jj,xx,yy,zz,dd);
   }
     break;
+  case 20: // inches -> cm
+    mode_scale=2.54f;  // inches -> cm
+    strcpy(mode_name,"in");
+    printFeedRate();
+    break;
+  case 21:
+    mode_scale=0.1;  // mm -> cm
+    strcpy(mode_name,"mm");
+    printFeedRate();
+    break;
+  case 90:  absolute_mode=1;  break;  // absolute mode
+  case 91:  absolute_mode=0;  break;  // relative mode
   case 4:  delay(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
   }
 

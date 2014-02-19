@@ -20,9 +20,21 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	long t_elapsed,t_start;
 	double progress;
 	double old_len,len;
-
+	float feed_rate=2000;
 	int w2,h2;
 	double iscale;
+
+	long time_limit=10*60*1000;  // 10 minutes
+	String dest;
+	int numPoints;
+	Point2D[] points = null;
+	int[] solution = null;
+	int scount;
+	ProgressMonitor pm;
+	double scale;
+	TSPOptimizer task;
+	int image_height,image_width;
+
 	
 	public String formatTime(long millis) {
     	String elapsed="";
@@ -58,7 +70,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 				setProgress((int)progress);
 			}
 		}
-
+/*
 		// does moving a point to somewhere else in the series shorten the series?
 		// @TODO: Debug, it doesn't seem to work.
 		// we have s1,s2,s3...e-1,e
@@ -158,7 +170,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			}
 			return once;
 		}
-
+*/
 		// we have s1,s2...e-1,e
 		// check if s1,e-1,...s2,e is shorter
 		public int flipTests() {
@@ -201,7 +213,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			}
 			return once;
 		}
-		
+	
 		@Override
 		public Void doInBackground() {
 			len=GetTourLength(solution);
@@ -232,29 +244,29 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
             pm.close();
 			ConvertAndSaveToGCode();
 
+			// TODO move to GUI
+			DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
+			DrawbotGUI.getSingleton().PlayConversionFinishedSound();
 			DrawbotGUI.getSingleton().LoadGCode(dest);
 		}
 	}
 
-	long time_limit=10*60*1000;  // 10 minutes
-	String dest;
-	int numPoints;
-	Point2D[] points = null;
-	int[] solution = null;
-	int image_width, image_height;
-	int scount;
-	ProgressMonitor pm;
-	double scale;
-	TSPOptimizer task;
-	String bobbin_line, config_line;
+
+	private void liftPen(BufferedWriter out) throws IOException {
+		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenUpString()+" F80;\n");  // lower the pen.
+		out.write("G00 F"+feed_rate+";\n");
+	}
+	
+	private void lowerPen(BufferedWriter out) throws IOException {
+		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenDownString()+" F80;\n");  // lower the pen.
+		out.write("G00 F"+feed_rate+";\n");
+	}
 	
 	Filter_TSPGcodeGenerator(String _dest,double _scale) {
 		dest=_dest;
 		scale=_scale;
 	}
-
-	public void SetConfigLine(String str) { config_line=str; }
-	public void SetBobbinLine(String str) { bobbin_line=str; }
+	
 	
 	protected float CalculateWeight(int a,int b) {
 		float x = points[a].x - points[b].x;
@@ -352,10 +364,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		} while(scount<numPoints);
 	}
 	
-	
-	private double RoundOff(double value) {
-		return Math.floor(value * 1000) / 1000;
-	}
 
 	private void MoveTo(BufferedWriter out,int i,boolean up) throws IOException {
 		out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + ";\n");
@@ -391,35 +399,30 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
-			out.write(config_line+";\n");
-			out.write(bobbin_line+";\n");
+			out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
+			out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
 			// change to tool 0
 			out.write("M06 T0;\n");
-			// set absolute coordinates, lift pen and set a default feed rate
-			out.write("G00 G90 F2000 Z90;\n");
+			// set absolute coordinates, lift pen
+			out.write("G90;\n");
+			liftPen(out);
 			// move to the first point
 			MoveTo(out,besti,false);
-			// lower the pen
-			out.write("G00 Z0;\n");
+			lowerPen(out);
 
 			for(i=1;i<numPoints;++i) {
 				MoveTo(out,(besti+i)%numPoints,false);
 			}
 			MoveTo(out,besti,false);
+			
 			// lift pen and return to home
-			out.write("G00 Z90;\n");
+			liftPen(out);
 			out.write("G00 X0 Y0;\n");
-			// Unpower Steppers
-			out.write("M18;\n");
 			out.close();
 		}
 		catch(IOException e) {
 			DrawbotGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
-		
-		// @TODO: Move to DrawbotGUI.getSingleton().ConversionFinished() ?
-		DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
-		DrawbotGUI.getSingleton().PlayConversionFinishedSound();
 	}
 	
 	

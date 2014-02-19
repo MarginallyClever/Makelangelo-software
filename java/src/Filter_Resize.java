@@ -5,23 +5,17 @@ import java.awt.image.BufferedImage;
 
 
 /**
- * Reduces any picture to a more manageable size
+ * Resize and flip horizontally if needed.
  * @author Dan
  */
 public class Filter_Resize {
 	private final double cm_to_mm=10.0f;
 	private	double dots_per_cm=1;
 	private double margin=0.9f;
-	private double paper_top, paper_bottom, paper_left, paper_right;
 	
 	
-	public Filter_Resize(double t,double b,double l,double r,double _dots_per_cm,double _margin) {
-		paper_top=t;
-		paper_bottom=b;
-		paper_left=l;
-		paper_right=r;
+	public Filter_Resize(double _dots_per_cm) {
 		dots_per_cm=_dots_per_cm;
-		margin=_margin;
 	}
 	
 	
@@ -33,7 +27,11 @@ public class Filter_Resize {
 	                           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 	        g.setBackground(background);
 	        g.clearRect(0, 0, width, height);
-	        g.drawImage(img, 0, 0, width, height, null);
+	        if(MachineConfiguration.getSingleton().reverseForGlass) {
+	        	g.drawImage(img, width, 0, 0, height, 0,0,img.getWidth(),img.getHeight(), null);
+	        } else {
+	        	g.drawImage(img, 0, 0, width, height, null);
+	        }
 	    } finally {
 	        g.dispose();
 	    }
@@ -42,10 +40,11 @@ public class Filter_Resize {
 
 
 	public BufferedImage Process(BufferedImage img) {
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		int max_w=(int)((paper_right-paper_left)*dots_per_cm*cm_to_mm*margin);
-		int max_h=(int)((paper_top-paper_bottom)*dots_per_cm*cm_to_mm*margin);
+		int max_w=(int)((mc.paper_right-mc.paper_left)*dots_per_cm*cm_to_mm*margin);
+		int max_h=(int)((mc.paper_top-mc.paper_bottom)*dots_per_cm*cm_to_mm*margin);
 		
 		// adjust up
 		if(w<max_w && h<max_h) {

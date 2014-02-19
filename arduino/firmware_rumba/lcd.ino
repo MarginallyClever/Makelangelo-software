@@ -186,6 +186,10 @@ void LCD_main_menu() {
   MENU_START
     MENU_SUBMENU("Back",LCD_status_menu);
     if(!sd_printing_now) {
+      MENU_ACTION("Disable motors",LCD_disable_motors);
+      MENU_ACTION("Enable motors",LCD_enable_motors);
+      MENU_ACTION("This is home",LCD_this_is_home);
+      MENU_ACTION("Go home",LCD_go_home);
       if(sd_inserted) {
         MENU_SUBMENU("Start from file...",LCD_start_menu);
       }
@@ -213,6 +217,27 @@ void LCD_stop() {
   MENU_GOTO(LCD_main_menu);
 }
 
+void LCD_disable_motors() {
+  motor_disable();
+  MENU_GOTO(LCD_main_menu);
+}
+
+void LCD_enable_motors() {
+  motor_enable();
+  MENU_GOTO(LCD_main_menu);
+}
+
+
+void LCD_this_is_home() {
+  teleport(0,0);
+  MENU_GOTO(LCD_main_menu);
+}
+
+
+void LCD_go_home() {
+  polargraph_line( 0, 0, posz );
+  MENU_GOTO(LCD_main_menu);
+}
 
 void LCD_start_menu() {
   if(!sd_inserted) MENU_GOTO(LCD_main_menu);

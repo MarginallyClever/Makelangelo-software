@@ -2,8 +2,8 @@
 // Draw robot
 // dan@marginallycelver.com 2012 feb 11
 //------------------------------------------------------------------------------
-// Copyright at end of file.
-// please see http://www.github.com/i-make-robots/Drawbot for more information.
+// Copyright at end of file.  Please see
+// http://www.github.com/MarginallyClever/Makelangelo for more information.
 
 
 //------------------------------------------------------------------------------
@@ -187,8 +187,11 @@ static void adjustSpoolDiameter(float diameter1,float diameter2) {
   float MAX_VEL2 = MAX_STEPS_S * THREADPERSTEP2;  // cm/s
   MAX_VEL = MAX_VEL1 > MAX_VEL2 ? MAX_VEL1 : MAX_VEL2;
 
-  // Serial.print(F("SpoolDiameter1 = "); Serial.println(F(SPOOL_DIAMETER1,3));
-  // Serial.print(F("SpoolDiameter2 = "); Serial.println(F(SPOOL_DIAMETER2,3));
+//  Serial.print(F("SpoolDiameter1 = "));  Serial.println(SPOOL_DIAMETER1,3);
+//  Serial.print(F("SpoolDiameter2 = "));  Serial.println(SPOOL_DIAMETER2,3);
+//  Serial.print(F("THREADPERSTEP1="));  Serial.println(THREADPERSTEP1,3);
+//  Serial.print(F("THREADPERSTEP2="));  Serial.println(THREADPERSTEP2,3);
+//  Serial.print(F("MAX_VEL="));  Serial.println(MAX_VEL,3);
 }
 
 
@@ -228,19 +231,20 @@ static char readSwitches() {
 //------------------------------------------------------------------------------
 // feed rate is given in units/min and converted to cm/s
 static void setFeedRate(float v) {
-  float v1 = v * mode_scale/60.0;
-  if( feed_rate != v1 ) {
-    feed_rate = v1;
-    if(feed_rate > MAX_VEL) feed_rate=MAX_VEL;
-    if(feed_rate < MIN_VEL) feed_rate=MIN_VEL;
-  }
+  if(feed_rate==v) return;
+  feed_rate=v;
   
-  long step_delay1 = 1000000.0 / (feed_rate/THREADPERSTEP1);
-  long step_delay2 = 1000000.0 / (feed_rate/THREADPERSTEP2);
+  float v1 = v * mode_scale/60.0;
+  
+  if(v1 > MAX_VEL) v1=MAX_VEL;
+  if(v1 < MIN_VEL) v1=MIN_VEL;
+  
+  long step_delay1 = 1000000.0 / (v1/THREADPERSTEP1);
+  long step_delay2 = 1000000.0 / (v1/THREADPERSTEP2);
   step_delay = step_delay1 > step_delay2 ? step_delay1 : step_delay2;
   
-  Serial.print(F("step_delay="));
-  Serial.println(step_delay);
+//  Serial.print(F("feed_rate="));  Serial.println(feed_rate);
+  Serial.print(F("step_delay="));  Serial.println(step_delay);
 }
 
 
@@ -333,6 +337,13 @@ static void line_safe(float x,float y,float z) {
 
 
 //------------------------------------------------------------------------------
+void pause(long ms) {
+  delay(ms/1000);
+  delayMicroseconds(ms%1000);
+}
+
+
+//------------------------------------------------------------------------------
 static void line(float x,float y,float z) {
   long l1,l2;
   IK(x,y,l1,l2);
@@ -357,7 +368,7 @@ static void line(float x,float y,float z) {
         over-=ad1;
         m2.onestep(dir2);
       }
-      delayMicroseconds(step_delay);
+      pause(step_delay);
       if(readSwitches()) return;
     }
   } else {
@@ -368,7 +379,7 @@ static void line(float x,float y,float z) {
         over-=ad2;
         m1.onestep(dir1);
       }
-      delayMicroseconds(step_delay);
+      pause(step_delay);
       if(readSwitches()) return;
     }
   }
@@ -377,6 +388,7 @@ static void line(float x,float y,float z) {
   laststep2=l2;
   posx=x;
   posy=y;
+  posz=z;
 }
 
 
@@ -707,6 +719,36 @@ static int processSubcommand() {
 }
 
 
+void disable_motors() {
+  m1.release();
+  m2.release();
+}
+
+
+void activate_motors() {
+  m1.step(1,1);  m1.step(1,-1);
+  m2.step(1,1);  m2.step(1,-1);
+}
+
+
+/**
+ * Look for character /code/ in the buffer and read the float that immediately follows it.
+ * @return the value found.  If nothing is found, /val/ is returned.
+ * @input code the character to look for.
+ * @input val the return value if /code/ is not found.
+ **/
+float parsenumber(char code,float val) {
+  char *ptr=buffer;
+  while(ptr && *ptr && ptr<buffer+sofar) {
+    if(*ptr==code) {
+      return atof(ptr+1);
+    }
+    ptr=strchr(ptr,' ')+1;
+  }
+  return val;
+}
+
+
 //------------------------------------------------------------------------------
 static void processCommand() {
   // blank lines
@@ -717,8 +759,6 @@ static void processCommand() {
   } else if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"G28",3)) {
-    FindHome();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
     float xx=posx;
     float yy=posy;
@@ -734,13 +774,6 @@ static void processCommand() {
     }
 
     teleport(xx,yy);
-  } else 
-  if(!strncmp(buffer,"M114",4)) {
-    where();
-  } else if(!strncmp(buffer,"M18",3)) {
-    // disable motors
-    m1.release();
-    m2.release();
   } else if(!strncmp(buffer,"CONFIG",6)) {
     float tt=limit_top;
     float bb=limit_bottom;
@@ -790,8 +823,20 @@ static void processCommand() {
     
     teleport(0,0);
     printConfig();
-  } else if(!strncmp(buffer,"G00 ",4) || !strncmp(buffer,"G01 ",4)
-         || !strncmp(buffer,"G0 " ,3) || !strncmp(buffer,"G1 " ,3) ) {
+  } 
+
+  int cmd=parsenumber('M',-1);
+  switch(cmd) {
+  case 114:  where();  break;
+  case 18:  disable_motors();  break;
+  case 17:  activate_motors();  break;
+  }
+
+  cmd=parsenumber('G',-1);
+  switch(cmd) {
+  case 28:  FindHome();  break;
+  case 0:
+  case 1: {
     // line
     processSubcommand();
     float xx, yy, zz;
@@ -806,26 +851,35 @@ static void processCommand() {
       zz=0;
     }
   
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
-      }
-    }
+    xx=parsenumber('X',xx)*mode_scale;
+    yy=parsenumber('Y',yy)*mode_scale;
+    zz=parsenumber('Z',zz);
+    setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
       xx+=posx;
       yy+=posy;
       zz+=posz;
     }
-    
+
+    Serial.print("from ");
+    Serial.print(posx);
+    Serial.print(',');
+    Serial.print(posy);
+    Serial.print(',');
+    Serial.print(posz);
+    Serial.print(" to ");
+    Serial.print(xx);
+    Serial.print(',');
+    Serial.print(yy);
+    Serial.print(',');
+    Serial.print(zz);
+    Serial.print('\n');
     line_safe(xx,yy,zz);
-  } else if(!strncmp(buffer,"G02 ",4) || !strncmp(buffer,"G2 " ,3) 
-         || !strncmp(buffer,"G03 ",4) || !strncmp(buffer,"G3 " ,3)) {
+  }
+    break;
+  case 2:
+  case 3: {
     // arc
     processSubcommand();
     float xx, yy, zz;
@@ -843,18 +897,12 @@ static void processCommand() {
       zz=0;
     }
     
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'I': ii=atof(ptr+1)*mode_scale;  break;
-      case 'J': jj=atof(ptr+1)*mode_scale;  break;
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      case 'Z': zz=atof(ptr+1);  break;
-      case 'F': setFeedRate(atof(ptr+1));  break;
-      }
-    }
+    ii=parsenumber('I',ii)*mode_scale;
+    jj=parsenumber('J',jj)*mode_scale;
+    xx=parsenumber('X',xx)*mode_scale;
+    yy=parsenumber('Y',yy)*mode_scale;
+    zz=parsenumber('Z',zz);
+    setFeedRate(parsenumber('F',feed_rate));
  
     if(absolute_mode==0) {
       xx+=posx;
@@ -863,22 +911,26 @@ static void processCommand() {
     }
 
     arc(posx+ii,posy+jj,xx,yy,zz,dd);
-  } else if(!strncmp(buffer,"G04 ",4) || !strncmp(buffer,"G4 ",3)) {
-    // dwell
-    long xx=0;
+  }
+    break;
+  case 20: // inches -> cm
+    mode_scale=2.54f;  // inches -> cm
+    strcpy(mode_name,"in");
+    printFeedRate();
+    break;
+  case 21:
+    mode_scale=0.1;  // mm -> cm
+    strcpy(mode_name,"mm");
+    printFeedRate();
+    break;
+  case 90:  absolute_mode=1;  break;  // absolute mode
+  case 91:  absolute_mode=0;  break;  // relative mode
+  case 4:  delay(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
+  }
 
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': 
-      case 'U': 
-      case 'P': xx=atoi(ptr+1);  break;
-      }
-    }
-
-    delay(xx);
-  } else if(!strncmp(buffer,"D00 ",4)) {
+  cmd=parsenumber('D',-1);
+  switch(cmd) {
+  case 0: {
     // move one motor
     char *ptr=strchr(buffer,' ')+1;
     int amount = atoi(ptr+1);
@@ -892,40 +944,28 @@ static void processCommand() {
       amount = abs(amount);
       for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
     }
-  }  else if(!strncmp(buffer,"D01 ",4)) {
+  }
+    break;
+  case 1: {
     // adjust spool diameters
-    float amountL=SPOOL_DIAMETER1;
-    float amountR=SPOOL_DIAMETER2;
-    
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'L': amountL=atof(ptr+1)*mode_scale;  break;
-      case 'R': amountR=atof(ptr+1)*mode_scale;  break;
-      }
-    }
+    float amountL=parsenumber('L',SPOOL_DIAMETER1);
+    float amountR=parsenumber('R',SPOOL_DIAMETER2);
 
+    float tps1=THREADPERSTEP1;
+    float tps2=THREADPERSTEP2;
     adjustSpoolDiameter(amountL,amountR);
-    // Update EEPROM
-    SaveSpoolDiameter();
-  } else if(!strncmp(buffer,"D02 ",4)) {
-    Serial.print('L');
-    Serial.print(SPOOL_DIAMETER1);
-    Serial.print(F(" R"));
-    Serial.println(SPOOL_DIAMETER2);
-  } else if(!strncmp(buffer,"D03 ",4)) {
-    // read directory
-    SD_ListFiles();
-  } else if(!strncmp(buffer,"D04 ",4)) {
-    // read file
-    SD_ProcessFile(strchr(buffer,' ')+1);
-  } else {
-    if(processSubcommand()==0) {
-      Serial.print(F("Invalid command '"));
-      Serial.print(buffer);
-      Serial.println(F("'"));
+    if(THREADPERSTEP1 != tps1 || THREADPERSTEP2 != tps2) {
+      // Update EEPROM
+      SaveSpoolDiameter();
     }
+  }
+    break;
+  case 2:
+    Serial.print('L');  Serial.print(SPOOL_DIAMETER1);
+    Serial.print(F(" R"));   Serial.println(SPOOL_DIAMETER2);
+    break;
+  case 3:  SD_ListFiles();  break;    // read directory
+  case 4:  SD_ProcessFile(strchr(buffer,' ')+1);  break;  // read file
   }
 }
 
@@ -1000,25 +1040,19 @@ void loop() {
 }
 
 
-
-//------------------------------------------------------------------------------
-// Copyright (C) 2012 Dan Royer (dan@marginallyclever.com)
-// Permission is hereby granted, free of charge, to any person obtaining a 
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation 
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-//------------------------------------------------------------------------------
-
+/**
+ * This file is part of DrawbotGUI.
+ *
+ * DrawbotGUI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * DrawbotGUI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */

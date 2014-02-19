@@ -28,15 +28,15 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-//@TODO: in-app gcode editing with immediate visusal feedback - only while not drawing
-//@TODO: image processing options - cutoff, exposure, resolution, voronoi stipples?
-//@TODO: vector output?  stl input?
+// TODO while not drawing, in-app gcode editing with immediate visusal feedback 
+// TODO image processing options - cutoff, exposure, resolution, voronoi stippling
+// TODO vector output
+// TODO STL input
 
 public class DrawbotGUI
 		extends JPanel
@@ -63,45 +63,24 @@ public class DrawbotGUI
 	// Serial communication
 	static private final String cue = "> ";
 	static private final String eol = ";";
-	static private final String NL = System.getProperty("line.separator");
 	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
 	
-	// Preferences
+	// Image processing preferences
 	private static final int IMAGE_TSP=0;
 	private static final int IMAGE_SPIRAL=1;
 	private static final int IMAGE_4LEVEL=2;
+	private static final int IMAGE_SPRAY=3;
 	private int draw_style=IMAGE_SPIRAL;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
 	private String recentPort;
-	private boolean allowMetrics=true;
+	//private boolean allowMetrics=true;
 	
-	// Metrics
+	// Metrics?
 	PublishImage reportImage = new PublishImage();
 	DistanceMetric reportDistance = new DistanceMetric();
 	
-	// Robot config
-	private long robot_uid=0;
-	private double limit_top=10;
-	private double limit_bottom=-10;
-	private double limit_left=-10;
-	private double limit_right=10;
-	private int image_dpi;
-	private int startingPositionIndex;
-	private boolean m1invert=false;
-	private boolean m2invert=false;
-	private double bobbin_left_diameter=0.95;
-	private double bobbin_right_diameter=0.95;
-	private long penUpNumber, penDownNumber;
-	
-	// paper area
-	private double paper_top=10;
-	private double paper_bottom=-10;
-	private double paper_left=-10;
-	private double paper_right=10;
-	private double paper_margin=0.85;
-
 	// machine settings while running
 	private double feed_rate;
 	private boolean penIsUp,penIsUpBeforePause;
@@ -110,8 +89,8 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonSaveFile, buttonExit;
-    private JMenuItem buttonConfigurePreferences, buttonConfigureLimits, buttonConfigureBobbins, 
-    					buttonRescan, buttonDisconnect, buttonAdjustZ, buttonJogMotors;
+    private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, 
+    					buttonRescan, buttonDisconnect, buttonAdjustUpDown, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -142,39 +121,28 @@ public class DrawbotGUI
 	
 	GCodeFile gcode = new GCodeFile();
 	
-	
-	private String getPenUp() {
-		return Long.toString(penUpNumber);
-	}
-	
-	private String getPenDown() {
-		return Long.toString(penDownNumber);
-	}
-	
 	public double getScale() {
-		return image_dpi/100.0;
+		return MachineConfiguration.getSingleton().image_dpi/100.0;
 	}
 
 	private void RaisePen() {
-		SendLineToRobot("G00 Z"+getPenUp());
+		SendLineToRobot("G00 Z"+MachineConfiguration.getSingleton().getPenUpString());
 		penIsUp=true;
 	}
 	
 	private void LowerPen() {
-		SendLineToRobot("G00 Z"+getPenDown());
+		SendLineToRobot("G00 Z"+MachineConfiguration.getSingleton().getPenDownString());
 		penIsUp=false;
 	}
 	
 	private DrawbotGUI() {
 		StartLog();
-		LoadConfig();
+		MachineConfiguration.getSingleton().LoadConfig();
         GetRecentFiles();
-		GetRecentPaperSize();
         GetRecentPort();
 	}
 	
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		//do finalization here
 		EndLog();
 		super.finalize(); //not necessary if extending Object.
@@ -251,75 +219,79 @@ public class DrawbotGUI
 	}
 	
 	public void LoadImage(String filename) {
+        // where to save temp output file?
+		String workingDirectory=System.getProperty("user.dir");
+		String destinationFile = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+		
+		// read in image
+		BufferedImage img;
+		try {
+			img = ImageIO.read(new File(filename));
+		}
+		catch(IOException e) {
+			return;
+		}
+	
+		// resize & flip as needed
+		Filter_Resize rs = new Filter_Resize(getScale()); 
+		img = rs.Process(img);
+		
+		// convert with style
 		try {
 			switch(draw_style) {
-			case DrawbotGUI.IMAGE_TSP:		LoadImageTSP(filename);		break;
-			case DrawbotGUI.IMAGE_SPIRAL:	LoadImageSpiral(filename);  break;
-			case DrawbotGUI.IMAGE_4LEVEL:	LoadImage4Level(filename);	break;
+			case DrawbotGUI.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
+			case DrawbotGUI.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
+			case DrawbotGUI.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
+			case DrawbotGUI.IMAGE_SPRAY:	LoadImageSpray(img,destinationFile);	break;
 			}
 		}
-		catch(IOException e) {}
+		catch(IOException e) {
+			DrawbotGUI.getSingleton().Log("<font color='red'>Conversion error: "+e.getMessage()+"</font>");
+		}
 	}
 
 	
-	private void LoadImageTSP(String filename) throws IOException {
-		BufferedImage img = ImageIO.read(new File(filename));
-		
-		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
-		img = rs.Process(img);
-
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(3);
+	private void LoadImageTSP(BufferedImage img,String destinationFile) throws IOException {
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.Process(img);
 		
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 		img = dither.Process(img);
 
-        String workingDirectory=System.getProperty("user.dir");
-		String ngcPair = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
-		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(ngcPair,getScale());
-		generator.SetConfigLine(GetConfigLine());
-		generator.SetBobbinLine(GetBobbinLine());
+		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(destinationFile,getScale());
 		generator.Process(img);
 	}
 	
-	private void LoadImage4Level(String filename) throws IOException {
-		BufferedImage img = ImageIO.read(new File(filename));
-		
-		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
-		img = rs.Process(img);
-		
+	
+	private void LoadImage4Level(BufferedImage img,String destinationFile) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-        String workingDirectory=System.getProperty("user.dir");
-		String ngcPair = workingDirectory+"temp.ngc";
-		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(ngcPair,getScale(),paper_margin);
-		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
-		generator.SetConfigLine(GetConfigLine());
-		generator.SetBobbinLine(GetBobbinLine());
+		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(destinationFile,getScale());
 		generator.Process(img);
 	}
 	
 	
-	private void LoadImageSpiral(String filename) throws IOException {
-		BufferedImage img = ImageIO.read(new File(filename));
-		
-		Filter_Resize rs = new Filter_Resize(paper_top,paper_bottom,paper_left,paper_right,getScale(),paper_margin); 
-		img = rs.Process(img);
-		
+	private void LoadImageSpiral(BufferedImage img,String destinationFile) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-        String workingDirectory=System.getProperty("user.dir");
-		String ngcPair = workingDirectory+"temp.ngc";
-		Filter_Spiral generator = new Filter_Spiral(ngcPair,getScale(),paper_margin);
-		generator.SetMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-		generator.SetPaperLimits(paper_top, paper_bottom, paper_left, paper_right);
-		generator.SetConfigLine(GetConfigLine());
-		generator.SetBobbinLine(GetBobbinLine());
+		Filter_Spiral generator = new Filter_Spiral(destinationFile,getScale());
 		generator.Process(img);
 	}
+	
+	
+	private void LoadImageSpray(BufferedImage img,String destinationFile) throws IOException {
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		img = bw.Process(img);
+		
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		img = dither.Process(img);
+
+		Filter_Spray generator = new Filter_Spray(destinationFile,getScale());
+		generator.Process(img);
+	}
+	
 
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
@@ -459,70 +431,26 @@ public class DrawbotGUI
 	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		int found=line3.lastIndexOf(hello);
-		if(found >= 0) {
+		if(line3.lastIndexOf(hello) >= 0) {
 			portConfirmed=true;
 			
-			GetRobotUID(line3);
+			String after_hello = line3.substring(line3.lastIndexOf(hello) + hello.length());
+			MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
 			
-			mainframe.setTitle("Makelangelo #"+Long.toString(robot_uid)+" connected");
+			mainframe.setTitle("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().robot_uid)+" connected");
 
-			// load machine specific config
-			GetRecentPaperSize();
-			LoadConfig();
-			if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
-				ConfigureLimits();
+			// did read go ok?
+			if(MachineConfiguration.getSingleton().robot_uid!=0) {
+				reportDistance.SetUID(MachineConfiguration.getSingleton().robot_uid);
 			}
 
 			SendConfig();
-			previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-			previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-			
+			previewPane.updateMachineConfig();
+
 			UpdateMenuBar();
 			previewPane.setConnected(true);
 		}
 		return portConfirmed;
-	}
-	
-	private void GetRobotUID(String line3) {
-		int found=line3.lastIndexOf(hello);
-		
-		// get the UID reported by the robot
-		String[] lines = line3.substring(found+hello.length()).split("\\r?\\n");
-		if(lines.length>0) {
-			try {
-				robot_uid = Long.parseLong(lines[0]);
-			}
-			catch(NumberFormatException e) {}
-		}
-		
-		// new robots have UID=0
-		if(robot_uid==0) GetNewRobotUID();
-
-		// did read go ok?
-		if(robot_uid!=0) {
-			reportDistance.SetUID(robot_uid);
-		}
-
-	}
-	
-	/**
-	 * based on http://www.exampledepot.com/egs/java.net/Post.html
-	 */
-	private void GetNewRobotUID() {
-		try {
-		    // Send data
-			URL url = new URL("http://marginallyclever.com/drawbot_getuid.php");
-		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		    robot_uid = Long.parseLong(rd.readLine());
-		    rd.close();
-		} catch (Exception e) {}
-
-		// did read go ok?
-		if(robot_uid!=0) {
-			SendLineToRobot("UID "+robot_uid);
-		}
 	}
 	
 	// find all available serial ports for the settings->ports menu.
@@ -551,24 +479,6 @@ public class DrawbotGUI
 		prefs.put("recent-port", portName);
 		recentPort=portName;
 		UpdateMenuBar();
-	}
-	
-	// save paper limits
-	public void SetRecentPaperSize() {
-		String id=Long.toString(robot_uid);
-		prefs.putDouble(id+"_paper_left", paper_left);
-		prefs.putDouble(id+"_paper_right", paper_right);
-		prefs.putDouble(id+"_paper_top", paper_top);
-		prefs.putDouble(id+"_paper_bottom", paper_bottom);
-		previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-	}
-	
-	public void GetRecentPaperSize() {
-		String id = Long.toString(robot_uid);
-		paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
-		paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
-		paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
-		paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
 	}
 	
 	/**
@@ -692,8 +602,8 @@ public class DrawbotGUI
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
 	    	if(!IsFileGcode(selectedFile)) {
 	    		// if machine is not yet calibrated
-	    		if(paper_top<=paper_bottom || paper_right<=paper_left) {
-	    			JOptionPane.showMessageDialog(null,"Please set a paper size before importing an image.  Paper size is set in Settings > Configure Limits.");
+	    		if(MachineConfiguration.getSingleton().IsPaperConfigured() == false) {
+	    			JOptionPane.showMessageDialog(null,"Please set a paper size before importing an image.  Paper size is set in Settings > Adjust machine size.");
 	    			return;
 	    		}
 	    	}
@@ -760,26 +670,29 @@ public class DrawbotGUI
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
 		
-		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 25, 200, image_dpi);
+		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 25, 200, MachineConfiguration.getSingleton().image_dpi);
 		//input_image_dpi.setSize(250,input_image_dpi.getSize().height);
 		input_image_dpi.setMajorTickSpacing(50);
 		input_image_dpi.setMinorTickSpacing(25);
 		input_image_dpi.setPaintTicks(false);
 		input_image_dpi.setPaintLabels(true);
 		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(paper_margin*100));
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
 		input_paper_margin.setMajorTickSpacing(20);
 		input_paper_margin.setMinorTickSpacing(5);
 		input_paper_margin.setPaintTicks(false);
 		input_paper_margin.setPaintLabels(true);
 		
-		final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the global total"));
-		allow_metrics.setSelected(allowMetrics);
+		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
+		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox show_pen_up = new JCheckBox(String.valueOf("Show pen up moves"));
+		final JCheckBox show_pen_up = new JCheckBox("Show pen up moves");
 		show_pen_up.setSelected(previewPane.getShowPenUp());
 
-		String [] styles= { "Single Line TSP", "Spiral", "Cross hatching" };
+		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
+		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
+
+		String [] styles= { "Pen Single Line", "Pen Spiral", "Pen Cross hatching", "Spray paint dithering" };
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(draw_style);
 		
@@ -787,19 +700,20 @@ public class DrawbotGUI
 		final JButton save = new JButton("Save");
 		
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
-		c.gridwidth=1;	c.gridx=0;  c.gridy=3;  driver.add(change_sound_connect,c);								c.gridwidth=3;	c.gridx=1;  c.gridy=3;  driver.add(sound_connect,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);					c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(show_pen_up,c);										c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
-		
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=3;  driver.add(change_sound_connect,c);								c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=3;  driver.add(sound_connect,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(show_pen_up,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
 
-		c.gridwidth=1;	c.gridx=2;  c.gridy=10;  driver.add(cancel,c);
-		c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(save,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -810,17 +724,19 @@ public class DrawbotGUI
 					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
 
 					if(subject == save) {
-						image_dpi=input_image_dpi.getValue();
-						paper_margin=(100-input_paper_margin.getValue())*0.01;
+						MachineConfiguration.getSingleton().image_dpi=input_image_dpi.getValue();
+						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
 						
-						allowMetrics = allow_metrics.isSelected();
+						//allowMetrics = allow_metrics.isSelected();
 						previewPane.setShowPenUp(show_pen_up.isSelected());
+						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
+						
 						draw_style=input_draw_style.getSelectedIndex();
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
-						SaveConfig();
+						MachineConfiguration.getSingleton().SaveConfig();
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -839,311 +755,6 @@ public class DrawbotGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
-	
-	/**
-	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	*/
-	public void ConfigureLimits() {
-		final JDialog driver = new JDialog(mainframe,"Configure Limits",true);
-		driver.setLayout(new GridBagLayout());
-		
-		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
-		final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
-		final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
-		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
-
-		String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
-		final JComboBox startPos = new JComboBox(startingStrings);
-		startPos.setSelectedIndex(startingPositionIndex);
-		
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Save");
-		
-		BufferedImage myPicture = null;
-		try {
-			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
-		}
-		catch(IOException e) {}
-		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
-		
-		GridBagConstraints c = new GridBagConstraints();
-		GridBagConstraints d = new GridBagConstraints();
-		
-		c.weightx=0.25;
-		c.gridx=0; c.gridy=0; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
-		
-		c.gridheight=1; c.gridwidth=1; 
-		d.anchor=GridBagConstraints.WEST;
-
-		c.gridx=0; c.gridy=5; c.gridwidth=4; c.gridheight=1;
-		driver.add(new JLabel("All values in mm."),c);
-		c.gridwidth=1;
-		
-		c.ipadx=3;
-		c.anchor=GridBagConstraints.EAST;
-		c.gridx=0; c.gridy=6; driver.add(new JLabel("Machine width"),c);	d.gridx=1;	d.gridy=6;	driver.add(mw,d);
-		c.gridx=2; c.gridy=6; driver.add(new JLabel("Machine height"),c);	d.gridx=3;	d.gridy=6;	driver.add(mh,d);
-		c.gridx=0; c.gridy=7; driver.add(new JLabel("Paper width"),c);		d.gridx=1;	d.gridy=7;	driver.add(pw,d);
-		c.gridx=2; c.gridy=7; driver.add(new JLabel("Paper height"),c);		d.gridx=3;	d.gridy=7;	driver.add(ph,d);
-		
-		//c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
-		//driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
-		c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel("Pen starts at paper"),c);
-		c.anchor=GridBagConstraints.WEST;
-		c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(startPos,c);
-
-		
-		c.anchor=GridBagConstraints.EAST;
-		c.gridy=13;
-		c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
-		c.gridx=2; c.gridwidth=1; driver.add(save,c);
-		
-		Dimension s=ph.getPreferredSize();
-		s.width=80;
-		mw.setPreferredSize(s);
-		mh.setPreferredSize(s);
-		pw.setPreferredSize(s);
-		ph.setPreferredSize(s);
-	
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				if(subject == save) {
-					float pwf = Math.round( Float.valueOf(pw.getText()) * 100 ) / (100 * 10);
-					float phf = Math.round( Float.valueOf(ph.getText()) * 100 ) / (100 * 10);
-					float mwf = Math.round( Float.valueOf(mw.getText()) * 100 ) / (100 * 10);
-					float mhf = Math.round( Float.valueOf(mh.getText()) * 100 ) / (100 * 10);
-					
-					boolean data_is_sane=true;
-					if( pwf<=0 ) data_is_sane=false;
-					if( phf<=0 ) data_is_sane=false;
-					if( mwf<=0 ) data_is_sane=false;
-					if( mhf<=0 ) data_is_sane=false;
-					if(data_is_sane) {
-						startingPositionIndex = startPos.getSelectedIndex();
-						/*// relative to machine limits 
-						switch(startingPositionIndex%3) {
-						case 0:
-							paper_left=(mwf-pwf)/2.0f;
-							paper_right=mwf-paper_left;
-							limit_left=0;
-							limit_right=mwf;
-							break;
-						case 1:
-							paper_left = -pwf/2.0f;
-							paper_right = pwf/2.0f;
-							limit_left = -mwf/2.0f;
-							limit_right = mwf/2.0f;
-							break;
-						case 2:
-							paper_right=-(mwf-pwf)/2.0f;
-							paper_left=-mwf-paper_right;
-							limit_left=-mwf;
-							limit_right=0;
-							break;
-						}
-						switch(startingPositionIndex/3) {
-						case 0:
-							paper_top=-(mhf-phf)/2;
-							paper_bottom=-mhf-paper_top;
-							limit_top=0;
-							limit_bottom=-mhf;
-							break;
-						case 1:
-							paper_top=phf/2;
-							paper_bottom=-phf/2;
-							limit_top=mhf/2;
-							limit_bottom=-mhf/2;
-							break;
-						case 2:
-							paper_bottom=(mhf-phf)/2;
-							paper_top=mhf-paper_bottom;
-							limit_top=mhf;
-							limit_bottom=0;
-							break;
-						}
-						*/
-						// relative to paper limits
-						switch(startingPositionIndex%3) {
-						case 0:
-							paper_left=0;
-							paper_right=pwf;
-							limit_left=-(mwf-pwf)/2.0;
-							limit_right=(mwf-pwf)/2.0 + pwf;
-							break;
-						case 1:
-							paper_left = -pwf/2.0f;
-							paper_right = pwf/2.0f;
-							limit_left = -mwf/2.0f;
-							limit_right = mwf/2.0f;
-							break;
-						case 2:
-							paper_right=0;
-							paper_left=-pwf;
-							limit_left=-pwf - (mwf-pwf)/2.0f;
-							limit_right=(mwf-pwf)/2;
-							break;
-						}
-						switch(startingPositionIndex/3) {
-						case 0:
-							paper_top=0;
-							paper_bottom=-phf;
-							limit_top=(mhf-phf)/2;
-							limit_bottom=-phf - (mhf-phf)/2;
-							break;
-						case 1:
-							paper_top=phf/2;
-							paper_bottom=-phf/2;
-							limit_top=mhf/2;
-							limit_bottom=-mhf/2;
-							break;
-						case 2:
-							paper_bottom=0;
-							paper_top=phf;
-							limit_top=phf + (mhf-phf)/2;
-							limit_bottom= - (mhf-phf)/2;
-							break;
-						}
-						
-						previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-						previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
-						SetRecentPaperSize();
-						SaveConfig();
-						SendConfig();
-						driver.dispose();
-					}
-				}
-				if(subject == cancel) {
-					driver.dispose();
-				}
-			}
-		};
-	
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		SendLineToRobot("M114"); // "where" command
-		driver.pack();
-		driver.setVisible(true);
-	}
-
-	/**
-	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	 */
-	public void ConfigureBobbins() {
-		final JDialog driver = new JDialog(mainframe,"Configure Bobbins",true);
-		driver.setLayout(new GridBagLayout());
-
-		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
-		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter*10));
-
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Save");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.weightx=50;
-		c.gridx=0;  c.gridy=1;  driver.add(new JLabel("Left"),c);
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel("Right"),c);
-		
-		c.gridx=1;  c.gridy=0;  driver.add(new JLabel("Diameter"),c);
-		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
-		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
-
-		c.gridx=2;  c.gridy=1;  driver.add(new JLabel("mm"),c);
-		c.gridx=2;  c.gridy=2;  driver.add(new JLabel("mm"),c);
-
-		c.gridx=0;  c.gridy=3;  driver.add(save,c);
-		c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
-		
-		Dimension s=mBobbin1.getPreferredSize();
-		s.width=80;
-		mBobbin1.setPreferredSize(s);
-		mBobbin2.setPreferredSize(s);
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						bobbin_left_diameter = Double.valueOf(mBobbin1.getText())/10.0;
-						bobbin_right_diameter = Double.valueOf(mBobbin2.getText())/10.0;
-						boolean data_is_sane=true;
-						if( bobbin_left_diameter <= 0 ) data_is_sane=false;
-						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
-						if(data_is_sane ) {
-							SaveConfig();
-							SendConfig();
-							driver.dispose();
-						}
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-			  }
-			};
-		
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		driver.pack();
-		driver.setVisible(true);
-	}
-
-	/**
-	 * Load the machine configuration
-	 */
-	void LoadConfig() {
-		String id=Long.toString(robot_uid);
-		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
-		limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
-		limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
-		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
-		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
-		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-		image_dpi=Integer.parseInt(prefs.get(id+"_image_dpi","100"));
-		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "0.95"));
-		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "0.95"));
-		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
-		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
-		feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
-		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
-		// @TODO: move these values to TSP filter preferences
-		image_dpi= Integer.valueOf(prefs.get(id+"_image_dpi", "100"));
-		paper_margin = Double.valueOf(prefs.get(id+"_paper_margin","0.85"));
-	}
-
-	/**
-	 * Save the machine configuration
-	 */
-	void SaveConfig() {
-		String id=Long.toString(robot_uid);
-		prefs.put(id+"_limit_top", Double.toString(limit_top));
-		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
-		prefs.put(id+"_limit_right", Double.toString(limit_right));
-		prefs.put(id+"_limit_left", Double.toString(limit_left));
-		prefs.put(id+"_m1invert",Boolean.toString(m1invert));
-		prefs.put(id+"_m2invert",Boolean.toString(m2invert));
-		prefs.put(id+"_bobbin_left_diameter", Double.toString(bobbin_left_diameter));
-		prefs.put(id+"_bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		prefs.put(id+"_penUp", Long.toString(penUpNumber));
-		prefs.put(id+"_penDown", Long.toString(penDownNumber));
-		prefs.put(id+"_feed_rate", Double.toString(feed_rate));
-		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
-		// @TODO: move these values to TSP filter preferences
-		prefs.put(id+"_image_dpi",Integer.toString(image_dpi));
-		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
-	}
-	
-	
-	private String GetBobbinLine() {
-		return new String("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
-	}
-
-	private String GetConfigLine() {
-		return new String("CONFIG T"+limit_top
-		+" B"+limit_bottom
-		+" L"+limit_left
-		+" R"+limit_right
-		+" I"+(m1invert?"-1":"1")
-		+" J"+(m2invert?"-1":"1"));
-	}
 
 	
 	/**
@@ -1153,8 +764,8 @@ public class DrawbotGUI
 		if(!portConfirmed) return;
 		
 		// Send a command to the robot with new configuration values
-		SendLineToRobot(GetConfigLine());
-		SendLineToRobot(GetBobbinLine());
+		SendLineToRobot(MachineConfiguration.getSingleton().GetConfigLine());
+		SendLineToRobot(MachineConfiguration.getSingleton().GetBobbinLine());
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
 	
@@ -1182,13 +793,13 @@ public class DrawbotGUI
 	
 	private void ChangeToTool(String toolName) {
 		int i=Integer.parseInt(toolName.replace(";",""));
-		String names[] = { "Black (tool 0)", "Red (tool 1)", "Green (tool 2)", "Blue (tool 3)" };
+		String names[] = { "pen (tool 0)", "LED (tool 1)", "spray can (tool 2)" };
 		if(i>names.length) {
 			Log("<span style='color:red'>Invalid tool "+i+" requested.</span>");
 			i=0;
 		}
 		toolName = names[i];
-		JOptionPane.showMessageDialog(null,"Please change to "+toolName+" and click OK.");
+		JOptionPane.showMessageDialog(null,"Please prepare "+toolName+", then click any button to begin.");
 	}
 	
 	/**
@@ -1241,23 +852,8 @@ public class DrawbotGUI
 				return true;  // still ready to send
 			}
 		}
-		
-		// contains a pen-up command?
-		index=line.indexOf("Z90");
-		if(index!=-1) {
-			line=line.replaceAll("Z90", "Z"+getPenUp());
-			penIsUp=true;
-		}
-		
-		// contains a pen-down command?
-		index=line.indexOf("Z0");
-		if(index!=-1) {
-			line=line.replaceAll("Z0", "Z"+getPenDown());
-			penIsUp=false;
-		}
 
 		// send relevant part of line to the robot
-
 		SendLineToRobot(line);
 		
 		return false;
@@ -1271,7 +867,7 @@ public class DrawbotGUI
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		
-		if(!line.endsWith(";")) {
+		if(!line.endsWith(";") && !line.endsWith(";\n")) {
 			line+=eol;
 		}
 		Log("<font color='white'>"+line+"</font>");
@@ -1414,16 +1010,19 @@ public class DrawbotGUI
 			ConfigurePreferences();
 			return;
 		}
-		if( subject == buttonConfigureLimits ) {
-			ConfigureLimits();
+		if( subject == buttonAdjustMachineSize ) {
+			MachineConfiguration.getSingleton().AdjustMachineSize();
+			previewPane.updateMachineConfig();
 			return;
 		}
-		if( subject == buttonConfigureBobbins ) {
-			ConfigureBobbins();
+		if( subject == buttonAdjustPulleySize ) {
+			MachineConfiguration.getSingleton().AdjustPulleySize();
+			previewPane.updateMachineConfig();
 			return;
 		}
-		if( subject == buttonAdjustZ ) {
-			AdjustZ();
+		if( subject == buttonAdjustUpDown ) {
+			MachineConfiguration.getSingleton().AdjustUpDown();
+			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonJogMotors ) {
@@ -1431,10 +1030,14 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"Makelangelo v"+version+"\n\n"
-					+"Created by Dan Royer (dan@marginallyclever.com).\n\n"
-					+"Get the latest version and read the documentation @ https://github.com/MarginallyClever/Makelangelo\n"
-					+"Find out more at http://www.makelangelo.com/\n");
+			JOptionPane.showMessageDialog(null,"<html><body>"
+					+"<h1>Makelangelo v"+version+"</h1>"
+					+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
+					+"<p>Created by Dan Royer (dan@marginallyclever.com).</p><br>"
+					+"<p>To get the latest version please visit<br>"
+					+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
+					+"<p>This program is open source and free.  If this was helpful<br>to you, please buy me a thank you beer through Paypal.</p>"
+					+"</body></html>");
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1574,13 +1177,13 @@ public class DrawbotGUI
 						GoHome();
 						SendLineToRobot("M114");
 					} else if(b==TL) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_left *10)+" Y"+(paper_top*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
 					} else if(b==TR) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_right*10)+" Y"+(paper_top*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
 					} else if(b==BL) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_left *10)+" Y"+(paper_bottom*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
 					} else if(b==BR) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(paper_right*10)+" Y"+(paper_bottom*10));
+						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
 					} else if(b==find) {
 						SendLineToRobot("G28");
 					} else if(b==center) {
@@ -1593,14 +1196,13 @@ public class DrawbotGUI
 						String fr=feedRate.getText();
 						fr=fr.replaceAll("[ ,]","");
 						feed_rate = Double.parseDouble(fr);
-						if(feed_rate<1) feed_rate=1;
-						//if(feed_rate>10000) feed_rate=2000;
+						if(feed_rate<0.001) feed_rate=0.001;
 						feedRate.setText(Double.toString(feed_rate));
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {
-						SendLineToRobot("G91");
+						SendLineToRobot("G91");  // set relative mode
 						SendLineToRobot("G00 G21 F"+feed_rate+" "+b.getText());
-						SendLineToRobot("G90");
+						SendLineToRobot("G90");  // return to absolute mode
 						SendLineToRobot("M114");
 					}
 			  }
@@ -1632,81 +1234,6 @@ public class DrawbotGUI
 		return driver;
 	}
 	
-
-	/**
-	 * dialog to adjust the pen up & pen down values
-	 */
-	protected void AdjustZ() {
-		final JDialog driver = new JDialog(mainframe,"Adjust Z",true);
-		driver.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		final JTextField penUp   = new JTextField(Long.toString(penUpNumber),5);
-		final JTextField penDown = new JTextField(Long.toString(penDownNumber),5);
-		final JButton buttonTestUp = new JButton("Test up");
-		final JButton buttonTestDown = new JButton("Test down");
-		final JButton buttonSave = new JButton("Save");
-		final JButton buttonCancel = new JButton("Cancel");
-
-
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel("Up"),c);
-		c.gridx=1;	c.gridy=0;	driver.add(new JLabel("Down"),c);
-
-		c.anchor=GridBagConstraints.WEST;
-		c.fill=GridBagConstraints.HORIZONTAL;
-		c.weightx=50;
-		c.gridx=0;	c.gridy=1;	driver.add(penUp,c);
-		c.gridx=1;	c.gridy=1;	driver.add(penDown,c);
-		
-		c.gridx=0;	c.gridy=2;	driver.add(buttonTestUp,c);
-		c.gridx=1;	c.gridy=2;	driver.add(buttonTestDown,c);
-
-		c.gridx=0;	c.gridy=3;	driver.add(buttonSave,c);
-		c.gridx=1;	c.gridy=3;	driver.add(buttonCancel,c);
-
-		c.gridwidth=2;
-		c.insets=new Insets(0,5,5,5);
-		c.anchor=GridBagConstraints.WEST;
-		
-		c.gridheight=4;
-		c.gridx=0;  c.gridy=4;
-		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
-								 "raise and lower the pen."),c);
-		
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				
-				if(subject == buttonTestUp) {
-					SendLineToRobot("G00 Z"+Long.valueOf(penUp.getText()));
-				}
-				if(subject == buttonTestDown) {
-					SendLineToRobot("G00 Z"+Long.valueOf(penDown.getText()));
-				}
-				if(subject == buttonSave) {
-					penUpNumber = Long.valueOf(penUp.getText());
-					penDownNumber = Long.valueOf(penDown.getText());
-					SaveConfig();
-					driver.dispose();
-				}
-				if(subject == buttonCancel) {
-					driver.dispose();
-				}
-			}
-		};
-		
-		buttonTestUp.addActionListener(driveButtons);
-		buttonTestDown.addActionListener(driveButtons);
-		
-		buttonSave.addActionListener(driveButtons);
-		buttonCancel.addActionListener(driveButtons);
-
-		SendLineToRobot("M114");
-		driver.pack();
-		driver.setVisible(true);
-	}
-	
 	protected void JogMotors() {
 		JDialog driver = new JDialog(mainframe,"Jog Motors",true);
 		driver.setLayout(new GridBagLayout());
@@ -1714,11 +1241,11 @@ public class DrawbotGUI
 		
 		final JButton buttonAneg = new JButton("IN");
 		final JButton buttonApos = new JButton("OUT");
-		final JCheckBox m1i = new JCheckBox("Invert",m1invert);
+		final JCheckBox m1i = new JCheckBox("Invert",MachineConfiguration.getSingleton().m1invert);
 		
 		final JButton buttonBneg = new JButton("IN");
 		final JButton buttonBpos = new JButton("OUT");
-		final JCheckBox m2i = new JCheckBox("Invert",m2invert);
+		final JCheckBox m2i = new JCheckBox("Invert",MachineConfiguration.getSingleton().m2invert);
 
 		c.gridx=0;	c.gridy=0;	driver.add(new JLabel("L"),c);
 		c.gridx=0;	c.gridy=1;	driver.add(new JLabel("R"),c);
@@ -1731,7 +1258,6 @@ public class DrawbotGUI
 
 		c.gridx=3;	c.gridy=0;	driver.add(m1i,c);
 		c.gridx=3;	c.gridy=1;	driver.add(m2i,c);
-		
 		
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1746,10 +1272,10 @@ public class DrawbotGUI
 
 		ActionListener invertButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				m1invert = m1i.isSelected();
-				m2invert = m2i.isSelected();
+				MachineConfiguration.getSingleton().m1invert = m1i.isSelected();
+				MachineConfiguration.getSingleton().m2invert = m2i.isSelected();
 				
-				SaveConfig();
+				MachineConfiguration.getSingleton().SaveConfig();
 				SendConfig();
 			}
 		};
@@ -1884,23 +1410,21 @@ public class DrawbotGUI
         
         menu.add(subMenu);
 
-        buttonConfigureLimits = new JMenuItem("Configure limits",KeyEvent.VK_L);
-        buttonConfigureLimits.getAccessibleContext().setAccessibleDescription("Adjust the robot & paper shape.");
-        buttonConfigureLimits.addActionListener(this);
-        buttonConfigureLimits.setEnabled(!running);
-        menu.add(buttonConfigureLimits);
+        buttonAdjustMachineSize = new JMenuItem("Adjust machine size",KeyEvent.VK_L);
+        buttonAdjustMachineSize.addActionListener(this);
+        buttonAdjustMachineSize.setEnabled(!running);
+        menu.add(buttonAdjustMachineSize);
 
-        buttonConfigureBobbins = new JMenuItem("Configure bobbins",KeyEvent.VK_B);
-        buttonConfigureBobbins.getAccessibleContext().setAccessibleDescription("Adjust the bobbin sizes.");
-        buttonConfigureBobbins.addActionListener(this);
-        buttonConfigureBobbins.setEnabled(!running);
-        menu.add(buttonConfigureBobbins);
+        buttonAdjustPulleySize = new JMenuItem("Adjust pulley size",KeyEvent.VK_B);
+        buttonAdjustPulleySize.addActionListener(this);
+        buttonAdjustPulleySize.setEnabled(!running);
+        menu.add(buttonAdjustPulleySize);
 
-        buttonAdjustZ = new JMenuItem("Adjust Z",KeyEvent.VK_B);
-        buttonAdjustZ.getAccessibleContext().setAccessibleDescription("Adjust the Z axis.");
-        buttonAdjustZ.addActionListener(this);
-        buttonAdjustZ.setEnabled(!running);
-        menu.add(buttonAdjustZ);
+        buttonAdjustUpDown = new JMenuItem("Adjust Up/Down",KeyEvent.VK_B);
+        buttonAdjustUpDown.getAccessibleContext().setAccessibleDescription("Adjust the Z axis.");
+        buttonAdjustUpDown.addActionListener(this);
+        buttonAdjustUpDown.setEnabled(!running);
+        menu.add(buttonAdjustUpDown);
         
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
@@ -2003,8 +1527,6 @@ public class DrawbotGUI
         
         // the preview panel
         previewPane = new DrawPanel();
-		previewPane.setMachineLimits(limit_top, limit_bottom, limit_left, limit_right);
-        previewPane.setPaperSize(paper_top,paper_bottom,paper_left,paper_right);
         
         // the drive panel
         drivePane = DriveManually();
@@ -2034,6 +1556,28 @@ public class DrawbotGUI
 		
         return contentPane;
     }
+
+    
+	// connect to the last port
+    private void reconnectToLastPort() {
+	    ListSerialPorts();
+		if(Arrays.asList(portsDetected).contains(recentPort)) {
+			OpenPort(recentPort);
+		}
+	}
+    
+    /** 
+     * if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
+     */
+    private void reopenLastFile() {
+		if(recentFiles[0].length()>0) {
+			OpenFileOnDemand(recentFiles[0]);
+		}
+    }
+    
+    public JFrame getParentFrame() {
+    	return mainframe;
+    }
     
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
@@ -2047,28 +1591,13 @@ public class DrawbotGUI
         mainframe.setContentPane(demo.CreateContentPane());
  
         //Display the window.
+        // TODO remember preferences for window size
         mainframe.setSize(1200,700);
         mainframe.setVisible(true);
 
-        DrawbotGUI s=getSingleton();
-        /*
-        // if the default file being opened in a g-code file, this is ok.
-        // else load time is long and it feels like the app has crashed on load to new users.
-        // open the file
-		if(s.recentFiles[0].length()>0) {
-			s.OpenFileOnDemand(s.recentFiles[0]);
-		}
-		*/
-		
-		// connect to the last port
-		s.ListSerialPorts();
-		/*
-		if(Arrays.asList(s.portsDetected).contains(s.recentPort)) {
-			s.OpenPort(s.recentPort);
-		}
-		*/
-		
-		s.CheckForUpdate();
+        // demo.reconnectToLastPort();
+        // demo.reopenLastFile();
+        demo.CheckForUpdate();
     }
     
     public static void main(String[] args) {

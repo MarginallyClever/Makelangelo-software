@@ -34,7 +34,7 @@ public class GCodeFile {
 	void EstimateDrawTime() {
 		int i,j;
 		
-		double px=0,py=0,pz=0;
+		double px=0,py=0,pz=0, length=0, x,y,z,ai,aj;
 		feed_rate=1.0f;
 		scale=0.1f;
 		estimated_time=0;
@@ -57,11 +57,11 @@ public class GCodeFile {
 				}
 			}
 			
-			double x=px;
-			double y=py;
-			double z=pz;
-			double ai=px;
-			double aj=py;
+			x=px;
+			y=py;
+			z=pz;
+			ai=px;
+			aj=py;
 			for(j=1;j<tokens.length;++j) {
 				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
 				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
@@ -80,9 +80,9 @@ public class GCodeFile {
 				// draw a line
 				double ddx=x-px;
 				double ddy=y-py;
-				double dd=Math.sqrt(ddx*ddx+ddy*ddy);
-				estimated_time+=dd/feed_rate;
-				estimated_length+=dd;
+				length=Math.sqrt(ddx*ddx+ddy*ddy);
+				estimated_time+=length/feed_rate;
+				estimated_length+=length;
 				++estimate_count;
 				px=x;
 				py=y;
@@ -105,10 +105,9 @@ public class GCodeFile {
 
 				theta=Math.abs(angle2-angle1);
 				// length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
-				double dd = theta * radius;
-				
-				estimated_time+=dd/feed_rate;
-				estimated_length+=dd;
+				length = theta * radius;
+				estimated_time+=length/feed_rate;
+				estimated_length+=length;
 				++estimate_count;
 				px=x;
 				py=y;
@@ -153,7 +152,11 @@ public class GCodeFile {
 		String temp;
 		
 		for(int i=0;i<linesTotal;++i) {
-			temp = lines.get(i) + ";\n";
+			temp=lines.get(i);
+			if(!temp.endsWith(";") && !temp.endsWith(";\n")) {
+				temp += ";";
+			}
+			if(!temp.endsWith("\n")) temp+="\n";
 			out.write(temp.getBytes());
 		}
 

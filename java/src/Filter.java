@@ -16,6 +16,11 @@ public class Filter {
 	protected int encode(int i) {
 		return (0xff<<24) | (i<<16) | (i<< 8) | i;
 	}		
+
+	
+	protected double RoundOff(double value) {
+		return Math.floor(value * 100) / 100;
+	}
 }
 
 /**
