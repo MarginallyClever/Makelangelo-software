@@ -5,12 +5,8 @@ import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
 
-/**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
- * @author Dan
- */
-class Filter_4levelGcodeGenerator extends Filter {
+
+public class Filter_PointilismGenerator extends Filter {
 	String dest;
 	int numPoints;
 	Point2D[] points = null;
@@ -23,7 +19,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	DrawingTool tool;
 
 	
-	Filter_4levelGcodeGenerator(String _dest) {
+	Filter_PointilismGenerator(String _dest) {
 		dest=_dest;
 	}
 	
@@ -129,7 +125,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	public void Process(BufferedImage img) throws IOException {
 		int i,j;
 		int x,y;
-		double leveladd = 255.0/6.0;
+		double leveladd = 255.0/2.0;
 		double level=leveladd;
 		int z=0;
 
@@ -149,7 +145,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 			scale=10f*(float)mc.GetPaperHeight()/(float)image_height;
 		}
 		
-		int steps = 3*(int)Math.ceil(tool.GetDiameter()/scale);
+		int steps = (int)Math.ceil(tool.GetDiameter()/scale);
 		if(steps<1) steps=1;
 		
 		out.write(mc.GetConfigLine()+";\n");
@@ -186,111 +182,6 @@ class Filter_4levelGcodeGenerator extends Filter {
 			}
 		}
 		level+=leveladd;
-
-
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
-		// create vertical lines across the image
-		// raise and lower the pen to darken the appropriate areas
-		i=0;
-		for(x=0;x<image_width;x+=steps) {
-			++i;
-			if((i%2)==0) {
-				MoveTo(out,(float)x,(float)0           ,true);
-				for(y=0;y<image_height;++y) {
-					z=TakeImageSample(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
-				}
-				MoveTo(out,(float)x,(float)image_height,true);
-			} else {
-				MoveTo(out,(float)x,(float)image_height,true);
-				for(y=image_height-1;y>=0;--y) {
-					z=TakeImageSample(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
-				}
-				MoveTo(out,(float)x,(float)0           ,true);
-			}
-		}
-		level+=leveladd;
-
-
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
-		// create diagonal \ lines across the image
-		// raise and lower the pen to darken the appropriate areas
-		i=0;
-		for(x=-(image_height-1);x<image_width;x+=steps) {
-			int endx=image_height-1+x;
-			int endy=image_height-1;
-			if(endx >= image_width) {
-				endy -= endx - (image_width-1);
-				endx = image_width-1;
-			}
-			int startx=x;
-			int starty=0;
-			if( startx < 0 ) {
-				starty -= startx;
-				startx=0;
-			}
-			int delta=endy-starty;
-			
-			if((i%2)==0)
-			{
-				MoveTo(out,(float)startx,(float)starty,true);
-				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,startx+j,starty+j);
-					MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
-				}
-				MoveTo(out,(float)endx,(float)endy,true);
-			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
-				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,endx-j,endy-j);
-					MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
-				}
-				MoveTo(out,(float)startx,(float)starty,true);
-			}
-			++i;
-		}
-		level+=leveladd;
-
-
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
-		// create diagonal / lines across the image
-		// raise and lower the pen to darken the appropriate areas
-		i=0;
-		for(x=0;x<image_width+image_height;x+=steps) {
-			int endx=0;
-			int endy=x;
-			if( endy >= image_height ) {
-				endx += endy - (image_height-1);
-				endy = image_height-1;
-			}
-			int startx=x;
-			int starty=0;
-			if( startx >= image_width ) {
-				starty += startx - (image_width-1);
-				startx=image_width-1;
-			}
-			int delta=endy-starty;
-			
-			assert( (startx-endx) == (starty-endy) );
-
-			++i;
-			if((i%2)==0) {
-				MoveTo(out,(float)startx,(float)starty,true);
-				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,startx-j,starty+j);
-					MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
-				}
-				MoveTo(out,(float)endx,(float)endy,true);
-			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
-				for(j=0;j<delta;++j) {
-					z=TakeImageSample(img,endx+j,endy-j);
-					MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
-				}
-				MoveTo(out,(float)startx,(float)starty,true);
-			}
-		}
 		
 		// lift pen and return to home
 		liftPen(out);

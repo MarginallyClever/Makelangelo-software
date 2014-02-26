@@ -8,17 +8,67 @@
 
 
 // io functions
-import gnu.io.*;
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.TooManyListenersException;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -26,29 +76,23 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import java.io.*;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.prefs.Preferences;
-
 // TODO while not drawing, in-app gcode editing with immediate visusal feedback 
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling
 // TODO vector output
 // TODO STL input
 
-public class DrawbotGUI
+public class Makelangelo
 		extends JPanel
 		implements ActionListener, SerialPortEventListener
 {
 	// software version
-	static final String version="2";
+	static final String version="3";
 	
 	static final long serialVersionUID=1;
 	
-	private static DrawbotGUI singletonObject;
-	   
+	private static Makelangelo singletonObject;
+	
+	// TODO put all serial stuff in a Serial class, hide it inside Robot class?
 	// Serial connection
 	private static final int BAUD_RATE = 57600;
 	private CommPortIdentifier portIdentifier;
@@ -59,7 +103,6 @@ public class DrawbotGUI
 	private String[] portsDetected;
 	private boolean portOpened=false;
 	private boolean portConfirmed=false;
-	
 	// Serial communication
 	static private final String cue = "> ";
 	static private final String eol = ";";
@@ -89,8 +132,7 @@ public class DrawbotGUI
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonSaveFile, buttonExit;
-    private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, 
-    					buttonRescan, buttonDisconnect, buttonAdjustUpDown, buttonJogMotors;
+    private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -121,9 +163,6 @@ public class DrawbotGUI
 	
 	GCodeFile gcode = new GCodeFile();
 	
-	public double getScale() {
-		return MachineConfiguration.getSingleton().image_dpi/100.0;
-	}
 
 	private void RaisePen() {
 		SendLineToRobot("G00 Z"+MachineConfiguration.getSingleton().getPenUpString());
@@ -135,7 +174,7 @@ public class DrawbotGUI
 		penIsUp=false;
 	}
 	
-	private DrawbotGUI() {
+	private Makelangelo() {
 		StartLog();
 		MachineConfiguration.getSingleton().LoadConfig();
         GetRecentFiles();
@@ -164,9 +203,9 @@ public class DrawbotGUI
 		logToFile.close();
 	}
 	
-	public static DrawbotGUI getSingleton() {
+	public static Makelangelo getSingleton() {
 		if(singletonObject==null) {
-			singletonObject = new DrawbotGUI();
+			singletonObject = new Makelangelo();
 		}
 		return singletonObject;
 	}
@@ -233,20 +272,20 @@ public class DrawbotGUI
 		}
 	
 		// resize & flip as needed
-		Filter_Resize rs = new Filter_Resize(getScale()); 
+		Filter_Resize rs = new Filter_Resize(); 
 		img = rs.Process(img);
 		
 		// convert with style
 		try {
 			switch(draw_style) {
-			case DrawbotGUI.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
-			case DrawbotGUI.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
-			case DrawbotGUI.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
-			case DrawbotGUI.IMAGE_SPRAY:	LoadImageSpray(img,destinationFile);	break;
+			case Makelangelo.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
+			case Makelangelo.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
+			case Makelangelo.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
+			case Makelangelo.IMAGE_SPRAY:	LoadImagePointilism(img,destinationFile);	break;
 			}
 		}
 		catch(IOException e) {
-			DrawbotGUI.getSingleton().Log("<font color='red'>Conversion error: "+e.getMessage()+"</font>");
+			Makelangelo.getSingleton().Log("<font color='red'>Conversion error: "+e.getMessage()+"</font>");
 		}
 	}
 
@@ -258,7 +297,7 @@ public class DrawbotGUI
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 		img = dither.Process(img);
 
-		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(destinationFile,getScale());
+		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -267,7 +306,7 @@ public class DrawbotGUI
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(destinationFile,getScale());
+		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -276,19 +315,19 @@ public class DrawbotGUI
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-		Filter_Spiral generator = new Filter_Spiral(destinationFile,getScale());
+		Filter_Spiral generator = new Filter_Spiral(destinationFile);
 		generator.Process(img);
 	}
+
 	
-	
-	private void LoadImageSpray(BufferedImage img,String destinationFile) throws IOException {
+	private void LoadImagePointilism(BufferedImage img,String destinationFile) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.Process(img);
 		
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 		img = dither.Process(img);
 
-		Filter_Spray generator = new Filter_Spray(destinationFile,getScale());
+		Filter_PointilismGenerator generator = new Filter_PointilismGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -656,7 +695,7 @@ public class DrawbotGUI
 	/**
 	 * Adjust preferences
 	 */
-	public void ConfigurePreferences() {
+	public void AdjustPreferences() {
 		final JDialog driver = new JDialog(mainframe,"Preferences",true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -669,14 +708,7 @@ public class DrawbotGUI
 		final JButton change_sound_disconnect = new JButton("Disconnect sound");
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
-		
-		final JSlider input_image_dpi = new JSlider(JSlider.HORIZONTAL, 25, 200, MachineConfiguration.getSingleton().image_dpi);
-		//input_image_dpi.setSize(250,input_image_dpi.getSize().height);
-		input_image_dpi.setMajorTickSpacing(50);
-		input_image_dpi.setMinorTickSpacing(25);
-		input_image_dpi.setPaintTicks(false);
-		input_image_dpi.setPaintLabels(true);
-		
+
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
 		input_paper_margin.setMajorTickSpacing(20);
 		input_paper_margin.setMinorTickSpacing(5);
@@ -692,7 +724,7 @@ public class DrawbotGUI
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		String [] styles= { "Pen Single Line", "Pen Spiral", "Pen Cross hatching", "Spray paint dithering" };
+		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Spray paint pointillism" };
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(draw_style);
 		
@@ -706,7 +738,6 @@ public class DrawbotGUI
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=7;  driver.add(new JLabel("Image resolution"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=7;  driver.add(input_image_dpi,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(show_pen_up,c);
@@ -724,7 +755,6 @@ public class DrawbotGUI
 					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
 
 					if(subject == save) {
-						MachineConfiguration.getSingleton().image_dpi=input_image_dpi.getValue();
 						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
 						
 						//allowMetrics = allow_metrics.isSelected();
@@ -1007,7 +1037,7 @@ public class DrawbotGUI
 			return;
 		}
 		if( subject == buttonConfigurePreferences ) {
-			ConfigurePreferences();
+			AdjustPreferences();
 			return;
 		}
 		if( subject == buttonAdjustMachineSize ) {
@@ -1020,8 +1050,13 @@ public class DrawbotGUI
 			previewPane.updateMachineConfig();
 			return;
 		}
-		if( subject == buttonAdjustUpDown ) {
-			MachineConfiguration.getSingleton().AdjustUpDown();
+		if( subject == buttonChangeTool ) {
+			MachineConfiguration.getSingleton().ChangeTool();
+			previewPane.updateMachineConfig();
+			return;
+		}
+		if( subject == buttonAdjustTool ) {
+			MachineConfiguration.getSingleton().AdjustTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
@@ -1329,50 +1364,29 @@ public class DrawbotGUI
         menuBar.removeAll();
         
         // File menu
-        menu = new JMenu("File");
+        menu = new JMenu("Makelangelo");
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
-
-        subMenu = new JMenu("Open...");
-        subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
-        subMenu.setEnabled(!running);
-        group = new ButtonGroup();
-
-        // list recent files
-        if(recentFiles != null && recentFiles.length>0) {
-        	// list files here
-        	for(i=0;i<recentFiles.length;++i) {
-        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
-            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-            	if(buttonRecent[i]!=null) {
-            		buttonRecent[i].addActionListener(this);
-            		subMenu.add(buttonRecent[i]);
-            	}
-        	}
-        	if(i!=0) subMenu.addSeparator();
-        }
         
-        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
-        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
-        buttonOpenFile.addActionListener(this);
-        subMenu.add(buttonOpenFile);
-        
-        menu.add(subMenu);
+        buttonAbout = new JMenuItem("About",KeyEvent.VK_A);
+        menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
+        buttonAbout.addActionListener(this);
+        menu.add(buttonAbout);
 
-        buttonSaveFile = new JMenuItem("Save GCODE as...");
-        buttonSaveFile.getAccessibleContext().setAccessibleDescription("Save the current g-code file...");
-        buttonSaveFile.addActionListener(this);
-        menu.add(buttonSaveFile);
+        buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
+        menu.getAccessibleContext().setAccessibleDescription("Is there a newer version available?");
+        buttonCheckForUpdate.addActionListener(this);
+        buttonCheckForUpdate.setEnabled(false);
+        menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();
-
+        
         buttonExit = new JMenuItem("Exit",KeyEvent.VK_Q);
         buttonExit.getAccessibleContext().setAccessibleDescription("Goodbye...");
         buttonExit.addActionListener(this);
         menu.add(buttonExit);
-
-        menuBar.add(menu);
+        
+        
 
         // settings menu
         menu = new JMenu("Settings");
@@ -1419,17 +1433,25 @@ public class DrawbotGUI
         buttonAdjustPulleySize.addActionListener(this);
         buttonAdjustPulleySize.setEnabled(!running);
         menu.add(buttonAdjustPulleySize);
-
-        buttonAdjustUpDown = new JMenuItem("Adjust Up/Down",KeyEvent.VK_B);
-        buttonAdjustUpDown.getAccessibleContext().setAccessibleDescription("Adjust the Z axis.");
-        buttonAdjustUpDown.addActionListener(this);
-        buttonAdjustUpDown.setEnabled(!running);
-        menu.add(buttonAdjustUpDown);
         
         buttonJogMotors = new JMenuItem("Jog Motors",KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
         buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
+
+        menu.addSeparator();
+        
+        buttonChangeTool = new JMenuItem("Select Tool",KeyEvent.VK_T);
+        buttonChangeTool.getAccessibleContext().setAccessibleDescription("Change the tool.");
+        buttonChangeTool.addActionListener(this);
+        buttonChangeTool.setEnabled(!running);
+        menu.add(buttonChangeTool);
+
+        buttonAdjustTool = new JMenuItem("Adjust Current Tool",KeyEvent.VK_B);
+        buttonAdjustTool.getAccessibleContext().setAccessibleDescription("Adjust the tool.");
+        buttonAdjustTool.addActionListener(this);
+        buttonAdjustTool.setEnabled(!running);
+        menu.add(buttonAdjustTool);
 
         menu.addSeparator();
         
@@ -1441,6 +1463,49 @@ public class DrawbotGUI
         
         menuBar.add(menu);
 
+        
+
+        // File conversion menu
+        menu = new JMenu("File");
+        menu.setMnemonic(KeyEvent.VK_H);
+        menu.getAccessibleContext().setAccessibleDescription("Get help");
+
+        subMenu = new JMenu("Open...");
+        subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+        subMenu.setEnabled(!running);
+        group = new ButtonGroup();
+
+        // list recent files
+        if(recentFiles != null && recentFiles.length>0) {
+        	// list files here
+        	for(i=0;i<recentFiles.length;++i) {
+        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
+            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
+            	if(buttonRecent[i]!=null) {
+            		buttonRecent[i].addActionListener(this);
+            		subMenu.add(buttonRecent[i]);
+            	}
+        	}
+        	if(i!=0) subMenu.addSeparator();
+        }
+        
+        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
+        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+        buttonOpenFile.addActionListener(this);
+        subMenu.add(buttonOpenFile);
+        
+        menu.add(subMenu);
+
+        buttonSaveFile = new JMenuItem("Save GCODE as...");
+        buttonSaveFile.getAccessibleContext().setAccessibleDescription("Save the current g-code file...");
+        buttonSaveFile.addActionListener(this);
+        menu.add(buttonSaveFile);
+
+        menuBar.add(menu);
+        
+        
+        
         // Draw menu
         menu = new JMenu("Draw");
         menu.getAccessibleContext().setAccessibleDescription("Start & Stop progress");
@@ -1471,8 +1536,8 @@ public class DrawbotGUI
 
         menuBar.add(menu);
         
-        // tools menu
-        menu = new JMenu("Tools");
+        // view menu
+        menu = new JMenu("View");
         buttonZoomOut = new JMenuItem("Zoom -");
         buttonZoomOut.addActionListener(this);
         buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
@@ -1483,24 +1548,6 @@ public class DrawbotGUI
         buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomIn);
         
-        menuBar.add(menu);
-        
-        // Help menu
-        menu = new JMenu("Help");
-        menu.setMnemonic(KeyEvent.VK_H);
-        menu.getAccessibleContext().setAccessibleDescription("Get help");
-
-        buttonAbout = new JMenuItem("About",KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
-        buttonAbout.addActionListener(this);
-        menu.add(buttonAbout);
-
-        buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
-        menu.getAccessibleContext().setAccessibleDescription("Is there a newer version available?");
-        buttonCheckForUpdate.addActionListener(this);
-        buttonCheckForUpdate.setEnabled(false);
-        menu.add(buttonCheckForUpdate);
-
         menuBar.add(menu);
 
         // finish
@@ -1557,7 +1604,7 @@ public class DrawbotGUI
         return contentPane;
     }
 
-    
+    /*
 	// connect to the last port
     private void reconnectToLastPort() {
 	    ListSerialPorts();
@@ -1566,14 +1613,13 @@ public class DrawbotGUI
 		}
 	}
     
-    /** 
-     * if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
-     */
+    // if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
     private void reopenLastFile() {
 		if(recentFiles[0].length()>0) {
 			OpenFileOnDemand(recentFiles[0]);
 		}
     }
+    */
     
     public JFrame getParentFrame() {
     	return mainframe;
@@ -1586,7 +1632,7 @@ public class DrawbotGUI
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.
-        DrawbotGUI demo = DrawbotGUI.getSingleton();
+        Makelangelo demo = Makelangelo.getSingleton();
         mainframe.setJMenuBar(demo.CreateMenuBar());
         mainframe.setContentPane(demo.CreateContentPane());
  

@@ -21,9 +21,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	double progress;
 	double old_len,len;
 	float feed_rate=2000;
-	int w2,h2;
-	double iscale;
-
 	long time_limit=10*60*1000;  // 10 minutes
 	String dest;
 	int numPoints;
@@ -31,9 +28,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	int[] solution = null;
 	int scount;
 	ProgressMonitor pm;
-	double scale;
 	TSPOptimizer task;
 	int image_height,image_width;
+	DrawingTool tool;
 
 	
 	public String formatTime(long millis) {
@@ -50,7 +47,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 	
 	private class TSPOptimizer extends SwingWorker<Void,Void> {
-		
 		public void UpdateProgress(double len,int color) {
 			t_elapsed=System.currentTimeMillis()-t_start;
 			double new_progress = 100.0 * (double)t_elapsed / (double)time_limit;
@@ -64,7 +60,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 					if(color==0) c="yellow";
 					if(color==1) c="blue";
 					if(color==2) c="red";
-					DrawbotGUI.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
+					Makelangelo.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
 				}
 				progress = new_progress;
 				setProgress((int)progress);
@@ -245,26 +241,23 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			ConvertAndSaveToGCode();
 
 			// TODO move to GUI
-			DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
-			DrawbotGUI.getSingleton().PlayConversionFinishedSound();
-			DrawbotGUI.getSingleton().LoadGCode(dest);
+			Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
+			Makelangelo.getSingleton().PlayConversionFinishedSound();
+			Makelangelo.getSingleton().LoadGCode(dest);
 		}
 	}
 
 
 	private void liftPen(BufferedWriter out) throws IOException {
-		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenUpString()+" F80;\n");  // lower the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		tool.WriteOff(out);
 	}
 	
 	private void lowerPen(BufferedWriter out) throws IOException {
-		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenDownString()+" F80;\n");  // lower the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		tool.WriteOn(out);
 	}
 	
-	Filter_TSPGcodeGenerator(String _dest,double _scale) {
+	Filter_TSPGcodeGenerator(String _dest) {
 		dest=_dest;
-		scale=_scale;
 	}
 	
 	
@@ -277,7 +270,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	private void GenerateTSP() {
 		GreedyTour();
 
-		DrawbotGUI.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+		Makelangelo.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
 		pm = new ProgressMonitor(null, "Optimizing path.  Press Cancel when you've had enough...", "", 0, 100);
 		pm.setProgress(0);
@@ -287,9 +280,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		task.execute();
 	}
 
-    /**
-     * Invoked when task's progress property changes.
-     */
+    // Invoked when task's progress property changes.
     public void propertyChange(PropertyChangeEvent evt) {
         if ("progress" == evt.getPropertyName() ) {
             int progress = (Integer) evt.getNewValue();
@@ -300,9 +291,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
                 Toolkit.getDefaultToolkit().beep();
                 if (pm.isCanceled()) {
                     task.cancel(true);
-                    DrawbotGUI.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
+                    Makelangelo.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
                 } else {
-                	DrawbotGUI.getSingleton().Log("<font color='green'>Task completed.</font>\n");
+                	Makelangelo.getSingleton().Log("<font color='green'>Task completed.</font>\n");
                 }
             }
         }
@@ -331,7 +322,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void GreedyTour() {
-		DrawbotGUI.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
+		Makelangelo.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
 
 		int i;
 		float w, bestw;
@@ -366,8 +357,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	
 
 	private void MoveTo(BufferedWriter out,int i,boolean up) throws IOException {
-		out.write("G01 X" + RoundOff((points[solution[i]].x-w2)*iscale) + " Y" + RoundOff((h2-points[solution[i]].y)*iscale) + ";\n");
+		tool.WriteMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
+	
 	
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
@@ -375,12 +367,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
 	private void ConvertAndSaveToGCode() {
-		DrawbotGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		
-		w2=image_width/2;
-		h2=image_height/2;
-		
-		iscale=1.0/scale;
 		
 		// find the tsp point closest to the calibration point
 		int i;
@@ -388,8 +376,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		float bestw=1000000;
 		float x,y,w;
 		for(i=0;i<numPoints;++i) {
-			x=points[solution[i]].x-w2;
-			y=points[solution[i]].y-h2;
+			x=points[solution[i]].x;
+			y=points[solution[i]].y;
 			w=x*x+y*y;
 			if(w<bestw) {
 				bestw=w;
@@ -401,10 +389,9 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 			out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
 			out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
-			// change to tool 0
-			out.write("M06 T0;\n");
-			// set absolute coordinates, lift pen
+			// set absolute coordinates
 			out.write("G90;\n");
+			tool.WriteChangeTo(out);
 			liftPen(out);
 			// move to the first point
 			MoveTo(out,besti,false);
@@ -417,11 +404,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			
 			// lift pen and return to home
 			liftPen(out);
-			out.write("G00 X0 Y0;\n");
+			tool.WriteMoveTo(out,0,0);
 			out.close();
 		}
 		catch(IOException e) {
-			DrawbotGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
+			Makelangelo.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
 	}
 	
@@ -434,6 +421,8 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		image_height = img.getHeight();
 		image_width = img.getWidth();
 		int x,y,i;
+
+		tool = MachineConfiguration.getSingleton().GetCurrentTool();
 		
 		// count the points
 		numPoints=0;
@@ -446,17 +435,19 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			}
 		}
 		
-		DrawbotGUI.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
+		Makelangelo.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 	
 		// collect the point data
+		float w2=image_width/2;
+		float h2=image_height/2;
 		numPoints=0;
 		for(y=0;y<image_height;++y) {
 			for(x=0;x<image_width;++x) {
 				i=decode(img.getRGB(x,y));
 				if(i==0) {
-					points[numPoints++]=new Point2D(x,y);
+					points[numPoints++]=new Point2D(x-w2,h2-y);
 				}
 			}
 		}

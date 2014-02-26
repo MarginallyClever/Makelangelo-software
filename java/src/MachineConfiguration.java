@@ -1,7 +1,6 @@
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -18,7 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 
@@ -27,40 +25,42 @@ public class MachineConfiguration {
 	
 	// GUID
 	public long robot_uid=0;
+	
 	// machine physical limits
-	public double limit_top=10;
-	public double limit_bottom=-10;
-	public double limit_left=-10;
-	public double limit_right=10;
-
-	private int startingPositionIndex;
+	public double limit_top=18*2.45;
+	public double limit_bottom=-18*2.45;
+	public double limit_left=-18*2.45;
+	public double limit_right=18*2.45;
+	
+	// paper area
+	public double paper_top=9*2.45;
+	public double paper_bottom=-9*2.45;
+	public double paper_left=-12*2.45;
+	public double paper_right=13*2.45;
+	public double paper_margin=0.9;
 	
 	// pulleys turning backwards?
 	public boolean m1invert=false;
 	public boolean m2invert=false;
 
 	// pulley diameter
-	private double bobbin_left_diameter=0.95;
-	private double bobbin_right_diameter=0.95;
+	private double bobbin_left_diameter=16;
+	private double bobbin_right_diameter=16;
 
+	private double default_feed_rate=2000;  // etch-a-sketch speed
+	
 	// pen lifting Z values
 	public long penUpNumber;
 	public long penDownNumber;
 
 	public boolean reverseForGlass=false;
-	
-	// defaults
-	public double default_feed_rate=2000;
-	
-	// paper area
-	public double paper_top=10;
-	public double paper_bottom=-10;
-	public double paper_left=-10;
-	public double paper_right=10;
-	public double paper_margin=0.85;
 
-	// image settings
-	public int image_dpi;
+	// top left, bottom center, etc...
+	private int startingPositionIndex;
+	
+	protected DrawingTool tools[];
+	protected int current_tool=0;
+	
 	
 	// singleton
 	private static MachineConfiguration singletonObject;
@@ -72,12 +72,18 @@ public class MachineConfiguration {
 		return singletonObject;
 	}
 	
+	protected MachineConfiguration() {
+		tools = new DrawingTool[3];
+		tools[0]=new DrawingTool_Pen();
+		tools[1]=new DrawingTool_LED();
+		tools[2]=new DrawingTool_Spraypaint();
+	}
 	
 	/**
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
 	public void AdjustMachineSize() {
-		final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust machine size",true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust machine size",true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
@@ -94,7 +100,7 @@ public class MachineConfiguration {
 		
 		BufferedImage myPicture = null;
 		try {
-			myPicture = ImageIO.read(DrawbotGUI.class.getResourceAsStream("limits.png"));
+			myPicture = ImageIO.read(Makelangelo.class.getResourceAsStream("limits.png"));
 		}
 		catch(IOException e) {}
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
@@ -240,7 +246,7 @@ public class MachineConfiguration {
 						
 						SetRecentPaperSize();
 						SaveConfig();
-						DrawbotGUI.getSingleton().SendConfig();
+						Makelangelo.getSingleton().SendConfig();
 						driver.dispose();
 					}
 				}
@@ -252,92 +258,84 @@ public class MachineConfiguration {
 	
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
-		DrawbotGUI.getSingleton().SendLineToRobot("M114"); // "where" command
+		Makelangelo.getSingleton().SendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
 	}
 	
 
-	/**
-	 * dialog to adjust the pen up & pen down values
-	 */
-	protected void AdjustUpDown() {
-		final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust Up/Down",true);
+	// dialog to adjust the pen up & pen down values
+	protected void ChangeTool() {
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust machine size",true);
 		driver.setLayout(new GridBagLayout());
+		
+		String[] toolNames = new String[tools.length];
+		for(int i=0;i<tools.length;++i) {
+			toolNames[i] = tools[i].GetName();
+		}
+		
+		final JComboBox toolCombo = new JComboBox(toolNames);
+		toolCombo.setSelectedIndex(current_tool);
+		
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+		
 		GridBagConstraints c = new GridBagConstraints();
 		
-		final JTextField penUp   = new JTextField(Long.toString(penUpNumber),5);
-		final JTextField penDown = new JTextField(Long.toString(penDownNumber),5);
-		final JButton buttonTestUp = new JButton("Test up");
-		final JButton buttonTestDown = new JButton("Test down");
-		final JButton buttonSave = new JButton("Save");
-		final JButton buttonCancel = new JButton("Cancel");
-
-
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel("Up"),c);
-		c.gridx=1;	c.gridy=0;	driver.add(new JLabel("Down"),c);
-
+		c.gridheight=1; c.gridwidth=1; 
+		
+		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel("Tool type"),c);
 		c.anchor=GridBagConstraints.WEST;
-		c.fill=GridBagConstraints.HORIZONTAL;
-		c.weightx=50;
-		c.gridx=0;	c.gridy=1;	driver.add(penUp,c);
-		c.gridx=1;	c.gridy=1;	driver.add(penDown,c);
-		
-		c.gridx=0;	c.gridy=2;	driver.add(buttonTestUp,c);
-		c.gridx=1;	c.gridy=2;	driver.add(buttonTestDown,c);
+		c.gridx=2; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(toolCombo,c);
 
-		c.gridx=0;	c.gridy=3;	driver.add(buttonSave,c);
-		c.gridx=1;	c.gridy=3;	driver.add(buttonCancel,c);
-
-		c.gridwidth=2;
-		c.insets=new Insets(0,5,5,5);
-		c.anchor=GridBagConstraints.WEST;
 		
-		c.gridheight=4;
-		c.gridx=0;  c.gridy=4;
-		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
-								 "raise and lower the pen."),c);
-		
-		
+		c.anchor=GridBagConstraints.EAST;
+		c.gridy=3;
+		c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
+		c.gridx=2; c.gridwidth=1; driver.add(save,c);
+			
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
-				
-				if(subject == buttonTestUp) {
-					DrawbotGUI.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penUp.getText()));
-				}
-				if(subject == buttonTestDown) {
-					DrawbotGUI.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penDown.getText()));
-				}
-				if(subject == buttonSave) {
-					penUpNumber = Long.valueOf(penUp.getText());
-					penDownNumber = Long.valueOf(penDown.getText());
+				if(subject == save) {
+					current_tool = toolCombo.getSelectedIndex();
+					
 					SaveConfig();
+					Makelangelo.getSingleton().SendConfig();
 					driver.dispose();
 				}
-				if(subject == buttonCancel) {
+				if(subject == cancel) {
 					driver.dispose();
 				}
 			}
 		};
-		
-		buttonTestUp.addActionListener(driveButtons);
-		buttonTestDown.addActionListener(driveButtons);
-		
-		buttonSave.addActionListener(driveButtons);
-		buttonCancel.addActionListener(driveButtons);
-
-		DrawbotGUI.getSingleton().SendLineToRobot("M114");
+	
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
 		driver.pack();
 		driver.setVisible(true);
 	}
-
 	
-	/**
-	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	 */
+	
+	// dialog to adjust the pen up & pen down values
+	protected void AdjustTool() {
+		GetCurrentTool().Adjust();
+	}
+	
+
+	public DrawingTool GetTool(int tool_id) {
+		return tools[tool_id];
+	}
+	
+	
+	public DrawingTool GetCurrentTool() {
+		return GetTool(current_tool);
+	}
+	
+	
+	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	public void AdjustPulleySize() {
-		final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust pulley size",true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust pulley size",true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
@@ -377,7 +375,7 @@ public class MachineConfiguration {
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
 						if(data_is_sane ) {
 							SaveConfig();
-							DrawbotGUI.getSingleton().SendConfig();
+							Makelangelo.getSingleton().SendConfig();
 							driver.dispose();
 						}
 					}
@@ -393,9 +391,8 @@ public class MachineConfiguration {
 		driver.setVisible(true);
 	}
 
-	/**
-	 * Load the machine configuration
-	 */
+	
+	// Load the machine configuration
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
 		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
@@ -404,7 +401,6 @@ public class MachineConfiguration {
 		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
 		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
 		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-		image_dpi=Integer.parseInt(prefs.get(id+"_image_dpi","100"));
 		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "0.95"));
 		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "0.95"));
 		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
@@ -412,16 +408,20 @@ public class MachineConfiguration {
 		default_feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
 		// TODO move these values to image filter preferences
-		image_dpi= Integer.valueOf(prefs.get(id+"_image_dpi", "100"));
 		paper_margin = Double.valueOf(prefs.get(id+"_paper_margin","0.85"));
 		reverseForGlass = Boolean.parseBoolean(prefs.get(id+"_reverseForGlass","false"));
+		current_tool = Integer.parseInt(prefs.get(id+"_current_tool","0"),10);
 		
+		// load each tool's settings
+		for(int i=0;i<tools.length;++i) {
+			tools[i].LoadConfig();
+		}
+
 		GetRecentPaperSize();
 	}
 
-	/**
-	 * Save the machine configuration
-	 */
+	
+	// Save the machine configuration
 	void SaveConfig() {
 		String id=Long.toString(robot_uid);
 		prefs.put(id+"_limit_top", Double.toString(limit_top));
@@ -437,9 +437,14 @@ public class MachineConfiguration {
 		prefs.put(id+"_feed_rate", Double.toString(default_feed_rate));
 		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
 		// TODO move these values to image filter preferences
-		prefs.put(id+"_image_dpi",Integer.toString(image_dpi));
 		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
 		prefs.put(id+"_reverseForGlass",Boolean.toString(reverseForGlass));
+		prefs.put(id+"_current_tool", Integer.toString(current_tool));
+
+		// TODO: save each tool's settings
+		for(int i=0;i<tools.length;++i) {
+			tools[i].SaveConfig();
+		}
 		
 		SetRecentPaperSize();
 	}
@@ -450,6 +455,7 @@ public class MachineConfiguration {
 		return new String("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
 	}
 
+	
 	String GetConfigLine() {
 		return new String("CONFIG T"+limit_top
 		+" B"+limit_bottom
@@ -525,7 +531,26 @@ public class MachineConfiguration {
 
 		// did read go ok?
 		if(robot_uid!=0) {
-			DrawbotGUI.getSingleton().SendLineToRobot("UID "+robot_uid);
+			Makelangelo.getSingleton().SendLineToRobot("UID "+robot_uid);
+		}
+	}
+	
+	public double GetPaperWidth() {
+		return paper_right - paper_left;
+	}
+	
+	public double GetPaperHeight() {
+		return paper_top -paper_bottom;
+	}
+	
+	public double GetPaperScale() {
+		double paper_w=GetPaperWidth();
+		double paper_h=GetPaperHeight();
+		
+		if(paper_w>paper_h) {
+			return paper_h/paper_w;
+		} else {
+			return paper_w/paper_h;
 		}
 	}
 }

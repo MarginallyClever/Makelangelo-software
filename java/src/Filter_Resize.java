@@ -9,14 +9,7 @@ import java.awt.image.BufferedImage;
  * @author Dan
  */
 public class Filter_Resize {
-	private final double cm_to_mm=10.0f;
-	private	double dots_per_cm=1;
-	private double margin=0.9f;
-	
-	
-	public Filter_Resize(double _dots_per_cm) {
-		dots_per_cm=_dots_per_cm;
-	}
+	public Filter_Resize() {}
 	
 	
 	protected BufferedImage scaleImage(BufferedImage img, int width, int height, Color background) {
@@ -43,9 +36,23 @@ public class Filter_Resize {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		int max_w=(int)((mc.paper_right-mc.paper_left)*dots_per_cm*cm_to_mm*margin);
-		int max_h=(int)((mc.paper_top-mc.paper_bottom)*dots_per_cm*cm_to_mm*margin);
+		//private final double cm_to_mm=10.0f;
+		//private final double dots_per_cm=1;
+		//int max_w=(int)((mc.paper_right-mc.paper_left)*dots_per_cm*cm_to_mm);
+		//int max_h=(int)((mc.paper_top-mc.paper_bottom)*dots_per_cm*cm_to_mm);
 		
+		// cap the max_w and max_h so that enormous drawbot images don't break the software.
+		double paper_w= mc.GetPaperWidth();
+		double paper_h= mc.GetPaperHeight();
+		int max_w=1000;
+		int max_h=1000;
+		if(paper_w>paper_h) {
+			max_h *= paper_h/paper_w;
+		}
+		if(paper_h>paper_w) {
+			max_w *= paper_w/paper_h;
+		}
+
 		// adjust up
 		if(w<max_w && h<max_h) {
 			if(w>h) {

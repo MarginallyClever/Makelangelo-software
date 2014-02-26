@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Drawbot</name>
+	<name>Makelangelo</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>images/limits.png</name>
+			<type>1</type>
+			<location>/Users/danroyer/Documents/workspace/DrawBot/limits.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -17,68 +17,36 @@ class Filter_Spiral extends Filter {
 	int image_width, image_height;
 	int scount;
 	boolean lastup;
-	float w2,h2;
+	float w2,h2,scale;
 	ProgressMonitor pm;
-	double scale,iscale;
-	String previous_command;
-	float feed_rate=2000;
+	DrawingTool tool;
 
 	
-	Filter_Spiral(String _dest,double _scale) {
+	Filter_Spiral(String _dest) {
 		dest=_dest;
-		scale=_scale;
-		iscale=1.0/scale;
 	}
 
 
 	private void liftPen(BufferedWriter out) throws IOException {
-		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenUpString()+" F80;\n");  // lower the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		tool.WriteOff(out);
 	}
 	
 	private void lowerPen(BufferedWriter out) throws IOException {
-		out.write("G00 Z"+MachineConfiguration.getSingleton().getPenDownString()+" F80;\n");  // lower the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		tool.WriteOn(out);
 	}
 
 	
-	private void MoveTo(BufferedWriter out,double x,double y,boolean up) throws IOException {
-		String command="G00 X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+";\n";
-		if(up) {
-			previous_command=command;
-		}
-		if(lastup!=up && !up) {
-			out.write(previous_command);
-		}
-		if(!up) {
-			out.write(command);
-		}
+	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
+		tool.WriteMoveTo(out,
+						 (x-w2)*scale,
+						 -(y-h2)*scale);
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
+			lastup=up;
 		}
-		lastup=up;
 	}
 	
-	/*  Version supporting G02 arcs
-	private void MoveTo(BufferedWriter out,double x,double y,boolean up) throws IOException {
-		String command=" X"+RoundOff((x-w2)*iscale) + " Y" + RoundOff((h2-y)*iscale)+";\n";
-		if(up) {
-			previous_command=command;
-		}
-		if(lastup!=up && !up) {
-			out.write("G00 "+previous_command);
-		}
-		if(!up) {
-			out.write("G02 "+command);
-		}
-		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-		}
-		lastup=up;
-	}
-	*/
 	
 	private int TakeImageSample(BufferedImage img,int x,int y) {
 		image_height = img.getHeight();
@@ -154,46 +122,56 @@ class Filter_Spiral extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) throws IOException {
-		image_height = img.getHeight();
-		image_width = img.getWidth();
 		int x,y,i,j;
-		w2=image_width/2;
-		h2=image_height/2;
 		double steps=4;
 		double leveladd = 255.0/(steps+1);
 		double level;
 		int z=0;
 		
-		DrawbotGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		image_height = img.getHeight();
+		image_width = img.getWidth();
+		w2=image_width/2;
+		h2=image_height/2;
+
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
+		if(mc.GetPaperWidth()<mc.GetPaperHeight()) {
+			scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
+		} else {
+			scale=10f*(float)mc.GetPaperHeight()/(float)image_height;
+		}
+
+		tool = mc.GetCurrentTool();
+		double toolDiameter=tool.GetDiameter()/scale;
+
+		
+		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		
 		BufferedWriter out = new BufferedWriter(new FileWriter(dest));
 		out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
 		out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
-		// change to tool 0
-		out.write("M06 T0;\n");
 		// set absolute coordinates
+		out.write("G90;\n");
+		tool.WriteChangeTo(out);
 		liftPen(out);
 		lastup=true;
-		previous_command="";
+
 		//*
 		// create a spiral across the image
 		// raise and lower the pen to darken the appropriate areas
 
-		double hh=(image_height/2.0);
-		double hw=(image_width/2.0);
-		double maxr;
+		float maxr;
 		//if(whole_image) {
 			// go right to the corners
 		//	maxr=Math.sqrt( hh*hh + hw*hw )+1;
 		//} else 
 		{
 			// do the largest circle that still fits in the image.
-			maxr = (hh>hw) ? hw : hh;
+			maxr = (h2>w2) ? w2 : h2;
 		}
 		maxr/=2;
-		DrawbotGUI.getSingleton().Log("<font color='yellow'>Maxd="+maxr+"</font>\n");
-		double r=maxr, d, f;
-		double fx,fy;
+
+		float r=maxr, d, f;
+		float fx,fy;
 		j=0;
 		while(r>0) {
 			d=r*2;
@@ -201,14 +179,14 @@ class Filter_Spiral extends Filter {
 			++j;
 			level = leveladd*j;
 			// find circumference of current circle
-			double circumference=Math.floor(((d+d-1)*Math.PI)/2);
+			float circumference=(float) Math.floor(((d+(d-toolDiameter))*Math.PI)/2);
 
 			for(i=0;i<=circumference;++i) {
 				f = i/circumference;
 				//fx = hw + (Math.cos(Math.PI*2.0*f)*(d-f));
-				fx = hw + (Math.cos(Math.PI*2.0*f)*d);
+				fx = w2 + (float)(Math.cos(Math.PI*2.0*f)*d);
 				//fy = hh + (Math.sin(Math.PI*2.0*f)*(d-f));
-				fy = hh + (Math.sin(Math.PI*2.0*f)*d);
+				fy = h2 + (float)(Math.sin(Math.PI*2.0*f)*d);
 				x = (int)fx;
 				y = (int)fy;
 				// clip to image boundaries
@@ -219,19 +197,18 @@ class Filter_Spiral extends Filter {
 					MoveTo(out,fx,fy,true);
 				}
 			}
-			r-=0.5;
-			DrawbotGUI.getSingleton().Log("<font color='yellow'>d="+d+","+circumference+"</font>\n");
+			r-=toolDiameter*0.5;
+			Makelangelo.getSingleton().Log("<font color='yellow'>d="+d+","+circumference+"</font>\n");
 		}
 		
-		// lift pen 
-		out.write("G00 Z90;\n");
+		tool.WriteOff(out);
 		// already home
 		out.close();
 		
 		// TODO move to GUI
-		DrawbotGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
-		DrawbotGUI.getSingleton().PlayConversionFinishedSound();
-		DrawbotGUI.getSingleton().LoadGCode(dest);
+		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
+		Makelangelo.getSingleton().PlayConversionFinishedSound();
+		Makelangelo.getSingleton().LoadGCode(dest);
 	}
 }
 

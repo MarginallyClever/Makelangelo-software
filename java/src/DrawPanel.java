@@ -1,11 +1,10 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-//import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.awt.*;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
@@ -166,6 +165,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		super.paintComponent(g);    // paint background
 		Graphics2D g2d = (Graphics2D)g;
 
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
+		
+		DrawingTool tool = mc.GetTool(0);
+
 		cx = this.getWidth()/2;
 		cy = this.getHeight()/2;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -175,8 +178,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// draw background
 		setBackground(Color.GRAY);
 
-		MachineConfiguration mc=MachineConfiguration.getSingleton();
-		
 		// draw limits
 		if(!connected) {
 			g2d.setColor(new Color(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f));
@@ -206,15 +207,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		
 		// TODO draw left motor
 		// TODO draw right motor
-		// TODO draw arduino + connection status
 
 		// draw image
 		if(instructions==null) return;
 		
 		drawScale=0.1f;
 		
-		double px=0,py=0,pz=90;
-		int i,j, tool=0;
+		float px=0,py=0,pz=90;
+		float x,y,z,ai,aj;
+		int i,j;
 		String tool_change="M06 T";
 		
 		for(i=0;i<instructions.size();++i) {
@@ -224,14 +225,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 			if(line.startsWith(tool_change)) {
 				String numberOnly= line.substring(tool_change.length()).replaceAll("[^0-9]", "");
-				tool = (int)Integer.valueOf(numberOnly, 10);
-				
-				switch(tool) {
-				case 0: g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));	break;  // sharpie/pen
-				case 1: g2d.setStroke(new BasicStroke(0.1f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));	break;  // LED
-				case 2: g2d.setStroke(new BasicStroke(0.2f*extraScale,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));		break;  // spray paint
-				}
-				// TODO set size & color from config
+				int tool_id = (int)Integer.valueOf(numberOnly, 10);
+
+				tool = MachineConfiguration.getSingleton().GetTool(tool_id);
+				g2d.setStroke(tool.getStroke());
 			}
 			
 			String[] tokens = pieces[0].split("\\s");
@@ -239,11 +236,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			
 			// have we changed scale?
 			// what are our coordinates?
-			double x=px;
-			double y=py;
-			double z=pz;
-			double ai=px;
-			double aj=py;
+			x=px;
+			y=py;
+			z=pz;
+			ai=px;
+			aj=py;
 			for(j=1;j<tokens.length;++j) {
 				if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
 				if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
@@ -255,23 +252,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			}
 			
 			// is pen up or down?
-			boolean is_up=false;
-			if(z==MachineConfiguration.getSingleton().penUpNumber) {
+			tool.DrawZ(z);
+			if(tool.DrawIsOff()) {
 				if(show_pen_up==false) {
 					px=x;
 					py=y;
 					pz=z;
 					continue;
 				}
-				is_up=true;
 				g2d.setColor( Color.BLUE );
-			} else if(z==MachineConfiguration.getSingleton().penDownNumber) {
+			} else if(tool.DrawIsOn()) {
 				g2d.setColor( Color.BLACK );
 			} else {
 				g2d.setColor( Color.ORANGE );
 			}
 			
-			if(is_up==false) {
+			if(tool.DrawIsOn()) {
 				if(running && i<=linesProcessed) {
 					g2d.setColor( Color.RED );
 				} else if(running && i>linesProcessed && i<=linesProcessed+500) {
@@ -282,8 +278,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
-				// draw a line
-				g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));	
+				tool.DrawLine(g2d,ITX(px),ITY(py),ITX(x),ITY(y));	
 			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
 					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
 				// draw an arc
@@ -311,11 +306,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					float nx = (float)(ai + Math.cos(angle3) * radius);
 				    float ny = (float)(aj + Math.sin(angle3) * radius);
 
-				    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(nx),(int)ITY(ny));
+					tool.DrawLine(g2d,ITX(px),ITY(py),ITX(nx),ITY(ny));
 					px=nx;
 					py=ny;
 				}
-			    g2d.drawLine((int)ITX(px),(int)ITY(py),(int)ITX(x),(int)ITY(y));
+				tool.DrawLine(g2d,ITX(px),ITY(py),ITX(x),ITY(y));	
 			}
 			
 			px=x;
