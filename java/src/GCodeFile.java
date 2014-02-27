@@ -72,7 +72,7 @@ public class GCodeFile {
 			
 			if(z!=pz) {
 				// pen up/down action
-				estimated_time+=0.020;  // seconds?
+				estimated_time+=(z-pz)/feed_rate;  // seconds?
 			}
 			
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
@@ -114,7 +114,9 @@ public class GCodeFile {
 				pz=z;
 			}
 		}  // for ( each instruction )
+		// processing time for each instruction
 	   	estimated_time += estimate_count * 0.007617845117845f;
+	   	// conversion to ms?
 	   	estimated_time *= 10000;
 	}
 	

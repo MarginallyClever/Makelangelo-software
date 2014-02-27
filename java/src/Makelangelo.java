@@ -112,7 +112,7 @@ public class Makelangelo
 	private static final int IMAGE_TSP=0;
 	private static final int IMAGE_SPIRAL=1;
 	private static final int IMAGE_4LEVEL=2;
-	private static final int IMAGE_SPRAY=3;
+	private static final int IMAGE_SCANLINE=3;
 	private int draw_style=IMAGE_SPIRAL;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
@@ -281,7 +281,7 @@ public class Makelangelo
 			case Makelangelo.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
 			case Makelangelo.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
 			case Makelangelo.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
-			case Makelangelo.IMAGE_SPRAY:	LoadImagePointilism(img,destinationFile);	break;
+			case Makelangelo.IMAGE_SCANLINE:	LoadImageScanLine(img,destinationFile);	break;
 			}
 		}
 		catch(IOException e) {
@@ -306,7 +306,7 @@ public class Makelangelo
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-		Filter_4levelGcodeGenerator generator = new Filter_4levelGcodeGenerator(destinationFile);
+		Filter_CrosshatchGenerator generator = new Filter_CrosshatchGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -320,14 +320,14 @@ public class Makelangelo
 	}
 
 	
-	private void LoadImagePointilism(BufferedImage img,String destinationFile) throws IOException {
+	private void LoadImageScanLine(BufferedImage img,String destinationFile) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.Process(img);
 		
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
 		img = dither.Process(img);
 
-		Filter_PointilismGenerator generator = new Filter_PointilismGenerator(destinationFile);
+		Filter_ScanlineGenerator generator = new Filter_ScanlineGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -724,7 +724,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Spray paint pointillism" };
+		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines" };
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(draw_style);
 		
@@ -1537,7 +1537,7 @@ public class Makelangelo
         menuBar.add(menu);
         
         // view menu
-        menu = new JMenu("View");
+        menu = new JMenu("Preview");
         buttonZoomOut = new JMenuItem("Zoom -");
         buttonZoomOut.addActionListener(this);
         buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));

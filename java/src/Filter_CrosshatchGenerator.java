@@ -10,7 +10,7 @@ import javax.swing.ProgressMonitor;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-class Filter_4levelGcodeGenerator extends Filter {
+class Filter_CrosshatchGenerator extends Filter {
 	String dest;
 	int numPoints;
 	Point2D[] points = null;
@@ -23,7 +23,7 @@ class Filter_4levelGcodeGenerator extends Filter {
 	DrawingTool tool;
 
 	
-	Filter_4levelGcodeGenerator(String _dest) {
+	Filter_CrosshatchGenerator(String _dest) {
 		dest=_dest;
 	}
 	
@@ -143,13 +143,10 @@ class Filter_4levelGcodeGenerator extends Filter {
 		image_width = img.getWidth();
 		h2=image_height/2;
 		w2=image_width/2;
-		if(mc.GetPaperWidth()<mc.GetPaperHeight()) {
-			scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
-		} else {
-			scale=10f*(float)mc.GetPaperHeight()/(float)image_height;
-		}
+		scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
+		scale *= mc.paper_margin;
 		
-		int steps = 3*(int)Math.ceil(tool.GetDiameter()/scale);
+		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
 		if(steps<1) steps=1;
 		
 		out.write(mc.GetConfigLine()+";\n");

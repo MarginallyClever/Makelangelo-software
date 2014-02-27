@@ -8,6 +8,7 @@ public class DrawingTool_LED extends DrawingTool {
 		name="LED";
 		z_on=180;
 		z_off=0;
+		feed_rate=5000;
 	}
 	
 	public void WriteChangeTo(BufferedWriter out) throws IOException {

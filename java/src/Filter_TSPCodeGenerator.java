@@ -31,7 +31,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	TSPOptimizer task;
 	int image_height,image_width;
 	DrawingTool tool;
-
+	
 	
 	public String formatTime(long millis) {
     	String elapsed="";
@@ -368,7 +368,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 */
 	private void ConvertAndSaveToGCode() {
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-		
+
 		
 		// find the tsp point closest to the calibration point
 		int i;
@@ -422,7 +422,16 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		image_width = img.getWidth();
 		int x,y,i;
 
-		tool = MachineConfiguration.getSingleton().GetCurrentTool();
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
+		tool = mc.GetCurrentTool();
+
+		float scale;
+		if(mc.GetPaperWidth()<mc.GetPaperHeight()) {
+			scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
+		} else {
+			scale=10f*(float)mc.GetPaperHeight()/(float)image_height;
+		}
+		scale *= mc.paper_margin;
 		
 		// count the points
 		numPoints=0;
@@ -447,7 +456,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			for(x=0;x<image_width;++x) {
 				i=decode(img.getRGB(x,y));
 				if(i==0) {
-					points[numPoints++]=new Point2D(x-w2,h2-y);
+					points[numPoints++]=new Point2D((x-w2)*scale,(h2-y)*scale);
 				}
 			}
 		}

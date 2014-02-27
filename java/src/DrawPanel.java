@@ -119,6 +119,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		float wzoom=w/(float)(mc.paper_right-mc.paper_left);
 		float hzoom=h/(float)(mc.paper_top-mc.paper_bottom);
 		cameraZoom = (wzoom < hzoom ? wzoom : hzoom) / extraScale;
+		cameraOffsetX=-getWidth()/2;
+		cameraOffsetY=-getHeight()/2;
 		repaint();
 	}
 	

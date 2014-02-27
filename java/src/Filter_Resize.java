@@ -36,20 +36,16 @@ public class Filter_Resize {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		int w = img.getWidth();
 		int h = img.getHeight();
-		//private final double cm_to_mm=10.0f;
-		//private final double dots_per_cm=1;
-		//int max_w=(int)((mc.paper_right-mc.paper_left)*dots_per_cm*cm_to_mm);
-		//int max_h=(int)((mc.paper_top-mc.paper_bottom)*dots_per_cm*cm_to_mm);
 		
 		// cap the max_w and max_h so that enormous drawbot images don't break the software.
 		double paper_w= mc.GetPaperWidth();
 		double paper_h= mc.GetPaperHeight();
-		int max_w=1000;
-		int max_h=1000;
+		// TODO make this number a variable that can be tweaked
+		int max_w=750;
+		int max_h=750;
 		if(paper_w>paper_h) {
 			max_h *= paper_h/paper_w;
-		}
-		if(paper_h>paper_w) {
+		} else {
 			max_w *= paper_w/paper_h;
 		}
 
