@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>images/limits.png</name>
-			<type>1</type>
-			<location>/Users/danroyer/Documents/workspace/DrawBot/limits.png</location>
-		</link>
-	</linkedResources>
 </projectDescription>
