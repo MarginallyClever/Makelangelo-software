@@ -3,6 +3,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -86,10 +87,10 @@ public class DrawingTool_Pen extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestUp) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penUp.getText()));
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Float.valueOf(penUp.getText()));
 				}
 				if(subject == buttonTestDown) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penDown.getText()));
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Float.valueOf(penDown.getText()));
 				}
 				if(subject == buttonSave) {
 					diameter = Float.valueOf(penDiameter.getText());
@@ -115,4 +116,5 @@ public class DrawingTool_Pen extends DrawingTool {
 		driver.pack();
 		driver.setVisible(true);
 	}
+
 }
