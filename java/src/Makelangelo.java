@@ -731,8 +731,13 @@ public class Makelangelo
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
 		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines" };
+<<<<<<< HEAD
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
+=======
+		final JComboBox<String> input_draw_style = new JComboBox<>(styles);
+		input_draw_style.setSelectedIndex(draw_style);
+>>>>>>> pr/52
 		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");

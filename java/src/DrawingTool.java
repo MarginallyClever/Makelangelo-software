@@ -2,6 +2,7 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 
 public class DrawingTool {
@@ -60,6 +61,24 @@ public class DrawingTool {
 		g2d.drawLine((int)x1,(int)y1,(int)x2,(int)y2);
 	}
 	
-	public void LoadConfig() {}
-	public void SaveConfig() {}
+
+	public void LoadConfig(Preferences prefs) {
+		prefs = prefs.node(name);
+		diameter = Float.parseFloat(prefs.get("diameter","4"));
+		z_rate = Float.parseFloat(prefs.get("z_rate","80"));
+		z_on = Float.parseFloat(prefs.get("z_on","50"));
+		z_off = Float.parseFloat(prefs.get("z_off","90"));
+		tool_number = Integer.parseInt(prefs.get("tool_number","-1"));
+		feed_rate = Float.parseFloat(prefs.get("feed_rate","4000"));		
+	}
+
+	public void SaveConfig(Preferences prefs) {
+		prefs = prefs.node(name);
+		prefs.put("diameter", Float.toString(diameter));
+		prefs.put("z_rate", Float.toString(z_rate));
+		prefs.put("z_on", Float.toString(z_on));
+		prefs.put("z_off", Float.toString(z_off));
+		prefs.put("tool_number", Integer.toString(tool_number));
+		prefs.put("feed_rate", Float.toString(feed_rate));		
+	}
 }
