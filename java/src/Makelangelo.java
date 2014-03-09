@@ -113,7 +113,6 @@ public class Makelangelo
 	private static final int IMAGE_SPIRAL=1;
 	private static final int IMAGE_4LEVEL=2;
 	private static final int IMAGE_SCANLINE=3;
-	private int draw_style=IMAGE_SPIRAL;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
@@ -246,6 +245,13 @@ public class Makelangelo
 		PlaySound(prefs.get("sound_drawing_finished", ""));
 	}
 		
+	private void SetDrawStyle(int style) {
+		prefs.putInt("Draw Style", style);
+	}
+	private int GetDrawStyle() {
+		return prefs.getInt("Draw Style", IMAGE_SPIRAL);
+	}
+	
 	// manages the vertical split in the GUI
 	public class Splitter extends JSplitPane {
 		static final long serialVersionUID=1;
@@ -277,7 +283,7 @@ public class Makelangelo
 		
 		// convert with style
 		try {
-			switch(draw_style) {
+			switch(GetDrawStyle()) {
 			case Makelangelo.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
 			case Makelangelo.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
 			case Makelangelo.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
@@ -726,7 +732,7 @@ public class Makelangelo
 
 		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines" };
 		final JComboBox input_draw_style = new JComboBox(styles);
-		input_draw_style.setSelectedIndex(draw_style);
+		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
@@ -761,7 +767,7 @@ public class Makelangelo
 						previewPane.setShowPenUp(show_pen_up.isSelected());
 						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
 						
-						draw_style=input_draw_style.getSelectedIndex();
+						SetDrawStyle(input_draw_style.getSelectedIndex());
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
@@ -1165,6 +1171,7 @@ public class Makelangelo
 		final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
 		final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
 		
+		feed_rate = MachineConfiguration.getSingleton().GetFeedRate();
 		final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(60,20));
 		feedRate.setText(Double.toString(feed_rate));
 		final JButton setFeedRate = new JButton("Set");	setFeedRate.setPreferredSize(new Dimension(60,20));
@@ -1232,6 +1239,7 @@ public class Makelangelo
 						fr=fr.replaceAll("[ ,]","");
 						feed_rate = Double.parseDouble(fr);
 						if(feed_rate<0.001) feed_rate=0.001;
+						MachineConfiguration.getSingleton().SetFeedRate(feed_rate);
 						feedRate.setText(Double.toString(feed_rate));
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {

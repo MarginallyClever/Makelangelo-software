@@ -54,13 +54,16 @@ public class MachineConfiguration {
 	public long penDownNumber;
 
 	public boolean reverseForGlass=false;
+	public boolean motors_backwards=false;
+	protected int current_style;
+
 
 	// top left, bottom center, etc...
 	private int startingPositionIndex;
 	
 	protected DrawingTool tools[];
 	protected int current_tool=0;
-	
+		
 	
 	// singleton
 	private static MachineConfiguration singletonObject;
@@ -395,14 +398,14 @@ public class MachineConfiguration {
 	// Load the machine configuration
 	void LoadConfig() {
 		String id=Long.toString(robot_uid);
-		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "0"));
-		limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "0"));
-		limit_left = Double.valueOf(prefs.get(id+"_limit_left", "0"));
-		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "0"));
+		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "58.8"));
+		limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "-58.8"));
+		limit_left = Double.valueOf(prefs.get(id+"_limit_left", "-44.1"));
+		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "44.1"));
 		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
 		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "0.95"));
-		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "0.95"));
+		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "1.5"));
+		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "1.5"));
 		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
 		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
 		default_feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
@@ -467,11 +470,11 @@ public class MachineConfiguration {
 	
 	
 	String getPenUpString() {
-		return Long.toString(penUpNumber);
+		return Float.toString(tools[current_tool].z_off);
 	}
 	
 	String getPenDownString() {
-		return Long.toString(penDownNumber);
+		return Float.toString(tools[current_tool].z_on);
 	}
 	
 	// save paper limits
@@ -552,5 +555,13 @@ public class MachineConfiguration {
 		} else {
 			return paper_w/paper_h;
 		}
+	}
+	
+	public double GetFeedRate() {
+		return default_feed_rate;
+	}
+	
+	public void SetFeedRate(double f) {
+		default_feed_rate = f;
 	}
 }

@@ -142,7 +142,7 @@ public class Filter_ScanlineGenerator extends Filter {
 		scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
 		scale *= mc.paper_margin;
 		
-		int steps = (int)Math.ceil(tool.GetDiameter()/scale);
+		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
 		
 		out.write(mc.GetConfigLine()+";\n");

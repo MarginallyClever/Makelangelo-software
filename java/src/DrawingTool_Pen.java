@@ -21,7 +21,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		z_on=90;
 		z_off=50;
 		tool_number=0;
-		feed_rate=4000;
+		feed_rate=3500;
 		name="Pen";
 	}
 	
@@ -32,8 +32,8 @@ public class DrawingTool_Pen extends DrawingTool {
 		final JTextField penDiameter   = new JTextField(Float.toString(diameter),5);
 		final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
 		
-		final JTextField penUp   = new JTextField(Float.toString(z_on),5);
-		final JTextField penDown = new JTextField(Float.toString(z_off),5);
+		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
+		final JTextField penDown = new JTextField(Float.toString(z_on),5);
 		final JButton buttonTestUp = new JButton("Test");
 		final JButton buttonTestDown = new JButton("Test");
 		final JButton buttonSave = new JButton("Save");
@@ -86,16 +86,16 @@ public class DrawingTool_Pen extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestUp) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penUp.getText()));
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penUp.getText());
 				}
 				if(subject == buttonTestDown) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+Long.valueOf(penDown.getText()));
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penDown.getText());
 				}
 				if(subject == buttonSave) {
 					diameter = Float.valueOf(penDiameter.getText());
 					feed_rate = Float.valueOf(penFeedRate.getText());
-					z_on = Float.valueOf(penUp.getText());
-					z_off = Float.valueOf(penDown.getText());
+					z_off = Float.valueOf(penUp.getText());
+					z_on = Float.valueOf(penDown.getText());
 					MachineConfiguration.getSingleton().SaveConfig();
 					driver.dispose();
 				}
