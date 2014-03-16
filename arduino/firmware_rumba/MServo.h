@@ -46,6 +46,8 @@
 #ifndef Servo_h
 #define Servo_h
 
+#include <avr/interrupt.h>
+#include <Arduino.h> 
 #include <inttypes.h>
 
 /* 

@@ -41,8 +41,8 @@ public class Filter_Resize {
 		double paper_w= mc.GetPaperWidth();
 		double paper_h= mc.GetPaperHeight();
 		// TODO make this number a variable that can be tweaked
-		int max_w=750;
-		int max_h=750;
+		int max_w=1000;
+		int max_h=1000;
 		if(paper_w>paper_h) {
 			max_h *= paper_h/paper_w;
 		} else {

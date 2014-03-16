@@ -41,7 +41,7 @@
 // for arc directions
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
-#define CM_PER_SEGMENT  (0.2)  // Arcs are split into many line segments.  How long are the segments?
+#define CM_PER_SEGMENT  (0.25)  // Arcs are split into many line segments.  How long are the segments?
 
 
 #ifdef HAS_LCD

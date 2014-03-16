@@ -133,7 +133,7 @@ public class Makelangelo
     private JMenuItem buttonOpenFile, buttonSaveFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
-    private JMenuItem buttonZoomIn,buttonZoomOut;
+    private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
@@ -731,13 +731,9 @@ public class Makelangelo
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
 		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines" };
-<<<<<<< HEAD
+
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
-=======
-		final JComboBox<String> input_draw_style = new JComboBox<>(styles);
-		input_draw_style.setSelectedIndex(draw_style);
->>>>>>> pr/52
 		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
@@ -995,6 +991,10 @@ public class Makelangelo
 			previewPane.ZoomOut();
 			return;
 		}
+		if( subject == buttonZoomToFit ) {
+			previewPane.ZoomToFitPaper();
+			return;
+		}
 		if( subject == buttonOpenFile ) {
 			OpenFileDialog();
 			return;
@@ -1079,7 +1079,7 @@ public class Makelangelo
 			JOptionPane.showMessageDialog(null,"<html><body>"
 					+"<h1>Makelangelo v"+version+"</h1>"
 					+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
-					+"<p>Created by Dan Royer (dan@marginallyclever.com).</p><br>"
+					+"<p>Created by Dan Royer (dan@marginallyclever.com).<br>Additional contributions by Joseph Cottam.</p><br>"
 					+"<p>To get the latest version please visit<br>"
 					+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
 					+"<p>This program is open source and free.  If this was helpful<br>to you, please buy me a thank you beer through Paypal.</p>"
@@ -1560,6 +1560,10 @@ public class Makelangelo
         buttonZoomIn.addActionListener(this);
         buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomIn);
+        
+        buttonZoomToFit = new JMenuItem("Zoom to fit");
+        buttonZoomToFit.addActionListener(this);
+        menu.add(buttonZoomToFit);
         
         menuBar.add(menu);
 

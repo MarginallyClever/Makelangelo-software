@@ -43,8 +43,6 @@
  
 */
 
-#include <avr/interrupt.h>
-#include <Arduino.h> 
 
 #include "MServo.h"
 

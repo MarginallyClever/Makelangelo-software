@@ -92,7 +92,7 @@ public class MachineConfiguration {
 		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
 
 		String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
-		final JComboBox<String> startPos = new JComboBox<>(startingStrings);
+		final JComboBox startPos = new JComboBox(startingStrings);
 		startPos.setSelectedIndex(startingPositionIndex);
 		
 		final JButton cancel = new JButton("Cancel");
@@ -280,7 +280,7 @@ public class MachineConfiguration {
 			toolNames[i] = tools[i].GetName();
 		}
 		
-		final JComboBox<String> toolCombo = new JComboBox<>(toolNames);
+		final JComboBox toolCombo = new JComboBox(toolNames);
 		toolCombo.setSelectedIndex(current_tool);
 		
 		final JButton cancel = new JButton("Cancel");
@@ -407,15 +407,8 @@ public class MachineConfiguration {
 		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "44.1"));
 		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
 		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-<<<<<<< HEAD
 		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "1.5"));
 		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "1.5"));
-		penUpNumber=Long.valueOf(prefs.get(id+"_penUp", "90"));
-		penDownNumber=Long.valueOf(prefs.get(id+"_penDown", "65"));
-=======
-		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "0.95"));
-		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "0.95"));
->>>>>>> pr/52
 		default_feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
 		// TODO move these values to image filter preferences

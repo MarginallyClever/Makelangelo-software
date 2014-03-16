@@ -143,7 +143,12 @@ class Filter_CrosshatchGenerator extends Filter {
 		image_width = img.getWidth();
 		h2=image_height/2;
 		w2=image_width/2;
-		scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
+		scale=10f;
+		if(image_width>image_height) {
+			scale*=(float)mc.GetPaperWidth()/(float)image_width;
+		} else {
+			scale*=(float)mc.GetPaperHeight()/(float)image_height;
+		}
 		scale *= mc.paper_margin;
 		
 		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);

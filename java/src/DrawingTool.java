@@ -25,6 +25,10 @@ public class DrawingTool {
 		//final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust pulley size",true);		
 	}
 	
+	public void SetDiameter(float d) {
+		diameter = d;
+	}
+	
 	public float GetDiameter() {
 		return diameter;
 	}
@@ -64,21 +68,21 @@ public class DrawingTool {
 
 	public void LoadConfig(Preferences prefs) {
 		prefs = prefs.node(name);
-		diameter = Float.parseFloat(prefs.get("diameter","4"));
-		z_rate = Float.parseFloat(prefs.get("z_rate","80"));
-		z_on = Float.parseFloat(prefs.get("z_on","50"));
-		z_off = Float.parseFloat(prefs.get("z_off","90"));
-		tool_number = Integer.parseInt(prefs.get("tool_number","-1"));
-		feed_rate = Float.parseFloat(prefs.get("feed_rate","4000"));		
+		SetDiameter(Float.parseFloat(prefs.get("diameter",Float.toString(diameter))));
+		z_rate = Float.parseFloat(prefs.get("z_rate",Float.toString(z_rate)));
+		z_on = Float.parseFloat(prefs.get("z_on",Float.toString(z_on)));
+		z_off = Float.parseFloat(prefs.get("z_off",Float.toString(z_off)));
+		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
+		feed_rate = Float.parseFloat(prefs.get("feed_rate",Float.toString(feed_rate)));		
 	}
 
 	public void SaveConfig(Preferences prefs) {
 		prefs = prefs.node(name);
-		prefs.put("diameter", Float.toString(diameter));
+		prefs.put("diameter", Float.toString(GetDiameter()));
 		prefs.put("z_rate", Float.toString(z_rate));
 		prefs.put("z_on", Float.toString(z_on));
 		prefs.put("z_off", Float.toString(z_off));
 		prefs.put("tool_number", Integer.toString(tool_number));
-		prefs.put("feed_rate", Float.toString(feed_rate));		
+		prefs.put("feed_rate", Float.toString(feed_rate));
 	}
 }

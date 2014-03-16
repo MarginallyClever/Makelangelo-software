@@ -222,26 +222,33 @@ void line_safe(float x,float y,float z) {
   // split up long lines to make them straighter?
   float dx=x-posx;
   float dy=y-posy;
+  float dz=z-posz;
+/*
+  Serial.print("dx ");  Serial.println(dx);
+  Serial.print("dy ");  Serial.println(dy);
+  Serial.print("dz ");  Serial.println(dz);
 
+  Serial.print("posx ");  Serial.println(posx);
+  Serial.print("posy ");  Serial.println(posy);
+  Serial.print("posz ");  Serial.println(posz);
+*/
   float len=sqrt(dx*dx+dy*dy);
+//  Serial.print("LEN ");  Serial.println(len);
   
-  if(len<=CM_PER_SEGMENT) {
-    polargraph_line(x,y,z);
-    return;
-  }
-  
-  // too long!
   long pieces=floor(len/CM_PER_SEGMENT);
+//  Serial.print("pieces ");  Serial.println(pieces);
+  
   float x0=posx;
   float y0=posy;
   float z0=posz;
   float a;
-  for(long j=0;j<=pieces;++j) {
+  for(long j=0;j<pieces;++j) {
     a=(float)j/(float)pieces;
+//  Serial.print("a ");  Serial.println(a);
 
-    polargraph_line((x-x0)*a+x0,
-         (y-y0)*a+y0,
-         (z-z0)*a+z0);
+    polargraph_line(dx*a+x0,
+                    dy*a+y0,
+                    dz*a+z0);
   }
   polargraph_line(x,y,z);
 }
@@ -300,10 +307,10 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    polargraph_line(nx,ny,nz);
+    line_safe(nx,ny,nz);
   }
   
-  polargraph_line(x,y,z);
+  line_safe(x,y,z);
 }
 
 
@@ -473,9 +480,9 @@ void processCommand() {
   case 0:
   case 1:  // line
     setFeedRate(parsenumber('F',feed_rate));
-    polargraph_line( parsenumber('X',(absolute_mode?posx:0)*10)*0.1 + (absolute_mode?0:posx),
-                     parsenumber('Y',(absolute_mode?posy:0)*10)*0.1 + (absolute_mode?0:posy),
-                     parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz) );
+    line_safe( parsenumber('X',(absolute_mode?posx:0)*10)*0.1 + (absolute_mode?0:posx),
+               parsenumber('Y',(absolute_mode?posy:0)*10)*0.1 + (absolute_mode?0:posy),
+               parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz) );
     break;
   case 2:
   case 3:  // arc

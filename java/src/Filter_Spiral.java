@@ -134,7 +134,12 @@ class Filter_Spiral extends Filter {
 		h2=image_height/2;
 
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
+		scale=10f;
+		if(image_width>image_height) {
+			scale*=(float)mc.GetPaperWidth()/(float)image_width;
+		} else {
+			scale*=(float)mc.GetPaperHeight()/(float)image_height;
+		}
 		scale *= mc.paper_margin;
 
 		tool = mc.GetCurrentTool();
