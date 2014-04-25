@@ -79,7 +79,6 @@ import javax.swing.text.html.HTMLEditorKit;
 // TODO while not drawing, in-app gcode editing with immediate visusal feedback 
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling
 // TODO vector output
-// TODO STL input
 
 public class Makelangelo
 		extends JPanel
@@ -1354,14 +1353,14 @@ public class Makelangelo
 	public void CheckForUpdate() {
 		try {
 		    // Get Github info
-			URL github = new URL("http://www.marginallyclever.com/other/makelangelo-version.php");
+			URL github = new URL("https://www.marginallyclever.com/other/software-update-check.php?id=1");
 	        BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
 
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
 	        	if( inputLine.compareTo(version) !=0 ) {
 	        		JOptionPane.showMessageDialog(null,"A new version of this software is available.  The latest version is "+inputLine+"\n"
-	        											+"Please visit http://bit.ly/13DrlLK to get the new hotness.");
+	        											+"Please visit http://makelangelo.com/ to get the new hotness.");
 	        	}
 	        }
 	        in.close();
@@ -1389,7 +1388,7 @@ public class Makelangelo
         buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
         menu.getAccessibleContext().setAccessibleDescription("Is there a newer version available?");
         buttonCheckForUpdate.addActionListener(this);
-        buttonCheckForUpdate.setEnabled(false);
+        buttonCheckForUpdate.setEnabled(true);
         menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();

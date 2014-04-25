@@ -123,7 +123,7 @@ public class Filter_ScanlineGenerator extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) throws IOException {
-		int i,j;
+		int i;
 		int x,y;
 		double leveladd = 255.0/2.0;
 		double level=leveladd;
