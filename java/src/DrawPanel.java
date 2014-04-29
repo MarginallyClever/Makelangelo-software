@@ -218,6 +218,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		float px=0,py=0,pz=90;
 		float x,y,z,ai,aj;
 		int i,j;
+		boolean absMode=true;
 		String tool_change="M06 T";
 		
 		for(i=0;i<instructions.size();++i) {
@@ -246,8 +247,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			for(j=1;j<tokens.length;++j) {
 				if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
 				if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
-				if(tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * drawScale;
-				if(tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if(tokens[j].equals("G90")) absMode=true;
+				if(tokens[j].equals("G91")) absMode=false;
+				if(tokens[j].startsWith("X")) {
+					float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
+					x = absMode ? tx : x + tx; 
+				}
+				if(tokens[j].startsWith("Y")) {
+					float ty = Float.valueOf(tokens[j].substring(1)) * drawScale;
+					y = absMode ? ty : y + ty; 
+				}
 				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));// * drawScale;
 				if(tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if(tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;

@@ -9,4 +9,4 @@ SOURCE="$(readlink "$SOURCE")"
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-java -classpath "$DIR/RXTXcomm.jar" -Djava.library.path="$DIR" -jar "$DIR/DrawbotGUI.jar"
+java -classpath "$DIR/RXTXcomm.jar" -Djava.library.path="$DIR" -jar "$DIR/Makelangelo.jar"

@@ -1,10 +1,16 @@
-Makelangelo instructions for OSX
---------------------------------
+Makelangelo OSX help
+--------------------
 
+Last updated: 2014-04-24
+
+Start
+-----
 Double click DrawbotGUI.jar.
+
 If that doesn't work, try start.command.
 
-If the software is still not working or you need any further help,
-please join us in our support forums at
+If that doesn't work, please use our forums for more help.
 
-http://www.marginallyclever.com/forums/
+More help
+---------
+Please join the conversation at https://www.marginallyclever.com/forums/
