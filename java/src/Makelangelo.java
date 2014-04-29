@@ -265,7 +265,7 @@ public class Makelangelo
 	public void LoadImage(String filename) {
         // where to save temp output file?
 		String workingDirectory=System.getProperty("user.dir");
-		String destinationFile = workingDirectory+"temp.ngc";//filename.substring(0, filename.lastIndexOf('.')) + ".ngc";
+		String destinationFile = workingDirectory+"temp.ngc";
 		
 		// read in image
 		BufferedImage img;
@@ -283,9 +283,9 @@ public class Makelangelo
 		// convert with style
 		try {
 			switch(GetDrawStyle()) {
-			case Makelangelo.IMAGE_TSP:		LoadImageTSP(img,destinationFile);		break;
-			case Makelangelo.IMAGE_SPIRAL:	LoadImageSpiral(img,destinationFile);	break;
-			case Makelangelo.IMAGE_4LEVEL:	LoadImage4Level(img,destinationFile);	break;
+			case Makelangelo.IMAGE_TSP:			LoadImageTSP(img,destinationFile);		break;
+			case Makelangelo.IMAGE_SPIRAL:		LoadImageSpiral(img,destinationFile);	break;
+			case Makelangelo.IMAGE_4LEVEL:		LoadImage4Level(img,destinationFile);	break;
 			case Makelangelo.IMAGE_SCANLINE:	LoadImageScanLine(img,destinationFile);	break;
 			}
 		}
@@ -1361,10 +1361,16 @@ public class Makelangelo
 	        	if( inputLine.compareTo(version) !=0 ) {
 	        		JOptionPane.showMessageDialog(null,"A new version of this software is available.  The latest version is "+inputLine+"\n"
 	        											+"Please visit http://makelangelo.com/ to get the new hotness.");
+	        	} else {
+	        		JOptionPane.showMessageDialog(null,"This version is up to date.");
 	        	}
+	        } else {
+	        	throw new Exception();
 	        }
 	        in.close();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null,"Sorry, I failed.  Please visit http://www.marginallyclever.com/ to check yourself.");
+		}
 	}
 
 	// Rebuild the contents of the menu based on current program state
@@ -1657,9 +1663,9 @@ public class Makelangelo
         mainframe.setSize(1200,700);
         mainframe.setVisible(true);
 
-        // demo.reconnectToLastPort();
-        // demo.reopenLastFile();
-        demo.CheckForUpdate();
+        //demo.reconnectToLastPort();
+        //demo.reopenLastFile();
+        //demo.CheckForUpdate();
     }
     
     public static void main(String[] args) {

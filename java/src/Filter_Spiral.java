@@ -204,6 +204,9 @@ class Filter_Spiral extends Filter {
 		}
 		
 		tool.WriteOff(out);
+		
+		SignName(out);
+		
 		// already home
 		out.close();
 		
@@ -211,6 +214,11 @@ class Filter_Spiral extends Filter {
 		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
 		Makelangelo.getSingleton().PlayConversionFinishedSound();
 		Makelangelo.getSingleton().LoadGCode(dest);
+	}
+	
+	
+	protected void SignName(BufferedWriter out) throws IOException {
+		CreateMessageNow("Makelangelo #"+MachineConfiguration.getSingleton().GetUID(),out);
 	}
 }
 

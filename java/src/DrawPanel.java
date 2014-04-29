@@ -221,6 +221,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		boolean absMode=true;
 		String tool_change="M06 T";
 		
+		pz=0.5f;
+		
 		for(i=0;i<instructions.size();++i) {
 			String line=instructions.get(i);
 			String[] pieces=line.split(";");
@@ -244,24 +246,29 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			z=pz;
 			ai=px;
 			aj=py;
-			for(j=1;j<tokens.length;++j) {
+			for(j=0;j<tokens.length;++j) {
 				if(tokens[j].equals("G20")) drawScale=2.54f; // in->cm
-				if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
-				if(tokens[j].equals("G90")) absMode=true;
-				if(tokens[j].equals("G91")) absMode=false;
-				if(tokens[j].startsWith("X")) {
+				else if(tokens[j].equals("G21")) drawScale=0.10f; // mm->cm
+				else if(tokens[j].equals("G90")) absMode=true;
+				else if(tokens[j].equals("G91")) absMode=false;
+				else if(tokens[j].equals("G54")) break;
+				else if(tokens[j].startsWith("X")) {
 					float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					x = absMode ? tx : x + tx; 
 				}
-				if(tokens[j].startsWith("Y")) {
+				else if(tokens[j].startsWith("Y")) {
 					float ty = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					y = absMode ? ty : y + ty; 
 				}
-				if(tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1));// * drawScale;
+				else if(tokens[j].startsWith("Z")) {
+					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
+					z = absMode ? tz : z + tz; 
+				}
 				if(tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if(tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
 			}
-			
+			if(j<tokens.length) continue;
+			//*
 			// is pen up or down?
 			tool.DrawZ(z);
 			if(tool.DrawIsOff()) {
@@ -285,6 +292,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					g2d.setColor( Color.GREEN );
 				}
 			}
+			/*/
+			// for testing gcodesender generated pictures
+			if(z<0.1) {
+				g2d.setColor(Color.RED);
+			} else {
+				px=x;
+				py=y;
+				pz=z;
+				continue;
+			}*/
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||

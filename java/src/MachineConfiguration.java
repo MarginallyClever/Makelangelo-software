@@ -563,4 +563,8 @@ public class MachineConfiguration {
 	public void SetFeedRate(double f) {
 		default_feed_rate = f;
 	}
+	
+	public long GetUID() {
+		return robot_uid;
+	}
 }
