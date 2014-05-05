@@ -36,6 +36,7 @@
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
 
 #define NUM_AXIES            (3)  // x,y,z
+#define NUM_TOOLS            (6)
 #define MAX_SEGMENTS         (32)  // number of line segments to buffer ahead
 
 // for arc directions

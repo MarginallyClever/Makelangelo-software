@@ -11,6 +11,7 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 #include "configure.h"
+#include "Vector3.h"
 
 
 //------------------------------------------------------------------------------
@@ -51,6 +52,9 @@ char absolute_mode=1;  // absolute or incremental programming mode?
 // Serial comm reception
 char buffer[MAX_BUF];  // Serial buffer
 int sofar;             // Serial buffer progress
+
+Vector3 tool_offset[NUM_TOOLS];
+int current_tool=0;
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -433,6 +437,32 @@ void printConfig() {
 }
 
 
+
+
+//------------------------------------------------------------------------------
+void set_tool_offset(int axis,float x,float y,float z) {
+  tool_offset[axis].x=x;
+  tool_offset[axis].y=y;
+  tool_offset[axis].z=z;
+}
+
+
+//------------------------------------------------------------------------------
+Vector3 get_end_plus_offset() {
+  return Vector3(tool_offset[current_tool].x + posx,
+                 tool_offset[current_tool].y + posy,
+                 tool_offset[current_tool].z + posz);
+}
+
+
+//------------------------------------------------------------------------------
+void tool_change(int tool_id) {
+  if(tool_id < 0) tool_id=0;
+  if(tool_id > NUM_TOOLS) tool_id=NUM_TOOLS;
+  current_tool=tool_id;
+}
+
+
 /**
  * Look for character /code/ in the buffer and read the float that immediately follows it.
  * @return the value found.  If nothing is found, /val/ is returned.
@@ -456,9 +486,7 @@ void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
   
-  if(!strncmp(buffer,"HELP",4)) {
-    help();
-  } else if(!strncmp(buffer,"UID",3)) {
+  if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
   } else if(!strncmp(buffer,"TELEPORT",8)) {
@@ -470,6 +498,7 @@ void processCommand() {
 
   int cmd=parsenumber('M',-1);
   switch(cmd) {
+  case 100:  help();  break;
   case 114:  where();  break;
   case 18:  motor_enable();  break;
   case 17:  motor_disable();  break;
@@ -478,26 +507,55 @@ void processCommand() {
   cmd=parsenumber('G',-1);
   switch(cmd) {
   case 0:
-  case 1:  // line
-    setFeedRate(parsenumber('F',feed_rate));
-    line_safe( parsenumber('X',(absolute_mode?posx:0)*10)*0.1 + (absolute_mode?0:posx),
-               parsenumber('Y',(absolute_mode?posy:0)*10)*0.1 + (absolute_mode?0:posy),
-               parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz) );
-    break;
+  case 1: {  // line
+      Vector3 offset=get_end_plus_offset();
+      setFeedRate(parsenumber('F',feed_rate));
+      line_safe( parsenumber('X',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
+                 parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
+                 parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z) );
+      break;
+    }
   case 2:
-  case 3:  // arc
-    setFeedRate(parsenumber('F',feed_rate));
-    arc(parsenumber('I',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
-        parsenumber('J',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
-        parsenumber('X',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
-        parsenumber('Y',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
-        parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz),
-        (cmd==2) ? -1 : 1);
-    break;
-  case 4:  pause(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
+  case 3: {  // arc
+      Vector3 offset=get_end_plus_offset();
+      setFeedRate(parsenumber('F',feed_rate));
+      arc(parsenumber('I',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('J',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
+          parsenumber('X',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('Y',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
+          parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
+          (cmd==2) ? -1 : 1);
+      break;
+    }
+  case 4:  {  // dwell
+      wait_for_empty_segment_buffer();
+      pause(parsenumber('S',0) + parsenumber('P',0)*1000.0f);
+      break;
+    }
   case 28:  FindHome();  break;
+  case 54:
+  case 55:
+  case 56:
+  case 57:
+  case 58:
+  case 59: {  // 54-59 tool offsets
+    int tool_id=cmd-54;
+    set_tool_offset(tool_id,parsenumber('X',tool_offset[tool_id].x),
+                            parsenumber('Y',tool_offset[tool_id].y),
+                            parsenumber('Z',tool_offset[tool_id].z));
+    break;
+    }
   case 90:  absolute_mode=1;  break;  // absolute mode
   case 91:  absolute_mode=0;  break;  // relative mode
+  case 92: {  // set position (teleport)
+      Vector3 offset = get_end_plus_offset();
+      teleport( parsenumber('X',offset.x),
+                         parsenumber('Y',offset.y)
+                         //,
+                         //parsenumber('Z',offset.z)
+                         );
+      break;
+    }
   }
 
   cmd=parsenumber('D',-1);

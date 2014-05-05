@@ -349,6 +349,11 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
 }
 
 
+void wait_for_empty_segment_buffer() {
+  while( current_segment != last_segment );
+}
+
+
 /**
  * This file is part of DrawbotGUI.
  *

@@ -16,6 +16,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 	// arc smoothness - increase to make more smooth and run slower.
 	public static final double STEPS_PER_DEGREE=1;
+	public static final double RAD2DEG = 180.0/Math.PI;
+	public static final double DEG2RAD = Math.PI/180.0;
 
 	// progress
 	long linesProcessed=0;
@@ -323,14 +325,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				double angle2=atan3(y-aj,x-ai);
 				double theta=angle2-angle1;
 
-				if(dir>0 && theta<0) angle2+=2.0*Math.PI;
-				else if(dir<0 && theta>0) angle1+=2.0*Math.PI;
+				if(dir>0 && theta<0) angle2+=Math.PI*2.0;
+				else if(dir<0 && theta>0) angle1+=Math.PI*2.0;
 
-				theta=Math.abs(angle2-angle1);
+				theta=Math.abs(angle2-angle1)*RAD2DEG*STEPS_PER_DEGREE;
 
 				// Draw the arc from a lot of little line segments.
-				for(int k=0;k<=theta*STEPS_PER_DEGREE;++k) {
-					double angle3 = (angle2-angle1) * ((double)k/(theta*STEPS_PER_DEGREE)) + angle1;
+				for(int k=0;k<=theta;++k) {
+					double angle3 = (angle2-angle1) * ((double)k/theta) + angle1;
 					float nx = (float)(ai + Math.cos(angle3) * radius);
 				    float ny = (float)(aj + Math.sin(angle3) * radius);
 
