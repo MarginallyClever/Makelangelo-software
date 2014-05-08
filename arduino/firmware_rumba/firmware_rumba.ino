@@ -498,10 +498,11 @@ void processCommand() {
 
   int cmd=parsenumber('M',-1);
   switch(cmd) {
-  case 100:  help();  break;
-  case 114:  where();  break;
+  case 6:  tool_change(parsenumber('T',current_tool));  break;
   case 18:  motor_enable();  break;
   case 17:  motor_disable();  break;
+  case 100:  help();  break;
+  case 114:  where();  break;
   }
 
   cmd=parsenumber('G',-1);
