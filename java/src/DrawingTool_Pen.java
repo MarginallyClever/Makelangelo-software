@@ -1,3 +1,4 @@
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,7 +18,7 @@ public class DrawingTool_Pen extends DrawingTool {
 	
 	DrawingTool_Pen() {
 		diameter=1.5f;
-		z_rate=80;
+		z_rate=120;
 		z_on=90;
 		z_off=50;
 		tool_number=0;

@@ -129,7 +129,7 @@ public class Makelangelo
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
-    private JMenuItem buttonOpenFile, buttonSaveFile, buttonExit;
+    private JMenuItem buttonOpenFile, buttonText2GCODE, buttonSaveFile, buttonExit;
     private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
@@ -264,8 +264,7 @@ public class Makelangelo
 	
 	public void LoadImage(String filename) {
         // where to save temp output file?
-		String workingDirectory=System.getProperty("user.dir");
-		String destinationFile = workingDirectory+"temp.ngc";
+		String destinationFile = System.getProperty("user.dir")+"/temp.ngc";
 		
 		// read in image
 		BufferedImage img;
@@ -334,6 +333,15 @@ public class Makelangelo
 
 		Filter_ScanlineGenerator generator = new Filter_ScanlineGenerator(destinationFile);
 		generator.Process(img);
+	}
+	
+	
+	private void TextToGCODE() {
+		Filter_YourMessageHere msg = new Filter_YourMessageHere();
+
+		msg.Generate( System.getProperty("user.dir")+"/temp.ngc");
+
+    	previewPane.ZoomToFitPaper();
 	}
 	
 
@@ -998,6 +1006,10 @@ public class Makelangelo
 			OpenFileDialog();
 			return;
 		}
+		if( subject == buttonText2GCODE ) {
+			TextToGCODE();
+			return;
+		}
 
 		if( subject == buttonStart ) {
 			if(gcode.fileOpened && !running) {
@@ -1484,34 +1496,39 @@ public class Makelangelo
         
 
         // File conversion menu
-        menu = new JMenu("File");
+        menu = new JMenu("GCODE");
         menu.setMnemonic(KeyEvent.VK_H);
         menu.getAccessibleContext().setAccessibleDescription("Get help");
 
-        subMenu = new JMenu("Open...");
-        subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+        buttonText2GCODE = new JMenuItem("Text to GCODE");
+        buttonText2GCODE.setEnabled(!running);
+        buttonText2GCODE.addActionListener(this);
+        menu.add(buttonText2GCODE);
+        
+        subMenu = new JMenu("Open/Convert File...");
+        subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file");
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-        // list recent files
-        if(recentFiles != null && recentFiles.length>0) {
-        	// list files here
-        	for(i=0;i<recentFiles.length;++i) {
-        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
-            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-            	if(buttonRecent[i]!=null) {
-            		buttonRecent[i].addActionListener(this);
-            		subMenu.add(buttonRecent[i]);
-            	}
-        	}
-        	if(i!=0) subMenu.addSeparator();
-        }
+	        // list recent files
+	        if(recentFiles != null && recentFiles.length>0) {
+	        	// list files here
+	        	for(i=0;i<recentFiles.length;++i) {
+	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
+	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
+	            	if(buttonRecent[i]!=null) {
+	            		buttonRecent[i].addActionListener(this);
+	            		subMenu.add(buttonRecent[i]);
+	            	}
+	        	}
+	        	if(i!=0) subMenu.addSeparator();
+	        }
         
-        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
-        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
-        buttonOpenFile.addActionListener(this);
-        subMenu.add(buttonOpenFile);
+	        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
+	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+	        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+	        buttonOpenFile.addActionListener(this);
+	        subMenu.add(buttonOpenFile);
         
         menu.add(subMenu);
 

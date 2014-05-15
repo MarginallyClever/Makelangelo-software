@@ -1,6 +1,8 @@
+
+
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
@@ -11,45 +13,35 @@ import javax.swing.ProgressMonitor;
  * @author Dan
  */
 class Filter_CrosshatchGenerator extends Filter {
+	// file properties
 	String dest;
+	
+	// conversion tools
 	int numPoints;
 	Point2D[] points = null;
-	int image_width, image_height;
 	int scount;
 	boolean lastup;
-	float w2,h2,scale;
 	ProgressMonitor pm;
 	float previous_x,previous_y;
-	DrawingTool tool;
 
 	
 	Filter_CrosshatchGenerator(String _dest) {
 		dest=_dest;
 	}
 	
-
-	private void liftPen(BufferedWriter out) throws IOException {
-		tool.WriteOff(out);
-	}
 	
-	
-	private void lowerPen(BufferedWriter out) throws IOException {
-		tool.WriteOn(out);
-	}
-	
-	
-	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
-		float x2 = (x-w2)*scale;
-		float y2 = -(y-h2)*scale;
+	private void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		float x2 = TX(x);
+		float y2 = TY(y);
 		
 		if(up==lastup) {
 			previous_x=x2;
 			previous_y=y2;
 		} else {
 			tool.WriteMoveTo(out,previous_x,previous_y);
-			tool.WriteMoveTo(out,x2,y2);
 			if(up) liftPen(out);
 			else   lowerPen(out);
+			tool.WriteMoveTo(out,x2,y2);
 			lastup=up;
 		}
 	}
@@ -134,28 +126,12 @@ class Filter_CrosshatchGenerator extends Filter {
 		int z=0;
 
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-		BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
-
-		image_height = img.getHeight();
-		image_width = img.getWidth();
-		h2=image_height/2;
-		w2=image_width/2;
-		scale=10f;
-		if(image_width>image_height) {
-			scale*=(float)mc.GetPaperWidth()/(float)image_width;
-		} else {
-			scale*=(float)mc.GetPaperHeight()/(float)image_height;
-		}
-		scale *= mc.paper_margin;
+		ImageStart(img,out);
 		
 		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
 		if(steps<1) steps=1;
-		
-		out.write(mc.GetConfigLine()+";\n");
-		out.write(mc.GetBobbinLine()+";\n");
 		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
@@ -293,9 +269,9 @@ class Filter_CrosshatchGenerator extends Filter {
 				MoveTo(out,(float)startx,(float)starty,true);
 			}
 		}
-		
-		// lift pen and return to home
+
 		liftPen(out);
+		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
 		
@@ -303,6 +279,15 @@ class Filter_CrosshatchGenerator extends Filter {
 		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
 		Makelangelo.getSingleton().PlayConversionFinishedSound();
 		Makelangelo.getSingleton().LoadGCode(dest);
+	}
+	
+	
+	protected void SignName(OutputStreamWriter out) throws IOException {
+		TextSetAlign(Align.RIGHT);
+		TextSetVAlign(VAlign.BOTTOM);
+		TextSetPosition(image_width, image_height);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
+		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 	}
 }
 

@@ -264,7 +264,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				}
 				else if(tokens[j].startsWith("Z")) {
 					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
-					z = absMode ? tz : z + tz; 
+					z =  absMode ? tz : z + tz; 
 				}
 				if(tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if(tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;

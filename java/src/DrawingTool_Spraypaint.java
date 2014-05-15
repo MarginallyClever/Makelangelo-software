@@ -1,9 +1,10 @@
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -31,15 +32,15 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		old_y=0;
 	}
 
-	public void WriteOn(BufferedWriter out) throws IOException {
+	public void WriteOn(OutputStreamWriter out) throws IOException {
 		is_up=false;
 	}
 
-	public void WriteOff(BufferedWriter out) throws IOException {
+	public void WriteOff(OutputStreamWriter out) throws IOException {
 		is_up=true;
 	}
 		
-	public void WriteMoveTo(BufferedWriter out,float x,float y) throws IOException {
+	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
 		if(is_up) {
 			out.write("G00 X"+x+" Y"+y+";\n");			
 		} else {

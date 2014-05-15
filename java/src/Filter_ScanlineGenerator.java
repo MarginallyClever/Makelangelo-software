@@ -1,6 +1,8 @@
+
+
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
@@ -10,33 +12,20 @@ public class Filter_ScanlineGenerator extends Filter {
 	String dest;
 	int numPoints;
 	Point2D[] points = null;
-	int image_width, image_height;
 	int scount;
 	boolean lastup;
-	float w2,h2,scale;
 	ProgressMonitor pm;
 	float previous_x,previous_y;
-	DrawingTool tool;
 
 	
 	Filter_ScanlineGenerator(String _dest) {
 		dest=_dest;
 	}
 	
-
-	private void liftPen(BufferedWriter out) throws IOException {
-		tool.WriteOff(out);
-	}
 	
-	
-	private void lowerPen(BufferedWriter out) throws IOException {
-		tool.WriteOn(out);
-	}
-	
-	
-	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
-		float x2 = (x-w2)*scale;
-		float y2 = -(y-h2)*scale;
+	private void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		float x2 = TX(x);
+		float y2 = TY(y);
 		
 		if(up==lastup) {
 			previous_x=x2;
@@ -130,31 +119,16 @@ public class Filter_ScanlineGenerator extends Filter {
 		int z=0;
 
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-		BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
+		ImageStart(img,out);
 
-		image_height = img.getHeight();
-		image_width = img.getWidth();
-		h2=image_height/2;
-		w2=image_width/2;
-		scale=10f;
-		if(image_width>image_height) {
-			scale*=(float)mc.GetPaperWidth()/(float)image_width;
-		} else {
-			scale*=(float)mc.GetPaperHeight()/(float)image_height;
-		}
-		scale *= mc.paper_margin;
-		
 		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
 		
-		out.write(mc.GetConfigLine()+";\n");
-		out.write(mc.GetBobbinLine()+";\n");
-		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
+		
 		tool.WriteChangeTo(out);
 		liftPen(out);
 		lastup=true;

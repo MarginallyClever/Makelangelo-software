@@ -1,6 +1,7 @@
+
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
-import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
@@ -11,6 +12,7 @@ public class DrawingTool {
 	
 	protected float diameter=1; // mm
 	protected float feed_rate;
+	protected float feed_rate_multiplier=1;
 	protected float z_on;
 	protected float z_off;
 	protected float z_rate;
@@ -34,22 +36,28 @@ public class DrawingTool {
 	}
 
 	public String GetName() { return name; }
+	public float GetFeedRate() { return feed_rate; }
+	public float GetFeedRateMultiplied() { return feed_rate * feed_rate_multiplier; }
+	public void SetMultiplier(float x) {
+		assert(x>0 && x<=2);
+		feed_rate_multiplier = x;
+	}
 	
-	public void WriteChangeTo(BufferedWriter out) throws IOException {
+	public void WriteChangeTo(OutputStreamWriter out) throws IOException {
 		out.write("M06 T"+tool_number+";\n");
 	}
 
-	public void WriteOn(BufferedWriter out) throws IOException {
+	public void WriteOn(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
 	}
 
-	public void WriteOff(BufferedWriter out) throws IOException {
+	public void WriteOff(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
-		out.write("G00 F"+feed_rate+";\n");
+		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
 	}
 	
-	public void WriteMoveTo(BufferedWriter out,float x,float y) throws IOException {
+	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
 		out.write("G00 X"+x+" Y"+y+";\n");
 	}
 	

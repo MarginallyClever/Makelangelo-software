@@ -1,6 +1,7 @@
+
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
@@ -11,35 +12,23 @@ import javax.swing.ProgressMonitor;
  * @author Dan
  */
 class Filter_Spiral extends Filter {
+	// file properties
 	String dest;
+	// processing tools
 	int numPoints;
 	Point2D[] points = null;
-	int image_width, image_height;
 	int scount;
 	boolean lastup;
-	float w2,h2,scale;
 	ProgressMonitor pm;
-	DrawingTool tool;
 
 	
 	Filter_Spiral(String _dest) {
 		dest=_dest;
 	}
 
-
-	private void liftPen(BufferedWriter out) throws IOException {
-		tool.WriteOff(out);
-	}
 	
-	private void lowerPen(BufferedWriter out) throws IOException {
-		tool.WriteOn(out);
-	}
-
-	
-	private void MoveTo(BufferedWriter out,float x,float y,boolean up) throws IOException {
-		tool.WriteMoveTo(out,
-						 (x-w2)*scale,
-						 -(y-h2)*scale);
+	private void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		tool.WriteMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
@@ -49,9 +38,6 @@ class Filter_Spiral extends Filter {
 	
 	
 	private int TakeImageSample(BufferedImage img,int x,int y) {
-		image_height = img.getHeight();
-		image_width = img.getWidth();
-		
 		// point sampling
 		//return decode(img.getRGB(x,y));
 
@@ -127,30 +113,13 @@ class Filter_Spiral extends Filter {
 		double leveladd = 255.0/(steps+1);
 		double level;
 		int z=0;
-		
-		image_height = img.getHeight();
-		image_width = img.getWidth();
-		w2=image_width/2;
-		h2=image_height/2;
 
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		scale=10f;
-		if(image_width>image_height) {
-			scale*=(float)mc.GetPaperWidth()/(float)image_width;
-		} else {
-			scale*=(float)mc.GetPaperHeight()/(float)image_height;
-		}
-		scale *= mc.paper_margin;
-
-		tool = mc.GetCurrentTool();
-		double toolDiameter=tool.GetDiameter()/scale;
-
-		
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		BufferedWriter out = new BufferedWriter(new FileWriter(dest));
-		out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
-		out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
+		ImageStart(img,out);
+
+		double toolDiameter=tool.GetDiameter()/scale;
 		// set absolute coordinates
 		out.write("G90;\n");
 		tool.WriteChangeTo(out);
@@ -203,11 +172,9 @@ class Filter_Spiral extends Filter {
 			Makelangelo.getSingleton().Log("<font color='yellow'>d="+d+","+circumference+"</font>\n");
 		}
 		
-		tool.WriteOff(out);
-		
+		liftPen(out);
 		SignName(out);
-		
-		// already home
+		tool.WriteMoveTo(out, 0, 0);
 		out.close();
 		
 		// TODO move to GUI
@@ -217,8 +184,11 @@ class Filter_Spiral extends Filter {
 	}
 	
 	
-	protected void SignName(BufferedWriter out) throws IOException {
-		CreateMessageNow("Makelangelo #"+MachineConfiguration.getSingleton().GetUID(),out);
+	protected void SignName(OutputStreamWriter out) throws IOException {
+		TextSetAlign(Align.CENTER);
+		TextSetVAlign(VAlign.BOTTOM);
+		TextSetPosition(image_width/2, image_height);
+		TextCreateMessageNow("Makelangelo #"+MachineConfiguration.getSingleton().GetUID(),out);
 	}
 }
 

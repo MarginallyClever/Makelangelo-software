@@ -1,9 +1,11 @@
+
+
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
@@ -17,19 +19,20 @@ import javax.swing.SwingWorker;
  * @author Dan
  */
 class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
+	// file properties
+	String dest;
+	// processing tools
 	long t_elapsed,t_start;
 	double progress;
 	double old_len,len;
 	float feed_rate=2000;
 	long time_limit=10*60*1000;  // 10 minutes
-	String dest;
 	int numPoints;
 	Point2D[] points = null;
 	int[] solution = null;
 	int scount;
 	ProgressMonitor pm;
 	TSPOptimizer task;
-	int image_height,image_width;
 	DrawingTool tool;
 	
 	
@@ -247,14 +250,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		}
 	}
 
-
-	private void liftPen(BufferedWriter out) throws IOException {
-		tool.WriteOff(out);
-	}
-	
-	private void lowerPen(BufferedWriter out) throws IOException {
-		tool.WriteOn(out);
-	}
 	
 	Filter_TSPGcodeGenerator(String _dest) {
 		dest=_dest;
@@ -266,6 +261,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		float y = points[a].y - points[b].y;
 		return x*x+y*y;
 	}
+	
 	
 	private void GenerateTSP() {
 		GreedyTour();
@@ -279,6 +275,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		task.addPropertyChangeListener(this);
 		task.execute();
 	}
+	
 
     // Invoked when task's progress property changes.
     public void propertyChange(PropertyChangeEvent evt) {
@@ -356,7 +353,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 	
 
-	private void MoveTo(BufferedWriter out,int i,boolean up) throws IOException {
+	private void MoveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
 		tool.WriteMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 	
@@ -367,9 +364,6 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
 	private void ConvertAndSaveToGCode() {
-		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-
-		
 		// find the tsp point closest to the calibration point
 		int i;
 		int besti=-1;
@@ -385,8 +379,10 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 			}
 		}
 		
+		// write
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(dest));
+			Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
 			out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
 			// set absolute coordinates
@@ -418,21 +414,11 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) {
-		image_height = img.getHeight();
-		image_width = img.getWidth();
-		int x,y,i;
-
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		tool = mc.GetCurrentTool();
+		ImageSetupTransform(img);
 
-		float scale;
-		if(mc.GetPaperWidth()<mc.GetPaperHeight()) {
-			scale=10f*(float)mc.GetPaperWidth()/(float)image_width;
-		} else {
-			scale=10f*(float)mc.GetPaperHeight()/(float)image_height;
-		}
-		scale *= mc.paper_margin;
-		
+		int x,y,i;
 		// count the points
 		numPoints=0;
 		for(y=0;y<image_height;++y) {
@@ -449,18 +435,15 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 		solution = new int[numPoints+1];
 	
 		// collect the point data
-		float w2=image_width/2;
-		float h2=image_height/2;
 		numPoints=0;
 		for(y=0;y<image_height;++y) {
 			for(x=0;x<image_width;++x) {
 				i=decode(img.getRGB(x,y));
 				if(i==0) {
-					points[numPoints++]=new Point2D((x-w2)*scale,(h2-y)*scale);
+					points[numPoints++]=new Point2D(TX(x),TY(y));
 				}
 			}
 		}
-		
 		
 		GenerateTSP();
 	}
