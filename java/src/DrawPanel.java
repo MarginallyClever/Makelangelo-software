@@ -48,6 +48,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		double x1,y1,x2,y2;
 		Color c;
 		int tool_id;
+		int line_number;
 		NodeType type;
 	}
 	ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
@@ -102,6 +103,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	
 	public void setRunning(boolean state) {
 		running=state;
+		if(running==false) {
+			linesProcessed=0;
+		}
 	}
 	
 	// returns angle of dy/dx as a value from 0...2PI
@@ -246,11 +250,23 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// TODO draw right motor
 		// TODO draw control box
 
+		g2d.setColor(Color.BLACK);
+		
 		// draw image		
 		if(fast_nodes.size()>0) {
 			// draw the nodes
 			for(int i=0;i<fast_nodes.size();++i) {
 				DrawPanelNode n=fast_nodes.get(i);
+
+				if(running) {
+					if(n.line_number<=linesProcessed) {
+						g2d.setColor(Color.RED);
+					} else if(n.line_number<=linesProcessed+500) {
+						g2d.setColor(Color.GREEN);
+					} else if(true) {
+						break;
+					}
+				}
 				
 				switch(n.type) {
 				case TOOL:
@@ -258,7 +274,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					g2d.setStroke(tool.getStroke());
 					break;
 				case COLOR:
-					g2d.setColor(n.c);
+					if(n.line_number>linesProcessed+500) {
+						g2d.setColor(n.c);
+					}
 					break;
 				default:
 					tool.DrawLine(g2d, n.x1, n.y1, n.x2, n.y2);
@@ -269,8 +287,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		g2d.dispose();
 	}
 	
-	private void addNodePos(double x1,double y1,double x2,double y2) {
+	private void addNodePos(int i,double x1,double y1,double x2,double y2) {
 		DrawPanelNode n = new DrawPanelNode();
+		n.line_number=i;
 		n.x1=x1;
 		n.x2=x2;
 		n.y1=y1;
@@ -279,15 +298,17 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		fast_nodes.add(n);
 	}
 	
-	private void addNodeColor(Color c) {
+	private void addNodeColor(int i,Color c) {
 		DrawPanelNode n = new DrawPanelNode();
+		n.line_number=i;
 		n.c=c;
 		n.type=NodeType.COLOR;
 		fast_nodes.add(n);
 	}
 	
-	private void addNodeTool(int tool_id) {
+	private void addNodeTool(int i,int tool_id) {
 		DrawPanelNode n = new DrawPanelNode();
+		n.line_number=i;
 		n.tool_id=tool_id;
 		n.type=NodeType.TOOL;
 		fast_nodes.add(n);
@@ -315,7 +336,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 			if(line.startsWith(tool_change)) {
 				String numberOnly= line.substring(tool_change.length()).replaceAll("[^0-9]", "");
-				addNodeTool((int)Integer.valueOf(numberOnly, 10));
+				addNodeTool(i,(int)Integer.valueOf(numberOnly, 10));
 				continue;
 			}
 			
@@ -366,36 +387,18 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					pz=z;
 					continue;
 				}
-				addNodeColor( Color.BLUE );
+				addNodeColor(i, Color.BLUE );
 			} else if(tool.DrawIsOn()) {
-				addNodeColor( Color.BLACK );
+				addNodeColor(i, Color.BLACK );
 			} else {
-				addNodeColor( Color.ORANGE );
+				addNodeColor(i, Color.ORANGE );
 			}
-			
-			if(tool.DrawIsOn()) {
-				if(running && i<=linesProcessed) {
-					addNodeColor(Color.RED);
-				} else if(running && i>linesProcessed && i<=linesProcessed+500) {
-					addNodeColor(Color.GREEN);
-				}
-			}
-			/*/
-			// for testing gcodesender generated pictures
-			if(z<0.1) {
-				g2d.setColor(Color.RED);
-			} else {
-				px=x;
-				py=y;
-				pz=z;
-				continue;
-			}*/
 			
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
 				if(z==pz) {
-					addNodePos(ITX(px),ITY(py),ITX(x),ITY(y));	
+					addNodePos(i,ITX(px),ITY(py),ITX(x),ITY(y));	
 				}
 			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
 					  tokens[0].equals("G03") || tokens[0].equals("G3")) {
@@ -424,11 +427,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					float nx = (float)(ai + Math.cos(angle3) * radius);
 				    float ny = (float)(aj + Math.sin(angle3) * radius);
 
-				    addNodePos(ITX(px),ITY(py),ITX(nx),ITY(ny));
+				    addNodePos(i,ITX(px),ITY(py),ITX(nx),ITY(ny));
 					px=nx;
 					py=ny;
 				}
-				addNodePos(ITX(px),ITY(py),ITX(x),ITY(y));	
+				addNodePos(i,ITX(px),ITY(py),ITX(x),ITY(y));	
 			}
 			
 			px=x;
