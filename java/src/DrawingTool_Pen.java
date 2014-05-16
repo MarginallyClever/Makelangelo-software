@@ -12,8 +12,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 
-
-
 public class DrawingTool_Pen extends DrawingTool {
 	
 	DrawingTool_Pen() {

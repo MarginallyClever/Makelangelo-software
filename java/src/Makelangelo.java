@@ -1679,7 +1679,8 @@ public class Makelangelo
         // TODO remember preferences for window size
         mainframe.setSize(1200,700);
         mainframe.setVisible(true);
-
+        
+        demo.previewPane.ZoomToFitPaper();
         //demo.reconnectToLastPort();
         //demo.reopenLastFile();
         //demo.CheckForUpdate();

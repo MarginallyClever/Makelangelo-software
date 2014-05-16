@@ -34,9 +34,9 @@ public class Filter_BlackAndWhite extends Filter {
 		double ilevels=1;
 		if( levels != 0 ) ilevels = 1.0 / levels;
 
-		System.out.println("min_intensity="+min_intensity);
-		System.out.println("max_intensity="+max_intensity);
-		System.out.println("levels="+levels);
+		//System.out.println("min_intensity="+min_intensity);
+		//System.out.println("max_intensity="+max_intensity);
+		//System.out.println("levels="+levels);
 		//System.out.println("inverse="+ilevels);
 		
 		double pixel;

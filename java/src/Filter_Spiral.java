@@ -152,7 +152,7 @@ class Filter_Spiral extends Filter {
 			// find circumference of current circle
 			float circumference=(float) Math.floor(((d+(d-toolDiameter))*Math.PI)/2);
 
-			for(i=0;i<=circumference;++i) {
+			for(i=0;i<=circumference;i+=2) {
 				f = i/circumference;
 				//fx = hw + (Math.cos(Math.PI*2.0*f)*(d-f));
 				fx = w2 + (float)(Math.cos(Math.PI*2.0*f)*d);

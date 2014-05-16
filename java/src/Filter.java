@@ -151,14 +151,13 @@ public class Filter {
 	
 	public void TextSetCharsPerLine(int numChars) {
 		chars_per_line = numChars;
-		System.out.println("MAX="+numChars);
+		//System.out.println("MAX="+numChars);
 	}
 	
 	
 	public void TextFindCharsPerLine(float width) {
 		chars_per_line=(int)Math.floor( (float)(width - padding*2.0f) / (float)(letter_width+kerning) );
-		
-		System.out.println("MAX="+chars_per_line);
+		//System.out.println("MAX="+chars_per_line);
 	}
 	
 
@@ -167,12 +166,9 @@ public class Filter {
 		int len = TextLongestLine(lines);
 		
 		int num_lines = lines.length;
-		float h = ( letter_height + line_spacing ) * num_lines;// - line_spacing;
-		float w = ( letter_width + kerning ) * len - kerning;
-		float xmax =  w/2 + padding;  // center the text, go left 50%
-		float xmin = -w/2 - padding;
-		float ymax =  h/2 + padding;
-		float ymin = -h/2 - padding;
+		float h = padding*2 + ( letter_height + line_spacing ) * num_lines;//- line_spacing; removed because of letters that hang below the line
+		float w = padding*2 + ( letter_width + kerning ) * len - kerning;
+		float xmax=0, xmin=0, ymax=0, ymin=0;
 		
 		switch(align_horizontal) {
 		case LEFT:
@@ -228,7 +224,6 @@ public class Filter {
 		Rectangle2D r = TextCalculateBounds(text);
 
 		output.write("G90;\n");
-
 		liftPen(output);
 		
 		if(draw_bounding_box) {
@@ -267,6 +262,7 @@ public class Filter {
 			TextDrawLine(lines[i],output);
 		}
 
+		output.write("G90;\n");
 		liftPen(output);
 	}
 
@@ -312,8 +308,7 @@ public class Filter {
 	}
 	
  	protected void TextDrawLine(String a1,OutputStreamWriter output) throws IOException {
-		String wd = System.getProperty("user.dir") + "/";
-		String ud = wd + alphabetFolder;
+		String ud = System.getProperty("user.dir") + "/" + alphabetFolder;
 		
 		//System.out.println(a1+" ("+a1.length()+")");
 		
