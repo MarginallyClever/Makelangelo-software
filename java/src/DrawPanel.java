@@ -316,6 +316,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 	}
 
 	private void OptimizeNodes() {
+		if(instructions == null) return;
+		
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		DrawingTool tool = mc.GetTool(0);
 		

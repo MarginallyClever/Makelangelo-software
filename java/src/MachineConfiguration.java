@@ -15,6 +15,7 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -90,6 +91,8 @@ public class MachineConfiguration {
 		final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
 		final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
 		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
+		final JCheckBox m1i = new JCheckBox("Invert",MachineConfiguration.getSingleton().m1invert);
+		final JCheckBox m2i = new JCheckBox("Invert",MachineConfiguration.getSingleton().m2invert);
 
 		String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
 		final JComboBox startPos = new JComboBox(startingStrings);
@@ -114,22 +117,31 @@ public class MachineConfiguration {
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
 		
+		int y=0;
+		
 		c.weightx=0.25;
-		c.gridx=0; c.gridy=0; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
+		c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
+		y+=5;
 		
 		c.gridheight=1; c.gridwidth=1; 
-		d.anchor=GridBagConstraints.WEST;
-
-		c.gridx=0; c.gridy=5; c.gridwidth=4; c.gridheight=1;
+		c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
 		driver.add(new JLabel("All values in mm."),c);
 		c.gridwidth=1;
-		
+		y++;
+
 		c.ipadx=3;
 		c.anchor=GridBagConstraints.EAST;
-		c.gridx=0; c.gridy=6; driver.add(new JLabel("Machine width"),c);	d.gridx=1;	d.gridy=6;	driver.add(mw,d);
-		c.gridx=2; c.gridy=6; driver.add(new JLabel("Machine height"),c);	d.gridx=3;	d.gridy=6;	driver.add(mh,d);
-		c.gridx=0; c.gridy=7; driver.add(new JLabel("Paper width"),c);		d.gridx=1;	d.gridy=7;	driver.add(pw,d);
-		c.gridx=2; c.gridy=7; driver.add(new JLabel("Paper height"),c);		d.gridx=3;	d.gridy=7;	driver.add(ph,d);
+		d.anchor=GridBagConstraints.WEST;
+		c.gridx=0; c.gridy=y; driver.add(new JLabel("Machine width"),c);	d.gridx=1;	d.gridy=y;	driver.add(mw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel("Machine height"),c);	d.gridx=3;	d.gridy=y;	driver.add(mh,d);
+		y++;
+		c.gridx=0; c.gridy=y; driver.add(new JLabel("Paper width"),c);		d.gridx=1;	d.gridy=y;	driver.add(pw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel("Paper height"),c);		d.gridx=3;	d.gridy=y;	driver.add(ph,d);
+		y++;
+
+		c.gridx=0; c.gridy=y; driver.add(new JLabel("Invert left"),c);		d.gridx=1;	d.gridy=y;	driver.add(m1i,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel("Invert right"),c);		d.gridx=3;	d.gridy=y;	driver.add(m2i,d);
+		y++;
 		
 		//c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
 		//driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
@@ -153,17 +165,19 @@ public class MachineConfiguration {
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
+				
+				float pwf = Math.round( Float.valueOf(pw.getText()) * 100 ) / (100 * 10);
+				float phf = Math.round( Float.valueOf(ph.getText()) * 100 ) / (100 * 10);
+				float mwf = Math.round( Float.valueOf(mw.getText()) * 100 ) / (100 * 10);
+				float mhf = Math.round( Float.valueOf(mh.getText()) * 100 ) / (100 * 10);
+				boolean data_is_sane=true;
+				if( pwf<=0 ) data_is_sane=false;
+				if( phf<=0 ) data_is_sane=false;
+				if( mwf<=0 ) data_is_sane=false;
+				if( mhf<=0 ) data_is_sane=false;
+				
 				if(subject == save) {
-					float pwf = Math.round( Float.valueOf(pw.getText()) * 100 ) / (100 * 10);
-					float phf = Math.round( Float.valueOf(ph.getText()) * 100 ) / (100 * 10);
-					float mwf = Math.round( Float.valueOf(mw.getText()) * 100 ) / (100 * 10);
-					float mhf = Math.round( Float.valueOf(mh.getText()) * 100 ) / (100 * 10);
 					
-					boolean data_is_sane=true;
-					if( pwf<=0 ) data_is_sane=false;
-					if( phf<=0 ) data_is_sane=false;
-					if( mwf<=0 ) data_is_sane=false;
-					if( mhf<=0 ) data_is_sane=false;
 					if(data_is_sane) {
 						startingPositionIndex = startPos.getSelectedIndex();
 						/*// relative to machine limits 
@@ -249,6 +263,9 @@ public class MachineConfiguration {
 							limit_bottom= - (mhf-phf)/2;
 							break;
 						}
+
+						m1invert = m1i.isSelected();
+						m2invert = m2i.isSelected();
 						
 						SetRecentPaperSize();
 						SaveConfig();
@@ -270,17 +287,21 @@ public class MachineConfiguration {
 	}
 	
 
+	public String [] getToolNames() {
+		String[] toolNames = new String[tools.length];
+		for(int i=0;i<tools.length;++i) {
+			toolNames[i] = tools[i].GetName();
+		}
+		return toolNames;
+	}
+	
+	
 	// dialog to adjust the pen up & pen down values
 	protected void ChangeTool() {
 		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust machine size",true);
 		driver.setLayout(new GridBagLayout());
 		
-		String[] toolNames = new String[tools.length];
-		for(int i=0;i<tools.length;++i) {
-			toolNames[i] = tools[i].GetName();
-		}
-		
-		final JComboBox toolCombo = new JComboBox(toolNames);
+		final JComboBox toolCombo = new JComboBox(getToolNames());
 		toolCombo.setSelectedIndex(current_tool);
 		
 		final JButton cancel = new JButton("Cancel");

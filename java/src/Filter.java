@@ -1,5 +1,6 @@
 
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -41,11 +42,17 @@ public class Filter {
 	
 	
 	protected int decode(int pixel) {
-		//pixel=(int)( Math.min(Math.max(pixel, 0),255) );
-		float r = ((pixel>>16)&0xff);
-		float g = ((pixel>> 8)&0xff);
-		float b = ((pixel    )&0xff);
-		return (int)( (r+g+b)/3 );
+		int r = ((pixel>>16)&0xff);
+		int g = ((pixel>> 8)&0xff);
+		int b = ((pixel    )&0xff);
+		return (r+g+b)/3;
+	}
+	
+	protected int decode(Color c) {
+		int r = c.getRed();
+		int g = c.getGreen();
+		int b = c.getBlue();
+		return (r+g+b)/3;
 	}
 	
 	

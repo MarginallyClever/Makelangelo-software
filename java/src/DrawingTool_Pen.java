@@ -33,6 +33,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		
 		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
 		final JTextField penDown = new JTextField(Float.toString(z_on),5);
+		final JTextField penZRate = new JTextField(Float.toString(z_rate),5);
 		final JButton buttonTestUp = new JButton("Test");
 		final JButton buttonTestDown = new JButton("Test");
 		final JButton buttonSave = new JButton("Save");
@@ -65,6 +66,10 @@ public class DrawingTool_Pen extends DrawingTool {
 		d.gridx=1;	d.gridy=y;	driver.add(penDown,d);
 		d.gridx=2;	d.gridy=y;	driver.add(buttonTestDown,d);
 		++y;
+
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("lift speed"),c);
+		d.gridx=1;	d.gridy=y;	driver.add(penZRate,d);
+		++y;
 	
 		c.gridx=1;	c.gridy=y;	driver.add(buttonSave,c);
 		c.gridx=2;	c.gridy=y;	driver.add(buttonCancel,c);
@@ -93,6 +98,7 @@ public class DrawingTool_Pen extends DrawingTool {
 				if(subject == buttonSave) {
 					SetDiameter(Float.valueOf(penDiameter.getText()));
 					feed_rate = Float.valueOf(penFeedRate.getText());
+					z_rate = Float.valueOf(penZRate.getText());
 					z_off = Float.valueOf(penUp.getText());
 					z_on = Float.valueOf(penDown.getText());
 					MachineConfiguration.getSingleton().SaveConfig();

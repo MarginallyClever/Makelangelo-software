@@ -112,6 +112,7 @@ public class Makelangelo
 	private static final int IMAGE_SPIRAL=1;
 	private static final int IMAGE_4LEVEL=2;
 	private static final int IMAGE_SCANLINE=3;
+	private static final int IMAGE_RGB=4;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
@@ -286,6 +287,7 @@ public class Makelangelo
 			case Makelangelo.IMAGE_SPIRAL:		LoadImageSpiral(img,destinationFile);	break;
 			case Makelangelo.IMAGE_4LEVEL:		LoadImage4Level(img,destinationFile);	break;
 			case Makelangelo.IMAGE_SCANLINE:	LoadImageScanLine(img,destinationFile);	break;
+			case Makelangelo.IMAGE_RGB:         LoadImageRGB(img,destinationFile);		break;
 			}
 		}
 		catch(IOException e) {
@@ -311,6 +313,12 @@ public class Makelangelo
 		img = bw.Process(img);
 
 		Filter_CrosshatchGenerator generator = new Filter_CrosshatchGenerator(destinationFile);
+		generator.Process(img);
+	}
+	
+	
+	private void LoadImageRGB(BufferedImage img,String destinationFile) throws IOException {
+		Filter_RGBCircleGenerator generator = new Filter_RGBCircleGenerator(destinationFile);
 		generator.Process(img);
 	}
 	
@@ -554,6 +562,10 @@ public class Makelangelo
 	    Halt();
 	}
 	
+	public boolean IsFileLoaded() {
+		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
+	}
+	
 	/**
 	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
 	 * @param filename the file to push to the top of the list.
@@ -737,7 +749,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines" };
+		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines", "RGB" };
 
 		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
@@ -835,15 +847,17 @@ public class Makelangelo
 		}
 	}
 	
-	private void ChangeToTool(String toolName) {
-		int i=Integer.parseInt(toolName.replace(";",""));
-		String names[] = { "pen (tool 0)", "LED (tool 1)", "spray can (tool 2)" };
-		if(i>names.length) {
+	private void ChangeToTool(String changeToolString) {
+		int i=Integer.parseInt(changeToolString.replace(";",""));
+		
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
+		String [] toolNames = mc.getToolNames();
+		
+		if(i>toolNames.length) {
 			Log("<span style='color:red'>Invalid tool "+i+" requested.</span>");
 			i=0;
 		}
-		toolName = names[i];
-		JOptionPane.showMessageDialog(null,"Please prepare "+toolName+", then click any button to begin.");
+		JOptionPane.showMessageDialog(null,"Please prepare "+toolNames[i]+", then click any button to begin.");
 	}
 	
 	/**
