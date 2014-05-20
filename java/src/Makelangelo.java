@@ -825,6 +825,7 @@ public class Makelangelo
 		SendLineToRobot("TELEPORT X0 Y0 Z0");
 	}
 	
+	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
 		if(running==false || paused==true || gcode.fileOpened==false || portConfirmed==false || gcode.linesProcessed>=gcode.linesTotal) return;
@@ -847,6 +848,7 @@ public class Makelangelo
 		}
 	}
 	
+	
 	private void ChangeToTool(String changeToolString) {
 		int i=Integer.parseInt(changeToolString.replace(";",""));
 		
@@ -859,6 +861,7 @@ public class Makelangelo
 		}
 		JOptionPane.showMessageDialog(null,"Please prepare "+toolNames[i]+", then click any button to begin.");
 	}
+	
 	
 	/**
 	 * removes comments, processes commands drawbot shouldn't have to handle.

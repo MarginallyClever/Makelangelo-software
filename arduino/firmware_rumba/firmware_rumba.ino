@@ -638,8 +638,8 @@ void setup() {
 
 
 //------------------------------------------------------------------------------
-void loop() {
-  // See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+// See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
     buffer[sofar++]=Serial.read();
@@ -656,8 +656,13 @@ void loop() {
     // do something with the command
     processCommand();
     ready();
-  }
-  
+  } 
+}
+
+
+//------------------------------------------------------------------------------
+void loop() {
+  Serial_listen();
   SD_check();
   LCD_update();
 }

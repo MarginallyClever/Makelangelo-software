@@ -391,7 +391,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				}
 				addNodeColor(i, Color.BLUE );
 			} else if(tool.DrawIsOn()) {
-				addNodeColor(i, Color.BLACK );
+				addNodeColor(i, Color.BLACK );  // TODO use actual pen color
 			} else {
 				addNodeColor(i, Color.ORANGE );
 			}

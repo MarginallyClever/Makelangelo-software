@@ -126,14 +126,16 @@ void SD_StartPrintingFile(char *filename) {
     return;
   }
   
-  sd_printing_now=true;
-  sd_printing_paused=false;
-  sd_percent_complete=0;
-
   // count the number of lines (\n characters) for displaying % complete.
   sd_file_size=sd_print_file.size();
+  sd_bytes_read=0;
+  sd_percent_complete=0;
+
   // return to start
   sd_print_file.seek(0);
+
+  sd_printing_now=true;
+  sd_printing_paused=false;
 #endif
 }
 

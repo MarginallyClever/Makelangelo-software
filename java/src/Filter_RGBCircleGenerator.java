@@ -32,7 +32,7 @@ class Filter_RGBCircleGenerator extends Filter {
 	}
 	
 	
-	private void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	private void MoveTo(OutputStreamWriter out,int x,int y,boolean up) throws IOException {
 		float x2 = TX(x);
 		float y2 = TY(y);
 		
@@ -51,11 +51,11 @@ class Filter_RGBCircleGenerator extends Filter {
 	private int pointSample(BufferedImage img,int x,int y) {
 		Color c = new Color(img.getRGB(x, y));
 		switch(channel) {
-		case  0: return decode(c);
-		case  1: return c.getRed();
-		case  2: return c.getGreen();
-		default: return c.getBlue();
+		case 1: return c.getRed();
+		case 2: return c.getGreen();
+		case 3: return c.getBlue();
 		}
+		return decode(c);
 	}
 	
 	private int TakeImageSample(BufferedImage img,int x,int y) {
@@ -129,10 +129,8 @@ class Filter_RGBCircleGenerator extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) throws IOException {
-		int i,j;
-		int x,y;
-		double level=127;
-		int z=0;
+		int i,j,x,y,z=0;
+		double level=255.0/2.0f;
 
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
@@ -149,14 +147,14 @@ class Filter_RGBCircleGenerator extends Filter {
 		lastup=true;
 		previous_x=0;
 		previous_y=0;
-		channel=0;
 		
-		boolean allow_black = false;//true;
-		boolean allow_c1 = false;  // blue?
-		boolean allow_c2 = true;  // green
-		boolean allow_c3 = false;  // RED
+		boolean allow_black = false;
+		boolean allow_red = true;
+		boolean allow_green = true;
+		boolean allow_blue = true;
 
 		if(allow_black) {
+			channel=0;
 			Makelangelo.getSingleton().Log("<font color='green'>Generating layer 1 (black)</font>\n");
 			// create horizontal lines across the image
 			// raise and lower the pen to darken the appropriate areas
@@ -164,27 +162,27 @@ class Filter_RGBCircleGenerator extends Filter {
 			for(y=0;y<image_height;y+=steps) {
 				++i;
 				if((i%2)==0) {
-					MoveTo(out,(float)          0,(float)y,true);
+					MoveTo(out,          0,y,true);
 					for(x=0;x<image_width;++x) {
 						z=TakeImageSample(img,x,y);
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,x,y,( z > level ));
 					}
-					MoveTo(out,(float)image_width,(float)y,true);
+					MoveTo(out,image_width,y,true);
 				} else {
-					MoveTo(out,(float)image_width,(float)y,true);
+					MoveTo(out,image_width,y,true);
 					for(x=image_width-1;x>=0;--x) {
 						z=TakeImageSample(img,x,y);
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,x,y,( z > level ));
 					}
-					MoveTo(out,(float)          0,(float)y,true);
+					MoveTo(out,          0,y,true);
 				}
 			}
 		}
 
-		if(allow_c1) {
+		if(allow_red) {
+			channel=1;
 			liftPen(out);
 			tool.WriteChangeTo(out);
-			channel=1;
 	
 			Makelangelo.getSingleton().Log("<font color='green'>Generating layer 2 (green)</font>\n");
 			// create vertical lines across the image
@@ -193,27 +191,27 @@ class Filter_RGBCircleGenerator extends Filter {
 			for(x=0;x<image_width;x+=steps) {
 				++i;
 				if((i%2)==0) {
-					MoveTo(out,(float)x,(float)0           ,true);
+					MoveTo(out,x,0           ,true);
 					for(y=0;y<image_height;++y) {
 						z=TakeImageSample(img,x,y);
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,x,y,( z > level ));
 					}
-					MoveTo(out,(float)x,(float)image_height,true);
+					MoveTo(out,x,image_height,true);
 				} else {
-					MoveTo(out,(float)x,(float)image_height,true);
+					MoveTo(out,x,image_height,true);
 					for(y=image_height-1;y>=0;--y) {
 						z=TakeImageSample(img,x,y);
-						MoveTo(out,(float)x,(float)y,( z > level ));
+						MoveTo(out,x,y,( z > level ));
 					}
-					MoveTo(out,(float)x,(float)0           ,true);
+					MoveTo(out,x,0           ,true);
 				}
 			}
 		}
 
-		if(allow_c2) {
+		if(allow_green) {
+			channel=2;
 			liftPen(out);
 			tool.WriteChangeTo(out);
-			channel=2;
 	
 			Makelangelo.getSingleton().Log("<font color='green'>Generating layer 3 (green)</font>\n");
 			// create diagonal \ lines across the image
@@ -236,28 +234,28 @@ class Filter_RGBCircleGenerator extends Filter {
 				
 				if((i%2)==0)
 				{
-					MoveTo(out,(float)startx,(float)starty,true);
+					MoveTo(out,startx,starty,true);
 					for(j=0;j<=delta;++j) {
 						z=TakeImageSample(img,startx+j,starty+j);
-						MoveTo(out,(float)(startx+j),(float)(starty+j),( z > level ) );
+						MoveTo(out,(startx+j),(starty+j),( z > level ) );
 					}
-					MoveTo(out,(float)endx,(float)endy,true);
+					MoveTo(out,endx,endy,true);
 				} else {
-					MoveTo(out,(float)endx,(float)endy,true);
+					MoveTo(out,endx,endy,true);
 					for(j=0;j<=delta;++j) {
 						z=TakeImageSample(img,endx-j,endy-j);
-						MoveTo(out,(float)(endx-j),(float)(endy-j),( z > level ) );
+						MoveTo(out,(endx-j),(endy-j),( z > level ) );
 					}
-					MoveTo(out,(float)startx,(float)starty,true);
+					MoveTo(out,startx,starty,true);
 				}
 				++i;
 			}
 		}
 		
-		if(allow_c3) {
+		if(allow_blue) {
+			channel=3;
 			liftPen(out);
 			tool.WriteChangeTo(out);
-			channel=3;
 	
 			Makelangelo.getSingleton().Log("<font color='green'>Generating layer 4 (blue)</font>\n");
 			// create diagonal / lines across the image
@@ -282,19 +280,19 @@ class Filter_RGBCircleGenerator extends Filter {
 	
 				++i;
 				if((i%2)==0) {
-					MoveTo(out,(float)startx,(float)starty,true);
+					MoveTo(out,startx,starty,true);
 					for(j=0;j<=delta;++j) {
 						z=TakeImageSample(img,startx-j,starty+j);
-						MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
+						MoveTo(out,(startx-j),(starty+j),( z > level ) );
 					}
-					MoveTo(out,(float)endx,(float)endy,true);
+					MoveTo(out,endx,endy,true);
 				} else {
-					MoveTo(out,(float)endx,(float)endy,true);
+					MoveTo(out,endx,endy,true);
 					for(j=0;j<delta;++j) {
 						z=TakeImageSample(img,endx+j,endy-j);
-						MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
+						MoveTo(out,(endx+j),(endy-j),( z > level ) );
 					}
-					MoveTo(out,(float)startx,(float)starty,true);
+					MoveTo(out,startx,starty,true);
 				}
 			}
 		}
