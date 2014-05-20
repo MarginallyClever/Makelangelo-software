@@ -271,17 +271,12 @@ public class Makelangelo
 		BufferedImage img;
 		try {
 			img = ImageIO.read(new File(filename));
-		}
-		catch(IOException e) {
-			return;
-		}
-	
-		// resize & flip as needed
-		Filter_Resize rs = new Filter_Resize(); 
-		img = rs.Process(img);
-		
-		// convert with style
-		try {
+			
+			// resize & flip as needed
+			Filter_Resize rs = new Filter_Resize(); 
+			img = rs.Process(img);
+			
+			// convert with style
 			switch(GetDrawStyle()) {
 			case Makelangelo.IMAGE_TSP:			LoadImageTSP(img,destinationFile);		break;
 			case Makelangelo.IMAGE_SPIRAL:		LoadImageSpiral(img,destinationFile);	break;
@@ -291,7 +286,9 @@ public class Makelangelo
 			}
 		}
 		catch(IOException e) {
-			Makelangelo.getSingleton().Log("<font color='red'>Conversion error: "+e.getMessage()+"</font>");
+	    	Log("<span style='color:red'>File could not be opened: "+e.getLocalizedMessage()+"</span>\n");
+	    	RemoveRecentFile(filename);
+	    	return;
 		}
 	}
 
@@ -553,7 +550,7 @@ public class Makelangelo
 			   		"Estimated "+statusBar.formatTime((long)(gcode.estimated_time))+"s to draw.</font>\n");
 	    }
 	    catch(IOException e) {
-	    	Log("<span style='color:red'>File "+filename+" could not be opened.</span>\n");
+	    	Log("<span style='color:red'>File could not be opened: "+e.getLocalizedMessage()+"</span>\n");
 	    	RemoveRecentFile(filename);
 	    	return;
 	    }
@@ -615,6 +612,7 @@ public class Makelangelo
 				prefs.put("recent-files-"+i, recentFiles[i]);
 			}
 		}
+		prefs.remove("recent-files-"+(i-1));
 		
 		UpdateMenuBar();
 	}
@@ -637,14 +635,15 @@ public class Makelangelo
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
 		Log("<font color='green'>Opening file "+filename+"...</font>\n");
-		
-		if(IsFileGcode(filename)) {
+
+	   	UpdateRecentFiles(filename);
+	   	
+	   	if(IsFileGcode(filename)) {
 			LoadGCode(filename);
     	} else {
     		LoadImage(filename);
     	}
 
-	   	UpdateRecentFiles(filename);
     	previewPane.ZoomToFitPaper();
 
     	statusBar.Clear();
