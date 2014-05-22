@@ -1,3 +1,4 @@
+package DrawingTools;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
@@ -21,6 +22,9 @@ public class DrawingTool {
 	// used while drawing to the GUI
 	protected float draw_z=0;
 	
+	
+	public float GetZOn() { return z_on; }
+	public float GetZOff() { return z_off; }
 	
 	// Load a configure menu and let people adjust the tool settings
 	public void Adjust() {

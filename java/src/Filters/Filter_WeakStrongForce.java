@@ -1,6 +1,10 @@
+package Filters;
+
 
 
 import java.awt.image.BufferedImage;
+
+import Makelangelo.Point2D;
 
 
 

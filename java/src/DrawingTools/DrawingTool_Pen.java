@@ -1,11 +1,11 @@
+package DrawingTools;
+
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -13,75 +13,34 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.Makelangelo;
 
-public class DrawingTool_Spraypaint extends DrawingTool {
-	boolean is_up;
-	float old_x,old_y;
-	float overlap=0.3f;
+
+public class DrawingTool_Pen extends DrawingTool {
 	
-	DrawingTool_Spraypaint() {
-		diameter=40;
-		z_rate=80;
-		z_on=50;
-		z_off=90;
-		tool_number=2;
-		name="Spray paint";
-		feed_rate=3000;
-		
-		old_x=0;
-		old_y=0;
-	}
-
-	public void WriteOn(OutputStreamWriter out) throws IOException {
-		is_up=false;
-	}
-
-	public void WriteOff(OutputStreamWriter out) throws IOException {
-		is_up=true;
-	}
-		
-	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
-		if(is_up) {
-			out.write("G00 X"+x+" Y"+y+";\n");			
-		} else {
-			// TODO make this into a set of dots
-			//out.write("G00 X"+x+" Y"+y+";\n");
-			float dx=x-old_x;
-			float dy=y-old_y;
-			float len=(float)Math.sqrt(dx*dx+dy*dy);
-			float step=diameter*(1-overlap);
-			float r=step/2;
-			float d,px,py;
-			
-			for( d=r;d<len-r;d+=step) {
-				 px = old_x + dx * d/len;
-				 py = old_y + dy * d/len;		
-				out.write("G00 X"+px+" Y"+py+" F"+feed_rate+";\n");	
-				super.WriteOn(out);
-				super.WriteOff(out);	
-			}
-			d=len-r;
-			 px = old_x + dx * d/len;
-			 py = old_y + dy * d/len;		
-			out.write("G00 X"+px+" Y"+py+" F"+feed_rate+";\n");	
-			super.WriteOn(out);
-			super.WriteOff(out);
-		}
-		old_x=x;
-		old_y=y;
+	public DrawingTool_Pen() {
+		diameter=1.5f;
+		z_rate=120;
+		z_on=90;
+		z_off=50;
+		tool_number=0;
+		feed_rate=3500;
+		name="Pen";
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust Spraypaint",true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust Pen",true);
 		driver.setLayout(new GridBagLayout());
 
-		final JTextField penDiameter   = new JTextField(Float.toString(diameter),5);
+		final JTextField penDiameter   = new JTextField(Float.toString(GetDiameter()),5);
 		final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
 		
 		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
 		final JTextField penDown = new JTextField(Float.toString(z_on),5);
-		final JTextField penz = new JTextField(Float.toString(z_rate),5);
-		final JButton buttonTestDot = new JButton("Test");
+		final JTextField penZRate = new JTextField(Float.toString(z_rate),5);
+		final JButton buttonTestUp = new JButton("Test");
+		final JButton buttonTestDown = new JButton("Test");
 		final JButton buttonSave = new JButton("Save");
 		final JButton buttonCancel = new JButton("Cancel");
 	
@@ -105,18 +64,16 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 
 		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Up"),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penUp,d);
+		d.gridx=2;	d.gridy=y;	driver.add(buttonTestUp,d);
 		++y;
 
 		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Down"),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penDown,d);
+		d.gridx=2;	d.gridy=y;	driver.add(buttonTestDown,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Servo speed"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penz,d);
-		++y;
-
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Make a dot"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(buttonTestDot,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("lift speed"),c);
+		d.gridx=1;	d.gridy=y;	driver.add(penZRate,d);
 		++y;
 	
 		c.gridx=1;	c.gridy=y;	driver.add(buttonSave,c);
@@ -137,16 +94,18 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
 				
-				if(subject == buttonTestDot) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
+				if(subject == buttonTestUp) {
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penUp.getText());
+				}
+				if(subject == buttonTestDown) {
+					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penDown.getText());
 				}
 				if(subject == buttonSave) {
-					diameter = Float.valueOf(penDiameter.getText());
+					SetDiameter(Float.valueOf(penDiameter.getText()));
 					feed_rate = Float.valueOf(penFeedRate.getText());
+					z_rate = Float.valueOf(penZRate.getText());
 					z_off = Float.valueOf(penUp.getText());
 					z_on = Float.valueOf(penDown.getText());
-					z_rate = Float.valueOf(penz.getText());
 					MachineConfiguration.getSingleton().SaveConfig();
 					driver.dispose();
 				}
@@ -156,7 +115,8 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 			}
 		};
 		
-		buttonTestDot.addActionListener(driveButtons);
+		buttonTestUp.addActionListener(driveButtons);
+		buttonTestDown.addActionListener(driveButtons);
 		
 		buttonSave.addActionListener(driveButtons);
 		buttonCancel.addActionListener(driveButtons);
@@ -165,4 +125,5 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		driver.pack();
 		driver.setVisible(true);
 	}
+
 }

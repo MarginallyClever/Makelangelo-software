@@ -1,17 +1,19 @@
+package Makelangelo;
 
-public class Point2D {
-	float x, y;
+public class Point3D {
+	public float x, y, z;
 	
-	public Point2D(float xx,float yy) {
-		set(xx,yy);
+	public Point3D(float xx,float yy,float zz) {
+		set(xx,yy,zz);
 	}
-	public Point2D(double xx,double yy) {
-		set((float)xx,(float)yy);
+	public Point3D(double xx,double yy,double zz) {
+		set((float)xx,(float)yy,(float)zz);
 	}
 	
-	public void set(float xx,float yy) {
+	public void set(float xx,float yy,float zz) {
 		x=xx;
 		y=yy;
+		z=zz;
 	}
 }
 

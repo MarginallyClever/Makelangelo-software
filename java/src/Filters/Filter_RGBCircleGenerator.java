@@ -1,3 +1,5 @@
+package Filters;
+
 
 
 import java.awt.Color;
@@ -8,12 +10,16 @@ import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.Makelangelo;
+import Makelangelo.Point2D;
+
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-class Filter_RGBCircleGenerator extends Filter {
+public class Filter_RGBCircleGenerator extends Filter {
 	// file properties
 	String dest;
 	
@@ -27,7 +33,7 @@ class Filter_RGBCircleGenerator extends Filter {
 	int channel;
 
 	
-	Filter_RGBCircleGenerator(String _dest) {
+	public Filter_RGBCircleGenerator(String _dest) {
 		dest=_dest;
 	}
 	

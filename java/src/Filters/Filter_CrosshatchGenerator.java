@@ -1,4 +1,9 @@
+package Filters;
 
+
+import Makelangelo.Makelangelo;
+import Makelangelo.Point2D;
+import Makelangelo.MachineConfiguration;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
@@ -7,9 +12,16 @@ import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
 
-
-public class Filter_ScanlineGenerator extends Filter {
+/**
+ * Generate a Gcode file from the BufferedImage supplied.<br>
+ * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
+ * @author Dan
+ */
+public class Filter_CrosshatchGenerator extends Filter {
+	// file properties
 	String dest;
+	
+	// conversion tools
 	int numPoints;
 	Point2D[] points = null;
 	int scount;
@@ -18,7 +30,7 @@ public class Filter_ScanlineGenerator extends Filter {
 	float previous_x,previous_y;
 
 	
-	Filter_ScanlineGenerator(String _dest) {
+	public Filter_CrosshatchGenerator(String _dest) {
 		dest=_dest;
 	}
 	
@@ -32,9 +44,9 @@ public class Filter_ScanlineGenerator extends Filter {
 			previous_y=y2;
 		} else {
 			tool.WriteMoveTo(out,previous_x,previous_y);
-			tool.WriteMoveTo(out,x2,y2);
 			if(up) liftPen(out);
 			else   lowerPen(out);
+			tool.WriteMoveTo(out,x2,y2);
 			lastup=up;
 		}
 	}
@@ -112,9 +124,9 @@ public class Filter_ScanlineGenerator extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) throws IOException {
-		int i;
+		int i,j;
 		int x,y;
-		double leveladd = 255.0/2.0;
+		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		int z=0;
 
@@ -122,13 +134,12 @@ public class Filter_ScanlineGenerator extends Filter {
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		ImageStart(img,out);
-
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
+		
+		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
 		if(steps<1) steps=1;
 		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
-		
 		tool.WriteChangeTo(out);
 		liftPen(out);
 		lastup=true;
@@ -158,9 +169,114 @@ public class Filter_ScanlineGenerator extends Filter {
 			}
 		}
 		level+=leveladd;
-		
-		// lift pen and return to home
+
+
+		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
+		// create vertical lines across the image
+		// raise and lower the pen to darken the appropriate areas
+		i=0;
+		for(x=0;x<image_width;x+=steps) {
+			++i;
+			if((i%2)==0) {
+				MoveTo(out,(float)x,(float)0           ,true);
+				for(y=0;y<image_height;++y) {
+					z=TakeImageSample(img,x,y);
+					MoveTo(out,(float)x,(float)y,( z >= level ));
+				}
+				MoveTo(out,(float)x,(float)image_height,true);
+			} else {
+				MoveTo(out,(float)x,(float)image_height,true);
+				for(y=image_height-1;y>=0;--y) {
+					z=TakeImageSample(img,x,y);
+					MoveTo(out,(float)x,(float)y,( z >= level ));
+				}
+				MoveTo(out,(float)x,(float)0           ,true);
+			}
+		}
+		level+=leveladd;
+
+
+		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
+		// create diagonal \ lines across the image
+		// raise and lower the pen to darken the appropriate areas
+		i=0;
+		for(x=-(image_height-1);x<image_width;x+=steps) {
+			int endx=image_height-1+x;
+			int endy=image_height-1;
+			if(endx >= image_width) {
+				endy -= endx - (image_width-1);
+				endx = image_width-1;
+			}
+			int startx=x;
+			int starty=0;
+			if( startx < 0 ) {
+				starty -= startx;
+				startx=0;
+			}
+			int delta=endy-starty;
+			
+			if((i%2)==0)
+			{
+				MoveTo(out,(float)startx,(float)starty,true);
+				for(j=0;j<=delta;++j) {
+					z=TakeImageSample(img,startx+j,starty+j);
+					MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
+				}
+				MoveTo(out,(float)endx,(float)endy,true);
+			} else {
+				MoveTo(out,(float)endx,(float)endy,true);
+				for(j=0;j<=delta;++j) {
+					z=TakeImageSample(img,endx-j,endy-j);
+					MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
+				}
+				MoveTo(out,(float)startx,(float)starty,true);
+			}
+			++i;
+		}
+		level+=leveladd;
+
+
+		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
+		// create diagonal / lines across the image
+		// raise and lower the pen to darken the appropriate areas
+		i=0;
+		for(x=0;x<image_width+image_height;x+=steps) {
+			int endx=0;
+			int endy=x;
+			if( endy >= image_height ) {
+				endx += endy - (image_height-1);
+				endy = image_height-1;
+			}
+			int startx=x;
+			int starty=0;
+			if( startx >= image_width ) {
+				starty += startx - (image_width-1);
+				startx=image_width-1;
+			}
+			int delta=endy-starty;
+			
+			assert( (startx-endx) == (starty-endy) );
+
+			++i;
+			if((i%2)==0) {
+				MoveTo(out,(float)startx,(float)starty,true);
+				for(j=0;j<=delta;++j) {
+					z=TakeImageSample(img,startx-j,starty+j);
+					MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
+				}
+				MoveTo(out,(float)endx,(float)endy,true);
+			} else {
+				MoveTo(out,(float)endx,(float)endy,true);
+				for(j=0;j<delta;++j) {
+					z=TakeImageSample(img,endx+j,endy-j);
+					MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
+				}
+				MoveTo(out,(float)startx,(float)starty,true);
+			}
+		}
+
 		liftPen(out);
+		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
 		
@@ -168,6 +284,15 @@ public class Filter_ScanlineGenerator extends Filter {
 		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
 		Makelangelo.getSingleton().PlayConversionFinishedSound();
 		Makelangelo.getSingleton().LoadGCode(dest);
+	}
+	
+	
+	protected void SignName(OutputStreamWriter out) throws IOException {
+		TextSetAlign(Align.RIGHT);
+		TextSetVAlign(VAlign.BOTTOM);
+		TextSetPosition(image_width, image_height);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
+		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 	}
 }
 

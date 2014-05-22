@@ -1,3 +1,4 @@
+package Makelangelo;
 import java.util.prefs.Preferences;
 
 public class PublishImage {

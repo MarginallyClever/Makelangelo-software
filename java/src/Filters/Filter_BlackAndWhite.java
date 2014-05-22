@@ -1,3 +1,4 @@
+package Filters;
 
 import java.awt.image.BufferedImage;
 
@@ -10,7 +11,7 @@ import java.awt.image.BufferedImage;
 public class Filter_BlackAndWhite extends Filter {
 	double levels=2;
 
-	Filter_BlackAndWhite(int _levels) {
+	public Filter_BlackAndWhite(int _levels) {
 		levels = (double)_levels;
 	}
 	

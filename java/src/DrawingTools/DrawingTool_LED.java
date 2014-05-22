@@ -1,10 +1,11 @@
+package DrawingTools;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 
 public class DrawingTool_LED extends DrawingTool {
-	DrawingTool_LED() {
+	public DrawingTool_LED() {
 		diameter=4;
 		name="LED";
 		z_on=180;

@@ -1,3 +1,4 @@
+package Makelangelo;
 /**@(#)drawbotGUI.java
  *
  * drawbot application with GUI
@@ -75,6 +76,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
+import Filters.Filter_BlackAndWhite;
+import Filters.Filter_CrosshatchGenerator;
+import Filters.Filter_DitherFloydSteinberg;
+import Filters.Filter_RGBCircleGenerator;
+import Filters.Filter_Resize;
+import Filters.Filter_ScanlineGenerator;
+import Filters.Filter_Spiral;
+import Filters.Filter_TSPGcodeGenerator;
+import Filters.Filter_YourMessageHere;
 
 // TODO while not drawing, in-app gcode editing with immediate visusal feedback 
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling
@@ -1433,13 +1444,8 @@ public class Makelangelo
         menu.add(buttonExit);
         
         
-
-        // settings menu
-        menu = new JMenu("Settings");
-        menu.setMnemonic(KeyEvent.VK_T);
-        menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
-
-        subMenu = new JMenu("Port");
+        // Connect menu
+        subMenu = new JMenu("Connect");
         subMenu.getAccessibleContext().setAccessibleDescription("What port to connect to?");
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
@@ -1468,7 +1474,12 @@ public class Makelangelo
         buttonDisconnect.setEnabled(portOpened);
         subMenu.add(buttonDisconnect);
         
-        menu.add(subMenu);
+        menuBar.add(subMenu);
+
+        // settings menu
+        menu = new JMenu("Settings");
+        menu.setMnemonic(KeyEvent.VK_T);
+        menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
 
         buttonAdjustMachineSize = new JMenuItem("Adjust machine size",KeyEvent.VK_L);
         buttonAdjustMachineSize.addActionListener(this);

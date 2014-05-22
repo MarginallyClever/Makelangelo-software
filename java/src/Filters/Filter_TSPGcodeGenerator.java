@@ -1,3 +1,4 @@
+package Filters;
 
 
 import java.awt.Toolkit;
@@ -12,13 +13,18 @@ import java.text.DecimalFormat;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
+import DrawingTools.DrawingTool;
+import Makelangelo.MachineConfiguration;
+import Makelangelo.Makelangelo;
+import Makelangelo.Point2D;
+
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
+public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
 	// file properties
 	String dest;
 	// processing tools
@@ -59,10 +65,13 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 				if( old_len > len ) {
 					old_len=len;
 					DecimalFormat flen=new DecimalFormat("#.##");
-					String c="white";
-					if(color==0) c="yellow";
-					if(color==1) c="blue";
-					if(color==2) c="red";
+					String c;
+					switch(color) {
+					case  0: c="yellow";  break;
+					case  1: c="blue";    break;
+					case  2: c="red";	  break;
+					default: c="white";   break;
+					}
 					Makelangelo.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
 				}
 				progress = new_progress;
@@ -251,7 +260,7 @@ class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener 
 	}
 
 	
-	Filter_TSPGcodeGenerator(String _dest) {
+	public Filter_TSPGcodeGenerator(String _dest) {
 		dest=_dest;
 	}
 	

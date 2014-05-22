@@ -1,3 +1,4 @@
+package Makelangelo;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
+
+import DrawingTools.DrawingTool;
 
 
 	// Custom drawing panel written as an inner class to access the instance variables.

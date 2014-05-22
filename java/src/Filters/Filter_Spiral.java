@@ -1,3 +1,5 @@
+package Filters;
+
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
@@ -6,12 +8,16 @@ import java.io.IOException;
 
 import javax.swing.ProgressMonitor;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.Makelangelo;
+import Makelangelo.Point2D;
+
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-class Filter_Spiral extends Filter {
+public class Filter_Spiral extends Filter {
 	// file properties
 	String dest;
 	// processing tools
@@ -22,7 +28,7 @@ class Filter_Spiral extends Filter {
 	ProgressMonitor pm;
 
 	
-	Filter_Spiral(String _dest) {
+	public Filter_Spiral(String _dest) {
 		dest=_dest;
 	}
 

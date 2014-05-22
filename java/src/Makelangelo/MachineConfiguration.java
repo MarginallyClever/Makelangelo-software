@@ -1,3 +1,4 @@
+package Makelangelo;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -21,10 +22,16 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import DrawingTools.DrawingTool;
+import DrawingTools.DrawingTool_LED;
+import DrawingTools.DrawingTool_Pen;
+import DrawingTools.DrawingTool_Spraypaint;
+
 
 public class MachineConfiguration {
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	
+	static final String CURRENT_VERSION = "1";
 	// GUID
 	public long robot_uid=0;
 	
@@ -78,6 +85,8 @@ public class MachineConfiguration {
 		tools[0]=new DrawingTool_Pen();
 		tools[1]=new DrawingTool_LED();
 		tools[2]=new DrawingTool_Spraypaint();
+		
+		VersionCheck();
 	}
 	
 	/**
@@ -103,7 +112,7 @@ public class MachineConfiguration {
 		
 		BufferedImage myPicture = null;
 		try {
-			InputStream s = Makelangelo.class.getResourceAsStream("limits.png");
+			InputStream s = Makelangelo.class.getResourceAsStream("/limits.png");
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
@@ -419,27 +428,35 @@ public class MachineConfiguration {
 	}
 
 	
+	protected void VersionCheck() {
+		String version = prefs.get("version", CURRENT_VERSION);
+		if( version.equals(CURRENT_VERSION) == false ) {
+			prefs.put("version", CURRENT_VERSION);
+		}
+	}
+	
+	
 	// Load the machine configuration
 	void LoadConfig() {
-		String id=Long.toString(robot_uid);
-		limit_top = Double.valueOf(prefs.get(id+"_limit_top", "58.8"));
-		limit_bottom = Double.valueOf(prefs.get(id+"_limit_bottom", "-58.8"));
-		limit_left = Double.valueOf(prefs.get(id+"_limit_left", "-44.1"));
-		limit_right = Double.valueOf(prefs.get(id+"_limit_right", "44.1"));
-		m1invert=Boolean.parseBoolean(prefs.get(id+"_m1invert", "false"));
-		m2invert=Boolean.parseBoolean(prefs.get(id+"_m2invert", "false"));
-		bobbin_left_diameter=Double.valueOf(prefs.get(id+"_bobbin_left_diameter", "1.5"));
-		bobbin_right_diameter=Double.valueOf(prefs.get(id+"_bobbin_right_diameter", "1.5"));
-		default_feed_rate=Double.valueOf(prefs.get(id+"_feed_rate","2000"));
-		startingPositionIndex=Integer.valueOf(prefs.get(id+"_startingPosIndex","4"));
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
+		limit_top = Double.valueOf(prefs2.get("limit_top", "45.72"));
+		limit_bottom = Double.valueOf(prefs2.get("limit_bottom", "-45.72"));
+		limit_left = Double.valueOf(prefs2.get("limit_left", "-45.72"));
+		limit_right = Double.valueOf(prefs2.get("limit_right", "45.72"));
+		m1invert=Boolean.parseBoolean(prefs2.get("m1invert", "false"));
+		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", "false"));
+		bobbin_left_diameter=Double.valueOf(prefs2.get("bobbin_left_diameter", "3.0"));
+		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", "3.0"));
+		default_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));
+		startingPositionIndex=Integer.valueOf(prefs2.get("startingPosIndex","4"));
 		// TODO move these values to image filter preferences
-		paper_margin = Double.valueOf(prefs.get(id+"_paper_margin","0.85"));
-		reverseForGlass = Boolean.parseBoolean(prefs.get(id+"_reverseForGlass","false"));
-		current_tool = Integer.parseInt(prefs.get(id+"_current_tool","0"),10);
+		paper_margin = Double.valueOf(prefs2.get("paper_margin","0.85"));
+		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass","false"));
+		current_tool = Integer.parseInt(prefs2.get("current_tool","0"),10);
 		
 		// load each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].LoadConfig(prefs);
+			tools[i].LoadConfig(prefs2);
 		}
 
 		GetRecentPaperSize();
@@ -447,26 +464,26 @@ public class MachineConfiguration {
 
 	
 	// Save the machine configuration
-	void SaveConfig() {
-		String id=Long.toString(robot_uid);
-		prefs.put(id+"_limit_top", Double.toString(limit_top));
-		prefs.put(id+"_limit_bottom", Double.toString(limit_bottom));
-		prefs.put(id+"_limit_right", Double.toString(limit_right));
-		prefs.put(id+"_limit_left", Double.toString(limit_left));
-		prefs.put(id+"_m1invert",Boolean.toString(m1invert));
-		prefs.put(id+"_m2invert",Boolean.toString(m2invert));
-		prefs.put(id+"_bobbin_left_diameter", Double.toString(bobbin_left_diameter));
-		prefs.put(id+"_bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		prefs.put(id+"_feed_rate", Double.toString(default_feed_rate));
-		prefs.put(id+"_startingPosIndex", Integer.toString(startingPositionIndex));
+	public void SaveConfig() {
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
+		prefs2.put("limit_top", Double.toString(limit_top));
+		prefs2.put("limit_bottom", Double.toString(limit_bottom));
+		prefs2.put("limit_right", Double.toString(limit_right));
+		prefs2.put("limit_left", Double.toString(limit_left));
+		prefs2.put("m1invert",Boolean.toString(m1invert));
+		prefs2.put("m2invert",Boolean.toString(m2invert));
+		prefs2.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
+		prefs2.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
+		prefs2.put("feed_rate", Double.toString(default_feed_rate));
+		prefs2.put("startingPosIndex", Integer.toString(startingPositionIndex));
 		// TODO move these values to image filter preferences
-		prefs.put(id+"_paper_margin", Double.toString(paper_margin));
-		prefs.put(id+"_reverseForGlass",Boolean.toString(reverseForGlass));
-		prefs.put(id+"_current_tool", Integer.toString(current_tool));
+		prefs2.put("paper_margin", Double.toString(paper_margin));
+		prefs2.put("reverseForGlass",Boolean.toString(reverseForGlass));
+		prefs2.put("current_tool", Integer.toString(current_tool));
 		
 		// TODO: save each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].SaveConfig(prefs);
+			tools[i].SaveConfig(prefs2);
 		}
 		
 		SetRecentPaperSize();
@@ -474,12 +491,12 @@ public class MachineConfiguration {
 
 
 	
-	String GetBobbinLine() {
+	public String GetBobbinLine() {
 		return new String("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
 	}
 
 	
-	String GetConfigLine() {
+	public String GetConfigLine() {
 		return new String("CONFIG T"+limit_top
 		+" B"+limit_bottom
 		+" L"+limit_left
@@ -489,29 +506,29 @@ public class MachineConfiguration {
 	}
 	
 	
-	String getPenUpString() {
-		return Float.toString(tools[current_tool].z_off);
+	public String getPenUpString() {
+		return Float.toString(tools[current_tool].GetZOff());
 	}
 	
-	String getPenDownString() {
-		return Float.toString(tools[current_tool].z_on);
+	public String getPenDownString() {
+		return Float.toString(tools[current_tool].GetZOn());
 	}
 	
 	// save paper limits
 	private void SetRecentPaperSize() {
-		String id=Long.toString(robot_uid);
-		prefs.putDouble(id+"_paper_left", paper_left);
-		prefs.putDouble(id+"_paper_right", paper_right);
-		prefs.putDouble(id+"_paper_top", paper_top);
-		prefs.putDouble(id+"_paper_bottom", paper_bottom);
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
+		prefs2.putDouble("paper_left", paper_left);
+		prefs2.putDouble("paper_right", paper_right);
+		prefs2.putDouble("paper_top", paper_top);
+		prefs2.putDouble("paper_bottom", paper_bottom);
 	}
 	
 	private void GetRecentPaperSize() {
-		String id = Long.toString(robot_uid);
-		paper_left=Double.parseDouble(prefs.get(id+"_paper_left","0"));
-		paper_right=Double.parseDouble(prefs.get(id+"_paper_right","0"));
-		paper_top=Double.parseDouble(prefs.get(id+"_paper_top","0"));
-		paper_bottom=Double.parseDouble(prefs.get(id+"_paper_bottom","0"));
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
+		paper_left=Double.parseDouble(prefs2.get("paper_left","-10.5"));
+		paper_right=Double.parseDouble(prefs2.get("paper_right","10.5"));
+		paper_top=Double.parseDouble(prefs2.get("paper_top","14.85"));
+		paper_bottom=Double.parseDouble(prefs2.get("paper_bottom","-14.85"));
 	}
 	
 	public boolean IsPaperConfigured() {
@@ -519,6 +536,8 @@ public class MachineConfiguration {
 	}
 	
 	public void ParseRobotUID(String line) {
+		SaveConfig();
+		
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
 		if(lines.length>0) {
@@ -530,11 +549,11 @@ public class MachineConfiguration {
 		
 		// new robots have UID=0
 		if(robot_uid==0) GetNewRobotUID();
-
+		
 		// load machine specific config
-		GetRecentPaperSize();
 		LoadConfig();
 		if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
+			// probably first time turning on, adjust the machine size
 			AdjustMachineSize();
 		}
 	}
@@ -554,6 +573,9 @@ public class MachineConfiguration {
 
 		// did read go ok?
 		if(robot_uid!=0) {
+			// make sure a prefs node is created
+			prefs.node("Machines").node(Long.toString(robot_uid));
+			// tell the robot it's new UID.
 			Makelangelo.getSingleton().SendLineToRobot("UID "+robot_uid);
 		}
 	}

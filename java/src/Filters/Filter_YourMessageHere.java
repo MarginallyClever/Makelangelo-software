@@ -1,3 +1,5 @@
+package Filters;
+
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -11,6 +13,9 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import Makelangelo.MachineConfiguration;
+import Makelangelo.Makelangelo;
 
 
 public class Filter_YourMessageHere extends Filter {
