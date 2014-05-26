@@ -113,8 +113,12 @@ public class Makelangelo
 	private boolean portConfirmed=false;
 	// Serial communication
 	static private final String cue = "> ";
-	static private final String eol = ";";
 	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
+	static private final String badchecksum = "BADCHECKSUM ";
+	static private final String badlinenum = "BADLINENUM ";
+	
+	// parsing input from Makelangelo
+	private String serial_recv_buffer="";
 	
 	// Image processing preferences
 	private static final int IMAGE_TSP=0;
@@ -161,9 +165,6 @@ public class Makelangelo
     private DrawPanel previewPane;
 	private StatusBar statusBar;
 	private JPanel drivePane;
-	
-	// parsing input from Drawbot
-	private String line3="";
 
 	// reading file
 	private boolean running=false;
@@ -444,15 +445,35 @@ public class Makelangelo
 	}
 
 	/**
+	 * Check if the robot reports an error and if so what line number 
+	 * @return
+	 */
+	protected int ErrorReported() {
+		if(portConfirmed==false) return -1;
+		
+		if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
+			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
+			return Integer.decode(after_error);
+		}
+		if( serial_recv_buffer.lastIndexOf(badlinenum) != -1 ) {
+			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badlinenum) + badlinenum.length());
+			return Integer.decode(after_error);
+		}
+		
+		return -1;
+	}
+	
+	
+	/**
 	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
 	 * @return true if handshake succeeds.
 	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		if(line3.lastIndexOf(hello) >= 0) {
+		if(serial_recv_buffer.lastIndexOf(hello) >= 0) {
 			portConfirmed=true;
 			
-			String after_hello = line3.substring(line3.lastIndexOf(hello) + hello.length());
+			String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
 			MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
 			
 			mainframe.setTitle("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().robot_uid)+" connected");
@@ -882,7 +903,8 @@ public class Makelangelo
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		if(line.trim().equals("")) return;
-		Log("<font color='white'>"+line+"</font>");
+		String [] visible = line.split("[*]");
+		Log("<font color='white'>"+visible[0]+"</font>");
 		line += "\n";
 		
 		try {
@@ -1112,11 +1134,17 @@ public class Makelangelo
 					if( len>0 ) {
 						String line2 = new String(buffer,0,len);
 						Log("<span style='color:#FFA500'>"+line2.replace("\n","<br>")+"</span>");
-						line3+=line2;
+						serial_recv_buffer+=line2;
 						// wait for the cue ("> ") to send another command
-						if(line3.lastIndexOf(cue)!=-1) {
+						if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
+							int error_line = ErrorReported();
+							if(error_line != -1) {
+								gcode.linesProcessed = error_line;
+								serial_recv_buffer="";
+								SendFileCommand();
+							}
 							if(ConfirmPort()) {
-								line3="";
+								serial_recv_buffer="";
 								SendFileCommand();
 							}
 						}

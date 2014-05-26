@@ -508,7 +508,8 @@ void processCommand() {
   if(cmd!=-1) {
     if( cmd != line_number ) {
       // wrong line number error
-      Serial.println(F("BADLINENUM"));
+      Serial.print(F("BADLN "));
+      Serial.println(line_number);
       return;
     }
     
