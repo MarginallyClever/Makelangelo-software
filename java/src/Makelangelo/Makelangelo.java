@@ -77,9 +77,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import Filters.Filter_BlackAndWhite;
 import Filters.Filter_CrosshatchGenerator;
-import Filters.Filter_DitherFloydSteinberg;
 import Filters.Filter_RGBCircleGenerator;
 import Filters.Filter_Resize;
 import Filters.Filter_ScanlineGenerator;
@@ -289,11 +287,11 @@ public class Makelangelo
 			
 			// convert with style
 			switch(GetDrawStyle()) {
-			case Makelangelo.IMAGE_TSP:			LoadImageTSP(img,destinationFile);		break;
-			case Makelangelo.IMAGE_SPIRAL:		LoadImageSpiral(img,destinationFile);	break;
-			case Makelangelo.IMAGE_4LEVEL:		LoadImage4Level(img,destinationFile);	break;
-			case Makelangelo.IMAGE_SCANLINE:	LoadImageScanLine(img,destinationFile);	break;
-			case Makelangelo.IMAGE_RGB:         LoadImageRGB(img,destinationFile);		break;
+			case Makelangelo.IMAGE_TSP:			(new Filter_TSPGcodeGenerator  (destinationFile)).Process(img);		break;
+			case Makelangelo.IMAGE_SPIRAL:		(new Filter_Spiral             (destinationFile)).Process(img);		break;
+			case Makelangelo.IMAGE_4LEVEL:		(new Filter_CrosshatchGenerator(destinationFile)).Process(img);		break;
+			case Makelangelo.IMAGE_SCANLINE:	(new Filter_ScanlineGenerator  (destinationFile)).Process(img);		break;
+			case Makelangelo.IMAGE_RGB:         (new Filter_RGBCircleGenerator (destinationFile)).Process(img);		break;
 			}
 		}
 		catch(IOException e) {
@@ -301,54 +299,6 @@ public class Makelangelo
 	    	RemoveRecentFile(filename);
 	    	return;
 		}
-	}
-
-	
-	private void LoadImageTSP(BufferedImage img,String destinationFile) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.Process(img);
-		
-		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
-		img = dither.Process(img);
-
-		Filter_TSPGcodeGenerator generator = new Filter_TSPGcodeGenerator(destinationFile);
-		generator.Process(img);
-	}
-	
-	
-	private void LoadImage4Level(BufferedImage img,String destinationFile) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
-		img = bw.Process(img);
-
-		Filter_CrosshatchGenerator generator = new Filter_CrosshatchGenerator(destinationFile);
-		generator.Process(img);
-	}
-	
-	
-	private void LoadImageRGB(BufferedImage img,String destinationFile) throws IOException {
-		Filter_RGBCircleGenerator generator = new Filter_RGBCircleGenerator(destinationFile);
-		generator.Process(img);
-	}
-	
-	
-	private void LoadImageSpiral(BufferedImage img,String destinationFile) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
-		img = bw.Process(img);
-
-		Filter_Spiral generator = new Filter_Spiral(destinationFile);
-		generator.Process(img);
-	}
-
-	
-	private void LoadImageScanLine(BufferedImage img,String destinationFile) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.Process(img);
-		
-		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
-		img = dither.Process(img);
-
-		Filter_ScanlineGenerator generator = new Filter_ScanlineGenerator(destinationFile);
-		generator.Process(img);
 	}
 	
 	
@@ -929,6 +879,19 @@ public class Makelangelo
 		
 		return false;
 	}
+	
+	
+	protected String AddLengthAndChecksum(String line) {
+		char checksum=0;
+		
+		int len = line.length();
+		for( int i=0; i<len; ++i ) {
+			checksum ^= line.charAt(i);
+		}
+		
+		return ""+len+line+checksum;
+	}
+	
 
 	/**
 	 * Sends a single command the robot.  Could be anything.
@@ -938,10 +901,14 @@ public class Makelangelo
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		
+		if(line.trim().equals("")) return;
+		
 		if(!line.endsWith(";") && !line.endsWith(";\n")) {
 			line+=eol;
 		}
 		Log("<font color='white'>"+line+"</font>");
+		//if(checksum_on) line = AddLengthAndChecksum(line);
+		
 		try {
 			out.write(line.getBytes());
 		}
@@ -1461,7 +1428,7 @@ public class Makelangelo
             group.add(buttonPorts[i]);
             subMenu.add(buttonPorts[i]);
         }
- 
+        
         subMenu.addSeparator();
 
         buttonRescan = new JMenuItem("Rescan",KeyEvent.VK_N);

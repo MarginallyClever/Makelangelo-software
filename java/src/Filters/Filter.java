@@ -46,6 +46,9 @@ public class Filter {
 	protected float posy=0;
 	
 	
+	public void Generate(String dest) {}
+	
+	
 	protected int decode(int pixel) {
 		int r = ((pixel>>16)&0xff);
 		int g = ((pixel>> 8)&0xff);

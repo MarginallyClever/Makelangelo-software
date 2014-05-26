@@ -423,6 +423,12 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) {
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		img = bw.Process(img);
+		
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		img = dither.Process(img);
+
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		tool = mc.GetCurrentTool();
 		ImageSetupTransform(img);

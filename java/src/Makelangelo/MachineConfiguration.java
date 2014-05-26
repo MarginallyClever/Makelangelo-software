@@ -444,7 +444,7 @@ public class MachineConfiguration {
 		limit_left = Double.valueOf(prefs2.get("limit_left", "-45.72"));
 		limit_right = Double.valueOf(prefs2.get("limit_right", "45.72"));
 		m1invert=Boolean.parseBoolean(prefs2.get("m1invert", "false"));
-		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", "false"));
+		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", "true"));
 		bobbin_left_diameter=Double.valueOf(prefs2.get("bobbin_left_diameter", "3.0"));
 		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", "3.0"));
 		default_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));

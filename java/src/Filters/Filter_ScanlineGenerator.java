@@ -21,7 +21,10 @@ public class Filter_ScanlineGenerator extends Filter {
 	boolean lastup;
 	ProgressMonitor pm;
 	float previous_x,previous_y;
-
+	
+	// image preprocess
+	boolean dither_first=false;
+	
 	
 	public Filter_ScanlineGenerator(String _dest) {
 		dest=_dest;
@@ -122,6 +125,14 @@ public class Filter_ScanlineGenerator extends Filter {
 		double leveladd = 255.0/2.0;
 		double level=leveladd;
 		int z=0;
+
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		img = bw.Process(img);
+		
+		if(dither_first) {
+			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+			img = dither.Process(img);
+		}
 
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");

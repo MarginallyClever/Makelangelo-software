@@ -1,5 +1,6 @@
 *.class
 *.DS_Store
+*.ngc
 
 java/DrawbotGUI.jar
 
@@ -9,8 +10,4 @@ java/Windows/log.html
 
 java/OSX/log.html
 
-javatemp.ngc
-
-java/OSXtemp.ngc
-
-java/temp.ngc
+gcode/*

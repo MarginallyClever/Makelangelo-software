@@ -130,6 +130,9 @@ public class Filter_CrosshatchGenerator extends Filter {
 		double level=leveladd;
 		int z=0;
 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
+		img = bw.Process(img);
+
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
