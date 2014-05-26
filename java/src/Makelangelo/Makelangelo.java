@@ -794,7 +794,14 @@ public class Makelangelo
 		do {			
 			// are there any more commands?
 			// @TODO: find out how far the pen moved each line and add it to the distance total.
-			line=gcode.lines.get((int)gcode.linesProcessed++).trim();
+			int line_number = gcode.linesProcessed;
+			gcode.linesProcessed++;
+			line=gcode.lines.get(line_number).trim();
+			if(line.length()>3) {
+				line="N"+line_number+" "+line;
+			}
+			line += GenerateChecksum(line);
+			
 			previewPane.setLinesProcessed(gcode.linesProcessed);
 			statusBar.SetProgress(gcode.linesProcessed, gcode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
@@ -849,31 +856,8 @@ public class Makelangelo
 			Halt();
 			return false;
 		}
-
-		if(Arrays.asList(tokens).contains("M18")) {
-		  // Handle M18 (disable motors)
-		  SendLineToRobot(line);
-		  return true;
-        }
 		
-		// other machine code to ignore?
-		if(tokens[0].startsWith("M")) {
-			Log("<span style='color:pink'>"+line+"</span>\n");
-			return true;
-		} 
-
-		// contains a comment?  if so remove it
-		int index=line.indexOf('(');
-		if(index!=-1) {
-			String comment=line.substring(index+1,line.lastIndexOf(')'));
-			line=line.substring(0,index).trim();
-			Log("<font color='grey'>* "+comment+"</font\n");
-			if(line.length()==0) {
-				// entire line was a comment.
-				return true;  // still ready to send
-			}
-		}
-
+		
 		// send relevant part of line to the robot
 		SendLineToRobot(line);
 		
@@ -881,15 +865,14 @@ public class Makelangelo
 	}
 	
 	
-	protected String AddLengthAndChecksum(String line) {
+	protected String GenerateChecksum(String line) {
 		char checksum=0;
 		
-		int len = line.length();
-		for( int i=0; i<len; ++i ) {
+		for( int i=0; i<line.length(); ++i ) {
 			checksum ^= line.charAt(i);
 		}
 		
-		return ""+len+line+checksum;
+		return "*"+checksum;
 	}
 	
 
@@ -907,7 +890,6 @@ public class Makelangelo
 			line+=eol;
 		}
 		Log("<font color='white'>"+line+"</font>");
-		//if(checksum_on) line = AddLengthAndChecksum(line);
 		
 		try {
 			out.write(line.getBytes());
@@ -922,7 +904,6 @@ public class Makelangelo
 	public void Halt() {
 		running=false;
 		paused=false;
-		gcode.linesProcessed=0;
 	    previewPane.setLinesProcessed(0);
 		previewPane.setRunning(running);
 		UpdateMenuBar();
@@ -951,7 +932,8 @@ public class Makelangelo
 					Object subject = e.getSource();
 					
 					if(subject == start) {
-						gcode.linesProcessed=Long.parseLong(starting_line.getText());
+						gcode.linesProcessed=Integer.decode(starting_line.getText());
+						SendLineToRobot("M110 N"+gcode.linesProcessed);
 						dialog_result=true;
 						driver.dispose();
 					}
@@ -971,11 +953,14 @@ public class Makelangelo
 	}
 
 	private void StartDrawing() {
+		gcode.linesProcessed=0;
+		SendLineToRobot("M110 N"+gcode.linesProcessed);
+		previewPane.setLinesProcessed(gcode.linesProcessed);
+		
 		paused=false;
 		running=true;
-		UpdateMenuBar();
 		previewPane.setRunning(running);
-		previewPane.setLinesProcessed(gcode.linesProcessed);
+		UpdateMenuBar();
 		statusBar.Start();
 		SendFileCommand();
 	}
@@ -1008,6 +993,7 @@ public class Makelangelo
 		if( subject == buttonStart ) {
 			if(gcode.fileOpened && !running) {
 				gcode.linesProcessed=0;
+				SendLineToRobot("M110 N"+gcode.linesProcessed);
 				StartDrawing();
 			}
 			return;

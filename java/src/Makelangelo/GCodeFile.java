@@ -15,8 +15,8 @@ import java.util.Scanner;
  *
  */
 public class GCodeFile {
-    public long linesTotal=0;
-	public long linesProcessed=0;
+    public int linesTotal=0;
+	public int linesProcessed=0;
 	public boolean fileOpened=false;
 	public ArrayList<String> lines;
 	public float estimated_time=0;
