@@ -817,7 +817,7 @@ public class Makelangelo
 	
 	
 	private void ChangeToTool(String changeToolString) {
-		int i=Integer.parseInt(changeToolString.replace(";",""));
+		int i=Integer.decode(changeToolString);
 		
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		String [] toolNames = mc.getToolNames();
@@ -837,7 +837,7 @@ public class Makelangelo
 	 */
 	public boolean ProcessLine(String line) {
 		// tool change request?
-		String [] tokens = line.split("\\s");
+		String [] tokens = line.split("(\\s|;)");
 
 		// tool change?
 		if(Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
@@ -846,8 +846,6 @@ public class Makelangelo
 					ChangeToTool(tokens[i].substring(1));
 				}
 			}
-			// still ready to send
-			return true;
 		}
 		
 		// end of program?
@@ -883,13 +881,9 @@ public class Makelangelo
 	 */
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
-		
 		if(line.trim().equals("")) return;
-		
-		if(!line.endsWith(";") && !line.endsWith(";\n")) {
-			line+=eol;
-		}
 		Log("<font color='white'>"+line+"</font>");
+		line += "\n";
 		
 		try {
 			out.write(line.getBytes());

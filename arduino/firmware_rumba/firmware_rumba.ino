@@ -39,7 +39,6 @@ float SPOOL_DIAMETER = 3.2;  // cm
 float MAX_VEL = 0;  // cm/s
 float THREAD_PER_STEP=0;
 
-
 // plotter position.
 float posx, posy, posz;  // pen state
 float feed_rate=0;
@@ -55,6 +54,10 @@ int sofar;             // Serial buffer progress
 
 Vector3 tool_offset[NUM_TOOLS];
 int current_tool=0;
+
+
+long line_number=0;
+
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -481,7 +484,9 @@ float parsenumber(char code,float val) {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * process commands in the serial receive buffer
+ */
 void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
@@ -496,12 +501,40 @@ void processCommand() {
     processConfig();
   } 
 
-  int cmd=parsenumber('M',-1);
+  long cmd;
+  
+  // is there a line number?
+  cmd=parsenumber('N',-1);
+  if(cmd!=-1) {
+    if( cmd != line_number ) {
+      // wrong line number error
+      Serial.println(F("BADLINENUM"));
+      return;
+    }
+    
+    line_number++;
+  }
+  
+  if(strchr(buffer,'*')!=0) {
+    // checksum exists.  is it valid?
+    char checksum=0;
+    int c;
+    while(buffer[c]!='*') checksum ^= buffer[c++];
+    c++; // skip *
+    if( checksum != buffer[c] ) {
+      Serial.println(F("BADCHECKSUM"));
+      return;
+    } 
+  }
+  
+  
+  cmd=parsenumber('M',-1);
   switch(cmd) {
   case 6:  tool_change(parsenumber('T',current_tool));  break;
   case 18:  motor_enable();  break;
   case 17:  motor_disable();  break;
   case 100:  help();  break;
+  case 110:  line_number = parsenumber('N',line_number);  break;
   case 114:  where();  break;
   }
 
@@ -643,11 +676,11 @@ void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
     buffer[sofar++]=Serial.read();
-    if(buffer[sofar-1]==';') break;  // in case there are multiple instructions
+    if(buffer[sofar-1]=='\n') break;  // in case there are multiple instructions
   }
  
   // if we hit a semi-colon, assume end of instruction.
-  if(sofar>0 && buffer[sofar-1]==';') {
+  if(sofar>0 && buffer[sofar-1]=='\n') {
     buffer[sofar]=0;
     
     // echo confirmation
