@@ -491,6 +491,36 @@ void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
   
+  long cmd;
+  
+  // is there a line number?
+  cmd=parsenumber('N',-1);
+  if(cmd!=-1) {
+    if( cmd != line_number ) {
+      // wrong line number error
+      Serial.print(F("BADLINENUM "));
+      Serial.println(line_number);
+      return;
+    }
+    
+    line_number++;
+  }
+  
+  // is there a checksum?
+  if(strchr(buffer,'*')!=0) {
+    // yes.  is it valid?
+    char checksum=0;
+    int c;
+    while(buffer[c]!='*') checksum ^= buffer[c++];
+    c++; // skip *
+    if( checksum != buffer[c] ) {
+      Serial.print(F("BADCHECKSUM "));
+      Serial.println(line_number);
+      return;
+    } 
+  }
+  
+  
   if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
@@ -501,33 +531,6 @@ void processCommand() {
     processConfig();
   } 
 
-  long cmd;
-  
-  // is there a line number?
-  cmd=parsenumber('N',-1);
-  if(cmd!=-1) {
-    if( cmd != line_number ) {
-      // wrong line number error
-      Serial.print(F("BADLN "));
-      Serial.println(line_number);
-      return;
-    }
-    
-    line_number++;
-  }
-  
-  if(strchr(buffer,'*')!=0) {
-    // checksum exists.  is it valid?
-    char checksum=0;
-    int c;
-    while(buffer[c]!='*') checksum ^= buffer[c++];
-    c++; // skip *
-    if( checksum != buffer[c] ) {
-      Serial.println(F("BADCHECKSUM"));
-      return;
-    } 
-  }
-  
   
   cmd=parsenumber('M',-1);
   switch(cmd) {
