@@ -6,7 +6,7 @@
         <jar destfile="/Users/danroyer/Documents/workspace/DrawBot/java/Makelangelo.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="Makelangelo"/>
+                <attribute name="Rsrc-Main-Class" value="Makelangelo.Makelangelo"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ RXTXcomm.jar"/>
             </manifest>
