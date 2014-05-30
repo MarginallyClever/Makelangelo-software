@@ -29,8 +29,9 @@ public class Filter_CrosshatchGenerator extends Filter {
 	ProgressMonitor pm;
 	float previous_x,previous_y;
 
+
 	
-	public Filter_CrosshatchGenerator(String _dest) {
+	public void SetDestinationFile(String _dest) {
 		dest=_dest;
 	}
 	
@@ -123,7 +124,7 @@ public class Filter_CrosshatchGenerator extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Process(BufferedImage img) throws IOException {
+	public void Convert(BufferedImage img) throws IOException {
 		int i,j;
 		int x,y;
 		double leveladd = 255.0/6.0;

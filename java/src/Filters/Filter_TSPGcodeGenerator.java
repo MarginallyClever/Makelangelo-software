@@ -26,6 +26,7 @@ import Makelangelo.Point2D;
 public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
 	// file properties
 	String dest;
+	
 	// processing tools
 	long t_elapsed,t_start;
 	double progress;
@@ -38,6 +39,10 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	int scount;
 	ProgressMonitor pm;
 	TSPOptimizer task;
+	
+	public void SetDestinationFile(String _dest) {
+		dest=_dest;
+	}
 	
 	
 	public String formatTime(long millis) {
@@ -256,11 +261,6 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 			Makelangelo.getSingleton().LoadGCode(dest);
 		}
 	}
-
-	
-	public Filter_TSPGcodeGenerator(String _dest) {
-		dest=_dest;
-	}
 	
 	
 	protected float CalculateWeight(int a,int b) {
@@ -458,7 +458,7 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Process(BufferedImage img) {
+	public void Convert(BufferedImage img) {
 		// resize & flip as needed
 		Filter_Resize rs = new Filter_Resize(250,250); 
 		img = rs.Process(img);

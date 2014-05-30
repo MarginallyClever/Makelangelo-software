@@ -32,8 +32,9 @@ public class Filter_RGBCircleGenerator extends Filter {
 	float previous_x,previous_y;
 	int channel;
 
+
 	
-	public Filter_RGBCircleGenerator(String _dest) {
+	public void SetDestinationFile(String _dest) {
 		dest=_dest;
 	}
 	
@@ -134,7 +135,7 @@ public class Filter_RGBCircleGenerator extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Process(BufferedImage img) throws IOException {
+	public void Convert(BufferedImage img) throws IOException {
 		int i,j,x,y,z=0;
 		double level=255.0/2.0f;
 

@@ -26,9 +26,8 @@ public class Filter_SpiralGenerator extends Filter {
 	int scount;
 	boolean lastup;
 	ProgressMonitor pm;
-
 	
-	public Filter_SpiralGenerator(String _dest) {
+	public void SetDestinationFile(String _dest) {
 		dest=_dest;
 	}
 
@@ -113,7 +112,7 @@ public class Filter_SpiralGenerator extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Process(BufferedImage img) throws IOException {
+	public void Convert(BufferedImage img) throws IOException {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);

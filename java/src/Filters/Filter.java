@@ -46,7 +46,13 @@ public class Filter {
 	protected float posy=0;
 	
 	
-	public void Generate(String dest) {}
+	public void Generate() {}
+	public void SetDestinationFile(String dest) {}
+	public String GetName() {  return "Unnamed";  }
+	public BufferedImage Process(BufferedImage img) {
+		return img;
+	}
+	public void Convert(BufferedImage img) throws IOException {}
 	
 	
 	protected int decode(int pixel) {
@@ -89,15 +95,21 @@ public class Filter {
 		out.write(mc.GetBobbinLine()+";\n");
 	}
 	
+	/**
+	 * setup transform from source image dimensions to destination paper dimensions.
+	 * @param img source dimensions
+	 */
 	protected void ImageSetupTransform(BufferedImage img) {
 		SetupTransform( img.getWidth(), img.getHeight() );
 	}
 	
+	/**
+	 * setup transform when there is no image to convert from.  Essentially a 1:1 transform.
+	 */
 	protected void SetupTransform() {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		// what is this *15 and *10?
-		//SetupTransform( (int)mc.GetPaperWidth()*15, (int)mc.GetPaperHeight()*10 );
-		SetupTransform( (int)mc.GetPaperWidth(), (int)mc.GetPaperHeight() );
+		// TODO I don't remember why these * 20 are needed here.  Find out and comment the code.
+		SetupTransform( (int)mc.GetPaperWidth()*20, (int)mc.GetPaperHeight()*20 );
 	}
 	
 	protected void SetupTransform(int width,int height) {

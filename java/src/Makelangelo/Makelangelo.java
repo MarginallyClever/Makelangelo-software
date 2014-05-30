@@ -83,6 +83,7 @@ import Filters.Filter_ScanlineGenerator;
 import Filters.Filter_SpiralGenerator;
 import Filters.Filter_TSPGcodeGenerator;
 import Filters.Filter_YourMessageHere;
+import Filters.Filter;
 
 // TODO while not drawing, in-app gcode editing with immediate visusal feedback 
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling
@@ -98,6 +99,23 @@ public class Makelangelo
 	static final long serialVersionUID=1;
 	
 	private static Makelangelo singletonObject;
+
+	
+	// Image processing
+		// TODO: get rid of these and use a serviceloader instead
+		private static final int IMAGE_TSP=0;
+		private static final int IMAGE_SPIRAL=1;
+		private static final int IMAGE_4LEVEL=2;
+		private static final int IMAGE_SCANLINE=3;
+		private static final int IMAGE_RGB=4;
+		private static final int MAX_IMAGE_FILTERS=5;
+	
+		// TODO: get these names from the filters
+		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines", "RGB" };
+		
+		Filter [] image_converters;
+		boolean startConvertingNow;
+	
 	
 	// TODO put all serial stuff in a Serial class, hide it inside Robot class?
 	// Serial connection
@@ -119,13 +137,6 @@ public class Makelangelo
 	// parsing input from Makelangelo
 	private String serial_recv_buffer="";
 	
-	// Image processing preferences
-	private static final int IMAGE_TSP=0;
-	private static final int IMAGE_SPIRAL=1;
-	private static final int IMAGE_4LEVEL=2;
-	private static final int IMAGE_SCANLINE=3;
-	private static final int IMAGE_RGB=4;
-	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private String[] recentFiles;
 	private String recentPort;
@@ -143,7 +154,7 @@ public class Makelangelo
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonText2GCODE, buttonSaveFile, buttonExit;
-    private JMenuItem buttonConfigurePreferences, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
+    private JMenuItem buttonAdjustSounds, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -187,6 +198,19 @@ public class Makelangelo
 		MachineConfiguration.getSingleton().LoadConfig();
         GetRecentFiles();
         GetRecentPort();
+        LoadImageConverters();
+	}
+	
+	/**
+	 * TODO use a serviceLoader instead
+	 */
+	protected void LoadImageConverters() {
+		image_converters = new Filter[MAX_IMAGE_FILTERS];
+		image_converters[IMAGE_TSP		] = new Filter_TSPGcodeGenerator();
+		image_converters[IMAGE_SPIRAL	] = new Filter_SpiralGenerator();
+		image_converters[IMAGE_4LEVEL	] = new Filter_CrosshatchGenerator();
+		image_converters[IMAGE_SCANLINE	] = new Filter_ScanlineGenerator();
+		image_converters[IMAGE_RGB		] = new Filter_RGBCircleGenerator();
 	}
 	
 	protected void finalize() throws Throwable {
@@ -272,9 +296,73 @@ public class Makelangelo
 		}
 	}
 	
-	public void LoadImage(String filename) {
+	protected boolean ChooseConversionOptions() {
+		// display menu with conversion styles
+
+		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
+		driver.setLayout(new GridBagLayout());
+		
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
+		input_paper_margin.setMajorTickSpacing(20);
+		input_paper_margin.setMinorTickSpacing(5);
+		input_paper_margin.setPaintTicks(false);
+		input_paper_margin.setPaintLabels(true);
+		
+		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
+		//allow_metrics.setSelected(allowMetrics);
+		
+		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
+		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
+
+		final JComboBox input_draw_style = new JComboBox(styles);
+		input_draw_style.setSelectedIndex(GetDrawStyle());
+		
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Start");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
+
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
+
+		startConvertingNow = false;
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
+						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
+						SetDrawStyle(input_draw_style.getSelectedIndex());
+						MachineConfiguration.getSingleton().SaveConfig();
+						startConvertingNow=true;
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+		};
+			
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+		
+		return startConvertingNow;
+	}
+	
+	
+	public boolean LoadImage(String filename) {
         // where to save temp output file?
 		String destinationFile = System.getProperty("user.dir")+"/temp.ngc";
+		
+		if( ChooseConversionOptions() == false ) return false;
 		
 		// read in image
 		BufferedImage img;
@@ -282,19 +370,17 @@ public class Makelangelo
 			img = ImageIO.read(new File(filename));
 			
 			// convert with style
-			switch(GetDrawStyle()) {
-			case Makelangelo.IMAGE_TSP:			(new Filter_TSPGcodeGenerator  (destinationFile)).Process(img);		break;
-			case Makelangelo.IMAGE_SPIRAL:		(new Filter_SpiralGenerator    (destinationFile)).Process(img);		break;
-			case Makelangelo.IMAGE_4LEVEL:		(new Filter_CrosshatchGenerator(destinationFile)).Process(img);		break;
-			case Makelangelo.IMAGE_SCANLINE:	(new Filter_ScanlineGenerator  (destinationFile)).Process(img);		break;
-			case Makelangelo.IMAGE_RGB:         (new Filter_RGBCircleGenerator (destinationFile)).Process(img);		break;
-			}
+			int style = GetDrawStyle();
+			image_converters[style].SetDestinationFile(destinationFile);
+			image_converters[style].Convert(img);
 		}
 		catch(IOException e) {
 	    	Log("<span style='color:red'>File could not be opened: "+e.getLocalizedMessage()+"</span>\n");
 	    	RemoveRecentFile(filename);
-	    	return;
+	    	return false;
 		}
+		
+		return true;
 	}
 	
 	
@@ -709,26 +795,12 @@ public class Makelangelo
 		final JButton change_sound_disconnect = new JButton("Disconnect sound");
 		final JButton change_sound_conversion_finished = new JButton("Convert finish sound");
 		final JButton change_sound_drawing_finished = new JButton("Draw finish sound");
-
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
-		input_paper_margin.setMajorTickSpacing(20);
-		input_paper_margin.setMinorTickSpacing(5);
-		input_paper_margin.setPaintTicks(false);
-		input_paper_margin.setPaintLabels(true);
 		
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
 		final JCheckBox show_pen_up = new JCheckBox("Show pen up moves");
 		show_pen_up.setSelected(previewPane.getShowPenUp());
-
-		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
-		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
-
-		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines", "RGB" };
-
-		final JComboBox input_draw_style = new JComboBox(styles);
-		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
@@ -740,11 +812,8 @@ public class Makelangelo
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(show_pen_up,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
-
+		
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
 		
@@ -757,13 +826,8 @@ public class Makelangelo
 					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
 
 					if(subject == save) {
-						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
-						
 						//allowMetrics = allow_metrics.isSelected();
 						previewPane.setShowPenUp(show_pen_up.isSelected());
-						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
-						
-						SetDrawStyle(input_draw_style.getSelectedIndex());
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
@@ -1049,7 +1113,7 @@ public class Makelangelo
 			ClosePort();
 			return;
 		}
-		if( subject == buttonConfigurePreferences ) {
+		if( subject == buttonAdjustSounds ) {
 			AdjustPreferences();
 			return;
 		}
@@ -1395,16 +1459,30 @@ public class Makelangelo
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
         
-        buttonAbout = new JMenuItem("About",KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
-        buttonAbout.addActionListener(this);
-        menu.add(buttonAbout);
-
+        subMenu = new JMenu("Preferences");
+        
+        buttonAdjustSounds = new JMenuItem("Sound options");
+        buttonAdjustSounds.getAccessibleContext().setAccessibleDescription("Adjust sounds.");
+        buttonAdjustSounds.addActionListener(this);
+        subMenu.add(buttonAdjustSounds);
+        /*
+        buttonAdjustGraphics = new JMenuItem("Graphics options");
+        buttonAdjustGraphics.getAccessibleContext().setAccessibleDescription("Adjust graphics.");
+        buttonAdjustGraphics.addActionListener(this);
+        subMenu.add(buttonAdjustGraphics);
+         */
+        menu.add(subMenu);
+        
         buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
         menu.getAccessibleContext().setAccessibleDescription("Is there a newer version available?");
         buttonCheckForUpdate.addActionListener(this);
         buttonCheckForUpdate.setEnabled(true);
         menu.add(buttonCheckForUpdate);
+        
+        buttonAbout = new JMenuItem("About",KeyEvent.VK_A);
+        menu.getAccessibleContext().setAccessibleDescription("Find out about this program");
+        buttonAbout.addActionListener(this);
+        menu.add(buttonAbout);
 
         menu.addSeparator();
         
@@ -1479,14 +1557,6 @@ public class Makelangelo
         buttonAdjustTool.addActionListener(this);
         buttonAdjustTool.setEnabled(!running);
         menu.add(buttonAdjustTool);
-
-        menu.addSeparator();
-        
-        buttonConfigurePreferences = new JMenuItem("Preferences");
-        buttonConfigurePreferences.getAccessibleContext().setAccessibleDescription("Adjust miscelaneous preferences.");
-        buttonConfigurePreferences.addActionListener(this);
-        buttonConfigurePreferences.setEnabled(!running);
-        menu.add(buttonConfigurePreferences);
         
         menuBar.add(menu);
 
