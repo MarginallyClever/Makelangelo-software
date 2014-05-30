@@ -95,7 +95,9 @@ public class Filter {
 	
 	protected void SetupTransform() {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		SetupTransform( (int)mc.GetPaperWidth()*15, (int)mc.GetPaperHeight()*10 );
+		// what is this *15 and *10?
+		//SetupTransform( (int)mc.GetPaperWidth()*15, (int)mc.GetPaperHeight()*10 );
+		SetupTransform( (int)mc.GetPaperWidth(), (int)mc.GetPaperHeight() );
 	}
 	
 	protected void SetupTransform(int width,int height) {

@@ -79,9 +79,8 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import Filters.Filter_CrosshatchGenerator;
 import Filters.Filter_RGBCircleGenerator;
-import Filters.Filter_Resize;
 import Filters.Filter_ScanlineGenerator;
-import Filters.Filter_Spiral;
+import Filters.Filter_SpiralGenerator;
 import Filters.Filter_TSPGcodeGenerator;
 import Filters.Filter_YourMessageHere;
 
@@ -282,14 +281,10 @@ public class Makelangelo
 		try {
 			img = ImageIO.read(new File(filename));
 			
-			// resize & flip as needed
-			Filter_Resize rs = new Filter_Resize(); 
-			img = rs.Process(img);
-			
 			// convert with style
 			switch(GetDrawStyle()) {
 			case Makelangelo.IMAGE_TSP:			(new Filter_TSPGcodeGenerator  (destinationFile)).Process(img);		break;
-			case Makelangelo.IMAGE_SPIRAL:		(new Filter_Spiral             (destinationFile)).Process(img);		break;
+			case Makelangelo.IMAGE_SPIRAL:		(new Filter_SpiralGenerator    (destinationFile)).Process(img);		break;
 			case Makelangelo.IMAGE_4LEVEL:		(new Filter_CrosshatchGenerator(destinationFile)).Process(img);		break;
 			case Makelangelo.IMAGE_SCANLINE:	(new Filter_ScanlineGenerator  (destinationFile)).Process(img);		break;
 			case Makelangelo.IMAGE_RGB:         (new Filter_RGBCircleGenerator (destinationFile)).Process(img);		break;

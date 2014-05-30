@@ -17,7 +17,7 @@ import Makelangelo.Point2D;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-public class Filter_Spiral extends Filter {
+public class Filter_SpiralGenerator extends Filter {
 	// file properties
 	String dest;
 	// processing tools
@@ -28,7 +28,7 @@ public class Filter_Spiral extends Filter {
 	ProgressMonitor pm;
 
 	
-	public Filter_Spiral(String _dest) {
+	public Filter_SpiralGenerator(String _dest) {
 		dest=_dest;
 	}
 
@@ -114,14 +114,16 @@ public class Filter_Spiral extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Process(BufferedImage img) throws IOException {
+		// black and white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
+		img = bw.Process(img);
+		
+		// spiralize
 		int x,y,i,j;
 		double steps=4;
 		double leveladd = 255.0/(steps+1);
 		double level;
 		int z=0;
-
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
-		img = bw.Process(img);
 
 		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");

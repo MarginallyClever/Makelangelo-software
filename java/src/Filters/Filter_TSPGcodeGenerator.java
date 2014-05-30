@@ -13,7 +13,6 @@ import java.text.DecimalFormat;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import DrawingTools.DrawingTool;
 import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 import Makelangelo.Point2D;
@@ -31,15 +30,14 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	long t_elapsed,t_start;
 	double progress;
 	double old_len,len;
-	float feed_rate=2000;
 	long time_limit=10*60*1000;  // 10 minutes
+
 	int numPoints;
 	Point2D[] points = null;
 	int[] solution = null;
 	int scount;
 	ProgressMonitor pm;
 	TSPOptimizer task;
-	DrawingTool tool;
 	
 	
 	public String formatTime(long millis) {
@@ -338,24 +336,25 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 		for(i=0;i<numPoints;++i) {
 			solution[i]=i;
 		}
-		scount=1;
 		
-		solution[numPoints]=solution[0];
+
+		int scount=0;
+		solution[scount]=solution[0];
 		
 		do {
 			// Find the nearest point not already in the line.
 			// Any solution[n] where n>scount is not in the line.
-			bestw=CalculateWeight(solution[scount],solution[scount-1]);
-			besti=solution[scount];
-			for( i=scount; i<numPoints; ++i ) {
-				w=CalculateWeight(solution[i],solution[scount-1]);
+			bestw=CalculateWeight(solution[scount],solution[scount+1]);
+			besti=scount+1;
+			for( i=scount+2; i<numPoints; ++i ) {
+				w=CalculateWeight(solution[scount],solution[i]);
 				if( w < bestw ) {
 					bestw=w;
 					besti=i;
 				}
 			}
-			i=solution[scount];
-			solution[scount]=solution[besti];
+			i=solution[scount+1];
+			solution[scount+1]=solution[besti];
 			solution[besti]=i;
 			scount++;
 		} while(scount<numPoints);
@@ -394,6 +393,10 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
 			out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
+
+			//MachineConfiguration mc = MachineConfiguration.getSingleton();
+			//tool = mc.GetCurrentTool();
+			
 			// set absolute coordinates
 			out.write("G90;\n");
 			tool.WriteChangeTo(out);
@@ -418,17 +421,7 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	}
 	
 	
-	/**
-	 * The main entry point
-	 * @param img the image to convert.
-	 */
-	public void Process(BufferedImage img) {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.Process(img);
-		
-		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
-		img = dither.Process(img);
-
+	protected void ConnectTheDots(BufferedImage img) {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		tool = mc.GetCurrentTool();
 		ImageSetupTransform(img);
@@ -459,7 +452,29 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 				}
 			}
 		}
+	}
+	
+	/**
+	 * The main entry point
+	 * @param img the image to convert.
+	 */
+	public void Process(BufferedImage img) {
+		// resize & flip as needed
+		Filter_Resize rs = new Filter_Resize(250,250); 
+		img = rs.Process(img);
 		
+		// make black & white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		img = bw.Process(img);
+		
+		// dither
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		img = dither.Process(img);
+
+		// connect the dots
+		ConnectTheDots(img);
+		
+		// Shorten the line that connects the dots
 		GenerateTSP();
 	}
 }

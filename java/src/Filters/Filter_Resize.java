@@ -15,16 +15,25 @@ import Makelangelo.MachineConfiguration;
  * @author Dan
  */
 public class Filter_Resize {
-	public Filter_Resize() {}
+	protected int maxWidth, maxHeight;
+	
+	public Filter_Resize(int max_width,int max_height) {
+		maxWidth=max_width;
+		maxHeight=max_height;
+	}
+	public Filter_Resize() {
+		maxWidth=1000;
+		maxHeight=1000;
+	}
 	
 	
-	protected BufferedImage scaleImage(BufferedImage img, int width, int height, Color background) {
+	protected BufferedImage scaleImage(BufferedImage img, int width, int height) {
 	    BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	    Graphics2D g = newImage.createGraphics();
 	    try {
 	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 	                           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-	        g.setBackground(background);
+	        g.setBackground(Color.WHITE);
 	        g.clearRect(0, 0, width, height);
 	        if(MachineConfiguration.getSingleton().reverseForGlass) {
 	        	g.drawImage(img, width, 0, 0, height, 0,0,img.getWidth(),img.getHeight(), null);
@@ -47,8 +56,8 @@ public class Filter_Resize {
 		double paper_w= mc.GetPaperWidth();
 		double paper_h= mc.GetPaperHeight();
 		// TODO make this number a variable that can be tweaked
-		int max_w=1000;
-		int max_h=1000;
+		int max_w=maxWidth;
+		int max_h=maxHeight;
 		if(paper_w>paper_h) {
 			max_h *= paper_h/paper_w;
 		} else {
@@ -75,7 +84,7 @@ public class Filter_Resize {
 			h=max_h;
 		}
 		// now scale the image
-		return scaleImage(img, w,h,Color.WHITE);
+		return scaleImage(img, w,h);
 	}
 }
 
