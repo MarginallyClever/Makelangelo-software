@@ -945,6 +945,15 @@ static void processCommand() {
 }
 
 
+/**
+ * prepares the input buffer to receive a new message and tells the serial connected device it is ready for more.
+ */
+void ready() {
+  sofar=0;  // clear input buffer
+  Serial.print(F("\n> "));  // signal ready to receive input
+}
+
+
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
@@ -993,16 +1002,16 @@ void setup() {
 
 
 //------------------------------------------------------------------------------
-void loop() {
-  // See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+// See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
     buffer[sofar++]=Serial.read();
-    if(buffer[sofar-1]==';') break;  // in case there are multiple instructions
+    if(buffer[sofar-1]=='\n') break;  // in case there are multiple instructions
   }
  
   // if we hit a semi-colon, assume end of instruction.
-  if(sofar>0 && buffer[sofar-1]==';') {
+  if(sofar>0 && buffer[sofar-1]=='\n') {
     buffer[sofar]=0;
     
     // echo confirmation
@@ -1010,13 +1019,14 @@ void loop() {
  
     // do something with the command
     processCommand();
- 
-    // reset the buffer
-    sofar=0;
- 
-    // echo completion
-    Serial.print(F("> "));
-  }
+    ready();
+  } 
+}
+
+
+//------------------------------------------------------------------------------
+void loop() {
+  Serial_listen();
 }
 
 
