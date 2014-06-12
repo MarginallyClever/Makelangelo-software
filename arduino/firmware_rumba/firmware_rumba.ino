@@ -679,21 +679,21 @@ void setup() {
 void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
-    buffer[sofar++]=Serial.read();
-    if(buffer[sofar-1]=='\n') break;  // in case there are multiple instructions
+    char c = Serial.read();
+    if(c=='\r') continue;
+    if(sofar<MAX_BUF) buffer[sofar++]=c;
+    if(c=='\n') {
+      buffer[sofar-1]=0;
+      
+      // echo confirmation
+//      Serial.println(F(buffer));
+   
+      // do something with the command
+      processCommand();
+      ready();
+      break;
+    }
   }
- 
-  // if we hit a semi-colon, assume end of instruction.
-  if(sofar>0 && buffer[sofar-1]=='\n') {
-    buffer[sofar]=0;
-    
-    // echo confirmation
-//    Serial.println(F(buffer));
- 
-    // do something with the command
-    processCommand();
-    ready();
-  } 
 }
 
 

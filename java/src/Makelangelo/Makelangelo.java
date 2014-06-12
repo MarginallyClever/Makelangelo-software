@@ -534,16 +534,27 @@ public class Makelangelo
 		
 		if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
-			return Integer.decode(after_error);
+			return Integer.decode(GetNumberPortion(after_error));
 		}
 		if( serial_recv_buffer.lastIndexOf(badlinenum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badlinenum) + badlinenum.length());
-			return Integer.decode(after_error);
+			return Integer.decode(GetNumberPortion(after_error));
 		}
 		
 		return -1;
 	}
 	
+	protected String GetNumberPortion(String src) { 
+	    int length = src.length();
+	    String result = "";
+	    for (int i = 0; i < length; i++) {
+	        Character character = src.charAt(i);
+	        if (Character.isDigit(character)) {
+	            result += character;
+	        }
+	    }
+	    return result;
+	}
 	
 	/**
 	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
@@ -862,7 +873,7 @@ public class Makelangelo
 		// Send a command to the robot with new configuration values
 		SendLineToRobot(MachineConfiguration.getSingleton().GetConfigLine());
 		SendLineToRobot(MachineConfiguration.getSingleton().GetBobbinLine());
-		SendLineToRobot("TELEPORT X0 Y0 Z0");
+		SendLineToRobot("G92 X0 Y0 Z0");
 	}
 	
 	
@@ -1306,7 +1317,7 @@ public class Makelangelo
 					} else if(b==find) {
 						SendLineToRobot("G28");
 					} else if(b==center) {
-						SendLineToRobot("TELEPORT X0 Y0");
+						SendLineToRobot("G92 X0 Y0");
 					} else if(b==z90) {
 						RaisePen();
 					} else if(b==z0) {

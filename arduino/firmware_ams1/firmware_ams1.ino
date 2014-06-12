@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-// Comment out this line to silence most serial output.
-//#define VERBOSE         (1)
+// Increase this number to see more output
+#define VERBOSE         (0)
 
 // Comment out this line to disable SD cards.
 //#define USE_SD_CARD       (1)
@@ -223,9 +223,11 @@ static void setFeedRate(float v) {
   if(v < MIN_FEEDRATE) v = MIN_FEEDRATE;
   
   step_delay = 1000000.0 / v;
-  
+ 
+#if VERBOSE > 1
   Serial.print(F("feed_rate="));  Serial.println(feed_rate);
   Serial.print(F("step_delay="));  Serial.println(step_delay);
+#endif
 }
 
 
@@ -444,9 +446,8 @@ static void help() {
   Serial.println(F("HELP;  - display this message"));
   Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
   Serial.println(F("       - display/update this robot's configuration."));
-  Serial.println(F("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter."));
   Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
-  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,M18,M114"));
+  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,G92,M18,M114"));
 }
 
 
@@ -996,21 +997,21 @@ void setup() {
 void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
-    buffer[sofar++]=Serial.read();
-    if(buffer[sofar-1]=='\n') break;  // in case there are multiple instructions
+    char c = Serial.read();
+    if(c=='\r') continue;
+    if(sofar<MAX_BUF) buffer[sofar++]=c;
+    if(c=='\n') {
+      buffer[sofar-1]=0;
+      
+      // echo confirmation
+//      Serial.println(F(buffer));
+   
+      // do something with the command
+      processCommand();
+      ready();
+      break;
+    }
   }
- 
-  // if we hit a semi-colon, assume end of instruction.
-  if(sofar>0 && buffer[sofar-1]=='\n') {
-    buffer[sofar]=0;
-    
-    // echo confirmation
-//    Serial.println(F(buffer));
- 
-    // do something with the command
-    processCommand();
-    ready();
-  } 
 }
 
 
