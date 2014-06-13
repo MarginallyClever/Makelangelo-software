@@ -133,6 +133,7 @@ public class Makelangelo
 	// Serial communication
 	static private final String cue = "> ";
 	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
+	static private final String nochecksum = "NOCHECKSUM";
 	static private final String badchecksum = "BADCHECKSUM ";
 	static private final String badlinenum = "BADLINENUM ";
 	
@@ -420,7 +421,8 @@ public class Makelangelo
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
 		try {
-			msg=msg.replace("\n", "<br>\n");
+			msg=msg.replace("\n", "<br>\n")+"\n";
+			msg=msg.replace("\n\n","\n");
 			logToFile.write(msg);
 			logToFile.flush();
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
@@ -555,7 +557,11 @@ public class Makelangelo
 	 */
 	protected int ErrorReported() {
 		if(portConfirmed==false) return -1;
-		
+
+		if( serial_recv_buffer.lastIndexOf(nochecksum) != -1 ) {
+			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(nochecksum) + nochecksum.length());
+			return Integer.decode(GetNumberPortion(after_error));
+		}
 		if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
 			return Integer.decode(GetNumberPortion(after_error));
@@ -568,11 +574,12 @@ public class Makelangelo
 		return -1;
 	}
 	
-	protected String GetNumberPortion(String src) { 
-	    int length = src.length();
+	protected String GetNumberPortion(String src) {
+		String [] lines = src.split(" ");
+	    int length = lines[0].length();
 	    String result = "";
 	    for (int i = 0; i < length; i++) {
-	        Character character = src.charAt(i);
+	        Character character = lines[0].charAt(i);
 	        if (Character.isDigit(character)) {
 	            result += character;
 	        }
@@ -985,7 +992,7 @@ public class Makelangelo
 			checksum ^= line.charAt(i);
 		}
 		
-		return "*"+checksum;
+		return "*"+((int)checksum);
 	}
 	
 
@@ -997,8 +1004,7 @@ public class Makelangelo
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		if(line.trim().equals("")) return;
-		String [] visible = line.split("[*]");
-		Log("<font color='white'>"+visible[0]+"</font>");
+		Log("<font color='white'>"+line+"</font>");
 		line += "\n";
 		
 		try {
@@ -1227,17 +1233,23 @@ public class Makelangelo
 					int len = in.read(buffer);
 					if( len>0 ) {
 						String line2 = new String(buffer,0,len);
-						Log("<span style='color:#FFA500'>"+line2.replace("\n","<br>")+"</span>");
+					
 						serial_recv_buffer+=line2;
 						// wait for the cue ("> ") to send another command
 						if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
+							String line2_mod = serial_recv_buffer.replace("\n", "");
+							line2_mod = line2_mod.replace(">", "");
+							line2_mod = line2_mod.trim();
+							if(!line2_mod.equals("")) {
+								Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
+							}
+							
 							int error_line = ErrorReported();
 							if(error_line != -1) {
 								gcode.linesProcessed = error_line;
 								serial_recv_buffer="";
 								SendFileCommand();
-							}
-							if(ConfirmPort()) {
+							} else if(ConfirmPort()) {
 								serial_recv_buffer="";
 								SendFileCommand();
 							}

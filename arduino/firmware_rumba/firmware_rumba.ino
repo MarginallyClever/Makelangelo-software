@@ -49,8 +49,10 @@ volatile long laststep[NUM_AXIES];
 char absolute_mode=1;  // absolute or incremental programming mode?
 
 // Serial comm reception
-char buffer[MAX_BUF];  // Serial buffer
-int sofar;             // Serial buffer progress
+char buffer[MAX_BUF+1];  // Serial buffer
+int sofar;               // Serial buffer progress
+static long last_cmd_time;    // prevent timeouts
+
 
 Vector3 tool_offset[NUM_TOOLS];
 int current_tool=0;
@@ -495,31 +497,35 @@ void processCommand() {
   
   // is there a line number?
   cmd=parsenumber('N',-1);
-  if(cmd!=-1) {
+  if(cmd!=-1 && buffer[0]=='N') {  // line number must appear first on the line
     if( cmd != line_number ) {
       // wrong line number error
       Serial.print(F("BADLINENUM "));
       Serial.println(line_number);
       return;
     }
+  
+    // is there a checksum?
+    if(strchr(buffer,'*')!=0) {
+      // yes.  is it valid?
+      char checksum=0;
+      int c=0;
+      while(buffer[c]!='*') checksum ^= buffer[c++];
+      c++; // skip *
+      int against = strtod(buffer+c,NULL);
+      if( checksum != against ) {
+        Serial.print(F("BADCHECKSUM "));
+        Serial.println(line_number);
+        return;
+      } 
+    } else {
+      Serial.print(F("NOCHECKSUM "));
+      Serial.println(line_number);
+      return;
+    }
     
     line_number++;
   }
-  
-  // is there a checksum?
-  if(strchr(buffer,'*')!=0) {
-    // yes.  is it valid?
-    char checksum=0;
-    int c;
-    while(buffer[c]!='*') checksum ^= buffer[c++];
-    c++; // skip *
-    if( checksum != buffer[c] ) {
-      Serial.print(F("BADCHECKSUM "));
-      Serial.println(line_number);
-      return;
-    } 
-  }
-  
   
   if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
@@ -646,6 +652,15 @@ void processCommand() {
 void ready() {
   sofar=0;  // clear input buffer
   Serial.print(F("\n> "));  // signal ready to receive input
+  last_cmd_time = millis();
+}
+
+
+//------------------------------------------------------------------------------
+void tools_setup() {
+  for(int i=0;i<NUM_TOOLS;++i) {
+    set_tool_offset(i,0,0,0);
+  }
 }
 
 
@@ -661,6 +676,7 @@ void setup() {
   
   motor_setup();
   motor_enable();
+  tools_setup();
   
   //easyPWM_init();
   SD_init();
@@ -683,7 +699,7 @@ void Serial_listen() {
     if(c=='\r') continue;
     if(sofar<MAX_BUF) buffer[sofar++]=c;
     if(c=='\n') {
-      buffer[sofar-1]=0;
+      buffer[sofar]=0;
       
       // echo confirmation
 //      Serial.println(F(buffer));
@@ -702,6 +718,13 @@ void loop() {
   Serial_listen();
   SD_check();
   LCD_update();
+  
+  // The PC will wait forever for the ready signal.
+  // if Arduino hasn't received a new instruction in a while, send ready() again
+  // just in case USB garbled ready and each half is waiting on the other.
+  if( !segment_buffer_full() && (millis() - last_cmd_time) > TIMEOUT_OK ) {
+    ready();
+  }
 }
 
 

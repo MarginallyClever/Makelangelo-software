@@ -313,10 +313,9 @@ public class Filter {
 		String [] lines = new String[num_lines];
 		j=0;
 		for(i=0;i<test_lines.length;++i) {
-			if(test_lines[i].length() < chars_per_line) {
+			if(test_lines[i].length() <= chars_per_line) {
 				lines[j++] = test_lines[i];
-			}
-			if(test_lines[i].length()>chars_per_line) {
+			} else {
 				String [] temp = test_lines[i].split("(?<=\\G.{"+chars_per_line+"})");
 				for(int k=0;k<temp.length;++k) {
 					lines[j++] = temp[k];

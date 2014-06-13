@@ -45,8 +45,8 @@
 #define SWITCH_HALF     (512)
 
 // servo angles for pen control
-#define PEN_UP_ANGLE    (170)
-#define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
+#define PEN_UP_ANGLE    (90)
+#define PEN_DOWN_ANGLE  (10)  // Some servos don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
@@ -66,7 +66,9 @@
 #define MAX_BUF         (64)
 
 // servo pin differs based on device
-#define SERVO_PIN        10
+#define SERVO_PIN       (10)
+
+#define TIMEOUT_OK      (1000)  // 1/4 with no instruction?  Make sure PC knows we are waiting.
 
 #ifndef USE_SD_CARD
 #define File int
@@ -86,6 +88,8 @@
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
+#include <SPI.h>  // pkm fix for Arduino 1.5
+
 // Adafruit motor driver library
 #include <AFMotorDrawbot.h>
 
@@ -158,8 +162,9 @@ static char mode_name[3];
 
 
 // Serial comm reception
-static char buffer[MAX_BUF];  // Serial buffer
-static int sofar;             // Serial buffer progress
+static char buffer[MAX_BUF+1];  // Serial buffer
+static int sofar;               // Serial buffer progress
+static long last_cmd_time;      // prevent timeouts
 
 Vector3 tool_offset[NUM_TOOLS];
 int current_tool=0;
@@ -183,7 +188,7 @@ static void adjustSpoolDiameter(float diameter1,float diameter2) {
   SPOOL_CIRC = SPOOL_DIAMETER2*PI;  // circumference
   THREADPERSTEP2 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
 
-#if VERBOSE > 0
+#if VERBOSE > 2
   Serial.print(F("SpoolDiameter1 = "));  Serial.println(SPOOL_DIAMETER1,3);
   Serial.print(F("SpoolDiameter2 = "));  Serial.println(SPOOL_DIAMETER2,3);
   Serial.print(F("THREADPERSTEP1="));  Serial.println(THREADPERSTEP1,3);
@@ -734,7 +739,7 @@ static void processCommand() {
   
   // is there a line number?
   cmd=parsenumber('N',-1);
-  if(cmd!=-1) {
+  if(cmd!=-1 && buffer[0] == 'N') {  // line number must appear first on the line
     if( cmd != line_number ) {
       // wrong line number error
       Serial.print(F("BADLINENUM "));
@@ -742,21 +747,28 @@ static void processCommand() {
       return;
     }
     
-    line_number++;
-  }
-  
-  // is there a checksum?
-  if(strchr(buffer,'*')!=0) {
-    // yes.  is it valid?
-    char checksum=0;
-    int c;
-    while(buffer[c]!='*') checksum ^= buffer[c++];
-    c++; // skip *
-    if( checksum != buffer[c] ) {
-      Serial.print(F("BADCHECKSUM "));
+    
+    // is there a checksum?
+    if(strchr(buffer,'*')!=0) {
+      // yes.  is it valid?
+      char checksum=0;
+      int c;
+      while(buffer[c]!='*') checksum ^= buffer[c++];
+      c++; // skip *
+      int against = (int)strtod(buffer+c,NULL);
+      if( checksum != against ) {
+        Serial.print(F("BADCHECKSUM "));
+        Serial.println(line_number);
+        return;
+      } 
+    } else {
+      Serial.print(F("NOCHECKSUM "));
       Serial.println(line_number);
+      Serial.println(buffer);
       return;
-    } 
+    }
+  
+    line_number++;
   }
   
   if(!strncmp(buffer,"UID",3)) {
@@ -947,6 +959,15 @@ static void processCommand() {
 void ready() {
   sofar=0;  // clear input buffer
   Serial.print(F("\n> "));  // signal ready to receive input
+  last_cmd_time = millis();
+}
+
+
+//------------------------------------------------------------------------------
+void tools_setup() {
+  for(int i=0;i<NUM_TOOLS;++i) {
+    set_tool_offset(i,0,0,0);
+  }
 }
 
 
@@ -979,8 +1000,7 @@ void setup() {
   digitalWrite(L_PIN,HIGH);
   digitalWrite(R_PIN,HIGH);
   
-  // display the help at startup.
-  help();
+  tools_setup();
 
   // initialize the plotter position.
   teleport(0,0);
@@ -988,7 +1008,9 @@ void setup() {
   velx=0;
   setPenAngle(PEN_UP_ANGLE);
   
-  Serial.print(F("> "));
+  // display the help at startup.
+  help();
+  ready();
 }
 
 
@@ -998,13 +1020,14 @@ void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
     char c = Serial.read();
-    if(c=='\r') continue;
     if(sofar<MAX_BUF) buffer[sofar++]=c;
-    if(c=='\n') {
-      buffer[sofar-1]=0;
+    if(c=='\n' || c=='\r') {
+      buffer[sofar]=0;
       
+#if VERBOSE > 0
       // echo confirmation
-//      Serial.println(F(buffer));
+      Serial.println(buffer);
+#endif
    
       // do something with the command
       processCommand();
@@ -1018,6 +1041,13 @@ void Serial_listen() {
 //------------------------------------------------------------------------------
 void loop() {
   Serial_listen();
+  
+  // The PC will wait forever for the ready signal.
+  // if Arduino hasn't received a new instruction in a while, send ready() again
+  // just in case USB garbled ready and each half is waiting on the other.
+  if( (millis() - last_cmd_time) > TIMEOUT_OK ) {
+    ready();
+  }
 }
 
 

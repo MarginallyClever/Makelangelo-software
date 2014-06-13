@@ -548,7 +548,9 @@ public class MachineConfiguration {
 		}
 		
 		// new robots have UID=0
-		if(robot_uid==0) GetNewRobotUID();
+		if(robot_uid==0) {
+			GetNewRobotUID();
+		}
 		
 		// load machine specific config
 		LoadConfig();
@@ -564,10 +566,11 @@ public class MachineConfiguration {
 	private void GetNewRobotUID() {
 		try {
 		    // Send data
-			URL url = new URL("http://marginallyclever.com/drawbot_getuid.php");
+			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
 		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		    robot_uid = Long.parseLong(rd.readLine());
+		    String line = rd.readLine();
+		    robot_uid = Long.parseLong(line);
 		    rd.close();
 		} catch (Exception e) {}
 

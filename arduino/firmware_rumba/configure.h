@@ -100,6 +100,11 @@
 #define TIMER_PRESCALER_COUNT (5)
 
 
+// time passed with no instruction?  Make sure PC knows we are waiting.
+#define TIMEOUT_OK      (1000)
+
+
+
 //------------------------------------------------------------------------------
 // STRUCTS
 //------------------------------------------------------------------------------
