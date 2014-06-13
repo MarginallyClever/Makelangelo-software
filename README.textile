@@ -7,3 +7,8 @@ Please visit "the Makelangelo homepage":http://www.makelangelo.com/ for the acco
 Please visit "the wiki":https://github.com/MarginallyClever/Makelangelo/wiki for installation, troubleshooting, and more.
 
 Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
+
+h2. Notes
+
+The ./last_official_release folder contains the last release on the http://makelangelo.com website.
+It is NOT the latest development version.

@@ -25,6 +25,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,6 +50,7 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -91,7 +93,7 @@ import Filters.Filter;
 
 public class Makelangelo
 		extends JPanel
-		implements ActionListener, SerialPortEventListener
+		implements ActionListener, KeyListener, SerialPortEventListener
 {
 	// software version
 	static final String version="3";
@@ -175,6 +177,11 @@ public class Makelangelo
     private DrawPanel previewPane;
 	private StatusBar statusBar;
 	private JPanel drivePane;
+	
+	// command line
+	private JPanel textInputArea;
+	private JTextField commandLineText;
+	private JButton commandLineSend;
 
 	// reading file
 	private boolean running=false;
@@ -219,6 +226,23 @@ public class Makelangelo
 		super.finalize(); //not necessary if extending Object.
 	} 
 
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
+
+    /** Handle the key-pressed event from the text field. */
+    public void keyPressed(KeyEvent e) {}
+
+    /** Handle the key-released event from the text field. */
+    public void keyReleased(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if(portConfirmed && !running) {
+				ProcessLine(commandLineText.getText());
+				commandLineText.setText("");
+			}
+		}
+	}
+	
 	private void StartLog() {
 		try {
 			logToFile = new PrintWriter(new FileWriter("log.html"));
@@ -1291,12 +1315,10 @@ public class Makelangelo
 		c.gridx=7;  c.gridy=5;  driver.add(z90,c);
 		c.gridx=7;  c.gridy=6;  driver.add(z0,c);
 		
-		
 		c.gridx=3;  c.gridy=8;  driver.add(new JLabel("Speed:"),c);
 		c.gridx=4;  c.gridy=8;  driver.add(feedRate,c);
 		c.gridx=5;  c.gridy=8;  driver.add(new JLabel("mm/min"),c);
 		c.gridx=6;  c.gridy=8;  driver.add(setFeedRate,c);
-		
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
@@ -1337,7 +1359,7 @@ public class Makelangelo
 						SendLineToRobot("M114");
 					}
 			  }
-			};
+		};
 		
 		up1.addActionListener(driveButtons);
 		up10.addActionListener(driveButtons);
@@ -1704,9 +1726,14 @@ public class Makelangelo
         statusBar.setMinimumSize(d);
 
         // layout
+	    JSplitPane splitControls = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	    splitControls.add(drivePane);
+	    splitControls.add(GetTextInputField());
+	    splitControls.setDividerSize(0);
+	    
         Splitter drive_and_preview = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
         drive_and_preview.add(logPane);
-        drive_and_preview.add(drivePane);
+        drive_and_preview.add(splitControls);
         drive_and_preview.setDividerSize(8);
         drive_and_preview.setDividerLocation(-100);
         
@@ -1737,7 +1764,23 @@ public class Makelangelo
 		}
     }
     */
-    
+
+	private JPanel GetTextInputField() {
+		textInputArea = new JPanel();
+		textInputArea.setLayout(new BoxLayout(textInputArea,BoxLayout.LINE_AXIS));
+		
+		commandLineText = new JTextField(1);
+		commandLineSend = new JButton("Send");
+		
+		textInputArea.add(commandLineText);
+		textInputArea.add(commandLineSend);
+		
+		commandLineText.addKeyListener(this);
+		commandLineSend.addActionListener(this);
+		
+		return textInputArea;
+	}
+
     public JFrame getParentFrame() {
     	return mainframe;
     }
