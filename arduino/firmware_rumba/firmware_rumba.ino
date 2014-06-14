@@ -11,6 +11,9 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 #include "configure.h"
+
+#include <SPI.h>  // pkm fix for Arduino 1.5
+
 #include "Vector3.h"
 
 

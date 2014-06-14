@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -72,6 +73,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -1264,99 +1266,114 @@ public class Makelangelo
 	 * Open the config dialog, update the paper size, refresh the preview tab.
 	 */
 	public JPanel DriveManually() {
+		GridBagConstraints c;
+		
 		JPanel driver = new JPanel();
-		driver.setLayout(new GridBagLayout());
+		driver.setLayout(new BoxLayout(driver, BoxLayout.PAGE_AXIS));
 
-		final JButton find = new JButton("FIND HOME");		find.setPreferredSize(new Dimension(100,20));
-		final JButton home = new JButton("GO HOME");		home.setPreferredSize(new Dimension(100,20));
-		final JButton center = new JButton("THIS IS HOME");	center.setPreferredSize(new Dimension(100,20));
-		
-		final JButton up1 = new JButton("Y1");  		up1.setPreferredSize(new Dimension(60,20));
-		final JButton up10 = new JButton("Y10");  		up10.setPreferredSize(new Dimension(60,20));
-		final JButton up100 = new JButton("Y100");  	up100.setPreferredSize(new Dimension(60,20));
-		
-		final JButton down1 = new JButton("Y-1");		down1.setPreferredSize(new Dimension(60,20));
-		final JButton down10 = new JButton("Y-10");		down10.setPreferredSize(new Dimension(60,20));
-		final JButton down100 = new JButton("Y-100");	down100.setPreferredSize(new Dimension(60,20));
-		
-		final JButton left1 = new JButton("X-1");		left1.setPreferredSize(new Dimension(60,20));
-		final JButton left10 = new JButton("X-10");		left10.setPreferredSize(new Dimension(60,20));
-		final JButton left100 = new JButton("X-100");	left100.setPreferredSize(new Dimension(60,20));
-		
-		final JButton right1 = new JButton("X1");		right1.setPreferredSize(new Dimension(60,20));
-		final JButton right10 = new JButton("X10");		right10.setPreferredSize(new Dimension(60,20));
-		final JButton right100 = new JButton("X100");	right100.setPreferredSize(new Dimension(60,20));
-		
-		final JButton TL = new JButton("TL");			TL.setPreferredSize(new Dimension(60,20));
-		final JButton TR = new JButton("TR");			TR.setPreferredSize(new Dimension(60,20));
-		final JButton BL = new JButton("BL");			BL.setPreferredSize(new Dimension(60,20));
-		final JButton BR = new JButton("BR");			BR.setPreferredSize(new Dimension(60,20));
+		JPanel axisControl = new JPanel();
+			axisControl.setLayout(new GridBagLayout());
+			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(50,20));		yAxis.setHorizontalAlignment(SwingConstants.CENTER);
+			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(50,20));
+			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(50,20));
+			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(50,20));
+			final JButton up1 = new JButton("1");  			up1.setPreferredSize(new Dimension(50,20));
+			final JButton up10 = new JButton("10");  		up10.setPreferredSize(new Dimension(50,20));
+			final JButton up100 = new JButton("100");  		up100.setPreferredSize(new Dimension(50,20));
+			
+			final JLabel xAxis = new JLabel("X");			xAxis.setPreferredSize(new Dimension(50,20));		xAxis.setHorizontalAlignment(SwingConstants.CENTER);
+			final JButton left100 = new JButton("-100");	left100.setPreferredSize(new Dimension(50,20));
+			final JButton left10 = new JButton("-10");		left10.setPreferredSize(new Dimension(50,20));
+			final JButton left1 = new JButton("-1");		left1.setPreferredSize(new Dimension(50,20));	
+			final JButton right1 = new JButton("1");		right1.setPreferredSize(new Dimension(50,20));
+			final JButton right10 = new JButton("10");		right10.setPreferredSize(new Dimension(50,20));
+			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(50,20));
 
-		final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
-		final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
+			//final JButton find = new JButton("FIND HOME");		find.setPreferredSize(new Dimension(100,20));
+			final JButton center = new JButton("SET HOME");	center.setPreferredSize(new Dimension(100,20));
+			final JButton home = new JButton("GO HOME");	home.setPreferredSize(new Dimension(100,20));
+			
+			c = new GridBagConstraints();
+			//c.fill=GridBagConstraints.BOTH; 
+			c.gridx=0;  c.gridy=0;  axisControl.add(xAxis,c);
+			c.gridx=1;	c.gridy=0;	axisControl.add(down100,c);
+			c.gridx=2;	c.gridy=0;	axisControl.add(down10,c);
+			c.gridx=3;	c.gridy=0;	axisControl.add(down1,c);
+			c.gridx=4;	c.gridy=0;	axisControl.add(up1,c);
+			c.gridx=5;	c.gridy=0;	axisControl.add(up10,c);
+			c.gridx=6;	c.gridy=0;	axisControl.add(up100,c);
+			c.gridx=8;	c.gridy=0;	axisControl.add(home,c);
+			
+			c.gridx=0;  c.gridy=1;  axisControl.add(yAxis,c);
+			c.gridx=1;	c.gridy=1;	axisControl.add(left100,c);
+			c.gridx=2;	c.gridy=1;	axisControl.add(left10,c);
+			c.gridx=3;	c.gridy=1;	axisControl.add(left1,c);
+			c.gridx=4;	c.gridy=1;	axisControl.add(right1,c);
+			c.gridx=5;	c.gridy=1;	axisControl.add(right10,c);
+			c.gridx=6;	c.gridy=1;	axisControl.add(right100,c);
+			c.gridx=8;	c.gridy=1;	axisControl.add(center,c);
 		
-		feed_rate = MachineConfiguration.getSingleton().GetFeedRate();
-		final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(60,20));
-		feedRate.setText(Double.toString(feed_rate));
-		final JButton setFeedRate = new JButton("Set");	setFeedRate.setPreferredSize(new Dimension(60,20));
 		
-		GridBagConstraints c = new GridBagConstraints();
-		//c.fill=GridBagConstraints.BOTH; 
-		c.gridx=1;  c.gridy=1;  driver.add(TL,c);
-		c.gridx=5;  c.gridy=1;  driver.add(TR,c);
-		c.gridx=1;  c.gridy=5;  driver.add(BL,c);
-		c.gridx=5;  c.gridy=5;  driver.add(BR,c);
+		JPanel corners = new JPanel();
+			corners.setLayout(new GridBagLayout());
+			final JButton goTop = new JButton("TOP");		goTop.setPreferredSize(new Dimension(100,20));
+			final JButton goBottom = new JButton("BOTTOM");	goBottom.setPreferredSize(new Dimension(100,20));
+			final JButton goLeft = new JButton("LEFT");		goLeft.setPreferredSize(new Dimension(100,20));
+			final JButton goRight = new JButton("RIGHT");	goRight.setPreferredSize(new Dimension(100,20));
+			final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
+			final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
+			c = new GridBagConstraints();
+			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
+			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
+			c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
+			c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
+			c.insets = new Insets(0,0,0,5);
+			c.gridx=5;  c.gridy=0;  corners.add(z90,c);
+			c.gridx=5;  c.gridy=1;  corners.add(z0,c);
+			c.insets = null;
 		
-		c.gridx=3;	c.gridy=0;	driver.add(up100,c);
-		c.gridx=3;	c.gridy=1;	driver.add(up10,c);
-		c.gridx=3;	c.gridy=2;	driver.add(up1,c);
-		c.gridx=3;	c.gridy=4;	driver.add(down1,c);
-		c.gridx=3;	c.gridy=5;	driver.add(down10,c);
-		c.gridx=3;	c.gridy=6;	driver.add(down100,c);
+	
+		JPanel feedRateControl = new JPanel();
+		feedRateControl.setLayout(new GridBagLayout());
+			c = new GridBagConstraints();
+			feed_rate = MachineConfiguration.getSingleton().GetFeedRate();
+			final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
+			feedRate.setText(Double.toString(feed_rate));
+			final JButton setFeedRate = new JButton("Set");
 
-		c.gridx=0;	c.gridy=3;	driver.add(left100,c);
-		c.gridx=1;	c.gridy=3;	driver.add(left10,c);
-		c.gridx=2;	c.gridy=3;	driver.add(left1,c);
-		c.gridx=4;	c.gridy=3;	driver.add(right1,c);
-		c.gridx=5;	c.gridy=3;	driver.add(right10,c);
-		c.gridx=6;	c.gridy=3;	driver.add(right100,c);
-
-		//c.gridx=3;	c.gridy=3;	driver.add(home,c);
-		c.gridx=7;  c.gridy=0;  driver.add(center,c);
-		c.gridx=7;  c.gridy=1;  driver.add(home,c);  //driver.add(find,c);
-		c.gridx=7;  c.gridy=5;  driver.add(z90,c);
-		c.gridx=7;  c.gridy=6;  driver.add(z0,c);
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel("Speed:"),c);
+			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel("mm/min"),c);
+			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		
-		c.gridx=3;  c.gridy=8;  driver.add(new JLabel("Speed:"),c);
-		c.gridx=4;  c.gridy=8;  driver.add(feedRate,c);
-		c.gridx=5;  c.gridy=8;  driver.add(new JLabel("mm/min"),c);
-		c.gridx=6;  c.gridy=8;  driver.add(setFeedRate,c);
+
+		driver.add(axisControl);
+		driver.add(corners);
+		driver.add(feedRateControl);
+		
+	    JPanel inputField=GetTextInputField();
+	    //inputField.setMinimumSize(new Dimension(100,50));
+	    //inputField.setMaximumSize(new Dimension(10000,50));
+
+	    driver.add(inputField);
+	    
 		
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					JButton b = (JButton)subject;
 					if(running) return;
-					if(b==home) {
-						GoHome();
-						SendLineToRobot("M114");
-					} else if(b==TL) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
-					} else if(b==TR) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
-					} else if(b==BL) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
-					} else if(b==BR) { 
-						SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
-					} else if(b==find) {
-						SendLineToRobot("G28");
-					} else if(b==center) {
-						SendLineToRobot("G92 X0 Y0");
-					} else if(b==z90) {
-						RaisePen();
-					} else if(b==z0) {
-						LowerPen();
-					} else if(b==setFeedRate) {
+					if(b==home) SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
+					else if(b==center) SendLineToRobot("G92 X0 Y0");
+					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
+					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
+					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					//} else if(b==find) {
+					//	SendLineToRobot("G28");
+					else if(b==z90) RaisePen();
+					else if(b==z0) LowerPen();
+					else if(b==setFeedRate) {
 						String fr=feedRate.getText();
 						fr=fr.replaceAll("[ ,]","");
 						feed_rate = Double.parseDouble(fr);
@@ -1366,9 +1383,22 @@ public class Makelangelo
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {
 						SendLineToRobot("G91");  // set relative mode
-						SendLineToRobot("G00 G21 F"+feed_rate+" "+b.getText());
+
+						if(b==down100) SendLineToRobot("G0 Y-100");
+						if(b==down10) SendLineToRobot("G0 Y-10");
+						if(b==down1) SendLineToRobot("G0 Y-1");
+						if(b==up100) SendLineToRobot("G0 Y100");
+						if(b==up10) SendLineToRobot("G0 Y10");
+						if(b==up1) SendLineToRobot("G0 Y1");
+
+						if(b==left100) SendLineToRobot("G0 X-100");
+						if(b==left10) SendLineToRobot("G0 X-10");
+						if(b==left1) SendLineToRobot("G0 X-1");
+						if(b==right100) SendLineToRobot("G0 X100");
+						if(b==right10) SendLineToRobot("G0 X10");
+						if(b==right1) SendLineToRobot("G0 X1");
+						
 						SendLineToRobot("G90");  // return to absolute mode
-						SendLineToRobot("M114");
 					}
 			  }
 		};
@@ -1389,13 +1419,14 @@ public class Makelangelo
 		z0.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
-		find.addActionListener(driveButtons);
-		TL.addActionListener(driveButtons);
-		TR.addActionListener(driveButtons);
-		BL.addActionListener(driveButtons);
-		BR.addActionListener(driveButtons);
+		//find.addActionListener(driveButtons);
+		goTop.addActionListener(driveButtons);
+		goBottom.addActionListener(driveButtons);
+		goLeft.addActionListener(driveButtons);
+		goRight.addActionListener(driveButtons);
 		setFeedRate.addActionListener(driveButtons);
 		
+		driver.setPreferredSize(new Dimension(150,100));
 		return driver;
 	}
 	
@@ -1738,21 +1769,17 @@ public class Makelangelo
         statusBar.setMinimumSize(d);
 
         // layout
-	    JSplitPane splitControls = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	    splitControls.add(drivePane);
-	    splitControls.add(GetTextInputField());
-	    splitControls.setDividerSize(0);
-	    
-        Splitter drive_and_preview = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+        Splitter drive_and_preview = new Splitter(JSplitPane.VERTICAL_SPLIT);
         drive_and_preview.add(logPane);
-        drive_and_preview.add(splitControls);
-        drive_and_preview.setDividerSize(8);
-        drive_and_preview.setDividerLocation(-100);
+        drive_and_preview.add(drivePane);
+        //drive_and_preview.setDividerSize(8);
+        //drive_and_preview.setDividerLocation(-100);
         
-        Splitter split = new Splitter(JSplitPane.VERTICAL_SPLIT);
+        Splitter split = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
         split.add(previewPane);
         split.add(drive_and_preview);
-        split.setDividerSize(8);
+        //split.setDividerSize(8);
+        //split.setDividerLocation(-10);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
         contentPane.add(split,BorderLayout.CENTER);
@@ -1781,7 +1808,7 @@ public class Makelangelo
 		textInputArea = new JPanel();
 		textInputArea.setLayout(new BoxLayout(textInputArea,BoxLayout.LINE_AXIS));
 		
-		commandLineText = new JTextField(1);
+		commandLineText = new JTextField(0);
 		commandLineSend = new JButton("Send");
 		
 		textInputArea.add(commandLineText);
