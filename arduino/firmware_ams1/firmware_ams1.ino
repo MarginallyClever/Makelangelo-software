@@ -446,11 +446,9 @@ static void teleport(float x,float y) {
 static void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
-  Serial.println(F("== DRAWBOT - http://www.makelangelo.com/ =="));
-  Serial.println(F("All commands end with a semi-colon."));
-  Serial.println(F("HELP;  - display this message"));
-  Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
-  Serial.println(F("       - display/update this robot's configuration."));
+  Serial.println(F("M100 - display this message"));
+  Serial.println(F("M101 [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx]"));
+  Serial.println(F("       - display/update board dimensions."));
   Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
   Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,G92,M18,M114"));
 }
@@ -729,6 +727,42 @@ void tool_change(int tool_id) {
 }
 
 
+//------------------------------------------------------------------------------
+void processConfig() {
+  limit_top=parsenumber('T',limit_top);
+  limit_bottom=parsenumber('B',limit_bottom);
+  limit_right=parsenumber('R',limit_right);
+  limit_left=parsenumber('L',limit_left);
+  
+  char gg=parsenumber('G',m1d);
+  char hh=parsenumber('H',m2d);
+  char i=parsenumber('I',0);
+  char j=parsenumber('J',0);
+  if(i!=0) {
+    if(i>0) {
+      M1_REEL_IN  = HIGH;
+      M1_REEL_OUT = LOW;
+    } else {
+      M1_REEL_IN  = LOW;
+      M1_REEL_OUT = HIGH;
+    }
+  }
+  if(j!=0) {
+    if(j>0) {
+      M2_REEL_IN  = HIGH;
+      M2_REEL_OUT = LOW;
+    } else {
+      M2_REEL_IN  = LOW;
+      M2_REEL_OUT = HIGH;
+    }
+  }
+  
+  // @TODO: check t>b, r>l ?
+  printConfig();
+  
+  teleport(0,0);
+}
+
 
 //------------------------------------------------------------------------------
 static void processCommand() {
@@ -774,81 +808,19 @@ static void processCommand() {
   if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"TELEPORT",8)) {
-    float xx=posx;
-    float yy=posy;
-  
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'X': xx=atof(ptr+1)*mode_scale;  break;
-      case 'Y': yy=atof(ptr+1)*mode_scale;  break;
-      default: ptr=0; break;
-      }
-    }
-
-    teleport(xx,yy);
-  } else if(!strncmp(buffer,"CONFIG",6)) {
-    float tt=limit_top;
-    float bb=limit_bottom;
-    float rr=limit_right;
-    float ll=limit_left;
-    char gg=m1d;
-    char hh=m2d;
-    
-    char *ptr=buffer;
-    while(ptr && ptr<buffer+sofar && strlen(ptr)) {
-      ptr=strchr(ptr,' ')+1;
-      switch(*ptr) {
-      case 'T': tt=atof(ptr+1);  break;
-      case 'B': bb=atof(ptr+1);  break;
-      case 'R': rr=atof(ptr+1);  break;
-      case 'L': ll=atof(ptr+1);  break;
-      case 'G': gg=*(ptr+1);  break;
-      case 'H': hh=*(ptr+1);  break;
-      case 'I':
-        if(atoi(ptr+1)>0) {
-          M1_REEL_IN=FORWARD;
-          M1_REEL_OUT=BACKWARD;
-        } else {
-          M1_REEL_IN=BACKWARD;
-          M1_REEL_OUT=FORWARD;
-        }
-        break;
-      case 'J':
-        if(atoi(ptr+1)>0) {
-          M2_REEL_IN=FORWARD;
-          M2_REEL_OUT=BACKWARD;
-        } else {
-          M2_REEL_IN=BACKWARD;
-          M2_REEL_OUT=FORWARD;
-        }
-        break;
-      }
-    }
-    
-    // @TODO: check t>b, r>l ?
-    limit_top=tt;
-    limit_bottom=bb;
-    limit_right=rr;
-    limit_left=ll;
-    m1d=gg;
-    m2d=hh;
-    
-    teleport(0,0);
-    printConfig();
-  } 
+  }
 
   cmd=parsenumber('M',-1);
   switch(cmd) {
   case 18:  disable_motors();  break;
   case 17:  activate_motors();  break;
   case 100:  help();  break;
+  case 101:  processConfig();  break;
   case 110:  line_number = parsenumber('N',line_number);  break;
   case 114:  where();  break;
   }
-
+  
+  
   cmd=parsenumber('G',-1);
   switch(cmd) {
   case 0:
@@ -953,6 +925,7 @@ static void processCommand() {
 }
 
 
+//------------------------------------------------------------------------------
 /**
  * prepares the input buffer to receive a new message and tells the serial connected device it is ready for more.
  */

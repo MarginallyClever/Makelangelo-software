@@ -213,6 +213,7 @@ void processConfig() {
 }
 
 
+//------------------------------------------------------------------------------
 // test FK(IK(x,y))=x,y
 void test_kinematics(float x,float y) {
   float A, B, C, D;
@@ -346,13 +347,11 @@ void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
   Serial.println(F("== DRAWBOT - http://www.makelangelo.com/ =="));
-  Serial.println(F("All commands end with a semi-colon."));
-  Serial.println(F("HELP;  - display this message"));
-  Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
-  Serial.println(F("       - display/update this robot's configuration."));
-  Serial.println(F("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter."));
+  Serial.println(F("M100 - display this message"));
+  Serial.println(F("M101 [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx]"));
+  Serial.println(F("       - display/update board dimensions."));
   Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
-  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,M18,M114"));
+  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,G92,M18,M114"));
 }
 
 
@@ -533,12 +532,7 @@ void processCommand() {
   if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"TELEPORT",8)) {
-    teleport(parsenumber('X',posx),
-             parsenumber('Y',posy));
-  } else if(!strncmp(buffer,"CONFIG",6)) {
-    processConfig();
-  } 
+  }
 
   
   cmd=parsenumber('M',-1);
@@ -547,6 +541,7 @@ void processCommand() {
   case 18:  motor_enable();  break;
   case 17:  motor_disable();  break;
   case 100:  help();  break;
+  case 101:  processConfig();  break;
   case 110:  line_number = parsenumber('N',line_number);  break;
   case 114:  where();  break;
   }

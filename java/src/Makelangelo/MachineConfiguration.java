@@ -492,12 +492,12 @@ public class MachineConfiguration {
 
 	
 	public String GetBobbinLine() {
-		return new String("D01 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
+		return new String("D1 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
 	}
 
 	
 	public String GetConfigLine() {
-		return new String("CONFIG T"+limit_top
+		return new String("M101 T"+limit_top
 		+" B"+limit_bottom
 		+" L"+limit_left
 		+" R"+limit_right

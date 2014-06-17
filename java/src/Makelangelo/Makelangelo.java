@@ -902,7 +902,7 @@ public class Makelangelo
 		// Send a command to the robot with new configuration values
 		SendLineToRobot(MachineConfiguration.getSingleton().GetConfigLine());
 		SendLineToRobot(MachineConfiguration.getSingleton().GetBobbinLine());
-		SendLineToRobot("G92 X0 Y0 Z0");
+		SendLineToRobot("G92 X0 Y0");
 	}
 	
 	
@@ -942,7 +942,7 @@ public class Makelangelo
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		String [] toolNames = mc.getToolNames();
 		
-		if(i>toolNames.length) {
+		if(i<0 || i>toolNames.length) {
 			Log("<span style='color:red'>Invalid tool "+i+" requested.</span>");
 			i=0;
 		}
@@ -1298,7 +1298,6 @@ public class Makelangelo
 			c.gridx=4;	c.gridy=0;	axisControl.add(up1,c);
 			c.gridx=5;	c.gridy=0;	axisControl.add(up10,c);
 			c.gridx=6;	c.gridy=0;	axisControl.add(up100,c);
-			c.gridx=8;	c.gridy=0;	axisControl.add(home,c);
 			
 			c.gridx=0;  c.gridy=1;  axisControl.add(yAxis,c);
 			c.gridx=1;	c.gridy=1;	axisControl.add(left100,c);
@@ -1307,15 +1306,14 @@ public class Makelangelo
 			c.gridx=4;	c.gridy=1;	axisControl.add(right1,c);
 			c.gridx=5;	c.gridy=1;	axisControl.add(right10,c);
 			c.gridx=6;	c.gridy=1;	axisControl.add(right100,c);
-			c.gridx=8;	c.gridy=1;	axisControl.add(center,c);
 		
 		
 		JPanel corners = new JPanel();
 			corners.setLayout(new GridBagLayout());
-			final JButton goTop = new JButton("TOP");		goTop.setPreferredSize(new Dimension(100,20));
-			final JButton goBottom = new JButton("BOTTOM");	goBottom.setPreferredSize(new Dimension(100,20));
-			final JButton goLeft = new JButton("LEFT");		goLeft.setPreferredSize(new Dimension(100,20));
-			final JButton goRight = new JButton("RIGHT");	goRight.setPreferredSize(new Dimension(100,20));
+			final JButton goTop = new JButton("TOP");		goTop.setPreferredSize(new Dimension(80,20));
+			final JButton goBottom = new JButton("BOTTOM");	goBottom.setPreferredSize(new Dimension(80,20));
+			final JButton goLeft = new JButton("LEFT");		goLeft.setPreferredSize(new Dimension(80,20));
+			final JButton goRight = new JButton("RIGHT");	goRight.setPreferredSize(new Dimension(80,20));
 			final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
 			final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
 			c = new GridBagConstraints();
@@ -1323,10 +1321,12 @@ public class Makelangelo
 			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
 			c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
 			c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
-			c.insets = new Insets(0,0,0,5);
+			c.insets = new Insets(0,5,0,0);
 			c.gridx=5;  c.gridy=0;  corners.add(z90,c);
 			c.gridx=5;  c.gridy=1;  corners.add(z0,c);
-			c.insets = null;
+			c.gridx=6;	c.gridy=0;	corners.add(home,c);
+			c.gridx=6;	c.gridy=1;	corners.add(center,c);
+			c.insets = new Insets(0,0,0,0);
 		
 	
 		JPanel feedRateControl = new JPanel();
