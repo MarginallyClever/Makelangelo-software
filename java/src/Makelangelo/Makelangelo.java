@@ -422,21 +422,20 @@ public class Makelangelo
 
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
+		msg=msg.replace("\n", "<br>\n")+"\n";
+		msg=msg.replace("\n\n","\n");
+		logToFile.write(msg);
+		logToFile.flush();
+
 		try {
-			msg=msg.replace("\n", "<br>\n")+"\n";
-			msg=msg.replace("\n\n","\n");
-			logToFile.write(msg);
-			logToFile.flush();
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
 			int over_length = doc.getLength() - msg.length() - 5000;
 			doc.remove(0, over_length);
 			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// Do we care if it fails?
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// Do we care if it fails?
 		}
 	}
 	
@@ -446,11 +445,9 @@ public class Makelangelo
 			kit.insertHTML(doc, 0, "", 0,0,null);
 			logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// Do we care if it fails?
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// Do we care if it fails?
 		}
 	}
 	
@@ -1648,14 +1645,22 @@ public class Makelangelo
         buttonText2GCODE.addActionListener(this);
         menu.add(buttonText2GCODE);
         
-        subMenu = new JMenu("Open/Convert File...");
+        subMenu = new JMenu("Convert Image");
         subMenu.getAccessibleContext().setAccessibleDescription("Open a g-code file");
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
+	        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
+	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+	        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
+	        buttonOpenFile.addActionListener(this);
+	        subMenu.add(buttonOpenFile);
+
 	        // list recent files
 	        if(recentFiles != null && recentFiles.length>0) {
-	        	// list files here
+	        	// add a separator only if there are recent files
+	        	if( recentFiles.length!=0 ) subMenu.addSeparator();
+	        	
 	        	for(i=0;i<recentFiles.length;++i) {
 	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
 	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
@@ -1664,14 +1669,7 @@ public class Makelangelo
 	            		subMenu.add(buttonRecent[i]);
 	            	}
 	        	}
-	        	if(i!=0) subMenu.addSeparator();
 	        }
-        
-	        buttonOpenFile = new JMenuItem("Open File...",KeyEvent.VK_O);
-	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-	        buttonOpenFile.getAccessibleContext().setAccessibleDescription("Open a g-code file...");
-	        buttonOpenFile.addActionListener(this);
-	        subMenu.add(buttonOpenFile);
         
         menu.add(subMenu);
 
@@ -1787,7 +1785,7 @@ public class Makelangelo
         return contentPane;
     }
 
-    /*
+
 	// connect to the last port
     private void reconnectToLastPort() {
 	    ListSerialPorts();
@@ -1802,7 +1800,6 @@ public class Makelangelo
 			OpenFileOnDemand(recentFiles[0]);
 		}
     }
-    */
 
 	private JPanel GetTextInputField() {
 		textInputArea = new JPanel();
@@ -1826,24 +1823,26 @@ public class Makelangelo
     
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
-        //Create and set up the window.
+        // Create and set up the window.
     	mainframe = new JFrame("Makelangelo not connected");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
-        //Create and set up the content pane.
-        Makelangelo demo = Makelangelo.getSingleton();
-        mainframe.setJMenuBar(demo.CreateMenuBar());
-        mainframe.setContentPane(demo.CreateContentPane());
+        // Create and set up the content pane.
+        Makelangelo m = Makelangelo.getSingleton();
+        mainframe.setJMenuBar(m.CreateMenuBar());
+        mainframe.setContentPane(m.CreateContentPane());
  
-        //Display the window.
-        // TODO remember preferences for window size
-        mainframe.setSize(1200,700);
+        // Display the window.
+        int width =m.prefs.getInt("Default window width", 1200);
+        int height=m.prefs.getInt("Default window height", 700);
+        mainframe.setSize(width,height);
         mainframe.setVisible(true);
         
-        demo.previewPane.ZoomToFitPaper();
-        //demo.reconnectToLastPort();
-        //demo.reopenLastFile();
-        //demo.CheckForUpdate();
+        m.previewPane.ZoomToFitPaper();
+        
+        if(m.prefs.getBoolean("Reconnect to last port on start", false)) m.reconnectToLastPort();
+        if(m.prefs.getBoolean("Open last file on start", false)) m.reopenLastFile();
+        if(m.prefs.getBoolean("Check for updates", false)) m.CheckForUpdate();
     }
     
     public static void main(String[] args) {
