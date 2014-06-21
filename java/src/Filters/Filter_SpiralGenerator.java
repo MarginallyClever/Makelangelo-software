@@ -114,13 +114,13 @@ public class Filter_SpiralGenerator extends Filter {
 	 */
 	public void Convert(BufferedImage img) throws IOException {
 		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
 		img = bw.Process(img);
 		
 		// spiralize
 		int x,y,i,j;
-		double steps=4;
-		double leveladd = 255.0/(steps+1);
+		final int steps=4;
+		double leveladd = 255.0/(steps);
 		double level;
 		int z=0;
 
@@ -153,21 +153,24 @@ public class Filter_SpiralGenerator extends Filter {
 
 		float r=maxr, d, f;
 		float fx,fy;
+		int numRings=0;
+		double [] each_level = new double[steps];
+		each_level[0]=leveladd*1;
+		each_level[1]=leveladd*3;
+		each_level[2]=leveladd*2;
+		each_level[3]=leveladd*4;
 		j=0;
-		while(r>0) {
+		while(r>1) {
 			d=r*2;
-			if(j==steps) j=0;
 			++j;
-			level = leveladd*j;
+			level = each_level[j%steps];
 			// find circumference of current circle
-			float circumference=(float) Math.floor(((d+(d-toolDiameter))*Math.PI)/2);
+			float circumference=(float) Math.floor(((d+d-toolDiameter)*Math.PI)/2);
 
-			for(i=0;i<=circumference;i+=2) {
-				f = i/circumference;
-				//fx = hw + (Math.cos(Math.PI*2.0*f)*(d-f));
-				fx = w2 + (float)(Math.cos(Math.PI*2.0*f)*d);
-				//fy = hh + (Math.sin(Math.PI*2.0*f)*(d-f));
-				fy = h2 + (float)(Math.sin(Math.PI*2.0*f)*d);
+			for(i=0;i<=circumference;++i) {
+				f = (float)Math.PI*2.0f*(i/circumference);
+				fx = w2 + (float)(Math.cos(f)*d);
+				fy = h2 + (float)(Math.sin(f)*d);
 				x = (int)fx;
 				y = (int)fy;
 				// clip to image boundaries
@@ -179,9 +182,11 @@ public class Filter_SpiralGenerator extends Filter {
 				}
 			}
 			r-=toolDiameter*0.5;
-			Makelangelo.getSingleton().Log("<font color='yellow'>d="+d+","+circumference+"</font>\n");
+			++numRings;
 		}
 		
+		Makelangelo.getSingleton().Log("<font color='yellow'>"+numRings+" rings.</font>\n");
+
 		liftPen(out);
 		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);

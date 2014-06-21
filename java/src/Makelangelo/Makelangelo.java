@@ -341,7 +341,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		final JComboBox input_draw_style = new JComboBox(styles);
+		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");
@@ -649,7 +649,6 @@ public class Makelangelo
 	public void LoadGCode(String filename) {
 		try {
 			gcode.Load(filename);
-			gcode.EstimateDrawTime();
 		   	Log("<font color='green'>"+gcode.estimate_count + " line segments.\n"+gcode.estimated_length+ "cm of line.\n" +
 			   		"Estimated "+statusBar.formatTime((long)(gcode.estimated_time))+"s to draw.</font>\n");
 	    }
