@@ -8,11 +8,11 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="Makelangelo.Makelangelo"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ RXTXcomm.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ jssc.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="/Users/danroyer/Documents/workspace/DrawBot/java/classes"/>
-            <zipfileset dir="/Users/danroyer/Documents/workspace/DrawBot/java" includes="RXTXcomm.jar"/>
+            <zipfileset dir="/Users/danroyer/Documents/workspace/DrawBot/java/libs/jSSC-2.6.0-Release" includes="jssc.jar"/>
         </jar>
     </target>
 </project>

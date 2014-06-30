@@ -320,7 +320,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
+		final JComboBox input_draw_style = new JComboBox(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");
@@ -544,10 +544,10 @@ public class Makelangelo
 	public String[] ListSerialPorts() {
         if(System.getProperty("os.name").equals("Mac OS X")){
         	portsDetected = SerialPortList.getPortNames("/dev/");
-            System.out.println("OS X");
+            //System.out.println("OS X");
         } else {
         	portsDetected = SerialPortList.getPortNames("COM");
-            System.out.println("Windows");
+            //System.out.println("Windows");
         }
         
 	    return portsDetected;
