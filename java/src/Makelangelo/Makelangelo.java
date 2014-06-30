@@ -9,11 +9,7 @@ package Makelangelo;
 
 
 // io functions
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
+import jssc.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,9 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.text.NumberFormat;
@@ -43,8 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.TooManyListenersException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -123,21 +115,19 @@ public class Makelangelo
 	
 	// TODO put all serial stuff in a Serial class, hide it inside Robot class?
 	// Serial connection
-	private static final int BAUD_RATE = 57600;
-	private CommPortIdentifier portIdentifier;
-	private CommPort commPort;
-	private SerialPort serialPort;
-	private InputStream in;
-	private OutputStream out;
-	private String[] portsDetected;
-	private boolean portOpened=false;
-	private boolean portConfirmed=false;
-	// Serial communication
-	static private final String cue = "> ";
-	static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
-	static private final String nochecksum = "NOCHECKSUM";
-	static private final String badchecksum = "BADCHECKSUM ";
-	static private final String badlinenum = "BADLINENUM ";
+		private static final int BAUD_RATE = 57600;
+		//private CommPortIdentifier portIdentifier;
+		//private CommPort commPort;
+		private SerialPort serialPort;
+		private String[] portsDetected;
+		private boolean portOpened=false;
+		private boolean portConfirmed=false;
+		// Serial communication
+		static private final String cue = "> ";
+		static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
+		static private final String nochecksum = "NOCHECKSUM";
+		static private final String badchecksum = "BADCHECKSUM ";
+		static private final String badlinenum = "BADLINENUM ";
 	
 	// parsing input from Makelangelo
 	private String serial_recv_buffer="";
@@ -444,15 +434,9 @@ public class Makelangelo
 		if(portOpened) {
 		    if (serialPort != null) {
 		        try {
-		            // Close the I/O streams.
-		            out.close();
-		            in.close();
-			        // Close the port.
 			        serialPort.removeEventListener();
-			        serialPort.close();
-		        } catch (IOException e) {
-		            // Don't care
-		        }
+			        serialPort.closePort();
+		        } catch (SerialPortException e) {}
 		    }
 
 		    ClearLog();
@@ -472,62 +456,15 @@ public class Makelangelo
 		
 		Log("<font color='green'>Connecting to "+portName+"...</font>\n");
 		
-		// find the port
-		try {
-			portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
-		}
-		catch(Exception e) {
-			Log("<span style='color:red'>Ports could not be identified:"+e.getMessage()+"</span>\n");
-			e.printStackTrace();
-			return 1;
-		}
-
-		if ( portIdentifier.isCurrentlyOwned() ) {
-    	    Log("<span style='color:red'>Error: Another program is currently using this port."+"</span>\n");
-			return 2;
-		}
-
 		// open the port
+		serialPort = new SerialPort(portName);
 		try {
-		    commPort = portIdentifier.open("DrawbotGUI",2000);
-		}
-		catch(Exception e) {
-			Log("<span style='color:red'>Port could not be opened:"+e.getMessage()+"</span>\n");
-			e.printStackTrace();
-			return 3;
-		}
-
-	    if( ( commPort instanceof SerialPort ) == false ) {
-			Log("<span style='color:red'>This is not a SerialPort.</span>\n");
-			return 4;
-		}
-
-		// set the port parameters (like baud rate)
-		serialPort = (SerialPort)commPort;
-		try {
-			serialPort.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-		}
-		catch(Exception e) {
+            serialPort.openPort();// Open serial port
+            serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+            serialPort.addEventListener(this);
+        } catch (SerialPortException e) {
 			Log("<span style='color:red'>Port could not be configured:"+e.getMessage()+"</span>\n");
-			return 5;
-		}
-
-		try {
-			in = serialPort.getInputStream();
-			out = serialPort.getOutputStream();
-		}
-		catch(Exception e) {
-			Log("<span style='color:red'>Streams could not be opened:"+e.getMessage()+"</span>\n");
-			return 6;
-		}
-		
-		try {
-			serialPort.addEventListener(this);
-			serialPort.notifyOnDataAvailable(true);
-		}
-		catch(TooManyListenersException e) {
-			Log("<span style='color:red'>Streams could not be opened:"+e.getMessage()+"</span>\n");
-			return 7;
+			return 3;
 		}
 
 		Log("<span style='color:green'>Opened.</span>\n");
@@ -605,16 +542,14 @@ public class Makelangelo
 	
 	// find all available serial ports for the settings->ports menu.
 	public String[] ListSerialPorts() {
-		@SuppressWarnings("unchecked")
-	    Enumeration<CommPortIdentifier> ports = (Enumeration<CommPortIdentifier>)CommPortIdentifier.getPortIdentifiers();
-	    ArrayList<String> portList = new ArrayList<String>();
-	    while (ports.hasMoreElements()) {
-	        CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
-	        if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-	        	portList.add(port.getName());
-	        }
-	    }
-	    portsDetected = (String[]) portList.toArray(new String[0]);
+        if(System.getProperty("os.name").equals("Mac OS X")){
+        	portsDetected = SerialPortList.getPortNames("/dev/");
+            System.out.println("OS X");
+        } else {
+        	portsDetected = SerialPortList.getPortNames("COM");
+            System.out.println("Windows");
+        }
+        
 	    return portsDetected;
 	}
 	
@@ -995,9 +930,9 @@ public class Makelangelo
 		line += "\n";
 		
 		try {
-			out.write(line.getBytes());
+			serialPort.writeBytes(line.getBytes());
 		}
-		catch(IOException e) {}
+		catch(SerialPortException e) {}
 	}
 	
 	/**
@@ -1213,37 +1148,33 @@ public class Makelangelo
 	
 	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
-        switch (events.getEventType()) {
-            case SerialPortEvent.DATA_AVAILABLE:
-	            try {
-	            	final byte[] buffer = new byte[1024];
-					int len = in.read(buffer);
-					if( len>0 ) {
-						String line2 = new String(buffer,0,len);
-					
-						serial_recv_buffer+=line2;
-						// wait for the cue ("> ") to send another command
-						if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
-							String line2_mod = serial_recv_buffer.replace("\n", "");
-							line2_mod = line2_mod.replace(">", "");
-							line2_mod = line2_mod.trim();
-							if(!line2_mod.equals("")) {
-								Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
-							}
-							
-							int error_line = ErrorReported();
-							if(error_line != -1) {
-								gcode.linesProcessed = error_line;
-								serial_recv_buffer="";
-								SendFileCommand();
-							} else if(ConfirmPort()) {
-								serial_recv_buffer="";
-								SendFileCommand();
-							}
-						}
+        if(events.isRXCHAR()) {
+            try {
+            	int len = events.getEventValue();
+            	byte[] buffer = serialPort.readBytes(len);
+				String line2 = new String(buffer,0,len);
+				
+				serial_recv_buffer+=line2;
+				// wait for the cue ("> ") to send another command
+				if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
+					String line2_mod = serial_recv_buffer.replace("\n", "");
+					line2_mod = line2_mod.replace(">", "");
+					line2_mod = line2_mod.trim();
+					if(!line2_mod.equals("")) {
+						Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
 					}
-	            } catch (IOException e) {}
-                break;
+					
+					int error_line = ErrorReported();
+					if(error_line != -1) {
+						gcode.linesProcessed = error_line;
+						serial_recv_buffer="";
+						SendFileCommand();
+					} else if(ConfirmPort()) {
+						serial_recv_buffer="";
+						SendFileCommand();
+					}
+				}
+            } catch (SerialPortException e) {}
         }
     }
 
