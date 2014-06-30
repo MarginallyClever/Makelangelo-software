@@ -27,6 +27,8 @@ public class Filter {
 	float w2,h2,scale;
 	DrawingTool tool;
 	
+	int color_channel=0;
+	
 	// text properties
 	protected float kerning=5.0f;
 	protected float letter_width=10.0f;
@@ -44,14 +46,34 @@ public class Filter {
 	protected Align  align_horizontal = Align.CENTER;
 	protected float posx=0;
 	protected float posy=0;
+
+
+	// file properties
+	String dest;
+	// pen position optimizing
+	boolean lastup;
+	float previous_x,previous_y;
+
+
 	
+	public void SetDestinationFile(String _dest) {
+		dest=_dest;
+	}
 	
+	/**
+	 * Generate should be called by filters that create GCODE from a bufferedImage.
+	 */
 	public void Generate() {}
-	public void SetDestinationFile(String dest) {}
+
+	/**
+	 * Replace this with your generator/converter name.
+	 */
 	public String GetName() {  return "Unnamed";  }
 	public BufferedImage Process(BufferedImage img) {
 		return img;
 	}
+
+	// convert should be called by filters that modify a bufferedImage.
 	public void Convert(BufferedImage img) throws IOException {}
 	
 	
@@ -146,6 +168,83 @@ public class Filter {
 	}
 	
 	
+	protected int pointSample(BufferedImage img,int x,int y) {
+		Color c = new Color(img.getRGB(x, y));
+		switch(color_channel) {
+		case 1: return c.getRed();
+		case 2: return c.getGreen();
+		case 3: return c.getBlue();
+		default: return decode(c);
+		}
+	}
+
+	
+	protected int TakeImageSample(BufferedImage img,int x,int y) {
+		// point sampling
+
+		// 3x3 sampling
+		int c=0;
+		int values[]=new int[9];
+		int weights[]=new int[9];
+		if(y>0) {
+			if(x>0) {
+				values[c]=pointSample(img,x-1, y-1);
+				weights[c]=1;
+				c++;
+			}
+			values[c]=pointSample(img,x, y-1);
+			weights[c]=2;
+			c++;
+
+			if(x<image_width-1) {
+				values[c]=pointSample(img,x+1, y-1);
+				weights[c]=1;
+				c++;
+			}
+		}
+
+		if(x>0) {
+			values[c]=pointSample(img,x-1, y);
+			weights[c]=2;
+			c++;
+		}
+		values[c]=pointSample(img,x, y);
+		weights[c]=4;
+		c++;
+		if(x<image_width-1) {
+			values[c]=pointSample(img,x+1, y);
+			weights[c]=2;
+			c++;
+		}
+
+		if(y<image_height-1) {
+			if(x>0) {
+				values[c]=pointSample(img,x-1, y+1);
+				weights[c]=1;
+				c++;
+			}
+			values[c]=pointSample(img,x, y+1);
+			weights[c]=2;
+			c++;
+	
+			if(x<image_width-1) {
+				values[c]=pointSample(img,x+1, y+1);
+				weights[c]=1;
+				c++;
+			}
+		}
+		
+		int value=0,j;
+		int sum=0;
+		for(j=0;j<c;++j) {
+			value+=values[j]*weights[j];
+			sum+=weights[j];
+		}
+		
+		return value/sum;
+	}
+
+	
 	protected float TX(float x) {
 		return SX(x-w2);
 	}
@@ -158,6 +257,24 @@ public class Filter {
 	protected float SY(float y) {
 		return y*scale;
 	}
+	
+	
+	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		float x2 = TX(x);
+		float y2 = TY(y);
+		
+		if(up==lastup) {
+			previous_x=x2;
+			previous_y=y2;
+		} else {
+			tool.WriteMoveTo(out,previous_x,previous_y);
+			tool.WriteMoveTo(out,x2,y2);
+			if(up) liftPen(out);
+			else   lowerPen(out);
+			lastup=up;
+		}
+	}
+	
 	
 	protected double RoundOff(double value) {
 		return Math.floor(value * 100.0) / 100.0;

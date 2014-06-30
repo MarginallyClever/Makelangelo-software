@@ -14,123 +14,10 @@ import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 import Makelangelo.Point2D;
 
-/**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
+/** 
  * @author Dan
  */
-public class Filter_RGBCircleGenerator extends Filter {
-	// file properties
-	String dest;
-	
-	// conversion tools
-	int numPoints;
-	Point2D[] points = null;
-	int scount;
-	boolean lastup;
-	ProgressMonitor pm;
-	float previous_x,previous_y;
-	int channel;
-
-
-	
-	public void SetDestinationFile(String _dest) {
-		dest=_dest;
-	}
-	
-	
-	private void MoveTo(OutputStreamWriter out,int x,int y,boolean up) throws IOException {
-		float x2 = TX(x);
-		float y2 = TY(y);
-		
-		if(up==lastup) {
-			previous_x=x2;
-			previous_y=y2;
-		} else {
-			tool.WriteMoveTo(out,previous_x,previous_y);
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			tool.WriteMoveTo(out,x2,y2);
-			lastup=up;
-		}
-	}
-
-	private int pointSample(BufferedImage img,int x,int y) {
-		Color c = new Color(img.getRGB(x, y));
-		switch(channel) {
-		case 1: return c.getRed();
-		case 2: return c.getGreen();
-		case 3: return c.getBlue();
-		}
-		return decode(c);
-	}
-	
-	private int TakeImageSample(BufferedImage img,int x,int y) {
-		// point sampling
-
-		// 3x3 sampling
-		int c=0;
-		int values[]=new int[9];
-		int weights[]=new int[9];
-		if(y>0) {
-			if(x>0) {
-				values[c]=pointSample(img,x-1, y-1);
-				weights[c]=1;
-				c++;
-			}
-			values[c]=pointSample(img,x, y-1);
-			weights[c]=2;
-			c++;
-
-			if(x<image_width-1) {
-				values[c]=pointSample(img,x+1, y-1);
-				weights[c]=1;
-				c++;
-			}
-		}
-
-		if(x>0) {
-			values[c]=pointSample(img,x-1, y);
-			weights[c]=2;
-			c++;
-		}
-		values[c]=pointSample(img,x, y);
-		weights[c]=4;
-		c++;
-		if(x<image_width-1) {
-			values[c]=pointSample(img,x+1, y);
-			weights[c]=2;
-			c++;
-		}
-
-		if(y<image_height-1) {
-			if(x>0) {
-				values[c]=pointSample(img,x-1, y+1);
-				weights[c]=1;
-				c++;
-			}
-			values[c]=pointSample(img,x, y+1);
-			weights[c]=2;
-			c++;
-	
-			if(x<image_width-1) {
-				values[c]=pointSample(img,x+1, y+1);
-				weights[c]=1;
-				c++;
-			}
-		}
-		
-		int value=0,j;
-		int sum=0;
-		for(j=0;j<c;++j) {
-			value+=values[j]*weights[j];
-			sum+=weights[j];
-		}
-		
-		return value/sum;
-	}
-	
-
+public class Filter_RGBCrosshatchGenerator extends Filter {
 	/**
 	 * The main entry point
 	 * @param img the image to convert.
@@ -161,7 +48,7 @@ public class Filter_RGBCircleGenerator extends Filter {
 		boolean allow_blue = true;
 
 		if(allow_black) {
-			channel=0;
+			color_channel=0;
 			Makelangelo.getSingleton().Log("<font color='green'>Generating layer 1 (black)</font>\n");
 			// create horizontal lines across the image
 			// raise and lower the pen to darken the appropriate areas
@@ -187,7 +74,7 @@ public class Filter_RGBCircleGenerator extends Filter {
 		}
 
 		if(allow_red) {
-			channel=1;
+			color_channel=1;
 			liftPen(out);
 			tool.WriteChangeTo(out);
 	
@@ -216,7 +103,7 @@ public class Filter_RGBCircleGenerator extends Filter {
 		}
 
 		if(allow_green) {
-			channel=2;
+			color_channel=2;
 			liftPen(out);
 			tool.WriteChangeTo(out);
 	
@@ -260,7 +147,7 @@ public class Filter_RGBCircleGenerator extends Filter {
 		}
 		
 		if(allow_blue) {
-			channel=3;
+			color_channel=3;
 			liftPen(out);
 			tool.WriteChangeTo(out);
 	

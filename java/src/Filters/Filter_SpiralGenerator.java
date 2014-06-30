@@ -6,11 +6,8 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.ProgressMonitor;
-
 import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
-import Makelangelo.Point2D;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -18,21 +15,10 @@ import Makelangelo.Point2D;
  * @author Dan
  */
 public class Filter_SpiralGenerator extends Filter {
-	// file properties
-	String dest;
-	// processing tools
-	int numPoints;
-	Point2D[] points = null;
-	int scount;
-	boolean lastup;
-	ProgressMonitor pm;
-	
-	public void SetDestinationFile(String _dest) {
-		dest=_dest;
-	}
-
-	
-	private void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	/**
+	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
+	 */
+	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		tool.WriteMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);
@@ -41,72 +27,6 @@ public class Filter_SpiralGenerator extends Filter {
 		}
 	}
 	
-	
-	private int TakeImageSample(BufferedImage img,int x,int y) {
-		// point sampling
-		//return decode(img.getRGB(x,y));
-
-		// 3x3 sampling
-		int c=0;
-		int values[]=new int[9];
-		int weights[]=new int[9];
-		if(y>0) {
-			if(x>0) {
-				values[c]=decode(img.getRGB(x-1, y-1));
-				weights[c]=1;
-				c++;
-			}
-			values[c]=decode(img.getRGB(x, y-1));
-			weights[c]=2;
-			c++;
-
-			if(x<image_width-1) {
-				values[c]=decode(img.getRGB(x+1, y-1));
-				weights[c]=1;
-				c++;
-			}
-		}
-
-		if(x>0) {
-			values[c]=decode(img.getRGB(x-1, y));
-			weights[c]=2;
-			c++;
-		}
-		values[c]=decode(img.getRGB(x, y));
-		weights[c]=4;
-		c++;
-		if(x<image_width-1) {
-			values[c]=decode(img.getRGB(x+1, y));
-			weights[c]=2;
-			c++;
-		}
-
-		if(y<image_height-1) {
-			if(x>0) {
-				values[c]=decode(img.getRGB(x-1, y+1));
-				weights[c]=1;
-				c++;
-			}
-			values[c]=decode(img.getRGB(x, y+1));
-			weights[c]=2;
-			c++;
-	
-			if(x<image_width-1) {
-				values[c]=decode(img.getRGB(x+1, y+1));
-				weights[c]=1;
-				c++;
-			}
-		}
-		
-		int value=0,j;
-		int sum=0;
-		for(j=0;j<c;++j) {
-			value+=values[j]*weights[j];
-			sum+=weights[j];
-		}
-		
-		return value/sum;
-	}
 	
 	/**
 	 * The main entry point

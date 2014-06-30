@@ -24,9 +24,6 @@ import Makelangelo.Point2D;
  * @author Dan
  */
 public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeListener {
-	// file properties
-	String dest;
-	
 	// processing tools
 	long t_elapsed,t_start;
 	double progress;
@@ -40,11 +37,7 @@ public class Filter_TSPGcodeGenerator extends Filter implements PropertyChangeLi
 	ProgressMonitor pm;
 	TSPOptimizer task;
 	
-	public void SetDestinationFile(String _dest) {
-		dest=_dest;
-	}
-	
-	
+
 	public String formatTime(long millis) {
     	String elapsed="";
     	long s=millis/1000;
