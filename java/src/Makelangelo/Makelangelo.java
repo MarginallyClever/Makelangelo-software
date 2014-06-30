@@ -312,17 +312,6 @@ public class Makelangelo
 		return prefs.getInt("Draw Style", IMAGE_SPIRAL);
 	}
 	
-	// manages the vertical split in the GUI
-	public class Splitter extends JSplitPane {
-		static final long serialVersionUID=1;
-		
-		public Splitter(int split_direction) {
-			super(split_direction);
-			setResizeWeight(0.9);
-			setDividerLocation(0.9);
-		}
-	}
-	
 	protected boolean ChooseConversionOptions() {
 		// display menu with conversion styles
 
@@ -1269,21 +1258,21 @@ public class Makelangelo
 
 		JPanel axisControl = new JPanel();
 			axisControl.setLayout(new GridBagLayout());
-			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(50,20));		yAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(50,20));
-			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(50,20));
-			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(50,20));
-			final JButton up1 = new JButton("1");  			up1.setPreferredSize(new Dimension(50,20));
-			final JButton up10 = new JButton("10");  		up10.setPreferredSize(new Dimension(50,20));
-			final JButton up100 = new JButton("100");  		up100.setPreferredSize(new Dimension(50,20));
+			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(60,20));		yAxis.setHorizontalAlignment(SwingConstants.CENTER);
+			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(60,20));
+			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(60,20));
+			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(60,20));
+			final JButton up1 = new JButton("1");  			up1.setPreferredSize(new Dimension(60,20));
+			final JButton up10 = new JButton("10");  		up10.setPreferredSize(new Dimension(60,20));
+			final JButton up100 = new JButton("100");  		up100.setPreferredSize(new Dimension(60,20));
 			
-			final JLabel xAxis = new JLabel("X");			xAxis.setPreferredSize(new Dimension(50,20));		xAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton left100 = new JButton("-100");	left100.setPreferredSize(new Dimension(50,20));
-			final JButton left10 = new JButton("-10");		left10.setPreferredSize(new Dimension(50,20));
-			final JButton left1 = new JButton("-1");		left1.setPreferredSize(new Dimension(50,20));	
-			final JButton right1 = new JButton("1");		right1.setPreferredSize(new Dimension(50,20));
-			final JButton right10 = new JButton("10");		right10.setPreferredSize(new Dimension(50,20));
-			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(50,20));
+			final JLabel xAxis = new JLabel("X");			xAxis.setPreferredSize(new Dimension(60,20));		xAxis.setHorizontalAlignment(SwingConstants.CENTER);
+			final JButton left100 = new JButton("-100");	left100.setPreferredSize(new Dimension(60,20));
+			final JButton left10 = new JButton("-10");		left10.setPreferredSize(new Dimension(60,20));
+			final JButton left1 = new JButton("-1");		left1.setPreferredSize(new Dimension(60,20));	
+			final JButton right1 = new JButton("1");		right1.setPreferredSize(new Dimension(60,20));
+			final JButton right10 = new JButton("10");		right10.setPreferredSize(new Dimension(60,20));
+			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(60,20));
 
 			//final JButton find = new JButton("FIND HOME");		find.setPreferredSize(new Dimension(100,20));
 			final JButton center = new JButton("SET HOME");	center.setPreferredSize(new Dimension(100,20));
@@ -1732,6 +1721,17 @@ public class Makelangelo
         // finish
         menuBar.updateUI();
     }
+
+	// manages the vertical split in the GUI
+	public class Splitter extends JSplitPane {
+		static final long serialVersionUID=1;
+		
+		public Splitter(int split_direction) {
+			super(split_direction);
+			setResizeWeight(0.9);
+			setDividerLocation(0.9);
+		}
+	}
 	
     public Container CreateContentPane() {
         //Create the content-pane-to-be.
@@ -1805,6 +1805,7 @@ public class Makelangelo
 		textInputArea.setLayout(new BoxLayout(textInputArea,BoxLayout.LINE_AXIS));
 		
 		commandLineText = new JTextField(0);
+		commandLineText.setPreferredSize(new Dimension(10,10));
 		commandLineSend = new JButton("Send");
 		
 		textInputArea.add(commandLineText);

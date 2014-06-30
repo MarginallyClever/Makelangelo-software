@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
@@ -18,6 +19,8 @@ import DrawingTools.DrawingTool;
 public class DrawPanel extends JPanel implements MouseListener, MouseInputListener  {
 	static final long serialVersionUID=2;
 
+	private Preferences prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
+	
 	// arc smoothness - increase to make more smooth and run slower.
 	public static final double STEPS_PER_DEGREE=1;
 	public static final double RAD2DEG = 180.0/Math.PI;
@@ -199,8 +202,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
     private void paintCamera(Graphics2D g2d) {
 		float w=(float)this.getWidth();
 		float h=(float)this.getHeight();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
+		if(prefs.getBoolean("antialias", true)) g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		if(prefs.getBoolean("speed_over_quality", true)) g2d.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
 		g2d.translate(-cameraOffsetX+w/2, -cameraOffsetY+h/2);
 		g2d.scale(cameraZoom, cameraZoom);
     }
@@ -267,7 +270,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 						g2d.setColor(Color.RED);
 					} else if(n.line_number<=linesProcessed+500) {
 						g2d.setColor(Color.GREEN);
-					} else if(true) {
+					} else if(prefs.getBoolean("Draw all while running", true) == false) {
 						break;
 					}
 				}
