@@ -13,6 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
+
 import DrawingTools.DrawingTool;
 import Makelangelo.MachineConfiguration;
 
@@ -47,15 +50,22 @@ public class Filter {
 	protected float posx=0;
 	protected float posy=0;
 
-
 	// file properties
 	String dest;
 	// pen position optimizing
 	boolean lastup;
 	float previous_x,previous_y;
-
+	// threading
+	ProgressMonitor pm;
+	SwingWorker<Void,Void> parent;
 
 	
+	public void SetParent(SwingWorker<Void,Void> p) {
+		parent=p;
+	}
+	public void SetProgressMonitor(ProgressMonitor p) {
+		pm=p;
+	}
 	public void SetDestinationFile(String _dest) {
 		dest=_dest;
 	}
@@ -115,6 +125,16 @@ public class Filter {
 		
 		out.write(mc.GetConfigLine()+";\n");
 		out.write(mc.GetBobbinLine()+";\n");
+
+		SetAbsoluteMode(out);
+	}
+	
+	protected void SetAbsoluteMode(OutputStreamWriter out) throws IOException {
+		out.write("G00 G90;\n");
+	}
+	
+	protected void SetRelativeMode(OutputStreamWriter out) throws IOException {
+		out.write("G00 G91;\n");
 	}
 	
 	/**

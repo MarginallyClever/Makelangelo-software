@@ -36,22 +36,12 @@ public class Filter_SpiralGenerator extends Filter {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
 		img = bw.Process(img);
-		
-		// spiralize
-		int x,y,i,j;
-		final int steps=4;
-		double leveladd = 255.0/(steps);
-		double level;
-		int z=0;
 
-		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		ImageStart(img,out);
 
 		double toolDiameter=tool.GetDiameter()/scale;
-		// set absolute coordinates
-		out.write("G90;\n");
 		tool.WriteChangeTo(out);
 		liftPen(out);
 		lastup=true;
@@ -59,6 +49,13 @@ public class Filter_SpiralGenerator extends Filter {
 		//*
 		// create a spiral across the image
 		// raise and lower the pen to darken the appropriate areas
+		
+		// spiralize
+		int x,y,i,j;
+		final int steps=4;
+		double leveladd = 255.0/(steps);
+		double level;
+		int z=0;
 
 		float maxr;
 		//if(whole_image) {
@@ -111,11 +108,6 @@ public class Filter_SpiralGenerator extends Filter {
 		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
-		
-		// TODO move to GUI
-		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
-		Makelangelo.getSingleton().PlayConversionFinishedSound();
-		Makelangelo.getSingleton().LoadGCode(dest);
 	}
 	
 	

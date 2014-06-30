@@ -2,7 +2,6 @@ package Filters;
 
 
 import Makelangelo.Makelangelo;
-import Makelangelo.Point2D;
 import Makelangelo.MachineConfiguration;
 
 import java.awt.image.BufferedImage;
@@ -10,7 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.ProgressMonitor;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>

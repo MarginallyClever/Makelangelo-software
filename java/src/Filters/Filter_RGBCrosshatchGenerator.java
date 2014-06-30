@@ -1,18 +1,14 @@
 package Filters;
 
 
-
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.ProgressMonitor;
-
 import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
-import Makelangelo.Point2D;
+
 
 /** 
  * @author Dan
@@ -34,8 +30,6 @@ public class Filter_RGBCrosshatchGenerator extends Filter {
 		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
 		if(steps<1) steps=1;
 		
-		// set absolute coordinates
-		out.write("G00 G90;\n");
 		tool.WriteChangeTo(out);
 		liftPen(out);
 		lastup=true;

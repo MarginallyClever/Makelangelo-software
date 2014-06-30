@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +67,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -74,14 +78,15 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import Filters.Filter_CrosshatchGenerator;
-import Filters.Filter_RGBCircleGenerator;
+import Filters.Filter_RGBCrosshatchGenerator;
 import Filters.Filter_ScanlineGenerator;
 import Filters.Filter_SpiralGenerator;
 import Filters.Filter_TSPGcodeGenerator;
 import Filters.Filter_YourMessageHere;
 import Filters.Filter;
 
-// TODO while not drawing, in-app gcode editing with immediate visusal feedback 
+
+// TODO while not drawing, in-app gcode editing with immediate visual feedback 
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling
 // TODO vector output
 
@@ -210,7 +215,7 @@ public class Makelangelo
 		image_converters[IMAGE_SPIRAL	] = new Filter_SpiralGenerator();
 		image_converters[IMAGE_4LEVEL	] = new Filter_CrosshatchGenerator();
 		image_converters[IMAGE_SCANLINE	] = new Filter_ScanlineGenerator();
-		image_converters[IMAGE_RGB		] = new Filter_RGBCircleGenerator();
+		image_converters[IMAGE_RGB		] = new Filter_RGBCrosshatchGenerator();
 	}
 	
 	protected void finalize() throws Throwable {
@@ -366,25 +371,70 @@ public class Makelangelo
 	
 	public boolean LoadImage(String filename) {
         // where to save temp output file?
-		String destinationFile = System.getProperty("user.dir")+"/temp.ngc";
+		final String sourceFile = filename;
+		final String destinationFile = System.getProperty("user.dir")+"/temp.ngc";
 		
 		if( ChooseConversionOptions() == false ) return false;
+
+		final ProgressMonitor pm = new ProgressMonitor(null, "Converting...", "", 0, 100);
+		pm.setProgress(0);
+		pm.setMillisToPopup(0);
 		
-		// read in image
-		BufferedImage img;
-		try {
-			img = ImageIO.read(new File(filename));
+		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
+			@Override
+			public Void doInBackground() {
+				// read in image
+				BufferedImage img;
+				try {
+					Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
+					// convert with style
+					img = ImageIO.read(new File(sourceFile));
+					
+					int style = GetDrawStyle();
+					image_converters[style].SetParent(this);
+					image_converters[style].SetProgressMonitor(pm);
+					image_converters[style].SetDestinationFile(destinationFile);
+					image_converters[style].Convert(img);
+				}
+				catch(IOException e) {
+					Log("<font color='red'>File conversion failed: "+e.getLocalizedMessage()+"</font>\n");
+					RemoveRecentFile(sourceFile);
+				}
+
+				pm.setProgress(100);
+			    return null;
+			}
 			
-			// convert with style
-			int style = GetDrawStyle();
-			image_converters[style].SetDestinationFile(destinationFile);
-			image_converters[style].Convert(img);
-		}
-		catch(IOException e) {
-	    	Log("<span style='color:red'>File could not be opened: "+e.getLocalizedMessage()+"</span>\n");
-	    	RemoveRecentFile(filename);
-	    	return false;
-		}
+			@Override
+			public void done() {
+				pm.close();
+				Log("<font color='green'>Completed.</font>\n");
+				PlayConversionFinishedSound();
+				LoadGCode(destinationFile);
+			}
+		};
+		
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+		    // Invoked when task's progress property changes.
+		    public void propertyChange(PropertyChangeEvent evt) {
+		        if ("progress" == evt.getPropertyName() ) {
+		            int progress = (Integer) evt.getNewValue();
+		            pm.setProgress(progress);
+		            String message = String.format("Completed %d%%.\n", progress);
+		            pm.setNote(message);
+		            if(s.isDone()) {
+	                	Makelangelo.getSingleton().Log("<font color='green'>Task completed.</font>\n");
+		            } else if (s.isCancelled() || pm.isCanceled()) {
+		                if (pm.isCanceled()) {
+		                    s.cancel(true);
+		                }
+	                    Makelangelo.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
+		            }
+		        }
+		    }
+		});
+		
+		s.execute();
 		
 		return true;
 	}

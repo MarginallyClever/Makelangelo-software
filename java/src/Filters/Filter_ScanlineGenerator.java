@@ -6,83 +6,72 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Makelangelo.Makelangelo;
-
 
 public class Filter_ScanlineGenerator extends Filter {
-	// image preprocessing
-	boolean dither_first=false;
-	
-	
 	/**
-	 * The main entry point
+	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
 	public void Convert(BufferedImage img) throws IOException {
-		int i;
-		int x,y;
-		double leveladd = 255.0/2.0;
-		double level=leveladd;
-		int z=0;
-
+		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.Process(img);
-		
-		if(dither_first) {
-			Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
-			img = dither.Process(img);
-		}
 
-		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		// Open the destination file
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		
+		// Set up the conversion from image space to paper space, select the current tool, etc.
 		ImageStart(img,out);
+		// "please change to tool X and press any key to continue"
+		tool.WriteChangeTo(out);
+		// Make sure the pen is up for the first move
+		liftPen(out);
 
+		// figure out how many lines we're going to have on this image.
 		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
 		
-		// set absolute coordinates
-		out.write("G00 G90;\n");
-		
-		tool.WriteChangeTo(out);
-		liftPen(out);
+		// these next three might not be strictly necessary.  Call me paranoid.
 		lastup=true;
 		previous_x=0;
 		previous_y=0;
 
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
-		// create horizontal lines across the image
-		// raise and lower the pen to darken the appropriate areas
-		i=0;
+		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
+		// Lift the pen any time the color value is > level (128 or more).
+		double level=255.0/2.0;
+
+		// from top to bottom of the image...
+		int x,y,z,i=0;
 		for(y=0;y<image_height;y+=steps) {
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)          0,(float)y,true);
+				// every even line move left to right
+				
+				//MoveTo(file,x,y,pen up?)
+				MoveTo(out,(float)0,(float)y,true);
 				for(x=0;x<image_width;++x) {
+					// read the image at x,y
 					z=TakeImageSample(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					MoveTo(out,(float)x,(float)y,( z > level ));
 				}
 				MoveTo(out,(float)image_width,(float)y,true);
 			} else {
+				// every odd line move right to left
 				MoveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
 					z=TakeImageSample(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					MoveTo(out,(float)x,(float)y,( z > level ));
 				}
-				MoveTo(out,(float)          0,(float)y,true);
+				MoveTo(out,(float)0,(float)y,true);
 			}
 		}
-		level+=leveladd;
+
+		// TODO Sign name here?
 		
-		// lift pen and return to home
-		liftPen(out);
+		// pen is already lifted.  Return to home.
 		tool.WriteMoveTo(out, 0, 0);
-		out.close();
 		
-		// TODO Move to GUI
-		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
-		Makelangelo.getSingleton().PlayConversionFinishedSound();
-		Makelangelo.getSingleton().LoadGCode(dest);
+		// close the file
+		out.close();
 	}
 }
 

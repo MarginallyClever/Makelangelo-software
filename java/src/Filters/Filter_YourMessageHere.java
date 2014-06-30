@@ -59,7 +59,6 @@ public class Filter_YourMessageHere extends Filter {
 					Makelangelo.getSingleton().PlayConversionFinishedSound();
 					Makelangelo.getSingleton().LoadGCode(dest2);
 
-					
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {
