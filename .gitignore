@@ -14,3 +14,4 @@ gcode/*
 java/Thumbs.db
 last_official_release/Windows/log.html
 *.classpath
+java/.classpath

@@ -32,19 +32,12 @@ h2. To run the project in eclipse
 * Choose "Browse" next to "Select root directory" and select the root folder of your download/clone from github.
 * eclipse will scan the folder and find the project.  Choose "Finish"
 
-Your project is now in eclipse, but if you run the project you will probably get an error saying 
+This project has been developed with the 1.7 JDK.  You can find out more about it here:
 
-"java.lang.UnsatisfiedLinkError: no rxtxSerial in java.library.path thrown while loading gnu.io.RXTXCommDriver"
+* http://stackoverflow.com/questions/6267392/how-do-i-use-jdk-7-on-mac-osx
+* http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-To fix this,
-
-* Open the Project Explorder View, select the Makelangelo project, and choose File > Properties.
-* Choose Java Build Path > Libraries and then expand "RXTXcomm.jar - Makelangelo" clicking the arrow on the left.
-* Choose Native library location > Edit > Choose Workspace
-* In Windows 32 bit, choose Makelangelo/src/rxtxnative/Windows/i368-mingw32
-* In Windows 64 bit, choose Makelangelo/src/rxtxnative/Windows/x64
-* In OSX, choose Makelangelo/src/rxtxnative/Mac_OS_X
-* In Linux, choose Makelangelo/src/rxtxnative/Linux and select your flavor of linux.
+More details are available in the forums.
 
 h2. See Also
 

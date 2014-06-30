@@ -320,7 +320,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		final JComboBox input_draw_style = new JComboBox(styles);
+		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");

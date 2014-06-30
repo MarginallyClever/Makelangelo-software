@@ -104,7 +104,7 @@ public class MachineConfiguration {
 		final JCheckBox m2i = new JCheckBox("Invert",MachineConfiguration.getSingleton().m2invert);
 
 		String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
-		final JComboBox startPos = new JComboBox(startingStrings);
+		final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
 		startPos.setSelectedIndex(startingPositionIndex);
 		
 		final JButton cancel = new JButton("Cancel");
@@ -310,7 +310,7 @@ public class MachineConfiguration {
 		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust machine size",true);
 		driver.setLayout(new GridBagLayout());
 		
-		final JComboBox toolCombo = new JComboBox(getToolNames());
+		final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
 		toolCombo.setSelectedIndex(current_tool);
 		
 		final JButton cancel = new JButton("Cancel");
