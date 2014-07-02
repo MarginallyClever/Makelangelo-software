@@ -58,6 +58,71 @@ public class Filter_BlackAndWhite extends Filter {
 		
 		return img;
 	}
+	
+
+	/**
+	 * An experimental black & white converter that doesn't just greyscale to 4 levels, it also tries to divide by histogram frequency.
+	 * Didn't look good so I left it for the lulz.
+	 * @param img
+	 * @return
+	 */
+	public BufferedImage Process_Via_Histogram(BufferedImage img) {
+		int h = img.getHeight();
+		int w = img.getWidth();
+
+		int x,y,i;
+		
+		double [] histogram = new double[256];
+
+		for(i=0;i<256;++i) {
+			histogram[i]=0;
+		}
+		
+		for(y=0;y<h;++y) {
+			for(x=0;x<w;++x) {
+				i=decode(img.getRGB(x, y));
+				++histogram[i];
+			}
+		}
+
+		double histogram_area=0;
+		System.out.println("histogram:");
+		for(i=1;i<255;++i) {
+			System.out.println(i+"="+histogram[i]);
+			histogram_area+=histogram[i];
+		}
+		double histogram_zone = histogram_area / (double)levels;
+		System.out.println("histogram area: "+histogram_area);		
+		System.out.println("histogram zone: "+histogram_zone);		
+
+		double histogram_sum=0;
+		x=0;
+		y=0;
+		for(i=1;i<255;++i) {
+			histogram_sum +=histogram[i];
+			System.out.println("mapping "+i+" to "+x);
+			if(histogram_sum > histogram_zone) {
+				System.out.println("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
+				histogram_sum-=histogram_zone;
+				x+=(int)(256.0/(double)levels);
+				++y;
+			}
+			histogram[i]=x;
+		}
+		
+		System.out.println("y="+y+" x="+x);
+		int pixel, b;
+		
+		for(y=0;y<h;++y) {
+			for(x=0;x<w;++x) {
+				pixel=decode(img.getRGB(x, y));
+				b = (int)histogram[pixel];
+				img.setRGB(x, y, encode(b));
+			}
+		}
+		
+		return img;
+	}
 }
 
 /**

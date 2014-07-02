@@ -26,6 +26,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,13 +78,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import Filters.Filter_CrosshatchGenerator;
-import Filters.Filter_RGBCrosshatchGenerator;
-import Filters.Filter_ScanlineGenerator;
-import Filters.Filter_SpiralGenerator;
-import Filters.Filter_TSPGcodeGenerator;
-import Filters.Filter_YourMessageHere;
-import Filters.Filter;
+import Filters.*;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback 
@@ -274,7 +269,7 @@ public class Makelangelo
 		
 		try {
 			Clip clip = AudioSystem.getClip();
-			FileInputStream x = new FileInputStream(url);
+			BufferedInputStream x = new BufferedInputStream(new FileInputStream(url));
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(x);
 			clip.open(inputStream);
 			clip.start(); 
@@ -1802,12 +1797,13 @@ public class Makelangelo
     	return mainframe;
     }
     
+    
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo not connected");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
- 
+        
         // Create and set up the content pane.
         Makelangelo m = Makelangelo.getSingleton();
         mainframe.setJMenuBar(m.CreateMenuBar());
