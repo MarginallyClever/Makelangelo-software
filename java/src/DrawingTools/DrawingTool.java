@@ -54,11 +54,13 @@ public class DrawingTool {
 	public void WriteOn(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
 		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
+		DrawZ(z_on);
 	}
 
 	public void WriteOff(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
 		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
+		DrawZ(z_off);
 	}
 	
 	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {

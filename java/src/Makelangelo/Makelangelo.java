@@ -29,9 +29,12 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.text.NumberFormat;
@@ -39,6 +42,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -77,6 +82,23 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import oracle.jrockit.jfr.parser.ParseException;
+
+import org.kabeja.dxf.Bounds;
+import org.kabeja.dxf.DXFConstants;
+import org.kabeja.dxf.DXFDocument;
+import org.kabeja.dxf.DXFEntity;
+import org.kabeja.dxf.DXFLayer;
+import org.kabeja.dxf.DXFLine;
+import org.kabeja.dxf.DXFPolyline;
+import org.kabeja.dxf.DXFSpline;
+import org.kabeja.dxf.DXFVertex;
+import org.kabeja.dxf.helpers.Point;
+import org.kabeja.parser.DXFParser;
+import org.kabeja.parser.Parser;
+import org.kabeja.parser.ParserBuilder;
+
+import DrawingTools.DrawingTool;
 import Filters.Filter_CrosshatchGenerator;
 import Filters.Filter_RGBCrosshatchGenerator;
 import Filters.Filter_ScanlineGenerator;
@@ -307,143 +329,11 @@ public class Makelangelo
 		return prefs.getInt("Draw Style", IMAGE_SPIRAL);
 	}
 	
-	protected boolean ChooseConversionOptions() {
-		// display menu with conversion styles
-
-		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
-		driver.setLayout(new GridBagLayout());
-		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
-		input_paper_margin.setMajorTickSpacing(20);
-		input_paper_margin.setMinorTickSpacing(5);
-		input_paper_margin.setPaintTicks(false);
-		input_paper_margin.setPaintLabels(true);
-		
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
-		
-		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
-		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
-
-		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
-		input_draw_style.setSelectedIndex(GetDrawStyle());
-		
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Start");
-		
-		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
-
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
-
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
-
-		startConvertingNow = false;
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
-						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
-						SetDrawStyle(input_draw_style.getSelectedIndex());
-						MachineConfiguration.getSingleton().SaveConfig();
-						startConvertingNow=true;
-						driver.dispose();
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-			  }
-		};
-			
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		driver.pack();
-		driver.setVisible(true);
-		
-		return startConvertingNow;
-	}
-	
-	
-	public boolean LoadImage(String filename) {
-        // where to save temp output file?
-		final String sourceFile = filename;
-		final String destinationFile = System.getProperty("user.dir")+"/temp.ngc";
-		
-		if( ChooseConversionOptions() == false ) return false;
-
-		final ProgressMonitor pm = new ProgressMonitor(null, "Converting...", "", 0, 100);
-		pm.setProgress(0);
-		pm.setMillisToPopup(0);
-		
-		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
-			@Override
-			public Void doInBackground() {
-				// read in image
-				BufferedImage img;
-				try {
-					Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
-					// convert with style
-					img = ImageIO.read(new File(sourceFile));
-					
-					int style = GetDrawStyle();
-					image_converters[style].SetParent(this);
-					image_converters[style].SetProgressMonitor(pm);
-					image_converters[style].SetDestinationFile(destinationFile);
-					image_converters[style].Convert(img);
-				}
-				catch(IOException e) {
-					Log("<font color='red'>File conversion failed: "+e.getLocalizedMessage()+"</font>\n");
-					RemoveRecentFile(sourceFile);
-				}
-
-				pm.setProgress(100);
-			    return null;
-			}
-			
-			@Override
-			public void done() {
-				pm.close();
-				Log("<font color='green'>Completed.</font>\n");
-				PlayConversionFinishedSound();
-				LoadGCode(destinationFile);
-			}
-		};
-		
-		s.addPropertyChangeListener(new PropertyChangeListener() {
-		    // Invoked when task's progress property changes.
-		    public void propertyChange(PropertyChangeEvent evt) {
-		        if ("progress" == evt.getPropertyName() ) {
-		            int progress = (Integer) evt.getNewValue();
-		            pm.setProgress(progress);
-		            String message = String.format("Completed %d%%.\n", progress);
-		            pm.setNote(message);
-		            if(s.isDone()) {
-	                	Makelangelo.getSingleton().Log("<font color='green'>Task completed.</font>\n");
-		            } else if (s.isCancelled() || pm.isCanceled()) {
-		                if (pm.isCanceled()) {
-		                    s.cancel(true);
-		                }
-	                    Makelangelo.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
-		            }
-		        }
-		    }
-		});
-		
-		s.execute();
-		
-		return true;
-	}
-	
 	
 	private void TextToGCODE() {
 		Filter_YourMessageHere msg = new Filter_YourMessageHere();
 
-		msg.Generate( System.getProperty("user.dir")+"/temp.ngc");
+		msg.Generate( GetTempDestinationFile());
 
     	previewPane.ZoomToFitPaper();
 	}
@@ -636,6 +526,266 @@ public class Makelangelo
 	    Halt();
 	}
 	
+	public String GetTempDestinationFile() {
+		return System.getProperty("user.dir")+"/temp.ngc";
+	}
+		
+	double dxf_x2,dxf_y2;
+	public void LoadDXF(String filename) {
+	    previewPane.setGCode(gcode.lines);
+        // where to save temp output file?
+		final String destinationFile = GetTempDestinationFile();
+		
+		Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
+
+		Parser parser = ParserBuilder.createDefaultParser();
+
+		dxf_x2=0;
+		dxf_y2=0;
+		OutputStreamWriter out=null;
+		boolean ok=false;
+
+		try {
+			out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
+			MachineConfiguration mc = MachineConfiguration.getSingleton();
+			DrawingTool tool = mc.GetCurrentTool();
+			out.write(mc.GetConfigLine()+";\n");
+			out.write(mc.GetBobbinLine()+";\n");
+			out.write("G00 G90;\n");
+			tool.WriteOff(out);
+
+			
+			parser.parse(filename, DXFParser.DEFAULT_ENCODING);
+			DXFDocument doc = parser.getDocument();
+			Bounds b = doc.getBounds();
+			double width = b.getMaximumX() - b.getMinimumX();
+			double height = b.getMaximumY() - b.getMinimumY();
+			double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
+			double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
+			double sy = mc.GetPaperHeight()*10/height;
+			double sx = mc.GetPaperWidth()*10/width;
+			double scale = (sx<sy? sx:sy ) * mc.paper_margin;
+			
+			Iterator layer_iter = doc.getDXFLayerIterator();
+			while(layer_iter.hasNext()) {
+				DXFLayer layer = (DXFLayer)layer_iter.next();
+				Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
+
+				Iterator entity_iter = layer.getDXFEntityTypeIterator();
+				while(entity_iter.hasNext()) {
+					String entity_type = (String)entity_iter.next();
+					List entity_list = layer.getDXFEntities(entity_type);
+					Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
+					
+					if(entity_type.equals("LINE")) {
+						for(int i=0;i<entity_list.size();++i) {
+							DXFLine entity = (DXFLine)entity_list.get(i);
+							Point start = entity.getStartPoint();
+							Point end = entity.getEndPoint();
+
+							double x=(start.getX()-cx)*scale;
+							double y=(start.getY()-cy)*scale;
+							
+							// no sanity checking!
+							if( dxf_x2!=x || dxf_y2!=y ) {
+								if(tool.DrawIsOn()) tool.WriteOff(out);
+								tool.WriteMoveTo(out, (float)x,(float)y);
+							}
+							if(tool.DrawIsOff()) tool.WriteOn(out);
+							x=(end.getX()-cx)*scale;
+							y=(end.getY()-cy)*scale;
+							tool.WriteMoveTo(out, (float)x,(float)y);
+							dxf_x2=x;
+							dxf_y2=y;
+						}
+					} else if(entity_type.equals("SPLINE")) {
+						for(int i=0;i<entity_list.size();++i) {
+							DXFSpline entity = (DXFSpline)entity_list.get(i);
+							DXFPolyline polyLine = entity.toDXFPolyline();
+							for(int j=0;j<polyLine.getVertexCount();++j) {
+								DXFVertex v = polyLine.getVertex(j);
+								double x = (v.getX()-cx)*scale;
+								double y = (v.getY()-cy)*scale;
+								
+								// no sanity checking!
+								if(j==0) {
+									if(dxf_x2!=x || dxf_y2 !=y) {
+										// line does not start at last tool location, lift and move.
+										if(tool.DrawIsOn()) tool.WriteOff(out);
+										tool.WriteMoveTo(out, (float)x,(float)y);
+									}
+									// else line starts right here, do nothing.
+								} else {
+									// not the first point, draw.
+									if(tool.DrawIsOff()) tool.WriteOn(out);
+									tool.WriteMoveTo(out, (float)x,(float)y);
+								}
+								dxf_x2=x;
+								dxf_y2=y;
+							}
+						}
+					}
+				}
+			}
+
+			// entities finished.  Close up file.
+			tool.WriteOff(out);
+			tool.WriteMoveTo(out, 0, 0);
+			
+			ok=true;
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch (org.kabeja.parser.ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if(out!=null) out.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+				
+		}
+
+		Log("<font color='green'>Completed.</font>\n");
+		PlayConversionFinishedSound();
+		if(ok) LoadGCode(destinationFile);
+	    Halt();
+	}
+
+	protected boolean ChooseConversionOptions() {
+		// display menu with conversion styles
+
+		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
+		driver.setLayout(new GridBagLayout());
+		
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
+		input_paper_margin.setMajorTickSpacing(20);
+		input_paper_margin.setMinorTickSpacing(5);
+		input_paper_margin.setPaintTicks(false);
+		input_paper_margin.setPaintLabels(true);
+		
+		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
+		//allow_metrics.setSelected(allowMetrics);
+		
+		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
+		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
+
+		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
+		input_draw_style.setSelectedIndex(GetDrawStyle());
+		
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Start");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel("Conversion style"),c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
+
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
+
+		startConvertingNow = false;
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
+						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
+						SetDrawStyle(input_draw_style.getSelectedIndex());
+						MachineConfiguration.getSingleton().SaveConfig();
+						startConvertingNow=true;
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+		};
+			
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+		
+		return startConvertingNow;
+	}
+	
+	
+	public boolean LoadImage(String filename) {
+        // where to save temp output file?
+		final String sourceFile = filename;
+		final String destinationFile = GetTempDestinationFile();
+		
+		if( ChooseConversionOptions() == false ) return false;
+
+		final ProgressMonitor pm = new ProgressMonitor(null, "Converting...", "", 0, 100);
+		pm.setProgress(0);
+		pm.setMillisToPopup(0);
+		
+		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
+			@Override
+			public Void doInBackground() {
+				// read in image
+				BufferedImage img;
+				try {
+					Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
+					// convert with style
+					img = ImageIO.read(new File(sourceFile));
+					
+					int style = GetDrawStyle();
+					image_converters[style].SetParent(this);
+					image_converters[style].SetProgressMonitor(pm);
+					image_converters[style].SetDestinationFile(destinationFile);
+					image_converters[style].Convert(img);
+				}
+				catch(IOException e) {
+					Log("<font color='red'>File conversion failed: "+e.getLocalizedMessage()+"</font>\n");
+					RemoveRecentFile(sourceFile);
+				}
+
+				pm.setProgress(100);
+			    return null;
+			}
+			
+			@Override
+			public void done() {
+				pm.close();
+				Log("<font color='green'>Completed.</font>\n");
+				PlayConversionFinishedSound();
+				LoadGCode(destinationFile);
+			}
+		};
+		
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+		    // Invoked when task's progress property changes.
+		    public void propertyChange(PropertyChangeEvent evt) {
+		        if ("progress" == evt.getPropertyName() ) {
+		            int progress = (Integer) evt.getNewValue();
+		            pm.setProgress(progress);
+		            String message = String.format("Completed %d%%.\n", progress);
+		            pm.setNote(message);
+		            if(s.isDone()) {
+	                	Makelangelo.getSingleton().Log("<font color='green'>Task completed.</font>\n");
+		            } else if (s.isCancelled() || pm.isCanceled()) {
+		                if (pm.isCanceled()) {
+		                    s.cancel(true);
+		                }
+	                    Makelangelo.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
+		            }
+		        }
+		    }
+		});
+		
+		s.execute();
+		
+		return true;
+	}
+	
+	
 	public boolean IsFileLoaded() {
 		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
 	}
@@ -709,6 +859,19 @@ public class Makelangelo
     	return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
 	
+	public boolean IsFileDXF(String filename) {
+		String ext=filename.substring(filename.lastIndexOf('.'));
+    	return (ext.equalsIgnoreCase(".dxf"));
+	}
+	
+	public boolean IsFileImage(String filename) {
+		String ext=filename.substring(filename.lastIndexOf('.'));
+    	return ext.equalsIgnoreCase(".jpg")
+    			|| ext.equalsIgnoreCase(".png")
+    			|| ext.equalsIgnoreCase(".bmp")
+    			|| ext.equalsIgnoreCase(".gif");
+	}
+	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
 		Log("<font color='green'>Opening file "+filename+"...</font>\n");
@@ -717,8 +880,12 @@ public class Makelangelo
 	   	
 	   	if(IsFileGcode(filename)) {
 			LoadGCode(filename);
-    	} else {
+    	} else if(IsFileDXF(filename)) {
+    		LoadDXF(filename);
+    	} else if(IsFileImage(filename)) {
     		LoadImage(filename);
+    	} else {
+    		Log("<font color='red'>I don't recognize this file type.</font>\n");
     	}
 
     	previewPane.ZoomToFitPaper();
@@ -733,19 +900,20 @@ public class Makelangelo
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
 		FileFilter filterGCODE = new FileNameExtensionFilter("GCODE files (ngc)", "ngc");
-		FileFilter filterImage  = new FileNameExtensionFilter("Images (jpg/bmp/png/gif)", "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+		FileFilter filterImage = new FileNameExtensionFilter("Images (jpg/bmp/png/gif)", "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+		FileFilter filterDXF   = new FileNameExtensionFilter("DXF R12 (dxf)", "dxf");
 		 
 		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterGCODE);
 		fc.addChoosableFileFilter(filterImage);
+		fc.addChoosableFileFilter(filterDXF);
+		fc.addChoosableFileFilter(filterGCODE);
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
-	    	if(!IsFileGcode(selectedFile)) {
-	    		// if machine is not yet calibrated
-	    		if(MachineConfiguration.getSingleton().IsPaperConfigured() == false) {
-	    			JOptionPane.showMessageDialog(null,"Please set a paper size before importing an image.  Paper size is set in Settings > Adjust machine size.");
-	    			return;
-	    		}
+
+	    	// if machine is not yet calibrated
+	    	if(MachineConfiguration.getSingleton().IsPaperConfigured() == false) {
+	    		JOptionPane.showMessageDialog(null,"Please set a paper size before importing an image.  Paper size is set in Settings > Adjust machine size.");
+	    		return;
 	    	}
 	    	OpenFileOnDemand(selectedFile);
 	    }
@@ -1261,7 +1429,7 @@ public class Makelangelo
 			
 			c = new GridBagConstraints();
 			//c.fill=GridBagConstraints.BOTH; 
-			c.gridx=0;  c.gridy=0;  axisControl.add(xAxis,c);
+			c.gridx=0;  c.gridy=0;  axisControl.add(yAxis,c);
 			c.gridx=1;	c.gridy=0;	axisControl.add(down100,c);
 			c.gridx=2;	c.gridy=0;	axisControl.add(down10,c);
 			c.gridx=3;	c.gridy=0;	axisControl.add(down1,c);
@@ -1269,7 +1437,7 @@ public class Makelangelo
 			c.gridx=5;	c.gridy=0;	axisControl.add(up10,c);
 			c.gridx=6;	c.gridy=0;	axisControl.add(up100,c);
 			
-			c.gridx=0;  c.gridy=1;  axisControl.add(yAxis,c);
+			c.gridx=0;  c.gridy=1;  axisControl.add(xAxis,c);
 			c.gridx=1;	c.gridy=1;	axisControl.add(left100,c);
 			c.gridx=2;	c.gridy=1;	axisControl.add(left10,c);
 			c.gridx=3;	c.gridy=1;	axisControl.add(left1,c);
@@ -1331,10 +1499,10 @@ public class Makelangelo
 					if(running) return;
 					if(b==home) SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
 					else if(b==center) SendLineToRobot("G92 X0 Y0");
-					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
-					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
-					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
-					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10)+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10));
+					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10));
+					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
 					//} else if(b==find) {
 					//	SendLineToRobot("G28");
 					else if(b==z90) RaisePen();
