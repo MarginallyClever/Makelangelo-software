@@ -179,11 +179,6 @@ public class Filter_CrosshatchGenerator extends Filter {
 		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
-		
-		// TODO Move to GUI
-		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
-		Makelangelo.getSingleton().PlayConversionFinishedSound();
-		Makelangelo.getSingleton().LoadGCode(dest);
 	}
 	
 	
