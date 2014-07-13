@@ -59,6 +59,9 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import oracle.jrockit.jfr.parser.ParseException;
 
+import org.kabeja.dxf.*;
+import org.kabeja.dxf.helpers.*;
+import org.kabeja.parser.*;
 import org.kabeja.*;
 
 import DrawingTools.DrawingTool;
