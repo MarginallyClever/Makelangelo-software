@@ -27,12 +27,16 @@ import org.kabeja.math.NURBSFixedNTELSPointIterator;
 
 public class DXFSplineConverter {
     public static DXFPolyline toDXFPolyline(DXFSpline spline) {
+    	return toDXFPolyline(spline,30);
+    }
+    
+    public static DXFPolyline toDXFPolyline(DXFSpline spline, int ntels) {
         DXFPolyline p = new DXFPolyline();
         p.setDXFDocument(spline.getDXFDocument());
 
         if ((spline.getDegree() > 0) && (spline.getKnots().length > 0)) {
         	// 2014-07-13 changed 30 to 10 to reduce the amount of memory used
-            Iterator pi = new NURBSFixedNTELSPointIterator(toNurbs(spline), 10);
+            Iterator pi = new NURBSFixedNTELSPointIterator(toNurbs(spline), ntels);
 
             while (pi.hasNext()) {
                 p.addVertex(new DXFVertex((Point) pi.next()));

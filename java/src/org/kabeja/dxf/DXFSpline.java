@@ -247,8 +247,7 @@ public class DXFSpline extends DXFEntity {
         return this.polyline.getLength();
     }
 
-    // 2014-07-13 dan - made public for DXF > Gcode conversion
-    public DXFPolyline toDXFPolyline() {
+    protected DXFPolyline toDXFPolyline() {
         return DXFSplineConverter.toDXFPolyline(this);
     }
 }

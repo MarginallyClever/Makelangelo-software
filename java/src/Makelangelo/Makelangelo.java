@@ -486,12 +486,70 @@ public class Makelangelo
 	public String GetTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
+
+
+	protected boolean ChooseDXFConversionOptions() {
+		// display menu with conversion styles
+
+		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
+		driver.setLayout(new GridBagLayout());
 		
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 100, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
+		input_paper_margin.setMajorTickSpacing(20);
+		input_paper_margin.setMinorTickSpacing(5);
+		input_paper_margin.setPaintTicks(false);
+		input_paper_margin.setPaintLabels(true);
+		
+		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
+		//allow_metrics.setSelected(allowMetrics);
+		
+		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
+		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
+
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Start");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel("Margin at paper edge (%)"),c);			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
+
+		startConvertingNow = false;
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
+						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
+						MachineConfiguration.getSingleton().SaveConfig();
+						startConvertingNow=true;
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+		};
+			
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+		
+		return startConvertingNow;
+	}
+	
 	double dxf_x2,dxf_y2;
-	public void LoadDXF(String filename) {
+	public boolean LoadDXF(String filename) {
 	    previewPane.setGCode(gcode.lines);
         // where to save temp output file?
 		final String destinationFile = GetTempDestinationFile();
+
+		if( ChooseDXFConversionOptions() == false ) return false;
 		
 		Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
 
@@ -522,6 +580,8 @@ public class Makelangelo
 			double sy = mc.GetPaperHeight()*10/height;
 			double sx = mc.GetPaperWidth()*10/width;
 			double scale = (sx<sy? sx:sy ) * mc.paper_margin;
+			sx = scale * (MachineConfiguration.getSingleton().reverseForGlass? -1 : 1);
+			sy = scale;
 			
 			Iterator layer_iter = doc.getDXFLayerIterator();
 			while(layer_iter.hasNext()) {
@@ -533,39 +593,40 @@ public class Makelangelo
 					String entity_type = (String)entity_iter.next();
 					List entity_list = layer.getDXFEntities(entity_type);
 					Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
-					
-					if(entity_type.equals("LINE")) {
-						for(int i=0;i<entity_list.size();++i) {
+
+					for(int i=0;i<entity_list.size();++i) {
+						if(entity_type.equals("LINE")) {
 							DXFLine entity = (DXFLine)entity_list.get(i);
 							Point start = entity.getStartPoint();
 							Point end = entity.getEndPoint();
 
-							double x=(start.getX()-cx)*scale;
-							double y=(start.getY()-cy)*scale;
-							
+							double x=(start.getX()-cx)*sx;
+							double y=(start.getY()-cy)*sy;
 							// no sanity checking!
 							if( dxf_x2!=x || dxf_y2!=y ) {
 								if(tool.DrawIsOn()) tool.WriteOff(out);
 								tool.WriteMoveTo(out, (float)x,(float)y);
 							}
 							if(tool.DrawIsOff()) tool.WriteOn(out);
-							x=(end.getX()-cx)*scale;
-							y=(end.getY()-cy)*scale;
+							x=(end.getX()-cx)*sx;
+							y=(end.getY()-cy)*sy;
 							tool.WriteMoveTo(out, (float)x,(float)y);
 							dxf_x2=x;
 							dxf_y2=y;
-						}
-					} else if(entity_type.equals("SPLINE")) {
-						for(int i=0;i<entity_list.size();++i) {
+						} else if(entity_type.equals("SPLINE")) {
 							DXFSpline entity = (DXFSpline)entity_list.get(i);
-							DXFPolyline polyLine = entity.toDXFPolyline();
+							DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+							boolean first=true;
 							for(int j=0;j<polyLine.getVertexCount();++j) {
 								DXFVertex v = polyLine.getVertex(j);
-								double x = (v.getX()-cx)*scale;
-								double y = (v.getY()-cy)*scale;
+								double x = (v.getX()-cx)*sx;
+								double y = (v.getY()-cy)*sy;
+								double dx = dxf_x2 - x;
+								double dy = dxf_y2 - y;
 								
 								// no sanity checking!
-								if(j==0) {
+								if(first==true) {
+									first=false;
 									if(dxf_x2!=x || dxf_y2 !=y) {
 										// line does not start at last tool location, lift and move.
 										if(tool.DrawIsOn()) tool.WriteOff(out);
@@ -575,6 +636,7 @@ public class Makelangelo
 								} else {
 									// not the first point, draw.
 									if(tool.DrawIsOff()) tool.WriteOn(out);
+									if(j<polyLine.getVertexCount() && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
 									tool.WriteMoveTo(out, (float)x,(float)y);
 								}
 								dxf_x2=x;
@@ -608,9 +670,10 @@ public class Makelangelo
 		PlayConversionFinishedSound();
 		if(ok) LoadGCode(destinationFile);
 	    Halt();
+	    return true;
 	}
 
-	protected boolean ChooseConversionOptions() {
+	protected boolean ChooseImageConversionOptions() {
 		// display menu with conversion styles
 
 		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
@@ -677,7 +740,7 @@ public class Makelangelo
 		final String sourceFile = filename;
 		final String destinationFile = GetTempDestinationFile();
 		
-		if( ChooseConversionOptions() == false ) return false;
+		if( ChooseImageConversionOptions() == false ) return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, "Converting...", "", 0, 100);
 		pm.setProgress(0);
