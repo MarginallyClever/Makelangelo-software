@@ -543,134 +543,229 @@ public class Makelangelo
 		return startConvertingNow;
 	}
 	
-	double dxf_x2,dxf_y2;
-	public boolean LoadDXF(String filename) {
-	    previewPane.setGCode(gcode.lines);
+	protected boolean LoadDXF(String filename) {
+		if( ChooseDXFConversionOptions() == false ) return false;
+
         // where to save temp output file?
 		final String destinationFile = GetTempDestinationFile();
-
-		if( ChooseDXFConversionOptions() == false ) return false;
+		final String srcFile = filename;
 		
-		Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
-
-		Parser parser = ParserBuilder.createDefaultParser();
-
-		dxf_x2=0;
-		dxf_y2=0;
-		OutputStreamWriter out=null;
-		boolean ok=false;
-
-		try {
-			out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
-			MachineConfiguration mc = MachineConfiguration.getSingleton();
-			DrawingTool tool = mc.GetCurrentTool();
-			out.write(mc.GetConfigLine()+";\n");
-			out.write(mc.GetBobbinLine()+";\n");
-			out.write("G00 G90;\n");
-			tool.WriteOff(out);
-
+		final ProgressMonitor pm = new ProgressMonitor(null, "Converting...", "", 0, 100);
+		pm.setProgress(0);
+		pm.setMillisToPopup(0);
+		
+		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
+			public boolean ok=false;
 			
-			parser.parse(filename, DXFParser.DEFAULT_ENCODING);
-			DXFDocument doc = parser.getDocument();
-			Bounds b = doc.getBounds();
-			double width = b.getMaximumX() - b.getMinimumX();
-			double height = b.getMaximumY() - b.getMinimumY();
-			double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
-			double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-			double sy = mc.GetPaperHeight()*10/height;
-			double sx = mc.GetPaperWidth()*10/width;
-			double scale = (sx<sy? sx:sy ) * mc.paper_margin;
-			sx = scale * (MachineConfiguration.getSingleton().reverseForGlass? -1 : 1);
-			sy = scale;
-			
-			Iterator layer_iter = doc.getDXFLayerIterator();
-			while(layer_iter.hasNext()) {
-				DXFLayer layer = (DXFLayer)layer_iter.next();
-				Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
+			@Override
+			@SuppressWarnings("unchecked")
+			public Void doInBackground() {
+				Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
 
-				Iterator entity_iter = layer.getDXFEntityTypeIterator();
-				while(entity_iter.hasNext()) {
-					String entity_type = (String)entity_iter.next();
-					List entity_list = layer.getDXFEntities(entity_type);
-					Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
+				Parser parser = ParserBuilder.createDefaultParser();
 
-					for(int i=0;i<entity_list.size();++i) {
-						if(entity_type.equals("LINE")) {
-							DXFLine entity = (DXFLine)entity_list.get(i);
-							Point start = entity.getStartPoint();
-							Point end = entity.getEndPoint();
+				double dxf_x2=0;
+				double dxf_y2=0;
+				OutputStreamWriter out=null;
 
-							double x=(start.getX()-cx)*sx;
-							double y=(start.getY()-cy)*sy;
-							// no sanity checking!
-							if( dxf_x2!=x || dxf_y2!=y ) {
-								if(tool.DrawIsOn()) tool.WriteOff(out);
-								tool.WriteMoveTo(out, (float)x,(float)y);
-							}
-							if(tool.DrawIsOff()) tool.WriteOn(out);
-							x=(end.getX()-cx)*sx;
-							y=(end.getY()-cy)*sy;
-							tool.WriteMoveTo(out, (float)x,(float)y);
-							dxf_x2=x;
-							dxf_y2=y;
-						} else if(entity_type.equals("SPLINE")) {
-							DXFSpline entity = (DXFSpline)entity_list.get(i);
-							DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-							boolean first=true;
-							for(int j=0;j<polyLine.getVertexCount();++j) {
-								DXFVertex v = polyLine.getVertex(j);
-								double x = (v.getX()-cx)*sx;
-								double y = (v.getY()-cy)*sy;
-								double dx = dxf_x2 - x;
-								double dy = dxf_y2 - y;
-								
-								// no sanity checking!
-								if(first==true) {
-									first=false;
-									if(dxf_x2!=x || dxf_y2 !=y) {
-										// line does not start at last tool location, lift and move.
+				try {
+					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
+					MachineConfiguration mc = MachineConfiguration.getSingleton();
+					DrawingTool tool = mc.GetCurrentTool();
+					out.write(mc.GetConfigLine()+";\n");
+					out.write(mc.GetBobbinLine()+";\n");
+					out.write("G00 G90;\n");
+					tool.WriteChangeTo(out);
+					tool.WriteOff(out);
+					
+					parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
+					DXFDocument doc = parser.getDocument();
+					Bounds b = doc.getBounds();
+					double width = b.getMaximumX() - b.getMinimumX();
+					double height = b.getMaximumY() - b.getMinimumY();
+					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
+					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
+					double sy = mc.GetPaperHeight()*10/height;
+					double sx = mc.GetPaperWidth()*10/width;
+					double scale = (sx<sy? sx:sy ) * mc.paper_margin;
+					sx = scale * (MachineConfiguration.getSingleton().reverseForGlass? -1 : 1);
+					sy = scale;
+					
+					// count all entities in all layers
+					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
+					int entity_total=0;
+					int entity_count=0;
+					while(layer_iter.hasNext()) {
+						DXFLayer layer = (DXFLayer)layer_iter.next();
+						Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
+						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
+						while(entity_iter.hasNext()) {
+							String entity_type = (String)entity_iter.next();
+							List<DXFEntity> entity_list = (List<DXFEntity>)layer.getDXFEntities(entity_type);
+							Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
+							entity_total+=entity_list.size();
+						}
+					}
+					// set the progress meter
+					pm.setMinimum(0);
+					pm.setMaximum(entity_total);
+					
+					// convert each entity
+					layer_iter = doc.getDXFLayerIterator();
+					while(layer_iter.hasNext()) {
+						DXFLayer layer = (DXFLayer)layer_iter.next();
+
+						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
+						while(entity_iter.hasNext()) {
+							String entity_type = (String)entity_iter.next();
+
+							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
+								List<DXFLine> entity_list = (List<DXFLine>)layer.getDXFEntities(entity_type);
+								for(int i=0;i<entity_list.size();++i) {
+									pm.setProgress(entity_count++);
+									DXFLine entity = entity_list.get(i);
+									Point start = entity.getStartPoint();
+									Point end = entity.getEndPoint();
+
+									double x=(start.getX()-cx)*sx;
+									double y=(start.getY()-cy)*sy;
+									double dx = dxf_x2 - x;
+									double dy = dxf_y2 - y;
+
+									if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
 										if(tool.DrawIsOn()) tool.WriteOff(out);
 										tool.WriteMoveTo(out, (float)x,(float)y);
 									}
-									// else line starts right here, do nothing.
-								} else {
-									// not the first point, draw.
 									if(tool.DrawIsOff()) tool.WriteOn(out);
-									if(j<polyLine.getVertexCount() && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
+									x=(end.getX()-cx)*sx;
+									y=(end.getY()-cy)*sy;
 									tool.WriteMoveTo(out, (float)x,(float)y);
+									dxf_x2=x;
+									dxf_y2=y;
 								}
-								dxf_x2=x;
-								dxf_y2=y;
+							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+								List<DXFSpline> entity_list = (List<DXFSpline>)layer.getDXFEntities(entity_type);
+								for(int i=0;i<entity_list.size();++i) {
+									pm.setProgress(entity_count++);
+									DXFSpline entity = entity_list.get(i);
+									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
+									boolean first=true;
+									for(int j=0;j<polyLine.getVertexCount();++j) {
+										DXFVertex v = polyLine.getVertex(j);
+										double x = (v.getX()-cx)*sx;
+										double y = (v.getY()-cy)*sy;
+										double dx = dxf_x2 - x;
+										double dy = dxf_y2 - y;
+										
+										if(first==true) {
+											first=false;
+											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
+												// line does not start at last tool location, lift and move.
+												if(tool.DrawIsOn()) tool.WriteOff(out);
+												tool.WriteMoveTo(out, (float)x,(float)y);
+											}
+											// else line starts right here, do nothing.
+										} else {
+											// not the first point, draw.
+											if(tool.DrawIsOff()) tool.WriteOn(out);
+											if(j<polyLine.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
+											tool.WriteMoveTo(out, (float)x,(float)y);
+										}
+										dxf_x2=x;
+										dxf_y2=y;
+									}
+								}
+							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+								List<DXFPolyline> entity_list = (List<DXFPolyline>)layer.getDXFEntities(entity_type);
+								for(int i=0;i<entity_list.size();++i) {
+									pm.setProgress(entity_count++);
+									DXFPolyline entity = entity_list.get(i);
+									boolean first=true;
+									for(int j=0;j<entity.getVertexCount();++j) {
+										DXFVertex v = entity.getVertex(j);
+										double x = (v.getX()-cx)*sx;
+										double y = (v.getY()-cy)*sy;
+										double dx = dxf_x2 - x;
+										double dy = dxf_y2 - y;
+										
+										if(first==true) {
+											first=false;
+											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
+												// line does not start at last tool location, lift and move.
+												if(tool.DrawIsOn()) tool.WriteOff(out);
+												tool.WriteMoveTo(out, (float)x,(float)y);
+											}
+											// else line starts right here, do nothing.
+										} else {
+											// not the first point, draw.
+											if(tool.DrawIsOff()) tool.WriteOn(out);
+											if(j<entity.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
+											tool.WriteMoveTo(out, (float)x,(float)y);
+										}
+										dxf_x2=x;
+										dxf_y2=y;
+									}
+								}
 							}
 						}
 					}
+
+					// entities finished.  Close up file.
+					tool.WriteOff(out);
+					tool.WriteMoveTo(out, 0, 0);
+					
+					ok=true;
+				} catch(IOException e) {
+					e.printStackTrace();
+				} catch (org.kabeja.parser.ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					try {
+						if(out!=null) out.close();
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
+						
 				}
-			}
-
-			// entities finished.  Close up file.
-			tool.WriteOff(out);
-			tool.WriteMoveTo(out, 0, 0);
-			
-			ok=true;
-		} catch(IOException e) {
-			e.printStackTrace();
-		} catch (org.kabeja.parser.ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if(out!=null) out.close();
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
 				
-		}
-
-		Log("<font color='green'>Completed.</font>\n");
-		PlayConversionFinishedSound();
-		if(ok) LoadGCode(destinationFile);
-	    Halt();
-	    return true;
+				pm.setProgress(100);
+			    return null;
+			}
+			
+			@Override
+			public void done() {
+				pm.close();
+				Log("<font color='green'>Completed.</font>\n");
+				PlayConversionFinishedSound();
+				if(ok) LoadGCode(destinationFile);
+			    Halt();
+			}
+		};
+		
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+		    // Invoked when task's progress property changes.
+		    public void propertyChange(PropertyChangeEvent evt) {
+		        if ("progress" == evt.getPropertyName() ) {
+		            int progress = (Integer) evt.getNewValue();
+		            pm.setProgress(progress);
+		            String message = String.format("Completed %d%%.\n", progress);
+		            pm.setNote(message);
+		            if(s.isDone()) {
+	                	Makelangelo.getSingleton().Log("<font color='green'>Task completed.</font>\n");
+		            } else if (s.isCancelled() || pm.isCanceled()) {
+		                if (pm.isCanceled()) {
+		                    s.cancel(true);
+		                }
+	                    Makelangelo.getSingleton().Log("<font color='green'>Task cancelled.</font>\n");
+		            }
+		        }
+		    }
+		});
+		
+		s.execute();
+		
+		return true;
 	}
 
 	protected boolean ChooseImageConversionOptions() {
