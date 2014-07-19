@@ -203,7 +203,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		float w=(float)this.getWidth();
 		float h=(float)this.getHeight();
 		if(prefs.getBoolean("antialias", true)) g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-		if(prefs.getBoolean("speed_over_quality", true)) g2d.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
+		if(prefs.getBoolean("speed over quality", true)) g2d.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
 		g2d.translate(-cameraOffsetX+w/2, -cameraOffsetY+h/2);
 		g2d.scale(cameraZoom, cameraZoom);
     }

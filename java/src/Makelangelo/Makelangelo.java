@@ -19,6 +19,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -133,7 +134,7 @@ public class Makelangelo
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonText2GCODE, buttonSaveFile, buttonExit;
-    private JMenuItem buttonAdjustSounds, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
+    private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -1076,11 +1077,9 @@ public class Makelangelo
 	    return "";
 	}
 	
-	/**
-	 * Adjust preferences
-	 */
-	public void AdjustPreferences() {
-		final JDialog driver = new JDialog(mainframe,"Preferences",true);
+	// Adjust sound preferences
+	protected void AdjustSounds() {
+		final JDialog driver = new JDialog(mainframe,"Sounds",true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField sound_connect = new JTextField(prefs.get("sound_connect",""),32);
@@ -1096,9 +1095,6 @@ public class Makelangelo
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox show_pen_up = new JCheckBox("Show pen up moves");
-		show_pen_up.setSelected(previewPane.getShowPenUp());
-		
 		final JButton cancel = new JButton("Cancel");
 		final JButton save = new JButton("Save");
 		
@@ -1109,7 +1105,6 @@ public class Makelangelo
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=4;  driver.add(change_sound_disconnect,c);							c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=4;  driver.add(sound_disconnect,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=5;  driver.add(change_sound_conversion_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=5;  driver.add(sound_conversion_finished,c);
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=6;  driver.add(change_sound_drawing_finished,c);					c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=6;  driver.add(sound_drawing_finished,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=10;  driver.add(show_pen_up,c);
 		
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
@@ -1124,7 +1119,6 @@ public class Makelangelo
 
 					if(subject == save) {
 						//allowMetrics = allow_metrics.isSelected();
-						previewPane.setShowPenUp(show_pen_up.isSelected());
 						prefs.put("sound_connect",sound_connect.getText());
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
@@ -1149,11 +1143,69 @@ public class Makelangelo
 		driver.setVisible(true);
 	}
 
+    // Adjust graphics preferences	
+	protected void AdjustGraphics() {
+		final Preferences graphics_prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
+		
+		final JDialog driver = new JDialog(mainframe,"Graphics",true);
+		driver.setLayout(new GridBagLayout());
+		
+		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
+		//allow_metrics.setSelected(allowMetrics);
+		
+		final JCheckBox show_pen_up = new JCheckBox("Show pen up moves");
+		final JCheckBox antialias_on = new JCheckBox("Antialias lines");
+		final JCheckBox speed_over_quality = new JCheckBox("Speed over quality");
+		final JCheckBox draw_all_while_running = new JCheckBox("While drawing show entire picture, not just results so far");
+
+		show_pen_up.setSelected(graphics_prefs.getBoolean("show pen up", false));
+		antialias_on.setSelected(graphics_prefs.getBoolean("antialias", true));
+		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
+		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
+		
+		final JButton cancel = new JButton("Cancel");
+		final JButton save = new JButton("Save");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
+
+		int y=0;
+		
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=y;  driver.add(show_pen_up,c);  y++;
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=y;  driver.add(draw_all_while_running,c);  y++;
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=y;  driver.add(antialias_on,c);  y++;
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=1;  c.gridy=y;  driver.add(speed_over_quality,c);  y++;
+		
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=y;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=y;  driver.add(cancel,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			  public void actionPerformed(ActionEvent e) {
+					Object subject = e.getSource();
+					if(subject == save) {
+						//allowMetrics = allow_metrics.isSelected();
+						graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
+						graphics_prefs.putBoolean("antialias", antialias_on.isSelected());
+						graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
+						graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
+
+						previewPane.setShowPenUp(show_pen_up.isSelected());
+						driver.dispose();
+					}
+					if(subject == cancel) {
+						driver.dispose();
+					}
+			  }
+		};
+
+		save.addActionListener(driveButtons);
+		cancel.addActionListener(driveButtons);
+		driver.pack();
+		driver.setVisible(true);
+	}
 	
-	/**
-	 * Send the machine configuration to the robot
-	 */
-	void SendConfig() {
+	// Send the machine configuration to the robot
+	protected void SendConfig() {
 		if(!portConfirmed) return;
 		
 		// Send a command to the robot with new configuration values
@@ -1410,7 +1462,11 @@ public class Makelangelo
 			return;
 		}
 		if( subject == buttonAdjustSounds ) {
-			AdjustPreferences();
+			AdjustSounds();
+			return;
+		}
+		if( subject == buttonAdjustGraphics ) {
+			AdjustGraphics();
 			return;
 		}
 		if( subject == buttonAdjustMachineSize ) {
@@ -1786,16 +1842,16 @@ public class Makelangelo
         
         subMenu = new JMenu("Preferences");
         
-        buttonAdjustSounds = new JMenuItem("Sound options");
+        buttonAdjustSounds = new JMenuItem("Sound");
         buttonAdjustSounds.getAccessibleContext().setAccessibleDescription("Adjust sounds.");
         buttonAdjustSounds.addActionListener(this);
         subMenu.add(buttonAdjustSounds);
-        /*
-        buttonAdjustGraphics = new JMenuItem("Graphics options");
+
+        buttonAdjustGraphics = new JMenuItem("Graphics");
         buttonAdjustGraphics.getAccessibleContext().setAccessibleDescription("Adjust graphics.");
         buttonAdjustGraphics.addActionListener(this);
         subMenu.add(buttonAdjustGraphics);
-         */
+
         menu.add(subMenu);
         
         buttonCheckForUpdate = new JMenuItem("Check for updates",KeyEvent.VK_U);
