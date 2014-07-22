@@ -256,6 +256,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		// TODO draw left motor
 		// TODO draw right motor
 		// TODO draw control box
+		
+		final int look_ahead=500;
 
 		g2d.setColor(Color.BLACK);
 		
@@ -268,7 +270,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				if(running) {
 					if(n.line_number<=linesProcessed) {
 						g2d.setColor(Color.RED);
-					} else if(n.line_number<=linesProcessed+500) {
+					} else if(n.line_number<=linesProcessed+look_ahead) {
 						g2d.setColor(Color.GREEN);
 					} else if(prefs.getBoolean("Draw all while running", true) == false) {
 						break;
@@ -281,7 +283,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 					g2d.setStroke(tool.getStroke());
 					break;
 				case COLOR:
-					if(n.line_number>linesProcessed+500) {
+					if(!running || n.line_number>linesProcessed+look_ahead) {
 						g2d.setColor(n.c);
 					}
 					break;
@@ -406,7 +408,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 			// what kind of motion are we going to make?
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
 			   tokens[0].equals("G01") || tokens[0].equals("G1")) {
-				if(z==pz) {
+				//if(z==pz)
+				{
 					addNodePos(i,ITX(px),ITY(py),ITX(x),ITY(y));	
 				}
 			} else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||

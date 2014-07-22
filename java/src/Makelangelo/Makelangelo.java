@@ -616,9 +616,9 @@ public class Makelangelo
 					while(layer_iter.hasNext()) {
 						DXFLayer layer = (DXFLayer)layer_iter.next();
 
-						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
-						while(entity_iter.hasNext()) {
-							String entity_type = (String)entity_iter.next();
+						Iterator<String> entity_type_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
+						while(entity_type_iter.hasNext()) {
+							String entity_type = (String)entity_type_iter.next();
 
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
 								List<DXFLine> entity_list = (List<DXFLine>)layer.getDXFEntities(entity_type);
@@ -630,19 +630,31 @@ public class Makelangelo
 
 									double x=(start.getX()-cx)*sx;
 									double y=(start.getY()-cy)*sy;
-									double dx = dxf_x2 - x;
-									double dy = dxf_y2 - y;
+									double x2=(end.getX()-cx)*sx;
+									double y2=(end.getY()-cy)*sy;
+									
+									// is it worth drawing this line?
+									double dx = x2-x;
+									double dy = y2-y;
+									if(dx*dx+dy*dy < tool.GetDiameter()/2.0) {
+										continue;
+									}
+									
+									dx = dxf_x2 - x;
+									dy = dxf_y2 - y;
 
 									if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
-										if(tool.DrawIsOn()) tool.WriteOff(out);
+										if(tool.DrawIsOn()) {
+											tool.WriteOff(out);
+										}
 										tool.WriteMoveTo(out, (float)x,(float)y);
 									}
-									if(tool.DrawIsOff()) tool.WriteOn(out);
-									x=(end.getX()-cx)*sx;
-									y=(end.getY()-cy)*sy;
-									tool.WriteMoveTo(out, (float)x,(float)y);
-									dxf_x2=x;
-									dxf_y2=y;
+									if(tool.DrawIsOff()) {
+										tool.WriteOn(out);
+									}
+									tool.WriteMoveTo(out, (float)x2,(float)y2);
+									dxf_x2=x2;
+									dxf_y2=y2;
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 								List<DXFSpline> entity_list = (List<DXFSpline>)layer.getDXFEntities(entity_type);
@@ -662,7 +674,9 @@ public class Makelangelo
 											first=false;
 											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
 												// line does not start at last tool location, lift and move.
-												if(tool.DrawIsOn()) tool.WriteOff(out);
+												if(tool.DrawIsOn()) {
+													tool.WriteOff(out);
+												}
 												tool.WriteMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
@@ -693,7 +707,9 @@ public class Makelangelo
 											first=false;
 											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
 												// line does not start at last tool location, lift and move.
-												if(tool.DrawIsOn()) tool.WriteOff(out);
+												if(tool.DrawIsOn()) {
+													tool.WriteOff(out);
+												}
 												tool.WriteMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
