@@ -1639,16 +1639,16 @@ public class Makelangelo
 			final JButton goBottom = new JButton("BOTTOM");	goBottom.setPreferredSize(new Dimension(80,20));
 			final JButton goLeft = new JButton("LEFT");		goLeft.setPreferredSize(new Dimension(80,20));
 			final JButton goRight = new JButton("RIGHT");	goRight.setPreferredSize(new Dimension(80,20));
-			final JButton z90 = new JButton("Pen Up");		z90.setPreferredSize(new Dimension(100,20));
-			final JButton z0  = new JButton("Pen Down");	z0.setPreferredSize(new Dimension(100,20));
+			final JButton goUp = new JButton("Pen Up");		goUp.setPreferredSize(new Dimension(100,20));
+			final JButton goDown = new JButton("Pen Down");	goDown.setPreferredSize(new Dimension(100,20));
 			c = new GridBagConstraints();
 			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
 			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
 			c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
 			c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
 			c.insets = new Insets(0,5,0,0);
-			c.gridx=5;  c.gridy=0;  corners.add(z90,c);
-			c.gridx=5;  c.gridy=1;  corners.add(z0,c);
+			c.gridx=5;  c.gridy=0;  corners.add(goUp,c);
+			c.gridx=5;  c.gridy=1;  corners.add(goDown,c);
 			c.gridx=6;	c.gridy=0;	corners.add(home,c);
 			c.gridx=6;	c.gridy=1;	corners.add(center,c);
 			c.insets = new Insets(0,0,0,0);
@@ -1688,12 +1688,12 @@ public class Makelangelo
 					else if(b==center) SendLineToRobot("G92 X0 Y0");
 					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10));
 					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10));
-					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
 					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
 					//} else if(b==find) {
 					//	SendLineToRobot("G28");
-					else if(b==z90) RaisePen();
-					else if(b==z0) LowerPen();
+					else if(b==goUp) RaisePen();
+					else if(b==goDown) LowerPen();
 					else if(b==setFeedRate) {
 						String fr=feedRate.getText();
 						fr=fr.replaceAll("[ ,]","");
@@ -1736,8 +1736,8 @@ public class Makelangelo
 		right1.addActionListener(driveButtons);
 		right10.addActionListener(driveButtons);
 		right100.addActionListener(driveButtons);
-		z90.addActionListener(driveButtons);
-		z0.addActionListener(driveButtons);
+		goUp.addActionListener(driveButtons);
+		goDown.addActionListener(driveButtons);
 		center.addActionListener(driveButtons);
 		home.addActionListener(driveButtons);
 		//find.addActionListener(driveButtons);
