@@ -9,6 +9,9 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
+//#define MOTHERBOARD 1  // Adafruit Motor Shield 1
+#define MOTHERBOARD 2  // Adafruit Motor Shield 2
+
 // Increase this number to see more output
 #define VERBOSE         (0)
 
@@ -75,6 +78,21 @@
 #endif
 
 
+#if MOTHERBOARD == 1
+#define M1_STEP  m1.step
+#define M2_STEP  m2.step
+#define M1_ONESTEP(x)  m1.onestep(x)
+#define M2_ONESTEP(x)  m2.onestep(x)
+#endif
+#if MOTHERBOARD == 2
+#define M1_STEP  m1->step
+#define M2_STEP  m2->step
+#define M1_ONESTEP(x)  m1->onestep(x,SINGLE)
+#define M2_ONESTEP(x)  m2->onestep(x,SINGLE)
+// stacked motor shields have different addresses. The default is 0x60
+#define SHIELD_ADDRESS (0x60)
+#endif
+
 //------------------------------------------------------------------------------
 // EEPROM MEMORY MAP
 //------------------------------------------------------------------------------
@@ -88,10 +106,16 @@
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
+#if MOTHERBOARD == 1
 #include <SPI.h>  // pkm fix for Arduino 1.5
-
 // Adafruit motor driver library
 #include <AFMotorDrawbot.h>
+#endif
+
+#if MOTHERBOARD == 2
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#endif
 
 // Default servo library
 #include <Servo.h> 
@@ -111,9 +135,17 @@
 //------------------------------------------------------------------------------
 // VARIABLES
 //------------------------------------------------------------------------------
+#if MOTHERBOARD == 1
 // Initialize Adafruit stepper controller
 static AF_Stepper m1((int)STEPS_PER_TURN, M2_PIN);
 static AF_Stepper m2((int)STEPS_PER_TURN, M1_PIN);
+#endif
+#if MOTHERBOARD == 2
+// Initialize Adafruit stepper controller
+Adafruit_MotorShield AFMS0 = Adafruit_MotorShield(SHIELD_ADDRESS);
+Adafruit_StepperMotor *m1;
+Adafruit_StepperMotor *m2;
+#endif
 
 static Servo s1;
 
@@ -293,6 +325,62 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 
 //------------------------------------------------------------------------------
+void pause(long ms) {
+  delay(ms/1000);
+  delayMicroseconds(ms%1000);
+}
+
+
+//------------------------------------------------------------------------------
+static void line(float x,float y,float z) {
+  long l1,l2;
+  IK(x,y,l1,l2);
+  long d1 = l1 - laststep1;
+  long d2 = l2 - laststep2;
+
+  long ad1=abs(d1);
+  long ad2=abs(d2);
+  int dir1=d1<0?M1_REEL_IN:M1_REEL_OUT;
+  int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
+  long over=0;
+  long i;
+  
+  setPenAngle((int)z);
+  
+  // bresenham's line algorithm.
+  if(ad1>ad2) {
+    for(i=0;i<ad1;++i) {
+      M1_ONESTEP(dir1);
+      over+=ad2;
+      if(over>=ad1) {
+        over-=ad1;
+        M2_ONESTEP(dir2);
+      }
+      delayMicroseconds(step_delay);
+      if(readSwitches()) return;
+    }
+  } else {
+    for(i=0;i<ad2;++i) {
+      M2_ONESTEP(dir2);
+      over+=ad1;
+      if(over>=ad2) {
+        over-=ad2;
+        M1_ONESTEP(dir1);
+      }
+      delayMicroseconds(step_delay);
+      if(readSwitches()) return;
+    }
+  }
+
+  laststep1=l1;
+  laststep2=l2;
+  posx=x;
+  posy=y;
+  posz=z;
+}
+
+
+//------------------------------------------------------------------------------
 static void line_safe(float x,float y,float z) {
   // split up long lines to make them straighter?
   float dx=x-posx;
@@ -319,62 +407,6 @@ static void line_safe(float x,float y,float z) {
          (z-z0)*a+z0);
   }
   line(x,y,z);
-}
-
-
-//------------------------------------------------------------------------------
-void pause(long ms) {
-  delay(ms/1000);
-  delayMicroseconds(ms%1000);
-}
-
-
-//------------------------------------------------------------------------------
-static void line(float x,float y,float z) {
-  long l1,l2;
-  IK(x,y,l1,l2);
-  long d1 = l1 - laststep1;
-  long d2 = l2 - laststep2;
-
-  long ad1=abs(d1);
-  long ad2=abs(d2);
-  int dir1=d1<0?M1_REEL_IN:M1_REEL_OUT;
-  int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
-  long over=0;
-  long i;
-  
-  setPenAngle((int)z);
-  
-  // bresenham's line algorithm.
-  if(ad1>ad2) {
-    for(i=0;i<ad1;++i) {
-      m1.onestep(dir1);
-      over+=ad2;
-      if(over>=ad1) {
-        over-=ad1;
-        m2.onestep(dir2);
-      }
-      delayMicroseconds(step_delay);
-      if(readSwitches()) return;
-    }
-  } else {
-    for(i=0;i<ad2;++i) {
-      m2.onestep(dir2);
-      over+=ad1;
-      if(over>=ad2) {
-        over-=ad2;
-        m1.onestep(dir1);
-      }
-      delayMicroseconds(step_delay);
-      if(readSwitches()) return;
-    }
-  }
-
-  laststep1=l1;
-  laststep2=l2;
-  posx=x;
-  posy=y;
-  posz=z;
 }
 
 
@@ -473,8 +505,8 @@ static void FindHome() {
   // reel in the left motor until contact is made.
   Serial.println(F("Find left..."));
   do {
-    m1.step(1,M1_REEL_IN );
-    m2.step(1,M2_REEL_OUT);
+    M1_STEP(1,M1_REEL_IN );
+    M2_STEP(1,M2_REEL_OUT);
     delayMicroseconds(home_step_delay);
   } while(!readSwitches());
   laststep1=0;
@@ -482,7 +514,7 @@ static void FindHome() {
   // back off so we don't get a false positive on the next motor
   int i;
   for(i=0;i<safe_out;++i) {
-    m1.step(1,M1_REEL_OUT);
+    M1_STEP(1,M1_REEL_OUT);
     delayMicroseconds(home_step_delay);
   }
   laststep1=safe_out;
@@ -490,8 +522,8 @@ static void FindHome() {
   // reel in the right motor until contact is made
   Serial.println(F("Find right..."));
   do {
-    m1.step(1,M1_REEL_OUT);
-    m2.step(1,M2_REEL_IN );
+    M1_STEP(1,M1_REEL_OUT);
+    M2_STEP(1,M2_REEL_IN );
     delay(step_delay);
     laststep1++;
   } while(!readSwitches());
@@ -499,7 +531,7 @@ static void FindHome() {
   
   // back off so we don't get a false positive that kills line()
   for(i=0;i<safe_out;++i) {
-    m2.step(1,M2_REEL_OUT);
+    M2_STEP(1,M2_REEL_OUT);
     delay(step_delay);
   }
   laststep2=safe_out;
@@ -557,6 +589,18 @@ float EEPROM_readLong(int ee) {
 
 
 //------------------------------------------------------------------------------
+static void SaveUID() {
+  EEPROM_writeLong(ADDR_UUID,(long)robot_uid);
+}
+
+//------------------------------------------------------------------------------
+static void SaveSpoolDiameter() {
+  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER1*10000);
+  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER2*10000);
+}
+
+
+//------------------------------------------------------------------------------
 static void LoadConfig() {
   char version_number=EEPROM.read(ADDR_VERSION);
   if(version_number<3 || version_number>EEPROM_VERSION) {
@@ -587,18 +631,6 @@ static void LoadConfig() {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println(F("An Error Occurred during LoadConfig"));
   }
-}
-
-
-//------------------------------------------------------------------------------
-static void SaveUID() {
-  EEPROM_writeLong(ADDR_UUID,(long)robot_uid);
-}
-
-//------------------------------------------------------------------------------
-static void SaveSpoolDiameter() {
-  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER1*10000);
-  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER2*10000);
 }
 
 
@@ -672,14 +704,20 @@ static void SD_ProcessFile(char *filename) {
 
 
 void disable_motors() {
+#if MOTHERBOARD == 1
   m1.release();
   m2.release();
+#endif
+#if MOTHERBOARD == 2
+  m1->release();
+  m2->release();
+#endif
 }
 
 
 void activate_motors() {
-  m1.step(1,1);  m1.step(1,-1);
-  m2.step(1,1);  m2.step(1,-1);
+  M1_STEP(1,1);  M1_STEP(1,-1);
+  M2_STEP(1,1);  M2_STEP(1,-1);
 }
 
 
@@ -893,11 +931,11 @@ static void processCommand() {
     if(*ptr == m1d) {
       dir = amount < 0 ? M1_REEL_IN : M1_REEL_OUT;
       amount=abs(amount);
-      for(i=0;i<amount;++i) {  m1.step(1,dir);  delay(2);  }
+      for(i=0;i<amount;++i) {  M1_STEP(1,dir);  delay(2);  }
     } else if(*ptr == m2d) {
       dir = amount < 0 ? M2_REEL_IN : M2_REEL_OUT;
       amount = abs(amount);
-      for(i=0;i<amount;++i) {  m2.step(1,dir);  delay(2);  }
+      for(i=0;i<amount;++i) {  M2_STEP(1,dir);  delay(2);  }
     }
   }
     break;
@@ -958,6 +996,13 @@ void setup() {
 #ifdef USE_SD_CARD
   SD.begin();
   SD_ListFiles();
+#endif
+
+#if MOTHERBOARD == 2
+  // start the shield
+  AFMS0.begin();
+  m1 = AFMS0.getStepper(STEPS_PER_TURN, M2_PIN);
+  m2 = AFMS0.getStepper(STEPS_PER_TURN, M1_PIN);
 #endif
 
   // initialize the scale
