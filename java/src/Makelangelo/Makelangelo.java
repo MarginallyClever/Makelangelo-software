@@ -299,6 +299,9 @@ public class Makelangelo
 
 	// appends a message to the log tab and system out.
 	public void Log(String msg) {
+		// remove the 
+		if(msg.indexOf(';') != -1 ) msg = msg.substring(0,msg.indexOf(';'));
+		
 		msg=msg.replace("\n", "<br>\n")+"\n";
 		msg=msg.replace("\n\n","\n");
 		logToFile.write(msg);
@@ -610,6 +613,8 @@ public class Makelangelo
 					// set the progress meter
 					pm.setMinimum(0);
 					pm.setMaximum(entity_total);
+					
+					DXFEntity[] list = new DXFEntity[entity_total]; 
 					
 					// convert each entity
 					layer_iter = doc.getDXFLayerIterator();
