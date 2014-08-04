@@ -38,6 +38,7 @@ Servo servos[NUM_SERVOS];
  * set up the pins for each motor
  */
 void motor_setup() {
+#if MOTHERBOARD == 1
   motors[0].step_pin=17;
   motors[0].dir_pin=16;
   motors[0].enable_pin=48;
@@ -51,6 +52,23 @@ void motor_setup() {
   motors[1].limit_switch_pin=36;
   motors[1].reel_in  = HIGH;
   motors[1].reel_out = LOW;
+#endif
+#if MOTHERBOARD == 2
+  motors[0].step_pin=54;
+  motors[0].dir_pin=55;
+  motors[0].enable_pin=38;
+  motors[0].limit_switch_pin=3;
+  motors[0].reel_in  = HIGH;
+  motors[0].reel_out = LOW;
+
+  motors[1].step_pin=60;
+  motors[1].dir_pin=61;
+  motors[1].enable_pin=56;
+  motors[1].limit_switch_pin=14;
+  motors[1].reel_in  = HIGH;
+  motors[1].reel_out = LOW;
+
+#endif
   
   int i;
   for(i=0;i<NUM_AXIES;++i) {  

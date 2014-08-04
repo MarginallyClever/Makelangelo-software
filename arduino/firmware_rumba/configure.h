@@ -45,10 +45,15 @@
 #define CM_PER_SEGMENT  (0.25)  // Arcs are split into many line segments.  How long are the segments?
 
 
+#define MOTHERBOARD 1  // RUMBA
+//#define MOTHERBOARD 2  // RAMPS
+
+
 #ifdef HAS_LCD
 #define HAS_SD
 #endif
 
+#if MOTHERBOARD == 1
 // SD card settings
 #define SDPOWER            -1
 #define SDSS               53
@@ -74,6 +79,35 @@
 #define encrot1 2
 #define encrot2 3
 #define encrot3 1
+#endif
+#if MOTHERBOARD == 2
+// SD card settings
+#define SDPOWER            -1
+#define SDSS               53
+#define SDCARDDETECT       49
+// Smart controller settings
+#define BEEPER             79
+#define LCD_PINS_RS        16 
+#define LCD_PINS_ENABLE    17
+#define LCD_PINS_D4        23
+#define LCD_PINS_D5        25 
+#define LCD_PINS_D6        27
+#define LCD_PINS_D7        29
+#define LCD_HEIGHT         4
+#define LCD_WIDTH          20
+// Encoder rotation values
+#define BTN_EN1            31
+#define BTN_EN2            33
+#define BTN_ENC            35
+#define BLEN_C 2
+#define BLEN_B 1
+#define BLEN_A 0
+#define encrot0 0
+#define encrot1 2
+#define encrot2 3
+#define encrot3 1
+#endif
+
 
 #define NUM_SERVOS (1)
 #define SERVO0_PIN (5)

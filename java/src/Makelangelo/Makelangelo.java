@@ -19,7 +19,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,7 +31,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -613,9 +611,7 @@ public class Makelangelo
 					// set the progress meter
 					pm.setMinimum(0);
 					pm.setMaximum(entity_total);
-					
-					DXFEntity[] list = new DXFEntity[entity_total]; 
-					
+							
 					// convert each entity
 					layer_iter = doc.getDXFLayerIterator();
 					while(layer_iter.hasNext()) {
