@@ -131,7 +131,7 @@ public class Makelangelo
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
-    private JMenuItem buttonOpenFile, buttonText2GCODE, buttonSaveFile, buttonExit;
+    private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile, buttonExit;
     private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
@@ -286,10 +286,17 @@ public class Makelangelo
 	}
 	
 	
+	private void HilbertCurve() {
+		Filter_HilbertCurve msg = new Filter_HilbertCurve();
+		msg.Generate( GetTempDestinationFile() );
+		previewPane.ZoomToFitPaper();
+	}
+	
+	
 	private void TextToGCODE() {
 		Filter_YourMessageHere msg = new Filter_YourMessageHere();
 
-		msg.Generate( GetTempDestinationFile());
+		msg.Generate( GetTempDestinationFile() );
 
     	previewPane.ZoomToFitPaper();
 	}
@@ -622,10 +629,10 @@ public class Makelangelo
 							String entity_type = (String)entity_type_iter.next();
 
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								List<DXFLine> entity_list = (List<DXFLine>)layer.getDXFEntities(entity_type);
+								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFLine entity = entity_list.get(i);
+									DXFLine entity = (DXFLine)entity_list.get(i);
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
@@ -658,10 +665,10 @@ public class Makelangelo
 									dxf_y2=y2;
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								List<DXFSpline> entity_list = (List<DXFSpline>)layer.getDXFEntities(entity_type);
+								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFSpline entity = entity_list.get(i);
+									DXFSpline entity = (DXFSpline)entity_list.get(i);
 									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
@@ -692,10 +699,10 @@ public class Makelangelo
 									}
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								List<DXFPolyline> entity_list = (List<DXFPolyline>)layer.getDXFEntities(entity_type);
+								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFPolyline entity = entity_list.get(i);
+									DXFPolyline entity = (DXFPolyline)entity_list.get(i);
 									boolean first=true;
 									for(int j=0;j<entity.getVertexCount();++j) {
 										DXFVertex v = entity.getVertex(j);
@@ -1328,7 +1335,12 @@ public class Makelangelo
 	public void SendLineToRobot(String line) {
 		if(!portConfirmed) return;
 		if(line.trim().equals("")) return;
-		Log("<font color='white'>"+line+"</font>");
+		String reportedline = line;
+		if(line.contains(";")) {
+			String [] lines = line.split(";");
+			reportedline = lines[0];
+		}
+		Log("<font color='white'>"+reportedline+"</font>");
 		line += "\n";
 		
 		try {
@@ -1423,6 +1435,10 @@ public class Makelangelo
 		}
 		if( subject == buttonOpenFile ) {
 			OpenFileDialog();
+			return;
+		}
+		if( subject == buttonHilbertCurve ) {
+			HilbertCurve();
 			return;
 		}
 		if( subject == buttonText2GCODE ) {
@@ -1549,6 +1565,11 @@ public class Makelangelo
 				OpenPort(portsDetected[i]);
 				return;
 			}
+		}
+		
+		if( subject == commandLineSend ) {
+			SendLineToRobot(commandLineText.getText());
+			commandLineText.setText("");
 		}
 	}
 	
@@ -1965,6 +1986,11 @@ public class Makelangelo
         menu.setMnemonic(KeyEvent.VK_H);
         menu.getAccessibleContext().setAccessibleDescription("Get help");
 
+        buttonHilbertCurve = new JMenuItem("Hilbert Curve");
+        buttonHilbertCurve.setEnabled(!running);
+        buttonHilbertCurve.addActionListener(this);
+        menu.add(buttonHilbertCurve);
+        
         buttonText2GCODE = new JMenuItem("Text to GCODE");
         buttonText2GCODE.setEnabled(!running);
         buttonText2GCODE.addActionListener(this);

@@ -44,7 +44,8 @@ float THREAD_PER_STEP=0;
 
 // plotter position.
 float posx, posy, posz;  // pen state
-float feed_rate=0;
+float feed_rate=DEFAULT_FEEDRATE;
+float acceleration=DEFAULT_ACCELERATION;
 
 // motor position
 volatile long laststep[NUM_AXIES];
@@ -605,20 +606,20 @@ void processCommand() {
   case 0: {
       // move one motor
       int i,amount=parsenumber(m1d,0);
-      digitalWrite(motors[0].dir_pin,amount < 0 ? motors[0].reel_in : motors[0].reel_out);
+      digitalWrite(MOTOR_0_DIR_PIN,amount < 0 ? motors[0].reel_in : motors[0].reel_out);
       amount=abs(amount);
       for(i=0;i<amount;++i) {
-        digitalWrite(motors[0].step_pin,HIGH);
-        digitalWrite(motors[0].step_pin,LOW);
+        digitalWrite(MOTOR_0_STEP_PIN,HIGH);
+        digitalWrite(MOTOR_0_STEP_PIN,LOW);
         pause(STEP_DELAY);
       }
       
       amount=parsenumber(m2d,0);
-      digitalWrite(motors[1].dir_pin,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
+      digitalWrite(MOTOR_1_DIR_PIN,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
       amount = abs(amount);
       for(i=0;i<amount;++i) {
-        digitalWrite(motors[1].step_pin,HIGH);
-        digitalWrite(motors[1].step_pin,LOW);
+        digitalWrite(MOTOR_1_STEP_PIN,HIGH);
+        digitalWrite(MOTOR_1_STEP_PIN,LOW);
         pause(STEP_DELAY);
       }
     }
@@ -683,7 +684,7 @@ void setup() {
   // initialize the plotter position.
   teleport(0,0);
   setPenAngle(PEN_UP_ANGLE);
-  setFeedRate((MAX_FEEDRATE+MIN_FEEDRATE)/2);
+  setFeedRate(DEFAULT_FEEDRATE);
   ready();
 }
 

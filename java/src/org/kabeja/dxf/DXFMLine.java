@@ -33,7 +33,7 @@ public class DXFMLine extends DXFEntity {
     public final static int JUSTIFICATION_BOTTOM = 2;
     protected double scale = 1.0;
     protected Point startPoint = new Point();
-    protected List mlineSegments = new ArrayList();
+    protected List<DXFMLineSegment> mlineSegments = new ArrayList<DXFMLineSegment>();
     protected int lineCount = 0;
     protected int justification = 0;
     protected String mLineStyleID = "";

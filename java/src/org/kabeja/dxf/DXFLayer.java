@@ -28,7 +28,7 @@ import java.util.List;
  *
  */
 public class DXFLayer {
-    private Hashtable entities = new Hashtable();
+    private Hashtable<String,ArrayList<DXFEntity>> entities = new Hashtable<String,ArrayList<DXFEntity>>();
     private String name = "";
     private int color = 7;
     private DXFDocument doc;
@@ -59,9 +59,9 @@ public class DXFLayer {
         entity.setDXFDocument(this.doc);
 
         if (entities.containsKey(entity.getType())) {
-            ((ArrayList) entities.get(entity.getType())).add(entity);
+            ((ArrayList<DXFEntity>) entities.get(entity.getType())).add(entity);
         } else {
-            ArrayList list = new ArrayList();
+            ArrayList<DXFEntity> list = new ArrayList<DXFEntity>();
 
             list.add(entity);
             entities.put(entity.getType(), list);
@@ -70,7 +70,7 @@ public class DXFLayer {
 
     public void removeDXFEntity(DXFEntity entity) {
         if (entities.containsKey(entity.getType())) {
-            ArrayList list = (ArrayList) entities.get(entity.getType());
+            ArrayList<DXFEntity> list = (ArrayList<DXFEntity>) entities.get(entity.getType());
             list.remove(entity);
 
             if (list.isEmpty()) {
@@ -89,12 +89,12 @@ public class DXFLayer {
 
     public Bounds getBounds() {
         Bounds bounds = new Bounds();
-        Enumeration e = entities.elements();
+        Enumeration<ArrayList<DXFEntity>> e = entities.elements();
 
         while (e.hasMoreElements()) {
-            ArrayList list = (ArrayList) e.nextElement();
+            ArrayList<DXFEntity> list = (ArrayList<DXFEntity>) e.nextElement();
 
-            Iterator i = list.iterator();
+            Iterator<DXFEntity> i = list.iterator();
 
             while (i.hasNext()) {
                 DXFEntity entity = (DXFEntity) i.next();
@@ -119,12 +119,12 @@ public class DXFLayer {
     public Bounds getBounds(boolean onModelspace) {
         Bounds bounds = new Bounds();
 
-        Enumeration e = entities.elements();
+        Enumeration<ArrayList<DXFEntity>> e = entities.elements();
 
         while (e.hasMoreElements()) {
-            ArrayList list = (ArrayList) e.nextElement();
+            ArrayList<DXFEntity> list = (ArrayList<DXFEntity>) e.nextElement();
 
-            Iterator i = list.iterator();
+            Iterator<DXFEntity> i = list.iterator();
 
             while (i.hasNext()) {
                 DXFEntity entity = (DXFEntity) i.next();
@@ -153,9 +153,9 @@ public class DXFLayer {
      * @param type
      * @return List or null
      */
-    public List getDXFEntities(String type) {
+    public List<DXFEntity> getDXFEntities(String type) {
         if (entities.containsKey(type)) {
-            return (ArrayList) entities.get(type);
+            return (ArrayList<DXFEntity>) entities.get(type);
         }
 
         return null;
@@ -169,7 +169,7 @@ public class DXFLayer {
      *
      * @return a iterator over all entity types of this layer
      */
-    public Iterator getDXFEntityTypeIterator() {
+    public Iterator<String> getDXFEntityTypeIterator() {
         return entities.keySet().iterator();
     }
 
@@ -186,10 +186,10 @@ public class DXFLayer {
      */
     public DXFEntity getDXFEntityByID(String id) {
         DXFEntity entity = null;
-        Iterator i = this.entities.values().iterator();
+        Iterator<ArrayList<DXFEntity>> i = this.entities.values().iterator();
 
         while (i.hasNext()) {
-            Iterator entityIterator = ((List) i.next()).iterator();
+            Iterator<DXFEntity> entityIterator = ((List<DXFEntity>) i.next()).iterator();
 
             while (entityIterator.hasNext()) {
                 DXFEntity e = (DXFEntity) entityIterator.next();
