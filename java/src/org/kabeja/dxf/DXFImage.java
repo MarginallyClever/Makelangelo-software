@@ -24,7 +24,7 @@ public class DXFImage extends DXFEntity {
     protected double brightness;
     protected double contrast;
     protected double fade;
-    protected ArrayList<Point> clipBoundary = new ArrayList<Point>();
+    protected ArrayList clipBoundary = new ArrayList();
     protected boolean clipping = false;
     protected boolean rectangularClipping = false;
     protected boolean polygonalClipping = false;
@@ -197,7 +197,7 @@ public class DXFImage extends DXFEntity {
     /**
      * @return Returns the clipBoundary.
      */
-    public ArrayList<Point> getClipBoundary() {
+    public ArrayList getClipBoundary() {
         return clipBoundary;
     }
 

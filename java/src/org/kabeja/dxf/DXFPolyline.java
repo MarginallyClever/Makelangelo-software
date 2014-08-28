@@ -19,7 +19,7 @@ import org.kabeja.math.MathUtils;
  */
 public class DXFPolyline extends DXFEntity {
     protected static final double QUARTER_CIRCLE_ANGLE = Math.tan(0.39269908169872414D);
-    protected ArrayList<DXFVertex> vertices = new ArrayList<DXFVertex>();
+    protected ArrayList vertices = new ArrayList();
     protected double startWidth = 0.0;
     protected double endWidth = 0.0;
     protected boolean constantWidth = true;
@@ -43,7 +43,7 @@ public class DXFPolyline extends DXFEntity {
     public Bounds getBounds() {
         Bounds bounds = new Bounds();
 
-        Iterator<DXFVertex> i = vertices.iterator();
+        Iterator i = vertices.iterator();
 
         if (i.hasNext()) {
             DXFVertex last;
@@ -81,7 +81,7 @@ public class DXFPolyline extends DXFEntity {
         return this.vertices.size();
     }
 
-    public Iterator<DXFVertex> getVertexIterator() {
+    public Iterator getVertexIterator() {
         return this.vertices.iterator();
     }
 
@@ -89,7 +89,7 @@ public class DXFPolyline extends DXFEntity {
         // remove and check the constantwidth
         constantWidth = true;
 
-        Iterator<DXFVertex> i = vertices.iterator();
+        Iterator i = vertices.iterator();
 
         while (i.hasNext()) {
             DXFVertex v = (DXFVertex) i.next();
@@ -245,7 +245,7 @@ public class DXFPolyline extends DXFEntity {
         } else {
             this.constantWidth = true;
 
-            Iterator<DXFVertex> i = vertices.iterator();
+            Iterator i = vertices.iterator();
 
             while (i.hasNext()) {
                 DXFVertex vertex = (DXFVertex) i.next();
@@ -419,7 +419,7 @@ public class DXFPolyline extends DXFEntity {
     }
 
     public DXFVertex getPolyFaceMeshVertex(int index) {
-        Iterator<DXFVertex> i = this.vertices.iterator();
+        Iterator i = this.vertices.iterator();
         int count = 1;
 
         while (i.hasNext()) {
@@ -495,7 +495,7 @@ public class DXFPolyline extends DXFEntity {
             return getMeshLength();
         } else {
             // a normal polyline with or without bulges
-            Iterator<DXFVertex> i = this.vertices.iterator();
+            Iterator i = this.vertices.iterator();
             DXFVertex first;
             DXFVertex last = first = (DXFVertex) i.next();
 
@@ -532,7 +532,7 @@ public class DXFPolyline extends DXFEntity {
         double length = 0.0;
 
         // use the approximation
-        Iterator<DXFVertex> i = this.vertices.iterator();
+        Iterator i = this.vertices.iterator();
         DXFVertex first;
         DXFVertex last = first = null;
 
@@ -558,7 +558,7 @@ public class DXFPolyline extends DXFEntity {
 
     protected double getPolyfaceLength() {
         double length = 0.0;
-        Iterator<DXFVertex> i = this.vertices.iterator();
+        Iterator i = this.vertices.iterator();
 
         while (i.hasNext()) {
             DXFVertex v = (DXFVertex) i.next();
@@ -602,7 +602,7 @@ public class DXFPolyline extends DXFEntity {
 
         if (isSimpleMesh()) {
             DXFVertex[][] points = new DXFVertex[this.rows][this.columns];
-            Iterator<DXFVertex> it = this.vertices.iterator();
+            Iterator it = this.vertices.iterator();
 
             // create a line for each row
             for (int i = 0; i < this.rows; i++) {
@@ -638,8 +638,8 @@ public class DXFPolyline extends DXFEntity {
             }
         } else {
             DXFVertex[][] points = new DXFVertex[this.surefaceDensityRows][this.surefaceDensityColumns];
-            Iterator<DXFVertex> vi = this.vertices.iterator();
-            List<DXFVertex> appVertices = new ArrayList<DXFVertex>();
+            Iterator vi = this.vertices.iterator();
+            List appVertices = new ArrayList();
 
             while (vi.hasNext()) {
                 DXFVertex v = (DXFVertex) vi.next();
@@ -649,7 +649,7 @@ public class DXFPolyline extends DXFEntity {
                 }
             }
 
-            Iterator<DXFVertex> it = appVertices.iterator();
+            Iterator it = appVertices.iterator();
 
             // create a line for each row
             for (int i = 0; i < this.surefaceDensityRows; i++) {

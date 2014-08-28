@@ -82,7 +82,7 @@ public class Filter_SpiralGenerator extends Filter {
 			++j;
 			level = each_level[j%steps];
 			// find circumference of current circle
-			float circumference=(float) Math.floor(((d+d-toolDiameter)*Math.PI)/2);
+			float circumference=(float) Math.floor(((d+d-toolDiameter)*Math.PI)/6.0f);
 
 			for(i=0;i<=circumference;++i) {
 				f = (float)Math.PI*2.0f*(i/circumference);

@@ -33,7 +33,7 @@ public class DXFLeader extends DXFEntity {
     protected double scaleFactor;
     protected double textWidth;
     protected double textHeight;
-    protected List<Point> coordinates = new ArrayList<Point>();
+    protected List coordinates = new ArrayList();
     protected int pathType = 0;
     protected int creationType = 0;
     protected int hooklineDirecton = 0;
@@ -287,7 +287,7 @@ public class DXFLeader extends DXFEntity {
         return (Point) this.coordinates.get(index);
     }
 
-    public Iterator<Point> getCoordinateIterator() {
+    public Iterator getCoordinateIterator() {
         return this.coordinates.iterator();
     }
 

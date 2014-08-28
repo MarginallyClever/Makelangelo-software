@@ -109,11 +109,13 @@ public class Filter {
 
 	protected void liftPen(OutputStreamWriter out) throws IOException {
 		tool.WriteOff(out);
+		lastup=true;
 	}
 	
 	
 	protected void lowerPen(OutputStreamWriter out) throws IOException {
 		tool.WriteOn(out);
+		lastup=false;
 	}
 
 	
@@ -291,7 +293,6 @@ public class Filter {
 			tool.WriteMoveTo(out,x2,y2);
 			if(up) liftPen(out);
 			else   lowerPen(out);
-			lastup=up;
 		}
 	}
 	
@@ -383,7 +384,6 @@ public class Filter {
 
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		tool = mc.GetCurrentTool();
-		tool.SetMultiplier(0.5f);
 		
 		// find size of text block
 		// TODO count newlines

@@ -13,7 +13,6 @@ public class DrawingTool {
 	
 	protected float diameter=1; // mm
 	protected float feed_rate;
-	protected float feed_rate_multiplier=1;
 	protected float z_on;
 	protected float z_off;
 	protected float z_rate;
@@ -41,11 +40,6 @@ public class DrawingTool {
 
 	public String GetName() { return name; }
 	public float GetFeedRate() { return feed_rate; }
-	public float GetFeedRateMultiplied() { return feed_rate * feed_rate_multiplier; }
-	public void SetMultiplier(float x) {
-		assert(x>0 && x<=2);
-		feed_rate_multiplier = x;
-	}
 	
 	public void WriteChangeTo(OutputStreamWriter out) throws IOException {
 		out.write("M06 T"+tool_number+";\n");
@@ -53,13 +47,15 @@ public class DrawingTool {
 
 	public void WriteOn(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
-		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
+		out.write("G04 P50;\n");
+		out.write("G00 F"+GetFeedRate()+";\n");
 		DrawZ(z_on);
 	}
 
 	public void WriteOff(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
-		out.write("G00 F"+GetFeedRateMultiplied()+";\n");
+		out.write("G04 P50;\n");
+		out.write("G00 F"+GetFeedRate()+";\n");
 		DrawZ(z_off);
 	}
 	

@@ -391,26 +391,28 @@ public class Makelangelo
 
 		if( serial_recv_buffer.lastIndexOf(nochecksum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(nochecksum) + nochecksum.length());
-			return Integer.decode(GetNumberPortion(after_error));
+			String x=GetNumberPortion(after_error);
+			return Integer.decode(x);
 		}
 		if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
-			return Integer.decode(GetNumberPortion(after_error));
+			String x=GetNumberPortion(after_error);
+			return Integer.decode(x);
 		}
 		if( serial_recv_buffer.lastIndexOf(badlinenum) != -1 ) {
 			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badlinenum) + badlinenum.length());
-			return Integer.decode(GetNumberPortion(after_error));
+			String x=GetNumberPortion(after_error);
+			return Integer.decode(x);
 		}
 		
 		return -1;
 	}
 	
 	protected String GetNumberPortion(String src) {
-		String [] lines = src.split(" ");
-	    int length = lines[0].length();
+	    int length = src.length();
 	    String result = "";
 	    for (int i = 0; i < length; i++) {
-	        Character character = lines[0].charAt(i);
+	        Character character = src.charAt(i);
 	        if (Character.isDigit(character)) {
 	            result += character;
 	        }
@@ -629,10 +631,10 @@ public class Makelangelo
 							String entity_type = (String)entity_type_iter.next();
 
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+								List<DXFLine> entity_list = (List<DXFLine>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFLine entity = (DXFLine)entity_list.get(i);
+									DXFLine entity = entity_list.get(i);
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
@@ -665,10 +667,10 @@ public class Makelangelo
 									dxf_y2=y2;
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+								List<DXFSpline> entity_list = (List<DXFSpline>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFSpline entity = (DXFSpline)entity_list.get(i);
+									DXFSpline entity = entity_list.get(i);
 									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
@@ -699,10 +701,10 @@ public class Makelangelo
 									}
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+								List<DXFPolyline> entity_list = (List<DXFPolyline>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFPolyline entity = (DXFPolyline)entity_list.get(i);
+									DXFPolyline entity = entity_list.get(i);
 									boolean first=true;
 									for(int j=0;j<entity.getVertexCount();++j) {
 										DXFVertex v = entity.getVertex(j);

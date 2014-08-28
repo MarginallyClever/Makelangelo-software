@@ -28,8 +28,8 @@ public class DXFLineType {
     private double totalPatternLength = 0.0;
     private double[] pattern;
     private int elementCount = 0;
-    //private int[] offsetX;
-    //private int[] offsetY;
+    private int[] offsetX;
+    private int[] offsetY;
     private int alignment;
     protected double scale = 1.0;
 

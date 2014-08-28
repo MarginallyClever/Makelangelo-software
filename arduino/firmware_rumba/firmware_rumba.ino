@@ -131,14 +131,14 @@ void printFeedRate() {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-void IK(float x, float y, float &l1, float &l2) {
+void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  l1 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
   // find length to M2
   dx = x - limit_right;
-  l2 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  l2 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
 }
 
 
@@ -146,10 +146,10 @@ void IK(float x, float y, float &l1, float &l2) {
 // Forward Kinematics - turns L1,L2 lengths into XY coordinates
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
-void FK(float l1, float l2,float &x,float &y) {
-  float a = l1 * THREAD_PER_STEP;
+void FK(long l1, long l2,float &x,float &y) {
+  float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
-  float c = l2 * THREAD_PER_STEP;
+  float c = (float)l2 * THREAD_PER_STEP;
   
   // slow, uses trig
   // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
@@ -180,7 +180,7 @@ void processConfig() {
   if(i!=0) {
     if(i>0) {
       motors[0].reel_in  = HIGH;
-      motors[0].reel_out = LOW;
+      motors[0].reel_out = LOW; 
     } else {
       motors[0].reel_in  = LOW;
       motors[0].reel_out = HIGH;
@@ -217,7 +217,8 @@ void processConfig() {
 //------------------------------------------------------------------------------
 // test FK(IK(x,y))=x,y
 void test_kinematics(float x,float y) {
-  float A, B, C, D;
+  long A,B;
+  float C,D;
   IK(x,y,A,B);
   FK(A,B,C,D);
   Serial.print(F("\tx="));  Serial.print(x);
@@ -249,7 +250,7 @@ void line_safe(float x,float y,float z) {
   float len=sqrt(dx*dx+dy*dy);
 //  Serial.print("LEN ");  Serial.println(len);
   
-  long pieces=floor(len/CM_PER_SEGMENT);
+  long pieces = floor( len * MM_PER_SEGMENT );
 //  Serial.print("pieces ");  Serial.println(pieces);
   
   float x0=posx;
@@ -270,7 +271,7 @@ void line_safe(float x,float y,float z) {
 
 //------------------------------------------------------------------------------
 void polargraph_line(float x,float y,float z) {
-  float l1,l2;
+  long l1,l2;
   IK(x,y,l1,l2);
   posx=x;
   posy=y;
@@ -308,7 +309,7 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
   // simplifies to
   float len = abs(theta) * radius;
 
-  int i, segments = floor( len / CM_PER_SEGMENT );
+  int i, segments = floor( len * MM_PER_SEGMENT );
  
   float nx, ny, nz, angle3, scale;
 
@@ -336,7 +337,7 @@ void teleport(float x,float y) {
   posy=y;
   
   // @TODO: posz?
-  float L1,L2;
+  long L1,L2;
   IK(posx,posy,L1,L2);
   
   motor_set_step_count(L1,L2,0);
@@ -433,6 +434,8 @@ void where() {
   Serial.print(posz);
   Serial.print(F(" "));
   printFeedRate();
+  Serial.print(F(" A"));
+  Serial.print(acceleration);
 }
 
 
@@ -552,6 +555,7 @@ void processCommand() {
   case 0:
   case 1: {  // line
       Vector3 offset=get_end_plus_offset();
+      acceleration = min(max(parsenumber('A',acceleration),1),2000);
       setFeedRate(parsenumber('F',feed_rate));
       line_safe( parsenumber('X',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
                  parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
@@ -561,6 +565,7 @@ void processCommand() {
   case 2:
   case 3: {  // arc
       Vector3 offset=get_end_plus_offset();
+      acceleration = min(max(parsenumber('A',acceleration),1),2000);
       setFeedRate(parsenumber('F',feed_rate));
       arc(parsenumber('I',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
           parsenumber('J',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),

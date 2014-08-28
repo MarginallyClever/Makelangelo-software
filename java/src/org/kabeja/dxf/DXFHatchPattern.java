@@ -31,7 +31,7 @@ import org.kabeja.dxf.helpers.HatchLineFamily;
 public class DXFHatchPattern {
     private static int idCount = 0;
     private String id = null;
-    private List<HatchLineFamily> patterns = new ArrayList<HatchLineFamily>();
+    private List patterns = new ArrayList();
     private DXFHatch hatch;
 
     /**
@@ -58,7 +58,7 @@ public class DXFHatchPattern {
         patterns.add(pattern);
     }
 
-    public Iterator<HatchLineFamily> getLineFamilyIterator() {
+    public Iterator getLineFamilyIterator() {
         return patterns.iterator();
     }
 
