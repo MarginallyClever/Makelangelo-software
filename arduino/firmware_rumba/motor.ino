@@ -36,14 +36,13 @@ int steps_taken;
 int accel_until,decel_after;
 long current_feed_rate;
 long old_feed_rate=0;
-
+/*
 long prescalers[] = {CLOCK_FREQ /   1,
                      CLOCK_FREQ /   8,
                      CLOCK_FREQ /  64,
                      CLOCK_FREQ / 256,
                      CLOCK_FREQ /1024};
-                     
-
+*/
 
 //------------------------------------------------------------------------------
 // METHODS
