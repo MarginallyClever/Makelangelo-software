@@ -18,7 +18,7 @@ import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 
 
-public class Filter_YourMessageHere extends Filter {
+public class Filter_GeneratorYourMessageHere extends Filter {
 	protected float kerning=-0.50f;
 	protected float letter_width=2.0f;
 	protected float letter_height=2.0f;
@@ -27,6 +27,8 @@ public class Filter_YourMessageHere extends Filter {
 	static final String alphabetFolder = new String("ALPHABET/");
 	protected int chars_per_line=35;
 	protected static String lastMessage = "";
+
+	public String GetName() { return "Your message here"; }
 	
 	
 	public void Generate(String dest) {

@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 
-public class Filter_HilbertCurve extends Filter {
+public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
 	float turtle_dx,turtle_dy;
 	float turtle_step=10.0f;
@@ -31,6 +31,8 @@ public class Filter_HilbertCurve extends Filter {
 	float x,y;
 	
 
+	public String GetName() { return "Hilbert curve"; }
+	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */

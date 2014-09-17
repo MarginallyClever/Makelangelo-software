@@ -14,7 +14,9 @@ import Makelangelo.Makelangelo;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-public class Filter_SpiralGenerator extends Filter {
+public class Filter_GeneratorSpiral extends Filter {
+	public String GetName() { return "Spiral"; }
+	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
@@ -108,14 +110,6 @@ public class Filter_SpiralGenerator extends Filter {
 		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
-	}
-	
-	
-	protected void SignName(OutputStreamWriter out) throws IOException {
-		TextSetAlign(Align.CENTER);
-		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(image_width/2, image_height);
-		TextCreateMessageNow("Makelangelo #"+MachineConfiguration.getSingleton().GetUID(),out);
 	}
 }
 

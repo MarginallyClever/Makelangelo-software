@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-public class Filter_ScanlineGenerator extends Filter {
+public class Filter_GeneratorScanline extends Filter {
+	public String GetName() { return "Scanline"; }
+	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.

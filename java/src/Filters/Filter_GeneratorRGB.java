@@ -13,7 +13,9 @@ import Makelangelo.Makelangelo;
 /** 
  * @author Dan
  */
-public class Filter_RGBCrosshatchGenerator extends Filter {
+public class Filter_GeneratorRGB extends Filter {
+	public String GetName() { return "Red Green Blue"; }
+	
 	/**
 	 * The main entry point
 	 * @param img the image to convert.
@@ -194,15 +196,6 @@ public class Filter_RGBCrosshatchGenerator extends Filter {
 		Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
 		Makelangelo.getSingleton().PlayConversionFinishedSound();
 		Makelangelo.getSingleton().LoadGCode(dest);
-	}
-	
-	
-	protected void SignName(OutputStreamWriter out) throws IOException {
-		TextSetAlign(Align.RIGHT);
-		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(image_width, image_height);
-		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
-		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 	}
 }
 

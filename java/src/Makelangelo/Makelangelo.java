@@ -72,27 +72,18 @@ public class Makelangelo
 		extends JPanel
 		implements ActionListener, KeyListener, SerialPortEventListener
 {
+	// Java required?
+	static final long serialVersionUID=1;
+
 	// software version
 	static final String version="3";
 	
-	static final long serialVersionUID=1;
-	
 	private static Makelangelo singletonObject;
-
 	
 	// Image processing
-		// TODO: get rid of these and use a serviceloader instead
-		private static final int IMAGE_TSP=0;
-		private static final int IMAGE_SPIRAL=1;
-		private static final int IMAGE_4LEVEL=2;
-		private static final int IMAGE_SCANLINE=3;
-		private static final int IMAGE_RGB=4;
-		private static final int MAX_IMAGE_FILTERS=5;
-	
-		// TODO: get these names from the filters
-		String [] styles= { "Single Line Zigzag", "Spiral", "Cross hatching", "Scanlines", "RGB" };
-		
+		// TODO: use a serviceloader for easier plugin writing
 		Filter [] image_converters;
+		String [] filter_names = null;
 		boolean startConvertingNow;
 	
 	
@@ -184,16 +175,22 @@ public class Makelangelo
         LoadImageConverters();
 	}
 	
-	/**
-	 * TODO use a serviceLoader instead
-	 */
+	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
-		image_converters = new Filter[MAX_IMAGE_FILTERS];
-		image_converters[IMAGE_TSP		] = new Filter_TSPGcodeGenerator();
-		image_converters[IMAGE_SPIRAL	] = new Filter_SpiralGenerator();
-		image_converters[IMAGE_4LEVEL	] = new Filter_CrosshatchGenerator();
-		image_converters[IMAGE_SCANLINE	] = new Filter_ScanlineGenerator();
-		image_converters[IMAGE_RGB		] = new Filter_RGBCrosshatchGenerator();
+		image_converters = new Filter[7];  // this number must match the actual number of filters.
+		int i=0;
+		image_converters[i++] = new Filter_GeneratorTSP();
+		image_converters[i++] = new Filter_GeneratorSpiral();
+		image_converters[i++] = new Filter_GeneratorCrosshatch();
+		image_converters[i++] = new Filter_GeneratorScanline();
+		image_converters[i++] = new Filter_GeneratorPulse();
+		image_converters[i++] = new Filter_GeneratorBoxes();
+		image_converters[i++] = new Filter_GeneratorRGB();
+		
+		filter_names = new String[image_converters.length];
+		for(i=0;i<image_converters.length;++i) {
+			filter_names[i] = image_converters[i].GetName();
+		}
 	}
 	
 	protected void finalize() throws Throwable {
@@ -282,19 +279,19 @@ public class Makelangelo
 		prefs.putInt("Draw Style", style);
 	}
 	private int GetDrawStyle() {
-		return prefs.getInt("Draw Style", IMAGE_SPIRAL);
+		return prefs.getInt("Draw Style", 0);
 	}
 	
 	
 	private void HilbertCurve() {
-		Filter_HilbertCurve msg = new Filter_HilbertCurve();
+		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve();
 		msg.Generate( GetTempDestinationFile() );
 		previewPane.ZoomToFitPaper();
 	}
 	
 	
 	private void TextToGCODE() {
-		Filter_YourMessageHere msg = new Filter_YourMessageHere();
+		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere();
 
 		msg.Generate( GetTempDestinationFile() );
 
@@ -500,8 +497,6 @@ public class Makelangelo
 
 
 	protected boolean ChooseDXFConversionOptions() {
-		// display menu with conversion styles
-
 		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -796,8 +791,6 @@ public class Makelangelo
 	}
 
 	protected boolean ChooseImageConversionOptions() {
-		// display menu with conversion styles
-
 		final JDialog driver = new JDialog(mainframe,"Conversion options",true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -813,7 +806,7 @@ public class Makelangelo
 		final JCheckBox reverse_h = new JCheckBox("Flip for glass");
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		final JComboBox<String> input_draw_style = new JComboBox<String>(styles);
+		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		final JButton cancel = new JButton("Cancel");

@@ -267,17 +267,23 @@ public class Filter {
 	}
 
 	
-	protected float TX(float x) {
-		return SX(x-w2);
-	}
-	protected float TY(float y) {
-		return SY(h2-y);
-	}
 	protected float SX(float x) {
 		return x*scale;
 	}
 	protected float SY(float y) {
 		return y*scale;
+	}
+	protected float PX(float x) {
+		return x-w2;
+	}
+	protected float PY(float y) {
+		return h2-y;
+	}
+	protected float TX(float x) {
+		return SX(PX(x));
+	}
+	protected float TY(float y) {
+		return SY(PY(y));
 	}
 	
 	
@@ -581,6 +587,14 @@ public class Filter {
 				System.out.println(" NOK");
 			}
 		}
+	}
+	
+	protected void SignName(OutputStreamWriter out) throws IOException {
+		TextSetAlign(Align.RIGHT);
+		TextSetVAlign(VAlign.BOTTOM);
+		TextSetPosition(image_width, image_height);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
+		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 	}
 }
 

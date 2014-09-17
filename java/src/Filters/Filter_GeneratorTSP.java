@@ -17,7 +17,9 @@ import Makelangelo.Point2D;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-public class Filter_TSPGcodeGenerator extends Filter {
+public class Filter_GeneratorTSP extends Filter {
+	public String GetName() { return "Big zig zag"; }
+	
 	// processing tools
 	long t_elapsed,t_start;
 	double progress;
@@ -353,6 +355,7 @@ public class Filter_TSPGcodeGenerator extends Filter {
 			
 			// lift pen and return to home
 			liftPen(out);
+			SignName(out);
 			tool.WriteMoveTo(out,0,0);
 			out.close();
 		}

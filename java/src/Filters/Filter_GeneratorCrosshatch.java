@@ -15,7 +15,9 @@ import java.io.IOException;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-public class Filter_CrosshatchGenerator extends Filter {
+public class Filter_GeneratorCrosshatch extends Filter {
+	public String GetName() { return "Crosshatch"; }
+	
 	/**
 	 * The main entry point
 	 * @param img the image to convert.
@@ -179,15 +181,6 @@ public class Filter_CrosshatchGenerator extends Filter {
 		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		out.close();
-	}
-	
-	
-	protected void SignName(OutputStreamWriter out) throws IOException {
-		TextSetAlign(Align.RIGHT);
-		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(image_width, image_height);
-		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
-		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 	}
 }
 
