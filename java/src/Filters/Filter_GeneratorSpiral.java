@@ -55,7 +55,7 @@ public class Filter_GeneratorSpiral extends Filter {
 		// spiralize
 		int x,y,i,j;
 		final int steps=4;
-		double leveladd = 255.0/(steps);
+		double leveladd = 255.0/5.0f;
 		double level;
 		int z=0;
 

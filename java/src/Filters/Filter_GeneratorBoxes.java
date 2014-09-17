@@ -12,7 +12,7 @@ import Makelangelo.MachineConfiguration;
 
 
 public class Filter_GeneratorBoxes extends Filter {
-	public String GetName() { return "Circle line"; }
+	public String GetName() { return "Boxxy"; }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.

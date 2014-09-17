@@ -69,7 +69,7 @@ public class Filter_GeneratorPulse extends Filter {
 
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
+		int steps = (int)Math.ceil(tool.GetDiameter()/(3.0f*scale));
 		if(steps<1) steps=1;
 
 		int blockSize=(int)(image_width*scale/40.0f);
@@ -93,22 +93,25 @@ public class Filter_GeneratorPulse extends Filter {
 				for(x=0;x<image_width;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z=TakeImageSampleBlock(img,x,(int)(y-halfstep),x+blockSize,(int)(y+halfstep));
-					if(z > 240) {
-						MoveTo(out,x+blockSize,y,true);
-					} else
-					{
-						// scale the intensity value
-						float scale_z = (255.0f-(float)z)/255.0f;
-						float pulse_size = halfstep * scale_z;
+					// scale the intensity value
+					float scale_z = (255.0f-(float)z)/255.0f;
+					float pulse_size = halfstep * scale_z;
+					if(pulse_size < 1) {
+						MoveTo(out,x,y+halfstep,true);
+						MoveTo(out,x+blockSize,y+halfstep,true);
+					} else {
 						int finalx = x + blockSize;
 						if( finalx >= image_width ) finalx = image_width-1;
 						// fill the same block in the output image with a heartbeat monitor zigzag.
 						// the height of the pulse is relative to the intensity.
+						MoveTo( out, (float)(x), (float)(y+halfstep), false );
+						++k;
 						for(int block_x=x; block_x <= finalx; block_x+=steps) {
 							float n = 1 + ( k % 2 ) * -2;
 							++k;
 							MoveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
 						}
+						MoveTo( out, (float)(finalx), (float)(y+halfstep), false );
 					}
 				}
 				MoveTo(out,(float)image_width,(float)y+halfstep,true);
@@ -120,22 +123,25 @@ public class Filter_GeneratorPulse extends Filter {
 				for(x=image_width;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z=TakeImageSampleBlock(img,x-blockSize,(int)(y-halfstep),x,(int)(y+halfstep));
-					if(z > 240) {
-						MoveTo(out,x-blockSize,y,true);
-					} else
-					{
-						// scale the intensity value
-						float scale_z = (255.0f-(float)z)/255.0f;
-						float pulse_size = halfstep * scale_z;
+					// scale the intensity value
+					float scale_z = (255.0f-(float)z)/255.0f;
+					float pulse_size = halfstep * scale_z;
+					if(pulse_size < 1) {
+						MoveTo(out,x,y+halfstep,true);
+						MoveTo(out,x-blockSize,y+halfstep,true);
+					} else {
 						int finalx = x - blockSize;
 						if( finalx < 0 ) finalx = 0;
 						// fill the same block in the output image with a heartbeat monitor zigzag.
 						// the height of the pulse is relative to the intensity.
+						MoveTo( out, (float)(x), (float)(y+halfstep), false );
+						++k;
 						for(int block_x=x; block_x >= finalx; block_x-=steps) {
 							float n = 1 + ( k % 2 ) * -2;
 							++k;
 							MoveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
 						}
+						MoveTo( out, (float)(finalx), (float)(y+halfstep), false );
 					}
 				}
 				MoveTo(out,(float)0,(float)y+halfstep,true);
