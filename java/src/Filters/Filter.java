@@ -128,6 +128,9 @@ public class Filter {
 		out.write(mc.GetConfigLine()+";\n");
 		out.write(mc.GetBobbinLine()+";\n");
 
+		previous_x=0;
+		previous_y=0;
+		
 		SetAbsoluteMode(out);
 	}
 	

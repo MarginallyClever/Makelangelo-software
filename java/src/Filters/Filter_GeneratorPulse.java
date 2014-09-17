@@ -6,10 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Filters.Filter.Align;
-import Filters.Filter.VAlign;
-import Makelangelo.MachineConfiguration;
-
 
 public class Filter_GeneratorPulse extends Filter {
 	public String GetName() { return "Pulse line"; }
@@ -73,12 +69,6 @@ public class Filter_GeneratorPulse extends Filter {
 		if(steps<1) steps=1;
 
 		int blockSize=(int)(image_width*scale/40.0f);
-		
-		// these next three might not be strictly necessary.  Call me paranoid.
-		lastup=true;
-		previous_x=0;
-		previous_y=0;
-
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...
@@ -116,7 +106,7 @@ public class Filter_GeneratorPulse extends Filter {
 				}
 				MoveTo(out,(float)image_width,(float)y+halfstep,true);
 			} else {
-				// every even line move left to right
+				// every odd line move right to left
 				//MoveTo(file,x,y,pen up?)]
 				MoveTo(out,(float)image_width,(float)y+halfstep,true);
 

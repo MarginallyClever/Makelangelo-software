@@ -6,10 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Filters.Filter.Align;
-import Filters.Filter.VAlign;
-import Makelangelo.MachineConfiguration;
-
 
 public class Filter_GeneratorBoxes extends Filter {
 	public String GetName() { return "Boxxy"; }
@@ -74,16 +70,10 @@ public class Filter_GeneratorBoxes extends Filter {
 
 		int blockSize=(int)(image_width*scale/40.0f);
 		//int blockSize=(int)(image_width/(120.0f*scale));  // interesting results
-		
-		// these next three might not be strictly necessary.  Call me paranoid.
-		lastup=true;
-		previous_x=0;
-		previous_y=0;
-
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...
-		int x,y,z,i=0,k=0;
+		int x,y,z,i=0;
 		for(y=0;y<image_height;y+=blockSize) {
 			++i;
 			if((i%2)==0) {
@@ -107,7 +97,7 @@ public class Filter_GeneratorBoxes extends Filter {
 					}
 				}
 			} else {
-				// every even line move left to right
+				// every odd line move right to left
 				//MoveTo(file,x,y,pen up?)]
 				for(x=image_width-blockSize;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block

@@ -2,7 +2,6 @@ package Filters;
 
 
 import Makelangelo.Makelangelo;
-import Makelangelo.MachineConfiguration;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
@@ -44,9 +43,6 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		out.write("G00 G90;\n");
 		tool.WriteChangeTo(out);
 		liftPen(out);
-		lastup=true;
-		previous_x=0;
-		previous_y=0;
 
 		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image

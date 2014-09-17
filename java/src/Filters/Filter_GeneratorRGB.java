@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 
 
@@ -34,9 +33,6 @@ public class Filter_GeneratorRGB extends Filter {
 		
 		tool.WriteChangeTo(out);
 		liftPen(out);
-		lastup=true;
-		previous_x=0;
-		previous_y=0;
 		
 		boolean allow_black = false;
 		boolean allow_red = true;

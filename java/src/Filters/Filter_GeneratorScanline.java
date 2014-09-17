@@ -31,11 +31,6 @@ public class Filter_GeneratorScanline extends Filter {
 		// figure out how many lines we're going to have on this image.
 		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
-		
-		// these next three might not be strictly necessary.  Call me paranoid.
-		lastup=true;
-		previous_x=0;
-		previous_y=0;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).

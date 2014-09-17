@@ -6,7 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
 
 /**
@@ -46,7 +45,6 @@ public class Filter_GeneratorSpiral extends Filter {
 		double toolDiameter=tool.GetDiameter()/scale;
 		tool.WriteChangeTo(out);
 		liftPen(out);
-		lastup=true;
 
 		//*
 		// create a spiral across the image
