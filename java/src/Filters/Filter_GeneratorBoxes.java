@@ -68,8 +68,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
 
-		int blockSize=(int)(image_width*scale/40.0f);
-		//int blockSize=(int)(image_width/(120.0f*scale));  // interesting results
+		int blockSize=(int)(steps*5);
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...
@@ -82,7 +81,6 @@ public class Filter_GeneratorBoxes extends Filter {
 				for(x=0;x<image_width-blockSize;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z=TakeImageSampleBlock(img,x,(int)(y-halfstep),x+blockSize,(int)(y+halfstep));
-
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
 					float pulse_size = (halfstep-1) * scale_z;
@@ -99,7 +97,7 @@ public class Filter_GeneratorBoxes extends Filter {
 			} else {
 				// every odd line move right to left
 				//MoveTo(file,x,y,pen up?)]
-				for(x=image_width-blockSize;x>=0;x-=blockSize) {
+				for(x=image_width;x>=blockSize;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z=TakeImageSampleBlock(img,x-blockSize,(int)(y-halfstep),x,(int)(y+halfstep));
 					// scale the intensity value
@@ -107,12 +105,12 @@ public class Filter_GeneratorBoxes extends Filter {
 					float pulse_size = (halfstep-1) * scale_z;
 					if( pulse_size>1) {
 						// draw a circle.  the diameter is relative to the intensity.
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
+						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
+						MoveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
+						MoveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
+						MoveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
+						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
+						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
 					}
 				}
 			}

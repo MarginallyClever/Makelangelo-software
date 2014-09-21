@@ -337,6 +337,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 		int i,j;
 		boolean absMode=true;
 		String tool_change="M06 T";
+		Color tool_color=Color.BLACK;
 		
 		pz=0.5f;
 		
@@ -347,7 +348,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 
 			if(line.startsWith(tool_change)) {
 				String numberOnly= line.substring(tool_change.length()).replaceAll("[^0-9]", "");
-				addNodeTool(i,(int)Integer.valueOf(numberOnly, 10));
+				int id = (int)Integer.valueOf(numberOnly, 10);
+				addNodeTool(i,id);
+				switch(id) {
+				case 1: tool_color = Color.RED; break;
+				case 2: tool_color = Color.GREEN; break;
+				case 3: tool_color = Color.BLUE; break;
+				default: tool_color = Color.BLACK; break;
+				}
 				continue;
 			}
 			
@@ -400,7 +408,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				}
 				addNodeColor(i, Color.BLUE );
 			} else if(tool.DrawIsOn()) {
-				addNodeColor(i, Color.BLACK );  // TODO use actual pen color
+				addNodeColor(i, tool_color );  // TODO use actual pen color
 			} else {
 				addNodeColor(i, Color.ORANGE );
 			}

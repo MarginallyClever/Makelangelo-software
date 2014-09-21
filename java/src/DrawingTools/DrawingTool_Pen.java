@@ -28,6 +28,15 @@ public class DrawingTool_Pen extends DrawingTool {
 		feed_rate=3500;
 		name="Pen";
 	}
+	public DrawingTool_Pen(String name2,int tool_id) {
+		diameter=1.5f;
+		z_rate=120;
+		z_on=90;
+		z_off=50;
+		tool_number=tool_id;
+		feed_rate=3500;
+		name=name2;
+	}
 	
 	public void Adjust() {
 		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust Pen",true);

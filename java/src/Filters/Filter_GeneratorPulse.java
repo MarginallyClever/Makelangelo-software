@@ -65,10 +65,10 @@ public class Filter_GeneratorPulse extends Filter {
 
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(3.0f*scale));
+		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75f*scale));
 		if(steps<1) steps=1;
 
-		int blockSize=(int)(image_width*scale/40.0f);
+		int blockSize=(int)(steps*8);
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...
@@ -85,8 +85,9 @@ public class Filter_GeneratorPulse extends Filter {
 					z=TakeImageSampleBlock(img,x,(int)(y-halfstep),x+blockSize,(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
+					//scale_z *= scale_z;  // quadratic curve
 					float pulse_size = halfstep * scale_z;
-					if(pulse_size < 1) {
+					if(pulse_size < 0.5f) {
 						MoveTo(out,x,y+halfstep,true);
 						MoveTo(out,x+blockSize,y+halfstep,true);
 					} else {
@@ -115,8 +116,9 @@ public class Filter_GeneratorPulse extends Filter {
 					z=TakeImageSampleBlock(img,x-blockSize,(int)(y-halfstep),x,(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
+					//scale_z *= scale_z;  // quadratic curve
 					float pulse_size = halfstep * scale_z;
-					if(pulse_size < 1) {
+					if(pulse_size < 0.5f) {
 						MoveTo(out,x,y+halfstep,true);
 						MoveTo(out,x-blockSize,y+halfstep,true);
 					} else {

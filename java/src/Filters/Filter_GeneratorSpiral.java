@@ -16,6 +16,8 @@ import Makelangelo.Makelangelo;
 public class Filter_GeneratorSpiral extends Filter {
 	public String GetName() { return "Spiral"; }
 	
+	boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
+	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
@@ -35,7 +37,7 @@ public class Filter_GeneratorSpiral extends Filter {
 	 */
 	public void Convert(BufferedImage img) throws IOException {
 		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(6); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
@@ -58,11 +60,10 @@ public class Filter_GeneratorSpiral extends Filter {
 		int z=0;
 
 		float maxr;
-		//if(whole_image) {
+		if(whole_image) {
 			// go right to the corners
-		//	maxr=Math.sqrt( hh*hh + hw*hw )+1;
-		//} else 
-		{
+			maxr = (float)(Math.sqrt( h2*h2 + w2*w2 ) + 1.0f);
+		} else {
 			// do the largest circle that still fits in the image.
 			maxr = (h2>w2) ? w2 : h2;
 		}

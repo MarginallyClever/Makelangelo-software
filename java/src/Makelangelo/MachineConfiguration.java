@@ -81,10 +81,14 @@ public class MachineConfiguration {
 	}
 	
 	protected MachineConfiguration() {
-		tools = new DrawingTool[3];
-		tools[0]=new DrawingTool_Pen();
-		tools[1]=new DrawingTool_LED();
-		tools[2]=new DrawingTool_Spraypaint();
+		tools = new DrawingTool[6];
+		int i=0;
+		tools[i++]=new DrawingTool_Pen("Pen (black)",0);
+		tools[i++]=new DrawingTool_Pen("Pen (red)",1);
+		tools[i++]=new DrawingTool_Pen("Pen (green)",2);
+		tools[i++]=new DrawingTool_Pen("Pen (blue)",3);
+		tools[i++]=new DrawingTool_LED();
+		tools[i++]=new DrawingTool_Spraypaint();
 		
 		VersionCheck();
 	}

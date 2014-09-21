@@ -543,6 +543,7 @@ public class Makelangelo
 			
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+	    driver.getRootPane().setDefaultButton(save);
 		driver.pack();
 		driver.setVisible(true);
 		
@@ -843,6 +844,7 @@ public class Makelangelo
 			
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+	    driver.getRootPane().setDefaultButton(save);
 		driver.pack();
 		driver.setVisible(true);
 		
@@ -1158,6 +1160,7 @@ public class Makelangelo
 			
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+	    driver.getRootPane().setDefaultButton(save);
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1219,6 +1222,7 @@ public class Makelangelo
 
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+	    driver.getRootPane().setDefaultButton(save);
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1393,6 +1397,7 @@ public class Makelangelo
 
 		start.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+	    driver.getRootPane().setDefaultButton(start);
 		driver.pack();
 		driver.setVisible(true);  // modal
 		
@@ -1868,6 +1873,7 @@ public class Makelangelo
         
         menuBar.removeAll();
         
+        
         // File menu
         menu = new JMenu("Makelangelo");
         menu.setMnemonic(KeyEvent.VK_F);
@@ -1942,6 +1948,7 @@ public class Makelangelo
         menu = new JMenu("Settings");
         menu.setMnemonic(KeyEvent.VK_T);
         menu.getAccessibleContext().setAccessibleDescription("Adjust the robot settings.");
+        menu.setEnabled(!running);
 
         buttonAdjustMachineSize = new JMenuItem("Adjust machine size",KeyEvent.VK_L);
         buttonAdjustMachineSize.addActionListener(this);
