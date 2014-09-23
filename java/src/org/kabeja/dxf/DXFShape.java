@@ -38,7 +38,7 @@ public class DXFShape extends DXFEntity {
     /* (non-Javadoc)
      * @see org.kabeja.dxf.DXFEntity#toSAX(org.xml.sax.ContentHandler, java.util.Map)
      */
-    public void toSAX(ContentHandler handler, Map svgContext, DXFEntity entity,
+    public void toSAX(ContentHandler handler, Map<String,String> svgContext, DXFEntity entity,
         TransformContext transformContext) throws SAXException {
     }
 

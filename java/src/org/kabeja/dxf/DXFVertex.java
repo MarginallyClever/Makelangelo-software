@@ -82,7 +82,7 @@ public class DXFVertex extends DXFPoint {
      *
      * @see org.dxf2svg.dxf.DXFEntity#toSAX(org.xml.sax.ContentHandler)
      */
-    public void toSAX(ContentHandler handler, Map svgContext, DXFEntity entity,
+    public void toSAX(ContentHandler handler, Map<String,String> context, DXFEntity entity,
         TransformContext transformContext) throws SAXException {
     }
 

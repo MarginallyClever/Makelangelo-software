@@ -24,7 +24,7 @@ import org.kabeja.dxf.DXFConstants;
 
 
 public class DXFMLineStyle extends DXFObject {
-    protected List lines = new ArrayList();
+    protected List<DXFMLineStyleElement> lines = new ArrayList<DXFMLineStyleElement>();
     protected String name = "";
     protected String descrition = "";
     protected int fillColor = 256;
@@ -52,7 +52,7 @@ public class DXFMLineStyle extends DXFObject {
         return this.lines.size();
     }
 
-    public void sortDXFMLineStyleElements(Comparator comp) {
+    public void sortDXFMLineStyleElements(Comparator<DXFMLineStyleElement> comp) {
         Collections.sort(this.lines, comp);
     }
 

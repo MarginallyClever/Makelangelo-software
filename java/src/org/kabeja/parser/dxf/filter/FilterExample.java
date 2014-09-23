@@ -33,7 +33,7 @@ public class FilterExample {
 
             //test 
             DXFStreamFilter filter = new DXFStreamLayerFilter();
-            Map p = new HashMap();
+            Map<String,String> p = new HashMap<String,String>();
             p.put("layers.include", args[0]);
             filter.setProperties(p);
             parser.addDXFStreamFilter(filter);
@@ -42,6 +42,7 @@ public class FilterExample {
             DXFDocument doc = parser.getDocument();
 
             //do something with the doc
+            doc.getClass();
         } catch (Exception e) {
             e.printStackTrace();
         }

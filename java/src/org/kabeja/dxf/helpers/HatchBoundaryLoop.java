@@ -28,7 +28,7 @@ import org.kabeja.dxf.DXFEntity;
  *
  */
 public class HatchBoundaryLoop {
-    private List edges = new ArrayList();
+    private List<DXFEntity> edges = new ArrayList<DXFEntity>();
     private boolean outermost = true;
 
     /**
@@ -46,7 +46,7 @@ public class HatchBoundaryLoop {
         this.outermost = outermost;
     }
 
-    public Iterator getBoundaryEdgesIterator() {
+    public Iterator<DXFEntity> getBoundaryEdgesIterator() {
         return edges.iterator();
     }
 
@@ -59,7 +59,7 @@ public class HatchBoundaryLoop {
 
         // System.out.println("edges="+edges.size());
         if (edges.size() > 0) {
-            Iterator i = edges.iterator();
+            Iterator<DXFEntity> i = edges.iterator();
 
             while (i.hasNext()) {
                 DXFEntity entity = (DXFEntity) i.next();

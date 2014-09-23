@@ -565,7 +565,6 @@ public class Makelangelo
 			public boolean ok=false;
 			
 			@Override
-			@SuppressWarnings("unchecked")
 			public Void doInBackground() {
 				Log("<font color='green'>Converting to gcode and saving "+destinationFile+"</font>\n");
 
@@ -625,12 +624,12 @@ public class Makelangelo
 						Iterator<String> entity_type_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_type_iter.hasNext()) {
 							String entity_type = (String)entity_type_iter.next();
-
+							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+							
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								List<DXFLine> entity_list = (List<DXFLine>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFLine entity = entity_list.get(i);
+									DXFLine entity = (DXFLine)entity_list.get(i);
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
@@ -663,10 +662,9 @@ public class Makelangelo
 									dxf_y2=y2;
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								List<DXFSpline> entity_list = (List<DXFSpline>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFSpline entity = entity_list.get(i);
+									DXFSpline entity = (DXFSpline)entity_list.get(i);
 									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
@@ -697,10 +695,9 @@ public class Makelangelo
 									}
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								List<DXFPolyline> entity_list = (List<DXFPolyline>)layer.getDXFEntities(entity_type);
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFPolyline entity = entity_list.get(i);
+									DXFPolyline entity = (DXFPolyline)entity_list.get(i);
 									boolean first=true;
 									for(int j=0;j<entity.getVertexCount();++j) {
 										DXFVertex v = entity.getVertex(j);

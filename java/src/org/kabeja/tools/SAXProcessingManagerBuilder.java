@@ -73,8 +73,8 @@ public class SAXProcessingManagerBuilder implements ContentHandler {
 	private PostProcessor postprocessor;
 	private SAXGenerator saxgenerator;
 	private AggregatorGenerator aggregator;
-	private Map properties;
-	private StringBuffer buf = new StringBuffer();
+	private Map<String,String> properties;
+	//private StringBuffer buf = new StringBuffer();
 	private String name;
 	private ProcessPipeline pipeline;
 	private boolean config = false;
@@ -223,17 +223,17 @@ public class SAXProcessingManagerBuilder implements ContentHandler {
 			String qName, Attributes atts) throws SAXException {
 		if (namespaceURI.equals(XMLNS_KABEJA_PROCESSING)) {
 			if (ELEMENT_SAXFILTER.equals(localName) && this.config) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				name = atts.getValue(ATTRIBUTE_NAME);
 				saxfilter = (SAXFilter) createInstance(atts
 						.getValue(ATTRIBUTE_CLASS));
 			} else if (ELEMENT_SAXSERIALIZER.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				name = atts.getValue(ATTRIBUTE_NAME);
 				saxserializer = (SAXSerializer) createInstance(atts
 						.getValue(ATTRIBUTE_CLASS));
 			} else if (ELEMENT_POSTPROCESSOR.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				this.name = atts.getValue(ATTRIBUTE_NAME);
 
 				String clazz = (atts.getValue(ATTRIBUTE_CLASS));
@@ -247,27 +247,26 @@ public class SAXProcessingManagerBuilder implements ContentHandler {
 					this.pipeline.setDescription(des);
 				}
 			} else if (ELEMENT_SERIALIZE.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				this.name = atts.getValue(ATTRIBUTE_NAME);
 			} else if (ELEMENT_FILTER.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				name = atts.getValue(ATTRIBUTE_NAME);
 			} else if (ELEMENT_PROPERTY.equals(localName)) {
-				this.properties.put(atts.getValue(ATTRIBUTE_NAME), atts
-						.getValue(ATTRIBUTE_VALUE));
+				this.properties.put(atts.getValue(ATTRIBUTE_NAME), atts.getValue(ATTRIBUTE_VALUE));
 			} else if (ELEMENT_POSTPROCESS.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				name = atts.getValue(ATTRIBUTE_NAME);
 			} else if (ELEMENT_CONFIGURATION.equals(localName)) {
 				this.config = true;
 			} else if (ELEMENT_SAXGENERATOR.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				this.name = atts.getValue(ATTRIBUTE_NAME);
 
 				String clazz = (atts.getValue(ATTRIBUTE_CLASS));
 				this.saxgenerator = (SAXGenerator) createInstance(clazz);
 			} else if (ELEMENT_GENERATE.equals(localName)) {
-				this.properties = new HashMap();
+				this.properties = new HashMap<String,String>();
 				this.name = atts.getValue(ATTRIBUTE_NAME);
 			} else if (ELEMENT_AGGREGATE.equals(localName)) {
 				this.aggregate = true;
@@ -301,8 +300,7 @@ public class SAXProcessingManagerBuilder implements ContentHandler {
 
 	protected Object createInstance(String clazz) {
 		try {
-			Class cl = this.getClass().getClassLoader().loadClass(clazz);
-			Object obj = cl.newInstance();
+			Object obj = this.getClass().getClassLoader().loadClass(clazz).newInstance();
 
 			return obj;
 		} catch (ClassNotFoundException e) {

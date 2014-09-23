@@ -36,9 +36,9 @@ public class ViewportFilter extends AbstractPostProcessor {
      * @see org.kabeja.tools.PostProcessor#process(org.kabeja.dxf.DXFDocument,
      *      java.util.Map)
      */
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
         DXFViewport viewport = null;
-        Iterator i = doc.getDXFViewportIterator();
+        Iterator<DXFViewport> i = doc.getDXFViewportIterator();
 
         boolean found = false;
 
@@ -70,15 +70,15 @@ public class ViewportFilter extends AbstractPostProcessor {
     }
 
     protected void filterEntities(Bounds b, DXFDocument doc) {
-        Iterator i = doc.getDXFLayerIterator();
+        Iterator<DXFLayer> i = doc.getDXFLayerIterator();
 
         while (i.hasNext()) {
             DXFLayer l = (DXFLayer) i.next();
-            Iterator ti = l.getDXFEntityTypeIterator();
+            Iterator<String> ti = l.getDXFEntityTypeIterator();
 
             while (ti.hasNext()) {
                 String type = (String) ti.next();
-                Iterator ei = l.getDXFEntities(type).iterator();
+                Iterator<DXFEntity> ei = l.getDXFEntities(type).iterator();
 
                 while (ei.hasNext()) {
                     DXFEntity entity = (DXFEntity) ei.next();
@@ -95,7 +95,7 @@ public class ViewportFilter extends AbstractPostProcessor {
     /* (non-Javadoc)
          * @see org.kabeja.tools.PostProcessor#setProperties(java.util.Map)
          */
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         // TODO Auto-generated method stub
     }
 }

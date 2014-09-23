@@ -29,8 +29,8 @@ import org.kabeja.parser.DXFValue;
 public class DXFLineHandler extends AbstractEntityHandler {
     public final static String ENTITY_NAME = "LINE";
     private DXFLine line;
-    private DXFDocument doc;
-    private String layerID = "";
+    //private DXFDocument doc;
+    //private String layerID = "";
 
     public DXFLineHandler() {
     }

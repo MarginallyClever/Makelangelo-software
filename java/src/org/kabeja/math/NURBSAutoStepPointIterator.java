@@ -17,14 +17,16 @@ package org.kabeja.math;
 
 import java.util.Iterator;
 
+import org.kabeja.dxf.helpers.Point;
 
-public class NURBSAutoStepPointIterator implements Iterator {
+
+public class NURBSAutoStepPointIterator implements Iterator<Point> {
     public boolean hasNext() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public Object next() {
+    public Point next() {
         // TODO Auto-generated method stub
         return null;
     }

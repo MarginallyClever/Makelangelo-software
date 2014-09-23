@@ -29,7 +29,7 @@ import org.kabeja.dxf.helpers.Point;
  */
 public class DXFHatch extends DXFEntity {
     private String name = "";
-    private boolean solid = false;
+    //private boolean solid = false;
     private int associativityFlag = 0;
     private int boundaryPathCount = 0;
     private int hatchStyle = 0;
@@ -45,8 +45,8 @@ public class DXFHatch extends DXFEntity {
     private int degenerateBoundaryPathCount = 0;
     private boolean gradientHatch = false;
     private Point elevationPoint = new Point();
-    private List boundaries = new ArrayList();
-    private List patterns = new ArrayList();
+    private List<HatchBoundaryLoop> boundaries = new ArrayList<HatchBoundaryLoop>();
+    //private List patterns = new ArrayList();
     private String patternID = "";
     private double patternScale;
 
@@ -290,14 +290,14 @@ public class DXFHatch extends DXFEntity {
      *            The solid to set.
      */
     public void setSolid(boolean solid) {
-        this.solid = solid;
+        //this.solid = solid;
     }
 
     public void addBoundaryLoop(HatchBoundaryLoop loop) {
         this.boundaries.add(loop);
     }
 
-    public Iterator getBoundaryLoops() {
+    public Iterator<HatchBoundaryLoop> getBoundaryLoops() {
         return this.boundaries.iterator();
     }
 
@@ -308,7 +308,7 @@ public class DXFHatch extends DXFEntity {
      */
     public Bounds getBounds() {
         Bounds bounds = new Bounds();
-        Iterator i = this.boundaries.iterator();
+        Iterator<HatchBoundaryLoop> i = this.boundaries.iterator();
 
         while (i.hasNext()) {
             HatchBoundaryLoop loop = (HatchBoundaryLoop) i.next();

@@ -64,9 +64,9 @@ public class DXFHatchHandler extends AbstractEntityHandler {
     public static final int GROUPCODE_SEED_POINTS_COUNT = 98;
     public static final int GROUPCODE_SOLID_FILL_FLAG = 70;
     protected DXFEntityHandler boundaryHandler;
-    protected Hashtable boundaryHandlers = new Hashtable();
+    protected Hashtable<String,DXFEntityHandler> boundaryHandlers = new Hashtable<String,DXFEntityHandler>();
     protected int count;
-    private boolean follow = false;
+    //private boolean follow = false;
     private DXFHatch hatch;
     protected HatchLineFamily linePattern = new HatchLineFamily();
     protected HatchBoundaryLoop loop;
@@ -385,7 +385,7 @@ public class DXFHatchHandler extends AbstractEntityHandler {
     public void setDXFDocument(DXFDocument doc) {
         super.setDXFDocument(doc);
 
-        Iterator i = this.boundaryHandlers.values().iterator();
+        Iterator<DXFEntityHandler> i = this.boundaryHandlers.values().iterator();
 
         while (i.hasNext()) {
             DXFEntityHandler handler = (DXFEntityHandler) i.next();

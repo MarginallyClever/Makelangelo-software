@@ -33,8 +33,8 @@ public class PolylineSegment {
     private Point point4 = new Point();
     private double radius;
     private double bulgeHeight;
-    private double innerRadius;
-    private double outerRadius;
+    //private double innerRadius;
+    //private double outerRadius;
     private DXFVertex start;
     private DXFPolyline p;
 
@@ -172,13 +172,13 @@ public class PolylineSegment {
 
         double h = Math.abs(start.getBulge() * length) / 2;
         double r = p.getRadius(start.getBulge(), length);
-        boolean right = false;
+        //boolean right = false;
 
         if (start.getBulge() > 0.0) {
             double t = h - r;
             mp = MathUtils.getPointOfStraightLine(mp, d, t);
         } else {
-            right = true;
+            //right = true;
 
             double t = r - h;
             mp = MathUtils.getPointOfStraightLine(mp, d, t);

@@ -26,7 +26,7 @@ import java.util.Iterator;
  *
  */
 public class DXFVariable {
-    private Hashtable values = new Hashtable();
+    private Hashtable<String,String> values = new Hashtable<String,String>();
     private String name = "";
 
     public DXFVariable(String name) {
@@ -61,7 +61,7 @@ public class DXFVariable {
      *
      * @return a iterator over all keys of this DXFValue
      */
-    public Iterator getValueKeyIterator() {
+    public Iterator<String> getValueKeyIterator() {
         return values.keySet().iterator();
     }
 }

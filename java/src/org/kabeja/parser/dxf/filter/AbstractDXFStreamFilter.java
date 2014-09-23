@@ -21,10 +21,10 @@ import org.kabeja.parser.dxf.DXFHandler;
 
 
 public abstract class AbstractDXFStreamFilter implements DXFStreamFilter {
-    protected Map properties;
+    protected Map<String,String> properties;
     protected DXFHandler handler;
 
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         this.properties = properties;
     }
 

@@ -29,7 +29,7 @@ public class DXFHeaderSectionHandler implements DXFSectionHandler {
     private final String sectionKey = "HEADER";
     private DXFDocument doc;
     private DXFVariable variable = null;
-    private String mode;
+    //private String mode;
 
     /* (non-Javadoc)
      * @see org.dxf2svg.parser.SectionHandler#getSectionKey()

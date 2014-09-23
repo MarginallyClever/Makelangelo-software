@@ -32,7 +32,7 @@ public class DXFEntitiesSectionHandler extends AbstractSectionHandler
     implements DXFSectionHandler, HandlerManager {
     private static String SECTION_KEY = "ENTITIES";
     public static final int ENTITY_START = 0;
-    protected Hashtable handlers = new Hashtable();
+    protected Hashtable<String,Handler> handlers = new Hashtable<String,Handler>();
     protected DXFEntityHandler handler = null;
     protected boolean parseEntity = false;
 
@@ -132,10 +132,10 @@ public class DXFEntitiesSectionHandler extends AbstractSectionHandler
     public void releaseDXFDocument() {
         this.doc = null;
 
-        Iterator i = handlers.values().iterator();
+        Iterator<Handler> i = handlers.values().iterator();
 
         while (i.hasNext()) {
-            Handler handler = (Handler) i.next();
+            Handler handler = i.next();
             handler.releaseDXFDocument();
         }
     }

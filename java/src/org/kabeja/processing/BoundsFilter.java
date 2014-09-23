@@ -31,7 +31,7 @@ public class BoundsFilter extends AbstractPostProcessor {
     public final static String PROPERTY_HEIGHT = "boundsfilter.height";
     public final static String PROPERTY_PROCESS = "boundsfilter.process";
 
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
         if (this.properties.containsKey(PROPERTY_PROCESS) &&
                 Boolean.valueOf((String) this.properties.get(PROPERTY_PROCESS))
                            .booleanValue()) {

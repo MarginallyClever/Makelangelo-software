@@ -35,7 +35,7 @@ public class DXFSpline extends DXFEntity {
     protected int fitPointSize;
     protected double[] knots;
     protected double[] weights;
-    protected List points = new ArrayList();
+    protected List<SplinePoint> points = new ArrayList<SplinePoint>();
     protected double fitTolerance;
     protected double knotsTolerance;
     protected double controlPointTolerance;
@@ -79,7 +79,7 @@ public class DXFSpline extends DXFEntity {
         this.polyline = null;
     }
 
-    public Iterator getSplinePointIterator() {
+    public Iterator<SplinePoint> getSplinePointIterator() {
         return points.iterator();
     }
 

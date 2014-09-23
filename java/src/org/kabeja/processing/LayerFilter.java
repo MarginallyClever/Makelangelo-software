@@ -31,9 +31,9 @@ public class LayerFilter extends AbstractPostProcessor {
     public final static String PROPERTY_MERGE_LAYERS = "layers.merge";
     public final static String MERGED_LAYER_NAME = "ALL";
     protected boolean merge = false;
-    protected Set removableLayers = new HashSet();
+    protected Set<String> removableLayers = new HashSet<String>();
 
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         super.setProperties(properties);
 
         if (properties.containsKey(PROPERTY_MERGE_LAYERS)) {
@@ -53,7 +53,7 @@ public class LayerFilter extends AbstractPostProcessor {
         }
     }
 
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
         DXFLayer mergeLayer = null;
 
         if (this.merge) {
@@ -67,7 +67,7 @@ public class LayerFilter extends AbstractPostProcessor {
         }
 
         // iterate over all layers
-        Iterator i = doc.getDXFLayerIterator();
+        Iterator<DXFLayer> i = doc.getDXFLayerIterator();
 
         while (i.hasNext()) {
             DXFLayer layer = (DXFLayer) i.next();
@@ -76,12 +76,11 @@ public class LayerFilter extends AbstractPostProcessor {
                 i.remove();
             } else if (this.merge) {
                 if (layer != mergeLayer) {
-                    Iterator types = layer.getDXFEntityTypeIterator();
+                    Iterator<String> types = layer.getDXFEntityTypeIterator();
 
                     while (types.hasNext()) {
                         String type = (String) types.next();
-                        Iterator entityIterator = layer.getDXFEntities(type)
-                                                       .iterator();
+                        Iterator<DXFEntity> entityIterator = layer.getDXFEntities(type).iterator();
 
                         while (entityIterator.hasNext()) {
                             DXFEntity e = (DXFEntity) entityIterator.next();

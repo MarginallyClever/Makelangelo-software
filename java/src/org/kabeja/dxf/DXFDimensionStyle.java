@@ -114,7 +114,7 @@ public class DXFDimensionStyle {
     public static final String PROPERTY_DIMTVP = "145";
     public static final String PROPERTY_DIMTZIN = "284";
     public static final String PROPERTY_DIMZIN = "78";
-    private HashMap properties = new HashMap();
+    private HashMap<String,String> properties = new HashMap<String,String>();
     private int flags = 0;
     private String name = "";
 
@@ -186,7 +186,7 @@ public class DXFDimensionStyle {
         }
     }
 
-    public Iterator getPropertyIterator() {
+    public Iterator<String> getPropertyIterator() {
         return properties.values().iterator();
     }
 

@@ -35,7 +35,7 @@ import org.kabeja.dxf.DXFDocument;
  *@author <a href="mailto:simon.mieth@gmx.de">Simon Mieth</a>
  */
 public interface StreamGenerator {
-    public void setProperties(Map properties);
+    public void setProperties(Map<String,String> properties);
 
     public String getSuffix();
 

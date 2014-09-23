@@ -37,10 +37,10 @@ public class ViewFilter extends AbstractPostProcessor {
      *
      * @see de.miethxml.kabeja.tools.PostProcessor#process(de.miethxml.kabeja.dxf.DXFDocument)
      */
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
         // get the active viewport
         DXFView view = null;
-        Iterator i = doc.getDXFViewIterator();
+        Iterator<DXFView> i = doc.getDXFViewIterator();
 
         if (context.containsKey(CONTEXT_OPTION_VIEW_NAME)) {
             String name = (String) context.get(CONTEXT_OPTION_VIEW_NAME);
@@ -77,15 +77,15 @@ public class ViewFilter extends AbstractPostProcessor {
     }
 
     protected void filterEntities(Bounds b, DXFDocument doc) {
-        Iterator i = doc.getDXFLayerIterator();
+        Iterator<DXFLayer> i = doc.getDXFLayerIterator();
 
         while (i.hasNext()) {
             DXFLayer l = (DXFLayer) i.next();
-            Iterator ti = l.getDXFEntityTypeIterator();
+            Iterator<String> ti = l.getDXFEntityTypeIterator();
 
             while (ti.hasNext()) {
                 String type = (String) ti.next();
-                Iterator ei = l.getDXFEntities(type).iterator();
+                Iterator<DXFEntity> ei = l.getDXFEntities(type).iterator();
 
                 while (ei.hasNext()) {
                     DXFEntity entity = (DXFEntity) ei.next();
@@ -102,7 +102,7 @@ public class ViewFilter extends AbstractPostProcessor {
     /* (non-Javadoc)
          * @see org.kabeja.tools.PostProcessor#setProperties(java.util.Map)
          */
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         // TODO Auto-generated method stub
     }
 }

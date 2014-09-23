@@ -40,5 +40,5 @@ public interface PostProcessor extends Configurable {
      * @param context
      * @throws ProcessorException
      */
-    public void process(DXFDocument doc, Map context) throws ProcessorException;
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException;
 }

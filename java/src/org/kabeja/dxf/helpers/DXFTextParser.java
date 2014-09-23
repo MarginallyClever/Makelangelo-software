@@ -91,7 +91,7 @@ public class DXFTextParser {
         boolean formatting = false;
         boolean keyfollow = false;
         boolean complete = true;
-        Stack paras = new Stack();
+        Stack<StyledTextParagraph> paras = new Stack<StyledTextParagraph>();
         int linecount = 0;
         String str = text.getText();
         char key = ' ';

@@ -39,12 +39,12 @@ import org.kabeja.xml.SAXSerializer;
  *
  */
 public class ProcessingManager {
-    private Map saxfilters = new HashMap();
-    private Map saxserializers = new HashMap();
-    private Map postprocessors = new HashMap();
-    private Map pipelines = new HashMap();
-    private Map saxgenerators = new HashMap();
-    private List parsers = new ArrayList();
+    private Map<String,SAXFilter> saxfilters = new HashMap<String,SAXFilter>();
+    private Map<String,SAXSerializer> saxserializers = new HashMap<String,SAXSerializer>();
+    private Map<String,PostProcessor> postprocessors = new HashMap<String,PostProcessor>();
+    private Map<String,ProcessPipeline> pipelines = new HashMap<String,ProcessPipeline>();
+    private Map<String,SAXGenerator> saxgenerators = new HashMap<String,SAXGenerator>();
+    private List<Parser> parsers = new ArrayList<Parser>();
 
     public void addSAXFilter(SAXFilter filter, String name) {
         this.saxfilters.put(name, filter);
@@ -54,7 +54,7 @@ public class ProcessingManager {
         return (SAXFilter) this.saxfilters.get(name);
     }
 
-    public Map getSAXFilters() {
+    public Map<String,SAXFilter> getSAXFilters() {
         return this.saxfilters;
     }
 
@@ -66,7 +66,7 @@ public class ProcessingManager {
         return (SAXSerializer) this.saxserializers.get(name);
     }
 
-    public Map getSAXSerializers() {
+    public Map<String,SAXSerializer> getSAXSerializers() {
         return this.saxserializers;
     }
 
@@ -78,15 +78,15 @@ public class ProcessingManager {
         this.parsers.add(parser);
     }
 
-    public List getParsers() {
+    public List<Parser> getParsers() {
         return this.parsers;
     }
 
     protected Parser getParser(String extension) {
-        Iterator i = this.parsers.iterator();
+        Iterator<Parser> i = this.parsers.iterator();
 
         while (i.hasNext()) {
-            Parser parser = (Parser) i.next();
+            Parser parser = i.next();
 
             if (parser.supportedExtension(extension)) {
                 return parser;
@@ -97,10 +97,10 @@ public class ProcessingManager {
     }
 
     public PostProcessor getPostProcessor(String name) {
-        return (PostProcessor) this.postprocessors.get(name);
+        return this.postprocessors.get(name);
     }
 
-    public Map getPostProcessors() {
+    public Map<String,PostProcessor> getPostProcessors() {
         return this.postprocessors;
     }
 
@@ -113,11 +113,11 @@ public class ProcessingManager {
         return (ProcessPipeline) this.pipelines.get(name);
     }
 
-    public Map getProcessPipelines() {
+    public Map<String,ProcessPipeline> getProcessPipelines() {
         return this.pipelines;
     }
 
-    public void process(InputStream stream, String extension, Map context,
+    public void process(InputStream stream, String extension, Map<String,String> context,
         String pipeline, OutputStream out) throws ProcessorException {
         Parser parser = this.getParser(extension);
 
@@ -133,7 +133,7 @@ public class ProcessingManager {
         }
     }
 
-    public void process(DXFDocument doc, Map context, String pipeline,
+    public void process(DXFDocument doc, Map<String,String> context, String pipeline,
         OutputStream out) throws ProcessorException {
         if (this.pipelines.containsKey(pipeline)) {
             ProcessPipeline pp = (ProcessPipeline) this.pipelines.get(pipeline);
@@ -145,7 +145,7 @@ public class ProcessingManager {
         }
     }
 
-    public void process(DXFDocument doc, Map context, String pipeline,
+    public void process(DXFDocument doc, Map<String,String> context, String pipeline,
         String sourceFile) throws ProcessorException {
         if (this.pipelines.containsKey(pipeline)) {
             try {
@@ -172,7 +172,7 @@ public class ProcessingManager {
         return (SAXGenerator) this.saxgenerators.get(name);
     }
 
-    public Map getSAXGenerators() {
+    public Map<String,SAXGenerator> getSAXGenerators() {
         return this.saxgenerators;
     }
 

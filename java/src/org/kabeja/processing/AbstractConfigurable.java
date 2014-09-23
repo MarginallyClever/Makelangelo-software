@@ -20,13 +20,13 @@ import java.util.Map;
 
 
 public abstract class AbstractConfigurable implements Configurable {
-    protected Map properties = new HashMap();
+    protected Map<String,String> properties = new HashMap<String,String>();
 
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         this.properties = properties;
     }
 
-    public Map getProperties() {
+    public Map<String,String> getProperties() {
         return this.properties;
     }
 }

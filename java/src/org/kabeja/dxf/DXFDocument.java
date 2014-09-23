@@ -34,22 +34,22 @@ import org.kabeja.dxf.objects.DXFObject;
 public class DXFDocument {
     public static String PROPERTY_ENCODING = "encoding";
     public static final double DEFAULT_MARGIN = 5;
-    private Hashtable layers = new Hashtable();
-    private Hashtable blocks = new Hashtable();
-    private HashMap lineTypes = new HashMap();
-    private HashMap dimensionStyles = new HashMap();
-    private HashMap textStyles = new HashMap();
+    private Hashtable<String,DXFLayer> layers = new Hashtable<String,DXFLayer>();
+    private Hashtable<String,DXFBlock> blocks = new Hashtable<String,DXFBlock>();
+    private HashMap<String,DXFLineType> lineTypes = new HashMap<String,DXFLineType>();
+    private HashMap<String,DXFDimensionStyle> dimensionStyles = new HashMap<String,DXFDimensionStyle>();
+    private HashMap<String,DXFStyle> textStyles = new HashMap<String,DXFStyle>();
 
     // the user coordinate systems
     //private Hashtable ucs = new Hashtable();
-    private Hashtable properties = new Hashtable();
-    private List viewports = new ArrayList();
+    private Hashtable<String,String> properties = new Hashtable<String,String>();
+    private List<DXFViewport> viewports = new ArrayList<DXFViewport>();
     private Bounds bounds = new Bounds();
     //private double margin;
     private DXFHeader header = new DXFHeader();
-    private HashMap objects = new HashMap();
-    private HashMap patterns = new HashMap();
-    private List views = new ArrayList();
+    private HashMap<String,HashMap<String,DXFObject>> objects = new HashMap<String,HashMap<String,DXFObject>>();
+    private HashMap<String,DXFHatchPattern> patterns = new HashMap<String,DXFHatchPattern>();
+    private List<DXFView> views = new ArrayList<DXFView>();
     private DXFDictionary rootDictionary = new DXFDictionary();
 
     public DXFDocument() {
@@ -128,7 +128,7 @@ public class DXFDocument {
      *
      * @return the iterator over all DXFLineTypes
      */
-    public Iterator getDXFLineTypeIterator() {
+    public Iterator<DXFLineType> getDXFLineTypeIterator() {
         return lineTypes.values().iterator();
     }
 
@@ -152,7 +152,7 @@ public class DXFDocument {
      *
      * @return the iterator over all DXFBlocks
      */
-    public Iterator getDXFBlockIterator() {
+    public Iterator<DXFBlock> getDXFBlockIterator() {
         return blocks.values().iterator();
     }
 
@@ -180,10 +180,10 @@ public class DXFDocument {
     public Bounds getBounds() {
         this.bounds = new Bounds();
 
-        Enumeration e = this.layers.elements();
+        Enumeration<DXFLayer> e = this.layers.elements();
 
         while (e.hasMoreElements()) {
-            DXFLayer layer = (DXFLayer) e.nextElement();
+            DXFLayer layer = e.nextElement();
 
             if (!layer.isFrozen()) {
                 Bounds b = layer.getBounds();
@@ -205,10 +205,10 @@ public class DXFDocument {
     public Bounds getBounds(boolean onModelspace) {
         Bounds bounds = new Bounds();
 
-        Enumeration e = this.layers.elements();
+        Enumeration<DXFLayer> e = this.layers.elements();
 
         while (e.hasMoreElements()) {
-            DXFLayer layer = (DXFLayer) e.nextElement();
+            DXFLayer layer = e.nextElement();
 
             if (!layer.isFrozen()) {
                 Bounds b = layer.getBounds(onModelspace);
@@ -254,7 +254,7 @@ public class DXFDocument {
         return (DXFDimensionStyle) this.dimensionStyles.get(name);
     }
 
-    public Iterator getDXFDimensionStyleIterator() {
+    public Iterator<DXFDimensionStyle> getDXFDimensionStyleIterator() {
         return this.dimensionStyles.values().iterator();
     }
 
@@ -266,7 +266,7 @@ public class DXFDocument {
         return (DXFStyle) this.textStyles.get(name);
     }
 
-    public Iterator getDXFStyleIterator() {
+    public Iterator<DXFStyle> getDXFStyleIterator() {
         return this.textStyles.values().iterator();
     }
 
@@ -278,7 +278,7 @@ public class DXFDocument {
         this.viewports.add(viewport);
     }
 
-    public Iterator getDXFViewportIterator() {
+    public Iterator<DXFViewport> getDXFViewportIterator() {
         return this.viewports.iterator();
     }
 
@@ -294,7 +294,7 @@ public class DXFDocument {
         this.views.add(view);
     }
 
-    public Iterator getDXFViewIterator() {
+    public Iterator<DXFView> getDXFViewIterator() {
         return this.views.iterator();
     }
 
@@ -306,12 +306,12 @@ public class DXFDocument {
             d.putDXFObject(obj);
         } else {
             // is not bound to a dictionary
-            HashMap type = null;
+            HashMap<String,DXFObject> type = null;
 
             if (this.objects.containsKey(obj.getObjectType())) {
-                type = (HashMap) objects.get(obj.getObjectType());
+                type = (HashMap<String,DXFObject>) objects.get(obj.getObjectType());
             } else {
-                type = new HashMap();
+                type = new HashMap<String,DXFObject>();
                 this.objects.put(obj.getObjectType(), type);
             }
 
@@ -332,9 +332,9 @@ public class DXFDocument {
         this.rootDictionary = root;
     }
 
-    public List getDXFObjectsByType(String type) {
-        HashMap objecttypes = (HashMap) this.objects.get(type);
-        List list = new ArrayList(objecttypes.values());
+    public List<DXFObject> getDXFObjectsByType(String type) {
+        HashMap<String,DXFObject> objecttypes = this.objects.get(type);
+        List<DXFObject> list = new ArrayList<DXFObject>(objecttypes.values());
 
         return list;
     }
@@ -346,10 +346,10 @@ public class DXFDocument {
      * @return the object
      */
     public DXFObject getDXFObjectByID(String id) {
-        Iterator i = this.objects.values().iterator();
+        Iterator<HashMap<String,DXFObject>> i = this.objects.values().iterator();
 
         while (i.hasNext()) {
-            HashMap map = (HashMap) i.next();
+            HashMap<String,DXFObject> map = i.next();
             Object obj;
 
             if ((obj = map.get(id)) != null) {
@@ -374,7 +374,7 @@ public class DXFDocument {
      */
     public DXFEntity getDXFEntityByID(String id) {
         DXFEntity entity = null;
-        Iterator i = this.getDXFLayerIterator();
+        Iterator<DXFLayer> i = this.getDXFLayerIterator();
 
         while (i.hasNext()) {
             DXFLayer layer = (DXFLayer) i.next();
@@ -384,10 +384,10 @@ public class DXFDocument {
             }
         }
 
-        i = this.getDXFBlockIterator();
+        Iterator<DXFBlock> j = this.getDXFBlockIterator();
 
-        while (i.hasNext()) {
-            DXFBlock block = (DXFBlock) i.next();
+        while (j.hasNext()) {
+            DXFBlock block = j.next();
 
             if ((entity = block.getDXFEntityByID(id)) != null) {
                 return entity;
@@ -410,7 +410,7 @@ public class DXFDocument {
      *
      * @return java.util.Iterator over all DXFHatchPattern of the document
      */
-    public Iterator getDXFHatchPatternIterator() {
+    public Iterator<DXFHatchPattern> getDXFHatchPatternIterator() {
         return this.patterns.values().iterator();
     }
 

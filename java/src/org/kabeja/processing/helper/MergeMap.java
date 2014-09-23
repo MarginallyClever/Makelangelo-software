@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class MergeMap implements Map {
-    private Map base;
-    private Map override;
+public class MergeMap<K,V> implements Map<K,V> {
+    private Map<K,V> base;
+    private Map<K,V> override;
 
-    public MergeMap(Map base, Map override) {
+    public MergeMap(Map<K,V> base, Map<K,V> override) {
         this.base = base;
         this.override = override;
     }
@@ -48,12 +48,12 @@ public class MergeMap implements Map {
         }
     }
 
-    public Set entrySet() {
+    public Set<Map.Entry<K,V>> entrySet() {
         return null;
     }
 
-    public Object get(Object key) {
-        Object obj = this.override.get(key);
+    public V get(Object key) {
+        V obj = this.override.get(key);
 
         if (obj == null) {
             obj = this.base.get(key);
@@ -70,18 +70,19 @@ public class MergeMap implements Map {
         }
     }
 
-    public Set keySet() {
+    public Set<K> keySet() {
         return null;
     }
 
-    public Object put(Object arg0, Object arg1) {
+    public V put(K arg0, V arg1) {
         return null;
     }
 
     public void putAll(Map arg0) {
+    	
     }
 
-    public Object remove(Object key) {
+    public V remove(Object key) {
         return null;
     }
 
@@ -89,7 +90,7 @@ public class MergeMap implements Map {
         return this.base.size();
     }
 
-    public Collection values() {
+    public Collection<V> values() {
         return null;
     }
 }

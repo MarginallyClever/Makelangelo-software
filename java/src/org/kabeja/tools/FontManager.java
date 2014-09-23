@@ -30,7 +30,7 @@ import java.util.Hashtable;
 public class FontManager {
     private static FontManager instance = new FontManager();
     private String fontDescription = "conf/font.properties";
-    private Hashtable fontProperties = new Hashtable();
+    private Hashtable<String,String> fontProperties = new Hashtable<String,String>();
 
     private FontManager() {
         loadFontDescription();

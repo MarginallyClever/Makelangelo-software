@@ -34,19 +34,19 @@ public class VisibilityFilter extends AbstractPostProcessor {
     /* (non-Javadoc)
      * @see org.kabeja.tools.PostProcessor#process(org.kabeja.dxf.DXFDocument)
      */
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
-        Iterator i = doc.getDXFLayerIterator();
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
+        Iterator<DXFLayer> i = doc.getDXFLayerIterator();
 
         while (i.hasNext()) {
             DXFLayer l = (DXFLayer) i.next();
 
             if (l.isVisible()) {
-                Iterator inner = l.getDXFEntityTypeIterator();
+                Iterator<String> inner = l.getDXFEntityTypeIterator();
 
                 while (inner.hasNext()) {
                     String type = (String) inner.next();
-                    List entities = l.getDXFEntities(type);
-                    Iterator ei = entities.iterator();
+                    List<DXFEntity> entities = l.getDXFEntities(type);
+                    Iterator<DXFEntity> ei = entities.iterator();
 
                     while (ei.hasNext()) {
                         DXFEntity entity = (DXFEntity) ei.next();
@@ -65,7 +65,7 @@ public class VisibilityFilter extends AbstractPostProcessor {
     /* (non-Javadoc)
      * @see org.kabeja.tools.PostProcessor#setProperties(java.util.Map)
      */
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         // TODO Auto-generated method stub
     }
 }

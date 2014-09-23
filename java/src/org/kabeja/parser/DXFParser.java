@@ -43,14 +43,14 @@ public class DXFParser implements HandlerManager, Handler, Parser, DXFHandler {
     public final static String EXTENSION = "dxf";
     private final static String SECTION_START = "SECTION";
     private final static String SECTION_END = "ENDSEC";
-    private final static String END_STREAM = "EOF";
+    //private final static String END_STREAM = "EOF";
     private final static int COMMAND_CODE = 0;
     public static final String DEFAULT_ENCODING = "";
     protected DXFDocument doc;
-    protected Hashtable handlers = new Hashtable();
+    protected Hashtable<String,DXFSectionHandler> handlers = new Hashtable<String,DXFSectionHandler>();
     protected DXFSectionHandler currentHandler;
     private String line;
-    protected List streamFilters = new ArrayList();
+    protected List<DXFStreamFilter> streamFilters = new ArrayList<DXFStreamFilter>();
     protected DXFHandler filter;
 
     // some parse flags
@@ -239,7 +239,7 @@ public class DXFParser implements HandlerManager, Handler, Parser, DXFHandler {
     public void releaseDXFDocument() {
         this.doc = null;
 
-        Iterator i = handlers.values().iterator();
+        Iterator<DXFSectionHandler> i = handlers.values().iterator();
 
         while (i.hasNext()) {
             Handler handler = (Handler) i.next();

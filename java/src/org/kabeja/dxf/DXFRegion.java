@@ -24,7 +24,7 @@ import java.util.List;
  *
  */
 public class DXFRegion extends DXFEntity {
-    protected List acisData = new ArrayList();
+    protected List<String> acisData = new ArrayList<String>();
 
     /**
      *
@@ -52,7 +52,7 @@ public class DXFRegion extends DXFEntity {
      *
      * @return the list
      */
-    public List getACISDATA() {
+    public List<String> getACISDATA() {
         return acisData;
     }
 

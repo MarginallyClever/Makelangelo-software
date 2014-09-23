@@ -33,7 +33,7 @@ public class DXFTableSectionHandler extends AbstractSectionHandler
     public final int TABLE_CODE = 0;
     private String table = "";
     private DXFTableHandler handler;
-    private Hashtable handlers = new Hashtable();
+    private Hashtable<String,Handler> handlers = new Hashtable<String,Handler>();
     private boolean parse = false;
 
     public DXFTableSectionHandler() {
@@ -118,7 +118,7 @@ public class DXFTableSectionHandler extends AbstractSectionHandler
     public void releaseDXFDocument() {
         this.doc = null;
 
-        Iterator i = handlers.values().iterator();
+        Iterator<Handler> i = handlers.values().iterator();
 
         while (i.hasNext()) {
             Handler handler = (Handler) i.next();

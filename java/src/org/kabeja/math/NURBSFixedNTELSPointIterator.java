@@ -20,7 +20,7 @@ import java.util.Iterator;
 import org.kabeja.dxf.helpers.Point;
 
 
-public class NURBSFixedNTELSPointIterator implements Iterator {
+public class NURBSFixedNTELSPointIterator implements Iterator<Point> {
     private NURBS nurbs;
     private int ntels;
     private double dt = 0;
@@ -85,7 +85,7 @@ public class NURBSFixedNTELSPointIterator implements Iterator {
         return false;
     }
 
-    public Object next() {
+    public Point next() {
         Point p = this.nurbs.getPointAt(this.interval - 1, t);
         //		System.out.println("t="+t);
         //		Point p = this.nurbs.getPointAt(t);

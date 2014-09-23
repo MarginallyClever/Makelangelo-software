@@ -37,5 +37,5 @@ public interface DXFStreamFilter extends DXFHandler {
      * starts.
      * @param properties
      */
-    public void setProperties(Map properties);
+    public void setProperties(Map<String,String> properties);
 }

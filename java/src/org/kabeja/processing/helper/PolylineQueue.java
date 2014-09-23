@@ -31,7 +31,7 @@ import org.kabeja.dxf.helpers.Point;
 
 
 public class PolylineQueue {
-    private List elements = new ArrayList();
+    private List<DXFEntity> elements = new ArrayList<DXFEntity>();
     private Point startPoint;
     private Point endPoint;
     private double radius = DXFConstants.POINT_CONNECTION_RADIUS;
@@ -93,7 +93,7 @@ public class PolylineQueue {
         return this.endPoint;
     }
 
-    public Iterator getElementIterator() {
+    public Iterator<DXFEntity> getElementIterator() {
         return this.elements.iterator();
     }
 
@@ -130,7 +130,7 @@ public class PolylineQueue {
         DXFVertex first = new DXFVertex(this.startPoint);
         pline.addVertex(first);
 
-        Iterator i = this.elements.iterator();
+        Iterator<DXFEntity> i = this.elements.iterator();
 
         while (i.hasNext()) {
             DXFEntity e = (DXFEntity) i.next();
@@ -228,7 +228,7 @@ public class PolylineQueue {
     public void insertBefore(PolylineQueue queue) {
         this.startPoint = queue.getStartPoint();
 
-        Iterator i = queue.getElementIterator();
+        Iterator<DXFEntity> i = queue.getElementIterator();
         int x = 0;
 
         while (i.hasNext()) {
@@ -246,7 +246,7 @@ public class PolylineQueue {
     public void add(PolylineQueue queue) {
         this.endPoint = queue.getEndPoint();
 
-        Iterator i = queue.getElementIterator();
+        Iterator<DXFEntity> i = queue.getElementIterator();
 
         while (i.hasNext()) {
             DXFEntity e = (DXFEntity) i.next();

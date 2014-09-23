@@ -24,7 +24,7 @@ import org.kabeja.dxf.DXFConstants;
 
 
 public class DXFDictionary extends DXFObject {
-    protected ArrayList records = new ArrayList();
+    protected ArrayList<DXFDictionaryRecord> records = new ArrayList<DXFDictionaryRecord>();
 
     public String getObjectType() {
         return DXFConstants.OBJECT_TYPE_DICTIONARY;
@@ -116,7 +116,7 @@ public class DXFDictionary extends DXFObject {
      * @return the dictionary or null
      */
     public DXFDictionary getDXFDictionaryForID(String id) {
-        Set dictionaries = new HashSet();
+        Set<DXFObject> dictionaries = new HashSet<DXFObject>();
         DXFObject obj = null;
 
         for (int i = 0; i < this.records.size(); i++) {
@@ -131,7 +131,7 @@ public class DXFDictionary extends DXFObject {
             }
         }
 
-        Iterator ie = dictionaries.iterator();
+        Iterator<DXFObject> ie = dictionaries.iterator();
 
         while (ie.hasNext()) {
             DXFDictionary dic = (DXFDictionary) ie.next();
@@ -149,15 +149,15 @@ public class DXFDictionary extends DXFObject {
      *
      * @return iterator over all DXFObjects in this dictionary
      */
-    public Iterator getDXFObjectIterator() {
-        Iterator i = new Iterator() {
+    public Iterator<DXFObject> getDXFObjectIterator() {
+        Iterator<DXFObject> i = new Iterator<DXFObject>() {
                 int count = 0;
 
                 public boolean hasNext() {
                     return count < records.size();
                 }
 
-                public Object next() {
+                public DXFObject next() {
                     return ((DXFDictionaryRecord) records.get(count++)).getDXFObject();
                 }
 

@@ -91,7 +91,7 @@ public class DXFUtils {
     }
 
     public static void reverseDXFPolyline(DXFPolyline pline) {
-        ArrayList list = new ArrayList();
+        ArrayList<DXFVertex> list = new ArrayList<DXFVertex>();
         double bulge = 0;
         int size = pline.getVertexCount();
 

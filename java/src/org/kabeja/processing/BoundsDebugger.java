@@ -39,13 +39,13 @@ public class BoundsDebugger extends AbstractPostProcessor {
      *
      * @see de.miethxml.kabeja.tools.PostProcessor#process(de.miethxml.kabeja.dxf.DXFDocument)
      */
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
         //set all blocks to color gray
-        Iterator i = doc.getDXFBlockIterator();
+        Iterator<DXFBlock> i = doc.getDXFBlockIterator();
 
         while (i.hasNext()) {
             DXFBlock b = (DXFBlock) i.next();
-            Iterator ie = b.getDXFEntitiesIterator();
+            Iterator<DXFEntity> ie = b.getDXFEntitiesIterator();
 
             while (ie.hasNext()) {
                 DXFEntity entity = (DXFEntity) ie.next();
@@ -70,22 +70,22 @@ public class BoundsDebugger extends AbstractPostProcessor {
         Bounds tBounds = new Bounds(x, x, y, y);
         Bounds bBounds = new Bounds(x, x, y, y);
 
-        i = doc.getDXFLayerIterator();
+        Iterator<DXFLayer> j = doc.getDXFLayerIterator();
 
-        while (i.hasNext()) {
-            DXFLayer l = (DXFLayer) i.next();
+        while (j.hasNext()) {
+            DXFLayer l = j.next();
 
             //set color to gray
             l.setColor(8);
 
-            Iterator ti = l.getDXFEntityTypeIterator();
+            Iterator<String> ti = l.getDXFEntityTypeIterator();
 
             while (ti.hasNext()) {
                 String type = (String) ti.next();
-                Iterator ei = l.getDXFEntities(type).iterator();
+                Iterator<DXFEntity> ei = l.getDXFEntities(type).iterator();
 
                 while (ei.hasNext()) {
-                    DXFEntity entity = (DXFEntity) ei.next();
+                    DXFEntity entity = ei.next();
 
                     //set to gray
                     entity.setColor(8);
@@ -171,6 +171,6 @@ public class BoundsDebugger extends AbstractPostProcessor {
     /* (non-Javadoc)
      * @see org.kabeja.tools.PostProcessor#setProperties(java.util.Map)
      */
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
     }
 }

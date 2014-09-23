@@ -80,7 +80,7 @@ public class SAXParserBuilder implements ContentHandler {
     public static String ATTRIBUTE_EXTENSIONS = "extensions";
     public static String XMLNS_KABEJA_PARSER = "http://kabeja.org/parser/1.0";
     private Parser parser;
-    private Stack stack = new Stack();
+    private Stack<HandlerManager> stack = new Stack<HandlerManager>();
     private HandlerManager currentHandlerManager;
     private Handler handler;
 
@@ -189,8 +189,7 @@ public class SAXParserBuilder implements ContentHandler {
 
                 try {
                     // load the class and add to the currentHandlerManager
-                    Class c = this.getClass().getClassLoader().loadClass(clazz);
-                    handler = (Handler) c.newInstance();
+                    handler = (Handler) this.getClass().getClassLoader().loadClass(clazz).newInstance();
                     currentHandlerManager.addHandler(handler);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -207,14 +206,13 @@ public class SAXParserBuilder implements ContentHandler {
 
                 try {
                     // load the class and add to the currentHandlerManager
-                    Class c = this.getClass().getClassLoader().loadClass(clazz);
-                    this.parser = (Parser) c.newInstance();
+                    this.parser = (Parser)this.getClass().getClassLoader().loadClass(clazz).newInstance();
 
                     if (this.parser instanceof HandlerManager) {
                         this.currentHandlerManager = (HandlerManager) this.parser;
                     }
 
-                    this.stack = new Stack();
+                    this.stack = new Stack<HandlerManager>();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 } catch (InstantiationException e) {

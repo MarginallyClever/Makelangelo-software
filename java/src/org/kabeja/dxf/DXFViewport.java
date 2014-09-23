@@ -63,7 +63,7 @@ public class DXFViewport extends DXFEntity {
     private boolean grid;
     private boolean active = false;
     private int renderMode;
-    private Set frozenLayerSet = new HashSet();
+    private Set<String> frozenLayerSet = new HashSet<String>();
 
     /**
      * @return Returns the backClippingPlane.
@@ -497,7 +497,7 @@ public class DXFViewport extends DXFEntity {
         return this.frozenLayerSet.contains(layerName);
     }
 
-    public Iterator getFrozenLayerIterator() {
+    public Iterator<String> getFrozenLayerIterator() {
         return this.frozenLayerSet.iterator();
     }
 
@@ -523,7 +523,7 @@ public class DXFViewport extends DXFEntity {
         // the half of width and height
         double modelH = (this.height / this.getZoomXPFactor()) / 2;
         double modelW = (f * modelH);
-        double wf = modelW / modelH;
+        //double wf = modelW / modelH;
         Vector directionX = null;
 
         if ((this.viewDirectionVector.getX() == 0.0) &&

@@ -30,13 +30,13 @@ public class DXFStreamLayerFilter extends DXFStreamEntityFilter {
     public final static String PROPERTY_LAYERS_EXCLUDE = "layers.exclude";
     public final static String PROPERTY_LAYERS_INCLUDE = "layers.include";
     public final static int LAYER_NAME = 8;
-    protected List parseValues = new ArrayList();
-    protected Set exclude = new HashSet();
-    protected Set include = new HashSet();
+    protected List<ParseValue> parseValues = new ArrayList<ParseValue>();
+    protected Set<String> exclude = new HashSet<String>();
+    protected Set<String> include = new HashSet<String>();
     protected String layer = "";
     boolean findLayer = true;
 
-    public void setProperties(Map properties) {
+    public void setProperties(Map<String,String> properties) {
         if (properties.containsKey(PROPERTY_LAYERS_INCLUDE)) {
             this.include.clear();
 

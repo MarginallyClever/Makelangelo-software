@@ -37,6 +37,6 @@ import org.xml.sax.SAXException;
  *
  */
 public interface SAXGenerator extends Configurable {
-    public void generate(DXFDocument doc, ContentHandler handler, Map context)
+    public void generate(DXFDocument doc, ContentHandler handler, Map<String,String> context)
         throws SAXException;
 }

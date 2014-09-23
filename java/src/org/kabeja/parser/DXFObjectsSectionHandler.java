@@ -28,7 +28,7 @@ public class DXFObjectsSectionHandler extends AbstractSectionHandler
     implements HandlerManager {
     private static String SECTION_KEY = "OBJECTS";
     public static final int OBJECT_START = 0;
-    private HashMap handlers = new HashMap();
+    private HashMap<String,Handler> handlers = new HashMap<String,Handler>();
     private DXFObjectHandler handler;
     private boolean parseObject = false;
 

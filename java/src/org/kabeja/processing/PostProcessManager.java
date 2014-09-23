@@ -27,7 +27,7 @@ import org.kabeja.dxf.DXFDocument;
  *
  */
 public class PostProcessManager {
-    private ArrayList processors = new ArrayList();
+    private ArrayList<PostProcessor> processors = new ArrayList<PostProcessor>();
 
     public void addPostProcessor(PostProcessor pp) {
         processors.add(pp);
@@ -51,8 +51,8 @@ public class PostProcessManager {
         }
     }
 
-    public void process(DXFDocument doc, Map context) throws ProcessorException {
-        Iterator i = processors.iterator();
+    public void process(DXFDocument doc, Map<String,String> context) throws ProcessorException {
+        Iterator<PostProcessor> i = processors.iterator();
 
         while (i.hasNext()) {
             PostProcessor pp = (PostProcessor) i.next();

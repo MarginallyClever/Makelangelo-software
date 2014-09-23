@@ -28,7 +28,7 @@ import org.kabeja.math.MathUtils;
  * @author <a href="mailto:simon.mieth@gmx.de>Simon Mieth</a>
  *
  */
-public class HatchLineIterator implements Iterator {
+public class HatchLineIterator implements Iterator<HatchLineSegment> {
     public static final double LIMIT = 0.00001;
     protected double angle;
     protected Bounds hatchBounds;
@@ -36,7 +36,7 @@ public class HatchLineIterator implements Iterator {
     protected double length;
     protected Vector v;
     protected Vector r;
-    protected List bounderyEdges;
+    protected List<ParametricLine> bounderyEdges;
     protected ParametricLine patternLine;
     protected double tmin = Double.POSITIVE_INFINITY;
     protected double tmax = Double.NEGATIVE_INFINITY;
@@ -55,7 +55,7 @@ public class HatchLineIterator implements Iterator {
         this.hatchBounds = hatch.getBounds();
         this.length = pattern.getLength();
 
-        this.bounderyEdges = new ArrayList();
+        this.bounderyEdges = new ArrayList<ParametricLine>();
 
         // edge 0
         Point start = new Point(this.hatchBounds.getMinimumX(),
@@ -211,13 +211,13 @@ public class HatchLineIterator implements Iterator {
         return v;
     }
 
-    public Object next() {
+    public HatchLineSegment next() {
         Point p = this.patternLine.getPointAt(this.currentWalkingStep);
         ParametricLine line = new ParametricLine(p, this.v);
 
         // get the next intersection of
-        Iterator i = this.bounderyEdges.iterator();
-        List points = new ArrayList();
+        Iterator<ParametricLine> i = this.bounderyEdges.iterator();
+        List<Point> points = new ArrayList<Point>();
 
         while (i.hasNext()) {
             ParametricLine edge = (ParametricLine) i.next();
