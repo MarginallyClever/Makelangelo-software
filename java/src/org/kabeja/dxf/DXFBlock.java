@@ -31,7 +31,7 @@ public class DXFBlock {
     private String layerID = DXFConstants.DEFAULT_LAYER;
     private String name = "";
     private String description = "";
-    private ArrayList entities;
+    private ArrayList<DXFEntity> entities;
     private DXFDocument doc;
 
     /**
@@ -40,14 +40,14 @@ public class DXFBlock {
     public DXFBlock() {
         super();
 
-        this.entities = new ArrayList();
+        this.entities = new ArrayList<DXFEntity>();
         this.referencePoint = new Point();
     }
 
     public Bounds getBounds() {
         // first set the own point
         Bounds bounds = new Bounds();
-        Iterator i = entities.iterator();
+        Iterator<DXFEntity> i = entities.iterator();
 
         if (i.hasNext()) {
             while (i.hasNext()) {
@@ -103,7 +103,7 @@ public class DXFBlock {
      *
      * @return a iterator over all entities of this block
      */
-    public Iterator getDXFEntitiesIterator() {
+    public Iterator<DXFEntity> getDXFEntitiesIterator() {
         return entities.iterator();
     }
 
@@ -144,7 +144,7 @@ public class DXFBlock {
     public void setDXFDocument(DXFDocument doc) {
         this.doc = doc;
 
-        Iterator i = entities.iterator();
+        Iterator<DXFEntity> i = entities.iterator();
 
         while (i.hasNext()) {
             DXFEntity entity = (DXFEntity) i.next();
@@ -162,7 +162,7 @@ public class DXFBlock {
 
     public double getLength() {
         double length = 0;
-        Iterator i = entities.iterator();
+        Iterator<DXFEntity> i = entities.iterator();
 
         while (i.hasNext()) {
             DXFEntity entity = (DXFEntity) i.next();
@@ -185,7 +185,7 @@ public class DXFBlock {
      */
     public DXFEntity getDXFEntityByID(String id) {
         DXFEntity entity = null;
-        Iterator i = this.entities.iterator();
+        Iterator<DXFEntity> i = this.entities.iterator();
 
         while (i.hasNext()) {
             DXFEntity e = (DXFEntity) i.next();

@@ -41,11 +41,11 @@ public class DXFDocument {
     private HashMap textStyles = new HashMap();
 
     // the user coordinate systems
-    private Hashtable ucs = new Hashtable();
+    //private Hashtable ucs = new Hashtable();
     private Hashtable properties = new Hashtable();
     private List viewports = new ArrayList();
     private Bounds bounds = new Bounds();
-    private double margin;
+    //private double margin;
     private DXFHeader header = new DXFHeader();
     private HashMap objects = new HashMap();
     private HashMap patterns = new HashMap();
@@ -60,7 +60,7 @@ public class DXFDocument {
         this.layers.put(DXFConstants.DEFAULT_LAYER, defaultLayer);
 
         // setup the margin
-        this.margin = DEFAULT_MARGIN;
+        //this.margin = DEFAULT_MARGIN;
 
         // setup the root Dictionary
         this.rootDictionary = new DXFDictionary();
@@ -112,7 +112,7 @@ public class DXFDocument {
      *
      * @return the iterator over all DXFLayer of this document
      */
-    public Iterator getDXFLayerIterator() {
+    public Iterator<DXFLayer> getDXFLayerIterator() {
         return layers.values().iterator();
     }
 

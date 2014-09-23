@@ -129,6 +129,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		
 		buttonSave.addActionListener(driveButtons);
 		buttonCancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(buttonSave);
 	
 		Makelangelo.getSingleton().SendLineToRobot("M114");
 		driver.pack();

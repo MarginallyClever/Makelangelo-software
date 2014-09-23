@@ -294,6 +294,7 @@ public class MachineConfiguration {
 	
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(save);
 		Makelangelo.getSingleton().SendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
@@ -352,6 +353,7 @@ public class MachineConfiguration {
 	
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(save);
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -427,6 +429,8 @@ public class MachineConfiguration {
 		
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(save);
+		
 		driver.pack();
 		driver.setVisible(true);
 	}

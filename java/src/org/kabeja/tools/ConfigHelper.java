@@ -19,8 +19,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+//import org.xml.sax.XMLReader;
+//import org.xml.sax.helpers.XMLReaderFactory;
 
 
 /**
@@ -33,14 +33,14 @@ public class ConfigHelper {
 
     public static String getSAXSDDriver() {
         // check for version 1.4 and above
-        String ver = System.getProperty("java.version");
+        //String ver = System.getProperty("java.version");
         String parser = null;
 
         try {
             parser = SAXParserFactory.newInstance().newSAXParser().getXMLReader()
                                      .getClass().getName();
 
-            XMLReader r = XMLReaderFactory.createXMLReader(parser);
+            //XMLReader r = XMLReaderFactory.createXMLReader(parser);
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {

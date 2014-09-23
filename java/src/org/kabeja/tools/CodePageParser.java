@@ -36,8 +36,6 @@ public class CodePageParser {
 
         try {
             String line = null;
-            String code;
-            String value;
             boolean next = true;
             boolean codepage = false;
             boolean key = true;

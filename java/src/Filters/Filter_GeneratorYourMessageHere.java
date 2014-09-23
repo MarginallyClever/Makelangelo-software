@@ -71,6 +71,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		
 		buttonSave.addActionListener(driveButtons);
 		buttonCancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(buttonSave);
 
 		driver.setSize(300,100);
 		driver.setVisible(true);

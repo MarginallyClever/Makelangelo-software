@@ -62,7 +62,7 @@ public class BoundsFilter extends AbstractPostProcessor {
             // the bounds should be setup now
             // we remove all entities which are
             // not inside our bounds
-            Iterator i = doc.getDXFLayerIterator();
+            Iterator<DXFLayer> i = doc.getDXFLayerIterator();
 
             while (i.hasNext()) {
                 DXFLayer layer = (DXFLayer) i.next();
@@ -72,11 +72,11 @@ public class BoundsFilter extends AbstractPostProcessor {
     }
 
     protected void filterLayer(DXFLayer layer, Bounds bounds) {
-        Iterator i = layer.getDXFEntityTypeIterator();
+        Iterator<String> i = layer.getDXFEntityTypeIterator();
 
         while (i.hasNext()) {
             String type = (String) i.next();
-            Iterator entities = layer.getDXFEntities(type).iterator();
+            Iterator<DXFEntity> entities = layer.getDXFEntities(type).iterator();
 
             while (entities.hasNext()) {
                 DXFEntity entity = (DXFEntity) entities.next();

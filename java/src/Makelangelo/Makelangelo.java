@@ -81,7 +81,7 @@ public class Makelangelo
 	private static Makelangelo singletonObject;
 	
 	// Image processing
-		// TODO: use a serviceloader for easier plugin writing
+		// TODO: use a ServiceLoader for plugins
 		Filter [] image_converters;
 		String [] filter_names = null;
 		boolean startConvertingNow;

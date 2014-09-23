@@ -87,6 +87,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 		
 		buttonSave.addActionListener(driveButtons);
 		buttonCancel.addActionListener(driveButtons);
+		driver.getRootPane().setDefaultButton(buttonSave);
 
 		driver.setSize(300,400);
 		driver.setVisible(true);
