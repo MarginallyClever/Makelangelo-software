@@ -19,9 +19,9 @@
 
 
 // servo angles for pen control
-#define PEN_UP_ANGLE    (80)
-#define PEN_DOWN_ANGLE  (10)  // Some steppers don't like 0 degrees
-#define PEN_DELAY       (250)  // in ms
+#define PEN_UP_ANGLE         (80)
+#define PEN_DOWN_ANGLE       (10)  // Some steppers don't like 0 degrees
+#define PEN_DELAY            (250)  // in ms
 
 // for serial comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
@@ -30,18 +30,21 @@
 
 #define MICROSTEPS           (16.0)  // microstepping on this microcontroller
 #define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
-#define MAX_FEEDRATE         (6250)
-#define MIN_FEEDRATE         (0.01)
+#define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
+#define MIN_FEEDRATE         (1500)
+#define DEFAULT_FEEDRATE     (7000.0)
+#define DEFAULT_ACCELERATION (8)
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
 
-#define NUM_AXIES            (3)  // x,y,z
+#define NUM_AXIES            (6)  // x,y,z
+#define NUM_TOOLS            (6)
 #define MAX_SEGMENTS         (32)  // number of line segments to buffer ahead
 
 // for arc directions
-#define ARC_CW          (1)
-#define ARC_CCW         (-1)
-#define CM_PER_SEGMENT  (0.25)  // Arcs are split into many line segments.  How long are the segments?
+#define ARC_CW               (1)
+#define ARC_CCW              (-1)
+#define MM_PER_SEGMENT       (10)  // Arcs are split into many line segments.  How long are the segments?
 
 
 #ifdef HAS_LCD
@@ -66,17 +69,34 @@
 #define BTN_EN1            11
 #define BTN_EN2            12
 #define BTN_ENC            43
-#define BLEN_C 2
-#define BLEN_B 1
-#define BLEN_A 0
-#define encrot0 0
-#define encrot1 2
-#define encrot2 3
-#define encrot3 1
+#define BLEN_C             2
+#define BLEN_B             1
+#define BLEN_A             0
+#define encrot0            0
+#define encrot1            2
+#define encrot2            3
+#define encrot3            1
 
-#define NUM_SERVOS (1)
-#define SERVO0_PIN (5)
-#define SERVO1_PIN (4)
+#define NUM_SERVOS         (1)
+#define SERVO0_PIN         (5)
+#define SERVO1_PIN         (4)
+
+
+#define MOTHERBOARD 1 // RUMBA
+//#define MOTHERBOARD 2 // RAMPS
+
+#if MOTHERBOARD == 1
+#define MOTOR_0_DIR_PIN    (16)
+#define MOTOR_0_STEP_PIN   (17)
+#define MOTOR_0_ENABLE_PIN (48)
+
+#define MOTOR_1_DIR_PIN    (47)
+#define MOTOR_1_STEP_PIN   (54)
+#define MOTOR_1_ENABLE_PIN (55)
+#endif
+
+#if MOTHERBOARD == 2
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -93,10 +113,20 @@
 // TIMERS
 //------------------------------------------------------------------------------
 // for timer interrupt control
-#define CLOCK_FREQ           (16000000L)
-#define MAX_COUNTER          (65536L)
-
+#define CLOCK_FREQ            (16000000L)
+#define MAX_COUNTER           (65536L)
 #define TIMER_PRESCALER_COUNT (5)
+// time passed with no instruction?  Make sure PC knows we are waiting.
+#define TIMEOUT_OK            (1000)
+
+// optimize code, please
+#define FORCE_INLINE         __attribute__((always_inline)) inline
+
+
+#ifndef CRITICAL_SECTION_START
+  #define CRITICAL_SECTION_START  unsigned char _sreg = SREG;  cli();
+  #define CRITICAL_SECTION_END    SREG = _sreg;
+#endif //CRITICAL_SECTION_START
 
 
 //------------------------------------------------------------------------------
@@ -107,8 +137,8 @@ typedef struct {
   long step_count;
   long delta;  // number of steps to move
   long absdelta;
-  long over;  // for dx/dy bresenham calculations
   int dir;
+  float delta_normalized;
 } Axis;
 
 
@@ -125,11 +155,30 @@ typedef struct {
 
 typedef struct {
   Axis a[NUM_AXIES];
-  long steps;
-  long steps_left;
-  long feed_rate;
+  int steps_total;
+  int steps_taken;
+  int accel_until;
+  int decel_after;
+  float feed_rate_max;
+  float feed_rate_start;
+  float feed_rate_start_max;
+  float feed_rate_end;
+  char nominal_length_flag;
+  char recalculate_flag;
+  char busy;
 } Segment;
 
+
+
+//------------------------------------------------------------------------------
+// METHODS
+//------------------------------------------------------------------------------
+
+extern Segment line_segments[MAX_SEGMENTS];
+extern Segment *working_seg;
+extern volatile int current_segment;
+extern volatile int last_segment;
+extern float acceleration;
 
 
 //------------------------------------------------------------------------------

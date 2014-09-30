@@ -235,9 +235,10 @@ void LCD_this_is_home() {
 
 
 void LCD_go_home() {
-  polargraph_line( 0, 0, posz );
+  polargraph_line( 0, 0, posz, DEFAULT_FEEDRATE );
   MENU_GOTO(LCD_main_menu);
 }
+
 
 void LCD_start_menu() {
   if(!sd_inserted) MENU_GOTO(LCD_main_menu);

@@ -12,6 +12,10 @@
 //------------------------------------------------------------------------------
 #include "configure.h"
 
+#include <SPI.h>  // pkm fix for Arduino 1.5
+
+#include "Vector3.h"
+
 
 //------------------------------------------------------------------------------
 // GLOBALS
@@ -38,19 +42,28 @@ float SPOOL_DIAMETER = 3.2;  // cm
 float MAX_VEL = 0;  // cm/s
 float THREAD_PER_STEP=0;
 
-
 // plotter position.
 float posx, posy, posz;  // pen state
-float feed_rate=0;
+float feed_rate=DEFAULT_FEEDRATE;
+float acceleration=DEFAULT_ACCELERATION;
 
-// motor position
+// motor position as read from the LCD
 volatile long laststep[NUM_AXIES];
 
 char absolute_mode=1;  // absolute or incremental programming mode?
 
 // Serial comm reception
-char buffer[MAX_BUF];  // Serial buffer
-int sofar;             // Serial buffer progress
+char buffer[MAX_BUF+1];  // Serial buffer
+int sofar;               // Serial buffer progress
+static long last_cmd_time;    // prevent timeouts
+
+
+Vector3 tool_offset[NUM_TOOLS];
+int current_tool=0;
+
+
+long line_number=0;
+
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -118,14 +131,14 @@ void printFeedRate() {
 
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
-void IK(float x, float y, float &l1, float &l2) {
+void IK(float x, float y, long &l1, long &l2) {
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  l1 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
   // find length to M2
   dx = x - limit_right;
-  l2 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  l2 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
 }
 
 
@@ -133,10 +146,10 @@ void IK(float x, float y, float &l1, float &l2) {
 // Forward Kinematics - turns L1,L2 lengths into XY coordinates
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
-void FK(float l1, float l2,float &x,float &y) {
-  float a = l1 * THREAD_PER_STEP;
+void FK(long l1, long l2,float &x,float &y) {
+  float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
-  float c = l2 * THREAD_PER_STEP;
+  float c = (float)l2 * THREAD_PER_STEP;
   
   // slow, uses trig
   // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
@@ -167,7 +180,7 @@ void processConfig() {
   if(i!=0) {
     if(i>0) {
       motors[0].reel_in  = HIGH;
-      motors[0].reel_out = LOW;
+      motors[0].reel_out = LOW; 
     } else {
       motors[0].reel_in  = LOW;
       motors[0].reel_out = HIGH;
@@ -201,9 +214,11 @@ void processConfig() {
 }
 
 
+//------------------------------------------------------------------------------
 // test FK(IK(x,y))=x,y
 void test_kinematics(float x,float y) {
-  float A, B, C, D;
+  long A,B;
+  float C,D;
   IK(x,y,A,B);
   FK(A,B,C,D);
   Serial.print(F("\tx="));  Serial.print(x);
@@ -218,50 +233,41 @@ void test_kinematics(float x,float y) {
 
 
 //------------------------------------------------------------------------------
-void line_safe(float x,float y,float z) {
+void line_safe(float x,float y,float z,float new_feed_rate) {
+  x-=tool_offset[current_tool].x;
+  y-=tool_offset[current_tool].y;
+  z-=tool_offset[current_tool].z;
+  
   // split up long lines to make them straighter?
-  float dx=x-posx;
-  float dy=y-posy;
-  float dz=z-posz;
-/*
-  Serial.print("dx ");  Serial.println(dx);
-  Serial.print("dy ");  Serial.println(dy);
-  Serial.print("dz ");  Serial.println(dz);
-
-  Serial.print("posx ");  Serial.println(posx);
-  Serial.print("posy ");  Serial.println(posy);
-  Serial.print("posz ");  Serial.println(posz);
-*/
-  float len=sqrt(dx*dx+dy*dy);
-//  Serial.print("LEN ");  Serial.println(len);
+  Vector3 destination(x,y,z);
+  Vector3 start(posx,posy,posz);
+  Vector3 dp = destination - start;
+  Vector3 temp;
   
-  long pieces=floor(len/CM_PER_SEGMENT);
-//  Serial.print("pieces ");  Serial.println(pieces);
+  float len=dp.Length();
+  int pieces = ceil(dp.Length() * (float)MM_PER_SEGMENT );
   
-  float x0=posx;
-  float y0=posy;
-  float z0=posz;
   float a;
-  for(long j=0;j<pieces;++j) {
+  long j;
+  
+  for(j=1;j<pieces;++j) {
     a=(float)j/(float)pieces;
-//  Serial.print("a ");  Serial.println(a);
-
-    polargraph_line(dx*a+x0,
-                    dy*a+y0,
-                    dz*a+z0);
+    temp = dp * a + start;
+    polargraph_line(temp.x,temp.y,temp.z,new_feed_rate);
   }
-  polargraph_line(x,y,z);
+  polargraph_line(x,y,z,new_feed_rate);
 }
 
 
 //------------------------------------------------------------------------------
-void polargraph_line(float x,float y,float z) {
-  float l1,l2;
+void polargraph_line(float x,float y,float z,float new_feed_rate) {
+  long l1,l2;
   IK(x,y,l1,l2);
   posx=x;
   posy=y;
   posz=z;
-  motor_line(l1,l2,z,feed_rate);
+  feed_rate = new_feed_rate;
+  motor_line(l1,l2,z,new_feed_rate);
 }
 
 
@@ -272,7 +278,7 @@ void polargraph_line(float x,float y,float z) {
 // cx/cy - center of circle
 // x/y - end position
 // dir - ARC_CW or ARC_CCW to control direction of arc
-void arc(float cx,float cy,float x,float y,float z,float dir) {
+void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate) {
   // get radius
   float dx = posx - cx;
   float dy = posy - cy;
@@ -294,7 +300,7 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
   // simplifies to
   float len = abs(theta) * radius;
 
-  int i, segments = floor( len / CM_PER_SEGMENT );
+  int i, segments = floor( len * MM_PER_SEGMENT );
  
   float nx, ny, nz, angle3, scale;
 
@@ -307,10 +313,10 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line_safe(nx,ny,nz);
+    line_safe(nx,ny,nz,new_feed_rate);
   }
   
-  line_safe(x,y,z);
+  line_safe(x,y,z,new_feed_rate);
 }
 
 
@@ -322,7 +328,7 @@ void teleport(float x,float y) {
   posy=y;
   
   // @TODO: posz?
-  float L1,L2;
+  long L1,L2;
   IK(posx,posy,L1,L2);
   
   motor_set_step_count(L1,L2,0);
@@ -334,13 +340,11 @@ void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
   Serial.println(F("== DRAWBOT - http://www.makelangelo.com/ =="));
-  Serial.println(F("All commands end with a semi-colon."));
-  Serial.println(F("HELP;  - display this message"));
-  Serial.println(F("CONFIG [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx];"));
-  Serial.println(F("       - display/update this robot's configuration."));
-  Serial.println(F("TELEPORT [Xx.xx] [Yx.xx]; - move the virtual plotter."));
+  Serial.println(F("M100 - display this message"));
+  Serial.println(F("M101 [Tx.xx] [Bx.xx] [Rx.xx] [Lx.xx]"));
+  Serial.println(F("       - display/update board dimensions."));
   Serial.println(F("As well as the following G-codes (http://en.wikipedia.org/wiki/G-code):"));
-  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,M18,M114"));
+  Serial.println(F("G00,G01,G02,G03,G04,G28,G90,G91,G92,M18,M114"));
 }
 
 
@@ -421,6 +425,8 @@ void where() {
   Serial.print(posz);
   Serial.print(F(" "));
   printFeedRate();
+  Serial.print(F(" A"));
+  Serial.print(acceleration);
 }
 
 
@@ -430,6 +436,32 @@ void printConfig() {
   Serial.print(limit_top);        Serial.print(F(" - "));
   Serial.print(limit_right);     Serial.print(F(","));
   Serial.print(limit_bottom);      Serial.print(F("\n"));
+}
+
+
+
+
+//------------------------------------------------------------------------------
+void set_tool_offset(int axis,float x,float y,float z) {
+  tool_offset[axis].x=x;
+  tool_offset[axis].y=y;
+  tool_offset[axis].z=z;
+}
+
+
+//------------------------------------------------------------------------------
+Vector3 get_end_plus_offset() {
+  return Vector3(tool_offset[current_tool].x + posx,
+                 tool_offset[current_tool].y + posy,
+                 tool_offset[current_tool].z + posz);
+}
+
+
+//------------------------------------------------------------------------------
+void tool_change(int tool_id) {
+  if(tool_id < 0) tool_id=0;
+  if(tool_id > NUM_TOOLS) tool_id=NUM_TOOLS;
+  current_tool=tool_id;
 }
 
 
@@ -451,53 +483,119 @@ float parsenumber(char code,float val) {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * process commands in the serial receive buffer
+ */
 void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
   
-  if(!strncmp(buffer,"HELP",4)) {
-    help();
-  } else if(!strncmp(buffer,"UID",3)) {
+  long cmd;
+  
+  // is there a line number?
+  cmd=parsenumber('N',-1);
+  if(cmd!=-1 && buffer[0]=='N') {  // line number must appear first on the line
+    if( cmd != line_number ) {
+      // wrong line number error
+      Serial.print(F("BADLINENUM "));
+      Serial.println(line_number);
+      return;
+    }
+  
+    // is there a checksum?
+    if(strchr(buffer,'*')!=0) {
+      // yes.  is it valid?
+      char checksum=0;
+      int c=0;
+      while(buffer[c]!='*') checksum ^= buffer[c++];
+      c++; // skip *
+      int against = strtod(buffer+c,NULL);
+      if( checksum != against ) {
+        Serial.print(F("BADCHECKSUM "));
+        Serial.println(line_number);
+        return;
+      } 
+    } else {
+      Serial.print(F("NOCHECKSUM "));
+      Serial.println(line_number);
+      return;
+    }
+    
+    line_number++;
+  }
+  
+  if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
-  } else if(!strncmp(buffer,"TELEPORT",8)) {
-    teleport(parsenumber('X',posx),
-             parsenumber('Y',posy));
-  } else if(!strncmp(buffer,"CONFIG",6)) {
-    processConfig();
-  } 
+  }
 
-  int cmd=parsenumber('M',-1);
+  
+  cmd=parsenumber('M',-1);
   switch(cmd) {
-  case 114:  where();  break;
+  case 6:  tool_change(parsenumber('T',current_tool));  break;
   case 18:  motor_enable();  break;
   case 17:  motor_disable();  break;
+  case 100:  help();  break;
+  case 101:  processConfig();  break;
+  case 110:  line_number = parsenumber('N',line_number);  break;
+  case 114:  where();  break;
   }
 
   cmd=parsenumber('G',-1);
   switch(cmd) {
   case 0:
-  case 1:  // line
-    setFeedRate(parsenumber('F',feed_rate));
-    line_safe( parsenumber('X',(absolute_mode?posx:0)*10)*0.1 + (absolute_mode?0:posx),
-               parsenumber('Y',(absolute_mode?posy:0)*10)*0.1 + (absolute_mode?0:posy),
-               parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz) );
-    break;
+  case 1: {  // line
+      Vector3 offset=get_end_plus_offset();
+      acceleration = min(max(parsenumber('A',acceleration),1),2000);
+      line_safe( parsenumber('X',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
+                 parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
+                 parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
+                 parsenumber('F',feed_rate) );
+      break;
+    }
   case 2:
-  case 3:  // arc
-    setFeedRate(parsenumber('F',feed_rate));
-    arc(parsenumber('I',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
-        parsenumber('J',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
-        parsenumber('X',(absolute_mode?posx:0))*0.1 + (absolute_mode?0:posx),
-        parsenumber('Y',(absolute_mode?posy:0))*0.1 + (absolute_mode?0:posy),
-        parsenumber('Z',(absolute_mode?posz:0)) + (absolute_mode?0:posz),
-        (cmd==2) ? -1 : 1);
-    break;
-  case 4:  pause(parsenumber('X',0) + parsenumber('U',0) + parsenumber('P',0));  break;  // dwell
+  case 3: {  // arc
+      Vector3 offset=get_end_plus_offset();
+      acceleration = min(max(parsenumber('A',acceleration),1),2000);
+      setFeedRate(parsenumber('F',feed_rate));
+      arc(parsenumber('I',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('J',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
+          parsenumber('X',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('Y',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
+          parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
+          (cmd==2) ? -1 : 1,
+          parsenumber('F',feed_rate) );
+      break;
+    }
+  case 4:  {  // dwell
+      wait_for_empty_segment_buffer();
+      pause(parsenumber('S',0) + parsenumber('P',0)*1000.0f);
+      break;
+    }
   case 28:  FindHome();  break;
+  case 54:
+  case 55:
+  case 56:
+  case 57:
+  case 58:
+  case 59: {  // 54-59 tool offsets
+    int tool_id=cmd-54;
+    set_tool_offset(tool_id,parsenumber('X',tool_offset[tool_id].x),
+                            parsenumber('Y',tool_offset[tool_id].y),
+                            parsenumber('Z',tool_offset[tool_id].z));
+    break;
+    }
   case 90:  absolute_mode=1;  break;  // absolute mode
   case 91:  absolute_mode=0;  break;  // relative mode
+  case 92: {  // set position (teleport)
+      Vector3 offset = get_end_plus_offset();
+      teleport( parsenumber('X',offset.x),
+                         parsenumber('Y',offset.y)
+                         //,
+                         //parsenumber('Z',offset.z)
+                         );
+      break;
+    }
   }
 
   cmd=parsenumber('D',-1);
@@ -505,20 +603,20 @@ void processCommand() {
   case 0: {
       // move one motor
       int i,amount=parsenumber(m1d,0);
-      digitalWrite(motors[0].dir_pin,amount < 0 ? motors[0].reel_in : motors[0].reel_out);
+      digitalWrite(MOTOR_0_DIR_PIN,amount < 0 ? motors[0].reel_in : motors[0].reel_out);
       amount=abs(amount);
       for(i=0;i<amount;++i) {
-        digitalWrite(motors[0].step_pin,HIGH);
-        digitalWrite(motors[0].step_pin,LOW);
+        digitalWrite(MOTOR_0_STEP_PIN,HIGH);
+        digitalWrite(MOTOR_0_STEP_PIN,LOW);
         pause(STEP_DELAY);
       }
       
       amount=parsenumber(m2d,0);
-      digitalWrite(motors[1].dir_pin,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
+      digitalWrite(MOTOR_1_DIR_PIN,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
       amount = abs(amount);
       for(i=0;i<amount;++i) {
-        digitalWrite(motors[1].step_pin,HIGH);
-        digitalWrite(motors[1].step_pin,LOW);
+        digitalWrite(MOTOR_1_STEP_PIN,HIGH);
+        digitalWrite(MOTOR_1_STEP_PIN,LOW);
         pause(STEP_DELAY);
       }
     }
@@ -550,6 +648,15 @@ void processCommand() {
 void ready() {
   sofar=0;  // clear input buffer
   Serial.print(F("\n> "));  // signal ready to receive input
+  last_cmd_time = millis();
+}
+
+
+//------------------------------------------------------------------------------
+void tools_setup() {
+  for(int i=0;i<NUM_TOOLS;++i) {
+    set_tool_offset(i,0,0,0);
+  }
 }
 
 
@@ -565,6 +672,7 @@ void setup() {
   
   motor_setup();
   motor_enable();
+  tools_setup();
   
   //easyPWM_init();
   SD_init();
@@ -573,34 +681,45 @@ void setup() {
   // initialize the plotter position.
   teleport(0,0);
   setPenAngle(PEN_UP_ANGLE);
-  setFeedRate((MAX_FEEDRATE+MIN_FEEDRATE)/2);
+  setFeedRate(DEFAULT_FEEDRATE);
   ready();
 }
 
 
 //------------------------------------------------------------------------------
-void loop() {
-  // See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+// See: http://www.marginallyclever.com/2011/10/controlling-your-arduino-through-the-serial-monitor/
+void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
-    buffer[sofar++]=Serial.read();
-    if(buffer[sofar-1]==';') break;  // in case there are multiple instructions
+    char c = Serial.read();
+    if(c=='\r') continue;
+    if(sofar<MAX_BUF) buffer[sofar++]=c;
+    if(c=='\n') {
+      buffer[sofar]=0;
+      
+      // echo confirmation
+//      Serial.println(F(buffer));
+   
+      // do something with the command
+      processCommand();
+      ready();
+    }
   }
- 
-  // if we hit a semi-colon, assume end of instruction.
-  if(sofar>0 && buffer[sofar-1]==';') {
-    buffer[sofar]=0;
-    
-    // echo confirmation
-//    Serial.println(F(buffer));
- 
-    // do something with the command
-    processCommand();
-    ready();
-  }
-  
+}
+
+
+//------------------------------------------------------------------------------
+void loop() {
+  Serial_listen();
   SD_check();
   LCD_update();
+  
+  // The PC will wait forever for the ready signal.
+  // if Arduino hasn't received a new instruction in a while, send ready() again
+  // just in case USB garbled ready and each half is waiting on the other.
+  if( !segment_buffer_full() && (millis() - last_cmd_time) > TIMEOUT_OK ) {
+    ready();
+  }
 }
 
 

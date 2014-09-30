@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 // METHODS
 //------------------------------------------------------------------------------
+/*
 void serial_setup(long baud) {
   UBRR0H = ( baud & 0xFF00) >> 8; // Load upper 8-bits of the baud rate value into the high byte of the UBRR register 
   UBRR0L = ( baud & 0x00FF); // Load lower 8-bits of the baud rate value into the low byte of the UBRR register 
@@ -26,8 +27,9 @@ void serial_setup(long baud) {
 
 
 // serial receive interrupt
-//ISR(USART0_RX_vect) {
-//}
+ISR(USART0_RX_vect) {
+}
+*/
 
 
 /**
