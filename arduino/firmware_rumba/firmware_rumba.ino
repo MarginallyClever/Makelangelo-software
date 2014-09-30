@@ -47,7 +47,7 @@ float posx, posy, posz;  // pen state
 float feed_rate=DEFAULT_FEEDRATE;
 float acceleration=DEFAULT_ACCELERATION;
 
-// motor position
+// motor position as read from the LCD
 volatile long laststep[NUM_AXIES];
 
 char absolute_mode=1;  // absolute or incremental programming mode?
@@ -233,50 +233,41 @@ void test_kinematics(float x,float y) {
 
 
 //------------------------------------------------------------------------------
-void line_safe(float x,float y,float z) {
+void line_safe(float x,float y,float z,float new_feed_rate) {
+  x-=tool_offset[current_tool].x;
+  y-=tool_offset[current_tool].y;
+  z-=tool_offset[current_tool].z;
+  
   // split up long lines to make them straighter?
-  float dx=x-posx;
-  float dy=y-posy;
-  float dz=z-posz;
-/*
-  Serial.print("dx ");  Serial.println(dx);
-  Serial.print("dy ");  Serial.println(dy);
-  Serial.print("dz ");  Serial.println(dz);
-
-  Serial.print("posx ");  Serial.println(posx);
-  Serial.print("posy ");  Serial.println(posy);
-  Serial.print("posz ");  Serial.println(posz);
-*/
-  float len=sqrt(dx*dx+dy*dy);
-//  Serial.print("LEN ");  Serial.println(len);
+  Vector3 destination(x,y,z);
+  Vector3 start(posx,posy,posz);
+  Vector3 dp = destination - start;
+  Vector3 temp;
   
-  long pieces = floor( len * MM_PER_SEGMENT );
-//  Serial.print("pieces ");  Serial.println(pieces);
+  float len=dp.Length();
+  int pieces = ceil(dp.Length() * (float)MM_PER_SEGMENT );
   
-  float x0=posx;
-  float y0=posy;
-  float z0=posz;
   float a;
-  for(long j=0;j<pieces;++j) {
+  long j;
+  
+  for(j=1;j<pieces;++j) {
     a=(float)j/(float)pieces;
-//  Serial.print("a ");  Serial.println(a);
-
-    polargraph_line(dx*a+x0,
-                    dy*a+y0,
-                    dz*a+z0);
+    temp = dp * a + start;
+    polargraph_line(temp.x,temp.y,temp.z,new_feed_rate);
   }
-  polargraph_line(x,y,z);
+  polargraph_line(x,y,z,new_feed_rate);
 }
 
 
 //------------------------------------------------------------------------------
-void polargraph_line(float x,float y,float z) {
+void polargraph_line(float x,float y,float z,float new_feed_rate) {
   long l1,l2;
   IK(x,y,l1,l2);
   posx=x;
   posy=y;
   posz=z;
-  motor_line(l1,l2,z,feed_rate);
+  feed_rate = new_feed_rate;
+  motor_line(l1,l2,z,new_feed_rate);
 }
 
 
@@ -287,7 +278,7 @@ void polargraph_line(float x,float y,float z) {
 // cx/cy - center of circle
 // x/y - end position
 // dir - ARC_CW or ARC_CCW to control direction of arc
-void arc(float cx,float cy,float x,float y,float z,float dir) {
+void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate) {
   // get radius
   float dx = posx - cx;
   float dy = posy - cy;
@@ -322,10 +313,10 @@ void arc(float cx,float cy,float x,float y,float z,float dir) {
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
     // send it to the planner
-    line_safe(nx,ny,nz);
+    line_safe(nx,ny,nz,new_feed_rate);
   }
   
-  line_safe(x,y,z);
+  line_safe(x,y,z,new_feed_rate);
 }
 
 
@@ -556,10 +547,10 @@ void processCommand() {
   case 1: {  // line
       Vector3 offset=get_end_plus_offset();
       acceleration = min(max(parsenumber('A',acceleration),1),2000);
-      setFeedRate(parsenumber('F',feed_rate));
       line_safe( parsenumber('X',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
                  parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
-                 parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z) );
+                 parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
+                 parsenumber('F',feed_rate) );
       break;
     }
   case 2:
@@ -572,7 +563,8 @@ void processCommand() {
           parsenumber('X',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
           parsenumber('Y',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
           parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
-          (cmd==2) ? -1 : 1);
+          (cmd==2) ? -1 : 1,
+          parsenumber('F',feed_rate) );
       break;
     }
   case 4:  {  // dwell
@@ -711,7 +703,6 @@ void Serial_listen() {
       // do something with the command
       processCommand();
       ready();
-      break;
     }
   }
 }

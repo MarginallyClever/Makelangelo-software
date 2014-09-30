@@ -195,7 +195,7 @@ void recalculate_reverse2(Segment *prev,Segment *current,Segment *next) {
     // for max allowable speed if block is decelerating and nominal length is false.
     if ((!current->nominal_length_flag) && (current->feed_rate_start_max > next->feed_rate_start)) {
       float v = min( current->feed_rate_start_max,
-                                      max_speed_allowed(-acceleration,next->feed_rate_start,current->steps_total));
+                     max_speed_allowed(-acceleration,next->feed_rate_start,current->steps_total));
       current->feed_rate_start = v;
     } else {
       current->feed_rate_start = current->feed_rate_start_max;
@@ -414,52 +414,7 @@ FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
   } else {
     step_multiplier = 1;
   }
-  /*
-  //  CPU frequency 16Mhz for Arduino
-  //  maximum timer counter value (256 for 8bit, 65536 for 16bit timer)
-  int prescaler_index=-1;
-  long counter_value;
-  do {
-    ++prescaler_index;
-    //  Divide CPU frequency through the choosen prescaler (16000000 / 256 = 62500)
-    //  Divide result through the desired frequency (62500 / 2Hz = 31250)
-    counter_value = prescalers[prescaler_index] / desired_freq_hz;
-    //  Verify counter_value < maximum timer. if fail, choose bigger prescaler.
-  } while(counter_value >= MAX_COUNTER && prescaler_index < TIMER_PRESCALER_COUNT );
-  
-  if( prescaler_index >= TIMER_PRESCALER_COUNT ) {
-#if VERBOSE > 1
-    // if Serial.print is called from inside a timing thread it will probably crash the arduino.
-    // Serial.print takesk too long, the interrupt will interrupt itself.
-    Serial.println(F("Timer could not be set: Desired frequency out of bounds."));
-#endif
-    return;
-  }
-  
-#if VERBOSE > 4
-  Serial.print("freq=");
-  Serial.print(desired_freq_hz);
-#endif
 
-  prescaler_index++;
-  
-  // disable global interrupts
-  noInterrupts();
-
-  // set compare match register to desired timer count
-  OCR1A = counter_value;
-  
-  // set entire TCCR1B register to 0
-  // turn on CTC mode
-  TCCR1B = (1 << WGM12);
-  // Set CS10, CS11, and CS12 bits for prescaler
-  //TCCR1B |= ( (( prescaler_index&0x1 )   ) << CS10);
-  //TCCR1B |= ( (( prescaler_index&0x2 )>>1) << CS11);
-  //TCCR1B |= ( (( prescaler_index&0x4 )>>2) << CS12);
-  TCCR1B |= ( prescaler_index & 0x7 ) << CS10;  
-  
-  interrupts();  // enable global interrupts
-*/
   long counter_value = ( CLOCK_FREQ / 8 ) / desired_freq_hz;
   if( counter_value >= MAX_COUNTER ) {
     //Serial.print("this breaks the timer and crashes the arduino");
@@ -535,13 +490,13 @@ ISR(TIMER1_COMPA_vect) {
     float nfr=current_feed_rate;
     if( steps_taken <= accel_until ) {
       nfr-=acceleration;
+      if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
     } else if( steps_taken > decel_after ) {
       nfr+=acceleration;
+      if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
     }
     
     if(nfr!=current_feed_rate) {
-      if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
-      if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
       current_feed_rate=nfr;
       timer_set_frequency(current_feed_rate);
     }      
@@ -590,7 +545,6 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
 
   // the axis that has the most steps will control the overall acceleration
   new_seg.steps_total = 0;
-  
   float len=0;
   int i;
   for(i=0;i<NUM_AXIES;++i) {
@@ -631,6 +585,7 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
 
   float allowable_speed = max_speed_allowed(-acceleration, MIN_FEEDRATE, new_seg.steps_total);
   
+  // come to a stop for entering or exiting a Z move
   if( new_seg.a[2].delta != 0 || old_seg.a[2].delta != 0 ) allowable_speed = MIN_FEEDRATE;
 
   //Serial.print("max = ");  Serial.println(feed_rate_start_max);
@@ -646,10 +601,6 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
   segment_update_trapezoid(&new_seg,new_seg.feed_rate_start,MIN_FEEDRATE);
   
   recalculate_acceleration();
-
-  //if( current_segment==last_segment ) {
-    //timer_set_frequency(new_feed_rate);
-  //}
   
   last_segment = next_segment;
 }

@@ -78,7 +78,7 @@ public class MergeMap<K,V> implements Map<K,V> {
         return null;
     }
 
-    public void putAll(Map arg0) {
+    public void putAll(Map<? extends K,? extends V> m) {
     	
     }
 

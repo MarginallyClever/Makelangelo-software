@@ -113,15 +113,11 @@
 // TIMERS
 //------------------------------------------------------------------------------
 // for timer interrupt control
-#define CLOCK_FREQ           (16000000L)
-#define MAX_COUNTER          (65536L)
-
+#define CLOCK_FREQ            (16000000L)
+#define MAX_COUNTER           (65536L)
 #define TIMER_PRESCALER_COUNT (5)
-
-
 // time passed with no instruction?  Make sure PC knows we are waiting.
-#define TIMEOUT_OK      (1000)
-
+#define TIMEOUT_OK            (1000)
 
 // optimize code, please
 #define FORCE_INLINE         __attribute__((always_inline)) inline
