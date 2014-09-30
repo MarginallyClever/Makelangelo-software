@@ -21,7 +21,7 @@ import Makelangelo.MachineConfiguration;
 
 
 /**
- * A base class for image filtering
+ * base class for image filtering
  * @author Dan
  */
 public class Filter {
@@ -71,7 +71,7 @@ public class Filter {
 	}
 	
 	/**
-	 * Generate should be called by filters that create GCODE from a bufferedImage.
+	 * Called by filters that create GCODE from a bufferedImage.
 	 */
 	public void Generate() {}
 
@@ -79,6 +79,12 @@ public class Filter {
 	 * Replace this with your generator/converter name.
 	 */
 	public String GetName() {  return "Unnamed";  }
+	
+	/**
+	 * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
+	 * @param img
+	 * @return the altered image
+	 */
 	public BufferedImage Process(BufferedImage img) {
 		return img;
 	}

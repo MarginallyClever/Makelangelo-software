@@ -7,81 +7,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import Makelangelo.MachineConfiguration;
+import Makelangelo.C3;
 
 
 
 /** 
  * @author Dan
  */
-public class Filter_GeneratorRGB extends Filter {
-	class C3 {
-		int red=0, green=0, blue=0;
-
-		C3(int r,int g,int b) {
-			red=r;
-			green=g;
-			blue=b;
-		}
-		C3(C3 x) {
-			set(x);
-		}
-		C3(int pixel) {
-			int r = ((pixel>>16)&0xff);
-			int g = ((pixel>> 8)&0xff);
-			int b = ((pixel    )&0xff);
-			set(r,g,b);
-		}
-		int toInt() {
-			return (red<<16) | (green<<8) | (blue);
-		}
-		C3 set(C3 x) {
-			red=x.red;
-			green=x.green;
-			blue=x.blue;
-			return this;
-		}
-		void set(int r,int g,int b) {
-			red=r;
-			green=g;
-			blue=b;
-		}
-		C3 sub(C3 x) {
-			red-=x.red;
-			green-=x.green;
-			blue-=x.blue;
-			return this;
-		}
-		C3 add(C3 x) {
-			red+=x.red;
-			green+=x.green;
-			blue+=x.blue;
-			return this;
-		}
-		C3 mul(double f) {
-			red*=f;
-			green*=f;
-			blue*=f;
-			return this;
-		}
-		float diff(C3 o) {
-		    int Rdiff = o.red - this.red;
-		    int Gdiff = o.green - this.green;
-		    int Bdiff = o.blue - this.blue;
-		    int distanceSquared = Rdiff*Rdiff + Gdiff*Gdiff + Bdiff*Bdiff;
-		    return distanceSquared;
-		}
-		boolean notWhite() {
-			return red+green+blue != 256*3;
-		}
-	}
-	
+public class Filter_GeneratorRGB extends Filter {	
 	// The palette color mask has to match the tool index in the machine configuration
 	C3 [] palette = new C3[] {
-			new C3(0,0,0),
-			new C3(255,0,0),
-			new C3(0,255,0),
-			new C3(0,0,255),
-			new C3(255,255,255),
+		new C3(0,0,0),
+		new C3(255,0,0),
+		new C3(0,255,0),
+		new C3(0,0,255),
+		new C3(255,255,255),
 	};
 
 	OutputStreamWriter out;
@@ -254,7 +194,7 @@ public class Filter_GeneratorRGB extends Filter {
 		ImageStart(img,out);
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
+		int steps = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
 		if(steps<1) steps=1;
 
 		step4 = (int)(steps*4.0);

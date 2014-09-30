@@ -73,7 +73,7 @@ public class Makelangelo
 		implements ActionListener, KeyListener, SerialPortEventListener
 {
 	// Java required?
-	static final long serialVersionUID=1;
+	static final long serialVersionUID=1L;
 
 	// software version
 	static final String version="3";
@@ -81,13 +81,13 @@ public class Makelangelo
 	private static Makelangelo singletonObject;
 	
 	// Image processing
-		// TODO: use a ServiceLoader for plugins
+		// TODO use a ServiceLoader for plugins
 		Filter [] image_converters;
 		String [] filter_names = null;
 		boolean startConvertingNow;
 	
 	
-	// TODO put all serial stuff in a Serial class, hide it inside Robot class?
+	// TODO put all serial stuff in a SerialConnection (Connection) class, hide it inside Robot class?
 	// Serial connection
 		private static final int BAUD_RATE = 57600;
 		//private CommPortIdentifier portIdentifier;
