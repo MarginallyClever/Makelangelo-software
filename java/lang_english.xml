@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <language>
+	<author>Dan Royer (dan@marginallyclever.com)</author>
+	
 	<string><key>Invert</key><value>Invert</value></string>
 	<string><key>Cancel</key><value>Cancel</value></string>
 	<string><key>Save</key><value>Save</value></string>
