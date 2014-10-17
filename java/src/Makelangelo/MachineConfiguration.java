@@ -67,29 +67,7 @@ public class MachineConfiguration {
 	private int startingPositionIndex;
 	
 	protected DrawingTool tools[];
-	protected int current_tool=0;
-	
-	// strings
-	protected String sInvert="Invert";
-	protected String sCancel="Cancel";
-	protected String sSave="Save";
-	protected String sCouldNotFind="Could not find ";
-	
-	protected String sMachineWidth="Machine width";
-	protected String sMachineHeight="Machine height";
-	protected String sPaperWidth="Paper width";
-	protected String sPaperHeight="Paper height";
-	protected String sInvertLeft="Invert left";
-	protected String sInvertRight="Invert right";
-
-	protected String sAdjustMachineSize = "Adjust machine & paper size";
-	protected String sToolType="Tool type";
-	protected String sAdjustPulleySize="Adjust pulley size";
-	protected String sLeft="Left";
-	protected String sRight="Right";
-	protected String sDiameter="Diameter";
-	protected String sMillimeters="mm";
-	
+	protected int current_tool=0;	
 	
 	// singleton
 	private static MachineConfiguration singletonObject;
@@ -126,15 +104,15 @@ public class MachineConfiguration {
 		final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
 		final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
 		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
-		final JCheckBox m1i = new JCheckBox(sInvert,MachineConfiguration.getSingleton().m1invert);
-		final JCheckBox m2i = new JCheckBox(sInvert,MachineConfiguration.getSingleton().m2invert);
+		final JCheckBox m1i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m1invert);
+		final JCheckBox m2i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m2invert);
 
 		//String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
 		//final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
 		//startPos.setSelectedIndex(startingPositionIndex);
 		
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sSave);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
 		
 		String limit_file = "limits.png";
 		
@@ -147,7 +125,7 @@ public class MachineConfiguration {
 			e.printStackTrace();
 			
 		}
-		if (myPicture == null) {System.err.println(sCouldNotFind+limit_file); return;}
+		if (myPicture == null) {System.err.println(MultilingualSupport.getSingleton().get("CouldNotFind")+limit_file); return;}
 		
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
 		
@@ -170,15 +148,15 @@ public class MachineConfiguration {
 		c.anchor=GridBagConstraints.EAST;
 		d.anchor=GridBagConstraints.WEST;
 		
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(sMachineWidth),c);	d.gridx=1;	d.gridy=y;	driver.add(mw,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(sMachineHeight),c);	d.gridx=3;	d.gridy=y;	driver.add(mh,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("MachineWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(mw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("MachineHeight")),c);	d.gridx=3;	d.gridy=y;	driver.add(mh,d);
 		y++;
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(sPaperWidth),c);		d.gridx=1;	d.gridy=y;	driver.add(pw,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(sPaperHeight),c);		d.gridx=3;	d.gridy=y;	driver.add(ph,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(pw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperHeight")),c);		d.gridx=3;	d.gridy=y;	driver.add(ph,d);
 		y++;
 
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(sInvertLeft),c);		d.gridx=1;	d.gridy=y;	driver.add(m1i,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(sInvertRight),c);		d.gridx=3;	d.gridy=y;	driver.add(m2i,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("InvertLeft")),c);		d.gridx=1;	d.gridy=y;	driver.add(m1i,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("InvertRight")),c);		d.gridx=3;	d.gridy=y;	driver.add(m2i,d);
 		y++;
 		
 		//c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
@@ -337,20 +315,20 @@ public class MachineConfiguration {
 	
 	// dialog to adjust the pen up & pen down values
 	protected void ChangeTool() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),sAdjustMachineSize,true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustMachineSize"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
 		toolCombo.setSelectedIndex(current_tool);
 		
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sSave);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
 		c.gridheight=1; c.gridwidth=1; 
 		
-		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(sToolType),c);
+		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ToolType")),c);
 		c.anchor=GridBagConstraints.WEST;
 		c.gridx=2; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(toolCombo,c);
 
@@ -402,24 +380,24 @@ public class MachineConfiguration {
 	
 	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	public void AdjustPulleySize() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),sAdjustPulleySize,true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustPulleySize"),true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
 		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter*10));
 
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sSave);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx=50;
-		c.gridx=0;  c.gridy=1;  driver.add(new JLabel(sLeft),c);
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel(sRight),c);
-		c.gridx=1;  c.gridy=0;  driver.add(new JLabel(sDiameter),c);
+		c.gridx=0;  c.gridy=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Left")),c);
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Right")),c);
+		c.gridx=1;  c.gridy=0;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Diameter")),c);
 		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
 		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
-		c.gridx=2;  c.gridy=1;  driver.add(new JLabel(sMillimeters),c);
-		c.gridx=2;  c.gridy=2;  driver.add(new JLabel(sMillimeters),c);
+		c.gridx=2;  c.gridy=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Millimeters")),c);
+		c.gridx=2;  c.gridy=2;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Millimeters")),c);
 		c.gridx=0;  c.gridy=3;  driver.add(save,c);
 		c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
 		

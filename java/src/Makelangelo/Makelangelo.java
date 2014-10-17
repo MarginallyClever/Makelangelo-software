@@ -156,123 +156,6 @@ public class Makelangelo
 	
 	GCodeFile gcode = new GCodeFile();
 	
-	// language strings
-	String sConnectingTo="Connecting to ";
-	String sPortNotConfigured="Port could not be configured: ";
-	String sPortOpened="Port opened.";
-	String sTitlePrefix="Makelangelo #";
-	String sTitlePostfix=" connected";
-
-	String sLineSegments=" line segments.";
-	String sCentimeters="cm";
-
-	String sEstimatedTime="Estimated draw time: ";
-
-	String sFileNotOpened="File could not be opened: ";
-
-	String sConversionOptions="Conversion options";
-	String sFlipForGlass="Flip for glass";
-
-	String sCancel="Cancel";
-	String sStart="Start";
-	String sSave="Save";
-
-	String sPaperMargin="Margin at paper edge (%)";
-	String sConverting="Converting";
-	String sFinished="Completed";
-	String sCancelled="Cancelled";
-	String sFailed="Failed: ";
-
-	String sConversionStyle="Conversion style";
-
-	String sOpeningFile="Opening ";
-	String sUnknownFileType="Unknown file type";
-	String sSetPaperSize="Please set a paper size before importing an image.";
-
-	String sFileTypeGCode="GCODE (ngc)";
-	String sFileTypeImage="Image (jpg/bmp/png/gif)";
-	String sFileTypeDXF="DXF R12 (dxf)";
-
-	String sMenuSoundsTitle="Sounds";
-	String sMenuSoundsConnect="Connect";
-	String sMenuSoundsDisconnect="Disconnect";
-	String sMenuSoundsFinishConvert="Finish converting";
-	String sMenuSoundsFinishDraw="Finish drawing";
-
-	String sMenuGraphicsTitle="Graphics";
-	String sMenuGraphicsPenUp="Show pen up moves";
-	String sMenuGraphicsAntialias="Antialias lines";
-	String sMenuGraphicsSpeedVSQuality="Speed over quality";
-	String sMenuGraphicsDrawWhileRunning="While drawing show entire image, not just results so far";
-	String sMenuGraphics="";
-
-	String sInvalidTool="Requested invalid tool #";
-	String sChangeToolPrefix="Please prepare ";
-	String sChangeToolPostfix=" and click any button to continue.";
-
-	String sStartAt="Start at";
-	String sStartAtLine="Start at line #";
-
-	String sPause="Pause";
-	String sUnpause="Unpause";
-
-	String sSetHome="SET HOME";
-	String sGoHome="GO HOME";
-
-	String sTop="TOP";
-	String sBottom="BOTTOM";
-	String sLeft="LEFT";
-	String sRight="RIGHT";
-	String sPenUp="PEN UP";
-	String sPenDown="PEN DOWN";
-
-	String sSet= "Set";
-	String sSpeed="Speed:";
-	String sRate="steps/min";
-
-	String sJogMotors="Jog Motors";
-	String sJogIn="IN";
-	String sJogOut="OUT";
-	String sInvert="Invert";
-
-	String sUpdateNotice="A new version of this software is available.\nPlease visit http://makelangelo.com/ to get the new hotness.";
-	String sUpToDate = "This software is up to date.";
-	String sUpdateCheckFailed="Sorry, I failed.  Please visit http://www.marginallyclever.com/ to check yourself.";
-
-	String sSend="Send";
-	String sTitleNotConnected=" not connected";
-	String sMenuMakelangelo="Makelangelo";
-	String sMenuPreferences="Preferences";
-	String sMenuUpdate="Check for updates";
-	String sMenuAbout="About";
-	String sMenuQuit="Quit";
-
-	String sMenuConnect="Connect";
-	String sMenuRescan="Rescan";
-	String sMenuDisconnect="Disconnect";
-
-	String sMenuSettings="Settings";
-	String sMenuSettingsMachine="Adjust machine & paper size";
-	String sMenuAdjustPulleys="Adjust pulley size";
-	String sMenuJogMotors="Jog Motors";
-
-	String sMenuSelectTool="Select active tool";
-	String sMenuAdjustTool="Adjust active tool";
-
-	String sMenuGCODE="GCODE";
-	String sMenuHilbertCurve="Hilbert Curve";
-	String sMenuTextToGCODE="Text to GCODE";
-	String sMenuConvertImage="Convert Image";
-	String sMenuOpenFile="Open File...";
-	String sMenuSaveGCODEAs="Save GCODE as...";
-
-	String sMenuDraw="Draw";
-	String sHalt="Halt";
-
-	String sMenuPreview="Preview";
-	String sZoomIn="Zoom +";
-	String sZoomOut="Zoom -";
-	String sZoomFit="Zoom to fit";
 	
 
 	private void RaisePen() {
@@ -475,7 +358,7 @@ public class Makelangelo
 		
 		ClosePort();
 		
-		Log("<font color='green'>"+sConnectingTo + portName+"...</font>\n");
+		Log("<font color='green'>"+MultilingualSupport.getSingleton().get("ConnectingTo") + portName+"...</font>\n");
 		
 		// open the port
 		serialPort = new SerialPort(portName);
@@ -484,11 +367,11 @@ public class Makelangelo
             serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
             serialPort.addEventListener(this);
         } catch (SerialPortException e) {
-			Log("<span style='color:red'>"+sPortNotConfigured+e.getMessage()+"</span>\n");
+			Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("PortNotConfigured")+e.getMessage()+"</span>\n");
 			return 3;
 		}
 
-		Log("<span style='color:green'>"+sPortOpened+"</span>\n");
+		Log("<span style='color:green'>"+MultilingualSupport.getSingleton().get("PortOpened")+"</span>\n");
 		SetRecentPort(portName);
 		portOpened=true;
 		UpdateMenuBar();
@@ -547,7 +430,9 @@ public class Makelangelo
 			String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
 			MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
 			
-			mainframe.setTitle(sTitlePrefix + Long.toString(MachineConfiguration.getSingleton().robot_uid) + sTitlePostfix);
+			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
+					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
+					+ MultilingualSupport.getSingleton().get("TitlePostfix"));
 
 			// did read go ok?
 			if(MachineConfiguration.getSingleton().robot_uid!=0) {
@@ -596,11 +481,12 @@ public class Makelangelo
 	public void LoadGCode(String filename) {
 		try {
 			gcode.Load(filename);
-		   	Log("<font color='green'>"+gcode.estimate_count + sLineSegments + "\n" + gcode.estimated_length+ sCentimeters + "\n" +
-		   			sEstimatedTime +statusBar.formatTime((long)(gcode.estimated_time))+"s.</font>\n");
+		   	Log("<font color='green'>"+gcode.estimate_count + MultilingualSupport.getSingleton().get("LineSegments")
+		   			+ "\n" + gcode.estimated_length + MultilingualSupport.getSingleton().get("Centimeters") + "\n"
+		   			+ MultilingualSupport.getSingleton().get("EstimatedTime") + statusBar.formatTime((long)(gcode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
-	    	Log("<span style='color:red'>"+sFileNotOpened + e.getLocalizedMessage()+"</span>\n");
+	    	Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
 	    	RemoveRecentFile(filename);
 	    	return;
 	    }
@@ -615,7 +501,7 @@ public class Makelangelo
 
 
 	protected boolean ChooseDXFConversionOptions() {
-		final JDialog driver = new JDialog(mainframe,sConversionOptions,true);
+		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
@@ -627,16 +513,16 @@ public class Makelangelo
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox reverse_h = new JCheckBox(sFlipForGlass);
+		final JCheckBox reverse_h = new JCheckBox(MultilingualSupport.getSingleton().get("FlipForGlass"));
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sStart);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Start"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(sPaperMargin),c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
 		
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
@@ -677,7 +563,7 @@ public class Makelangelo
 		final String destinationFile = GetTempDestinationFile();
 		final String srcFile = filename;
 		
-		final ProgressMonitor pm = new ProgressMonitor(null, sConverting, "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, MultilingualSupport.getSingleton().get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		
@@ -686,7 +572,7 @@ public class Makelangelo
 			
 			@Override
 			public Void doInBackground() {
-				Log("<font color='green'>"+sConverting+" "+destinationFile+"</font>\n");
+				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Converting")+" "+destinationFile+"</font>\n");
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
@@ -876,7 +762,7 @@ public class Makelangelo
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+sFinished+"</font>\n");
+				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
 				if(ok) LoadGCode(destinationFile);
 			    Halt();
@@ -892,12 +778,12 @@ public class Makelangelo
 		            String message = String.format("%d%%\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	Makelangelo.getSingleton().Log("<font color='green'>"+sFinished+"</font>\n");
+	                	Makelangelo.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    Makelangelo.getSingleton().Log("<font color='green'>"+sCancelled+"</font>\n");
+	                    Makelangelo.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -909,7 +795,7 @@ public class Makelangelo
 	}
 
 	protected boolean ChooseImageConversionOptions() {
-		final JDialog driver = new JDialog(mainframe,sConversionOptions,true);
+		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
@@ -921,7 +807,7 @@ public class Makelangelo
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox reverse_h = new JCheckBox(sFlipForGlass);
+		final JCheckBox reverse_h = new JCheckBox(MultilingualSupport.getSingleton().get("FlipForGlass"));
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
 
 		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
@@ -933,10 +819,10 @@ public class Makelangelo
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(sPaperMargin),c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
 		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel(sConversionStyle),c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ConversionStyle")),c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
 		
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
@@ -980,7 +866,7 @@ public class Makelangelo
 		
 		if( ChooseImageConversionOptions() == false ) return false;
 
-		final ProgressMonitor pm = new ProgressMonitor(null, sConverting, "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, MultilingualSupport.getSingleton().get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		
@@ -990,7 +876,7 @@ public class Makelangelo
 				// read in image
 				BufferedImage img;
 				try {
-					Log("<font color='green'>"+sConverting+" "+destinationFile+"</font>\n");
+					Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Converting")+" "+destinationFile+"</font>\n");
 					// convert with style
 					img = ImageIO.read(new File(sourceFile));
 					
@@ -1001,7 +887,7 @@ public class Makelangelo
 					image_converters[style].Convert(img);
 				}
 				catch(IOException e) {
-					Log("<font color='red'>"+sFailed+e.getLocalizedMessage()+"</font>\n");
+					Log("<font color='red'>"+MultilingualSupport.getSingleton().get("Failed")+e.getLocalizedMessage()+"</font>\n");
 					RemoveRecentFile(sourceFile);
 				}
 
@@ -1012,7 +898,7 @@ public class Makelangelo
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+sFinished+"</font>\n");
+				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
 				LoadGCode(destinationFile);
 			}
@@ -1027,12 +913,12 @@ public class Makelangelo
 		            String message = String.format("%d%%.\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	Makelangelo.getSingleton().Log("<font color='green'>"+sFinished+"</font>\n");
+	                	Makelangelo.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    Makelangelo.getSingleton().Log("<font color='green'>"+sCancelled+"</font>\n");
+	                    Makelangelo.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -1132,7 +1018,7 @@ public class Makelangelo
 	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
-		Log("<font color='green'>" + sOpeningFile + filename + "...</font>\n");
+		Log("<font color='green'>" + MultilingualSupport.getSingleton().get("OpeningFile") + filename + "...</font>\n");
 
 	   	UpdateRecentFiles(filename);
 	   	
@@ -1143,7 +1029,7 @@ public class Makelangelo
     	} else if(IsFileImage(filename)) {
     		LoadImage(filename);
     	} else {
-    		Log("<font color='red'>"+sUnknownFileType+"</font>\n");
+    		Log("<font color='red'>"+MultilingualSupport.getSingleton().get("UnknownFileType")+"</font>\n");
     	}
 
     	previewPane.ZoomToFitPaper();
@@ -1156,9 +1042,9 @@ public class Makelangelo
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(sFileTypeGCode, "ngc");
-		FileFilter filterImage = new FileNameExtensionFilter(sFileTypeImage, "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
-		FileFilter filterDXF   = new FileNameExtensionFilter(sFileTypeDXF, "dxf");
+		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
+		FileFilter filterImage = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+		FileFilter filterDXF   = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeDXF"), "dxf");
 		 
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterImage);
@@ -1169,7 +1055,7 @@ public class Makelangelo
 
 	    	// if machine is not yet calibrated
 	    	if(MachineConfiguration.getSingleton().IsPaperConfigured() == false) {
-	    		JOptionPane.showMessageDialog(null,sSetPaperSize);
+	    		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("SetPaperSize"));
 	    		return;
 	    	}
 	    	OpenFileOnDemand(selectedFile);
@@ -1181,7 +1067,7 @@ public class Makelangelo
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(sFileTypeGCode, "ngc");
+		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
 		
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterGCODE);
@@ -1196,7 +1082,7 @@ public class Makelangelo
 	    		gcode.Save(selectedFile);
 	    	}
 		    catch(IOException e) {
-		    	Log("<span style='color:red'>"+sFailed+e.getMessage()+"</span>\n");
+		    	Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("Failed")+e.getMessage()+"</span>\n");
 		    	return;
 		    }
 	    }
@@ -1220,7 +1106,7 @@ public class Makelangelo
 	
 	// Adjust sound preferences
 	protected void AdjustSounds() {
-		final JDialog driver = new JDialog(mainframe,sMenuSoundsTitle,true);
+		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField sound_connect = new JTextField(prefs.get("sound_connect",""),32);
@@ -1228,16 +1114,16 @@ public class Makelangelo
 		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""),32);
 		final JTextField sound_drawing_finished = new JTextField(prefs.get("sound_drawing_finished", ""),32);
 
-		final JButton change_sound_connect = new JButton(sMenuSoundsConnect);
-		final JButton change_sound_disconnect = new JButton(sMenuSoundsDisconnect);
-		final JButton change_sound_conversion_finished = new JButton(sMenuSoundsFinishConvert);
-		final JButton change_sound_drawing_finished = new JButton(sMenuSoundsFinishDraw);
+		final JButton change_sound_connect = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsConnect"));
+		final JButton change_sound_disconnect = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsDisconnect"));
+		final JButton change_sound_conversion_finished = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsFinishConvert"));
+		final JButton change_sound_drawing_finished = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsFinishDraw"));
 		
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sSave);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -1289,24 +1175,24 @@ public class Makelangelo
 	protected void AdjustGraphics() {
 		final Preferences graphics_prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
 		
-		final JDialog driver = new JDialog(mainframe,sMenuGraphicsTitle,true);
+		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("MenuGraphicsTitle"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox show_pen_up = new JCheckBox(sMenuGraphicsPenUp);
-		final JCheckBox antialias_on = new JCheckBox(sMenuGraphicsAntialias);
-		final JCheckBox speed_over_quality = new JCheckBox(sMenuGraphicsSpeedVSQuality);
-		final JCheckBox draw_all_while_running = new JCheckBox(sMenuGraphicsDrawWhileRunning);
+		final JCheckBox show_pen_up = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsPenUp"));
+		final JCheckBox antialias_on = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsAntialias"));
+		final JCheckBox speed_over_quality = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsSpeedVSQuality"));
+		final JCheckBox draw_all_while_running = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsDrawWhileRunning"));
 
 		show_pen_up.setSelected(graphics_prefs.getBoolean("show pen up", false));
 		antialias_on.setSelected(graphics_prefs.getBoolean("antialias", true));
 		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
 		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
 		
-		final JButton cancel = new JButton(sCancel);
-		final JButton save = new JButton(sSave);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -1395,10 +1281,10 @@ public class Makelangelo
 		String [] toolNames = mc.getToolNames();
 		
 		if(i<0 || i>toolNames.length) {
-			Log("<span style='color:red'>"+sInvalidTool+i+"</span>");
+			Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("InvalidTool")+i+"</span>");
 			i=0;
 		}
-		JOptionPane.showMessageDialog(null,sChangeToolPrefix + toolNames[i] + sChangeToolPostfix);
+		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("ChangeToolPrefix") + toolNames[i] + MultilingualSupport.getSingleton().get("ChangeToolPostfix"));
 	}
 	
 	
@@ -1487,13 +1373,13 @@ public class Makelangelo
 	private boolean getStartingLineNumber() {
 		dialog_result=false;
 		
-		final JDialog driver = new JDialog(mainframe,sStartAt,true);
+		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("StartAt"),true);
 		driver.setLayout(new GridBagLayout());		
 		final JTextField starting_line = new JTextField("0",8);
-		final JButton cancel = new JButton(sCancel);
-		final JButton start = new JButton(sStart);
+		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
+		final JButton start = new JButton(MultilingualSupport.getSingleton().get("Start"));
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(sStartAtLine),c);
+		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("StartAtLine")),c);
 		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  driver.add(starting_line,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  driver.add(cancel,c);
 		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  driver.add(start,c);
@@ -1588,13 +1474,13 @@ public class Makelangelo
 				if(paused==true) {
 					penIsUpBeforePause=penIsUp;
 					RaisePen();
-					buttonPause.setText(sPause);
+					buttonPause.setText(MultilingualSupport.getSingleton().get("Pause"));
 					paused=false;
 					// @TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					SendFileCommand();
 				} else {
 					if(!penIsUpBeforePause) LowerPen();
-					buttonPause.setText(sUnpause);
+					buttonPause.setText(MultilingualSupport.getSingleton().get("Unpause"));
 					paused=true;
 				}
 			}
@@ -1752,8 +1638,8 @@ public class Makelangelo
 			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(60,20));
 
 			//final JButton find = new JButton("FIND HOME");	find.setPreferredSize(new Dimension(100,20));
-			final JButton center = new JButton(sSetHome);	center.setPreferredSize(new Dimension(100,20));
-			final JButton home = new JButton(sGoHome);		home.setPreferredSize(new Dimension(100,20));
+			final JButton center = new JButton(MultilingualSupport.getSingleton().get("SetHome"));	center.setPreferredSize(new Dimension(100,20));
+			final JButton home = new JButton(MultilingualSupport.getSingleton().get("GoHome"));		home.setPreferredSize(new Dimension(100,20));
 			
 			c = new GridBagConstraints();
 			//c.fill=GridBagConstraints.BOTH; 
@@ -1776,12 +1662,12 @@ public class Makelangelo
 		
 		JPanel corners = new JPanel();
 			corners.setLayout(new GridBagLayout());
-			final JButton goTop = new JButton(sTop);		goTop.setPreferredSize(new Dimension(80,20));
-			final JButton goBottom = new JButton(sBottom);	goBottom.setPreferredSize(new Dimension(80,20));
-			final JButton goLeft = new JButton(sLeft);		goLeft.setPreferredSize(new Dimension(80,20));
-			final JButton goRight = new JButton(sRight);	goRight.setPreferredSize(new Dimension(80,20));
-			final JButton goUp = new JButton(sPenUp);		goUp.setPreferredSize(new Dimension(100,20));
-			final JButton goDown = new JButton(sPenDown);	goDown.setPreferredSize(new Dimension(100,20));
+			final JButton goTop = new JButton(MultilingualSupport.getSingleton().get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
+			final JButton goBottom = new JButton(MultilingualSupport.getSingleton().get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
+			final JButton goLeft = new JButton(MultilingualSupport.getSingleton().get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
+			final JButton goRight = new JButton(MultilingualSupport.getSingleton().get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
+			final JButton goUp = new JButton(MultilingualSupport.getSingleton().get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
+			final JButton goDown = new JButton(MultilingualSupport.getSingleton().get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
 			c = new GridBagConstraints();
 			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
 			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
@@ -1801,11 +1687,11 @@ public class Makelangelo
 			feed_rate = MachineConfiguration.getSingleton().GetFeedRate();
 			final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 			feedRate.setText(Double.toString(feed_rate));
-			final JButton setFeedRate = new JButton(sSet);
+			final JButton setFeedRate = new JButton(MultilingualSupport.getSingleton().get("Set"));
 
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(sSpeed),c);
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(MultilingualSupport.getSingleton().get("Speed")),c);
 			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(sRate),c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(MultilingualSupport.getSingleton().get("Rate")),c);
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		
 
@@ -1893,20 +1779,20 @@ public class Makelangelo
 	}
 	
 	protected void JogMotors() {
-		JDialog driver = new JDialog(mainframe,sJogMotors,true);
+		JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("JogMotors"),true);
 		driver.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		final JButton buttonAneg = new JButton(sJogIn);
-		final JButton buttonApos = new JButton(sJogOut);
-		final JCheckBox m1i = new JCheckBox(sInvert,MachineConfiguration.getSingleton().m1invert);
+		final JButton buttonAneg = new JButton(MultilingualSupport.getSingleton().get("JogIn"));
+		final JButton buttonApos = new JButton(MultilingualSupport.getSingleton().get("JogOut"));
+		final JCheckBox m1i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m1invert);
 		
-		final JButton buttonBneg = new JButton(sJogIn);
-		final JButton buttonBpos = new JButton(sJogOut);
-		final JCheckBox m2i = new JCheckBox(sInvert,MachineConfiguration.getSingleton().m2invert);
+		final JButton buttonBneg = new JButton(MultilingualSupport.getSingleton().get("JogIn"));
+		final JButton buttonBpos = new JButton(MultilingualSupport.getSingleton().get("JogOut"));
+		final JCheckBox m2i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m2invert);
 
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(sLeft),c);
-		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(sRight),c);
+		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("Left")),c);
+		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("Right")),c);
 		
 		c.gridx=1;	c.gridy=0;	driver.add(buttonAneg,c);
 		c.gridx=1;	c.gridy=1;	driver.add(buttonBneg,c);
@@ -1970,16 +1856,16 @@ public class Makelangelo
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
 	        	if( inputLine.compareTo(version) !=0 ) {
-	        		JOptionPane.showMessageDialog(null,sUpdateNotice);
+	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpdateNotice"));
 	        	} else {
-	        		JOptionPane.showMessageDialog(null,sUpToDate);
+	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpToDate"));
 	        	}
 	        } else {
 	        	throw new Exception();
 	        }
 	        in.close();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,sUpdateCheckFailed);
+			JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpdateCheckFailed"));
 		}
 	}
 
@@ -1993,40 +1879,40 @@ public class Makelangelo
         
         
         // File menu
-        menu = new JMenu(sMenuMakelangelo);
+        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuMakelangelo"));
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
         
-        subMenu = new JMenu(sMenuPreferences);
+        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreferences"));
         
-        buttonAdjustSounds = new JMenuItem(sMenuSoundsTitle);
+        buttonAdjustSounds = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSoundsTitle"));
         buttonAdjustSounds.addActionListener(this);
         subMenu.add(buttonAdjustSounds);
 
-        buttonAdjustGraphics = new JMenuItem(sMenuGraphicsTitle);
+        buttonAdjustGraphics = new JMenuItem(MultilingualSupport.getSingleton().get("MenuGraphicsTitle"));
         buttonAdjustGraphics.addActionListener(this);
         subMenu.add(buttonAdjustGraphics);
 
         menu.add(subMenu);
         
-        buttonCheckForUpdate = new JMenuItem(sMenuUpdate,KeyEvent.VK_U);
+        buttonCheckForUpdate = new JMenuItem(MultilingualSupport.getSingleton().get("MenuUpdate"),KeyEvent.VK_U);
         buttonCheckForUpdate.addActionListener(this);
         buttonCheckForUpdate.setEnabled(true);
         menu.add(buttonCheckForUpdate);
         
-        buttonAbout = new JMenuItem(sMenuAbout,KeyEvent.VK_A);
+        buttonAbout = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAbout"),KeyEvent.VK_A);
         buttonAbout.addActionListener(this);
         menu.add(buttonAbout);
 
         menu.addSeparator();
         
-        buttonExit = new JMenuItem(sMenuQuit,KeyEvent.VK_Q);
+        buttonExit = new JMenuItem(MultilingualSupport.getSingleton().get("MenuQuit"),KeyEvent.VK_Q);
         buttonExit.addActionListener(this);
         menu.add(buttonExit);
         
         
         // Connect menu
-        subMenu = new JMenu(sMenuConnect);
+        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConnect"));
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
@@ -2044,11 +1930,11 @@ public class Makelangelo
         
         subMenu.addSeparator();
 
-        buttonRescan = new JMenuItem(sMenuRescan,KeyEvent.VK_N);
+        buttonRescan = new JMenuItem(MultilingualSupport.getSingleton().get("MenuRescan"),KeyEvent.VK_N);
         buttonRescan.addActionListener(this);
         subMenu.add(buttonRescan);
 
-        buttonDisconnect = new JMenuItem(sMenuDisconnect,KeyEvent.VK_D);
+        buttonDisconnect = new JMenuItem(MultilingualSupport.getSingleton().get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
         buttonDisconnect.setEnabled(portOpened);
         subMenu.add(buttonDisconnect);
@@ -2056,33 +1942,33 @@ public class Makelangelo
         menuBar.add(subMenu);
 
         // settings menu
-        menu = new JMenu(sMenuSettings);
+        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuSettings"));
         menu.setMnemonic(KeyEvent.VK_T);
         menu.setEnabled(!running);
 
-        buttonAdjustMachineSize = new JMenuItem(sMenuSettingsMachine,KeyEvent.VK_L);
+        buttonAdjustMachineSize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSettingsMachine"),KeyEvent.VK_L);
         buttonAdjustMachineSize.addActionListener(this);
         buttonAdjustMachineSize.setEnabled(!running);
         menu.add(buttonAdjustMachineSize);
 
-        buttonAdjustPulleySize = new JMenuItem(sMenuAdjustPulleys,KeyEvent.VK_B);
+        buttonAdjustPulleySize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAdjustPulleys"),KeyEvent.VK_B);
         buttonAdjustPulleySize.addActionListener(this);
         buttonAdjustPulleySize.setEnabled(!running);
         menu.add(buttonAdjustPulleySize);
         
-        buttonJogMotors = new JMenuItem(sJogMotors,KeyEvent.VK_J);
+        buttonJogMotors = new JMenuItem(MultilingualSupport.getSingleton().get("JogMotors"),KeyEvent.VK_J);
         buttonJogMotors.addActionListener(this);
         buttonJogMotors.setEnabled(portConfirmed && !running);
         menu.add(buttonJogMotors);
 
         menu.addSeparator();
         
-        buttonChangeTool = new JMenuItem(sMenuSelectTool,KeyEvent.VK_T);
+        buttonChangeTool = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSelectTool"),KeyEvent.VK_T);
         buttonChangeTool.addActionListener(this);
         buttonChangeTool.setEnabled(!running);
         menu.add(buttonChangeTool);
 
-        buttonAdjustTool = new JMenuItem(sMenuAdjustTool,KeyEvent.VK_B);
+        buttonAdjustTool = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAdjustTool"),KeyEvent.VK_B);
         buttonAdjustTool.addActionListener(this);
         buttonAdjustTool.setEnabled(!running);
         menu.add(buttonAdjustTool);
@@ -2092,14 +1978,14 @@ public class Makelangelo
         
 
         // File conversion menu
-        menu = new JMenu(sMenuGCODE);
+        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuGCODE"));
         menu.setMnemonic(KeyEvent.VK_H);
         
-        subMenu = new JMenu(sMenuConvertImage);
+        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-	        buttonOpenFile = new JMenuItem(sMenuOpenFile,KeyEvent.VK_O);
+	        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
 	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
 	        buttonOpenFile.addActionListener(this);
 	        subMenu.add(buttonOpenFile);
@@ -2121,17 +2007,17 @@ public class Makelangelo
         
         menu.add(subMenu);
 
-        buttonHilbertCurve = new JMenuItem(sMenuHilbertCurve);
+        buttonHilbertCurve = new JMenuItem(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
         buttonHilbertCurve.setEnabled(!running);
         buttonHilbertCurve.addActionListener(this);
         menu.add(buttonHilbertCurve);
         
-        buttonText2GCODE = new JMenuItem(sMenuTextToGCODE);
+        buttonText2GCODE = new JMenuItem(MultilingualSupport.getSingleton().get("MenuTextToGCODE"));
         buttonText2GCODE.setEnabled(!running);
         buttonText2GCODE.addActionListener(this);
         menu.add(buttonText2GCODE);
 
-        buttonSaveFile = new JMenuItem(sMenuSaveGCODEAs);
+        buttonSaveFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSaveGCODEAs"));
         buttonSaveFile.addActionListener(this);
         menu.add(buttonSaveFile);
 
@@ -2140,24 +2026,24 @@ public class Makelangelo
         
         
         // Draw menu
-        menu = new JMenu(sMenuDraw);
+        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuDraw"));
 
-        buttonStart = new JMenuItem(sStart,KeyEvent.VK_S);
+        buttonStart = new JMenuItem(MultilingualSupport.getSingleton().get("Start"),KeyEvent.VK_S);
         buttonStart.addActionListener(this);
     	buttonStart.setEnabled(portConfirmed && !running);
         menu.add(buttonStart);
 
-        buttonStartAt = new JMenuItem(sStartAtLine);
+        buttonStartAt = new JMenuItem(MultilingualSupport.getSingleton().get("StartAtLine"));
         buttonStartAt.addActionListener(this);
         buttonStartAt.setEnabled(portConfirmed && !running);
         menu.add(buttonStartAt);
 
-        buttonPause = new JMenuItem(sPause,KeyEvent.VK_P);
+        buttonPause = new JMenuItem(MultilingualSupport.getSingleton().get("Pause"),KeyEvent.VK_P);
         buttonPause.addActionListener(this);
         buttonPause.setEnabled(portConfirmed && running);
         menu.add(buttonPause);
 
-        buttonHalt = new JMenuItem(sHalt,KeyEvent.VK_H);
+        buttonHalt = new JMenuItem(MultilingualSupport.getSingleton().get("Halt"),KeyEvent.VK_H);
         buttonHalt.addActionListener(this);
         buttonHalt.setEnabled(portConfirmed && running);
         menu.add(buttonHalt);
@@ -2165,18 +2051,18 @@ public class Makelangelo
         menuBar.add(menu);
         
         // view menu
-        menu = new JMenu(sMenuPreview);
-        buttonZoomOut = new JMenuItem(sZoomOut);
+        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreview"));
+        buttonZoomOut = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomOut"));
         buttonZoomOut.addActionListener(this);
         buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomOut);
         
-        buttonZoomIn = new JMenuItem(sZoomIn,KeyEvent.VK_EQUALS);
+        buttonZoomIn = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomIn"),KeyEvent.VK_EQUALS);
         buttonZoomIn.addActionListener(this);
         buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomIn);
         
-        buttonZoomToFit = new JMenuItem(sZoomFit);
+        buttonZoomToFit = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomFit"));
         buttonZoomToFit.addActionListener(this);
         menu.add(buttonZoomToFit);
         
@@ -2270,7 +2156,7 @@ public class Makelangelo
 		
 		commandLineText = new JTextField(0);
 		commandLineText.setPreferredSize(new Dimension(10,10));
-		commandLineSend = new JButton(sSend);
+		commandLineSend = new JButton(MultilingualSupport.getSingleton().get("Send"));
 		
 		textInputArea.add(commandLineText);
 		textInputArea.add(commandLineSend);
