@@ -505,11 +505,11 @@ void processCommand() {
     // is there a checksum?
     if(strchr(buffer,'*')!=0) {
       // yes.  is it valid?
-      char checksum=0;
-      int c=0;
+      unsigned char checksum=0;
+      int c;
       while(buffer[c]!='*') checksum ^= buffer[c++];
       c++; // skip *
-      int against = strtod(buffer+c,NULL);
+      unsigned char against = (unsigned char)strtod(buffer+c,NULL);
       if( checksum != against ) {
         Serial.print(F("BADCHECKSUM "));
         Serial.println(line_number);

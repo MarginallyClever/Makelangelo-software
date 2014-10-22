@@ -1322,7 +1322,7 @@ public class Makelangelo
 	
 	
 	protected String GenerateChecksum(String line) {
-		char checksum=0;
+		byte checksum=0;
 		
 		for( int i=0; i<line.length(); ++i ) {
 			checksum ^= line.charAt(i);

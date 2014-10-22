@@ -808,12 +808,12 @@ static void processCommand() {
   if(buffer[0]==';') return;
   
   long cmd;
-    
+
   // is there a line number?
   cmd=parsenumber('N',-1);
   if(cmd!=-1 && buffer[0] == 'N') {  // line number must appear first on the line
     if( cmd != line_number ) {
-      // wrong line number error
+      // Wrong line number error
       Serial.print(F("BADLINENUM "));
       Serial.println(line_number);
       return;
@@ -822,17 +822,17 @@ static void processCommand() {
     
     // is there a checksum?
     if(strchr(buffer,'*')!=0) {
-      // yes.  is it valid?
-      char checksum=0;
+      // Yes.  Is it valid?
+      unsigned char checksum=0;
       int c;
       while(buffer[c]!='*') checksum ^= buffer[c++];
       c++; // skip *
-      int against = (int)strtod(buffer+c,NULL);
+      unsigned char against = (unsigned char)strtod(buffer+c,NULL);
       if( checksum != against ) {
         Serial.print(F("BADCHECKSUM "));
         Serial.println(line_number);
         return;
-      } 
+      }
     } else {
       Serial.print(F("NOCHECKSUM "));
       Serial.println(line_number);
