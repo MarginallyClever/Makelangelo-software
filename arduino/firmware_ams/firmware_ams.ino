@@ -824,8 +824,8 @@ static void processCommand() {
     if(strchr(buffer,'*')!=0) {
       // Yes.  Is it valid?
       unsigned char checksum=0;
-      int c;
-      while(buffer[c]!='*') checksum ^= buffer[c++];
+      int c=0;
+      while(buffer[c]!='*' && c<MAX_BUF) checksum ^= buffer[c++];
       c++; // skip *
       unsigned char against = (unsigned char)strtod(buffer+c,NULL);
       if( checksum != against ) {
@@ -836,7 +836,6 @@ static void processCommand() {
     } else {
       Serial.print(F("NOCHECKSUM "));
       Serial.println(line_number);
-      Serial.println(buffer);
       return;
     }
   

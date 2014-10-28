@@ -507,7 +507,7 @@ void processCommand() {
       // yes.  is it valid?
       char checksum=0;
       int c=0;
-      while(buffer[c]!='*') checksum ^= buffer[c++];
+      while(buffer[c]!='*' && c<MAX_BUF) checksum ^= buffer[c++];
       c++; // skip *
       int against = strtod(buffer+c,NULL);
       if( checksum != against ) {
