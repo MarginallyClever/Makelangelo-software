@@ -181,11 +181,11 @@ public class MachineConfiguration {
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
-				
-				float pwf = Math.round( Float.valueOf(pw.getText()) * 100 ) / (100 * 10);
-				float phf = Math.round( Float.valueOf(ph.getText()) * 100 ) / (100 * 10);
-				float mwf = Math.round( Float.valueOf(mw.getText()) * 100 ) / (100 * 10);
-				float mhf = Math.round( Float.valueOf(mh.getText()) * 100 ) / (100 * 10);
+
+				float pwf = Float.valueOf(pw.getText()) / 10.0f;
+				float phf = Float.valueOf(ph.getText()) / 10.0f;
+				float mwf = Float.valueOf(mw.getText()) / 10.0f;
+				float mhf = Float.valueOf(mh.getText()) / 10.0f;
 				boolean data_is_sane=true;
 				if( pwf<=0 ) data_is_sane=false;
 				if( phf<=0 ) data_is_sane=false;
@@ -243,8 +243,8 @@ public class MachineConfiguration {
 						case 0:
 							paper_left=0;
 							paper_right=pwf;
-							limit_left=-(mwf-pwf)/2.0;
-							limit_right=(mwf-pwf)/2.0 + pwf;
+							limit_left=-(mwf-pwf)/2.0f;
+							limit_right=(mwf-pwf)/2.0f + pwf;
 							break;
 						case 1:
 							paper_left = -pwf/2.0f;
@@ -256,27 +256,27 @@ public class MachineConfiguration {
 							paper_right=0;
 							paper_left=-pwf;
 							limit_left=-pwf - (mwf-pwf)/2.0f;
-							limit_right=(mwf-pwf)/2;
+							limit_right=(mwf-pwf)/2.0f;
 							break;
 						}
 						switch(startingPositionIndex/3) {
 						case 0:
 							paper_top=0;
 							paper_bottom=-phf;
-							limit_top=(mhf-phf)/2;
-							limit_bottom=-phf - (mhf-phf)/2;
+							limit_top=(mhf-phf)/2.0f;
+							limit_bottom=-phf - (mhf-phf)/2.0f;
 							break;
 						case 1:
-							paper_top=phf/2;
-							paper_bottom=-phf/2;
-							limit_top=mhf/2;
-							limit_bottom=-mhf/2;
+							paper_top=phf/2.0f;
+							paper_bottom=-phf/2.0f;
+							limit_top=mhf/2.0f;
+							limit_bottom=-mhf/2.0f;
 							break;
 						case 2:
 							paper_bottom=0;
 							paper_top=phf;
-							limit_top=phf + (mhf-phf)/2;
-							limit_bottom= - (mhf-phf)/2;
+							limit_top=phf + (mhf-phf)/2.0f;
+							limit_bottom= - (mhf-phf)/2.0f;
 							break;
 						}
 

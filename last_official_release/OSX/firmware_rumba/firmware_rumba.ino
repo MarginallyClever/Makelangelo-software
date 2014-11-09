@@ -43,7 +43,7 @@ float MAX_VEL = 0;  // cm/s
 float THREAD_PER_STEP=0;
 
 // plotter position.
-float posx, posy, posz;  // pen state
+float posx=0, posy=0, posz=0;  // pen state
 float feed_rate=DEFAULT_FEEDRATE;
 float acceleration=DEFAULT_ACCELERATION;
 
@@ -283,7 +283,21 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
   float dx = posx - cx;
   float dy = posy - cy;
   float radius=sqrt(dx*dx+dy*dy);
+  
+  x-=tool_offset[current_tool].x;
+  y-=tool_offset[current_tool].y;
+  z-=tool_offset[current_tool].z;
 
+  Serial.print("pX");  Serial.println(posx);
+  Serial.print("pY");  Serial.println(posy);
+  Serial.print("cX");  Serial.println(cx);
+  Serial.print("cY");  Serial.println(cy);
+  Serial.print("X");  Serial.println(x);
+  Serial.print("Y");  Serial.println(y);
+  Serial.print("Z");  Serial.println(z);
+  Serial.print("dX");  Serial.println(dx);
+  Serial.print("dY");  Serial.println(dy);
+  
   // find angle of arc (sweep)
   float angle1=atan3(dy,dx);
   float angle2=atan3(y-cy,x-cx);
@@ -292,31 +306,40 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
   
-  theta=angle2-angle1;
+  theta = angle2-angle1;
   
   // get length of arc
   // float circ=PI*2.0*radius;
   // float len=theta*circ/(PI*2.0);
   // simplifies to
   float len = abs(theta) * radius;
-
-  int i, segments = floor( len * MM_PER_SEGMENT );
- 
+  float segments = len * MM_PER_SEGMENT;
   float nx, ny, nz, angle3, scale;
 
-  for(i=0;i<segments;++i) {
+  Serial.print("theta");  Serial.println(theta);
+  Serial.print("len");  Serial.println(len);
+  Serial.print("segs ");  Serial.println(segments);
+
+  for(int i=1;i<segments;++i) {
     // interpolate around the arc
-    scale = ((float)i)/((float)segments);
-    
-    angle3 = ( theta * scale ) + angle1;
+    scale = (float)i/segments;
+    angle3 = theta * scale + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
     nz = ( z - posz ) * scale + posz;
+    Serial.print(scale);
+    Serial.print("\t");
+    Serial.print(angle3);
+    Serial.print("\t");
+    Serial.print(nx);
+    Serial.print("\t");
+    Serial.print(ny);
+    Serial.print("\n");
     // send it to the planner
-    line_safe(nx,ny,nz,new_feed_rate);
+    polargraph_line(nx,ny,nz,new_feed_rate);
   }
   
-  line_safe(x,y,z,new_feed_rate);
+  polargraph_line(x,y,z,new_feed_rate);
 }
 
 
@@ -507,7 +530,7 @@ void processCommand() {
       // yes.  is it valid?
       char checksum=0;
       int c=0;
-      while(buffer[c]!='*') checksum ^= buffer[c++];
+      while(buffer[c]!='*' && c<MAX_BUF) checksum ^= buffer[c++];
       c++; // skip *
       int against = strtod(buffer+c,NULL);
       if( checksum != against ) {
@@ -558,10 +581,10 @@ void processCommand() {
       Vector3 offset=get_end_plus_offset();
       acceleration = min(max(parsenumber('A',acceleration),1),2000);
       setFeedRate(parsenumber('F',feed_rate));
-      arc(parsenumber('I',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
-          parsenumber('J',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
-          parsenumber('X',(absolute_mode?offset.x:0))*0.1 + (absolute_mode?0:offset.x),
-          parsenumber('Y',(absolute_mode?offset.y:0))*0.1 + (absolute_mode?0:offset.y),
+      arc(parsenumber('I',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('J',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
+          parsenumber('X',(absolute_mode?offset.x:0)*10)*0.1 + (absolute_mode?0:offset.x),
+          parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
           parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
           (cmd==2) ? -1 : 1,
           parsenumber('F',feed_rate) );

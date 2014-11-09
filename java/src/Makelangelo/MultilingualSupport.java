@@ -1,8 +1,5 @@
 package Makelangelo;
 
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;

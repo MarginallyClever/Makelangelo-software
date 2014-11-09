@@ -439,17 +439,24 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				if(dir>0 && theta<0) angle2+=Math.PI*2.0;
 				else if(dir<0 && theta>0) angle1+=Math.PI*2.0;
 
-				theta=Math.abs(angle2-angle1)*RAD2DEG*STEPS_PER_DEGREE;
+				theta=angle2-angle1;
 
+				double len = Math.abs(theta) * radius;
+				double MM_PER_SEGMENT = 10;
+				double segments = len * STEPS_PER_DEGREE*2;
+				//double segments = Math.abs(theta)*RAD2DEG*STEPS_PER_DEGREE;
+				double nx,ny,angle3,scale;
+				
 				// Draw the arc from a lot of little line segments.
-				for(int k=0;k<=theta;++k) {
-					double angle3 = (angle2-angle1) * ((double)k/theta) + angle1;
-					float nx = (float)(ai + Math.cos(angle3) * radius);
-				    float ny = (float)(aj + Math.sin(angle3) * radius);
+				for(int k=0;k<segments;++k) {
+					scale = (double)k / segments;
+					angle3 = theta * scale + angle1;
+					nx = ai + Math.cos(angle3) * radius;
+				    ny = aj + Math.sin(angle3) * radius;
 
 				    addNodePos(i,ITX(px),ITY(py),ITX(nx),ITY(ny));
-					px=nx;
-					py=ny;
+					px=(float)nx;
+					py=(float)ny;
 				}
 				addNodePos(i,ITX(px),ITY(py),ITX(x),ITY(y));	
 			}

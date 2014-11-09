@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-//#define MOTHERBOARD 1  // Adafruit Motor Shield 1
-#define MOTHERBOARD 2  // Adafruit Motor Shield 2
+#define MOTHERBOARD 1  // Adafruit Motor Shield 1
+//#define MOTHERBOARD 2  // Adafruit Motor Shield 2
 
 // Increase this number to see more output
 #define VERBOSE         (0)
@@ -385,21 +385,21 @@ static void line_safe(float x,float y,float z) {
   // split up long lines to make them straighter?
   float dx=x-posx;
   float dy=y-posy;
-
+  
   float len=sqrt(dx*dx+dy*dy);
   
   if(len<=CM_PER_SEGMENT) {
     line(x,y,z);
     return;
   }
-  
+
   // too long!
   long pieces=floor(len/CM_PER_SEGMENT);
   float x0=posx;
   float y0=posy;
   float z0=posz;
   float a;
-  for(long j=0;j<=pieces;++j) {
+  for(long j=1;j<pieces;++j) {
     a=(float)j/(float)pieces;
 
     line((x-x0)*a+x0,
@@ -808,12 +808,12 @@ static void processCommand() {
   if(buffer[0]==';') return;
   
   long cmd;
-  
+
   // is there a line number?
   cmd=parsenumber('N',-1);
   if(cmd!=-1 && buffer[0] == 'N') {  // line number must appear first on the line
     if( cmd != line_number ) {
-      // wrong line number error
+      // Wrong line number error
       Serial.print(F("BADLINENUM "));
       Serial.println(line_number);
       return;
@@ -822,21 +822,20 @@ static void processCommand() {
     
     // is there a checksum?
     if(strchr(buffer,'*')!=0) {
-      // yes.  is it valid?
-      char checksum=0;
-      int c;
-      while(buffer[c]!='*') checksum ^= buffer[c++];
+      // Yes.  Is it valid?
+      unsigned char checksum=0;
+      int c=0;
+      while(buffer[c]!='*' && c<MAX_BUF) checksum ^= buffer[c++];
       c++; // skip *
-      int against = (int)strtod(buffer+c,NULL);
+      unsigned char against = (unsigned char)strtod(buffer+c,NULL);
       if( checksum != against ) {
         Serial.print(F("BADCHECKSUM "));
         Serial.println(line_number);
         return;
-      } 
+      }
     } else {
       Serial.print(F("NOCHECKSUM "));
       Serial.println(line_number);
-      Serial.println(buffer);
       return;
     }
   
@@ -857,8 +856,7 @@ static void processCommand() {
   case 110:  line_number = parsenumber('N',line_number);  break;
   case 114:  where();  break;
   }
-  
-  
+
   cmd=parsenumber('G',-1);
   switch(cmd) {
   case 0:
@@ -869,7 +867,7 @@ static void processCommand() {
                  parsenumber('Y',(absolute_mode?offset.y:0)*10)*0.1 + (absolute_mode?0:offset.y),
                  parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z) );
     break;
-  }
+    }
   case 2:
   case 3: {  // arc
       Vector3 offset=get_end_plus_offset();
@@ -881,7 +879,7 @@ static void processCommand() {
           parsenumber('Z',(absolute_mode?offset.z:0)) + (absolute_mode?0:offset.z),
           (cmd==2) ? -1 : 1);
       break;
-  }
+    }
   case 4:  // dwell
     pause(parsenumber('S',0) + parsenumber('P',0)*1000.0f);
     break;
@@ -924,34 +922,34 @@ static void processCommand() {
   cmd=parsenumber('D',-1);
   switch(cmd) {
   case 0: {
-    // move one motor
-    char *ptr=strchr(buffer,' ')+1;
-    int amount = atoi(ptr+1);
-    int i, dir;
-    if(*ptr == m1d) {
-      dir = amount < 0 ? M1_REEL_IN : M1_REEL_OUT;
-      amount=abs(amount);
-      for(i=0;i<amount;++i) {  M1_STEP(1,dir);  delay(2);  }
-    } else if(*ptr == m2d) {
-      dir = amount < 0 ? M2_REEL_IN : M2_REEL_OUT;
-      amount = abs(amount);
-      for(i=0;i<amount;++i) {  M2_STEP(1,dir);  delay(2);  }
+      // move one motor
+      char *ptr=strchr(buffer,' ')+1;
+      int amount = atoi(ptr+1);
+      int i, dir;
+      if(*ptr == m1d) {
+        dir = amount < 0 ? M1_REEL_IN : M1_REEL_OUT;
+        amount=abs(amount);
+        for(i=0;i<amount;++i) {  M1_STEP(1,dir);  delay(2);  }
+      } else if(*ptr == m2d) {
+        dir = amount < 0 ? M2_REEL_IN : M2_REEL_OUT;
+        amount = abs(amount);
+        for(i=0;i<amount;++i) {  M2_STEP(1,dir);  delay(2);  }
+      }
     }
-  }
     break;
   case 1: {
-    // adjust spool diameters
-    float amountL=parsenumber('L',SPOOL_DIAMETER1);
-    float amountR=parsenumber('R',SPOOL_DIAMETER2);
-
-    float tps1=THREADPERSTEP1;
-    float tps2=THREADPERSTEP2;
-    adjustSpoolDiameter(amountL,amountR);
-    if(THREADPERSTEP1 != tps1 || THREADPERSTEP2 != tps2) {
-      // Update EEPROM
-      SaveSpoolDiameter();
+      // adjust spool diameters
+      float amountL=parsenumber('L',SPOOL_DIAMETER1);
+      float amountR=parsenumber('R',SPOOL_DIAMETER2);
+  
+      float tps1=THREADPERSTEP1;
+      float tps2=THREADPERSTEP2;
+      adjustSpoolDiameter(amountL,amountR);
+      if(THREADPERSTEP1 != tps1 || THREADPERSTEP2 != tps2) {
+        // Update EEPROM
+        SaveSpoolDiameter();
+      }
     }
-  }
     break;
   case 2:
     Serial.print('L');  Serial.print(SPOOL_DIAMETER1);
