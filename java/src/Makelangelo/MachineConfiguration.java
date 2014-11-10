@@ -182,10 +182,10 @@ public class MachineConfiguration {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
 
-				float pwf = Float.valueOf(pw.getText()) / 10.0f;
-				float phf = Float.valueOf(ph.getText()) / 10.0f;
-				float mwf = Float.valueOf(mw.getText()) / 10.0f;
-				float mhf = Float.valueOf(mh.getText()) / 10.0f;
+				double pwf = Double.valueOf(pw.getText()) / 10.0;
+				double phf = Double.valueOf(ph.getText()) / 10.0;
+				double mwf = Double.valueOf(mw.getText()) / 10.0;
+				double mhf = Double.valueOf(mh.getText()) / 10.0;
 				boolean data_is_sane=true;
 				if( pwf<=0 ) data_is_sane=false;
 				if( phf<=0 ) data_is_sane=false;
