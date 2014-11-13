@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -33,7 +34,8 @@ public class MultilingualSupport {
 		LoadLanguages();
 		LoadConfig();
 		
-		if(prefs.getBoolean("first time", true)) {
+		//if(prefs.getBoolean("first time", true))
+		{
 			ChooseLanguage();
 			prefs.putBoolean("first time", false);
 		}
@@ -87,14 +89,30 @@ public class MultilingualSupport {
 	}
 	
 	public void LoadLanguages() {
-		// @TODO scan folder for language files?
-		LanguageContainer lang = new LanguageContainer();
-		lang.Load("english");
-		languages.put("english", lang);
+		// Scan folder for language files
+        String workingDirectory=System.getProperty("user.dir")+"/languages";
+        System.out.println(workingDirectory);
+		File f = new File(workingDirectory);
+		LanguageContainer lang;
 		
+		File [] all_files = f.listFiles();
+		for(int i=0;i<all_files.length;++i) {
+			if(all_files[i].isHidden()) continue;
+			if(all_files[i].isDirectory()) continue;
+			lang = new LanguageContainer();
+			lang.Load(all_files[i].getAbsolutePath());
+			languages.put(lang.getName(), lang);
+		}	
 	}
 	
 	public String get(String key) {
-		return languages.get(currentLanguage).get(key);
+		String value=null;
+		try {
+			value = languages.get(currentLanguage).get(key);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return value;
 	}
 }

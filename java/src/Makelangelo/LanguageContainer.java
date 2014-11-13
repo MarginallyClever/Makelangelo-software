@@ -8,15 +8,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 public class LanguageContainer {
+	protected String name = "";
+	protected String author = "";
 	protected Map<String,String> strings = new HashMap<String,String>();
 	
-	void Load(String language) {
+	void Load(String language_file) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document dom=null;
 		
@@ -24,7 +24,7 @@ public class LanguageContainer {
 			//Using factory get an instance of document builder
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			//parse using builder to get DOM representation of the XML file
-			dom = db.parse("lang_"+language+".xml");
+			dom = db.parse(language_file);
 		} catch(ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch(SAXException se) {
@@ -36,6 +36,10 @@ public class LanguageContainer {
 		if(dom==null) return;
 		
 		Element docEle = dom.getDocumentElement();
+		
+		name = docEle.getElementsByTagName("name").item(0).getFirstChild().getNodeValue();
+		author = docEle.getElementsByTagName("author").item(0).getFirstChild().getNodeValue();
+		
 		NodeList nl = docEle.getElementsByTagName("string");
 		if(nl != null && nl.getLength() > 0) {
 			for(int i = 0 ; i < nl.getLength();i++) {
@@ -46,7 +50,7 @@ public class LanguageContainer {
 				String value = getTextValue(el,"value");
 				
 				// store key/value pairs into a map
-				//System.out.println(key+"="+value);
+				System.out.println(language_file +"\t"+key+"\t=\t"+value);
 				strings.put(key, value);
 			}
 		}
@@ -73,5 +77,12 @@ public class LanguageContainer {
 		}
 
 		return textVal;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public String getAuthor() {
+		return author;
 	}
 }

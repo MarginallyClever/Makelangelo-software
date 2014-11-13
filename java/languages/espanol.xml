@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <language>
-	<author>Dan Royer (dan@marginallyclever.com)</author>
-	
-	<string><key>Invert</key><value>Invert</value></string>
-	<string><key>Cancel</key><value>Cancel</value></string>
-	<string><key>Save</key><value>Save</value></string>
-	<string><key>CouldNotFind</key><value>Could not find </value></string>
+	<meta>
+		<name>Espanol</name>
+		<author>Dan Royer (dan@marginallyclever.com)</author>
+	</meta>
+
+	<string><key>Invert</key><value>Invertido</value></string>
+	<string><key>Cancel</key><value>Cancelar</value></string>
+	<string><key>Save</key><value>Guardar</value></string>
+	<string><key>CouldNotFind</key><value>No pude encontrar </value></string>
 	<string><key>MachineWidth</key><value>Machine width</value></string>
 	<string><key>MachineHeight</key><value>Machine height</value></string>
 	<string><key>PaperWidth</key><value>Paper width</value></string>
@@ -56,8 +59,8 @@
 	<string><key>FileTypeDXF</key><value>DXF R12 (dxf)</value></string>
 
 	<string><key>MenuSoundsTitle</key><value>Sounds</value></string>
-	<string><key>MenuSoundsConnect</key><value>Connect</value></string>
-	<string><key>MenuSoundsDisconnect</key><value>Disconnect</value></string>
+	<string><key>MenuSoundsConnect</key><value>Connectar</value></string>
+	<string><key>MenuSoundsDisconnect</key><value>Desconectar</value></string>
 	<string><key>MenuSoundsFinishConvert</key><value>Finish converting</value></string>
 	<string><key>MenuSoundsFinishDraw</key><value>Finish drawing</value></string>
 
@@ -114,7 +117,7 @@
 	<string><key>MenuRescan</key><value>Rescan</value></string>
 	<string><key>MenuDisconnect</key><value>Disconnect</value></string>
 
-	<string><key>MenuSettings</key><value>Settings</value></string>
+	<string><key>MenuSettings</key><value>Ajustes</value></string>
 	<string><key>MenuSettingsMachine</key><value>Adjust machine &amp; paper size</value></string>
 	<string><key>MenuAdjustPulleys</key><value>Adjust pulley size</value></string>
 	<string><key>MenuJogMotors</key><value>Jog Motors</value></string>
@@ -129,10 +132,10 @@
 	<string><key>MenuOpenFile</key><value>Open File...</value></string>
 	<string><key>MenuSaveGCODEAs</key><value>Save GCODE as...</value></string>
 
-	<string><key>MenuDraw</key><value>Draw</value></string>
-	<string><key>Halt</key><value>Halt</value></string>
+	<string><key>MenuDraw</key><value>Dibujar</value></string>
+	<string><key>Halt</key><value>Alto</value></string>
 
-	<string><key>MenuPreview</key><value>Preview</value></string>
+	<string><key>MenuPreview</key><value>Preestreno</value></string>
 	<string><key>ZoomIn</key><value>Zoom +</value></string>
 	<string><key>ZoomOut</key><value>Zoom -</value></string>
 	<string><key>ZoomFit</key><value>Zoom to fit</value></string>
