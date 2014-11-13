@@ -448,6 +448,7 @@ public class Filter {
 	}
 
 	
+	// break the text into an array of strings.  each string is one line of text made to fit into the chars_per_line limit.
 	protected String [] TextWrapToLength(String src) {
 		String [] test_lines = src.split("\n");
 		int i,j;

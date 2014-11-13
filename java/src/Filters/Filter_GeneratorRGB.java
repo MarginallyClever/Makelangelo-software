@@ -218,6 +218,7 @@ public class Filter_GeneratorRGB extends Filter {
 		
 		liftPen(out);
 		SignName(out);
+		
 		tool.WriteMoveTo(out, 0, 0);
 		
 		// close the file

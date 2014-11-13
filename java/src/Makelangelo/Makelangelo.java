@@ -123,7 +123,8 @@ public class Makelangelo
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
     private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile, buttonExit;
-    private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
+    private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
+    private JMenuItem buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -149,6 +150,9 @@ public class Makelangelo
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
+	
+	// prevent repeating pings from appearing in console
+	boolean lastLineWasCue=false;
 
 	// reading file
 	private boolean running=false;
@@ -374,6 +378,7 @@ public class Makelangelo
 		Log("<span style='color:green'>"+MultilingualSupport.getSingleton().get("PortOpened")+"</span>\n");
 		SetRecentPort(portName);
 		portOpened=true;
+		lastLineWasCue=false;
 		UpdateMenuBar();
 		PlayConnectSound();
 		
@@ -1507,6 +1512,9 @@ public class Makelangelo
 			AdjustGraphics();
 			return;
 		}
+		if( subject == buttonAdjustLanguage ) {
+			MultilingualSupport.getSingleton().ChooseLanguage();
+		}
 		if( subject == buttonAdjustMachineSize ) {
 			MachineConfiguration.getSingleton().AdjustMachineSize();
 			previewPane.updateMachineConfig();
@@ -1593,7 +1601,18 @@ public class Makelangelo
 					//line2_mod = line2_mod.replace(">", "");
 					line2_mod = line2_mod.trim();
 					if(!line2_mod.equals("")) {
-						Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
+						if(line2_mod.lastIndexOf(">")!=-1) {
+							if(lastLineWasCue==true) {
+								// don't repeat the ping
+								//Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
+							} else {
+								Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
+							}
+							lastLineWasCue=true;
+						} else {
+							lastLineWasCue=false;
+							Log("<span style='color:#FFA500'>a"+line2_mod+"b</span>");
+						}
 					}
 					
 					int error_line = ErrorReported();
@@ -1893,6 +1912,9 @@ public class Makelangelo
         buttonAdjustGraphics.addActionListener(this);
         subMenu.add(buttonAdjustGraphics);
 
+        buttonAdjustLanguage = new JMenuItem(MultilingualSupport.getSingleton().get("MenuLanguageTitle"));
+        buttonAdjustLanguage.addActionListener(this);
+        subMenu.add(buttonAdjustLanguage);
         menu.add(subMenu);
         
         buttonCheckForUpdate = new JMenuItem(MultilingualSupport.getSingleton().get("MenuUpdate"),KeyEvent.VK_U);
@@ -2174,6 +2196,9 @@ public class Makelangelo
     
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private static void CreateAndShowGUI() {
+    	// Check language preferences
+    	MultilingualSupport.getSingleton();
+    	
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

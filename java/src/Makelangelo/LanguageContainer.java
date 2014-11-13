@@ -46,7 +46,7 @@ public class LanguageContainer {
 				String value = getTextValue(el,"value");
 				
 				// store key/value pairs into a map
-				System.out.println(key+"="+value);
+				//System.out.println(key+"="+value);
 				strings.put(key, value);
 			}
 		}

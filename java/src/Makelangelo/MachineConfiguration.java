@@ -616,6 +616,7 @@ public class MachineConfiguration {
 	
 	public void SetFeedRate(double f) {
 		default_feed_rate = f;
+		SaveConfig();
 	}
 	
 	public long GetUID() {

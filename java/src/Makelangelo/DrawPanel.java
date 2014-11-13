@@ -442,9 +442,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseInputListen
 				theta=angle2-angle1;
 
 				double len = Math.abs(theta) * radius;
-				double MM_PER_SEGMENT = 10;
 				double segments = len * STEPS_PER_DEGREE*2;
-				//double segments = Math.abs(theta)*RAD2DEG*STEPS_PER_DEGREE;
 				double nx,ny,angle3,scale;
 				
 				// Draw the arc from a lot of little line segments.

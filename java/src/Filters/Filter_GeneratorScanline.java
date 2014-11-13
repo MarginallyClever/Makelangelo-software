@@ -62,9 +62,8 @@ public class Filter_GeneratorScanline extends Filter {
 			}
 		}
 
-		// TODO Sign name here?
-		
-		// pen is already lifted.  Return to home.
+		// pen already lifted
+		SignName(out);
 		tool.WriteMoveTo(out, 0, 0);
 		
 		// close the file

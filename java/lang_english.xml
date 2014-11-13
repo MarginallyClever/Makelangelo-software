@@ -67,6 +67,8 @@
 	<string><key>MenuGraphicsSpeedVSQuality</key><value>Speed over quality</value></string>
 	<string><key>MenuGraphicsDrawWhileRunning</key><value>Show entire image while drawing</value></string>
 
+	<string><key>MenuLanguageTitle</key><value>Language</value></string>
+
 	<string><key>InvalidTool</key><value>Requested invalid tool #</value></string>
 	<string><key>ChangeToolPrefix</key><value>Please prepare </value></string>
 	<string><key>ChangeToolPostfix</key><value> and click any button to continue.</value></string>
