@@ -65,7 +65,7 @@ import Filters.*;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback 
-// TODO image processing options - cutoff, exposure, resolution, voronoi stippling
+// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing
 // TODO vector output
 
 public class Makelangelo
@@ -87,8 +87,8 @@ public class Makelangelo
 		boolean startConvertingNow;
 	
 	
-	// TODO put all serial stuff in a SerialConnection (Connection) class, hide it inside Robot class?
 	// Serial connection
+		// TODO put all serial stuff in a SerialConnection (Connection) class, hide it inside Robot class?
 		private static final int BAUD_RATE = 57600;
 		//private CommPortIdentifier portIdentifier;
 		//private CommPort commPort;
@@ -122,9 +122,11 @@ public class Makelangelo
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
-    private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile, buttonExit;
+    private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
+    private JMenuItem buttonExit;
     private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
-    private JMenuItem buttonAdjustMachineSize, buttonAdjustPulleySize, buttonChangeTool, buttonAdjustTool, buttonRescan, buttonDisconnect, buttonJogMotors;
+    private JMenuItem buttonLoadMachineConfig, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
+    private JMenuItem buttonRescan, buttonDisconnect;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
@@ -174,7 +176,7 @@ public class Makelangelo
 	
 	private Makelangelo() {
 		StartLog();
-		MachineConfiguration.getSingleton().LoadConfig();
+		MachineConfiguration.getSingleton();
         GetRecentFiles();
         GetRecentPort();
         LoadImageConverters();
@@ -353,6 +355,11 @@ public class Makelangelo
 			previewPane.setConnected(false);
 			UpdateMenuBar();
 			PlayDisconnectSound();
+			
+			// update window title
+			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
+					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
+					+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
 		}
 	}
 	
@@ -472,7 +479,7 @@ public class Makelangelo
 	}
 	
 	// update the prefs with the last port connected and refreshes the menus.
-	// @TODO: only update when the port is confirmed?
+	// TODO: only update when the port is confirmed?
 	public void SetRecentPort(String portName) {
 		prefs.put("recent-port", portName);
 		recentPort=portName;
@@ -1256,7 +1263,7 @@ public class Makelangelo
 		String line;
 		do {			
 			// are there any more commands?
-			// @TODO: find out how far the pen moved each line and add it to the distance total.
+			// TODO: find out how far the pen moved each line and add it to the distance total.
 			int line_number = gcode.linesProcessed;
 			gcode.linesProcessed++;
 			line=gcode.lines.get(line_number).trim();
@@ -1361,7 +1368,7 @@ public class Makelangelo
 	
 	/**
 	 * stop sending file commands to the robot.
-	 * @todo add an e-stop command?
+	 * TODO add an e-stop command?
 	 */
 	public void Halt() {
 		running=false;
@@ -1481,7 +1488,7 @@ public class Makelangelo
 					RaisePen();
 					buttonPause.setText(MultilingualSupport.getSingleton().get("Pause"));
 					paused=false;
-					// @TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
+					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					SendFileCommand();
 				} else {
 					if(!penIsUpBeforePause) LowerPen();
@@ -1502,6 +1509,10 @@ public class Makelangelo
 		}
 		if( subject == buttonDisconnect ) {
 			ClosePort();
+			return;
+		}
+		if( subject == buttonLoadMachineConfig ) {
+			LoadMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustSounds ) {
@@ -1561,7 +1572,7 @@ public class Makelangelo
 		}
 		
 		if( subject == buttonExit ) {
-			System.exit(0);  // @TODO: be more graceful?
+			System.exit(0);  // TODO: be more graceful?
 			return;
 		}
 		
@@ -1585,6 +1596,32 @@ public class Makelangelo
 			commandLineText.setText("");
 		}
 	}
+	
+	
+	/**
+	 * Load a known machine configuration.
+	 * Only available if the software is not currently connected to a machine.
+	 * 
+	 */
+	public void LoadMachineConfig() {
+		long old_uid = MachineConfiguration.getSingleton().GetUID();
+		
+		MachineConfiguration.getSingleton().ChooseNewConfig();
+		
+		long new_uid = MachineConfiguration.getSingleton().GetUID();
+		if(old_uid != new_uid) {
+			// Force update of graphics layout.
+			previewPane.updateMachineConfig();
+			previewPane.ZoomToFitPaper();
+			// update window title
+			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
+					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
+					+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
+			// TODO offer to regenerate image?
+			
+		}
+	}
+	
 	
 	// Deal with something robot has sent.
 	public void serialEvent(SerialPortEvent events) {
@@ -1968,6 +2005,15 @@ public class Makelangelo
         menu.setMnemonic(KeyEvent.VK_T);
         menu.setEnabled(!running);
 
+        if(MachineConfiguration.getSingleton().GetMachineCount() > 1) {
+	        buttonLoadMachineConfig = new JMenuItem(MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"));
+	        buttonLoadMachineConfig.addActionListener(this);
+	        buttonLoadMachineConfig.setEnabled(!portOpened);
+	        menu.add(buttonLoadMachineConfig);
+	        
+	        menu.addSeparator();
+        }
+        
         buttonAdjustMachineSize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSettingsMachine"),KeyEvent.VK_L);
         buttonAdjustMachineSize.addActionListener(this);
         buttonAdjustMachineSize.setEnabled(!running);

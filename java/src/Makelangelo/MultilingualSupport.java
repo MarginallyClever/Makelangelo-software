@@ -39,8 +39,7 @@ public class MultilingualSupport {
 			prefs.putBoolean("first time", false);
 		}
 		
-		//if(prefs.getBoolean("first time", true))
-		{
+		if(prefs.getBoolean("first time", true)) {
 			ChooseLanguage();
 			prefs.putBoolean("first time", false);
 		}
@@ -58,7 +57,7 @@ public class MultilingualSupport {
 	
 	// display a dialog box of available languages and let the user select their preference.
 	public void ChooseLanguage() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Language",true);
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),":) ?",true);
 		driver.setLayout(new GridBagLayout());
 
 		final String [] choices = new String[languages.keySet().size()];
@@ -79,7 +78,7 @@ public class MultilingualSupport {
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
-				// @TODO prevent "close" icon.  Must press save to continue!
+				// TODO prevent "close" icon.  Must press save to continue!
 				if(subject == save) {
 					currentLanguage = choices[language_options.getSelectedIndex()];
 					SaveConfig();

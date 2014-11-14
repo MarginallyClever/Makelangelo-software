@@ -33,7 +33,7 @@ public class MachineConfiguration {
 	
 	static final String CURRENT_VERSION = "1";
 	// GUID
-	public long robot_uid=0;
+	protected long robot_uid=0;
 	
 	// machine physical limits
 	public double limit_top=18*2.45;
@@ -66,8 +66,11 @@ public class MachineConfiguration {
 	// top left, bottom center, etc...
 	private int startingPositionIndex;
 	
+	// TODO a way for users to create different tools for each machine 
 	protected DrawingTool tools[];
 	protected int current_tool=0;	
+	
+	protected String [] configurations_available = null;
 	
 	// singleton
 	private static MachineConfiguration singletonObject;
@@ -91,6 +94,17 @@ public class MachineConfiguration {
 		tools[i++]=new DrawingTool_Spraypaint();
 		
 		VersionCheck();
+		
+		// which configurations are available?
+		try {
+			configurations_available = prefs.node("Machines").childrenNames();
+		}
+		catch(Exception e) {
+			configurations_available = new String[0];
+		}
+		
+		// TODO load most recent config?
+		LoadConfig(0);
 	}
 	
 	/**
@@ -445,8 +459,10 @@ public class MachineConfiguration {
 	
 	
 	// Load the machine configuration
-	void LoadConfig() {
-		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
+	protected void LoadConfig(long uid) {
+		robot_uid = uid;
+		
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(uid));
 		limit_top = Double.valueOf(prefs2.get("limit_top", "45.72"));
 		limit_bottom = Double.valueOf(prefs2.get("limit_bottom", "-45.72"));
 		limit_left = Double.valueOf(prefs2.get("limit_left", "-45.72"));
@@ -489,7 +505,7 @@ public class MachineConfiguration {
 		prefs2.put("reverseForGlass",Boolean.toString(reverseForGlass));
 		prefs2.put("current_tool", Integer.toString(current_tool));
 		
-		// TODO: save each tool's settings
+		// TODO save each tool's settings
 		for(int i=0;i<tools.length;++i) {
 			tools[i].SaveConfig(prefs2);
 		}
@@ -548,20 +564,22 @@ public class MachineConfiguration {
 		
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
+		long new_uid=0;
 		if(lines.length>0) {
 			try {
-				robot_uid = Long.parseLong(lines[0]);
+				new_uid = Long.parseLong(lines[0]);
 			}
 			catch(NumberFormatException e) {}
 		}
 		
 		// new robots have UID=0
-		if(robot_uid==0) {
-			GetNewRobotUID();
+		if(new_uid==0) {
+			new_uid=GetNewRobotUID();
 		}
 		
 		// load machine specific config
-		LoadConfig();
+		LoadConfig(new_uid);
+		
 		if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
 			// probably first time turning on, adjust the machine size
 			AdjustMachineSize();
@@ -571,24 +589,78 @@ public class MachineConfiguration {
 	/**
 	 * based on http://www.exampledepot.com/egs/java.net/Post.html
 	 */
-	private void GetNewRobotUID() {
+	private long GetNewRobotUID() {
+		long new_uid=0;
 		try {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
 		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		    String line = rd.readLine();
-		    robot_uid = Long.parseLong(line);
+		    new_uid = Long.parseLong(line);
 		    rd.close();
 		} catch (Exception e) {}
 
 		// did read go ok?
-		if(robot_uid!=0) {
+		if(new_uid!=0) {
 			// make sure a prefs node is created
-			prefs.node("Machines").node(Long.toString(robot_uid));
+			prefs.node("Machines").node(Long.toString(new_uid));
 			// tell the robot it's new UID.
-			Makelangelo.getSingleton().SendLineToRobot("UID "+robot_uid);
+			Makelangelo.getSingleton().SendLineToRobot("UID "+new_uid);
+
+			// if this is a new robot UID, update the list of available configurations
+			String [] new_list = new String[configurations_available.length+1];
+			for(int i=0;i<configurations_available.length;++i) {
+				new_list[i] = configurations_available[i];
+			}
+			new_list[configurations_available.length] = Long.toString(new_uid);
 		}
+		return new_uid;
+	}
+	
+	public int GetMachineCount() {
+		return configurations_available.length;
+	}
+	
+	// must only be called when there is already more than the default configutation (uid=0) 
+	public void ChooseNewConfig() {
+		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"),true);
+		driver.setLayout(new GridBagLayout());
+
+		assert(configurations_available.length>1);
+		final String [] choices = new String[configurations_available.length-1];
+
+		int j=0;
+		for(int i=0;i<configurations_available.length;++i) {
+			if(configurations_available[i].equals("0")) continue;
+			choices[j++] = configurations_available[i];
+		}
+		
+		final JComboBox<String> language_options = new JComboBox<String>(choices);
+		
+		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Load"));
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				// TODO prevent "close" icon.  Must press save to continue!
+				if(subject == save) {
+					long new_uid = Long.parseLong( choices[language_options.getSelectedIndex()] );
+					LoadConfig(new_uid);
+					GetRecentPaperSize();
+					driver.dispose();
+				}
+			}
+		};
+
+		save.addActionListener(driveButtons);
+
+		driver.pack();
+		driver.setVisible(true);
 	}
 	
 	public double GetPaperWidth() {

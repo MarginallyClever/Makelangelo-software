@@ -16,6 +16,11 @@
 		<hint>used in many places</hint>
 	</string>
 	<string>
+		<key>Load</key>
+		<value>Load</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
 		<key>CouldNotFind</key>
 		<value>Could not find </value>
 		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
@@ -461,6 +466,12 @@
 	<string>
 		<key>MenuDisconnect</key>
 		<value>Disconnect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuLoadMachineConfig</key>
+		<value>Load settings for...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
