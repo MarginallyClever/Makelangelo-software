@@ -33,6 +33,11 @@ public class MultilingualSupport {
 	protected MultilingualSupport() {
 		LoadLanguages();
 		LoadConfig();
+
+		// Did the language file disappear?  Offer the language dialog.
+		if(!languages.keySet().contains(currentLanguage)) {
+			prefs.putBoolean("first time", false);
+		}
 		
 		//if(prefs.getBoolean("first time", true))
 		{
@@ -74,6 +79,7 @@ public class MultilingualSupport {
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
+				// @TODO prevent "close" icon.  Must press save to continue!
 				if(subject == save) {
 					currentLanguage = choices[language_options.getSelectedIndex()];
 					SaveConfig();
@@ -90,12 +96,21 @@ public class MultilingualSupport {
 	
 	public void LoadLanguages() {
 		// Scan folder for language files
-        String workingDirectory=System.getProperty("user.dir")+"/languages";
+        String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
         System.out.println(workingDirectory);
 		File f = new File(workingDirectory);
 		LanguageContainer lang;
-		
+
 		File [] all_files = f.listFiles();
+		try {
+			if(all_files.length<=0) {
+				throw new Exception("No language files found!");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		for(int i=0;i<all_files.length;++i) {
 			if(all_files[i].isHidden()) continue;
 			if(all_files[i].isDirectory()) continue;
