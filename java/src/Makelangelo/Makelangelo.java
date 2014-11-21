@@ -64,9 +64,9 @@ import DrawingTools.DrawingTool;
 import Filters.*;
 
 
-// TODO while not drawing, in-app gcode editing with immediate visual feedback 
-// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing
-// TODO vector output
+// TODO while not drawing, in-app gcode editing with immediate visual feedback ?
+// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
+// TODO vector output ?
 
 public class Makelangelo
 		extends JPanel
@@ -76,7 +76,7 @@ public class Makelangelo
 	static final long serialVersionUID=1L;
 
 	// software version
-	static final String version="4";
+	static final String version="5";
 	
 	private static Makelangelo singletonObject;
 	

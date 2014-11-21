@@ -161,8 +161,8 @@ public class Filter {
 	 */
 	protected void SetupTransform() {
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		// TODO I don't remember why these * 20 are needed here.  Find out and comment the code.
-		SetupTransform( (int)mc.GetPaperWidth()*20, (int)mc.GetPaperHeight()*20 );
+		// 10mm = 1cm.  letters should be 1cm tall.
+		SetupTransform( (int)mc.GetPaperWidth()*10, (int)mc.GetPaperHeight()*10 );
 	}
 	
 	protected void SetupTransform(int width,int height) {
@@ -173,7 +173,7 @@ public class Filter {
 		
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		
-		scale=10f;
+		scale=10f;  // 10mm = 1cm
 
 		int new_width = image_width;
 		int new_height = image_height;
@@ -502,7 +502,7 @@ public class Filter {
 			String name;
 
 			// find the file that goes with this character
-			// TODO load these from an XML description
+			// TODO load these from an XML description?
 			if('a'<= letter && letter <= 'z') {
 				name="SMALL_" + Character.toUpperCase(letter);
 			} else {
@@ -602,9 +602,22 @@ public class Filter {
 	protected void SignName(OutputStreamWriter out) throws IOException {
 		TextSetAlign(Align.RIGHT);
 		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(image_width, image_height);
+		TextSetPosition(TX(image_width)*2, -TY(image_height)*2);
+		
+		TextSetCharsPerLine(25);
+		float xx=w2;
+		float yy=h2;
+		h2=0;
+		w2=0;
+		
+		float old_scale = scale;
+		scale=0.5f;
+
 		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
+		h2=yy;
+		w2=xx;
+		scale = old_scale;
 	}
 }
 

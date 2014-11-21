@@ -1,0 +1,572 @@
+<?xml version="1.0"?>
+<language>
+	<meta>
+		<name>English</name>
+		<author>Dan Royer (dan@marginallyclever.com)</author>
+	</meta>
+	
+	<string>
+		<key>Cancel</key>
+		<value>Cancel</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Save</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Load</key>
+		<value>Load</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>CouldNotFind</key>
+		<value>Could not find </value>
+		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>MachineWidth</key>
+		<value>Machine width</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>MachineHeight</key>
+		<value>Machine height</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperWidth</key>
+		<value>Paper width</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperHeight</key>
+		<value>Paper height</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertLeft</key>
+		<value>Invert left</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertRight</key>
+		<value>Invert right</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>ToolType</key>
+		<value>Tool type</value>
+		<hint>tool settings</hint>
+	</string>
+	<string>
+		<key>AdjustPulleySize</key>
+		<value>Adjust pulley size</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>Left</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>Right</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Diameter</key>
+		<value>Diameter</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Millimeters</key>
+		<value>mm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConnectingTo</key>
+		<value>Connecting to </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortNotConfigured</key>
+		<value>Port could not be configured: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortOpened</key>
+		<value>Port opened.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>TitlePrefix</key>
+		<value>Makelangelo #</value>
+		<hint>window title</hint>
+	</string>
+	<string>
+		<key>TitlePostfix</key>
+		<value> connected</value>
+		<hint>window title</hint>
+	</string>
+
+	<string>
+		<key>LineSegments</key>
+		<value> line segments.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>Centimeters</key>
+		<value>cm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>EstimatedTime</key>
+		<value>Estimated draw time: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>FileNotOpened</key>
+		<value>File could not be opened: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionOptions</key>
+		<value>Conversion options</value>
+		<hint>dialog title</hint>
+	</string>
+	<string>
+		<key>FlipForGlass</key>
+		<value>Flip for glass</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>Cancel</key>
+		<value>Cancel</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Start</key>
+		<value>Start</value>
+		<hint>As in "start drawing"</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Save</value>
+		<hint>used in many places</hint>
+	</string>
+
+	<string>
+		<key>PaperMargin</key>
+		<value>Margin at paper edge (%)</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>Converting</key>
+		<value>Converting</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Finished</key>
+		<value>Completed</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Cancelled</key>
+		<value>Cancelled</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Failed</key>
+		<value>Failed: </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionStyle</key>
+		<value>Conversion style</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>OpeningFile</key>
+		<value>Opening </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>UnknownFileType</key>
+		<value>Unknown file type</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>SetPaperSize</key>
+		<value>Please set a paper size before importing an image.</value>
+		<hint>warning message</hint>
+	</string>
+
+	<string>
+		<key>FileTypeGCode</key>
+		<value>GCODE (ngc)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeImage</key>
+		<value>Image (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuSoundsTitle</key>
+		<value>Sounds</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSoundsConnect</key>
+		<value>Connect</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsDisconnect</key>
+		<value>Disconnect</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishConvert</key>
+		<value>Finish converting</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishDraw</key>
+		<value>Finish drawing</value>
+		<hint>sound settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuGraphicsTitle</key>
+		<value>Graphics</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsPenUp</key>
+		<value>Show pen up moves</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsAntialias</key>
+		<value>Antialias lines</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsSpeedVSQuality</key>
+		<value>Speed over quality</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsDrawWhileRunning</key>
+		<value>Show entire image while drawing</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuLanguageTitle</key>
+		<value>Language</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>InvalidTool</key>
+		<value>Requested invalid tool #</value>
+		<hint>warning message</hint>
+	</string>
+	<string>
+		<key>ChangeToolPrefix</key>
+		<value>Please prepare </value>
+		<hint>tool change prompt.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>ChangeToolPostfix</key>
+		<value> and click any button to continue.</value>
+		<hint>tool change prompt.  keep the space at the start.</hint>
+	</string>
+
+	<string>
+		<key>StartAt</key>
+		<value>Start at</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>StartAtLine</key>
+		<value>Start at line #</value>
+		<hint>start at dialog</hint>
+	</string>
+
+	<string>
+		<key>Pause</key>
+		<value>Pause</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Unpause</key>
+		<value>Unpause</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>SetHome</key>
+		<value>SET HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>GoHome</key>
+		<value>GO HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Top</key>
+		<value>TOP</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Bottom</key>
+		<value>BOTTOM</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>LEFT</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>RIGHT</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenUp</key>
+		<value>PEN UP</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenDown</key>
+		<value>PEN DOWN</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Set</key>
+		<value>Set</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Speed</key>
+		<value>Speed:</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Rate</key>
+		<value>steps/min</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>JogMotors</key>
+		<value>Jog Motors</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>JogIn</key>
+		<value>IN</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogOut</key>
+		<value>OUT</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>Invert</key>
+		<value>Invert</value>
+		<hint>jog motors dialog</hint>
+	</string>
+
+	<string>
+		<key>UpdateNotice</key>
+		<value>A new version of this software is available.\nPlease visit http://makelangelo.com/ to get the new hotness.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpToDate</key>
+		<value>This software is up to date.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpdateCheckFailed</key>
+		<value>Sorry, I failed.  Please visit http://www.marginallyclever.com/ to check yourself.</value>
+		<hint>check for update dialog</hint>
+	</string>
+
+	<string>
+		<key>Send</key>
+		<value>Send</value>
+		<hint>drive manually dialog</hint>
+	</string>
+	<string>
+		<key>TitleNotConnected</key>
+		<value> not connected</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuMakelangelo</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuPreferences</key>
+		<value>Preferences</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuUpdate</key>
+		<value>Check for updates</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAbout</key>
+		<value>About</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuQuit</key>
+		<value>Quit</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuConnect</key>
+		<value>Connect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuRescan</key>
+		<value>Rescan</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuDisconnect</key>
+		<value>Disconnect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuLoadMachineConfig</key>
+		<value>Load settings for...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSettings</key>
+		<value>Settings</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSettingsMachine</key>
+		<value>Adjust machine &amp; paper size</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustPulleys</key>
+		<value>Adjust pulley size</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuJogMotors</key>
+		<value>Jog Motors</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSelectTool</key>
+		<value>Select active tool</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustTool</key>
+		<value>Adjust active tool</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuGCODE</key>
+		<value>GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuHilbertCurve</key>
+		<value>Hilbert Curve</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuTextToGCODE</key>
+		<value>Text to GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuConvertImage</key>
+		<value>Convert Image</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuOpenFile</key>
+		<value>Open File...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSaveGCODEAs</key>
+		<value>Save GCODE as...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuDraw</key>
+		<value>Draw</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Halt</key>
+		<value>Halt</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuPreview</key>
+		<value>Preview</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomIn</key>
+		<value>Zoom +</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomOut</key>
+		<value>Zoom -</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomFit</key>
+		<value>Zoom to fit</value>
+		<hint>menu or dialog title</hint>
+	</string>
+</language>

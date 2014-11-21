@@ -56,7 +56,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 					lastMessage = text.getText();
 					CreateMessage(lastMessage,dest2);
 					
-					// TODO Move to GUI
+					// TODO Move to GUI?
 					Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
 					Makelangelo.getSingleton().PlayConversionFinishedSound();
 					Makelangelo.getSingleton().LoadGCode(dest2);
