@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <language>
 	<meta>
 		<name>Italiano</name>
@@ -567,4 +567,10 @@
 		<value>Zoom a schermo intero</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
+    <string>
+        <key>mmNotice</key>
+        <value>Tutti i valori sono in mm.</value>
+		<hint>Adjust machine size</hint>
+    </string>
 </language>

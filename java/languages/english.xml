@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <language>
 	<meta>
 		<name>English</name>
@@ -573,5 +573,37 @@
 		<key>mmNotice</key>
 		<value>All values in mm.</value>
 		<hint>Adjust machine size</hint>
+	</string>
+
+
+	<string>
+		<key>penToolDiameter</key>
+		<value>Diameter</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolMaxFeedRate</key>
+		<value>Max feed rate</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolUp</key>
+		<value>Up</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolDown</key>
+		<value>Down</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolLiftSpeed</key>
+		<value>Lift speed</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolTest</key>
+		<value>Test</value>
+		<hint>Adjust pen tool</hint>
 	</string>
 </language>

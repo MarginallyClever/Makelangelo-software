@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
 import Makelangelo.Makelangelo;
+import Makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_Pen extends DrawingTool {
@@ -48,10 +49,10 @@ public class DrawingTool_Pen extends DrawingTool {
 		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
 		final JTextField penDown = new JTextField(Float.toString(z_on),5);
 		final JTextField penZRate = new JTextField(Float.toString(z_rate),5);
-		final JButton buttonTestUp = new JButton("Test");
-		final JButton buttonTestDown = new JButton("Test");
-		final JButton buttonSave = new JButton("Save");
-		final JButton buttonCancel = new JButton("Cancel");
+		final JButton buttonTestUp = new JButton(MultilingualSupport.getSingleton().get("penToolTest"));
+		final JButton buttonTestDown = new JButton(MultilingualSupport.getSingleton().get("penToolTest"));
+		final JButton buttonSave = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton buttonCancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
 	
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
@@ -63,25 +64,25 @@ public class DrawingTool_Pen extends DrawingTool {
 		d.weightx=50;
 		int y=0;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Diameter"),c);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("penToolDiameter")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penDiameter,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Max feed rate"),c);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("penToolMaxFeedRate")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penFeedRate,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Up"),c);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("penToolUp")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penUp,d);
 		d.gridx=2;	d.gridy=y;	driver.add(buttonTestUp,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Down"),c);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("penToolDown")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penDown,d);
 		d.gridx=2;	d.gridy=y;	driver.add(buttonTestDown,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("lift speed"),c);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("penToolLiftSpeed")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(penZRate,d);
 		++y;
 	
