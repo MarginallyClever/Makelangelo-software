@@ -1525,6 +1525,7 @@ public class Makelangelo
 		}
 		if( subject == buttonAdjustLanguage ) {
 			MultilingualSupport.getSingleton().ChooseLanguage();
+			UpdateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
 			MachineConfiguration.getSingleton().AdjustMachineSize();

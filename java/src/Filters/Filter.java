@@ -600,18 +600,21 @@ public class Filter {
 	}
 	
 	protected void SignName(OutputStreamWriter out) throws IOException {
+		float desired_scale=0.5f;  // changes the size of the font.  large number = larger font
+		
 		TextSetAlign(Align.RIGHT);
 		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(TX(image_width)*2, -TY(image_height)*2);
-		
-		TextSetCharsPerLine(25);
+		TextSetPosition(TX(image_width)*(1.0f/desired_scale), 
+				       -TY(image_height)*(1.0f/desired_scale));
+
 		float xx=w2;
 		float yy=h2;
+		float old_scale = scale;
 		h2=0;
 		w2=0;
+		scale=desired_scale;
 		
-		float old_scale = scale;
-		scale=0.5f;
+		TextSetCharsPerLine(25);
 
 		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);

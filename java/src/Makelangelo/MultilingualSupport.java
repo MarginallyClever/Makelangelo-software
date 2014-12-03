@@ -16,7 +16,7 @@ import javax.swing.JDialog;
 
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
-	protected String currentLanguage="english";
+	protected String currentLanguage="English";
 	Map<String,LanguageContainer> languages = new HashMap<String,LanguageContainer>();
 	
 	private Preferences prefs = Preferences.userRoot().node("Language");
@@ -51,7 +51,7 @@ public class MultilingualSupport {
 	}
 	
 	private void LoadConfig() {
-		currentLanguage = prefs.get("language", "english");
+		currentLanguage = prefs.get("language", "English");
 	}
 
 	
@@ -60,15 +60,8 @@ public class MultilingualSupport {
 		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),":) ?",true);
 		driver.setLayout(new GridBagLayout());
 
-		final String [] choices = new String[languages.keySet().size()];
-		Object[] lang_keys = languages.keySet().toArray();
-		
-		for(int i=0;i<lang_keys.length;++i) {
-			choices[i] = (String)lang_keys[i];
-		}
-		
+		final String [] choices = getLanguageList();
 		final JComboBox<String> language_options = new JComboBox<String>(choices);
-		
 		final JButton save = new JButton(">>>");
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -113,6 +106,10 @@ public class MultilingualSupport {
 		for(int i=0;i<all_files.length;++i) {
 			if(all_files[i].isHidden()) continue;
 			if(all_files[i].isDirectory()) continue;
+			// get extension
+			int j = all_files[i].getPath().lastIndexOf('.');
+			if (j <= 0) continue;  // no extension
+			if(all_files[i].getPath().substring(j+1).toLowerCase().equals("xml")==false) continue;  // only .XML or .xml files
 			lang = new LanguageContainer();
 			lang.Load(all_files[i].getAbsolutePath());
 			languages.put(lang.getName(), lang);
@@ -128,5 +125,16 @@ public class MultilingualSupport {
 			e.printStackTrace();
 		}
 		return value;
+	}
+	
+	protected String [] getLanguageList() {
+		final String [] choices = new String[languages.keySet().size()];
+		Object[] lang_keys = languages.keySet().toArray();
+		
+		for(int i=0;i<lang_keys.length;++i) {
+			choices[i] = (String)lang_keys[i];
+		}
+		
+		return choices;
 	}
 }

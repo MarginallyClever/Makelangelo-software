@@ -154,7 +154,7 @@ public class MachineConfiguration {
 		
 		c.gridheight=1; c.gridwidth=1; 
 		c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
-		driver.add(new JLabel("All values in mm."),c);
+		driver.add(new JLabel(MultilingualSupport.getSingleton().get("mmNotice")),c);
 		c.gridwidth=1;
 		y++;
 
