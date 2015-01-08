@@ -110,11 +110,7 @@ public class Makelangelo
 	private String[] recentFiles;
 	private String recentPort;
 	//private boolean allowMetrics=true;
-	
-	// Metrics?
-	PublishImage reportImage = new PublishImage();
-	DistanceMetric reportDistance = new DistanceMetric();
-	
+		
 	// machine settings while running
 	private double feed_rate;
 	private boolean penIsUp,penIsUpBeforePause;
@@ -436,28 +432,24 @@ public class Makelangelo
 	 */
 	public boolean ConfirmPort() {
 		if(portConfirmed==true) return true;
-		if(serial_recv_buffer.lastIndexOf(hello) >= 0) {
-			portConfirmed=true;
-			
-			String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
-			MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
-			
-			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
-					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
-					+ MultilingualSupport.getSingleton().get("TitlePostfix"));
+		if(serial_recv_buffer.lastIndexOf(hello) < 0) return false;
+		
+		portConfirmed=true;
+		
+		String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
+		MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
+		
+		mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
+				+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
+				+ MultilingualSupport.getSingleton().get("TitlePostfix"));
 
-			// did read go ok?
-			if(MachineConfiguration.getSingleton().robot_uid!=0) {
-				reportDistance.SetUID(MachineConfiguration.getSingleton().robot_uid);
-			}
+		SendConfig();
+		previewPane.updateMachineConfig();
 
-			SendConfig();
-			previewPane.updateMachineConfig();
+		UpdateMenuBar();
+		previewPane.setConnected(true);
 
-			UpdateMenuBar();
-			previewPane.setConnected(true);
-		}
-		return portConfirmed;
+		return true;
 	}
 	
 	// find all available serial ports for the settings->ports menu.
@@ -1282,7 +1274,23 @@ public class Makelangelo
 			// end of file
 			PlayDawingFinishedSound();
 			Halt();
+			SayHooray();
 		}
+	}
+	
+	
+	private void SayHooray() {
+		long num_lines = gcode.linesProcessed;
+		
+		JOptionPane.showMessageDialog(null,
+				MultilingualSupport.getSingleton().get("Finished") +
+				num_lines +
+				MultilingualSupport.getSingleton().get("LineSegments") + 
+				"\n" +
+				statusBar.GetElapsed() +
+				"\n" +
+				MultilingualSupport.getSingleton().get("SharePromo")
+				);
 	}
 	
 	
