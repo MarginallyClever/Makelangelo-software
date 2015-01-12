@@ -297,7 +297,6 @@ public class MachineConfiguration {
 						m1invert = m1i.isSelected();
 						m2invert = m2i.isSelected();
 						
-						SetRecentPaperSize();
 						SaveConfig();
 						Makelangelo.getSingleton().SendConfig();
 						driver.dispose();
@@ -462,7 +461,36 @@ public class MachineConfiguration {
 	protected void LoadConfig(long uid) {
 		robot_uid = uid;
 		
-		Preferences prefs2 = prefs.node("Machines").node(Long.toString(uid));
+		if( GetCanUseCloud() && LoadConfigFromCloud() ) return;
+		LoadConfigFromLocal();
+	}
+	
+	
+	protected boolean LoadConfigFromCloud() {
+		// Ask for credentials: MC login, password.  auto-remember login name.
+		String login = new String();
+		String password = new String();
+		// TODO finish this section
+
+		/*
+		try {
+		    // Send query
+			URL url = new URL("https://marginallyclever.com/drawbot_getmachineconfig.php?name="+login+"pass="+password+"&id="+robot_uid);
+		    URLConnection conn = url.openConnection();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    // read data
+			// TODO finish this section
+    
+		    // close connection
+		    rd.close();
+		} catch (Exception e) {}
+		*/
+		return false;
+	}
+	
+	
+	protected void LoadConfigFromLocal() {
+		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
 		limit_top = Double.valueOf(prefs2.get("limit_top", "45.72"));
 		limit_bottom = Double.valueOf(prefs2.get("limit_bottom", "-45.72"));
 		limit_left = Double.valueOf(prefs2.get("limit_left", "-45.72"));
@@ -473,22 +501,48 @@ public class MachineConfiguration {
 		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", "3.0"));
 		default_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs2.get("startingPosIndex","4"));
-		// TODO move these values to image filter preferences
-		paper_margin = Double.valueOf(prefs2.get("paper_margin","0.85"));
-		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass","false"));
-		current_tool = Integer.parseInt(prefs2.get("current_tool","0"),10);
+
+		paper_left=Double.parseDouble(prefs2.get("paper_left","-10.5"));
+		paper_right=Double.parseDouble(prefs2.get("paper_right","10.5"));
+		paper_top=Double.parseDouble(prefs2.get("paper_top","14.85"));
+		paper_bottom=Double.parseDouble(prefs2.get("paper_bottom","-14.85"));
 		
 		// load each tool's settings
 		for(int i=0;i<tools.length;++i) {
 			tools[i].LoadConfig(prefs2);
 		}
 
-		GetRecentPaperSize();
+		// TODO move these values to image filter preferences
+		paper_margin = Double.valueOf(prefs2.get("paper_margin","0.85"));
+		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass","false"));
+		current_tool = Integer.parseInt(prefs2.get("current_tool","0"),10);
 	}
 
 	
 	// Save the machine configuration
 	public void SaveConfig() {
+		if(GetCanUseCloud() && SaveConfigToCloud() ) return;
+		SaveConfigToLocal();
+	}
+	
+	
+	public boolean GetCanUseCloud() {
+		return prefs.getBoolean("can_use_cloud", false);
+	}
+
+	
+	public void SetCanUseCloud(boolean b) {
+		prefs.putBoolean("can_use_cloud", b);
+	}
+
+	
+	protected boolean SaveConfigToCloud() {
+		// TODO finish this section
+		return false;
+	}
+	
+	
+	protected void SaveConfigToLocal() {
 		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
 		prefs2.put("limit_top", Double.toString(limit_top));
 		prefs2.put("limit_bottom", Double.toString(limit_bottom));
@@ -500,17 +554,22 @@ public class MachineConfiguration {
 		prefs2.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
 		prefs2.put("feed_rate", Double.toString(default_feed_rate));
 		prefs2.put("startingPosIndex", Integer.toString(startingPositionIndex));
+
+		prefs2.putDouble("paper_left", paper_left);
+		prefs2.putDouble("paper_right", paper_right);
+		prefs2.putDouble("paper_top", paper_top);
+		prefs2.putDouble("paper_bottom", paper_bottom);
+
+		// save each tool's settings
+		for(int i=0;i<tools.length;++i) {
+			tools[i].SaveConfig(prefs2);
+		}
+
 		// TODO move these values to image filter preferences
 		prefs2.put("paper_margin", Double.toString(paper_margin));
 		prefs2.put("reverseForGlass",Boolean.toString(reverseForGlass));
 		prefs2.put("current_tool", Integer.toString(current_tool));
-		
-		// TODO save each tool's settings
-		for(int i=0;i<tools.length;++i) {
-			tools[i].SaveConfig(prefs2);
-		}
-		
-		SetRecentPaperSize();
+
 	}
 
 
@@ -536,23 +595,6 @@ public class MachineConfiguration {
 	
 	public String getPenDownString() {
 		return Float.toString(tools[current_tool].GetZOn());
-	}
-	
-	// save paper limits
-	private void SetRecentPaperSize() {
-		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
-		prefs2.putDouble("paper_left", paper_left);
-		prefs2.putDouble("paper_right", paper_right);
-		prefs2.putDouble("paper_top", paper_top);
-		prefs2.putDouble("paper_bottom", paper_bottom);
-	}
-	
-	private void GetRecentPaperSize() {
-		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
-		paper_left=Double.parseDouble(prefs2.get("paper_left","-10.5"));
-		paper_right=Double.parseDouble(prefs2.get("paper_right","10.5"));
-		paper_top=Double.parseDouble(prefs2.get("paper_top","14.85"));
-		paper_bottom=Double.parseDouble(prefs2.get("paper_bottom","-14.85"));
 	}
 	
 	public boolean IsPaperConfigured() {
@@ -651,7 +693,6 @@ public class MachineConfiguration {
 				if(subject == save) {
 					long new_uid = Long.parseLong( choices[language_options.getSelectedIndex()] );
 					LoadConfig(new_uid);
-					GetRecentPaperSize();
 					driver.dispose();
 				}
 			}

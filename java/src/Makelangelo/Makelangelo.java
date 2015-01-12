@@ -76,7 +76,7 @@ public class Makelangelo
 	static final long serialVersionUID=1L;
 
 	// software version
-	static final String version="5";
+	static final String version="6";
 	
 	private static Makelangelo singletonObject;
 	
