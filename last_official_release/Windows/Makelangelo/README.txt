@@ -1,7 +1,9 @@
 Makelangelo for Windows Help
 ============================
 
-Last updated: 2014-04-24
+Software version 6 for Makelangelo hardware version 2.5 and 3.0
+
+last updated 2015-01-12
 
 Start
 -----
@@ -21,4 +23,6 @@ If that doesn't work, please use our forums for more help.
 
 More help
 ---------
-Please join the conversation at https://www.marginallyclever.com/forums/
+Read all the how-to instructions: http://learn.marginallyclever.com
+
+Support forums: https://www.marginallyclever.com/forums/
