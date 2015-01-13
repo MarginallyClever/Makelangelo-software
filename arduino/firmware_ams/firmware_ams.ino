@@ -69,7 +69,9 @@
 #define MAX_BUF         (64)
 
 // servo pin differs based on device
-#define SERVO_PIN       (10)
+#define SERVO_PIN1      (10)
+#define SERVO_PIN2      (9)
+#define SERVO_PIN       SERVO_PIN1  // switch if you want to use the other pin.  Thanks, Aleksey!
 
 #define TIMEOUT_OK      (1000)  // 1/4 with no instruction?  Make sure PC knows we are waiting.
 
