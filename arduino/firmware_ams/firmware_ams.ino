@@ -1023,7 +1023,7 @@ void setup() {
   // initialize the plotter position.
   teleport(0,0);
   velx=0;
-  velx=0;
+  vely=0;
   setPenAngle(PEN_UP_ANGLE);
   
   // display the help at startup.
