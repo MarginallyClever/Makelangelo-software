@@ -472,14 +472,14 @@ void tool_change(int tool_id) {
  * @input val the return value if /code/ is not found.
  **/
 float parsenumber(char code,float val) {
-  char *ptr=buffer;
-  while(ptr && *ptr && ptr<buffer+sofar) {
-    if(*ptr==code) {
-      return atof(ptr+1);
+  char *ptr=buffer;  // start at the beginning of buffer
+  while(ptr && *ptr && ptr<buffer+sofar) {  // walk to the end
+    if(*ptr==code) {  // if you find code on your walk,
+      return atof(ptr+1);  // convert the digits that follow into a float and return it
     }
-    ptr=strchr(ptr,' ')+1;
+    ptr=strchr(ptr,' ')+1;  // take a step from here to the letter after the next space
   }
-  return val;
+  return val;  // end reached, nothing found, return default val.
 }
 
 
