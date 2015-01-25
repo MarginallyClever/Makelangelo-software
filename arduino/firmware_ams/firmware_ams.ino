@@ -12,6 +12,8 @@
 #define MOTHERBOARD 1  // Adafruit Motor Shield 1
 //#define MOTHERBOARD 2  // Adafruit Motor Shield 2
 
+//#define COREXY (1)  // uncomment this if you're using a CoreXY system
+
 // Increase this number to see more output
 #define VERBOSE         (0)
 
@@ -295,6 +297,10 @@ static void setPenAngle(int pen_angle) {
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(float x, float y, long &l1, long &l2) {
+#ifdef COREXY
+  l1 = floor((x+y) / THREADPERSTEP1);
+  l2 = floor((x-y) / THREADPERSTEP2);
+#else
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
@@ -302,6 +308,7 @@ static void IK(float x, float y, long &l1, long &l2) {
   // find length to M2
   dx = limit_right - x;
   l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
+#endif
 }
 
 
@@ -310,6 +317,13 @@ static void IK(float x, float y, long &l1, long &l2) {
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(float l1, float l2,float &x,float &y) {
+#ifdef COREXY
+  l1 *= THREADPERSTEP1;
+  l2 *= THREADPERSTEP2;
+
+  x = (float)( l1 + l2 ) / 2.0;
+  y = x - (float)l2;
+#else
   float a = l1 * THREADPERSTEP1;
   float b = (limit_right-limit_left);
   float c = l2 * THREADPERSTEP2;
@@ -323,6 +337,7 @@ static void FK(float l1, float l2,float &x,float &y) {
   float i=(a*a+b*b-c*c)/(2.0*a*b);
   x = i * l1 + limit_left;
   y = sqrt(1.0 - i*i)*l1 + limit_top;
+#endif
 }
 
 
