@@ -324,19 +324,22 @@ static void FK(float l1, float l2,float &x,float &y) {
   x = (float)( l1 + l2 ) / 2.0;
   y = x - (float)l2;
 #else
-  float a = l1 * THREADPERSTEP1;
+  float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
-  float c = l2 * THREADPERSTEP2;
+  float c = (float)l2 * THREAD_PER_STEP;
   
   // slow, uses trig
-  //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
+  // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
+  // or cc - aa - bb = -2ab * cos( theta )
+  // or ( aa + bb - cc ) / ( 2ab ) = cos( theta );
+  // or theta = acos((aa+bb-cc)/(2ab));
   //x = cos(theta)*l1 + limit_left;
   //y = sin(theta)*l1 + limit_top;
-  // but we know that cos(acos(i)) = i
+  // and we know that cos(acos(i)) = i
   // and we know that sin(acos(i)) = sqrt(1-i*i)
-  float i=(a*a+b*b-c*c)/(2.0*a*b);
-  x = i * l1 + limit_left;
-  y = sqrt(1.0 - i*i)*l1 + limit_top;
+  float theta = ((a*a+b*b-c*c)/(2.0*a*b));
+  x = theta * a + limit_left;
+  y = limit_top - (sqrt( 1.0 - theta * theta ) * a);
 #endif
 }
 
