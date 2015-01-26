@@ -454,6 +454,7 @@ public class Makelangelo
 	
 	// find all available serial ports for the settings->ports menu.
 	public String[] ListSerialPorts() {
+		//System.out.print("OS NAME="+System.getProperty("os.name"));
         if(System.getProperty("os.name").equals("Mac OS X")){
         	portsDetected = SerialPortList.getPortNames("/dev/");
             //System.out.println("OS X");
@@ -2057,21 +2058,18 @@ public class Makelangelo
         // File conversion menu
         menu = new JMenu(MultilingualSupport.getSingleton().get("MenuGCODE"));
         menu.setMnemonic(KeyEvent.VK_H);
+
+        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
+        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+        buttonOpenFile.addActionListener(this);
+        menu.add(buttonOpenFile);
         
         subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-	        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
-	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-	        buttonOpenFile.addActionListener(this);
-	        subMenu.add(buttonOpenFile);
-
 	        // list recent files
-	        if(recentFiles != null && recentFiles.length>0) {
-	        	// add a separator only if there are recent files
-	        	if( recentFiles.length!=0 ) subMenu.addSeparator();
-	        	
+	        if(recentFiles != null && recentFiles.length>0) {	        	
 	        	for(i=0;i<recentFiles.length;++i) {
 	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
 	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
@@ -2083,6 +2081,8 @@ public class Makelangelo
 	        }
         
         menu.add(subMenu);
+
+        menu.addSeparator();
 
         buttonHilbertCurve = new JMenuItem(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
         buttonHilbertCurve.setEnabled(!running);

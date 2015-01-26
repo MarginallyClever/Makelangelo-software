@@ -524,7 +524,7 @@
 	</string>
 	<string>
 		<key>MenuConvertImage</key>
-		<value>Convert Image</value>
+		<value>Open Recent...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>

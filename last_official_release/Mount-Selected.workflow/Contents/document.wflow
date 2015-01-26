@@ -49,6 +49,11 @@
 				<string>Get Selected Finder Items</string>
 				<key>ActionParameters</key>
 				<dict/>
+				<key>ActionRuntimeParameters</key>
+				<dict>
+					<key>temporary items path</key>
+					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/D43B616A-65F1-41E2-BCC0-CF42E9B016C7/1/com.apple.Automator.Get_Selected_Finder_Items_2</string>
+				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.Get_Selected_Finder_Items_2</string>
 				<key>CFBundleVersion</key>
@@ -106,7 +111,9 @@
 					<key>fileName</key>
 					<dict>
 						<key>tokenizedValue</key>
-						<string>Makelangelo OSX</string>
+						<array>
+							<string>Makelangelo</string>
+						</array>
 					</dict>
 					<key>folderPath</key>
 					<dict>
@@ -120,7 +127,9 @@
 					<key>volumeName</key>
 					<dict>
 						<key>tokenizedValue</key>
-						<string>Makelangelo OSX</string>
+						<array>
+							<string>Makelangelo</string>
+						</array>
 					</dict>
 					<key>whenDone</key>
 					<dict/>
@@ -143,13 +152,30 @@
 					<key>encryptImage</key>
 					<false/>
 					<key>fileName</key>
-					<string>Makelangelo OSX</string>
+					<string>Makelangelo</string>
 					<key>folderPath</key>
 					<string>~/Desktop</string>
 					<key>imageSize</key>
 					<integer>5</integer>
 					<key>volumeName</key>
-					<string>Makelangelo OSX</string>
+					<string>Makelangelo</string>
+					<key>whenDone</key>
+					<integer>1</integer>
+				</dict>
+				<key>ActionRuntimeParameters</key>
+				<dict>
+					<key>encryptImage</key>
+					<false/>
+					<key>fileName</key>
+					<string>Makelangelo</string>
+					<key>folderPath</key>
+					<string>/Users/danroyer/Desktop</string>
+					<key>imageSize</key>
+					<integer>5</integer>
+					<key>temporary items path</key>
+					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/D43B616A-65F1-41E2-BCC0-CF42E9B016C7/1/com.apple.Automator.NewDiskImage</string>
+					<key>volumeName</key>
+					<string>Makelangelo</string>
 					<key>whenDone</key>
 					<integer>1</integer>
 				</dict>
@@ -1069,26 +1095,26 @@
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>62AA9B71-02A8-4598-BF43-821F98F4CBE1</key>
+		<key>2298A424-42AD-4D56-B784-AC4C97EFE704</key>
 		<dict>
 			<key>from</key>
-			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
+			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
 			<key>to</key>
-			<string>643EF50B-C54D-4412-B7D7-4D35609E39B4 - 643EF50B-C54D-4412-B7D7-4D35609E39B4</string>
+			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
 		</dict>
-		<key>943B5D67-2967-4222-A0DB-4FDA80B9756C</key>
+		<key>398BE7C8-80A2-4DB8-A8F5-DFC82D015F9D</key>
 		<dict>
 			<key>from</key>
 			<string>88B59D59-9848-4E95-A991-43FBD1EBD08C - 88B59D59-9848-4E95-A991-43FBD1EBD08C</string>
 			<key>to</key>
 			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
 		</dict>
-		<key>EC8C6CD2-3AF3-405B-A66E-3E9D29C4E717</key>
+		<key>E89EE03D-EE87-48AC-B56F-D312BC6A810D</key>
 		<dict>
 			<key>from</key>
-			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
-			<key>to</key>
 			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
+			<key>to</key>
+			<string>643EF50B-C54D-4412-B7D7-4D35609E39B4 - 643EF50B-C54D-4412-B7D7-4D35609E39B4</string>
 		</dict>
 	</dict>
 	<key>workflowMetaData</key>
