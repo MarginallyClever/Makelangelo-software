@@ -132,13 +132,18 @@ void printFeedRate() {
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 void IK(float x, float y, long &l1, long &l2) {
+#ifdef COREXY
+  l1 = floor((x+y) / THREADPERSTEP1);
+  l2 = floor((x-y) / THREADPERSTEP2);
+#else
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP1 );
   // find length to M2
-  dx = x - limit_right;
-  l2 = (long)floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
+  dx = limit_right - x;
+  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
+#endif
 }
 
 
@@ -147,6 +152,13 @@ void IK(float x, float y, long &l1, long &l2) {
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 void FK(long l1, long l2,float &x,float &y) {
+#ifdef COREXY
+  l1 *= THREADPERSTEP1;
+  l2 *= THREADPERSTEP2;
+
+  x = (float)( l1 + l2 ) / 2.0;
+  y = x - (float)l2;
+#else
   float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
   float c = (float)l2 * THREAD_PER_STEP;
@@ -163,6 +175,7 @@ void FK(long l1, long l2,float &x,float &y) {
   float theta = ((a*a+b*b-c*c)/(2.0*a*b));
   x = theta * a + limit_left;
   y = limit_top - (sqrt( 1.0 - theta * theta ) * a);
+#endif
 }
 
 
@@ -472,14 +485,14 @@ void tool_change(int tool_id) {
  * @input val the return value if /code/ is not found.
  **/
 float parsenumber(char code,float val) {
-  char *ptr=buffer;
-  while(ptr && *ptr && ptr<buffer+sofar) {
-    if(*ptr==code) {
-      return atof(ptr+1);
+  char *ptr=buffer;  // start at the beginning of buffer
+  while(ptr && *ptr && ptr<buffer+sofar) {  // walk to the end
+    if(*ptr==code) {  // if you find code on your walk,
+      return atof(ptr+1);  // convert the digits that follow into a float and return it
     }
-    ptr=strchr(ptr,' ')+1;
+    ptr=strchr(ptr,' ')+1;  // take a step from here to the letter after the next space
   }
-  return val;
+  return val;  // end reached, nothing found, return default val.
 }
 
 

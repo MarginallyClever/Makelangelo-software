@@ -130,6 +130,8 @@ public class Makelangelo
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
+    private Splitter drive_and_preview;
+    private Splitter split_left_right;
     public boolean dialog_result=false;
     
     // logging
@@ -448,6 +450,10 @@ public class Makelangelo
 
 		UpdateMenuBar();
 		previewPane.setConnected(true);
+		
+        drive_and_preview.remove(drivePane);
+        drivePane = DriveManually();
+        drive_and_preview.add(drivePane);
 
 		return true;
 	}
@@ -2193,20 +2199,20 @@ public class Makelangelo
         statusBar.setMinimumSize(d);
 
         // layout
-        Splitter drive_and_preview = new Splitter(JSplitPane.VERTICAL_SPLIT);
+        drive_and_preview = new Splitter(JSplitPane.VERTICAL_SPLIT);
         drive_and_preview.add(logPane);
         drive_and_preview.add(drivePane);
         //drive_and_preview.setDividerSize(8);
         //drive_and_preview.setDividerLocation(-100);
         
-        Splitter split = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-        split.add(previewPane);
-        split.add(drive_and_preview);
+        split_left_right = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+        split_left_right.add(previewPane);
+        split_left_right.add(drive_and_preview);
         //split.setDividerSize(8);
         //split.setDividerLocation(-10);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
-        contentPane.add(split,BorderLayout.CENTER);
+        contentPane.add(split_left_right,BorderLayout.CENTER);
 		
         return contentPane;
     }

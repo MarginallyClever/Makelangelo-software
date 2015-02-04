@@ -52,7 +52,7 @@
 				<key>ActionRuntimeParameters</key>
 				<dict>
 					<key>temporary items path</key>
-					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/D43B616A-65F1-41E2-BCC0-CF42E9B016C7/1/com.apple.Automator.Get_Selected_Finder_Items_2</string>
+					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/DCFF4615-F9FB-40D2-BA56-DA138FA13086/1/com.apple.Automator.Get_Selected_Finder_Items_2</string>
 				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.Get_Selected_Finder_Items_2</string>
@@ -173,7 +173,7 @@
 					<key>imageSize</key>
 					<integer>5</integer>
 					<key>temporary items path</key>
-					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/D43B616A-65F1-41E2-BCC0-CF42E9B016C7/1/com.apple.Automator.NewDiskImage</string>
+					<string>/var/folders/rv/qhgbl4t14g3fyj6qqd264b1h0000gn/T/DCFF4615-F9FB-40D2-BA56-DA138FA13086/1/com.apple.Automator.NewDiskImage</string>
 					<key>volumeName</key>
 					<string>Makelangelo</string>
 					<key>whenDone</key>
@@ -1095,26 +1095,26 @@
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>2298A424-42AD-4D56-B784-AC4C97EFE704</key>
-		<dict>
-			<key>from</key>
-			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
-			<key>to</key>
-			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
-		</dict>
-		<key>398BE7C8-80A2-4DB8-A8F5-DFC82D015F9D</key>
+		<key>4E568CBB-7F1D-4B02-AF9A-3FDDA54DC3B3</key>
 		<dict>
 			<key>from</key>
 			<string>88B59D59-9848-4E95-A991-43FBD1EBD08C - 88B59D59-9848-4E95-A991-43FBD1EBD08C</string>
 			<key>to</key>
 			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
 		</dict>
-		<key>E89EE03D-EE87-48AC-B56F-D312BC6A810D</key>
+		<key>A1C186D9-3FAB-4E41-AD6C-9C2BF524E957</key>
 		<dict>
 			<key>from</key>
 			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
 			<key>to</key>
 			<string>643EF50B-C54D-4412-B7D7-4D35609E39B4 - 643EF50B-C54D-4412-B7D7-4D35609E39B4</string>
+		</dict>
+		<key>BF67FABC-D46C-4043-B105-D8374ADD4A6A</key>
+		<dict>
+			<key>from</key>
+			<string>C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1 - C7A140DE-AD3F-4292-ADEE-A84ABE0C03F1</string>
+			<key>to</key>
+			<string>A9EC2DE1-F51E-440A-8297-103A67097C77 - A9EC2DE1-F51E-440A-8297-103A67097C77</string>
 		</dict>
 	</dict>
 	<key>workflowMetaData</key>

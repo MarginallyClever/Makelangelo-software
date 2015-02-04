@@ -12,6 +12,8 @@
 #define MOTHERBOARD 1  // Adafruit Motor Shield 1
 //#define MOTHERBOARD 2  // Adafruit Motor Shield 2
 
+//#define COREXY (1)  // uncomment this if you're using a CoreXY system
+
 // Increase this number to see more output
 #define VERBOSE         (0)
 
@@ -69,7 +71,9 @@
 #define MAX_BUF         (64)
 
 // servo pin differs based on device
-#define SERVO_PIN       (10)
+#define SERVO_PIN1      (10)
+#define SERVO_PIN2      (9)
+#define SERVO_PIN       SERVO_PIN1  // switch if you want to use the other pin.  Thanks, Aleksey!
 
 #define TIMEOUT_OK      (1000)  // 1/4 with no instruction?  Make sure PC knows we are waiting.
 
@@ -293,6 +297,10 @@ static void setPenAngle(int pen_angle) {
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(float x, float y, long &l1, long &l2) {
+#ifdef COREXY
+  l1 = floor((x+y) / THREADPERSTEP1);
+  l2 = floor((x-y) / THREADPERSTEP2);
+#else
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
@@ -300,6 +308,7 @@ static void IK(float x, float y, long &l1, long &l2) {
   // find length to M2
   dx = limit_right - x;
   l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
+#endif
 }
 
 
@@ -308,19 +317,30 @@ static void IK(float x, float y, long &l1, long &l2) {
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(float l1, float l2,float &x,float &y) {
-  float a = l1 * THREADPERSTEP1;
+#ifdef COREXY
+  l1 *= THREADPERSTEP1;
+  l2 *= THREADPERSTEP2;
+
+  x = (float)( l1 + l2 ) / 2.0;
+  y = x - (float)l2;
+#else
+  float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
-  float c = l2 * THREADPERSTEP2;
+  float c = (float)l2 * THREAD_PER_STEP;
   
   // slow, uses trig
-  //float theta = acos((a*a+b*b-c*c)/(2.0*a*b));
+  // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
+  // or cc - aa - bb = -2ab * cos( theta )
+  // or ( aa + bb - cc ) / ( 2ab ) = cos( theta );
+  // or theta = acos((aa+bb-cc)/(2ab));
   //x = cos(theta)*l1 + limit_left;
   //y = sin(theta)*l1 + limit_top;
-  // but we know that cos(acos(i)) = i
+  // and we know that cos(acos(i)) = i
   // and we know that sin(acos(i)) = sqrt(1-i*i)
-  float i=(a*a+b*b-c*c)/(2.0*a*b);
-  x = i * l1 + limit_left;
-  y = sqrt(1.0 - i*i)*l1 + limit_top;
+  float theta = ((a*a+b*b-c*c)/(2.0*a*b));
+  x = theta * a + limit_left;
+  y = limit_top - (sqrt( 1.0 - theta * theta ) * a);
+#endif
 }
 
 
@@ -728,14 +748,14 @@ void activate_motors() {
  * @input val the return value if /code/ is not found.
  **/
 float parsenumber(char code,float val) {
-  char *ptr=buffer;
-  while(ptr && *ptr && ptr<buffer+sofar) {
-    if(*ptr==code) {
-      return atof(ptr+1);
+  char *ptr=buffer;  // start at the beginning of buffer
+  while(ptr && *ptr && ptr<buffer+sofar) {  // walk to the end
+    if(*ptr==code) {  // if you find code on your walk,
+      return atof(ptr+1);  // convert the digits that follow into a float and return it
     }
-    ptr=strchr(ptr,' ')+1;
+    ptr=strchr(ptr,' ')+1;  // take a step from here to the letter after the next space
   }
-  return val;
+  return val;  // end reached, nothing found, return default val.
 }
 
 
@@ -1021,7 +1041,7 @@ void setup() {
   // initialize the plotter position.
   teleport(0,0);
   velx=0;
-  velx=0;
+  vely=0;
   setPenAngle(PEN_UP_ANGLE);
   
   // display the help at startup.

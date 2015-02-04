@@ -56,7 +56,7 @@ public class MachineConfiguration {
 	private double bobbin_left_diameter=16;
 	private double bobbin_right_diameter=16;
 
-	private double default_feed_rate=2000;  // etch-a-sketch speed
+	private double max_feed_rate=3500;  // etch-a-sketch speed
 	
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
@@ -468,8 +468,8 @@ public class MachineConfiguration {
 	
 	protected boolean LoadConfigFromCloud() {
 		// Ask for credentials: MC login, password.  auto-remember login name.
-		String login = new String();
-		String password = new String();
+		//String login = new String();
+		//String password = new String();
 		// TODO finish this section
 
 		/*
@@ -499,7 +499,7 @@ public class MachineConfiguration {
 		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", "true"));
 		bobbin_left_diameter=Double.valueOf(prefs2.get("bobbin_left_diameter", "3.0"));
 		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", "3.0"));
-		default_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));
+		max_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));
 		startingPositionIndex=Integer.valueOf(prefs2.get("startingPosIndex","4"));
 
 		paper_left=Double.parseDouble(prefs2.get("paper_left","-10.5"));
@@ -552,7 +552,7 @@ public class MachineConfiguration {
 		prefs2.put("m2invert",Boolean.toString(m2invert));
 		prefs2.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
 		prefs2.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		prefs2.put("feed_rate", Double.toString(default_feed_rate));
+		prefs2.put("feed_rate", Double.toString(max_feed_rate));
 		prefs2.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		prefs2.putDouble("paper_left", paper_left);
@@ -724,11 +724,11 @@ public class MachineConfiguration {
 	}
 	
 	public double GetFeedRate() {
-		return default_feed_rate;
+		return max_feed_rate;
 	}
 	
 	public void SetFeedRate(double f) {
-		default_feed_rate = f;
+		max_feed_rate = f;
 		SaveConfig();
 	}
 	
