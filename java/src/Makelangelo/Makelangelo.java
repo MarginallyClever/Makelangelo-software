@@ -1614,7 +1614,6 @@ public class Makelangelo
 		}
 		
 		if( subject == commandLineSend ) {
-			JOptionPane.showMessageDialog(null, "x"+ commandLineText.getText()+"x", "InfoBox", JOptionPane.INFORMATION_MESSAGE);
 			SendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
