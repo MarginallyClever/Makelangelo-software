@@ -1614,6 +1614,7 @@ public class Makelangelo
 		}
 		
 		if( subject == commandLineSend ) {
+			JOptionPane.showMessageDialog(null, "x"+ commandLineText.getText()+"x", "InfoBox", JOptionPane.INFORMATION_MESSAGE);
 			SendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
@@ -1688,9 +1689,6 @@ public class Makelangelo
         }
     }
 
-	/**
-	 * Open the config dialog, update the paper size, refresh the preview tab.
-	 */
 	public JPanel DriveManually() {
 		GridBagConstraints c;
 		

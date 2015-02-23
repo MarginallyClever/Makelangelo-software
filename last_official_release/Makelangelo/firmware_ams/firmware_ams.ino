@@ -50,7 +50,7 @@
 #define SWITCH_HALF     (512)
 
 // servo angles for pen control
-#define PEN_UP_ANGLE    (90)
+#define PEN_UP_ANGLE    (180)
 #define PEN_DOWN_ANGLE  (10)  // Some servos don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
@@ -175,11 +175,8 @@ int M2_REEL_IN  = FORWARD;
 int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
-float SPOOL_DIAMETER1 = 0.950;
-float THREADPERSTEP1;  // thread per step
-
-float SPOOL_DIAMETER2 = 0.950;
-float THREADPERSTEP2;  // thread per step
+float SPOOL_DIAMETER = 0.950;
+float THREAD_PER_STEP;  // thread per step
 
 // plotter position.
 static float posx, velx;
@@ -198,7 +195,7 @@ static char mode_name[3];
 
 
 // Serial comm reception
-static char buffer[MAX_BUF+1];  // Serial buffer
+static char serial_buffer[MAX_BUF+1];  // Serial buffer
 static int sofar;               // Serial buffer progress
 static long last_cmd_time;      // prevent timeouts
 
@@ -215,20 +212,14 @@ long line_number;
 
 //------------------------------------------------------------------------------
 // calculate max velocity, threadperstep.
-static void adjustSpoolDiameter(float diameter1,float diameter2) {
-  SPOOL_DIAMETER1 = diameter1;
-  float SPOOL_CIRC = SPOOL_DIAMETER1*PI;  // circumference
-  THREADPERSTEP1 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
+static void adjustSpoolDiameter(float diameter1) {
+  SPOOL_DIAMETER = diameter1;
+  float SPOOL_CIRC = SPOOL_DIAMETER*PI;  // circumference
+  THREAD_PER_STEP = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
   
-  SPOOL_DIAMETER2 = diameter2;
-  SPOOL_CIRC = SPOOL_DIAMETER2*PI;  // circumference
-  THREADPERSTEP2 = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-
 #if VERBOSE > 2
-  Serial.print(F("SpoolDiameter1 = "));  Serial.println(SPOOL_DIAMETER1,3);
-  Serial.print(F("SpoolDiameter2 = "));  Serial.println(SPOOL_DIAMETER2,3);
-  Serial.print(F("THREADPERSTEP1="));  Serial.println(THREADPERSTEP1,3);
-  Serial.print(F("THREADPERSTEP2="));  Serial.println(THREADPERSTEP2,3);
+  Serial.print(F("SpoolDiameter = "));  Serial.println(SPOOL_DIAMETER,3);
+  Serial.print(F("THREAD_PER_STEP="));  Serial.println(THREAD_PER_STEP,3);
   Serial.print(F("MAX_VEL="));  Serial.println(MAX_VEL,3);
 #endif
 }
@@ -298,16 +289,16 @@ static void setPenAngle(int pen_angle) {
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 static void IK(float x, float y, long &l1, long &l2) {
 #ifdef COREXY
-  l1 = floor((x+y) / THREADPERSTEP1);
-  l2 = floor((x-y) / THREADPERSTEP2);
+  l1 = floor((x+y) / THREAD_PER_STEP);
+  l2 = floor((x-y) / THREAD_PER_STEP);
 #else
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP1 );
+  l1 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
   // find length to M2
   dx = limit_right - x;
-  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
+  l2 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
 #endif
 }
 
@@ -318,8 +309,8 @@ static void IK(float x, float y, long &l1, long &l2) {
 // to find angle between M1M2 and M1P where P is the plotter position.
 static void FK(float l1, float l2,float &x,float &y) {
 #ifdef COREXY
-  l1 *= THREADPERSTEP1;
-  l2 *= THREADPERSTEP2;
+  l1 *= THREAD_PER_STEP;
+  l2 *= THREAD_PER_STEP;
 
   x = (float)( l1 + l2 ) / 2.0;
   y = x - (float)l2;
@@ -408,23 +399,20 @@ static void line_safe(float x,float y,float z) {
   
   float len=sqrt(dx*dx+dy*dy);
   
-  if(len<=CM_PER_SEGMENT) {
-    line(x,y,z);
-    return;
-  }
-
-  // too long!
-  long pieces=floor(len/CM_PER_SEGMENT);
-  float x0=posx;
-  float y0=posy;
-  float z0=posz;
-  float a;
-  for(long j=1;j<pieces;++j) {
-    a=(float)j/(float)pieces;
-
-    line((x-x0)*a+x0,
-         (y-y0)*a+y0,
-         (z-z0)*a+z0);
+  if(len>CM_PER_SEGMENT) {
+    // too long!
+    long pieces=floor(len/CM_PER_SEGMENT);
+    float x0=posx;
+    float y0=posy;
+    float z0=posz;
+    float a;
+    for(long j=1;j<pieces;++j) {
+      a=(float)j/(float)pieces;
+  
+      line((x-x0)*a+x0,
+           (y-y0)*a+y0,
+           (z-z0)*a+z0);
+    }
   }
   line(x,y,z);
 }
@@ -615,8 +603,8 @@ static void SaveUID() {
 
 //------------------------------------------------------------------------------
 static void SaveSpoolDiameter() {
-  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER1*10000);
-  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER2*10000);
+  EEPROM_writeLong(ADDR_SPOOL_DIA1,SPOOL_DIAMETER*10000);
+  EEPROM_writeLong(ADDR_SPOOL_DIA2,SPOOL_DIAMETER*10000);
 }
 
 
@@ -636,8 +624,7 @@ static void LoadConfig() {
   if(version_number==3) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
-                        (float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
     // save the new data so the next load doesn't screw up one bobbin size
     SaveSpoolDiameter();
     // update the EEPROM version
@@ -645,8 +632,7 @@ static void LoadConfig() {
   } else if(version_number==EEPROM_VERSION) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f,
-                        (float)EEPROM_readLong(ADDR_SPOOL_DIA2)/10000.0f);   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
   } else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println(F("An Error Occurred during LoadConfig"));
@@ -678,21 +664,17 @@ void SD_PrintDirectory(File dir, int numTabs) {
      }
    }
 }
-#endif // USE_SD_CARD
 
 
 //------------------------------------------------------------------------------
 static void SD_ListFiles() {
-#ifdef USE_SD_CARD
   File f = SD.open("/");
   SD_PrintDirectory(f,0);
-#endif // USE_SD_CARD
 }
 
 
 //------------------------------------------------------------------------------
 static void SD_ProcessFile(char *filename) {
-#ifdef USE_SD_CARD
   File f=SD.open(filename);
   if(!f) {
     Serial.print(F("File "));
@@ -704,14 +686,14 @@ static void SD_ProcessFile(char *filename) {
   int c;
   while(f.peek() != -1) {
     c=f.read();
-    if(c=='\n' || c=='\r') continue;
-    buffer[sofar++]=c;
-    if(buffer[sofar]==';') {
+    if(sofar<MAX_BUF) serial_buffer[sofar++]=c;
+    if(c=='\n') {
       // end string
-      buffer[sofar]=0;
+      serial_buffer[sofar]=0;
+#if VERBOSE > 0
       // print for our benefit
-      Serial.println(buffer);
-      // process command
+      Serial.println(serial_buffer);
+#endif
       processCommand();
       // reset buffer for next line
       sofar=0;
@@ -719,10 +701,11 @@ static void SD_ProcessFile(char *filename) {
   }
   
   f.close();
-#endif // USE_SD_CARD
 }
+#endif // USE_SD_CARD
 
 
+//------------------------------------------------------------------------------
 void disable_motors() {
 #if MOTHERBOARD == 1
   m1.release();
@@ -748,8 +731,8 @@ void activate_motors() {
  * @input val the return value if /code/ is not found.
  **/
 float parsenumber(char code,float val) {
-  char *ptr=buffer;  // start at the beginning of buffer
-  while(ptr && *ptr && ptr<buffer+sofar) {  // walk to the end
+  char *ptr=serial_buffer;  // start at the beginning of buffer
+  while(ptr && *ptr && ptr<serial_buffer+sofar) {  // walk to the end
     if(*ptr==code) {  // if you find code on your walk,
       return atof(ptr+1);  // convert the digits that follow into a float and return it
     }
@@ -824,14 +807,11 @@ void processConfig() {
 
 //------------------------------------------------------------------------------
 static void processCommand() {
-  // blank lines
-  if(buffer[0]==';') return;
-  
   long cmd;
 
   // is there a line number?
   cmd=parsenumber('N',-1);
-  if(cmd!=-1 && buffer[0] == 'N') {  // line number must appear first on the line
+  if(cmd!=-1 && serial_buffer[0] == 'N') {  // line number must appear first on the line
     if( cmd != line_number ) {
       // Wrong line number error
       Serial.print(F("BADLINENUM "));
@@ -841,13 +821,13 @@ static void processCommand() {
     
     
     // is there a checksum?
-    if(strchr(buffer,'*')!=0) {
+    if(strchr(serial_buffer,'*')!=0) {
       // Yes.  Is it valid?
       unsigned char checksum=0;
       int c=0;
-      while(buffer[c]!='*' && c<MAX_BUF) checksum ^= buffer[c++];
+      while(serial_buffer[c]!='*' && c<MAX_BUF) checksum ^= serial_buffer[c++];
       c++; // skip *
-      unsigned char against = (unsigned char)strtod(buffer+c,NULL);
+      unsigned char against = (unsigned char)strtod(serial_buffer+c,NULL);
       if( checksum != against ) {
         Serial.print(F("BADCHECKSUM "));
         Serial.println(line_number);
@@ -862,8 +842,8 @@ static void processCommand() {
     line_number++;
   }
   
-  if(!strncmp(buffer,"UID",3)) {
-    robot_uid=atoi(strchr(buffer,' ')+1);
+  if(!strncmp(serial_buffer,"UID",3)) {
+    robot_uid=atoi(strchr(serial_buffer,' ')+1);
     SaveUID();
   }
 
@@ -943,7 +923,7 @@ static void processCommand() {
   switch(cmd) {
   case 0: {
       // move one motor
-      char *ptr=strchr(buffer,' ')+1;
+      char *ptr=strchr(serial_buffer,' ')+1;
       int amount = atoi(ptr+1);
       int i, dir;
       if(*ptr == m1d) {
@@ -959,24 +939,25 @@ static void processCommand() {
     break;
   case 1: {
       // adjust spool diameters
-      float amountL=parsenumber('L',SPOOL_DIAMETER1);
-      float amountR=parsenumber('R',SPOOL_DIAMETER2);
+      float amountL=parsenumber('L',SPOOL_DIAMETER);
+      float amountR=parsenumber('R',SPOOL_DIAMETER);
   
-      float tps1=THREADPERSTEP1;
-      float tps2=THREADPERSTEP2;
-      adjustSpoolDiameter(amountL,amountR);
-      if(THREADPERSTEP1 != tps1 || THREADPERSTEP2 != tps2) {
+      float tps1=THREAD_PER_STEP;
+      adjustSpoolDiameter(amountL);
+      if(THREAD_PER_STEP != tps1) {
         // Update EEPROM
         SaveSpoolDiameter();
       }
     }
     break;
   case 2:
-    Serial.print('L');  Serial.print(SPOOL_DIAMETER1);
-    Serial.print(F(" R"));   Serial.println(SPOOL_DIAMETER2);
+    Serial.print('L');  Serial.print(SPOOL_DIAMETER);
+    Serial.print(F(" R"));   Serial.println(SPOOL_DIAMETER);
     break;
+#ifdef USE_SD_CARD
   case 3:  SD_ListFiles();  break;    // read directory
-  case 4:  SD_ProcessFile(strchr(buffer,' ')+1);  break;  // read file
+  case 4:  SD_ProcessFile(strchr(serial_buffer,' ')+1);  break;  // read file
+#endif
   }
 }
 
@@ -1056,13 +1037,13 @@ void Serial_listen() {
   // listen for serial commands
   while(Serial.available() > 0) {
     char c = Serial.read();
-    if(sofar<MAX_BUF) buffer[sofar++]=c;
-    if(c=='\n' || c=='\r') {
-      buffer[sofar]=0;
+    if(sofar<MAX_BUF) serial_buffer[sofar++]=c;
+    if(c=='\n') {
+      serial_buffer[sofar]=0;
       
 #if VERBOSE > 0
       // echo confirmation
-      Serial.println(buffer);
+      Serial.println(serial_buffer);
 #endif
    
       // do something with the command

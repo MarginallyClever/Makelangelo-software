@@ -133,16 +133,16 @@ void printFeedRate() {
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 void IK(float x, float y, long &l1, long &l2) {
 #ifdef COREXY
-  l1 = floor((x+y) / THREADPERSTEP1);
-  l2 = floor((x-y) / THREADPERSTEP2);
+  l1 = floor((x+y) / THREAD_PER_STEP);
+  l2 = floor((x-y) / THREAD_PER_STEP);
 #else
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
-  l1 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP1 );
+  l1 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
   // find length to M2
   dx = limit_right - x;
-  l2 = floor( sqrt(dx*dx+dy*dy) / THREADPERSTEP2 );
+  l2 = floor( sqrt(dx*dx+dy*dy) / THREAD_PER_STEP );
 #endif
 }
 
