@@ -1656,11 +1656,12 @@ public class Makelangelo
 				serial_recv_buffer+=line2;
 				// wait for the cue ("> ") to send another command
 				if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
-					String line2_mod = serial_recv_buffer.replace("\n", "");
+					String line2_mod = serial_recv_buffer;
+					//line2_mod = line2.mod.replace("\n", "");
 					//line2_mod = line2_mod.replace(">", "");
 					line2_mod = line2_mod.trim();
-					if(!line2_mod.equals("")) {
-						if(line2_mod.lastIndexOf(">")!=-1) {
+					if(line2_mod.length()>0) {
+						if(line2_mod.equals(cue.trim())) {
 							if(lastLineWasCue==true) {
 								// don't repeat the ping
 								//Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
@@ -1670,7 +1671,7 @@ public class Makelangelo
 							lastLineWasCue=true;
 						} else {
 							lastLineWasCue=false;
-							Log("<span style='color:#FFA500'>a"+line2_mod+"b</span>");
+							Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
 						}
 					}
 					
