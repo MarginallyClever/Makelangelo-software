@@ -36,7 +36,7 @@
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
-#define STEPS_PER_TURN  (200.0)
+#define STEPS_PER_TURN  (400.0)
 
 
 #define NUM_TOOLS  (6)
@@ -56,7 +56,7 @@
 
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
 
-#define MAX_FEEDRATE    (200)
+#define MAX_FEEDRATE    (1000)
 #define MIN_FEEDRATE    (0.01) // steps / second
 
 // for arc directions
