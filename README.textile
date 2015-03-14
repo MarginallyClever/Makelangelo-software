@@ -26,16 +26,9 @@ h2. Notes
 
 The contents of ./last_official_release are also available on the official purchase page http://makelangelo.com website.
 
-h2. To run the project in eclipse
+h2. To modify the code / run the project in eclipse
 
-* Choose File > Import > General > Existing Projects into Workspace and select "Next".
-* Choose "Browse" next to "Select root directory" and select the root folder of your download/clone from github.
-* eclipse will scan the folder and find the project.  Choose "Finish"
-
-This project has been developed with the 1.7 JDK.  You can find out more about it here:
-
-* http://stackoverflow.com/questions/6267392/how-do-i-use-jdk-7-on-mac-osx
-* http://www.oracle.com/technetwork/java/javase/downloads/index.html
+Please visit the Github Wiki:https://github.com/MarginallyClever/Makelangelo/wiki
 
 More details are available in the forums.
 

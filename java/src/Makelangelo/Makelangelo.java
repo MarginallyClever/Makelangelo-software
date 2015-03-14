@@ -76,7 +76,7 @@ public class Makelangelo
 	static final long serialVersionUID=1L;
 
 	// software version
-	static final String version="6";
+	static final String version="7";
 	
 	private static Makelangelo singletonObject;
 	
@@ -130,6 +130,8 @@ public class Makelangelo
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
+    private Splitter drive_and_preview;
+    private Splitter split_left_right;
     public boolean dialog_result=false;
     
     // logging
@@ -448,21 +450,32 @@ public class Makelangelo
 
 		UpdateMenuBar();
 		previewPane.setConnected(true);
+		
+        drive_and_preview.remove(drivePane);
+        drivePane = DriveManually();
+        drive_and_preview.add(drivePane);
 
 		return true;
 	}
 	
 	// find all available serial ports for the settings->ports menu.
 	public String[] ListSerialPorts() {
-        if(System.getProperty("os.name").equals("Mac OS X")){
-        	portsDetected = SerialPortList.getPortNames("/dev/");
-            //System.out.println("OS X");
-        } else {
-        	portsDetected = SerialPortList.getPortNames("COM");
-            //System.out.println("Windows");
-        }
-        
-	    return portsDetected;
+		String OS = System.getProperty("os.name").toLowerCase();
+		
+	        if(OS.indexOf("mac") >= 0){
+	        	portsDetected = SerialPortList.getPortNames("/dev/");
+	            	//System.out.println("OS X");
+	        } else if(OS.indexOf("win") >= 0) {
+	        	portsDetected = SerialPortList.getPortNames("COM");
+	            	//System.out.println("Windows");
+	        } else if(OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0){
+	        	portsDetected = SerialPortList.getPortNames("/dev/");
+	            	//System.out.println("Linux/Unix");
+	        } else {
+	        	System.out.println("OS ERROR");
+	        	System.out.println("OS NAME="+System.getProperty("os.name"));
+	        }
+		return portsDetected;
 	}
 	
 	// pull the last connected port from prefs
@@ -1643,11 +1656,12 @@ public class Makelangelo
 				serial_recv_buffer+=line2;
 				// wait for the cue ("> ") to send another command
 				if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
-					String line2_mod = serial_recv_buffer.replace("\n", "");
+					String line2_mod = serial_recv_buffer;
+					//line2_mod = line2.mod.replace("\n", "");
 					//line2_mod = line2_mod.replace(">", "");
 					line2_mod = line2_mod.trim();
-					if(!line2_mod.equals("")) {
-						if(line2_mod.lastIndexOf(">")!=-1) {
+					if(line2_mod.length()>0) {
+						if(line2_mod.equals(cue.trim())) {
 							if(lastLineWasCue==true) {
 								// don't repeat the ping
 								//Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
@@ -1657,7 +1671,7 @@ public class Makelangelo
 							lastLineWasCue=true;
 						} else {
 							lastLineWasCue=false;
-							Log("<span style='color:#FFA500'>a"+line2_mod+"b</span>");
+							Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
 						}
 					}
 					
@@ -1675,9 +1689,6 @@ public class Makelangelo
         }
     }
 
-	/**
-	 * Open the config dialog, update the paper size, refresh the preview tab.
-	 */
 	public JPanel DriveManually() {
 		GridBagConstraints c;
 		
@@ -2057,21 +2068,18 @@ public class Makelangelo
         // File conversion menu
         menu = new JMenu(MultilingualSupport.getSingleton().get("MenuGCODE"));
         menu.setMnemonic(KeyEvent.VK_H);
+
+        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
+        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+        buttonOpenFile.addActionListener(this);
+        menu.add(buttonOpenFile);
         
         subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-	        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
-	        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-	        buttonOpenFile.addActionListener(this);
-	        subMenu.add(buttonOpenFile);
-
 	        // list recent files
-	        if(recentFiles != null && recentFiles.length>0) {
-	        	// add a separator only if there are recent files
-	        	if( recentFiles.length!=0 ) subMenu.addSeparator();
-	        	
+	        if(recentFiles != null && recentFiles.length>0) {	        	
 	        	for(i=0;i<recentFiles.length;++i) {
 	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
 	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
@@ -2083,6 +2091,8 @@ public class Makelangelo
 	        }
         
         menu.add(subMenu);
+
+        menu.addSeparator();
 
         buttonHilbertCurve = new JMenuItem(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
         buttonHilbertCurve.setEnabled(!running);
@@ -2193,20 +2203,20 @@ public class Makelangelo
         statusBar.setMinimumSize(d);
 
         // layout
-        Splitter drive_and_preview = new Splitter(JSplitPane.VERTICAL_SPLIT);
+        drive_and_preview = new Splitter(JSplitPane.VERTICAL_SPLIT);
         drive_and_preview.add(logPane);
         drive_and_preview.add(drivePane);
         //drive_and_preview.setDividerSize(8);
         //drive_and_preview.setDividerLocation(-100);
         
-        Splitter split = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-        split.add(previewPane);
-        split.add(drive_and_preview);
+        split_left_right = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+        split_left_right.add(previewPane);
+        split_left_right.add(drive_and_preview);
         //split.setDividerSize(8);
         //split.setDividerLocation(-10);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
-        contentPane.add(split,BorderLayout.CENTER);
+        contentPane.add(split_left_right,BorderLayout.CENTER);
 		
         return contentPane;
     }
