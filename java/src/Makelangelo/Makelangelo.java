@@ -191,7 +191,7 @@ public class Makelangelo
 		image_converters[i++] = new Filter_GeneratorPulse();
 		image_converters[i++] = new Filter_GeneratorBoxes();
 		image_converters[i++] = new Filter_GeneratorRGB();
-		image_converters[i++] = new Filter_WeakStrongForce();
+		image_converters[i++] = new Filter_DitherVoronoiStippling();
 		
 		filter_names = new String[image_converters.length];
 		for(i=0;i<image_converters.length;++i) {

@@ -20,7 +20,7 @@ import Makelangelo.Polygon2D;
  * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  */
-public class Filter_WeakStrongForce extends Filter {
+public class Filter_DitherVoronoiStippling extends Filter {
 	public String GetName() { return "Voronoi stipples"; }
 	
 	class VoronoiCell implements Comparable<VoronoiCell> {
