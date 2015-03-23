@@ -66,8 +66,8 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			generation++;
 			Makelangelo.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
 			
-			// update the voronoi diagram
-			updateVoronoiDiagram();
+			// 
+			tessellateVoronoiDiagram();
 			
 			// adjust centroids
 			change = AdjustCentroids();
@@ -126,7 +126,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	
 	// I have a set of points.  I want a list of cell borders.
 	// cell borders are halfway between any point and it's nearest neighbors.
-	protected void updateVoronoiDiagram() {
+	protected void tessellateVoronoiDiagram() {
 		// throw out any junk borders we might have from the last generation.
 		int i;
 		for(i=0;i<used;++i) {
