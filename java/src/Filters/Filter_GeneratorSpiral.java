@@ -93,7 +93,7 @@ public class Filter_GeneratorSpiral extends Filter {
 				y = (int)fy;
 				// clip to image boundaries
 				if( x>=0 && x<image_width && y>=0 && y<image_height ) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,fx,fy,( z >= level ));
 				} else {
 					MoveTo(out,fx,fy,true);

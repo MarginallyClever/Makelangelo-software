@@ -47,7 +47,7 @@ public class Filter_GeneratorScanline extends Filter {
 				MoveTo(out,(float)0,(float)y,true);
 				for(x=0;x<image_width;++x) {
 					// read the image at x,y
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z > level ));
 				}
 				MoveTo(out,(float)image_width,(float)y,true);
@@ -55,7 +55,7 @@ public class Filter_GeneratorScanline extends Filter {
 				// every odd line move right to left
 				MoveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z > level ));
 				}
 				MoveTo(out,(float)0,(float)y,true);
@@ -64,7 +64,7 @@ public class Filter_GeneratorScanline extends Filter {
 
 		// pen already lifted
 		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
+		MoveTo(out, 0, 0, true);
 		
 		// close the file
 		out.close();

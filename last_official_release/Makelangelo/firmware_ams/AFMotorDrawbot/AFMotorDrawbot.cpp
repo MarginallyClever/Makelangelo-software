@@ -159,6 +159,7 @@ void AF_Stepper::step(uint16_t steps, uint8_t dir) {
 
 
 uint8_t AF_Stepper::onestep(uint8_t dir) {
+  /*
   if((currentstep/(MICROSTEPS/2)) % 2) { // we're at an odd step, weird
     if(dir == FORWARD) currentstep += MICROSTEPS/2;
     else               currentstep -= MICROSTEPS/2;
@@ -166,7 +167,8 @@ uint8_t AF_Stepper::onestep(uint8_t dir) {
     if(dir == FORWARD) currentstep += MICROSTEPS;
     else               currentstep -= MICROSTEPS;
   }
-
+  */
+  currentstep += ( dir * MICROSTEPS );
   currentstep += MICROSTEPS*4;
   currentstep %= MICROSTEPS*4;
 
@@ -175,7 +177,7 @@ uint8_t AF_Stepper::onestep(uint8_t dir) {
 #endif
 
   // preprare to release all coils
-  latch_state &= ~a & ~b & ~c & ~d; // all motor pins to 0
+  latch_state =0;//&= ~a & ~b & ~c & ~d; // all motor pins to 0
 
   // No wait!  Keep some energized.
   switch (currentstep/(MICROSTEPS/2)) {

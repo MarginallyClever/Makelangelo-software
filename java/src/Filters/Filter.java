@@ -199,7 +199,7 @@ public class Filter {
 	}
 	
 	
-	protected int pointSample(BufferedImage img,int x,int y) {
+	protected int sample1x1(BufferedImage img,int x,int y) {
 		Color c = new Color(img.getRGB(x, y));
 		switch(color_channel) {
 		case 1: return c.getRed();
@@ -210,56 +210,53 @@ public class Filter {
 	}
 
 	
-	protected int TakeImageSample(BufferedImage img,int x,int y) {
-		// point sampling
-
-		// 3x3 sampling
+	protected int sample3x3(BufferedImage img,int x,int y) {
 		int c=0;
 		int values[]=new int[9];
 		int weights[]=new int[9];
 		if(y>0) {
 			if(x>0) {
-				values[c]=pointSample(img,x-1, y-1);
+				values[c]=sample1x1(img,x-1, y-1);
 				weights[c]=1;
 				c++;
 			}
-			values[c]=pointSample(img,x, y-1);
+			values[c]=sample1x1(img,x, y-1);
 			weights[c]=2;
 			c++;
 
 			if(x<image_width-1) {
-				values[c]=pointSample(img,x+1, y-1);
+				values[c]=sample1x1(img,x+1, y-1);
 				weights[c]=1;
 				c++;
 			}
 		}
 
 		if(x>0) {
-			values[c]=pointSample(img,x-1, y);
+			values[c]=sample1x1(img,x-1, y);
 			weights[c]=2;
 			c++;
 		}
-		values[c]=pointSample(img,x, y);
+		values[c]=sample1x1(img,x, y);
 		weights[c]=4;
 		c++;
 		if(x<image_width-1) {
-			values[c]=pointSample(img,x+1, y);
+			values[c]=sample1x1(img,x+1, y);
 			weights[c]=2;
 			c++;
 		}
 
 		if(y<image_height-1) {
 			if(x>0) {
-				values[c]=pointSample(img,x-1, y+1);
+				values[c]=sample1x1(img,x-1, y+1);
 				weights[c]=1;
 				c++;
 			}
-			values[c]=pointSample(img,x, y+1);
+			values[c]=sample1x1(img,x, y+1);
 			weights[c]=2;
 			c++;
 	
 			if(x<image_width-1) {
-				values[c]=pointSample(img,x+1, y+1);
+				values[c]=sample1x1(img,x+1, y+1);
 				weights[c]=1;
 				c++;
 			}

@@ -53,14 +53,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			if((i%2)==0) {
 				MoveTo(out,(float)          0,(float)y,true);
 				for(x=0;x<image_width;++x) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z >= level ));
 				}
 				MoveTo(out,(float)image_width,(float)y,true);
 			} else {
 				MoveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z >= level ));
 				}
 				MoveTo(out,(float)          0,(float)y,true);
@@ -78,14 +78,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			if((i%2)==0) {
 				MoveTo(out,(float)x,(float)0           ,true);
 				for(y=0;y<image_height;++y) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z >= level ));
 				}
 				MoveTo(out,(float)x,(float)image_height,true);
 			} else {
 				MoveTo(out,(float)x,(float)image_height,true);
 				for(y=image_height-1;y>=0;--y) {
-					z=TakeImageSample(img,x,y);
+					z=sample3x3(img,x,y);
 					MoveTo(out,(float)x,(float)y,( z >= level ));
 				}
 				MoveTo(out,(float)x,(float)0           ,true);
@@ -117,14 +117,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			{
 				MoveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,startx+j,starty+j);
+					z=sample3x3(img,startx+j,starty+j);
 					MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
 				}
 				MoveTo(out,(float)endx,(float)endy,true);
 			} else {
 				MoveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,endx-j,endy-j);
+					z=sample3x3(img,endx-j,endy-j);
 					MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
 				}
 				MoveTo(out,(float)startx,(float)starty,true);
@@ -159,14 +159,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			if((i%2)==0) {
 				MoveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
-					z=TakeImageSample(img,startx-j,starty+j);
+					z=sample3x3(img,startx-j,starty+j);
 					MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
 				}
 				MoveTo(out,(float)endx,(float)endy,true);
 			} else {
 				MoveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<delta;++j) {
-					z=TakeImageSample(img,endx+j,endy-j);
+					z=sample3x3(img,endx+j,endy-j);
 					MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
 				}
 				MoveTo(out,(float)startx,(float)starty,true);

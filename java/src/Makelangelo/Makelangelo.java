@@ -182,15 +182,16 @@ public class Makelangelo
 	
 	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
-		image_converters = new Filter[7];  // this number must match the actual number of filters.
+		image_converters = new Filter[8];  // this number must match the actual number of filters.
 		int i=0;
-		image_converters[i++] = new Filter_GeneratorTSP();
+		image_converters[i++] = new Filter_GeneratorZigZag();
 		image_converters[i++] = new Filter_GeneratorSpiral();
 		image_converters[i++] = new Filter_GeneratorCrosshatch();
 		image_converters[i++] = new Filter_GeneratorScanline();
 		image_converters[i++] = new Filter_GeneratorPulse();
 		image_converters[i++] = new Filter_GeneratorBoxes();
 		image_converters[i++] = new Filter_GeneratorRGB();
+		image_converters[i++] = new Filter_WeakStrongForce();
 		
 		filter_names = new String[image_converters.length];
 		for(i=0;i<image_converters.length;++i) {
