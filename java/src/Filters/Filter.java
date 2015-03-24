@@ -537,7 +537,7 @@ public class Filter {
 				case '}':  name="B3CLOSE";  break;
 				case '~':  name="TILDE";  break;
 				case '\\':  name="BSLASH";  break;
-				case 'É':  name="SPACE";  break;
+				//case '':  name="SPACE";  break; FIXME Makelangelo/java/src/Filters/Filter.java:[540,39] unmappable character for encoding UTF-8
 				default: name=Character.toString(letter);  break;
 				}
 			}
