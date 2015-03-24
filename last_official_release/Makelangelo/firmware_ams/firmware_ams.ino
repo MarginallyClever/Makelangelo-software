@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-#define MOTHERBOARD 1  // Adafruit Motor Shield 1
-//#define MOTHERBOARD 2  // Adafruit Motor Shield 2
+//#define MOTHERBOARD 1  // Adafruit Motor Shield 1
+#define MOTHERBOARD 2  // Adafruit Motor Shield 2
 
 //#define COREXY (1)  // uncomment this if you're using a CoreXY system
 
@@ -31,12 +31,10 @@
 #define L_PIN           (A3)
 #define R_PIN           (A5)
 
-// NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
-// then it is 2.5132741228718345 circumference, and
-// 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
-// NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
-// These numbers directly affect the maximum velocity.
-#define STEPS_PER_TURN  (400.0)
+// stepper motor @ 200 steps per turn
+#define STEPPER_STEPS_PER_TURN    (200.0)
+#define MICROSTEPPING_MULTIPLIER  (1.0)
+#define STEPS_PER_TURN            (STEPPER_STEPS_PER_TURN*MICROSTEPPING_MULTIPLIER)
 
 
 #define NUM_TOOLS  (6)
@@ -54,16 +52,21 @@
 #define PEN_DOWN_ANGLE  (10)  // Some servos don't like 0 degrees
 #define PEN_DELAY       (250)  // in ms
 
+// NEMA17 are 200 steps (1.8 degrees) per turn.  If a spool is 0.8 diameter
+// then it is 2.5132741228718345 circumference, and
+// 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
+// NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
+// These numbers directly affect the maximum velocity.
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
 
-#define MAX_FEEDRATE    (1000)
-#define MIN_FEEDRATE    (0.01) // steps / second
+#define MAX_FEEDRATE    (10000.0)
+#define MIN_FEEDRATE    (1.0) // steps / second
 
 // for arc directions
 #define ARC_CW          (1)
 #define ARC_CCW         (-1)
 // Arcs are split into many line segments.  How long are the segments?
-#define CM_PER_SEGMENT   (0.2)
+#define MM_PER_SEGMENT  (10)
 
 // Serial communication bitrate
 #define BAUD            (57600)
@@ -94,7 +97,8 @@
 #define M1_ONESTEP(x)  m1->onestep(x,SINGLE)
 #define M2_ONESTEP(x)  m2->onestep(x,SINGLE)
 // stacked motor shields have different addresses. The default is 0x60
-#define SHIELD_ADDRESS (0x60)
+// 0x70 is the "all call" address - every shield will respond as one.
+#define SHIELD_ADDRESS (0x61)
 #endif
 
 //------------------------------------------------------------------------------
@@ -175,7 +179,7 @@ int M2_REEL_IN  = FORWARD;
 int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
-float SPOOL_DIAMETER = 0.950;
+float SPOOL_DIAMETER = 1.5;
 float THREAD_PER_STEP;  // thread per step
 
 // plotter position.
@@ -255,7 +259,7 @@ static void setFeedRate(float v) {
   if(v < MIN_FEEDRATE) v = MIN_FEEDRATE;
   
   step_delay = 1000000.0 / v;
- 
+
 #if VERBOSE > 1
   Serial.print(F("feed_rate="));  Serial.println(feed_rate);
   Serial.print(F("step_delay="));  Serial.println(step_delay);
@@ -336,9 +340,9 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 
 //------------------------------------------------------------------------------
-void pause(long ms) {
-  delay(ms/1000);
-  delayMicroseconds(ms%1000);
+void pause(long us) {
+  delay(us/1000);
+  delayMicroseconds(us%1000);
 }
 
 
@@ -356,6 +360,20 @@ static void line(float x,float y,float z) {
   long over=0;
   long i;
   
+  long ad = max(ad1,ad2);
+  long d = 1500;
+  long accelerate_until = d - step_delay;
+  long decelerate_after = ad - accelerate_until;
+  if(decelerate_after < accelerate_until ) {
+    decelerate_after = accelerate_until = ad/2;
+  }
+
+#ifdef VERBOSE > 2
+  Serial.print("s ");  Serial.println(ad);
+  Serial.print("a ");  Serial.println(accelerate_until);
+  Serial.print("d ");  Serial.println(decelerate_after);
+#endif
+
   setPenAngle((int)z);
   
   // bresenham's line algorithm.
@@ -367,8 +385,13 @@ static void line(float x,float y,float z) {
         over-=ad1;
         M2_ONESTEP(dir2);
       }
-      delayMicroseconds(step_delay);
+      
+      if(i<accelerate_until) d--;
+      if(i>=decelerate_after) d++;
+      pause(d);
+#ifdef USE_LIMIT_SWITCH
       if(readSwitches()) return;
+#endif
     }
   } else {
     for(i=0;i<ad2;++i) {
@@ -378,8 +401,13 @@ static void line(float x,float y,float z) {
         over-=ad2;
         M1_ONESTEP(dir1);
       }
-      delayMicroseconds(step_delay);
+      
+      if(i<accelerate_until) d--;
+      if(i>=decelerate_after) d++;
+      pause(d);
+#ifdef USE_LIMIT_SWITCH
       if(readSwitches()) return;
+#endif
     }
   }
 
@@ -396,23 +424,23 @@ static void line_safe(float x,float y,float z) {
   // split up long lines to make them straighter?
   float dx=x-posx;
   float dy=y-posy;
+  float dz=z-posz;
   
+  float x0=posx;
+  float y0=posy;
+  float z0=posz;
+  float a;
+
   float len=sqrt(dx*dx+dy*dy);
+  // too long!
+  long pieces=ceil(len / MM_PER_SEGMENT);
   
-  if(len>CM_PER_SEGMENT) {
-    // too long!
-    long pieces=floor(len/CM_PER_SEGMENT);
-    float x0=posx;
-    float y0=posy;
-    float z0=posz;
-    float a;
-    for(long j=1;j<pieces;++j) {
-      a=(float)j/(float)pieces;
-  
-      line((x-x0)*a+x0,
-           (y-y0)*a+y0,
-           (z-z0)*a+z0);
-    }
+  for(long j=1;j<pieces;++j) {
+    a=(float)j/(float)pieces;
+
+    line(dx*a+x0,
+         dy*a+y0,
+         dz*a+z0);
   }
   line(x,y,z);
 }
@@ -447,7 +475,7 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
   // simplifies to
   float len = abs(theta) * radius;
 
-  int i, segments = floor( len / CM_PER_SEGMENT );
+  int i, segments = ceil( len * MM_PER_SEGMENT );
  
   float nx, ny, nz, angle3, scale;
 
@@ -1007,9 +1035,15 @@ void setup() {
   // initialize the scale
   strcpy(mode_name,"mm");
   mode_scale=0.1;
-  
+
+#if MOTHERBOARD == 2
+  // Change the i2c clock from 100KHz to 400KHz
+  // https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/faq
+  //TWBR = ((F_CPU /400000l) - 16) / 2; 
+#endif
+
   setFeedRate(MAX_FEEDRATE);  // *30 because i also /2
-  
+
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
   

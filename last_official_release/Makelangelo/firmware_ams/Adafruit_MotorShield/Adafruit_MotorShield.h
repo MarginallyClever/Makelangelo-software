@@ -34,10 +34,10 @@
 #define MOTOR3_A 5
 #define MOTOR3_B 7
 
+#define BRAKE 0
 #define FORWARD 1
-#define BACKWARD 2
-#define BRAKE 3
-#define RELEASE 4
+#define BACKWARD -1
+#define RELEASE 2
 
 #define SINGLE 1
 #define DOUBLE 2
