@@ -552,42 +552,47 @@ public class Filter {
 				
 				// file found. copy/paste it into the temp file
 				//System.out.println(" OK");
-				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fn),"UTF-8"));
+				
+				try (final FileInputStream fileInputStream = new FileInputStream(fn);
+								final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+								final BufferedReader in = new BufferedReader(inputStreamReader)) {
 
-				String b;
-		        while ( (b = in.readLine()) != null ) {
-		        	if(b.trim().length()==0) continue;
-		        	if(b.equals("UP")) {
-						output.write("G90;\n");
-		        		liftPen(output);
-						output.write("G91;\n");
-		        	} else if(b.equals("DOWN")) { 
-						output.write("G90;\n");
-						lowerPen(output);
-						output.write("G91;\n");
-		        	} else {
-		        		StringTokenizer st = new StringTokenizer(b);
-		        		String gap="";
-		        		while (st.hasMoreTokens()) {
-		        			String c=st.nextToken();
-		        			if(c.startsWith("G")) {
-		        				output.write(gap+c);
-		        			} else if(c.startsWith("X")) {
-				        		// translate coordinates
-		        				float x = Float.parseFloat(c.substring(1))*10;  // cm to mm
-		        				output.write(gap+"X"+SX(x));
-		        			} else if(c.startsWith("Y")) {
-				        		// translate coordinates
-		        				float x = Float.parseFloat(c.substring(1))*10;  // cm to mm
-		        				output.write(gap+"Y"+SY(x));
-		        			} else {
-				        		output.write(gap+c);
-		        			}
-		        			gap=" ";
-		        		}
-		        		output.write(";\n");
-		        	}
-		        }
+					String b;
+					while ((b = in.readLine()) != null) {
+						if (b.trim().length() == 0)
+							continue;
+						if (b.equals("UP")) {
+							output.write("G90;\n");
+							liftPen(output);
+							output.write("G91;\n");
+						} else if (b.equals("DOWN")) {
+							output.write("G90;\n");
+							lowerPen(output);
+							output.write("G91;\n");
+						} else {
+							StringTokenizer st = new StringTokenizer(b);
+							String gap = "";
+							while (st.hasMoreTokens()) {
+								String c = st.nextToken();
+								if (c.startsWith("G")) {
+									output.write(gap + c);
+								} else if (c.startsWith("X")) {
+									// translate coordinates
+									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									output.write(gap + "X" + SX(x));
+								} else if (c.startsWith("Y")) {
+									// translate coordinates
+									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									output.write(gap + "Y" + SY(x));
+								} else {
+									output.write(gap + c);
+								}
+								gap = " ";
+							}
+							output.write(";\n");
+						}
+					}
+				}
 			} else {
 				// file not found
 				System.out.print(fn);
