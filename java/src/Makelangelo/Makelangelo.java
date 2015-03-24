@@ -1973,7 +1973,7 @@ public class Makelangelo
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
 	        	if( inputLine.compareTo(version) !=0 ) {
-	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpdateNotice"));
+                    JOptionPane.showMessageDialog(null, createHyperlinkListenableJEditorPane(MultilingualSupport.getSingleton().get("UpdateNotice")));
 	        	} else {
 	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpToDate"));
 	        	}
