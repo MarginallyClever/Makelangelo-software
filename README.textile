@@ -37,3 +37,8 @@ h2. See Also
 * "The Makelangelo homepage":http://www.makelangelo.com/ 
 * "The wiki":https://learn.marginallyclever.com/
 * "The forums":https://marginallyclever.com/forum/
+
+h3. 3rd Party Dependencies
+* "rxtx":http://search.maven.org/#artifactdetails%7Corg.rxtx%7Crxtx%7C2.1.7%7Cjar
+* "appbundle":https://github.com/federkasten/appbundle-maven-plugin
+* "jssc":http://search.maven.org/#artifactdetails%7Corg.scream3r%7Cjssc%7C2.8.0%7Cjar
