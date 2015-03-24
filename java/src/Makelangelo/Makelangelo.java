@@ -14,6 +14,7 @@ import jssc.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -49,10 +51,13 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -67,6 +72,7 @@ import Filters.*;
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
 // TODO vector output ?
+// TODO externalize constants like version and ABOUT_HTML
 
 public class Makelangelo
 		extends JPanel
@@ -77,6 +83,16 @@ public class Makelangelo
 
 	// software version
 	static final String version="7";
+	
+	// HTML for About Dialog.
+	private static final String ABOUT_HTML = "<html><body>"
+			+"<h1>Makelangelo v"+version+"</h1>"
+			+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
+            +"<p>Created by Dan Royer (<a href=\"mailto:dan@marginallyclever.com\">dan@marginallyclever.com</a>).<br>Additional contributions by Joseph Cottam and <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>.</p><br>"
+			+"<p>To get the latest version please visit<br>"
+			+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
+			+"<p>This program is open source and free.  As it should be!</p>"
+			+"</body></html>";
 	
 	private static Makelangelo singletonObject;
 	
@@ -1574,14 +1590,8 @@ public class Makelangelo
 			return;
 		}
 		if( subject == buttonAbout ) {
-			JOptionPane.showMessageDialog(null,"<html><body>"
-					+"<h1>Makelangelo v"+version+"</h1>"
-					+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
-					+"<p>Created by Dan Royer (dan@marginallyclever.com).<br>Additional contributions by Joseph Cottam.</p><br>"
-					+"<p>To get the latest version please visit<br>"
-					+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
-					+"<p>This program is open source and free.  As it should be!</p>"
-					+"</body></html>");
+			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(ABOUT_HTML);
+		    JOptionPane.showMessageDialog(null, bottomText);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1618,6 +1628,36 @@ public class Makelangelo
 			SendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
+	}
+
+	/**
+	 * 
+	 * @param html String of valid HTML.
+	 * @return a 
+	 */
+	private JTextComponent createHyperlinkListenableJEditorPane(String html) {
+		final JEditorPane bottomText = new JEditorPane();
+		bottomText.setContentType("text/html");
+		bottomText.setEditable(false);
+		bottomText.setText(html);
+		bottomText.setOpaque(false);
+		final HyperlinkListener hyperlinkListener = new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
+				if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+					if (Desktop.isDesktopSupported()) {
+						try {
+							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
+						} catch (IOException | URISyntaxException exception) {
+							// FIXME Auto-generated catch block
+							exception.printStackTrace();
+						}
+					}
+
+				}
+			}
+		};
+		bottomText.addHyperlinkListener(hyperlinkListener);
+		return bottomText;
 	}
 	
 	
