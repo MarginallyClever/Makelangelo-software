@@ -62,11 +62,25 @@ public class LanguageContainer {
 		return x;
 	}
 
+
 	/**
+	 * 
+	 * <p>
+	 * When a newline character "\n" was being read in from an xml file, 
+	 * it was being escaped ("\\n") and thus not behaving as an actual newline.
+	 * This method replaces any "\\n" with "\n".
+	 * </p>
+	 * 
+	 * <p>
 	 * I take a xml element and the tag name, look for the tag and get
 	 * the text content
 	 * i.e for <employee><name>John</name></employee> xml snippet if
 	 * the Element points to employee node and tagName is 'name' I will return John
+	 * </p>
+	 * 
+	 * @param ele XML element
+	 * @param tagName name of 'tag' or child XML element of ele
+	 * @return text value of tagName
 	 */
 	private String getTextValue(Element ele, String tagName) {
 		String textVal = null;
@@ -75,7 +89,7 @@ public class LanguageContainer {
 			Element el = (Element)nl.item(0);
 			textVal = el.getFirstChild().getNodeValue();
 		}
-
+		textVal = textVal.replace("\\n", "\n");
 		return textVal;
 	}
 	
