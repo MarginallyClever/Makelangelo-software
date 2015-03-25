@@ -73,6 +73,7 @@ import Filters.*;
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
 // TODO vector output ?
 // TODO externalize constants like version and ABOUT_HTML
+// TODO externalize constants like version
 
 public class Makelangelo
 		extends JPanel
@@ -83,16 +84,6 @@ public class Makelangelo
 
 	// software version
 	static final String version="7";
-	
-	// HTML for About Dialog.
-	private static final String ABOUT_HTML = "<html><body>"
-			+"<h1>Makelangelo v"+version+"</h1>"
-			+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
-            +"<p>Created by Dan Royer (<a href=\"mailto:dan@marginallyclever.com\">dan@marginallyclever.com</a>).<br>Additional contributions by Joseph Cottam and <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>.</p><br>"
-			+"<p>To get the latest version please visit<br>"
-			+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
-			+"<p>This program is open source and free.  As it should be!</p>"
-			+"</body></html>";
 	
 	private static Makelangelo singletonObject;
 	
@@ -1590,7 +1581,19 @@ public class Makelangelo
 			return;
 		}
 		if( subject == buttonAbout ) {
-			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(ABOUT_HTML);
+            final String aboutHtmlBeforeVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLBeforeVersionNumber");
+            final String aboutHmlAfterVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLAfterVersionNumber");
+            final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
+            final int versionNumberStringLength = version.length();
+            final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
+            final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
+            final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
+            aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
+            aboutHtmlStringBuilder.append(version);
+            aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
+            final String aboutHtml = aboutHtmlStringBuilder.toString();
+
+			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		    JOptionPane.showMessageDialog(null, bottomText);
 			return;
 		}
