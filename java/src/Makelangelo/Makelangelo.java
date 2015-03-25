@@ -1581,18 +1581,7 @@ public class Makelangelo
 			return;
 		}
 		if( subject == buttonAbout ) {
-            final String aboutHtmlBeforeVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLBeforeVersionNumber");
-            final String aboutHmlAfterVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLAfterVersionNumber");
-            final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
-            final int versionNumberStringLength = version.length();
-            final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
-            final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
-            final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
-            aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
-            aboutHtmlStringBuilder.append(version);
-            aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
-            final String aboutHtml = aboutHtmlStringBuilder.toString();
-
+            final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		    JOptionPane.showMessageDialog(null, bottomText);
 			return;
@@ -1634,6 +1623,24 @@ public class Makelangelo
 	}
 
 	/**
+	 * 
+     * @return An HTML string (supports internationalization) used for the About Message Dialog.
+     */
+    private String getAboutHtmlFromMultilingualString() {
+        final String aboutHtmlBeforeVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLBeforeVersionNumber");
+        final String aboutHmlAfterVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLAfterVersionNumber");
+        final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
+        final int versionNumberStringLength = version.length();
+        final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
+        final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
+        final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
+        aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
+        aboutHtmlStringBuilder.append(version);
+        aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
+        return aboutHtmlStringBuilder.toString();
+    }
+
+    /**
 	 * 
 	 * @param html String of valid HTML.
 	 * @return a 
