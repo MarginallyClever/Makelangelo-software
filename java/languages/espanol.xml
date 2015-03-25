@@ -471,7 +471,7 @@
 		<key>ZoomFit</key>
 		<value>Zoom to fit</value>
 	</string>
-  
+
   <!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to Spanish.
   Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
 used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
@@ -481,8 +481,7 @@ one big CDATA html blob. -->
     <value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo v
-    ]]>
+        <h1>Makelangelo v]]>
     </value>
     <hint>HTML for About Dialog</hint>
   </string>
