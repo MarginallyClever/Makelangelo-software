@@ -73,6 +73,7 @@ import Filters.*;
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
 // TODO vector output ?
 // TODO externalize constants like version and ABOUT_HTML
+// TODO externalize constants like version
 
 public class Makelangelo
 		extends JPanel
@@ -81,18 +82,10 @@ public class Makelangelo
 	// Java required?
 	static final long serialVersionUID=1L;
 
-	// software version
-	static final String version="7";
-	
-	// HTML for About Dialog.
-	private static final String ABOUT_HTML = "<html><body>"
-			+"<h1>Makelangelo v"+version+"</h1>"
-			+"<h3><a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a></h3>"
-            +"<p>Created by Dan Royer (<a href=\"mailto:dan@marginallyclever.com\">dan@marginallyclever.com</a>).<br>Additional contributions by Joseph Cottam and <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>.</p><br>"
-			+"<p>To get the latest version please visit<br>"
-			+"<a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a></p><br>"
-			+"<p>This program is open source and free.  As it should be!</p>"
-			+"</body></html>";
+    /**
+     * software version
+     */
+	public static final String version="7";
 	
 	private static Makelangelo singletonObject;
 	
@@ -1590,7 +1583,8 @@ public class Makelangelo
 			return;
 		}
 		if( subject == buttonAbout ) {
-			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(ABOUT_HTML);
+            final String aboutHtml = getAboutHtmlFromMultilingualString();
+			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		    JOptionPane.showMessageDialog(null, bottomText);
 			return;
 		}
@@ -1631,6 +1625,35 @@ public class Makelangelo
 	}
 
 	/**
+	 * 
+     * <p>
+     * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
+     * representing the About Message Dialog's HTML.
+     * </p>
+     *
+     * <p>
+     * The summation of {@link String#length()} for each of the respective values retrieved with the
+     * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link MultilingualSupport} keys,
+     * in conjunction with {@link Makelangelo#version} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
+     * </p>
+     *
+     * @return An HTML string used for the About Message Dialog.
+     */
+    private String getAboutHtmlFromMultilingualString() {
+        final String aboutHtmlBeforeVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLBeforeVersionNumber");
+        final String aboutHmlAfterVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLAfterVersionNumber");
+        final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
+        final int versionNumberStringLength = version.length();
+        final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
+        final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
+        final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
+        aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
+        aboutHtmlStringBuilder.append(version);
+        aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
+        return aboutHtmlStringBuilder.toString();
+    }
+
+    /**
 	 * 
 	 * @param html String of valid HTML.
 	 * @return a 
