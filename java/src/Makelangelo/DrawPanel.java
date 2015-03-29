@@ -1,5 +1,5 @@
 package Makelangelo;
-import java.awt.BasicStroke;
+
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -64,7 +64,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		NodeType type;
 	}
 	ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
-	BasicStroke fast_stroke;
 	
 	
 	public DrawPanel() {
@@ -366,7 +365,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 				switch(n.type) {
 				case TOOL:
 					tool = MachineConfiguration.getSingleton().GetTool(n.tool_id);
-					//g2d.setStroke(tool.getStroke());
 					gl2.glLineWidth(tool.GetDiameter());
 					break;
 				case COLOR:
