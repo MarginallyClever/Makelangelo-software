@@ -77,6 +77,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <minimum.maven.version>2.2.1</minimum.maven.version>
     <minimum.java.version>1.7</minimum.java.version>
-    <jogl.version>2.0.2</jogl.version>
+    <jogl.version>2.2.4</jogl.version>
   </properties>
 </project>
