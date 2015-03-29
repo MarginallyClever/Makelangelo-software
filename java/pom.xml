@@ -6,6 +6,9 @@
   <version>v7-SNAPSHOT</version>
   <name>Makelangelo</name>
   <description>Wall-hanging polargraph robot that draws murals</description>
+  <prerequisites>
+    <maven>2.2.1</maven>
+  </prerequisites>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
