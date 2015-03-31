@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 import Makelangelo.Point2D;
 import Makelangelo.Polygon2D;
 
@@ -58,13 +58,13 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 	// jiggle the dots until they make a nice picture
 	protected void evolveCells() {
-		Makelangelo.getSingleton().Log("<font color='green'>Mutating</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
 
 		int generation=0;
 		float change;
 		do {
 			generation++;
-			Makelangelo.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
+			MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
 			
 			// 
 			tessellateVoronoiDiagram();
@@ -77,7 +77,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	
 	// write cell centroids to gcode.
 	protected void writeOutCells() throws IOException {
-		Makelangelo.getSingleton().Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		ImageStart(src_img,out);
@@ -103,7 +103,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 	// set some starting points in a grid
 	protected void initializeCells() {
-		Makelangelo.getSingleton().Log("<font color='green'>Initializing cells</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Initializing cells</font>\n");
 
 		used=0;
 		

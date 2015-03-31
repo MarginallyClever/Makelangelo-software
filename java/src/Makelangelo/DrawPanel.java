@@ -251,7 +251,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private void paintCamera(GL2 gl2) {
 		gl2.glMatrixMode(GL2.GL_PROJECTION);
 		gl2.glLoadIdentity();
-		gl2.glOrtho(0, window_width, 0, window_height, 1, -1);
+		gl2.glOrtho(-window_width/2.0f, window_width/2.0f, -window_height/2.0f, window_height/2.0f, 1, -1);
 		//GLU glu = new GLU();
         //glu.gluPerspective(60, window_aspect_ratio, 1.0f, 1000.0f);
         gl2.glMatrixMode(GL2.GL_MODELVIEW);
@@ -260,7 +260,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		//if(prefs.getBoolean("antialias", true)) g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 		//if(prefs.getBoolean("speed over quality", true)) g2d.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
-		gl2.glTranslated(-cameraOffsetX+window_width/2.0f, cameraOffsetY+window_height/2.0f,0);
+		gl2.glTranslated(-cameraOffsetX, cameraOffsetY,0);
 		gl2.glScaled(cameraZoom,cameraZoom,1);
     }
   
