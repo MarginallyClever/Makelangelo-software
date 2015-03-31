@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import Makelangelo.MachineConfiguration;
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
@@ -32,7 +32,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	
 	
 	public void Generate(String dest) {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Text To GCODE",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Text To GCODE",true);
 		driver.setLayout(new GridLayout(0,1));
 
 		final JTextArea text = new JTextArea(lastMessage,60,6);
@@ -57,9 +57,9 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 					CreateMessage(lastMessage,dest2);
 					
 					// TODO Move to GUI?
-					Makelangelo.getSingleton().Log("<font color='green'>Completed.</font>\n");
-					Makelangelo.getSingleton().PlayConversionFinishedSound();
-					Makelangelo.getSingleton().LoadGCode(dest2);
+					MainGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
+					MainGUI.getSingleton().PlayConversionFinishedSound();
+					MainGUI.getSingleton().LoadGCode(dest2);
 
 					driver.dispose();
 				}

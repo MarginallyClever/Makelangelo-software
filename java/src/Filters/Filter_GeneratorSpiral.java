@@ -6,7 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -103,7 +103,7 @@ public class Filter_GeneratorSpiral extends Filter {
 			++numRings;
 		}
 		
-		Makelangelo.getSingleton().Log("<font color='yellow'>"+numRings+" rings.</font>\n");
+		MainGUI.getSingleton().Log("<font color='yellow'>"+numRings+" rings.</font>\n");
 
 		liftPen(out);
 		SignName(out);

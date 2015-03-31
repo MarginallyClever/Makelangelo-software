@@ -1,7 +1,7 @@
 package Filters;
 
 
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
@@ -31,7 +31,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
 		img = bw.Process(img);
 
-		Makelangelo.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		ImageStart(img,out);
@@ -44,7 +44,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		tool.WriteChangeTo(out);
 		liftPen(out);
 
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -69,7 +69,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
 		// create vertical lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -94,7 +94,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
 		// create diagonal \ lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -134,7 +134,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		Makelangelo.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
 		// create diagonal / lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
