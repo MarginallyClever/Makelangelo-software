@@ -14,7 +14,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 import Makelangelo.MultilingualSupport;
 
 
@@ -40,7 +40,7 @@ public class DrawingTool_Pen extends DrawingTool {
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust Pen",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Adjust Pen",true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField penDiameter   = new JTextField(Float.toString(GetDiameter()),5);
@@ -105,10 +105,10 @@ public class DrawingTool_Pen extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestUp) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penUp.getText());
+					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penUp.getText());
 				}
 				if(subject == buttonTestDown) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penDown.getText());
+					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penDown.getText());
 				}
 				if(subject == buttonSave) {
 					SetDiameter(Float.valueOf(penDiameter.getText()));
@@ -132,7 +132,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		buttonCancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(buttonSave);
 	
-		Makelangelo.getSingleton().SendLineToRobot("M114");
+		MainGUI.getSingleton().SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}

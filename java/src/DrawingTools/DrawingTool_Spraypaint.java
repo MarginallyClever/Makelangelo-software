@@ -16,7 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 
 
 public class DrawingTool_Spraypaint extends DrawingTool {
@@ -77,7 +77,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust Spraypaint",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Adjust Spraypaint",true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField penDiameter   = new JTextField(Float.toString(diameter),5);
@@ -143,8 +143,8 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestDot) {
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
-					Makelangelo.getSingleton().SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
+					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
+					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
 				}
 				if(subject == buttonSave) {
 					diameter = Float.valueOf(penDiameter.getText());
@@ -167,7 +167,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		buttonCancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(buttonSave);
 	
-		Makelangelo.getSingleton().SendLineToRobot("M114");
+		MainGUI.getSingleton().SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}
