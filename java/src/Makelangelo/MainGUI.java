@@ -1601,7 +1601,7 @@ public class MainGUI
 		}
 		
 		if( subject == buttonExit ) {
-			System.exit(0);  // TODO: be more graceful?
+			getParentFrame().dispose();
 			return;
 		}
 		
@@ -2333,7 +2333,7 @@ public class MainGUI
     	
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
-        mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         // Create and set up the content pane.
         mainframe.setJMenuBar(CreateMenuBar());
