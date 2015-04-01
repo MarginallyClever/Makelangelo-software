@@ -3,8 +3,7 @@
 *.png           binary
 
 *.ngc           text
-*.java          text
-*.ngc           text  diff=java
+*.java          text  diff=java
 *.prefs         text
 *.txt           text
 *.xml           text
