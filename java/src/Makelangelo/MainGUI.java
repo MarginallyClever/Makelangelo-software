@@ -72,8 +72,7 @@ import Filters.*;
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
 // TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
 // TODO vector output ?
-// TODO externalize constants like version and ABOUT_HTML
-// TODO externalize constants like version
+// TODO externalize constants such as version
 
 public class MainGUI
 		extends JPanel
