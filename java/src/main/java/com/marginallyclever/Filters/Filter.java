@@ -537,7 +537,7 @@ public class Filter {
 				case '}':  name="B3CLOSE";  break;
 				case '~':  name="TILDE";  break;
 				case '\\':  name="BSLASH";  break;
-				//case '':  name="SPACE";  break; FIXME com.marginallyclever.makelangelo/java/src/com.marginallyclever.filters/Filter.java:[540,39] unmappable character for encoding UTF-8
+                //case '':  name="SPACE";  break; FIXME Makelangelo/java/src/com.marginallyclever.filters/Filter.java:[540,39] unmappable character for encoding UTF-8
 				default: name=Character.toString(letter);  break;
 				}
 			}
@@ -618,7 +618,7 @@ public class Filter {
 		
 		TextSetCharsPerLine(25);
 
-		TextCreateMessageNow("com.marginallyclever.makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 		h2=yy;
 		w2=xx;

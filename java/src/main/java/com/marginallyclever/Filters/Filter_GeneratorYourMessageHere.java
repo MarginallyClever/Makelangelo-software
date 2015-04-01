@@ -97,7 +97,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			TextSetAlign(Align.RIGHT);
 			TextSetVAlign(VAlign.TOP);
 			TextSetPosition(image_width,image_height);
-			TextCreateMessageNow("com.marginallyclever.makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),output);
+			TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),output);
 			
 			output.close();
 		}

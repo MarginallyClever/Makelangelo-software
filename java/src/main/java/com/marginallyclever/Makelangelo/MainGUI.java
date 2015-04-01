@@ -112,7 +112,7 @@ public class MainGUI
 		static private final String badchecksum = "BADCHECKSUM ";
 		static private final String badlinenum = "BADLINENUM ";
 	
-	// parsing input from com.marginallyclever.makelangelo
+	// parsing input from Makelangelo
 	private String serial_recv_buffer="";
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
@@ -2332,7 +2332,7 @@ public class MainGUI
     	MultilingualSupport.getSingleton();
     	
         // Create and set up the window.
-    	mainframe = new JFrame("com/marginallyclever/makelangelo");
+    	mainframe = new JFrame("Makelangelo");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Create and set up the content pane.
