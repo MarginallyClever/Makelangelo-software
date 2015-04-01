@@ -122,8 +122,6 @@
       <groupId>org.kabeja</groupId>
       <artifactId>kabeja</artifactId>
       <version>0.4</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/kabeja-0.4.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
@@ -132,4 +130,11 @@
     <minimum.java.version>1.7</minimum.java.version>
     <jogl.version>2.3.1</jogl.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>my-local-repo</id>
+      <url>file://${basedir}/lib</url>
+    </repository>
+  </repositories>
 </project>
