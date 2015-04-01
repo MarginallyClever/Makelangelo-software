@@ -61,6 +61,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.*;
 import org.kabeja.parser.*;
@@ -1587,7 +1588,13 @@ public class MainGUI
 		if( subject == buttonAbout ) {
             final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-		    JOptionPane.showMessageDialog(null, bottomText);
+			ImageIcon icon = null;
+			try {
+				icon = new ImageIcon(IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("logo.png")));
+			} catch (IOException exceptionLoadingIconImage) {
+				System.err.print(exceptionLoadingIconImage);
+			}
+		    JOptionPane.showMessageDialog(null, bottomText, "About FIXME", JOptionPane.INFORMATION_MESSAGE, icon);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
