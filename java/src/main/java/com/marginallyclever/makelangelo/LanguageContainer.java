@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class LanguageContainer {
 	protected String author = "";
 	protected Map<String,String> strings = new HashMap<String,String>();
 	
-	void Load(String language_file) {
+	void Load(InputStream language_file) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document dom=null;
 		

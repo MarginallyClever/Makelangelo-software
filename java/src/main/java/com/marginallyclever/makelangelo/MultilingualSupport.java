@@ -1,15 +1,12 @@
 package com.marginallyclever.makelangelo;
 
+import org.apache.commons.io.IOUtils;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -21,6 +18,7 @@ import javax.swing.JDialog;
 
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
+	private static final int SUPPORTED_LANGUAGES = 4;
 	protected String currentLanguage="English";
 	Map<String,LanguageContainer> languages = new HashMap<String,LanguageContainer>();
 	
@@ -92,36 +90,11 @@ public class MultilingualSupport {
 	}
 	
 	public void LoadLanguages() {
-		// Scan folder for language files
-		final URL resource = this.getClass().getClassLoader().getResource("languages");
-		File f = null;
-		try {
-			f = new File(resource.toURI());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		LanguageContainer lang;
-
-		File [] all_files = f.listFiles();
-		try {
-			if(all_files.length<=0) {
-				throw new Exception("No language files found!");
-			}
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		for(int i=0;i<all_files.length;++i) {
-			if(all_files[i].isHidden()) continue;
-			if(all_files[i].isDirectory()) continue;
-			// get extension
-			int j = all_files[i].getPath().lastIndexOf('.');
-			if (j <= 0) continue;  // no extension
-			if(all_files[i].getPath().substring(j+1).toLowerCase().equals("xml")==false) continue;  // only .XML or .xml files
+		LanguageContainer lang = null;
+		for (SupportedLanguage supportedLanguage : SupportedLanguage.values()) {
 			lang = new LanguageContainer();
-			lang.Load(all_files[i].getAbsolutePath());
-			languages.put(lang.getName(), lang);
+			lang.Load(getClass().getClassLoader().getResourceAsStream("languages/" + supportedLanguage.name().toLowerCase() + ".xml"));
+			this.languages.put(lang.getName(), lang);
 		}	
 	}
 	
