@@ -10,13 +10,13 @@ import javax.swing.event.MouseInputListener;
 
 import DrawingTools.DrawingTool;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLPipelineFactory;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.awt.GLJPanel;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLPipelineFactory;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLJPanel;
 
 	// Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
@@ -95,14 +95,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         if(glDebug) {
             try {
                 // Debug ..
-                gl = gl.getContext().setGL( GLPipelineFactory.create("javax.media.opengl.Debug", null, gl, null) );
+                gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null) );
             } catch (Exception e) {e.printStackTrace();}
         }
 
         if(glTrace) {
             try {
                 // Trace ..
-                gl = gl.getContext().setGL( GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err } ) );
+                gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err } ) );
             } catch (Exception e) {e.printStackTrace();}
         }
     }
@@ -271,9 +271,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         // Special handling for the case where the GLJPanel is translucent
         // and wants to be composited with other Java 2D content
         if (GLProfile.isAWTAvailable() &&
-            (this instanceof javax.media.opengl.awt.GLJPanel) &&
-            !((javax.media.opengl.awt.GLJPanel) this).isOpaque() &&
-            ((javax.media.opengl.awt.GLJPanel) this).shouldPreserveColorBufferIfTranslucent()) {
+            (this instanceof com.jogamp.opengl.awt.GLJPanel) &&
+            !((com.jogamp.opengl.awt.GLJPanel) this).isOpaque() &&
+            ((com.jogamp.opengl.awt.GLJPanel) this).shouldPreserveColorBufferIfTranslucent()) {
           gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
         } else {
           gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
