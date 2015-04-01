@@ -5,12 +5,8 @@ package com.marginallyclever.filters;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 import javax.swing.ProgressMonitor;
@@ -486,7 +482,7 @@ public class Filter {
 	}
 	
  	protected void TextDrawLine(String a1,OutputStreamWriter output) throws IOException {
-		String ud = System.getProperty("user.dir") + "/" + alphabetFolder;
+		String ud = alphabetFolder;//System.getProperty("user.dir") + "/" + alphabetFolder;
 		
 		//System.out.println(a1+" ("+a1.length()+")");
 		
@@ -542,20 +538,13 @@ public class Filter {
 				}
 			}
 			String fn = ud + name  + ".NGC";
-			//System.out.print(fn);
-			
-			
-			if(new File(fn).isFile()) {
+			final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
+			if(inputStream != null) {
 				if(i>0 && kerning!=0) {
 					output.write("G0 X"+SX(kerning)+";\n");
 				}
-				
-				// file found. copy/paste it into the temp file
-				//System.out.println(" OK");
-				
-				try (final FileInputStream fileInputStream = new FileInputStream(fn);
-								final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-								final BufferedReader in = new BufferedReader(inputStreamReader)) {
+				try (	final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+						final BufferedReader in = new BufferedReader(inputStreamReader)) {
 
 					String b;
 					while ((b = in.readLine()) != null) {
@@ -595,6 +584,7 @@ public class Filter {
 				}
 			} else {
 				// file not found
+				System.out.println("file not found. Making best guess as to where it is.");
 				System.out.print(fn);
 				System.out.println(" NOK");
 			}
