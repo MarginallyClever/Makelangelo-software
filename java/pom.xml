@@ -10,15 +10,6 @@
     <maven>${minimum.maven.version}</maven>
   </prerequisites>
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -34,7 +25,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>Makelangelo.Makelangelo</mainClass>
+              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -107,6 +98,11 @@
     </plugins>
   </build>
   <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
     <dependency>
       <groupId>org.scream3r</groupId>
         <artifactId>jssc</artifactId>
