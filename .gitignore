@@ -25,3 +25,6 @@ java/Makelangelo.jar
 *.jar
 
 *.jar
+
+last_official_release/Makelangelo/log.html
+target/

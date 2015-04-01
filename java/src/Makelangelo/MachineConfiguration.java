@@ -35,17 +35,19 @@ public class MachineConfiguration {
 	// GUID
 	protected long robot_uid=0;
 	
+	protected double INCH_TO_CM = 2.54;
+	
 	// machine physical limits
-	public double limit_top=18*2.45;
-	public double limit_bottom=-18*2.45;
-	public double limit_left=-18*2.45;
-	public double limit_right=18*2.45;
+	public double limit_top=18*INCH_TO_CM;
+	public double limit_bottom=-18*INCH_TO_CM;
+	public double limit_left=-18*INCH_TO_CM;
+	public double limit_right=18*INCH_TO_CM;
 	
 	// paper area
-	public double paper_top=9*2.45;
-	public double paper_bottom=-9*2.45;
-	public double paper_left=-12*2.45;
-	public double paper_right=13*2.45;
+	public double paper_top=12*INCH_TO_CM;
+	public double paper_bottom=-12*INCH_TO_CM;
+	public double paper_left=-9*INCH_TO_CM;
+	public double paper_right=9*INCH_TO_CM;
 	public double paper_margin=0.9;
 	
 	// pulleys turning backwards?
@@ -53,10 +55,10 @@ public class MachineConfiguration {
 	public boolean m2invert=false;
 
 	// pulley diameter
-	private double bobbin_left_diameter=16;
-	private double bobbin_right_diameter=16;
+	private double bobbin_left_diameter=1.5;
+	private double bobbin_right_diameter=1.5;
 
-	private double default_feed_rate=2000;  // etch-a-sketch speed
+	private double max_feed_rate=3500;  // etch-a-sketch speed
 	
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
@@ -468,8 +470,8 @@ public class MachineConfiguration {
 	
 	protected boolean LoadConfigFromCloud() {
 		// Ask for credentials: MC login, password.  auto-remember login name.
-		String login = new String();
-		String password = new String();
+		//String login = new String();
+		//String password = new String();
 		// TODO finish this section
 
 		/*
@@ -491,21 +493,21 @@ public class MachineConfiguration {
 	
 	protected void LoadConfigFromLocal() {
 		Preferences prefs2 = prefs.node("Machines").node(Long.toString(robot_uid));
-		limit_top = Double.valueOf(prefs2.get("limit_top", "45.72"));
-		limit_bottom = Double.valueOf(prefs2.get("limit_bottom", "-45.72"));
-		limit_left = Double.valueOf(prefs2.get("limit_left", "-45.72"));
-		limit_right = Double.valueOf(prefs2.get("limit_right", "45.72"));
-		m1invert=Boolean.parseBoolean(prefs2.get("m1invert", "false"));
-		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", "true"));
-		bobbin_left_diameter=Double.valueOf(prefs2.get("bobbin_left_diameter", "3.0"));
-		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", "3.0"));
-		default_feed_rate=Double.valueOf(prefs2.get("feed_rate","2000"));
-		startingPositionIndex=Integer.valueOf(prefs2.get("startingPosIndex","4"));
+		limit_top = Double.valueOf(prefs2.get("limit_top", Double.toString(limit_top)));
+		limit_bottom = Double.valueOf(prefs2.get("limit_bottom", Double.toString(limit_bottom)));
+		limit_left = Double.valueOf(prefs2.get("limit_left", Double.toString(limit_left)));
+		limit_right = Double.valueOf(prefs2.get("limit_right", Double.toString(limit_right)));
+		m1invert=Boolean.parseBoolean(prefs2.get("m1invert", m1invert?"true":"false"));
+		m2invert=Boolean.parseBoolean(prefs2.get("m2invert", m2invert?"true":"false"));
+		bobbin_left_diameter=Double.valueOf(prefs2.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
+		bobbin_right_diameter=Double.valueOf(prefs2.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
+		max_feed_rate=Double.valueOf(prefs2.get("feed_rate",Double.toString(max_feed_rate)));
+		startingPositionIndex=Integer.valueOf(prefs2.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
-		paper_left=Double.parseDouble(prefs2.get("paper_left","-10.5"));
-		paper_right=Double.parseDouble(prefs2.get("paper_right","10.5"));
-		paper_top=Double.parseDouble(prefs2.get("paper_top","14.85"));
-		paper_bottom=Double.parseDouble(prefs2.get("paper_bottom","-14.85"));
+		paper_left=Double.parseDouble(prefs2.get("paper_left",Double.toString(paper_left)));
+		paper_right=Double.parseDouble(prefs2.get("paper_right",Double.toString(paper_right)));
+		paper_top=Double.parseDouble(prefs2.get("paper_top",Double.toString(paper_top)));
+		paper_bottom=Double.parseDouble(prefs2.get("paper_bottom",Double.toString(paper_bottom)));
 		
 		// load each tool's settings
 		for(int i=0;i<tools.length;++i) {
@@ -513,9 +515,9 @@ public class MachineConfiguration {
 		}
 
 		// TODO move these values to image filter preferences
-		paper_margin = Double.valueOf(prefs2.get("paper_margin","0.85"));
-		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass","false"));
-		current_tool = Integer.parseInt(prefs2.get("current_tool","0"),10);
+		paper_margin = Double.valueOf(prefs2.get("paper_margin",Double.toString(paper_margin)));
+		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass",reverseForGlass?"true":"false"));
+		current_tool = Integer.valueOf(prefs2.get("current_tool",Integer.toString(current_tool)));
 	}
 
 	
@@ -552,7 +554,7 @@ public class MachineConfiguration {
 		prefs2.put("m2invert",Boolean.toString(m2invert));
 		prefs2.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
 		prefs2.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		prefs2.put("feed_rate", Double.toString(default_feed_rate));
+		prefs2.put("feed_rate", Double.toString(max_feed_rate));
 		prefs2.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		prefs2.putDouble("paper_left", paper_left);
@@ -724,11 +726,11 @@ public class MachineConfiguration {
 	}
 	
 	public double GetFeedRate() {
-		return default_feed_rate;
+		return max_feed_rate;
 	}
 	
 	public void SetFeedRate(double f) {
-		default_feed_rate = f;
+		max_feed_rate = f;
 		SaveConfig();
 	}
 	

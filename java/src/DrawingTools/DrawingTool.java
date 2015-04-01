@@ -1,10 +1,11 @@
 package DrawingTools;
 
 import java.awt.BasicStroke;
-import java.awt.Graphics2D;
 import java.io.OutputStreamWriter;
+import com.jogamp.opengl.GL2;
 import java.io.IOException;
 import java.util.prefs.Preferences;
+
 
 
 public class DrawingTool {
@@ -71,8 +72,11 @@ public class DrawingTool {
 	public boolean DrawIsOn() { return z_on==draw_z; }
 	public boolean DrawIsOff() { return z_off==draw_z; }
 
-	public void DrawLine(Graphics2D g2d,double x1,double y1,double x2,double y2) {
-		g2d.drawLine((int)x1,(int)y1,(int)x2,(int)y2);
+	public void DrawLine(GL2 gl2,double x1,double y1,double x2,double y2) {
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glVertex2d(x1,y1);
+		gl2.glVertex2d(x2, y2);
+		gl2.glEnd();
 	}
 	
 

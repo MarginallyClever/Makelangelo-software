@@ -3,6 +3,9 @@ package Makelangelo;
 public class Point2D {
 	public float x, y;
 	
+	public Point2D() {
+		set(0,0);
+	}
 	public Point2D(float xx,float yy) {
 		set(xx,yy);
 	}
