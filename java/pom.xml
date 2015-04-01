@@ -118,6 +118,13 @@
         <artifactId>jogl-all-main</artifactId>
         <version>${jogl.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.kabeja</groupId>
+      <artifactId>kabeja</artifactId>
+      <version>0.4</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/kabeja-0.4.jar</systemPath>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
