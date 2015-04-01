@@ -5,6 +5,11 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -88,9 +93,13 @@ public class MultilingualSupport {
 	
 	public void LoadLanguages() {
 		// Scan folder for language files
-        String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
-        System.out.println(workingDirectory);
-		File f = new File(workingDirectory);
+		final URL resource = this.getClass().getClassLoader().getResource("languages");
+		File f = null;
+		try {
+			f = new File(resource.toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		LanguageContainer lang;
 
 		File [] all_files = f.listFiles();
