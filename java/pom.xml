@@ -25,7 +25,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.marginallyclever.Makelangelo.Makelangelo</mainClass>
+              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

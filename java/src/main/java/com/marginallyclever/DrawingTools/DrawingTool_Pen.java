@@ -1,4 +1,4 @@
-package com.marginallyclever.DrawingTools;
+package com.marginallyclever.drawingtools;
 
 
 import java.awt.GridBagConstraints;
@@ -13,9 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
-import com.marginallyclever.Makelangelo.MainGUI;
-import com.marginallyclever.Makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_Pen extends DrawingTool {

@@ -1,7 +1,7 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
-import com.marginallyclever.Makelangelo.C3;
+import com.marginallyclever.makelangelo.C3;
 
 
 /**

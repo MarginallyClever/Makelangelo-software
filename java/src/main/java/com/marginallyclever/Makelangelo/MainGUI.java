@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 /**@(#)drawbotGUI.java
  *
  * drawbot application with GUI
@@ -65,8 +65,8 @@ import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.*;
 import org.kabeja.parser.*;
 
-import com.marginallyclever.DrawingTools.DrawingTool;
-import com.marginallyclever.Filters.*;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.filters.*;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
@@ -112,7 +112,7 @@ public class MainGUI
 		static private final String badchecksum = "BADCHECKSUM ";
 		static private final String badlinenum = "BADLINENUM ";
 	
-	// parsing input from com.marginallyclever.Makelangelo
+	// parsing input from com.marginallyclever.makelangelo
 	private String serial_recv_buffer="";
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
@@ -2332,7 +2332,7 @@ public class MainGUI
     	MultilingualSupport.getSingleton();
     	
         // Create and set up the window.
-    	mainframe = new JFrame("com/marginallyclever/Makelangelo");
+    	mainframe = new JFrame("com/marginallyclever/makelangelo");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Create and set up the content pane.

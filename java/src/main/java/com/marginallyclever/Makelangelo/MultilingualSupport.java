@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

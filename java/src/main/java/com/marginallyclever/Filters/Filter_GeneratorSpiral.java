@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 import java.awt.image.BufferedImage;
@@ -6,7 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.marginallyclever.Makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MainGUI;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>

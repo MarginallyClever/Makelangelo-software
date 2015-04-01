@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 
@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
-import com.marginallyclever.Makelangelo.MainGUI;
-import com.marginallyclever.Makelangelo.Point2D;
-import com.marginallyclever.Makelangelo.Polygon2D;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Point2D;
+import com.marginallyclever.makelangelo.Polygon2D;
 
 
 

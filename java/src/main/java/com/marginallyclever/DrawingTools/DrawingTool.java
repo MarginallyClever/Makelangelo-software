@@ -1,4 +1,4 @@
-package com.marginallyclever.DrawingTools;
+package com.marginallyclever.drawingtools;
 
 import java.awt.BasicStroke;
 import java.io.OutputStreamWriter;

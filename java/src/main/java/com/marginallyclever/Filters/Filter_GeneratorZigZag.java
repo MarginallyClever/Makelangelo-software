@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 import java.awt.image.BufferedImage;
@@ -7,9 +7,9 @@ import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
-import com.marginallyclever.Makelangelo.MainGUI;
-import com.marginallyclever.Makelangelo.Point2D;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Point2D;
 
 
 /**

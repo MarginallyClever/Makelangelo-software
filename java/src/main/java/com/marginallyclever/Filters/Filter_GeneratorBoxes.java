@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 import java.awt.image.BufferedImage;

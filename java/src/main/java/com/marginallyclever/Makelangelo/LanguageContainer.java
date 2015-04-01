@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 
 import java.io.IOException;
 import java.util.HashMap;

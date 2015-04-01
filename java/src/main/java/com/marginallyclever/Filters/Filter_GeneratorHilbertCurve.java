@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -13,8 +13,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
-import com.marginallyclever.Makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;

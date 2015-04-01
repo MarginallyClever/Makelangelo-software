@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -8,7 +8,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.event.MouseInputListener;
 
-import com.marginallyclever.DrawingTools.DrawingTool;
+import com.marginallyclever.drawingtools.DrawingTool;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;

@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 
 public class Polygon2D {
 	public Point2D [] list;

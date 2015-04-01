@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 
@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MachineConfiguration;
 
 
 /**

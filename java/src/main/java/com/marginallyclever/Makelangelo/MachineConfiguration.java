@@ -1,4 +1,4 @@
-package com.marginallyclever.Makelangelo;
+package com.marginallyclever.makelangelo;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,10 +22,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.DrawingTools.DrawingTool;
-import com.marginallyclever.DrawingTools.DrawingTool_LED;
-import com.marginallyclever.DrawingTools.DrawingTool_Pen;
-import com.marginallyclever.DrawingTools.DrawingTool_Spraypaint;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.drawingtools.DrawingTool_LED;
+import com.marginallyclever.drawingtools.DrawingTool_Pen;
+import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 
 
 public class MachineConfiguration {

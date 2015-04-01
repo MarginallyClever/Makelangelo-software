@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 import java.awt.GridLayout;
@@ -14,8 +14,8 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
-import com.marginallyclever.Makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
@@ -97,7 +97,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			TextSetAlign(Align.RIGHT);
 			TextSetVAlign(VAlign.TOP);
 			TextSetPosition(image_width,image_height);
-			TextCreateMessageNow("com.marginallyclever.Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),output);
+			TextCreateMessageNow("com.marginallyclever.makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),output);
 			
 			output.close();
 		}

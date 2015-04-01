@@ -1,4 +1,4 @@
-package com.marginallyclever.DrawingTools;
+package com.marginallyclever.drawingtools;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

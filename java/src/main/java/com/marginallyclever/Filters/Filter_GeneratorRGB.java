@@ -1,4 +1,4 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
 import java.awt.image.BufferedImage;
@@ -6,8 +6,8 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.marginallyclever.Makelangelo.MachineConfiguration;
-import com.marginallyclever.Makelangelo.C3;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.C3;
 
 
 

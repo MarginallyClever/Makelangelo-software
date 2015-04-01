@@ -1,7 +1,7 @@
-package com.marginallyclever.Filters;
+package com.marginallyclever.filters;
 
 
-import com.marginallyclever.Makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MainGUI;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStreamWriter;
