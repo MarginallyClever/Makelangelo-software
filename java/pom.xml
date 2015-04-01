@@ -134,7 +134,7 @@
   <repositories>
     <repository>
       <id>my-local-repo</id>
-      <url>file://${basedir}/lib</url>
+      <url>file://${basedir}/local-maven-repo</url>
     </repository>
   </repositories>
 </project>
