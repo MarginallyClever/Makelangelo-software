@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import Makelangelo.MachineConfiguration;
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 import Makelangelo.Point2D;
 
 
@@ -62,7 +62,7 @@ public class Filter_GeneratorZigZag extends Filter {
 				case  2: c="red";	  break;
 				default: c="white";   break;
 				}
-				Makelangelo.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
+				MainGUI.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
 			}
 			progress = new_progress;
 			pm.setProgress((int)progress);
@@ -224,7 +224,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	private void GenerateTSP() {
 		GreedyTour();
 
-		Makelangelo.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
 		len=GetTourLength(solution);
 		old_len=len;
@@ -271,7 +271,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void GreedyTour() {
-		Makelangelo.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
 
 		int i;
 		float w, bestw;
@@ -360,7 +360,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			out.close();
 		}
 		catch(IOException e) {
-			Makelangelo.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
+			MainGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
 	}
 	
@@ -382,7 +382,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			}
 		}
 		
-		Makelangelo.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
+		MainGUI.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 	

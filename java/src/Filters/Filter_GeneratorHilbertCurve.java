@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
-import Makelangelo.Makelangelo;
+import Makelangelo.MainGUI;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
@@ -47,7 +47,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	
 	
 	public void Generate(final String dest) {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Hilbert Curve",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Hilbert Curve",true);
 		driver.setLayout(new GridLayout(0,1));
 
 		final JTextField field_size = new JTextField(Integer.toString((int)xmax));
@@ -133,7 +133,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	        output.close();
 	        
 			// open the file automatically to save a click.
-			Makelangelo.getSingleton().OpenFileOnDemand(dest);
+			MainGUI.getSingleton().OpenFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}

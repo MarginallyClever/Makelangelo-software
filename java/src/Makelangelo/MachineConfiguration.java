@@ -113,7 +113,7 @@ public class MachineConfiguration {
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
 	public void AdjustMachineSize() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),"Adjust machine & paper size",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Adjust machine & paper size",true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
@@ -134,7 +134,7 @@ public class MachineConfiguration {
 		
 		BufferedImage myPicture = null;
 		try {
-			InputStream s = Makelangelo.class.getResourceAsStream("/"+limit_file);
+			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
@@ -300,7 +300,7 @@ public class MachineConfiguration {
 						m2invert = m2i.isSelected();
 						
 						SaveConfig();
-						Makelangelo.getSingleton().SendConfig();
+						MainGUI.getSingleton().SendConfig();
 						driver.dispose();
 					}
 				}
@@ -313,7 +313,7 @@ public class MachineConfiguration {
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(save);
-		Makelangelo.getSingleton().SendLineToRobot("M114"); // "where" command
+		MainGUI.getSingleton().SendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -330,7 +330,7 @@ public class MachineConfiguration {
 	
 	// dialog to adjust the pen up & pen down values
 	protected void ChangeTool() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustMachineSize"),true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustMachineSize"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
@@ -360,7 +360,7 @@ public class MachineConfiguration {
 					current_tool = toolCombo.getSelectedIndex();
 					
 					SaveConfig();
-					Makelangelo.getSingleton().SendConfig();
+					MainGUI.getSingleton().SendConfig();
 					driver.dispose();
 				}
 				if(subject == cancel) {
@@ -395,7 +395,7 @@ public class MachineConfiguration {
 	
 	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	public void AdjustPulleySize() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustPulleySize"),true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustPulleySize"),true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
@@ -432,7 +432,7 @@ public class MachineConfiguration {
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
 						if(data_is_sane ) {
 							SaveConfig();
-							Makelangelo.getSingleton().SendConfig();
+							MainGUI.getSingleton().SendConfig();
 							driver.dispose();
 						}
 					}
@@ -650,7 +650,7 @@ public class MachineConfiguration {
 			// make sure a prefs node is created
 			prefs.node("Machines").node(Long.toString(new_uid));
 			// tell the robot it's new UID.
-			Makelangelo.getSingleton().SendLineToRobot("UID "+new_uid);
+			MainGUI.getSingleton().SendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
 			String [] new_list = new String[configurations_available.length+1];
@@ -668,7 +668,7 @@ public class MachineConfiguration {
 	
 	// must only be called when there is already more than the default configutation (uid=0) 
 	public void ChooseNewConfig() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"),true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"),true);
 		driver.setLayout(new GridBagLayout());
 
 		assert(configurations_available.length>1);

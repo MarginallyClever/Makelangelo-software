@@ -57,7 +57,7 @@ public class MultilingualSupport {
 	
 	// display a dialog box of available languages and let the user select their preference.
 	public void ChooseLanguage() {
-		final JDialog driver = new JDialog(Makelangelo.getSingleton().getParentFrame(),":) ?",true);
+		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),":) ?",true);
 		driver.setLayout(new GridBagLayout());
 
 		final String [] choices = getLanguageList();
