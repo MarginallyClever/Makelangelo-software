@@ -1,12 +1,9 @@
 package com.marginallyclever.makelangelo;
 
-import org.apache.commons.io.IOUtils;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -18,7 +15,6 @@ import javax.swing.JDialog;
 
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
-	private static final int SUPPORTED_LANGUAGES = 4;
 	protected String currentLanguage="English";
 	Map<String,LanguageContainer> languages = new HashMap<String,LanguageContainer>();
 	
