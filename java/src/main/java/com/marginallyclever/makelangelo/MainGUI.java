@@ -701,7 +701,7 @@ public class MainGUI
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
 									DXFSpline entity = (DXFSpline)entity_list.get(i);
-									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
+									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
 										DXFVertex v = polyLine.getVertex(j);

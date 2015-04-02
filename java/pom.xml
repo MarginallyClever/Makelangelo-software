@@ -118,6 +118,11 @@
         <artifactId>jogl-all-main</artifactId>
         <version>${jogl.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.kabeja</groupId>
+      <artifactId>kabeja</artifactId>
+      <version>0.4</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -125,4 +130,11 @@
     <minimum.java.version>1.7</minimum.java.version>
     <jogl.version>2.3.1</jogl.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>my-local-repo</id>
+      <url>file://${basedir}/local-maven-repo</url>
+    </repository>
+  </repositories>
 </project>
