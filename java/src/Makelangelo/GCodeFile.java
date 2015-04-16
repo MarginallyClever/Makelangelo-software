@@ -25,12 +25,14 @@ public class GCodeFile {
 	public float scale=1.0f;
 	public float feed_rate=1.0f;
 
+	
 	// returns angle of dy/dx as a value from 0...2PI
 	private double atan3(double dy,double dx) {
 	  double a=Math.atan2(dy,dx);
 	  if(a<0) a=(Math.PI*2.0)+a;
 	  return a;
 	}
+	
 	
 	void EstimateDrawTime() {
 		int i,j;
@@ -124,6 +126,7 @@ public class GCodeFile {
 	   	// conversion to ms?
 	   	estimated_time *= 10000;
 	}
+	
 	
 	// close the file, clear the preview tab
 	public void CloseFile() {
