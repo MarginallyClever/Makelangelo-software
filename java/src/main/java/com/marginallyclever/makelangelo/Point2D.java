@@ -2,7 +2,10 @@ package com.marginallyclever.makelangelo;
 
 public class Point2D {
 	public float x, y;
-	
+
+	public Point2D(Point2D p) {
+		set(p.x,p.y);
+	}
 	public Point2D() {
 		set(0,0);
 	}

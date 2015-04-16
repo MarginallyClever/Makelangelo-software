@@ -15,7 +15,7 @@ public class Polygon2D {
 			
 			list = new_list;
 		}
-		list[list.length-1]=p;
+		list[list.length-1]=new Point2D(p);
 	}
 	
 	public void removeAll() {
