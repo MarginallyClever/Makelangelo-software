@@ -49,12 +49,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import Makelangelo.MachineConfiguration;
 import Makelangelo.MainGUI;
 import Makelangelo.Point2D;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -150,13 +152,15 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	VoronoiCell [] cells = new VoronoiCell[1];
 	int w, h;
 	BufferedImage src_img;
-	List <GraphEdge> graphEdges = null;
-	int MAX_GENERATIONS=200;
-	int MAX_CELLS=1000;
+	List<GraphEdge> graphEdges = null;
+	int MAX_GENERATIONS=40;
+	int MAX_CELLS=5000;
 	Point2D bound_min = new Point2D();
 	Point2D bound_max = new Point2D();
 	int numEdgesInCell;
-	CellEdge[] cellBorder=null;
+	List<CellEdge> cellBorder = null;
+	double[] xValuesIn=null;
+	double[] yValuesIn=null;
 	
 	
 	
@@ -164,8 +168,14 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		src_img = img;
 		h = img.getHeight();
 		w = img.getWidth();
+		
+		MachineConfiguration mc = MachineConfiguration.getSingleton();
+		tool = mc.GetCurrentTool();
+		ImageSetupTransform(img);
 
-		initializeCells(1);
+		cellBorder = new ArrayList<CellEdge>();
+		
+		initializeCells(0.5);
 		evolveCells();
 		writeOutCells();
 	}
@@ -199,6 +209,10 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				++used;
 			}
 		}
+
+		// convert the cells to sites used in the Voronoi class.
+		xValuesIn = new double[cells.length];
+		yValuesIn = new double[cells.length];
 		
         siteidx = 0;
         sites = null;
@@ -209,19 +223,26 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 	// jiggle the dots until they make a nice picture
 	protected void evolveCells() {
-		MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
-
-		int generation=0;
-		float change;
-		do {
-			generation++;
-			MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
+		try {
+			MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
+	
+			int generation=0;
+			float change=0;
+			do {
+				generation++;
+				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+" ("+change+")</font>\n");
+	
+				tessellateVoronoiDiagram();
+				change = AdjustCentroids();
+				
+				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
+			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
 			
-			tessellateVoronoiDiagram();
-			
-			change = AdjustCentroids();
-			// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-		} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
+			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+" ("+change+")</font>\n");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -239,7 +260,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			liftPen(out);
 
 			int i;
-//*
+/*
 			for(i=0;i<graphEdges.size();++i) {
 				GraphEdge e= graphEdges.get(i);
 				
@@ -249,11 +270,32 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
 //*/		
+			float step = (int)Math.ceil(tool.GetDiameter()/scale);
+			float most=cells[0].weight;
+			//float least=cells[0].weight;
+			for(i=1;i<cells.length;++i) {
+				if(most<cells[i].weight) most=cells[i].weight;
+				//if(least>cells[i].weight) least=cells[i].weight;
+			}
+			
 			for(i=0;i<cells.length;++i) {
-				this.MoveTo(out, cells[i].centroid.x, cells[i].centroid.y, true);
-				this.MoveTo(out, cells[i].centroid.x, cells[i].centroid.y, false);
-				this.MoveTo(out, cells[i].centroid.x+1, cells[i].centroid.y+1, false);
-				this.MoveTo(out, cells[i].centroid.x, cells[i].centroid.y, true);
+				float v = 4f * cells[i].weight / most;
+				v/=scale;
+				if(v<1) continue;
+				//System.out.println(i+"\t"+v);
+				float x=cells[i].centroid.x;
+				float y=cells[i].centroid.y;
+				this.MoveTo(out, x-v, y-v, true);
+				this.MoveTo(out, x+v, y-v, false);
+				this.MoveTo(out, x+v, y+v, false);
+				this.MoveTo(out, x-v, y+v, false);
+				this.MoveTo(out, x-v, y-v, false);
+				for(float j=y-v;j<y+v;j+=step) {
+					this.MoveTo(out, x+v, j, false);
+					this.MoveTo(out, x-v, j, false);					
+				}
+				this.MoveTo(out, x-v, y-v, false);
+				this.MoveTo(out, x-v, y-v, true);
 			}
 			
 			liftPen(out);
@@ -263,6 +305,18 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		}
 	}
 	
+
+	/**
+	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
+	 */
+	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		if(lastup!=up) {
+			if(up) liftPen(out);
+			else   lowerPen(out);
+			lastup=up;
+		}
+		tool.WriteMoveTo(out, TX(x), TY(y));
+	}
 	
 	// I have a set of points.  I want a list of cell borders.
 	// cell borders are halfway between any point and it's nearest neighbors.
@@ -282,16 +336,21 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		
 	
 	protected void generateBounds(int cellIndex) {
-		int i;
-		boolean first=true;
 		numEdgesInCell=0;
+		boolean first=true;
+
+		float cx = cells[cellIndex].centroid.x;
+		float cy = cells[cellIndex].centroid.y;
+
+		double dx,dy,nx,ny,dot1;
 		
-		for(i=0;i<graphEdges.size();++i) {
-			GraphEdge e = graphEdges.get(i);
+		//long ta = System.nanoTime();
+		
+		Iterator<GraphEdge> ige = graphEdges.iterator();
+		while(ige.hasNext()) {
+			GraphEdge e = ige.next();
 			if(e.site1 != cellIndex && e.site2 != cellIndex ) continue;
-			++numEdgesInCell;
-			if(first) {
-				first=false;
+			if(numEdgesInCell==0) {
 				if(e.x1<e.x2) {
 					bound_min.x=(float)e.x1;
 					bound_max.x=(float)e.x2;
@@ -317,16 +376,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				if(bound_max.y<e.y1) bound_max.y=(float)e.y1;
 				if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
 			}
-		}
 
-		float cx = cells[cellIndex].centroid.x;
-		float cy = cells[cellIndex].centroid.y;
-		cellBorder = new CellEdge[numEdgesInCell];
-		double dx,dy,nx,ny,dot1;
-		int j=0;
-		for(i=0;i<graphEdges.size();++i) {
-			GraphEdge e = graphEdges.get(i);
-			if(e.site1 != cellIndex && e.site2 != cellIndex ) continue;
 			// make a unnormalized vector along the edge of e
 			dx = e.x2 - e.x1;
 			dy = e.y2 - e.y1;
@@ -338,7 +388,11 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			dy = cy-e.y1;
 			dot1=(dx*nx+dy*ny);
 			
-			CellEdge ce = new CellEdge();
+			if(cellBorder.size()==numEdgesInCell) {
+				cellBorder.add(new CellEdge());
+			}
+
+			CellEdge ce=cellBorder.get(numEdgesInCell++);
 			ce.px = e.x1;
 			ce.py = e.y1;
 			if(dot1<0) {
@@ -348,16 +402,20 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				ce.nx = nx;
 				ce.ny = ny;
 			}
-			cellBorder[j++] = ce;
 		}
+
+		//long tc = System.nanoTime();
+		
+		//System.out.println("\t"+((tb-ta)/1e6)+"\t"+((tc-tb)/1e6));
 	}
 	
 	
 	protected boolean insideBorder(int x,int y) {
 		double dx,dy;
 		int i;
-		for(i=0;i<cellBorder.length;++i) {
-			CellEdge ce = cellBorder[i];
+		Iterator<CellEdge> ice = cellBorder.iterator();
+		for(i=0;i<numEdgesInCell;++i) {
+			CellEdge ce = ice.next();
 			
 			// dot product the test point.
 			dx = x-ce.px;
@@ -374,10 +432,10 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	// weight is based on the intensity of the color of each pixel inside the cell
 	// the center of the pixel must be inside the cell to be counted.
 	protected float AdjustCentroids() {
-		int i,x1,x2,y;
+		int i,x,y;
 		float change=0;
 		float weight,wx,wy;
-		int step=10;
+		int step = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
 		
 		for(i=0;i<cells.length;++i) {
 			generateBounds(i);		
@@ -385,33 +443,22 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			int sy = (int)Math.floor(bound_min.y);
 			int ex = (int)Math.floor(bound_max.x);
 			int ey = (int)Math.floor(bound_max.y);
-			System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+", "+ey);
+			//System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+", "+ey);
 			//System.out.println("centroid "+cells[i].centroid.x+", "+cells[i].centroid.y);
 			
 			weight=0;
 			wx=0;
 			wy=0;
-			
+
 			for(y = sy; y <= ey; y+=step) {
-				for(x1 = sx; x1 <= ex; x1+=step) {
-					if(insideBorder(x1, y)) {
-						break;
+				for(x = sx; x <= ex; x+=step) {
+					if(insideBorder(x, y)) {
+						float val = (float)sample1x1(src_img,x,y) / 255.0f;
+						val = 1.0f - val;
+						weight += val;
+						wx += x * val;
+						wy += y * val;
 					}
-				}
-				//for(x2 = x1+step; x2 <= ex; x2+=step) {
-				for(x2 = ex; x2 > x1; x2-=step) {
-					//if(!insideBorder(x2, y)) {
-					if(insideBorder(x2, y)) {
-						break;
-					}
-				}
-				
-				for(int x=x1;x<=x2;x+=step) {
-					float f = sample1x1(src_img,x,y);
-					f=255.0f - f;
-					weight += f;
-					wx += x * f;
-					wy += y * f;
 				}
 			}
 			if( weight > 0 ) {
@@ -430,7 +477,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				float dy = wy - cells[i].centroid.y;
 				
 				change += dx*dx+dy*dy;
-				// change = Math.sqrt(change);
+				//change = (float)Math.sqrt(change);
 				
 				// use the new center
 				cells[i].centroid.set(wx, wy);
