@@ -149,18 +149,18 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	
 	
 	private int totalCells=1;
-	VoronoiCell [] cells = new VoronoiCell[1];
-	int w, h;
-	BufferedImage src_img;
-	List<GraphEdge> graphEdges = null;
-	int MAX_GENERATIONS=40;
-	int MAX_CELLS=5000;
-	Point2D bound_min = new Point2D();
-	Point2D bound_max = new Point2D();
-	int numEdgesInCell;
-	List<CellEdge> cellBorder = null;
-	double[] xValuesIn=null;
-	double[] yValuesIn=null;
+	private VoronoiCell [] cells = new VoronoiCell[1];
+	private int w, h;
+	private BufferedImage src_img;
+	private List<GraphEdge> graphEdges = null;
+	private int MAX_GENERATIONS=40;
+	private int MAX_CELLS=5000;
+	private Point2D bound_min = new Point2D();
+	private Point2D bound_max = new Point2D();
+	private int numEdgesInCell;
+	private List<CellEdge> cellBorder = null;
+	private double[] xValuesIn=null;
+	private double[] yValuesIn=null;
 	
 	
 	
@@ -168,6 +168,8 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		src_img = img;
 		h = img.getHeight();
 		w = img.getWidth();
+		MAX_GENERATIONS=1000;
+		MAX_CELLS=5000;
 		
 		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		tool = mc.GetCurrentTool();
@@ -230,7 +232,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			float change=0;
 			do {
 				generation++;
-				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+" ("+change+")</font>\n");
+				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
 	
 				tessellateVoronoiDiagram();
 				change = AdjustCentroids();
@@ -238,7 +240,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
 			
-			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+" ("+change+")</font>\n");
+			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+"</font>\n");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -270,7 +272,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
 //*/		
-			float step = (int)Math.ceil(tool.GetDiameter()/scale);
+			//float step = (int)Math.ceil(tool.GetDiameter()/scale);
 			float most=cells[0].weight;
 			//float least=cells[0].weight;
 			for(i=1;i<cells.length;++i) {
@@ -279,23 +281,62 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			}
 			
 			for(i=0;i<cells.length;++i) {
-				float v = 4f * cells[i].weight / most;
-				v/=scale;
-				if(v<1) continue;
+				float r = 5f * cells[i].weight / most;
+				r/=scale;
+				if(r<1) continue;
 				//System.out.println(i+"\t"+v);
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;
-				this.MoveTo(out, x-v, y-v, true);
-				this.MoveTo(out, x+v, y-v, false);
-				this.MoveTo(out, x+v, y+v, false);
-				this.MoveTo(out, x-v, y+v, false);
-				this.MoveTo(out, x-v, y-v, false);
-				for(float j=y-v;j<y+v;j+=step) {
-					this.MoveTo(out, x+v, j, false);
-					this.MoveTo(out, x-v, j, false);					
+				/*
+				// boxes
+				this.MoveTo(out, x-r, y-r, true);
+				this.MoveTo(out, x+r, y-r, false);
+				this.MoveTo(out, x+r, y+r, false);
+				this.MoveTo(out, x-r, y+r, false);
+				this.MoveTo(out, x-r, y-r, false);
+				this.MoveTo(out, x-r, y-r, true);
+				
+				// filled boxes
+				this.MoveTo(out, x-r, y-r, true);
+				this.MoveTo(out, x+r, y-r, false);
+				this.MoveTo(out, x+r, y+r, false);
+				this.MoveTo(out, x-r, y+r, false);
+				this.MoveTo(out, x-r, y-r, false);
+				for(float j=y-r;j<y+r;j+=step) {
+					this.MoveTo(out, x+r, j, false);
+					this.MoveTo(out, x-r, j, false);					
 				}
-				this.MoveTo(out, x-v, y-v, false);
-				this.MoveTo(out, x-v, y-v, true);
+				this.MoveTo(out, x-r, y-r, false);
+				this.MoveTo(out, x-r, y-r, true);
+
+				// circles
+				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
+				float detail=(float)(0.5*Math.PI*r);
+				if(detail<4) detail=4;
+				if(detail>20) detail=20;
+				for(float j=1;j<=detail;++j) {
+					this.MoveTo(out, 
+							x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
+							y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
+				}
+				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), false);
+				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
+				*/
+				// filled circles
+				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
+				while(r>1) {
+					float detail=(float)(0.5*Math.PI*r);
+					if(detail<4) detail=4;
+					if(detail>10) detail=10;
+					for(float j=1;j<=detail;++j) {
+						this.MoveTo(out, 
+								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
+								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
+					}
+					r-=(tool.GetDiameter()/(scale*1.5f));
+				}
+				this.MoveTo(out, x, y-r, false);
+				this.MoveTo(out, x, y-r, true);
 			}
 			
 			liftPen(out);
@@ -322,8 +363,6 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	// cell borders are halfway between any point and it's nearest neighbors.
 	protected void tessellateVoronoiDiagram() {
 		// convert the cells to sites used in the Voronoi class.
-		double[] xValuesIn = new double[cells.length];
-		double[] yValuesIn = new double[cells.length];
 		int i;
 		for(i=0;i<cells.length;++i) {
 			xValuesIn[i]= cells[i].centroid.x;
@@ -337,7 +376,6 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	
 	protected void generateBounds(int cellIndex) {
 		numEdgesInCell=0;
-		boolean first=true;
 
 		float cx = cells[cellIndex].centroid.x;
 		float cy = cells[cellIndex].centroid.y;
