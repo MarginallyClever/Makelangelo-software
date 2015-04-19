@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 import javax.swing.ProgressMonitor;
@@ -554,7 +555,7 @@ public class Filter {
 				//System.out.println(" OK");
 				
 				try (final FileInputStream fileInputStream = new FileInputStream(fn);
-								final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+								final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
 								final BufferedReader in = new BufferedReader(inputStreamReader)) {
 
 					String b;
