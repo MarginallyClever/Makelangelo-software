@@ -1,6 +1,12 @@
 package com.marginallyclever.makelangelo;
 
-public class Makelangelo {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Makelangelo  {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Makelangelo.class);
+
 	public static MainGUI gui;
 	
 	public static void main(String[] argv) {
@@ -11,5 +17,6 @@ public class Makelangelo {
 	        	gui = MainGUI.getSingleton();
 	        }
 	    });
+		LOGGER.info("Called javax.swing.SwingUtilities#invokeLater using com.marginallyclever.makelangelo.MainGUI#getSingleton. Unless something went terribly wrong, GUI is created and shown.");
 	}
 }
