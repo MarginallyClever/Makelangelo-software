@@ -92,9 +92,9 @@ public class MainGUI
 	
 	// Image processing
 		// TODO use a ServiceLoader for plugins
-		Filter [] image_converters;
-		String [] filter_names = null;
-		boolean startConvertingNow;
+		private Filter [] image_converters;
+		private String [] filter_names = null;
+		private boolean startConvertingNow;
 	
 	
 	// Serial connection
@@ -131,7 +131,7 @@ public class MainGUI
     private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
     private JMenuItem buttonExit;
     private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
-    private JMenuItem buttonLoadMachineConfig, buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
+    private JMenuItem buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
     private JMenuItem buttonRescan, buttonDisconnect;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
@@ -528,11 +528,15 @@ public class MainGUI
 	public String GetTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
-
-
-	protected boolean ChooseDXFConversionOptions() {
+	
+	
+	protected boolean ChooseImageConversionOptions(boolean isDXF) {
 		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
+		
+		final String[] choices = MachineConfiguration.getSingleton().getKnownMachineNames();
+		final JComboBox<String> machine_choice = new JComboBox<String>(choices);
+		machine_choice.setSelectedIndex(MachineConfiguration.getSingleton().getCurrentMachineIndex());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
 		input_paper_margin.setMajorTickSpacing(10);
@@ -545,19 +549,30 @@ public class MainGUI
 		
 		final JCheckBox reverse_h = new JCheckBox(MultilingualSupport.getSingleton().get("FlipForGlass"));
 		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
-
 		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
 		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Start"));
+
+		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
+		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
+		int y=0;
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("MenuLoadMachineConfig")),c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machine_choice,c);
+
+		if(!isDXF) {
+			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ConversionStyle")),c);
+			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	driver.add(input_draw_style,c);
+		}
 		
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  driver.add(input_paper_margin,c);
+		
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  driver.add(reverse_h,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=y  ;  driver.add(save,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=y++;  driver.add(cancel,c);
 
 		startConvertingNow = false;
 		
@@ -565,9 +580,23 @@ public class MainGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
+						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
+						MachineConfiguration.getSingleton().LoadConfig(new_uid);
+						SetDrawStyle(input_draw_style.getSelectedIndex());
 						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
 						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
 						MachineConfiguration.getSingleton().SaveConfig();
+						
+						// if we aren't connected, don't show the new 
+						if(!portConfirmed) {
+							// Force update of graphics layout.
+							previewPane.updateMachineConfig();
+							previewPane.ZoomToFitPaper();
+							// update window title
+							mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
+									+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
+									+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
+						}
 						startConvertingNow=true;
 						driver.dispose();
 					}
@@ -587,7 +616,7 @@ public class MainGUI
 	}
 	
 	protected boolean LoadDXF(String filename) {
-		if( ChooseDXFConversionOptions() == false ) return false;
+		if( ChooseImageConversionOptions(true) == false ) return false;
 
         // where to save temp output file?
 		final String destinationFile = GetTempDestinationFile();
@@ -701,7 +730,7 @@ public class MainGUI
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
 									DXFSpline entity = (DXFSpline)entity_list.get(i);
-									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
 										DXFVertex v = polyLine.getVertex(j);
@@ -823,70 +852,6 @@ public class MainGUI
 		
 		return true;
 	}
-
-	protected boolean ChooseImageConversionOptions() {
-		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("ConversionOptions"),true);
-		driver.setLayout(new GridBagLayout());
-		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
-		input_paper_margin.setMajorTickSpacing(10);
-		input_paper_margin.setMinorTickSpacing(5);
-		input_paper_margin.setPaintTicks(false);
-		input_paper_margin.setPaintLabels(true);
-		
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
-		
-		final JCheckBox reverse_h = new JCheckBox(MultilingualSupport.getSingleton().get("FlipForGlass"));
-		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
-
-		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
-		input_draw_style.setSelectedIndex(GetDrawStyle());
-		
-		final JButton cancel = new JButton("Cancel");
-		final JButton save = new JButton("Start");
-		
-		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
-
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=8;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=8;  driver.add(input_paper_margin,c);
-		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=9;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ConversionStyle")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=9;	driver.add(input_draw_style,c);
-		
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=11; driver.add(reverse_h,c);
-		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=12;  driver.add(save,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=12;  driver.add(cancel,c);
-
-		startConvertingNow = false;
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
-						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
-						SetDrawStyle(input_draw_style.getSelectedIndex());
-						MachineConfiguration.getSingleton().SaveConfig();
-						startConvertingNow=true;
-						driver.dispose();
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-			  }
-		};
-			
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-	    driver.getRootPane().setDefaultButton(save);
-		driver.pack();
-		driver.setVisible(true);
-		
-		return startConvertingNow;
-	}
 	
 	
 	public boolean LoadImage(String filename) {
@@ -894,7 +859,7 @@ public class MainGUI
 		final String sourceFile = filename;
 		final String destinationFile = GetTempDestinationFile();
 		
-		if( ChooseImageConversionOptions() == false ) return false;
+		if( ChooseImageConversionOptions(false) == false ) return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, MultilingualSupport.getSingleton().get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -1545,10 +1510,6 @@ public class MainGUI
 			ClosePort();
 			return;
 		}
-		if( subject == buttonLoadMachineConfig ) {
-			LoadMachineConfig();
-			return;
-		}
 		if( subject == buttonAdjustSounds ) {
 			AdjustSounds();
 			return;
@@ -1692,30 +1653,6 @@ public class MainGUI
 		return bottomText;
 	}
 	
-	
-	/**
-	 * Load a known machine configuration.
-	 * Only available if the software is not currently connected to a machine.
-	 * 
-	 */
-	public void LoadMachineConfig() {
-		long old_uid = MachineConfiguration.getSingleton().GetUID();
-		
-		MachineConfiguration.getSingleton().ChooseNewConfig();
-		
-		long new_uid = MachineConfiguration.getSingleton().GetUID();
-		if(old_uid != new_uid) {
-			// Force update of graphics layout.
-			previewPane.updateMachineConfig();
-			previewPane.ZoomToFitPaper();
-			// update window title
-			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
-					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
-					+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
-			// TODO offer to regenerate image?
-			
-		}
-	}
 	
 	
 	// Deal with something robot has sent.
@@ -2098,15 +2035,7 @@ public class MainGUI
         menu.setMnemonic(KeyEvent.VK_T);
         menu.setEnabled(!running);
 
-        if(MachineConfiguration.getSingleton().GetMachineCount() > 1) {
-	        buttonLoadMachineConfig = new JMenuItem(MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"));
-	        buttonLoadMachineConfig.addActionListener(this);
-	        buttonLoadMachineConfig.setEnabled(!portOpened);
-	        menu.add(buttonLoadMachineConfig);
-	        
-	        menu.addSeparator();
-        }
-        
+        // TODO: move all these into tabs in a pop-up menu.
         buttonAdjustMachineSize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSettingsMachine"),KeyEvent.VK_L);
         buttonAdjustMachineSize.addActionListener(this);
         buttonAdjustMachineSize.setEnabled(!running);
