@@ -729,8 +729,9 @@ public class MainGUI
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									DXFSpline entity = (DXFSpline)entity_list.get(i);
-									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity,30);
+									final DXFSpline entity = (DXFSpline)entity_list.get(i);
+									final DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+									polyLine.setLineWeight(30);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
 										DXFVertex v = polyLine.getVertex(j);
