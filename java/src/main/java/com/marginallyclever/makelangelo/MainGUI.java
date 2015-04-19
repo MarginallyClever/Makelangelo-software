@@ -412,7 +412,7 @@ public class MainGUI
 						MachineConfiguration.getSingleton().SaveConfig();
 						
 						// if we aren't connected, don't show the new 
-						if(!portConfirmed) {
+						if(!serialConnection.isPortConfirmed()) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
 							previewPane.ZoomToFitPaper();
@@ -1486,52 +1486,6 @@ public class MainGUI
 		bottomText.addHyperlinkListener(hyperlinkListener);
 		return bottomText;
 	}
-	
-	
-	
-	// Deal with something robot has sent.
-	public void serialEvent(SerialPortEvent events) {
-        if(events.isRXCHAR()) {
-            try {
-            	int len = events.getEventValue();
-            	byte[] buffer = serialPort.readBytes(len);
-				String line2 = new String(buffer,0,len);
-				
-				serial_recv_buffer+=line2;
-				// wait for the cue ("> ") to send another command
-				if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
-					String line2_mod = serial_recv_buffer;
-					//line2_mod = line2.mod.replace("\n", "");
-					//line2_mod = line2_mod.replace(">", "");
-					line2_mod = line2_mod.trim();
-					if(line2_mod.length()>0) {
-						if(line2_mod.equals(cue.trim())) {
-							if(lastLineWasCue==true) {
-								// don't repeat the ping
-								//Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
-							} else {
-								Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
-							}
-							lastLineWasCue=true;
-						} else {
-							lastLineWasCue=false;
-							Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
-						}
-					}
-					
-					int error_line = ErrorReported();
-					if(error_line != -1) {
-						gcode.linesProcessed = error_line;
-						serial_recv_buffer="";
-						SendFileCommand();
-					} else if(ConfirmPort()) {
-						serial_recv_buffer="";
-						SendFileCommand();
-					}
-				}
-            } catch (SerialPortException e) {}
-        }
-    }
 
 	public JPanel DriveManually() {
 		GridBagConstraints c;
