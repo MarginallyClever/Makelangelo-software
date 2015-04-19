@@ -662,17 +662,15 @@ public class MachineConfiguration {
 		return new_uid;
 	}
 	
+	
 	public int GetMachineCount() {
 		return configurations_available.length;
 	}
 	
-	// must only be called when there is already more than the default configutation (uid=0) 
-	public void ChooseNewConfig() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("MenuLoadMachineConfig"),true);
-		driver.setLayout(new GridBagLayout());
-
+	
+	public String[] getKnownMachineNames() {
 		assert(configurations_available.length>1);
-		final String [] choices = new String[configurations_available.length-1];
+		String [] choices = new String[configurations_available.length-1];
 
 		int j=0;
 		for(int i=0;i<configurations_available.length;++i) {
@@ -680,39 +678,34 @@ public class MachineConfiguration {
 			choices[j++] = configurations_available[i];
 		}
 		
-		final JComboBox<String> language_options = new JComboBox<String>(choices);
-		
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Load"));
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				// TODO prevent "close" icon.  Must press save to continue!
-				if(subject == save) {
-					long new_uid = Long.parseLong( choices[language_options.getSelectedIndex()] );
-					LoadConfig(new_uid);
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-
-		driver.pack();
-		driver.setVisible(true);
+		return choices;
 	}
+	
+	
+	public int getCurrentMachineIndex() {
+		assert(configurations_available.length>1);
+		int j=0;
+		for(int i=0;i<configurations_available.length;++i) {
+			if(configurations_available[i].equals("0")) continue;
+			if(configurations_available[i].equals(Long.toString(robot_uid))) {
+				return j;
+			}
+			++j;
+		}
+		
+		return 0;
+	}
+	
 	
 	public double GetPaperWidth() {
 		return paper_right - paper_left;
 	}
 	
+	
 	public double GetPaperHeight() {
 		return paper_top -paper_bottom;
 	}
+	
 	
 	public double GetPaperScale() {
 		double paper_w=GetPaperWidth();
