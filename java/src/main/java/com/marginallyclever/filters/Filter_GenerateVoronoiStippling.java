@@ -14,7 +14,7 @@ package com.marginallyclever.filters;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-/* 
+/*
  * This code was originally written by Stephan Fortune in C code.  I, Shane O'Sullivan,
  * have since modified it, encapsulating it in a C++ class and, fixing memory leaks and
  * adding accessors to the Voronoi Edges.
@@ -29,7 +29,7 @@ package com.marginallyclever.filters;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-/* 
+/*
  * Java Version by Zhenyu Pan
  * Permission to use, copy, modify, and distribute this software for any
  * purpose without fee is hereby granted, provided that this entire notice
@@ -49,7 +49,6 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
 
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -74,9 +73,9 @@ import javax.swing.JTextField;
  * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  */
-public class Filter_DitherVoronoiStippling extends Filter {
+public class Filter_GenerateVoronoiStippling extends Filter {
 	public String GetName() { return "Voronoi stipples"; }
-	
+
 	class Point
 	{
 	    double x, y;
@@ -92,7 +91,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	    }
 	}
 
-	
+
 	public class Site
 	{
 	    Point coord;
@@ -103,7 +102,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	        coord = new Point();
 	    }
 	}
-	
+
 	class Edge
 	{
 	    public double a = 0, b = 0, c = 0;
@@ -127,13 +126,13 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	    Site vertex;
 	    double ystar;
 	    Halfedge PQnext;
-	
+
 	    public Halfedge()
 	    {
 	        PQnext = null;
 	    }
 	}
-	
+
 	public class GraphEdge
 	{
 	    public double x1, y1, x2, y2;
@@ -147,14 +146,14 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		public Point2D centroid = new Point2D();
 		public float weight;
 	}
-	
+
 
 	class CellEdge {
 		double px,py;
 		double nx,ny;
 	}
-	
-	
+
+
 	private int totalCells=1;
 	private VoronoiCell [] cells = new VoronoiCell[1];
 	private int w, h;
@@ -168,34 +167,34 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	private List<CellEdge> cellBorder = null;
 	private double[] xValuesIn=null;
 	private double[] yValuesIn=null;
-	
-	
-	
+
+
+
 	public void Convert(BufferedImage img) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
-	
+
 		JPanel panel = new JPanel(new GridLayout(0,1));
 		panel.add(new JLabel("Number of cells"));
 		panel.add(text_cells);
 		panel.add(new JLabel("Number of generations"));
 		panel.add(text_gens);
-		
+
 	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
 	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
-	    	
+
 			src_img = img;
 			h = img.getHeight();
 			w = img.getWidth();
-			
+
 			tool = MachineConfiguration.getSingleton().GetCurrentTool();
 			ImageSetupTransform(img);
-	
+
 			cellBorder = new ArrayList<CellEdge>();
-	
-		    
+
+
 			initializeCells(0.5);
 			evolveCells();
 			writeOutCells();
@@ -222,7 +221,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 		cells = new VoronoiCell[totalCells];
 		int used=0;
-		
+
 		for(y = length/2; y < h; y += length ) {
 			for(x = length/2; x < w; x += length ) {
 				cells[used]=new VoronoiCell();
@@ -235,7 +234,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[cells.length];
 		yValuesIn = new double[cells.length];
-		
+
         siteidx = 0;
         sites = null;
         allEdges = null;
@@ -247,35 +246,35 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	protected void evolveCells() {
 		try {
 			MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
-	
+
 			int generation=0;
 			float change=0;
 			do {
 				generation++;
 				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
-	
+
 				tessellateVoronoiDiagram();
 				change = AdjustCentroids();
-				
+
 				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
-			
+
 			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+"</font>\n");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	// write cell centroids to gcode.
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
 			MainGUI.getSingleton().Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			
+
 			ImageStart(src_img,out);
-	
+
 			// set absolute coordinates
 			out.write("G00 G90;\n");
 			tool.WriteChangeTo(out);
@@ -285,13 +284,13 @@ public class Filter_DitherVoronoiStippling extends Filter {
 /*
 			for(i=0;i<graphEdges.size();++i) {
 				GraphEdge e= graphEdges.get(i);
-				
+
 				this.MoveTo(out, (float)e.x1,(float)e.y1, true);
 				this.MoveTo(out, (float)e.x1,(float)e.y1, false);
 				this.MoveTo(out, (float)e.x2,(float)e.y2, false);
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
-//*/		
+//*/
 			//float step = (int)Math.ceil(tool.GetDiameter()/scale);
 			float most=cells[0].weight;
 			//float least=cells[0].weight;
@@ -299,7 +298,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				if(most<cells[i].weight) most=cells[i].weight;
 				//if(least>cells[i].weight) least=cells[i].weight;
 			}
-			
+
 			for(i=0;i<cells.length;++i) {
 				float r = 5f * cells[i].weight / most;
 				r/=scale;
@@ -315,7 +314,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				this.MoveTo(out, x-r, y+r, false);
 				this.MoveTo(out, x-r, y-r, false);
 				this.MoveTo(out, x-r, y-r, true);
-				
+
 				// filled boxes
 				this.MoveTo(out, x-r, y-r, true);
 				this.MoveTo(out, x+r, y-r, false);
@@ -324,7 +323,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				this.MoveTo(out, x-r, y-r, false);
 				for(float j=y-r;j<y+r;j+=step) {
 					this.MoveTo(out, x+r, j, false);
-					this.MoveTo(out, x-r, j, false);					
+					this.MoveTo(out, x-r, j, false);
 				}
 				this.MoveTo(out, x-r, y-r, false);
 				this.MoveTo(out, x-r, y-r, true);
@@ -335,7 +334,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				if(detail<4) detail=4;
 				if(detail>20) detail=20;
 				for(float j=1;j<=detail;++j) {
-					this.MoveTo(out, 
+					this.MoveTo(out,
 							x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 							y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 				}
@@ -349,7 +348,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 					if(detail<4) detail=4;
 					if(detail>10) detail=10;
 					for(float j=1;j<=detail;++j) {
-						this.MoveTo(out, 
+						this.MoveTo(out,
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
@@ -358,14 +357,14 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				this.MoveTo(out, x, y-r, false);
 				this.MoveTo(out, x, y-r, true);
 			}
-			
+
 			liftPen(out);
 			SignName(out);
 			tool.WriteMoveTo(out, 0, 0);
 			out.close();
 		}
 	}
-	
+
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
@@ -378,7 +377,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		}
 		tool.WriteMoveTo(out, TX(x), TY(y));
 	}
-	
+
 	// I have a set of points.  I want a list of cell borders.
 	// cell borders are halfway between any point and it's nearest neighbors.
 	protected void tessellateVoronoiDiagram() {
@@ -388,12 +387,12 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			xValuesIn[i]= cells[i].centroid.x;
 			yValuesIn[i]= cells[i].centroid.y;
 		}
-		
+
 		// scan left to right across the image, building the list of borders as we go.
 		graphEdges = generateVoronoi(xValuesIn, yValuesIn, 0, w-1, 0, h-1);
 	}
-		
-	
+
+
 	protected void generateBounds(int cellIndex) {
 		numEdgesInCell=0;
 
@@ -401,9 +400,9 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		float cy = cells[cellIndex].centroid.y;
 
 		double dx,dy,nx,ny,dot1;
-		
+
 		//long ta = System.nanoTime();
-		
+
 		Iterator<GraphEdge> ige = graphEdges.iterator();
 		while(ige.hasNext()) {
 			GraphEdge e = ige.next();
@@ -414,21 +413,21 @@ public class Filter_DitherVoronoiStippling extends Filter {
 					bound_max.x=(float)e.x2;
 				} else {
 					bound_min.x=(float)e.x2;
-					bound_max.x=(float)e.x1;					
+					bound_max.x=(float)e.x1;
 				}
 				if(e.y1<e.y2) {
 					bound_min.y=(float)e.y1;
 					bound_max.y=(float)e.y2;
 				} else {
 					bound_min.y=(float)e.y2;
-					bound_max.y=(float)e.y1;					
+					bound_max.y=(float)e.y1;
 				}
 			} else {
 				if(bound_min.x>e.x1) bound_min.x=(float)e.x1;
 				if(bound_min.x>e.x2) bound_min.x=(float)e.x2;
 				if(bound_max.x<e.x1) bound_max.x=(float)e.x1;
 				if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
-				
+
 				if(bound_min.y>e.y1) bound_min.y=(float)e.y1;
 				if(bound_min.y>e.y2) bound_min.y=(float)e.y2;
 				if(bound_max.y<e.y1) bound_max.y=(float)e.y1;
@@ -445,7 +444,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 			dx = cx-e.x1;
 			dy = cy-e.y1;
 			dot1=(dx*nx+dy*ny);
-			
+
 			if(cellBorder.size()==numEdgesInCell) {
 				cellBorder.add(new CellEdge());
 			}
@@ -463,18 +462,18 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		}
 
 		//long tc = System.nanoTime();
-		
+
 		//System.out.println("\t"+((tb-ta)/1e6)+"\t"+((tc-tb)/1e6));
 	}
-	
-	
+
+
 	protected boolean insideBorder(int x,int y) {
 		double dx,dy;
 		int i;
 		Iterator<CellEdge> ice = cellBorder.iterator();
 		for(i=0;i<numEdgesInCell;++i) {
 			CellEdge ce = ice.next();
-			
+
 			// dot product the test point.
 			dx = x-ce.px;
 			dy = y-ce.py;
@@ -484,8 +483,8 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		// passed all tests, must be in cell.
 		return true;
 	}
-	
-	
+
+
 	// find the weighted center of each cell.
 	// weight is based on the intensity of the color of each pixel inside the cell
 	// the center of the pixel must be inside the cell to be counted.
@@ -494,16 +493,16 @@ public class Filter_DitherVoronoiStippling extends Filter {
 		float change=0;
 		float weight,wx,wy;
 		int step = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
-		
+
 		for(i=0;i<cells.length;++i) {
-			generateBounds(i);		
+			generateBounds(i);
 			int sx = (int)Math.floor(bound_min.x);
 			int sy = (int)Math.floor(bound_min.y);
 			int ex = (int)Math.floor(bound_max.x);
 			int ey = (int)Math.floor(bound_max.y);
 			//System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+", "+ey);
 			//System.out.println("centroid "+cells[i].centroid.x+", "+cells[i].centroid.y);
-			
+
 			weight=0;
 			wx=0;
 			wy=0;
@@ -524,7 +523,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 				wy /= weight;
 
 				cells[i].weight = weight;
-				
+
 				// make sure centroid can't leave image bounds
 				if(wx<0) wx=0;
 				if(wy<0) wy=0;
@@ -533,22 +532,22 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 				float dx = wx - cells[i].centroid.x;
 				float dy = wy - cells[i].centroid.y;
-				
+
 				change += dx*dx+dy*dy;
 				//change = (float)Math.sqrt(change);
-				
+
 				// use the new center
 				cells[i].centroid.set(wx, wy);
 			}
 		}
-		
+
 		return change;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
     // ************* Private members ******************
     private double borderMinX, borderMaxX, borderMinY, borderMaxY;
     private int siteidx;
@@ -572,7 +571,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
     private Halfedge ELhash[];
     private Halfedge ELleftend, ELrightend;
     private List<GraphEdge> allEdges;
-    
+
 
     /*********************************************************
      * Public methods
@@ -580,7 +579,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
 
 
     /**
-     * 
+     *
      * @param xValuesIn Array of X values for each site.
      * @param yValuesIn Array of Y values for each site. Must be identical length to yValuesIn
      * @param minX The minimum X of the bounding box around the voronoi
@@ -620,7 +619,7 @@ public class Filter_DitherVoronoiStippling extends Filter {
     }
 
 
-    
+
      /*********************************************************
      * Private methods - implementation details
      ********************************************************/
@@ -1516,12 +1515,12 @@ public class Filter_DitherVoronoiStippling extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
