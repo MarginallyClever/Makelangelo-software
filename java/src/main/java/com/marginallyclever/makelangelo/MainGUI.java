@@ -667,11 +667,11 @@ public class MainGUI
 					int entity_total=0;
 					int entity_count=0;
 					while(layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer)layer_iter.next();
+						DXFLayer layer = layer_iter.next();
 						Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
 						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_iter.hasNext()) {
-							String entity_type = (String)entity_iter.next();
+							String entity_type = entity_iter.next();
 							List<DXFEntity> entity_list = (List<DXFEntity>)layer.getDXFEntities(entity_type);
 							Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
 							entity_total+=entity_list.size();
@@ -684,11 +684,11 @@ public class MainGUI
 					// convert each entity
 					layer_iter = doc.getDXFLayerIterator();
 					while(layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer)layer_iter.next();
+						DXFLayer layer = layer_iter.next();
 
 						Iterator<String> entity_type_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_type_iter.hasNext()) {
-							String entity_type = (String)entity_type_iter.next();
+							String entity_type = entity_type_iter.next();
 							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 							
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
