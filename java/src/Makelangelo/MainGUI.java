@@ -16,9 +16,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -127,19 +127,21 @@ public class MainGUI
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
-    private JMenuItem buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
     private JMenuItem buttonExit;
     private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
     private JMenuItem buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
     private JMenuItem buttonRescan, buttonDisconnect;
-    private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
+    // prepare pane
+    private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
+    // drive pane
+    private JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
 
-    private JTabbedPane log_and_drive;
+    private JTabbedPane contextMenu;
     private Splitter split_left_right;
     public boolean dialog_result=false;
     
@@ -154,6 +156,7 @@ public class MainGUI
     private DrawPanel previewPane;
 	private StatusBar statusBar;
 	private JPanel drivePane;
+	private JPanel preparePane;
 	
 	// command line
 	private JPanel textInputArea;
@@ -463,9 +466,9 @@ public class MainGUI
 		
 		// rebuild the drive pane so that the feed rates are correct.
 
-		log_and_drive.removeTabAt(0);
+		contextMenu.removeTabAt(0);
         drivePane = DriveManually();
-        log_and_drive.insertTab("Drive", null, drivePane, null, 0);
+        contextMenu.insertTab(MultilingualSupport.getSingleton().get("MenuDraw"), null, drivePane, null, 0);
 
 		return true;
 	}
@@ -1012,10 +1015,8 @@ public class MainGUI
 	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
-		Log("<font color='green'>" + MultilingualSupport.getSingleton().get("OpeningFile") + filename + "...</font>\n");
+ 		Log("<font color='green'>" + MultilingualSupport.getSingleton().get("OpeningFile") + filename + "...</font>\n");
 
-	   	UpdateRecentFiles(filename);
-	   	
 	   	if(IsFileGcode(filename)) {
 			LoadGCode(filename);
     	} else if(IsFileDXF(filename)) {
@@ -1026,6 +1027,8 @@ public class MainGUI
     		Log("<font color='red'>"+MultilingualSupport.getSingleton().get("UnknownFileType")+"</font>\n");
     	}
 
+	   	// TODO: if succeeded
+	   	UpdateRecentFiles(filename);
     	previewPane.ZoomToFitPaper();
     	statusBar.Clear();
 	}
@@ -1692,15 +1695,77 @@ public class MainGUI
         }
     }
 
+	public JPanel ProcessImages() {
+		JPanel driver = new JPanel(new GridLayout(0,1));
+
+        // File conversion menu
+        buttonOpenFile = new JButton(MultilingualSupport.getSingleton().get("MenuOpenFile"));
+        buttonOpenFile.addActionListener(this);
+        driver.add(buttonOpenFile);
+/*        
+        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
+        group = new ButtonGroup();
+
+	        // list recent files
+	        if(recentFiles != null && recentFiles.length>0) {	        	
+	        	for(i=0;i<recentFiles.length;++i) {
+	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
+	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
+	            	if(buttonRecent[i]!=null) {
+	            		buttonRecent[i].addActionListener(this);
+	            		subMenu.add(buttonRecent[i]);
+	            	}
+	        	}
+	        }
+        
+        menu.add(subMenu);
+
+        menu.addSeparator();
+*/
+        buttonHilbertCurve = new JButton(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
+        buttonHilbertCurve.addActionListener(this);
+        driver.add(buttonHilbertCurve);
+        
+        buttonText2GCODE = new JButton(MultilingualSupport.getSingleton().get("MenuTextToGCODE"));
+        buttonText2GCODE.addActionListener(this);
+        driver.add(buttonText2GCODE);
+
+        buttonSaveFile = new JButton(MultilingualSupport.getSingleton().get("MenuSaveGCODEAs"));
+        buttonSaveFile.addActionListener(this);
+        driver.add(buttonSaveFile);
+
+        return driver;
+	}
+	
 	public JPanel DriveManually() {
 		GridBagConstraints c;
 		
-		JPanel driver = new JPanel();
-		driver.setLayout(new BoxLayout(driver, BoxLayout.PAGE_AXIS));
+		JPanel driver = new JPanel(new GridLayout(0,1));
 
-		JPanel axisControl = new JPanel();
-			axisControl.setLayout(new GridBagLayout());
-			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(60,20));		yAxis.setHorizontalAlignment(SwingConstants.CENTER);
+        // Draw menu
+		JPanel go = new JPanel(new GridBagLayout());
+
+        buttonStart = new JButton(MultilingualSupport.getSingleton().get("Start"));
+        buttonStart.addActionListener(this);
+    	go.add(buttonStart);
+
+        buttonStartAt = new JButton(MultilingualSupport.getSingleton().get("StartAtLine"));
+        buttonStartAt.addActionListener(this);
+        go.add(buttonStartAt);
+
+        buttonPause = new JButton(MultilingualSupport.getSingleton().get("Pause"));
+        buttonPause.addActionListener(this);
+        go.add(buttonPause);
+
+        buttonHalt = new JButton(MultilingualSupport.getSingleton().get("Halt"));
+        buttonHalt.addActionListener(this);
+        go.add(buttonHalt);
+        
+        go.add(new JSeparator());
+        
+		
+		JPanel axisControl = new JPanel(new GridBagLayout());
+			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(60,20));			yAxis.setHorizontalAlignment(SwingConstants.CENTER);
 			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(60,20));
 			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(60,20));
 			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(60,20));
@@ -1774,6 +1839,7 @@ public class MainGUI
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		
 
+		driver.add(go);
 		driver.add(axisControl);
 		driver.add(corners);
 		driver.add(feedRateControl);
@@ -1954,6 +2020,18 @@ public class MainGUI
 		ButtonGroup group;
         int i;
         
+        if(preparePane!=null) {
+            buttonHilbertCurve.setEnabled(!running);
+            buttonText2GCODE.setEnabled(!running);
+        }
+        if(drivePane!=null) {
+        	buttonStart.setEnabled(portConfirmed && !running);
+            buttonStartAt.setEnabled(portConfirmed && !running);
+            buttonPause.setEnabled(portConfirmed && running);
+            buttonHalt.setEnabled(portConfirmed && running);
+        }
+        
+        
         menuBar.removeAll();
         
         
@@ -2057,80 +2135,6 @@ public class MainGUI
         menu.add(buttonAdjustTool);
         
         menuBar.add(menu);
-
-        
-
-        // File conversion menu
-        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuGCODE"));
-        menu.setMnemonic(KeyEvent.VK_H);
-
-        buttonOpenFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuOpenFile"),KeyEvent.VK_O);
-        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-        buttonOpenFile.addActionListener(this);
-        menu.add(buttonOpenFile);
-        
-        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
-        subMenu.setEnabled(!running);
-        group = new ButtonGroup();
-
-	        // list recent files
-	        if(recentFiles != null && recentFiles.length>0) {	        	
-	        	for(i=0;i<recentFiles.length;++i) {
-	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
-	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-	            	if(buttonRecent[i]!=null) {
-	            		buttonRecent[i].addActionListener(this);
-	            		subMenu.add(buttonRecent[i]);
-	            	}
-	        	}
-	        }
-        
-        menu.add(subMenu);
-
-        menu.addSeparator();
-
-        buttonHilbertCurve = new JMenuItem(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
-        buttonHilbertCurve.setEnabled(!running);
-        buttonHilbertCurve.addActionListener(this);
-        menu.add(buttonHilbertCurve);
-        
-        buttonText2GCODE = new JMenuItem(MultilingualSupport.getSingleton().get("MenuTextToGCODE"));
-        buttonText2GCODE.setEnabled(!running);
-        buttonText2GCODE.addActionListener(this);
-        menu.add(buttonText2GCODE);
-
-        buttonSaveFile = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSaveGCODEAs"));
-        buttonSaveFile.addActionListener(this);
-        menu.add(buttonSaveFile);
-
-        menuBar.add(menu);
-        
-        
-        
-        // Draw menu
-        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuDraw"));
-
-        buttonStart = new JMenuItem(MultilingualSupport.getSingleton().get("Start"),KeyEvent.VK_S);
-        buttonStart.addActionListener(this);
-    	buttonStart.setEnabled(portConfirmed && !running);
-        menu.add(buttonStart);
-
-        buttonStartAt = new JMenuItem(MultilingualSupport.getSingleton().get("StartAtLine"));
-        buttonStartAt.addActionListener(this);
-        buttonStartAt.setEnabled(portConfirmed && !running);
-        menu.add(buttonStartAt);
-
-        buttonPause = new JMenuItem(MultilingualSupport.getSingleton().get("Pause"),KeyEvent.VK_P);
-        buttonPause.addActionListener(this);
-        buttonPause.setEnabled(portConfirmed && running);
-        menu.add(buttonPause);
-
-        buttonHalt = new JMenuItem(MultilingualSupport.getSingleton().get("Halt"),KeyEvent.VK_H);
-        buttonHalt.addActionListener(this);
-        buttonHalt.setEnabled(portConfirmed && running);
-        menu.add(buttonHalt);
-
-        menuBar.add(menu);
         
         // view menu
         menu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreview"));
@@ -2182,34 +2186,21 @@ public class MainGUI
         DefaultCaret c = (DefaultCaret)log.getCaret();
         c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         ClearLog();
-        
-        // the preview panel
-        previewPane = new DrawPanel();
-        
-        // the drive panel
-        drivePane = DriveManually();
-        
-        // status bar
-        statusBar = new StatusBar();
-        Font f = statusBar.getFont();
-        statusBar.setFont(f.deriveFont(Font.BOLD,15));
-        Dimension d=statusBar.getMinimumSize();
-        d.setSize(d.getWidth(), d.getHeight()+30);
-        statusBar.setMinimumSize(d);
 
-        // layout
-        //log_and_drive = new Splitter(JSplitPane.VERTICAL_SPLIT);
-        log_and_drive = new JTabbedPane();
-        log_and_drive.addTab("Drive",null,drivePane,null);
-        log_and_drive.addTab("Log",null,logPane,null);
-        //drive_and_preview.setDividerSize(8);
-        //drive_and_preview.setDividerLocation(-100);
-        
+        previewPane = new DrawPanel();
+        preparePane = ProcessImages();
+        drivePane = DriveManually();
+        statusBar = new StatusBar();
+
+        contextMenu = new JTabbedPane();
+        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuGCODE"),null,preparePane,null);
+        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuDraw"),null,drivePane,null);
+        contextMenu.addTab("Log",null,logPane,null);
+
+        // major layout
         split_left_right = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
         split_left_right.add(previewPane);
-        split_left_right.add(log_and_drive);
-        //split.setDividerSize(8);
-        //split.setDividerLocation(-10);
+        split_left_right.add(contextMenu);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
         contentPane.add(split_left_right,BorderLayout.CENTER);
