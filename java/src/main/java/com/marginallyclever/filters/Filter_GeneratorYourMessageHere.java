@@ -7,12 +7,17 @@ import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -32,49 +37,21 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	
 	
 	public void Generate(String dest) {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Text To GCODE",true);
-		driver.setLayout(new GridLayout(0,1));
-
-		final JTextArea text = new JTextArea(lastMessage,60,6);
-		final JButton buttonSave = new JButton("Go");
-		final JButton buttonCancel = new JButton("Cancel");
-		final String dest2 = dest;
-
-		driver.add(new JScrollPane(text));
+		final JTextArea text = new JTextArea(lastMessage,6,60);
+	
+		JPanel panel = new JPanel(new GridLayout(0,1));
+		panel.add(new JScrollPane(text));
 		
-		Box horizontalBox = Box.createHorizontalBox();
-	    horizontalBox.add(Box.createGlue());
-	    horizontalBox.add(buttonSave);
-	    horizontalBox.add(buttonCancel);
-	    driver.add(horizontalBox);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				
-				if(subject == buttonSave) {
-					lastMessage = text.getText();
-					CreateMessage(lastMessage,dest2);
-					
-					// TODO Move to GUI?
-					MainGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
-					MainGUI.getSingleton().PlayConversionFinishedSound();
-					MainGUI.getSingleton().LoadGCode(dest2);
-
-					driver.dispose();
-				}
-				if(subject == buttonCancel) {
-					driver.dispose();
-				}
-			}
-		};
-		
-		buttonSave.addActionListener(driveButtons);
-		buttonCancel.addActionListener(driveButtons);
-		driver.getRootPane().setDefaultButton(buttonSave);
-
-		driver.setSize(300,100);
-		driver.setVisible(true);
+	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+			lastMessage = text.getText();
+			CreateMessage(lastMessage,dest);
+			
+			// TODO Move to GUI?
+			MainGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
+			MainGUI.getSingleton().PlayConversionFinishedSound();
+			MainGUI.getSingleton().LoadGCode(dest);
+	    }
 	}
 
 	protected void CreateMessage(String str,String dest) {
