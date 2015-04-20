@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
@@ -35,6 +36,13 @@ public class StatusBar extends JLabel {
     public StatusBar() {
         super();
         super.setPreferredSize(new Dimension(100, 16));
+
+        Font f = getFont();
+        setFont(f.deriveFont(Font.BOLD,15));
+        Dimension d=getMinimumSize();
+        d.setSize(d.getWidth(), d.getHeight()+30);
+        setMinimumSize(d);
+        
         Clear();
     }
     
