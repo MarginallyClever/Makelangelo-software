@@ -2266,9 +2266,6 @@ public class MainGUI
     
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
     private void CreateAndShowGUI() {
-    	// Check language preferences
-    	MultilingualSupport.getSingleton();
-    	
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
         mainframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

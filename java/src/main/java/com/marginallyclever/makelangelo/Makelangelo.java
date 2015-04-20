@@ -15,6 +15,7 @@ public class Makelangelo  {
 	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
 	        	gui = MainGUI.getSingleton();
+				MultilingualSupport.getSingleton().checkIfThisIsTheFirstTimeLoadingLanguageFiles();
 	        }
 	    });
 		LOGGER.info("Called javax.swing.SwingUtilities#invokeLater using com.marginallyclever.makelangelo.MainGUI#getSingleton. Unless something went terribly wrong, GUI is created and shown.");
