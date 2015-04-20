@@ -615,6 +615,7 @@ public class MainGUI
 		return startConvertingNow;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected boolean LoadDXF(String filename) {
 		if( ChooseImageConversionOptions(true) == false ) return false;
 
