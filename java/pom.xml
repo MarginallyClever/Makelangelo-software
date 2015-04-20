@@ -22,17 +22,17 @@
       <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.5.3</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
-        <!-- see http://stackoverflow.com/a/574650 -->
+          <configuration>
+            <archive>
+              <manifest>
+                <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+              </manifest>
+            </archive>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+          </configuration>
+          <!-- see http://stackoverflow.com/a/574650 -->
         <executions>
           <execution>
             <id>make-assembly</id>
@@ -61,6 +61,13 @@
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
