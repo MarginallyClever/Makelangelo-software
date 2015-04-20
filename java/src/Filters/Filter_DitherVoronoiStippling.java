@@ -44,6 +44,7 @@ package Filters;
 
 
 
+import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,6 +60,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 
 /**
@@ -165,21 +171,34 @@ public class Filter_DitherVoronoiStippling extends Filter {
 	
 	
 	public void Convert(BufferedImage img) throws IOException {
-		src_img = img;
-		h = img.getHeight();
-		w = img.getWidth();
-		MAX_GENERATIONS=1000;
-		MAX_CELLS=5000;
+		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
+		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
+	
+		JPanel panel = new JPanel(new GridLayout(0,1));
+		panel.add(new JLabel("Number of cells"));
+		panel.add(text_cells);
+		panel.add(new JLabel("Number of generations"));
+		panel.add(text_gens);
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
-		ImageSetupTransform(img);
-
-		cellBorder = new ArrayList<CellEdge>();
-		
-		initializeCells(0.5);
-		evolveCells();
-		writeOutCells();
+	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
+	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
+	    	
+			src_img = img;
+			h = img.getHeight();
+			w = img.getWidth();
+			
+			tool = MachineConfiguration.getSingleton().GetCurrentTool();
+			ImageSetupTransform(img);
+	
+			cellBorder = new ArrayList<CellEdge>();
+	
+		    
+			initializeCells(0.5);
+			evolveCells();
+			writeOutCells();
+	    }
 	}
 
 

@@ -11,6 +11,10 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
@@ -47,50 +51,25 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	
 	
 	public void Generate(final String dest) {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Hilbert Curve",true);
-		driver.setLayout(new GridLayout(0,1));
-
 		final JTextField field_size = new JTextField(Integer.toString((int)xmax));
 		final JTextField field_order = new JTextField(Integer.toString(order));
 
-		driver.add(new JLabel("Size"));		driver.add(field_size);
-		driver.add(new JLabel("Order"));	driver.add(field_order);
-
-		final JButton buttonSave = new JButton("Go");
-		final JButton buttonCancel = new JButton("Cancel");
-		Box horizontalBox = Box.createHorizontalBox();
-	    horizontalBox.add(Box.createGlue());
-	    horizontalBox.add(buttonSave);
-	    horizontalBox.add(buttonCancel);
-	    driver.add(horizontalBox);
-	    driver.getRootPane().setDefaultButton(buttonSave);
+	
+		JPanel panel = new JPanel(new GridLayout(0,1));
+		panel.add(new JLabel("Size"));
+		panel.add(field_size);
+		panel.add(new JLabel("Order"));
+		panel.add(field_order);
 		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				
-				if(subject == buttonSave) {
-					xmax = Integer.parseInt(field_size.getText())*2;
-					ymax= xmax;
-					xmin=0;
-					ymin=0;
-					order = Integer.parseInt(field_order.getText());
-					CreateCurveNow(dest);
-					
-					driver.dispose();
-				}
-				if(subject == buttonCancel) {
-					driver.dispose();
-				}
-			}
-		};
-		
-		buttonSave.addActionListener(driveButtons);
-		buttonCancel.addActionListener(driveButtons);
-		driver.getRootPane().setDefaultButton(buttonSave);
-
-		driver.setSize(300,400);
-		driver.setVisible(true);
+	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+			xmax = Integer.parseInt(field_size.getText())*2;
+			ymax= xmax;
+			xmin=0;
+			ymin=0;
+			order = Integer.parseInt(field_order.getText());
+			CreateCurveNow(dest);
+	    }
 	}
 	
 
