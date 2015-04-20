@@ -129,10 +129,11 @@ public class MainGUI
 	private JMenuBar menuBar;
     private JMenuItem buttonExit;
     private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
-    private JMenuItem buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
     private JMenuItem buttonRescan, buttonDisconnect;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
+    // settings pane
+    private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
     // prepare pane
     private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
     // drive pane
@@ -157,6 +158,7 @@ public class MainGUI
 	private StatusBar statusBar;
 	private JPanel drivePane;
 	private JPanel preparePane;
+	private JPanel settingsPane;
 	
 	// command line
 	private JPanel textInputArea;
@@ -1695,6 +1697,37 @@ public class MainGUI
         }
     }
 
+    // settings menu
+	public JPanel SettingsPanel() {
+		JPanel panel = new JPanel(new GridLayout(0,1));
+
+        // TODO: move all these into a pop-up menu with tabs
+        buttonAdjustMachineSize = new JButton(MultilingualSupport.getSingleton().get("MenuSettingsMachine"));
+        buttonAdjustMachineSize.addActionListener(this);
+        panel.add(buttonAdjustMachineSize);
+
+        buttonAdjustPulleySize = new JButton(MultilingualSupport.getSingleton().get("MenuAdjustPulleys"));
+        buttonAdjustPulleySize.addActionListener(this);
+        panel.add(buttonAdjustPulleySize);
+        
+        buttonJogMotors = new JButton(MultilingualSupport.getSingleton().get("JogMotors"));
+        buttonJogMotors.addActionListener(this);
+        panel.add(buttonJogMotors);
+
+        panel.add(new JSeparator());
+        
+        buttonChangeTool = new JButton(MultilingualSupport.getSingleton().get("MenuSelectTool"));
+        buttonChangeTool.addActionListener(this);
+        panel.add(buttonChangeTool);
+
+        buttonAdjustTool = new JButton(MultilingualSupport.getSingleton().get("MenuAdjustTool"));
+        buttonAdjustTool.addActionListener(this);
+        panel.add(buttonAdjustTool);
+        
+        return panel;
+	}
+	
+	
 	public JPanel ProcessImages() {
 		JPanel driver = new JPanel(new GridLayout(0,1));
 
@@ -1760,8 +1793,6 @@ public class MainGUI
         buttonHalt = new JButton(MultilingualSupport.getSingleton().get("Halt"));
         buttonHalt.addActionListener(this);
         go.add(buttonHalt);
-        
-        go.add(new JSeparator());
         
 		
 		JPanel axisControl = new JPanel(new GridBagLayout());
@@ -1840,15 +1871,12 @@ public class MainGUI
 		
 
 		driver.add(go);
+        driver.add(new JSeparator());
 		driver.add(axisControl);
 		driver.add(corners);
 		driver.add(feedRateControl);
-		
-	    JPanel inputField=GetTextInputField();
-	    //inputField.setMinimumSize(new Dimension(100,50));
-	    //inputField.setMaximumSize(new Dimension(10000,50));
-
-	    driver.add(inputField);
+        driver.add(new JSeparator());
+	    driver.add(GetTextInputField());
 	    
 		
 		ActionListener driveButtons = new ActionListener() {
@@ -2020,6 +2048,13 @@ public class MainGUI
 		ButtonGroup group;
         int i;
         
+        if(settingsPane!=null) {
+            buttonAdjustMachineSize.setEnabled(!running);
+            buttonAdjustPulleySize.setEnabled(!running);
+            buttonJogMotors.setEnabled(portConfirmed && !running);
+            buttonChangeTool.setEnabled(!running);
+            buttonAdjustTool.setEnabled(!running);
+        }
         if(preparePane!=null) {
             buttonHilbertCurve.setEnabled(!running);
             buttonText2GCODE.setEnabled(!running);
@@ -2100,41 +2135,6 @@ public class MainGUI
         subMenu.add(buttonDisconnect);
         
         menuBar.add(subMenu);
-
-        // settings menu
-        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuSettings"));
-        menu.setMnemonic(KeyEvent.VK_T);
-        menu.setEnabled(!running);
-
-        // TODO: move all these into tabs in a pop-up menu.
-        buttonAdjustMachineSize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSettingsMachine"),KeyEvent.VK_L);
-        buttonAdjustMachineSize.addActionListener(this);
-        buttonAdjustMachineSize.setEnabled(!running);
-        menu.add(buttonAdjustMachineSize);
-
-        buttonAdjustPulleySize = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAdjustPulleys"),KeyEvent.VK_B);
-        buttonAdjustPulleySize.addActionListener(this);
-        buttonAdjustPulleySize.setEnabled(!running);
-        menu.add(buttonAdjustPulleySize);
-        
-        buttonJogMotors = new JMenuItem(MultilingualSupport.getSingleton().get("JogMotors"),KeyEvent.VK_J);
-        buttonJogMotors.addActionListener(this);
-        buttonJogMotors.setEnabled(portConfirmed && !running);
-        menu.add(buttonJogMotors);
-
-        menu.addSeparator();
-        
-        buttonChangeTool = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSelectTool"),KeyEvent.VK_T);
-        buttonChangeTool.addActionListener(this);
-        buttonChangeTool.setEnabled(!running);
-        menu.add(buttonChangeTool);
-
-        buttonAdjustTool = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAdjustTool"),KeyEvent.VK_B);
-        buttonAdjustTool.addActionListener(this);
-        buttonAdjustTool.setEnabled(!running);
-        menu.add(buttonAdjustTool);
-        
-        menuBar.add(menu);
         
         // view menu
         menu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreview"));
@@ -2187,12 +2187,14 @@ public class MainGUI
         c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         ClearLog();
 
+        settingsPane = SettingsPanel();
         previewPane = new DrawPanel();
         preparePane = ProcessImages();
         drivePane = DriveManually();
         statusBar = new StatusBar();
 
         contextMenu = new JTabbedPane();
+        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuSettings"),null,settingsPane,null);
         contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuGCODE"),null,preparePane,null);
         contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuDraw"),null,drivePane,null);
         contextMenu.addTab("Log",null,logPane,null);
@@ -2225,19 +2227,20 @@ public class MainGUI
     }
 
 	private JPanel GetTextInputField() {
-		textInputArea = new JPanel();
-		textInputArea.setLayout(new BoxLayout(textInputArea,BoxLayout.LINE_AXIS));
-		
+		textInputArea = new JPanel(new GridLayout(0,1));
 		commandLineText = new JTextField(0);
 		commandLineText.setPreferredSize(new Dimension(10,10));
 		commandLineSend = new JButton(MultilingualSupport.getSingleton().get("Send"));
-		
+		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
 		textInputArea.add(commandLineText);
 		textInputArea.add(commandLineSend);
 		
 		commandLineText.addKeyListener(this);
 		commandLineSend.addActionListener(this);
-		
+
+	    //textInputArea.setMinimumSize(new Dimension(100,50));
+	    //textInputArea.setMaximumSize(new Dimension(10000,50));
+
 		return textInputArea;
 	}
 
