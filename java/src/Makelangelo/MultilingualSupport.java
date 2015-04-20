@@ -16,8 +16,9 @@ import javax.swing.JDialog;
 
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
+	public static final String FIRST_TIME_KEY = "first time";
 	protected String currentLanguage="English";
-	Map<String,LanguageContainer> languages = new HashMap<String,LanguageContainer>();
+	private final Map<String,LanguageContainer> languages = new HashMap<>();
 	
 	private Preferences prefs = Preferences.userRoot().node("Language");
 	
@@ -33,19 +34,21 @@ public class MultilingualSupport {
 	protected MultilingualSupport() {
 		LoadLanguages();
 		LoadConfig();
+	}
 
+	public synchronized void checkIfThisIsTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
 		if(!languages.keySet().contains(currentLanguage)) {
-			prefs.putBoolean("first time", false);
+			prefs.putBoolean(FIRST_TIME_KEY, false);
 		}
-		
-		if(prefs.getBoolean("first time", true)) {
+
+		if(prefs.getBoolean(FIRST_TIME_KEY, true)) {
 			ChooseLanguage();
-			prefs.putBoolean("first time", false);
+			prefs.putBoolean(FIRST_TIME_KEY, false);
 		}
 	}
-	
-	
+
+
 	private void SaveConfig() {
 		prefs.put("language", currentLanguage );
 	}
