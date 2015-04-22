@@ -6,8 +6,18 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
+
 
 public class Filter_GeneratorScanline extends Filter {
+	public Filter_GeneratorScanline(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
 	public String GetName() { return "Scanline"; }
 	
 	/**
@@ -16,7 +26,7 @@ public class Filter_GeneratorScanline extends Filter {
 	 */
 	public void Convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
 		img = bw.Process(img);
 
 		// Open the destination file

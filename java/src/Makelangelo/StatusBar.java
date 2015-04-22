@@ -15,6 +15,7 @@ public class StatusBar extends JLabel {
 	protected String sSoFar = "so far: ";
 	protected String sRemaining=" remaining: ";
 	protected String sElapsed="";
+	protected MultilingualSupport translator;
 	
 	
 	public String formatTime(long millis) {
@@ -33,10 +34,12 @@ public class StatusBar extends JLabel {
 	}
 	
 	
-    public StatusBar() {
+    public StatusBar(MultilingualSupport ms) {
         super();
         super.setPreferredSize(new Dimension(100, 16));
 
+        translator = ms;
+        
         Font f = getFont();
         setFont(f.deriveFont(Font.BOLD,15));
         Dimension d=getMinimumSize();
@@ -71,8 +74,8 @@ public class StatusBar extends JLabel {
     		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
     		long total_time = (long)( (float)t_draw_now * (float)total / (float)sofar );
         	long remaining = total_time - t_draw_now;
-        	sElapsed = MultilingualSupport.getSingleton().get("StatusSoFar") + formatTime(t_draw_now) + 
-        			MultilingualSupport.getSingleton().get("StatusRemaining") + formatTime(remaining);
+        	sElapsed = translator.get("StatusSoFar") + formatTime(t_draw_now) + 
+        			translator.get("StatusRemaining") + formatTime(remaining);
     	}
 
 	   	SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);

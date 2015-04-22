@@ -2,6 +2,10 @@ package Filters;
 
 import java.awt.image.BufferedImage;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
+
 
 	
 /**
@@ -12,6 +16,14 @@ import java.awt.image.BufferedImage;
  */
 public class Filter_DitherFloydSteinberg extends Filter {
 	private long tone;
+	
+	
+	public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
 	
 	private int QuantizeColor(int original) {
 		int i=(int)Math.min(Math.max(original, 0),255);

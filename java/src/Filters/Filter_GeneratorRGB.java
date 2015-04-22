@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import Makelangelo.MachineConfiguration;
 import Makelangelo.C3;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
 
 
 
@@ -34,6 +36,13 @@ public class Filter_GeneratorRGB extends Filter {
 	int stepw=0,steph=0;
 	int direction=1;
 	
+
+	public Filter_GeneratorRGB(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
 
 
 	public String GetName() { return "Red Green Blue"; }
@@ -159,7 +168,7 @@ public class Filter_GeneratorRGB extends Filter {
 		palette_mask=tool_index;
 		
 		// "please change to tool X and press any key to continue"
-		tool = MachineConfiguration.getSingleton().GetTool(tool_index);
+		tool = machine.GetTool(tool_index);
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);

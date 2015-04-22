@@ -2,6 +2,10 @@ package Filters;
 
 import java.awt.image.BufferedImage;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
+
 	
 /**
  * Converts an image to N shades of grey.
@@ -11,7 +15,10 @@ import java.awt.image.BufferedImage;
 public class Filter_BlackAndWhite extends Filter {
 	double levels=2;
 
-	public Filter_BlackAndWhite(int _levels) {
+
+	public Filter_BlackAndWhite(MainGUI gui,
+			MachineConfiguration mc, MultilingualSupport ms,int _levels) {
+		super(gui, mc, ms);
 		levels = (double)_levels;
 	}
 	

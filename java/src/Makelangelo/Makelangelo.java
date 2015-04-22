@@ -31,8 +31,7 @@ public class Makelangelo {
 	    	        }
 	            }
 	    		*/
-	        	gui = MainGUI.getSingleton();
-            MultilingualSupport.getSingleton().checkIfThisIsTheFirstTimeLoadingLanguageFiles();
+        	gui = new MainGUI();
 	        }
 	    });
 	}

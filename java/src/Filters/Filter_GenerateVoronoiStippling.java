@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 
 import Makelangelo.MachineConfiguration;
 import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
 import Makelangelo.Point2D;
 import Voronoi.*;
 
@@ -28,8 +29,6 @@ import javax.swing.JTextField;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  */
 public class Filter_GenerateVoronoiStippling extends Filter {
-	public String GetName() { return "Voronoi stipples"; }
-
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private int totalCells=1;
 	private VoronoiCell [] cells = new VoronoiCell[1];
@@ -44,6 +43,16 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	private List<VoronoiCellEdge> cellBorder = null;
 	private double[] xValuesIn=null;
 	private double[] yValuesIn=null;
+	
+	
+	public Filter_GenerateVoronoiStippling(MainGUI gui,
+			MachineConfiguration mc, MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
+
+	public String GetName() { return "Voronoi stipples"; }
 	
 	
 	public void Convert(BufferedImage img) throws IOException {
@@ -65,7 +74,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 			h = img.getHeight();
 			w = img.getWidth();
 			
-			tool = MachineConfiguration.getSingleton().GetCurrentTool();
+			tool = machine.GetCurrentTool();
 			ImageSetupTransform(img);
 	
 			cellBorder = new ArrayList<VoronoiCellEdge>();
@@ -80,7 +89,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		MainGUI.getSingleton().Log("<font color='green'>Initializing cells</font>\n");
+		mainGUI.Log("<font color='green'>Initializing cells</font>\n");
 
 		totalCells=MAX_CELLS;
 
@@ -118,13 +127,13 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	// jiggle the dots until they make a nice picture
 	protected void evolveCells() {
 		try {
-			MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
+			mainGUI.Log("<font color='green'>Mutating</font>\n");
 	
 			int generation=0;
 			float change=0;
 			do {
 				generation++;
-				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
+				mainGUI.Log("<font color='green'>Generation "+generation+"</font>\n");
 	
 				tessellateVoronoiDiagram();
 				change = AdjustCentroids();
@@ -132,7 +141,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
 			
-			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+"</font>\n");
+			mainGUI.Log("<font color='green'>Last "+generation+"</font>\n");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -143,7 +152,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	// write cell centroids to gcode.
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
-			MainGUI.getSingleton().Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
+			mainGUI.Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			
 			ImageStart(src_img,out);

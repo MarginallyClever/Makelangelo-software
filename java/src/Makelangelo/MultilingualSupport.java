@@ -1,17 +1,9 @@
 package Makelangelo;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
 
 
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
@@ -22,74 +14,31 @@ public class MultilingualSupport {
 	
 	private Preferences prefs = Preferences.userRoot().node("Language");
 	
-	private static MultilingualSupport singletonObject=null;
-	
-	public static MultilingualSupport getSingleton() {
-		if(singletonObject==null) {
-			singletonObject = new MultilingualSupport();
-		}
-		return singletonObject;
+
+	public MultilingualSupport() {
+		loadLanguages();
+		loadConfig();
 	}
 
-	protected MultilingualSupport() {
-		LoadLanguages();
-		LoadConfig();
-	}
-
-	public synchronized void checkIfThisIsTheFirstTimeLoadingLanguageFiles() {
+	public boolean isThisTheFirstTime() {
 		// Did the language file disappear?  Offer the language dialog.
 		if(!languages.keySet().contains(currentLanguage)) {
 			prefs.putBoolean(FIRST_TIME_KEY, false);
 		}
 
-		if(prefs.getBoolean(FIRST_TIME_KEY, true)) {
-			ChooseLanguage();
-			prefs.putBoolean(FIRST_TIME_KEY, false);
-		}
+		return prefs.getBoolean(FIRST_TIME_KEY, true);
 	}
 
 
-	private void SaveConfig() {
+	public void saveConfig() {
 		prefs.put("language", currentLanguage );
 	}
 	
-	private void LoadConfig() {
+	public void loadConfig() {
 		currentLanguage = prefs.get("language", "English");
 	}
-
 	
-	// display a dialog box of available languages and let the user select their preference.
-	public void ChooseLanguage() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),":) ?",true);
-		driver.setLayout(new GridBagLayout());
-
-		final String [] choices = getLanguageList();
-		final JComboBox<String> language_options = new JComboBox<String>(choices);
-		final JButton save = new JButton(">>>");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				// TODO prevent "close" icon.  Must press save to continue!
-				if(subject == save) {
-					currentLanguage = choices[language_options.getSelectedIndex()];
-					SaveConfig();
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-
-		driver.pack();
-		driver.setVisible(true);
-	}
-	
-	public void LoadLanguages() {
+	public void loadLanguages() {
 		// Scan folder for language files
         String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
         System.out.println(workingDirectory);

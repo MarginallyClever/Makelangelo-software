@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 
 import Makelangelo.MachineConfiguration;
 import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
 import Makelangelo.Point2D;
 
 
@@ -30,6 +31,11 @@ public class Filter_GeneratorZigZag extends Filter {
 	Point2D[] points = null;
 	int[] solution = null;
 	int scount;
+	
+	
+	public Filter_GeneratorZigZag(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+		super(gui,mc,ms);
+	}
 	
 
 	public String formatTime(long millis) {
@@ -62,7 +68,7 @@ public class Filter_GeneratorZigZag extends Filter {
 				case  2: c="red";	  break;
 				default: c="white";   break;
 				}
-				MainGUI.getSingleton().Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
+				mainGUI.Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
 			}
 			progress = new_progress;
 			pm.setProgress((int)progress);
@@ -224,7 +230,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	private void GenerateTSP() {
 		GreedyTour();
 
-		MainGUI.getSingleton().Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+		mainGUI.Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
 		len=GetTourLength(solution);
 		old_len=len;
@@ -271,7 +277,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void GreedyTour() {
-		MainGUI.getSingleton().Log("<font color='green'>Finding greedy tour solution...</font>\n");
+		mainGUI.Log("<font color='green'>Finding greedy tour solution...</font>\n");
 
 		int i;
 		float w, bestw;
@@ -335,10 +341,10 @@ public class Filter_GeneratorZigZag extends Filter {
 		// write
 		try {
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			out.write(MachineConfiguration.getSingleton().GetConfigLine()+";\n");
-			out.write(MachineConfiguration.getSingleton().GetBobbinLine()+";\n");
+			out.write(machine.GetConfigLine()+";\n");
+			out.write(machine.GetBobbinLine()+";\n");
 
-			//MachineConfiguration mc = MachineConfiguration.getSingleton();
+			//MachineConfiguration mc = machine;
 			//tool = mc.GetCurrentTool();
 			
 			SetAbsoluteMode(out);
@@ -360,14 +366,13 @@ public class Filter_GeneratorZigZag extends Filter {
 			out.close();
 		}
 		catch(IOException e) {
-			MainGUI.getSingleton().Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
+			mainGUI.Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
 		}
 	}
 	
 	
 	protected void ConnectTheDots(BufferedImage img) {
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
+		tool = machine.GetCurrentTool();
 		ImageSetupTransform(img);
 
 		int x,y,i;
@@ -382,7 +387,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			}
 		}
 		
-		MainGUI.getSingleton().Log("<font color='green'>"+numPoints + " points,</font>\n");
+		mainGUI.Log("<font color='green'>"+numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 	
@@ -404,13 +409,13 @@ public class Filter_GeneratorZigZag extends Filter {
 	 */
 	public void Convert(BufferedImage img) {
 		// resize & flip as needed
-		Filter_Resize rs = new Filter_Resize(250,250); 
+		Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250); 
 		img = rs.Process(img);
 		// make black & white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
 		img = bw.Process(img);
 		// dither
-		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg();
+		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI,machine,translator);
 		img = dither.Process(img);
 		// connect the dots
 		ConnectTheDots(img);

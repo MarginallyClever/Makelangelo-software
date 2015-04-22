@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 
 import Makelangelo.MachineConfiguration;
 import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_Spraypaint extends DrawingTool {
@@ -24,7 +25,9 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 	float old_x,old_y;
 	float overlap=0.3f;
 	
-	public DrawingTool_Spraypaint() {
+	public DrawingTool_Spraypaint(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
+		super(gui,ms,mc);
+		
 		diameter=40;
 		z_rate=80;
 		z_on=50;
@@ -77,7 +80,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Adjust Spraypaint",true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust Spraypaint",true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField penDiameter   = new JTextField(Float.toString(diameter),5);
@@ -143,8 +146,8 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestDot) {
-					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
-					MainGUI.getSingleton().SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
+					mainGUI.SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
+					mainGUI.SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
 				}
 				if(subject == buttonSave) {
 					diameter = Float.valueOf(penDiameter.getText());
@@ -152,7 +155,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 					z_off = Float.valueOf(penUp.getText());
 					z_on = Float.valueOf(penDown.getText());
 					z_rate = Float.valueOf(penz.getText());
-					MachineConfiguration.getSingleton().SaveConfig();
+					machine.SaveConfig();
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {
@@ -167,7 +170,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		buttonCancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(buttonSave);
 	
-		MainGUI.getSingleton().SendLineToRobot("M114");
+		mainGUI.SendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}

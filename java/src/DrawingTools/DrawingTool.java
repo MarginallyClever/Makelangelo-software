@@ -2,7 +2,13 @@ package DrawingTools;
 
 import java.awt.BasicStroke;
 import java.io.OutputStreamWriter;
+
+import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
+
 import com.jogamp.opengl.GL2;
+
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
@@ -21,7 +27,17 @@ public class DrawingTool {
 
 	// used while drawing to the GUI
 	protected float draw_z=0;
+
+	protected MainGUI mainGUI;
+	protected MultilingualSupport translator;
+	protected MachineConfiguration machine;
 	
+
+	public DrawingTool(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
+		mainGUI = gui;
+		translator = ms;
+		machine = mc;
+	}
 	
 	public float GetZOn() { return z_on; }
 	public float GetZOff() { return z_off; }

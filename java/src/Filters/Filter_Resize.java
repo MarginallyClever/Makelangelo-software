@@ -8,24 +8,36 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
 
 
 /**
  * Resize and flip horizontally if needed.
  * @author Dan
  */
-public class Filter_Resize {
+public class Filter_Resize extends Filter {
 	protected int maxWidth, maxHeight;
-	
-	public Filter_Resize(int max_width,int max_height) {
-		maxWidth=max_width;
-		maxHeight=max_height;
-	}
-	public Filter_Resize() {
+
+
+	public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
 		maxWidth=1000;
 		maxHeight=1000;
 	}
-	
+
+	public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms,int max_width,int max_height) {
+		super(gui, mc, ms);
+		maxWidth=max_width;
+		maxHeight=max_height;
+		// TODO Auto-generated constructor stub
+		maxWidth=1000;
+		maxHeight=1000;
+	}
+
 	
 	protected BufferedImage scaleImage(BufferedImage img, int width, int height) {
 	    BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -35,7 +47,7 @@ public class Filter_Resize {
 	                           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 	        g.setBackground(Color.WHITE);
 	        g.clearRect(0, 0, width, height);
-	        if(MachineConfiguration.getSingleton().reverseForGlass) {
+	        if(machine.reverseForGlass) {
 	        	g.drawImage(img, width, 0, 0, height, 0,0,img.getWidth(),img.getHeight(), null);
 	        } else {
 	        	g.drawImage(img, 0, 0, width, height, null);
@@ -48,13 +60,12 @@ public class Filter_Resize {
 
 
 	public BufferedImage Process(BufferedImage img) {
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		int w = img.getWidth();
 		int h = img.getHeight();
 		
 		// cap the max_w and max_h so that enormous drawbot images don't break the software.
-		double paper_w= mc.GetPaperWidth();
-		double paper_h= mc.GetPaperHeight();
+		double paper_w= machine.GetPaperWidth();
+		double paper_h= machine.GetPaperHeight();
 		// TODO make this number a variable that can be tweaked
 		int max_w=maxWidth;
 		int max_h=maxHeight;

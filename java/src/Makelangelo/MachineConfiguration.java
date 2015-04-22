@@ -73,27 +73,23 @@ public class MachineConfiguration {
 	protected int current_tool=0;	
 	
 	protected String [] configurations_available = null;
+	private MainGUI mainGUI = null;
+	private MultilingualSupport translator;
 	
-	// singleton
-	private static MachineConfiguration singletonObject;
-	
-	public static MachineConfiguration getSingleton() {
-		if(singletonObject==null) {
-			singletonObject = new MachineConfiguration();
-		}
-		return singletonObject;
-	}
 	
 	// constructor
-	protected MachineConfiguration() {
+	protected MachineConfiguration(MainGUI gui,MultilingualSupport ms) {
+		mainGUI = gui;
+		translator = ms;
+		
 		tools = new DrawingTool[6];
 		int i=0;
-		tools[i++]=new DrawingTool_Pen("Pen (black)",0);
-		tools[i++]=new DrawingTool_Pen("Pen (red)",1);
-		tools[i++]=new DrawingTool_Pen("Pen (green)",2);
-		tools[i++]=new DrawingTool_Pen("Pen (blue)",3);
-		tools[i++]=new DrawingTool_LED();
-		tools[i++]=new DrawingTool_Spraypaint();
+		tools[i++]=new DrawingTool_Pen("Pen (black)",0,gui,ms,this);
+		tools[i++]=new DrawingTool_Pen("Pen (red)",1,gui,ms,this);
+		tools[i++]=new DrawingTool_Pen("Pen (green)",2,gui,ms,this);
+		tools[i++]=new DrawingTool_Pen("Pen (blue)",3,gui,ms,this);
+		tools[i++]=new DrawingTool_LED(gui,ms,this);
+		tools[i++]=new DrawingTool_Spraypaint(gui,ms,this);
 		
 		VersionCheck();
 		
@@ -113,22 +109,22 @@ public class MachineConfiguration {
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
 	public void AdjustMachineSize() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),"Adjust machine & paper size",true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust machine & paper size",true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
 		final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
 		final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
 		final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
-		final JCheckBox m1i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m1invert);
-		final JCheckBox m2i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m2invert);
+		final JCheckBox m1i = new JCheckBox(translator.get("Invert"),this.m1invert);
+		final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
 
 		//String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
 		//final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
 		//startPos.setSelectedIndex(startingPositionIndex);
 		
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Save"));
 		
 		String limit_file = "limits.png";
 		
@@ -141,7 +137,7 @@ public class MachineConfiguration {
 			e.printStackTrace();
 			
 		}
-		if (myPicture == null) {System.err.println(MultilingualSupport.getSingleton().get("CouldNotFind")+limit_file); return;}
+		if (myPicture == null) {System.err.println(translator.get("CouldNotFind")+limit_file); return;}
 		
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
 		
@@ -156,7 +152,7 @@ public class MachineConfiguration {
 		
 		c.gridheight=1; c.gridwidth=1; 
 		c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
-		driver.add(new JLabel(MultilingualSupport.getSingleton().get("mmNotice")),c);
+		driver.add(new JLabel(translator.get("mmNotice")),c);
 		c.gridwidth=1;
 		y++;
 
@@ -164,15 +160,15 @@ public class MachineConfiguration {
 		c.anchor=GridBagConstraints.EAST;
 		d.anchor=GridBagConstraints.WEST;
 		
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("MachineWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(mw,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("MachineHeight")),c);	d.gridx=3;	d.gridy=y;	driver.add(mh,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("MachineWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(mw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("MachineHeight")),c);	d.gridx=3;	d.gridy=y;	driver.add(mh,d);
 		y++;
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(pw,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperHeight")),c);		d.gridx=3;	d.gridy=y;	driver.add(ph,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("PaperWidth")),c);		d.gridx=1;	d.gridy=y;	driver.add(pw,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("PaperHeight")),c);		d.gridx=3;	d.gridy=y;	driver.add(ph,d);
 		y++;
 
-		c.gridx=0; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("InvertLeft")),c);		d.gridx=1;	d.gridy=y;	driver.add(m1i,d);
-		c.gridx=2; c.gridy=y; driver.add(new JLabel(MultilingualSupport.getSingleton().get("InvertRight")),c);		d.gridx=3;	d.gridy=y;	driver.add(m2i,d);
+		c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("InvertLeft")),c);		d.gridx=1;	d.gridy=y;	driver.add(m1i,d);
+		c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("InvertRight")),c);		d.gridx=3;	d.gridy=y;	driver.add(m2i,d);
 		y++;
 		
 		//c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
@@ -300,7 +296,7 @@ public class MachineConfiguration {
 						m2invert = m2i.isSelected();
 						
 						SaveConfig();
-						MainGUI.getSingleton().SendConfig();
+						mainGUI.SendConfig();
 						driver.dispose();
 					}
 				}
@@ -313,7 +309,7 @@ public class MachineConfiguration {
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(save);
-		MainGUI.getSingleton().SendLineToRobot("M114"); // "where" command
+		mainGUI.SendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -330,20 +326,20 @@ public class MachineConfiguration {
 	
 	// dialog to adjust the pen up & pen down values
 	protected void ChangeTool() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustMachineSize"),true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustMachineSize"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
 		toolCombo.setSelectedIndex(current_tool);
 		
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
 		c.gridheight=1; c.gridwidth=1; 
 		
-		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ToolType")),c);
+		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(translator.get("ToolType")),c);
 		c.anchor=GridBagConstraints.WEST;
 		c.gridx=2; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(toolCombo,c);
 
@@ -360,7 +356,7 @@ public class MachineConfiguration {
 					current_tool = toolCombo.getSelectedIndex();
 					
 					SaveConfig();
-					MainGUI.getSingleton().SendConfig();
+					mainGUI.SendConfig();
 					driver.dispose();
 				}
 				if(subject == cancel) {
@@ -395,24 +391,24 @@ public class MachineConfiguration {
 	
 	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	public void AdjustPulleySize() {
-		final JDialog driver = new JDialog(MainGUI.getSingleton().getParentFrame(),MultilingualSupport.getSingleton().get("AdjustPulleySize"),true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustPulleySize"),true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
 		final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter*10));
 
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Save"));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx=50;
-		c.gridx=0;  c.gridy=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Left")),c);
-		c.gridx=0;  c.gridy=2;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Right")),c);
-		c.gridx=1;  c.gridy=0;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Diameter")),c);
+		c.gridx=0;  c.gridy=1;  driver.add(new JLabel(translator.get("Left")),c);
+		c.gridx=0;  c.gridy=2;  driver.add(new JLabel(translator.get("Right")),c);
+		c.gridx=1;  c.gridy=0;  driver.add(new JLabel(translator.get("Diameter")),c);
 		c.gridx=1;	c.gridy=1;	driver.add(mBobbin1,c);
 		c.gridx=1;	c.gridy=2;	driver.add(mBobbin2,c);
-		c.gridx=2;  c.gridy=1;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Millimeters")),c);
-		c.gridx=2;  c.gridy=2;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("Millimeters")),c);
+		c.gridx=2;  c.gridy=1;  driver.add(new JLabel(translator.get("Millimeters")),c);
+		c.gridx=2;  c.gridy=2;  driver.add(new JLabel(translator.get("Millimeters")),c);
 		c.gridx=0;  c.gridy=3;  driver.add(save,c);
 		c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
 		
@@ -432,7 +428,7 @@ public class MachineConfiguration {
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
 						if(data_is_sane ) {
 							SaveConfig();
-							MainGUI.getSingleton().SendConfig();
+							mainGUI.SendConfig();
 							driver.dispose();
 						}
 					}
@@ -650,7 +646,7 @@ public class MachineConfiguration {
 			// make sure a prefs node is created
 			prefs.node("Machines").node(Long.toString(new_uid));
 			// tell the robot it's new UID.
-			MainGUI.getSingleton().SendLineToRobot("UID "+new_uid);
+			mainGUI.SendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
 			String [] new_list = new String[configurations_available.length+1];

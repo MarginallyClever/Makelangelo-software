@@ -3,9 +3,15 @@ package DrawingTools;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import Makelangelo.MachineConfiguration;
+import Makelangelo.MainGUI;
+import Makelangelo.MultilingualSupport;
+
 
 public class DrawingTool_LED extends DrawingTool {
-	public DrawingTool_LED() {
+	public DrawingTool_LED(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
+		super(gui,ms,mc);
+		
 		diameter=4;
 		name="LED";
 		z_on=180;
