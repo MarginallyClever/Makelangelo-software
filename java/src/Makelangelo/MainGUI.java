@@ -116,7 +116,7 @@ public class MainGUI
 	private String serial_recv_buffer="";
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
-	private String[] recentFiles;
+	private RecentFiles recentFiles;
 	private String recentPort;
 	//private boolean allowMetrics=true;
 		
@@ -178,7 +178,7 @@ public class MainGUI
 	private MainGUI() {
 		StartLog();
 		MachineConfiguration.getSingleton();
-        GetRecentFiles();
+        recentFiles = new RecentFiles();
         GetRecentPort();
         LoadImageConverters();
         CreateAndShowGUI();
@@ -520,7 +520,8 @@ public class MainGUI
 	    }
 	    catch(IOException e) {
 	    	Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
-	    	RemoveRecentFile(filename);
+	    	recentFiles.remove(filename);
+	    	UpdateMenuBar();
 	    	return;
 	    }
 	    
@@ -886,7 +887,8 @@ public class MainGUI
 				}
 				catch(IOException e) {
 					Log("<font color='red'>"+MultilingualSupport.getSingleton().get("Failed")+e.getLocalizedMessage()+"</font>\n");
-					RemoveRecentFile(sourceFile);
+					recentFiles.remove(sourceFile);
+					UpdateMenuBar();
 				}
 
 				pm.setProgress(100);
@@ -932,70 +934,6 @@ public class MainGUI
 		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
 	}
 	
-	/**
-	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
-	 * @param filename the file to push to the top of the list.
-	 */
-	public void UpdateRecentFiles(String filename) {
-		int cnt = recentFiles.length;
-		String [] newFiles = new String[cnt];
-		
-		newFiles[0]=filename;
-		
-		int i,j=1;
-		for(i=0;i<cnt;++i) {
-			if(!filename.equals(recentFiles[i]) && recentFiles[i] != "") {
-				newFiles[j++] = recentFiles[i];
-				if(j == cnt ) break;
-			}
-		}
-
-		recentFiles=newFiles;
-
-		// update prefs
-		for(i=0;i<cnt;++i) {
-			if( recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		
-		UpdateMenuBar();
-	}
-	
-	// A file failed to load.  Remove it from recent files, refresh the menu bar.
-	public void RemoveRecentFile(String filename) {
-		int i;
-		for(i=0;i<recentFiles.length-1;++i) {
-			if(recentFiles[i]==filename) {
-				break;
-			}
-		}
-		for(;i<recentFiles.length-1;++i) {
-			recentFiles[i]=recentFiles[i+1];
-		}
-		recentFiles[recentFiles.length-1]="";
-
-		// update prefs
-		for(i=0;i<recentFiles.length;++i) {
-			if(recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		prefs.remove("recent-files-"+(i-1));
-		
-		UpdateMenuBar();
-	}
-	
-	// Load recent files from prefs
-	public void GetRecentFiles() {
-		recentFiles = new String[10];
-		
-		int i;
-		for(i=0;i<recentFiles.length;++i) {
-			recentFiles[i] = prefs.get("recent-files-"+i, "");
-		}
-	}	
-	
 	public boolean IsFileGcode(String filename) {
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
@@ -1029,7 +967,8 @@ public class MainGUI
     	}
 
 	   	// TODO: if succeeded
-	   	UpdateRecentFiles(filename);
+	   	recentFiles.add(filename);
+		UpdateMenuBar();
     	previewPane.ZoomToFitPaper();
     	statusBar.Clear();
 	}
@@ -1038,7 +977,8 @@ public class MainGUI
 	public void OpenFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
+		String s = recentFiles.get(0);
+		String filename = (s.length()>0) ? filename = s : "";
 
 		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
 		FileFilter filterImage = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
@@ -1063,7 +1003,8 @@ public class MainGUI
 	private void SaveFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
+		String s = recentFiles.get(0);
+		String filename = (s.length()>0) ? filename = s : "";
 
 		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
 		
@@ -1573,7 +1514,7 @@ public class MainGUI
 		int i;
 		for(i=0;i<10;++i) {
 			if(subject == buttonRecent[i]) {
-				OpenFileOnDemand(recentFiles[i]);
+				OpenFileOnDemand(recentFiles.get(i));
 				return;
 			}
 		}
@@ -2220,8 +2161,9 @@ public class MainGUI
     
     // if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
     private void reopenLastFile() {
-		if(recentFiles[0].length()>0) {
-			OpenFileOnDemand(recentFiles[0]);
+    	String s = recentFiles.get(0);
+		if(s.length()>0) {
+			OpenFileOnDemand(s);
 		}
     }
 
