@@ -1,4 +1,4 @@
-package Filters;
+package Voronoi;
 
 /*
  * The author of this software is Steven Fortune.  Copyright (c) 1994 by AT&T
@@ -42,512 +42,15 @@ package Filters;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-
-
-import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-import Makelangelo.MachineConfiguration;
-import Makelangelo.MainGUI;
-import Makelangelo.Point2D;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import Makelangelo.Point2D;
 
-
-/**
- * Dithering using a particle system
- * @author Dan
- * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
- * http://skynet.ie/~sos/mapviewer/voronoi.php
- */
-public class Filter_GenerateVoronoiStippling extends Filter {
-	public String GetName() { return "Voronoi stipples"; }
-	
-	class Point
-	{
-	    double x, y;
-
-	    public Point()
-	    {
-	    }
-
-	    public void setPoint(double x, double y)
-	    {
-	        this.x = x;
-	        this.y = y;
-	    }
-	}
-
-	
-	public class Site
-	{
-	    Point coord;
-	    int sitenbr;
-
-	    public Site()
-	    {
-	        coord = new Point();
-	    }
-	}
-	
-	class Edge
-	{
-	    public double a = 0, b = 0, c = 0;
-	    Site[] ep;  // JH: End points?
-	    Site[] reg; // JH: Sites this edge bisects?
-	    int edgenbr;
-
-	    Edge()
-	    {
-	        ep = new Site[2];
-	        reg = new Site[2];
-	    }
-	}
-
-	public class Halfedge
-	{
-	    Halfedge ELleft, ELright;
-	    Edge ELedge;
-	    boolean deleted;
-	    int ELpm;
-	    Site vertex;
-	    double ystar;
-	    Halfedge PQnext;
-	
-	    public Halfedge()
-	    {
-	        PQnext = null;
-	    }
-	}
-	
-	public class GraphEdge
-	{
-	    public double x1, y1, x2, y2;
-
-	    public int site1;
-	    public int site2;
-	}
-
-
-	class VoronoiCell {
-		public Point2D centroid = new Point2D();
-		public float weight;
-	}
-	
-
-	class CellEdge {
-		double px,py;
-		double nx,ny;
-	}
-	
-	
-	private int totalCells=1;
-	private VoronoiCell [] cells = new VoronoiCell[1];
-	private int w, h;
-	private BufferedImage src_img;
-	private List<GraphEdge> graphEdges = null;
-	private int MAX_GENERATIONS=40;
-	private int MAX_CELLS=5000;
-	private Point2D bound_min = new Point2D();
-	private Point2D bound_max = new Point2D();
-	private int numEdgesInCell;
-	private List<CellEdge> cellBorder = null;
-	private double[] xValuesIn=null;
-	private double[] yValuesIn=null;
-	
-	
-	
-	public void Convert(BufferedImage img) throws IOException {
-		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
-		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
-	
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel("Number of cells"));
-		panel.add(text_cells);
-		panel.add(new JLabel("Number of generations"));
-		panel.add(text_gens);
-		
-	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	    if (result == JOptionPane.OK_OPTION) {
-	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
-	    	
-			src_img = img;
-			h = img.getHeight();
-			w = img.getWidth();
-			
-			tool = MachineConfiguration.getSingleton().GetCurrentTool();
-			ImageSetupTransform(img);
-	
-			cellBorder = new ArrayList<CellEdge>();
-	
-		    
-			initializeCells(0.5);
-			evolveCells();
-			writeOutCells();
-	    }
-	}
-
-
-	// set some starting points in a grid
-	protected void initializeCells(double minDistanceBetweenSites) {
-		MainGUI.getSingleton().Log("<font color='green'>Initializing cells</font>\n");
-
-		totalCells=MAX_CELLS;
-
-		double totalArea = w*h;
-		double pointArea = totalArea/totalCells;
-		float length = (float)Math.sqrt(pointArea);
-		float x,y;
-		totalCells=0;
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				totalCells++;
-			}
-		}
-
-		cells = new VoronoiCell[totalCells];
-		int used=0;
-		
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				cells[used]=new VoronoiCell();
-				//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
-				cells[used].centroid.set(x,y);
-				++used;
-			}
-		}
-
-		// convert the cells to sites used in the Voronoi class.
-		xValuesIn = new double[cells.length];
-		yValuesIn = new double[cells.length];
-		
-        siteidx = 0;
-        sites = null;
-        allEdges = null;
-        this.minDistanceBetweenSites = minDistanceBetweenSites;
-	}
-
-
-	// jiggle the dots until they make a nice picture
-	protected void evolveCells() {
-		try {
-			MainGUI.getSingleton().Log("<font color='green'>Mutating</font>\n");
-	
-			int generation=0;
-			float change=0;
-			do {
-				generation++;
-				MainGUI.getSingleton().Log("<font color='green'>Generation "+generation+"</font>\n");
-	
-				tessellateVoronoiDiagram();
-				change = AdjustCentroids();
-				
-				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
-			
-			MainGUI.getSingleton().Log("<font color='green'>Last "+generation+"</font>\n");
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	// write cell centroids to gcode.
-	protected void writeOutCells() throws IOException {
-		if(graphEdges != null ) {
-			MainGUI.getSingleton().Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			
-			ImageStart(src_img,out);
-	
-			// set absolute coordinates
-			out.write("G00 G90;\n");
-			tool.WriteChangeTo(out);
-			liftPen(out);
-
-			int i;
-/*
-			for(i=0;i<graphEdges.size();++i) {
-				GraphEdge e= graphEdges.get(i);
-				
-				this.MoveTo(out, (float)e.x1,(float)e.y1, true);
-				this.MoveTo(out, (float)e.x1,(float)e.y1, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
-			}
-//*/		
-			//float step = (int)Math.ceil(tool.GetDiameter()/scale);
-			float most=cells[0].weight;
-			//float least=cells[0].weight;
-			for(i=1;i<cells.length;++i) {
-				if(most<cells[i].weight) most=cells[i].weight;
-				//if(least>cells[i].weight) least=cells[i].weight;
-			}
-			
-			for(i=0;i<cells.length;++i) {
-				float r = 5f * cells[i].weight / most;
-				r/=scale;
-				if(r<1) continue;
-				//System.out.println(i+"\t"+v);
-				float x=cells[i].centroid.x;
-				float y=cells[i].centroid.y;
-				/*
-				// boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-				
-				// filled boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				for(float j=y-r;j<y+r;j+=step) {
-					this.MoveTo(out, x+r, j, false);
-					this.MoveTo(out, x-r, j, false);					
-				}
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-
-				// circles
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				float detail=(float)(0.5*Math.PI*r);
-				if(detail<4) detail=4;
-				if(detail>20) detail=20;
-				for(float j=1;j<=detail;++j) {
-					this.MoveTo(out, 
-							x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
-							y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
-				}
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), false);
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				*/
-				// filled circles
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				while(r>1) {
-					float detail=(float)(0.5*Math.PI*r);
-					if(detail<4) detail=4;
-					if(detail>10) detail=10;
-					for(float j=1;j<=detail;++j) {
-						this.MoveTo(out, 
-								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
-								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
-					}
-					r-=(tool.GetDiameter()/(scale*1.5f));
-				}
-				this.MoveTo(out, x, y-r, false);
-				this.MoveTo(out, x, y-r, true);
-			}
-			
-			liftPen(out);
-			SignName(out);
-			tool.WriteMoveTo(out, 0, 0);
-			out.close();
-		}
-	}
-	
-
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
-		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastup=up;
-		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
-	}
-	
-	// I have a set of points.  I want a list of cell borders.
-	// cell borders are halfway between any point and it's nearest neighbors.
-	protected void tessellateVoronoiDiagram() {
-		// convert the cells to sites used in the Voronoi class.
-		int i;
-		for(i=0;i<cells.length;++i) {
-			xValuesIn[i]= cells[i].centroid.x;
-			yValuesIn[i]= cells[i].centroid.y;
-		}
-		
-		// scan left to right across the image, building the list of borders as we go.
-		graphEdges = generateVoronoi(xValuesIn, yValuesIn, 0, w-1, 0, h-1);
-	}
-		
-	
-	protected void generateBounds(int cellIndex) {
-		numEdgesInCell=0;
-
-		float cx = cells[cellIndex].centroid.x;
-		float cy = cells[cellIndex].centroid.y;
-
-		double dx,dy,nx,ny,dot1;
-		
-		//long ta = System.nanoTime();
-		
-		Iterator<GraphEdge> ige = graphEdges.iterator();
-		while(ige.hasNext()) {
-			GraphEdge e = ige.next();
-			if(e.site1 != cellIndex && e.site2 != cellIndex ) continue;
-			if(numEdgesInCell==0) {
-				if(e.x1<e.x2) {
-					bound_min.x=(float)e.x1;
-					bound_max.x=(float)e.x2;
-				} else {
-					bound_min.x=(float)e.x2;
-					bound_max.x=(float)e.x1;					
-				}
-				if(e.y1<e.y2) {
-					bound_min.y=(float)e.y1;
-					bound_max.y=(float)e.y2;
-				} else {
-					bound_min.y=(float)e.y2;
-					bound_max.y=(float)e.y1;					
-				}
-			} else {
-				if(bound_min.x>e.x1) bound_min.x=(float)e.x1;
-				if(bound_min.x>e.x2) bound_min.x=(float)e.x2;
-				if(bound_max.x<e.x1) bound_max.x=(float)e.x1;
-				if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
-				
-				if(bound_min.y>e.y1) bound_min.y=(float)e.y1;
-				if(bound_min.y>e.y2) bound_min.y=(float)e.y2;
-				if(bound_max.y<e.y1) bound_max.y=(float)e.y1;
-				if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
-			}
-
-			// make a unnormalized vector along the edge of e
-			dx = e.x2 - e.x1;
-			dy = e.y2 - e.y1;
-			// find a line orthogonal to dx/dy
-			nx=dy;
-			ny=-dx;
-			// dot product the centroid and the normal.
-			dx = cx-e.x1;
-			dy = cy-e.y1;
-			dot1=(dx*nx+dy*ny);
-			
-			if(cellBorder.size()==numEdgesInCell) {
-				cellBorder.add(new CellEdge());
-			}
-
-			CellEdge ce=cellBorder.get(numEdgesInCell++);
-			ce.px = e.x1;
-			ce.py = e.y1;
-			if(dot1<0) {
-				ce.nx = -nx;
-				ce.ny = -ny;
-			} else {
-				ce.nx = nx;
-				ce.ny = ny;
-			}
-		}
-
-		//long tc = System.nanoTime();
-		
-		//System.out.println("\t"+((tb-ta)/1e6)+"\t"+((tc-tb)/1e6));
-	}
-	
-	
-	protected boolean insideBorder(int x,int y) {
-		double dx,dy;
-		int i;
-		Iterator<CellEdge> ice = cellBorder.iterator();
-		for(i=0;i<numEdgesInCell;++i) {
-			CellEdge ce = ice.next();
-			
-			// dot product the test point.
-			dx = x-ce.px;
-			dy = y-ce.py;
-			// If they are opposite signs then the test point is outside the cell
-			if( dx*ce.nx+dy*ce.ny < 0 ) return false;
-		}
-		// passed all tests, must be in cell.
-		return true;
-	}
-	
-	
-	// find the weighted center of each cell.
-	// weight is based on the intensity of the color of each pixel inside the cell
-	// the center of the pixel must be inside the cell to be counted.
-	protected float AdjustCentroids() {
-		int i,x,y;
-		float change=0;
-		float weight,wx,wy;
-		int step = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
-		
-		for(i=0;i<cells.length;++i) {
-			generateBounds(i);		
-			int sx = (int)Math.floor(bound_min.x);
-			int sy = (int)Math.floor(bound_min.y);
-			int ex = (int)Math.floor(bound_max.x);
-			int ey = (int)Math.floor(bound_max.y);
-			//System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+", "+ey);
-			//System.out.println("centroid "+cells[i].centroid.x+", "+cells[i].centroid.y);
-			
-			weight=0;
-			wx=0;
-			wy=0;
-
-			for(y = sy; y <= ey; y+=step) {
-				for(x = sx; x <= ex; x+=step) {
-					if(insideBorder(x, y)) {
-						float val = (float)sample1x1(src_img,x,y) / 255.0f;
-						val = 1.0f - val;
-						weight += val;
-						wx += x * val;
-						wy += y * val;
-					}
-				}
-			}
-			if( weight > 0 ) {
-				wx /= weight;
-				wy /= weight;
-
-				cells[i].weight = weight;
-				
-				// make sure centroid can't leave image bounds
-				if(wx<0) wx=0;
-				if(wy<0) wy=0;
-				if(wx>=w) wx = w-1;
-				if(wy>=h) wy = h-1;
-
-				float dx = wx - cells[i].centroid.x;
-				float dy = wy - cells[i].centroid.y;
-				
-				change += dx*dx+dy*dy;
-				//change = (float)Math.sqrt(change);
-				
-				// use the new center
-				cells[i].centroid.set(wx, wy);
-			}
-		}
-		
-		return change;
-	}
-	
-	
-	
-	
-	
+public class VoronoiTesselator {
     // ************* Private members ******************
     private double borderMinX, borderMaxX, borderMinY, borderMaxY;
     private int siteidx;
@@ -555,29 +58,37 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     private int nvertices;
     private int nedges;
     private int nsites;
-    private Site[] sites;
-    private Site bottomsite;
+    private VoronoiSite[] sites;
+    private VoronoiSite bottomsite;
     private int sqrt_nsites;
     private double minDistanceBetweenSites;
     private int PQcount;
     private int PQmin;
     private int PQhashsize;
-    private Halfedge PQhash[];
+    private VoronoiHalfEdge[] PQhash;
 
     private final static int LE = 0;
     private final static int RE = 1;
 
     private int ELhashsize;
-    private Halfedge ELhash[];
-    private Halfedge ELleftend, ELrightend;
-    private List<GraphEdge> allEdges;
+    private VoronoiHalfEdge ELhash[];
+    private VoronoiHalfEdge ELleftend, ELrightend;
+    private List<VoronoiGraphEdge> allEdges;
     
 
     /*********************************************************
      * Public methods
      ********************************************************/
 
+    public VoronoiTesselator() {}
 
+    public void Init(double minDistanceBetweenSites) {
+		siteidx = 0;
+		this.sites = null;
+		this.allEdges = null;
+		this.minDistanceBetweenSites = minDistanceBetweenSites;
+    }
+    
     /**
      * 
      * @param xValuesIn Array of X values for each site.
@@ -588,7 +99,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
      * @param maxY The maximum Y of the bounding box around the voronoi
      * @return
      */
-    public List<GraphEdge> generateVoronoi(double[] xValuesIn, double[] yValuesIn,
+    public List<VoronoiGraphEdge> generateVoronoi(double[] xValuesIn, double[] yValuesIn,
             double minX, double maxX, double minY, double maxY)
     {
         sort(xValuesIn, yValuesIn, xValuesIn.length);
@@ -627,7 +138,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     private void sort(double[] xValuesIn, double[] yValuesIn, int count)
     {
         sites = null;
-        allEdges = new LinkedList<GraphEdge>();
+        allEdges = new LinkedList<VoronoiGraphEdge>();
 
         nsites = count;
         nvertices = 0;
@@ -647,20 +158,20 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         sortNode(xValues, yValues, count);
     }
 
-    private void qsort(Site[] sites)
+    private void qsort(VoronoiSite[] sites)
     {
-        List<Site> listSites = new ArrayList<Site>(sites.length);
-        for (Site s: sites)
+        List<VoronoiSite> listSites = new ArrayList<VoronoiSite>(sites.length);
+        for (VoronoiSite s: sites)
         {
             listSites.add(s);
         }
 
-        Collections.sort(listSites, new Comparator<Site>()
+        Collections.sort(listSites, new Comparator<VoronoiSite>()
         {
             @Override
-            public final int compare(Site p1, Site p2)
+            public final int compare(VoronoiSite p1, VoronoiSite p2)
             {
-                Point s1 = p1.coord, s2 = p2.coord;
+            	Point2D s1 = p1.coord, s2 = p2.coord;
                 if (s1.y < s2.y)
                 {
                     return (-1);
@@ -692,15 +203,15 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     {
         int i;
         nsites = numPoints;
-        sites = new Site[nsites];
+        sites = new VoronoiSite[nsites];
         xmin = xValues[0];
         ymin = yValues[0];
         xmax = xValues[0];
         ymax = yValues[0];
         for (i = 0; i < nsites; i++)
         {
-            sites[i] = new Site();
-            sites[i].coord.setPoint(xValues[i], yValues[i]);
+            sites[i] = new VoronoiSite();
+            sites[i].coord.set((float)xValues[i], (float)yValues[i]);
             sites[i].sitenbr = i;
 
             if (xValues[i] < xmin)
@@ -725,9 +236,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     }
 
     /* return a single in-storage site */
-    private Site nextone()
+    private VoronoiSite nextone()
     {
-        Site s;
+        VoronoiSite s;
         if (siteidx < nsites)
         {
             s = sites[siteidx];
@@ -739,12 +250,12 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         }
     }
 
-    private Edge bisect(Site s1, Site s2)
+    private VoronoiEdge bisect(VoronoiSite s1, VoronoiSite s2)
     {
         double dx, dy, adx, ady;
-        Edge newedge;
+        VoronoiEdge newedge;
 
-        newedge = new Edge();
+        newedge = new VoronoiEdge();
 
         // store the sites that this edge is bisecting
         newedge.reg[0] = s1;
@@ -781,7 +292,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (newedge);
     }
 
-    private void makevertex(Site v)
+    private void makevertex(VoronoiSite v)
     {
         v.sitenbr = nvertices;
         nvertices += 1;
@@ -792,16 +303,16 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         PQcount = 0;
         PQmin = 0;
         PQhashsize = 4 * sqrt_nsites;
-        PQhash = new Halfedge[PQhashsize];
+        PQhash = new VoronoiHalfEdge[PQhashsize];
 
         for (int i = 0; i < PQhashsize; i += 1)
         {
-            PQhash[i] = new Halfedge();
+            PQhash[i] = new VoronoiHalfEdge();
         }
         return true;
     }
 
-    private int PQbucket(Halfedge he)
+    private int PQbucket(VoronoiHalfEdge he)
     {
         int bucket;
 
@@ -822,9 +333,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     }
 
     // push the HalfEdge into the ordered linked list of vertices
-    private void PQinsert(Halfedge he, Site v, double offset)
+    private void PQinsert(VoronoiHalfEdge he, VoronoiSite v, double offset)
     {
-        Halfedge last, next;
+        VoronoiHalfEdge last, next;
 
         he.vertex = v;
         he.ystar = (double) (v.coord.y + offset);
@@ -840,9 +351,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     }
 
     // remove the HalfEdge from the list of vertices
-    private void PQdelete(Halfedge he)
+    private void PQdelete(VoronoiHalfEdge he)
     {
-        Halfedge last;
+        VoronoiHalfEdge last;
 
         if (he.vertex != null)
         {
@@ -863,22 +374,22 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (PQcount == 0);
     }
 
-    private Point PQ_min()
+    private Point2D PQ_min()
     {
-        Point answer = new Point();
+    	Point2D answer = new Point2D();
 
         while (PQhash[PQmin].PQnext == null)
         {
             PQmin += 1;
         }
-        answer.x = PQhash[PQmin].PQnext.vertex.coord.x;
-        answer.y = PQhash[PQmin].PQnext.ystar;
+        answer.x = (float)PQhash[PQmin].PQnext.vertex.coord.x;
+        answer.y = (float)PQhash[PQmin].PQnext.ystar;
         return (answer);
     }
 
-    private Halfedge PQextractmin()
+    private VoronoiHalfEdge PQextractmin()
     {
-        Halfedge curr;
+        VoronoiHalfEdge curr;
 
         curr = PQhash[PQmin].PQnext;
         PQhash[PQmin].PQnext = curr.PQnext;
@@ -886,10 +397,10 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (curr);
     }
 
-    private Halfedge HEcreate(Edge e, int pm)
+    private VoronoiHalfEdge HEcreate(VoronoiEdge e, int pm)
     {
-        Halfedge answer;
-        answer = new Halfedge();
+        VoronoiHalfEdge answer;
+        answer = new VoronoiHalfEdge();
         answer.ELedge = e;
         answer.ELpm = pm;
         answer.PQnext = null;
@@ -901,7 +412,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     {
         int i;
         ELhashsize = 2 * sqrt_nsites;
-        ELhash = new Halfedge[ELhashsize];
+        ELhash = new VoronoiHalfEdge[ELhashsize];
 
         for (i = 0; i < ELhashsize; i += 1)
         {
@@ -919,17 +430,17 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return true;
     }
 
-    private Halfedge ELright(Halfedge he)
+    private VoronoiHalfEdge ELright(VoronoiHalfEdge he)
     {
         return (he.ELright);
     }
 
-    private Halfedge ELleft(Halfedge he)
+    private VoronoiHalfEdge ELleft(VoronoiHalfEdge he)
     {
         return (he.ELleft);
     }
 
-    private Site leftreg(Halfedge he)
+    private VoronoiSite leftreg(VoronoiHalfEdge he)
     {
         if (he.ELedge == null)
         {
@@ -938,7 +449,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (he.ELpm == LE ? he.ELedge.reg[LE] : he.ELedge.reg[RE]);
     }
 
-    private void ELinsert(Halfedge lb, Halfedge newHe)
+    private void ELinsert(VoronoiHalfEdge lb, VoronoiHalfEdge newHe)
     {
         newHe.ELleft = lb;
         newHe.ELright = lb.ELright;
@@ -950,7 +461,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
      * This delete routine can't reclaim node, since pointers from hash table
      * may be present.
      */
-    private void ELdelete(Halfedge he)
+    private void ELdelete(VoronoiHalfEdge he)
     {
         (he.ELleft).ELright = he.ELright;
         (he.ELright).ELleft = he.ELleft;
@@ -958,9 +469,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     }
 
     /* Get entry from hash table, pruning any deleted nodes */
-    private Halfedge ELgethash(int b)
+    private VoronoiHalfEdge ELgethash(int b)
     {
-        Halfedge he;
+        VoronoiHalfEdge he;
 
         if (b < 0 || b >= ELhashsize)
         {
@@ -977,10 +488,10 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (null);
     }
 
-    private Halfedge ELleftbnd(Point p)
+    private VoronoiHalfEdge ELleftbnd(Point2D p)
     {
         int i, bucket;
-        Halfedge he;
+        VoronoiHalfEdge he;
 
         /* Use hash table to get close to desired halfedge */
         // use the hash function to find the place in the hash map that this
@@ -1043,9 +554,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (he);
     }
 
-    private void pushGraphEdge(Site leftSite, Site rightSite, double x1, double y1, double x2, double y2)
+    private void pushGraphEdge(VoronoiSite leftSite, VoronoiSite rightSite, double x1, double y1, double x2, double y2)
     {
-        GraphEdge newEdge = new GraphEdge();
+        VoronoiGraphEdge newEdge = new VoronoiGraphEdge();
         allEdges.add(newEdge);
         newEdge.x1 = x1;
         newEdge.y1 = y1;
@@ -1056,10 +567,10 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         newEdge.site2 = rightSite.sitenbr;
     }
 
-    private void clip_line(Edge e)
+    private void clip_line(VoronoiEdge e)
     {
         double pxmin, pxmax, pymin, pymax;
-        Site s1, s2;
+        VoronoiSite s1, s2;
         double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
         x1 = e.reg[0].coord.x;
@@ -1186,7 +697,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         pushGraphEdge(e.reg[0], e.reg[1], x1, y1, x2, y2);
     }
 
-    private void endpoint(Edge e, int lr, Site s)
+    private void endpoint(VoronoiEdge e, int lr, VoronoiSite s)
     {
         e.ep[lr] = s;
         if (e.ep[RE - lr] == null)
@@ -1197,10 +708,10 @@ public class Filter_GenerateVoronoiStippling extends Filter {
     }
 
     /* returns 1 if p is to right of halfedge e */
-    private boolean right_of(Halfedge el, Point p)
+    private boolean right_of(VoronoiHalfEdge el, Point2D p)
     {
-        Edge e;
-        Site topsite;
+        VoronoiEdge e;
+        VoronoiSite topsite;
         boolean right_of_site;
         boolean above, fast;
         double dxp, dyp, dxs, t1, t2, t3, yl;
@@ -1266,9 +777,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (el.ELpm == LE ? above : !above);
     }
 
-    private Site rightreg(Halfedge he)
+    private VoronoiSite rightreg(VoronoiHalfEdge he)
     {
-        if (he.ELedge == (Edge) null)
+        if (he.ELedge == (VoronoiEdge) null)
         // if this halfedge has no edge, return the bottom site (whatever
         // that is)
         {
@@ -1280,7 +791,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return (he.ELpm == LE ? he.ELedge.reg[RE] : he.ELedge.reg[LE]);
     }
 
-    private double dist(Site s, Site t)
+    private double dist(VoronoiSite s, VoronoiSite t)
     {
         double dx, dy;
         dx = s.coord.x - t.coord.x;
@@ -1290,13 +801,13 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 
     // create a new site where the HalfEdges el1 and el2 intersect - note that
     // the Point in the argument list is not used, don't know why it's there
-    private Site intersect(Halfedge el1, Halfedge el2)
+    private VoronoiSite intersect(VoronoiHalfEdge el1, VoronoiHalfEdge el2)
     {
-        Edge e1, e2, e;
-        Halfedge el;
+        VoronoiEdge e1, e2, e;
+        VoronoiHalfEdge el;
         double d, xint, yint;
         boolean right_of_site;
-        Site v;
+        VoronoiSite v;
 
         e1 = el1.ELedge;
         e2 = el2.ELedge;
@@ -1340,9 +851,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 
         // create a new site at the point of intersection - this is a new vector
         // event waiting to happen
-        v = new Site();
-        v.coord.x = xint;
-        v.coord.y = yint;
+        v = new VoronoiSite();
+        v.coord.x = (float)xint;
+        v.coord.y = (float)yint;
         return (v);
     }
 
@@ -1353,12 +864,12 @@ public class Filter_GenerateVoronoiStippling extends Filter {
      */
     private boolean voronoi_bd()
     {
-        Site newsite, bot, top, temp, p;
-        Site v;
-        Point newintstar = null;
+        VoronoiSite newsite, bot, top, temp, p;
+        VoronoiSite v;
+        Point2D newintstar = null;
         int pm;
-        Halfedge lbnd, rbnd, llbnd, rrbnd, bisector;
-        Edge e;
+        VoronoiHalfEdge lbnd, rbnd, llbnd, rrbnd, bisector;
+        VoronoiEdge e;
 
         PQinitialize();
         ELinitialize();
@@ -1506,21 +1017,3 @@ public class Filter_GenerateVoronoiStippling extends Filter {
         return true;
     }
 }
-
-
-/**
- * This file is part of DrawbotGUI.
- *
- * DrawbotGUI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * DrawbotGUI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
- */

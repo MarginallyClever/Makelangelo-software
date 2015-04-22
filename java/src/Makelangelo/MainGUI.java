@@ -175,7 +175,6 @@ public class MainGUI
 	GCodeFile gcode = new GCodeFile();
 	
 	
-	
 	private MainGUI() {
 		StartLog();
 		MachineConfiguration.getSingleton();
