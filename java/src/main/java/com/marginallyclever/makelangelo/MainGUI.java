@@ -12,6 +12,7 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.filters.*;
 import jssc.*;
 import com.marginallyclever.drawingtools.DrawingTool;
+import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
 import org.kabeja.parser.ParseException;
 import org.kabeja.dxf.*;
@@ -1509,7 +1510,13 @@ public class MainGUI
 		if( subject == buttonAbout ) {
             final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-		    JOptionPane.showMessageDialog(null, bottomText);
+			ImageIcon icon = null;
+			try {
+				icon = new ImageIcon(IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("logo.png")));
+			} catch (IOException exceptionLoadingIconImage) {
+				System.err.print(exceptionLoadingIconImage);
+			}
+		    JOptionPane.showMessageDialog(null, bottomText, "About FIXME", JOptionPane.INFORMATION_MESSAGE, icon);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
