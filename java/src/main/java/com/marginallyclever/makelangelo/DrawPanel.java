@@ -52,6 +52,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	float window_aspect_ratio = 1f;
 
 	ArrayList<String> instructions;
+	
+	protected MachineConfiguration machine;
 
 	public enum NodeType { COLOR, POS, TOOL };
 	
@@ -66,8 +68,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
 	
 	
-	public DrawPanel() {
+	public DrawPanel(MachineConfiguration mc) {
 		super();
+		machine = mc;
         addMouseMotionListener(this);
         addMouseListener(this);
         addGLEventListener(this);
@@ -208,13 +211,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 	
 	public void ZoomToFitPaper() {
-		MachineConfiguration mc=MachineConfiguration.getSingleton();
-		
 		float w=(float)this.getWidth();
 		float h=(float)this.getHeight();
 		// which one do we have to zoom more to fit the picture in the component?
-		float wzoom=w/(float)(mc.paper_right-mc.paper_left);
-		float hzoom=h/(float)(mc.paper_top-mc.paper_bottom);
+		float wzoom=w/(float)(machine.paper_right-machine.paper_left);
+		float hzoom=h/(float)(machine.paper_top-machine.paper_bottom);
 		cameraZoom = (wzoom < hzoom ? wzoom : hzoom);
 		cameraOffsetX=0;
 		cameraOffsetY=0;
@@ -281,36 +282,36 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
   
     // draw the machine edges and paper edges
-    private void paintLimits(GL2 gl2,MachineConfiguration mc) {
+    private void paintLimits(GL2 gl2) {
 		if(!connected) {
 			gl2.glColor3f(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f);
 			gl2.glBegin(GL2.GL_LINE_LOOP);
-			gl2.glVertex2d(mc.limit_left, mc.limit_top);
-			gl2.glVertex2d(mc.limit_right, mc.limit_top);
-			gl2.glVertex2d(mc.limit_right, mc.limit_bottom);
-			gl2.glVertex2d(mc.limit_left, mc.limit_bottom);
+			gl2.glVertex2d(machine.limit_left, machine.limit_top);
+			gl2.glVertex2d(machine.limit_right, machine.limit_top);
+			gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
+			gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
 			gl2.glEnd();
 			gl2.glColor3f(1,1,1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(mc.paper_left, mc.paper_top);
-			gl2.glVertex2d(mc.paper_right, mc.paper_top);
-			gl2.glVertex2d(mc.paper_right, mc.paper_bottom);
-			gl2.glVertex2d(mc.paper_left, mc.paper_bottom);
+			gl2.glVertex2d(machine.paper_left, machine.paper_top);
+			gl2.glVertex2d(machine.paper_right, machine.paper_top);
+			gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
+			gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
 			gl2.glEnd();
 		} else {
 			gl2.glColor3f(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(mc.limit_left, mc.limit_top);
-			gl2.glVertex2d(mc.limit_right, mc.limit_top);
-			gl2.glVertex2d(mc.limit_right, mc.limit_bottom);
-			gl2.glVertex2d(mc.limit_left, mc.limit_bottom);
+			gl2.glVertex2d(machine.limit_left, machine.limit_top);
+			gl2.glVertex2d(machine.limit_right, machine.limit_top);
+			gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
+			gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
 			gl2.glEnd();
 			gl2.glColor3f(1,1,1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(mc.paper_left, mc.paper_top);
-			gl2.glVertex2d(mc.paper_right, mc.paper_top);
-			gl2.glVertex2d(mc.paper_right, mc.paper_bottom);
-			gl2.glVertex2d(mc.paper_left, mc.paper_bottom);
+			gl2.glVertex2d(machine.paper_left, machine.paper_top);
+			gl2.glVertex2d(machine.paper_right, machine.paper_top);
+			gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
+			gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
 			gl2.glEnd();
 		}
     }
@@ -328,12 +329,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
 	
 	public void render( GL2 gl2 ) {
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		DrawingTool tool = mc.GetTool(0);
+		DrawingTool tool = machine.GetTool(0);
 		
 		paintBackground(gl2);
 		paintCamera(gl2);
-		paintLimits(gl2,mc);
+		paintLimits(gl2);
 		paintCenter(gl2);
 		
 		// TODO draw left motor
@@ -364,7 +364,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 				
 				switch(n.type) {
 				case TOOL:
-					tool = MachineConfiguration.getSingleton().GetTool(n.tool_id);
+					tool = machine.GetTool(n.tool_id);
 					gl2.glLineWidth(tool.GetDiameter());
 					break;
 				case COLOR:
@@ -412,8 +412,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void OptimizeNodes() {
 		if(instructions == null) return;
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		DrawingTool tool = mc.GetTool(0);
+		DrawingTool tool = machine.GetTool(0);
 		
 		drawScale=0.1f;
 		

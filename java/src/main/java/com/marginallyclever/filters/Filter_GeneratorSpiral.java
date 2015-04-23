@@ -1,12 +1,14 @@
 package com.marginallyclever.filters;
 
 
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
 import java.awt.image.BufferedImage;
-import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import com.marginallyclever.makelangelo.MainGUI;
+import java.io.OutputStreamWriter;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -17,6 +19,12 @@ public class Filter_GeneratorSpiral extends Filter {
 	public String GetName() { return "Spiral"; }
 	
 	boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
+	
+	
+	public Filter_GeneratorSpiral(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+		super(gui,mc,ms);
+	}
+	
 	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
@@ -37,7 +45,7 @@ public class Filter_GeneratorSpiral extends Filter {
 	 */
 	public void Convert(BufferedImage img) throws IOException {
 		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.Process(img);
 
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
@@ -103,7 +111,7 @@ public class Filter_GeneratorSpiral extends Filter {
 			++numRings;
 		}
 		
-		MainGUI.getSingleton().Log("<font color='yellow'>"+numRings+" rings.</font>\n");
+		mainGUI.Log("<font color='yellow'>"+numRings+" rings.</font>\n");
 
 		liftPen(out);
 		SignName(out);

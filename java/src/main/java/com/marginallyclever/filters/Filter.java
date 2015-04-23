@@ -1,19 +1,18 @@
 package com.marginallyclever.filters;
 
 
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
-
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.MachineConfiguration;
 
 
 /**
@@ -55,6 +54,16 @@ public class Filter {
 	ProgressMonitor pm;
 	SwingWorker<Void,Void> parent;
 
+	protected MainGUI mainGUI;
+	protected MultilingualSupport translator;
+	protected MachineConfiguration machine;
+	
+	
+	public Filter(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+		mainGUI = gui;
+		translator = ms;
+		machine = mc;
+	}
 	
 	public void SetParent(SwingWorker<Void,Void> p) {
 		parent=p;
@@ -122,13 +131,12 @@ public class Filter {
 
 	
 	protected void ImageStart(BufferedImage img,OutputStreamWriter out) throws IOException {
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
+		tool = machine.GetCurrentTool();
 
 		ImageSetupTransform(img);
 		
-		out.write(mc.GetConfigLine()+";\n");
-		out.write(mc.GetBobbinLine()+";\n");
+		out.write(machine.GetConfigLine()+";\n");
+		out.write(machine.GetBobbinLine()+";\n");
 
 		previous_x=0;
 		previous_y=0;
@@ -156,9 +164,8 @@ public class Filter {
 	 * setup transform when there is no image to convert from.  Essentially a 1:1 transform.
 	 */
 	protected void SetupTransform() {
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
 		// 10mm = 1cm.  letters should be 1cm tall.
-		SetupTransform( (int)mc.GetPaperWidth()*10, (int)mc.GetPaperHeight()*10 );
+		SetupTransform( (int)machine.GetPaperWidth()*10, (int)machine.GetPaperHeight()*10 );
 	}
 	
 	protected void SetupTransform(int width,int height) {
@@ -167,26 +174,24 @@ public class Filter {
 		h2=image_height/2;
 		w2=image_width/2;
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		
 		scale=10f;  // 10mm = 1cm
 
 		int new_width = image_width;
 		int new_height = image_height;
 		
-		if(image_width>mc.GetPaperWidth()) {
-			float resize = (float)mc.GetPaperWidth()/(float)image_width;
+		if(image_width>machine.GetPaperWidth()) {
+			float resize = (float)machine.GetPaperWidth()/(float)image_width;
 			scale *= resize;
 			new_height *= resize;
 		}
-		if(new_height>mc.GetPaperHeight()) {
-			float resize = (float)mc.GetPaperHeight()/(float)new_height;
+		if(new_height>machine.GetPaperHeight()) {
+			float resize = (float)machine.GetPaperHeight()/(float)new_height;
 			scale *= resize;
 			new_width *= resize;
 		}
-		scale *= mc.paper_margin;
-		new_width *= mc.paper_margin;
-		new_height *= mc.paper_margin;
+		scale *= machine.paper_margin;
+		new_width *= machine.paper_margin;
+		new_height *= machine.paper_margin;
 		
 		TextFindCharsPerLine(new_width);
 		
@@ -390,8 +395,7 @@ public class Filter {
 	protected void TextCreateMessageNow(String text,OutputStreamWriter output) throws IOException {
 		if(chars_per_line<=0) return;
 
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		tool = mc.GetCurrentTool();
+		tool = machine.GetCurrentTool();
 		
 		// find size of text block
 		// TODO count newlines
@@ -533,7 +537,7 @@ public class Filter {
 				case '}':  name="B3CLOSE";  break;
 				case '~':  name="TILDE";  break;
 				case '\\':  name="BSLASH";  break;
-                //case '':  name="SPACE";  break; FIXME Makelangelo/java/src/com.marginallyclever.filters/Filter.java:[540,39] unmappable character for encoding UTF-8
+				case '�':  name="SPACE";  break;
 				default: name=Character.toString(letter);  break;
 				}
 			}
@@ -608,7 +612,7 @@ public class Filter {
 		
 		TextSetCharsPerLine(25);
 
-		TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),out);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(machine.GetUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 		h2=yy;
 		w2=xx;

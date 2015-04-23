@@ -9,47 +9,21 @@ package com.marginallyclever.makelangelo;
 
 
 // io functions
-import jssc.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.prefs.Preferences;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.filters.*;
+import jssc.*;
+import org.kabeja.dxf.*;
+import org.kabeja.dxf.helpers.DXFSplineConverter;
+import org.kabeja.dxf.helpers.Point;
+import org.kabeja.parser.DXFParser;
+import org.kabeja.parser.Parser;
+import org.kabeja.parser.ParserBuilder;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -60,14 +34,22 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-
-import org.apache.commons.io.IOUtils;
-import org.kabeja.dxf.*;
-import org.kabeja.dxf.helpers.*;
-import org.kabeja.parser.*;
-
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
@@ -87,13 +69,11 @@ public class MainGUI
      * software version
      */
 	public static final String version="7";
-	
-	private static MainGUI singletonObject;
+
 	
 	// Image processing
 		// TODO use a ServiceLoader for plugins
-		private Filter [] image_converters;
-		private String [] filter_names = null;
+		private List<Filter> image_converters;
 		private boolean startConvertingNow;
 	
 	
@@ -117,7 +97,7 @@ public class MainGUI
 	private String serial_recv_buffer="";
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
-	private String[] recentFiles;
+	private RecentFiles recentFiles;
 	private String recentPort;
 	//private boolean allowMetrics=true;
 		
@@ -173,47 +153,84 @@ public class MainGUI
 	private boolean running=false;
 	private boolean paused=true;
 	
-	GCodeFile gcode = new GCodeFile();
+	private GCodeFile gcode = new GCodeFile();
+
+	private MachineConfiguration machineConfiguration;
+	private MultilingualSupport  translator;
 	
 	
-	
-	private MainGUI() {
+	public MainGUI() {
 		StartLog();
-		MachineConfiguration.getSingleton();
-        GetRecentFiles();
+		StartTranslator();
+		machineConfiguration = new MachineConfiguration(this,translator);
+        recentFiles = new RecentFiles();
         GetRecentPort();
-        LoadImageConverters();
         CreateAndShowGUI();
 	}
 
 
+	public void StartTranslator() {
+		translator = new MultilingualSupport();
+		if(translator.isThisTheFirstTime()) {
+			chooseLanguage();
+		}
+	}
+	
+	// display a dialog box of available languages and let the user select their preference.
+	public void chooseLanguage() {
+		final JDialog driver = new JDialog(mainframe,"Language",true);
+		driver.setLayout(new GridBagLayout());
+
+		final String [] choices = translator.getLanguageList();
+		final JComboBox<String> language_options = new JComboBox<String>(choices);
+		final JButton save = new JButton(">>>");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				// TODO prevent "close" icon.  Must press save to continue!
+				if(subject == save) {
+					translator.currentLanguage = choices[language_options.getSelectedIndex()];
+					translator.saveConfig();
+					driver.dispose();
+				}
+			}
+		};
+
+		save.addActionListener(driveButtons);
+
+		driver.pack();
+		driver.setVisible(true);
+	}
+	
+
 	private void RaisePen() {
-		SendLineToRobot("G00 Z"+MachineConfiguration.getSingleton().getPenUpString());
+		SendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
 		penIsUp=true;
 	}
 	
 	private void LowerPen() {
-		SendLineToRobot("G00 Z"+MachineConfiguration.getSingleton().getPenDownString());
+		SendLineToRobot("G00 Z"+machineConfiguration.getPenDownString());
 		penIsUp=false;
 	}
 	
 	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
-		image_converters = new Filter[8];  // this number must match the actual number of filters.
-		int i=0;
-		image_converters[i++] = new Filter_GeneratorZigZag();
-		image_converters[i++] = new Filter_GeneratorSpiral();
-		image_converters[i++] = new Filter_GeneratorCrosshatch();
-		image_converters[i++] = new Filter_GeneratorScanline();
-		image_converters[i++] = new Filter_GeneratorPulse();
-		image_converters[i++] = new Filter_GeneratorBoxes();
-		image_converters[i++] = new Filter_GeneratorRGB();
-		image_converters[i++] = new Filter_GenerateVoronoiStippling();
+		image_converters = new ArrayList<Filter>();
 		
-		filter_names = new String[image_converters.length];
-		for(i=0;i<image_converters.length;++i) {
-			filter_names[i] = image_converters[i].GetName();
-		}
+		int i=0;
+		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorSpiral(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorCrosshatch(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorScanline(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorPulse(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorBoxes(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorRGB(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GenerateVoronoiStippling(this,machineConfiguration,translator));
 	}
 	
 	protected void finalize() throws Throwable {
@@ -254,13 +271,7 @@ public class MainGUI
 	private void EndLog() {
 		logToFile.close();
 	}
-	
-	public static MainGUI getSingleton() {
-		if(singletonObject==null) {
-			singletonObject = new MainGUI();
-		}
-		return singletonObject;
-	}
+
 	
 	//  data access
 	public ArrayList<String> getGcode() {
@@ -307,16 +318,14 @@ public class MainGUI
 	
 	
 	private void HilbertCurve() {
-		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve();
+		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(this,machineConfiguration,translator);
 		msg.Generate( GetTempDestinationFile() );
-		previewPane.ZoomToFitPaper();
 	}
 	
 	
 	private void TextToGCODE() {
-		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere();
+		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
 		msg.Generate( GetTempDestinationFile() );
-    	previewPane.ZoomToFitPaper();
 	}
 	
 
@@ -367,13 +376,13 @@ public class MainGUI
 			portOpened=false;
 			portConfirmed=false;
 			previewPane.setConnected(false);
-			UpdateMenuBar();
+			updateMenuBar();
 			PlayDisconnectSound();
 			
 			// update window title
-			mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
-					+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
-					+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
+			mainframe.setTitle(translator.get("TitlePrefix") 
+					+ Long.toString(machineConfiguration.robot_uid) 
+					+ translator.get("TitleNotConnected"));
 		}
 	}
 	
@@ -383,7 +392,7 @@ public class MainGUI
 		
 		ClosePort();
 		
-		Log("<font color='green'>"+MultilingualSupport.getSingleton().get("ConnectingTo") + portName+"...</font>\n");
+		Log("<font color='green'>"+translator.get("ConnectingTo") + portName+"...</font>\n");
 		
 		// open the port
 		serialPort = new SerialPort(portName);
@@ -392,15 +401,15 @@ public class MainGUI
             serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
             serialPort.addEventListener(this);
         } catch (SerialPortException e) {
-			Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("PortNotConfigured")+e.getMessage()+"</span>\n");
+			Log("<span style='color:red'>"+translator.get("PortNotConfigured")+e.getMessage()+"</span>\n");
 			return 3;
 		}
 
-		Log("<span style='color:green'>"+MultilingualSupport.getSingleton().get("PortOpened")+"</span>\n");
+		Log("<span style='color:green'>"+translator.get("PortOpened")+"</span>\n");
 		SetRecentPort(portName);
 		portOpened=true;
 		lastLineWasCue=false;
-		UpdateMenuBar();
+		updateMenuBar();
 		PlayConnectSound();
 		
 		return 0;
@@ -455,23 +464,23 @@ public class MainGUI
 		portConfirmed=true;
 		
 		String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
-		MachineConfiguration.getSingleton().ParseRobotUID(after_hello);
+		machineConfiguration.ParseRobotUID(after_hello);
 		
-		mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
-				+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
-				+ MultilingualSupport.getSingleton().get("TitlePostfix"));
+		mainframe.setTitle(translator.get("TitlePrefix") 
+				+ Long.toString(machineConfiguration.robot_uid) 
+				+ translator.get("TitlePostfix"));
 
 		SendConfig();
 		previewPane.updateMachineConfig();
 
-		UpdateMenuBar();
+		updateMenuBar();
 		previewPane.setConnected(true);
 		
 		// rebuild the drive pane so that the feed rates are correct.
 
 		contextMenu.removeTabAt(0);
         drivePane = DriveManually();
-        contextMenu.insertTab(MultilingualSupport.getSingleton().get("MenuDraw"), null, drivePane, null, 0);
+        contextMenu.insertTab(translator.get("MenuDraw"), null, drivePane, null, 0);
 
 		return true;
 	}
@@ -506,7 +515,7 @@ public class MainGUI
 	public void SetRecentPort(String portName) {
 		prefs.put("recent-port", portName);
 		recentPort=portName;
-		UpdateMenuBar();
+		updateMenuBar();
 	}
 	
 	/**
@@ -516,13 +525,14 @@ public class MainGUI
 	public void LoadGCode(String filename) {
 		try {
 			gcode.Load(filename);
-		   	Log("<font color='green'>"+gcode.estimate_count + MultilingualSupport.getSingleton().get("LineSegments")
-		   			+ "\n" + gcode.estimated_length + MultilingualSupport.getSingleton().get("Centimeters") + "\n"
-		   			+ MultilingualSupport.getSingleton().get("EstimatedTime") + statusBar.formatTime((long)(gcode.estimated_time)) + "s.</font>\n");
+		   	Log("<font color='green'>"+gcode.estimate_count + translator.get("LineSegments")
+		   			+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
+		   			+ translator.get("EstimatedTime") + statusBar.formatTime((long)(gcode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
-	    	Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
-	    	RemoveRecentFile(filename);
+	    	Log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
+	    	recentFiles.remove(filename);
+	    	updateMenuBar();
 	    	return;
 	    }
 	    
@@ -536,14 +546,14 @@ public class MainGUI
 	
 	
 	protected boolean ChooseImageConversionOptions(boolean isDXF) {
-		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("ConversionOptions"),true);
+		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
-		final String[] choices = MachineConfiguration.getSingleton().getKnownMachineNames();
+		final String[] choices = machineConfiguration.getKnownMachineNames();
 		final JComboBox<String> machine_choice = new JComboBox<String>(choices);
-		machine_choice.setSelectedIndex(MachineConfiguration.getSingleton().getCurrentMachineIndex());
+		machine_choice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(MachineConfiguration.getSingleton().paper_margin*100));
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paper_margin*100));
 		input_paper_margin.setMajorTickSpacing(10);
 		input_paper_margin.setMinorTickSpacing(5);
 		input_paper_margin.setPaintTicks(false);
@@ -552,11 +562,19 @@ public class MainGUI
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox reverse_h = new JCheckBox(MultilingualSupport.getSingleton().get("FlipForGlass"));
-		reverse_h.setSelected(MachineConfiguration.getSingleton().reverseForGlass);
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Start"));
+		final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
+		reverse_h.setSelected(machineConfiguration.reverseForGlass);
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Start"));
 
+		String [] filter_names = new String[image_converters.size()];
+		Iterator<Filter> fit = image_converters.iterator();
+		int i=0;
+		while(fit.hasNext()) {
+			Filter f = fit.next();
+			filter_names[i++] = f.GetName();
+		}
+		
 		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
 		input_draw_style.setSelectedIndex(GetDrawStyle());
 		
@@ -564,15 +582,15 @@ public class MainGUI
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
 		int y=0;
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("MenuLoadMachineConfig")),c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("MenuLoadMachineConfig")),c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machine_choice,c);
 
 		if(!isDXF) {
-			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("ConversionStyle")),c);
+			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(translator.get("ConversionStyle")),c);
 			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	driver.add(input_draw_style,c);
 		}
 		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("PaperMargin")),c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("PaperMargin")),c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  driver.add(input_paper_margin,c);
 		
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  driver.add(reverse_h,c);
@@ -586,21 +604,20 @@ public class MainGUI
 					Object subject = e.getSource();
 					if(subject == save) {
 						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
-						MachineConfiguration.getSingleton().LoadConfig(new_uid);
+						machineConfiguration.LoadConfig(new_uid);
 						SetDrawStyle(input_draw_style.getSelectedIndex());
-						MachineConfiguration.getSingleton().paper_margin=(100-input_paper_margin.getValue())*0.01;
-						MachineConfiguration.getSingleton().reverseForGlass=reverse_h.isSelected();
-						MachineConfiguration.getSingleton().SaveConfig();
+						machineConfiguration.paper_margin=(100-input_paper_margin.getValue())*0.01;
+						machineConfiguration.reverseForGlass=reverse_h.isSelected();
+						machineConfiguration.SaveConfig();
 						
 						// if we aren't connected, don't show the new 
 						if(!portConfirmed) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
-							previewPane.ZoomToFitPaper();
 							// update window title
-							mainframe.setTitle(MultilingualSupport.getSingleton().get("TitlePrefix") 
-									+ Long.toString(MachineConfiguration.getSingleton().robot_uid) 
-									+ MultilingualSupport.getSingleton().get("TitleNotConnected"));
+							mainframe.setTitle(translator.get("TitlePrefix") 
+									+ Long.toString(machineConfiguration.robot_uid) 
+									+ translator.get("TitleNotConnected"));
 						}
 						startConvertingNow=true;
 						driver.dispose();
@@ -620,7 +637,6 @@ public class MainGUI
 		return startConvertingNow;
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected boolean LoadDXF(String filename) {
 		if( ChooseImageConversionOptions(true) == false ) return false;
 
@@ -628,7 +644,7 @@ public class MainGUI
 		final String destinationFile = GetTempDestinationFile();
 		final String srcFile = filename;
 		
-		final ProgressMonitor pm = new ProgressMonitor(null, MultilingualSupport.getSingleton().get("Converting"), "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		
@@ -637,7 +653,7 @@ public class MainGUI
 			
 			@Override
 			public Void doInBackground() {
-				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Converting")+" "+destinationFile+"</font>\n");
+				Log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
@@ -647,10 +663,9 @@ public class MainGUI
 
 				try {
 					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
-					MachineConfiguration mc = MachineConfiguration.getSingleton();
-					DrawingTool tool = mc.GetCurrentTool();
-					out.write(mc.GetConfigLine()+";\n");
-					out.write(mc.GetBobbinLine()+";\n");
+					DrawingTool tool = machineConfiguration.GetCurrentTool();
+					out.write(machineConfiguration.GetConfigLine()+";\n");
+					out.write(machineConfiguration.GetBobbinLine()+";\n");
 					out.write("G00 G90;\n");
 					tool.WriteChangeTo(out);
 					tool.WriteOff(out);
@@ -662,22 +677,20 @@ public class MainGUI
 					double height = b.getMaximumY() - b.getMinimumY();
 					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
 					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-					double sy = mc.GetPaperHeight()*10/height;
-					double sx = mc.GetPaperWidth()*10/width;
-					double scale = (sx<sy? sx:sy ) * mc.paper_margin;
-					sx = scale * (MachineConfiguration.getSingleton().reverseForGlass? -1 : 1);
-					sy = scale;
-					
+					double sy = machineConfiguration.GetPaperHeight()*10/height;
+					double sx = machineConfiguration.GetPaperWidth()*10/width;
+					double scale = (sx<sy? sx:sy ) * machineConfiguration.paper_margin;
+					sx = scale * (machineConfiguration.reverseForGlass? -1 : 1);
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
 					int entity_total=0;
 					int entity_count=0;
 					while(layer_iter.hasNext()) {
-						DXFLayer layer = layer_iter.next();
+						DXFLayer layer = (DXFLayer)layer_iter.next();
 						Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
 						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_iter.hasNext()) {
-							String entity_type = entity_iter.next();
+							String entity_type = (String)entity_iter.next();
 							List<DXFEntity> entity_list = (List<DXFEntity>)layer.getDXFEntities(entity_type);
 							Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
 							entity_total+=entity_list.size();
@@ -690,11 +703,11 @@ public class MainGUI
 					// convert each entity
 					layer_iter = doc.getDXFLayerIterator();
 					while(layer_iter.hasNext()) {
-						DXFLayer layer = layer_iter.next();
+						DXFLayer layer = (DXFLayer)layer_iter.next();
 
 						Iterator<String> entity_type_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_type_iter.hasNext()) {
-							String entity_type = entity_type_iter.next();
+							String entity_type = (String)entity_type_iter.next();
 							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 							
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
@@ -735,9 +748,9 @@ public class MainGUI
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 								for(int i=0;i<entity_list.size();++i) {
 									pm.setProgress(entity_count++);
-									final DXFSpline entity = (DXFSpline)entity_list.get(i);
-									final DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-									polyLine.setLineWeight(30);
+									DXFSpline entity = (DXFSpline)entity_list.get(i);
+									entity.setLineWeight(30);
+									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
 									boolean first=true;
 									for(int j=0;j<polyLine.getVertexCount();++j) {
 										DXFVertex v = polyLine.getVertex(j);
@@ -828,7 +841,7 @@ public class MainGUI
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
+				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
 				if(ok) LoadGCode(destinationFile);
 			    Halt();
@@ -844,12 +857,12 @@ public class MainGUI
 		            String message = String.format("%d%%\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	MainGUI.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
+	                	Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    MainGUI.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Cancelled")+"</font>\n");
+	                    Log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -866,9 +879,10 @@ public class MainGUI
 		final String sourceFile = filename;
 		final String destinationFile = GetTempDestinationFile();
 		
+		LoadImageConverters();
 		if( ChooseImageConversionOptions(false) == false ) return false;
 
-		final ProgressMonitor pm = new ProgressMonitor(null, MultilingualSupport.getSingleton().get("Converting"), "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		
@@ -878,19 +892,20 @@ public class MainGUI
 				// read in image
 				BufferedImage img;
 				try {
-					Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Converting")+" "+destinationFile+"</font>\n");
+					Log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 					// convert with style
 					img = ImageIO.read(new File(sourceFile));
-					
 					int style = GetDrawStyle();
-					image_converters[style].SetParent(this);
-					image_converters[style].SetProgressMonitor(pm);
-					image_converters[style].SetDestinationFile(destinationFile);
-					image_converters[style].Convert(img);
+					Filter f = image_converters.get(style);
+					f.SetParent(this);
+					f.SetProgressMonitor(pm);
+					f.SetDestinationFile(destinationFile);
+					f.Convert(img);
 				}
 				catch(IOException e) {
-					Log("<font color='red'>"+MultilingualSupport.getSingleton().get("Failed")+e.getLocalizedMessage()+"</font>\n");
-					RemoveRecentFile(sourceFile);
+					Log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
+					recentFiles.remove(sourceFile);
+					updateMenuBar();
 				}
 
 				pm.setProgress(100);
@@ -900,7 +915,7 @@ public class MainGUI
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
+				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
 				LoadGCode(destinationFile);
 			}
@@ -915,12 +930,12 @@ public class MainGUI
 		            String message = String.format("%d%%.\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	MainGUI.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Finished")+"</font>\n");
+	                	Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    MainGUI.getSingleton().Log("<font color='green'>"+MultilingualSupport.getSingleton().get("Cancelled")+"</font>\n");
+	                    Log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -935,70 +950,6 @@ public class MainGUI
 	public boolean IsFileLoaded() {
 		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
 	}
-	
-	/**
-	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
-	 * @param filename the file to push to the top of the list.
-	 */
-	public void UpdateRecentFiles(String filename) {
-		int cnt = recentFiles.length;
-		String [] newFiles = new String[cnt];
-		
-		newFiles[0]=filename;
-		
-		int i,j=1;
-		for(i=0;i<cnt;++i) {
-			if(!filename.equals(recentFiles[i]) && recentFiles[i] != "") {
-				newFiles[j++] = recentFiles[i];
-				if(j == cnt ) break;
-			}
-		}
-
-		recentFiles=newFiles;
-
-		// update prefs
-		for(i=0;i<cnt;++i) {
-			if( recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		
-		UpdateMenuBar();
-	}
-	
-	// A file failed to load.  Remove it from recent files, refresh the menu bar.
-	public void RemoveRecentFile(String filename) {
-		int i;
-		for(i=0;i<recentFiles.length-1;++i) {
-			if(recentFiles[i]==filename) {
-				break;
-			}
-		}
-		for(;i<recentFiles.length-1;++i) {
-			recentFiles[i]=recentFiles[i+1];
-		}
-		recentFiles[recentFiles.length-1]="";
-
-		// update prefs
-		for(i=0;i<recentFiles.length;++i) {
-			if(recentFiles[i]!=null && !recentFiles[i].isEmpty()) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		prefs.remove("recent-files-"+(i-1));
-		
-		UpdateMenuBar();
-	}
-	
-	// Load recent files from prefs
-	public void GetRecentFiles() {
-		recentFiles = new String[10];
-		
-		int i;
-		for(i=0;i<recentFiles.length;++i) {
-			recentFiles[i] = prefs.get("recent-files-"+i, "");
-		}
-	}	
 	
 	public boolean IsFileGcode(String filename) {
 		String ext=filename.substring(filename.lastIndexOf('.'));
@@ -1020,7 +971,7 @@ public class MainGUI
 	
 	// User has asked that a file be opened.
 	public void OpenFileOnDemand(String filename) {
- 		Log("<font color='green'>" + MultilingualSupport.getSingleton().get("OpeningFile") + filename + "...</font>\n");
+ 		Log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
 
 	   	if(IsFileGcode(filename)) {
 			LoadGCode(filename);
@@ -1029,12 +980,12 @@ public class MainGUI
     	} else if(IsFileImage(filename)) {
     		LoadImage(filename);
     	} else {
-    		Log("<font color='red'>"+MultilingualSupport.getSingleton().get("UnknownFileType")+"</font>\n");
+    		Log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
     	}
 
 	   	// TODO: if succeeded
-	   	UpdateRecentFiles(filename);
-    	previewPane.ZoomToFitPaper();
+	   	recentFiles.add(filename);
+		updateMenuBar();
     	statusBar.Clear();
 	}
 
@@ -1042,11 +993,12 @@ public class MainGUI
 	public void OpenFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
+		String s = recentFiles.get(0);
+		String filename = (s.length()>0) ? filename = s : "";
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
-		FileFilter filterImage = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
-		FileFilter filterDXF   = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeDXF"), "dxf");
+		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
+		FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+		FileFilter filterDXF   = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
 		 
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterImage);
@@ -1056,8 +1008,8 @@ public class MainGUI
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
 
 	    	// if machine is not yet calibrated
-	    	if(MachineConfiguration.getSingleton().IsPaperConfigured() == false) {
-	    		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("SetPaperSize"));
+	    	if(machineConfiguration.IsPaperConfigured() == false) {
+	    		JOptionPane.showMessageDialog(null,translator.get("SetPaperSize"));
 	    		return;
 	    	}
 	    	OpenFileOnDemand(selectedFile);
@@ -1067,9 +1019,10 @@ public class MainGUI
 	private void SaveFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = (recentFiles[0].length()>0) ? filename=recentFiles[0] : "";
+		String s = recentFiles.get(0);
+		String filename = (s.length()>0) ? filename = s : "";
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(MultilingualSupport.getSingleton().get("FileTypeGCode"), "ngc");
+		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
 		
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterGCODE);
@@ -1084,7 +1037,7 @@ public class MainGUI
 	    		gcode.Save(selectedFile);
 	    	}
 		    catch(IOException e) {
-		    	Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("Failed")+e.getMessage()+"</span>\n");
+		    	Log("<span style='color:red'>"+translator.get("Failed")+e.getMessage()+"</span>\n");
 		    	return;
 		    }
 	    }
@@ -1108,7 +1061,7 @@ public class MainGUI
 	
 	// Adjust sound preferences
 	protected void AdjustSounds() {
-		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("MenuSoundsTitle"),true);
+		final JDialog driver = new JDialog(mainframe,translator.get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField sound_connect = new JTextField(prefs.get("sound_connect",""),32);
@@ -1116,16 +1069,16 @@ public class MainGUI
 		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""),32);
 		final JTextField sound_drawing_finished = new JTextField(prefs.get("sound_drawing_finished", ""),32);
 
-		final JButton change_sound_connect = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsConnect"));
-		final JButton change_sound_disconnect = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsDisconnect"));
-		final JButton change_sound_conversion_finished = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsFinishConvert"));
-		final JButton change_sound_drawing_finished = new JButton(MultilingualSupport.getSingleton().get("MenuSoundsFinishDraw"));
+		final JButton change_sound_connect = new JButton(translator.get("MenuSoundsConnect"));
+		final JButton change_sound_disconnect = new JButton(translator.get("MenuSoundsDisconnect"));
+		final JButton change_sound_conversion_finished = new JButton(translator.get("MenuSoundsFinishConvert"));
+		final JButton change_sound_drawing_finished = new JButton(translator.get("MenuSoundsFinishDraw"));
 		
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -1152,7 +1105,7 @@ public class MainGUI
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
-						MachineConfiguration.getSingleton().SaveConfig();
+						machineConfiguration.SaveConfig();
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -1177,24 +1130,24 @@ public class MainGUI
 	protected void AdjustGraphics() {
 		final Preferences graphics_prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
 		
-		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("MenuGraphicsTitle"),true);
+		final JDialog driver = new JDialog(mainframe,translator.get("MenuGraphicsTitle"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 		
-		final JCheckBox show_pen_up = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsPenUp"));
-		final JCheckBox antialias_on = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsAntialias"));
-		final JCheckBox speed_over_quality = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsSpeedVSQuality"));
-		final JCheckBox draw_all_while_running = new JCheckBox(MultilingualSupport.getSingleton().get("MenuGraphicsDrawWhileRunning"));
+		final JCheckBox show_pen_up = new JCheckBox(translator.get("MenuGraphicsPenUp"));
+		final JCheckBox antialias_on = new JCheckBox(translator.get("MenuGraphicsAntialias"));
+		final JCheckBox speed_over_quality = new JCheckBox(translator.get("MenuGraphicsSpeedVSQuality"));
+		final JCheckBox draw_all_while_running = new JCheckBox(translator.get("MenuGraphicsDrawWhileRunning"));
 
 		show_pen_up.setSelected(graphics_prefs.getBoolean("show pen up", false));
 		antialias_on.setSelected(graphics_prefs.getBoolean("antialias", true));
 		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
 		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
 		
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton save = new JButton(MultilingualSupport.getSingleton().get("Save"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton save = new JButton(translator.get("Save"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -1240,8 +1193,8 @@ public class MainGUI
 		if(!portConfirmed) return;
 		
 		// Send a command to the robot with new configuration values
-		SendLineToRobot(MachineConfiguration.getSingleton().GetConfigLine());
-		SendLineToRobot(MachineConfiguration.getSingleton().GetBobbinLine());
+		SendLineToRobot(machineConfiguration.GetConfigLine());
+		SendLineToRobot(machineConfiguration.GetBobbinLine());
 		SendLineToRobot("G92 X0 Y0");
 	}
 	
@@ -1281,13 +1234,13 @@ public class MainGUI
 		long num_lines = gcode.linesProcessed;
 		
 		JOptionPane.showMessageDialog(null,
-				MultilingualSupport.getSingleton().get("Finished") +
+				translator.get("Finished") +
 				num_lines +
-				MultilingualSupport.getSingleton().get("LineSegments") + 
+				translator.get("LineSegments") + 
 				"\n" +
 				statusBar.GetElapsed() +
 				"\n" +
-				MultilingualSupport.getSingleton().get("SharePromo")
+				translator.get("SharePromo")
 				);
 	}
 	
@@ -1295,14 +1248,13 @@ public class MainGUI
 	private void ChangeToTool(String changeToolString) {
 		int i=Integer.decode(changeToolString);
 		
-		MachineConfiguration mc = MachineConfiguration.getSingleton();
-		String [] toolNames = mc.getToolNames();
+		String [] toolNames = machineConfiguration.getToolNames();
 		
 		if(i<0 || i>toolNames.length) {
-			Log("<span style='color:red'>"+MultilingualSupport.getSingleton().get("InvalidTool")+i+"</span>");
+			Log("<span style='color:red'>"+translator.get("InvalidTool")+i+"</span>");
 			i=0;
 		}
-		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("ChangeToolPrefix") + toolNames[i] + MultilingualSupport.getSingleton().get("ChangeToolPostfix"));
+		JOptionPane.showMessageDialog(null,translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
 	}
 	
 	
@@ -1381,7 +1333,7 @@ public class MainGUI
 		paused=false;
 	    previewPane.setLinesProcessed(0);
 		previewPane.setRunning(running);
-		UpdateMenuBar();
+		updateMenuBar();
 	}
 
 	/**
@@ -1391,13 +1343,13 @@ public class MainGUI
 	private boolean getStartingLineNumber() {
 		dialog_result=false;
 		
-		final JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("StartAt"),true);
+		final JDialog driver = new JDialog(mainframe,translator.get("StartAt"),true);
 		driver.setLayout(new GridBagLayout());		
 		final JTextField starting_line = new JTextField("0",8);
-		final JButton cancel = new JButton(MultilingualSupport.getSingleton().get("Cancel"));
-		final JButton start = new JButton(MultilingualSupport.getSingleton().get("Start"));
+		final JButton cancel = new JButton(translator.get("Cancel"));
+		final JButton start = new JButton(translator.get("Start"));
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(MultilingualSupport.getSingleton().get("StartAtLine")),c);
+		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(translator.get("StartAtLine")),c);
 		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  driver.add(starting_line,c);
 		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  driver.add(cancel,c);
 		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  driver.add(start,c);
@@ -1432,7 +1384,7 @@ public class MainGUI
 		paused=false;
 		running=true;
 		previewPane.setRunning(running);
-		UpdateMenuBar();
+		updateMenuBar();
 		statusBar.Start();
 		SendFileCommand();
 	}
@@ -1492,13 +1444,13 @@ public class MainGUI
 				if(paused==true) {
 					penIsUpBeforePause=penIsUp;
 					RaisePen();
-					buttonPause.setText(MultilingualSupport.getSingleton().get("Pause"));
+					buttonPause.setText(translator.get("Pause"));
 					paused=false;
 					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					SendFileCommand();
 				} else {
 					if(!penIsUpBeforePause) LowerPen();
-					buttonPause.setText(MultilingualSupport.getSingleton().get("Unpause"));
+					buttonPause.setText(translator.get("Unpause"));
 					paused=true;
 				}
 			}
@@ -1510,7 +1462,7 @@ public class MainGUI
 		}
 		if( subject == buttonRescan ) {
 			ListSerialPorts();
-			UpdateMenuBar();
+			updateMenuBar();
 			return;
 		}
 		if( subject == buttonDisconnect ) {
@@ -1526,26 +1478,26 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAdjustLanguage ) {
-			MultilingualSupport.getSingleton().ChooseLanguage();
-			UpdateMenuBar();
+			chooseLanguage();
+			updateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
-			MachineConfiguration.getSingleton().AdjustMachineSize();
+			machineConfiguration.AdjustMachineSize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustPulleySize ) {
-			MachineConfiguration.getSingleton().AdjustPulleySize();
+			machineConfiguration.AdjustPulleySize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonChangeTool ) {
-			MachineConfiguration.getSingleton().ChangeTool();
+			machineConfiguration.ChangeTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustTool ) {
-			MachineConfiguration.getSingleton().AdjustTool();
+			machineConfiguration.AdjustTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
@@ -1556,13 +1508,7 @@ public class MainGUI
 		if( subject == buttonAbout ) {
             final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-			ImageIcon icon = null;
-			try {
-				icon = new ImageIcon(IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("logo.png")));
-			} catch (IOException exceptionLoadingIconImage) {
-				System.err.print(exceptionLoadingIconImage);
-			}
-		    JOptionPane.showMessageDialog(null, bottomText, "About FIXME", JOptionPane.INFORMATION_MESSAGE, icon);
+		    JOptionPane.showMessageDialog(null, bottomText);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1576,14 +1522,14 @@ public class MainGUI
 		}
 		
 		if( subject == buttonExit ) {
-			getParentFrame().dispose();
+			System.exit(0);  // TODO: be more graceful?
 			return;
 		}
 		
 		int i;
 		for(i=0;i<10;++i) {
 			if(subject == buttonRecent[i]) {
-				OpenFileOnDemand(recentFiles[i]);
+				OpenFileOnDemand(recentFiles.get(i));
 				return;
 			}
 		}
@@ -1617,8 +1563,8 @@ public class MainGUI
      * @return An HTML string used for the About Message Dialog.
      */
     private String getAboutHtmlFromMultilingualString() {
-        final String aboutHtmlBeforeVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLBeforeVersionNumber");
-        final String aboutHmlAfterVersionNumber = MultilingualSupport.getSingleton().get("AboutHTMLAfterVersionNumber");
+        final String aboutHtmlBeforeVersionNumber = translator.get("AboutHTMLBeforeVersionNumber");
+        final String aboutHmlAfterVersionNumber = translator.get("AboutHTMLAfterVersionNumber");
         final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
         final int versionNumberStringLength = version.length();
         final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
@@ -1711,25 +1657,25 @@ public class MainGUI
 		JPanel panel = new JPanel(new GridLayout(0,1));
 
         // TODO: move all these into a pop-up menu with tabs
-        buttonAdjustMachineSize = new JButton(MultilingualSupport.getSingleton().get("MenuSettingsMachine"));
+        buttonAdjustMachineSize = new JButton(translator.get("MenuSettingsMachine"));
         buttonAdjustMachineSize.addActionListener(this);
         panel.add(buttonAdjustMachineSize);
 
-        buttonAdjustPulleySize = new JButton(MultilingualSupport.getSingleton().get("MenuAdjustPulleys"));
+        buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
         buttonAdjustPulleySize.addActionListener(this);
         panel.add(buttonAdjustPulleySize);
         
-        buttonJogMotors = new JButton(MultilingualSupport.getSingleton().get("JogMotors"));
+        buttonJogMotors = new JButton(translator.get("JogMotors"));
         buttonJogMotors.addActionListener(this);
         panel.add(buttonJogMotors);
 
         panel.add(new JSeparator());
         
-        buttonChangeTool = new JButton(MultilingualSupport.getSingleton().get("MenuSelectTool"));
+        buttonChangeTool = new JButton(translator.get("MenuSelectTool"));
         buttonChangeTool.addActionListener(this);
         panel.add(buttonChangeTool);
 
-        buttonAdjustTool = new JButton(MultilingualSupport.getSingleton().get("MenuAdjustTool"));
+        buttonAdjustTool = new JButton(translator.get("MenuAdjustTool"));
         buttonAdjustTool.addActionListener(this);
         panel.add(buttonAdjustTool);
         
@@ -1741,11 +1687,11 @@ public class MainGUI
 		JPanel driver = new JPanel(new GridLayout(0,1));
 
         // File conversion menu
-        buttonOpenFile = new JButton(MultilingualSupport.getSingleton().get("MenuOpenFile"));
+        buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
         buttonOpenFile.addActionListener(this);
         driver.add(buttonOpenFile);
 /*        
-        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConvertImage"));
+        subMenu = new JMenu(translator.get("MenuConvertImage"));
         group = new ButtonGroup();
 
 	        // list recent files
@@ -1764,15 +1710,15 @@ public class MainGUI
 
         menu.addSeparator();
 */
-        buttonHilbertCurve = new JButton(MultilingualSupport.getSingleton().get("MenuHilbertCurve"));
+        buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
         buttonHilbertCurve.addActionListener(this);
         driver.add(buttonHilbertCurve);
         
-        buttonText2GCODE = new JButton(MultilingualSupport.getSingleton().get("MenuTextToGCODE"));
+        buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
         buttonText2GCODE.addActionListener(this);
         driver.add(buttonText2GCODE);
 
-        buttonSaveFile = new JButton(MultilingualSupport.getSingleton().get("MenuSaveGCODEAs"));
+        buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
         buttonSaveFile.addActionListener(this);
         driver.add(buttonSaveFile);
 
@@ -1787,19 +1733,19 @@ public class MainGUI
         // Draw menu
 		JPanel go = new JPanel(new GridBagLayout());
 
-        buttonStart = new JButton(MultilingualSupport.getSingleton().get("Start"));
+        buttonStart = new JButton(translator.get("Start"));
         buttonStart.addActionListener(this);
     	go.add(buttonStart);
 
-        buttonStartAt = new JButton(MultilingualSupport.getSingleton().get("StartAtLine"));
+        buttonStartAt = new JButton(translator.get("StartAtLine"));
         buttonStartAt.addActionListener(this);
         go.add(buttonStartAt);
 
-        buttonPause = new JButton(MultilingualSupport.getSingleton().get("Pause"));
+        buttonPause = new JButton(translator.get("Pause"));
         buttonPause.addActionListener(this);
         go.add(buttonPause);
 
-        buttonHalt = new JButton(MultilingualSupport.getSingleton().get("Halt"));
+        buttonHalt = new JButton(translator.get("Halt"));
         buttonHalt.addActionListener(this);
         go.add(buttonHalt);
         
@@ -1822,8 +1768,8 @@ public class MainGUI
 			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(60,20));
 
 			//final JButton find = new JButton("FIND HOME");	find.setPreferredSize(new Dimension(100,20));
-			final JButton center = new JButton(MultilingualSupport.getSingleton().get("SetHome"));	center.setPreferredSize(new Dimension(100,20));
-			final JButton home = new JButton(MultilingualSupport.getSingleton().get("GoHome"));		home.setPreferredSize(new Dimension(100,20));
+			final JButton center = new JButton(translator.get("SetHome"));	center.setPreferredSize(new Dimension(100,20));
+			final JButton home = new JButton(translator.get("GoHome"));		home.setPreferredSize(new Dimension(100,20));
 			
 			c = new GridBagConstraints();
 			//c.fill=GridBagConstraints.BOTH; 
@@ -1846,12 +1792,12 @@ public class MainGUI
 		
 		JPanel corners = new JPanel();
 			corners.setLayout(new GridBagLayout());
-			final JButton goTop = new JButton(MultilingualSupport.getSingleton().get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
-			final JButton goBottom = new JButton(MultilingualSupport.getSingleton().get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
-			final JButton goLeft = new JButton(MultilingualSupport.getSingleton().get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
-			final JButton goRight = new JButton(MultilingualSupport.getSingleton().get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
-			final JButton goUp = new JButton(MultilingualSupport.getSingleton().get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
-			final JButton goDown = new JButton(MultilingualSupport.getSingleton().get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
+			final JButton goTop = new JButton(translator.get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
+			final JButton goBottom = new JButton(translator.get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
+			final JButton goLeft = new JButton(translator.get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
+			final JButton goRight = new JButton(translator.get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
+			final JButton goUp = new JButton(translator.get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
+			final JButton goDown = new JButton(translator.get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
 			c = new GridBagConstraints();
 			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
 			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
@@ -1868,14 +1814,14 @@ public class MainGUI
 		JPanel feedRateControl = new JPanel();
 		feedRateControl.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
-			feed_rate = MachineConfiguration.getSingleton().GetFeedRate();
+			feed_rate = machineConfiguration.GetFeedRate();
 			final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 			feedRate.setText(Double.toString(feed_rate));
-			final JButton setFeedRate = new JButton(MultilingualSupport.getSingleton().get("Set"));
+			final JButton setFeedRate = new JButton(translator.get("Set"));
 
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(MultilingualSupport.getSingleton().get("Speed")),c);
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
 			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(MultilingualSupport.getSingleton().get("Rate")),c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		
 
@@ -1895,10 +1841,10 @@ public class MainGUI
 					if(running) return;
 					if(b==home) SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
 					else if(b==center) SendLineToRobot("G92 X0 Y0");
-					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_left *10));
-					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(MachineConfiguration.getSingleton().paper_right*10));
-					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_top*10));
-					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(MachineConfiguration.getSingleton().paper_bottom*10));
+					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_left *10));
+					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_right*10));
+					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_top*10));
+					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_bottom*10));
 					//} else if(b==find) {
 					//	SendLineToRobot("G28");
 					else if(b==goUp) RaisePen();
@@ -1908,7 +1854,7 @@ public class MainGUI
 						fr=fr.replaceAll("[ ,]","");
 						feed_rate = Double.parseDouble(fr);
 						if(feed_rate<0.001) feed_rate=0.001;
-						MachineConfiguration.getSingleton().SetFeedRate(feed_rate);
+						machineConfiguration.SetFeedRate(feed_rate);
 						feedRate.setText(Double.toString(feed_rate));
 						SendLineToRobot("G00 G21 F"+feed_rate);
 					} else {
@@ -1961,20 +1907,20 @@ public class MainGUI
 	}
 	
 	protected void JogMotors() {
-		JDialog driver = new JDialog(mainframe,MultilingualSupport.getSingleton().get("JogMotors"),true);
+		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
 		driver.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		final JButton buttonAneg = new JButton(MultilingualSupport.getSingleton().get("JogIn"));
-		final JButton buttonApos = new JButton(MultilingualSupport.getSingleton().get("JogOut"));
-		final JCheckBox m1i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m1invert);
+		final JButton buttonAneg = new JButton(translator.get("JogIn"));
+		final JButton buttonApos = new JButton(translator.get("JogOut"));
+		final JCheckBox m1i = new JCheckBox(translator.get("Invert"),machineConfiguration.m1invert);
 		
-		final JButton buttonBneg = new JButton(MultilingualSupport.getSingleton().get("JogIn"));
-		final JButton buttonBpos = new JButton(MultilingualSupport.getSingleton().get("JogOut"));
-		final JCheckBox m2i = new JCheckBox(MultilingualSupport.getSingleton().get("Invert"),MachineConfiguration.getSingleton().m2invert);
+		final JButton buttonBneg = new JButton(translator.get("JogIn"));
+		final JButton buttonBpos = new JButton(translator.get("JogOut"));
+		final JCheckBox m2i = new JCheckBox(translator.get("Invert"),machineConfiguration.m2invert);
 
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("Left")),c);
-		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(MultilingualSupport.getSingleton().get("Right")),c);
+		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(translator.get("Left")),c);
+		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(translator.get("Right")),c);
 		
 		c.gridx=1;	c.gridy=0;	driver.add(buttonAneg,c);
 		c.gridx=1;	c.gridy=1;	driver.add(buttonBneg,c);
@@ -1998,10 +1944,9 @@ public class MainGUI
 
 		ActionListener invertButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MachineConfiguration.getSingleton().m1invert = m1i.isSelected();
-				MachineConfiguration.getSingleton().m2invert = m2i.isSelected();
-				
-				MachineConfiguration.getSingleton().SaveConfig();
+				machineConfiguration.m1invert = m1i.isSelected();
+				machineConfiguration.m2invert = m2i.isSelected();
+				machineConfiguration.SaveConfig();
 				SendConfig();
 			}
 		};
@@ -2024,7 +1969,7 @@ public class MainGUI
         // If the menu bar exists, empty it.  If it doesn't exist, create it.
         menuBar = new JMenuBar();
 
-        UpdateMenuBar();
+        updateMenuBar();
         
         return menuBar;
 	}
@@ -2038,21 +1983,21 @@ public class MainGUI
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
 	        	if( inputLine.compareTo(version) !=0 ) {
-	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpdateNotice"));
+	        		JOptionPane.showMessageDialog(null,translator.get("UpdateNotice"));
 	        	} else {
-	        		JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpToDate"));
+	        		JOptionPane.showMessageDialog(null,translator.get("UpToDate"));
 	        	}
 	        } else {
 	        	throw new Exception();
 	        }
 	        in.close();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,MultilingualSupport.getSingleton().get("UpdateCheckFailed"));
+			JOptionPane.showMessageDialog(null,translator.get("UpdateCheckFailed"));
 		}
 	}
 
 	// Rebuild the contents of the menu based on current program state
-	public void UpdateMenuBar() {
+	public void updateMenuBar() {
 		JMenu menu, subMenu;
 		ButtonGroup group;
         int i;
@@ -2080,43 +2025,43 @@ public class MainGUI
         
         
         // File menu
-        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuMakelangelo"));
+        menu = new JMenu(translator.get("MenuMakelangelo"));
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
         
-        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreferences"));
+        subMenu = new JMenu(translator.get("MenuPreferences"));
         
-        buttonAdjustSounds = new JMenuItem(MultilingualSupport.getSingleton().get("MenuSoundsTitle"));
+        buttonAdjustSounds = new JMenuItem(translator.get("MenuSoundsTitle"));
         buttonAdjustSounds.addActionListener(this);
         subMenu.add(buttonAdjustSounds);
 
-        buttonAdjustGraphics = new JMenuItem(MultilingualSupport.getSingleton().get("MenuGraphicsTitle"));
+        buttonAdjustGraphics = new JMenuItem(translator.get("MenuGraphicsTitle"));
         buttonAdjustGraphics.addActionListener(this);
         subMenu.add(buttonAdjustGraphics);
 
-        buttonAdjustLanguage = new JMenuItem(MultilingualSupport.getSingleton().get("MenuLanguageTitle"));
+        buttonAdjustLanguage = new JMenuItem(translator.get("MenuLanguageTitle"));
         buttonAdjustLanguage.addActionListener(this);
         subMenu.add(buttonAdjustLanguage);
         menu.add(subMenu);
         
-        buttonCheckForUpdate = new JMenuItem(MultilingualSupport.getSingleton().get("MenuUpdate"),KeyEvent.VK_U);
+        buttonCheckForUpdate = new JMenuItem(translator.get("MenuUpdate"),KeyEvent.VK_U);
         buttonCheckForUpdate.addActionListener(this);
         buttonCheckForUpdate.setEnabled(true);
         menu.add(buttonCheckForUpdate);
         
-        buttonAbout = new JMenuItem(MultilingualSupport.getSingleton().get("MenuAbout"),KeyEvent.VK_A);
+        buttonAbout = new JMenuItem(translator.get("MenuAbout"),KeyEvent.VK_A);
         buttonAbout.addActionListener(this);
         menu.add(buttonAbout);
 
         menu.addSeparator();
         
-        buttonExit = new JMenuItem(MultilingualSupport.getSingleton().get("MenuQuit"),KeyEvent.VK_Q);
+        buttonExit = new JMenuItem(translator.get("MenuQuit"),KeyEvent.VK_Q);
         buttonExit.addActionListener(this);
         menu.add(buttonExit);
         
         
         // Connect menu
-        subMenu = new JMenu(MultilingualSupport.getSingleton().get("MenuConnect"));
+        subMenu = new JMenu(translator.get("MenuConnect"));
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
@@ -2134,11 +2079,11 @@ public class MainGUI
         
         subMenu.addSeparator();
 
-        buttonRescan = new JMenuItem(MultilingualSupport.getSingleton().get("MenuRescan"),KeyEvent.VK_N);
+        buttonRescan = new JMenuItem(translator.get("MenuRescan"),KeyEvent.VK_N);
         buttonRescan.addActionListener(this);
         subMenu.add(buttonRescan);
 
-        buttonDisconnect = new JMenuItem(MultilingualSupport.getSingleton().get("MenuDisconnect"),KeyEvent.VK_D);
+        buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
         buttonDisconnect.setEnabled(portOpened);
         subMenu.add(buttonDisconnect);
@@ -2146,18 +2091,18 @@ public class MainGUI
         menuBar.add(subMenu);
         
         // view menu
-        menu = new JMenu(MultilingualSupport.getSingleton().get("MenuPreview"));
-        buttonZoomOut = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomOut"));
+        menu = new JMenu(translator.get("MenuPreview"));
+        buttonZoomOut = new JMenuItem(translator.get("ZoomOut"));
         buttonZoomOut.addActionListener(this);
         buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomOut);
         
-        buttonZoomIn = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomIn"),KeyEvent.VK_EQUALS);
+        buttonZoomIn = new JMenuItem(translator.get("ZoomIn"),KeyEvent.VK_EQUALS);
         buttonZoomIn.addActionListener(this);
         buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
         menu.add(buttonZoomIn);
         
-        buttonZoomToFit = new JMenuItem(MultilingualSupport.getSingleton().get("ZoomFit"));
+        buttonZoomToFit = new JMenuItem(translator.get("ZoomFit"));
         buttonZoomToFit.addActionListener(this);
         menu.add(buttonZoomToFit);
         
@@ -2197,15 +2142,15 @@ public class MainGUI
         ClearLog();
 
         settingsPane = SettingsPanel();
-        previewPane = new DrawPanel();
+        previewPane = new DrawPanel(machineConfiguration);
         preparePane = ProcessImages();
         drivePane = DriveManually();
-        statusBar = new StatusBar();
+        statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
-        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuSettings"),null,settingsPane,null);
-        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuGCODE"),null,preparePane,null);
-        contextMenu.addTab(MultilingualSupport.getSingleton().get("MenuDraw"),null,drivePane,null);
+        contextMenu.addTab(translator.get("MenuSettings"),null,settingsPane,null);
+        contextMenu.addTab(translator.get("MenuGCODE"),null,preparePane,null);
+        contextMenu.addTab(translator.get("MenuDraw"),null,drivePane,null);
         contextMenu.addTab("Log",null,logPane,null);
 
         // major layout
@@ -2230,8 +2175,9 @@ public class MainGUI
     
     // if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
     private void reopenLastFile() {
-		if(recentFiles[0].length()>0) {
-			OpenFileOnDemand(recentFiles[0]);
+    	String s = recentFiles.get(0);
+		if(s.length()>0) {
+			OpenFileOnDemand(s);
 		}
     }
 
@@ -2239,7 +2185,7 @@ public class MainGUI
 		textInputArea = new JPanel(new GridLayout(0,1));
 		commandLineText = new JTextField(0);
 		commandLineText.setPreferredSize(new Dimension(10,10));
-		commandLineSend = new JButton(MultilingualSupport.getSingleton().get("Send"));
+		commandLineSend = new JButton(translator.get("Send"));
 		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
 		textInputArea.add(commandLineText);
 		textInputArea.add(commandLineSend);
@@ -2262,7 +2208,7 @@ public class MainGUI
     private void CreateAndShowGUI() {
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
-        mainframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Create and set up the content pane.
         mainframe.setJMenuBar(CreateMenuBar());
@@ -2273,8 +2219,6 @@ public class MainGUI
         int height=prefs.getInt("Default window height", 700);
         mainframe.setSize(width,height);
         mainframe.setVisible(true);
-        
-        previewPane.ZoomToFitPaper();
         
         if(prefs.getBoolean("Reconnect to last port on start", false)) reconnectToLastPort();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();

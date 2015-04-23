@@ -1,9 +1,11 @@
 package com.marginallyclever.filters;
 
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
 import java.awt.image.BufferedImage;
 
-
-	
 /**
  * Floyd/Steinberg dithering
  * @author Dan
@@ -12,6 +14,14 @@ import java.awt.image.BufferedImage;
  */
 public class Filter_DitherFloydSteinberg extends Filter {
 	private long tone;
+	
+	
+	public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
 	
 	private int QuantizeColor(int original) {
 		int i=(int)Math.min(Math.max(original, 0),255);

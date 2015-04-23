@@ -1,7 +1,11 @@
 package com.marginallyclever.filters;
 
-import java.awt.image.BufferedImage;
 import com.marginallyclever.makelangelo.C3;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import java.awt.image.BufferedImage;
 
 
 /**
@@ -10,6 +14,13 @@ import com.marginallyclever.makelangelo.C3;
  * @see {@link http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering}
  */
 public class Filter_DitherFloydSteinbergRGB extends Filter {
+	public Filter_DitherFloydSteinbergRGB(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
+
 	C3 [] palette = new C3[] {
 		new C3(0,0,0),
 		new C3(255,0,0),

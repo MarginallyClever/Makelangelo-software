@@ -1,18 +1,15 @@
 package com.marginallyclever.filters;
 
 
-import java.awt.GridLayout;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
@@ -25,8 +22,13 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	protected int chars_per_line=35;
 	protected static String lastMessage = "";
 
+	public Filter_GeneratorYourMessageHere(MainGUI gui,
+			MachineConfiguration mc, MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
+
 	public String GetName() { return "Your message here"; }
-	
 	
 	public void Generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage,6,60);
@@ -40,9 +42,9 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			CreateMessage(lastMessage,dest);
 			
 			// TODO Move to GUI?
-			MainGUI.getSingleton().Log("<font color='green'>Completed.</font>\n");
-			MainGUI.getSingleton().PlayConversionFinishedSound();
-			MainGUI.getSingleton().LoadGCode(dest);
+			mainGUI.Log("<font color='green'>Completed.</font>\n");
+			mainGUI.PlayConversionFinishedSound();
+			mainGUI.LoadGCode(dest);
 	    }
 	}
 
@@ -52,11 +54,10 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 
-			MachineConfiguration mc = MachineConfiguration.getSingleton();
-			tool = mc.GetCurrentTool();
+			tool = machine.GetCurrentTool();
 			SetupTransform();
-			output.write(mc.GetConfigLine()+";\n");
-			output.write(mc.GetBobbinLine()+";\n");
+			output.write(machine.GetConfigLine()+";\n");
+			output.write(machine.GetBobbinLine()+";\n");
 			tool.WriteChangeTo(output);
 			
 			TextSetAlign(Align.CENTER);
@@ -66,7 +67,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			TextSetAlign(Align.RIGHT);
 			TextSetVAlign(VAlign.TOP);
 			TextSetPosition(image_width,image_height);
-			TextCreateMessageNow("Makelangelo #"+Long.toString(MachineConfiguration.getSingleton().GetUID()),output);
+			TextCreateMessageNow("Makelangelo #"+Long.toString(machine.GetUID()),output);
 			
 			output.close();
 		}

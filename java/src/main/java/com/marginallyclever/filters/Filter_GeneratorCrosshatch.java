@@ -1,12 +1,14 @@
 package com.marginallyclever.filters;
 
 
+import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 
 /**
@@ -16,6 +18,11 @@ import java.io.IOException;
  */
 public class Filter_GeneratorCrosshatch extends Filter {
 	public String GetName() { return "Crosshatch"; }
+	
+	public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+		super(gui,mc,ms);
+	}
+	
 	
 	/**
 	 * The main entry point
@@ -28,10 +35,10 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		double level=leveladd;
 		int z=0;
 
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255); 
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.Process(img);
 
-		MainGUI.getSingleton().Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		mainGUI.Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		ImageStart(img,out);
@@ -44,7 +51,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		tool.WriteChangeTo(out);
 		liftPen(out);
 
-		MainGUI.getSingleton().Log("<font color='green'>Generating layer 1</font>\n");
+		mainGUI.Log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -69,7 +76,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		MainGUI.getSingleton().Log("<font color='green'>Generating layer 2</font>\n");
+		mainGUI.Log("<font color='green'>Generating layer 2</font>\n");
 		// create vertical lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -94,7 +101,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		MainGUI.getSingleton().Log("<font color='green'>Generating layer 3</font>\n");
+		mainGUI.Log("<font color='green'>Generating layer 3</font>\n");
 		// create diagonal \ lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -134,7 +141,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		MainGUI.getSingleton().Log("<font color='green'>Generating layer 4</font>\n");
+		mainGUI.Log("<font color='green'>Generating layer 4</font>\n");
 		// create diagonal / lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;

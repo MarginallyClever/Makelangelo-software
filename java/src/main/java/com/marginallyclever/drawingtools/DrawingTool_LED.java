@@ -1,11 +1,17 @@
 package com.marginallyclever.drawingtools;
 
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 
 public class DrawingTool_LED extends DrawingTool {
-	public DrawingTool_LED() {
+	public DrawingTool_LED(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
+		super(gui,ms,mc);
+		
 		diameter=4;
 		name="LED";
 		z_on=180;

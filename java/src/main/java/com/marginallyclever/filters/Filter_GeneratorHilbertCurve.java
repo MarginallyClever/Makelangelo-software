@@ -1,17 +1,14 @@
 package com.marginallyclever.filters;
 
-import java.awt.GridLayout;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
@@ -26,7 +23,14 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	float z_up=90;
 	int order=4; // controls complexity of curve
 	float x,y;
+
 	
+	
+	public Filter_GeneratorHilbertCurve(MainGUI gui, MachineConfiguration mc,
+			MultilingualSupport ms) {
+		super(gui, mc, ms);
+		// TODO Auto-generated constructor stub
+	}
 
 	public String GetName() { return "Hilbert curve"; }
 	
@@ -69,11 +73,10 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	private void CreateCurveNow(String dest) {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			MachineConfiguration mc = MachineConfiguration.getSingleton();
-			tool = mc.GetCurrentTool();
+			tool = machine.GetCurrentTool();
 			SetupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
-			output.write(mc.GetConfigLine()+";\n");
-			output.write(mc.GetBobbinLine()+";\n");
+			output.write(machine.GetConfigLine()+";\n");
+			output.write(machine.GetBobbinLine()+";\n");
 			tool.WriteChangeTo(output);
 						
 			turtle_x=0;
@@ -105,7 +108,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	        output.close();
 	        
 			// open the file automatically to save a click.
-			MainGUI.getSingleton().OpenFileOnDemand(dest);
+			mainGUI.OpenFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}
