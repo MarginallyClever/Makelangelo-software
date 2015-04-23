@@ -28,3 +28,5 @@ java/Makelangelo.jar
 
 last_official_release/Makelangelo/log.html
 target/
+
+java/.settings/org.eclipse.core.resources.prefs
