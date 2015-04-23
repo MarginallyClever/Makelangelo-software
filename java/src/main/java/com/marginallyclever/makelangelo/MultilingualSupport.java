@@ -11,9 +11,9 @@ public class MultilingualSupport {
 	public static final String FIRST_TIME_KEY = "first time";
 	protected String currentLanguage="English";
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
-
+	
 	private Preferences prefs = Preferences.userRoot().node("Language");
-
+	
 
 	public MultilingualSupport() {
 		loadLanguages();
@@ -33,11 +33,11 @@ public class MultilingualSupport {
 	public void saveConfig() {
 		prefs.put("language", currentLanguage );
 	}
-
+	
 	public void loadConfig() {
 		currentLanguage = prefs.get("language", "English");
 	}
-
+	
 	public void loadLanguages() {
 		// Scan folder for language files
         String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
@@ -54,7 +54,7 @@ public class MultilingualSupport {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		for(int i=0;i<all_files.length;++i) {
 			if(all_files[i].isHidden()) continue;
 			if(all_files[i].isDirectory()) continue;
@@ -65,9 +65,9 @@ public class MultilingualSupport {
 			lang = new LanguageContainer();
 			lang.Load(all_files[i].getAbsolutePath());
 			languages.put(lang.getName(), lang);
-		}
+		}	
 	}
-
+	
 	public String get(String key) {
 		String value=null;
 		try {
@@ -78,15 +78,15 @@ public class MultilingualSupport {
 		}
 		return value;
 	}
-
+	
 	protected String [] getLanguageList() {
 		final String [] choices = new String[languages.keySet().size()];
 		Object[] lang_keys = languages.keySet().toArray();
-
+		
 		for(int i=0;i<lang_keys.length;++i) {
 			choices[i] = (String)lang_keys[i];
 		}
-
+		
 		return choices;
 	}
 }

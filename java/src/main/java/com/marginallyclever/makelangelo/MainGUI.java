@@ -9,10 +9,11 @@ package com.marginallyclever.makelangelo;
 
 
 // io functions
-
-import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.*;
 import jssc.*;
+import com.marginallyclever.drawingtools.DrawingTool;
+import org.kabeja.dxf.*;
+import org.kabeja.parser.ParseException;
 import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
@@ -822,7 +823,7 @@ public class MainGUI
 					ok=true;
 				} catch(IOException e) {
 					e.printStackTrace();
-				} catch (org.kabeja.parser.ParseException e) {
+				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
