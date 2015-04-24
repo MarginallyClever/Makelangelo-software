@@ -10,6 +10,8 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 import com.marginallyclever.filters.*;
+import com.marginallyclever.communications.MarginallyCleverSerialPortEventListener;
+import com.marginallyclever.communications.SerialConnection;
 import jssc.*;
 import com.marginallyclever.drawingtools.DrawingTool;
 import org.apache.commons.io.IOUtils;
@@ -62,8 +64,10 @@ import java.util.prefs.Preferences;
 
 public class MainGUI
 		extends JPanel
-		implements ActionListener, KeyListener, SerialPortEventListener
+		implements ActionListener, KeyListener
 {
+	private MarginallyCleverSerialPortEventListener serialConnection;
+
 	// Java required?
 	static final long serialVersionUID=1L;
 
@@ -78,27 +82,8 @@ public class MainGUI
 		private List<Filter> image_converters;
 		private boolean startConvertingNow;
 	
-	
-	// Serial connection
-		// TODO put all serial stuff in a SerialConnection (Connection) class, hide it inside Robot class?
-		private static final int BAUD_RATE = 57600;
-		//private CommPortIdentifier portIdentifier;
-		//private CommPort commPort;
-		private SerialPort serialPort;
-		private String[] portsDetected;
-		private boolean portOpened=false;
-		private boolean portConfirmed=false;
-		// Serial communication
-		static private final String cue = "> ";
-		static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
-		static private final String nochecksum = "NOCHECKSUM";
-		static private final String badchecksum = "BADCHECKSUM ";
-		static private final String badlinenum = "BADLINENUM ";
-	
-	// parsing input from Makelangelo
-	private String serial_recv_buffer="";
-	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
+
 	private RecentFiles recentFiles;
 	private String recentPort;
 	//private boolean allowMetrics=true;
@@ -147,9 +132,6 @@ public class MainGUI
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
-	
-	// prevent repeating pings from appearing in console
-	boolean lastLineWasCue=false;
 
 	// reading file
 	private boolean running=false;
@@ -166,7 +148,8 @@ public class MainGUI
 		StartTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
         recentFiles = new RecentFiles();
-        GetRecentPort();
+		serialConnection = new SerialConnection(prefs, this, translator, machineConfiguration);
+        LoadImageConverters();
         CreateAndShowGUI();
 	}
 
@@ -216,7 +199,7 @@ public class MainGUI
 	}
 	
 	private void LowerPen() {
-		SendLineToRobot("G00 Z"+machineConfiguration.getPenDownString());
+		SendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
 		penIsUp=false;
 	}
 	
@@ -231,8 +214,8 @@ public class MainGUI
 		image_converters.add(new Filter_GeneratorScanline(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorPulse(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorBoxes(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorRGB(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GenerateVoronoiStippling(this,machineConfiguration,translator));
+		image_converters.add(new Filter_GeneratorRGB(this, machineConfiguration, translator));
+		image_converters.add(new Filter_GenerateVoronoiStippling(this, machineConfiguration, translator));
 	}
 	
 	protected void finalize() throws Throwable {
@@ -246,12 +229,14 @@ public class MainGUI
 	public void keyTyped(KeyEvent e) {}
 
     /** Handle the key-pressed event from the text field. */
+	@Override
     public void keyPressed(KeyEvent e) {}
 
     /** Handle the key-released event from the text field. */
-    public void keyReleased(KeyEvent e) {
+    @Override
+	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(portConfirmed && !running) {
+			if(serialConnection.isPortConfirmed() && !running) {
 				ProcessLine(commandLineText.getText());
 				commandLineText.setText("");
 			}
@@ -295,7 +280,7 @@ public class MainGUI
 		}
 	}
 	
-	private void PlayConnectSound() {
+	public void PlayConnectSound() {
 		PlaySound(prefs.get("sound_connect", ""));
 	}
 	
@@ -327,7 +312,7 @@ public class MainGUI
 	
 	private void TextToGCODE() {
 		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
-		msg.Generate( GetTempDestinationFile() );
+		msg.Generate(GetTempDestinationFile() );
 	}
 	
 
@@ -352,11 +337,11 @@ public class MainGUI
 			// Do we care if it fails?
 		}
 	}
-	
+
 	public void ClearLog() {
 		try {
 			doc.replace(0, doc.getLength(), "", null);
-			kit.insertHTML(doc, 0, "", 0,0,null);
+			kit.insertHTML(doc, 0, "", 0, 0, null);
 			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException e) {
 			// Do we care if it fails?
@@ -364,162 +349,7 @@ public class MainGUI
 			// Do we care if it fails?
 		}
 	}
-	
-	public void ClosePort() {
-		if(portOpened) {
-		    if (serialPort != null) {
-		        try {
-			        serialPort.removeEventListener();
-			        serialPort.closePort();
-		        } catch (SerialPortException e) {}
-		    }
 
-		    ClearLog();
-			portOpened=false;
-			portConfirmed=false;
-			previewPane.setConnected(false);
-			updateMenuBar();
-			PlayDisconnectSound();
-			
-			// update window title
-			mainframe.setTitle(translator.get("TitlePrefix") 
-					+ Long.toString(machineConfiguration.robot_uid) 
-					+ translator.get("TitleNotConnected"));
-		}
-	}
-	
-	// open a serial connection to a device.  We won't know it's the robot until  
-	public int OpenPort(String portName) {
-		if(portOpened && portName.equals(recentPort)) return 0;
-		
-		ClosePort();
-		
-		Log("<font color='green'>"+translator.get("ConnectingTo") + portName+"...</font>\n");
-		
-		// open the port
-		serialPort = new SerialPort(portName);
-		try {
-            serialPort.openPort();// Open serial port
-            serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-            serialPort.addEventListener(this);
-        } catch (SerialPortException e) {
-			Log("<span style='color:red'>"+translator.get("PortNotConfigured")+e.getMessage()+"</span>\n");
-			return 3;
-		}
-
-		Log("<span style='color:green'>"+translator.get("PortOpened")+"</span>\n");
-		SetRecentPort(portName);
-		portOpened=true;
-		lastLineWasCue=false;
-		updateMenuBar();
-		PlayConnectSound();
-		
-		return 0;
-	}
-
-	/**
-	 * Check if the robot reports an error and if so what line number 
-	 * @return
-	 */
-	protected int ErrorReported() {
-		if(portConfirmed==false) return -1;
-
-		if( serial_recv_buffer.lastIndexOf(nochecksum) != -1 ) {
-			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(nochecksum) + nochecksum.length());
-			String x=GetNumberPortion(after_error);
-			return Integer.decode(x);
-		}
-		if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
-			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
-			String x=GetNumberPortion(after_error);
-			return Integer.decode(x);
-		}
-		if( serial_recv_buffer.lastIndexOf(badlinenum) != -1 ) {
-			String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badlinenum) + badlinenum.length());
-			String x=GetNumberPortion(after_error);
-			return Integer.decode(x);
-		}
-		
-		return -1;
-	}
-	
-	protected String GetNumberPortion(String src) {
-	    int length = src.length();
-	    String result = "";
-	    for (int i = 0; i < length; i++) {
-	        Character character = src.charAt(i);
-	        if (Character.isDigit(character)) {
-	            result += character;
-	        }
-	    }
-	    return result;
-	}
-	
-	/**
-	 * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
-	 * @return true if handshake succeeds.
-	 */
-	public boolean ConfirmPort() {
-		if(portConfirmed==true) return true;
-		if(serial_recv_buffer.lastIndexOf(hello) < 0) return false;
-		
-		portConfirmed=true;
-		
-		String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
-		machineConfiguration.ParseRobotUID(after_hello);
-		
-		mainframe.setTitle(translator.get("TitlePrefix") 
-				+ Long.toString(machineConfiguration.robot_uid) 
-				+ translator.get("TitlePostfix"));
-
-		SendConfig();
-		previewPane.updateMachineConfig();
-
-		updateMenuBar();
-		previewPane.setConnected(true);
-		
-		// rebuild the drive pane so that the feed rates are correct.
-
-		contextMenu.removeTabAt(0);
-        drivePane = DriveManually();
-        contextMenu.insertTab(translator.get("MenuDraw"), null, drivePane, null, 0);
-
-		return true;
-	}
-	
-	// find all available serial ports for the settings->ports menu.
-	public String[] ListSerialPorts() {
-		String OS = System.getProperty("os.name").toLowerCase();
-		
-	        if(OS.indexOf("mac") >= 0){
-	        	portsDetected = SerialPortList.getPortNames("/dev/");
-	            	//System.out.println("OS X");
-	        } else if(OS.indexOf("win") >= 0) {
-	        	portsDetected = SerialPortList.getPortNames("COM");
-	            	//System.out.println("Windows");
-	        } else if(OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0){
-	        	portsDetected = SerialPortList.getPortNames("/dev/");
-	            	//System.out.println("Linux/Unix");
-	        } else {
-	        	System.out.println("OS ERROR");
-	        	System.out.println("OS NAME="+System.getProperty("os.name"));
-	        }
-		return portsDetected;
-	}
-	
-	// pull the last connected port from prefs
-	public void GetRecentPort() {
-		recentPort = prefs.get("recent-port", "");
-	}
-	
-	// update the prefs with the last port connected and refreshes the menus.
-	// TODO: only update when the port is confirmed?
-	public void SetRecentPort(String portName) {
-		prefs.put("recent-port", portName);
-		recentPort=portName;
-		updateMenuBar();
-	}
-	
 	/**
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
@@ -613,7 +443,7 @@ public class MainGUI
 						machineConfiguration.SaveConfig();
 						
 						// if we aren't connected, don't show the new 
-						if(!portConfirmed) {
+						if(!serialConnection.isPortConfirmed()) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
 							// update window title
@@ -846,7 +676,7 @@ public class MainGUI
 				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
 				if(ok) LoadGCode(destinationFile);
-			    Halt();
+				Halt();
 			}
 		};
 		
@@ -1046,7 +876,7 @@ public class MainGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
+		SendLineToRobot("G00 F" + feed_rate + " X0 Y0");
 	}
 	
 	private String SelectFile() {
@@ -1191,8 +1021,8 @@ public class MainGUI
 	}
 	
 	// Send the machine configuration to the robot
-	protected void SendConfig() {
-		if(!portConfirmed) return;
+	public void SendConfig() {
+		if(!serialConnection.isPortConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
 		SendLineToRobot(machineConfiguration.GetConfigLine());
@@ -1203,7 +1033,7 @@ public class MainGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || gcode.fileOpened==false || portConfirmed==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(running==false || paused==true || gcode.fileOpened==false || serialConnection.isPortConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1248,15 +1078,15 @@ public class MainGUI
 	
 	
 	private void ChangeToTool(String changeToolString) {
-		int i=Integer.decode(changeToolString);
+		int i = Integer.decode(changeToolString);
 		
 		String [] toolNames = machineConfiguration.getToolNames();
 		
 		if(i<0 || i>toolNames.length) {
-			Log("<span style='color:red'>"+translator.get("InvalidTool")+i+"</span>");
+			Log("<span style='color:red'>" + translator.get("InvalidTool") + i +"</span>");
 			i=0;
 		}
-		JOptionPane.showMessageDialog(null,translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
+		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
 	}
 	
 	
@@ -1310,18 +1140,18 @@ public class MainGUI
 	 * @return true means the command is sent.  false means it was not.
 	 */
 	public void SendLineToRobot(String line) {
-		if(!portConfirmed) return;
+		if(!serialConnection.isPortConfirmed()) return;
 		if(line.trim().equals("")) return;
 		String reportedline = line;
 		if(line.contains(";")) {
 			String [] lines = line.split(";");
 			reportedline = lines[0];
 		}
-		Log("<font color='white'>"+reportedline+"</font>");
+		Log("<font color='white'>" + reportedline + "</font>");
 		line += "\n";
 		
 		try {
-			serialPort.writeBytes(line.getBytes());
+			serialConnection.getSerialPort().writeBytes(line.getBytes());
 		}
 		catch(SerialPortException e) {}
 	}
@@ -1463,12 +1293,21 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonRescan ) {
-			ListSerialPorts();
+			serialConnection.ListSerialPorts();
 			updateMenuBar();
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			ClosePort();
+			serialConnection.ClosePort();
+			ClearLog();
+			previewPane.setConnected(false);
+			updateMenuBar();
+			PlayDisconnectSound();
+
+			// update window title
+			mainframe.setTitle(translator.get("TitlePrefix")
+					+ Long.toString(machineConfiguration.robot_uid)
+					+ translator.get("TitleNotConnected"));
 			return;
 		}
 		if( subject == buttonAdjustSounds ) {
@@ -1542,9 +1381,9 @@ public class MainGUI
 			}
 		}
 
-		for(i=0;i<portsDetected.length;++i) {
+		for(i=0;i<serialConnection.getPortsDetected().length;++i) {
 			if(subject == buttonPorts[i]) {
-				OpenPort(portsDetected[i]);
+				serialConnection.OpenPort(serialConnection.getPortsDetected()[i]);
 				return;
 			}
 		}
@@ -1613,52 +1452,6 @@ public class MainGUI
 		bottomText.addHyperlinkListener(hyperlinkListener);
 		return bottomText;
 	}
-	
-	
-	
-	// Deal with something robot has sent.
-	public void serialEvent(SerialPortEvent events) {
-        if(events.isRXCHAR()) {
-            try {
-            	int len = events.getEventValue();
-            	byte[] buffer = serialPort.readBytes(len);
-				String line2 = new String(buffer,0,len);
-				
-				serial_recv_buffer+=line2;
-				// wait for the cue ("> ") to send another command
-				if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
-					String line2_mod = serial_recv_buffer;
-					//line2_mod = line2.mod.replace("\n", "");
-					//line2_mod = line2_mod.replace(">", "");
-					line2_mod = line2_mod.trim();
-					if(line2_mod.length()>0) {
-						if(line2_mod.equals(cue.trim())) {
-							if(lastLineWasCue==true) {
-								// don't repeat the ping
-								//Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
-							} else {
-								Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
-							}
-							lastLineWasCue=true;
-						} else {
-							lastLineWasCue=false;
-							Log("<span style='color:#FFA500'>"+line2_mod+"</span>");
-						}
-					}
-					
-					int error_line = ErrorReported();
-					if(error_line != -1) {
-						gcode.linesProcessed = error_line;
-						serial_recv_buffer="";
-						SendFileCommand();
-					} else if(ConfirmPort()) {
-						serial_recv_buffer="";
-						SendFileCommand();
-					}
-				}
-            } catch (SerialPortException e) {}
-        }
-    }
 
     // settings menu
 	public JPanel SettingsPanel() {
@@ -1671,11 +1464,11 @@ public class MainGUI
 
         buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
         buttonAdjustPulleySize.addActionListener(this);
-        panel.add(buttonAdjustPulleySize);
+		panel.add(buttonAdjustPulleySize);
         
         buttonJogMotors = new JButton(translator.get("JogMotors"));
         buttonJogMotors.addActionListener(this);
-        panel.add(buttonJogMotors);
+		panel.add(buttonJogMotors);
 
         panel.add(new JSeparator());
         
@@ -2013,7 +1806,7 @@ public class MainGUI
         if(settingsPane!=null) {
             buttonAdjustMachineSize.setEnabled(!running);
             buttonAdjustPulleySize.setEnabled(!running);
-            buttonJogMotors.setEnabled(portConfirmed && !running);
+            buttonJogMotors.setEnabled(serialConnection.isPortConfirmed() && !running);
             buttonChangeTool.setEnabled(!running);
             buttonAdjustTool.setEnabled(!running);
         }
@@ -2022,10 +1815,10 @@ public class MainGUI
             buttonText2GCODE.setEnabled(!running);
         }
         if(drivePane!=null) {
-        	buttonStart.setEnabled(portConfirmed && !running);
-            buttonStartAt.setEnabled(portConfirmed && !running);
-            buttonPause.setEnabled(portConfirmed && running);
-            buttonHalt.setEnabled(portConfirmed && running);
+        	buttonStart.setEnabled(serialConnection.isPortConfirmed() && !running);
+            buttonStartAt.setEnabled(serialConnection.isPortConfirmed() && !running);
+            buttonPause.setEnabled(serialConnection.isPortConfirmed()&& running);
+            buttonHalt.setEnabled(serialConnection.isPortConfirmed() && running);
         }
         
         
@@ -2073,11 +1866,11 @@ public class MainGUI
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-        ListSerialPorts();
-        buttonPorts = new JRadioButtonMenuItem[portsDetected.length];
-        for(i=0;i<portsDetected.length;++i) {
-        	buttonPorts[i] = new JRadioButtonMenuItem(portsDetected[i]);
-            if(recentPort.equals(portsDetected[i]) && portOpened) {
+        serialConnection.ListSerialPorts();
+        buttonPorts = new JRadioButtonMenuItem[serialConnection.getPortsDetected().length];
+        for(i=0;i<serialConnection.getPortsDetected().length;++i) {
+        	buttonPorts[i] = new JRadioButtonMenuItem(serialConnection.getPortsDetected()[i]);
+            if(serialConnection.getRecentPort().equals(serialConnection.getPortsDetected()[i]) && serialConnection.isPortOpened()) {
             	buttonPorts[i].setSelected(true);
             }
             buttonPorts[i].addActionListener(this);
@@ -2093,7 +1886,7 @@ public class MainGUI
 
         buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
-        buttonDisconnect.setEnabled(portOpened);
+        buttonDisconnect.setEnabled(serialConnection.isPortOpened());
         subMenu.add(buttonDisconnect);
         
         menuBar.add(subMenu);
@@ -2171,15 +1964,6 @@ public class MainGUI
 		
         return contentPane;
     }
-
-
-	// connect to the last port
-    private void reconnectToLastPort() {
-	    ListSerialPorts();
-		if(Arrays.asList(portsDetected).contains(recentPort)) {
-			OpenPort(recentPort);
-		}
-	}
     
     // if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
     private void reopenLastFile() {
@@ -2228,10 +2012,52 @@ public class MainGUI
         mainframe.setSize(width,height);
         mainframe.setVisible(true);
         
-        if(prefs.getBoolean("Reconnect to last port on start", false)) reconnectToLastPort();
+        previewPane.ZoomToFitPaper();
+        
+        if(prefs.getBoolean("Reconnect to last port on start", false)) serialConnection.reconnectToLastPort();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
         if(prefs.getBoolean("Check for updates", false)) CheckForUpdate();
     }
+
+	/**
+	 *
+	 * @return
+	 */
+	public static JFrame getMainframe() {
+		return mainframe;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public DrawPanel getPreviewPane() {
+		return previewPane;
+	}
+
+	/**
+	 *
+	 * @param drivePane
+	 */
+	public void setDrivePane(JPanel drivePane) {
+		this.drivePane = drivePane;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public JPanel getDrivePane() {
+		return drivePane;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public GCodeFile getGcodeFile() {
+		return gcode;
+	}
 }
 
 
