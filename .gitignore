@@ -36,3 +36,5 @@ target/
 *.ipr
 *.iws
 .idea/
+
+java/.settings/org.eclipse.core.resources.prefs
