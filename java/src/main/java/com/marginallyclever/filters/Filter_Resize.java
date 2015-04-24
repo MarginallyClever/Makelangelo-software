@@ -1,15 +1,12 @@
 package com.marginallyclever.filters;
 
 
-
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 /**

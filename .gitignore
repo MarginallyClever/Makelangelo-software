@@ -28,5 +28,11 @@ java/Makelangelo.jar
 
 last_official_release/Makelangelo/log.html
 target/
+.settings/
 
-java/.settings/org.eclipse.core.resources.prefs
+# Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+*.iml
+## File-based project format:
+*.ipr
+*.iws
+.idea/

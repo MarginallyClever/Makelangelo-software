@@ -1,16 +1,16 @@
 package com.marginallyclever.filters;
 
 
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.makelangelo.Point2D;
+
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 
 
 /**
@@ -68,7 +68,7 @@ public class Filter_GeneratorZigZag extends Filter {
 				case  2: c="red";	  break;
 				default: c="white";   break;
 				}
-				mainGUI.Log("<font color='"+c+"'>"+formatTime(t_elapsed)+": "+flen.format(len)+"mm</font>\n");
+				mainGUI.Log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
 			}
 			progress = new_progress;
 			pm.setProgress((int)progress);
@@ -366,7 +366,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			out.close();
 		}
 		catch(IOException e) {
-			mainGUI.Log("<font color='red'>Error saving "+dest+": "+e.getMessage()+"</font>");
+			mainGUI.Log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");
 		}
 	}
 	
@@ -387,7 +387,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			}
 		}
 		
-		mainGUI.Log("<font color='green'>"+numPoints + " points,</font>\n");
+		mainGUI.Log("<font color='green'>" + numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 	

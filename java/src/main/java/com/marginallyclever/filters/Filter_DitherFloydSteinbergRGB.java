@@ -1,11 +1,11 @@
 package com.marginallyclever.filters;
 
-import java.awt.image.BufferedImage;
-
 import com.marginallyclever.makelangelo.C3;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import java.awt.image.BufferedImage;
 
 
 /**

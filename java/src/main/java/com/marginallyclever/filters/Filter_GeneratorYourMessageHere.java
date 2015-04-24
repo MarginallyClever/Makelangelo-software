@@ -1,19 +1,15 @@
 package com.marginallyclever.filters;
 
 
-import java.awt.GridLayout;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
@@ -71,7 +67,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			TextSetAlign(Align.RIGHT);
 			TextSetVAlign(VAlign.TOP);
 			TextSetPosition(image_width,image_height);
-			TextCreateMessageNow("main.java.com.marginallyclever.makelangelo #"+Long.toString(machine.GetUID()),output);
+			TextCreateMessageNow("Makelangelo #"+Long.toString(machine.GetUID()),output);
 			
 			output.close();
 		}

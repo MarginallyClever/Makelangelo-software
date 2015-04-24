@@ -403,7 +403,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value>A new version of this software is available.\nPlease visit http://makelangelo.com/ to get the new hotness.</value>
+		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="http://makelangelo.com/#productDescription">http://makelangelo.com/</a> to get the new hotness.</html></body>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>

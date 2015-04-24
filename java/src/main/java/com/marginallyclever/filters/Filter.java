@@ -1,26 +1,18 @@
 package com.marginallyclever.filters;
 
 
-
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.StringTokenizer;
-
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.StringTokenizer;
 
 
 /**
@@ -32,9 +24,9 @@ public class Filter {
 	int image_width, image_height;
 	float w2,h2,scale;
 	DrawingTool tool;
-
+	
 	int color_channel=0;
-
+	
 	// text properties
 	protected float kerning=5.0f;
 	protected float letter_width=10.0f;
@@ -44,7 +36,7 @@ public class Filter {
 	static final String alphabetFolder = new String("ALPHABET/");
 	protected int chars_per_line=25;
 	protected boolean draw_bounding_box=false;
-
+	
 	// text position and alignment
 	public enum VAlign { TOP, MIDDLE, BOTTOM };
 	public enum Align { LEFT, CENTER, RIGHT };
@@ -65,14 +57,14 @@ public class Filter {
 	protected MainGUI mainGUI;
 	protected MultilingualSupport translator;
 	protected MachineConfiguration machine;
-
-
+	
+	
 	public Filter(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
 		mainGUI = gui;
 		translator = ms;
 		machine = mc;
 	}
-
+	
 	public void SetParent(SwingWorker<Void,Void> p) {
 		parent=p;
 	}
@@ -82,7 +74,7 @@ public class Filter {
 	public void SetDestinationFile(String _dest) {
 		dest=_dest;
 	}
-
+	
 	/**
 	 * Called by filters that create GCODE from a bufferedImage.
 	 */
@@ -92,7 +84,7 @@ public class Filter {
 	 * Replace this with your generator/converter name.
 	 */
 	public String GetName() {  return "Unnamed";  }
-
+	
 	/**
 	 * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
 	 * @param img
@@ -104,62 +96,62 @@ public class Filter {
 
 	// convert should be called by filters that modify a bufferedImage.
 	public void Convert(BufferedImage img) throws IOException {}
-
-
+	
+	
 	protected int decode(int pixel) {
 		int r = ((pixel>>16)&0xff);
 		int g = ((pixel>> 8)&0xff);
 		int b = ((pixel    )&0xff);
 		return (r+g+b)/3;
 	}
-
+	
 	protected int decode(Color c) {
 		int r = c.getRed();
 		int g = c.getGreen();
 		int b = c.getBlue();
 		return (r+g+b)/3;
 	}
-
-
+	
+	
 	protected int encode(int i) {
 		return (0xff<<24) | (i<<16) | (i<< 8) | i;
 	}
-
+	
 
 	protected void liftPen(OutputStreamWriter out) throws IOException {
 		tool.WriteOff(out);
 		lastup=true;
 	}
-
-
+	
+	
 	protected void lowerPen(OutputStreamWriter out) throws IOException {
 		tool.WriteOn(out);
 		lastup=false;
 	}
 
-
+	
 	protected void ImageStart(BufferedImage img,OutputStreamWriter out) throws IOException {
 		tool = machine.GetCurrentTool();
 
 		ImageSetupTransform(img);
-
+		
 		out.write(machine.GetConfigLine()+";\n");
 		out.write(machine.GetBobbinLine()+";\n");
 
 		previous_x=0;
 		previous_y=0;
-
+		
 		SetAbsoluteMode(out);
 	}
-
+	
 	protected void SetAbsoluteMode(OutputStreamWriter out) throws IOException {
 		out.write("G00 G90;\n");
 	}
-
+	
 	protected void SetRelativeMode(OutputStreamWriter out) throws IOException {
 		out.write("G00 G91;\n");
 	}
-
+	
 	/**
 	 * setup transform from source image dimensions to destination paper dimensions.
 	 * @param img source dimensions
@@ -167,7 +159,7 @@ public class Filter {
 	protected void ImageSetupTransform(BufferedImage img) {
 		SetupTransform( img.getWidth(), img.getHeight() );
 	}
-
+	
 	/**
 	 * setup transform when there is no image to convert from.  Essentially a 1:1 transform.
 	 */
@@ -175,18 +167,18 @@ public class Filter {
 		// 10mm = 1cm.  letters should be 1cm tall.
 		SetupTransform( (int)machine.GetPaperWidth()*10, (int)machine.GetPaperHeight()*10 );
 	}
-
+	
 	protected void SetupTransform(int width,int height) {
 		image_height = height;
 		image_width = width;
 		h2=image_height/2;
 		w2=image_width/2;
-
+		
 		scale=10f;  // 10mm = 1cm
 
 		int new_width = image_width;
 		int new_height = image_height;
-
+		
 		if(image_width>machine.GetPaperWidth()) {
 			float resize = (float)machine.GetPaperWidth()/(float)image_width;
 			scale *= resize;
@@ -200,14 +192,14 @@ public class Filter {
 		scale *= machine.paper_margin;
 		new_width *= machine.paper_margin;
 		new_height *= machine.paper_margin;
-
+		
 		TextFindCharsPerLine(new_width);
-
+		
 		posx = w2;
 		posy = h2;
 	}
-
-
+	
+	
 	protected int sample1x1(BufferedImage img,int x,int y) {
 		Color c = new Color(img.getRGB(x, y));
 		switch(color_channel) {
@@ -218,7 +210,7 @@ public class Filter {
 		}
 	}
 
-
+	
 	protected int sample3x3(BufferedImage img,int x,int y) {
 		int c=0;
 		int values[]=new int[9];
@@ -263,25 +255,25 @@ public class Filter {
 			values[c]=sample1x1(img,x, y+1);
 			weights[c]=2;
 			c++;
-
+	
 			if(x<image_width-1) {
 				values[c]=sample1x1(img,x+1, y+1);
 				weights[c]=1;
 				c++;
 			}
 		}
-
+		
 		int value=0,j;
 		int sum=0;
 		for(j=0;j<c;++j) {
 			value+=values[j]*weights[j];
 			sum+=weights[j];
 		}
-
+		
 		return value/sum;
 	}
 
-
+	
 	protected float SX(float x) {
 		return x*scale;
 	}
@@ -300,12 +292,12 @@ public class Filter {
 	protected float TY(float y) {
 		return SY(PY(y));
 	}
-
-
+	
+	
 	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		float x2 = TX(x);
 		float y2 = TY(y);
-
+		
 		if(up==lastup) {
 			previous_x=x2;
 			previous_y=y2;
@@ -316,48 +308,48 @@ public class Filter {
 			else   lowerPen(out);
 		}
 	}
-
-
+	
+	
 	protected double RoundOff(double value) {
 		return Math.floor(value * 100.0) / 100.0;
 	}
 
-
+	
 	public void TextSetPosition(float x,float y) {
 		posx=x;
 		posy=y;
 	}
-
+	
 	public void TextSetAlign(Align x) {
 		align_horizontal = x;
 	}
-
+	
 	public void TextSetVAlign(VAlign x) {
 		align_vertical = x;
 	}
-
-
+	
+	
 	public void TextSetCharsPerLine(int numChars) {
 		chars_per_line = numChars;
 		//System.out.println("MAX="+numChars);
 	}
-
-
+	
+	
 	public void TextFindCharsPerLine(float width) {
 		chars_per_line=(int)Math.floor( (float)(width - padding*2.0f) / (float)(letter_width+kerning) );
 		//System.out.println("MAX="+chars_per_line);
 	}
-
+	
 
 	protected Rectangle2D TextCalculateBounds(String text) {
 		String [] lines = TextWrapToLength(text);
 		int len = TextLongestLine(lines);
-
+		
 		int num_lines = lines.length;
 		float h = padding*2 + ( letter_height + line_spacing ) * num_lines;//- line_spacing; removed because of letters that hang below the line
 		float w = padding*2 + ( letter_width + kerning ) * len - kerning;
 		float xmax=0, xmin=0, ymax=0, ymin=0;
-
+		
 		switch(align_horizontal) {
 		case LEFT:
 			xmax=posx + w;
@@ -372,7 +364,7 @@ public class Filter {
 			xmin = posx - w;
 			break;
 		}
-
+		
 		switch(align_vertical) {
 		case BOTTOM:
 			ymax=posy + h;
@@ -395,23 +387,23 @@ public class Filter {
 		*/
 		Rectangle2D r = new Rectangle2D.Float();
 		r.setRect(xmin, ymin, xmax - xmin, ymax - ymin);
-
+		
 		return r;
 	}
 
-
+	
 	protected void TextCreateMessageNow(String text,OutputStreamWriter output) throws IOException {
 		if(chars_per_line<=0) return;
 
 		tool = machine.GetCurrentTool();
-
+		
 		// find size of text block
 		// TODO count newlines
 		Rectangle2D r = TextCalculateBounds(text);
 
 		output.write("G90;\n");
 		liftPen(output);
-
+		
 		if(draw_bounding_box) {
 			// draw bounding box
 			output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
@@ -422,12 +414,12 @@ public class Filter {
 			output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
 			liftPen(output);
 		}
-
+		
 		// move to first line height
 		// assumes we are still G90
 		float message_start = TX((float)r.getMinX()) + SX(padding);
 		float firstline = TY((float)r.getMinY()) - SY(padding + letter_height);
-		float interline = -SY(letter_height + line_spacing);
+		float interline = -SY(letter_height + line_spacing); 
 
 		output.write("G0 X"+message_start+" Y"+firstline+";\n");
 		output.write("G91;\n");
@@ -444,7 +436,7 @@ public class Filter {
 				output.write("G0 X"+message_start+";\n");
 				output.write("G91;\n");
 			}
-
+			
 			TextDrawLine(lines[i],output);
 		}
 
@@ -452,17 +444,17 @@ public class Filter {
 		liftPen(output);
 	}
 
-
+	
 	// break the text into an array of strings.  each string is one line of text made to fit into the chars_per_line limit.
 	protected String [] TextWrapToLength(String src) {
 		String [] test_lines = src.split("\n");
 		int i,j;
-
+		
 		int num_lines = 0;
 		for(i=0;i<test_lines.length;++i) {
 			if( test_lines[i].length() > chars_per_line ) {
 				int x = (int)Math.ceil( (double)test_lines[i].length() / (double)chars_per_line );
-				num_lines += x;
+				num_lines += x;	
 			} else {
 				num_lines++;
 			}
@@ -480,28 +472,28 @@ public class Filter {
 				}
 			}
 		}
-
+		
 		return lines;
 	}
-
+	
 	protected int TextLongestLine(String [] lines) {
 		int len=0;
 		for(int i=0;i<lines.length;++i) {
 			if(len < lines[i].length()) len = lines[i].length();
 		}
-
+		
 		return len;
 	}
-
+	
  	protected void TextDrawLine(String a1,OutputStreamWriter output) throws IOException {
-		String ud = System.getProperty("user.dir") + "/" + alphabetFolder;
-
+		String ud = alphabetFolder;//System.getProperty("user.dir") + "/" + alphabetFolder;
+		
 		//System.out.println(a1+" ("+a1.length()+")");
-
+		
 		int i=0;
 		for(i=0;i<a1.length();++i) {
 			char letter = a1.charAt(i);
-
+			
 			if(letter=='\n' || letter=='\r') continue;
 
 			String name;
@@ -518,7 +510,7 @@ public class Filter {
 				case '$':  name="DOLLAR";  break;
 				case '#':  name="POUND";  break;
 				case '%':  name="PERCENT";  break;
-				case '&':  name="AMPERSAND";  break;
+				case '&':  name="AMPERSAND";  break;				
 				case '\'':  name="SINGLEQ";  break;
 				case '(':  name="B1OPEN";  break;
 				case ')':  name="B1CLOSE";  break;
@@ -550,20 +542,13 @@ public class Filter {
 				}
 			}
 			String fn = ud + name  + ".NGC";
-			//System.out.print(fn);
-
-
-			if(new File(fn).isFile()) {
+			final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
+			if(inputStream != null) {
 				if(i>0 && kerning!=0) {
 					output.write("G0 X"+SX(kerning)+";\n");
 				}
-
-				// file found. copy/paste it into the temp file
-				//System.out.println(" OK");
-
-				try (final FileInputStream fileInputStream = new FileInputStream(fn);
-								final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
-								final BufferedReader in = new BufferedReader(inputStreamReader)) {
+				try (	final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+						final BufferedReader in = new BufferedReader(inputStreamReader)) {
 
 					String b;
 					while ((b = in.readLine()) != null) {
@@ -603,18 +588,19 @@ public class Filter {
 				}
 			} else {
 				// file not found
+				System.out.println("file not found. Making best guess as to where it is.");
 				System.out.print(fn);
 				System.out.println(" NOK");
 			}
 		}
 	}
-
+	
 	protected void SignName(OutputStreamWriter out) throws IOException {
 		float desired_scale=0.5f;  // changes the size of the font.  large number = larger font
-
+		
 		TextSetAlign(Align.RIGHT);
 		TextSetVAlign(VAlign.BOTTOM);
-		TextSetPosition(TX(image_width)*(1.0f/desired_scale),
+		TextSetPosition(TX(image_width)*(1.0f/desired_scale), 
 				       -TY(image_height)*(1.0f/desired_scale));
 
 		float xx=w2;
@@ -623,10 +609,10 @@ public class Filter {
 		h2=0;
 		w2=0;
 		scale=desired_scale;
-
+		
 		TextSetCharsPerLine(25);
 
-		TextCreateMessageNow("main.java.com.marginallyclever.makelangelo #"+Long.toString(machine.GetUID()),out);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(machine.GetUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 		h2=yy;
 		w2=xx;
@@ -641,12 +627,12 @@ public class Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */

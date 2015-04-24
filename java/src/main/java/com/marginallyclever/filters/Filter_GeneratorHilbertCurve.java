@@ -1,18 +1,14 @@
 package com.marginallyclever.filters;
 
-import java.awt.GridLayout;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
