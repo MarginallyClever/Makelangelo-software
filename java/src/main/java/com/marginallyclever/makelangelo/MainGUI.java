@@ -17,7 +17,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
 import org.kabeja.parser.ParseException;
-import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
 import org.kabeja.parser.DXFParser;
@@ -66,7 +65,6 @@ public class MainGUI
 		extends JPanel
 		implements ActionListener, KeyListener
 {
-	private MarginallyCleverSerialPortEventListener serialConnection;
 
 	// Java required?
 	static final long serialVersionUID=1L;
@@ -83,9 +81,8 @@ public class MainGUI
 		private boolean startConvertingNow;
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
-
 	private RecentFiles recentFiles;
-	private String recentPort;
+	private MarginallyCleverSerialPortEventListener serialConnection;
 	//private boolean allowMetrics=true;
 		
 	// machine settings while running
@@ -206,8 +203,6 @@ public class MainGUI
 	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
 		image_converters = new ArrayList<Filter>();
-		
-		int i=0;
 		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorSpiral(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorCrosshatch(this,machineConfiguration,translator));
@@ -483,6 +478,7 @@ public class MainGUI
 		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
 			public boolean ok=false;
 			
+			@SuppressWarnings("unchecked")
 			@Override
 			public Void doInBackground() {
 				Log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
@@ -2027,7 +2023,7 @@ public class MainGUI
 	 *
 	 * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
 	 */
-	public static JFrame getMainframe() {
+	public JFrame getMainframe() {
 		return mainframe;
 	}
 

@@ -12,7 +12,11 @@ Please visit "the Makelangelo homepage":http://www.makelangelo.com/ for the acco
 
 h2. Make it
 
-Please visit "The wiki":https://learn.marginallyclever.com/ for all the instructions
+Please read "the assembly instructions":https://learn.marginallyclever.com/ to build your own.
+
+h2. Use it
+
+Please read "the software instructions":http://learn.marginallyclever.com/index.php/Makelangelo_2_Software to learn how it works.
 
 h2. Get help
 
