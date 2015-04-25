@@ -1137,11 +1137,11 @@ public class MainGUI
 	/**
 	 * Sends a single command the robot.  Could be anything.
 	 * @param line command to send.
-	 * @return true means the command is sent.  false means it was not.
+	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
-	public void SendLineToRobot(String line) {
-		if(!serialConnection.isPortConfirmed()) return;
-		if(line.trim().equals("")) return;
+	public boolean SendLineToRobot(String line) {
+		if(!serialConnection.isPortConfirmed()) return false;
+		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
 			String [] lines = line.split(";");
@@ -1153,7 +1153,11 @@ public class MainGUI
 		try {
 			serialConnection.getSerialPort().writeBytes(line.getBytes());
 		}
-		catch(SerialPortException e) {}
+		catch(SerialPortException e) {
+			Log(e.getMessage());
+            return false;
+		}
+        return true;
 	}
 	
 	/**
