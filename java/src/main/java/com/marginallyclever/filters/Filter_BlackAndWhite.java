@@ -68,10 +68,10 @@ public class Filter_BlackAndWhite extends Filter {
 	
 
 	/**
-	 * An experimental black & white converter that doesn't just greyscale to 4 levels, it also tries to divide by histogram frequency.
+	 * An experimental black &#38; white converter that doesn't just greyscale to 4 levels, it also tries to divide by histogram frequency.
 	 * Didn't look good so I left it for the lulz.
-	 * @param img
-	 * @return
+	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is to process.
+	 * @return the altered image
 	 */
 	public BufferedImage Process_Via_Histogram(BufferedImage img) {
 		int h = img.getHeight();

@@ -1137,11 +1137,11 @@ public class MainGUI
 	/**
 	 * Sends a single command the robot.  Could be anything.
 	 * @param line command to send.
-	 * @return true means the command is sent.  false means it was not.
+	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
-	public void SendLineToRobot(String line) {
-		if(!serialConnection.isPortConfirmed()) return;
-		if(line.trim().equals("")) return;
+	public boolean SendLineToRobot(String line) {
+		if(!serialConnection.isPortConfirmed()) return false;
+		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
 			String [] lines = line.split(";");
@@ -1153,7 +1153,11 @@ public class MainGUI
 		try {
 			serialConnection.getSerialPort().writeBytes(line.getBytes());
 		}
-		catch(SerialPortException e) {}
+		catch(SerialPortException e) {
+			Log(e.getMessage());
+            return false;
+		}
+        return true;
 	}
 	
 	/**
@@ -2021,7 +2025,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
 	 */
 	public static JFrame getMainframe() {
 		return mainframe;
@@ -2029,7 +2033,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
 	public DrawPanel getPreviewPane() {
 		return previewPane;
@@ -2037,7 +2041,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param drivePane
+	 * @param drivePane the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void setDrivePane(JPanel drivePane) {
 		this.drivePane = drivePane;
@@ -2045,7 +2049,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>javax.swing.JPanel</code> representing the drive pane of this GUI.
 	 */
 	public JPanel getDrivePane() {
 		return drivePane;
@@ -2053,7 +2057,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>GCodeFile</code> representing the G-Code file used by this GUI.
 	 */
 	public GCodeFile getGcodeFile() {
 		return gcode;
