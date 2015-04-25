@@ -9,8 +9,9 @@ import java.awt.image.BufferedImage;
 /**
  * Floyd/Steinberg dithering
  * @author Dan
- * @see {@link http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29}<br>
- * {@link http://www.home.unix-ag.org/simon/gimp/fsdither.c}
+ * @see
+ * <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a>
+ * <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
 public class Filter_DitherFloydSteinberg extends Filter {
 	private long tone;

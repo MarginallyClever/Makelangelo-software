@@ -2025,7 +2025,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
 	 */
 	public static JFrame getMainframe() {
 		return mainframe;
@@ -2033,7 +2033,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
 	public DrawPanel getPreviewPane() {
 		return previewPane;
@@ -2041,7 +2041,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param drivePane
+	 * @param drivePane the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void setDrivePane(JPanel drivePane) {
 		this.drivePane = drivePane;
@@ -2049,7 +2049,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>javax.swing.JPanel</code> representing the drive pane of this GUI.
 	 */
 	public JPanel getDrivePane() {
 		return drivePane;
@@ -2057,7 +2057,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return
+	 * @return the <code>GCodeFile</code> representing the G-Code file used by this GUI.
 	 */
 	public GCodeFile getGcodeFile() {
 		return gcode;
