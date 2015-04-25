@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
  * base class for image filtering
  * @author Dan
  */
-public class Filter {
+public abstract class Filter {
 	// image properties
 	int image_width, image_height;
 	float w2,h2,scale;
