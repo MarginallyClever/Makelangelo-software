@@ -89,8 +89,8 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
 
     /**
-     * Check if the robot reports an error and if so what line number
-     * @return
+     * Check if the robot reports an error and if so what line number.
+     * @return -1 if there was no error, otherwise the line number containing the error.
      */
     protected int ErrorReported() {
         if(portConfirmed==false) return -1;
@@ -252,7 +252,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     /**
      *
-     * @return
+     * @return <code>true</code> if the serial port has been confirmed; <code>false</code> otherwise
      */
     @Override
     public boolean isPortConfirmed() {
@@ -261,7 +261,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     /**
      *
-     * @return
+     * @return the serial port of this serial connection.
      */
     @Override
     public SerialPort getSerialPort() {
@@ -270,7 +270,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     /**
      *
-     * @return
+     * @return the serial ports detected for this serial connection.
      */
     @Override
     public String[] getPortsDetected() {
@@ -279,7 +279,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     /**
      *
-     * @return
+     * @return the port open for this serial connection.
      */
     @Override
     public boolean isPortOpened() {
@@ -288,7 +288,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     /**
      *
-     * @return
+     * @return the most recent port used by this serial connection.
      */
     @Override
     public String getRecentPort() {

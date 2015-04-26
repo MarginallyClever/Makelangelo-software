@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 /**
  * Floyd/Steinberg dithering 
  * @author Dan
- * @see {@link http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering}
+ * @see <a href="http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering">http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering</a>
  */
 public class Filter_DitherFloydSteinbergRGB extends Filter {
 	public Filter_DitherFloydSteinbergRGB(MainGUI gui, MachineConfiguration mc,

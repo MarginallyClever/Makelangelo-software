@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
  * base class for image filtering
  * @author Dan
  */
-public class Filter {
+public abstract class Filter {
 	// image properties
 	int image_width, image_height;
 	float w2,h2,scale;
@@ -82,12 +82,15 @@ public class Filter {
 
 	/**
 	 * Replace this with your generator/converter name.
+     *
+     * @return name of this filter.
+     *
 	 */
 	public String GetName() {  return "Unnamed";  }
 	
 	/**
 	 * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
-	 * @param img
+	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is to process.
 	 * @return the altered image
 	 */
 	public BufferedImage Process(BufferedImage img) {
