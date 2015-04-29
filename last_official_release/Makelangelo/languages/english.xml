@@ -649,10 +649,55 @@
 	</string>
 
 	<string>
-		<key>
-		</key>
+		<key>voronoiStipplingName</key>
 		<value>Voronoi stipples</value>
-		<hint>voronoi stippling generator name</hint>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingCellCount</key>
+		<value>Number of Cells</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingGenCount</key>
+		<value>Number of Generations</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMax</key>
+		<value>Max dot size</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMin</key>
+		<value>Min dot size</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+
+	<string>
+		<key>BoxGeneratorName</key>
+		<value>Boxxy</value>
+		<hint>Boxxy generator</hint>
+	</string>
+	<string>
+		<key>CrosshatchName</key>
+		<value>Crosshatch</value>
+		<hint>Crosshatch generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveName</key>
+		<value>Hilbert Curve</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveSize</key>
+		<value>Size</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveOrder</key>
+		<value>Order</value>
+		<hint>Hilbert Curve generator</hint>
 	</string>
 
 	<string>

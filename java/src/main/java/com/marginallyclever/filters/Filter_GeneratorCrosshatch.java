@@ -17,7 +17,7 @@ import java.io.OutputStreamWriter;
  * @author Dan
  */
 public class Filter_GeneratorCrosshatch extends Filter {
-	public String GetName() { return "Crosshatch"; }
+	public String GetName() { return translator.get("Crosshatch"); }
 	
 	public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
 		super(gui,mc,ms);
