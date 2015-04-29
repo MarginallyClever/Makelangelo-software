@@ -649,6 +649,13 @@
 	</string>
 
 	<string>
+		<key>
+		</key>
+		<value>Voronoi stipples</value>
+		<hint>voronoi stippling generator name</hint>
+	</string>
+
+	<string>
 		<key>SharePromo</key>
 		<value>Share it on twitter to @MarginallyC to see what others have created.</value>
 		<hint>Your drawing is finished.  Share it</hint>
