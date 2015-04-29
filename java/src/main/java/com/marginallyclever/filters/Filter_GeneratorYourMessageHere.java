@@ -28,7 +28,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return "Your message here"; }
+	public String GetName() { return translator.get("YourMsgHereName"); }
 	
 	public void Generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage,6,60);

@@ -44,7 +44,7 @@ public class Filter_GeneratorRGB extends Filter {
 
 
 
-	public String GetName() { return "Red Green Blue"; }
+	public String GetName() { return translator.get("RGBName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.

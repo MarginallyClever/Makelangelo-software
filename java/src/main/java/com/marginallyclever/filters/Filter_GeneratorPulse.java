@@ -18,7 +18,7 @@ public class Filter_GeneratorPulse extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return "Pulse line"; }
+	public String GetName() { return translator.get("PulseLineName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.

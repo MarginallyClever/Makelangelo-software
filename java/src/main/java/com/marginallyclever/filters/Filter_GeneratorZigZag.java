@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
  * @author Dan
  */
 public class Filter_GeneratorZigZag extends Filter {
-	public String GetName() { return "Big zig zag"; }
+	public String GetName() { return translator.get("ZigZagName"); }
 	
 	// processing tools
 	long t_elapsed,t_start;

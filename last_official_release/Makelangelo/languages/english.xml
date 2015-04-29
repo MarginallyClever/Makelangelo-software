@@ -701,6 +701,37 @@
 	</string>
 
 	<string>
+		<key>PulseLineName</key>
+		<value>Pulse Line</value>
+		<hint>Pulse Line generator</hint>
+	</string>
+	<string>
+		<key>ZigZagName</key>
+		<value>Big zig zag</value>
+		<hint>Zig Zag generator</hint>
+	</string>
+	<string>
+		<key>YourMsgHereName</key>
+		<value>Your message here</value>
+		<hint>Your message here generator</hint>
+	</string>
+	<string>
+		<key>SpiralName</key>
+		<value>Spiral</value>
+		<hint>Spiral generator</hint>
+	</string>
+	<string>
+		<key>ScanlineName</key>
+		<value>Scanline</value>
+		<hint>Scanline generator</hint>
+	</string>
+	<string>
+		<key>RGBName</key>
+		<value>Red Green Blue</value>
+		<hint>RGB generator</hint>
+	</string>
+
+	<string>
 		<key>SharePromo</key>
 		<value>Share it on twitter to @MarginallyC to see what others have created.</value>
 		<hint>Your drawing is finished.  Share it</hint>
