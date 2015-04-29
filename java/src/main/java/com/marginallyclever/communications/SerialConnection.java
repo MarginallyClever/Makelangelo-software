@@ -21,7 +21,7 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
     private boolean portOpened=false;
     private boolean portConfirmed=false;
     static private final String cue = "> ";
-    static private final String hello = "HELLO WORLD! I AM DRAWBOT #";
+    static private final String hello = "HELLO WORLD! I AM "+"DRAWBOT"+" #";
     static private final String nochecksum = "NOCHECKSUM";
     static private final String badchecksum = "BADCHECKSUM ";
     static private final String badlinenum = "BADLINENUM ";

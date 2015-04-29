@@ -575,7 +575,11 @@
 		<hint>Adjust machine size</hint>
 	</string>
 
-
+	<string>
+		<key>penToolAdjust</key>
+		<value>Adjust Pen</value>
+		<hint>Adjust pen tool</hint>
+	</string>
 	<string>
 		<key>penToolDiameter</key>
 		<value>Diameter</value>
@@ -606,7 +610,44 @@
 		<value>Test</value>
 		<hint>Adjust pen tool</hint>
 	</string>
-	
+
+
+	<string>
+		<key>spraypaintToolTest</key>
+		<value>Adjust Spraypaint</value>
+		<hint>Adjust Spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolDiameter</key>
+		<value>Dot size</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolMaxFeedRate</key>
+		<value>Max feed rate</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolUp</key>
+		<value>Off</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolDown</key>
+		<value>On</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolLiftSpeed</key>
+		<value>On/off speed</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolTest</key>
+		<value>Make a dot</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+
 	<string>
 		<key>SharePromo</key>
 		<value>Share it on twitter to @MarginallyC to see what others have created.</value>

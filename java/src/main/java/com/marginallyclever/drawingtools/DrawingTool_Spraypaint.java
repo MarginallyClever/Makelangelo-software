@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,15 +74,15 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust Spraypaint",true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("spraypaintToolAdjust"),true);
 		driver.setLayout(new GridBagLayout());
 
-		final JTextField penDiameter   = new JTextField(Float.toString(diameter),5);
-		final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
+		final JTextField spraypaintDiameter   = new JTextField(Float.toString(diameter),5);
+		final JTextField spraypaintFeedRate   = new JTextField(Float.toString(feed_rate),5);
 		
-		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
-		final JTextField penDown = new JTextField(Float.toString(z_on),5);
-		final JTextField penz = new JTextField(Float.toString(z_rate),5);
+		final JTextField spraypaintUp   = new JTextField(Float.toString(z_off),5);
+		final JTextField spraypaintDown = new JTextField(Float.toString(z_on),5);
+		final JTextField spraypaintZRate = new JTextField(Float.toString(z_rate),5);
 		final JButton buttonTestDot = new JButton("Test");
 		final JButton buttonSave = new JButton("Save");
 		final JButton buttonCancel = new JButton("Cancel");
@@ -96,27 +97,27 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		d.weightx=50;
 		int y=0;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Diameter"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penDiameter,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolDiameter")),c);
+		d.gridx=1;	d.gridy=y;	driver.add(spraypaintDiameter,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Max feed rate"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penFeedRate,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolMaxFeedRate")),c);
+		d.gridx=1;	d.gridy=y;	driver.add(spraypaintFeedRate,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Up"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penUp,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolUp")),c);
+		d.gridx=1;	d.gridy=y;	driver.add(spraypaintUp,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Down"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penDown,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolDown")),c);
+		d.gridx=1;	d.gridy=y;	driver.add(spraypaintDown,d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Servo speed"),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penz,d);
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolLiftSpeed")),c);
+		d.gridx=1;	d.gridy=y;	driver.add(spraypaintZRate,d);
 		++y;
-
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel("Make a dot"),c);
+		
+		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("spraypaintToolTest")),c);
 		d.gridx=1;	d.gridy=y;	driver.add(buttonTestDot,d);
 		++y;
 	
@@ -127,27 +128,26 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		c.gridwidth=2;
 		c.insets=new Insets(0,5,5,5);
 		c.anchor=GridBagConstraints.WEST;
-		
+		/*
 		c.gridheight=4;
 		c.gridx=0;  c.gridy=y;
 		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
 								 "raise and lower the pen."),c);
-		
-		
+		*/
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestDot) {
-					mainGUI.SendLineToRobot("G00 Z"+penUp.getText()+" F"+penz.getText());
-					mainGUI.SendLineToRobot("G00 Z"+penDown.getText()+" F"+penz.getText());
+					mainGUI.SendLineToRobot("G00 Z"+spraypaintUp.getText()+" F"+spraypaintZRate.getText());
+					mainGUI.SendLineToRobot("G00 Z"+spraypaintDown.getText()+" F"+spraypaintZRate.getText());
 				}
 				if(subject == buttonSave) {
-					diameter = Float.valueOf(penDiameter.getText());
-					feed_rate = Float.valueOf(penFeedRate.getText());
-					z_off = Float.valueOf(penUp.getText());
-					z_on = Float.valueOf(penDown.getText());
-					z_rate = Float.valueOf(penz.getText());
+					diameter = Float.valueOf(spraypaintDiameter.getText());
+					feed_rate = Float.valueOf(spraypaintFeedRate.getText());
+					z_off = Float.valueOf(spraypaintUp.getText());
+					z_on = Float.valueOf(spraypaintDown.getText());
+					z_rate = Float.valueOf(spraypaintZRate.getText());
 					machine.SaveConfig();
 					driver.dispose();
 				}

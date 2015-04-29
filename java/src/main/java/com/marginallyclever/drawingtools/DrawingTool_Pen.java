@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MachineConfiguration;
@@ -45,7 +44,7 @@ public class DrawingTool_Pen extends DrawingTool {
 	}
 	
 	public void Adjust() {
-		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust Pen",true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("penToolAdjust"),true);
 		driver.setLayout(new GridBagLayout());
 
 		final JTextField penDiameter   = new JTextField(Float.toString(GetDiameter()),5);
@@ -98,13 +97,12 @@ public class DrawingTool_Pen extends DrawingTool {
 		c.gridwidth=2;
 		c.insets=new Insets(0,5,5,5);
 		c.anchor=GridBagConstraints.WEST;
-		
+		/*
 		c.gridheight=4;
 		c.gridx=0;  c.gridy=y;
 		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
 								 "raise and lower the pen."),c);
-		
-		
+		*/
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
