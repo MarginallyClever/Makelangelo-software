@@ -35,6 +35,8 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private int MAX_GENERATIONS=40;
 	private int MAX_CELLS=5000;
+	private float MAX_DOT_SIZE = 5.0f;
+	private float MIN_DOT_SIZE = 1.0f;
 	private Point2D bound_min = new Point2D();
 	private Point2D bound_max = new Point2D();
 	private int numEdgesInCell;
@@ -50,23 +52,32 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	}
 
 
-	public String GetName() { return "Voronoi stipples"; }
+	public String GetName() { return translator.get("voronoiStipplingName"); }
 	
 	
 	public void Convert(BufferedImage img) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
+		JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
+		JTextField text_dot_min = new JTextField(Float.toString(MIN_DOT_SIZE), 8);
 
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel("Number of cells"));
+		panel.add(new JLabel(translator.get("voronoiStipplingCellCount")));
 		panel.add(text_cells);
-		panel.add(new JLabel("Number of generations"));
+		panel.add(new JLabel(translator.get("voronoiStipplingGenCount")));
 		panel.add(text_gens);
+		panel.add(new JLabel(translator.get("voronoiStipplingDotMax")));
+		panel.add(text_dot_max);
+		panel.add(new JLabel(translator.get("voronoiStipplingDotMin")));
+		panel.add(text_dot_min);
+
 
 	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
 	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
+	    	MAX_DOT_SIZE = Float.parseFloat(text_cells.getText());
+	    	MIN_DOT_SIZE = Float.parseFloat(text_cells.getText());
 
 			src_img = img;
 			h = img.getHeight();
@@ -180,9 +191,9 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 			}
 
 			for(i=0;i<cells.length;++i) {
-				float r = 5f * cells[i].weight / most;
+				float r = MAX_DOT_SIZE * cells[i].weight / most;
 				r/=scale;
-				if(r<1) continue;
+				if(r<MIN_DOT_SIZE) continue;
 				//System.out.println(i+"\t"+v);
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;

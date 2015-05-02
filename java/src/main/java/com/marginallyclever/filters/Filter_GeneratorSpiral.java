@@ -16,7 +16,7 @@ import java.io.OutputStreamWriter;
  * @author Dan
  */
 public class Filter_GeneratorSpiral extends Filter {
-	public String GetName() { return "Spiral"; }
+	public String GetName() { return translator.get("SpiralName"); }
 	
 	boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 	

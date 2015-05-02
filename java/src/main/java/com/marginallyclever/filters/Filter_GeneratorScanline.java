@@ -18,7 +18,7 @@ public class Filter_GeneratorScanline extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return "Scanline"; }
+	public String GetName() { return translator.get("ScanlineName"); }
 	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas

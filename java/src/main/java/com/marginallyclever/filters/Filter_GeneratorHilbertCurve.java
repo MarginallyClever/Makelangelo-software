@@ -32,7 +32,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return "Hilbert curve"; }
+	public String GetName() { return translator.get("HilbertCurveName"); }
 	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
@@ -53,9 +53,9 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 
 	
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel("Size"));
+		panel.add(new JLabel(translator.get("HilbertCurveSize")));
 		panel.add(field_size);
-		panel.add(new JLabel("Order"));
+		panel.add(new JLabel(translator.get("HilbertCurveOrder")));
 		panel.add(field_order);
 		
 	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
