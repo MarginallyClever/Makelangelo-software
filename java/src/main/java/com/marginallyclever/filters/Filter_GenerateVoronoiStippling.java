@@ -76,8 +76,8 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	    if (result == JOptionPane.OK_OPTION) {
 	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
 	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
-	    	MAX_DOT_SIZE = Float.parseFloat(text_cells.getText());
-	    	MIN_DOT_SIZE = Float.parseFloat(text_cells.getText());
+	    	MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
+	    	MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
 			src_img = img;
 			h = img.getHeight();

@@ -741,6 +741,7 @@ public class MainGUI
 					f.SetDestinationFile(destinationFile);
 					f.Convert(img);
 					TabToDraw();
+			        previewPane.ZoomToFitPaper();
 				}
 				catch(IOException e) {
 					Log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
@@ -2042,7 +2043,8 @@ public class MainGUI
         
         previewPane.ZoomToFitPaper();
         
-        if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
+        // 2015-05-03: option is meaningless, connectionToRobot doesn't exist when software starts.
+        // if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
         if(prefs.getBoolean("Check for updates", false)) CheckForUpdate();
     }
