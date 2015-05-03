@@ -36,5 +36,5 @@ if defined JAVA_HOME (
 )
 
 "%JAVA_HOME%\bin\java.exe" -jar Makelangelo-v7-SNAPSHOT-jar-with-dependencies.jar -splash:src/main/resources/splash.png
-
+@pause
 :end
