@@ -7,18 +7,18 @@ package com.marginallyclever.communications;
  * @since v7
  */
 public interface MarginallyCleverConnection {
-    String[] ListSerialPorts();
-    String[] getPortsDetected();
+    String[] ListConnections();
+    String[] getConnectionsDetected();
 
 
     void closeConnection();
     int openConnection(String portName);
 
-    void reconnectToLastPort();
+    void reconnect();
 
-    boolean isPortOpened();
-    boolean isPortConfirmed();
-    String getRecentPort();
+    boolean isConnectionOpen();
+    boolean isConnectionConfirmed();
+    String getRecentConnection();
     
     public void sendMessage(String msg) throws Exception;
 }

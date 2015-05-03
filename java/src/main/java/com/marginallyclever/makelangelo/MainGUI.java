@@ -81,8 +81,7 @@ public class MainGUI
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private RecentFiles recentFiles;
-	private MarginallyCleverConnection serialConnection;
-	//private boolean allowMetrics=true;
+	private MarginallyCleverConnection connectionToRobot;
 		
 	// machine settings while running
 	private double feed_rate;
@@ -144,7 +143,7 @@ public class MainGUI
 		StartTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
         recentFiles = new RecentFiles();
-		serialConnection = new SerialConnection(prefs, this, translator, machineConfiguration);
+		connectionToRobot = new SerialConnection(prefs, this, translator, machineConfiguration);
         LoadImageConverters();
         CreateAndShowGUI();
 	}
@@ -230,7 +229,7 @@ public class MainGUI
     @Override
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(serialConnection.isPortConfirmed() && !running) {
+			if(connectionToRobot.isConnectionConfirmed() && !running) {
 				ProcessLine(commandLineText.getText());
 				commandLineText.setText("");
 			}
@@ -439,7 +438,7 @@ public class MainGUI
 						machineConfiguration.SaveConfig();
 						
 						// if we aren't connected, don't show the new 
-						if(!serialConnection.isPortConfirmed()) {
+						if(!connectionToRobot.isConnectionConfirmed()) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
 							// update window title
@@ -1026,7 +1025,7 @@ public class MainGUI
 	
 	// Send the machine configuration to the robot
 	public void SendConfig() {
-		if(!serialConnection.isPortConfirmed()) return;
+		if(!connectionToRobot.isConnectionConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
 		SendLineToRobot(machineConfiguration.GetConfigLine());
@@ -1037,7 +1036,7 @@ public class MainGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || gcode.fileOpened==false || serialConnection.isPortConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(running==false || paused==true || gcode.fileOpened==false || connectionToRobot.isConnectionConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1144,7 +1143,7 @@ public class MainGUI
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
 	public boolean SendLineToRobot(String line) {
-		if(!serialConnection.isPortConfirmed()) return false;
+		if(!connectionToRobot.isConnectionConfirmed()) return false;
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
@@ -1155,7 +1154,7 @@ public class MainGUI
 		line += "\n";
 		
 		try {
-			serialConnection.sendMessage(line);
+			connectionToRobot.sendMessage(line);
 		}
 		catch(Exception e) {
 			Log(e.getMessage());
@@ -1301,12 +1300,12 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonRescan ) {
-			serialConnection.ListSerialPorts();
+			connectionToRobot.ListConnections();
 			updateMenuBar();
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			serialConnection.closeConnection();
+			connectionToRobot.closeConnection();
 			ClearLog();
 			previewPane.setConnected(false);
 			updateMenuBar();
@@ -1389,9 +1388,9 @@ public class MainGUI
 			}
 		}
 
-		for(i=0;i<serialConnection.getPortsDetected().length;++i) {
+		for(i=0;i<connectionToRobot.getConnectionsDetected().length;++i) {
 			if(subject == buttonPorts[i]) {
-				serialConnection.openConnection(serialConnection.getPortsDetected()[i]);
+				connectionToRobot.openConnection(connectionToRobot.getConnectionsDetected()[i]);
 				return;
 			}
 		}
@@ -1814,7 +1813,7 @@ public class MainGUI
         if(settingsPane!=null) {
             buttonAdjustMachineSize.setEnabled(!running);
             buttonAdjustPulleySize.setEnabled(!running);
-            buttonJogMotors.setEnabled(serialConnection.isPortConfirmed() && !running);
+            buttonJogMotors.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
             buttonChangeTool.setEnabled(!running);
             buttonAdjustTool.setEnabled(!running);
         }
@@ -1823,10 +1822,10 @@ public class MainGUI
             buttonText2GCODE.setEnabled(!running);
         }
         if(drivePane!=null) {
-        	buttonStart.setEnabled(serialConnection.isPortConfirmed() && !running);
-            buttonStartAt.setEnabled(serialConnection.isPortConfirmed() && !running);
-            buttonPause.setEnabled(serialConnection.isPortConfirmed()&& running);
-            buttonHalt.setEnabled(serialConnection.isPortConfirmed() && running);
+        	buttonStart.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
+            buttonStartAt.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
+            buttonPause.setEnabled(connectionToRobot.isConnectionConfirmed()&& running);
+            buttonHalt.setEnabled(connectionToRobot.isConnectionConfirmed() && running);
         }
         
         
@@ -1874,11 +1873,11 @@ public class MainGUI
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-        serialConnection.ListSerialPorts();
-        buttonPorts = new JRadioButtonMenuItem[serialConnection.getPortsDetected().length];
-        for(i=0;i<serialConnection.getPortsDetected().length;++i) {
-        	buttonPorts[i] = new JRadioButtonMenuItem(serialConnection.getPortsDetected()[i]);
-            if(serialConnection.getRecentPort().equals(serialConnection.getPortsDetected()[i]) && serialConnection.isPortOpened()) {
+        connectionToRobot.ListConnections();
+        buttonPorts = new JRadioButtonMenuItem[connectionToRobot.getConnectionsDetected().length];
+        for(i=0;i<connectionToRobot.getConnectionsDetected().length;++i) {
+        	buttonPorts[i] = new JRadioButtonMenuItem(connectionToRobot.getConnectionsDetected()[i]);
+            if(connectionToRobot.getRecentConnection().equals(connectionToRobot.getConnectionsDetected()[i]) && connectionToRobot.isConnectionOpen()) {
             	buttonPorts[i].setSelected(true);
             }
             buttonPorts[i].addActionListener(this);
@@ -1894,7 +1893,7 @@ public class MainGUI
 
         buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
-        buttonDisconnect.setEnabled(serialConnection.isPortOpened());
+        buttonDisconnect.setEnabled(connectionToRobot.isConnectionOpen());
         subMenu.add(buttonDisconnect);
         
         menuBar.add(subMenu);
@@ -2035,7 +2034,7 @@ public class MainGUI
         
         previewPane.ZoomToFitPaper();
         
-        if(prefs.getBoolean("Reconnect to last port on start", false)) serialConnection.reconnectToLastPort();
+        if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
         if(prefs.getBoolean("Check for updates", false)) CheckForUpdate();
     }

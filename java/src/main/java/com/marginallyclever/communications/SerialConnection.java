@@ -101,10 +101,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
             return 3;
         }
 
-        mainGUI.Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
         SetRecentPort(portName);
         portOpened=true;
         lastLineWasCue=false;
+        
+        mainGUI.Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
         mainGUI.updateMenuBar();
         mainGUI.PlayConnectSound();
 
@@ -170,7 +171,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
     // find all available serial ports for the settings->ports menu.
     @Override
-    public String[] ListSerialPorts() {
+    public String[] ListConnections() {
         String OS = System.getProperty("os.name").toLowerCase();
 
         if(OS.indexOf("mac") >= 0){
@@ -236,8 +237,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
     // connect to the last port
     @Override
-    public void reconnectToLastPort() {
-        ListSerialPorts();
+    public void reconnect() {
+        ListConnections();
         if(Arrays.asList(portsDetected).contains(recentPort)) {
             openConnection(recentPort);
         }
@@ -280,7 +281,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
      * @return <code>true</code> if the serial port has been confirmed; <code>false</code> otherwise
      */
     @Override
-    public boolean isPortConfirmed() {
+    public boolean isConnectionConfirmed() {
         return portConfirmed;
     }
 
@@ -289,7 +290,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
      * @return the serial ports detected for this serial connection.
      */
     @Override
-    public String[] getPortsDetected() {
+    public String[] getConnectionsDetected() {
         return portsDetected;
     }
 
@@ -298,7 +299,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
      * @return the port open for this serial connection.
      */
     @Override
-    public boolean isPortOpened() {
+    public boolean isConnectionOpen() {
         return portOpened;
     }
 
@@ -307,7 +308,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
      * @return the most recent port used by this serial connection.
      */
     @Override
-    public String getRecentPort() {
+    public String getRecentConnection() {
         return recentPort;
     }
 }
