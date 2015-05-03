@@ -7,17 +7,13 @@ package com.marginallyclever.communications;
  * @since v7
  */
 public interface MarginallyCleverConnection {
-    String[] ListConnections();
-    String[] getConnectionsDetected();
-
-
     void closeConnection();
-    int openConnection(String portName);
+    void openConnection(String portName) throws Exception;
 
-    void reconnect();
+    void reconnect() throws Exception;
 
     boolean isConnectionOpen();
-    boolean isConnectionConfirmed();
+    boolean isRobotConfirmed();  // FIXME doesn't really belong in MarginallyCleverConnection
     String getRecentConnection();
     
     public void sendMessage(String msg) throws Exception;

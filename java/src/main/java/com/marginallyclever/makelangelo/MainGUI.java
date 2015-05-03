@@ -11,8 +11,10 @@ package com.marginallyclever.makelangelo;
 // io functions
 import com.marginallyclever.filters.*;
 import com.marginallyclever.communications.MarginallyCleverConnection;
-import com.marginallyclever.communications.SerialConnection;
+import com.marginallyclever.communications.MarginallyCleverConnectionManager;
+import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.drawingtools.DrawingTool;
+
 import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
 import org.kabeja.parser.ParseException;
@@ -36,6 +38,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,7 +84,9 @@ public class MainGUI
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private RecentFiles recentFiles;
-	private MarginallyCleverConnection connectionToRobot;
+	
+	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
+	private MarginallyCleverConnection connectionToRobot=null;
 		
 	// machine settings while running
 	private double feed_rate;
@@ -143,7 +148,7 @@ public class MainGUI
 		StartTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
         recentFiles = new RecentFiles();
-		connectionToRobot = new SerialConnection(prefs, this, translator, machineConfiguration);
+        connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
         LoadImageConverters();
         CreateAndShowGUI();
 	}
@@ -229,7 +234,7 @@ public class MainGUI
     @Override
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(connectionToRobot.isConnectionConfirmed() && !running) {
+			if(connectionToRobot != null && connectionToRobot.isRobotConfirmed() && !running) {
 				ProcessLine(commandLineText.getText());
 				commandLineText.setText("");
 			}
@@ -438,7 +443,7 @@ public class MainGUI
 						machineConfiguration.SaveConfig();
 						
 						// if we aren't connected, don't show the new 
-						if(!connectionToRobot.isConnectionConfirmed()) {
+						if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
 							// update window title
@@ -1025,7 +1030,7 @@ public class MainGUI
 	
 	// Send the machine configuration to the robot
 	public void SendConfig() {
-		if(!connectionToRobot.isConnectionConfirmed()) return;
+		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
 		SendLineToRobot(machineConfiguration.GetConfigLine());
@@ -1036,7 +1041,7 @@ public class MainGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || gcode.fileOpened==false || connectionToRobot.isConnectionConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(running==false || paused==true || gcode.fileOpened==false || connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1143,7 +1148,7 @@ public class MainGUI
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
 	public boolean SendLineToRobot(String line) {
-		if(!connectionToRobot.isConnectionConfirmed()) return false;
+		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return false;
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
@@ -1300,12 +1305,13 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonRescan ) {
-			connectionToRobot.ListConnections();
+			connectionManager.listConnections();
 			updateMenuBar();
 			return;
 		}
 		if( subject == buttonDisconnect ) {
 			connectionToRobot.closeConnection();
+			connectionToRobot=null;
 			ClearLog();
 			previewPane.setConnected(false);
 			updateMenuBar();
@@ -1388,9 +1394,10 @@ public class MainGUI
 			}
 		}
 
-		for(i=0;i<connectionToRobot.getConnectionsDetected().length;++i) {
+		String [] connections = connectionManager.listConnections(); 
+		for(i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
-				connectionToRobot.openConnection(connectionToRobot.getConnectionsDetected()[i]);
+				connectionToRobot = connectionManager.openConnection(connections[i]);
 				return;
 			}
 		}
@@ -1813,7 +1820,7 @@ public class MainGUI
         if(settingsPane!=null) {
             buttonAdjustMachineSize.setEnabled(!running);
             buttonAdjustPulleySize.setEnabled(!running);
-            buttonJogMotors.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
+            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !running);
             buttonChangeTool.setEnabled(!running);
             buttonAdjustTool.setEnabled(!running);
         }
@@ -1822,10 +1829,11 @@ public class MainGUI
             buttonText2GCODE.setEnabled(!running);
         }
         if(drivePane!=null) {
-        	buttonStart.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
-            buttonStartAt.setEnabled(connectionToRobot.isConnectionConfirmed() && !running);
-            buttonPause.setEnabled(connectionToRobot.isConnectionConfirmed()&& running);
-            buttonHalt.setEnabled(connectionToRobot.isConnectionConfirmed() && running);
+        	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
+        	buttonStart.setEnabled(x && !running);
+            buttonStartAt.setEnabled(x && !running);
+            buttonPause.setEnabled(x && running);
+            buttonHalt.setEnabled(x && running);
         }
         
         
@@ -1873,11 +1881,11 @@ public class MainGUI
         subMenu.setEnabled(!running);
         group = new ButtonGroup();
 
-        connectionToRobot.ListConnections();
-        buttonPorts = new JRadioButtonMenuItem[connectionToRobot.getConnectionsDetected().length];
-        for(i=0;i<connectionToRobot.getConnectionsDetected().length;++i) {
-        	buttonPorts[i] = new JRadioButtonMenuItem(connectionToRobot.getConnectionsDetected()[i]);
-            if(connectionToRobot.getRecentConnection().equals(connectionToRobot.getConnectionsDetected()[i]) && connectionToRobot.isConnectionOpen()) {
+        String [] connections = connectionManager.listConnections();
+        buttonPorts = new JRadioButtonMenuItem[connections.length];
+        for(i=0;i<connections.length;++i) {
+        	buttonPorts[i] = new JRadioButtonMenuItem(connections[i]);
+            if(connectionToRobot!=null && connectionToRobot.getRecentConnection().equals(connections[i]) && connectionToRobot.isConnectionOpen()) {
             	buttonPorts[i].setSelected(true);
             }
             buttonPorts[i].addActionListener(this);
@@ -1893,7 +1901,7 @@ public class MainGUI
 
         buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
-        buttonDisconnect.setEnabled(connectionToRobot.isConnectionOpen());
+        buttonDisconnect.setEnabled(connectionToRobot!=null && connectionToRobot.isConnectionOpen());
         subMenu.add(buttonDisconnect);
         
         menuBar.add(subMenu);

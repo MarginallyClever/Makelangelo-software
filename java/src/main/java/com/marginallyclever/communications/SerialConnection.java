@@ -1,20 +1,14 @@
 package com.marginallyclever.communications;
 
-import jssc.SerialPort;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
+import jssc.*;
 
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-import jssc.*;
-
-import java.util.Arrays;
-import java.util.prefs.Preferences;
 
 /**
- * Created on 4/12/15.
+ * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation 
  *
  * @author Peter Colapietro
  * @since v7
@@ -23,11 +17,12 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     private SerialPort serialPort;
     private static final int BAUD_RATE = 57600;
     
+    private String connectionName = new String();
     private boolean portOpened=false;
     private boolean portConfirmed=false;
     
-    private String robot_type_name = "DRAWBOT";
-    private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";
+    private String robot_type_name = "DRAWBOT";  // FIXME doesn't belong in connection, should be a higher class
+    private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";  // FIXME doesn't belong in connection, should be a higher class
     
     static private String CUE = "> ";
     static private String NOCHECKSUM = "NOCHECKSUM ";
@@ -39,21 +34,15 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     // prevent repeating pings from appearing in console
     boolean lastLineWasCue=false;
     
-    private String[] portsDetected;
-    private String recentPort;
-    
-    private final Preferences prefs;
     private final MainGUI mainGUI;
     private final MultilingualSupport translator;
     private final MachineConfiguration machine;
 
     
-    public SerialConnection(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
-        this.prefs = prefs;
+    public SerialConnection(MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
         this.mainGUI = mainGUI;
         this.translator = translator;
         this.machine = machine;
-        loadRecentPortFromPreferences(); //FIXME smelly
     }
 
     @Override
@@ -83,33 +72,20 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
     // open a serial connection to a device.  We won't know it's the robot until
     @Override
-    public int openConnection(String portName) {
-        if(portOpened && portName.equals(recentPort)) return 0;
+    public void openConnection(String portName) throws Exception {
+        if(portOpened) return;
 
         closeConnection();
 
-        mainGUI.Log("<font color='green'>" + translator.get("ConnectingTo") + portName + "...</font>\n");
-
         // open the port
         serialPort = new SerialPort(portName);
-        try {
-            serialPort.openPort();// Open serial port
-            serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-            serialPort.addEventListener(this);
-        } catch (SerialPortException e) {
-            mainGUI.Log("<span style='color:red'>" + translator.get("PortNotConfigured") + e.getMessage() + "</span>\n");
-            return 3;
-        }
+        serialPort.openPort();// Open serial port
+        serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+        serialPort.addEventListener(this);
 
-        SetRecentPort(portName);
+        connectionName = portName;
         portOpened=true;
         lastLineWasCue=false;
-        
-        mainGUI.Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
-        mainGUI.updateMenuBar();
-        mainGUI.PlayConnectSound();
-
-        return 0;
     }
 
 
@@ -168,27 +144,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
         return true;
     }
-
-    // find all available serial ports for the settings->ports menu.
-    @Override
-    public String[] ListConnections() {
-        String OS = System.getProperty("os.name").toLowerCase();
-
-        if(OS.indexOf("mac") >= 0){
-            portsDetected = SerialPortList.getPortNames("/dev/");
-            //System.out.println("OS X");
-        } else if(OS.indexOf("win") >= 0) {
-            portsDetected = SerialPortList.getPortNames("COM");
-            //System.out.println("Windows");
-        } else if(OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0){
-            portsDetected = SerialPortList.getPortNames("/dev/");
-            //System.out.println("Linux/Unix");
-        } else {
-            System.out.println("OS ERROR");
-            System.out.println("OS NAME="+System.getProperty("os.name"));
-        }
-        return portsDetected;
-    }
+    
 
     // Deal with something robot has sent.
     @Override
@@ -235,13 +191,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         }
     }
 
+    
     // connect to the last port
     @Override
-    public void reconnect() {
-        ListConnections();
-        if(Arrays.asList(portsDetected).contains(recentPort)) {
-            openConnection(recentPort);
-        }
+    public void reconnect() throws Exception {
+        openConnection(connectionName);
     }
 
     /**
@@ -263,35 +217,13 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     }
 
 
-    // pull the last connected port from prefs
-    private void loadRecentPortFromPreferences() {
-        recentPort = prefs.get("recent-port", "");
-    }
-
-    // update the prefs with the last port connected and refreshes the menus.
-    // TODO: only update when the port is confirmed?
-    public void SetRecentPort(String portName) {
-        prefs.put("recent-port", portName);
-        recentPort=portName;
-        //UpdateMenuBar(); FIXME
-    }
-
     /**
      *
      * @return <code>true</code> if the serial port has been confirmed; <code>false</code> otherwise
      */
     @Override
-    public boolean isConnectionConfirmed() {
+    public boolean isRobotConfirmed() {
         return portConfirmed;
-    }
-
-    /**
-     *
-     * @return the serial ports detected for this serial connection.
-     */
-    @Override
-    public String[] getConnectionsDetected() {
-        return portsDetected;
     }
 
     /**
@@ -302,13 +234,9 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     public boolean isConnectionOpen() {
         return portOpened;
     }
-
-    /**
-     *
-     * @return the most recent port used by this serial connection.
-     */
+    
     @Override
     public String getRecentConnection() {
-        return recentPort;
+    	return connectionName;
     }
 }
