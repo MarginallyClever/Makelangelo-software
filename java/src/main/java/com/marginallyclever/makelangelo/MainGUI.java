@@ -10,9 +10,8 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 import com.marginallyclever.filters.*;
-import com.marginallyclever.communications.MarginallyCleverSerialPortEventListener;
+import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.SerialConnection;
-import jssc.*;
 import com.marginallyclever.drawingtools.DrawingTool;
 import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
@@ -82,7 +81,7 @@ public class MainGUI
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private RecentFiles recentFiles;
-	private MarginallyCleverSerialPortEventListener serialConnection;
+	private MarginallyCleverConnection serialConnection;
 	//private boolean allowMetrics=true;
 		
 	// machine settings while running
@@ -1156,13 +1155,13 @@ public class MainGUI
 		line += "\n";
 		
 		try {
-			serialConnection.getSerialPort().writeBytes(line.getBytes());
+			serialConnection.sendMessage(line);
 		}
-		catch(SerialPortException e) {
+		catch(Exception e) {
 			Log(e.getMessage());
-            return false;
+			return false;
 		}
-        return true;
+		return true;
 	}
 	
 	/**
@@ -1307,7 +1306,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			serialConnection.ClosePort();
+			serialConnection.closeConnection();
 			ClearLog();
 			previewPane.setConnected(false);
 			updateMenuBar();
@@ -1392,7 +1391,7 @@ public class MainGUI
 
 		for(i=0;i<serialConnection.getPortsDetected().length;++i) {
 			if(subject == buttonPorts[i]) {
-				serialConnection.OpenPort(serialConnection.getPortsDetected()[i]);
+				serialConnection.openConnection(serialConnection.getPortsDetected()[i]);
 				return;
 			}
 		}

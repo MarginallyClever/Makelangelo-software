@@ -1,8 +1,13 @@
 package com.marginallyclever.communications;
 
+import jssc.SerialPort;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
+
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+
 import jssc.*;
 
 import java.util.Arrays;
@@ -14,27 +19,35 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @since v7
  */
-public final class SerialConnection implements MarginallyCleverSerialPortEventListener {
-    private static final int BAUD_RATE = 57600;
+public final class SerialConnection implements SerialPortEventListener, MarginallyCleverConnection {
     private SerialPort serialPort;
-    private String[] portsDetected;
+    private static final int BAUD_RATE = 57600;
+    
     private boolean portOpened=false;
     private boolean portConfirmed=false;
-    static private final String cue = "> ";
-    static private final String hello = "HELLO WORLD! I AM "+"DRAWBOT"+" #";
-    static private final String nochecksum = "NOCHECKSUM";
-    static private final String badchecksum = "BADCHECKSUM ";
-    static private final String badlinenum = "BADLINENUM ";
+    
+    private String robot_type_name = "DRAWBOT";
+    private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";
+    
+    static private String CUE = "> ";
+    static private String NOCHECKSUM = "NOCHECKSUM ";
+    static private String BADCHECKSUM = "BADCHECKSUM ";
+    static private String BADLINENUM = "BADLINENUM ";
+    
     // parsing input from Makelangelo
     private String serial_recv_buffer="";
     // prevent repeating pings from appearing in console
     boolean lastLineWasCue=false;
+    
+    private String[] portsDetected;
     private String recentPort;
+    
     private final Preferences prefs;
     private final MainGUI mainGUI;
     private final MultilingualSupport translator;
     private final MachineConfiguration machine;
 
+    
     public SerialConnection(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
         this.prefs = prefs;
         this.mainGUI = mainGUI;
@@ -44,7 +57,18 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
     }
 
     @Override
-    public void ClosePort() {
+    public void sendMessage(String msg) throws Exception {
+		try {
+			serialPort.writeBytes(msg.getBytes());
+		}
+		catch(SerialPortException e) {
+			throw new Exception(e.getMessage());
+		}
+    }
+    
+    
+    @Override
+    public void closeConnection() {
         if(portOpened) {
             if (serialPort != null) {
                 try {
@@ -59,10 +83,10 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
     // open a serial connection to a device.  We won't know it's the robot until
     @Override
-    public int OpenPort(String portName) {
+    public int openConnection(String portName) {
         if(portOpened && portName.equals(recentPort)) return 0;
 
-        ClosePort();
+        closeConnection();
 
         mainGUI.Log("<font color='green'>" + translator.get("ConnectingTo") + portName + "...</font>\n");
 
@@ -95,18 +119,18 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
     protected int ErrorReported() {
         if(portConfirmed==false) return -1;
 
-        if( serial_recv_buffer.lastIndexOf(nochecksum) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(nochecksum) + nochecksum.length());
+        if( serial_recv_buffer.lastIndexOf(NOCHECKSUM) != -1 ) {
+            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
             String x=GetNumberPortion(after_error);
             return Integer.decode(x);
         }
-        if( serial_recv_buffer.lastIndexOf(badchecksum) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badchecksum) + badchecksum.length());
+        if( serial_recv_buffer.lastIndexOf(BADCHECKSUM) != -1 ) {
+            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
             String x=GetNumberPortion(after_error);
             return Integer.decode(x);
         }
-        if( serial_recv_buffer.lastIndexOf(badlinenum) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(badlinenum) + badlinenum.length());
+        if( serial_recv_buffer.lastIndexOf(BADLINENUM) != -1 ) {
+            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADLINENUM) + BADLINENUM.length());
             String x=GetNumberPortion(after_error);
             return Integer.decode(x);
         }
@@ -176,13 +200,13 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
 
                 serial_recv_buffer+=line2;
                 // wait for the cue ("> ") to send another command
-                if(serial_recv_buffer.lastIndexOf(cue)!=-1) {
+                if(serial_recv_buffer.lastIndexOf(CUE)!=-1) {
                     String line2_mod = serial_recv_buffer;
                     //line2_mod = line2.mod.replace("\n", "");
                     //line2_mod = line2_mod.replace(">", "");
                     line2_mod = line2_mod.trim();
                     if(line2_mod.length()>0) {
-                        if(line2_mod.equals(cue.trim())) {
+                        if(line2_mod.equals(CUE.trim())) {
                             if(lastLineWasCue==true) {
                                 // don't repeat the ping
                                 //Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
@@ -215,16 +239,17 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
     public void reconnectToLastPort() {
         ListSerialPorts();
         if(Arrays.asList(portsDetected).contains(recentPort)) {
-            OpenPort(recentPort);
+            openConnection(recentPort);
         }
     }
 
     /**
-     *
+     * Java string to int is very picky.  this method is slightly less picky.  Only works with positive whole numbers.
      * @param src
-     * @return
+     * @return the portion of the string that is actually a number
      */
     private String GetNumberPortion(String src) {
+    	src = src.trim();
         int length = src.length();
         String result = "";
         for (int i = 0; i < length; i++) {
@@ -257,15 +282,6 @@ public final class SerialConnection implements MarginallyCleverSerialPortEventLi
     @Override
     public boolean isPortConfirmed() {
         return portConfirmed;
-    }
-
-    /**
-     *
-     * @return the serial port of this serial connection.
-     */
-    @Override
-    public SerialPort getSerialPort() {
-        return serialPort;
     }
 
     /**
