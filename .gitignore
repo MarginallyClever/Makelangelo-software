@@ -2,29 +2,16 @@
 *.DS_Store
 *.ngc
 
-java/DrawbotGUI.jar
-
-java/log.html
-
-java/Windows/log.html
-
-java/OSX/log.html
+*/log.html
 
 gcode/*
-java/Thumbs.db
-last_official_release/Windows/log.html
-*.classpath
-java/.classpath
-
+*/Thumbs.db
 java/src/Thumbs.db
+*/.classpath
 
-java/temp.png
+*/temp.png
 
 java/Makelangelo.jar
-
-*.jar
-
-*.jar
 
 last_official_release/Makelangelo/log.html
 target/

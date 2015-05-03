@@ -302,12 +302,14 @@ public class MainGUI
 	private void HilbertCurve() {
 		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(this,machineConfiguration,translator);
 		msg.Generate( GetTempDestinationFile() );
+		TabToDraw();
 	}
 	
 	
 	private void TextToGCODE() {
 		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
 		msg.Generate(GetTempDestinationFile() );
+		TabToDraw();
 	}
 	
 
@@ -470,6 +472,8 @@ public class MainGUI
         // where to save temp output file?
 		final String destinationFile = GetTempDestinationFile();
 		final String srcFile = filename;
+		
+		TabToLog();
 		
 		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -671,7 +675,10 @@ public class MainGUI
 				pm.close();
 				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 				PlayConversionFinishedSound();
-				if(ok) LoadGCode(destinationFile);
+				if(ok) {
+					LoadGCode(destinationFile);
+					TabToDraw();
+				}
 				Halt();
 			}
 		};
@@ -725,10 +732,12 @@ public class MainGUI
 					img = ImageIO.read(new File(sourceFile));
 					int style = GetDrawStyle();
 					Filter f = image_converters.get(style);
+					TabToLog();
 					f.SetParent(this);
 					f.SetProgressMonitor(pm);
 					f.SetDestinationFile(destinationFile);
 					f.Convert(img);
+					TabToDraw();
 				}
 				catch(IOException e) {
 					Log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
@@ -1973,6 +1982,19 @@ public class MainGUI
 		}
     }
 
+    //private void TabToSettings() {
+    //	contextMenu.setSelectedIndex(0);
+    //}
+    //private void TabToGcode() {
+    //	contextMenu.setSelectedIndex(1);
+    //}
+    private void TabToDraw() {
+    	contextMenu.setSelectedIndex(2);
+    }
+    private void TabToLog() {
+    	contextMenu.setSelectedIndex(3);
+    }
+    
 	private JPanel GetTextInputField() {
 		textInputArea = new JPanel(new GridLayout(0,1));
 		commandLineText = new JTextField(0);

@@ -24,6 +24,10 @@
           <version>2.5.3</version>
         <configuration>
           <archive>
+            <manifestEntries>
+              <!-- FIXME replace with high quality splash image. -->
+              <SplashScreen-Image>splash.png</SplashScreen-Image>
+            </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
             </manifest>
@@ -63,6 +67,10 @@
         <version>2.6</version>
         <configuration>
           <archive>
+            <manifestEntries>
+              <!-- FIXME replace logo.png with high quality splash image. -->
+              <SplashScreen-Image>logo.png</SplashScreen-Image>
+            </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
             </manifest>
