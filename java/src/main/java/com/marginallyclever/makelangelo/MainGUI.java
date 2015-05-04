@@ -43,14 +43,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -65,7 +63,7 @@ import java.util.prefs.Preferences;
 
 public class MainGUI
 		extends JPanel
-		implements ActionListener, KeyListener
+		implements ActionListener
 {
 
 	// Java required?
@@ -90,7 +88,6 @@ public class MainGUI
 		
 	// machine settings while running
 	private double feed_rate;
-	private boolean penIsUp,penIsUpBeforePause;
 	
 	// GUI elements
 	private static JFrame mainframe;
@@ -105,7 +102,7 @@ public class MainGUI
     // prepare pane
     private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
     // drive pane
-    private JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+    private MakelangeloDriveControls driveControls;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
@@ -124,14 +121,10 @@ public class MainGUI
     // panels
     private DrawPanel previewPane;
 	private StatusBar statusBar;
-	private JPanel drivePane;
+	private MakelangeloDriveControls drivePane;
 	private JPanel preparePane;
 	private JPanel settingsPane;
 	
-	// command line
-	private JPanel textInputArea;
-	private JTextField commandLineText;
-	private JButton commandLineSend;
 
 	// reading file
 	private boolean running=false;
@@ -193,15 +186,19 @@ public class MainGUI
 	}
 	
 
-	private void RaisePen() {
+	public void raisePen() {
 		SendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
-		penIsUp=true;
+		driveControls.penIsUp();
 	}
 	
-	private void LowerPen() {
+	public void lowerPen() {
 		SendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
-		penIsUp=false;
+		driveControls.penIsDown();
 	}
+	
+	public boolean isRunning() { return running; }
+	public boolean isPaused() { return paused; }
+	
 	
 	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
@@ -221,25 +218,6 @@ public class MainGUI
 		EndLog();
 		super.finalize(); //not necessary if extending Object.
 	} 
-
-
-	@Override
-	public void keyTyped(KeyEvent e) {}
-
-    /** Handle the key-pressed event from the text field. */
-	@Override
-    public void keyPressed(KeyEvent e) {}
-
-    /** Handle the key-released event from the text field. */
-    @Override
-	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(connectionToRobot != null && connectionToRobot.isRobotConfirmed() && !running) {
-				ProcessLine(commandLineText.getText());
-				commandLineText.setText("");
-			}
-		}
-	}
 	
 	private void StartLog() {
 		try {
@@ -1105,6 +1083,8 @@ public class MainGUI
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean ProcessLine(String line) {
+		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || running) return false;
+
 		// tool change request?
 		String [] tokens = line.split("(\\s|;)");
 
@@ -1180,49 +1160,20 @@ public class MainGUI
 		previewPane.setRunning(running);
 		updateMenuBar();
 	}
-
-	/**
-	 * open a dialog to ask for the line number.
-	 * @return true if "ok" is pressed, false if the window is closed any other way.
-	 */
-	private boolean getStartingLineNumber() {
-		dialog_result=false;
-		
-		final JDialog driver = new JDialog(mainframe,translator.get("StartAt"),true);
-		driver.setLayout(new GridBagLayout());		
-		final JTextField starting_line = new JTextField("0",8);
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton start = new JButton(translator.get("Start"));
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(translator.get("StartAtLine")),c);
-		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  driver.add(starting_line,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  driver.add(cancel,c);
-		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  driver.add(start,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					
-					if(subject == start) {
-						gcode.linesProcessed=Integer.decode(starting_line.getText());
-						SendLineToRobot("M110 N"+gcode.linesProcessed);
-						dialog_result=true;
-						driver.dispose();
-					}
-					if(subject == cancel) {
-						dialog_result=false;
-						driver.dispose();
-					}
-			  }
-		};
-
-		start.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-	    driver.getRootPane().setDefaultButton(start);
-		driver.pack();
-		driver.setVisible(true);  // modal
-		
-		return dialog_result;
+	
+	public void startAt(long lineNumber) {
+		gcode.linesProcessed=0;
+		SendLineToRobot("M110 N"+gcode.linesProcessed);
+		previewPane.setLinesProcessed(gcode.linesProcessed);
+		StartDrawing();
+	}
+	
+	public void pause() {
+		paused=true;
+	}
+	
+	public void unPause() {
+		paused=false;
 	}
 
 	private void StartDrawing() {
@@ -1260,49 +1211,6 @@ public class MainGUI
 		}
 		if( subject == buttonText2GCODE ) {
 			TextToGCODE();
-			return;
-		}
-
-		if( subject == buttonStart ) {
-			if(gcode.fileOpened && !running) {
-				gcode.linesProcessed=0;
-				SendLineToRobot("M110 N"+gcode.linesProcessed);
-				previewPane.setLinesProcessed(gcode.linesProcessed);
-				StartDrawing();
-			}
-			return;
-		}
-		if( subject == buttonStartAt ) {
-			if(gcode.fileOpened && !running) {
-				gcode.linesProcessed=0;
-				if(getStartingLineNumber()) {
-					SendLineToRobot("M110 N"+gcode.linesProcessed);
-					previewPane.setLinesProcessed(gcode.linesProcessed);
-					StartDrawing();
-				}
-			}
-			return;
-			
-		}
-		if( subject == buttonPause ) {
-			if(running) {
-				if(paused==true) {
-					penIsUpBeforePause=penIsUp;
-					RaisePen();
-					buttonPause.setText(translator.get("Pause"));
-					paused=false;
-					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
-					SendFileCommand();
-				} else {
-					if(!penIsUpBeforePause) LowerPen();
-					buttonPause.setText(translator.get("Unpause"));
-					paused=true;
-				}
-			}
-			return;
-		}
-		if( subject == buttonHalt ) {
-			Halt();
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -1411,11 +1319,6 @@ public class MainGUI
 				}
 				return;
 			}
-		}
-		
-		if( subject == commandLineSend ) {
-			SendLineToRobot(commandLineText.getText());
-			commandLineText.setText("");
 		}
 	}
 
@@ -1551,187 +1454,6 @@ public class MainGUI
         return driver;
 	}
 	
-	public JPanel driveManually() {
-		GridBagConstraints c;
-		
-		JPanel driver = new JPanel(new GridLayout(0,1));
-
-        // Draw menu
-		JPanel go = new JPanel(new GridBagLayout());
-
-        buttonStart = new JButton(translator.get("Start"));
-        buttonStart.addActionListener(this);
-    	go.add(buttonStart);
-
-        buttonStartAt = new JButton(translator.get("StartAtLine"));
-        buttonStartAt.addActionListener(this);
-        go.add(buttonStartAt);
-
-        buttonPause = new JButton(translator.get("Pause"));
-        buttonPause.addActionListener(this);
-        go.add(buttonPause);
-
-        buttonHalt = new JButton(translator.get("Halt"));
-        buttonHalt.addActionListener(this);
-        go.add(buttonHalt);
-        
-		
-		JPanel axisControl = new JPanel(new GridBagLayout());
-			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(60,20));			yAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(60,20));
-			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(60,20));
-			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(60,20));
-			final JButton up1 = new JButton("1");  			up1.setPreferredSize(new Dimension(60,20));
-			final JButton up10 = new JButton("10");  		up10.setPreferredSize(new Dimension(60,20));
-			final JButton up100 = new JButton("100");  		up100.setPreferredSize(new Dimension(60,20));
-			
-			final JLabel xAxis = new JLabel("X");			xAxis.setPreferredSize(new Dimension(60,20));		xAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton left100 = new JButton("-100");	left100.setPreferredSize(new Dimension(60,20));
-			final JButton left10 = new JButton("-10");		left10.setPreferredSize(new Dimension(60,20));
-			final JButton left1 = new JButton("-1");		left1.setPreferredSize(new Dimension(60,20));	
-			final JButton right1 = new JButton("1");		right1.setPreferredSize(new Dimension(60,20));
-			final JButton right10 = new JButton("10");		right10.setPreferredSize(new Dimension(60,20));
-			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(60,20));
-
-			//final JButton find = new JButton("FIND HOME");	find.setPreferredSize(new Dimension(100,20));
-			final JButton center = new JButton(translator.get("SetHome"));	center.setPreferredSize(new Dimension(100,20));
-			final JButton home = new JButton(translator.get("GoHome"));		home.setPreferredSize(new Dimension(100,20));
-			
-			c = new GridBagConstraints();
-			//c.fill=GridBagConstraints.BOTH; 
-			c.gridx=0;  c.gridy=0;  axisControl.add(yAxis,c);
-			c.gridx=1;	c.gridy=0;	axisControl.add(down100,c);
-			c.gridx=2;	c.gridy=0;	axisControl.add(down10,c);
-			c.gridx=3;	c.gridy=0;	axisControl.add(down1,c);
-			c.gridx=4;	c.gridy=0;	axisControl.add(up1,c);
-			c.gridx=5;	c.gridy=0;	axisControl.add(up10,c);
-			c.gridx=6;	c.gridy=0;	axisControl.add(up100,c);
-			
-			c.gridx=0;  c.gridy=1;  axisControl.add(xAxis,c);
-			c.gridx=1;	c.gridy=1;	axisControl.add(left100,c);
-			c.gridx=2;	c.gridy=1;	axisControl.add(left10,c);
-			c.gridx=3;	c.gridy=1;	axisControl.add(left1,c);
-			c.gridx=4;	c.gridy=1;	axisControl.add(right1,c);
-			c.gridx=5;	c.gridy=1;	axisControl.add(right10,c);
-			c.gridx=6;	c.gridy=1;	axisControl.add(right100,c);
-		
-		
-		JPanel corners = new JPanel();
-			corners.setLayout(new GridBagLayout());
-			final JButton goTop = new JButton(translator.get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
-			final JButton goBottom = new JButton(translator.get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
-			final JButton goLeft = new JButton(translator.get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
-			final JButton goRight = new JButton(translator.get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
-			final JButton goUp = new JButton(translator.get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
-			final JButton goDown = new JButton(translator.get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
-			c = new GridBagConstraints();
-			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
-			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
-			c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
-			c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
-			c.insets = new Insets(0,5,0,0);
-			c.gridx=5;  c.gridy=0;  corners.add(goUp,c);
-			c.gridx=5;  c.gridy=1;  corners.add(goDown,c);
-			c.gridx=6;	c.gridy=0;	corners.add(home,c);
-			c.gridx=6;	c.gridy=1;	corners.add(center,c);
-			c.insets = new Insets(0,0,0,0);
-		
-	
-		JPanel feedRateControl = new JPanel();
-		feedRateControl.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			feed_rate = machineConfiguration.GetFeedRate();
-			final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-			feedRate.setText(Double.toString(feed_rate));
-			final JButton setFeedRate = new JButton(translator.get("Set"));
-
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
-			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-		
-
-		driver.add(go);
-        driver.add(new JSeparator());
-		driver.add(axisControl);
-		driver.add(corners);
-		driver.add(feedRateControl);
-        driver.add(new JSeparator());
-	    driver.add(GetTextInputField());
-	    
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					JButton b = (JButton)subject;
-					if(running) return;
-					if(b==home) SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
-					else if(b==center) SendLineToRobot("G92 X0 Y0");
-					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_left *10));
-					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_right*10));
-					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_top*10));
-					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_bottom*10));
-					//} else if(b==find) {
-					//	SendLineToRobot("G28");
-					else if(b==goUp) RaisePen();
-					else if(b==goDown) LowerPen();
-					else if(b==setFeedRate) {
-						String fr=feedRate.getText();
-						fr=fr.replaceAll("[ ,]","");
-						feed_rate = Double.parseDouble(fr);
-						if(feed_rate<0.001) feed_rate=0.001;
-						machineConfiguration.SetFeedRate(feed_rate);
-						feedRate.setText(Double.toString(feed_rate));
-						SendLineToRobot("G00 G21 F"+feed_rate);
-					} else {
-						SendLineToRobot("G91");  // set relative mode
-
-						if(b==down100) SendLineToRobot("G0 Y-100");
-						if(b==down10) SendLineToRobot("G0 Y-10");
-						if(b==down1) SendLineToRobot("G0 Y-1");
-						if(b==up100) SendLineToRobot("G0 Y100");
-						if(b==up10) SendLineToRobot("G0 Y10");
-						if(b==up1) SendLineToRobot("G0 Y1");
-
-						if(b==left100) SendLineToRobot("G0 X-100");
-						if(b==left10) SendLineToRobot("G0 X-10");
-						if(b==left1) SendLineToRobot("G0 X-1");
-						if(b==right100) SendLineToRobot("G0 X100");
-						if(b==right10) SendLineToRobot("G0 X10");
-						if(b==right1) SendLineToRobot("G0 X1");
-						
-						SendLineToRobot("G90");  // return to absolute mode
-					}
-			  }
-		};
-		
-		up1.addActionListener(driveButtons);
-		up10.addActionListener(driveButtons);
-		up100.addActionListener(driveButtons);
-		down1.addActionListener(driveButtons);
-		down10.addActionListener(driveButtons);
-		down100.addActionListener(driveButtons);
-		left1.addActionListener(driveButtons);
-		left10.addActionListener(driveButtons);
-		left100.addActionListener(driveButtons);
-		right1.addActionListener(driveButtons);
-		right10.addActionListener(driveButtons);
-		right100.addActionListener(driveButtons);
-		goUp.addActionListener(driveButtons);
-		goDown.addActionListener(driveButtons);
-		center.addActionListener(driveButtons);
-		home.addActionListener(driveButtons);
-		//find.addActionListener(driveButtons);
-		goTop.addActionListener(driveButtons);
-		goBottom.addActionListener(driveButtons);
-		goLeft.addActionListener(driveButtons);
-		goRight.addActionListener(driveButtons);
-		setFeedRate.addActionListener(driveButtons);
-		
-		driver.setPreferredSize(new Dimension(150,100));
-		return driver;
-	}
-	
 	protected void JogMotors() {
 		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
 		driver.setLayout(new GridBagLayout());
@@ -1841,10 +1563,7 @@ public class MainGUI
         }
         if(drivePane!=null) {
         	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	buttonStart.setEnabled(x && !running);
-            buttonStartAt.setEnabled(x && !running);
-            buttonPause.setEnabled(x && running);
-            buttonHalt.setEnabled(x && running);
+        	drivePane.updateButtonAccess(x,running);
         }
         
         
@@ -1971,7 +1690,9 @@ public class MainGUI
         settingsPane = SettingsPanel();
         previewPane = new DrawPanel(machineConfiguration);
         preparePane = ProcessImages();
-        drivePane = driveManually();
+		drivePane = new MakelangeloDriveControls();
+		drivePane.createPanel(this,translator,machineConfiguration);
+		drivePane.updateButtonAccess(false, false);
         statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
@@ -2011,24 +1732,6 @@ public class MainGUI
     private void TabToLog() {
     	contextMenu.setSelectedIndex(3);
     }
-    
-	private JPanel GetTextInputField() {
-		textInputArea = new JPanel(new GridLayout(0,1));
-		commandLineText = new JTextField(0);
-		commandLineText.setPreferredSize(new Dimension(10,10));
-		commandLineSend = new JButton(translator.get("Send"));
-		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
-		textInputArea.add(commandLineText);
-		textInputArea.add(commandLineSend);
-		
-		commandLineText.addKeyListener(this);
-		commandLineSend.addActionListener(this);
-
-	    //textInputArea.setMinimumSize(new Dimension(100,50));
-	    //textInputArea.setMaximumSize(new Dimension(10000,50));
-
-		return textInputArea;
-	}
 
     public JFrame getParentFrame() {
     	return mainframe;
@@ -2079,16 +1782,8 @@ public class MainGUI
 	 *
 	 * @param drivePane the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
-	public void setDrivePane(JPanel drivePane) {
-		this.drivePane = drivePane;
-	}
-
-	/**
-	 *
-	 * @return the <code>javax.swing.JPanel</code> representing the drive pane of this GUI.
-	 */
-	public JPanel getDrivePane() {
-		return drivePane;
+	public void updateDrivePanel() {
+		drivePane.createPanel(this, translator, machineConfiguration);
 	}
 
 	/**
