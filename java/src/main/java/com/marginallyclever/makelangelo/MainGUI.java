@@ -126,7 +126,7 @@ public class MainGUI
 	
 
 	// reading file
-	private boolean running=false;
+	private boolean isrunning=false;
 	private boolean isPaused=true;
 	
 	private GCodeFile gcode = new GCodeFile();
@@ -195,7 +195,7 @@ public class MainGUI
 		driveControls.penIsDown();
 	}
 	
-	public boolean isRunning() { return running; }
+	public boolean isRunning() { return isrunning; }
 	public boolean isPaused() { return isPaused; }
 	
 	
@@ -1019,7 +1019,8 @@ public class MainGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || isPaused==true || gcode.fileOpened==false || connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(isrunning==false || isPaused==true || gcode.fileOpened==false ||
+				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1082,7 +1083,7 @@ public class MainGUI
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean ProcessLine(String line) {
-		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || running) return false;
+		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || !isrunning) return false;
 
 		// tool change request?
 		String [] tokens = line.split("(\\s|;)");
@@ -1129,6 +1130,7 @@ public class MainGUI
 	 */
 	public boolean sendLineToRobot(String line) {
 		if(connectionToRobot==null || !connectionToRobot.isRobotConfirmed()) return false;
+		
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
@@ -1153,10 +1155,10 @@ public class MainGUI
 	 * TODO add an e-stop command?
 	 */
 	public void Halt() {
-		running=false;
+		isrunning=false;
 		isPaused=false;
 	    previewPane.setLinesProcessed(0);
-		previewPane.setRunning(running);
+		previewPane.setRunning(isrunning);
 		updateMenuBar();
 	}
 	
@@ -1177,8 +1179,8 @@ public class MainGUI
 
 	private void startDrawing() {
 		isPaused=false;
-		running=true;
-		previewPane.setRunning(running);
+		isrunning=true;
+		previewPane.setRunning(isrunning);
 		updateMenuBar();
 		statusBar.Start();
 		SendFileCommand();
@@ -1550,19 +1552,19 @@ public class MainGUI
         int i;
         
         if(settingsPane!=null) {
-            buttonAdjustMachineSize.setEnabled(!running);
-            buttonAdjustPulleySize.setEnabled(!running);
-            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !running);
-            buttonChangeTool.setEnabled(!running);
-            buttonAdjustTool.setEnabled(!running);
+            buttonAdjustMachineSize.setEnabled(!isrunning);
+            buttonAdjustPulleySize.setEnabled(!isrunning);
+            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isrunning);
+            buttonChangeTool.setEnabled(!isrunning);
+            buttonAdjustTool.setEnabled(!isrunning);
         }
         if(preparePane!=null) {
-            buttonHilbertCurve.setEnabled(!running);
-            buttonText2GCODE.setEnabled(!running);
+            buttonHilbertCurve.setEnabled(!isrunning);
+            buttonText2GCODE.setEnabled(!isrunning);
         }
         if(driveControls!=null) {
         	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	driveControls.updateButtonAccess(x,running);
+        	driveControls.updateButtonAccess(x,isrunning);
         }
         
         
@@ -1607,7 +1609,7 @@ public class MainGUI
         
         // Connect menu
         subMenu = new JMenu(translator.get("MenuConnect"));
-        subMenu.setEnabled(!running);
+        subMenu.setEnabled(!isrunning);
         group = new ButtonGroup();
 
         String [] connections = connectionManager.listConnections();
