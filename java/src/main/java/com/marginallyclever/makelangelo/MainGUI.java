@@ -1399,7 +1399,7 @@ public class MainGUI
 		for(i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
 
-				Log("<font color='green'>" + translator.get("ConnectingTo") + connectionName + "...</font>\n");
+				Log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
 
 				connectionToRobot = connectionManager.openConnection(connections[i]);
 				if(connectionToRobot!=null) {
@@ -1551,7 +1551,7 @@ public class MainGUI
         return driver;
 	}
 	
-	public JPanel DriveManually() {
+	public JPanel driveManually() {
 		GridBagConstraints c;
 		
 		JPanel driver = new JPanel(new GridLayout(0,1));
@@ -1971,7 +1971,7 @@ public class MainGUI
         settingsPane = SettingsPanel();
         previewPane = new DrawPanel(machineConfiguration);
         preparePane = ProcessImages();
-        drivePane = DriveManually();
+        drivePane = driveManually();
         statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();

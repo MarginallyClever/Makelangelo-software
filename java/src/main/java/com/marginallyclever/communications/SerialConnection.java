@@ -140,7 +140,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         mainGUI.getPreviewPane().setConnected(true);
 
         // rebuild the drive pane so that the feed rates are correct.
-        mainGUI.setDrivePane(mainGUI.DriveManually());
+        mainGUI.setDrivePane(mainGUI.driveManually());
 
         return true;
     }
