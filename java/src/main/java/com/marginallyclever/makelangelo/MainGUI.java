@@ -187,12 +187,12 @@ public class MainGUI
 
 	public void raisePen() {
 		sendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
-		driveControls.penIsUp();
+		driveControls.raisePen();
 	}
 	
 	public void lowerPen() {
 		sendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
-		driveControls.penIsDown();
+		driveControls.lowerPen();
 	}
 	
 	public boolean isRunning() { return isrunning; }
@@ -1029,6 +1029,16 @@ public class MainGUI
 			int line_number = gcode.linesProcessed;
 			gcode.linesProcessed++;
 			line=gcode.lines.get(line_number).trim();
+
+			// TODO catch pen up/down status here
+			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
+				driveControls.raisePen();
+			}
+			if(line.contains("G00 Z"+machineConfiguration.getPenDownString())) {
+				driveControls.lowerPen();
+			}
+			
+
 			if(line.length()>3) {
 				line="N"+line_number+" "+line;
 			}

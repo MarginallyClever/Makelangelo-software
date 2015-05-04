@@ -54,11 +54,11 @@ public class MakelangeloDriveControls
 	}
 	
 	
-	public void penIsUp() {
+	public void raisePen() {
 		penIsUp=true;
 	}
 	
-	public void penIsDown() {
+	public void lowerPen() {
 		penIsUp=false;
 	}
 	
@@ -232,16 +232,16 @@ public class MakelangeloDriveControls
 
 			if( subject == buttonPause ) {
 				if(gui.isPaused()==true) {
-					penIsUpBeforePause=penIsUp;
-					gui.raisePen();
+					if(!penIsUpBeforePause) {
+						gui.lowerPen();
+					}
 					buttonPause.setText(translator.get("Pause"));
 					gui.unPause();
 					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					gui.SendFileCommand();
 				} else {
-					if(!penIsUpBeforePause) {
-						gui.lowerPen();
-					}
+					penIsUpBeforePause=penIsUp;
+					gui.raisePen();
 					buttonPause.setText(translator.get("Unpause"));
 					gui.pause();
 				}
