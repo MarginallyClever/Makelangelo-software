@@ -59,7 +59,7 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
      * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
      */
     public MarginallyCleverConnection openConnection(String connectionName) {
-    	 if(connectionName.equals(recentPort)) return null;
+    	 //if(connectionName.equals(recentPort)) return null;
     	 
     	 SerialConnection serialConnection = new SerialConnection(mainGUI, translator, machine);
 
@@ -69,7 +69,7 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
         	 serialConnection.openConnection(connectionName);
          }
          catch(Exception e) {
-	         mainGUI.Log("<span style='color:red'>" + translator.get("PortOpened") + "</span>\n");
+	         mainGUI.Log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
     		 return null;
          }
          
