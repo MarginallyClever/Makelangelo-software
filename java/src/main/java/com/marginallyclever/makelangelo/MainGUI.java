@@ -1398,7 +1398,17 @@ public class MainGUI
 		String [] connections = connectionManager.listConnections(); 
 		for(i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
+
+				Log("<font color='green'>" + translator.get("ConnectingTo") + connectionName + "...</font>\n");
+
 				connectionToRobot = connectionManager.openConnection(connections[i]);
+				if(connectionToRobot!=null) {
+					Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
+					updateMenuBar();
+					PlayConnectSound();
+				} else {
+					Log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
+				}
 				return;
 			}
 		}

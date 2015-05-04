@@ -63,19 +63,13 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
     	 
     	 SerialConnection serialConnection = new SerialConnection(mainGUI, translator, machine);
 
-         mainGUI.Log("<font color='green'>" + translator.get("ConnectingTo") + connectionName + "...</font>\n");
-
          try {
         	 serialConnection.openConnection(connectionName);
          }
          catch(Exception e) {
-	         mainGUI.Log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
     		 return null;
          }
          
-         mainGUI.Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
-         mainGUI.updateMenuBar();
-         mainGUI.PlayConnectSound();
     	 return serialConnection;
     }
     
