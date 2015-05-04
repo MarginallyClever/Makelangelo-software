@@ -224,11 +224,11 @@ public class MakelangeloDriveControls
 			}
 
 			if( subject == commandLineSend ) {
-				gui.SendLineToRobot(commandLineText.getText());
+				gui.sendLineToRobot(commandLineText.getText());
 				commandLineText.setText("");
 			}
 			
-			if(gui.isRunning()) return;
+			//if(gui.isRunning()) return;
 
 			if( subject == buttonPause ) {
 				if(gui.isPaused()==true) {
@@ -239,7 +239,9 @@ public class MakelangeloDriveControls
 					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
 					gui.SendFileCommand();
 				} else {
-					if(!penIsUpBeforePause) gui.lowerPen();
+					if(!penIsUpBeforePause) {
+						gui.lowerPen();
+					}
 					buttonPause.setText(translator.get("Unpause"));
 					gui.pause();
 				}
@@ -250,12 +252,12 @@ public class MakelangeloDriveControls
 				return;
 			}
 			
-			if(b==home) gui.SendLineToRobot("G00 F"+feedRate.getText()+" X0 Y0");
-			else if(b==center) gui.SendLineToRobot("G92 X0 Y0");
-			else if(b==goLeft) gui.SendLineToRobot("G00 F"+feedRate.getText()+" X"+(machineConfiguration.paper_left *10));
-			else if(b==goRight) gui.SendLineToRobot("G00 F"+feedRate.getText()+" X"+(machineConfiguration.paper_right*10));
-			else if(b==goTop) gui.SendLineToRobot("G00 F"+feedRate.getText()+" Y"+(machineConfiguration.paper_top*10));
-			else if(b==goBottom) gui.SendLineToRobot("G00 F"+feedRate.getText()+" Y"+(machineConfiguration.paper_bottom*10));
+			if(b==home) gui.sendLineToRobot("G00 F"+feedRate.getText()+" X0 Y0");
+			else if(b==center) gui.sendLineToRobot("G92 X0 Y0");
+			else if(b==goLeft) gui.sendLineToRobot("G00 F"+feedRate.getText()+" X"+(machineConfiguration.paper_left *10));
+			else if(b==goRight) gui.sendLineToRobot("G00 F"+feedRate.getText()+" X"+(machineConfiguration.paper_right*10));
+			else if(b==goTop) gui.sendLineToRobot("G00 F"+feedRate.getText()+" Y"+(machineConfiguration.paper_top*10));
+			else if(b==goBottom) gui.sendLineToRobot("G00 F"+feedRate.getText()+" Y"+(machineConfiguration.paper_bottom*10));
 			//} else if(b==find) {
 			//	gui.SendLineToRobot("G28");
 			else if(b==goUp) gui.raisePen();
@@ -267,25 +269,25 @@ public class MakelangeloDriveControls
 				if(feed_rate<0.001) feed_rate=0.001;
 				machineConfiguration.SetFeedRate(feed_rate);
 				feedRate.setText(Double.toString(feed_rate));
-				gui.SendLineToRobot("G00 G21 F"+feed_rate);
+				gui.sendLineToRobot("G00 G21 F"+feed_rate);
 			} else {
-				gui.SendLineToRobot("G91");  // set relative mode
+				gui.sendLineToRobot("G91");  // set relative mode
 
-				if(b==down100) gui.SendLineToRobot("G0 Y-100");
-				if(b==down10) gui.SendLineToRobot("G0 Y-10");
-				if(b==down1) gui.SendLineToRobot("G0 Y-1");
-				if(b==up100) gui.SendLineToRobot("G0 Y100");
-				if(b==up10) gui.SendLineToRobot("G0 Y10");
-				if(b==up1) gui.SendLineToRobot("G0 Y1");
+				if(b==down100) gui.sendLineToRobot("G0 Y-100");
+				if(b==down10) gui.sendLineToRobot("G0 Y-10");
+				if(b==down1) gui.sendLineToRobot("G0 Y-1");
+				if(b==up100) gui.sendLineToRobot("G0 Y100");
+				if(b==up10) gui.sendLineToRobot("G0 Y10");
+				if(b==up1) gui.sendLineToRobot("G0 Y1");
 
-				if(b==left100) gui.SendLineToRobot("G0 X-100");
-				if(b==left10) gui.SendLineToRobot("G0 X-10");
-				if(b==left1) gui.SendLineToRobot("G0 X-1");
-				if(b==right100) gui.SendLineToRobot("G0 X100");
-				if(b==right10) gui.SendLineToRobot("G0 X10");
-				if(b==right1) gui.SendLineToRobot("G0 X1");
+				if(b==left100) gui.sendLineToRobot("G0 X-100");
+				if(b==left10) gui.sendLineToRobot("G0 X-10");
+				if(b==left1) gui.sendLineToRobot("G0 X-1");
+				if(b==right100) gui.sendLineToRobot("G0 X100");
+				if(b==right10) gui.sendLineToRobot("G0 X10");
+				if(b==right1) gui.sendLineToRobot("G0 X1");
 				
-				gui.SendLineToRobot("G90");  // return to absolute mode
+				gui.sendLineToRobot("G90");  // return to absolute mode
 			}
 	  }
 

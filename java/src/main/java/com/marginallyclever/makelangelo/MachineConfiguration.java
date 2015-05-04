@@ -309,7 +309,7 @@ public class MachineConfiguration {
 		save.addActionListener(driveButtons);
 		cancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(save);
-		mainGUI.SendLineToRobot("M114"); // "where" command
+		mainGUI.sendLineToRobot("M114"); // "where" command
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -646,7 +646,7 @@ public class MachineConfiguration {
 			// make sure a prefs node is created
 			prefs.node("Machines").node(Long.toString(new_uid));
 			// tell the robot it's new UID.
-			mainGUI.SendLineToRobot("UID "+new_uid);
+			mainGUI.sendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
 			String [] new_list = new String[configurations_available.length+1];

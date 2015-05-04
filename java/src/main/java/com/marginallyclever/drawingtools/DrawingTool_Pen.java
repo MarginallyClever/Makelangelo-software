@@ -108,10 +108,10 @@ public class DrawingTool_Pen extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestUp) {
-					mainGUI.SendLineToRobot("G00 Z"+penUp.getText());
+					mainGUI.sendLineToRobot("G00 Z"+penUp.getText());
 				}
 				if(subject == buttonTestDown) {
-					mainGUI.SendLineToRobot("G00 Z"+penDown.getText());
+					mainGUI.sendLineToRobot("G00 Z"+penDown.getText());
 				}
 				if(subject == buttonSave) {
 					SetDiameter(Float.valueOf(penDiameter.getText()));
@@ -135,7 +135,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		buttonCancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(buttonSave);
 	
-		mainGUI.SendLineToRobot("M114");
+		mainGUI.sendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}

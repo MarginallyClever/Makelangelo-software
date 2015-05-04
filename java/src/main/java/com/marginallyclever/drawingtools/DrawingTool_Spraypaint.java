@@ -139,8 +139,8 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 				Object subject = e.getSource();
 				
 				if(subject == buttonTestDot) {
-					mainGUI.SendLineToRobot("G00 Z"+spraypaintUp.getText()+" F"+spraypaintZRate.getText());
-					mainGUI.SendLineToRobot("G00 Z"+spraypaintDown.getText()+" F"+spraypaintZRate.getText());
+					mainGUI.sendLineToRobot("G00 Z"+spraypaintUp.getText()+" F"+spraypaintZRate.getText());
+					mainGUI.sendLineToRobot("G00 Z"+spraypaintDown.getText()+" F"+spraypaintZRate.getText());
 				}
 				if(subject == buttonSave) {
 					diameter = Float.valueOf(spraypaintDiameter.getText());
@@ -163,7 +163,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		buttonCancel.addActionListener(driveButtons);
 		driver.getRootPane().setDefaultButton(buttonSave);
 	
-		mainGUI.SendLineToRobot("M114");
+		mainGUI.sendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}

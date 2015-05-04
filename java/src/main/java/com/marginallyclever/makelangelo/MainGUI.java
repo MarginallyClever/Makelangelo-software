@@ -121,14 +121,13 @@ public class MainGUI
     // panels
     private DrawPanel previewPane;
 	private StatusBar statusBar;
-	private MakelangeloDriveControls drivePane;
 	private JPanel preparePane;
 	private JPanel settingsPane;
 	
 
 	// reading file
 	private boolean running=false;
-	private boolean paused=true;
+	private boolean isPaused=true;
 	
 	private GCodeFile gcode = new GCodeFile();
 
@@ -187,17 +186,17 @@ public class MainGUI
 	
 
 	public void raisePen() {
-		SendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
+		sendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
 		driveControls.penIsUp();
 	}
 	
 	public void lowerPen() {
-		SendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
+		sendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
 		driveControls.penIsDown();
 	}
 	
 	public boolean isRunning() { return running; }
-	public boolean isPaused() { return paused; }
+	public boolean isPaused() { return isPaused; }
 	
 	
 	// TODO use a serviceLoader instead
@@ -863,7 +862,7 @@ public class MainGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 F" + feed_rate + " X0 Y0");
+		sendLineToRobot("G00 F" + feed_rate + " X0 Y0");
 	}
 	
 	private String SelectFile() {
@@ -1012,15 +1011,15 @@ public class MainGUI
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		SendLineToRobot(machineConfiguration.GetConfigLine());
-		SendLineToRobot(machineConfiguration.GetBobbinLine());
-		SendLineToRobot("G92 X0 Y0");
+		sendLineToRobot(machineConfiguration.GetConfigLine());
+		sendLineToRobot(machineConfiguration.GetBobbinLine());
+		sendLineToRobot("G92 X0 Y0");
 	}
 	
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || gcode.fileOpened==false || connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(running==false || isPaused==true || gcode.fileOpened==false || connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1106,7 +1105,7 @@ public class MainGUI
 		
 		
 		// send relevant part of line to the robot
-		SendLineToRobot(line);
+		sendLineToRobot(line);
 		
 		return false;
 	}
@@ -1128,7 +1127,7 @@ public class MainGUI
 	 * @param line command to send.
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
-	public boolean SendLineToRobot(String line) {
+	public boolean sendLineToRobot(String line) {
 		if(connectionToRobot==null || !connectionToRobot.isRobotConfirmed()) return false;
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
@@ -1155,7 +1154,7 @@ public class MainGUI
 	 */
 	public void Halt() {
 		running=false;
-		paused=false;
+		isPaused=false;
 	    previewPane.setLinesProcessed(0);
 		previewPane.setRunning(running);
 		updateMenuBar();
@@ -1163,21 +1162,21 @@ public class MainGUI
 	
 	public void startAt(long lineNumber) {
 		gcode.linesProcessed=0;
-		SendLineToRobot("M110 N"+gcode.linesProcessed);
+		sendLineToRobot("M110 N"+gcode.linesProcessed);
 		previewPane.setLinesProcessed(gcode.linesProcessed);
-		StartDrawing();
+		startDrawing();
 	}
 	
 	public void pause() {
-		paused=true;
+		isPaused=true;
 	}
 	
 	public void unPause() {
-		paused=false;
+		isPaused=false;
 	}
 
-	private void StartDrawing() {
-		paused=false;
+	private void startDrawing() {
+		isPaused=false;
 		running=true;
 		previewPane.setRunning(running);
 		updateMenuBar();
@@ -1482,11 +1481,11 @@ public class MainGUI
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
-				if(subject == buttonApos) SendLineToRobot("D00 L100");
-				if(subject == buttonAneg) SendLineToRobot("D00 L-100");
-				if(subject == buttonBpos) SendLineToRobot("D00 R100");
-				if(subject == buttonBneg) SendLineToRobot("D00 R-100");
-				SendLineToRobot("M114");
+				if(subject == buttonApos) sendLineToRobot("D00 L100");
+				if(subject == buttonAneg) sendLineToRobot("D00 L-100");
+				if(subject == buttonBpos) sendLineToRobot("D00 R100");
+				if(subject == buttonBneg) sendLineToRobot("D00 R-100");
+				sendLineToRobot("M114");
 			}
 		};
 
@@ -1508,7 +1507,7 @@ public class MainGUI
 		m1i.addActionListener(invertButtons);
 		m2i.addActionListener(invertButtons);
 
-		SendLineToRobot("M114");
+		sendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1561,9 +1560,9 @@ public class MainGUI
             buttonHilbertCurve.setEnabled(!running);
             buttonText2GCODE.setEnabled(!running);
         }
-        if(drivePane!=null) {
+        if(driveControls!=null) {
         	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	drivePane.updateButtonAccess(x,running);
+        	driveControls.updateButtonAccess(x,running);
         }
         
         
@@ -1690,15 +1689,15 @@ public class MainGUI
         settingsPane = SettingsPanel();
         previewPane = new DrawPanel(machineConfiguration);
         preparePane = ProcessImages();
-		drivePane = new MakelangeloDriveControls();
-		drivePane.createPanel(this,translator,machineConfiguration);
-		drivePane.updateButtonAccess(false, false);
+		driveControls = new MakelangeloDriveControls();
+		driveControls.createPanel(this,translator,machineConfiguration);
+		driveControls.updateButtonAccess(false, false);
         statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
         contextMenu.addTab(translator.get("MenuSettings"),null,settingsPane,null);
         contextMenu.addTab(translator.get("MenuGCODE"),null,preparePane,null);
-        contextMenu.addTab(translator.get("MenuDraw"),null,drivePane,null);
+        contextMenu.addTab(translator.get("MenuDraw"),null,driveControls,null);
         contextMenu.addTab("Log",null,logPane,null);
 
         // major layout
@@ -1780,10 +1779,10 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param drivePane the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
+	 * @param driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
-	public void updateDrivePanel() {
-		drivePane.createPanel(this, translator, machineConfiguration);
+	public void updatedriveControls() {
+		driveControls.createPanel(this, translator, machineConfiguration);
 	}
 
 	/**
