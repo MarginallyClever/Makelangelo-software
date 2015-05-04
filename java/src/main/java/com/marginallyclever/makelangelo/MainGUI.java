@@ -1149,7 +1149,7 @@ public class MainGUI
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
 	public boolean SendLineToRobot(String line) {
-		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return false;
+		if(connectionToRobot==null || !connectionToRobot.isRobotConfirmed()) return false;
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {

@@ -89,7 +89,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 			cellBorder = new ArrayList<VoronoiCellEdge>();
 	
 		    
-			initializeCells(0.5);
+			initializeCells(MIN_DOT_SIZE);
 			evolveCells();
 			writeOutCells();
 	    }
