@@ -8,6 +8,8 @@ Makelangelo is a polargraph mural drawing robot.  It is intended to teach studen
 
 h2. Get it
 
+Download "the latest version of the Makelangelo software":https://github.com/MarginallyClever/Makelangelo/releases
+
 Please visit "the Makelangelo homepage":http://www.makelangelo.com/ for the accompanying hardware kit.
 
 h2. Make it
@@ -20,30 +22,30 @@ Please read "the software instructions":http://learn.marginallyclever.com/index.
 
 h2. Get help
 
-Please visit "the forums":https://marginallyclever.com/forum 
+Please visit "the forums":https://marginallyclever.com/forum for all technical support and to meet other Makelangelo users.
 
 h2. Special thanks
 
 Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
 
-h2. Notes
+h2. Making changes to the code
 
-The contents of ./last_official_release are also available on the official purchase page http://makelangelo.com website.
+Please visit "the Github Wiki":https://github.com/MarginallyClever/Makelangelo/wiki for tips on setting up your Eclipse environment.
 
-h2. To modify the code / run the project in eclipse
+h2. Feedback
 
-Please visit the Github Wiki:https://github.com/MarginallyClever/Makelangelo/wiki
-
-More details are available in the forums.
+We love feedback!  Please send it to us via twitter, email, facebook, our forums, or by posting a issue right here.
 
 h2. See Also
 
 * "The Makelangelo homepage":http://www.makelangelo.com/ 
 * "The wiki":https://learn.marginallyclever.com/
 * "The forums":https://marginallyclever.com/forum/
+* "Instagram":https://instagram.com/imakerobots/
+* "Facebook":https://facebook.com/Marginallyclever/
+* "Twitter":https://twitter.com/aggrav8d/
 
 h3. 3rd Party Dependencies
-* "rxtx":http://search.maven.org/#artifactdetails%7Corg.rxtx%7Crxtx%7C2.1.7%7Cjar
 * "appbundle":https://github.com/federkasten/appbundle-maven-plugin
 * "jssc":http://search.maven.org/#artifactdetails%7Corg.scream3r%7Cjssc%7C2.8.0%7Cjar
 * "kabeja":https://github.com/fuzziness/kabeja

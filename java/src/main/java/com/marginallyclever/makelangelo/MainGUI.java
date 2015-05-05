@@ -10,10 +10,11 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 import com.marginallyclever.filters.*;
-import com.marginallyclever.communications.MarginallyCleverSerialPortEventListener;
-import com.marginallyclever.communications.SerialConnection;
-import jssc.*;
+import com.marginallyclever.communications.MarginallyCleverConnection;
+import com.marginallyclever.communications.MarginallyCleverConnectionManager;
+import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.drawingtools.DrawingTool;
+
 import org.apache.commons.io.IOUtils;
 import org.kabeja.dxf.*;
 import org.kabeja.parser.ParseException;
@@ -37,18 +38,17 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -63,7 +63,7 @@ import java.util.prefs.Preferences;
 
 public class MainGUI
 		extends JPanel
-		implements ActionListener, KeyListener
+		implements ActionListener
 {
 
 	// Java required?
@@ -82,12 +82,12 @@ public class MainGUI
 	
 	private Preferences prefs = Preferences.userRoot().node("DrawBot");
 	private RecentFiles recentFiles;
-	private MarginallyCleverSerialPortEventListener serialConnection;
-	//private boolean allowMetrics=true;
+	
+	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
+	private MarginallyCleverConnection connectionToRobot=null;
 		
 	// machine settings while running
 	private double feed_rate;
-	private boolean penIsUp,penIsUpBeforePause;
 	
 	// GUI elements
 	private static JFrame mainframe;
@@ -102,7 +102,7 @@ public class MainGUI
     // prepare pane
     private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
     // drive pane
-    private JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+    private MakelangeloDriveControls driveControls;
     
     private JMenuItem [] buttonRecent = new JMenuItem[10];
     private JMenuItem [] buttonPorts;
@@ -121,18 +121,13 @@ public class MainGUI
     // panels
     private DrawPanel previewPane;
 	private StatusBar statusBar;
-	private JPanel drivePane;
 	private JPanel preparePane;
 	private JPanel settingsPane;
 	
-	// command line
-	private JPanel textInputArea;
-	private JTextField commandLineText;
-	private JButton commandLineSend;
 
 	// reading file
-	private boolean running=false;
-	private boolean paused=true;
+	private boolean isrunning=false;
+	private boolean isPaused=true;
 	
 	private GCodeFile gcode = new GCodeFile();
 
@@ -145,7 +140,7 @@ public class MainGUI
 		StartTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
         recentFiles = new RecentFiles();
-		serialConnection = new SerialConnection(prefs, this, translator, machineConfiguration);
+        connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
         LoadImageConverters();
         CreateAndShowGUI();
 	}
@@ -190,15 +185,19 @@ public class MainGUI
 	}
 	
 
-	private void RaisePen() {
-		SendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
-		penIsUp=true;
+	public void raisePen() {
+		sendLineToRobot("G00 Z"+machineConfiguration.getPenUpString());
+		driveControls.raisePen();
 	}
 	
-	private void LowerPen() {
-		SendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
-		penIsUp=false;
+	public void lowerPen() {
+		sendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
+		driveControls.lowerPen();
 	}
+	
+	public boolean isRunning() { return isrunning; }
+	public boolean isPaused() { return isPaused; }
+	
 	
 	// TODO use a serviceLoader instead
 	protected void LoadImageConverters() {
@@ -218,25 +217,6 @@ public class MainGUI
 		EndLog();
 		super.finalize(); //not necessary if extending Object.
 	} 
-
-
-	@Override
-	public void keyTyped(KeyEvent e) {}
-
-    /** Handle the key-pressed event from the text field. */
-	@Override
-    public void keyPressed(KeyEvent e) {}
-
-    /** Handle the key-released event from the text field. */
-    @Override
-	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(serialConnection.isPortConfirmed() && !running) {
-				ProcessLine(commandLineText.getText());
-				commandLineText.setText("");
-			}
-		}
-	}
 	
 	private void StartLog() {
 		try {
@@ -440,7 +420,7 @@ public class MainGUI
 						machineConfiguration.SaveConfig();
 						
 						// if we aren't connected, don't show the new 
-						if(!serialConnection.isPortConfirmed()) {
+						if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
 							// Force update of graphics layout.
 							previewPane.updateMachineConfig();
 							// update window title
@@ -738,6 +718,7 @@ public class MainGUI
 					f.SetDestinationFile(destinationFile);
 					f.Convert(img);
 					TabToDraw();
+			        previewPane.ZoomToFitPaper();
 				}
 				catch(IOException e) {
 					Log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
@@ -881,7 +862,7 @@ public class MainGUI
 	}
 	
 	public void GoHome() {
-		SendLineToRobot("G00 F" + feed_rate + " X0 Y0");
+		sendLineToRobot("G00 F" + feed_rate + " X0 Y0");
 	}
 	
 	private String SelectFile() {
@@ -1027,18 +1008,19 @@ public class MainGUI
 	
 	// Send the machine configuration to the robot
 	public void SendConfig() {
-		if(!serialConnection.isPortConfirmed()) return;
+		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		SendLineToRobot(machineConfiguration.GetConfigLine());
-		SendLineToRobot(machineConfiguration.GetBobbinLine());
-		SendLineToRobot("G92 X0 Y0");
+		sendLineToRobot(machineConfiguration.GetConfigLine());
+		sendLineToRobot(machineConfiguration.GetBobbinLine());
+		sendLineToRobot("G92 X0 Y0");
 	}
 	
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void SendFileCommand() {
-		if(running==false || paused==true || gcode.fileOpened==false || serialConnection.isPortConfirmed()==false || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(isrunning==false || isPaused==true || gcode.fileOpened==false ||
+				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gcode.linesProcessed>=gcode.linesTotal) return;
 		
 		String line;
 		do {			
@@ -1047,6 +1029,16 @@ public class MainGUI
 			int line_number = gcode.linesProcessed;
 			gcode.linesProcessed++;
 			line=gcode.lines.get(line_number).trim();
+
+			// TODO catch pen up/down status here
+			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
+				driveControls.raisePen();
+			}
+			if(line.contains("G00 Z"+machineConfiguration.getPenDownString())) {
+				driveControls.lowerPen();
+			}
+			
+
 			if(line.length()>3) {
 				line="N"+line_number+" "+line;
 			}
@@ -1101,6 +1093,8 @@ public class MainGUI
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean ProcessLine(String line) {
+		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || !isrunning) return false;
+
 		// tool change request?
 		String [] tokens = line.split("(\\s|;)");
 
@@ -1122,7 +1116,7 @@ public class MainGUI
 		
 		
 		// send relevant part of line to the robot
-		SendLineToRobot(line);
+		sendLineToRobot(line);
 		
 		return false;
 	}
@@ -1144,8 +1138,9 @@ public class MainGUI
 	 * @param line command to send.
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
-	public boolean SendLineToRobot(String line) {
-		if(!serialConnection.isPortConfirmed()) return false;
+	public boolean sendLineToRobot(String line) {
+		if(connectionToRobot==null || !connectionToRobot.isRobotConfirmed()) return false;
+		
 		if(line.trim().equals("")) return false;
 		String reportedline = line;
 		if(line.contains(";")) {
@@ -1156,13 +1151,13 @@ public class MainGUI
 		line += "\n";
 		
 		try {
-			serialConnection.getSerialPort().writeBytes(line.getBytes());
+			connectionToRobot.sendMessage(line);
 		}
-		catch(SerialPortException e) {
+		catch(Exception e) {
 			Log(e.getMessage());
-            return false;
+			return false;
 		}
-        return true;
+		return true;
 	}
 	
 	/**
@@ -1170,61 +1165,32 @@ public class MainGUI
 	 * TODO add an e-stop command?
 	 */
 	public void Halt() {
-		running=false;
-		paused=false;
+		isrunning=false;
+		isPaused=false;
 	    previewPane.setLinesProcessed(0);
-		previewPane.setRunning(running);
+		previewPane.setRunning(isrunning);
 		updateMenuBar();
 	}
-
-	/**
-	 * open a dialog to ask for the line number.
-	 * @return true if "ok" is pressed, false if the window is closed any other way.
-	 */
-	private boolean getStartingLineNumber() {
-		dialog_result=false;
-		
-		final JDialog driver = new JDialog(mainframe,translator.get("StartAt"),true);
-		driver.setLayout(new GridBagLayout());		
-		final JTextField starting_line = new JTextField("0",8);
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton start = new JButton(translator.get("Start"));
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  driver.add(new JLabel(translator.get("StartAtLine")),c);
-		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  driver.add(starting_line,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  driver.add(cancel,c);
-		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  driver.add(start,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					
-					if(subject == start) {
-						gcode.linesProcessed=Integer.decode(starting_line.getText());
-						SendLineToRobot("M110 N"+gcode.linesProcessed);
-						dialog_result=true;
-						driver.dispose();
-					}
-					if(subject == cancel) {
-						dialog_result=false;
-						driver.dispose();
-					}
-			  }
-		};
-
-		start.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-	    driver.getRootPane().setDefaultButton(start);
-		driver.pack();
-		driver.setVisible(true);  // modal
-		
-		return dialog_result;
+	
+	public void startAt(long lineNumber) {
+		gcode.linesProcessed=0;
+		sendLineToRobot("M110 N"+gcode.linesProcessed);
+		previewPane.setLinesProcessed(gcode.linesProcessed);
+		startDrawing();
+	}
+	
+	public void pause() {
+		isPaused=true;
+	}
+	
+	public void unPause() {
+		isPaused=false;
 	}
 
-	private void StartDrawing() {
-		paused=false;
-		running=true;
-		previewPane.setRunning(running);
+	private void startDrawing() {
+		isPaused=false;
+		isrunning=true;
+		previewPane.setRunning(isrunning);
 		updateMenuBar();
 		statusBar.Start();
 		SendFileCommand();
@@ -1258,56 +1224,14 @@ public class MainGUI
 			TextToGCODE();
 			return;
 		}
-
-		if( subject == buttonStart ) {
-			if(gcode.fileOpened && !running) {
-				gcode.linesProcessed=0;
-				SendLineToRobot("M110 N"+gcode.linesProcessed);
-				previewPane.setLinesProcessed(gcode.linesProcessed);
-				StartDrawing();
-			}
-			return;
-		}
-		if( subject == buttonStartAt ) {
-			if(gcode.fileOpened && !running) {
-				gcode.linesProcessed=0;
-				if(getStartingLineNumber()) {
-					SendLineToRobot("M110 N"+gcode.linesProcessed);
-					previewPane.setLinesProcessed(gcode.linesProcessed);
-					StartDrawing();
-				}
-			}
-			return;
-			
-		}
-		if( subject == buttonPause ) {
-			if(running) {
-				if(paused==true) {
-					penIsUpBeforePause=penIsUp;
-					RaisePen();
-					buttonPause.setText(translator.get("Pause"));
-					paused=false;
-					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
-					SendFileCommand();
-				} else {
-					if(!penIsUpBeforePause) LowerPen();
-					buttonPause.setText(translator.get("Unpause"));
-					paused=true;
-				}
-			}
-			return;
-		}
-		if( subject == buttonHalt ) {
-			Halt();
-			return;
-		}
 		if( subject == buttonRescan ) {
-			serialConnection.ListSerialPorts();
+			connectionManager.listConnections();
 			updateMenuBar();
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			serialConnection.ClosePort();
+			connectionToRobot.closeConnection();
+			connectionToRobot=null;
 			ClearLog();
 			previewPane.setConnected(false);
 			updateMenuBar();
@@ -1390,16 +1314,22 @@ public class MainGUI
 			}
 		}
 
-		for(i=0;i<serialConnection.getPortsDetected().length;++i) {
+		String [] connections = connectionManager.listConnections(); 
+		for(i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
-				serialConnection.OpenPort(serialConnection.getPortsDetected()[i]);
+
+				Log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
+
+				connectionToRobot = connectionManager.openConnection(connections[i]);
+				if(connectionToRobot!=null) {
+					Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
+					updateMenuBar();
+					PlayConnectSound();
+				} else {
+					Log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
+				}
 				return;
 			}
-		}
-		
-		if( subject == commandLineSend ) {
-			SendLineToRobot(commandLineText.getText());
-			commandLineText.setText("");
 		}
 	}
 
@@ -1535,187 +1465,6 @@ public class MainGUI
         return driver;
 	}
 	
-	public JPanel DriveManually() {
-		GridBagConstraints c;
-		
-		JPanel driver = new JPanel(new GridLayout(0,1));
-
-        // Draw menu
-		JPanel go = new JPanel(new GridBagLayout());
-
-        buttonStart = new JButton(translator.get("Start"));
-        buttonStart.addActionListener(this);
-    	go.add(buttonStart);
-
-        buttonStartAt = new JButton(translator.get("StartAtLine"));
-        buttonStartAt.addActionListener(this);
-        go.add(buttonStartAt);
-
-        buttonPause = new JButton(translator.get("Pause"));
-        buttonPause.addActionListener(this);
-        go.add(buttonPause);
-
-        buttonHalt = new JButton(translator.get("Halt"));
-        buttonHalt.addActionListener(this);
-        go.add(buttonHalt);
-        
-		
-		JPanel axisControl = new JPanel(new GridBagLayout());
-			final JLabel yAxis = new JLabel("Y");			yAxis.setPreferredSize(new Dimension(60,20));			yAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton down100 = new JButton("-100");	down100.setPreferredSize(new Dimension(60,20));
-			final JButton down10 = new JButton("-10");		down10.setPreferredSize(new Dimension(60,20));
-			final JButton down1 = new JButton("-1");		down1.setPreferredSize(new Dimension(60,20));
-			final JButton up1 = new JButton("1");  			up1.setPreferredSize(new Dimension(60,20));
-			final JButton up10 = new JButton("10");  		up10.setPreferredSize(new Dimension(60,20));
-			final JButton up100 = new JButton("100");  		up100.setPreferredSize(new Dimension(60,20));
-			
-			final JLabel xAxis = new JLabel("X");			xAxis.setPreferredSize(new Dimension(60,20));		xAxis.setHorizontalAlignment(SwingConstants.CENTER);
-			final JButton left100 = new JButton("-100");	left100.setPreferredSize(new Dimension(60,20));
-			final JButton left10 = new JButton("-10");		left10.setPreferredSize(new Dimension(60,20));
-			final JButton left1 = new JButton("-1");		left1.setPreferredSize(new Dimension(60,20));	
-			final JButton right1 = new JButton("1");		right1.setPreferredSize(new Dimension(60,20));
-			final JButton right10 = new JButton("10");		right10.setPreferredSize(new Dimension(60,20));
-			final JButton right100 = new JButton("100");	right100.setPreferredSize(new Dimension(60,20));
-
-			//final JButton find = new JButton("FIND HOME");	find.setPreferredSize(new Dimension(100,20));
-			final JButton center = new JButton(translator.get("SetHome"));	center.setPreferredSize(new Dimension(100,20));
-			final JButton home = new JButton(translator.get("GoHome"));		home.setPreferredSize(new Dimension(100,20));
-			
-			c = new GridBagConstraints();
-			//c.fill=GridBagConstraints.BOTH; 
-			c.gridx=0;  c.gridy=0;  axisControl.add(yAxis,c);
-			c.gridx=1;	c.gridy=0;	axisControl.add(down100,c);
-			c.gridx=2;	c.gridy=0;	axisControl.add(down10,c);
-			c.gridx=3;	c.gridy=0;	axisControl.add(down1,c);
-			c.gridx=4;	c.gridy=0;	axisControl.add(up1,c);
-			c.gridx=5;	c.gridy=0;	axisControl.add(up10,c);
-			c.gridx=6;	c.gridy=0;	axisControl.add(up100,c);
-			
-			c.gridx=0;  c.gridy=1;  axisControl.add(xAxis,c);
-			c.gridx=1;	c.gridy=1;	axisControl.add(left100,c);
-			c.gridx=2;	c.gridy=1;	axisControl.add(left10,c);
-			c.gridx=3;	c.gridy=1;	axisControl.add(left1,c);
-			c.gridx=4;	c.gridy=1;	axisControl.add(right1,c);
-			c.gridx=5;	c.gridy=1;	axisControl.add(right10,c);
-			c.gridx=6;	c.gridy=1;	axisControl.add(right100,c);
-		
-		
-		JPanel corners = new JPanel();
-			corners.setLayout(new GridBagLayout());
-			final JButton goTop = new JButton(translator.get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
-			final JButton goBottom = new JButton(translator.get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
-			final JButton goLeft = new JButton(translator.get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
-			final JButton goRight = new JButton(translator.get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
-			final JButton goUp = new JButton(translator.get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
-			final JButton goDown = new JButton(translator.get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
-			c = new GridBagConstraints();
-			c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
-			c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
-			c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
-			c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
-			c.insets = new Insets(0,5,0,0);
-			c.gridx=5;  c.gridy=0;  corners.add(goUp,c);
-			c.gridx=5;  c.gridy=1;  corners.add(goDown,c);
-			c.gridx=6;	c.gridy=0;	corners.add(home,c);
-			c.gridx=6;	c.gridy=1;	corners.add(center,c);
-			c.insets = new Insets(0,0,0,0);
-		
-	
-		JPanel feedRateControl = new JPanel();
-		feedRateControl.setLayout(new GridBagLayout());
-			c = new GridBagConstraints();
-			feed_rate = machineConfiguration.GetFeedRate();
-			final JFormattedTextField feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-			feedRate.setText(Double.toString(feed_rate));
-			final JButton setFeedRate = new JButton(translator.get("Set"));
-
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
-			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-		
-
-		driver.add(go);
-        driver.add(new JSeparator());
-		driver.add(axisControl);
-		driver.add(corners);
-		driver.add(feedRateControl);
-        driver.add(new JSeparator());
-	    driver.add(GetTextInputField());
-	    
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					JButton b = (JButton)subject;
-					if(running) return;
-					if(b==home) SendLineToRobot("G00 F"+feed_rate+" X0 Y0");
-					else if(b==center) SendLineToRobot("G92 X0 Y0");
-					else if(b==goLeft) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_left *10));
-					else if(b==goRight) SendLineToRobot("G00 F"+feed_rate+" X"+(machineConfiguration.paper_right*10));
-					else if(b==goTop) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_top*10));
-					else if(b==goBottom) SendLineToRobot("G00 F"+feed_rate+" Y"+(machineConfiguration.paper_bottom*10));
-					//} else if(b==find) {
-					//	SendLineToRobot("G28");
-					else if(b==goUp) RaisePen();
-					else if(b==goDown) LowerPen();
-					else if(b==setFeedRate) {
-						String fr=feedRate.getText();
-						fr=fr.replaceAll("[ ,]","");
-						feed_rate = Double.parseDouble(fr);
-						if(feed_rate<0.001) feed_rate=0.001;
-						machineConfiguration.SetFeedRate(feed_rate);
-						feedRate.setText(Double.toString(feed_rate));
-						SendLineToRobot("G00 G21 F"+feed_rate);
-					} else {
-						SendLineToRobot("G91");  // set relative mode
-
-						if(b==down100) SendLineToRobot("G0 Y-100");
-						if(b==down10) SendLineToRobot("G0 Y-10");
-						if(b==down1) SendLineToRobot("G0 Y-1");
-						if(b==up100) SendLineToRobot("G0 Y100");
-						if(b==up10) SendLineToRobot("G0 Y10");
-						if(b==up1) SendLineToRobot("G0 Y1");
-
-						if(b==left100) SendLineToRobot("G0 X-100");
-						if(b==left10) SendLineToRobot("G0 X-10");
-						if(b==left1) SendLineToRobot("G0 X-1");
-						if(b==right100) SendLineToRobot("G0 X100");
-						if(b==right10) SendLineToRobot("G0 X10");
-						if(b==right1) SendLineToRobot("G0 X1");
-						
-						SendLineToRobot("G90");  // return to absolute mode
-					}
-			  }
-		};
-		
-		up1.addActionListener(driveButtons);
-		up10.addActionListener(driveButtons);
-		up100.addActionListener(driveButtons);
-		down1.addActionListener(driveButtons);
-		down10.addActionListener(driveButtons);
-		down100.addActionListener(driveButtons);
-		left1.addActionListener(driveButtons);
-		left10.addActionListener(driveButtons);
-		left100.addActionListener(driveButtons);
-		right1.addActionListener(driveButtons);
-		right10.addActionListener(driveButtons);
-		right100.addActionListener(driveButtons);
-		goUp.addActionListener(driveButtons);
-		goDown.addActionListener(driveButtons);
-		center.addActionListener(driveButtons);
-		home.addActionListener(driveButtons);
-		//find.addActionListener(driveButtons);
-		goTop.addActionListener(driveButtons);
-		goBottom.addActionListener(driveButtons);
-		goLeft.addActionListener(driveButtons);
-		goRight.addActionListener(driveButtons);
-		setFeedRate.addActionListener(driveButtons);
-		
-		driver.setPreferredSize(new Dimension(150,100));
-		return driver;
-	}
-	
 	protected void JogMotors() {
 		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
 		driver.setLayout(new GridBagLayout());
@@ -1744,11 +1493,11 @@ public class MainGUI
 		ActionListener driveButtons = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Object subject = e.getSource();
-				if(subject == buttonApos) SendLineToRobot("D00 L100");
-				if(subject == buttonAneg) SendLineToRobot("D00 L-100");
-				if(subject == buttonBpos) SendLineToRobot("D00 R100");
-				if(subject == buttonBneg) SendLineToRobot("D00 R-100");
-				SendLineToRobot("M114");
+				if(subject == buttonApos) sendLineToRobot("D00 L100");
+				if(subject == buttonAneg) sendLineToRobot("D00 L-100");
+				if(subject == buttonBpos) sendLineToRobot("D00 R100");
+				if(subject == buttonBneg) sendLineToRobot("D00 R-100");
+				sendLineToRobot("M114");
 			}
 		};
 
@@ -1770,7 +1519,7 @@ public class MainGUI
 		m1i.addActionListener(invertButtons);
 		m2i.addActionListener(invertButtons);
 
-		SendLineToRobot("M114");
+		sendLineToRobot("M114");
 		driver.pack();
 		driver.setVisible(true);
 	}
@@ -1813,21 +1562,19 @@ public class MainGUI
         int i;
         
         if(settingsPane!=null) {
-            buttonAdjustMachineSize.setEnabled(!running);
-            buttonAdjustPulleySize.setEnabled(!running);
-            buttonJogMotors.setEnabled(serialConnection.isPortConfirmed() && !running);
-            buttonChangeTool.setEnabled(!running);
-            buttonAdjustTool.setEnabled(!running);
+            buttonAdjustMachineSize.setEnabled(!isrunning);
+            buttonAdjustPulleySize.setEnabled(!isrunning);
+            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isrunning);
+            buttonChangeTool.setEnabled(!isrunning);
+            buttonAdjustTool.setEnabled(!isrunning);
         }
         if(preparePane!=null) {
-            buttonHilbertCurve.setEnabled(!running);
-            buttonText2GCODE.setEnabled(!running);
+            buttonHilbertCurve.setEnabled(!isrunning);
+            buttonText2GCODE.setEnabled(!isrunning);
         }
-        if(drivePane!=null) {
-        	buttonStart.setEnabled(serialConnection.isPortConfirmed() && !running);
-            buttonStartAt.setEnabled(serialConnection.isPortConfirmed() && !running);
-            buttonPause.setEnabled(serialConnection.isPortConfirmed()&& running);
-            buttonHalt.setEnabled(serialConnection.isPortConfirmed() && running);
+        if(driveControls!=null) {
+        	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
+        	driveControls.updateButtonAccess(x,isrunning);
         }
         
         
@@ -1872,14 +1619,14 @@ public class MainGUI
         
         // Connect menu
         subMenu = new JMenu(translator.get("MenuConnect"));
-        subMenu.setEnabled(!running);
+        subMenu.setEnabled(!isrunning);
         group = new ButtonGroup();
 
-        serialConnection.ListSerialPorts();
-        buttonPorts = new JRadioButtonMenuItem[serialConnection.getPortsDetected().length];
-        for(i=0;i<serialConnection.getPortsDetected().length;++i) {
-        	buttonPorts[i] = new JRadioButtonMenuItem(serialConnection.getPortsDetected()[i]);
-            if(serialConnection.getRecentPort().equals(serialConnection.getPortsDetected()[i]) && serialConnection.isPortOpened()) {
+        String [] connections = connectionManager.listConnections();
+        buttonPorts = new JRadioButtonMenuItem[connections.length];
+        for(i=0;i<connections.length;++i) {
+        	buttonPorts[i] = new JRadioButtonMenuItem(connections[i]);
+            if(connectionToRobot!=null && connectionToRobot.getRecentConnection().equals(connections[i]) && connectionToRobot.isConnectionOpen()) {
             	buttonPorts[i].setSelected(true);
             }
             buttonPorts[i].addActionListener(this);
@@ -1895,7 +1642,7 @@ public class MainGUI
 
         buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"),KeyEvent.VK_D);
         buttonDisconnect.addActionListener(this);
-        buttonDisconnect.setEnabled(serialConnection.isPortOpened());
+        buttonDisconnect.setEnabled(connectionToRobot!=null && connectionToRobot.isConnectionOpen());
         subMenu.add(buttonDisconnect);
         
         menuBar.add(subMenu);
@@ -1954,13 +1701,15 @@ public class MainGUI
         settingsPane = SettingsPanel();
         previewPane = new DrawPanel(machineConfiguration);
         preparePane = ProcessImages();
-        drivePane = DriveManually();
+		driveControls = new MakelangeloDriveControls();
+		driveControls.createPanel(this,translator,machineConfiguration);
+		driveControls.updateButtonAccess(false, false);
         statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
         contextMenu.addTab(translator.get("MenuSettings"),null,settingsPane,null);
         contextMenu.addTab(translator.get("MenuGCODE"),null,preparePane,null);
-        contextMenu.addTab(translator.get("MenuDraw"),null,drivePane,null);
+        contextMenu.addTab(translator.get("MenuDraw"),null,driveControls,null);
         contextMenu.addTab("Log",null,logPane,null);
 
         // major layout
@@ -1994,24 +1743,6 @@ public class MainGUI
     private void TabToLog() {
     	contextMenu.setSelectedIndex(3);
     }
-    
-	private JPanel GetTextInputField() {
-		textInputArea = new JPanel(new GridLayout(0,1));
-		commandLineText = new JTextField(0);
-		commandLineText.setPreferredSize(new Dimension(10,10));
-		commandLineSend = new JButton(translator.get("Send"));
-		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
-		textInputArea.add(commandLineText);
-		textInputArea.add(commandLineSend);
-		
-		commandLineText.addKeyListener(this);
-		commandLineSend.addActionListener(this);
-
-	    //textInputArea.setMinimumSize(new Dimension(100,50));
-	    //textInputArea.setMaximumSize(new Dimension(10000,50));
-
-		return textInputArea;
-	}
 
     public JFrame getParentFrame() {
     	return mainframe;
@@ -2036,7 +1767,8 @@ public class MainGUI
         
         previewPane.ZoomToFitPaper();
         
-        if(prefs.getBoolean("Reconnect to last port on start", false)) serialConnection.reconnectToLastPort();
+        // 2015-05-03: option is meaningless, connectionToRobot doesn't exist when software starts.
+        // if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
         if(prefs.getBoolean("Check for updates", false)) CheckForUpdate();
     }
@@ -2059,18 +1791,10 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param drivePane the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
+	 * @param driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
-	public void setDrivePane(JPanel drivePane) {
-		this.drivePane = drivePane;
-	}
-
-	/**
-	 *
-	 * @return the <code>javax.swing.JPanel</code> representing the drive pane of this GUI.
-	 */
-	public JPanel getDrivePane() {
-		return drivePane;
+	public void updatedriveControls() {
+		driveControls.createPanel(this, translator, machineConfiguration);
 	}
 
 	/**
