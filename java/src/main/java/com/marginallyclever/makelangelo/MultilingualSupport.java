@@ -41,7 +41,7 @@ public class MultilingualSupport {
 	public void loadLanguages() {
 		// Scan folder for language files
         String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
-        System.out.println(workingDirectory);
+        //System.out.println(workingDirectory);
 		File f = new File(workingDirectory);
 		LanguageContainer lang;
 
