@@ -35,6 +35,6 @@ if defined JAVA_HOME (
   goto end
 )
 
-"%JAVA_HOME%\bin\java.exe" -jar Makelangelo.jar -splash:src/main/resources/splash.png
+"%JAVA_HOME%\bin\java.exe" -jar Makelangelo.jar
 
 :end

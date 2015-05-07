@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<meta>
+		<name>Italiano</name>
+		<author>Antonio Ianiero (iant@unterwelt.it)</author>
+	</meta>
+	
+	<string>
+		<key>Cancel</key>
+		<value>Annulla</value>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Salva</value>
+	</string>
+	<string>
+		<key>Load</key>
+		<value>Apri</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>CouldNotFind</key>
+		<value>Impossibile trovare </value>
+		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>MachineWidth</key>
+		<value>Larghezza del plotter</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>MachineHeight</key>
+		<value>Altezza del plotter</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperWidth</key>
+		<value>Larghezza del foglio</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperHeight</key>
+		<value>Altezza del foglio</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertLeft</key>
+		<value>Inverti la sinistra</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertRight</key>
+		<value>Inverti la destra</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>ToolType</key>
+		<value>Tipo di strumento</value>
+		<hint>tool settings</hint>
+	</string>
+	<string>
+		<key>AdjustPulleySize</key>
+		<value>Imposta la dimensione della bobina</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>Sinistra</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>Destra</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Diameter</key>
+		<value>Diametro</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Millimeters</key>
+		<value>mm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConnectingTo</key>
+		<value>In attesa di connettersi a </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortNotConfigured</key>
+		<value>Impossibile configurare la porta: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortOpened</key>
+		<value>Porta aperta.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>TitlePrefix</key>
+		<value>Makelangelo #</value>
+		<hint>window title</hint>
+	</string>
+	<string>
+		<key>TitlePostfix</key>
+		<value> connesso</value>
+		<hint>window title</hint>
+	</string>
+
+	<string>
+		<key>LineSegments</key>
+		<value> segmenti.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>Centimeters</key>
+		<value>cm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>EstimatedTime</key>
+		<value>Tempo stimato per il disegno: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>FileNotOpened</key>
+		<value>Impossibile aprire il file: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionOptions</key>
+		<value>Opzioni di conversione</value>
+		<hint>dialog title</hint>
+	</string>
+	<string>
+		<key>FlipForGlass</key>
+		<value>Inverti per disegnare sul vetro</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>Cancel</key>
+		<value>Annulla</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Start</key>
+		<value>Inizia</value>
+		<hint>As in "start drawing"</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Salva</value>
+		<hint>used in many places</hint>
+	</string>
+
+	<string>
+		<key>PaperMargin</key>
+		<value>Margine al bordo del foglio (%)</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>Converting</key>
+		<value>In fase di conversione</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Finished</key>
+		<value>Completato</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Cancelled</key>
+		<value>Cancellato</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Failed</key>
+		<value>Fallito: </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionStyle</key>
+		<value>Stile di conversione</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>OpeningFile</key>
+		<value>Aprendo </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>UnknownFileType</key>
+		<value>Tipo di file sconosciuto</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>SetPaperSize</key>
+		<value>Impostare la dimensione del foglio prima di importare un'immagine.</value>
+		<hint>warning message</hint>
+	</string>
+
+	<string>
+		<key>FileTypeGCode</key>
+		<value>GCODE (ngc)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeImage</key>
+		<value>Immagine (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuSoundsTitle</key>
+		<value>Suoni</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSoundsConnect</key>
+		<value>Connessione</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsDisconnect</key>
+		<value>Disconnessione</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishConvert</key>
+		<value>Fine della conversione</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishDraw</key>
+		<value>Fine del disegno</value>
+		<hint>sound settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuGraphicsTitle</key>
+		<value>Grafica</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsPenUp</key>
+		<value>Mostra le mosse a penna alzata</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsAntialias</key>
+		<value>Linee di antialiasing</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsSpeedVSQuality</key>
+		<value>Preferisci la velocita' alla qualita'</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsDrawWhileRunning</key>
+		<value>Mostra l'intera immagine mentre si disegna</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuLanguageTitle</key>
+		<value>Lingua</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>InvalidTool</key>
+		<value>Richiesto strumento non valido #</value>
+		<hint>warning message</hint>
+	</string>
+	<string>
+		<key>ChangeToolPrefix</key>
+		<value>Prepara </value>
+		<hint>tool change prompt.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>ChangeToolPostfix</key>
+		<value> e premi un tasto per continuare.</value>
+		<hint>tool change prompt.  keep the space at the start.</hint>
+	</string>
+
+	<string>
+		<key>StartAt</key>
+		<value>Inizia a</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>StartAtLine</key>
+		<value>Inizia alla linea #</value>
+		<hint>start at dialog</hint>
+	</string>
+
+	<string>
+		<key>Pause</key>
+		<value>Pausa</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Unpause</key>
+		<value>Riprendi</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>SetHome</key>
+		<value>IMPOSTA HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>GoHome</key>
+		<value>VAI A HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Top</key>
+		<value>SU</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Bottom</key>
+		<value>GIU'</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>SINISTRA</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>DESTRA</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenUp</key>
+		<value>PENNA SU</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenDown</key>
+		<value>PENNA GIU'</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Set</key>
+		<value>Imposta</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Speed</key>
+		<value>Velocita':</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Rate</key>
+		<value>steps/min</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>JogMotors</key>
+		<value>Aziona i motori</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>JogIn</key>
+		<value>Avvolgi</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogOut</key>
+		<value>Rilascia</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>Invert</key>
+		<value>Inverti</value>
+		<hint>jog motors dialog</hint>
+	</string>
+
+	<string>
+		<key>UpdateNotice</key>
+		<value>E' disponibile una nuova versione di questo software.\nVisita il sito http://makelangelo.com/ per scaricare le nuove meraviglie.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpToDate</key>
+		<value>Questo software e' aggiornato all'ultima versione disponibile.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpdateCheckFailed</key>
+		<value>Spiacente, aggiornamento non riuscito.  Visita il sito http://www.marginallyclever.com/ per scaricare e aggiornare manualmente.</value>
+		<hint>check for update dialog</hint>
+	</string>
+
+	<string>
+		<key>Send</key>
+		<value>Invia</value>
+		<hint>drive manually dialog</hint>
+	</string>
+	<string>
+		<key>TitleNotConnected</key>
+		<value> non connesso</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuMakelangelo</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuPreferences</key>
+		<value>Preferenze</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuUpdate</key>
+		<value>Controlla gli aggiornamenti</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAbout</key>
+		<value>Informazioni</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuQuit</key>
+		<value>Esci</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuConnect</key>
+		<value>Connetti</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuRescan</key>
+		<value>Scansiona nuovamente</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuDisconnect</key>
+		<value>Disconnetti</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuLoadMachineConfig</key>
+		<value>Carica le impostazioni per...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSettings</key>
+		<value>Impostazioni</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSettingsMachine</key>
+		<value>Modifica le dimensioni della macchina e del foglio</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustPulleys</key>
+		<value>Modifica le dimensioni delle bobine</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuJogMotors</key>
+		<value>Aziona i motori</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSelectTool</key>
+		<value>Seleziona lo strumento attivo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustTool</key>
+		<value>Imposta lo strumento attivo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuGCODE</key>
+		<value>GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuHilbertCurve</key>
+		<value>Curvs di Hilbert</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuTextToGCODE</key>
+		<value>Da testo a GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuConvertImage</key>
+		<value>Converti Immagine</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuOpenFile</key>
+		<value>Apri il File...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSaveGCODEAs</key>
+		<value>Salva il GCODE come...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuDraw</key>
+		<value>Disegna</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Halt</key>
+		<value>Ferma</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuPreview</key>
+		<value>Anteprima</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomIn</key>
+		<value>Zoom +</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomOut</key>
+		<value>Zoom -</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomFit</key>
+		<value>Zoom a schermo intero</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+    <string>
+        <key>mmNotice</key>
+        <value>Tutti i valori sono in mm.</value>
+		<hint>Adjust machine size</hint>
+    </string>
+</language>
