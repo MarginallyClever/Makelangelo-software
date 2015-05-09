@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<meta>
+		<name>Ελληνικά</name>
+		<author>John Kari (ioakar0@gmail.com)</author>
+	</meta>
+	
+	<string>
+		<key>Cancel</key>
+		<value>Ακύρωση</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Αποθήκευση</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Load</key>
+		<value>Φόρτωση</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>CouldNotFind</key>
+		<value>Δεν βρέθηκε </value>
+		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>MachineWidth</key>
+		<value>Πλάτος μηχανής</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>MachineHeight</key>
+		<value>Ύψος μηχανής</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperWidth</key>
+		<value>Πλάτος Χαρτιού</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperHeight</key>
+		<value>Ύψος χαρτιού</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertLeft</key>
+		<value>Invert left</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertRight</key>
+		<value>Invert right</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>ToolType</key>
+		<value>Τύπος εργαλείου</value>
+		<hint>tool settings</hint>
+	</string>
+	<string>
+		<key>AdjustPulleySize</key>
+		<value>Ρύθμιση μεγέθους τροχαλίας</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>Αριστερά</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>Δεξιά</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Diameter</key>
+		<value>Διάμετρος</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Millimeters</key>
+		<value>mm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConnectingTo</key>
+		<value>Σύνδεση με </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortNotConfigured</key>
+		<value>Δεν μπορεί να ρυθμιστεί η θύρα: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortOpened</key>
+		<value>Η θύρα άνοιξε.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>TitlePrefix</key>
+		<value>Makelangelo #</value>
+		<hint>window title</hint>
+	</string>
+	<string>
+		<key>TitlePostfix</key>
+		<value> συνδέθηκε</value>
+		<hint>window title</hint>
+	</string>
+
+	<string>
+		<key>LineSegments</key>
+		<value> τμήματα γραμμής.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>Centimeters</key>
+		<value>cm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>EstimatedTime</key>
+		<value>Εκτιμώμενος χρόνος σχεδιασμού: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>FileNotOpened</key>
+		<value>Το αρχείο δεν μπορεί να ανοίξει: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionOptions</key>
+		<value>Επιλογές μετατροπής</value>
+		<hint>dialog title</hint>
+	</string>
+	<string>
+		<key>FlipForGlass</key>
+		<value>Αντιστροφή για γυαλί</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>Cancel</key>
+		<value>Ακύρωση</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Start</key>
+		<value>Έναρξη</value>
+		<hint>As in "start drawing"</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Αποθήκευση</value>
+		<hint>used in many places</hint>
+	</string>
+
+	<string>
+		<key>PaperMargin</key>
+		<value>Περιθώρια στις άκρες του χαρτιού (%)</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>Converting</key>
+		<value>Μετατροπή</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Finished</key>
+		<value>Ολοκληρώθηκε</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Cancelled</key>
+		<value>Ακυρώθηκε</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Failed</key>
+		<value>Απέτυχε: </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionStyle</key>
+		<value>Στυλ μετατροπής</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>OpeningFile</key>
+		<value>Άνοιγμα </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>UnknownFileType</key>
+		<value>Άγνωστος τύπος αρχείου</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>SetPaperSize</key>
+		<value>Παρακαλώ ορίστε ένα μέγεθος χαρτιού πριν εισάγετε εικόνα.</value>
+		<hint>warning message</hint>
+	</string>
+
+	<string>
+		<key>FileTypeGCode</key>
+		<value>GCODE (ngc)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeImage</key>
+		<value>Image (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuSoundsTitle</key>
+		<value>Ήχοι</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSoundsConnect</key>
+		<value>Σύνδεση</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsDisconnect</key>
+		<value>Αποσύνδεση</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishConvert</key>
+		<value>Ολοκλήρωση μετατροπής</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishDraw</key>
+		<value>Ολοκλήρωση σχεδιασμού</value>
+		<hint>sound settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuGraphicsTitle</key>
+		<value>Γραφικά</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsPenUp</key>
+		<value>Εμάνιση κινήσεις στυλό</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsAntialias</key>
+		<value>Γραμμές εξομάλυνσης</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsSpeedVSQuality</key>
+		<value>Ταχύτητα έναντι ποιότητας</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsDrawWhileRunning</key>
+		<value>Εμφάνιση ολόκληρης εικόνας καθώς ζωγραφίζεται</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuLanguageTitle</key>
+		<value>Γλώσσα</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>InvalidTool</key>
+		<value>Ζητήθηκε μη έγκυρο εργαλείο #</value>
+		<hint>warning message</hint>
+	</string>
+	<string>
+		<key>ChangeToolPrefix</key>
+		<value>Παρακλαώ προετοιμάστε </value>
+		<hint>tool change prompt.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>ChangeToolPostfix</key>
+		<value> και πατήστε οποιοδήποτε πλήκτρο για να συνεχίσετε.</value>
+		<hint>tool change prompt.  keep the space at the start.</hint>
+	</string>
+
+	<string>
+		<key>StartAt</key>
+		<value>Εκκίνηση από</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>StartAtLine</key>
+		<value>Εκκίνηση από γραμμή #</value>
+		<hint>start at dialog</hint>
+	</string>
+
+	<string>
+		<key>Pause</key>
+		<value>Παύση</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Unpause</key>
+		<value>Συνέχεια</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>SetHome</key>
+		<value>ΟΡΙΣΜΟΣ ΑΡΧΗΣ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>GoHome</key>
+		<value>ΑΡΧΗ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Top</key>
+		<value>ΚΟΡΥΦΗ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Bottom</key>
+		<value>ΚΑΤΩ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>ΑΡΙΣΤΕΡΑ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>ΔΕΞΙΑ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenUp</key>
+		<value>ΣΤΥΛΟ ΕΠΑΝΩ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenDown</key>
+		<value>ΣΤΥΛΟ ΚΑΤΩ</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Set</key>
+		<value>Ορισμός</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Speed</key>
+		<value>Ταχύτητα:</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Rate</key>
+		<value>βήματα/λεπτό</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>JogMotors</key>
+		<value>Σπρώξιμο Κινητήρων</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>JogIn</key>
+		<value>ΜΕΣΑ</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogOut</key>
+		<value>ΕΞΩ</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>Invert</key>
+		<value>Αντιστροφή</value>
+		<hint>jog motors dialog</hint>
+	</string>
+
+	<string>
+		<key>UpdateNotice</key>
+		<value>Μια νέαν έκδοση είναι διαθέσιμη.\nΠαρακαλώ επισκεφθείτε τη σελίδα http://makelangelo.com/ για να την κατεβάσετε.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpToDate</key>
+		<value>Το λογισμικό είναι ενημερωμένο.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpdateCheckFailed</key>
+		<value>Λυπούμαστε, αδυναμία ελέγχου. Παρακαλούμε επισκεφθείτε τη σελίδα http://www.marginallyclever.com/ για να ελέγξετε για νέες εκδόσεις.</value>
+		<hint>check for update dialog</hint>
+	</string>
+
+	<string>
+		<key>Send</key>
+		<value>Αποστολή</value>
+		<hint>drive manually dialog</hint>
+	</string>
+	<string>
+		<key>TitleNotConnected</key>
+		<value> μη συνδεδεμένο</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuMakelangelo</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuPreferences</key>
+		<value>Προτιμήσεις</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuUpdate</key>
+		<value>Έλεγχος για ενημερώσεις</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAbout</key>
+		<value>Σχετικά</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuQuit</key>
+		<value>Έξοδος</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuConnect</key>
+		<value>Σύνδεση</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuRescan</key>
+		<value>Επανάληψη σάρωσης</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuDisconnect</key>
+		<value>Αποσύνδεση</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuLoadMachineConfig</key>
+		<value>Φόρτωση ρυθμίσεων για...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSettings</key>
+		<value>Ρυθμίσεις</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSettingsMachine</key>
+		<value>Ρύθμιση μεγέθους χαρτιού</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustPulleys</key>
+		<value>Ρύθμιση μεγέθους τροχαλίας</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuJogMotors</key>
+		<value>Σπρώξιμο Κινητήρων</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSelectTool</key>
+		<value>Επιλογή ενεργού εργαλείου</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustTool</key>
+		<value>Ρύθμιση ενεργού εργαλείου</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuGCODE</key>
+		<value>GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuHilbertCurve</key>
+		<value>Hilbert Curve</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuTextToGCODE</key>
+		<value>Κείμενο σε GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuConvertImage</key>
+		<value>Άνοιγμα πρόσφατου...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuOpenFile</key>
+		<value>Άνοιγμα αρχείου...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSaveGCODEAs</key>
+		<value>Αποθήκευση GCODE ως...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuDraw</key>
+		<value>Σχεδιασμός</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Halt</key>
+		<value>Αλτ</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuPreview</key>
+		<value>Προεπισκόπηση</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomIn</key>
+		<value>Zoom +</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomOut</key>
+		<value>Zoom -</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomFit</key>
+		<value>Zoom to fit</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>mmNotice</key>
+		<value>Όλες οι τιμές σε mm.</value>
+		<hint>Adjust machine size</hint>
+	</string>
+
+
+	<string>
+		<key>penToolDiameter</key>
+		<value>Διάμετρος</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolMaxFeedRate</key>
+		<value>Μέγιστη τροφοδότηση</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolUp</key>
+		<value>Πάνω</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolDown</key>
+		<value>Κάτω</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolLiftSpeed</key>
+		<value>Ταχύτητα ανύψωσης</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolTest</key>
+		<value>Δοκιμή</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	
+	<string>
+		<key>SharePromo</key>
+		<value>Μοιραστείτε το στο twitter με τον λογαρισμό @MarginallyC για να δείτε τι έχουν δημιουργήσει και άλλοι.</value>
+		<hint>Your drawing is finished.  Share it</hint>
+	</string>
+	
+	<string>
+		<key>StatusSoFar</key>
+		<value>Χρόνος λειτουργίας: </value>
+		<hint>time machine has been drawing</hint>
+	</string>
+	
+	<string>
+		<key>StatusRemaining</key>
+		<value>Εκτιμώμενος χρόνος που απομένει: </value>
+		<hint>time machine will be drawing</hint>
+	</string>
+</language>

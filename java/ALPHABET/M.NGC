@@ -1,8 +1,0 @@
-DOWN
-
-G0 Y2
-G0 X0.5 Y-1
-G0 X0.5 Y1
-G0 Y-2
-
-UP

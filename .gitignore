@@ -2,26 +2,26 @@
 *.DS_Store
 *.ngc
 
-java/DrawbotGUI.jar
-
-java/log.html
-
-java/Windows/log.html
-
-java/OSX/log.html
+*/log.html
 
 gcode/*
-java/Thumbs.db
-last_official_release/Windows/log.html
-*.classpath
-java/.classpath
-
+*/Thumbs.db
 java/src/Thumbs.db
+*/.classpath
 
-java/temp.png
+*/temp.png
 
 java/Makelangelo.jar
 
-*.jar
+last_official_release/Makelangelo/log.html
+target/
+.settings/
 
-*.jar
+# Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+*.iml
+## File-based project format:
+*.ipr
+*.iws
+.idea/
+
+java/.settings/org.eclipse.core.resources.prefs
