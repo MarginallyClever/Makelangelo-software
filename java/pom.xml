@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marginallyclever</groupId>
     <artifactId>Makelangelo</artifactId>
-    <version>v7-SNAPSHOT</version>
+    <version>v7.1.0</version>
   <name>Makelangelo</name>
   <description>Wall-hanging polargraph robot that draws murals</description>
   <prerequisites>
@@ -26,7 +26,7 @@
           <archive>
             <manifestEntries>
               <!-- FIXME replace with high quality splash image. -->
-              <SplashScreen-Image>splash.png</SplashScreen-Image>
+              <SplashScreen-Image>logo.png</SplashScreen-Image>
             </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
@@ -184,4 +184,9 @@
       <url>file://${basedir}/local-maven-repo</url>
     </repository>
   </repositories>
+  <url>http://www.makelangelo.com/</url>
+  <organization>
+  	<name>Marginally Clever Robots, Inc.</name>
+  	<url>http://www.marginallyclever.com/</url>
+  </organization>
 </project>

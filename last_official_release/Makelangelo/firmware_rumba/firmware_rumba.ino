@@ -135,7 +135,12 @@ void IK(float x, float y, long &l1, long &l2) {
 #ifdef COREXY
   l1 = floor((x+y) / THREAD_PER_STEP);
   l2 = floor((x-y) / THREAD_PER_STEP);
-#else
+#endif
+#ifdef TRADITIONALXY
+  l1 = floor((x) / THREAD_PER_STEP);
+  l2 = floor((y) / THREAD_PER_STEP);
+#endif
+#ifdef POLARGRAPH2
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
