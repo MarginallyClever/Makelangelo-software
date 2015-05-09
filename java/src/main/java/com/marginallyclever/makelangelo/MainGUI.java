@@ -70,9 +70,9 @@ public class MainGUI
 	static final long serialVersionUID=1L;
 
     /**
-     * software version
+     * software version FIXME define once. Do not violate DRY.
      */
-	public static final String version="7.1.0";
+	public static final String version="7.1.1";
 
 	
 	// Image processing
