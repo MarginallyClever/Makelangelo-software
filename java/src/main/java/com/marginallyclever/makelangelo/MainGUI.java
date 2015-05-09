@@ -334,9 +334,9 @@ public class MainGUI
 	public void LoadGCode(String filename) {
 		try {
 			gcode.Load(filename);
-		   	Log("<font color='green'>"+gcode.estimate_count + translator.get("LineSegments")
-		   			+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
-		   			+ translator.get("EstimatedTime") + statusBar.formatTime((long)(gcode.estimated_time)) + "s.</font>\n");
+		   	Log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
+					+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
+					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gcode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
 	    	Log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
@@ -1174,7 +1174,7 @@ public class MainGUI
 	
 	public void startAt(long lineNumber) {
 		gcode.linesProcessed=0;
-		sendLineToRobot("M110 N"+gcode.linesProcessed);
+		sendLineToRobot("M110 N" + gcode.linesProcessed);
 		previewPane.setLinesProcessed(gcode.linesProcessed);
 		startDrawing();
 	}
@@ -1282,13 +1282,14 @@ public class MainGUI
 		if( subject == buttonAbout ) {
             final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-			ImageIcon icon = null;
-			try {
-				icon = new ImageIcon(IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("logo.png")));
-			} catch (IOException exceptionLoadingIconImage) {
-				System.err.print(exceptionLoadingIconImage);
+			ImageIcon icon = getImageIcon("logo.png");
+			final String menuAboutValue = translator.get("MenuAbout");
+			if (icon != null) {
+				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
+			} else {
+				icon = getImageIcon("resources/logo.png");
+				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 			}
-		    JOptionPane.showMessageDialog(null, bottomText, "About FIXME", JOptionPane.INFORMATION_MESSAGE, icon);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1334,7 +1335,7 @@ public class MainGUI
 	}
 
 	/**
-	 * 
+	 *
 	 * @return byte array containing date for image icon.
 	 */
 	private ImageIcon getImageIcon(String iconResourceName) {
