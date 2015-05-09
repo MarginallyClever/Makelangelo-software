@@ -1335,6 +1335,21 @@ public class MainGUI
 
 	/**
 	 * 
+	 * @return byte array containing date for image icon.
+	 */
+	private ImageIcon getImageIcon(String iconResourceName) {
+		ImageIcon icon = null;
+		try {
+            final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
+            icon = new ImageIcon(imageData);
+        } catch(NullPointerException | IOException exceptionLoadingIconImage) {
+            System.err.print(exceptionLoadingIconImage);
+        }
+		return icon;
+	}
+
+	/**
+	 * 
      * <p>
      * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
      * representing the About Message Dialog's HTML.
