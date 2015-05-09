@@ -1807,7 +1807,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
+	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void updatedriveControls() {
 		driveControls.createPanel(this, translator, machineConfiguration);
