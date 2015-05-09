@@ -1,1 +1,0 @@
-Zip the folder called "Makelangelo" so that, on extraction, the root folder is called "Makelangelo" instead of "Windows"

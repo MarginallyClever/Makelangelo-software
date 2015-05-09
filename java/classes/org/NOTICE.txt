@@ -1,3 +1,0 @@
-http://kabeja.sourceforge.net/license.html
-
-Kabeja is lisenced under the Apache Software License 2.0

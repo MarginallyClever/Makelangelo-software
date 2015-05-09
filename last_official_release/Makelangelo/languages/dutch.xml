@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<meta>
+		<name>Nederlands</name>
+		<author>Raymond Philippe (iamraymondphilippe@gmail.com)</author>
+	</meta>
+	
+	<string>
+		<key>Cancel</key>
+		<value>Annuleren</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Opslaan</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Load</key>
+		<value>Laden</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>CouldNotFind</key>
+		<value>Kan niet vinden </value>
+		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>MachineWidth</key>
+		<value>Machine breedte</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>MachineHeight</key>
+		<value>Machine hoogte</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperWidth</key>
+		<value>Papier breedte</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>PaperHeight</key>
+		<value>Papier hoogte</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertLeft</key>
+		<value>Links omkeren </value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>InvertRight</key>
+		<value>Rechts omkeren</value>
+		<hint>adjust machine settings</hint>
+	</string>
+	<string>
+		<key>ToolType</key>
+		<value>Soort Tool</value>
+		<hint>tool settings</hint>
+	</string>
+	<string>
+		<key>AdjustPulleySize</key>
+		<value>Pas pulley grootte aan</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>Links</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>Rechts</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Diameter</key>
+		<value>Diameter</value>
+		<hint>Adjust pulleys</hint>
+	</string>
+	<string>
+		<key>Millimeters</key>
+		<value>mm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConnectingTo</key>
+		<value>Aansluiten op  </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortNotConfigured</key>
+		<value>Poort kon niet worden geconfigureerd: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>PortOpened</key>
+		<value>Poort geopend.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>TitlePrefix</key>
+		<value>Makelangelo #</value>
+		<hint>window title</hint>
+	</string>
+	<string>
+		<key>TitlePostfix</key>
+		<value> verbonden</value>
+		<hint>window title</hint>
+	</string>
+
+	<string>
+		<key>LineSegments</key>
+		<value> lijn segmenten.</value>
+		<hint>status message</hint>
+	</string>
+	<string>
+		<key>Centimeters</key>
+		<value>cm</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>EstimatedTime</key>
+		<value>Geschatte teken tijd: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>FileNotOpened</key>
+		<value>File could not be opened: </value>
+		<hint>status message.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionOptions</key>
+		<value>Conversie opties</value>
+		<hint>dialog title</hint>
+	</string>
+	<string>
+		<key>FlipForGlass</key>
+		<value>Spiegelen voor glas</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>Cancel</key>
+		<value>Annuleren</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
+		<key>Start</key>
+		<value>Start</value>
+		<hint>As in "start drawing"</hint>
+	</string>
+	<string>
+		<key>Save</key>
+		<value>Opslaan</value>
+		<hint>used in many places</hint>
+	</string>
+
+	<string>
+		<key>PaperMargin</key>
+		<value>Marge bij papier rand (%)</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>Converting</key>
+		<value>Converteren</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Finished</key>
+		<value>Voltooid</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Cancelled</key>
+		<value>Geannuleerd</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>Failed</key>
+		<value>Mislukt: </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>ConversionStyle</key>
+		<value>Conversie stijl</value>
+		<hint>conversion options</hint>
+	</string>
+
+	<string>
+		<key>OpeningFile</key>
+		<value>Openen </value>
+		<hint>status update.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>UnknownFileType</key>
+		<value>Onbekend bestandstype</value>
+		<hint>status update</hint>
+	</string>
+	<string>
+		<key>SetPaperSize</key>
+		<value>Stel een papierformaat in voordat je een afbeelding importeert.</value>
+		<hint>warning message</hint>
+	</string>
+
+	<string>
+		<key>FileTypeGCode</key>
+		<value>GCODE (ngc)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeImage</key>
+		<value>Afbeelding (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuSoundsTitle</key>
+		<value>Geluiden</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSoundsConnect</key>
+		<value>Verbinden</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsDisconnect</key>
+		<value>Uitschakelen</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishConvert</key>
+		<value>Voltooi omzetting</value>
+		<hint>sound settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuSoundsFinishDraw</key>
+		<value>Voltooien tekening</value>
+		<hint>sound settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuGraphicsTitle</key>
+		<value>Graphics</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsPenUp</key>
+		<value>Laat pen up bewegingen zien</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsAntialias</key>
+		<value>Anti-alias lijnen</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsSpeedVSQuality</key>
+		<value>Snelheid boven kwaliteit</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuGraphicsDrawWhileRunning</key>
+		<value>Toon volledige afbeelding tijdens het tekenen</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+
+	<string>
+		<key>MenuLanguageTitle</key>
+		<value>Taal</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>InvalidTool</key>
+		<value>Ongeldig gereedschap gevraagd #</value>
+		<hint>warning message</hint>
+	</string>
+	<string>
+		<key>ChangeToolPrefix</key>
+		<value>Gelieve voor te bereiden </value>
+		<hint>tool change prompt.  keep the space at the end.</hint>
+	</string>
+	<string>
+		<key>ChangeToolPostfix</key>
+		<value> en klik op een knop om door te gaan.</value>
+		<hint>tool change prompt.  keep the space at the start.</hint>
+	</string>
+
+	<string>
+		<key>StartAt</key>
+		<value>Start bij</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>StartAtLine</key>
+		<value>Start bij lijn #</value>
+		<hint>start at dialog</hint>
+	</string>
+
+	<string>
+		<key>Pause</key>
+		<value>Pauze</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Unpause</key>
+		<value>Hervatten</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>SetHome</key>
+		<value>SET HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>GoHome</key>
+		<value>GO HOME</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Top</key>
+		<value>BOVEN</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Bottom</key>
+		<value>BENEDEN</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Left</key>
+		<value>LINKS</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Right</key>
+		<value>RECHTS</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenUp</key>
+		<value>PEN OMHOOG</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PenDown</key>
+		<value>PEN OMLAAG</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>Set</key>
+		<value>Set</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Speed</key>
+		<value>Snelheid:</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>Rate</key>
+		<value>stappen/min</value>
+		<hint>manual driving dialog</hint>
+	</string>
+
+	<string>
+		<key>JogMotors</key>
+		<value>Start en Stop Motoren</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>JogIn</key>
+		<value>IN</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogOut</key>
+		<value>UIT</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>Invert</key>
+		<value>Omkeren</value>
+		<hint>jog motors dialog</hint>
+	</string>
+
+	<string>
+		<key>UpdateNotice</key>
+		<value>Een nieuwe versie van deze software is beschikbaar.\nPlease bezoek http://makelangelo.com/ om de nieuwste te krijgen.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpToDate</key>
+		<value>Deze software is up-to-date.</value>
+		<hint>check for update dialog</hint>
+	</string>
+	<string>
+		<key>UpdateCheckFailed</key>
+		<value>Sorry, Ik heb gefaald. Bezoek http://www.marginallyclever.com/ om jezelf te controleren.</value>
+		<hint>check for update dialog</hint>
+	</string>
+
+	<string>
+		<key>Send</key>
+		<value>Verzenden</value>
+		<hint>drive manually dialog</hint>
+	</string>
+	<string>
+		<key>TitleNotConnected</key>
+		<value> Niet aangesloten</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuMakelangelo</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuPreferences</key>
+		<value>Voorkeuren</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuUpdate</key>
+		<value>Controleer op updates</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAbout</key>
+		<value>Over</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuQuit</key>
+		<value>Stoppen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuConnect</key>
+		<value>Verbinden</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuRescan</key>
+		<value>Opnieuw scannen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuDisconnect</key>
+		<value>Uitschakelen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuLoadMachineConfig</key>
+		<value>Instellingen laden voor...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSettings</key>
+		<value>Instellingen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSettingsMachine</key>
+		<value>Machine aanpassen &amp; papierformaat</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustPulleys</key>
+		<value>Pas katrol grootte aan</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuJogMotors</key>
+		<value>Start en Stop Motoren</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuSelectTool</key>
+		<value>Select active tool</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustTool</key>
+		<value>Selecteer actieve gereedschap</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuGCODE</key>
+		<value>GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuHilbertCurve</key>
+		<value>Hilbert Curve</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuTextToGCODE</key>
+		<value>Tekst naar GCODE</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuConvertImage</key>
+		<value>Open Recente...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuOpenFile</key>
+		<value>Open Bestand...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuSaveGCODEAs</key>
+		<value>Bewaar GCODE als...</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuDraw</key>
+		<value>Teken</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Halt</key>
+		<value>Stopzetten</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>MenuPreview</key>
+		<value>Voorbeeld</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomIn</key>
+		<value>Zoom +</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomOut</key>
+		<value>Zoom -</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ZoomFit</key>
+		<value>Zoom om passend te maken</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>mmNotice</key>
+		<value>Alle waarden in mm.</value>
+		<hint>Adjust machine size</hint>
+	</string>
+
+	<string>
+		<key>penToolAdjust</key>
+		<value>Stel Pen in</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolDiameter</key>
+		<value>Diameter</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolMaxFeedRate</key>
+		<value>Max toevoersnelheid</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolUp</key>
+		<value>Omhoog</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolDown</key>
+		<value>Omlaag</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolLiftSpeed</key>
+		<value>Hefsnelheid</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
+		<key>penToolTest</key>
+		<value>Test</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+
+
+	<string>
+		<key>spraypaintToolTest</key>
+		<value>Stel Spuitverf in</value>
+		<hint>Adjust Spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolDiameter</key>
+		<value>Punt grootte</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolMaxFeedRate</key>
+		<value>Max toevoersnelheid</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolUp</key>
+		<value>Uit</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolDown</key>
+		<value>Aan</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolLiftSpeed</key>
+		<value>Aan/uit snelheid</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolTest</key>
+		<value>Maak een stip</value>
+		<hint>Adjust spraypaint tool</hint>
+	</string>
+
+	<string>
+		<key>voronoiStipplingName</key>
+		<value>Voronoi stippels</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingCellCount</key>
+		<value>Aantal Cellen</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingGenCount</key>
+		<value>Gegenereerd Aantal</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMax</key>
+		<value>Max stip grootte</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMin</key>
+		<value>Min stip grootte</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+
+	<string>
+		<key>BoxGeneratorName</key>
+		<value>Boxxy</value>
+		<hint>Boxxy generator</hint>
+	</string>
+	<string>
+		<key>CrosshatchName</key>
+		<value>Gearceerd</value>
+		<hint>Crosshatch generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveName</key>
+		<value>Hilbert Curve</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveSize</key>
+		<value>Formaat</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveOrder</key>
+		<value>Bestellen</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+
+	<string>
+		<key>PulseLineName</key>
+		<value>Puls lijn</value>
+		<hint>Pulse Line generator</hint>
+	</string>
+	<string>
+		<key>ZigZagName</key>
+		<value>Grote zig zag</value>
+		<hint>Zig Zag generator</hint>
+	</string>
+	<string>
+		<key>YourMsgHereName</key>
+		<value>Your bericht hier</value>
+		<hint>Your message here generator</hint>
+	</string>
+	<string>
+		<key>SpiralName</key>
+		<value>Spiraal</value>
+		<hint>Spiral generator</hint>
+	</string>
+	<string>
+		<key>ScanlineName</key>
+		<value>Scanlijn</value>
+		<hint>Scanline generator</hint>
+	</string>
+	<string>
+		<key>RGBName</key>
+		<value>Rood Groen Blauw</value>
+		<hint>RGB generator</hint>
+	</string>
+
+	<string>
+		<key>SharePromo</key>
+		<value>Deel het op twitter om @MarginallyC om te zien wat anderen hebben gemaakt.</value>
+		<hint>Your drawing is finished.  Share it</hint>
+	</string>
+	
+	<string>
+		<key>StatusSoFar</key>
+		<value>Gebruikte tijd: </value>
+		<hint>time machine has been drawing</hint>
+	</string>
+	
+	<string>
+		<key>StatusRemaining</key>
+		<value>Geschatte resterende tijd: </value>
+		<hint>time machine will be drawing</hint>
+	</string>
+</language>
