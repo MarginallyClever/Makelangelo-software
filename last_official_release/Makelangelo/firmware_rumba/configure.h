@@ -16,7 +16,10 @@
 #define HAS_LCD  // comment this out if there is no SMART LCD controller
 //#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
 
+// machine style
+#define POLARGRAPH2  // uncomment this line if you use a polargraph like the Makelangelo
 //#define COREXY  // uncomment this line if you use a CoreXY setup.
+//#define TRADITIONALXY  // uncomment this line if you use a traditional XY setup.
 
 
 // servo angles for pen control

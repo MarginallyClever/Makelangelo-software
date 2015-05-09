@@ -12,7 +12,10 @@
 //#define MOTHERBOARD 1  // Adafruit Motor Shield 1
 #define MOTHERBOARD 2  // Adafruit Motor Shield 2
 
-//#define COREXY (1)  // uncomment this if you're using a CoreXY system
+// machine style
+#define POLARGRAPH2  // uncomment this line if you use a polargraph like the Makelangelo
+//#define COREXY  // uncomment this line if you use a CoreXY setup.
+//#define TRADITIONALXY  // uncomment this line if you use a traditional XY setup.
 
 // Increase this number to see more output
 #define VERBOSE         (0)
@@ -295,7 +298,12 @@ static void IK(float x, float y, long &l1, long &l2) {
 #ifdef COREXY
   l1 = floor((x+y) / THREAD_PER_STEP);
   l2 = floor((x-y) / THREAD_PER_STEP);
-#else
+#endif
+#ifdef TRADITIONALXY
+  l1 = floor((x) / THREAD_PER_STEP);
+  l2 = floor((y) / THREAD_PER_STEP);
+#endif
+#ifdef POLARGRAPH2
   // find length to M1
   float dy = y - limit_top;
   float dx = x - limit_left;
