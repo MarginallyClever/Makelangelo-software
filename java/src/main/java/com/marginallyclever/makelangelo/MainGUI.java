@@ -72,7 +72,7 @@ public class MainGUI
     /**
      * software version
      */
-	public static final String version="7";
+	public static final String version="7.1.0";
 
 	
 	// Image processing
