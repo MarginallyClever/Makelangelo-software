@@ -1,78 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
 	<meta>
-		<name>English</name>
-		<author>Dan Royer (dan@marginallyclever.com)</author>
+		<name>Nederlands</name>
+		<author>Raymond Philippe (iamraymondphilippe@gmail.com)</author>
 	</meta>
 	
 	<string>
 		<key>Cancel</key>
-		<value>Cancel</value>
+		<value>Annuleren</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Save</key>
-		<value>Save</value>
+		<value>Opslaan</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Load</key>
-		<value>Load</value>
+		<value>Laden</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>CouldNotFind</key>
-		<value>Could not find </value>
+		<value>Kan niet vinden </value>
 		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>MachineWidth</key>
-		<value>Machine width</value>
+		<value>Machine breedte</value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>MachineHeight</key>
-		<value>Machine height</value>
+		<value>Machine hoogte</value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>PaperWidth</key>
-		<value>Paper width</value>
+		<value>Papier breedte</value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>PaperHeight</key>
-		<value>Paper height</value>
+		<value>Papier hoogte</value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>InvertLeft</key>
-		<value>Invert left</value>
+		<value>Links omkeren </value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>InvertRight</key>
-		<value>Invert right</value>
+		<value>Rechts omkeren</value>
 		<hint>adjust machine settings</hint>
 	</string>
 	<string>
 		<key>ToolType</key>
-		<value>Tool type</value>
+		<value>Soort Tool</value>
 		<hint>tool settings</hint>
 	</string>
 	<string>
 		<key>AdjustPulleySize</key>
-		<value>Adjust pulley size</value>
+		<value>Pas pulley grootte aan</value>
 		<hint>Adjust pulleys</hint>
 	</string>
 	<string>
 		<key>Left</key>
-		<value>Left</value>
+		<value>Links</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Right</key>
-		<value>Right</value>
+		<value>Rechts</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
@@ -88,17 +88,17 @@
 
 	<string>
 		<key>ConnectingTo</key>
-		<value>Connecting to </value>
+		<value>Aansluiten op  </value>
 		<hint>status message.  keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortNotConfigured</key>
-		<value>Port could not be configured: </value>
+		<value>Poort kon niet worden geconfigureerd: </value>
 		<hint>status message.  keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortOpened</key>
-		<value>Port opened.</value>
+		<value>Poort geopend.</value>
 		<hint>status message</hint>
 	</string>
 	<string>
@@ -108,13 +108,13 @@
 	</string>
 	<string>
 		<key>TitlePostfix</key>
-		<value> connected</value>
+		<value> verbonden</value>
 		<hint>window title</hint>
 	</string>
 
 	<string>
 		<key>LineSegments</key>
-		<value> line segments.</value>
+		<value> lijn segmenten.</value>
 		<hint>status message</hint>
 	</string>
 	<string>
@@ -125,7 +125,7 @@
 
 	<string>
 		<key>EstimatedTime</key>
-		<value>Estimated draw time: </value>
+		<value>Geschatte teken tijd: </value>
 		<hint>status message.  keep the space at the end.</hint>
 	</string>
 
@@ -137,18 +137,18 @@
 
 	<string>
 		<key>ConversionOptions</key>
-		<value>Conversion options</value>
+		<value>Conversie opties</value>
 		<hint>dialog title</hint>
 	</string>
 	<string>
 		<key>FlipForGlass</key>
-		<value>Flip for glass</value>
+		<value>Spiegelen voor glas</value>
 		<hint>conversion options</hint>
 	</string>
 
 	<string>
 		<key>Cancel</key>
-		<value>Cancel</value>
+		<value>Annuleren</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
@@ -158,55 +158,55 @@
 	</string>
 	<string>
 		<key>Save</key>
-		<value>Save</value>
+		<value>Opslaan</value>
 		<hint>used in many places</hint>
 	</string>
 
 	<string>
 		<key>PaperMargin</key>
-		<value>Margin at paper edge (%)</value>
+		<value>Marge bij papier rand (%)</value>
 		<hint>conversion options</hint>
 	</string>
 	<string>
 		<key>Converting</key>
-		<value>Converting</value>
+		<value>Converteren</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Finished</key>
-		<value>Completed</value>
+		<value>Voltooid</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Cancelled</key>
-		<value>Cancelled</value>
+		<value>Geannuleerd</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Failed</key>
-		<value>Failed: </value>
+		<value>Mislukt: </value>
 		<hint>status update.  keep the space at the end.</hint>
 	</string>
 
 	<string>
 		<key>ConversionStyle</key>
-		<value>Conversion style</value>
+		<value>Conversie stijl</value>
 		<hint>conversion options</hint>
 	</string>
 
 	<string>
 		<key>OpeningFile</key>
-		<value>Opening </value>
+		<value>Openen </value>
 		<hint>status update.  keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>UnknownFileType</key>
-		<value>Unknown file type</value>
+		<value>Onbekend bestandstype</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>SetPaperSize</key>
-		<value>Please set a paper size before importing an image.</value>
+		<value>Stel een papierformaat in voordat je een afbeelding importeert.</value>
 		<hint>warning message</hint>
 	</string>
 
@@ -217,7 +217,7 @@
 	</string>
 	<string>
 		<key>FileTypeImage</key>
-		<value>Image (jpg/bmp/png/gif)</value>
+		<value>Afbeelding (jpg/bmp/png/gif)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string>
@@ -228,27 +228,27 @@
 
 	<string>
 		<key>MenuSoundsTitle</key>
-		<value>Sounds</value>
+		<value>Geluiden</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSoundsConnect</key>
-		<value>Connect</value>
+		<value>Verbinden</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsDisconnect</key>
-		<value>Disconnect</value>
+		<value>Uitschakelen</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsFinishConvert</key>
-		<value>Finish converting</value>
+		<value>Voltooi omzetting</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsFinishDraw</key>
-		<value>Finish drawing</value>
+		<value>Voltooien tekening</value>
 		<hint>sound settings dialog</hint>
 	</string>
 
@@ -259,66 +259,66 @@
 	</string>
 	<string>
 		<key>MenuGraphicsPenUp</key>
-		<value>Show pen up moves</value>
+		<value>Laat pen up bewegingen zien</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsAntialias</key>
-		<value>Antialias lines</value>
+		<value>Anti-alias lijnen</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsSpeedVSQuality</key>
-		<value>Speed over quality</value>
+		<value>Snelheid boven kwaliteit</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsDrawWhileRunning</key>
-		<value>Show entire image while drawing</value>
+		<value>Toon volledige afbeelding tijdens het tekenen</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 
 	<string>
 		<key>MenuLanguageTitle</key>
-		<value>Language</value>
+		<value>Taal</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>InvalidTool</key>
-		<value>Requested invalid tool #</value>
+		<value>Ongeldig gereedschap gevraagd #</value>
 		<hint>warning message</hint>
 	</string>
 	<string>
 		<key>ChangeToolPrefix</key>
-		<value>Please prepare </value>
+		<value>Gelieve voor te bereiden </value>
 		<hint>tool change prompt.  keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>ChangeToolPostfix</key>
-		<value> and click any button to continue.</value>
+		<value> en klik op een knop om door te gaan.</value>
 		<hint>tool change prompt.  keep the space at the start.</hint>
 	</string>
 
 	<string>
 		<key>StartAt</key>
-		<value>Start at</value>
+		<value>Start bij</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>StartAtLine</key>
-		<value>Start at line #</value>
+		<value>Start bij lijn #</value>
 		<hint>start at dialog</hint>
 	</string>
 
 	<string>
 		<key>Pause</key>
-		<value>Pause</value>
+		<value>Pauze</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>Unpause</key>
-		<value>Unpause</value>
+		<value>Hervatten</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -335,32 +335,32 @@
 
 	<string>
 		<key>Top</key>
-		<value>TOP</value>
+		<value>BOVEN</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Bottom</key>
-		<value>BOTTOM</value>
+		<value>BENEDEN</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Left</key>
-		<value>LEFT</value>
+		<value>LINKS</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
-		<value>RIGHT</value>
+		<value>RECHTS</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenUp</key>
-		<value>PEN UP</value>
+		<value>PEN OMHOOG</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenDown</key>
-		<value>PEN DOWN</value>
+		<value>PEN OMLAAG</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
@@ -371,18 +371,18 @@
 	</string>
 	<string>
 		<key>Speed</key>
-		<value>Speed:</value>
+		<value>Snelheid:</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Rate</key>
-		<value>steps/min</value>
+		<value>stappen/min</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
 		<key>JogMotors</key>
-		<value>Jog Motors</value>
+		<value>Start en Stop Motoren</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -392,39 +392,39 @@
 	</string>
 	<string>
 		<key>JogOut</key>
-		<value>OUT</value>
+		<value>UIT</value>
 		<hint>jog motors dialog</hint>
 	</string>
 	<string>
 		<key>Invert</key>
-		<value>Invert</value>
+		<value>Omkeren</value>
 		<hint>jog motors dialog</hint>
 	</string>
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="http://makelangelo.com/#productDescription">http://makelangelo.com/</a> to get the new hotness.</html></body>]]></value>
+		<value>Een nieuwe versie van deze software is beschikbaar.\nPlease bezoek http://makelangelo.com/ om de nieuwste te krijgen.</value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
 		<key>UpToDate</key>
-		<value>This software is up to date.</value>
+		<value>Deze software is up-to-date.</value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
 		<key>UpdateCheckFailed</key>
-		<value>Sorry, I failed.  Please visit http://www.marginallyclever.com/ to check yourself.</value>
+		<value>Sorry, Ik heb gefaald. Bezoek http://www.marginallyclever.com/ om jezelf te controleren.</value>
 		<hint>check for update dialog</hint>
 	</string>
 
 	<string>
 		<key>Send</key>
-		<value>Send</value>
+		<value>Verzenden</value>
 		<hint>drive manually dialog</hint>
 	</string>
 	<string>
 		<key>TitleNotConnected</key>
-		<value> not connected</value>
+		<value> Niet aangesloten</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -434,65 +434,65 @@
 	</string>
 	<string>
 		<key>MenuPreferences</key>
-		<value>Preferences</value>
+		<value>Voorkeuren</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuUpdate</key>
-		<value>Check for updates</value>
+		<value>Controleer op updates</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAbout</key>
-		<value>About</value>
+		<value>Over</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuQuit</key>
-		<value>Quit</value>
+		<value>Stoppen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuConnect</key>
-		<value>Connect</value>
+		<value>Verbinden</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuRescan</key>
-		<value>Rescan</value>
+		<value>Opnieuw scannen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuDisconnect</key>
-		<value>Disconnect</value>
+		<value>Uitschakelen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuLoadMachineConfig</key>
-		<value>Load settings for...</value>
+		<value>Instellingen laden voor...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuSettings</key>
-		<value>Settings</value>
+		<value>Instellingen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSettingsMachine</key>
-		<value>Adjust machine &amp; paper size</value>
+		<value>Machine aanpassen &amp; papierformaat</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAdjustPulleys</key>
-		<value>Adjust pulley size</value>
+		<value>Pas katrol grootte aan</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuJogMotors</key>
-		<value>Jog Motors</value>
+		<value>Start en Stop Motoren</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -503,7 +503,7 @@
 	</string>
 	<string>
 		<key>MenuAdjustTool</key>
-		<value>Adjust active tool</value>
+		<value>Selecteer actieve gereedschap</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -519,39 +519,39 @@
 	</string>
 	<string>
 		<key>MenuTextToGCODE</key>
-		<value>Text to GCODE</value>
+		<value>Tekst naar GCODE</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuConvertImage</key>
-		<value>Open Recent...</value>
+		<value>Open Recente...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuOpenFile</key>
-		<value>Open File...</value>
+		<value>Open Bestand...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value>Save GCODE as...</value>
+		<value>Bewaar GCODE als...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuDraw</key>
-		<value>Draw</value>
+		<value>Teken</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>Halt</key>
-		<value>Halt</value>
+		<value>Stopzetten</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuPreview</key>
-		<value>Preview</value>
+		<value>Voorbeeld</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -566,18 +566,18 @@
 	</string>
 	<string>
 		<key>ZoomFit</key>
-		<value>Zoom to fit</value>
+		<value>Zoom om passend te maken</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>mmNotice</key>
-		<value>All values in mm.</value>
+		<value>Alle waarden in mm.</value>
 		<hint>Adjust machine size</hint>
 	</string>
 
 	<string>
 		<key>penToolAdjust</key>
-		<value>Adjust Pen</value>
+		<value>Stel Pen in</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -587,22 +587,22 @@
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>Max toevoersnelheid</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolUp</key>
-		<value>Up</value>
+		<value>Omhoog</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolDown</key>
-		<value>Down</value>
+		<value>Omlaag</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift speed</value>
+		<value>Hefsnelheid</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -614,63 +614,63 @@
 
 	<string>
 		<key>spraypaintToolTest</key>
-		<value>Adjust Spraypaint</value>
+		<value>Stel Spuitverf in</value>
 		<hint>Adjust Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDiameter</key>
-		<value>Dot size</value>
+		<value>Punt grootte</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>Max toevoersnelheid</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolUp</key>
-		<value>Off</value>
+		<value>Uit</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDown</key>
-		<value>On</value>
+		<value>Aan</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolLiftSpeed</key>
-		<value>On/off speed</value>
+		<value>Aan/uit snelheid</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolTest</key>
-		<value>Make a dot</value>
+		<value>Maak een stip</value>
 		<hint>Adjust spraypaint tool</hint>
 	</string>
 
 	<string>
 		<key>voronoiStipplingName</key>
-		<value>Voronoi stipples</value>
+		<value>Voronoi stippels</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingCellCount</key>
-		<value>Number of Cells</value>
+		<value>Aantal Cellen</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingGenCount</key>
-		<value>Number of Generations</value>
+		<value>Gegenereerd Aantal</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingDotMax</key>
-		<value>Max dot size</value>
+		<value>Max stip grootte</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingDotMin</key>
-		<value>Min dot size</value>
+		<value>Min stip grootte</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 
@@ -681,7 +681,7 @@
 	</string>
 	<string>
 		<key>CrosshatchName</key>
-		<value>Crosshatch</value>
+		<value>Gearceerd</value>
 		<hint>Crosshatch generator</hint>
 	</string>
 	<string>
@@ -691,67 +691,68 @@
 	</string>
 	<string>
 		<key>HilbertCurveSize</key>
-		<value>Size</value>
+		<value>Formaat</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
 		<key>HilbertCurveOrder</key>
-		<value>Order</value>
+		<value>Bestellen</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 
 	<string>
 		<key>PulseLineName</key>
-		<value>Pulse Line</value>
+		<value>Puls lijn</value>
 		<hint>Pulse Line generator</hint>
 	</string>
 	<string>
 		<key>ZigZagName</key>
-		<value>Big zig zag</value>
+		<value>Grote zig zag</value>
 		<hint>Zig Zag generator</hint>
 	</string>
 	<string>
 		<key>YourMsgHereName</key>
-		<value>Your message here</value>
+		<value>Your bericht hier</value>
 		<hint>Your message here generator</hint>
 	</string>
 	<string>
 		<key>SpiralName</key>
-		<value>Spiral</value>
+		<value>Spiraal</value>
 		<hint>Spiral generator</hint>
 	</string>
 	<string>
 		<key>ScanlineName</key>
-		<value>Scanline</value>
+		<value>Scanlijn</value>
 		<hint>Scanline generator</hint>
 	</string>
 	<string>
 		<key>RGBName</key>
-		<value>Red Green Blue</value>
+		<value>Rood Groen Blauw</value>
 		<hint>RGB generator</hint>
 	</string>
 
 	<string>
 		<key>SharePromo</key>
-		<value>Share it on twitter to @MarginallyC to see what others have created.</value>
+		<value>Deel het op twitter om @MarginallyC om te zien wat anderen hebben gemaakt.</value>
 		<hint>Your drawing is finished.  Share it</hint>
 	</string>
 	
 	<string>
 		<key>StatusSoFar</key>
-		<value>Time running: </value>
+		<value>Gebruikte tijd: </value>
 		<hint>time machine has been drawing</hint>
 	</string>
 	
 	<string>
 		<key>StatusRemaining</key>
-		<value>Estimated time left: </value>
+		<value>Geschatte resterende tijd: </value>
 		<hint>time machine will be drawing</hint>
 	</string>
 
-  <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
-  used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
-  one big CDATA html blob. -->
+	<!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to Dutch.
+  Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
+used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
+one big CDATA html blob. -->
   <string>
     <key>AboutHTMLBeforeVersionNumber</key>
     <value><![CDATA[
@@ -788,5 +789,4 @@
     </value>
     <hint>HTML for About Dialog</hint>
   </string>
-
 </language>
