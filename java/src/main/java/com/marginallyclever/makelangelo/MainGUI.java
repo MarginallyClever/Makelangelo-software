@@ -1339,7 +1339,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return byte array containing date for image icon.
+	 * @return byte array containing data for image icon.
 	 */
 	private ImageIcon getImageIcon(String iconResourceName) {
 		ImageIcon icon = null;
