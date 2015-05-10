@@ -3,13 +3,33 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marginallyclever</groupId>
     <artifactId>Makelangelo</artifactId>
-    <version>v7.1.0</version>
+    <version>v7.1.2-SNAPSHOT</version>
   <name>Makelangelo</name>
   <description>Wall-hanging polargraph robot that draws murals</description>
   <prerequisites>
     <maven>${minimum.maven.version}</maven>
   </prerequisites>
   <build>
+    <!--
+    See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
+    and http://stackoverflow.com/a/3697482
+    -->
+    <resources>
+        <resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+          <includes>
+            <include>**/*.properties</include>
+          </includes>
+        </resource>
+        <resource>
+          <directory>src/main/resources</directory>
+          <filtering>false</filtering>
+          <excludes>
+            <exclude>**/*.properties</exclude>
+          </excludes>
+        </resource>
+      </resources>
     <plugins>
       <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -25,8 +45,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <!-- FIXME replace with high quality splash image. -->
-              <SplashScreen-Image>logo.png</SplashScreen-Image>
+              <SplashScreen-Image>splash.png</SplashScreen-Image>
             </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
@@ -68,8 +87,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <!-- FIXME replace logo.png with high quality splash image. -->
-              <SplashScreen-Image>logo.png</SplashScreen-Image>
+              <SplashScreen-Image>splash.png</SplashScreen-Image>
             </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>

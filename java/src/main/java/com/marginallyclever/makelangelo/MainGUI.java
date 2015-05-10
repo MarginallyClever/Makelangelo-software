@@ -70,9 +70,12 @@ public class MainGUI
 	static final long serialVersionUID=1L;
 
     /**
-     * software version
+     * software version. Defined in src/resources/version.properties and uses Maven's resource filtering to update
+	 * the version based upon version defined in POM.xml. In this way we only define the version once and prevent
+	 * violating DRY.
      */
-	public static final String version="7.1.0";
+	public static final String version =
+			PropertiesFileHelper.getMakelangeloVersionPropertyValue();;
 
 	
 	// Image processing
@@ -1336,7 +1339,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @return byte array containing date for image icon.
+	 * @return byte array containing data for image icon.
 	 */
 	private ImageIcon getImageIcon(String iconResourceName) {
 		ImageIcon icon = null;
@@ -1807,7 +1810,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
+	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void updatedriveControls() {
 		driveControls.createPanel(this, translator, machineConfiguration);
