@@ -26,7 +26,7 @@ import java.util.List;
  * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  */
-public class Filter_GenerateVoronoiStippling extends Filter {
+public class Filter_GeneratorVoronoiStippling extends Filter {
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private int totalCells=1;
 	private VoronoiCell [] cells = new VoronoiCell[1];
@@ -45,7 +45,7 @@ public class Filter_GenerateVoronoiStippling extends Filter {
 	private double[] yValuesIn=null;
 	
 	
-	public Filter_GenerateVoronoiStippling(MainGUI gui,
+	public Filter_GeneratorVoronoiStippling(MainGUI gui,
 			MachineConfiguration mc, MultilingualSupport ms) {
 		super(gui, mc, ms);
 		// TODO Auto-generated constructor stub

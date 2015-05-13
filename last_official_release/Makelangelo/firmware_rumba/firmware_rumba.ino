@@ -39,7 +39,6 @@ char m2d='R';
 // calculate some numbers to help us find feed_rate
 float SPOOL_DIAMETER = 3.2;  // cm
 
-float MAX_VEL = 0;  // cm/s
 float THREAD_PER_STEP=0;
 
 // plotter position.

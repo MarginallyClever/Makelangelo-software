@@ -29,7 +29,7 @@ public class C3 {
 		blue=c.getBlue();
 	}
 	public int toInt() {
-		return (red<<16) | (green<<8) | (blue);
+		return ((red&0xff)<<16) | ((green&0xff)<<8) | (blue&0xff);
 	}
 	public C3 set(C3 x) {
 		red=x.red;
@@ -66,5 +66,9 @@ public class C3 {
 	    int Bdiff = o.blue - this.blue;
 	    int distanceSquared = Rdiff*Rdiff + Gdiff*Gdiff + Bdiff*Bdiff;
 	    return distanceSquared;
+	}
+	
+	public String toString() {
+		return "("+red+","+green+","+blue+")";
 	}
 }

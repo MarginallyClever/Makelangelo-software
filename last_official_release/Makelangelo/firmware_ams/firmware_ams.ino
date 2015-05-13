@@ -227,7 +227,6 @@ static void adjustSpoolDiameter(float diameter1) {
 #if VERBOSE > 2
   Serial.print(F("SpoolDiameter = "));  Serial.println(SPOOL_DIAMETER,3);
   Serial.print(F("THREAD_PER_STEP="));  Serial.println(THREAD_PER_STEP,3);
-  Serial.print(F("MAX_VEL="));  Serial.println(MAX_VEL,3);
 #endif
 }
 
