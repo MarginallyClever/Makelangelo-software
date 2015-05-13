@@ -13,6 +13,7 @@
 *.pde           text
 *.prefs         text
 *.textile       text
+*.md            text
 .gitattributes  text
 .gitignore      text
 
