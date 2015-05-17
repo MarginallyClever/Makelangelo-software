@@ -9,6 +9,10 @@ import java.util.prefs.Preferences;
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
 	public static final String FIRST_TIME_KEY = "first time";
+	/**
+	 *
+	 */
+	private static final String LANGUAGE_KEY = "language";
 	protected String currentLanguage="English";
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
 	
@@ -31,11 +35,11 @@ public class MultilingualSupport {
 
 
 	public void saveConfig() {
-		prefs.put("language", currentLanguage );
+		prefs.put(LANGUAGE_KEY, currentLanguage );
 	}
 	
 	public void loadConfig() {
-		currentLanguage = prefs.get("language", "English");
+		currentLanguage = prefs.get(LANGUAGE_KEY, "English");
 	}
 	
 	public void loadLanguages() {
