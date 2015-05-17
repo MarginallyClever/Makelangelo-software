@@ -16,7 +16,7 @@ public class MultilingualSupport {
 	protected String currentLanguage="English";
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
 	
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(MultilingualSupport.class);
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 	
 
 	public MultilingualSupport() {

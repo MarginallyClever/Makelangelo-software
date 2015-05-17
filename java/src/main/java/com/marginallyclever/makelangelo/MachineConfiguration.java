@@ -29,7 +29,7 @@ import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 
 
 public class MachineConfiguration {
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(MachineConfiguration.class);
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 	
 	static final String CURRENT_VERSION = "1";
 	// GUID

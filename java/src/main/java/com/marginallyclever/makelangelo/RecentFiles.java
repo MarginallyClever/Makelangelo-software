@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo;
 import java.util.prefs.Preferences;
 
 public class RecentFiles {
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(RecentFiles.class);
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 	private String[] fileList;
 	final int MAX_FILES = 10;
 	

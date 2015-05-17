@@ -16,7 +16,7 @@ public final class PreferencesHelper {
     /**
      *
      */
-    private static final Map<Class, Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+    private static final Map<MakelangeloPreferenceKey, Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
     /**
      * @see <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
@@ -25,11 +25,10 @@ public final class PreferencesHelper {
         Map initialMap = new HashMap<>();
         final Preferences userRootPreferencesNode = Preferences.userRoot();
         final Preferences drawBotPreferenceNode = userRootPreferencesNode.node("DrawBot");
-        initialMap.put(DrawPanel.class, drawBotPreferenceNode.node("Graphics"));
-        initialMap.put(MachineConfiguration.class, drawBotPreferenceNode.node("Machines"));
-        initialMap.put(MainGUI.class, drawBotPreferenceNode);
-        initialMap.put(MultilingualSupport.class, userRootPreferencesNode.node("Language"));
-        initialMap.put(RecentFiles.class, drawBotPreferenceNode);
+        initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, drawBotPreferenceNode);
+        initialMap.put(MakelangeloPreferenceKey.GRAPHICS, drawBotPreferenceNode.node("Graphics"));
+        initialMap.put(MakelangeloPreferenceKey.MACHINES, drawBotPreferenceNode.node("Machines"));
+        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, userRootPreferencesNode.node("Language"));
         CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(initialMap);
     }
 
@@ -40,10 +39,17 @@ public final class PreferencesHelper {
 
     /**
      *
-     * @param marginallyCleverClass
+     * @param key
      * @return
      */
-    public static Preferences getPreferenceNode(Class<? extends Object> marginallyCleverClass) {
-        return CLASS_TO_PREFERENCE_NODE_MAP.get(marginallyCleverClass);
+    public static Preferences getPreferenceNode(MakelangeloPreferenceKey key) {
+        return CLASS_TO_PREFERENCE_NODE_MAP.get(key);
+    }
+
+    public enum MakelangeloPreferenceKey {
+        GRAPHICS,
+        MACHINES,
+        LANGUAGE,
+        MAKELANGELO_ROOT
     }
 }
