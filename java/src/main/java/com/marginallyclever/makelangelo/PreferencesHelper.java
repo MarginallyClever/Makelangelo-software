@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 /**
- * Created on 5/17/15.
+ * Created on 5/17/15. FIXME Write Javadocs.
  *
  * @author Peter Colapietro
  * @since v7.1.3
