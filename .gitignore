@@ -25,3 +25,4 @@ target/
 .idea/
 
 java/.settings/org.eclipse.core.resources.prefs
+log.html
