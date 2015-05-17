@@ -24,10 +24,11 @@ public final class PreferencesHelper {
     static {
         Map initialMap = new HashMap<>();
         final Preferences userRootPreferencesNode = Preferences.userRoot();
-        final Preferences drawBotPreferenceNode = userRootPreferencesNode.node("DrawBot");
-        initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, drawBotPreferenceNode);
-        initialMap.put(MakelangeloPreferenceKey.GRAPHICS, drawBotPreferenceNode.node("Graphics"));
-        initialMap.put(MakelangeloPreferenceKey.MACHINES, drawBotPreferenceNode.node("Machines"));
+        final String thisPackageName = PreferencesHelper.class.getPackage().getName();
+        final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(thisPackageName);
+        initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, makelangeloPreferenceNode);
+        initialMap.put(MakelangeloPreferenceKey.GRAPHICS, makelangeloPreferenceNode.node("Graphics"));
+        initialMap.put(MakelangeloPreferenceKey.MACHINES, makelangeloPreferenceNode.node("Machines"));
         initialMap.put(MakelangeloPreferenceKey.LANGUAGE, userRootPreferencesNode.node("Language"));
         CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(initialMap);
     }
