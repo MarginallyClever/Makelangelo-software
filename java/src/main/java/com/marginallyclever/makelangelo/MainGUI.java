@@ -83,7 +83,7 @@ public class MainGUI
 		private List<Filter> image_converters;
 		private boolean startConvertingNow;
 	
-	private Preferences prefs = Preferences.userRoot().node("DrawBot");
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(MainGUI.class);
 	private RecentFiles recentFiles;
 	
 	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
@@ -949,7 +949,7 @@ public class MainGUI
 
     // Adjust graphics preferences	
 	protected void AdjustGraphics() {
-		final Preferences graphics_prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
+		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(DrawPanel.class);
 		
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuGraphicsTitle"),true);
 		driver.setLayout(new GridBagLayout());

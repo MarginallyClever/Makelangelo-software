@@ -16,7 +16,7 @@ public class MultilingualSupport {
 	protected String currentLanguage="English";
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
 	
-	private Preferences prefs = Preferences.userRoot().node("Language");
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(MultilingualSupport.class);
 	
 
 	public MultilingualSupport() {
