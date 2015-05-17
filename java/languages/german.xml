@@ -1,7 +1,7 @@
 <?xml Version="1.0" encoding="UTF-8"?>
 	<language>
 		<meta>
-			<Name>Deutsch</name>
+			<name>Deutsch</name>
 			<author>https://www.fiverr.com/erminho</author>
 		</meta>
 		
@@ -748,5 +748,5 @@
 			<value> geschätzte Zeit Links: </value>
 			<hint>Time Machine wird Zeichnung</hint>
 		</string>
-	</Sprache>
+	</language>
 
