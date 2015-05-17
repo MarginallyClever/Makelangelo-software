@@ -5,25 +5,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-
-// from http://www.java-samples.com/showtutorial.php?tutorialid=152
+/**
+ *
+ * FIXME Write Javadoc.
+ *
+ * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
+ */
 public class MultilingualSupport {
-	public static final String FIRST_TIME_KEY = "first time";
+
+	/**
+	 *
+	 */
+	private static final String FIRST_TIME_KEY = "first time";
+
 	/**
 	 *
 	 */
 	private static final String LANGUAGE_KEY = "language";
-	protected String currentLanguage="English";
-	private final Map<String,LanguageContainer> languages = new HashMap<>();
-	
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
-	
 
+	/**
+	 *
+	 */
+	protected String currentLanguage="English";
+
+	/**
+	 *
+	 */
+	private final Map<String,LanguageContainer> languages = new HashMap<>();
+
+	/**
+	 *
+	 */
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+
+	/**
+	 *
+	 */
 	public MultilingualSupport() {
 		loadLanguages();
 		loadConfig();
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public boolean isThisTheFirstTime() {
 		// Did the language file disappear?  Offer the language dialog.
 		if(!languages.keySet().contains(currentLanguage)) {
@@ -33,11 +59,16 @@ public class MultilingualSupport {
 		return prefs.getBoolean(FIRST_TIME_KEY, true);
 	}
 
-
+	/**
+	 *
+	 */
 	public void saveConfig() {
 		prefs.put(LANGUAGE_KEY, currentLanguage );
 	}
-	
+
+	/**
+	 *
+	 */
 	public void loadConfig() {
 		currentLanguage = prefs.get(LANGUAGE_KEY, "English");
 	}
@@ -73,7 +104,12 @@ public class MultilingualSupport {
 			languages.put(lang.getName(), lang);
 		}
 	}
-	
+
+	/**
+	 *
+	 * @param key
+	 * @return
+	 */
 	public String get(String key) {
 		String value=null;
 		try {
@@ -84,7 +120,11 @@ public class MultilingualSupport {
 		}
 		return value;
 	}
-	
+
+	/**
+	 *
+	 * @return
+	 */
 	protected String [] getLanguageList() {
 		final String [] choices = new String[languages.keySet().size()];
 		final Object[] lang_keys = languages.keySet().toArray();
