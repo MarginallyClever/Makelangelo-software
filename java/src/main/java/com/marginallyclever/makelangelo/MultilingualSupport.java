@@ -85,7 +85,7 @@ public class MultilingualSupport {
 	
 	protected String [] getLanguageList() {
 		final String [] choices = new String[languages.keySet().size()];
-		Object[] lang_keys = languages.keySet().toArray();
+		final Object[] lang_keys = languages.keySet().toArray();
 		
 		for(int i=0;i<lang_keys.length;++i) {
 			choices[i] = (String)lang_keys[i];
