@@ -70,9 +70,12 @@ public class MainGUI
 	static final long serialVersionUID=1L;
 
     /**
-     * software version
+     * software version. Defined in src/resources/version.properties and uses Maven's resource filtering to update
+	 * the version based upon version defined in POM.xml. In this way we only define the version once and prevent
+	 * violating DRY.
      */
-	public static final String version="7.1.0";
+	public static final String version =
+			PropertiesFileHelper.getMakelangeloVersionPropertyValue();;
 
 	
 	// Image processing
@@ -334,9 +337,9 @@ public class MainGUI
 	public void LoadGCode(String filename) {
 		try {
 			gcode.Load(filename);
-		   	Log("<font color='green'>"+gcode.estimate_count + translator.get("LineSegments")
-		   			+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
-		   			+ translator.get("EstimatedTime") + statusBar.formatTime((long)(gcode.estimated_time)) + "s.</font>\n");
+		   	Log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
+					+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
+					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gcode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
 	    	Log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
@@ -1174,7 +1177,7 @@ public class MainGUI
 	
 	public void startAt(long lineNumber) {
 		gcode.linesProcessed=0;
-		sendLineToRobot("M110 N"+gcode.linesProcessed);
+		sendLineToRobot("M110 N" + gcode.linesProcessed);
 		previewPane.setLinesProcessed(gcode.linesProcessed);
 		startDrawing();
 	}
@@ -1282,13 +1285,14 @@ public class MainGUI
 		if( subject == buttonAbout ) {
             final String aboutHtml = getAboutHtmlFromMultilingualString();
 			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-			ImageIcon icon = null;
-			try {
-				icon = new ImageIcon(IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("logo.png")));
-			} catch (IOException exceptionLoadingIconImage) {
-				System.err.print(exceptionLoadingIconImage);
+			ImageIcon icon = getImageIcon("logo.png");
+			final String menuAboutValue = translator.get("MenuAbout");
+			if (icon != null) {
+				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
+			} else {
+				icon = getImageIcon("resources/logo.png");
+				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 			}
-		    JOptionPane.showMessageDialog(null, bottomText, "About FIXME", JOptionPane.INFORMATION_MESSAGE, icon);
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1331,6 +1335,21 @@ public class MainGUI
 				return;
 			}
 		}
+	}
+
+	/**
+	 *
+	 * @return byte array containing data for image icon.
+	 */
+	private ImageIcon getImageIcon(String iconResourceName) {
+		ImageIcon icon = null;
+		try {
+            final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
+            icon = new ImageIcon(imageData);
+        } catch(NullPointerException | IOException exceptionLoadingIconImage) {
+            System.err.print(exceptionLoadingIconImage);
+        }
+		return icon;
 	}
 
 	/**
@@ -1791,7 +1810,7 @@ public class MainGUI
 
 	/**
 	 *
-	 * @param driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
+	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void updatedriveControls() {
 		driveControls.createPanel(this, translator, machineConfiguration);
