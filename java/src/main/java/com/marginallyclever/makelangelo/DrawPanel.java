@@ -22,7 +22,7 @@ import com.jogamp.opengl.awt.GLJPanel;
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
     static final long serialVersionUID=2;
 
-    private Preferences prefs = Preferences.userRoot().node("DrawBot").node("Graphics");
+    private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
     
     // arc smoothness - increase to make more smooth and run slower.
     public static final double STEPS_PER_DEGREE=1;

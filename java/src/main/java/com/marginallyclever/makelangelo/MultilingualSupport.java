@@ -9,10 +9,14 @@ import java.util.prefs.Preferences;
 // from http://www.java-samples.com/showtutorial.php?tutorialid=152
 public class MultilingualSupport {
 	public static final String FIRST_TIME_KEY = "first time";
+	/**
+	 *
+	 */
+	private static final String LANGUAGE_KEY = "language";
 	protected String currentLanguage="English";
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
 	
-	private Preferences prefs = Preferences.userRoot().node("Language");
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 	
 
 	public MultilingualSupport() {
@@ -31,30 +35,32 @@ public class MultilingualSupport {
 
 
 	public void saveConfig() {
-		prefs.put("language", currentLanguage );
+		prefs.put(LANGUAGE_KEY, currentLanguage );
 	}
 	
 	public void loadConfig() {
-		currentLanguage = prefs.get("language", "English");
+		currentLanguage = prefs.get(LANGUAGE_KEY, "English");
 	}
-	
-	public void loadLanguages() {
-		// Scan folder for language files
-        String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
-        //System.out.println(workingDirectory);
-		File f = new File(workingDirectory);
-		LanguageContainer lang;
 
-		File [] all_files = f.listFiles();
-		try {
-			if(all_files.length<=0) {
-				throw new Exception("No language files found!");
-			}
+	/**
+	 * Scan folder for language files.
+	 */
+	public void loadLanguages() throws IllegalStateException {
+        String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
+		final File f = new File(workingDirectory);
+		final File [] all_files = f.listFiles();
+		if(all_files.length<=0) {
+			throw new IllegalStateException("No language files found!");
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+		createLanguageContainersFromLanguageFiles(all_files);
+	}
+
+	/**
+	 *
+	 * @param all_files
+	 */
+	private void createLanguageContainersFromLanguageFiles(File[] all_files) {
+		LanguageContainer lang;
 		for(int i=0;i<all_files.length;++i) {
 			if(all_files[i].isHidden()) continue;
 			if(all_files[i].isDirectory()) continue;
@@ -65,7 +71,7 @@ public class MultilingualSupport {
 			lang = new LanguageContainer();
 			lang.Load(all_files[i].getAbsolutePath());
 			languages.put(lang.getName(), lang);
-		}	
+		}
 	}
 	
 	public String get(String key) {
@@ -81,7 +87,7 @@ public class MultilingualSupport {
 	
 	protected String [] getLanguageList() {
 		final String [] choices = new String[languages.keySet().size()];
-		Object[] lang_keys = languages.keySet().toArray();
+		final Object[] lang_keys = languages.keySet().toArray();
 		
 		for(int i=0;i<lang_keys.length;++i) {
 			choices[i] = (String)lang_keys[i];
