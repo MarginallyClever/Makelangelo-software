@@ -492,10 +492,15 @@ public class MainGUI
 					double height = b.getMaximumY() - b.getMinimumY();
 					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
 					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-					double sy = machineConfiguration.GetPaperHeight()*10/height;
-					double sx = machineConfiguration.GetPaperWidth()*10/width;
+					double sy = machineConfiguration.GetPaperHeight()*10.0/height;
+					double sx = machineConfiguration.GetPaperWidth()*10.0/width;
 					double scale = (sx<sy? sx:sy ) * machineConfiguration.paper_margin;
 					sx = scale * (machineConfiguration.reverseForGlass? -1 : 1);
+
+					//sx *= (machineConfiguration.reverseForGlass? -1 : 1);
+					//sx *= machineConfiguration.paper_margin;
+					sy *= machineConfiguration.paper_margin;
+					
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
 					int entity_total=0;
