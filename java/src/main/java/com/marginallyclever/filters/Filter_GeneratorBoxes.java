@@ -72,17 +72,20 @@ public class Filter_GeneratorBoxes extends Filter {
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
-
+		
+		double pw = machine.GetPaperWidth();
+		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
+		float steps = (float)(pw/(tool.GetDiameter()));
 		if(steps<1) steps=1;
 
-		int blockSize=(int)(steps*5);
+		float blockSize=(int)(image_width / steps);
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...
-		int x,y,z,i=0;
+		float x,y,z;
+		int i=0;
 		for(y=0;y<image_height;y+=blockSize) {
 			++i;
 			if((i%2)==0) {
@@ -90,12 +93,12 @@ public class Filter_GeneratorBoxes extends Filter {
 				//MoveTo(file,x,y,pen up?)]
 				for(x=0;x<image_width-blockSize;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,x,(int)(y-halfstep),x+blockSize,(int)(y+halfstep));
+					z=TakeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
-					float pulse_size = (halfstep-1) * scale_z;
-					if( pulse_size>1) {
-						// draw a circle.  the diameter is relative to the intensity.
+					float pulse_size = (halfstep-1.0f) * scale_z;
+					if( pulse_size>0.1f) {
+						// draw a square.  the diameter is relative to the intensity.
 						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
 						MoveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
 						MoveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
@@ -107,14 +110,14 @@ public class Filter_GeneratorBoxes extends Filter {
 			} else {
 				// every odd line move right to left
 				//MoveTo(file,x,y,pen up?)]
-				for(x=image_width;x>=blockSize;x-=blockSize) {
+				for(x=image_width-blockSize;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,x-blockSize,(int)(y-halfstep),x,(int)(y+halfstep));
+					z=TakeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
-					float pulse_size = (halfstep-1) * scale_z;
-					if( pulse_size>1) {
-						// draw a circle.  the diameter is relative to the intensity.
+					float pulse_size = (halfstep-1.0f) * scale_z;
+					if( pulse_size>0.1f) {
+						// draw a square.  the diameter is relative to the intensity.
 						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
 						MoveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
 						MoveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
