@@ -29,12 +29,6 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void Convert(BufferedImage img) throws IOException {
-		int i,j;
-		int x,y;
-		double leveladd = 255.0/6.0;
-		double level=leveladd;
-		int z=0;
-
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.Process(img);
 
@@ -43,14 +37,143 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		
 		ImageStart(img,out);
 		
-		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
-		if(steps<1) steps=1;
-		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
 		tool.WriteChangeTo(out);
 		liftPen(out);
 
+		ConvertImageSpace(img,out);
+//		ConvertPaperSpace(img,out);
+
+		liftPen(out);
+		SignName(out);
+		MoveTo(out, 0, 0,true);
+		out.close();
+	}
+	
+	double xStart,yStart;
+	double xEnd,yEnd;
+	double paperWidth,paperHeight;
+		
+	protected int sampleScale(BufferedImage img,double x0,double y0,double x1,double y1) {
+		return sample(img,
+				(x0-xStart)/(xEnd-xStart) * image_width,
+				image_height - (y1-yStart)/(yEnd-yStart) * image_height,
+				(x1-xStart)/(xEnd-xStart) * image_width,
+				image_height - (y0-yStart)/(yEnd-yStart) * image_height
+				);
+	}
+	
+	protected void ConvertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+		double leveladd = 255.0/6.0;
+		double level=leveladd;
+		
+		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
+		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
+		
+		paperWidth = machine.getPaperWidth();
+		paperHeight = machine.getPaperHeight();
+		
+		xStart = -paperWidth/2.0;
+		yStart = xStart * (double)image_height/(double)image_width;
+
+		if(yStart < -(paperHeight/2.0)) {
+			xStart *= (-(paperHeight/2.0)) / yStart;			
+			yStart = -(paperHeight/2.0);
+		}
+
+		xStart *= 10.0* machine.paperMargin;
+		yStart *= 10.0* machine.paperMargin;
+		xEnd = -xStart;
+		yEnd = -yStart;
+		
+		previous_x=0;
+		previous_y=0;
+		
+		double stepSize = tool.GetDiameter()*3.0;
+		double halfStep = stepSize/2.0;
+		double x,y;
+		
+		for(y=yStart;y<yEnd;y+=stepSize) {
+			moveToPaper(out,xStart,y,true);
+			for(x=xStart;x<xEnd;x+=stepSize) {
+				int v = sampleScale(img,x-halfStep,y-halfStep,x+halfStep,y+halfStep);
+				moveToPaper(out,x,y,v>=level);
+			}
+			moveToPaper(out,xEnd,y,true);
+		}
+		level += leveladd;
+		for(x=xStart;x<xEnd;x+=stepSize) {
+			moveToPaper(out,x,yStart,true);
+			for(y=yStart;y<yEnd;y+=stepSize) {
+				int v = sampleScale(img,x-halfStep,y-halfStep,x+halfStep,y+halfStep);
+				moveToPaper(out,x,y,v>=level);
+			}
+			moveToPaper(out,x,yEnd,true);
+		}
+		
+
+		double x2;
+		
+		
+		level += leveladd;
+		x=xStart;
+		do {
+			x2=x;
+			moveToPaper(out,x2,yStart,true);
+			for(y=yStart;y<yEnd;y+=stepSize,x2-=stepSize) {
+				if(x2<xStart) {
+					moveToPaper(out,xStart,y-stepSize,true);
+					break;
+				}
+				if(x2>xEnd) continue;
+				int v = sampleScale(img,x2-halfStep,y-halfStep,x2+halfStep,y+halfStep);
+				moveToPaper(out,x2,y,v>=level);
+			}
+			if(x2>=xStart && x2 <xEnd)
+				moveToPaper(out,x2,yEnd,true);
+			
+			x+=stepSize;
+		} while(x2<xEnd);
+
+		level += leveladd;
+		x=xEnd;
+		do {
+			x2=x;
+			moveToPaper(out,x2,yStart,true);
+			for(y=yStart;y<yEnd;y+=stepSize,x2+=stepSize) {
+				if(x2<xStart) continue;
+				if(x2>xEnd) {
+					moveToPaper(out,xEnd,y-=stepSize,true);
+					break;
+				}
+				int v = sampleScale(img,x2-halfStep,y-halfStep,x2+halfStep,y+halfStep);
+				moveToPaper(out,x2,y,v>=level);
+			}
+			if(x2>=xStart && x2 <xEnd)
+				moveToPaper(out,x2,yEnd,true);
+			
+			x-=stepSize;
+		} while(x2>xStart);
+		/*
+		moveToPaper(out,xStart,yStart,false);
+		moveToPaper(out,xEnd  ,yStart,false);
+		moveToPaper(out,xEnd  ,yEnd  ,false);
+		moveToPaper(out,xStart,yEnd  ,false);
+		moveToPaper(out,xStart,yStart,false);
+		moveToPaper(out,xStart,yStart,true);
+		*/
+	}
+	
+	
+	protected void ConvertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+		int i,j,x,y,z=0;
+		double leveladd = 255.0/6.0;
+		double level=leveladd;
+		
+		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
+		if(steps<1) steps=1;
+		
 		mainGUI.Log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image
 		// raise and lower the pen to darken the appropriate areas
@@ -179,11 +302,6 @@ public class Filter_GeneratorCrosshatch extends Filter {
 				MoveTo(out,(float)startx,(float)starty,true);
 			}
 		}
-
-		liftPen(out);
-		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
-		out.close();
 	}
 }
 

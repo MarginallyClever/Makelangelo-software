@@ -73,7 +73,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		// Make sure the pen is up for the first move
 		liftPen(out);
 		
-		double pw = machine.GetPaperWidth();
+		double pw = machine.getPaperWidth();
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.

@@ -365,7 +365,7 @@ public class MainGUI
 		final JComboBox<String> machine_choice = new JComboBox<String>(choices);
 		machine_choice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paper_margin*100));
+		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
 		input_paper_margin.setMajorTickSpacing(10);
 		input_paper_margin.setMinorTickSpacing(5);
 		input_paper_margin.setPaintTicks(false);
@@ -418,7 +418,7 @@ public class MainGUI
 						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
 						machineConfiguration.LoadConfig(new_uid);
 						SetDrawStyle(input_draw_style.getSelectedIndex());
-						machineConfiguration.paper_margin=(100-input_paper_margin.getValue())*0.01;
+						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 						machineConfiguration.reverseForGlass=reverse_h.isSelected();
 						machineConfiguration.SaveConfig();
 						
@@ -492,14 +492,14 @@ public class MainGUI
 					double height = b.getMaximumY() - b.getMinimumY();
 					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
 					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-					double sy = machineConfiguration.GetPaperHeight()*10.0/height;
-					double sx = machineConfiguration.GetPaperWidth()*10.0/width;
-					double scale = (sx<sy? sx:sy ) * machineConfiguration.paper_margin;
+					double sy = machineConfiguration.getPaperHeight()*10.0/height;
+					double sx = machineConfiguration.getPaperWidth()*10.0/width;
+					double scale = (sx<sy? sx:sy ) * machineConfiguration.paperMargin;
 					sx = scale * (machineConfiguration.reverseForGlass? -1 : 1);
 
 					//sx *= (machineConfiguration.reverseForGlass? -1 : 1);
 					//sx *= machineConfiguration.paper_margin;
-					sy *= machineConfiguration.paper_margin;
+					sy *= machineConfiguration.paperMargin;
 					
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();

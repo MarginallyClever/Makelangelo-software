@@ -201,7 +201,7 @@ public class Filter_GeneratorRGB extends Filter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		ImageStart(img,out);
 
-		double pw = machine.GetPaperWidth();
+		double pw = machine.getPaperWidth();
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.

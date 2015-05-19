@@ -48,7 +48,7 @@ public class MachineConfiguration {
 	public double paper_bottom=-12*INCH_TO_CM;
 	public double paper_left=-9*INCH_TO_CM;
 	public double paper_right=9*INCH_TO_CM;
-	public double paper_margin=0.9;
+	public double paperMargin=0.9;
 	
 	// pulleys turning backwards?
 	public boolean m1invert=false;
@@ -486,9 +486,15 @@ public class MachineConfiguration {
 		}
 
 		// TODO move these values to image filter preferences
+<<<<<<< Updated upstream
 		paper_margin = Double.valueOf(prefs.get("paper_margin",Double.toString(paper_margin)));
 		reverseForGlass = Boolean.parseBoolean(prefs.get("reverseForGlass",reverseForGlass?"true":"false"));
 		current_tool = Integer.valueOf(prefs.get("current_tool",Integer.toString(current_tool)));
+=======
+		paperMargin = Double.valueOf(prefs2.get("paper_margin",Double.toString(paperMargin)));
+		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass",reverseForGlass?"true":"false"));
+		current_tool = Integer.valueOf(prefs2.get("current_tool",Integer.toString(current_tool)));
+>>>>>>> Stashed changes
 	}
 
 	
@@ -563,9 +569,15 @@ public class MachineConfiguration {
 		}
 
 		// TODO move these values to image filter preferences
+<<<<<<< Updated upstream
 		prefs.put("paper_margin", Double.toString(paper_margin));
 		prefs.put("reverseForGlass",Boolean.toString(reverseForGlass));
 		prefs.put("current_tool", Integer.toString(current_tool));
+=======
+		prefs2.put("paper_margin", Double.toString(paperMargin));
+		prefs2.put("reverseForGlass",Boolean.toString(reverseForGlass));
+		prefs2.put("current_tool", Integer.toString(current_tool));
+>>>>>>> Stashed changes
 
 	}
 
@@ -692,19 +704,19 @@ public class MachineConfiguration {
 	}
 	
 	
-	public double GetPaperWidth() {
+	public double getPaperWidth() {
 		return paper_right - paper_left;
 	}
 	
 	
-	public double GetPaperHeight() {
+	public double getPaperHeight() {
 		return paper_top -paper_bottom;
 	}
 	
 	
-	public double GetPaperScale() {
-		double paper_w=GetPaperWidth();
-		double paper_h=GetPaperHeight();
+	public double getPaperScale() {
+		double paper_w=getPaperWidth();
+		double paper_h=getPaperHeight();
 		
 		if(paper_w>paper_h) {
 			return paper_h/paper_w;
@@ -713,16 +725,16 @@ public class MachineConfiguration {
 		}
 	}
 	
-	public double GetFeedRate() {
+	public double getFeedRate() {
 		return max_feed_rate;
 	}
 	
-	public void SetFeedRate(double f) {
+	public void setFeedRate(double f) {
 		max_feed_rate = f;
 		SaveConfig();
 	}
 	
-	public long GetUID() {
+	public long getUID() {
 		return robot_uid;
 	}
 }

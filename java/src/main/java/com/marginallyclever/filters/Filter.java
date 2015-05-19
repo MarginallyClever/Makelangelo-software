@@ -168,7 +168,7 @@ public abstract class Filter {
 	 */
 	protected void SetupTransform() {
 		// 10mm = 1cm.  letters should be 1cm tall.
-		SetupTransform( (int)machine.GetPaperWidth()*10, (int)machine.GetPaperHeight()*10 );
+		SetupTransform( (int)machine.getPaperWidth()*10, (int)machine.getPaperHeight()*10 );
 	}
 	
 	protected void SetupTransform(int width,int height) {
@@ -182,19 +182,19 @@ public abstract class Filter {
 		int new_width = image_width;
 		int new_height = image_height;
 		
-		if(image_width>machine.GetPaperWidth()) {
-			float resize = (float)machine.GetPaperWidth()/(float)image_width;
+		if(image_width>machine.getPaperWidth()) {
+			float resize = (float)machine.getPaperWidth()/(float)image_width;
 			scale *= resize;
 			new_height *= resize;
 		}
-		if(new_height>machine.GetPaperHeight()) {
-			float resize = (float)machine.GetPaperHeight()/(float)new_height;
+		if(new_height>machine.getPaperHeight()) {
+			float resize = (float)machine.getPaperHeight()/(float)new_height;
 			scale *= resize;
 			new_width *= resize;
 		}
-		scale *= machine.paper_margin;
-		new_width *= machine.paper_margin;
-		new_height *= machine.paper_margin;
+		scale *= machine.paperMargin;
+		new_width *= machine.paperMargin;
+		new_height *= machine.paperMargin;
 		
 		TextFindCharsPerLine(new_width);
 		
@@ -215,67 +215,124 @@ public abstract class Filter {
 
 	
 	protected int sample3x3(BufferedImage img,int x,int y) {
-		int c=0;
-		int values[]=new int[9];
-		int weights[]=new int[9];
+		int value=0, weight=0;
+		
 		if(y>0) {
 			if(x>0) {
-				values[c]=sample1x1(img,x-1, y-1);
-				weights[c]=1;
-				c++;
+				value+=sample1x1(img,x-1, y-1);
+				weight+=1;
 			}
-			values[c]=sample1x1(img,x, y-1);
-			weights[c]=2;
-			c++;
+			value+=sample1x1(img,x, y-1)*2;
+			weight+=2;
 
 			if(x<image_width-1) {
-				values[c]=sample1x1(img,x+1, y-1);
-				weights[c]=1;
-				c++;
+				value+=sample1x1(img,x+1, y-1);
+				weight+=1;
 			}
 		}
 
 		if(x>0) {
-			values[c]=sample1x1(img,x-1, y);
-			weights[c]=2;
-			c++;
+			value+=sample1x1(img,x-1, y)*2;
+			weight+=2;
 		}
-		values[c]=sample1x1(img,x, y);
-		weights[c]=4;
-		c++;
+		value+=sample1x1(img,x, y)*4;
+		weight+=4;
 		if(x<image_width-1) {
-			values[c]=sample1x1(img,x+1, y);
-			weights[c]=2;
-			c++;
+			value+=sample1x1(img,x+1, y)*2;
+			weight+=2;
 		}
 
 		if(y<image_height-1) {
 			if(x>0) {
-				values[c]=sample1x1(img,x-1, y+1);
-				weights[c]=1;
-				c++;
+				value+=sample1x1(img,x-1, y+1);
+				weight+=1;
 			}
-			values[c]=sample1x1(img,x, y+1);
-			weights[c]=2;
-			c++;
+			value+=sample1x1(img,x, y+1)*2;
+			weight+=2;
 	
 			if(x<image_width-1) {
-				values[c]=sample1x1(img,x+1, y+1);
-				weights[c]=1;
-				c++;
+				value+=sample1x1(img,x+1, y+1);
+				weight+=1;
 			}
 		}
-		
-		int value=0,j;
-		int sum=0;
-		for(j=0;j<c;++j) {
-			value+=values[j]*weights[j];
-			sum+=weights[j];
-		}
-		
-		return value/sum;
+				
+		return value/weight;
 	}
 
+	
+	float sampleValue;
+	float sampleSum;
+	
+	protected void sample1x1Safe(BufferedImage img,int x,int y,double scale) {
+		if(x<0 || x >= image_width) return;
+		if(y<0 || y >= image_height) return;
+		
+		sampleValue += sample1x1(img,x,y) * scale;
+		sampleSum += scale;
+	}
+	
+	/**
+	 * sample the image, taking into account fractions of pixels.
+	 * @param img the image to sample
+	 * @param x0 paper-space coordinates, top left corner
+	 * @param y0 paper-space coordinates, top left corner
+	 * @param x1 paper-space coordinates, bottom right corner
+	 * @param y1 paper-space coordinates, bottom right corner
+	 * @return greyscale intensity in this region. range 0...255 inclusive
+	 */
+	protected int sample(BufferedImage img,double x0,double y0,double x1,double y1) {
+		sampleValue=0;
+		sampleSum=0;
+
+		double xceil = Math.ceil(x0);
+		double xweightstart = ( x0 != xceil ) ? xceil - x0 : 1;
+
+		double xfloor = Math.floor(x1);
+		double xweightend = ( x1 != xceil ) ? xfloor - x1 : 0;
+		
+		// top edge
+		double yceil = Math.ceil(y0);
+		if( y0 != yceil ) {
+			double yweightstart = yceil - y0;
+			
+			// left edge
+			sample1x1Safe(img,(int)x0,(int)y0, xweightstart * yweightstart);
+			
+			for(int i=(int)(x0+1);i<(int)x1;++i) {
+				sample1x1Safe(img,i,(int)y0, yweightstart);
+			}	
+			// right edge
+			sample1x1Safe(img,(int)x1,(int)y0, xweightend * yweightstart);
+		}
+		
+		for(int j=(int)(y0+1);j<(int)y1;++j) {
+			// left edge
+			sample1x1Safe(img,(int)x0,j, xweightstart);
+			
+			for(int i=(int)(x0+1);i<(int)x1;++i) {
+				sample1x1Safe(img,i,j,1);
+			}
+			// right edge
+			sample1x1Safe(img,(int)x1,j, xweightend);
+		}
+		
+		// bottom edge
+		double yfloor = Math.floor(y1);
+		if( y1 != yfloor ) {
+			double yweightend = yfloor - y1;
+
+			// left edge
+			sample1x1Safe(img,(int)x0,(int)y1, xweightstart * yweightend);
+			
+			for(int i=(int)(x0+1);i<(int)x1;++i) {
+				sample1x1Safe(img,i,(int)y1, yweightend);
+			}
+			// right edge
+			sample1x1Safe(img,(int)x1,(int)y1, xweightend * yweightend);
+		}
+		
+		return (int)(sampleValue/sampleSum);
+	}
 	
 	protected float SX(float x) {
 		return x*scale;
@@ -310,6 +367,18 @@ public abstract class Filter {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 		}
+	}
+	
+	protected void moveToPaper(OutputStreamWriter out,double x,double y,boolean up) throws IOException {
+		/*if(up==lastup) {
+			previous_x=(float)x;
+			previous_y=(float)y;
+		} else {
+			tool.WriteMoveTo(out,previous_x,previous_y);*/
+			tool.WriteMoveTo(out,(float)x,(float)y);
+			if(up) liftPen(out);
+			else   lowerPen(out);
+		//}
 	}
 	
 	
@@ -615,7 +684,7 @@ public abstract class Filter {
 		
 		TextSetCharsPerLine(25);
 
-		TextCreateMessageNow("Makelangelo #"+Long.toString(machine.GetUID()),out);
+		TextCreateMessageNow("Makelangelo #"+Long.toString(machine.getUID()),out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
 		h2=yy;
 		w2=xx;
