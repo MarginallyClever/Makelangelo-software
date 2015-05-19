@@ -27,7 +27,9 @@ public final class PropertiesFileHelper {
 
     /**
      *
-     * @return
+     * @return version number in the form of vX.Y.Z where X is MAJOR, Y is MINOR version, and Z is PATCH
+     *
+     * @see <a href="http://semver.org/">Semantic Versioning 2.0.0</a>
      */
     public static String getMakelangeloVersionPropertyValue() {
         final Properties prop = new Properties();
