@@ -1,2 +1,1 @@
-# FIXME
-See: [GitHub's Contributing Guidelines](https://github.com/blog/1184-contributing-guidelines)
+See: [Makelangelo's wiki entry for developers](https://github.com/MarginallyClever/Makelangelo/wiki#developers).
