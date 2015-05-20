@@ -61,8 +61,8 @@ public class Filter_Resize extends Filter {
 		int h = img.getHeight();
 		
 		// cap the max_w and max_h so that enormous drawbot images don't break the software.
-		double paper_w= machine.GetPaperWidth();
-		double paper_h= machine.GetPaperHeight();
+		double paper_w= machine.getPaperWidth();
+		double paper_h= machine.getPaperHeight();
 		// TODO make this number a variable that can be tweaked
 		int max_w=maxWidth;
 		int max_h=maxHeight;

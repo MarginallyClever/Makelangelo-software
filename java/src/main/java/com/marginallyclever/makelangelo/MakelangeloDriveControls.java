@@ -182,7 +182,7 @@ public class MakelangeloDriveControls
 		feedRateControl.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
 			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-			feedRate.setText(Double.toString(machineConfiguration.GetFeedRate()));
+			feedRate.setText(Double.toString(machineConfiguration.getFeedRate()));
 			setFeedRate = new JButton(translator.get("Set"));
 	
 			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
@@ -267,7 +267,7 @@ public class MakelangeloDriveControls
 				fr=fr.replaceAll("[ ,]","");
 				double feed_rate = Double.parseDouble(fr);
 				if(feed_rate<0.001) feed_rate=0.001;
-				machineConfiguration.SetFeedRate(feed_rate);
+				machineConfiguration.setFeedRate(feed_rate);
 				feedRate.setText(Double.toString(feed_rate));
 				gui.sendLineToRobot("G00 G21 F"+feed_rate);
 			} else {
