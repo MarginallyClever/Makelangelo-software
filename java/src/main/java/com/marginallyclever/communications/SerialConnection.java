@@ -130,7 +130,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         machine.ParseRobotUID(after_hello);
 
         mainGUI.getMainframe().setTitle(translator.get("TitlePrefix")
-                + Long.toString(machine.GetUID())
+                + Long.toString(machine.getUID())
                 + translator.get("TitlePostfix"));
 
         mainGUI.SendConfig();

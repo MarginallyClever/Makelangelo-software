@@ -26,13 +26,13 @@ public class Filter_GeneratorRGB extends Filter {
 	};
 
 	OutputStreamWriter out;
-	int step1;
-	int step2;
-	int step4;
+	float step1;
+	float step2;
+	float step4;
 	int palette_mask;
 	C3 [] error=null;
 	C3 [] nexterror=null;
-	int stepw=0,steph=0;
+	float stepw=0,steph=0;
 	int direction=1;
 	
 
@@ -69,7 +69,7 @@ public class Filter_GeneratorRGB extends Filter {
 	}
 	
 	private void DitherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) throws IOException {
-		int w = stepw;
+		float w = stepw;
 		C3 oldPixel = new C3(0,0,0);
 		C3 newPixel = new C3(0,0,0);
 		C3 quant_error = new C3(0,0,0);
@@ -79,9 +79,9 @@ public class Filter_GeneratorRGB extends Filter {
 		
 		if(direction>0) {
 			start=0;
-			end=w;
+			end=(int)w;
 		} else {
-			start=w-1;
+			start=(int)(w-1);
 			end=-1;
 		}
 		
@@ -92,7 +92,7 @@ public class Filter_GeneratorRGB extends Filter {
 		for(x=start;x!=end;x+=direction) {
 			// oldpixel := pixel[x][y]
 			//oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
-			oldPixel.set( new C3(TakeImageSampleBlock(img,x*step4,y*step4,x*step4+step4,y*step4+step4)).add(error[x]) );
+			oldPixel.set( new C3(TakeImageSampleBlock(img,(int)(x*step4),(int)(y*step4),(int)(x*step4+step4),(int)(y*step4+step4))).add(error[x]) );
 			// newpixel := find_closest_palette_color(oldpixel)
 			newPixel = QuantizeColor(oldPixel);
 
@@ -200,20 +200,25 @@ public class Filter_GeneratorRGB extends Filter {
 		out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		ImageStart(img,out);
+
+		double pw = machine.getPaperWidth();
+		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
+		float steps = (float)(pw/(tool.GetDiameter()));
+		// figure out how many lines we're going to have on this image.
+		//int steps = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
 		if(steps<1) steps=1;
 
-		step4 = (int)(steps*4.0);
-		step2 = (int)(step4*4.0/5);
-		step1 = (int)(step4*2.0/5);
+		step4 = (steps);
+		step2 = (step4/2.0f);
+		step1 = (step4/4.0f);
 		
 		// set up the error buffers for floyd/steinberg dithering
-		stepw=(int)Math.ceil((float)image_width/step4);
-		steph=(int)Math.ceil((float)image_height/step4);
-		error=new C3[stepw];
-		nexterror=new C3[stepw];
+		stepw=((float)image_width/step4);
+		steph=((float)image_height/step4);
+		error=new C3[(int)Math.ceil(stepw)];
+		nexterror=new C3[(int)Math.ceil(stepw)];
 		
 		try{
 			Scan(0,img);  // black
