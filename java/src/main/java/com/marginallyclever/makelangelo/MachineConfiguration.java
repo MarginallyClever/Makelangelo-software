@@ -486,15 +486,9 @@ public class MachineConfiguration {
 		}
 
 		// TODO move these values to image filter preferences
-<<<<<<< Updated upstream
-		paper_margin = Double.valueOf(prefs.get("paper_margin",Double.toString(paper_margin)));
+		paperMargin = Double.valueOf(prefs.get("paper_margin",Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(prefs.get("reverseForGlass",reverseForGlass?"true":"false"));
 		current_tool = Integer.valueOf(prefs.get("current_tool",Integer.toString(current_tool)));
-=======
-		paperMargin = Double.valueOf(prefs2.get("paper_margin",Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(prefs2.get("reverseForGlass",reverseForGlass?"true":"false"));
-		current_tool = Integer.valueOf(prefs2.get("current_tool",Integer.toString(current_tool)));
->>>>>>> Stashed changes
 	}
 
 	
@@ -569,16 +563,9 @@ public class MachineConfiguration {
 		}
 
 		// TODO move these values to image filter preferences
-<<<<<<< Updated upstream
-		prefs.put("paper_margin", Double.toString(paper_margin));
+		prefs.put("paper_margin", Double.toString(paperMargin));
 		prefs.put("reverseForGlass",Boolean.toString(reverseForGlass));
 		prefs.put("current_tool", Integer.toString(current_tool));
-=======
-		prefs2.put("paper_margin", Double.toString(paperMargin));
-		prefs2.put("reverseForGlass",Boolean.toString(reverseForGlass));
-		prefs2.put("current_tool", Integer.toString(current_tool));
->>>>>>> Stashed changes
-
 	}
 
 
