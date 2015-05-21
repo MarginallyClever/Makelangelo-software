@@ -131,6 +131,9 @@ public class MachineConfiguration {
 		BufferedImage myPicture = null;
 		try {
 			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
+			if(s==null) {
+				s = MainGUI.class.getResourceAsStream("resources/"+limit_file);
+			}
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
@@ -663,7 +666,7 @@ public class MachineConfiguration {
 	
 	
 	public String[] getKnownMachineNames() {
-		assert(configurations_available.length>1);
+		assert(GetMachineCount()>0);
 		String [] choices = new String[configurations_available.length-1];
 
 		int j=0;
@@ -677,7 +680,7 @@ public class MachineConfiguration {
 	
 	
 	public int getCurrentMachineIndex() {
-		assert(configurations_available.length>1);
+		assert(GetMachineCount()>0);
 		int j=0;
 		for(int i=0;i<configurations_available.length;++i) {
 			if(configurations_available[i].equals("0")) continue;
