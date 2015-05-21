@@ -3,5 +3,5 @@
 @REM #see: https://github.com/bdemers/maven-wrapper
 @echo off
 pushd script
-call callmavenwrapper.bat install
+call callmavenwrapper.bat test
 popd
