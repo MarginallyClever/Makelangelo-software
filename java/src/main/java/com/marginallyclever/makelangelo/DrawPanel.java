@@ -139,7 +139,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
     public void emptyNodeBuffer() {
         fast_nodes.clear();
-        OptimizeNodes();
+        optimizeNodes();
     }
     
     
@@ -184,7 +184,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
 
 
-    private void MoveCamera(int x,int y) {
+    private void moveCamera(int x,int y) {
         cameraOffsetX+=oldx-x;
         cameraOffsetY+=oldy-y;
     }
@@ -193,7 +193,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      *
      * @param y
      */
-    private void ZoomCamera(int y) {
+    private void zoomCamera(int y) {
         final double zoomAmount = (double)(y-oldy)*0.01;
         cameraZoom += zoomAmount;
         if(Double.compare(cameraZoom, 0.1d) < 0) cameraZoom = 0.1d;
@@ -202,7 +202,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     /**
      *
      */
-    public void ZoomIn() {
+    public void zoomIn() {
         cameraZoom*= 4.0d / 3.0d;
         repaint();
     }
@@ -210,7 +210,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     /**
      *
      */
-    public void ZoomOut() {
+    public void zoomOut() {
         cameraZoom*= 3.0d / 4.0d;
         repaint();
     }
@@ -218,7 +218,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     /**
      *
      */
-    public void ZoomToFitPaper() {
+    public void zoomToFitPaper() {
         final int drawPanelWidth = this.getWidth();
         final int drawPanelHeight = this.getHeight();
         final double widthOfPaper = machine.paper_right - machine.paper_left;
@@ -248,9 +248,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         int x=e.getX();
         int y=e.getY();
         if(buttonPressed==MouseEvent.BUTTON1) {
-            MoveCamera(x,y);
+            moveCamera(x,y);
         } else if(buttonPressed==MouseEvent.BUTTON3) {
-            ZoomCamera(y);
+            zoomCamera(y);
         }
         oldx=x;
         oldy=y;
@@ -370,7 +370,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 switch(n.type) {
                 case TOOL:
                     tool = machine.getTool(n.tool_id);
-                    gl2.glLineWidth(tool.GetDiameter());
+                    gl2.glLineWidth(tool.getDiameter());
                     break;
                 case COLOR:
                     if(!running || n.line_number>linesProcessed+look_ahead) {
@@ -379,7 +379,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                     }
                     break;
                 default:
-                    tool.DrawLine(gl2, n.x1, n.y1, n.x2, n.y2);
+                    tool.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
                     break;
                 }
             }
@@ -414,7 +414,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         
     }
 
-	private void OptimizeNodes() {
+	private void optimizeNodes() {
 		if(instructions == null) return;
 		
 		DrawingTool tool = machine.getTool(0);
@@ -487,8 +487,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             if(j<tokens.length) continue;
             //*
             // is pen up or down?
-            tool.DrawZ(z);
-            if(tool.DrawIsOff()) {
+            tool.drawZ(z);
+            if(tool.isDrawOff()) {
                 if(show_pen_up==false) {
                     px=x;
                     py=y;
@@ -496,7 +496,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                     continue;
                 }
                 addNodeColor(i, Color.BLUE );
-            } else if(tool.DrawIsOn()) {
+            } else if(tool.isDrawOn()) {
                 addNodeColor(i, tool_color );  // TODO use actual pen color
             } else {
                 addNodeColor(i, Color.ORANGE );

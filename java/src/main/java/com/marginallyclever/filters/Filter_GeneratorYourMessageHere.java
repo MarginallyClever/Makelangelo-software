@@ -30,7 +30,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
 	public String getName() { return translator.get("YourMsgHereName"); }
 	
-	public void Generate(String dest) {
+	public void generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage,6,60);
 	
 		JPanel panel = new JPanel(new GridLayout(0,1));
@@ -39,16 +39,16 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 			lastMessage = text.getText();
-			CreateMessage(lastMessage,dest);
+			createMessage(lastMessage,dest);
 			
 			// TODO Move to GUI?
-			mainGUI.Log("<font color='green'>Completed.</font>\n");
-			mainGUI.PlayConversionFinishedSound();
-			mainGUI.LoadGCode(dest);
+			mainGUI.log("<font color='green'>Completed.</font>\n");
+			mainGUI.playConversionFinishedSound();
+			mainGUI.loadGCode(dest);
 	    }
 	}
 
-	protected void CreateMessage(String str,String dest) {
+	protected void createMessage(String str,String dest) {
 		//System.out.println("output file = "+outputFile);
 
 		try {
@@ -58,7 +58,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			setupTransform();
 			output.write(machine.getConfigLine()+";\n");
 			output.write(machine.getBobbinLine()+";\n");
-			tool.WriteChangeTo(output);
+			tool.writeChangeTo(output);
 			
 			textSetAlign(Align.CENTER);
 			textSetVAlign(VAlign.MIDDLE);

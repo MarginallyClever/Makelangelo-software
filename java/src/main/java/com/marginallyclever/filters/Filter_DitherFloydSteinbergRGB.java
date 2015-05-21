@@ -29,7 +29,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 		new C3(255,255,255),
 	};
 	
-	C3 QuantizeColor(C3 c) {
+	C3 quantizeColor(C3 c) {
 		C3 closest = palette[0];
 
 	    for (C3 n : palette) 
@@ -39,7 +39,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 	    return closest;
 	}
 	
-	private void DitherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) {
+	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) {
 		int w = img.getWidth();
 		C3 oldPixel = new C3(0,0,0);
 		C3 newPixel = new C3(0,0,0);
@@ -61,7 +61,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 			// oldpixel := pixel[x][y]
 			oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
 			// newpixel := find_closest_palette_color(oldpixel)
-			newPixel = QuantizeColor(oldPixel);
+			newPixel = quantizeColor(oldPixel);
 			// pixel[x][y] := newpixel
 			img.setRGB(x, y, newPixel.toInt());
 			// quant_error := oldpixel - newpixel
@@ -97,7 +97,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 		
 		// for each y from top to bottom
 		for(y=0;y<h;++y) {
-			DitherDirection(img,y,error,nexterror,direction);
+			ditherDirection(img,y,error,nexterror,direction);
 			
 			direction = -direction;
 			C3 [] tmp = error;

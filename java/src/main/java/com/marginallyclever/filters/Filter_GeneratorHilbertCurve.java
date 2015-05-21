@@ -47,7 +47,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	}
 	
 	
-	public void Generate(final String dest) {
+	public void generate(final String dest) {
 		final JTextField field_size = new JTextField(Integer.toString((int)xmax));
 		final JTextField field_order = new JTextField(Integer.toString(order));
 
@@ -65,19 +65,19 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 			xmin=0;
 			ymin=0;
 			order = Integer.parseInt(field_order.getText());
-			CreateCurveNow(dest);
+			createCurveNow(dest);
 	    }
 	}
 	
 
-	private void CreateCurveNow(String dest) {
+	private void createCurveNow(String dest) {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			tool = machine.getCurrentTool();
 			setupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
 			output.write(machine.getConfigLine()+";\n");
 			output.write(machine.getBobbinLine()+";\n");
-			tool.WriteChangeTo(output);
+			tool.writeChangeTo(output);
 						
 			turtle_x=0;
 			turtle_y=0;
@@ -108,7 +108,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	        output.close();
 	        
 			// open the file automatically to save a click.
-			mainGUI.OpenFileOnDemand(dest);
+			mainGUI.openFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}

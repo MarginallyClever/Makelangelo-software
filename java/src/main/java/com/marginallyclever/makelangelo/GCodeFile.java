@@ -34,7 +34,7 @@ public class GCodeFile {
 	}
 	
 	
-	void EstimateDrawTime() {
+	void estimateDrawTime() {
 		int i,j;
 		
 		double px=0,py=0,pz=0, length=0, x,y,z,ai,aj;
@@ -129,15 +129,15 @@ public class GCodeFile {
 	
 	
 	// close the file, clear the preview tab
-	public void CloseFile() {
+	public void closeFile() {
 		if(fileOpened==true) {
 			fileOpened=false;
 		}
 	}
 	
 	
-	public void Load(String filename) throws IOException {
-		CloseFile();
+	public void load(String filename) throws IOException {
+		closeFile();
 
     	Scanner scanner = new Scanner(new FileInputStream(filename));
     	
@@ -153,11 +153,11 @@ public class GCodeFile {
 	      scanner.close();
 	    }
 	    fileOpened=true;
-	    EstimateDrawTime();
+	    estimateDrawTime();
 	}
 	
 	
-	public void Save(String filename) throws IOException {
+	public void save(String filename) throws IOException {
 		FileOutputStream out = new FileOutputStream(filename);
 		String temp;
 		

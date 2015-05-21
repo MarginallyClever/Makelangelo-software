@@ -52,12 +52,12 @@ public class Filter_GeneratorZigZag extends Filter {
 	}
 	
 
-	public void UpdateProgress(double len,int color) {
+	public void updateProgress(double len,int color) {
 		t_elapsed=System.currentTimeMillis()-t_start;
 		double new_progress = 100.0 * (double)t_elapsed / (double)time_limit;
 		if( new_progress > progress + 0.1 ) {
 			// find the new tour length
-			len=GetTourLength(solution);
+			len=getTourLength(solution);
 			if( old_len > len ) {
 				old_len=len;
 				DecimalFormat flen=new DecimalFormat("#.##");
@@ -68,7 +68,7 @@ public class Filter_GeneratorZigZag extends Filter {
 				case  2: c="red";	  break;
 				default: c="white";   break;
 				}
-				mainGUI.Log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
+				mainGUI.log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
 			}
 			progress = new_progress;
 			pm.setProgress((int)progress);
@@ -182,16 +182,16 @@ public class Filter_GeneratorZigZag extends Filter {
 		int start, end, j, once=0;
 		
 		for(start=0;start<numPoints-2 && !parent.isCancelled() && !pm.isCanceled();++start) {
-			float a=CalculateWeight(solution[start],solution[start+1]);
+			float a=calculateWeight(solution[start],solution[start+1]);
 			int best_end=-1;
 			double best_diff=0;
 			
 			for(end=start+2;end<=numPoints && !parent.isCancelled() && !pm.isCanceled();++end) {
 				// before
-				float b=CalculateWeight(solution[end  ],solution[end  -1]);
+				float b=calculateWeight(solution[end  ],solution[end  -1]);
 				// after
-				float c=CalculateWeight(solution[start],solution[end  -1]);
-				float d=CalculateWeight(solution[end  ],solution[start+1]);
+				float c=calculateWeight(solution[start],solution[end  -1]);
+				float d=calculateWeight(solution[end  ],solution[start+1]);
 				
 				double temp_diff=(a+b)-(c+d);
 				if(best_diff < temp_diff) {
@@ -213,32 +213,32 @@ public class Filter_GeneratorZigZag extends Filter {
 					solution[begin+j]=solution[finish-1-j];
 					solution[finish-1-j]=temp;
 				}
-				UpdateProgress(len,1);
+				updateProgress(len,1);
 			}
 		}
 		return once;
 	}
 	
 	
-	protected float CalculateWeight(int a,int b) {
+	protected float calculateWeight(int a,int b) {
 		float x = points[a].x - points[b].x;
 		float y = points[a].y - points[b].y;
 		return x*x+y*y;
 	}
 	
 	
-	private void GenerateTSP() {
-		GreedyTour();
+	private void generateTSP() {
+		greedyTour();
 
-		mainGUI.Log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+		mainGUI.log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
-		len=GetTourLength(solution);
+		len=getTourLength(solution);
 		old_len=len;
 		
 		t_elapsed=0;
 		t_start = System.currentTimeMillis();
 		progress=0;
-		UpdateProgress(len,2);
+		updateProgress(len,2);
 
 		int once=1;
 		while(once==1 && t_elapsed<time_limit && !parent.isCancelled()) {
@@ -247,15 +247,15 @@ public class Filter_GeneratorZigZag extends Filter {
 			//once|=transposeForwardTest();
 			//once|=transposeBackwardTest();
 			once|=flipTests();
-			UpdateProgress(len,2);
+			updateProgress(len,2);
 		}
 		
-		ConvertAndSaveToGCode();
+		convertAndSaveToGCode();
 	}
 	
     
-	private double CalculateLength(int a,int b) {
-		return Math.sqrt(CalculateWeight(a,b));
+	private double calculateLength(int a,int b) {
+		return Math.sqrt(calculateWeight(a,b));
 	}
 	
 	/**
@@ -265,10 +265,10 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * @param end the index of the last point of the tour segment
 	 * @return the length of the tour
 	 */
-	private double GetTourLength(int[] list) {
+	private double getTourLength(int[] list) {
 		double w=0;
 		for(int i=0;i<numPoints-1;++i) {
-			w+=CalculateLength(list[i],list[i+1]);
+			w+=calculateLength(list[i],list[i+1]);
 		}
 		return w;
 	}
@@ -276,8 +276,8 @@ public class Filter_GeneratorZigZag extends Filter {
 	/**
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
-	private void GreedyTour() {
-		mainGUI.Log("<font color='green'>Finding greedy tour solution...</font>\n");
+	private void greedyTour() {
+		mainGUI.log("<font color='green'>Finding greedy tour solution...</font>\n");
 
 		int i;
 		float w, bestw;
@@ -295,10 +295,10 @@ public class Filter_GeneratorZigZag extends Filter {
 		do {
 			// Find the nearest point not already in the line.
 			// Any solution[n] where n>scount is not in the line.
-			bestw=CalculateWeight(solution[scount],solution[scount+1]);
+			bestw=calculateWeight(solution[scount],solution[scount+1]);
 			besti=scount+1;
 			for( i=scount+2; i<numPoints; ++i ) {
-				w=CalculateWeight(solution[scount],solution[i]);
+				w=calculateWeight(solution[scount],solution[i]);
 				if( w < bestw ) {
 					bestw=w;
 					besti=i;
@@ -312,7 +312,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	}
 	
 
-	private void MoveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
+	private void moveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
 		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 	
@@ -322,7 +322,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * Since all the points are connected in a single loop,
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
-	private void ConvertAndSaveToGCode() {
+	private void convertAndSaveToGCode() {
 		// find the tsp point closest to the calibration point
 		int i;
 		int besti=-1;
@@ -348,16 +348,16 @@ public class Filter_GeneratorZigZag extends Filter {
 			//tool = mc.GetCurrentTool();
 			
 			setAbsoluteMode(out);
-			tool.WriteChangeTo(out);
+			tool.writeChangeTo(out);
 			liftPen(out);
 			// move to the first point
-			MoveTo(out,besti,false);
+			moveTo(out,besti,false);
 			lowerPen(out);
 
 			for(i=1;i<numPoints;++i) {
-				MoveTo(out,(besti+i)%numPoints,false);
+				moveTo(out,(besti+i)%numPoints,false);
 			}
-			MoveTo(out,besti,false);
+			moveTo(out,besti,false);
 			
 			// lift pen and return to home
 			liftPen(out);
@@ -366,12 +366,12 @@ public class Filter_GeneratorZigZag extends Filter {
 			out.close();
 		}
 		catch(IOException e) {
-			mainGUI.Log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");
+			mainGUI.log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");
 		}
 	}
 	
 	
-	protected void ConnectTheDots(BufferedImage img) {
+	protected void connectTheDots(BufferedImage img) {
 		tool = machine.getCurrentTool();
 		imageSetupTransform(img);
 
@@ -387,7 +387,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			}
 		}
 		
-		mainGUI.Log("<font color='green'>" + numPoints + " points,</font>\n");
+		mainGUI.log("<font color='green'>" + numPoints + " points,</font>\n");
 		points = new Point2D[numPoints+1];
 		solution = new int[numPoints+1];
 	
@@ -418,9 +418,9 @@ public class Filter_GeneratorZigZag extends Filter {
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI,machine,translator);
 		img = dither.process(img);
 		// connect the dots
-		ConnectTheDots(img);
+		connectTheDots(img);
 		// Shorten the line that connects the dots
-		GenerateTSP();
+		generateTSP();
 	}
 }
 

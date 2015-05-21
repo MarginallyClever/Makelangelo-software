@@ -73,7 +73,8 @@ public class Filter_BlackAndWhite extends Filter {
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is to process.
 	 * @return the altered image
 	 */
-	public BufferedImage Process_Via_Histogram(BufferedImage img) {
+	@Deprecated
+	public BufferedImage processViaHistogram(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();
 

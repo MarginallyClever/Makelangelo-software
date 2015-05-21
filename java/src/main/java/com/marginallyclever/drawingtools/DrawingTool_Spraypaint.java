@@ -34,11 +34,11 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		old_y=0;
 	}
 
-	public void WriteOn(OutputStreamWriter out) throws IOException {
+	public void writeOn(OutputStreamWriter out) throws IOException {
 		is_up=false;
 	}
 
-	public void WriteOff(OutputStreamWriter out) throws IOException {
+	public void writeOff(OutputStreamWriter out) throws IOException {
 		is_up=true;
 	}
 		
@@ -59,21 +59,21 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 				 px = old_x + dx * d/len;
 				 py = old_y + dy * d/len;		
 				out.write("G00 X"+px+" Y"+py+" F"+feed_rate+";\n");	
-				super.WriteOn(out);
-				super.WriteOff(out);	
+				super.writeOn(out);
+				super.writeOff(out);	
 			}
 			d=len-r;
 			 px = old_x + dx * d/len;
 			 py = old_y + dy * d/len;		
 			out.write("G00 X"+px+" Y"+py+" F"+feed_rate+";\n");	
-			super.WriteOn(out);
-			super.WriteOff(out);
+			super.writeOn(out);
+			super.writeOff(out);
 		}
 		old_x=x;
 		old_y=y;
 	}
 	
-	public void Adjust() {
+	public void adjust() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("spraypaintToolAdjust"),true);
 		driver.setLayout(new GridBagLayout());
 

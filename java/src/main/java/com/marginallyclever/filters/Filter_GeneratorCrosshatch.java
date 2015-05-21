@@ -32,17 +32,17 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.process(img);
 
-		mainGUI.Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		imageStart(img,out);
 		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
-		tool.WriteChangeTo(out);
+		tool.writeChangeTo(out);
 		liftPen(out);
 
-		ConvertImageSpace(img,out);
+		convertImageSpace(img,out);
 //		ConvertPaperSpace(img,out);
 
 		liftPen(out);
@@ -64,7 +64,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 				);
 	}
 	
-	protected void ConvertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
 		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		
@@ -90,7 +90,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		previous_x=0;
 		previous_y=0;
 		
-		double stepSize = tool.GetDiameter()*3.0;
+		double stepSize = tool.getDiameter()*3.0;
 		double halfStep = stepSize/2.0;
 		double x,y;
 		
@@ -166,15 +166,15 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	}
 	
 	
-	protected void ConvertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
 		int i,j,x,y,z=0;
 		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		
-		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
+		int steps = (int)Math.ceil(2.5*tool.getDiameter()/scale);
 		if(steps<1) steps=1;
 		
-		mainGUI.Log("<font color='green'>Generating layer 1</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -199,7 +199,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 2</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 2</font>\n");
 		// create vertical lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -224,7 +224,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 3</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 3</font>\n");
 		// create diagonal \ lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -264,7 +264,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 4</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 4</font>\n");
 		// create diagonal / lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;

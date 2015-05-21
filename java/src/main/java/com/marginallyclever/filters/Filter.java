@@ -68,13 +68,13 @@ public abstract class Filter {
 		machine = mc;
 	}
 	
-	public void SetParent(SwingWorker<Void,Void> p) {
+	public void setParent(SwingWorker<Void,Void> p) {
 		parent=p;
 	}
-	public void SetProgressMonitor(ProgressMonitor p) {
+	public void setProgressMonitor(ProgressMonitor p) {
 		pm=p;
 	}
-	public void SetDestinationFile(String _dest) {
+	public void setDestinationFile(String _dest) {
 		dest=_dest;
 	}
 	
@@ -129,13 +129,13 @@ public abstract class Filter {
 	
 
 	protected void liftPen(OutputStreamWriter out) throws IOException {
-		tool.WriteOff(out);
+		tool.writeOff(out);
 		lastup=true;
 	}
 	
 	
 	protected void lowerPen(OutputStreamWriter out) throws IOException {
-		tool.WriteOn(out);
+		tool.writeOn(out);
 		lastup=false;
 	}
 

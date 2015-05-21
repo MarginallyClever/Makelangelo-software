@@ -34,12 +34,12 @@ public class Filter_GeneratorScanline extends Filter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
-		tool.WriteChangeTo(out);
+		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.GetDiameter()/(1.75*scale));
+		int steps = (int)Math.ceil(tool.getDiameter()/(1.75*scale));
 		if(steps<1) steps=1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

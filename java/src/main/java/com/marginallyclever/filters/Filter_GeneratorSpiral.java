@@ -52,8 +52,8 @@ public class Filter_GeneratorSpiral extends Filter {
 		
 		imageStart(img,out);
 
-		double toolDiameter=tool.GetDiameter()/scale;
-		tool.WriteChangeTo(out);
+		double toolDiameter=tool.getDiameter()/scale;
+		tool.writeChangeTo(out);
 		liftPen(out);
 
 		//*
@@ -111,7 +111,7 @@ public class Filter_GeneratorSpiral extends Filter {
 			++numRings;
 		}
 		
-		mainGUI.Log("<font color='yellow'>"+numRings+" rings.</font>\n");
+		mainGUI.log("<font color='yellow'>"+numRings+" rings.</font>\n");
 
 		liftPen(out);
 		signName(out);

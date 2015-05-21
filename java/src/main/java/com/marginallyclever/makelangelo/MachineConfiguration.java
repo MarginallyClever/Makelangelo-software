@@ -307,7 +307,7 @@ public class MachineConfiguration {
 						m2invert = m2i.isSelected();
 						
 						saveConfig();
-						mainGUI.SendConfig();
+						mainGUI.sendConfig();
 						driver.dispose();
 					}
 				}
@@ -329,7 +329,7 @@ public class MachineConfiguration {
 	public String [] getToolNames() {
 		String[] toolNames = new String[tools.length];
 		for(int i=0;i<tools.length;++i) {
-			toolNames[i] = tools[i].GetName();
+			toolNames[i] = tools[i].getName();
 		}
 		return toolNames;
 	}
@@ -367,7 +367,7 @@ public class MachineConfiguration {
 					current_tool = toolCombo.getSelectedIndex();
 					
 					saveConfig();
-					mainGUI.SendConfig();
+					mainGUI.sendConfig();
 					driver.dispose();
 				}
 				if(subject == cancel) {
@@ -386,7 +386,7 @@ public class MachineConfiguration {
 	
 	// dialog to adjust the pen up & pen down values
 	protected void adjustTool() {
-		getCurrentTool().Adjust();
+		getCurrentTool().adjust();
 	}
 	
 
@@ -439,7 +439,7 @@ public class MachineConfiguration {
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
 						if(data_is_sane ) {
 							saveConfig();
-							mainGUI.SendConfig();
+							mainGUI.sendConfig();
 							driver.dispose();
 						}
 					}
@@ -493,7 +493,7 @@ public class MachineConfiguration {
 		
 		// load each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].LoadConfig(machinePreferences);
+			tools[i].loadConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
@@ -570,7 +570,7 @@ public class MachineConfiguration {
 
 		// save each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].SaveConfig(machinePreferences);
+			tools[i].saveConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
@@ -597,11 +597,11 @@ public class MachineConfiguration {
 	
 	
 	public String getPenUpString() {
-		return Float.toString(tools[current_tool].GetZOff());
+		return Float.toString(tools[current_tool].getZOff());
 	}
 	
 	public String getPenDownString() {
-		return Float.toString(tools[current_tool].GetZOn());
+		return Float.toString(tools[current_tool].getZOn());
 	}
 	
 	public boolean isPaperConfigured() {

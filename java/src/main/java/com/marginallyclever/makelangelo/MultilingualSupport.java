@@ -100,7 +100,7 @@ public class MultilingualSupport {
 			if (j <= 0) continue;  // no extension
 			if(all_files[i].getPath().substring(j+1).toLowerCase().equals("xml")==false) continue;  // only .XML or .xml files
 			lang = new LanguageContainer();
-			lang.Load(all_files[i].getAbsolutePath());
+			lang.load(all_files[i].getAbsolutePath());
 			languages.put(lang.getName(), lang);
 		}
 	}

@@ -33,7 +33,7 @@ public class Filter_GeneratorBoxes extends Filter {
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int TakeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
+	protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
 		// point sampling
 		int value=0;
 		int sum=0;
@@ -69,7 +69,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
-		tool.WriteChangeTo(out);
+		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 		
@@ -77,7 +77,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/(tool.GetDiameter()));
+		float steps = (float)(pw/(tool.getDiameter()));
 		if(steps<1) steps=1;
 
 		float blockSize=(int)(image_width / steps);
@@ -93,7 +93,7 @@ public class Filter_GeneratorBoxes extends Filter {
 				//MoveTo(file,x,y,pen up?)]
 				for(x=0;x<image_width-blockSize;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
+					z=takeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
 					float pulse_size = (halfstep-1.0f) * scale_z;
@@ -112,7 +112,7 @@ public class Filter_GeneratorBoxes extends Filter {
 				//MoveTo(file,x,y,pen up?)]
 				for(x=image_width-blockSize;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
+					z=takeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
 					float pulse_size = (halfstep-1.0f) * scale_z;
