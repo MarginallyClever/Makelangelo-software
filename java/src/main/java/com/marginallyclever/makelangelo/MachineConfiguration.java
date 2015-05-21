@@ -27,9 +27,20 @@ import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 
-
+/**
+ * FIXME Add Javadoc.
+ */
 public class MachineConfiguration {
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+
+	/**
+	 *
+	 */
+	private Preferences makelangeloPreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+
+	/**
+	 *
+	 */
+	private Preferences machinePreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 	
 	static final String CURRENT_VERSION = "1";
 	// GUID
@@ -95,7 +106,7 @@ public class MachineConfiguration {
 		
 		// which configurations are available?
 		try {
-			configurations_available = prefs.node("Machines").childrenNames();
+			configurations_available = machinePreferences.childrenNames();
 		}
 		catch(Exception e) {
 			configurations_available = new String[0];
@@ -131,9 +142,6 @@ public class MachineConfiguration {
 		BufferedImage myPicture = null;
 		try {
 			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
-			if(s==null) {
-				s = MainGUI.class.getResourceAsStream("resources/"+limit_file);
-			}
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
@@ -451,9 +459,9 @@ public class MachineConfiguration {
 
 	
 	protected void VersionCheck() {
-		String version = prefs.get("version", CURRENT_VERSION);
+		String version = makelangeloPreferences.get("version", CURRENT_VERSION);
 		if( version.equals(CURRENT_VERSION) == false ) {
-			prefs.put("version", CURRENT_VERSION);
+			makelangeloPreferences.put("version", CURRENT_VERSION);
 		}
 	}
 	
@@ -466,32 +474,32 @@ public class MachineConfiguration {
 	}
 	
 	protected void LoadConfigFromLocal() {
-		prefs.node(Long.toString(robot_uid));
-		limit_top = Double.valueOf(prefs.get("limit_top", Double.toString(limit_top)));
-		limit_bottom = Double.valueOf(prefs.get("limit_bottom", Double.toString(limit_bottom)));
-		limit_left = Double.valueOf(prefs.get("limit_left", Double.toString(limit_left)));
-		limit_right = Double.valueOf(prefs.get("limit_right", Double.toString(limit_right)));
-		m1invert=Boolean.parseBoolean(prefs.get("m1invert", m1invert?"true":"false"));
-		m2invert=Boolean.parseBoolean(prefs.get("m2invert", m2invert?"true":"false"));
-		bobbin_left_diameter=Double.valueOf(prefs.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
-		bobbin_right_diameter=Double.valueOf(prefs.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
-		max_feed_rate=Double.valueOf(prefs.get("feed_rate",Double.toString(max_feed_rate)));
-		startingPositionIndex=Integer.valueOf(prefs.get("startingPosIndex",Integer.toString(startingPositionIndex)));
+		machinePreferences.node(Long.toString(robot_uid));
+		limit_top = Double.valueOf(machinePreferences.get("limit_top", Double.toString(limit_top)));
+		limit_bottom = Double.valueOf(machinePreferences.get("limit_bottom", Double.toString(limit_bottom)));
+		limit_left = Double.valueOf(machinePreferences.get("limit_left", Double.toString(limit_left)));
+		limit_right = Double.valueOf(machinePreferences.get("limit_right", Double.toString(limit_right)));
+		m1invert=Boolean.parseBoolean(machinePreferences.get("m1invert", m1invert?"true":"false"));
+		m2invert=Boolean.parseBoolean(machinePreferences.get("m2invert", m2invert?"true":"false"));
+		bobbin_left_diameter=Double.valueOf(machinePreferences.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
+		bobbin_right_diameter=Double.valueOf(machinePreferences.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
+		max_feed_rate=Double.valueOf(machinePreferences.get("feed_rate",Double.toString(max_feed_rate)));
+		startingPositionIndex=Integer.valueOf(machinePreferences.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
-		paper_left=Double.parseDouble(prefs.get("paper_left",Double.toString(paper_left)));
-		paper_right=Double.parseDouble(prefs.get("paper_right",Double.toString(paper_right)));
-		paper_top=Double.parseDouble(prefs.get("paper_top",Double.toString(paper_top)));
-		paper_bottom=Double.parseDouble(prefs.get("paper_bottom",Double.toString(paper_bottom)));
+		paper_left=Double.parseDouble(machinePreferences.get("paper_left",Double.toString(paper_left)));
+		paper_right=Double.parseDouble(machinePreferences.get("paper_right",Double.toString(paper_right)));
+		paper_top=Double.parseDouble(machinePreferences.get("paper_top",Double.toString(paper_top)));
+		paper_bottom=Double.parseDouble(machinePreferences.get("paper_bottom",Double.toString(paper_bottom)));
 		
 		// load each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].LoadConfig(prefs);
+			tools[i].LoadConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
-		paperMargin = Double.valueOf(prefs.get("paper_margin",Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(prefs.get("reverseForGlass",reverseForGlass?"true":"false"));
-		current_tool = Integer.valueOf(prefs.get("current_tool",Integer.toString(current_tool)));
+		paperMargin = Double.valueOf(machinePreferences.get("paper_margin",Double.toString(paperMargin)));
+		reverseForGlass = Boolean.parseBoolean(machinePreferences.get("reverseForGlass",reverseForGlass?"true":"false"));
+		current_tool = Integer.valueOf(machinePreferences.get("current_tool",Integer.toString(current_tool)));
 	}
 
 	
@@ -504,12 +512,12 @@ public class MachineConfiguration {
 	/** 		TODO finish these methods.
 
 	 public boolean GetCanUseCloud() {
-		return prefs.getBoolean("can_use_cloud", false);
+		return machinePreferences.getBoolean("can_use_cloud", false);
 	}
 
 	
 	public void SetCanUseCloud(boolean b) {
-		prefs.putBoolean("can_use_cloud", b);
+		machinePreferences.putBoolean("can_use_cloud", b);
 	}
 
 	protected boolean SaveConfigToCloud() {
@@ -543,32 +551,32 @@ public class MachineConfiguration {
 	
 	
 	protected void SaveConfigToLocal() {
-		prefs.node(Long.toString(robot_uid));
-		prefs.put("limit_top", Double.toString(limit_top));
-		prefs.put("limit_bottom", Double.toString(limit_bottom));
-		prefs.put("limit_right", Double.toString(limit_right));
-		prefs.put("limit_left", Double.toString(limit_left));
-		prefs.put("m1invert",Boolean.toString(m1invert));
-		prefs.put("m2invert",Boolean.toString(m2invert));
-		prefs.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
-		prefs.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		prefs.put("feed_rate", Double.toString(max_feed_rate));
-		prefs.put("startingPosIndex", Integer.toString(startingPositionIndex));
+		machinePreferences.node(Long.toString(robot_uid));
+		machinePreferences.put("limit_top", Double.toString(limit_top));
+		machinePreferences.put("limit_bottom", Double.toString(limit_bottom));
+		machinePreferences.put("limit_right", Double.toString(limit_right));
+		machinePreferences.put("limit_left", Double.toString(limit_left));
+		machinePreferences.put("m1invert", Boolean.toString(m1invert));
+		machinePreferences.put("m2invert", Boolean.toString(m2invert));
+		machinePreferences.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
+		machinePreferences.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
+		machinePreferences.put("feed_rate", Double.toString(max_feed_rate));
+		machinePreferences.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
-		prefs.putDouble("paper_left", paper_left);
-		prefs.putDouble("paper_right", paper_right);
-		prefs.putDouble("paper_top", paper_top);
-		prefs.putDouble("paper_bottom", paper_bottom);
+		machinePreferences.putDouble("paper_left", paper_left);
+		machinePreferences.putDouble("paper_right", paper_right);
+		machinePreferences.putDouble("paper_top", paper_top);
+		machinePreferences.putDouble("paper_bottom", paper_bottom);
 
 		// save each tool's settings
 		for(int i=0;i<tools.length;++i) {
-			tools[i].SaveConfig(prefs);
+			tools[i].SaveConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
-		prefs.put("paper_margin", Double.toString(paperMargin));
-		prefs.put("reverseForGlass",Boolean.toString(reverseForGlass));
-		prefs.put("current_tool", Integer.toString(current_tool));
+		machinePreferences.put("paper_margin", Double.toString(paperMargin));
+		machinePreferences.put("reverseForGlass", Boolean.toString(reverseForGlass));
+		machinePreferences.put("current_tool", Integer.toString(current_tool));
 	}
 
 
@@ -636,7 +644,7 @@ public class MachineConfiguration {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream())); //FIXME use try with resources
 		    String line = rd.readLine();
 		    new_uid = Long.parseLong(line);
 		    rd.close();
@@ -644,8 +652,8 @@ public class MachineConfiguration {
 
 		// did read go ok?
 		if(new_uid!=0) {
-			// make sure a prefs node is created
-			prefs.node("Machines").node(Long.toString(new_uid));
+			// make sure a machinePreferences node is created
+			machinePreferences.node(Long.toString(new_uid));
 			// tell the robot it's new UID.
 			mainGUI.sendLineToRobot("UID "+new_uid);
 
@@ -666,7 +674,7 @@ public class MachineConfiguration {
 	
 	
 	public String[] getKnownMachineNames() {
-		assert(GetMachineCount()>0);
+		assert(configurations_available.length>1);
 		String [] choices = new String[configurations_available.length-1];
 
 		int j=0;
@@ -680,7 +688,7 @@ public class MachineConfiguration {
 	
 	
 	public int getCurrentMachineIndex() {
-		assert(GetMachineCount()>0);
+		assert(configurations_available.length>1);
 		int j=0;
 		for(int i=0;i<configurations_available.length;++i) {
 			if(configurations_available[i].equals("0")) continue;
