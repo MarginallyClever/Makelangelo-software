@@ -1288,14 +1288,14 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-            final String aboutHtml = getAboutHtmlFromMultilingualString();
-			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 			ImageIcon icon = getImageIcon("logo.png");
-			final String menuAboutValue = translator.get("MenuAbout");
-			if (icon != null) {
-				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-			} else {
+			if (icon == null) {
 				icon = getImageIcon("resources/logo.png");
+			}
+			if (icon != null) {
+	            final String aboutHtml = getAboutHtmlFromMultilingualString();
+				final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
+				final String menuAboutValue = translator.get("MenuAbout");
 				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 			}
 			return;
