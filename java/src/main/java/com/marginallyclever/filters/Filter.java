@@ -21,11 +21,11 @@ import java.util.StringTokenizer;
  */
 public abstract class Filter {
 	// image properties
-	int image_width, image_height;
-	float w2,h2,scale;
-	DrawingTool tool;
+	protected int image_width, image_height;
+	protected float w2,h2,scale;
+	protected DrawingTool tool;
 	
-	int color_channel=0;
+	protected int color_channel=0;
 	
 	// text properties
 	protected float kerning=5.0f;
@@ -46,18 +46,21 @@ public abstract class Filter {
 	protected float posy=0;
 
 	// file properties
-	String dest;
+	protected String dest;
 	// pen position optimizing
-	boolean lastup;
-	float previous_x,previous_y;
+	protected boolean lastup;
+	protected float previous_x,previous_y;
 	// threading
-	ProgressMonitor pm;
-	SwingWorker<Void,Void> parent;
+	protected ProgressMonitor pm;
+	protected SwingWorker<Void,Void> parent;
 
 	protected MainGUI mainGUI;
 	protected MultilingualSupport translator;
 	protected MachineConfiguration machine;
 	
+	protected float sampleValue;
+	protected float sampleSum;
+
 	
 	public Filter(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
 		mainGUI = gui;
@@ -260,8 +263,6 @@ public abstract class Filter {
 	}
 
 	
-	float sampleValue;
-	float sampleSum;
 	
 	protected void sample1x1Safe(BufferedImage img,int x,int y,double scale) {
 		if(x<0 || x >= image_width) return;
@@ -274,10 +275,10 @@ public abstract class Filter {
 	/**
 	 * sample the image, taking into account fractions of pixels.
 	 * @param img the image to sample
-	 * @param x0 paper-space coordinates, top left corner
-	 * @param y0 paper-space coordinates, top left corner
-	 * @param x1 paper-space coordinates, bottom right corner
-	 * @param y1 paper-space coordinates, bottom right corner
+	 * @param x0 top left corner
+	 * @param y0 top left corner
+	 * @param x1 bottom right corner
+	 * @param y1 bottom right corner
 	 * @return greyscale intensity in this region. range 0...255 inclusive
 	 */
 	protected int sample(BufferedImage img,double x0,double y0,double x1,double y1) {
@@ -290,6 +291,9 @@ public abstract class Filter {
 		double xfloor = Math.floor(x1);
 		double xweightend = ( x1 != xceil ) ? xfloor - x1 : 0;
 		
+		int left = (int)(x0+1);
+		int right = (int)x1;
+		
 		// top edge
 		double yceil = Math.ceil(y0);
 		if( y0 != yceil ) {
@@ -298,22 +302,24 @@ public abstract class Filter {
 			// left edge
 			sample1x1Safe(img,(int)x0,(int)y0, xweightstart * yweightstart);
 			
-			for(int i=(int)(x0+1);i<(int)x1;++i) {
+			for(int i=left;i<right;++i) {
 				sample1x1Safe(img,i,(int)y0, yweightstart);
 			}	
 			// right edge
-			sample1x1Safe(img,(int)x1,(int)y0, xweightend * yweightstart);
+			sample1x1Safe(img,right,(int)y0, xweightend * yweightstart);
 		}
 		
-		for(int j=(int)(y0+1);j<(int)y1;++j) {
+		int bottom = (int)(y0+1);
+		int top = (int)y1;
+		for(int j = bottom; j < top; ++j ) {
 			// left edge
 			sample1x1Safe(img,(int)x0,j, xweightstart);
 			
-			for(int i=(int)(x0+1);i<(int)x1;++i) {
+			for(int i=left;i<right;++i) {
 				sample1x1Safe(img,i,j,1);
 			}
 			// right edge
-			sample1x1Safe(img,(int)x1,j, xweightend);
+			sample1x1Safe(img,right,j, xweightend);
 		}
 		
 		// bottom edge
@@ -324,11 +330,11 @@ public abstract class Filter {
 			// left edge
 			sample1x1Safe(img,(int)x0,(int)y1, xweightstart * yweightend);
 			
-			for(int i=(int)(x0+1);i<(int)x1;++i) {
+			for(int i=left;i<right;++i) {
 				sample1x1Safe(img,i,(int)y1, yweightend);
 			}
 			// right edge
-			sample1x1Safe(img,(int)x1,(int)y1, xweightend * yweightend);
+			sample1x1Safe(img,right,(int)y1, xweightend * yweightend);
 		}
 		
 		return (int)(sampleValue/sampleSum);
@@ -370,15 +376,9 @@ public abstract class Filter {
 	}
 	
 	protected void moveToPaper(OutputStreamWriter out,double x,double y,boolean up) throws IOException {
-		/*if(up==lastup) {
-			previous_x=(float)x;
-			previous_y=(float)y;
-		} else {
-			tool.WriteMoveTo(out,previous_x,previous_y);*/
-			tool.WriteMoveTo(out,(float)x,(float)y);
-			if(up) liftPen(out);
-			else   lowerPen(out);
-		//}
+		tool.WriteMoveTo(out,(float)x,(float)y);
+		if(up) liftPen(out);
+		else   lowerPen(out);
 	}
 	
 	
