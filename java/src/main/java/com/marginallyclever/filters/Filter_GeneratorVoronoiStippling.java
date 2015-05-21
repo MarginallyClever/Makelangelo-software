@@ -83,7 +83,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			h = img.getHeight();
 			w = img.getWidth();
 			
-			tool = machine.GetCurrentTool();
+			tool = machine.getCurrentTool();
 			ImageSetupTransform(img);
 	
 			cellBorder = new ArrayList<VoronoiCellEdge>();

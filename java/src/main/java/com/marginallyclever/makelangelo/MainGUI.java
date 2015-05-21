@@ -416,11 +416,11 @@ public class MainGUI
 					Object subject = e.getSource();
 					if(subject == save) {
 						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
-						machineConfiguration.LoadConfig(new_uid);
+						machineConfiguration.loadConfig(new_uid);
 						SetDrawStyle(input_draw_style.getSelectedIndex());
 						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 						machineConfiguration.reverseForGlass=reverse_h.isSelected();
-						machineConfiguration.SaveConfig();
+						machineConfiguration.saveConfig();
 						
 						// if we aren't connected, don't show the new 
 						if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
@@ -478,9 +478,9 @@ public class MainGUI
 
 				try {
 					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
-					DrawingTool tool = machineConfiguration.GetCurrentTool();
-					out.write(machineConfiguration.GetConfigLine()+";\n");
-					out.write(machineConfiguration.GetBobbinLine()+";\n");
+					DrawingTool tool = machineConfiguration.getCurrentTool();
+					out.write(machineConfiguration.getConfigLine()+";\n");
+					out.write(machineConfiguration.getBobbinLine()+";\n");
 					out.write("G00 G90;\n");
 					tool.WriteChangeTo(out);
 					tool.WriteOff(out);
@@ -834,7 +834,7 @@ public class MainGUI
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
 
 	    	// if machine is not yet calibrated
-	    	if(machineConfiguration.IsPaperConfigured() == false) {
+	    	if(machineConfiguration.isPaperConfigured() == false) {
 	    		JOptionPane.showMessageDialog(null,translator.get("SetPaperSize"));
 	    		return;
 	    	}
@@ -931,7 +931,7 @@ public class MainGUI
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
-						machineConfiguration.SaveConfig();
+						machineConfiguration.saveConfig();
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -1019,8 +1019,8 @@ public class MainGUI
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		sendLineToRobot(machineConfiguration.GetConfigLine());
-		sendLineToRobot(machineConfiguration.GetBobbinLine());
+		sendLineToRobot(machineConfiguration.getConfigLine());
+		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
 	}
 	
@@ -1264,22 +1264,22 @@ public class MainGUI
 			updateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
-			machineConfiguration.AdjustMachineSize();
+			machineConfiguration.adjustMachineSize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustPulleySize ) {
-			machineConfiguration.AdjustPulleySize();
+			machineConfiguration.adjustPulleySize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonChangeTool ) {
-			machineConfiguration.ChangeTool();
+			machineConfiguration.changeTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustTool ) {
-			machineConfiguration.AdjustTool();
+			machineConfiguration.adjustTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
@@ -1529,7 +1529,7 @@ public class MainGUI
 			public void actionPerformed(ActionEvent e) {
 				machineConfiguration.m1invert = m1i.isSelected();
 				machineConfiguration.m2invert = m2i.isSelected();
-				machineConfiguration.SaveConfig();
+				machineConfiguration.saveConfig();
 				SendConfig();
 			}
 		};

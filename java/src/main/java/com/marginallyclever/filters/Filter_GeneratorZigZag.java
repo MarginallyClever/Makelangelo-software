@@ -341,8 +341,8 @@ public class Filter_GeneratorZigZag extends Filter {
 		// write
 		try {
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			out.write(machine.GetConfigLine()+";\n");
-			out.write(machine.GetBobbinLine()+";\n");
+			out.write(machine.getConfigLine()+";\n");
+			out.write(machine.getBobbinLine()+";\n");
 
 			//MachineConfiguration mc = machine;
 			//tool = mc.GetCurrentTool();
@@ -372,7 +372,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	
 	
 	protected void ConnectTheDots(BufferedImage img) {
-		tool = machine.GetCurrentTool();
+		tool = machine.getCurrentTool();
 		ImageSetupTransform(img);
 
 		int x,y,i;

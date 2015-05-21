@@ -334,7 +334,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
 	
 	public void render( GL2 gl2 ) {
-		DrawingTool tool = machine.GetTool(0);
+		DrawingTool tool = machine.getTool(0);
 		
 		paintBackground(gl2);
 		paintCamera(gl2);
@@ -369,7 +369,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 
                 switch(n.type) {
                 case TOOL:
-                    tool = machine.GetTool(n.tool_id);
+                    tool = machine.getTool(n.tool_id);
                     gl2.glLineWidth(tool.GetDiameter());
                     break;
                 case COLOR:
@@ -417,7 +417,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void OptimizeNodes() {
 		if(instructions == null) return;
 		
-		DrawingTool tool = machine.GetTool(0);
+		DrawingTool tool = machine.getTool(0);
 		
 		drawScale=0.1f;
 		

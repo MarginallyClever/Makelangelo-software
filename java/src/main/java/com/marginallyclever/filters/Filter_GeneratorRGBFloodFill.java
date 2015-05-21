@@ -204,7 +204,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		int i;
 		for(i=0;i<4;++i) {
 			// "please change to tool X and press any key to continue"
-			tool = machine.GetTool(i);
+			tool = machine.getTool(i);
 			tool.WriteChangeTo(osw);
 			// Make sure the pen is up for the first move
 			liftPen(osw);

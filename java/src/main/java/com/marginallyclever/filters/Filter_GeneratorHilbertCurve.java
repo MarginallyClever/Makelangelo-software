@@ -73,10 +73,10 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	private void CreateCurveNow(String dest) {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			tool = machine.GetCurrentTool();
+			tool = machine.getCurrentTool();
 			SetupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
-			output.write(machine.GetConfigLine()+";\n");
-			output.write(machine.GetBobbinLine()+";\n");
+			output.write(machine.getConfigLine()+";\n");
+			output.write(machine.getBobbinLine()+";\n");
 			tool.WriteChangeTo(output);
 						
 			turtle_x=0;

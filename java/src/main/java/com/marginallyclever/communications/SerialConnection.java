@@ -127,7 +127,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         portConfirmed=true;
 
         String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
-        machine.ParseRobotUID(after_hello);
+        machine.parseRobotUID(after_hello);
 
         mainGUI.getMainframe().setTitle(translator.get("TitlePrefix")
                 + Long.toString(machine.getUID())

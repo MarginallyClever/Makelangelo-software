@@ -137,12 +137,12 @@ public abstract class Filter {
 
 	
 	protected void ImageStart(BufferedImage img,OutputStreamWriter out) throws IOException {
-		tool = machine.GetCurrentTool();
+		tool = machine.getCurrentTool();
 
 		ImageSetupTransform(img);
 		
-		out.write(machine.GetConfigLine()+";\n");
-		out.write(machine.GetBobbinLine()+";\n");
+		out.write(machine.getConfigLine()+";\n");
+		out.write(machine.getBobbinLine()+";\n");
 
 		previous_x=0;
 		previous_y=0;
@@ -467,7 +467,7 @@ public abstract class Filter {
 	protected void TextCreateMessageNow(String text,OutputStreamWriter output) throws IOException {
 		if(chars_per_line<=0) return;
 
-		tool = machine.GetCurrentTool();
+		tool = machine.getCurrentTool();
 		
 		// find size of text block
 		// TODO count newlines

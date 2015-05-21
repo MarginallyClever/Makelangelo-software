@@ -54,10 +54,10 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 
-			tool = machine.GetCurrentTool();
+			tool = machine.getCurrentTool();
 			SetupTransform();
-			output.write(machine.GetConfigLine()+";\n");
-			output.write(machine.GetBobbinLine()+";\n");
+			output.write(machine.getConfigLine()+";\n");
+			output.write(machine.getBobbinLine()+";\n");
 			tool.WriteChangeTo(output);
 			
 			TextSetAlign(Align.CENTER);

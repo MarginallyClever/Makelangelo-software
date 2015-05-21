@@ -167,7 +167,7 @@ public class Filter_GeneratorRGB extends Filter {
 		palette_mask=tool_index;
 		
 		// "please change to tool X and press any key to continue"
-		tool = machine.GetTool(tool_index);
+		tool = machine.getTool(tool_index);
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);

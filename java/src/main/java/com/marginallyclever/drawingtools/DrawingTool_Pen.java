@@ -119,7 +119,7 @@ public class DrawingTool_Pen extends DrawingTool {
 					z_rate = Float.valueOf(penZRate.getText());
 					z_off = Float.valueOf(penUp.getText());
 					z_on = Float.valueOf(penDown.getText());
-					machine.SaveConfig();
+					machine.saveConfig();
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {

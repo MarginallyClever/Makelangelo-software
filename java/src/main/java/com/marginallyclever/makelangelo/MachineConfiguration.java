@@ -102,7 +102,7 @@ public class MachineConfiguration {
 		tools[i++]=new DrawingTool_LED(gui,ms,this);
 		tools[i++]=new DrawingTool_Spraypaint(gui,ms,this);
 		
-		VersionCheck();
+		versionCheck();
 		
 		// which configurations are available?
 		try {
@@ -113,13 +113,13 @@ public class MachineConfiguration {
 		}
 		
 		// TODO load most recent config?
-		LoadConfig(0);
+		loadConfig(0);
 	}
 	
 	/**
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
-	public void AdjustMachineSize() {
+	public void adjustMachineSize() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust machine & paper size",true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -306,7 +306,7 @@ public class MachineConfiguration {
 						m1invert = m1i.isSelected();
 						m2invert = m2i.isSelected();
 						
-						SaveConfig();
+						saveConfig();
 						mainGUI.SendConfig();
 						driver.dispose();
 					}
@@ -336,7 +336,7 @@ public class MachineConfiguration {
 	
 	
 	// dialog to adjust the pen up & pen down values
-	protected void ChangeTool() {
+	protected void changeTool() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustMachineSize"),true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -366,7 +366,7 @@ public class MachineConfiguration {
 				if(subject == save) {
 					current_tool = toolCombo.getSelectedIndex();
 					
-					SaveConfig();
+					saveConfig();
 					mainGUI.SendConfig();
 					driver.dispose();
 				}
@@ -385,23 +385,23 @@ public class MachineConfiguration {
 	
 	
 	// dialog to adjust the pen up & pen down values
-	protected void AdjustTool() {
-		GetCurrentTool().Adjust();
+	protected void adjustTool() {
+		getCurrentTool().Adjust();
 	}
 	
 
-	public DrawingTool GetTool(int tool_id) {
+	public DrawingTool getTool(int tool_id) {
 		return tools[tool_id];
 	}
 	
 	
-	public DrawingTool GetCurrentTool() {
-		return GetTool(current_tool);
+	public DrawingTool getCurrentTool() {
+		return getTool(current_tool);
 	}
 	
 	
 	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-	public void AdjustPulleySize() {
+	public void adjustPulleySize() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustPulleySize"),true);
 		driver.setLayout(new GridBagLayout());
 
@@ -438,7 +438,7 @@ public class MachineConfiguration {
 						if( bobbin_left_diameter <= 0 ) data_is_sane=false;
 						if( bobbin_right_diameter <= 0 ) data_is_sane=false;
 						if(data_is_sane ) {
-							SaveConfig();
+							saveConfig();
 							mainGUI.SendConfig();
 							driver.dispose();
 						}
@@ -458,7 +458,7 @@ public class MachineConfiguration {
 	}
 
 	
-	protected void VersionCheck() {
+	protected void versionCheck() {
 		String version = makelangeloPreferences.get("version", CURRENT_VERSION);
 		if( version.equals(CURRENT_VERSION) == false ) {
 			makelangeloPreferences.put("version", CURRENT_VERSION);
@@ -467,13 +467,13 @@ public class MachineConfiguration {
 	
 	
 	// Load the machine configuration
-	protected void LoadConfig(long uid) {
+	protected void loadConfig(long uid) {
 		robot_uid = uid;
 		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return; FIXME once cloud logic is finished.
-		LoadConfigFromLocal();
+		loadConfigFromLocal();
 	}
 	
-	protected void LoadConfigFromLocal() {
+	protected void loadConfigFromLocal() {
 		machinePreferences.node(Long.toString(robot_uid));
 		limit_top = Double.valueOf(machinePreferences.get("limit_top", Double.toString(limit_top)));
 		limit_bottom = Double.valueOf(machinePreferences.get("limit_bottom", Double.toString(limit_bottom)));
@@ -504,9 +504,9 @@ public class MachineConfiguration {
 
 	
 	// Save the machine configuration
-	public void SaveConfig() {
+	public void saveConfig() {
 		//if(GetCanUseCloud() && SaveConfigToCloud() ) return; FIXME once cloud logic is finished.
-		SaveConfigToLocal();
+		saveConfigToLocal();
 	}
 
 	/** 		TODO finish these methods.
@@ -550,7 +550,7 @@ public class MachineConfiguration {
 	 */
 	
 	
-	protected void SaveConfigToLocal() {
+	protected void saveConfigToLocal() {
 		machinePreferences.node(Long.toString(robot_uid));
 		machinePreferences.put("limit_top", Double.toString(limit_top));
 		machinePreferences.put("limit_bottom", Double.toString(limit_bottom));
@@ -581,12 +581,12 @@ public class MachineConfiguration {
 
 
 	
-	public String GetBobbinLine() {
+	public String getBobbinLine() {
 		return new String("D1 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
 	}
 
 	
-	public String GetConfigLine() {
+	public String getConfigLine() {
 		return new String("M101 T"+limit_top
 		+" B"+limit_bottom
 		+" L"+limit_left
@@ -604,12 +604,12 @@ public class MachineConfiguration {
 		return Float.toString(tools[current_tool].GetZOn());
 	}
 	
-	public boolean IsPaperConfigured() {
+	public boolean isPaperConfigured() {
 		return (paper_top>paper_bottom && paper_right>paper_left);
 	}
 	
-	public void ParseRobotUID(String line) {
-		SaveConfig();
+	public void parseRobotUID(String line) {
+		saveConfig();
 		
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
@@ -623,22 +623,22 @@ public class MachineConfiguration {
 		
 		// new robots have UID=0
 		if(new_uid==0) {
-			new_uid=GetNewRobotUID();
+			new_uid=getNewRobotUID();
 		}
 		
 		// load machine specific config
-		LoadConfig(new_uid);
+		loadConfig(new_uid);
 		
 		if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
 			// probably first time turning on, adjust the machine size
-			AdjustMachineSize();
+			adjustMachineSize();
 		}
 	}
 	
 	/**
 	 * based on http://www.exampledepot.com/egs/java.net/Post.html
 	 */
-	private long GetNewRobotUID() {
+	private long getNewRobotUID() {
 		long new_uid=0;
 		try {
 		    // Send data
@@ -737,7 +737,7 @@ public class MachineConfiguration {
 	
 	public void setFeedRate(double f) {
 		max_feed_rate = f;
-		SaveConfig();
+		saveConfig();
 	}
 	
 	public long getUID() {

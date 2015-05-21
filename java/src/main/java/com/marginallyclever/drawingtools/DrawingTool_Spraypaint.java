@@ -148,7 +148,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 					z_off = Float.valueOf(spraypaintUp.getText());
 					z_on = Float.valueOf(spraypaintDown.getText());
 					z_rate = Float.valueOf(spraypaintZRate.getText());
-					machine.SaveConfig();
+					machine.saveConfig();
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {
