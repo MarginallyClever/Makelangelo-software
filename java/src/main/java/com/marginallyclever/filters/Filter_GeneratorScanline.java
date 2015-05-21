@@ -18,21 +18,21 @@ public class Filter_GeneratorScanline extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("ScanlineName"); }
+	public String getName() { return translator.get("ScanlineName"); }
 	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		// Open the destination file
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
@@ -54,27 +54,27 @@ public class Filter_GeneratorScanline extends Filter {
 				// every even line move left to right
 				
 				//MoveTo(file,x,y,pen up?)
-				MoveTo(out,(float)0,(float)y,true);
+				moveTo(out,(float)0,(float)y,true);
 				for(x=0;x<image_width;++x) {
 					// read the image at x,y
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z > level ));
+					moveTo(out,(float)x,(float)y,( z > level ));
 				}
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 			} else {
 				// every odd line move right to left
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z > level ));
+					moveTo(out,(float)x,(float)y,( z > level ));
 				}
-				MoveTo(out,(float)0,(float)y,true);
+				moveTo(out,(float)0,(float)y,true);
 			}
 		}
 
 		// pen already lifted
-		SignName(out);
-		MoveTo(out, 0, 0, true);
+		signName(out);
+		moveTo(out, 0, 0, true);
 		
 		// close the file
 		out.close();

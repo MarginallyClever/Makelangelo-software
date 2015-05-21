@@ -37,7 +37,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("RGBFloodFillName"); }
+	public String getName() { return translator.get("RGBFloodFillName"); }
 
 	C3 QuantizeColor(C3 c) {
 		C3 closest = palette[0];
@@ -58,7 +58,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 			else   lowerPen(osw);
 			lastup=up;
 		}
-		tool.WriteMoveTo(osw, TX(x), TY(y));
+		tool.writeMoveTo(osw, TX(x), TY(y));
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
@@ -182,7 +182,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
 		//img = bw.Process(img);
@@ -190,7 +190,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		// Open the destination file
 		osw = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,osw);
+		imageStart(img,osw);
 		
 		// figure out how many lines we're going to have on this image.
 		diameter = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
@@ -216,7 +216,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		mainGUI.Log("<font color='green'>Signing my name</font>\n");
 		
 		// pen already lifted
-		SignName(osw);
+		signName(osw);
 		MoveTo(0, 0, true);
 		
 		// close the file

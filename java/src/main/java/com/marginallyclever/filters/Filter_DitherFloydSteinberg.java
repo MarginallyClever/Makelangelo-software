@@ -71,7 +71,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 	}
 	
 	
-	public BufferedImage Process(BufferedImage img) {
+	public BufferedImage process(BufferedImage img) {
 		int y,x;
 		int h = img.getHeight();
 		int w = img.getWidth();

@@ -19,7 +19,7 @@ import java.text.DecimalFormat;
  * @author Dan
  */
 public class Filter_GeneratorZigZag extends Filter {
-	public String GetName() { return translator.get("ZigZagName"); }
+	public String getName() { return translator.get("ZigZagName"); }
 	
 	// processing tools
 	long t_elapsed,t_start;
@@ -313,7 +313,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	
 
 	private void MoveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
-		tool.WriteMoveTo(out, points[solution[i]].x, points[solution[i]].y);
+		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 	
 	
@@ -347,7 +347,7 @@ public class Filter_GeneratorZigZag extends Filter {
 			//MachineConfiguration mc = machine;
 			//tool = mc.GetCurrentTool();
 			
-			SetAbsoluteMode(out);
+			setAbsoluteMode(out);
 			tool.WriteChangeTo(out);
 			liftPen(out);
 			// move to the first point
@@ -361,8 +361,8 @@ public class Filter_GeneratorZigZag extends Filter {
 			
 			// lift pen and return to home
 			liftPen(out);
-			SignName(out);
-			tool.WriteMoveTo(out,0,0);
+			signName(out);
+			tool.writeMoveTo(out,0,0);
 			out.close();
 		}
 		catch(IOException e) {
@@ -373,7 +373,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	
 	protected void ConnectTheDots(BufferedImage img) {
 		tool = machine.getCurrentTool();
-		ImageSetupTransform(img);
+		imageSetupTransform(img);
 
 		int x,y,i;
 		// count the points
@@ -407,16 +407,16 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) {
+	public void convert(BufferedImage img) {
 		// resize & flip as needed
 		Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250); 
-		img = rs.Process(img);
+		img = rs.process(img);
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.Process(img);
+		img = bw.process(img);
 		// dither
 		Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI,machine,translator);
-		img = dither.Process(img);
+		img = dither.process(img);
 		// connect the dots
 		ConnectTheDots(img);
 		// Shorten the line that connects the dots

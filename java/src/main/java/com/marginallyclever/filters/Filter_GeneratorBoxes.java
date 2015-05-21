@@ -18,18 +18,18 @@ public class Filter_GeneratorBoxes extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("BoxGeneratorName"); }
+	public String getName() { return translator.get("BoxGeneratorName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
@@ -59,15 +59,15 @@ public class Filter_GeneratorBoxes extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		// Open the destination file
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
@@ -99,12 +99,12 @@ public class Filter_GeneratorBoxes extends Filter {
 					float pulse_size = (halfstep-1.0f) * scale_z;
 					if( pulse_size>0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
 					}
 				}
 			} else {
@@ -118,20 +118,20 @@ public class Filter_GeneratorBoxes extends Filter {
 					float pulse_size = (halfstep-1.0f) * scale_z;
 					if( pulse_size>0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
-						MoveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
 					}
 				}
 			}
 		}
 
 		liftPen(out);
-		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
+		signName(out);
+		tool.writeMoveTo(out, 0, 0);
 		
 		// close the file
 		out.close();

@@ -28,7 +28,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("YourMsgHereName"); }
+	public String getName() { return translator.get("YourMsgHereName"); }
 	
 	public void Generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage,6,60);
@@ -36,7 +36,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 		JPanel panel = new JPanel(new GridLayout(0,1));
 		panel.add(new JScrollPane(text));
 		
-	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 			lastMessage = text.getText();
 			CreateMessage(lastMessage,dest);
@@ -55,19 +55,19 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 
 			tool = machine.getCurrentTool();
-			SetupTransform();
+			setupTransform();
 			output.write(machine.getConfigLine()+";\n");
 			output.write(machine.getBobbinLine()+";\n");
 			tool.WriteChangeTo(output);
 			
-			TextSetAlign(Align.CENTER);
-			TextSetVAlign(VAlign.MIDDLE);
-			TextCreateMessageNow(lastMessage,output);
+			textSetAlign(Align.CENTER);
+			textSetVAlign(VAlign.MIDDLE);
+			textCreateMessageNow(lastMessage,output);
 
-			TextSetAlign(Align.RIGHT);
-			TextSetVAlign(VAlign.TOP);
-			TextSetPosition(image_width,image_height);
-			TextCreateMessageNow("Makelangelo #"+Long.toString(machine.getUID()),output);
+			textSetAlign(Align.RIGHT);
+			textSetVAlign(VAlign.TOP);
+			textSetPosition(image_width,image_height);
+			textCreateMessageNow("Makelangelo #"+Long.toString(machine.getUID()),output);
 			
 			output.close();
 		}

@@ -74,7 +74,7 @@ public class DrawingTool {
 		DrawZ(z_off);
 	}
 	
-	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
 		out.write("G00 X"+x+" Y"+y+";\n");
 	}
 	

@@ -18,18 +18,18 @@ public class Filter_GeneratorPulse extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("PulseLineName"); }
+	public String getName() { return translator.get("PulseLineName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
@@ -59,15 +59,15 @@ public class Filter_GeneratorPulse extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		// Open the destination file
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
 		tool.WriteChangeTo(out);
 		// Make sure the pen is up for the first move
@@ -88,7 +88,7 @@ public class Filter_GeneratorPulse extends Filter {
 			if((i%2)==0) {
 				// every even line move left to right
 				//MoveTo(file,x,y,pen up?)]
-				MoveTo(out,(float)0,(float)y+halfstep,true);
+				moveTo(out,(float)0,(float)y+halfstep,true);
 
 				for(x=0;x<image_width;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
@@ -98,28 +98,28 @@ public class Filter_GeneratorPulse extends Filter {
 					//scale_z *= scale_z;  // quadratic curve
 					float pulse_size = halfstep * scale_z;
 					if(pulse_size < 0.5f) {
-						MoveTo(out,x,y+halfstep,true);
-						MoveTo(out,x+blockSize,y+halfstep,true);
+						moveTo(out,x,y+halfstep,true);
+						moveTo(out,x+blockSize,y+halfstep,true);
 					} else {
 						int finalx = x + blockSize;
 						if( finalx >= image_width ) finalx = image_width-1;
 						// fill the same block in the output image with a heartbeat monitor zigzag.
 						// the height of the pulse is relative to the intensity.
-						MoveTo( out, (float)(x), (float)(y+halfstep), false );
+						moveTo( out, (float)(x), (float)(y+halfstep), false );
 						++k;
 						for(int block_x=x; block_x <= finalx; block_x+=steps) {
 							float n = 1 + ( k % 2 ) * -2;
 							++k;
-							MoveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
+							moveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
 						}
-						MoveTo( out, (float)(finalx), (float)(y+halfstep), false );
+						moveTo( out, (float)(finalx), (float)(y+halfstep), false );
 					}
 				}
-				MoveTo(out,(float)image_width,(float)y+halfstep,true);
+				moveTo(out,(float)image_width,(float)y+halfstep,true);
 			} else {
 				// every odd line move right to left
 				//MoveTo(file,x,y,pen up?)]
-				MoveTo(out,(float)image_width,(float)y+halfstep,true);
+				moveTo(out,(float)image_width,(float)y+halfstep,true);
 
 				for(x=image_width;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
@@ -129,30 +129,30 @@ public class Filter_GeneratorPulse extends Filter {
 					//scale_z *= scale_z;  // quadratic curve
 					float pulse_size = halfstep * scale_z;
 					if(pulse_size < 0.5f) {
-						MoveTo(out,x,y+halfstep,true);
-						MoveTo(out,x-blockSize,y+halfstep,true);
+						moveTo(out,x,y+halfstep,true);
+						moveTo(out,x-blockSize,y+halfstep,true);
 					} else {
 						int finalx = x - blockSize;
 						if( finalx < 0 ) finalx = 0;
 						// fill the same block in the output image with a heartbeat monitor zigzag.
 						// the height of the pulse is relative to the intensity.
-						MoveTo( out, (float)(x), (float)(y+halfstep), false );
+						moveTo( out, (float)(x), (float)(y+halfstep), false );
 						++k;
 						for(int block_x=x; block_x >= finalx; block_x-=steps) {
 							float n = 1 + ( k % 2 ) * -2;
 							++k;
-							MoveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
+							moveTo( out, (float)(block_x), (float)(y+halfstep+pulse_size*n), false );
 						}
-						MoveTo( out, (float)(finalx), (float)(y+halfstep), false );
+						moveTo( out, (float)(finalx), (float)(y+halfstep), false );
 					}
 				}
-				MoveTo(out,(float)0,(float)y+halfstep,true);
+				moveTo(out,(float)0,(float)y+halfstep,true);
 			}
 		}
 
 		liftPen(out);
-		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
+		signName(out);
+		tool.writeMoveTo(out, 0, 0);
 		
 		// close the file
 		out.close();

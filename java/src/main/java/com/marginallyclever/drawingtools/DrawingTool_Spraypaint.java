@@ -42,7 +42,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		is_up=true;
 	}
 		
-	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
 		if(is_up) {
 			out.write("G00 X"+x+" Y"+y+";\n");			
 		} else {

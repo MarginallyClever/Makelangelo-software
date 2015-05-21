@@ -22,7 +22,7 @@ public class Filter_BlackAndWhite extends Filter {
 		levels = (double)_levels;
 	}
 	
-	public BufferedImage Process(BufferedImage img) {
+	public BufferedImage process(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();
 		int x,y,i;

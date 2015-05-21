@@ -384,7 +384,7 @@ public class MainGUI
 		int i=0;
 		while(fit.hasNext()) {
 			Filter f = fit.next();
-			filter_names[i++] = f.GetName();
+			filter_names[i++] = f.getName();
 		}
 		
 		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
@@ -556,12 +556,12 @@ public class MainGUI
 										if(tool.DrawIsOn()) {
 											tool.WriteOff(out);
 										}
-										tool.WriteMoveTo(out, (float)x,(float)y);
+										tool.writeMoveTo(out, (float)x,(float)y);
 									}
 									if(tool.DrawIsOff()) {
 										tool.WriteOn(out);
 									}
-									tool.WriteMoveTo(out, (float)x2,(float)y2);
+									tool.writeMoveTo(out, (float)x2,(float)y2);
 									dxf_x2=x2;
 									dxf_y2=y2;
 								}
@@ -586,14 +586,14 @@ public class MainGUI
 												if(tool.DrawIsOn()) {
 													tool.WriteOff(out);
 												}
-												tool.WriteMoveTo(out, (float)x,(float)y);
+												tool.writeMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
 										} else {
 											// not the first point, draw.
 											if(tool.DrawIsOff()) tool.WriteOn(out);
 											if(j<polyLine.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.WriteMoveTo(out, (float)x,(float)y);
+											tool.writeMoveTo(out, (float)x,(float)y);
 										}
 										dxf_x2=x;
 										dxf_y2=y;
@@ -618,14 +618,14 @@ public class MainGUI
 												if(tool.DrawIsOn()) {
 													tool.WriteOff(out);
 												}
-												tool.WriteMoveTo(out, (float)x,(float)y);
+												tool.writeMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
 										} else {
 											// not the first point, draw.
 											if(tool.DrawIsOff()) tool.WriteOn(out);
 											if(j<entity.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.WriteMoveTo(out, (float)x,(float)y);
+											tool.writeMoveTo(out, (float)x,(float)y);
 										}
 										dxf_x2=x;
 										dxf_y2=y;
@@ -637,7 +637,7 @@ public class MainGUI
 
 					// entities finished.  Close up file.
 					tool.WriteOff(out);
-					tool.WriteMoveTo(out, 0, 0);
+					tool.writeMoveTo(out, 0, 0);
 					
 					ok=true;
 				} catch(IOException e) {
@@ -724,7 +724,7 @@ public class MainGUI
 					f.SetParent(this);
 					f.SetProgressMonitor(pm);
 					f.SetDestinationFile(destinationFile);
-					f.Convert(img);
+					f.convert(img);
 					TabToDraw();
 			        previewPane.ZoomToFitPaper();
 				}

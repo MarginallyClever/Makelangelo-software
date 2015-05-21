@@ -17,7 +17,7 @@ import java.io.OutputStreamWriter;
  * @author Dan
  */
 public class Filter_GeneratorCrosshatch extends Filter {
-	public String GetName() { return translator.get("Crosshatch"); }
+	public String getName() { return translator.get("Crosshatch"); }
 	
 	public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
 		super(gui,mc,ms);
@@ -28,14 +28,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		mainGUI.Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		ImageStart(img,out);
+		imageStart(img,out);
 		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
@@ -46,8 +46,8 @@ public class Filter_GeneratorCrosshatch extends Filter {
 //		ConvertPaperSpace(img,out);
 
 		liftPen(out);
-		SignName(out);
-		MoveTo(out, 0, 0,true);
+		signName(out);
+		moveTo(out, 0, 0,true);
 		out.close();
 	}
 	
@@ -181,19 +181,19 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		for(y=0;y<image_height;y+=steps) {
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)          0,(float)y,true);
+				moveTo(out,(float)          0,(float)y,true);
 				for(x=0;x<image_width;++x) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 			} else {
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)          0,(float)y,true);
+				moveTo(out,(float)          0,(float)y,true);
 			}
 		}
 		level+=leveladd;
@@ -206,19 +206,19 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		for(x=0;x<image_width;x+=steps) {
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)x,(float)0           ,true);
+				moveTo(out,(float)x,(float)0           ,true);
 				for(y=0;y<image_height;++y) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)x,(float)image_height,true);
+				moveTo(out,(float)x,(float)image_height,true);
 			} else {
-				MoveTo(out,(float)x,(float)image_height,true);
+				moveTo(out,(float)x,(float)image_height,true);
 				for(y=image_height-1;y>=0;--y) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)x,(float)0           ,true);
+				moveTo(out,(float)x,(float)0           ,true);
 			}
 		}
 		level+=leveladd;
@@ -245,19 +245,19 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			
 			if((i%2)==0)
 			{
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,startx+j,starty+j);
-					MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
+					moveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
 				}
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,endx-j,endy-j);
-					MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
+					moveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
 				}
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 			}
 			++i;
 		}
@@ -287,19 +287,19 @@ public class Filter_GeneratorCrosshatch extends Filter {
 
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,startx-j,starty+j);
-					MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
+					moveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
 				}
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<delta;++j) {
 					z=sample3x3(img,endx+j,endy-j);
-					MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
+					moveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
 				}
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 			}
 		}
 	}

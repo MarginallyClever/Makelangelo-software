@@ -52,10 +52,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	}
 
 
-	public String GetName() { return translator.get("voronoiStipplingName"); }
+	public String getName() { return translator.get("voronoiStipplingName"); }
 	
 	
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
 		JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
@@ -72,7 +72,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 		panel.add(text_dot_min);
 
 
-	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 	    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
 	    	MAX_CELLS = Integer.parseInt(text_cells.getText());
@@ -84,7 +84,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			w = img.getWidth();
 			
 			tool = machine.getCurrentTool();
-			ImageSetupTransform(img);
+			imageSetupTransform(img);
 	
 			cellBorder = new ArrayList<VoronoiCellEdge>();
 	
@@ -164,7 +164,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			mainGUI.Log("<font color='green'>Writing gcode to "+dest+"</font>\n");
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 
-			ImageStart(src_img,out);
+			imageStart(src_img,out);
 
 			// set absolute coordinates
 			out.write("G00 G90;\n");
@@ -233,25 +233,25 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
 				*/
 				// filled circles
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
+				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
 				while(r>1) {
 					float detail=(float)(0.5*Math.PI*r);
 					if(detail<4) detail=4;
 					if(detail>10) detail=10;
 					for(float j=1;j<=detail;++j) {
-						this.MoveTo(out,
+						this.moveTo(out,
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
 					r-=(tool.GetDiameter()/(scale*1.5f));
 				}
-				this.MoveTo(out, x, y-r, false);
-				this.MoveTo(out, x, y-r, true);
+				this.moveTo(out, x, y-r, false);
+				this.moveTo(out, x, y-r, true);
 			}
 
 			liftPen(out);
-			SignName(out);
-			tool.WriteMoveTo(out, 0, 0);
+			signName(out);
+			tool.writeMoveTo(out, 0, 0);
 			out.close();
 		}
 	}
@@ -260,13 +260,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
 	

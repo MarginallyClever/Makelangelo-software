@@ -82,7 +82,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 	}
 	
 	
-	public BufferedImage Process(BufferedImage img) {
+	public BufferedImage process(BufferedImage img) {
 		int y;
 		int h = img.getHeight();
 		int w = img.getWidth();

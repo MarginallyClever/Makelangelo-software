@@ -44,18 +44,18 @@ public class Filter_GeneratorRGB extends Filter {
 
 
 
-	public String GetName() { return translator.get("RGBName"); }
+	public String getName() { return translator.get("RGBName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
 	C3 QuantizeColor(C3 c) {
@@ -100,24 +100,24 @@ public class Filter_GeneratorRGB extends Filter {
 			if(newPixel.diff(palette[palette_mask])==0) {
 				// draw a circle.  the diameter is relative to the intensity.
 				if(draw_filled) {
-					MoveTo(out,x*step4+step2-step2,y*step4+step2-step2,true);
-					MoveTo(out,x*step4+step2+step2,y*step4+step2-step2,false);
-					MoveTo(out,x*step4+step2+step2,y*step4+step2+step2,false);
-					MoveTo(out,x*step4+step2-step2,y*step4+step2+step2,false);
-					MoveTo(out,x*step4+step2-step2,y*step4+step2-step2,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2      ,y*step4+step2      ,false);
-					MoveTo(out,x*step4+step2      ,y*step4+step2      ,true);
+					moveTo(out,x*step4+step2-step2,y*step4+step2-step2,true);
+					moveTo(out,x*step4+step2+step2,y*step4+step2-step2,false);
+					moveTo(out,x*step4+step2+step2,y*step4+step2+step2,false);
+					moveTo(out,x*step4+step2-step2,y*step4+step2+step2,false);
+					moveTo(out,x*step4+step2-step2,y*step4+step2-step2,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2      ,y*step4+step2      ,false);
+					moveTo(out,x*step4+step2      ,y*step4+step2      ,true);
 				} else {
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
+					moveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
 				}
 			}
 			
@@ -195,11 +195,11 @@ public class Filter_GeneratorRGB extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// Open the destination file
 		out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 
 		double pw = machine.getPaperWidth();
 		//double ph = machine.GetPaperHeight();
@@ -230,9 +230,9 @@ public class Filter_GeneratorRGB extends Filter {
 		}
 		
 		liftPen(out);
-		SignName(out);
+		signName(out);
 		
-		tool.WriteMoveTo(out, 0, 0);
+		tool.writeMoveTo(out, 0, 0);
 		
 		// close the file
 		out.close();
