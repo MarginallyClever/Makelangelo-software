@@ -668,13 +668,21 @@ public class MachineConfiguration {
 	}
 	
 	
-	public int GetMachineCount() {
+	/**
+	 * 
+	 * @return the number of machine configurations that exist on this computer
+	 */
+	public int getMachineCount() {
 		return configurations_available.length;
 	}
 	
 	
+	/**
+	 * Get the UID of every machine this computer recognizes EXCEPT machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
+	 * @return an array of strings, each string is a machine UID.
+	 */
 	public String[] getKnownMachineNames() {
-		assert(configurations_available.length>1);
+		assert(getMachineCount()>0);
 		String [] choices = new String[configurations_available.length-1];
 
 		int j=0;
@@ -688,7 +696,7 @@ public class MachineConfiguration {
 	
 	
 	public int getCurrentMachineIndex() {
-		assert(configurations_available.length>1);
+		assert(getMachineCount()>0);
 		int j=0;
 		for(int i=0;i<configurations_available.length;++i) {
 			if(configurations_available[i].equals("0")) continue;
