@@ -624,4 +624,44 @@
 		<value>Εκτιμώμενος χρόνος που απομένει: </value>
 		<hint>time machine will be drawing</hint>
 	</string>
+	<!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to Greek.
+  Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
+used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
+one big CDATA html blob. -->
+  <string>
+    <key>AboutHTMLBeforeVersionNumber</key>
+    <value><![CDATA[
+    <html>
+      <body>
+        <h1>Makelangelo ]]>
+    </value>
+    <hint>HTML for About Dialog</hint>
+  </string>
+
+  <string>
+    <key>AboutHTMLAfterVersionNumber</key>
+    <value><![CDATA[
+</h1>
+      <h3>
+        <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
+      </h3>
+        <p>
+          Created by Dan Royer (<a href="mailto:dan@marginallyclever.com">dan@marginallyclever.com</a>).<br>
+          Additional contributions by Joseph Cottam and <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>.
+        </p>
+        <br>
+        <p>
+          To get the latest version please visit<br>
+          <a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a>
+        </p>
+        <br>
+        <p>
+          This program is open source and free.  As it should be!
+        </p>
+      </body>
+    </html>
+    ]]>
+    </value>
+    <hint>HTML for About Dialog</hint>
+  </string>
 </language>
