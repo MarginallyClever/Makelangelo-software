@@ -77,7 +77,17 @@ public class MachineConfiguration {
 
 
 	// top left, bottom center, etc...
-	private int startingPositionIndex;
+	private String[] startingStrings = { 
+			"Top Left", 
+			"Top Center",
+			"Top Right", 
+			"Left", 
+			"Center", 
+			"Right", 
+			"Bottom Left",
+			"Bottom Center",
+			"Bottom Right" };
+	private int startingPositionIndex=4;
 	
 	// TODO a way for users to create different tools for each machine 
 	protected DrawingTool tools[];
@@ -130,7 +140,6 @@ public class MachineConfiguration {
 		final JCheckBox m1i = new JCheckBox(translator.get("Invert"),this.m1invert);
 		final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
 
-		//String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right", "Bottom Left","Bottom Center","Bottom Right" };
 		//final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
 		//startPos.setSelectedIndex(startingPositionIndex);
 		
@@ -261,6 +270,7 @@ public class MachineConfiguration {
 							break;
 						}
 						*/
+						startingPositionIndex=4;
 						// relative to paper limits
 						switch(startingPositionIndex%3) {
 						case 0:

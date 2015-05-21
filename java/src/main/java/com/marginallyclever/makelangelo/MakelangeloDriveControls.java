@@ -37,6 +37,7 @@ public class MakelangeloDriveControls
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
+	private JButton disengageMotors;
 	
 	// to make sure pen isn't on the paper while the machine is paused
 	private boolean penIsUp,penIsUpBeforePause;
@@ -177,18 +178,20 @@ public class MakelangeloDriveControls
 			goUp.addActionListener(this);
 			goDown.addActionListener(this);
 		
-	
+			
 		JPanel feedRateControl = new JPanel();
 		feedRateControl.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
 			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 			feedRate.setText(Double.toString(machineConfiguration.getFeedRate()));
 			setFeedRate = new JButton(translator.get("Set"));
+			disengageMotors = new JButton(translator.get("DisengageMotors"));
 	
 			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
 			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
 			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+			c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
 		
 	
 		this.add(go);
