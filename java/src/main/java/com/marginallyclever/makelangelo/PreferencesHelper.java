@@ -22,7 +22,7 @@ public final class PreferencesHelper {
      * @see <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
      */
     static {
-        Map initialMap = new HashMap<>();
+        final Map<MakelangeloPreferenceKey, Preferences> initialMap = new HashMap<>();
         final Preferences userRootPreferencesNode = Preferences.userRoot();
         final String thisPackageName = PreferencesHelper.class.getPackage().getName();
         final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(thisPackageName);
@@ -40,7 +40,7 @@ public final class PreferencesHelper {
 
     /**
      *
-     * @param key
+     * @param key enumeration key used to look up a Makelangelo preference value.
      * @return
      */
     public static Preferences getPreferenceNode(MakelangeloPreferenceKey key) {
