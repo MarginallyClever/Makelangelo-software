@@ -748,6 +748,12 @@
 		<value>Estimated time left: </value>
 		<hint>time machine will be drawing</hint>
 	</string>
+	
+	<string>
+		<key>DisengageMotors</key>
+		<value>Disengage</value>
+		<hint>Disengage Button on manual driving dialog</hint>
+	</string>
 
   <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
   used to dynamically build the HTML for the about message dialog using the version string. This is why there is not

@@ -203,6 +203,7 @@ public class MakelangeloDriveControls
 	    this.add(getTextInputField());
 	    
 		setFeedRate.addActionListener(this);
+		disengageMotors.addActionListener(this);
 	}
     
 
@@ -273,7 +274,9 @@ public class MakelangeloDriveControls
 				machineConfiguration.setFeedRate(feed_rate);
 				feedRate.setText(Double.toString(feed_rate));
 				gui.sendLineToRobot("G00 G21 F"+feed_rate);
-			} else {
+			} 
+			else if(b==disengageMotors) gui.sendLineToRobot("M18");
+			else {
 				gui.sendLineToRobot("G91");  // set relative mode
 
 				if(b==down100) gui.sendLineToRobot("G0 Y-100");
