@@ -1239,6 +1239,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
+			sendLineToRobot("M18");
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
 			clearLog();
