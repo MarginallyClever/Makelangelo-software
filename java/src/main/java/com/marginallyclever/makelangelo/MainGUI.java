@@ -1022,7 +1022,7 @@ public class MainGUI
 		sendLineToRobot(machineConfiguration.getConfigLine());
 		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
-		sendLineToRobot("M17");
+		//sendLineToRobot("M17"); FIXME add to options dialog
 	}
 	
 	
@@ -1239,7 +1239,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			sendLineToRobot("M18");
+			//sendLineToRobot("M18"); FIXME add to options dialog
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
 			clearLog();
