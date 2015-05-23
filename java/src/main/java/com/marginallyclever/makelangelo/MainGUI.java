@@ -1022,6 +1022,7 @@ public class MainGUI
 		sendLineToRobot(machineConfiguration.getConfigLine());
 		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
+		sendLineToRobot("M17");
 	}
 	
 	
