@@ -540,7 +540,7 @@ public abstract class Filter {
 				case '}':  name="B3CLOSE";  break;
 				case '~':  name="TILDE";  break;
 				case '\\':  name="BSLASH";  break;
-				case '�':  name="SPACE";  break;
+				case '…':  name="SPACE";  break;
 				default: name=Character.toString(letter);  break;
 				}
 			}
