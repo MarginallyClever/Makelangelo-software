@@ -37,9 +37,9 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("RGBFloodFillName"); }
+	public String getName() { return translator.get("RGBFloodFillName"); }
 
-	C3 QuantizeColor(C3 c) {
+	C3 quantizeColor(C3 c) {
 		C3 closest = palette[0];
 
 	    for (C3 n : palette) 
@@ -52,17 +52,17 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(float x,float y,boolean up) throws IOException {
+	protected void moveTo(float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(osw);
 			else   lowerPen(osw);
 			lastup=up;
 		}
-		tool.WriteMoveTo(osw, TX(x), TY(y));
+		tool.writeMoveTo(osw, TX(x), TY(y));
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected C3 TakeImageSampleBlock(int x0,int y0,int x1,int y1) {
+	protected C3 takeImageSampleBlock(int x0,int y0,int x1,int y1) {
 		// point sampling
 		C3 value = new C3(0,0,0);
 		int sum=0;
@@ -84,7 +84,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		return value.mul(1.0f/sum);
 	}
 
-	protected void SetImagePixelWhite(int x0,int y0,int x1,int y1) {
+	protected void setImagePixelWhite(int x0,int y0,int x1,int y1) {
 		if(x0<0) x0=0;
 		if(x1>image_width-1) x1 = image_width-1;
 		if(y0<0) y0=0;
@@ -107,9 +107,9 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * @param out
 	 * @throws IOException
 	 */
-	void FloodFillBlob(int color_index,int x,int y) throws IOException {
-		C3 original_color = TakeImageSampleBlock(x, y, x+diameter, y+diameter);
-		C3 quantized_color = QuantizeColor(original_color);
+	void floodFillBlob(int color_index,int x,int y) throws IOException {
+		C3 original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
+		C3 quantized_color = quantizeColor(original_color);
 
 		if(quantized_color.diff(palette[color_index])!=0) {
 			//System.out.print("<font color='yellow'>Pop at "+x+", "+y+"</font>\n");
@@ -117,27 +117,27 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		}
 
 		// mark this spot as visited.
-		SetImagePixelWhite(x,y,x+diameter, y+diameter);
+		setImagePixelWhite(x,y,x+diameter, y+diameter);
 		// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
 		float dx=(float)(x-last_x);
 		float dy=(float)(y-last_y);
 		if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0) {
 			//System.out.print("Jump at "+x+", "+y+"\n");
-			MoveTo(last_x, last_y, true);
-			MoveTo(x, y, true);
-			MoveTo(x, y, false);
+			moveTo(last_x, last_y, true);
+			moveTo(x, y, true);
+			moveTo(x, y, false);
 		} else {
 			//System.out.print("Move to "+x+", "+y+"\n");
-			MoveTo(x, y, false);
+			moveTo(x, y, false);
 		}
 		// update the last position.
 		last_x=x;
 		last_y=y;
         
-		FloodFillBlob(color_index,x-diameter,y);
-		FloodFillBlob(color_index,x+diameter,y);
-		FloodFillBlob(color_index,x,y-diameter);
-		FloodFillBlob(color_index,x,y+diameter);
+		floodFillBlob(color_index,x-diameter,y);
+		floodFillBlob(color_index,x+diameter,y);
+		floodFillBlob(color_index,x,y-diameter);
+		floodFillBlob(color_index,x,y+diameter);
 	}
 
 	
@@ -148,17 +148,17 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * @param out output stream for writing gcode.
 	 * @throws IOException
 	 */
-	void ScanForContiguousBlocks(int color_index) throws IOException {
+	void scanForContiguousBlocks(int color_index) throws IOException {
 		C3 original_color, quantized_color;
 		
 		int x,y;
 
-		mainGUI.Log("<font color='orange'>Palette color "+palette[color_index].toString()+"</font>\n");
+		mainGUI.log("<font color='orange'>Palette color "+palette[color_index].toString()+"</font>\n");
 		
 		for(y=0;y<image_height;y+=diameter) {
 			for(x=0;x<image_width;x+=diameter) {
-				original_color = TakeImageSampleBlock(x, y, x+diameter, y+diameter);
-				quantized_color = QuantizeColor(original_color); 
+				original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
+				quantized_color = quantizeColor(original_color); 
 				if(quantized_color.diff(palette[color_index])==0) {
 					// found blob
 
@@ -167,7 +167,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 					//mainGUI.Log("<font color='white'>Blob starts at "+x+", "+y+"</font>\n");
 
 					try {
-						FloodFillBlob(color_index,x,y);
+						floodFillBlob(color_index,x,y);
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
@@ -182,7 +182,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
 		//img = bw.Process(img);
@@ -190,10 +190,10 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		// Open the destination file
 		osw = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,osw);
+		imageStart(img,osw);
 		
 		// figure out how many lines we're going to have on this image.
-		diameter = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
+		diameter = (int)Math.ceil(tool.getDiameter()/(1.0*scale));
 		if(diameter<1) diameter=1;
 		
 		imgChanged=img;
@@ -204,20 +204,20 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		int i;
 		for(i=0;i<4;++i) {
 			// "please change to tool X and press any key to continue"
-			tool = machine.GetTool(i);
-			tool.WriteChangeTo(osw);
+			tool = machine.getTool(i);
+			tool.writeChangeTo(osw);
 			// Make sure the pen is up for the first move
 			liftPen(osw);
 			
-			mainGUI.Log("<font color='green'>Color "+i+"</font>\n");
+			mainGUI.log("<font color='green'>Color "+i+"</font>\n");
 			
-			ScanForContiguousBlocks(i);
+			scanForContiguousBlocks(i);
 		}
-		mainGUI.Log("<font color='green'>Signing my name</font>\n");
+		mainGUI.log("<font color='green'>Signing my name</font>\n");
 		
 		// pen already lifted
-		SignName(osw);
-		MoveTo(0, 0, true);
+		signName(osw);
+		moveTo(0, 0, true);
 		
 		// close the file
 		osw.close();

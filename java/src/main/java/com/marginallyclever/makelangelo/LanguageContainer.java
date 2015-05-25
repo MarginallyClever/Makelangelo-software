@@ -17,7 +17,7 @@ public class LanguageContainer {
 	protected String author = "";
 	protected Map<String,String> strings = new HashMap<String,String>();
 
-	void Load(String language_file) {
+	void load(String language_file) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document dom=null;
 

@@ -46,26 +46,26 @@ public class StatusBar extends JLabel {
         d.setSize(d.getWidth(), d.getHeight()+30);
         setMinimumSize(d);
         
-        Clear();
+        clear();
     }
     
-    public void SetMessage(String message) {
+    public void setMessage(String message) {
         setText(" "+message);        
     }
     
-    public String GetElapsed() {
+    public String getElapsed() {
     	return sElapsed;
     }
     
-    public void Clear() {
-        SetMessage("Ready");
+    public void clear() {
+        setMessage("Ready");
     }
     
-    public void Start() {
+    public void start() {
     	t_start=System.currentTimeMillis();
     }
     
-    public void SetProgress(long sofar,long total) {
+    public void setProgress(long sofar,long total) {
     	float progress=0;
     	sElapsed="";
     	if(total>0) {
@@ -78,7 +78,7 @@ public class StatusBar extends JLabel {
         			translator.get("StatusRemaining") + formatTime(remaining);
     	}
 
-	   	SetMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);
+	   	setMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);
     }
 }
 

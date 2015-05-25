@@ -56,7 +56,7 @@ public class Filter_Resize extends Filter {
 	}
 
 
-	public BufferedImage Process(BufferedImage img) {
+	public BufferedImage process(BufferedImage img) {
 		int w = img.getWidth();
 		int h = img.getHeight();
 		

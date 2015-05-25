@@ -32,13 +32,13 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("HilbertCurveName"); }
+	public String getName() { return translator.get("HilbertCurveName"); }
 	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
-		tool.WriteMoveTo(out, TX(x), TY(y));
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		tool.writeMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
@@ -47,7 +47,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	}
 	
 	
-	public void Generate(final String dest) {
+	public void generate(final String dest) {
 		final JTextField field_size = new JTextField(Integer.toString((int)xmax));
 		final JTextField field_order = new JTextField(Integer.toString(order));
 
@@ -58,26 +58,26 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 		panel.add(new JLabel(translator.get("HilbertCurveOrder")));
 		panel.add(field_order);
 		
-	    int result = JOptionPane.showConfirmDialog(null, panel, GetName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 			xmax = Integer.parseInt(field_size.getText())*2;
 			ymax= xmax;
 			xmin=0;
 			ymin=0;
 			order = Integer.parseInt(field_order.getText());
-			CreateCurveNow(dest);
+			createCurveNow(dest);
 	    }
 	}
 	
 
-	private void CreateCurveNow(String dest) {
+	private void createCurveNow(String dest) {
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			tool = machine.GetCurrentTool();
-			SetupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
-			output.write(machine.GetConfigLine()+";\n");
-			output.write(machine.GetBobbinLine()+";\n");
-			tool.WriteChangeTo(output);
+			tool = machine.getCurrentTool();
+			setupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
+			output.write(machine.getConfigLine()+";\n");
+			output.write(machine.getBobbinLine()+";\n");
+			tool.writeChangeTo(output);
 						
 			turtle_x=0;
 			turtle_y=0;
@@ -88,17 +88,17 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 			// Draw bounding box
 			//SetAbsoluteMode(output);
 			liftPen(output);
-			MoveTo(output,xmax,ymax,false);
-			MoveTo(output,xmax,ymin,false);
-			MoveTo(output,xmin,ymin,false);
-			MoveTo(output,xmin,ymax,false);
-			MoveTo(output,xmax,ymax,false);
+			moveTo(output,xmax,ymax,false);
+			moveTo(output,xmax,ymin,false);
+			moveTo(output,xmin,ymin,false);
+			moveTo(output,xmin,ymax,false);
+			moveTo(output,xmax,ymax,false);
 			liftPen(output);
 
 			// move to starting position
 			x = (xmax-turtle_step/2);
 			y = (ymax-turtle_step/2);
-			MoveTo(output,x,y,true);
+			moveTo(output,x,y,true);
 			lowerPen(output);
 			// do the curve
 			hilbert(output,order);
@@ -108,7 +108,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	        output.close();
 	        
 			// open the file automatically to save a click.
-			mainGUI.OpenFileOnDemand(dest);
+			mainGUI.openFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}
@@ -165,6 +165,6 @@ public class Filter_GeneratorHilbertCurve extends Filter {
     	//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
     	x+=(turtle_dx*turtle_step);
     	y+=(turtle_dy*turtle_step);
-    	MoveTo(output,x,y,false);
+    	moveTo(output,x,y,false);
     }
 }

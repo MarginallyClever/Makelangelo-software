@@ -16,7 +16,7 @@ import java.io.OutputStreamWriter;
  * @author Dan
  */
 public class Filter_GeneratorSpiral extends Filter {
-	public String GetName() { return translator.get("SpiralName"); }
+	public String getName() { return translator.get("SpiralName"); }
 	
 	boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 	
@@ -29,8 +29,8 @@ public class Filter_GeneratorSpiral extends Filter {
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
-		tool.WriteMoveTo(out, TX(x), TY(y));
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+		tool.writeMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
@@ -43,17 +43,17 @@ public class Filter_GeneratorSpiral extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		ImageStart(img,out);
+		imageStart(img,out);
 
-		double toolDiameter=tool.GetDiameter()/scale;
-		tool.WriteChangeTo(out);
+		double toolDiameter=tool.getDiameter()/scale;
+		tool.writeChangeTo(out);
 		liftPen(out);
 
 		//*
@@ -102,20 +102,20 @@ public class Filter_GeneratorSpiral extends Filter {
 				// clip to image boundaries
 				if( x>=0 && x<image_width && y>=0 && y<image_height ) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,fx,fy,( z >= level ));
+					moveTo(out,fx,fy,( z >= level ));
 				} else {
-					MoveTo(out,fx,fy,true);
+					moveTo(out,fx,fy,true);
 				}
 			}
 			r-=toolDiameter*0.5;
 			++numRings;
 		}
 		
-		mainGUI.Log("<font color='yellow'>"+numRings+" rings.</font>\n");
+		mainGUI.log("<font color='yellow'>"+numRings+" rings.</font>\n");
 
 		liftPen(out);
-		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
+		signName(out);
+		tool.writeMoveTo(out, 0, 0);
 		out.close();
 	}
 }

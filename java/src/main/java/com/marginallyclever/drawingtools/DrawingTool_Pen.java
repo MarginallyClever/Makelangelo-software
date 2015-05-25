@@ -43,11 +43,11 @@ public class DrawingTool_Pen extends DrawingTool {
 		name=name2;
 	}
 	
-	public void Adjust() {
+	public void adjust() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("penToolAdjust"),true);
 		driver.setLayout(new GridBagLayout());
 
-		final JTextField penDiameter   = new JTextField(Float.toString(GetDiameter()),5);
+		final JTextField penDiameter   = new JTextField(Float.toString(getDiameter()),5);
 		final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
 		
 		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
@@ -114,12 +114,12 @@ public class DrawingTool_Pen extends DrawingTool {
 					mainGUI.sendLineToRobot("G00 Z"+penDown.getText());
 				}
 				if(subject == buttonSave) {
-					SetDiameter(Float.valueOf(penDiameter.getText()));
+					setDiameter(Float.valueOf(penDiameter.getText()));
 					feed_rate = Float.valueOf(penFeedRate.getText());
 					z_rate = Float.valueOf(penZRate.getText());
 					z_off = Float.valueOf(penUp.getText());
 					z_on = Float.valueOf(penDown.getText());
-					machine.SaveConfig();
+					machine.saveConfig();
 					driver.dispose();
 				}
 				if(subject == buttonCancel) {

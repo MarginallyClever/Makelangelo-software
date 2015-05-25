@@ -17,7 +17,7 @@ import java.io.OutputStreamWriter;
  * @author Dan
  */
 public class Filter_GeneratorCrosshatch extends Filter {
-	public String GetName() { return translator.get("Crosshatch"); }
+	public String getName() { return translator.get("Crosshatch"); }
 	
 	public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
 		super(gui,mc,ms);
@@ -28,26 +28,26 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
-		img = bw.Process(img);
+		img = bw.process(img);
 
-		mainGUI.Log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+		mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
-		ImageStart(img,out);
+		imageStart(img,out);
 		
 		// set absolute coordinates
 		out.write("G00 G90;\n");
-		tool.WriteChangeTo(out);
+		tool.writeChangeTo(out);
 		liftPen(out);
 
-		ConvertImageSpace(img,out);
+		convertImageSpace(img,out);
 //		ConvertPaperSpace(img,out);
 
 		liftPen(out);
-		SignName(out);
-		MoveTo(out, 0, 0,true);
+		signName(out);
+		moveTo(out, 0, 0,true);
 		out.close();
 	}
 	
@@ -64,7 +64,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 				);
 	}
 	
-	protected void ConvertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
 		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		
@@ -90,7 +90,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		previous_x=0;
 		previous_y=0;
 		
-		double stepSize = tool.GetDiameter()*3.0;
+		double stepSize = tool.getDiameter()*3.0;
 		double halfStep = stepSize/2.0;
 		double x,y;
 		
@@ -166,65 +166,65 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	}
 	
 	
-	protected void ConvertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
 		int i,j,x,y,z=0;
 		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		
-		int steps = (int)Math.ceil(2.5*tool.GetDiameter()/scale);
+		int steps = (int)Math.ceil(2.5*tool.getDiameter()/scale);
 		if(steps<1) steps=1;
 		
-		mainGUI.Log("<font color='green'>Generating layer 1</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 1</font>\n");
 		// create horizontal lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
 		for(y=0;y<image_height;y+=steps) {
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)          0,(float)y,true);
+				moveTo(out,(float)          0,(float)y,true);
 				for(x=0;x<image_width;++x) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 			} else {
-				MoveTo(out,(float)image_width,(float)y,true);
+				moveTo(out,(float)image_width,(float)y,true);
 				for(x=image_width-1;x>=0;--x) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)          0,(float)y,true);
+				moveTo(out,(float)          0,(float)y,true);
 			}
 		}
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 2</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 2</font>\n");
 		// create vertical lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
 		for(x=0;x<image_width;x+=steps) {
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)x,(float)0           ,true);
+				moveTo(out,(float)x,(float)0           ,true);
 				for(y=0;y<image_height;++y) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)x,(float)image_height,true);
+				moveTo(out,(float)x,(float)image_height,true);
 			} else {
-				MoveTo(out,(float)x,(float)image_height,true);
+				moveTo(out,(float)x,(float)image_height,true);
 				for(y=image_height-1;y>=0;--y) {
 					z=sample3x3(img,x,y);
-					MoveTo(out,(float)x,(float)y,( z >= level ));
+					moveTo(out,(float)x,(float)y,( z >= level ));
 				}
-				MoveTo(out,(float)x,(float)0           ,true);
+				moveTo(out,(float)x,(float)0           ,true);
 			}
 		}
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 3</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 3</font>\n");
 		// create diagonal \ lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -245,26 +245,26 @@ public class Filter_GeneratorCrosshatch extends Filter {
 			
 			if((i%2)==0)
 			{
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,startx+j,starty+j);
-					MoveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
+					moveTo(out,(float)(startx+j),(float)(starty+j),( z >= level ) );
 				}
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,endx-j,endy-j);
-					MoveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
+					moveTo(out,(float)(endx-j),(float)(endy-j),( z >= level ) );
 				}
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 			}
 			++i;
 		}
 		level+=leveladd;
 
 
-		mainGUI.Log("<font color='green'>Generating layer 4</font>\n");
+		mainGUI.log("<font color='green'>Generating layer 4</font>\n");
 		// create diagonal / lines across the image
 		// raise and lower the pen to darken the appropriate areas
 		i=0;
@@ -287,19 +287,19 @@ public class Filter_GeneratorCrosshatch extends Filter {
 
 			++i;
 			if((i%2)==0) {
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 				for(j=0;j<=delta;++j) {
 					z=sample3x3(img,startx-j,starty+j);
-					MoveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
+					moveTo(out,(float)(startx-j),(float)(starty+j),( z > level ) );
 				}
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 			} else {
-				MoveTo(out,(float)endx,(float)endy,true);
+				moveTo(out,(float)endx,(float)endy,true);
 				for(j=0;j<delta;++j) {
 					z=sample3x3(img,endx+j,endy-j);
-					MoveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
+					moveTo(out,(float)(endx+j),(float)(endy-j),( z > level ) );
 				}
-				MoveTo(out,(float)startx,(float)starty,true);
+				moveTo(out,(float)startx,(float)starty,true);
 			}
 		}
 	}

@@ -139,17 +139,17 @@ public class MainGUI
 	
 	
 	public MainGUI() {
-		StartLog();
-		StartTranslator();
+		startLog();
+		startTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
         recentFiles = new RecentFiles();
         connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
-        LoadImageConverters();
-        CreateAndShowGUI();
+        loadImageConverters();
+        createAndShowGUI();
 	}
 
 
-	public void StartTranslator() {
+	public void startTranslator() {
 		translator = new MultilingualSupport();
 		if(translator.isThisTheFirstTime()) {
 			chooseLanguage();
@@ -203,7 +203,7 @@ public class MainGUI
 	
 	
 	// TODO use a serviceLoader instead
-	protected void LoadImageConverters() {
+	protected void loadImageConverters() {
 		image_converters = new ArrayList<Filter>();
 		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorSpiral(this,machineConfiguration,translator));
@@ -217,11 +217,11 @@ public class MainGUI
 	
 	protected void finalize() throws Throwable {
 		//do finalization here
-		EndLog();
+		endLog();
 		super.finalize(); //not necessary if extending Object.
 	} 
 	
-	private void StartLog() {
+	private void startLog() {
 		try {
 			logToFile = new PrintWriter(new FileWriter("log.html"));
 			Calendar cal = Calendar.getInstance();
@@ -233,7 +233,7 @@ public class MainGUI
 		}
 	}
 
-	private void EndLog() {
+	private void endLog() {
 		logToFile.close();
 	}
 
@@ -243,7 +243,7 @@ public class MainGUI
 		return gcode.lines;
 	}
 
-	private void PlaySound(String url) {
+	private void playSound(String url) {
 		if(url.isEmpty()) return;
 		
 		try {
@@ -258,46 +258,46 @@ public class MainGUI
 		}
 	}
 	
-	public void PlayConnectSound() {
-		PlaySound(prefs.get("sound_connect", ""));
+	public void playConnectSound() {
+		playSound(prefs.get("sound_connect", ""));
 	}
 	
-	private void PlayDisconnectSound() {
-		PlaySound(prefs.get("sound_disconnect", ""));
+	private void playDisconnectSound() {
+		playSound(prefs.get("sound_disconnect", ""));
 	}
 	
-	public void PlayConversionFinishedSound() {
-		PlaySound(prefs.get("sound_conversion_finished", ""));
+	public void playConversionFinishedSound() {
+		playSound(prefs.get("sound_conversion_finished", ""));
 	}
 	
-	private void PlayDawingFinishedSound() {
-		PlaySound(prefs.get("sound_drawing_finished", ""));
+	private void playDawingFinishedSound() {
+		playSound(prefs.get("sound_drawing_finished", ""));
 	}
 		
-	private void SetDrawStyle(int style) {
+	private void setDrawStyle(int style) {
 		prefs.putInt("Draw Style", style);
 	}
-	private int GetDrawStyle() {
+	private int getDrawStyle() {
 		return prefs.getInt("Draw Style", 0);
 	}
 	
 	
-	private void HilbertCurve() {
+	private void hilbertCurve() {
 		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(this,machineConfiguration,translator);
-		msg.Generate( GetTempDestinationFile() );
-		TabToDraw();
+		msg.generate( getTempDestinationFile() );
+		tabToDraw();
 	}
 	
 	
-	private void TextToGCODE() {
+	private void textToGCODE() {
 		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
-		msg.Generate(GetTempDestinationFile() );
-		TabToDraw();
+		msg.generate(getTempDestinationFile() );
+		tabToDraw();
 	}
 	
 
 	// appends a message to the log tab and system out.
-	public void Log(String msg) {
+	public void log(String msg) {
 		// remove the 
 		if(msg.indexOf(';') != -1 ) msg = msg.substring(0,msg.indexOf(';'));
 		
@@ -318,7 +318,7 @@ public class MainGUI
 		}
 	}
 
-	public void ClearLog() {
+	public void clearLog() {
 		try {
 			doc.replace(0, doc.getLength(), "", null);
 			kit.insertHTML(doc, 0, "", 0, 0, null);
@@ -334,30 +334,30 @@ public class MainGUI
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
 	 */
-	public void LoadGCode(String filename) {
+	public void loadGCode(String filename) {
 		try {
-			gcode.Load(filename);
-		   	Log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
+			gcode.load(filename);
+		   	log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
 					+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
 					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gcode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
-	    	Log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
+	    	log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
 	    	recentFiles.remove(filename);
 	    	updateMenuBar();
 	    	return;
 	    }
 	    
 	    previewPane.setGCode(gcode.lines);
-	    Halt();
+	    halt();
 	}
 	
-	public String GetTempDestinationFile() {
+	public String getTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
 	
 	
-	protected boolean ChooseImageConversionOptions(boolean isDXF) {
+	protected boolean chooseImageConversionOptions(boolean isDXF) {
 		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -384,11 +384,11 @@ public class MainGUI
 		int i=0;
 		while(fit.hasNext()) {
 			Filter f = fit.next();
-			filter_names[i++] = f.GetName();
+			filter_names[i++] = f.getName();
 		}
 		
 		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
-		input_draw_style.setSelectedIndex(GetDrawStyle());
+		input_draw_style.setSelectedIndex(getDrawStyle());
 		
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -416,11 +416,11 @@ public class MainGUI
 					Object subject = e.getSource();
 					if(subject == save) {
 						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
-						machineConfiguration.LoadConfig(new_uid);
-						SetDrawStyle(input_draw_style.getSelectedIndex());
+						machineConfiguration.loadConfig(new_uid);
+						setDrawStyle(input_draw_style.getSelectedIndex());
 						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 						machineConfiguration.reverseForGlass=reverse_h.isSelected();
-						machineConfiguration.SaveConfig();
+						machineConfiguration.saveConfig();
 						
 						// if we aren't connected, don't show the new 
 						if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
@@ -449,14 +449,14 @@ public class MainGUI
 		return startConvertingNow;
 	}
 	
-	protected boolean LoadDXF(String filename) {
-		if( ChooseImageConversionOptions(true) == false ) return false;
+	protected boolean loadDXF(String filename) {
+		if( chooseImageConversionOptions(true) == false ) return false;
 
         // where to save temp output file?
-		final String destinationFile = GetTempDestinationFile();
+		final String destinationFile = getTempDestinationFile();
 		final String srcFile = filename;
 		
-		TabToLog();
+		tabToLog();
 		
 		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -468,7 +468,7 @@ public class MainGUI
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void doInBackground() {
-				Log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
+				log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
@@ -478,12 +478,12 @@ public class MainGUI
 
 				try {
 					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
-					DrawingTool tool = machineConfiguration.GetCurrentTool();
-					out.write(machineConfiguration.GetConfigLine()+";\n");
-					out.write(machineConfiguration.GetBobbinLine()+";\n");
+					DrawingTool tool = machineConfiguration.getCurrentTool();
+					out.write(machineConfiguration.getConfigLine()+";\n");
+					out.write(machineConfiguration.getBobbinLine()+";\n");
 					out.write("G00 G90;\n");
-					tool.WriteChangeTo(out);
-					tool.WriteOff(out);
+					tool.writeChangeTo(out);
+					tool.writeOff(out);
 					
 					parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
 					DXFDocument doc = parser.getDocument();
@@ -507,12 +507,12 @@ public class MainGUI
 					int entity_count=0;
 					while(layer_iter.hasNext()) {
 						DXFLayer layer = (DXFLayer)layer_iter.next();
-						Log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
+						log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
 						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
 						while(entity_iter.hasNext()) {
 							String entity_type = (String)entity_iter.next();
 							List<DXFEntity> entity_list = (List<DXFEntity>)layer.getDXFEntities(entity_type);
-							Log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
+							log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
 							entity_total+=entity_list.size();
 						}
 					}
@@ -545,23 +545,23 @@ public class MainGUI
 									// is it worth drawing this line?
 									double dx = x2-x;
 									double dy = y2-y;
-									if(dx*dx+dy*dy < tool.GetDiameter()/2.0) {
+									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
 										continue;
 									}
 									
 									dx = dxf_x2 - x;
 									dy = dxf_y2 - y;
 
-									if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
-										if(tool.DrawIsOn()) {
-											tool.WriteOff(out);
+									if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
+										if(tool.isDrawOn()) {
+											tool.writeOff(out);
 										}
-										tool.WriteMoveTo(out, (float)x,(float)y);
+										tool.writeMoveTo(out, (float)x,(float)y);
 									}
-									if(tool.DrawIsOff()) {
-										tool.WriteOn(out);
+									if(tool.isDrawOff()) {
+										tool.writeOn(out);
 									}
-									tool.WriteMoveTo(out, (float)x2,(float)y2);
+									tool.writeMoveTo(out, (float)x2,(float)y2);
 									dxf_x2=x2;
 									dxf_y2=y2;
 								}
@@ -581,19 +581,19 @@ public class MainGUI
 										
 										if(first==true) {
 											first=false;
-											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
+											if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
 												// line does not start at last tool location, lift and move.
-												if(tool.DrawIsOn()) {
-													tool.WriteOff(out);
+												if(tool.isDrawOn()) {
+													tool.writeOff(out);
 												}
-												tool.WriteMoveTo(out, (float)x,(float)y);
+												tool.writeMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
 										} else {
 											// not the first point, draw.
-											if(tool.DrawIsOff()) tool.WriteOn(out);
-											if(j<polyLine.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.WriteMoveTo(out, (float)x,(float)y);
+											if(tool.isDrawOff()) tool.writeOn(out);
+											if(j<polyLine.getVertexCount()-1 && dx*dx+dy*dy<tool.getDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
+											tool.writeMoveTo(out, (float)x,(float)y);
 										}
 										dxf_x2=x;
 										dxf_y2=y;
@@ -613,19 +613,19 @@ public class MainGUI
 										
 										if(first==true) {
 											first=false;
-											if(dx*dx+dy*dy > tool.GetDiameter()/2.0) {
+											if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
 												// line does not start at last tool location, lift and move.
-												if(tool.DrawIsOn()) {
-													tool.WriteOff(out);
+												if(tool.isDrawOn()) {
+													tool.writeOff(out);
 												}
-												tool.WriteMoveTo(out, (float)x,(float)y);
+												tool.writeMoveTo(out, (float)x,(float)y);
 											}
 											// else line starts right here, do nothing.
 										} else {
 											// not the first point, draw.
-											if(tool.DrawIsOff()) tool.WriteOn(out);
-											if(j<entity.getVertexCount()-1 && dx*dx+dy*dy<tool.GetDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.WriteMoveTo(out, (float)x,(float)y);
+											if(tool.isDrawOff()) tool.writeOn(out);
+											if(j<entity.getVertexCount()-1 && dx*dx+dy*dy<tool.getDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
+											tool.writeMoveTo(out, (float)x,(float)y);
 										}
 										dxf_x2=x;
 										dxf_y2=y;
@@ -636,8 +636,8 @@ public class MainGUI
 					}
 
 					// entities finished.  Close up file.
-					tool.WriteOff(out);
-					tool.WriteMoveTo(out, 0, 0);
+					tool.writeOff(out);
+					tool.writeMoveTo(out, 0, 0);
 					
 					ok=true;
 				} catch(IOException e) {
@@ -661,13 +661,13 @@ public class MainGUI
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-				PlayConversionFinishedSound();
+				log("<font color='green'>"+translator.get("Finished")+"</font>\n");
+				playConversionFinishedSound();
 				if(ok) {
-					LoadGCode(destinationFile);
-					TabToDraw();
+					loadGCode(destinationFile);
+					tabToDraw();
 				}
-				Halt();
+				halt();
 			}
 		};
 		
@@ -680,12 +680,12 @@ public class MainGUI
 		            String message = String.format("%d%%\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
+	                	log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    Log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
+	                    log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -697,13 +697,13 @@ public class MainGUI
 	}
 	
 	
-	public boolean LoadImage(String filename) {
+	public boolean loadImage(String filename) {
         // where to save temp output file?
 		final String sourceFile = filename;
-		final String destinationFile = GetTempDestinationFile();
+		final String destinationFile = getTempDestinationFile();
 		
-		LoadImageConverters();
-		if( ChooseImageConversionOptions(false) == false ) return false;
+		loadImageConverters();
+		if( chooseImageConversionOptions(false) == false ) return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -715,21 +715,21 @@ public class MainGUI
 				// read in image
 				BufferedImage img;
 				try {
-					Log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
+					log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 					// convert with style
 					img = ImageIO.read(new File(sourceFile));
-					int style = GetDrawStyle();
+					int style = getDrawStyle();
 					Filter f = image_converters.get(style);
-					TabToLog();
-					f.SetParent(this);
-					f.SetProgressMonitor(pm);
-					f.SetDestinationFile(destinationFile);
-					f.Convert(img);
-					TabToDraw();
-			        previewPane.ZoomToFitPaper();
+					tabToLog();
+					f.setParent(this);
+					f.setProgressMonitor(pm);
+					f.setDestinationFile(destinationFile);
+					f.convert(img);
+					tabToDraw();
+			        previewPane.zoomToFitPaper();
 				}
 				catch(IOException e) {
-					Log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
+					log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
 					recentFiles.remove(sourceFile);
 					updateMenuBar();
 				}
@@ -741,9 +741,9 @@ public class MainGUI
 			@Override
 			public void done() {
 				pm.close();
-				Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-				PlayConversionFinishedSound();
-				LoadGCode(destinationFile);
+				log("<font color='green'>"+translator.get("Finished")+"</font>\n");
+				playConversionFinishedSound();
+				loadGCode(destinationFile);
 			}
 		};
 		
@@ -756,12 +756,12 @@ public class MainGUI
 		            String message = String.format("%d%%.\n", progress);
 		            pm.setNote(message);
 		            if(s.isDone()) {
-	                	Log("<font color='green'>"+translator.get("Finished")+"</font>\n");
+	                	log("<font color='green'>"+translator.get("Finished")+"</font>\n");
 		            } else if (s.isCancelled() || pm.isCanceled()) {
 		                if (pm.isCanceled()) {
 		                    s.cancel(true);
 		                }
-	                    Log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
+	                    log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
 		            }
 		        }
 		    }
@@ -773,21 +773,21 @@ public class MainGUI
 	}
 	
 	
-	public boolean IsFileLoaded() {
+	public boolean isFileLoaded() {
 		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
 	}
 	
-	public boolean IsFileGcode(String filename) {
+	public boolean isFileGcode(String filename) {
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
 	
-	public boolean IsFileDXF(String filename) {
+	public boolean isFileDXF(String filename) {
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	return (ext.equalsIgnoreCase(".dxf"));
 	}
 	
-	public boolean IsFileImage(String filename) {
+	public boolean isFileImage(String filename) {
 		String ext=filename.substring(filename.lastIndexOf('.'));
     	return ext.equalsIgnoreCase(".jpg")
     			|| ext.equalsIgnoreCase(".png")
@@ -796,27 +796,27 @@ public class MainGUI
 	}
 	
 	// User has asked that a file be opened.
-	public void OpenFileOnDemand(String filename) {
- 		Log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
+	public void openFileOnDemand(String filename) {
+ 		log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
 
-	   	if(IsFileGcode(filename)) {
-			LoadGCode(filename);
-    	} else if(IsFileDXF(filename)) {
-    		LoadDXF(filename);
-    	} else if(IsFileImage(filename)) {
-    		LoadImage(filename);
+	   	if(isFileGcode(filename)) {
+			loadGCode(filename);
+    	} else if(isFileDXF(filename)) {
+    		loadDXF(filename);
+    	} else if(isFileImage(filename)) {
+    		loadImage(filename);
     	} else {
-    		Log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
+    		log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
     	}
 
 	   	// TODO: if succeeded
 	   	recentFiles.add(filename);
 		updateMenuBar();
-    	statusBar.Clear();
+    	statusBar.clear();
 	}
 
 	// creates a file open dialog. If you don't cancel it opens that file.
-	public void OpenFileDialog() {
+	public void openFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String s = recentFiles.get(0);
@@ -834,15 +834,15 @@ public class MainGUI
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
 
 	    	// if machine is not yet calibrated
-	    	if(machineConfiguration.IsPaperConfigured() == false) {
+	    	if(machineConfiguration.isPaperConfigured() == false) {
 	    		JOptionPane.showMessageDialog(null,translator.get("SetPaperSize"));
 	    		return;
 	    	}
-	    	OpenFileOnDemand(selectedFile);
+	    	openFileOnDemand(selectedFile);
 	    }
 	}
 	
-	private void SaveFileDialog() {
+	private void saveFileDialog() {
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String s = recentFiles.get(0);
@@ -860,20 +860,20 @@ public class MainGUI
 			}
 
 	    	try {
-	    		gcode.Save(selectedFile);
+	    		gcode.save(selectedFile);
 	    	}
 		    catch(IOException e) {
-		    	Log("<span style='color:red'>"+translator.get("Failed")+e.getMessage()+"</span>\n");
+		    	log("<span style='color:red'>"+translator.get("Failed")+e.getMessage()+"</span>\n");
 		    	return;
 		    }
 	    }
 	}
 	
-	public void GoHome() {
+	public void goHome() {
 		sendLineToRobot("G00 F" + feed_rate + " X0 Y0");
 	}
 	
-	private String SelectFile() {
+	private String selectFile() {
 		JFileChooser choose = new JFileChooser();
 	    int returnVal = choose.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -886,7 +886,7 @@ public class MainGUI
 	}
 	
 	// Adjust sound preferences
-	protected void AdjustSounds() {
+	protected void adjustSounds() {
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -920,10 +920,10 @@ public class MainGUI
 		ActionListener driveButtons = new ActionListener() {
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
-					if(subject == change_sound_connect) sound_connect.setText(SelectFile());
-					if(subject == change_sound_disconnect) sound_disconnect.setText(SelectFile());
-					if(subject == change_sound_conversion_finished) sound_conversion_finished.setText(SelectFile());
-					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(SelectFile());
+					if(subject == change_sound_connect) sound_connect.setText(selectFile());
+					if(subject == change_sound_disconnect) sound_disconnect.setText(selectFile());
+					if(subject == change_sound_conversion_finished) sound_conversion_finished.setText(selectFile());
+					if(subject == change_sound_drawing_finished) sound_drawing_finished.setText(selectFile());
 
 					if(subject == save) {
 						//allowMetrics = allow_metrics.isSelected();
@@ -931,7 +931,7 @@ public class MainGUI
 						prefs.put("sound_disconnect",sound_disconnect.getText());
 						prefs.put("sound_conversion_finished",sound_conversion_finished.getText());
 						prefs.put("sound_drawing_finished",sound_drawing_finished.getText());
-						machineConfiguration.SaveConfig();
+						machineConfiguration.saveConfig();
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -953,7 +953,7 @@ public class MainGUI
 	}
 
     // Adjust graphics preferences	
-	protected void AdjustGraphics() {
+	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuGraphicsTitle"),true);
@@ -1015,18 +1015,19 @@ public class MainGUI
 	}
 	
 	// Send the machine configuration to the robot
-	public void SendConfig() {
+	public void sendConfig() {
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		sendLineToRobot(machineConfiguration.GetConfigLine());
-		sendLineToRobot(machineConfiguration.GetBobbinLine());
+		sendLineToRobot(machineConfiguration.getConfigLine());
+		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
+		//sendLineToRobot("M17"); FIXME add to options dialog
 	}
 	
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
-	public void SendFileCommand() {
+	public void sendFileCommand() {
 		if(isrunning==false || isPaused==true || gcode.fileOpened==false ||
 				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gcode.linesProcessed>=gcode.linesTotal) return;
 		
@@ -1050,24 +1051,24 @@ public class MainGUI
 			if(line.length()>3) {
 				line="N"+line_number+" "+line;
 			}
-			line += GenerateChecksum(line);
+			line += generateChecksum(line);
 			
 			previewPane.setLinesProcessed(gcode.linesProcessed);
-			statusBar.SetProgress(gcode.linesProcessed, gcode.linesTotal);
+			statusBar.setProgress(gcode.linesProcessed, gcode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while(ProcessLine(line) && gcode.linesProcessed<gcode.linesTotal);
+		} while(processLine(line) && gcode.linesProcessed<gcode.linesTotal);
 		
 		if(gcode.linesProcessed==gcode.linesTotal) {
 			// end of file
-			PlayDawingFinishedSound();
-			Halt();
-			SayHooray();
+			playDawingFinishedSound();
+			halt();
+			sayHooray();
 		}
 	}
 	
 	
-	private void SayHooray() {
+	private void sayHooray() {
 		long num_lines = gcode.linesProcessed;
 		
 		JOptionPane.showMessageDialog(null,
@@ -1075,20 +1076,20 @@ public class MainGUI
 				num_lines +
 				translator.get("LineSegments") + 
 				"\n" +
-				statusBar.GetElapsed() +
+				statusBar.getElapsed() +
 				"\n" +
 				translator.get("SharePromo")
 				);
 	}
 	
 	
-	private void ChangeToTool(String changeToolString) {
+	private void changeToTool(String changeToolString) {
 		int i = Integer.decode(changeToolString);
 		
 		String [] toolNames = machineConfiguration.getToolNames();
 		
 		if(i<0 || i>toolNames.length) {
-			Log("<span style='color:red'>" + translator.get("InvalidTool") + i +"</span>");
+			log("<span style='color:red'>" + translator.get("InvalidTool") + i +"</span>");
 			i=0;
 		}
 		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
@@ -1100,7 +1101,7 @@ public class MainGUI
 	 * @param line command to send
 	 * @return true if the robot is ready for another command to be sent.
 	 */
-	public boolean ProcessLine(String line) {
+	public boolean processLine(String line) {
 		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || !isrunning) return false;
 
 		// tool change request?
@@ -1110,15 +1111,15 @@ public class MainGUI
 		if(Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
 			for(int i=0;i<tokens.length;++i) {
 				if(tokens[i].startsWith("T")) {
-					ChangeToTool(tokens[i].substring(1));
+					changeToTool(tokens[i].substring(1));
 				}
 			}
 		}
 		
 		// end of program?
 		if(tokens[0]=="M02" || tokens[0]=="M2" || tokens[0]=="M30") {
-			PlayDawingFinishedSound();
-			Halt();
+			playDawingFinishedSound();
+			halt();
 			return false;
 		}
 		
@@ -1130,7 +1131,7 @@ public class MainGUI
 	}
 	
 	
-	protected String GenerateChecksum(String line) {
+	protected String generateChecksum(String line) {
 		byte checksum=0;
 		
 		for( int i=0; i<line.length(); ++i ) {
@@ -1155,14 +1156,14 @@ public class MainGUI
 			String [] lines = line.split(";");
 			reportedline = lines[0];
 		}
-		Log("<font color='white'>" + reportedline + "</font>");
+		log("<font color='white'>" + reportedline + "</font>");
 		line += "\n";
 		
 		try {
 			connectionToRobot.sendMessage(line);
 		}
 		catch(Exception e) {
-			Log(e.getMessage());
+			log(e.getMessage());
 			return false;
 		}
 		return true;
@@ -1172,7 +1173,7 @@ public class MainGUI
 	 * stop sending file commands to the robot.
 	 * TODO add an e-stop command?
 	 */
-	public void Halt() {
+	public void halt() {
 		isrunning=false;
 		isPaused=false;
 	    previewPane.setLinesProcessed(0);
@@ -1200,8 +1201,8 @@ public class MainGUI
 		isrunning=true;
 		previewPane.setRunning(isrunning);
 		updateMenuBar();
-		statusBar.Start();
-		SendFileCommand();
+		statusBar.start();
+		sendFileCommand();
 	}
 	
 	// The user has done something.  respond to it.
@@ -1209,27 +1210,27 @@ public class MainGUI
 		Object subject = e.getSource();
 		
 		if( subject == buttonZoomIn ) {
-			previewPane.ZoomIn();
+			previewPane.zoomIn();
 			return;
 		}
 		if( subject == buttonZoomOut ) {
-			previewPane.ZoomOut();
+			previewPane.zoomOut();
 			return;
 		}
 		if( subject == buttonZoomToFit ) {
-			previewPane.ZoomToFitPaper();
+			previewPane.zoomToFitPaper();
 			return;
 		}
 		if( subject == buttonOpenFile ) {
-			OpenFileDialog();
+			openFileDialog();
 			return;
 		}
 		if( subject == buttonHilbertCurve ) {
-			HilbertCurve();
+			hilbertCurve();
 			return;
 		}
 		if( subject == buttonText2GCODE ) {
-			TextToGCODE();
+			textToGCODE();
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -1238,12 +1239,13 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
+			//sendLineToRobot("M18"); FIXME add to options dialog
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
-			ClearLog();
+			clearLog();
 			previewPane.setConnected(false);
 			updateMenuBar();
-			PlayDisconnectSound();
+			playDisconnectSound();
 
 			// update window title
 			mainframe.setTitle(translator.get("TitlePrefix")
@@ -1252,11 +1254,11 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAdjustSounds ) {
-			AdjustSounds();
+			adjustSounds();
 			return;
 		}
 		if( subject == buttonAdjustGraphics ) {
-			AdjustGraphics();
+			adjustGraphics();
 			return;
 		}
 		if( subject == buttonAdjustLanguage ) {
@@ -1264,27 +1266,27 @@ public class MainGUI
 			updateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
-			machineConfiguration.AdjustMachineSize();
+			machineConfiguration.adjustMachineSize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustPulleySize ) {
-			machineConfiguration.AdjustPulleySize();
+			machineConfiguration.adjustPulleySize();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonChangeTool ) {
-			machineConfiguration.ChangeTool();
+			machineConfiguration.changeTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonAdjustTool ) {
-			machineConfiguration.AdjustTool();
+			machineConfiguration.adjustTool();
 			previewPane.updateMachineConfig();
 			return;
 		}
 		if( subject == buttonJogMotors ) {
-			JogMotors();
+			jogMotors();
 			return;
 		}
 		if( subject == buttonAbout ) {
@@ -1301,12 +1303,12 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
-			CheckForUpdate();
+			checkForUpdate();
 			return;
 		}
 		
 		if( subject == buttonSaveFile ) {
-			SaveFileDialog();
+			saveFileDialog();
 			return;
 		}
 		
@@ -1318,7 +1320,7 @@ public class MainGUI
 		int i;
 		for(i=0;i<10;++i) {
 			if(subject == buttonRecent[i]) {
-				OpenFileOnDemand(recentFiles.get(i));
+				openFileOnDemand(recentFiles.get(i));
 				return;
 			}
 		}
@@ -1327,15 +1329,15 @@ public class MainGUI
 		for(i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
 
-				Log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
+				log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
 
 				connectionToRobot = connectionManager.openConnection(connections[i]);
 				if(connectionToRobot!=null) {
-					Log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
+					log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
 					updateMenuBar();
-					PlayConnectSound();
+					playConnectSound();
 				} else {
-					Log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
+					log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
 				}
 				return;
 			}
@@ -1417,7 +1419,7 @@ public class MainGUI
 	}
 
     // settings menu
-	public JPanel SettingsPanel() {
+	public JPanel settingsPanel() {
 		JPanel panel = new JPanel(new GridLayout(0,1));
 
         // TODO: move all these into a pop-up menu with tabs
@@ -1447,7 +1449,7 @@ public class MainGUI
 	}
 	
 	
-	public JPanel ProcessImages() {
+	public JPanel processImages() {
 		JPanel driver = new JPanel(new GridLayout(0,1));
 
         // File conversion menu
@@ -1489,7 +1491,7 @@ public class MainGUI
         return driver;
 	}
 	
-	protected void JogMotors() {
+	protected void jogMotors() {
 		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
 		driver.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -1529,8 +1531,8 @@ public class MainGUI
 			public void actionPerformed(ActionEvent e) {
 				machineConfiguration.m1invert = m1i.isSelected();
 				machineConfiguration.m2invert = m2i.isSelected();
-				machineConfiguration.SaveConfig();
-				SendConfig();
+				machineConfiguration.saveConfig();
+				sendConfig();
 			}
 		};
 		
@@ -1548,7 +1550,7 @@ public class MainGUI
 		driver.setVisible(true);
 	}
 	
-	public JMenuBar CreateMenuBar() {
+	public JMenuBar createMenuBar() {
         // If the menu bar exists, empty it.  If it doesn't exist, create it.
         menuBar = new JMenuBar();
 
@@ -1557,7 +1559,7 @@ public class MainGUI
         return menuBar;
 	}
 	
-	public void CheckForUpdate() {
+	public void checkForUpdate() {
 		try {
 		    // Get Github info
 			URL github = new URL("https://www.marginallyclever.com/other/software-update-check.php?id=1");
@@ -1704,7 +1706,7 @@ public class MainGUI
 		}
 	}
 	
-    public Container CreateContentPane() {
+    public Container createContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setOpaque(true);
@@ -1720,11 +1722,11 @@ public class MainGUI
         log.setDocument(doc);
         DefaultCaret c = (DefaultCaret)log.getCaret();
         c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        ClearLog();
+        clearLog();
 
-        settingsPane = SettingsPanel();
+        settingsPane = settingsPanel();
         previewPane = new DrawPanel(machineConfiguration);
-        preparePane = ProcessImages();
+        preparePane = processImages();
 		driveControls = new MakelangeloDriveControls();
 		driveControls.createPanel(this,translator,machineConfiguration);
 		driveControls.updateButtonAccess(false, false);
@@ -1751,7 +1753,7 @@ public class MainGUI
     private void reopenLastFile() {
     	String s = recentFiles.get(0);
 		if(s.length()>0) {
-			OpenFileOnDemand(s);
+			openFileOnDemand(s);
 		}
     }
 
@@ -1761,10 +1763,10 @@ public class MainGUI
     //private void TabToGcode() {
     //	contextMenu.setSelectedIndex(1);
     //}
-    private void TabToDraw() {
+    private void tabToDraw() {
     	contextMenu.setSelectedIndex(2);
     }
-    private void TabToLog() {
+    private void tabToLog() {
     	contextMenu.setSelectedIndex(3);
     }
 
@@ -1774,14 +1776,14 @@ public class MainGUI
     
     
     // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
-    private void CreateAndShowGUI() {
+    private void createAndShowGUI() {
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Create and set up the content pane.
-        mainframe.setJMenuBar(CreateMenuBar());
-        mainframe.setContentPane(CreateContentPane());
+        mainframe.setJMenuBar(createMenuBar());
+        mainframe.setContentPane(createContentPane());
  
         // Display the window.
         int width =prefs.getInt("Default window width", 1200);
@@ -1789,12 +1791,12 @@ public class MainGUI
         mainframe.setSize(width,height);
         mainframe.setVisible(true);
         
-        previewPane.ZoomToFitPaper();
+        previewPane.zoomToFitPaper();
         
         // 2015-05-03: option is meaningless, connectionToRobot doesn't exist when software starts.
         // if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
         if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
-        if(prefs.getBoolean("Check for updates", false)) CheckForUpdate();
+        if(prefs.getBoolean("Check for updates", false)) checkForUpdate();
     }
 
 	/**

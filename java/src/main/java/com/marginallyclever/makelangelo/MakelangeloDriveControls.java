@@ -37,6 +37,7 @@ public class MakelangeloDriveControls
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
+	private JButton disengageMotors;
 	
 	// to make sure pen isn't on the paper while the machine is paused
 	private boolean penIsUp,penIsUpBeforePause;
@@ -177,18 +178,20 @@ public class MakelangeloDriveControls
 			goUp.addActionListener(this);
 			goDown.addActionListener(this);
 		
-	
+			
 		JPanel feedRateControl = new JPanel();
 		feedRateControl.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
 			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 			feedRate.setText(Double.toString(machineConfiguration.getFeedRate()));
 			setFeedRate = new JButton(translator.get("Set"));
+			disengageMotors = new JButton(translator.get("DisengageMotors"));
 	
 			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
 			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
 			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+			c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
 		
 	
 		this.add(go);
@@ -197,9 +200,10 @@ public class MakelangeloDriveControls
 		this.add(corners);
 		this.add(feedRateControl);
 	    this.add(new JSeparator());
-	    this.add(GetTextInputField());
+	    this.add(getTextInputField());
 	    
 		setFeedRate.addActionListener(this);
+		disengageMotors.addActionListener(this);
 	}
     
 
@@ -208,7 +212,7 @@ public class MakelangeloDriveControls
 			JButton b = (JButton)subject;
 
 			
-			if(gui.IsFileLoaded() && !gui.isRunning()) {
+			if(gui.isFileLoaded() && !gui.isRunning()) {
 				if( subject == buttonStart ) {
 					gui.startAt(0);
 					return;
@@ -238,7 +242,7 @@ public class MakelangeloDriveControls
 					buttonPause.setText(translator.get("Pause"));
 					gui.unPause();
 					// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
-					gui.SendFileCommand();
+					gui.sendFileCommand();
 				} else {
 					penIsUpBeforePause=penIsUp;
 					gui.raisePen();
@@ -248,7 +252,7 @@ public class MakelangeloDriveControls
 				return;
 			}
 			if( subject == buttonHalt ) {
-				gui.Halt();
+				gui.halt();
 				return;
 			}
 			
@@ -270,7 +274,9 @@ public class MakelangeloDriveControls
 				machineConfiguration.setFeedRate(feed_rate);
 				feedRate.setText(Double.toString(feed_rate));
 				gui.sendLineToRobot("G00 G21 F"+feed_rate);
-			} else {
+			} 
+			else if(b==disengageMotors) gui.sendLineToRobot("M18");
+			else {
 				gui.sendLineToRobot("G91");  // set relative mode
 
 				if(b==down100) gui.sendLineToRobot("G0 Y-100");
@@ -291,7 +297,7 @@ public class MakelangeloDriveControls
 			}
 	  }
 
-	private JPanel GetTextInputField() {
+	private JPanel getTextInputField() {
 		textInputArea = new JPanel(new GridLayout(0,1));
 		commandLineText = new JTextField(0);
 		commandLineText.setPreferredSize(new Dimension(10,10));
@@ -321,7 +327,7 @@ public class MakelangeloDriveControls
     @Override
 	public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			gui.ProcessLine(commandLineText.getText());
+			gui.processLine(commandLineText.getText());
 			commandLineText.setText("");
 		}
 	}

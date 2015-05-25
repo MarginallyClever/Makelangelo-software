@@ -24,13 +24,13 @@ public class Filter_DitherFloydSteinberg extends Filter {
 	}
 
 	
-	private int QuantizeColor(int original) {
+	private int quantizeColor(int original) {
 		int i=(int)Math.min(Math.max(original, 0),255);
 		return ( i > tone ) ? 255 : 0;
 	}
 	
 	
-	private void DitherDirection(BufferedImage img,int y,int[] error,int[] nexterror,int direction) {
+	private void ditherDirection(BufferedImage img,int y,int[] error,int[] nexterror,int direction) {
 		int w = img.getWidth();
 		int oldPixel, newPixel, quant_error;
 		int start, end, x;
@@ -50,7 +50,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 			// oldpixel := pixel[x][y]
 			oldPixel = decode(img.getRGB(x, y)) + error[x];
 			// newpixel := find_closest_palette_color(oldpixel)
-			newPixel = QuantizeColor(oldPixel);
+			newPixel = quantizeColor(oldPixel);
 			// pixel[x][y] := newpixel
 			img.setRGB(x, y, encode(newPixel));
 			// quant_error := oldpixel - newpixel
@@ -71,7 +71,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 	}
 	
 	
-	public BufferedImage Process(BufferedImage img) {
+	public BufferedImage process(BufferedImage img) {
 		int y,x;
 		int h = img.getHeight();
 		int w = img.getWidth();
@@ -95,7 +95,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 		
 		// for each y from top to bottom
 		for(y=0;y<h;++y) {
-			DitherDirection(img,y,error,nexterror,direction);
+			ditherDirection(img,y,error,nexterror,direction);
 			
 			direction = direction> 0 ? -1 : 1;
 			int [] tmp = error;

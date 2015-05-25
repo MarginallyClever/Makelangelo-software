@@ -18,22 +18,22 @@ public class Filter_GeneratorBoxes extends Filter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String GetName() { return translator.get("BoxGeneratorName"); }
+	public String getName() { return translator.get("BoxGeneratorName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int TakeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
+	protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
 		// point sampling
 		int value=0;
 		int sum=0;
@@ -59,17 +59,17 @@ public class Filter_GeneratorBoxes extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.Process(img);
+		img = bw.process(img);
 
 		// Open the destination file
 		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 		// "please change to tool X and press any key to continue"
-		tool.WriteChangeTo(out);
+		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 		
@@ -77,7 +77,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/(tool.GetDiameter()));
+		float steps = (float)(pw/(tool.getDiameter()));
 		if(steps<1) steps=1;
 
 		float blockSize=(int)(image_width / steps);
@@ -93,18 +93,18 @@ public class Filter_GeneratorBoxes extends Filter {
 				//MoveTo(file,x,y,pen up?)]
 				for(x=0;x<image_width-blockSize;x+=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
+					z=takeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
 					float pulse_size = (halfstep-1.0f) * scale_z;
 					if( pulse_size>0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
 					}
 				}
 			} else {
@@ -112,26 +112,26 @@ public class Filter_GeneratorBoxes extends Filter {
 				//MoveTo(file,x,y,pen up?)]
 				for(x=image_width-blockSize;x>=0;x-=blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z=TakeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
+					z=takeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
 					// scale the intensity value
 					float scale_z = (255.0f-(float)z)/255.0f;
 					float pulse_size = (halfstep-1.0f) * scale_z;
 					if( pulse_size>0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
-						MoveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
-						MoveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
+						moveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
+						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
 					}
 				}
 			}
 		}
 
 		liftPen(out);
-		SignName(out);
-		tool.WriteMoveTo(out, 0, 0);
+		signName(out);
+		tool.writeMoveTo(out, 0, 0);
 		
 		// close the file
 		out.close();

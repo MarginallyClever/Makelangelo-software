@@ -44,21 +44,21 @@ public class Filter_GeneratorRGB extends Filter {
 
 
 
-	public String GetName() { return translator.get("RGBName"); }
+	public String getName() { return translator.get("RGBName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void MoveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
 			lastup=up;
 		}
-		tool.WriteMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out, TX(x), TY(y));
 	}
 	
-	C3 QuantizeColor(C3 c) {
+	C3 quantizeColor(C3 c) {
 		C3 closest = palette[0];
 
 	    for (C3 n : palette) 
@@ -68,7 +68,7 @@ public class Filter_GeneratorRGB extends Filter {
 	    return closest;
 	}
 	
-	private void DitherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) throws IOException {
+	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) throws IOException {
 		float w = stepw;
 		C3 oldPixel = new C3(0,0,0);
 		C3 newPixel = new C3(0,0,0);
@@ -92,32 +92,32 @@ public class Filter_GeneratorRGB extends Filter {
 		for(x=start;x!=end;x+=direction) {
 			// oldpixel := pixel[x][y]
 			//oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
-			oldPixel.set( new C3(TakeImageSampleBlock(img,(int)(x*step4),(int)(y*step4),(int)(x*step4+step4),(int)(y*step4+step4))).add(error[x]) );
+			oldPixel.set( new C3(takeImageSampleBlock(img,(int)(x*step4),(int)(y*step4),(int)(x*step4+step4),(int)(y*step4+step4))).add(error[x]) );
 			// newpixel := find_closest_palette_color(oldpixel)
-			newPixel = QuantizeColor(oldPixel);
+			newPixel = quantizeColor(oldPixel);
 
 			// pixel[x][y] := newpixel
 			if(newPixel.diff(palette[palette_mask])==0) {
 				// draw a circle.  the diameter is relative to the intensity.
 				if(draw_filled) {
-					MoveTo(out,x*step4+step2-step2,y*step4+step2-step2,true);
-					MoveTo(out,x*step4+step2+step2,y*step4+step2-step2,false);
-					MoveTo(out,x*step4+step2+step2,y*step4+step2+step2,false);
-					MoveTo(out,x*step4+step2-step2,y*step4+step2+step2,false);
-					MoveTo(out,x*step4+step2-step2,y*step4+step2-step2,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2      ,y*step4+step2      ,false);
-					MoveTo(out,x*step4+step2      ,y*step4+step2      ,true);
+					moveTo(out,x*step4+step2-step2,y*step4+step2-step2,true);
+					moveTo(out,x*step4+step2+step2,y*step4+step2-step2,false);
+					moveTo(out,x*step4+step2+step2,y*step4+step2+step2,false);
+					moveTo(out,x*step4+step2-step2,y*step4+step2+step2,false);
+					moveTo(out,x*step4+step2-step2,y*step4+step2-step2,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2      ,y*step4+step2      ,false);
+					moveTo(out,x*step4+step2      ,y*step4+step2      ,true);
 				} else {
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
-					MoveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
+					moveTo(out,x*step4+step2+step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2+step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2+step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,false);
+					moveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
 				}
 			}
 			
@@ -140,7 +140,7 @@ public class Filter_GeneratorRGB extends Filter {
 
 	
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected C3 TakeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
+	protected C3 takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
 		// point sampling
 		C3 value = new C3(0,0,0);
 		int sum=0;
@@ -163,12 +163,12 @@ public class Filter_GeneratorRGB extends Filter {
 	}
 	
 	
-	protected void Scan(int tool_index,BufferedImage img) throws IOException {
+	protected void scan(int tool_index,BufferedImage img) throws IOException {
 		palette_mask=tool_index;
 		
 		// "please change to tool X and press any key to continue"
-		tool = machine.GetTool(tool_index);
-		tool.WriteChangeTo(out);
+		tool = machine.getTool(tool_index);
+		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 
@@ -181,7 +181,7 @@ public class Filter_GeneratorRGB extends Filter {
 
 		direction=1;
 		for(y=0;y<steph;++y) {
-			DitherDirection(img,y,error,nexterror,direction);
+			ditherDirection(img,y,error,nexterror,direction);
 			
 			direction = -direction;
 			C3 [] tmp = error;
@@ -195,17 +195,17 @@ public class Filter_GeneratorRGB extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
-	public void Convert(BufferedImage img) throws IOException {
+	public void convert(BufferedImage img) throws IOException {
 		// Open the destination file
 		out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		ImageStart(img,out);
+		imageStart(img,out);
 
 		double pw = machine.getPaperWidth();
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/(tool.GetDiameter()));
+		float steps = (float)(pw/(tool.getDiameter()));
 		// figure out how many lines we're going to have on this image.
 		//int steps = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
 		if(steps<1) steps=1;
@@ -221,18 +221,18 @@ public class Filter_GeneratorRGB extends Filter {
 		nexterror=new C3[(int)Math.ceil(stepw)];
 		
 		try{
-			Scan(0,img);  // black
-			Scan(1,img);  // red
-			Scan(2,img);  // green
-			Scan(3,img);  // blue
+			scan(0,img);  // black
+			scan(1,img);  // red
+			scan(2,img);  // green
+			scan(3,img);  // blue
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		liftPen(out);
-		SignName(out);
+		signName(out);
 		
-		tool.WriteMoveTo(out, 0, 0);
+		tool.writeMoveTo(out, 0, 0);
 		
 		// close the file
 		out.close();

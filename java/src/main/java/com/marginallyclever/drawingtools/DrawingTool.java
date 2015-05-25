@@ -37,44 +37,44 @@ public class DrawingTool {
 		machine = mc;
 	}
 	
-	public float GetZOn() { return z_on; }
-	public float GetZOff() { return z_off; }
+	public float getZOn() { return z_on; }
+	public float getZOff() { return z_off; }
 	
 	// Load a configure menu and let people adjust the tool settings
-	public void Adjust() {
+	public void adjust() {
 		//final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust pulley size",true);		
 	}
 	
-	public void SetDiameter(float d) {
+	public void setDiameter(float d) {
 		diameter = d;
 	}
 	
-	public float GetDiameter() {
+	public float getDiameter() {
 		return diameter;
 	}
 
-	public String GetName() { return name; }
-	public float GetFeedRate() { return feed_rate; }
+	public String getName() { return name; }
+	public float getFeedRate() { return feed_rate; }
 	
-	public void WriteChangeTo(OutputStreamWriter out) throws IOException {
+	public void writeChangeTo(OutputStreamWriter out) throws IOException {
 		out.write("M06 T"+tool_number+";\n");
 	}
 
-	public void WriteOn(OutputStreamWriter out) throws IOException {
+	public void writeOn(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
 		out.write("G04 P50;\n");
-		out.write("G00 F"+GetFeedRate()+";\n");
-		DrawZ(z_on);
+		out.write("G00 F"+getFeedRate()+";\n");
+		drawZ(z_on);
 	}
 
-	public void WriteOff(OutputStreamWriter out) throws IOException {
+	public void writeOff(OutputStreamWriter out) throws IOException {
 		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
 		out.write("G04 P50;\n");
-		out.write("G00 F"+GetFeedRate()+";\n");
-		DrawZ(z_off);
+		out.write("G00 F"+getFeedRate()+";\n");
+		drawZ(z_off);
 	}
 	
-	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
 		out.write("G00 X"+x+" Y"+y+";\n");
 	}
 	
@@ -82,11 +82,11 @@ public class DrawingTool {
 		return new BasicStroke(diameter*10,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
 	}
 	
-	public void DrawZ(float z) { draw_z=z; }
-	public boolean DrawIsOn() { return z_on==draw_z; }
-	public boolean DrawIsOff() { return z_off==draw_z; }
+	public void drawZ(float z) { draw_z=z; }
+	public boolean isDrawOn() { return z_on==draw_z; }
+	public boolean isDrawOff() { return z_off==draw_z; }
 
-	public void DrawLine(GL2 gl2,double x1,double y1,double x2,double y2) {
+	public void drawLine(GL2 gl2,double x1,double y1,double x2,double y2) {
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2d(x1,y1);
 		gl2.glVertex2d(x2, y2);
@@ -94,9 +94,9 @@ public class DrawingTool {
 	}
 	
 
-	public void LoadConfig(Preferences prefs) {
+	public void loadConfig(Preferences prefs) {
 		prefs = prefs.node(name);
-		SetDiameter(Float.parseFloat(prefs.get("diameter",Float.toString(diameter))));
+		setDiameter(Float.parseFloat(prefs.get("diameter",Float.toString(diameter))));
 		z_rate = Float.parseFloat(prefs.get("z_rate",Float.toString(z_rate)));
 		z_on = Float.parseFloat(prefs.get("z_on",Float.toString(z_on)));
 		z_off = Float.parseFloat(prefs.get("z_off",Float.toString(z_off)));
@@ -104,9 +104,9 @@ public class DrawingTool {
 		feed_rate = Float.parseFloat(prefs.get("feed_rate",Float.toString(feed_rate)));		
 	}
 
-	public void SaveConfig(Preferences prefs) {
+	public void saveConfig(Preferences prefs) {
 		prefs = prefs.node(name);
-		prefs.put("diameter", Float.toString(GetDiameter()));
+		prefs.put("diameter", Float.toString(getDiameter()));
 		prefs.put("z_rate", Float.toString(z_rate));
 		prefs.put("z_on", Float.toString(z_on));
 		prefs.put("z_off", Float.toString(z_off));
