@@ -75,7 +75,7 @@ public class MachineConfiguration {
 	public boolean motors_backwards=false;
 	protected int current_style;
 
-
+/*
 	// top left, bottom center, etc...
 	private String[] startingStrings = { 
 			"Top Left", 
@@ -86,7 +86,7 @@ public class MachineConfiguration {
 			"Right", 
 			"Bottom Left",
 			"Bottom Center",
-			"Bottom Right" };
+			"Bottom Right" };*/
 	private int startingPositionIndex=4;
 	
 	// TODO a way for users to create different tools for each machine 
