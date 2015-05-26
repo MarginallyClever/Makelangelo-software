@@ -205,7 +205,7 @@ public class Filter_GeneratorRGB extends Filter {
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		float steps = ((float)pw/(tool.getDiameter()*8.0f))/scale;
+		float steps = ((float)pw*scale/(tool.getDiameter()*8.0f));
 		// figure out how many lines we're going to have on this image.
 		//int steps = (int)Math.ceil(tool.GetDiameter()/(1.0*scale));
 		if(steps<1) steps=1;
