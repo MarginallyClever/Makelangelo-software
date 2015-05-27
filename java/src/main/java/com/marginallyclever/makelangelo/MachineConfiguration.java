@@ -118,23 +118,6 @@ public class MachineConfiguration {
 		// which configurations are available?
 		try {
 			configurations_available = machinePreferences.childrenNames();
-			
-			// remove from configurations_available all names which are not parsable as a number.
-			// only numbers are machine names, the rest are tool names.
-			Vector<String> valid = new Vector<String>();
-			for(i=0;i<configurations_available.length;++i) {
-				try {
-					Integer.parseInt(configurations_available[i]);
-					// if parseInt throws a NumberFormatException, the next line will not happen.
-					// thus only names that fit our format (numbers only) will make it into the valid list.
-					valid.addElement(configurations_available[i]);
-				} catch(NumberFormatException e) {
-					// invalid, do nothing.
-				}
-			}
-			
-			configurations_available = new String[valid.size()];
-			valid.copyInto(configurations_available);
 		}
 		catch(Exception e) {
 			configurations_available = new String[0];
