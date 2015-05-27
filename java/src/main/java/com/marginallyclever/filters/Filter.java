@@ -186,18 +186,20 @@ public abstract class Filter {
 		
 		scale=10f;  // 10mm = 1cm
 
-		int new_width = image_width;
-		int new_height = image_height;
+		double new_width = image_width;
+		double new_height = image_height;
 		
-		if(image_width>machine.getPaperWidth()) {
+		if(image_width > machine.getPaperWidth()) {
 			float resize = (float)machine.getPaperWidth()/(float)image_width;
 			scale *= resize;
 			new_height *= resize;
+			new_width = machine.getPaperWidth();
 		}
-		if(new_height>machine.getPaperHeight()) {
+		if(new_height > machine.getPaperHeight()) {
 			float resize = (float)machine.getPaperHeight()/(float)new_height;
 			scale *= resize;
 			new_width *= resize;
+			new_height = machine.getPaperHeight();
 		}
 		scale *= machine.paperMargin;
 		new_width *= machine.paperMargin;
@@ -411,7 +413,7 @@ public abstract class Filter {
 	}
 	
 	
-	public void textFindCharsPerLine(float width) {
+	public void textFindCharsPerLine(double width) {
 		chars_per_line=(int)Math.floor( (float)(width - padding*2.0f) / (float)(letter_width+kerning) );
 		//System.out.println("MAX="+chars_per_line);
 	}

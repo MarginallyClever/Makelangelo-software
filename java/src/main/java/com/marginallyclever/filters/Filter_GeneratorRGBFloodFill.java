@@ -185,15 +185,23 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
-		//img = bw.Process(img);
+		//img = bw.process(img);
 		
 		// Open the destination file
 		osw = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(img,osw);
+
+
+		double pw = machine.getPaperWidth();
+		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		diameter = (int)Math.ceil(tool.getDiameter()/(1.0*scale));
+		float steps = ((float)pw*scale/(tool.getDiameter()*8.0f));
+		
+		
+		// figure out how many lines we're going to have on this image.
+		diameter = (int)(img.getWidth()/steps);
 		if(diameter<1) diameter=1;
 		
 		imgChanged=img;
