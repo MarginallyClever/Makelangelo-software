@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -90,7 +93,7 @@ public class MachineConfiguration {
 	private int startingPositionIndex=4;
 	
 	// TODO a way for users to create different tools for each machine 
-	protected DrawingTool tools[];
+	protected List<DrawingTool> tools;
 	protected int current_tool=0;	
 	
 	protected String [] configurations_available = null;
@@ -103,14 +106,13 @@ public class MachineConfiguration {
 		mainGUI = gui;
 		translator = ms;
 		
-		tools = new DrawingTool[6];
-		int i=0;
-		tools[i++]=new DrawingTool_Pen("Pen (black)",0,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (red)",1,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (green)",2,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (blue)",3,gui,ms,this);
-		tools[i++]=new DrawingTool_LED(gui,ms,this);
-		tools[i++]=new DrawingTool_Spraypaint(gui,ms,this);
+		tools = new ArrayList<DrawingTool>();
+		tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (blue)",3,gui,ms,this));
+		tools.add(new DrawingTool_LED(gui,ms,this));
+		tools.add(new DrawingTool_Spraypaint(gui,ms,this));
 		
 		versionCheck();
 		
@@ -337,9 +339,12 @@ public class MachineConfiguration {
 	
 
 	public String [] getToolNames() {
-		String[] toolNames = new String[tools.length];
-		for(int i=0;i<tools.length;++i) {
-			toolNames[i] = tools[i].getName();
+		String[] toolNames = new String[tools.size()];
+		Iterator<DrawingTool> i = tools.iterator();
+		int c=0;
+		while(i.hasNext()) {
+			DrawingTool t = i.next();
+			toolNames[c++] = t.getName();
 		}
 		return toolNames;
 	}
@@ -401,7 +406,7 @@ public class MachineConfiguration {
 	
 
 	public DrawingTool getTool(int tool_id) {
-		return tools[tool_id];
+		return tools.get(tool_id);
 	}
 	
 	
@@ -502,8 +507,9 @@ public class MachineConfiguration {
 		paper_bottom=Double.parseDouble(machinePreferences.get("paper_bottom",Double.toString(paper_bottom)));
 		
 		// load each tool's settings
-		for(int i=0;i<tools.length;++i) {
-			tools[i].loadConfig(machinePreferences);
+		Iterator<DrawingTool> i = tools.iterator();
+		while(i.hasNext()) {
+			i.next().loadConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
@@ -579,8 +585,9 @@ public class MachineConfiguration {
 		machinePreferences.putDouble("paper_bottom", paper_bottom);
 
 		// save each tool's settings
-		for(int i=0;i<tools.length;++i) {
-			tools[i].saveConfig(machinePreferences);
+		Iterator<DrawingTool> i = tools.iterator();
+		while(i.hasNext()) {
+			i.next().saveConfig(machinePreferences);
 		}
 
 		// TODO move these values to image filter preferences
@@ -607,11 +614,11 @@ public class MachineConfiguration {
 	
 	
 	public String getPenUpString() {
-		return Float.toString(tools[current_tool].getZOff());
+		return Float.toString(tools.get(current_tool).getZOff());
 	}
 	
 	public String getPenDownString() {
-		return Float.toString(tools[current_tool].getZOn());
+		return Float.toString(tools.get(current_tool).getZOn());
 	}
 	
 	public boolean isPaperConfigured() {
