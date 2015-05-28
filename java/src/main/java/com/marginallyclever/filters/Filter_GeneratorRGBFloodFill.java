@@ -5,12 +5,15 @@ import com.marginallyclever.makelangelo.C3;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Point2D;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
@@ -108,36 +111,55 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * @throws IOException
 	 */
 	void floodFillBlob(int color_index,int x,int y) throws IOException {
-		C3 original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
-		C3 quantized_color = quantizeColor(original_color);
+		Queue<Point2D> points_to_visit = new LinkedList<Point2D>();
+		points_to_visit.add(new Point2D(x,y));
 
-		if(quantized_color.diff(palette[color_index])!=0) {
-			//System.out.print("<font color='yellow'>Pop at "+x+", "+y+"</font>\n");
-			return;  // visited or irrelevant.
-		}
+		int blobSize=0;
+		
+		while(points_to_visit.size()>0) {
+			Point2D a = points_to_visit.remove();
+			
+			C3 original_color = takeImageSampleBlock((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
+			C3 quantized_color = quantizeColor(original_color);
 
-		// mark this spot as visited.
-		setImagePixelWhite(x,y,x+diameter, y+diameter);
-		// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
-		float dx=(float)(x-last_x);
-		float dy=(float)(y-last_y);
-		if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0) {
-			//System.out.print("Jump at "+x+", "+y+"\n");
-			moveTo(last_x, last_y, true);
-			moveTo(x, y, true);
-			moveTo(x, y, false);
-		} else {
-			//System.out.print("Move to "+x+", "+y+"\n");
-			moveTo(x, y, false);
+			if(quantized_color.diff(palette[color_index])!=0) {
+				//System.out.print("<font color='yellow'>Pop at "+x+", "+y+"</font>\n");
+				continue;  // visited or irrelevant.
+			}
+			
+			blobSize++;
+			
+			// mark this spot as visited.
+			setImagePixelWhite((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
+
+			// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
+			float dx=(float)(a.x-last_x);
+			float dy=(float)(a.y-last_y);
+			if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0) {
+				//System.out.print("Jump at "+x+", "+y+"\n");
+				moveTo(last_x, last_y, true);
+				moveTo(a.x, a.y, true);
+				moveTo(a.x, a.y, false);
+			} else {
+				//System.out.print("Move to "+x+", "+y+"\n");
+				moveTo(a.x, a.y, false);
+			}
+			// update the last position.
+			last_x=(int)a.x;
+			last_y=(int)a.y;
+
+			points_to_visit.add(new Point2D(a.x-diameter,a.y-diameter));
+			points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
+			points_to_visit.add(new Point2D(a.x+diameter,a.y-diameter));
+			points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+			points_to_visit.add(new Point2D(a.x         ,a.y         ));
+			points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
+			points_to_visit.add(new Point2D(a.x-diameter,a.y+diameter));
+			points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
+			points_to_visit.add(new Point2D(a.x+diameter,a.y+diameter));
 		}
-		// update the last position.
-		last_x=x;
-		last_y=y;
-        
-		floodFillBlob(color_index,x-diameter,y);
-		floodFillBlob(color_index,x+diameter,y);
-		floodFillBlob(color_index,x,y-diameter);
-		floodFillBlob(color_index,x,y+diameter);
+		
+		System.out.println("blob size = "+blobSize);
 	}
 
 	
@@ -165,7 +187,6 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 					//mainGUI.Log("<font color='red'>original color "+original_color.toString()+"</font>\n");
 					//mainGUI.Log("<font color='blue'>quantized color "+quantized_color.toString()+"</font>\n");
 					//mainGUI.Log("<font color='white'>Blob starts at "+x+", "+y+"</font>\n");
-
 					try {
 						floodFillBlob(color_index,x,y);
 					} catch(IOException e) {
@@ -193,16 +214,15 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		imageStart(img,osw);
 
 
-		double pw = machine.getPaperWidth();
-		//double ph = machine.GetPaperHeight();
+		float df = tool.getDiameter() * scale;
+		if(df<1) df=1;
+
+		float steps = img.getWidth() / df;
 		
-		// figure out how many lines we're going to have on this image.
-		float steps = ((float)pw*scale/(tool.getDiameter()*8.0f));
+		System.out.println("Diameter = "+df);
+		System.out.println("Steps = "+steps);
 		
-		
-		// figure out how many lines we're going to have on this image.
-		diameter = (int)(img.getWidth()/steps);
-		if(diameter<1) diameter=1;
+		diameter = (int)df;
 		
 		imgChanged=img;
 
