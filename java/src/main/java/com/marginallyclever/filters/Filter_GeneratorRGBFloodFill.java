@@ -12,19 +12,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
 
 public class Filter_GeneratorRGBFloodFill extends Filter {	
-	// The palette color mask has to match the tool index in the machine configuration
+	// The color mask has to match the tool index in the machine configuration
 	C3 [] palette = new C3[] {
 		new C3(0,0,0),
-		new C3(255,0,0),
-		new C3(0,255,0),
-		new C3(0,0,255),
+		new C3(127,0,0),
+		new C3(0,127,0),
+		new C3(0,0,127),
 		new C3(255,255,255),
 	};
 	
@@ -102,6 +102,13 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		imgChanged.flush();
 	}
 
+
+	protected boolean doesQuantizedBlockMatch(int color_index,float x,float y) {
+		C3 original_color = takeImageSampleBlock((int)x, (int)y, (int)(x+diameter), (int)(y+diameter));
+		C3 quantized_color = quantizeColor(original_color);
+		return (quantized_color.diff(palette[color_index]) == 0);
+	}
+	
 	
 	/**
 	 * Depth-first flood fill 
@@ -110,32 +117,29 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * @param out
 	 * @throws IOException
 	 */
-	void floodFillBlob(int color_index,int x,int y) throws IOException {
-		Queue<Point2D> points_to_visit = new LinkedList<Point2D>();
+	protected void floodFillBlob(int color_index,int x,int y) throws IOException {
+		LinkedList<Point2D> points_to_visit = new LinkedList<Point2D>();
 		points_to_visit.add(new Point2D(x,y));
+		
+		Point2D a;
 
-		int blobSize=0;
 		
 		while(points_to_visit.size()>0) {
-			Point2D a = points_to_visit.remove();
+			// TODO: pop the closest point to (last_x,last_y)
+			a = points_to_visit.removeLast();
 			
-			C3 original_color = takeImageSampleBlock((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
-			C3 quantized_color = quantizeColor(original_color);
-
-			if(quantized_color.diff(palette[color_index])!=0) {
-				//System.out.print("<font color='yellow'>Pop at "+x+", "+y+"</font>\n");
-				continue;  // visited or irrelevant.
+			if( !doesQuantizedBlockMatch(color_index, a.x,a.y) ) {
+				continue;
 			}
-			
-			blobSize++;
-			
 			// mark this spot as visited.
 			setImagePixelWhite((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
 
 			// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
 			float dx=(float)(a.x-last_x);
 			float dy=(float)(a.y-last_y);
-			if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0) {
+			if(Math.sqrt(dx*dx+dy*dy) > diameter*4.5)
+			//if(blobSize==1)
+			{
 				//System.out.print("Jump at "+x+", "+y+"\n");
 				moveTo(last_x, last_y, true);
 				moveTo(a.x, a.y, true);
@@ -148,18 +152,15 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 			last_x=(int)a.x;
 			last_y=(int)a.y;
 
-			points_to_visit.add(new Point2D(a.x-diameter,a.y-diameter));
-			points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
-			points_to_visit.add(new Point2D(a.x+diameter,a.y-diameter));
-			points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
-			points_to_visit.add(new Point2D(a.x         ,a.y         ));
-			points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
-			points_to_visit.add(new Point2D(a.x-diameter,a.y+diameter));
-			points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
-			points_to_visit.add(new Point2D(a.x+diameter,a.y+diameter));
+//			if( doesQuantizedBlockMatch(color_index, a.x,a.y+diameter) ) 
+				points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
+//			if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
+				points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
+//			if( doesQuantizedBlockMatch(color_index, a.x+diameter,a.y) ) 
+				points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
+//			if( doesQuantizedBlockMatch(color_index, a.x-diameter,a.y) ) 
+				points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
 		}
-		
-		System.out.println("blob size = "+blobSize);
 	}
 
 	
@@ -174,6 +175,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		C3 original_color, quantized_color;
 		
 		int x,y;
+		int z=0;
 
 		mainGUI.log("<font color='orange'>Palette color "+palette[color_index].toString()+"</font>\n");
 		
@@ -183,20 +185,14 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 				quantized_color = quantizeColor(original_color); 
 				if(quantized_color.diff(palette[color_index])==0) {
 					// found blob
-
-					//mainGUI.Log("<font color='red'>original color "+original_color.toString()+"</font>\n");
-					//mainGUI.Log("<font color='blue'>quantized color "+quantized_color.toString()+"</font>\n");
-					//mainGUI.Log("<font color='white'>Blob starts at "+x+", "+y+"</font>\n");
-					try {
-						floodFillBlob(color_index,x,y);
-					} catch(IOException e) {
-						e.printStackTrace();
-					}
-				
-					//mainGUI.Log("<font color='white'>Blob ends at "+last_x+", "+last_y+"</font>\n");
+					floodFillBlob(color_index,x,y);
+					z++;
+					//if(z==20)
+//						return;
 				}
 			}
 		}
+		System.out.println("Found "+z+" blobs.");
 	}
 	
 	/**
@@ -214,13 +210,14 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		imageStart(img,osw);
 
 
-		float df = tool.getDiameter() * scale;
+		float pw = (float)machine.getPaperWidth();
+		float df = tool.getDiameter() * (float)img.getWidth() / (4.0f*pw);
 		if(df<1) df=1;
 
-		float steps = img.getWidth() / df;
+//		float steps = img.getWidth() / df;
 		
-		System.out.println("Diameter = "+df);
-		System.out.println("Steps = "+steps);
+		//System.out.println("Diameter = "+df);
+		//System.out.println("Steps = "+steps);
 		
 		diameter = (int)df;
 		
@@ -249,7 +246,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		
 		// close the file
 		osw.close();
-		
+		/*
 		try {
 		    // save image
 		    File outputfile = new File("saved.png");
@@ -257,6 +254,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
+		*/
 	}
 }
 
