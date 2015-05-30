@@ -106,7 +106,7 @@ public class MachineConfiguration {
 		mainGUI = gui;
 		translator = ms;
 		
-		tools = new ArrayList<DrawingTool>();
+		tools = new ArrayList<>();
 		tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
@@ -709,6 +709,14 @@ public class MachineConfiguration {
 		return choices;
 	}
 	
+	/**
+	 * Get the UID of every machine this computer recognizes INCLUDING machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
+	 * @return an array of strings, each string is a machine UID.
+	 */
+	public String[] getAvailableConfigurations() {
+		return configurations_available;
+	}
+
 	
 	public int getCurrentMachineIndex() {
 		assert(getMachineCount()>0);
