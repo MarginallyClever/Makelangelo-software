@@ -151,7 +151,7 @@ public class MainGUI
 
 	public void startTranslator() {
 		translator = new MultilingualSupport();
-		if(translator.isThisTheFirstTime()) {
+		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
 	}
