@@ -38,12 +38,12 @@ public class MachineConfiguration {
 	/**
 	 *
 	 */
-	private Preferences makelangeloPreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+	private final Preferences makelangeloPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
 	/**
 	 *
 	 */
-	private Preferences machinePreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 	
 	static final String CURRENT_VERSION = "1";
 	// GUID
@@ -118,7 +118,7 @@ public class MachineConfiguration {
 		
 		// which configurations are available?
 		try {
-			configurations_available = machinePreferences.childrenNames();
+			configurations_available = topLevelMachinesPreferenceNode.childrenNames();
 		}
 		catch(Exception e) {
 			configurations_available = new String[0];
@@ -474,9 +474,9 @@ public class MachineConfiguration {
 
 	
 	protected void versionCheck() {
-		String version = makelangeloPreferences.get("version", CURRENT_VERSION);
+		String version = makelangeloPreferenceNode.get("version", CURRENT_VERSION);
 		if( version.equals(CURRENT_VERSION) == false ) {
-			makelangeloPreferences.put("version", CURRENT_VERSION);
+			makelangeloPreferenceNode.put("version", CURRENT_VERSION);
 		}
 	}
 	
@@ -489,33 +489,32 @@ public class MachineConfiguration {
 	}
 	
 	protected void loadConfigFromLocal() {
-		machinePreferences.node(Long.toString(robot_uid));
-		limit_top = Double.valueOf(machinePreferences.get("limit_top", Double.toString(limit_top)));
-		limit_bottom = Double.valueOf(machinePreferences.get("limit_bottom", Double.toString(limit_bottom)));
-		limit_left = Double.valueOf(machinePreferences.get("limit_left", Double.toString(limit_left)));
-		limit_right = Double.valueOf(machinePreferences.get("limit_right", Double.toString(limit_right)));
-		m1invert=Boolean.parseBoolean(machinePreferences.get("m1invert", m1invert?"true":"false"));
-		m2invert=Boolean.parseBoolean(machinePreferences.get("m2invert", m2invert?"true":"false"));
-		bobbin_left_diameter=Double.valueOf(machinePreferences.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
-		bobbin_right_diameter=Double.valueOf(machinePreferences.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
-		max_feed_rate=Double.valueOf(machinePreferences.get("feed_rate",Double.toString(max_feed_rate)));
-		startingPositionIndex=Integer.valueOf(machinePreferences.get("startingPosIndex",Integer.toString(startingPositionIndex)));
+		final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robot_uid));
+		limit_top = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limit_top)));
+		limit_bottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limit_bottom)));
+		limit_left = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limit_left)));
+		limit_right = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limit_right)));
+		m1invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", m1invert?"true":"false"));
+		m2invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", m2invert?"true":"false"));
+		bobbin_left_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
+		bobbin_right_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
+		max_feed_rate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(max_feed_rate)));
+		startingPositionIndex=Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
-		paper_left=Double.parseDouble(machinePreferences.get("paper_left",Double.toString(paper_left)));
-		paper_right=Double.parseDouble(machinePreferences.get("paper_right",Double.toString(paper_right)));
-		paper_top=Double.parseDouble(machinePreferences.get("paper_top",Double.toString(paper_top)));
-		paper_bottom=Double.parseDouble(machinePreferences.get("paper_bottom",Double.toString(paper_bottom)));
+		paper_left=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paper_left)));
+		paper_right=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paper_right)));
+		paper_top=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paper_top)));
+		paper_bottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paper_bottom)));
 		
 		// load each tool's settings
-		Iterator<DrawingTool> i = tools.iterator();
-		while(i.hasNext()) {
-			i.next().loadConfig(machinePreferences);
+		for (DrawingTool tool : tools) {
+			tool.loadConfig(uniqueMachinePreferencesNode);
 		}
 
 		// TODO move these values to image filter preferences
-		paperMargin = Double.valueOf(machinePreferences.get("paper_margin",Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(machinePreferences.get("reverseForGlass",reverseForGlass?"true":"false"));
-		current_tool = Integer.valueOf(machinePreferences.get("current_tool",Integer.toString(current_tool)));
+		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
+		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
+		current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",Integer.toString(current_tool)));
 	}
 
 	
@@ -528,12 +527,12 @@ public class MachineConfiguration {
 	/** 		TODO finish these methods.
 
 	 public boolean GetCanUseCloud() {
-		return machinePreferences.getBoolean("can_use_cloud", false);
+		return topLevelMachinesPreferenceNode.getBoolean("can_use_cloud", false);
 	}
 
 	
 	public void SetCanUseCloud(boolean b) {
-		machinePreferences.putBoolean("can_use_cloud", b);
+		topLevelMachinesPreferenceNode.putBoolean("can_use_cloud", b);
 	}
 
 	protected boolean SaveConfigToCloud() {
@@ -567,33 +566,32 @@ public class MachineConfiguration {
 	
 	
 	protected void saveConfigToLocal() {
-		machinePreferences.node(Long.toString(robot_uid));
-		machinePreferences.put("limit_top", Double.toString(limit_top));
-		machinePreferences.put("limit_bottom", Double.toString(limit_bottom));
-		machinePreferences.put("limit_right", Double.toString(limit_right));
-		machinePreferences.put("limit_left", Double.toString(limit_left));
-		machinePreferences.put("m1invert", Boolean.toString(m1invert));
-		machinePreferences.put("m2invert", Boolean.toString(m2invert));
-		machinePreferences.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
-		machinePreferences.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
-		machinePreferences.put("feed_rate", Double.toString(max_feed_rate));
-		machinePreferences.put("startingPosIndex", Integer.toString(startingPositionIndex));
+		final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robot_uid));
+		uniqueMachinePreferencesNode.put("limit_top", Double.toString(limit_top));
+		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limit_bottom));
+		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limit_right));
+		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limit_left));
+		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(m1invert));
+		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(m2invert));
+		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
+		uniqueMachinePreferencesNode.put("bobbin_right_diameter", Double.toString(bobbin_right_diameter));
+		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(max_feed_rate));
+		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
-		machinePreferences.putDouble("paper_left", paper_left);
-		machinePreferences.putDouble("paper_right", paper_right);
-		machinePreferences.putDouble("paper_top", paper_top);
-		machinePreferences.putDouble("paper_bottom", paper_bottom);
+		uniqueMachinePreferencesNode.putDouble("paper_left", paper_left);
+		uniqueMachinePreferencesNode.putDouble("paper_right", paper_right);
+		uniqueMachinePreferencesNode.putDouble("paper_top", paper_top);
+		uniqueMachinePreferencesNode.putDouble("paper_bottom", paper_bottom);
 
 		// save each tool's settings
-		Iterator<DrawingTool> i = tools.iterator();
-		while(i.hasNext()) {
-			i.next().saveConfig(machinePreferences);
+		for (DrawingTool tool : tools) {
+			tool.saveConfig(uniqueMachinePreferencesNode);
 		}
 
 		// TODO move these values to image filter preferences
-		machinePreferences.put("paper_margin", Double.toString(paperMargin));
-		machinePreferences.put("reverseForGlass", Boolean.toString(reverseForGlass));
-		machinePreferences.put("current_tool", Integer.toString(current_tool));
+		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
+		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
+		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(current_tool));
 	}
 
 
@@ -669,8 +667,8 @@ public class MachineConfiguration {
 
 		// did read go ok?
 		if(new_uid!=0) {
-			// make sure a machinePreferences node is created
-			machinePreferences.node(Long.toString(new_uid));
+			// make sure a topLevelMachinesPreferenceNode node is created
+			topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
 			// tell the robot it's new UID.
 			mainGUI.sendLineToRobot("UID "+new_uid);
 
