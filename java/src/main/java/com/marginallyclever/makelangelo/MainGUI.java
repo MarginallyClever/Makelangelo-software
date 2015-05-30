@@ -151,7 +151,7 @@ public class MainGUI
 
 	public void startTranslator() {
 		translator = new MultilingualSupport();
-		if(translator.isThisTheFirstTime()) {
+		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
 	}
@@ -174,7 +174,7 @@ public class MainGUI
 				Object subject = e.getSource();
 				// TODO prevent "close" icon.  Must press save to continue!
 				if(subject == save) {
-					translator.currentLanguage = choices[language_options.getSelectedIndex()];
+					translator.setCurrentLanguage(choices[language_options.getSelectedIndex()]);
 					translator.saveConfig();
 					driver.dispose();
 				}
@@ -356,14 +356,27 @@ public class MainGUI
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
+
+
+	/**
+	 *
+	 * @return
+	 */
+	private String[] getAnyMachineConfigurations() {
+		String[] machineNames = machineConfiguration.getKnownMachineNames();
+		if(machineNames.length < 1) {
+			machineNames = machineConfiguration.getAvailableConfigurations();
+		}
+		return machineNames;
+	}
 	
 	
 	protected boolean chooseImageConversionOptions(boolean isDXF) {
 		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
-		final String[] choices = machineConfiguration.getKnownMachineNames();
-		final JComboBox<String> machine_choice = new JComboBox<String>(choices);
+		final String[] machineConfigurations = getAnyMachineConfigurations();
+		final JComboBox<String> machine_choice = new JComboBox<>(machineConfigurations);
 		machine_choice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
@@ -416,7 +429,7 @@ public class MainGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
-						long new_uid = Long.parseLong( choices[machine_choice.getSelectedIndex()] );
+						long new_uid = Long.parseLong( machineConfigurations[machine_choice.getSelectedIndex()] );
 						machineConfiguration.loadConfig(new_uid);
 						setDrawStyle(input_draw_style.getSelectedIndex());
 						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;

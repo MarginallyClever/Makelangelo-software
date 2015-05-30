@@ -1,8 +1,13 @@
 package com.marginallyclever.makelangelo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -11,12 +16,7 @@ import java.util.prefs.Preferences;
  *
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
-public class MultilingualSupport {
-
-	/**
-	 *
-	 */
-	private static final String FIRST_TIME_KEY = "first time";
+public final class MultilingualSupport {
 
 	/**
 	 *
@@ -26,7 +26,12 @@ public class MultilingualSupport {
 	/**
 	 *
 	 */
-	protected String currentLanguage="English";
+	public static final String DEFAULT_LANGUAGE = "English";
+
+	/**
+	 *
+	 */
+	private String currentLanguage;
 
 	/**
 	 *
@@ -36,7 +41,12 @@ public class MultilingualSupport {
 	/**
 	 *
 	 */
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+	private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+
+	/**
+	 *
+	 */
+	private final Logger logger = LoggerFactory.getLogger(MultilingualSupport.class);
 
 	/**
 	 *
@@ -50,27 +60,42 @@ public class MultilingualSupport {
 	 *
 	 * @return
 	 */
-	public boolean isThisTheFirstTime() {
+	public boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
-		if(!languages.keySet().contains(currentLanguage)) {
-			prefs.putBoolean(FIRST_TIME_KEY, false);
+		try {
+			if (doesLanguagePreferenceExist()) {
+				return false;
+			}
+		} catch (BackingStoreException e) {
+			logger.error("{}",e);
 		}
+		return true;
+	}
 
-		return prefs.getBoolean(FIRST_TIME_KEY, true);
+	/**
+	 *
+	 * @return
+	 * @throws BackingStoreException
+	 */
+	private boolean doesLanguagePreferenceExist() throws BackingStoreException {
+		if(Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 *
 	 */
 	public void saveConfig() {
-		prefs.put(LANGUAGE_KEY, currentLanguage );
+		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 *
 	 */
 	public void loadConfig() {
-		currentLanguage = prefs.get(LANGUAGE_KEY, "English");
+		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, DEFAULT_LANGUAGE);
 	}
 
 	/**
@@ -134,5 +159,9 @@ public class MultilingualSupport {
 		}
 		
 		return choices;
+	}
+
+	public void setCurrentLanguage(String currentLanguage) {
+		this.currentLanguage = currentLanguage;
 	}
 }
