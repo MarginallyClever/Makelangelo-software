@@ -37,6 +37,7 @@
         <configuration>
           <source>${minimum.java.version}</source>
           <target>${minimum.java.version}</target>
+          <useIncrementalCompilation>false</useIncrementalCompilation>
         </configuration>
       </plugin>
       <plugin>
