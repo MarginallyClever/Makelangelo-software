@@ -9,6 +9,8 @@
         </encoder>
     </appender>
 
+    <logger name="java.util.prefs" level="off" />
+
     <root level="error">
         <appender-ref ref="STDOUT" />
     </root>
