@@ -1,8 +1,13 @@
 package com.marginallyclever.makelangelo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -41,6 +46,11 @@ public final class MultilingualSupport {
 	/**
 	 *
 	 */
+	private final Logger logger = LoggerFactory.getLogger(MultilingualSupport.class);
+
+	/**
+	 *
+	 */
 	public MultilingualSupport() {
 		loadLanguages();
 		loadConfig();
@@ -52,10 +62,26 @@ public final class MultilingualSupport {
 	 */
 	public boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
-		if(!languages.keySet().contains(LANGUAGE_KEY)) {
-			return false;
+		try {
+			if (doesLanguagePreferenceExist()) {
+				return false;
+			}
+		} catch (BackingStoreException e) {
+			logger.error("{}",e);
 		}
 		return true;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws BackingStoreException
+	 */
+	private boolean doesLanguagePreferenceExist() throws BackingStoreException {
+		if(Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
