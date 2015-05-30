@@ -26,7 +26,7 @@ public class MultilingualSupport {
 	/**
 	 *
 	 */
-	protected String currentLanguage="English";
+	private String currentLanguage;
 
 	/**
 	 *
@@ -134,5 +134,9 @@ public class MultilingualSupport {
 		}
 		
 		return choices;
+	}
+
+	public void setCurrentLanguage(String currentLanguage) {
+		this.currentLanguage = currentLanguage;
 	}
 }
