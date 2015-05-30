@@ -8,14 +8,10 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.makelangelo.Point2D;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Iterator;
 import java.util.LinkedList;
-
-import javax.imageio.ImageIO;
 
 
 public class Filter_GeneratorRGBFloodFill extends Filter {	
