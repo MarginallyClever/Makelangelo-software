@@ -9,7 +9,10 @@
         </encoder>
     </appender>
 
-    <root level="error">
+    <!-- See: https://github.com/MarginallyClever/Makelangelo/issues/93#issuecomment-105645772 -->
+    <logger name="java.util.prefs" level="OFF" />
+
+    <root level="ERROR">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
