@@ -212,7 +212,7 @@ public class MainGUI
 		image_converters.add(new Filter_GeneratorPulse(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorBoxes(this,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorRGB(this, machineConfiguration, translator));
-//		image_converters.add(new Filter_GeneratorRGBFloodFill(this, machineConfiguration, translator));  // not ready for public consumption
+		image_converters.add(new Filter_GeneratorRGBFloodFill(this, machineConfiguration, translator));  // not ready for public consumption
 		image_converters.add(new Filter_GeneratorVoronoiStippling(this, machineConfiguration, translator));
 	}
 	
