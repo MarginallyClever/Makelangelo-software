@@ -151,7 +151,7 @@ public class MainGUI
 
 	public void startTranslator() {
 		translator = new MultilingualSupport();
-		if(translator.isThisTheFirstTime()) {
+		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
 	}
@@ -174,7 +174,7 @@ public class MainGUI
 				Object subject = e.getSource();
 				// TODO prevent "close" icon.  Must press save to continue!
 				if(subject == save) {
-					translator.currentLanguage = choices[language_options.getSelectedIndex()];
+					translator.setCurrentLanguage(choices[language_options.getSelectedIndex()]);
 					translator.saveConfig();
 					driver.dispose();
 				}
