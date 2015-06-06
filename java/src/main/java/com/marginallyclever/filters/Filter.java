@@ -649,12 +649,12 @@ public abstract class Filter {
 									output.write(gap + c);
 								} else if (c.startsWith("X")) {
 									// translate coordinates
-									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
 									output.write(gap + "X" + SX(x));
 								} else if (c.startsWith("Y")) {
 									// translate coordinates
-									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "Y" + SY(x));
+									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									output.write(gap + "Y" + SY(y));
 								} else {
 									output.write(gap + c);
 								}
