@@ -33,7 +33,7 @@ public abstract class Filter {
 	protected float letter_height=20.0f;
 	protected float line_spacing=5.0f;
 	protected float padding=5.0f;
-	static final String alphabetFolder = new String("ALPHABET/");
+	static final String alphabetFolder = "ALPHABET/";
 	protected int chars_per_line=25;
 	protected boolean draw_bounding_box=false;
 	
