@@ -23,6 +23,7 @@ target/
 *.ipr
 *.iws
 .idea/
+# End JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 
 java/.settings/org.eclipse.core.resources.prefs
 log.html
