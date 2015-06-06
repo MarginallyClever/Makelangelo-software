@@ -31,11 +31,11 @@ log.html
 java/saved.png
 
 # Start Eclipse IDE
-*/classes/
-*/bin/
-*/.settings/
-*/.project
-*/.classpath
+classes/
+bin/
+.settings/
+**/.project
+**/.classpath
 # End Eclipse IDE
 
 ## Auto generated diff files from SourceTree
