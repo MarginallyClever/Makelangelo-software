@@ -38,8 +38,8 @@ public abstract class Filter {
 	protected boolean draw_bounding_box=false;
 	
 	// text position and alignment
-	public enum VAlign { TOP, MIDDLE, BOTTOM };
-	public enum Align { LEFT, CENTER, RIGHT };
+	public enum VAlign { TOP, MIDDLE, BOTTOM }
+	public enum Align { LEFT, CENTER, RIGHT }
 	protected VAlign align_vertical = VAlign.MIDDLE;
 	protected Align  align_horizontal = Align.CENTER;
 	protected float posx=0;
