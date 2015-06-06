@@ -1690,12 +1690,12 @@ public class MainGUI
         menu = new JMenu(translator.get("MenuPreview"));
         buttonZoomOut = new JMenuItem(translator.get("ZoomOut"));
         buttonZoomOut.addActionListener(this);
-        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,ActionEvent.ALT_MASK));
+        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.ALT_MASK));
         menu.add(buttonZoomOut);
         
         buttonZoomIn = new JMenuItem(translator.get("ZoomIn"),KeyEvent.VK_EQUALS);
         buttonZoomIn.addActionListener(this);
-        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,ActionEvent.ALT_MASK));
+        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.ALT_MASK));
         menu.add(buttonZoomIn);
         
         buttonZoomToFit = new JMenuItem(translator.get("ZoomFit"));
@@ -1792,7 +1792,7 @@ public class MainGUI
     private void createAndShowGUI() {
         // Create and set up the window.
     	mainframe = new JFrame("Makelangelo");
-        mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         // Create and set up the content pane.
         mainframe.setJMenuBar(createMenuBar());
