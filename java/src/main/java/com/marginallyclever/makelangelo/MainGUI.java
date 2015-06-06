@@ -506,13 +506,12 @@ public class MainGUI
 					double height = b.getMaximumY() - b.getMinimumY();
 					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
 					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-					double sy = machineConfiguration.getPaperHeight()*10.0/height;
-					double sx = machineConfiguration.getPaperWidth()*10.0/width;
-					double scale = (sx<sy? sx:sy ) * machineConfiguration.paperMargin;
+					double wh = width>height ?  width:height;
+					double sy = machineConfiguration.getPaperHeight()*10.0/wh;
+					double sx = machineConfiguration.getPaperWidth()*10.0/wh;
+					double scale = (sx<sy? sx:sy );
 					sx = scale * (machineConfiguration.reverseForGlass? -1 : 1);
-
-					//sx *= (machineConfiguration.reverseForGlass? -1 : 1);
-					//sx *= machineConfiguration.paper_margin;
+					sx *= machineConfiguration.paperMargin;
 					sy *= machineConfiguration.paperMargin;
 					
 					// count all entities in all layers

@@ -15,7 +15,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  */
 public final class SerialConnection implements SerialPortEventListener, MarginallyCleverConnection {
     private SerialPort serialPort;
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = 115200;
     
     private String connectionName = new String();
     private boolean portOpened=false;
@@ -99,17 +99,35 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         if( serial_recv_buffer.lastIndexOf(NOCHECKSUM) != -1 ) {
             String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
             String x=getNumberPortion(after_error);
-            return Integer.decode(x);
+            int err=0;
+            try {
+            	err = Integer.decode(x);
+            }
+            catch(Exception e) {}
+            
+            return err;
         }
         if( serial_recv_buffer.lastIndexOf(BADCHECKSUM) != -1 ) {
             String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
             String x=getNumberPortion(after_error);
-            return Integer.decode(x);
+            int err=0;
+            try {
+            	err = Integer.decode(x);
+            }
+            catch(Exception e) {}
+            
+            return err;
         }
         if( serial_recv_buffer.lastIndexOf(BADLINENUM) != -1 ) {
             String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADLINENUM) + BADLINENUM.length());
             String x=getNumberPortion(after_error);
-            return Integer.decode(x);
+            int err=0;
+            try {
+            	err = Integer.decode(x);
+            }
+            catch(Exception e) {}
+            
+            return err;
         }
 
         return -1;

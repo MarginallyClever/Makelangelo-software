@@ -28,7 +28,7 @@
 #define PEN_DELAY            (250)  // in ms
 
 // for serial comms
-#define BAUD                 (57600)  // How fast is the Arduino talking?
+#define BAUD                 (115200)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 
 
