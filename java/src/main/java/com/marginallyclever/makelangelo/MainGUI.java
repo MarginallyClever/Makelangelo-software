@@ -88,7 +88,7 @@ public class MainGUI
 	
 	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
 	private MarginallyCleverConnection connectionToRobot=null;
-	
+
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
@@ -170,7 +170,7 @@ public class MainGUI
 				Object subject = e.getSource();
 				// TODO prevent "close" icon.  Must press save to continue!
 				if(subject == save) {
-					translator.currentLanguage = languageList[languageOptions.getSelectedIndex()];
+					translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
 					translator.saveConfig();
 					driver.dispose();
 				}
@@ -288,7 +288,7 @@ public class MainGUI
 	
 	private void textToGCODE() {
 		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
-		msg.generate(getTempDestinationFile() );
+		msg.generate(getTempDestinationFile());
 		tabToDraw();
 	}
 	

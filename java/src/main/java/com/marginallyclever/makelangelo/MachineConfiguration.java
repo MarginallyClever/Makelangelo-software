@@ -39,12 +39,12 @@ public class MachineConfiguration {
 	/**
 	 *
 	 */
-	private final Preferences makelangeloPreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+	private final Preferences makelangeloPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
 	/**
 	 *
 	 */
-	private final Preferences machinePreferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 	
 	static final String CURRENT_VERSION = "1";
 	// GUID
@@ -107,20 +107,19 @@ public class MachineConfiguration {
 		mainGUI = gui;
 		translator = ms;
 		
-		tools = new DrawingTool[NUMBER_OF_DRAWING_TOOLS];
-		int i=0;
-		tools[i++]=new DrawingTool_Pen("Pen (black)",0,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (red)",1,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (green)",2,gui,ms,this);
-		tools[i++]=new DrawingTool_Pen("Pen (blue)",3,gui,ms,this);
-		tools[i++]=new DrawingTool_LED(gui,ms,this);
-		tools[i++]=new DrawingTool_Spraypaint(gui,ms,this);
+		tools = new ArrayList<>(NUMBER_OF_DRAWING_TOOLS);
+		tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
+		tools.add(new DrawingTool_Pen("Pen (blue)",3,gui,ms,this));
+		tools.add(new DrawingTool_LED(gui,ms,this));
+		tools.add(new DrawingTool_Spraypaint(gui,ms,this));
 		
 		versionCheck();
 		
 		// which configurations are available?
 		try {
-			machineConfigurationsAvailable = machinePreferences.childrenNames();
+			machineConfigurationsAvailable = topLevelMachinesPreferenceNode.childrenNames();
 		}
 		catch(Exception e) {
 			machineConfigurationsAvailable = new String[0];
@@ -715,7 +714,7 @@ public class MachineConfiguration {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getAvailableConfigurations() {
-		return configurations_available;
+		return machineConfigurationsAvailable;
 	}
 
 	

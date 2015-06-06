@@ -21,7 +21,17 @@ public final class MultilingualSupport {
 	/**
 	 *
 	 */
-	protected String currentLanguage="English";
+	private static final String LANGUAGE_KEY = "language";
+
+	/**
+	 *
+	 */
+	public static final String DEFAULT_LANGUAGE = "English";
+
+	/**
+	 *
+	 */
+	private String currentLanguage;
 
 	/**
 	 *
@@ -50,25 +60,42 @@ public final class MultilingualSupport {
 	 *
 	 * @return
 	 */
-	public boolean isThisTheFirstTime() {
-		if(languages.keySet().contains(currentLanguage)) {
-			languagePreferenceNode.putBoolean(LanguagePreferenceKey.IS_FACTORY_SETTINGS.toString(), false);
+	public boolean isThisTheFirstTimeLoadingLanguageFiles() {
+		// Did the language file disappear?  Offer the language dialog.
+		try {
+			if (doesLanguagePreferenceExist()) {
+				return false;
+			}
+		} catch (BackingStoreException e) {
+			logger.error("{}",e);
 		}
-		return languagePreferenceNode.getBoolean(LanguagePreferenceKey.IS_FACTORY_SETTINGS.toString(), true);
+		return true;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @throws BackingStoreException
+	 */
+	private boolean doesLanguagePreferenceExist() throws BackingStoreException {
+		if(Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 *
 	 */
 	public void saveConfig() {
-		languagePreferenceNode.put(LanguagePreferenceKey.LANGUAGE.toString(), currentLanguage);
+		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 *
 	 */
 	public void loadConfig() {
-		currentLanguage = languagePreferenceNode.get(LanguagePreferenceKey.LANGUAGE.toString(), "English");
+		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, DEFAULT_LANGUAGE);
 	}
 
 	/**
@@ -134,8 +161,7 @@ public final class MultilingualSupport {
 		return choices;
 	}
 
-	public enum LanguagePreferenceKey {
-		IS_FACTORY_SETTINGS,
-		LANGUAGE
+	public void setCurrentLanguage(String currentLanguage) {
+		this.currentLanguage = currentLanguage;
 	}
 }
