@@ -29,22 +29,27 @@ public class PreferencesHelperTest {
     @Test
     public void logPreferences() {
         final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+        logPreferenceNode(preferenceNode);
+    }
+
+    private void logPreferenceNode(Preferences preferenceNode) {
         try {
+            logger.info("node name:{}", preferenceNode);
             final String[] keys = preferenceNode.keys();
-            for (String key : keys) {
-                logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
-            }
+            logKeyValuesForPreferenceNode(preferenceNode, keys);
             final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
             for (String childNodeName : childrenPreferenceNodeNames) {
-                logger.info("{}", childNodeName);
                 final Preferences childNode = preferenceNode.node(childNodeName);
-                final String[] childKeys = childNode.keys();
-                for (String childKey : childKeys) {
-                    logger.info("key:{} value:{}", childKey, childNode.get(childKey, null));
-                }
+                logPreferenceNode(childNode);
             }
         } catch (BackingStoreException e) {
             logger.error("{}",e);
+        }
+    }
+
+    private void logKeyValuesForPreferenceNode(Preferences preferenceNode, String[] keys) {
+        for (String key : keys) {
+            logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
         }
     }
 
