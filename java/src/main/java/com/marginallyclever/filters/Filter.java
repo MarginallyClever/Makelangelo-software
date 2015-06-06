@@ -102,7 +102,7 @@ public abstract class Filter {
 
 	/**
 	 * convert generates GCODE from a bufferedImage.
-	 * @param img
+	 * @param img image to filter.
 	 * @throws IOException
 	 */
 	public void convert(BufferedImage img) throws IOException {}
