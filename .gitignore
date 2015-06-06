@@ -15,7 +15,7 @@ java/Makelangelo.jar
 
 last_official_release/Makelangelo/log.html
 target/
-.settings/
+*/.settings/
 
 # Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 *.iml
