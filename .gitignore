@@ -1,18 +1,12 @@
+# Start Makelangelo specific #
 *.class
-*.DS_Store
 *.ngc
-
-*/log.html
-
+**/log.html
 gcode/*
-*/Thumbs.db
-java/src/Thumbs.db
-
 */temp.png
-
 java/Makelangelo.jar
-
-last_official_release/Makelangelo/log.html
+java/saved.png
+# End Makelangelo specific #
 
 # Start Maven
 target/
@@ -25,10 +19,6 @@ target/
 *.iws
 .idea/
 # End JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
-
-log.html
-
-java/saved.png
 
 # Start Eclipse IDE
 classes/
