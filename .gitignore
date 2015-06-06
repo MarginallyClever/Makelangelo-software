@@ -7,7 +7,6 @@
 gcode/*
 */Thumbs.db
 java/src/Thumbs.db
-*/.classpath
 
 */temp.png
 
@@ -18,7 +17,6 @@ last_official_release/Makelangelo/log.html
 # Start Maven
 target/
 # End Maven
-*/.settings/
 
 # Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 *.iml
@@ -28,10 +26,17 @@ target/
 .idea/
 # End JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 
-java/.settings/org.eclipse.core.resources.prefs
 log.html
 
 java/saved.png
+
+# Start Eclipse IDE
+*/classes/
+*/bin/
+*/.settings/
 */.project
+*/.classpath
+# End Eclipse IDE
+
 # Auto generated diff files from SourceTree
 *.orig
