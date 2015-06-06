@@ -8,6 +8,13 @@ java/Makelangelo.jar
 java/saved.png
 # End Makelangelo specific #
 
+# Start OS generated files #
+*/.DS_Store
+.DS_Store
+.DS_Store?
+Thumbs.db
+# End OS generated files #
+
 # Start Maven
 target/
 # End Maven
