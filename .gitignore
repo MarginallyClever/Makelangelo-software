@@ -29,4 +29,5 @@ log.html
 
 java/saved.png
 */.project
-
+# Auto generated diff files from SourceTree
+*.orig
