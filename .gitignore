@@ -14,7 +14,10 @@ java/src/Thumbs.db
 java/Makelangelo.jar
 
 last_official_release/Makelangelo/log.html
+
+# Start Maven
 target/
+# End Maven
 */.settings/
 
 # Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
