@@ -15,14 +15,14 @@ import java.util.prefs.BackingStoreException;
 public class MarginallyCleverPreferences extends AbstractPreferences {
 
     /**
-     *
+     * FIXME
      */
-    private Map<String, String> preferences = new HashMap<>();
+    protected Map<String, String> preferences = new HashMap<>();
 
     /**
-     *
+     * FIXME
      */
-    private Map<String, AbstractPreferences> children = new HashMap<>();
+    protected Map<String, AbstractPreferences> children = new HashMap<>();
 
     /**
      * Creates a preference node with the specified parent and the specified
@@ -57,7 +57,14 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
 
     @Override
     protected void removeNodeSpi() throws BackingStoreException {
-        //FIXME
+        for (Map.Entry<String, AbstractPreferences> entry: children.entrySet()) {
+            entry.getValue().removeNode();
+            flush();
+        }
+        children.clear();
+        preferences.clear();
+        removeNode();
+        flush();
     }
 
     @Override
@@ -74,7 +81,12 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
 
     @Override
     protected AbstractPreferences childSpi(String name) {
-        return children.get(name);
+        AbstractPreferences childPreferenceNode = children.get(name);
+        if (childPreferenceNode == null) {
+            childPreferenceNode = new MarginallyCleverPreferences(this, name);
+            children.put(name, childPreferenceNode);
+        }
+        return childPreferenceNode;
     }
 
     @Override

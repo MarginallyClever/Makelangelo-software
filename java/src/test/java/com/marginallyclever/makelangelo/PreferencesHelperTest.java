@@ -1,9 +1,12 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.util.MarginallyCleverJsonPreferences;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -15,23 +18,76 @@ import java.util.prefs.Preferences;
  */
 public class PreferencesHelperTest {
 
+    /**
+     *
+     */
+    private final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+
+
+    /**
+     *
+     */
     private final Logger logger = LoggerFactory.getLogger(PreferencesHelperTest.class);
 
+    /**
+     *
+     * @throws Exception
+     */
     @org.junit.Before
     public void setUp() throws Exception {
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @org.junit.After
     public void tearDown() throws Exception {
 
     }
 
+    /**
+     *
+     */
     @Test
     public void logPreferences() {
-        final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
         logPreferenceNode(preferenceNode);
     }
 
+    @Test
+    public void testCopyPreferenceNode() {
+        final MarginallyCleverJsonPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverJsonPreferences((AbstractPreferences) preferenceNode, "JSON");
+        try {
+            clearAll(marginallyCleverJsonPreferenceNode);
+        } catch (BackingStoreException e) {
+            logger.error("{}", e);
+        }
+        copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
+        final JSONObject jsonObject = marginallyCleverJsonPreferenceNode.getPreferencesAsJsonObject();
+        logger.info("JSONObject: {}",jsonObject);
+    }
+
+    private void copyPreferenceNode(Preferences sourcePreferenceNode, AbstractPreferences destinationPreferenceNode) {
+        try {
+            final String[] keys = sourcePreferenceNode.keys();
+            for (String key: keys) {
+                final String value = sourcePreferenceNode.get(key, null);
+                destinationPreferenceNode.put(key, value);
+            }
+            final String[] childNames = sourcePreferenceNode.childrenNames();
+            for (String childName: childNames) {
+                final Preferences destinationChildNode = destinationPreferenceNode.node(childName);
+                copyPreferenceNode(sourcePreferenceNode.node(childName), (AbstractPreferences) destinationChildNode);
+            }
+        } catch (BackingStoreException e) {
+            logger.error("{}", e);
+        }
+    }
+
+    /**
+     *
+     * @param preferenceNode
+     */
     private void logPreferenceNode(Preferences preferenceNode) {
         try {
             logger.info("node name:{}", preferenceNode);
@@ -47,6 +103,11 @@ public class PreferencesHelperTest {
         }
     }
 
+    /**
+     *
+     * @param preferenceNode
+     * @param keys
+     */
     private void logKeyValuesForPreferenceNode(Preferences preferenceNode, String[] keys) {
         for (String key : keys) {
             logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
@@ -75,8 +136,10 @@ public class PreferencesHelperTest {
         preferenceNode.clear();
     }
 
-    private void shallowClearPreferences() {
-        final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+    /**
+     *
+     */
+    private void shallowClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
         } catch (BackingStoreException e) {
@@ -84,8 +147,10 @@ public class PreferencesHelperTest {
         }
     }
 
-    private void deepClearPreferences() {
-        final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+    /**
+     *
+     */
+    private void deepClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
             final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
