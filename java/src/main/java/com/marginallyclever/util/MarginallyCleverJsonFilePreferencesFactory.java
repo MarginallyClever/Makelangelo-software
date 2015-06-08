@@ -1,5 +1,6 @@
 package com.marginallyclever.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
         return userRoot();
     }
 
+    @NotNull
     @Override
     public Preferences userRoot() {
         if (rootPreferences == null) {

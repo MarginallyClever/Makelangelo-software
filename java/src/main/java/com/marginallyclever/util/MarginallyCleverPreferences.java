@@ -1,5 +1,6 @@
 package com.marginallyclever.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
     }
 
     @Override
-    protected void putSpi(String key, String value) {
+    protected void putSpi(@NotNull String key, String value) {
         root.put(key, value);
         try {
             flush();
@@ -74,12 +75,12 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
     }
 
     @Override
-    protected String getSpi(String key) {
+    protected String getSpi(@NotNull String key) {
         return root.get(key);
     }
 
     @Override
-    protected void removeSpi(String key) {
+    protected void removeSpi(@NotNull String key) {
         root.remove(key);
         try {
             flush();
@@ -94,20 +95,23 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
         flush();
     }
 
+    @NotNull
     @Override
     protected String[] keysSpi() throws BackingStoreException {
         final Set<String> keySet = root.keySet();
         return keySet.toArray(new String[keySet.size()]);
     }
 
+    @NotNull
     @Override
     protected String[] childrenNamesSpi() throws BackingStoreException {
         final Set<String> childrenNames = children.keySet();
         return childrenNames.toArray(new String[childrenNames.size()]);
     }
 
+    @NotNull
     @Override
-    protected AbstractPreferences childSpi(String name) {
+    protected AbstractPreferences childSpi(@NotNull String name) {
         MarginallyCleverPreferences childPreferenceNode = children.get(name);
         if (childPreferenceNode == null || childPreferenceNode.isRemoved()) {
             childPreferenceNode = new MarginallyCleverPreferences(this, name);
