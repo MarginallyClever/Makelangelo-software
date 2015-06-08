@@ -29,12 +29,12 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
     /**
      *
      */
-    private Map<String, String> root;
+    private final Map<String, String> root;
 
     /**
      *
      */
-    private Map<String, MarginallyCleverPreferences> children;
+    private final Map<String, MarginallyCleverPreferences> children;
 
     private boolean thisIsRemoved;
 

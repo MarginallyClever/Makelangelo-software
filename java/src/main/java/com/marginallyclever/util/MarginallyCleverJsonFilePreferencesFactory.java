@@ -18,7 +18,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
     /**
      *
      */
-    private static Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
 
     /**
      *
@@ -28,7 +28,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
     /**
      *
      */
-    public static final String SYSTEM_PROPERTY_FILE =
+    private static final String SYSTEM_PROPERTY_FILE =
             "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.file";
 
     /**
