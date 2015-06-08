@@ -887,7 +887,7 @@ public class MainGUI
 	    }
 	}
 	
-	// Adjust sound preferences
+	// Adjust sound root
 	protected void adjustSounds() {
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
@@ -954,7 +954,7 @@ public class MainGUI
 		driver.setVisible(true);
 	}
 
-    // Adjust graphics preferences	
+    // Adjust graphics root
 	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		

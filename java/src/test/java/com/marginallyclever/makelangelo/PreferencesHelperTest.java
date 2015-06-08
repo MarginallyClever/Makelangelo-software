@@ -1,11 +1,18 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.MarginallyCleverJsonPreferences;
+import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
+import com.marginallyclever.util.MarginallyCleverPreferences;
 import org.json.JSONObject;
+import org.json.XML;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -56,15 +63,22 @@ public class PreferencesHelperTest {
 
     @Test
     public void testCopyPreferenceNode() {
-        final MarginallyCleverJsonPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverJsonPreferences((AbstractPreferences) preferenceNode, "JSON");
+        final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) preferenceNode, "JSON");
         try {
             clearAll(marginallyCleverJsonPreferenceNode);
         } catch (BackingStoreException e) {
             logger.error("{}", e);
         }
         copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
-        final JSONObject jsonObject = marginallyCleverJsonPreferenceNode.getPreferencesAsJsonObject();
-        logger.info("JSONObject: {}",jsonObject);
+        final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferenceFile();
+        final String path = preferencesFile.toString();
+        try {
+            final byte[] encoded = Files.readAllBytes(Paths.get(path));
+            final JSONObject jsonObject = XML.toJSONObject(new String(encoded, StandardCharsets.UTF_8));
+            logger.info("JSONObject: {}", jsonObject);
+        } catch (IOException e) {
+            logger.error("{}", e);
+        }
     }
 
     private void copyPreferenceNode(Preferences sourcePreferenceNode, AbstractPreferences destinationPreferenceNode) {

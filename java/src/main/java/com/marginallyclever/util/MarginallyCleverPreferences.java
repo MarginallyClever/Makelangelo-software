@@ -1,8 +1,13 @@
 package com.marginallyclever.util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
@@ -11,18 +16,28 @@ import java.util.prefs.BackingStoreException;
  *
  * @author Peter Colapietro
  * @since v7.1.3
+ *
+ * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  */
 public class MarginallyCleverPreferences extends AbstractPreferences {
 
     /**
-     * FIXME
+     *
      */
-    protected Map<String, String> preferences = new HashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferences.class);
 
     /**
-     * FIXME
+     *
      */
-    protected Map<String, AbstractPreferences> children = new HashMap<>();
+    private Map<String, String> root;
+
+    /**
+     *
+     */
+    private Map<String, MarginallyCleverPreferences> children;
+
+    private boolean thisIsRemoved;
+
 
     /**
      * Creates a preference node with the specified parent and the specified
@@ -36,40 +51,52 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
      *                                  (<tt>'/'</tt>),  or <tt>parent</tt> is <tt>null</tt> and
      *                                  name isn't <tt>""</tt>.
      */
-    protected MarginallyCleverPreferences(AbstractPreferences parent, String name) {
+    public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
         super(parent, name);
+        logger.info("Instantiating node {}", name);
+        root = new TreeMap<>();
+        children = new TreeMap<>();
+        try {
+            sync();
+        } catch (BackingStoreException e) {
+            logger.error("Unable to sync on creation of node {}. {}", name, e);
+        }
     }
 
     @Override
     protected void putSpi(String key, String value) {
-        preferences.put(key, value);
+        root.put(key, value);
+        try {
+            flush();
+        } catch (BackingStoreException e) {
+            logger.error("Unable to flush after putting {}. {}", key, e);
+        }
     }
 
     @Override
     protected String getSpi(String key) {
-        return preferences.get(key);
+        return root.get(key);
     }
 
     @Override
     protected void removeSpi(String key) {
-        preferences.remove(key);
+        root.remove(key);
+        try {
+            flush();
+        } catch (BackingStoreException e) {
+            logger.error("Unable to flush after removing {}. {}", key, e);
+        }
     }
 
     @Override
     protected void removeNodeSpi() throws BackingStoreException {
-        for (Map.Entry<String, AbstractPreferences> entry: children.entrySet()) {
-            entry.getValue().removeNode();
-            flush();
-        }
-        children.clear();
-        preferences.clear();
-        removeNode();
+        thisIsRemoved = true;
         flush();
     }
 
     @Override
     protected String[] keysSpi() throws BackingStoreException {
-        final Set<String> keySet = preferences.keySet();
+        final Set<String> keySet = root.keySet();
         return keySet.toArray(new String[keySet.size()]);
     }
 
@@ -81,8 +108,8 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
 
     @Override
     protected AbstractPreferences childSpi(String name) {
-        AbstractPreferences childPreferenceNode = children.get(name);
-        if (childPreferenceNode == null) {
+        MarginallyCleverPreferences childPreferenceNode = children.get(name);
+        if (childPreferenceNode == null || childPreferenceNode.isRemoved()) {
             childPreferenceNode = new MarginallyCleverPreferences(this, name);
             children.put(name, childPreferenceNode);
         }
@@ -91,11 +118,114 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
 
     @Override
     protected void syncSpi() throws BackingStoreException {
-        // NOOP
+        if(isRemoved()) {
+            return;
+        }
+        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+        if (!file.exists()) return;
+        synchronized (file) {
+            final Properties p = new Properties();
+            try {
+                p.load(new FileInputStream(file));
+
+                final StringBuilder sb = new StringBuilder();
+                getPath(sb);
+                final String path = sb.toString();
+
+                final Enumeration<?> pnen = p.propertyNames();
+                while (pnen.hasMoreElements()) {
+                    final String propKey = (String) pnen.nextElement();
+                    if (propKey.startsWith(path)) {
+                        String subKey = propKey.substring(path.length());
+                        // Only load immediate descendants
+                        if (subKey.indexOf('.') == -1) {
+                            root.put(subKey, p.getProperty(propKey));
+                        }
+                    }
+                }
+            }
+            catch (IOException e) {
+                throw new BackingStoreException(e);
+            }
+        }
     }
 
     @Override
     protected void flushSpi() throws BackingStoreException {
-        //FIXME
+        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+        final File xmlFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferenceFile();
+
+        synchronized (xmlFile) {
+            synchronized (file) {
+                final Properties p = new Properties();
+                try {
+
+                    final StringBuilder sb = new StringBuilder();
+                    getPath(sb);
+                    final String path = sb.toString();
+
+                    if (file.exists()) {
+                        try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+                            p.load(fileInputStream);
+                        }
+
+                        final List<String> toRemove = new ArrayList<>();
+
+                        // Make a list of all direct children of this node to be removed
+                        final Enumeration<?> pnen = p.propertyNames();
+                        while (pnen.hasMoreElements()) {
+                            final String propKey = (String) pnen.nextElement();
+                            if (propKey.startsWith(path)) {
+                                final String subKey = propKey.substring(path.length());
+                                // Only do immediate descendants
+                                if (subKey.indexOf('.') == -1) {
+                                    toRemove.add(propKey);
+                                }
+                            }
+                        }
+
+                        // Remove them now that the enumeration is done with
+                        for (String propKey : toRemove) {
+                            p.remove(propKey);
+                        }
+                    }
+
+                    // If this node hasn't been removed, add back in any values
+                    if (!thisIsRemoved) {
+                        for (String s : root.keySet()) {
+                            p.setProperty(path + s, root.get(s));
+                        }
+                    }
+                    final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
+                    try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                        p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+                    }
+                    try (final FileOutputStream fileOutputStream = new FileOutputStream(xmlFile)) {
+                        p.storeToXML(fileOutputStream, marginallyCleverPreferencesFileComments);
+                    }
+                } catch (IOException e) {
+                    throw new BackingStoreException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param sb
+     */
+    private void getPath(StringBuilder sb)
+    {
+        MarginallyCleverPreferences parent = null;
+        try {
+            parent = (MarginallyCleverPreferences) parent();
+        } catch (ClassCastException e) {
+            logger.info("NOOP");
+        }
+        if (parent == null) {
+            return;
+        }
+        parent.getPath(sb);
+        sb.append(name()).append('.');
     }
 }
