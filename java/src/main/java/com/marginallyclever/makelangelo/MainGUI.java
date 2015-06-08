@@ -1195,7 +1195,7 @@ public class MainGUI
 	}
 	
 	public void startAt(long lineNumber) {
-		gcode.linesProcessed=0;
+		gcode.linesProcessed=(int)lineNumber;
 		sendLineToRobot("M110 N" + gcode.linesProcessed);
 		previewPane.setLinesProcessed(gcode.linesProcessed);
 		startDrawing();
