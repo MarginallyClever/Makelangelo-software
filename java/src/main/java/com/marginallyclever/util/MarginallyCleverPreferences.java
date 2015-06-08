@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
@@ -37,7 +39,25 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
      */
     private final Map<String, MarginallyCleverPreferences> children;
 
+    /**
+     *
+     */
     private boolean thisIsRemoved;
+
+    /**
+     *
+     */
+    private volatile boolean cacheValid;
+
+    /**
+     *
+     */
+    private final ReadWriteLock rwl = new ReentrantReadWriteLock();
+
+    /**
+     *
+     */
+    private File file;
 
 
     /**
@@ -125,85 +145,122 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
         if(isRemoved()) {
             return;
         }
-        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-        if (!file.exists()) return;
-        synchronized (file) {
-            final Properties p = new Properties();
+        rwl.readLock().lock();
+        if (!cacheValid) {
+            // Must release read lock before acquiring write lock
+            rwl.readLock().unlock();
+            rwl.writeLock().lock();
             try {
-                p.load(new FileInputStream(file));
+                // Recheck state because another thread might have
+                // acquired write lock and changed state before we did.
+                if (!cacheValid) {
+                    file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+                    //FIXME probably do writing here
+                    cacheValid = true;
+                }
+                // Downgrade by acquiring read lock before releasing write lock
+                rwl.readLock().lock();
+            } finally {
+                rwl.writeLock().unlock(); // Unlock write, still hold read
+            }
+        }
+        if (!file.exists()) {
+            return;
+        }
+        final Properties p = new Properties();
+        try {
+            try(final FileInputStream inStream = new FileInputStream(file)) {
+                p.load(inStream);
+            }
 
-                final StringBuilder sb = new StringBuilder();
-                getPath(sb);
-                final String path = sb.toString();
+            final StringBuilder sb = new StringBuilder();
+            getPath(sb);
+            final String path = sb.toString();
 
-                final Enumeration<?> pnen = p.propertyNames();
-                while (pnen.hasMoreElements()) {
-                    final String propKey = (String) pnen.nextElement();
-                    if (propKey.startsWith(path)) {
-                        String subKey = propKey.substring(path.length());
-                        // Only load immediate descendants
-                        if (subKey.indexOf('.') == -1) {
-                            root.put(subKey, p.getProperty(propKey));
-                        }
+            final Enumeration<?> pnen = p.propertyNames();
+            while (pnen.hasMoreElements()) {
+                final String propKey = (String) pnen.nextElement();
+                if (propKey.startsWith(path)) {
+                    final String subKey = propKey.substring(path.length());
+                    // Only load immediate descendants
+                    if (subKey.indexOf('.') == -1) {
+                        root.put(subKey, p.getProperty(propKey));
                     }
                 }
             }
-            catch (IOException e) {
-                throw new BackingStoreException(e);
-            }
+        }
+        catch (IOException e) {
+            throw new BackingStoreException(e);
+        } finally {
+            rwl.readLock().unlock();
         }
     }
 
     @Override
     protected void flushSpi() throws BackingStoreException {
-        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-        synchronized (file) {
-            final Properties p = new Properties();
+        final Properties p = new Properties();
+        rwl.readLock().lock();
+        if (!cacheValid) {
+            // Must release read lock before acquiring write lock
+            rwl.readLock().unlock();
+            rwl.writeLock().lock();
             try {
+                // Recheck state because another thread might have
+                // acquired write lock and changed state before we did.
+                if (!cacheValid) {
+                    file= MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+                    //FIXME probably do writing here
+                    cacheValid = true;
+                }
+                // Downgrade by acquiring read lock before releasing write lock
+                rwl.readLock().lock();
+            } finally {
+                rwl.writeLock().unlock(); // Unlock write, still hold read
+            }
+        }
+        try {
+            final StringBuilder sb = new StringBuilder();
+            getPath(sb);
+            final String path = sb.toString();
+            if (file.exists()) {
+                try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+                    p.load(fileInputStream);
+                }
 
-                final StringBuilder sb = new StringBuilder();
-                getPath(sb);
-                final String path = sb.toString();
+                final List<String> toRemove = new ArrayList<>();
 
-                if (file.exists()) {
-                    try (final FileInputStream fileInputStream = new FileInputStream(file)) {
-                        p.load(fileInputStream);
-                    }
-
-                    final List<String> toRemove = new ArrayList<>();
-
-                    // Make a list of all direct children of this node to be removed
-                    final Enumeration<?> pnen = p.propertyNames();
-                    while (pnen.hasMoreElements()) {
-                        final String propKey = (String) pnen.nextElement();
-                        if (propKey.startsWith(path)) {
-                            final String subKey = propKey.substring(path.length());
-                            // Only do immediate descendants
-                            if (subKey.indexOf('.') == -1) {
-                                toRemove.add(propKey);
-                            }
+                // Make a list of all direct children of this node to be removed
+                final Enumeration<?> pnen = p.propertyNames();
+                while (pnen.hasMoreElements()) {
+                    final String propKey = (String) pnen.nextElement();
+                    if (propKey.startsWith(path)) {
+                        final String subKey = propKey.substring(path.length());
+                        // Only do immediate descendants
+                        if (subKey.indexOf('.') == -1) {
+                            toRemove.add(propKey);
                         }
                     }
-
-                    // Remove them now that the enumeration is done with
-                    for (String propKey : toRemove) {
-                        p.remove(propKey);
-                    }
                 }
 
-                // If this node hasn't been removed, add back in any values
-                if (!thisIsRemoved) {
-                    for (String s : root.keySet()) {
-                        p.setProperty(path + s, root.get(s));
-                    }
+                // Remove them now that the enumeration is done with
+                for (String propKey : toRemove) {
+                    p.remove(propKey);
                 }
-                final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
-                try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                    p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
-                }
-            } catch (IOException e) {
-                throw new BackingStoreException(e);
             }
+            // If this node hasn't been removed, add back in any values
+            if (!thisIsRemoved) {
+                for (String s : root.keySet()) {
+                    p.setProperty(path + s, root.get(s));
+                }
+            }
+            final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
+            try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+            }
+        } catch (IOException e) {
+            throw new BackingStoreException(e);
+        } finally {
+            rwl.readLock().unlock();
         }
     }
 
@@ -217,7 +274,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
         try {
             parent = (MarginallyCleverPreferences) parent();
         } catch (ClassCastException e) {
-            logger.info("NOOP");
+            //logger.info("NOOP");
         }
         if (parent == null) {
             return;
