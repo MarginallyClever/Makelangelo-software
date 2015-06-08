@@ -63,7 +63,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
 
     /**
      *
-     * @return
+     * @return Preference file
      */
     public static File getPreferencesFile()
     {
@@ -80,7 +80,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
 
     /**
      *
-     * @return
+     * @return XML preference file.
      */
     public static File getXmlPreferenceFile() {
         if (xmlPreferenceFile == null) {

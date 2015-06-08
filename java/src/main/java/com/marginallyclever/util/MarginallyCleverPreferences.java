@@ -209,7 +209,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
 
     /**
      *
-     * @param sb
+     * @param sb String builder
      */
     private void getPath(StringBuilder sb)
     {
