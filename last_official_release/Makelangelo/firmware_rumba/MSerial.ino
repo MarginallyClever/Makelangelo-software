@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 // Copyright at end of file.  Please see
 // http://www.github.com/MarginallyClever/Makelangelo for more information.
-
+/*
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 // METHODS
 //------------------------------------------------------------------------------
-/*
+
 void serial_setup(long baud) {
   UBRR0H = ( baud & 0xFF00) >> 8; // Load upper 8-bits of the baud rate value into the high byte of the UBRR register 
   UBRR0L = ( baud & 0x00FF); // Load lower 8-bits of the baud rate value into the low byte of the UBRR register 

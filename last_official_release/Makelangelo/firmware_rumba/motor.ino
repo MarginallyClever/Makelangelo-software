@@ -24,13 +24,14 @@ Segment line_segments[MAX_SEGMENTS];
 Segment *working_seg = NULL;
 volatile int current_segment=0;
 volatile int last_segment=0;
-int step_multiplier;
+int step_multiplier, nominal_step_multiplier;
+unsigned short nominal_OCR1A;
 
 Servo servos[NUM_SERVOS];
 
 // used by timer1 to optimize interrupt inner loop
-int delta[NUM_AXIES];
-int over[NUM_AXIES];
+int delta_x,delta_y;
+int over_x,over_y;
 int steps_total;
 int steps_taken;
 int accel_until,decel_after;
@@ -144,7 +145,7 @@ void motor_setup() {
   // turn on CTC mode
   TCCR1B = (1 << WGM12);
   // Set 8x prescaler
-  TCCR1B |= ( 1 << CS11 );
+  TCCR1B = (TCCR1B & ~(0x07<<CS10)) | (2<<CS10);
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   
@@ -395,10 +396,9 @@ void motor_onestep(int motor) {
  * Different clock sources can be selected for each timer independently. 
  * To calculate the timer frequency (for example 2Hz using timer1) you will need:
  */
-FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
+FORCE_INLINE unsigned short calc_timer(unsigned short desired_freq_hz) {
   if( desired_freq_hz > MAX_FEEDRATE ) desired_freq_hz = MAX_FEEDRATE;
   if( desired_freq_hz < MIN_FEEDRATE ) desired_freq_hz = MIN_FEEDRATE;
-  if( old_feed_rate == desired_freq_hz ) return;
   old_feed_rate = desired_freq_hz;
 
   // Source: https://github.com/MarginallyClever/ArduinoTimerInterrupt
@@ -407,10 +407,10 @@ FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
   
   if( desired_freq_hz > 20000 ) {
     step_multiplier = 4;
-    desired_freq_hz >>= 2;
+    desired_freq_hz = (desired_freq_hz>>2)&0x3fff;
   } else if( desired_freq_hz > 10000 ) {
     step_multiplier = 2;
-    desired_freq_hz >>= 1;
+    desired_freq_hz = (desired_freq_hz>>1)&0x7fff;
   } else {
     step_multiplier = 1;
   }
@@ -424,7 +424,7 @@ FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
     counter_value = 100;
   }
 
-  OCR1A = counter_value;
+  return counter_value;
 }
 
  
@@ -435,6 +435,7 @@ ISR(TIMER1_COMPA_vect) {
   // segment buffer empty? do nothing
   if( working_seg == NULL ) {
     working_seg = segment_get_working();
+    
     if( working_seg != NULL ) {
       // New segment!
       // set the direction pins
@@ -445,61 +446,65 @@ ISR(TIMER1_COMPA_vect) {
       servos[0].write(working_seg->a[2].step_count);
     
       // set frequency to segment feed rate
-      timer_set_frequency(working_seg->feed_rate_start);
+      nominal_OCR1A = calc_timer(working_seg->feed_rate_max);
+      nominal_step_multiplier = step_multiplier;
+      
+      OCR1A = calc_timer(working_seg->feed_rate_start);
       current_feed_rate = working_seg->feed_rate_start;
       
       // defererencing some data so the loop runs faster.
       steps_total=working_seg->steps_total;
       steps_taken=0;
-      delta[0] = working_seg->a[0].absdelta;
-      delta[1] = working_seg->a[1].absdelta;
-      delta[2] = working_seg->a[2].absdelta;
-      memset(over,0,sizeof(int)*NUM_AXIES);
+      delta_x = working_seg->a[0].absdelta;
+      delta_y = working_seg->a[1].absdelta;
+      over_x = -steps_total;
+      over_y = -steps_total;
       accel_until=working_seg->accel_until;
       decel_after=working_seg->decel_after;
       return;
     } else {
-      OCR1A = 2000; // wait 1ms
-      return;
+      OCR1A = 2000; // wait 1kHz
     }
   }
   
   if( working_seg != NULL ) {
     // move each axis
-    for(int i=0;i<step_multiplier;++i) {
+    for(uint8_t i=0;i<step_multiplier;++i) {
       // M0
-      over[0] += delta[0];
-      if(over[0] >= steps_total) {
+      over_x += delta_x;
+      if(over_x > 0) {
         digitalWrite(MOTOR_0_STEP_PIN,LOW);
-        over[0] -= steps_total;
+        over_x -= steps_total;
         digitalWrite(MOTOR_0_STEP_PIN,HIGH);
       }
       // M1
-      over[1] += delta[1];
-      if(over[1] >= steps_total) {
+      over_y += delta_y;
+      if(over_y > 0) {
         digitalWrite(MOTOR_1_STEP_PIN,LOW);
-        over[1] -= steps_total;
+        over_y -= steps_total;
         digitalWrite(MOTOR_1_STEP_PIN,HIGH);
       }
+      // make a step
+      steps_taken++;
+      if(steps_taken>=steps_total) break;
     }
     
-    // make a step
-    steps_taken++;
-
     // accel
     float nfr=current_feed_rate;
     if( steps_taken <= accel_until ) {
       nfr-=acceleration;
-      if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
+      //if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
+      current_feed_rate=nfr;
+      OCR1A = calc_timer(current_feed_rate);
     } else if( steps_taken > decel_after ) {
       nfr+=acceleration;
-      if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
-    }
-    
-    if(nfr!=current_feed_rate) {
+      //if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
       current_feed_rate=nfr;
-      timer_set_frequency(current_feed_rate);
-    }      
+      OCR1A = calc_timer(current_feed_rate);
+    } else {
+      OCR1A = nominal_OCR1A;
+      step_multiplier = nominal_step_multiplier;
+    }
 
     // Is this segment done?
     if( steps_taken >= steps_total ) {

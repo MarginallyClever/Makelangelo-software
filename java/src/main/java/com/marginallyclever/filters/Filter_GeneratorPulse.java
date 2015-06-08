@@ -78,7 +78,7 @@ public class Filter_GeneratorPulse extends Filter {
 		int steps = (int)Math.ceil(tool.getDiameter()/(1.75f*scale));
 		if(steps<1) steps=1;
 
-		int blockSize=(int)(steps*8);
+		int blockSize=(int)(steps*4);
 		float halfstep = (float)blockSize/2.0f;
 		
 		// from top to bottom of the image...

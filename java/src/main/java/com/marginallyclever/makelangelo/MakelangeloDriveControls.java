@@ -341,13 +341,9 @@ public class MakelangeloDriveControls
 	private long getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());		
 		final JTextField starting_line = new JTextField("0",8);
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton start = new JButton(translator.get("Start"));
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth=2;	c.gridx=0;  c.gridy=0;  panel.add(new JLabel(translator.get("StartAtLine")),c);
 		c.gridwidth=2;	c.gridx=2;  c.gridy=0;  panel.add(starting_line,c);
-		c.gridwidth=1;	c.gridx=0;  c.gridy=1;  panel.add(cancel,c);
-		c.gridwidth=1;	c.gridx=2;  c.gridy=1;  panel.add(start,c);
 		
 	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {

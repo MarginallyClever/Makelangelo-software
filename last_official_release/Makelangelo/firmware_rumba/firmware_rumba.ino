@@ -162,7 +162,12 @@ void FK(long l1, long l2,float &x,float &y) {
 
   x = (float)( l1 + l2 ) / 2.0;
   y = x - (float)l2;
-#else
+#endif
+#ifdef TRADITIONALXY
+  x = l1 * THREADPERSTEP1;
+  y = l2 * THREADPERSTEP2;
+#endif
+#ifdef POLARGRAPH2
   float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
   float c = (float)l2 * THREAD_PER_STEP;

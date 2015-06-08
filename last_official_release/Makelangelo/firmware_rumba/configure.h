@@ -34,14 +34,15 @@
 
 #define MICROSTEPS           (16.0)  // microstepping on this microcontroller
 #define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
-#define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
-#define MIN_FEEDRATE         (1500)
-#define DEFAULT_FEEDRATE     (7000.0)
+
+#define MAX_FEEDRATE         (30000.0)  // depends on timer interrupt & hardware
+#define MIN_FEEDRATE         (1000)
+#define DEFAULT_FEEDRATE     (8500.0)
 #define DEFAULT_ACCELERATION (8)
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
 
-#define NUM_AXIES            (6)  // x,y,z
+#define NUM_AXIES            (3)  // x,y,z
 #define NUM_TOOLS            (6)
 #define MAX_SEGMENTS         (32)  // number of line segments to buffer ahead
 
@@ -163,10 +164,10 @@ typedef struct {
   int steps_taken;
   int accel_until;
   int decel_after;
-  float feed_rate_max;
-  float feed_rate_start;
-  float feed_rate_start_max;
-  float feed_rate_end;
+  unsigned short feed_rate_max;
+  unsigned short feed_rate_start;
+  unsigned short feed_rate_start_max;
+  unsigned short feed_rate_end;
   char nominal_length_flag;
   char recalculate_flag;
   char busy;
