@@ -157,59 +157,52 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
     @Override
     protected void flushSpi() throws BackingStoreException {
         final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-        final File xmlFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferenceFile();
+        synchronized (file) {
+            final Properties p = new Properties();
+            try {
 
-        synchronized (xmlFile) {
-            synchronized (file) {
-                final Properties p = new Properties();
-                try {
+                final StringBuilder sb = new StringBuilder();
+                getPath(sb);
+                final String path = sb.toString();
 
-                    final StringBuilder sb = new StringBuilder();
-                    getPath(sb);
-                    final String path = sb.toString();
+                if (file.exists()) {
+                    try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+                        p.load(fileInputStream);
+                    }
 
-                    if (file.exists()) {
-                        try (final FileInputStream fileInputStream = new FileInputStream(file)) {
-                            p.load(fileInputStream);
-                        }
+                    final List<String> toRemove = new ArrayList<>();
 
-                        final List<String> toRemove = new ArrayList<>();
-
-                        // Make a list of all direct children of this node to be removed
-                        final Enumeration<?> pnen = p.propertyNames();
-                        while (pnen.hasMoreElements()) {
-                            final String propKey = (String) pnen.nextElement();
-                            if (propKey.startsWith(path)) {
-                                final String subKey = propKey.substring(path.length());
-                                // Only do immediate descendants
-                                if (subKey.indexOf('.') == -1) {
-                                    toRemove.add(propKey);
-                                }
+                    // Make a list of all direct children of this node to be removed
+                    final Enumeration<?> pnen = p.propertyNames();
+                    while (pnen.hasMoreElements()) {
+                        final String propKey = (String) pnen.nextElement();
+                        if (propKey.startsWith(path)) {
+                            final String subKey = propKey.substring(path.length());
+                            // Only do immediate descendants
+                            if (subKey.indexOf('.') == -1) {
+                                toRemove.add(propKey);
                             }
                         }
-
-                        // Remove them now that the enumeration is done with
-                        for (String propKey : toRemove) {
-                            p.remove(propKey);
-                        }
                     }
 
-                    // If this node hasn't been removed, add back in any values
-                    if (!thisIsRemoved) {
-                        for (String s : root.keySet()) {
-                            p.setProperty(path + s, root.get(s));
-                        }
+                    // Remove them now that the enumeration is done with
+                    for (String propKey : toRemove) {
+                        p.remove(propKey);
                     }
-                    final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
-                    try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                        p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
-                    }
-                    try (final FileOutputStream fileOutputStream = new FileOutputStream(xmlFile)) {
-                        p.storeToXML(fileOutputStream, marginallyCleverPreferencesFileComments);
-                    }
-                } catch (IOException e) {
-                    throw new BackingStoreException(e);
                 }
+
+                // If this node hasn't been removed, add back in any values
+                if (!thisIsRemoved) {
+                    for (String s : root.keySet()) {
+                        p.setProperty(path + s, root.get(s));
+                    }
+                }
+                final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
+                try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                    p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+                }
+            } catch (IOException e) {
+                throw new BackingStoreException(e);
             }
         }
     }
