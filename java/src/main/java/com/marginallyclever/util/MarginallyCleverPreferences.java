@@ -1,6 +1,8 @@
 package com.marginallyclever.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
+import org.json.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,7 @@ import java.util.prefs.BackingStoreException;
  * @since v7.1.3
  *
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
+ * @see <a href="http://stackoverflow.com/a/25548386">SO answer to: How to synchronize file access in a Java servlet?</a>
  */
 public class MarginallyCleverPreferences extends AbstractPreferences {
 
@@ -47,18 +50,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
     /**
      *
      */
-    private volatile boolean cacheValid;
-
-    /**
-     *
-     */
-    private final ReadWriteLock rwl = new ReentrantReadWriteLock();
-
-    /**
-     *
-     */
-    private File file;
-
+    private final Object mutex = new Object();
 
     /**
      * Creates a preference node with the specified parent and the specified
@@ -145,122 +137,86 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
         if(isRemoved()) {
             return;
         }
-        rwl.readLock().lock();
-        if (!cacheValid) {
-            // Must release read lock before acquiring write lock
-            rwl.readLock().unlock();
-            rwl.writeLock().lock();
-            try {
-                // Recheck state because another thread might have
-                // acquired write lock and changed state before we did.
-                if (!cacheValid) {
-                    file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-                    //FIXME probably do writing here
-                    cacheValid = true;
-                }
-                // Downgrade by acquiring read lock before releasing write lock
-                rwl.readLock().lock();
-            } finally {
-                rwl.writeLock().unlock(); // Unlock write, still hold read
-            }
-        }
+        File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
         if (!file.exists()) {
             return;
         }
-        final Properties p = new Properties();
-        try {
-            try(final FileInputStream inStream = new FileInputStream(file)) {
-                p.load(inStream);
-            }
-
-            final StringBuilder sb = new StringBuilder();
-            getPath(sb);
-            final String path = sb.toString();
-
-            final Enumeration<?> pnen = p.propertyNames();
-            while (pnen.hasMoreElements()) {
-                final String propKey = (String) pnen.nextElement();
-                if (propKey.startsWith(path)) {
-                    final String subKey = propKey.substring(path.length());
-                    // Only load immediate descendants
-                    if (subKey.indexOf('.') == -1) {
-                        root.put(subKey, p.getProperty(propKey));
-                    }
-                }
-            }
-        }
-        catch (IOException e) {
-            throw new BackingStoreException(e);
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
-
-    @Override
-    protected void flushSpi() throws BackingStoreException {
-        final Properties p = new Properties();
-        rwl.readLock().lock();
-        if (!cacheValid) {
-            // Must release read lock before acquiring write lock
-            rwl.readLock().unlock();
-            rwl.writeLock().lock();
+        synchronized (mutex) {
+            final Properties p = new Properties();
             try {
-                // Recheck state because another thread might have
-                // acquired write lock and changed state before we did.
-                if (!cacheValid) {
-                    file= MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-                    //FIXME probably do writing here
-                    cacheValid = true;
-                }
-                // Downgrade by acquiring read lock before releasing write lock
-                rwl.readLock().lock();
-            } finally {
-                rwl.writeLock().unlock(); // Unlock write, still hold read
-            }
-        }
-        try {
-            final StringBuilder sb = new StringBuilder();
-            getPath(sb);
-            final String path = sb.toString();
-            if (file.exists()) {
-                try (final FileInputStream fileInputStream = new FileInputStream(file)) {
-                    p.load(fileInputStream);
+                try(final FileInputStream inStream = new FileInputStream(file)) {
+                    p.load(inStream);
                 }
 
-                final List<String> toRemove = new ArrayList<>();
+                final StringBuilder sb = new StringBuilder();
+                getPath(sb);
+                final String path = sb.toString();
 
-                // Make a list of all direct children of this node to be removed
                 final Enumeration<?> pnen = p.propertyNames();
                 while (pnen.hasMoreElements()) {
                     final String propKey = (String) pnen.nextElement();
                     if (propKey.startsWith(path)) {
                         final String subKey = propKey.substring(path.length());
-                        // Only do immediate descendants
+                        // Only load immediate descendants
                         if (subKey.indexOf('.') == -1) {
-                            toRemove.add(propKey);
+                            root.put(subKey, p.getProperty(propKey));
                         }
                     }
                 }
+            }
+            catch (IOException e) {
+                throw new BackingStoreException(e);
+            }
+        }
+    }
 
-                // Remove them now that the enumeration is done with
-                for (String propKey : toRemove) {
-                    p.remove(propKey);
+    @Override
+    protected void flushSpi() throws BackingStoreException {
+        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+        synchronized (mutex) {
+            try {
+                final Properties p = new Properties();
+                final StringBuilder sb = new StringBuilder();
+                getPath(sb);
+                final String path = sb.toString();
+                if (file.exists()) {
+                    try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+                        p.load(fileInputStream);
+                    }
+
+                    final List<String> toRemove = new ArrayList<>();
+
+                    // Make a list of all direct children of this node to be removed
+                    final Enumeration<?> pnen = p.propertyNames();
+                    while (pnen.hasMoreElements()) {
+                        final String propKey = (String) pnen.nextElement();
+                        if (propKey.startsWith(path)) {
+                            final String subKey = propKey.substring(path.length());
+                            // Only do immediate descendants
+                            if (subKey.indexOf('.') == -1) {
+                                toRemove.add(propKey);
+                            }
+                        }
+                    }
+
+                    // Remove them now that the enumeration is done with
+                    for (String propKey : toRemove) {
+                        p.remove(propKey);
+                    }
                 }
-            }
-            // If this node hasn't been removed, add back in any values
-            if (!thisIsRemoved) {
-                for (String s : root.keySet()) {
-                    p.setProperty(path + s, root.get(s));
+                // If this node hasn't been removed, add back in any values
+                if (!thisIsRemoved) {
+                    for (String s : root.keySet()) {
+                        p.setProperty(path + s, root.get(s));
+                    }
                 }
+                final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
+                try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                    p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+                }
+            } catch (IOException e) {
+                throw new BackingStoreException(e);
             }
-            final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
-            try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
-            }
-        } catch (IOException e) {
-            throw new BackingStoreException(e);
-        } finally {
-            rwl.readLock().unlock();
         }
     }
 
@@ -281,5 +237,21 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
         }
         parent.getPath(sb);
         sb.append(name()).append('.');
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Map<String, ? extends Object> getChildren() {
+        return new TreeMap<>(children);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Map<String, String> getRoot() {
+        return new TreeMap<>(root);
     }
 }

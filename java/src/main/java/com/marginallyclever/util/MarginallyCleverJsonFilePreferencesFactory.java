@@ -40,11 +40,6 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
      */
     private static File preferencesFile;
 
-    /**
-     *
-     */
-    private static File xmlPreferenceFile;
-
 
     @Override
     public Preferences systemRoot() {
@@ -76,22 +71,6 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
             logger.info("Preferences file is {}", preferencesFile);
         }
         return preferencesFile;
-    }
-
-    /**
-     *
-     * @return XML preference file.
-     */
-    public static File getXmlPreferenceFile() {
-        if (xmlPreferenceFile == null) {
-            String prefsFile = System.getProperty(SYSTEM_PROPERTY_FILE);
-            if (prefsFile == null || prefsFile.length() == 0) {
-                prefsFile = System.getProperty("user.home") + File.separator + ".fileprefs.xml";
-            }
-            xmlPreferenceFile = new File(prefsFile).getAbsoluteFile();
-            logger.info("Preferences file is {}", xmlPreferenceFile);
-        }
-        return xmlPreferenceFile;
     }
 
 }

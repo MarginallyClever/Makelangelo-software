@@ -3,16 +3,21 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import org.json.JSONObject;
+import org.json.Property;
 import org.json.XML;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Properties;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -70,17 +75,26 @@ public class PreferencesHelperTest {
             logger.error("{}", e);
         }
         copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
-        final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferenceFile();
-        final String path = preferencesFile.toString();
-        try {
-            final byte[] encoded = Files.readAllBytes(Paths.get(path));
-            final JSONObject jsonObject = XML.toJSONObject(new String(encoded, StandardCharsets.UTF_8));
-            logger.info("JSONObject: {}", jsonObject);
+        final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+        final Properties p = new Properties();
+        try(final FileInputStream inStream = new FileInputStream(preferencesFile)) {
+            p.load(inStream);
+        } catch (FileNotFoundException e) {
+            logger.error("{}", e);
         } catch (IOException e) {
             logger.error("{}", e);
         }
+        final JSONObject jsonObject = Property.toJSONObject(p);
+        logger.debug("{}", jsonObject);
+        final JSONObject object = new JSONObject(((Map<String,Object>)marginallyCleverJsonPreferenceNode.getChildren()));
+        logger.debug("{}", object);
     }
 
+    /**
+     *
+     * @param sourcePreferenceNode
+     * @param destinationPreferenceNode
+     */
     private void copyPreferenceNode(Preferences sourcePreferenceNode, AbstractPreferences destinationPreferenceNode) {
         try {
             final String[] keys = sourcePreferenceNode.keys();
