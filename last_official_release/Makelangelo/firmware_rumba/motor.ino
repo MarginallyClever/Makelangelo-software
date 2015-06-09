@@ -37,6 +37,9 @@ int steps_taken;
 int accel_until,decel_after;
 long current_feed_rate;
 long old_feed_rate=0;
+long start_feed_rate,end_feed_rate;
+long time_accelerating,time_decelerating;
+
 /*
 long prescalers[] = {CLOCK_FREQ /   1,
                      CLOCK_FREQ /   8,
@@ -449,8 +452,12 @@ ISR(TIMER1_COMPA_vect) {
       nominal_OCR1A = calc_timer(working_seg->feed_rate_max);
       nominal_step_multiplier = step_multiplier;
       
-      OCR1A = calc_timer(working_seg->feed_rate_start);
-      current_feed_rate = working_seg->feed_rate_start;
+      start_feed_rate = working_seg->feed_rate_start;
+      end_feed_rate = working_seg->feed_rate_end;
+      current_feed_rate = start_feed_rate;
+      time_decelerating = 0;
+      time_accelerating = calc_timer(start_feed_rate);
+      OCR1A = time_accelerating;
       
       // defererencing some data so the loop runs faster.
       steps_total=working_seg->steps_total;
@@ -490,17 +497,19 @@ ISR(TIMER1_COMPA_vect) {
     }
     
     // accel
-    float nfr=current_feed_rate;
+    unsigned short t;
     if( steps_taken <= accel_until ) {
-      nfr-=acceleration;
-      //if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
-      current_feed_rate=nfr;
-      OCR1A = calc_timer(current_feed_rate);
+      current_feed_rate = (acceleration * time_accelerating / 1000000);
+      current_feed_rate += start_feed_rate;
+      t = calc_timer(current_feed_rate);
+      OCR1A = t;
+      time_accelerating+=t;
     } else if( steps_taken > decel_after ) {
-      nfr+=acceleration;
-      //if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
-      current_feed_rate=nfr;
-      OCR1A = calc_timer(current_feed_rate);
+      unsigned short step_time = (acceleration * time_decelerating / 1000000);
+      long end_feed_rate = current_feed_rate - step_time;
+      t = calc_timer(end_feed_rate);
+      OCR1A = t;
+      time_decelerating+=t;
     } else {
       OCR1A = nominal_OCR1A;
       step_multiplier = nominal_step_multiplier;
