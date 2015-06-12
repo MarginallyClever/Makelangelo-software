@@ -25,7 +25,6 @@ public class Filter_GeneratorPulse extends Filter {
 	public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() { return translator.get("PulseLineName"); }

@@ -54,9 +54,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	
 	protected MachineConfiguration machine;
 
+	// optimization - turn gcode into vectors once on load, draw vectors after that.
 	private enum NodeType { COLOR, POS, TOOL };
-	
-	// optimization attempt
 	class DrawPanelNode {
 		double x1,y1,x2,y2;
 		Color c;
@@ -343,9 +342,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		paintLimits(gl2);
 		paintCenter(gl2);
 		
-		// TODO draw left motor
-		// TODO draw right motor
-		// TODO draw control box
+		// TODO draw left motor, right motor, and control box
 
         gl2.glColor3f(0, 0, 0);
 

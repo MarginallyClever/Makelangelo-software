@@ -20,7 +20,6 @@ public class Filter_Resize extends Filter {
 	public Filter_Resize(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 		maxWidth=1000;
 		maxHeight=1000;
 	}
@@ -30,9 +29,8 @@ public class Filter_Resize extends Filter {
 		super(gui, mc, ms);
 		maxWidth=max_width;
 		maxHeight=max_height;
-		// TODO Auto-generated constructor stub
-		maxWidth=1000;
-		maxHeight=1000;
+		//maxWidth=1000;
+		//maxHeight=1000;
 	}
 
 	
@@ -63,7 +61,7 @@ public class Filter_Resize extends Filter {
 		// cap the max_w and max_h so that enormous drawbot images don't break the software.
 		double paper_w= machine.getPaperWidth();
 		double paper_h= machine.getPaperHeight();
-		// TODO make this number a variable that can be tweaked
+
 		int max_w=maxWidth;
 		int max_h=maxHeight;
 		if(paper_w>paper_h) {

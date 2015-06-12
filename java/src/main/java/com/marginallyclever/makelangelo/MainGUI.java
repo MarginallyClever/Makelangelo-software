@@ -81,14 +81,13 @@ public class MainGUI
 
 	
 	// Image processing
-		// TODO use a ServiceLoader for plugins
-		private List<Filter> image_converters;
-		private boolean startConvertingNow;
+	private List<Filter> image_converters;
+	private boolean startConvertingNow;
 	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 	private RecentFiles recentFiles;
 	
-	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
+	private MarginallyCleverConnectionManager connectionManager;
 	private MarginallyCleverConnection connectionToRobot=null;
 		
 	// machine settings while running
@@ -173,7 +172,7 @@ public class MainGUI
 	public boolean isPaused() { return isPaused; }
 	
 	
-	// TODO use a serviceLoader instead
+	// TODO use a ServiceLoader instead?
 	protected void loadImageConverters() {
 		image_converters = new ArrayList<Filter>();
 		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
