@@ -23,6 +23,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     static final long serialVersionUID=2;
 
     private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+
+    // Use debug pipeline?
+    private static final boolean DEBUG_GL_ON=false;
+    private static final boolean TRACE_GL_ON=false;
     
     // arc smoothness - increase to make more smooth and run slower.
     private static final double STEPS_PER_DEGREE=1;
@@ -75,6 +79,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
 
+	/**
+     * set up the correct projection so the image appears in the right location and aspect ratio.
+	 */
     @Override
     public void reshape( GLAutoDrawable glautodrawable, int x, int y, int width, int height ) {
         GL2 gl2 = glautodrawable.getGL().getGL2();
@@ -89,35 +96,40 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glOrtho(-window_width / 2.0d, window_width / 2.0d, -window_height / 2.0d, window_height / 2.0d, 1.0d, -1.0d);
     }
     
+    /**
+     * turn on debug pipeline(s) if needed.
+     */
     @Override
     public void init( GLAutoDrawable drawable ) {
-        // Use debug pipeline
-        boolean glDebug=false;
-        boolean glTrace=false;
-        
         GL gl = drawable.getGL();
         
-        if(glDebug) {
+        if(DEBUG_GL_ON) {
             try {
                 // Debug ..
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null) );
-            } catch (Exception e) {e.printStackTrace();}
+            } catch (Exception e) {
+            	e.printStackTrace();
+            }
         }
 
-        if(glTrace) {
+        if(TRACE_GL_ON) {
             try {
                 // Trace ..
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err } ) );
-            } catch (Exception e) {e.printStackTrace();}
+            } catch (Exception e) {
+            	e.printStackTrace();
+            }
         }
     }
     
     
     @Override
-    public void dispose( GLAutoDrawable glautodrawable ) {
-    }
+    public void dispose( GLAutoDrawable glautodrawable ) {}
     
     
+    /**
+     * refresh the image in the view
+     */
     @Override
     public void display( GLAutoDrawable glautodrawable ) {
         //long now_time = System.currentTimeMillis();
@@ -125,13 +137,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         //last_time = now_time;
         //System.out.println(dt);
         
-        // Clear The Screen And The Depth Buffer
         GL2 gl2 = glautodrawable.getGL().getGL2();
 
         // draw the world
         render( gl2 );
     }
-    
     
     
     public void setGCode(ArrayList<String> gcode) {
@@ -152,12 +162,19 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
     
+    /**
+     * toggle pen up moves.  
+     * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
+     */
     public void setShowPenUp(boolean state) {
         show_pen_up=state;
         emptyNodeBuffer();
         repaint();
     }
     
+    /**
+     * @return the "show pen up" flag
+     */
     public boolean getShowPenUp() {
         return show_pen_up;
     }
@@ -180,7 +197,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         }
     }
     
-    // returns angle of dy/dx as a value from 0...2PI
+    /**
+     * returns angle of dy/dx as a value from 0...2PI
+     * @param dy a value from -1...1 inclusive
+     * @param dx a value from -1...1 inclusive
+     * @return angle of dy/dx as a value from 0...2PI
+     */
     private double atan3(double dy,double dx) {
       double a=Math.atan2(dy,dx);
       if(a<0) a=(Math.PI*2.0)+a;
@@ -188,13 +210,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
 
 
+    /**
+     * position the camera in from of the robot
+     * @param x position horizontally
+     * @param y position vertically
+     */
     private void moveCamera(int x,int y) {
         cameraOffsetX+=oldx-x;
         cameraOffsetY+=oldy-y;
     }
 
     /**
-     *
+     * scale the picture of the robot to fake a zoom.
      * @param y
      */
     private void zoomCamera(int y) {
@@ -204,7 +231,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
 
     /**
-     *
+     * scale the picture of the robot to fake a zoom.
      */
     public void zoomIn() {
         cameraZoom*= 4.0d / 3.0d;
@@ -212,7 +239,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
 
     /**
-     *
+     * scale the picture of the robot to fake a zoom.
      */
     public void zoomOut() {
         cameraZoom*= 3.0d / 4.0d;
@@ -220,7 +247,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
 
     /**
-     *
+     * scale the picture of the robot to fake a zoom.
      */
     public void zoomToFitPaper() {
         final int drawPanelWidth = this.getWidth();
@@ -263,7 +290,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     public void mouseMoved(MouseEvent e) {}
 
     
-    // scale and translate the output
+    /**
+     * set up the correct modelview so the robot appears where it hsould.
+     * @param gl2
+     */
     private void paintCamera(GL2 gl2) {
         gl2.glMatrixMode(GL2.GL_MODELVIEW);
         gl2.glLoadIdentity();
@@ -271,8 +301,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glScaled(cameraZoom, cameraZoom, 1.0d);
     }
   
-    // clear the panel
+    /**
+     * clear the panel
+     * @param gl2
+     */
     private void paintBackground( GL2 gl2 ) {
+        // Clear The Screen And The Depth Buffer
         gl2.glClearColor(0.5f,0.5f,0.5f, 0);
         
         // Special handling for the case where the GLJPanel is translucent
@@ -287,7 +321,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         }
     }
   
-    // draw the machine edges and paper edges
+    /**
+     * draw the machine edges and paper edges
+     * @param gl2
+     */
     private void paintLimits(GL2 gl2) {
         if(!connected) {
             gl2.glColor3f(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f);
