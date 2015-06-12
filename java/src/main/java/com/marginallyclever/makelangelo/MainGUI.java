@@ -1276,16 +1276,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-            final String aboutHtml = getAboutHtmlFromMultilingualString();
-			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-			ImageIcon icon = getImageIcon("logo.png");
-			final String menuAboutValue = translator.get("MenuAbout");
-			if (icon != null) {
-				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-			} else {
-				icon = getImageIcon("resources/logo.png");
-				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-			}
+			displayAbout();
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1392,7 +1383,7 @@ public class MainGUI
 						try {
 							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
 						} catch (IOException | URISyntaxException exception) {
-							// FIXME Auto-generated catch block
+							// Auto-generated catch block
 							exception.printStackTrace();
 						}
 					}
@@ -1402,6 +1393,21 @@ public class MainGUI
 		};
 		bottomText.addHyperlinkListener(hyperlinkListener);
 		return bottomText;
+	}
+	
+	
+	/**
+	 * display the about dialog.
+	 */
+	private void displayAbout() {
+        final String aboutHtml = getAboutHtmlFromMultilingualString();
+		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
+		ImageIcon icon = getImageIcon("logo.png");
+		final String menuAboutValue = translator.get("MenuAbout");
+		if (icon == null) {
+			icon = getImageIcon("resources/logo.png");
+		}
+		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
 
     // settings menu

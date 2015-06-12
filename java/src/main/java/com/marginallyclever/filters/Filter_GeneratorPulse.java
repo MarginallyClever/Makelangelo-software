@@ -5,13 +5,21 @@ import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
+import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 
 public class Filter_GeneratorPulse extends Filter {
+	float blockScale=1.75f;
+	
 	public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
@@ -60,6 +68,20 @@ public class Filter_GeneratorPulse extends Filter {
 	 * @param img the image to convert.
 	 */
 	public void convert(BufferedImage img) throws IOException {
+		final JTextField field_size = new JTextField(Float.toString(blockScale));
+
+		JPanel panel = new JPanel(new GridLayout(0,1));
+		panel.add(new JLabel(translator.get("HilbertCurveSize")));
+		panel.add(field_size);
+		
+	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+	    	blockScale = Integer.parseInt(field_size.getText());
+			convertNow(img);
+	    }
+	}
+	
+	private void convertNow(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
 		img = bw.process(img);
@@ -75,7 +97,7 @@ public class Filter_GeneratorPulse extends Filter {
 
 		
 		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.getDiameter()/(1.75f*scale));
+		int steps = (int)Math.ceil(tool.getDiameter()/(blockScale*scale));
 		if(steps<1) steps=1;
 
 		int blockSize=(int)(steps*4);

@@ -665,7 +665,7 @@ public class MachineConfiguration {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream())); // FIXME use try with resources
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		    String line = rd.readLine();
 		    new_uid = Long.parseLong(line);
 		    rd.close();
