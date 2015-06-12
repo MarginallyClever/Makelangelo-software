@@ -31,7 +31,7 @@ import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 
 /**
- * FIXME Add Javadoc.
+ * @author dan royer
  */
 public class MachineConfiguration {
 
@@ -101,7 +101,11 @@ public class MachineConfiguration {
 	private MultilingualSupport translator;
 	
 	
-	// constructor
+	/**
+	 * 
+	 * @param gui
+	 * @param ms
+	 */
 	protected MachineConfiguration(MainGUI gui,MultilingualSupport ms) {
 		mainGUI = gui;
 		translator = ms;
@@ -350,7 +354,9 @@ public class MachineConfiguration {
 	}
 	
 	
-	// dialog to adjust the pen up & pen down values
+	/**
+	 * dialog to adjust the pen up & pen down values
+	 */
 	protected void changeTool() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustMachineSize"),true);
 		driver.setLayout(new GridBagLayout());
@@ -415,7 +421,9 @@ public class MachineConfiguration {
 	}
 	
 	
-	// Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+	/**
+	 * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+	 */
 	public void adjustPulleySize() {
 		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustPulleySize"),true);
 		driver.setLayout(new GridBagLayout());
@@ -484,7 +492,7 @@ public class MachineConfiguration {
 	// Load the machine configuration
 	protected void loadConfig(long uid) {
 		robot_uid = uid;
-		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return; FIXME once cloud logic is finished.
+		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return; TODO once cloud logic is finished.
 		loadConfigFromLocal();
 	}
 	
@@ -520,11 +528,11 @@ public class MachineConfiguration {
 	
 	// Save the machine configuration
 	public void saveConfig() {
-		//if(GetCanUseCloud() && SaveConfigToCloud() ) return; FIXME once cloud logic is finished.
+		//if(GetCanUseCloud() && SaveConfigToCloud() ) return; TODO once cloud logic is finished.
 		saveConfigToLocal();
 	}
 
-	/** 		TODO finish these methods.
+	/* TODO finish these cloud storage methods.  Security will be a problem.
 
 	 public boolean GetCanUseCloud() {
 		return topLevelMachinesPreferenceNode.getBoolean("can_use_cloud", false);
@@ -542,26 +550,23 @@ public class MachineConfiguration {
 
 
 	 protected boolean LoadConfigFromCloud() {
-	 // Ask for credentials: MC login, password.  auto-remember login name.
-	 //String login = new String();
-	 //String password = new String();
-	 // TODO finish this section
-
-
-	 //try {
-	 // Send query
-	 //URL url = new URL("https://marginallyclever.com/drawbot_getmachineconfig.php?name="+login+"pass="+password+"&id="+robot_uid);
-	 //URLConnection conn = url.openConnection();
-	 //BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-	 // read data
-	 // TODO finish this section
-
-	 // close connection
-	 //rd.close();
-	 //} catch (Exception e) {}
-
-	return false;
-}
+		 // Ask for credentials: MC login, password.  auto-remember login name.
+		 //String login = new String();
+		 //String password = new String();
+	
+		 //try {
+		 // Send query
+		 //URL url = new URL("https://marginallyclever.com/drawbot_getmachineconfig.php?name="+login+"pass="+password+"&id="+robot_uid);
+		 //URLConnection conn = url.openConnection();
+		 //BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		 // read data
+	
+		 // close connection
+		 //rd.close();
+		 //} catch (Exception e) {}
+	
+		return false;
+	}
 	 */
 	
 	
@@ -655,15 +660,19 @@ public class MachineConfiguration {
 	 */
 	private long getNewRobotUID() {
 		long new_uid=0;
+		
 		try {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream())); //FIXME use try with resources
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream())); // FIXME use try with resources
 		    String line = rd.readLine();
 		    new_uid = Long.parseLong(line);
 		    rd.close();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
 
 		// did read go ok?
 		if(new_uid!=0) {

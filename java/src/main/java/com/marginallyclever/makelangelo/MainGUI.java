@@ -59,8 +59,8 @@ import java.util.prefs.Preferences;
 // TODO image processing options - cutoff, exposure, resolution, edge tracing ?
 // TODO vector output ?
 /**
- * MainGUI is the central source 
- * @author danroyer
+ * 
+ * @author dan royer
  * @since 0.0.1?
  */
 public class MainGUI
@@ -154,39 +154,8 @@ public class MainGUI
 	public void startTranslator() {
 		translator = new MultilingualSupport();
 		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			chooseLanguage();
+			translator.chooseLanguage();
 		}
-	}
-	
-	// display a dialog box of available languages and let the user select their preference.
-	public void chooseLanguage() {
-		final JDialog driver = new JDialog(mainframe,"Language",true);
-		driver.setLayout(new GridBagLayout());
-
-		final String [] choices = translator.getLanguageList();
-		final JComboBox<String> language_options = new JComboBox<String>(choices);
-		final JButton save = new JButton(">>>");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				// TODO prevent "close" icon.  Must press save to continue!
-				if(subject == save) {
-					translator.setCurrentLanguage(choices[language_options.getSelectedIndex()]);
-					translator.saveConfig();
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-
-		driver.pack();
-		driver.setVisible(true);
 	}
 	
 
@@ -1041,7 +1010,6 @@ public class MainGUI
 		sendLineToRobot(machineConfiguration.getConfigLine());
 		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
-		//sendLineToRobot("M17"); FIXME add to options dialog
 	}
 	
 	
@@ -1258,7 +1226,6 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			//sendLineToRobot("M18"); FIXME add to options dialog
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
 			clearLog();
@@ -1281,7 +1248,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAdjustLanguage ) {
-			chooseLanguage();
+			translator.chooseLanguage();
 			updateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
@@ -1332,7 +1299,7 @@ public class MainGUI
 		}
 		
 		if( subject == buttonExit ) {
-			System.exit(0);  // TODO: be more graceful?
+			System.exit(0);
 			return;
 		}
 		
