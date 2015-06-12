@@ -56,11 +56,13 @@ import java.util.prefs.Preferences;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
-// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
+// TODO image processing options - cutoff, exposure, resolution, edge tracing ?
 // TODO vector output ?
-// TODO externalize constants like version and ABOUT_HTML
-// TODO externalize constants like version
-
+/**
+ * MainGUI is the central source 
+ * @author danroyer
+ * @since 0.0.1?
+ */
 public class MainGUI
 		extends JPanel
 		implements ActionListener
@@ -335,7 +337,7 @@ public class MainGUI
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
 	 */
-	public void loadGCode(String filename) {
+	public boolean loadGCode(String filename) {
 		try {
 			gcode.load(filename);
 		   	log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
@@ -346,11 +348,12 @@ public class MainGUI
 	    	log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
 	    	recentFiles.remove(filename);
 	    	updateMenuBar();
-	    	return;
+	    	return false;
 	    }
 	    
 	    previewPane.setGCode(gcode.lines);
 	    halt();
+	    return true;
 	}
 	
 	public String getTempDestinationFile() {
@@ -554,14 +557,15 @@ public class MainGUI
 									double y=(start.getY()-cy)*sy;
 									double x2=(end.getX()-cx)*sx;
 									double y2=(end.getY()-cy)*sy;
-									
+									double dx,dy;
+									/*
 									// is it worth drawing this line?
-									double dx = x2-x;
-									double dy = y2-y;
+									dx = x2-x;
+									dy = y2-y;
 									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
 										continue;
 									}
-									
+									*/
 									dx = dxf_x2 - x;
 									dy = dxf_y2 - y;
 
@@ -811,20 +815,22 @@ public class MainGUI
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
  		log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
-
+ 		boolean file_loaded_ok=false;
+ 		
 	   	if(isFileGcode(filename)) {
-			loadGCode(filename);
+			file_loaded_ok = loadGCode(filename);
     	} else if(isFileDXF(filename)) {
-    		loadDXF(filename);
+    		file_loaded_ok = loadDXF(filename);
     	} else if(isFileImage(filename)) {
-    		loadImage(filename);
+    		file_loaded_ok = loadImage(filename);
     	} else {
     		log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
     	}
 
-	   	// TODO: if succeeded
-	   	recentFiles.add(filename);
-		updateMenuBar();
+	   	if(file_loaded_ok==true) {
+	   		recentFiles.add(filename);
+	   		updateMenuBar();
+	   	}
     	statusBar.clear();
 	}
 

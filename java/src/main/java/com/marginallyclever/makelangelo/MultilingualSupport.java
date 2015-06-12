@@ -11,37 +11,37 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- *
- * FIXME Write Javadoc.
- *
+ * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
+ * @author dan royer
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
 public final class MultilingualSupport {
 
 	/**
-	 *
+	 * The name of the preferences node containing the user's choice.
 	 */
 	private static final String LANGUAGE_KEY = "language";
 
 	/**
-	 *
+	 * 
+	 */
+	private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+
+
+	/**
+	 * The default choice when nothing has been selected.
 	 */
 	public static final String DEFAULT_LANGUAGE = "English";
 
 	/**
-	 *
+	 * The current choice
 	 */
 	private String currentLanguage;
 
 	/**
-	 *
+	 * a list of all languages and their translations strings
 	 */
 	private final Map<String,LanguageContainer> languages = new HashMap<>();
-
-	/**
-	 *
-	 */
-	private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
 	/**
 	 *
@@ -58,7 +58,7 @@ public final class MultilingualSupport {
 
 	/**
 	 *
-	 * @return
+	 * @return true if this is the first time loading language files (probably on install)
 	 */
 	public boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
@@ -74,7 +74,7 @@ public final class MultilingualSupport {
 
 	/**
 	 *
-	 * @return
+	 * @return true if a preferences node exists
 	 * @throws BackingStoreException
 	 */
 	private boolean doesLanguagePreferenceExist() throws BackingStoreException {
@@ -85,14 +85,14 @@ public final class MultilingualSupport {
 	}
 
 	/**
-	 *
+	 * save the user's current langauge choice
 	 */
 	public void saveConfig() {
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
-	 *
+	 * load the user's language choice
 	 */
 	public void loadConfig() {
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, DEFAULT_LANGUAGE);
@@ -112,8 +112,8 @@ public final class MultilingualSupport {
 	}
 
 	/**
-	 *
-	 * @param all_files
+	 * scan a list of files, find all XML files, try to load them as languages.
+	 * @param all_files the list of files
 	 */
 	private void createLanguageContainersFromLanguageFiles(File[] all_files) {
 		LanguageContainer lang;
@@ -133,7 +133,7 @@ public final class MultilingualSupport {
 	/**
 	 *
 	 * @param key
-	 * @return
+	 * @return the translated value for key
 	 */
 	public String get(String key) {
 		String value=null;
@@ -148,7 +148,7 @@ public final class MultilingualSupport {
 
 	/**
 	 *
-	 * @return
+	 * @return the list of language names
 	 */
 	protected String [] getLanguageList() {
 		final String [] choices = new String[languages.keySet().size()];
@@ -161,6 +161,10 @@ public final class MultilingualSupport {
 		return choices;
 	}
 
+	/**
+	 *
+	 * @param currentLanguage the name of the language to make active.
+	 */
 	public void setCurrentLanguage(String currentLanguage) {
 		this.currentLanguage = currentLanguage;
 	}
