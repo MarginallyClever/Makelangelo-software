@@ -25,35 +25,36 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
     
     // arc smoothness - increase to make more smooth and run slower.
-    public static final double STEPS_PER_DEGREE=1;
+    private static final double STEPS_PER_DEGREE=1;
 
     // progress
-    long linesProcessed=0;
-    boolean connected=false;
-    boolean running=false;
+    private long linesProcessed=0;
+    private boolean connected=false;
+    private boolean running=false;
 
     // config
-    boolean show_pen_up=false;
+    private boolean show_pen_up=false;
     
     // motion control
-    boolean mouseIn=false;
-    int buttonPressed=MouseEvent.NOBUTTON;
-    int oldx, oldy;
+    //private boolean mouseIn=false;
+    private int buttonPressed=MouseEvent.NOBUTTON;
+    private int oldx, oldy;
 
     // scale + position
     private double cameraOffsetX = 0.0d;
     private double cameraOffsetY = 0.0d;
     private double cameraZoom = 20.0d;
     private float drawScale = 0.1f;
-    int window_width=0;
-    int window_height=0;
-    float window_aspect_ratio = 1f;
+    private int window_width=0;
+    private int window_height=0;
+   
+    private final int look_ahead=500;
 
-	ArrayList<String> instructions;
+    private ArrayList<String> instructions;
 	
 	protected MachineConfiguration machine;
 
-	public enum NodeType { COLOR, POS, TOOL };
+	private enum NodeType { COLOR, POS, TOOL };
 	
 	// optimization attempt
 	class DrawPanelNode {
@@ -82,13 +83,17 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
         window_width=width;
         window_height=height;
-        window_aspect_ratio = window_width / window_height;
+        //window_aspect_ratio = window_width / window_height;
+
+        gl2.glMatrixMode(GL2.GL_PROJECTION);
+        gl2.glLoadIdentity();
+        gl2.glOrtho(-window_width / 2.0d, window_width / 2.0d, -window_height / 2.0d, window_height / 2.0d, 1.0d, -1.0d);
     }
     
     @Override
     public void init( GLAutoDrawable drawable ) {
         // Use debug pipeline
-        boolean glDebug=true;
+        boolean glDebug=false;
         boolean glTrace=false;
         
         GL gl = drawable.getGL();
@@ -261,9 +266,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
     // scale and translate the output
     private void paintCamera(GL2 gl2) {
-        gl2.glMatrixMode(GL2.GL_PROJECTION);
-        gl2.glLoadIdentity();
-        gl2.glOrtho(-window_width / 2.0d, window_width / 2.0d, -window_height / 2.0d, window_height / 2.0d, 1.0d, -1.0d);
         gl2.glMatrixMode(GL2.GL_MODELVIEW);
         gl2.glLoadIdentity();
         gl2.glTranslated(-cameraOffsetX, cameraOffsetY,0);
@@ -344,8 +346,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// TODO draw left motor
 		// TODO draw right motor
 		// TODO draw control box
-
-        final int look_ahead=500;
 
         gl2.glColor3f(0, 0, 0);
 
