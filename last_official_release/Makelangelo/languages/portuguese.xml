@@ -269,7 +269,7 @@
 	</string>
 	<string>
 		<key>MenuGraphicsSpeedVSQuality</key>
-		<value>Velocidade por qualidade/value>
+		<value>Velocidade por qualidade</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
@@ -313,7 +313,7 @@
 
 	<string>
 		<key>Pause</key>
-		<value>Pausar/value>
+		<value>Pausar</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -670,7 +670,7 @@
 	</string>
 	<string>
 		<key>voronoiStipplingDotMin</key>
-		<value>Tamanho minimo do ponto/value>
+		<value>Tamanho minimo do ponto</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 
