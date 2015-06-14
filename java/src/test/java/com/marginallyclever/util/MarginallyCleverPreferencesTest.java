@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
  * Created on 6/7/15.
  *
  * @author Peter Colapietro
- * @since 0.1.0
+ * @since v7.1.4
  */
 public class MarginallyCleverPreferencesTest {
 

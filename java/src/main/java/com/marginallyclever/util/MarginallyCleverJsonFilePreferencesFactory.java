@@ -12,7 +12,7 @@ import java.util.prefs.PreferencesFactory;
  * Created on 6/7/15.
  *
  * @author Peter Colapietro
- * @since v7.1.3
+ * @since v7.1.4
  *
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  *
