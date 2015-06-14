@@ -35,6 +35,10 @@ public class PreferencesHelperTest {
      */
     private final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
+    /**
+     *
+     */
+    final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) preferenceNode, "JSON");
 
     /**
      *
@@ -55,7 +59,7 @@ public class PreferencesHelperTest {
      */
     @org.junit.After
     public void tearDown() throws Exception {
-
+        marginallyCleverJsonPreferenceNode.removeNode();
     }
 
     /**
@@ -68,7 +72,6 @@ public class PreferencesHelperTest {
 
     @Test
     public void testCopyPreferenceNode() {
-        final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) preferenceNode, "JSON");
         try {
             clearAll(marginallyCleverJsonPreferenceNode);
         } catch (BackingStoreException e) {
