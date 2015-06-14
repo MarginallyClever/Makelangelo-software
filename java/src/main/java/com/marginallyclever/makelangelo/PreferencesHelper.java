@@ -29,7 +29,7 @@ public final class PreferencesHelper {
         initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, makelangeloPreferenceNode);
         initialMap.put(MakelangeloPreferenceKey.GRAPHICS, makelangeloPreferenceNode.node("Graphics"));
         initialMap.put(MakelangeloPreferenceKey.MACHINES, makelangeloPreferenceNode.node("Machines"));
-        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, userRootPreferencesNode.node("Language"));
+        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, makelangeloPreferenceNode.node("Language"));
         CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(initialMap);
     }
 

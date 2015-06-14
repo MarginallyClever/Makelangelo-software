@@ -55,8 +55,8 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 
-// TODO while not drawing, in-app gcode editing with immediate visual feedback ?
-// TODO image processing options - cutoff, exposure, resolution, edge tracing ?
+// TODO while not drawing, in-app gCode editing with immediate visual feedback ?
+// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
 // TODO vector output ?
 /**
  * 
@@ -81,6 +81,7 @@ public class MainGUI
 
 	
 	// Image processing
+	// TODO use a ServiceLoader for plugins
 	private List<Filter> image_converters;
 	private boolean startConvertingNow;
 	
@@ -89,10 +90,7 @@ public class MainGUI
 	
 	private MarginallyCleverConnectionManager connectionManager;
 	private MarginallyCleverConnection connectionToRobot=null;
-		
-	// machine settings while running
-	private double feed_rate;
-	
+
 	// GUI elements
 	private static JFrame mainframe;
 	private JMenuBar menuBar;
@@ -113,8 +111,7 @@ public class MainGUI
 
     private JTabbedPane contextMenu;
     private Splitter split_left_right;
-    public boolean dialog_result=false;
-    
+
     // logging
     private JTextPane log;
     private JScrollPane logPane;
@@ -130,10 +127,10 @@ public class MainGUI
 	
 
 	// reading file
-	private boolean isrunning=false;
+	private boolean isRunning =false;
 	private boolean isPaused=true;
 	
-	private GCodeFile gcode = new GCodeFile();
+	private GCodeFile gCode = new GCodeFile();
 
 	private MachineConfiguration machineConfiguration;
 	private MultilingualSupport  translator;
@@ -153,8 +150,39 @@ public class MainGUI
 	public void startTranslator() {
 		translator = new MultilingualSupport();
 		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			translator.chooseLanguage();
+			chooseLanguage();
 		}
+	}
+	
+	// display a dialog box of available languages and let the user select their preference.
+	public void chooseLanguage() {
+		final JDialog driver = new JDialog(mainframe,"Language",true);
+		driver.setLayout(new GridBagLayout());
+
+		final String [] languageList = translator.getLanguageList();
+		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
+		final JButton save = new JButton(">>>");
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(languageOptions,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
+		
+		ActionListener driveButtons = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object subject = e.getSource();
+				// TODO prevent "close" icon.  Must press save to continue!
+				if(subject == save) {
+					translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
+					translator.saveConfig();
+					driver.dispose();
+				}
+			}
+		};
+
+		save.addActionListener(driveButtons);
+
+		driver.pack();
+		driver.setVisible(true);
 	}
 	
 
@@ -168,7 +196,7 @@ public class MainGUI
 		driveControls.lowerPen();
 	}
 	
-	public boolean isRunning() { return isrunning; }
+	public boolean isRunning() { return isRunning; }
 	public boolean isPaused() { return isPaused; }
 	
 	
@@ -210,8 +238,8 @@ public class MainGUI
 
 	
 	//  data access
-	public ArrayList<String> getGcode() {
-		return gcode.lines;
+	public ArrayList<String> getgCode() {
+		return gCode.lines;
 	}
 
 	private void playSound(String url) {
@@ -262,7 +290,7 @@ public class MainGUI
 	
 	private void textToGCODE() {
 		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
-		msg.generate(getTempDestinationFile() );
+		msg.generate(getTempDestinationFile());
 		tabToDraw();
 	}
 	
@@ -307,10 +335,10 @@ public class MainGUI
 	 */
 	public boolean loadGCode(String filename) {
 		try {
-			gcode.load(filename);
-		   	log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
-					+ "\n" + gcode.estimated_length + translator.get("Centimeters") + "\n"
-					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gcode.estimated_time)) + "s.</font>\n");
+			gCode.load(filename);
+		   	log("<font color='green'>" + gCode.estimate_count + translator.get("LineSegments")
+					+ "\n" + gCode.estimated_length + translator.get("Centimeters") + "\n"
+					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gCode.estimated_time)) + "s.</font>\n");
 	    }
 	    catch(IOException e) {
 	    	log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
@@ -319,7 +347,7 @@ public class MainGUI
 	    	return false;
 	    }
 	    
-	    previewPane.setGCode(gcode.lines);
+	    previewPane.setGCode(gCode.lines);
 	    halt();
 	    return true;
 	}
@@ -346,18 +374,15 @@ public class MainGUI
 		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
-		final String[] machineConfigurations = getAnyMachineConfigurations();
-		final JComboBox<String> machine_choice = new JComboBox<>(machineConfigurations);
-		machine_choice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+		final String[] knownMachineNames = machineConfiguration.getKnownMachineNames();
+		final JComboBox<String> machineChoice = new JComboBox<>(knownMachineNames);
+		machineChoice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
 		input_paper_margin.setMajorTickSpacing(10);
 		input_paper_margin.setMinorTickSpacing(5);
 		input_paper_margin.setPaintTicks(false);
 		input_paper_margin.setPaintLabels(true);
-		
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
 		
 		final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
 		reverse_h.setSelected(machineConfiguration.reverseForGlass);
@@ -376,11 +401,10 @@ public class MainGUI
 		input_draw_style.setSelectedIndex(getDrawStyle());
 		
 		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4; 	c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
 		int y=0;
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("MenuLoadMachineConfig")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machine_choice,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machineChoice,c);
 
 		if(!isDXF) {
 			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(translator.get("ConversionStyle")),c);
@@ -400,7 +424,8 @@ public class MainGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
-						long new_uid = Long.parseLong( machineConfigurations[machine_choice.getSelectedIndex()] );
+						final int machine_choiceSelectedIndex = machineChoice.getSelectedIndex();
+						long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
 						machineConfiguration.loadConfig(new_uid);
 						setDrawStyle(input_draw_style.getSelectedIndex());
 						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
@@ -759,7 +784,7 @@ public class MainGUI
 	
 	
 	public boolean isFileLoaded() {
-		return ( gcode.fileOpened && gcode.lines != null && gcode.lines.size() > 0 );
+		return ( gCode.fileOpened && gCode.lines != null && gCode.lines.size() > 0 );
 	}
 	
 	public boolean isFileGcode(String filename) {
@@ -847,17 +872,13 @@ public class MainGUI
 			}
 
 	    	try {
-	    		gcode.save(selectedFile);
+	    		gCode.save(selectedFile);
 	    	}
 		    catch(IOException e) {
 		    	log("<span style='color:red'>"+translator.get("Failed")+e.getMessage()+"</span>\n");
 		    	return;
 		    }
 	    }
-	}
-	
-	public void goHome() {
-		sendLineToRobot("G00 F" + feed_rate + " X0 Y0");
 	}
 	
 	private String selectFile() {
@@ -1014,16 +1035,16 @@ public class MainGUI
 	
 	// Take the next line from the file and send it to the robot, if permitted. 
 	public void sendFileCommand() {
-		if(isrunning==false || isPaused==true || gcode.fileOpened==false ||
-				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gcode.linesProcessed>=gcode.linesTotal) return;
+		if(isRunning ==false || isPaused==true || gCode.fileOpened==false ||
+				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gCode.linesProcessed>= gCode.linesTotal) return;
 		
 		String line;
 		do {			
 			// are there any more commands?
 			// TODO: find out how far the pen moved each line and add it to the distance total.
-			int line_number = gcode.linesProcessed;
-			gcode.linesProcessed++;
-			line=gcode.lines.get(line_number).trim();
+			int line_number = gCode.linesProcessed;
+			gCode.linesProcessed++;
+			line= gCode.lines.get(line_number).trim();
 
 			// TODO catch pen up/down status here
 			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
@@ -1039,13 +1060,13 @@ public class MainGUI
 			}
 			line += generateChecksum(line);
 			
-			previewPane.setLinesProcessed(gcode.linesProcessed);
-			statusBar.setProgress(gcode.linesProcessed, gcode.linesTotal);
+			previewPane.setLinesProcessed(gCode.linesProcessed);
+			statusBar.setProgress(gCode.linesProcessed, gCode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while(processLine(line) && gcode.linesProcessed<gcode.linesTotal);
+		} while(processLine(line) && gCode.linesProcessed< gCode.linesTotal);
 		
-		if(gcode.linesProcessed==gcode.linesTotal) {
+		if(gCode.linesProcessed== gCode.linesTotal) {
 			// end of file
 			playDawingFinishedSound();
 			halt();
@@ -1055,7 +1076,7 @@ public class MainGUI
 	
 	
 	private void sayHooray() {
-		long num_lines = gcode.linesProcessed;
+		long num_lines = gCode.linesProcessed;
 		
 		JOptionPane.showMessageDialog(null,
 				translator.get("Finished") +
@@ -1088,7 +1109,7 @@ public class MainGUI
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean processLine(String line) {
-		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || !isrunning) return false;
+		if(connectionToRobot == null || !connectionToRobot.isRobotConfirmed() || !isRunning) return false;
 
 		// tool change request?
 		String [] tokens = line.split("(\\s|;)");
@@ -1160,17 +1181,17 @@ public class MainGUI
 	 * TODO add an e-stop command?
 	 */
 	public void halt() {
-		isrunning=false;
+		isRunning =false;
 		isPaused=false;
 	    previewPane.setLinesProcessed(0);
-		previewPane.setRunning(isrunning);
+		previewPane.setRunning(isRunning);
 		updateMenuBar();
 	}
 	
 	public void startAt(long lineNumber) {
-		gcode.linesProcessed=(int)lineNumber;
-		sendLineToRobot("M110 N" + gcode.linesProcessed);
-		previewPane.setLinesProcessed(gcode.linesProcessed);
+		gCode.linesProcessed=0;
+		sendLineToRobot("M110 N" + gCode.linesProcessed);
+		previewPane.setLinesProcessed(gCode.linesProcessed);
 		startDrawing();
 	}
 	
@@ -1184,8 +1205,8 @@ public class MainGUI
 
 	private void startDrawing() {
 		isPaused=false;
-		isrunning=true;
-		previewPane.setRunning(isrunning);
+		isRunning =true;
+		previewPane.setRunning(isRunning);
 		updateMenuBar();
 		statusBar.start();
 		sendFileCommand();
@@ -1579,19 +1600,19 @@ public class MainGUI
         int i;
         
         if(settingsPane!=null) {
-            buttonAdjustMachineSize.setEnabled(!isrunning);
-            buttonAdjustPulleySize.setEnabled(!isrunning);
-            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isrunning);
-            buttonChangeTool.setEnabled(!isrunning);
-            buttonAdjustTool.setEnabled(!isrunning);
+            buttonAdjustMachineSize.setEnabled(!isRunning);
+            buttonAdjustPulleySize.setEnabled(!isRunning);
+            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isRunning);
+            buttonChangeTool.setEnabled(!isRunning);
+            buttonAdjustTool.setEnabled(!isRunning);
         }
         if(preparePane!=null) {
-            buttonHilbertCurve.setEnabled(!isrunning);
-            buttonText2GCODE.setEnabled(!isrunning);
+            buttonHilbertCurve.setEnabled(!isRunning);
+            buttonText2GCODE.setEnabled(!isRunning);
         }
         if(driveControls!=null) {
         	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	driveControls.updateButtonAccess(x,isrunning);
+        	driveControls.updateButtonAccess(x, isRunning);
         }
         
         
@@ -1636,7 +1657,7 @@ public class MainGUI
         
         // Connect menu
         subMenu = new JMenu(translator.get("MenuConnect"));
-        subMenu.setEnabled(!isrunning);
+        subMenu.setEnabled(!isRunning);
         group = new ButtonGroup();
 
         String [] connections = connectionManager.listConnections();
@@ -1819,7 +1840,7 @@ public class MainGUI
 	 * @return the <code>GCodeFile</code> representing the G-Code file used by this GUI.
 	 */
 	public GCodeFile getGcodeFile() {
-		return gcode;
+		return gCode;
 	}
 }
 
