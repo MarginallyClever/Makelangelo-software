@@ -20,7 +20,6 @@ public class Filter_DitherFloydSteinberg extends Filter {
 	public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	

@@ -17,7 +17,6 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 	public Filter_DitherFloydSteinbergRGB(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 

@@ -48,7 +48,6 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	public Filter_GeneratorVoronoiStippling(MainGUI gui,
 			MachineConfiguration mc, MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 

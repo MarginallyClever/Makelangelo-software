@@ -157,15 +157,15 @@ void IK(float x, float y, long &l1, long &l2) {
 // to find angle between M1M2 and M1P where P is the plotter position.
 void FK(long l1, long l2,float &x,float &y) {
 #ifdef COREXY
-  l1 *= THREADPERSTEP1;
-  l2 *= THREADPERSTEP2;
+  l1 *= THREAD_PER_STEP;
+  l2 *= THREAD_PER_STEP;
 
   x = (float)( l1 + l2 ) / 2.0;
   y = x - (float)l2;
 #endif
 #ifdef TRADITIONALXY
-  x = l1 * THREADPERSTEP1;
-  y = l2 * THREADPERSTEP2;
+  x = l1 * THREAD_PER_STEP;
+  y = l2 * THREAD_PER_STEP;
 #endif
 #ifdef POLARGRAPH2
   float a = (float)l1 * THREAD_PER_STEP;

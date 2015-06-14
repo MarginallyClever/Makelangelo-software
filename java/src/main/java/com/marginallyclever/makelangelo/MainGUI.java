@@ -56,11 +56,13 @@ import java.util.prefs.Preferences;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
-// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
+// TODO image processing options - cutoff, exposure, resolution, edge tracing ?
 // TODO vector output ?
-// TODO externalize constants like version and ABOUT_HTML
-// TODO externalize constants like version
-
+/**
+ * 
+ * @author dan royer
+ * @since 0.0.1?
+ */
 public class MainGUI
 		extends JPanel
 		implements ActionListener
@@ -79,14 +81,13 @@ public class MainGUI
 
 	
 	// Image processing
-		// TODO use a ServiceLoader for plugins
-		private List<Filter> image_converters;
-		private boolean startConvertingNow;
+	private List<Filter> image_converters;
+	private boolean startConvertingNow;
 	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 	private RecentFiles recentFiles;
 	
-	private MarginallyCleverConnectionManager connectionManager;  // TODO replace with multi-type connection manager?
+	private MarginallyCleverConnectionManager connectionManager;
 	private MarginallyCleverConnection connectionToRobot=null;
 		
 	// machine settings while running
@@ -152,39 +153,8 @@ public class MainGUI
 	public void startTranslator() {
 		translator = new MultilingualSupport();
 		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			chooseLanguage();
+			translator.chooseLanguage();
 		}
-	}
-	
-	// display a dialog box of available languages and let the user select their preference.
-	public void chooseLanguage() {
-		final JDialog driver = new JDialog(mainframe,"Language",true);
-		driver.setLayout(new GridBagLayout());
-
-		final String [] choices = translator.getLanguageList();
-		final JComboBox<String> language_options = new JComboBox<String>(choices);
-		final JButton save = new JButton(">>>");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=0;	c.gridy=0;	driver.add(language_options,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=0;  driver.add(save,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				// TODO prevent "close" icon.  Must press save to continue!
-				if(subject == save) {
-					translator.setCurrentLanguage(choices[language_options.getSelectedIndex()]);
-					translator.saveConfig();
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-
-		driver.pack();
-		driver.setVisible(true);
 	}
 	
 
@@ -202,7 +172,7 @@ public class MainGUI
 	public boolean isPaused() { return isPaused; }
 	
 	
-	// TODO use a serviceLoader instead
+	// TODO use a ServiceLoader instead?
 	protected void loadImageConverters() {
 		image_converters = new ArrayList<Filter>();
 		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
@@ -335,7 +305,7 @@ public class MainGUI
 	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
 	 * @param filename what file to open
 	 */
-	public void loadGCode(String filename) {
+	public boolean loadGCode(String filename) {
 		try {
 			gcode.load(filename);
 		   	log("<font color='green'>" + gcode.estimate_count + translator.get("LineSegments")
@@ -346,11 +316,12 @@ public class MainGUI
 	    	log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
 	    	recentFiles.remove(filename);
 	    	updateMenuBar();
-	    	return;
+	    	return false;
 	    }
 	    
 	    previewPane.setGCode(gcode.lines);
 	    halt();
+	    return true;
 	}
 	
 	public String getTempDestinationFile() {
@@ -554,14 +525,15 @@ public class MainGUI
 									double y=(start.getY()-cy)*sy;
 									double x2=(end.getX()-cx)*sx;
 									double y2=(end.getY()-cy)*sy;
-									
+									double dx,dy;
+									/*
 									// is it worth drawing this line?
-									double dx = x2-x;
-									double dy = y2-y;
+									dx = x2-x;
+									dy = y2-y;
 									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
 										continue;
 									}
-									
+									*/
 									dx = dxf_x2 - x;
 									dy = dxf_y2 - y;
 
@@ -811,20 +783,22 @@ public class MainGUI
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
  		log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
-
+ 		boolean file_loaded_ok=false;
+ 		
 	   	if(isFileGcode(filename)) {
-			loadGCode(filename);
+			file_loaded_ok = loadGCode(filename);
     	} else if(isFileDXF(filename)) {
-    		loadDXF(filename);
+    		file_loaded_ok = loadDXF(filename);
     	} else if(isFileImage(filename)) {
-    		loadImage(filename);
+    		file_loaded_ok = loadImage(filename);
     	} else {
     		log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
     	}
 
-	   	// TODO: if succeeded
-	   	recentFiles.add(filename);
-		updateMenuBar();
+	   	if(file_loaded_ok==true) {
+	   		recentFiles.add(filename);
+	   		updateMenuBar();
+	   	}
     	statusBar.clear();
 	}
 
@@ -1035,7 +1009,6 @@ public class MainGUI
 		sendLineToRobot(machineConfiguration.getConfigLine());
 		sendLineToRobot(machineConfiguration.getBobbinLine());
 		sendLineToRobot("G92 X0 Y0");
-		//sendLineToRobot("M17"); FIXME add to options dialog
 	}
 	
 	
@@ -1252,7 +1225,6 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonDisconnect ) {
-			//sendLineToRobot("M18"); FIXME add to options dialog
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
 			clearLog();
@@ -1275,7 +1247,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAdjustLanguage ) {
-			chooseLanguage();
+			translator.chooseLanguage();
 			updateMenuBar();
 		}
 		if( subject == buttonAdjustMachineSize ) {
@@ -1303,16 +1275,7 @@ public class MainGUI
 			return;
 		}
 		if( subject == buttonAbout ) {
-            final String aboutHtml = getAboutHtmlFromMultilingualString();
-			final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-			ImageIcon icon = getImageIcon("logo.png");
-			final String menuAboutValue = translator.get("MenuAbout");
-			if (icon != null) {
-				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-			} else {
-				icon = getImageIcon("resources/logo.png");
-				JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-			}
+			displayAbout();
 			return;
 		}
 		if( subject == buttonCheckForUpdate ) {
@@ -1326,7 +1289,7 @@ public class MainGUI
 		}
 		
 		if( subject == buttonExit ) {
-			System.exit(0);  // TODO: be more graceful?
+			System.exit(0);
 			return;
 		}
 		
@@ -1419,7 +1382,7 @@ public class MainGUI
 						try {
 							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
 						} catch (IOException | URISyntaxException exception) {
-							// FIXME Auto-generated catch block
+							// Auto-generated catch block
 							exception.printStackTrace();
 						}
 					}
@@ -1429,6 +1392,21 @@ public class MainGUI
 		};
 		bottomText.addHyperlinkListener(hyperlinkListener);
 		return bottomText;
+	}
+	
+	
+	/**
+	 * display the about dialog.
+	 */
+	private void displayAbout() {
+        final String aboutHtml = getAboutHtmlFromMultilingualString();
+		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
+		ImageIcon icon = getImageIcon("logo.png");
+		final String menuAboutValue = translator.get("MenuAbout");
+		if (icon == null) {
+			icon = getImageIcon("resources/logo.png");
+		}
+		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
 
     // settings menu
