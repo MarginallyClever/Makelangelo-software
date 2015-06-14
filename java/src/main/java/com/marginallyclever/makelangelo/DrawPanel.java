@@ -380,6 +380,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		paintCenter(gl2);
 		
 		// TODO draw left motor, right motor, and control box
+		// TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
 
         gl2.glColor3f(0, 0, 0);
 

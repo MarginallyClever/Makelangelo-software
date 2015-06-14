@@ -419,6 +419,7 @@ public abstract class Filter {
 	}
 	
 
+	// TODO count newlines?
 	protected Rectangle2D textCalculateBounds(String text) {
 		String [] lines = textWrapToLength(text);
 		int len = textLongestLine(lines);
@@ -476,7 +477,6 @@ public abstract class Filter {
 		tool = machine.getCurrentTool();
 		
 		// find size of text block
-		// TODO count newlines
 		Rectangle2D r = textCalculateBounds(text);
 
 		output.write("G90;\n");

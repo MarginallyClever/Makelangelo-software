@@ -519,7 +519,6 @@ public class MachineConfiguration {
 			tool.loadConfig(uniqueMachinePreferencesNode);
 		}
 
-		// TODO move these values to image filter preferences
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
 		current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",Integer.toString(current_tool)));
@@ -593,7 +592,7 @@ public class MachineConfiguration {
 			tool.saveConfig(uniqueMachinePreferencesNode);
 		}
 
-		// TODO move these values to image filter preferences
+		// TODO move these values to image filter preferences?
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(current_tool));

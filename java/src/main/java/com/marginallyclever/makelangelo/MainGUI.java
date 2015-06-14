@@ -57,7 +57,7 @@ import java.util.prefs.Preferences;
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
 // TODO image processing options - cutoff, exposure, resolution, edge tracing ?
-// TODO vector output ?
+// TODO filters > vector output, vector output > gcode.
 /**
  * 
  * @author dan royer
@@ -199,7 +199,6 @@ public class MainGUI
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			logToFile.write("<h3>"+sdf.format(cal.getTime())+"</h3>\n");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -521,19 +520,19 @@ public class MainGUI
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
-									double x=(start.getX()-cx)*sx;
-									double y=(start.getY()-cy)*sy;
-									double x2=(end.getX()-cx)*sx;
-									double y2=(end.getY()-cy)*sy;
+									double x =(start.getX()-cx)*sx;
+									double y =(start.getY()-cy)*sy;
+									double x2=(end  .getX()-cx)*sx;
+									double y2=(end  .getY()-cy)*sy;
 									double dx,dy;
-									/*
+									//*
 									// is it worth drawing this line?
 									dx = x2-x;
 									dy = y2-y;
 									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
 										continue;
 									}
-									*/
+									//*/
 									dx = dxf_x2 - x;
 									dy = dxf_y2 - y;
 
@@ -628,7 +627,6 @@ public class MainGUI
 				} catch(IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
 					try {
@@ -872,7 +870,9 @@ public class MainGUI
 	    }
 	}
 	
-	// Adjust sound preferences
+	/**
+	 * Adjust sound preferences
+	 */
 	protected void adjustSounds() {
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
@@ -938,8 +938,11 @@ public class MainGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
+	
 
-    // Adjust graphics preferences	
+    /**
+     * Adjust graphics preferences	
+     */
 	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		
@@ -1001,7 +1004,10 @@ public class MainGUI
 		driver.setVisible(true);
 	}
 	
-	// Send the machine configuration to the robot
+	
+	/**
+	 * Send the machine configuration to the robot
+	 */
 	public void sendConfig() {
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
@@ -1012,7 +1018,9 @@ public class MainGUI
 	}
 	
 	
-	// Take the next line from the file and send it to the robot, if permitted. 
+	/**
+	 * Take the next line from the file and send it to the robot, if permitted. 
+	 */
 	public void sendFileCommand() {
 		if(isrunning==false || isPaused==true || gcode.fileOpened==false ||
 				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gcode.linesProcessed>=gcode.linesTotal) return;
@@ -1025,7 +1033,7 @@ public class MainGUI
 			gcode.linesProcessed++;
 			line=gcode.lines.get(line_number).trim();
 
-			// TODO catch pen up/down status here
+			// catch pen up/down status here
 			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
 				driveControls.raisePen();
 			}

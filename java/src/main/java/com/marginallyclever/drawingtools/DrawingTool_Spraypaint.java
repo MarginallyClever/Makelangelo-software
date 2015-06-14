@@ -46,7 +46,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		if(is_up) {
 			out.write("G00 X"+x+" Y"+y+";\n");			
 		} else {
-			// TODO make this into a set of dots
+			// Make a set of dots in a row, instead of a single continuous line
 			//out.write("G00 X"+x+" Y"+y+";\n");
 			float dx=x-old_x;
 			float dy=y-old_y;
