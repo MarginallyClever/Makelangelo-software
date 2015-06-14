@@ -26,7 +26,7 @@ import java.util.prefs.Preferences;
  * Created on 5/25/15.
  *
  * @author Peter Colapietro
- * @since v7.1.3
+ * @since v7.1.4
  */
 public class PreferencesHelperTest {
 
@@ -144,6 +144,8 @@ public class PreferencesHelperTest {
 
     /**
      *
+     * Recursively clears all the preferences (key-value associations) for a given node and its children.
+     *
      * @param preferenceNode
      *
      * @see <a href="http://stackoverflow.com/a/6411855"></a>
@@ -165,7 +167,9 @@ public class PreferencesHelperTest {
     }
 
     /**
-     *
+     * Removes all of the preferences (key-value associations) in this
+     * preference node with no effect on any descendants
+     * of this node.
      */
     private void shallowClearPreferences(Preferences preferenceNode) {
         try {
@@ -176,7 +180,8 @@ public class PreferencesHelperTest {
     }
 
     /**
-     *
+     * Removes all of the preferences (key-value associations) in this
+     * preference node and any descendants of this node.
      */
     private void deepClearPreferences(Preferences preferenceNode) {
         try {

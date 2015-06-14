@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
  * Created on 5/17/15. FIXME Write Javadocs.
  *
  * @author Peter Colapietro
- * @since v7.1.3
+ * @since v7.1.4
  */
 public final class PreferencesHelper {
 
