@@ -79,12 +79,15 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
         recentPort = prefs.get("recent-port", "");
     }
 
-    // update the prefs with the last port connected and refreshes the menus.
-    // TODO: only update when the port is confirmed?
+    /**
+     * update the prefs with the last port connected and refreshes the menus.
+     * @param portName
+     * TODO only update when the port is confirmed?
+     */
     public void setRecentPort(String portName) {
         prefs.put("recent-port", portName);
         recentPort=portName;
-        //UpdateMenuBar(); FIXME
+        //UpdateMenuBar();
     }
 
 

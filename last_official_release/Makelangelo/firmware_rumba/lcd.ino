@@ -161,22 +161,17 @@ void LCD_status_menu() {
     if(lcd_click_now) MENU_GOTO(LCD_main_menu);
 
     // update the current status
-    float d1=laststep[0];
-    float d2=laststep[1];
-    float px,py;
-    FK(d1,d2,px,py);
-    px*=10;
-    py*=10;
-
-    //lcd.clear();
-    lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(px);
-    lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(py);
+    lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(posx);
+    lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(posy);
     lcd.setCursor( 0, 1);  lcd.print('Z');  LCD_print_float(posz);
     lcd.setCursor(10, 1);  lcd.print('F');  LCD_print_float(feed_rate);
-    lcd.setCursor( 0, 2);  lcd.print("Makelangelo.com");
-    if(sd_printing_now==true && sd_printing_paused==false) {
+    lcd.setCursor( 0, 2);  lcd.print(F("Makelangelo.com "));  lcd.print(robot_uid);
+    if(sd_printing_now==true/* && sd_printing_paused==false*/) {
       lcd.setCursor(0,3);  LCD_print_float(sd_percent_complete);
       lcd.print('%');
+    } else {
+      lcd.setCursor(0,3);
+      lcd.print(F("          "));
     }
   MENU_END
 }

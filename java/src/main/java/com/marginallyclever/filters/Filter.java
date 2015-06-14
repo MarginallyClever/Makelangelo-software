@@ -33,13 +33,13 @@ public abstract class Filter {
 	protected float letter_height=20.0f;
 	protected float line_spacing=5.0f;
 	protected float padding=5.0f;
-	static final String alphabetFolder = new String("ALPHABET/");
+	static final String alphabetFolder = "ALPHABET/";
 	protected int chars_per_line=25;
 	protected boolean draw_bounding_box=false;
 	
 	// text position and alignment
-	public enum VAlign { TOP, MIDDLE, BOTTOM };
-	public enum Align { LEFT, CENTER, RIGHT };
+	public enum VAlign { TOP, MIDDLE, BOTTOM }
+	public enum Align { LEFT, CENTER, RIGHT }
 	protected VAlign align_vertical = VAlign.MIDDLE;
 	protected Align  align_horizontal = Align.CENTER;
 	protected float posx=0;
@@ -102,7 +102,7 @@ public abstract class Filter {
 
 	/**
 	 * convert generates GCODE from a bufferedImage.
-	 * @param img
+	 * @param img image to filter.
 	 * @throws IOException
 	 */
 	public void convert(BufferedImage img) throws IOException {}
@@ -649,12 +649,12 @@ public abstract class Filter {
 									output.write(gap + c);
 								} else if (c.startsWith("X")) {
 									// translate coordinates
-									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
 									output.write(gap + "X" + SX(x));
 								} else if (c.startsWith("Y")) {
 									// translate coordinates
-									float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "Y" + SY(x));
+									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									output.write(gap + "Y" + SY(y));
 								} else {
 									output.write(gap + c);
 								}

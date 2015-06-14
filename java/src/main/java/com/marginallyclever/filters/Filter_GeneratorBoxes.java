@@ -15,7 +15,6 @@ public class Filter_GeneratorBoxes extends Filter {
 	public Filter_GeneratorBoxes(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() { return translator.get("BoxGeneratorName"); }
@@ -56,7 +55,7 @@ public class Filter_GeneratorBoxes extends Filter {
 	}
 	
 	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
 	public void convert(BufferedImage img) throws IOException {
@@ -77,7 +76,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		//double ph = machine.GetPaperHeight();
 		
 		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/(tool.getDiameter()));
+		float steps = (float)(pw/tool.getDiameter());
 		if(steps<1) steps=1;
 
 		float blockSize=(int)(image_width / steps);

@@ -15,7 +15,6 @@ public class Filter_GeneratorScanline extends Filter {
 	public Filter_GeneratorScanline(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() { return translator.get("ScanlineName"); }

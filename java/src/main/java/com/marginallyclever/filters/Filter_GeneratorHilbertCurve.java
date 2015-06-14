@@ -29,7 +29,6 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	public Filter_GeneratorHilbertCurve(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() { return translator.get("HilbertCurveName"); }
