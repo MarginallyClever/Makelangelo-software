@@ -146,13 +146,13 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 			last_y=(int)a.y;
 
 //			if( doesQuantizedBlockMatch(color_index, a.x,a.y+diameter) ) 
-				points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
-//				if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
-					points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
+			points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
 //			if( doesQuantizedBlockMatch(color_index, a.x+diameter,a.y) ) 
-				points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
-//				if( doesQuantizedBlockMatch(color_index, a.x-diameter,a.y) ) 
-					points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+			points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
+//			if( doesQuantizedBlockMatch(color_index, a.x-diameter,a.y) ) 
+			points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+//			if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
+			points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
 		}
 	}
 

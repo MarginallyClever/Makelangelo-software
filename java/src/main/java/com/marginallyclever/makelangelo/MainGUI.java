@@ -1035,10 +1035,10 @@ public class MainGUI
 			line=gcode.lines.get(line_number).trim();
 
 			// catch pen up/down status here
-			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
+			if(line.contains("Z"+machineConfiguration.getPenUpString())) {
 				driveControls.raisePen();
 			}
-			if(line.contains("G00 Z"+machineConfiguration.getPenDownString())) {
+			if(line.contains("Z"+machineConfiguration.getPenDownString())) {
 				driveControls.lowerPen();
 			}
 			

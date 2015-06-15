@@ -65,7 +65,7 @@ public class C3 {
 	    int Gdiff = o.green - this.green;
 	    int Bdiff = o.blue - this.blue;
 	    int distanceSquared = Rdiff*Rdiff + Gdiff*Gdiff + Bdiff*Bdiff;
-	    return distanceSquared;
+	    return (float)Math.sqrt(distanceSquared);
 	}
 	
 	public String toString() {

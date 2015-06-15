@@ -76,7 +76,6 @@ public class MachineConfiguration {
 	
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
-	protected int current_style;
 
 /*
 	// top left, bottom center, etc...
