@@ -2,6 +2,7 @@ package com.marginallyclever.filters;
 
 
 import com.marginallyclever.makelangelo.C3;
+import com.marginallyclever.makelangelo.ColorPalette;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -14,38 +15,26 @@ import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 
 
-public class Filter_GeneratorRGBFloodFill extends Filter {	
-	// The color mask has to match the tool index in the machine configuration
-	C3 [] palette = new C3[] {
-		new C3(0,0,0),
-		new C3(127,0,0),
-		new C3(0,127,0),
-		new C3(0,0,127),
-		new C3(255,255,255),
-	};
-	
+public class Filter_GeneratorColorFloodFill extends Filter {
+	ColorPalette palette;	
 	int diameter=0;
 	int last_x,last_y;
 	BufferedImage imgChanged;
 	OutputStreamWriter osw;
 	
 	
-	public Filter_GeneratorRGBFloodFill(MainGUI gui, MachineConfiguration mc,
+	public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
+		
+		palette = new ColorPalette();
+		palette.addColor(new C3(127,0,0));
+		palette.addColor(new C3(0,127,0));
+		palette.addColor(new C3(0,0,127));
 	}
 
 	public String getName() { return translator.get("RGBFloodFillName"); }
 
-	C3 quantizeColor(C3 c) {
-		C3 closest = palette[0];
-
-	    for (C3 n : palette) 
-	      if (n.diff(c) < closest.diff(c))
-	        closest = n;
-
-	    return closest;
-	}
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
@@ -88,7 +77,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 		if(y0<0) y0=0;
 		if(y1>image_height-1) y1 = image_height-1;
 
-		int c = palette[4].toInt();
+		int c = (new C3(255,255,255)).toInt();
 		for(int y=y0;y<y1;++y) {
 			for(int x=x0;x<x1;++x) {
 				imgChanged.setRGB(x, y, c);
@@ -100,8 +89,8 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 
 	protected boolean doesQuantizedBlockMatch(int color_index,float x,float y) {
 		C3 original_color = takeImageSampleBlock((int)x, (int)y, (int)(x+diameter), (int)(y+diameter));
-		C3 quantized_color = quantizeColor(original_color);
-		return (quantized_color.diff(palette[color_index]) == 0);
+		int quantized_color = palette.quantizeIndex(original_color);
+		return ( quantized_color == color_index );
 	}
 	
 	
@@ -165,18 +154,19 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	 * @throws IOException
 	 */
 	void scanForContiguousBlocks(int color_index) throws IOException {
-		C3 original_color, quantized_color;
+		C3 original_color;
+		int quantized_color;
 		
 		int x,y;
 		int z=0;
 
-		mainGUI.log("<font color='orange'>Palette color "+palette[color_index].toString()+"</font>\n");
+		mainGUI.log("<font color='orange'>Palette color "+palette.getColor(color_index).toString()+"</font>\n");
 		
 		for(y=0;y<image_height;y+=diameter) {
 			for(x=0;x<image_width;x+=diameter) {
 				original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
-				quantized_color = quantizeColor(original_color); 
-				if(quantized_color.diff(palette[color_index])==0) {
+				quantized_color = palette.quantizeIndex(original_color); 
+				if( quantized_color == color_index ) {
 					// found blob
 					floodFillBlob(color_index,x,y);
 					z++;

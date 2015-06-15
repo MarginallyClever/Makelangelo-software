@@ -1,6 +1,7 @@
 package com.marginallyclever.filters;
 
 import com.marginallyclever.makelangelo.C3;
+import com.marginallyclever.makelangelo.ColorPalette;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -13,30 +14,19 @@ import java.awt.image.BufferedImage;
  * @author Dan
  * @see <a href="http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering">http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering</a>
  */
-public class Filter_DitherFloydSteinbergRGB extends Filter {
-	public Filter_DitherFloydSteinbergRGB(MainGUI gui, MachineConfiguration mc,
+public class Filter_DitherFloydSteinbergColor extends Filter {
+	public ColorPalette palette;
+	
+	public Filter_DitherFloydSteinbergColor(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
+
+		palette = new ColorPalette();
+		palette.addColor(new C3(255,0,0));
+		palette.addColor(new C3(0,255,0));
+		palette.addColor(new C3(0,0,255));
 	}
 
-
-	C3 [] palette = new C3[] {
-		new C3(0,0,0),
-		new C3(255,0,0),
-		new C3(0,255,0),
-		new C3(0,0,255),
-		new C3(255,255,255),
-	};
-	
-	C3 quantizeColor(C3 c) {
-		C3 closest = palette[0];
-
-	    for (C3 n : palette) 
-	      if (n.diff(c) < closest.diff(c))
-	        closest = n;
-
-	    return closest;
-	}
 	
 	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) {
 		int w = img.getWidth();
@@ -60,7 +50,7 @@ public class Filter_DitherFloydSteinbergRGB extends Filter {
 			// oldpixel := pixel[x][y]
 			oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
 			// newpixel := find_closest_palette_color(oldpixel)
-			newPixel = quantizeColor(oldPixel);
+			newPixel = palette.quantize(oldPixel);
 			// pixel[x][y] := newpixel
 			img.setRGB(x, y, newPixel.toInt());
 			// quant_error := oldpixel - newpixel

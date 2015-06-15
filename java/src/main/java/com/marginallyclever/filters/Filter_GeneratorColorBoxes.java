@@ -2,6 +2,7 @@ package com.marginallyclever.filters;
 
 
 import com.marginallyclever.makelangelo.C3;
+import com.marginallyclever.makelangelo.ColorPalette;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -15,16 +16,8 @@ import java.io.OutputStreamWriter;
 /**
  * @author Dan
  */
-public class Filter_GeneratorRGB extends Filter {	
-	// The palette color mask has to match the tool index in the machine configuration
-	C3 [] palette = new C3[] {
-		new C3(0,0,0),
-		new C3(255,0,0),
-		new C3(0,255,0),
-		new C3(0,0,255),
-		new C3(255,255,255),
-	};
-
+public class Filter_GeneratorColorBoxes extends Filter {
+	ColorPalette palette;
 	OutputStreamWriter out;
 	float step1;
 	float step2;
@@ -36,9 +29,14 @@ public class Filter_GeneratorRGB extends Filter {
 	int direction=1;
 	
 
-	public Filter_GeneratorRGB(MainGUI gui, MachineConfiguration mc,
+	public Filter_GeneratorColorBoxes(MainGUI gui, MachineConfiguration mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
+		
+		palette = new ColorPalette();
+		palette.addColor(new C3(255,0,0));
+		palette.addColor(new C3(0,255,0));
+		palette.addColor(new C3(0,0,255));
 	}
 
 
@@ -48,24 +46,15 @@ public class Filter_GeneratorRGB extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(OutputStreamWriter out1,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
+			if(up) liftPen(out1);
+			else   lowerPen(out1);
 			lastup=up;
 		}
-		tool.writeMoveTo(out, TX(x), TY(y));
+		tool.writeMoveTo(out1, TX(x), TY(y));
 	}
 	
-	C3 quantizeColor(C3 c) {
-		C3 closest = palette[0];
-
-	    for (C3 n : palette) 
-	      if (n.diff(c) < closest.diff(c))
-	        closest = n;
-
-	    return closest;
-	}
 	
 	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) throws IOException {
 		float w = stepw;
@@ -93,10 +82,11 @@ public class Filter_GeneratorRGB extends Filter {
 			//oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
 			oldPixel.set( new C3(takeImageSampleBlock(img,(int)(x*step4),(int)(y*step4),(int)(x*step4+step4),(int)(y*step4+step4))).add(error[x]) );
 			// newpixel := find_closest_palette_color(oldpixel)
-			newPixel = quantizeColor(oldPixel);
+			int newIndex = palette.quantizeIndex(oldPixel);
+			newPixel = palette.getColor(newIndex);
 
 			// pixel[x][y] := newpixel
-			if(newPixel.diff(palette[palette_mask])==0) {
+			if( newIndex == palette_mask ) {
 				// draw a circle.  the diameter is relative to the intensity.
 				if(draw_filled) {
 					moveTo(out,x*step4+step2-step2,y*step4+step2-step2,true);
