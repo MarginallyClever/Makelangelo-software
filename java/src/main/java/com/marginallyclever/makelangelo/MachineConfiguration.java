@@ -77,7 +77,6 @@ public class MachineConfiguration {
 	
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
-	protected int current_style;
 
 /*
 	// top left, bottom center, etc...
@@ -520,7 +519,6 @@ public class MachineConfiguration {
 			tools[i].loadConfig(machinePreferences);
 		}*/
 
-		// TODO move these values to image filter root
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
 		current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",Integer.toString(current_tool)));
@@ -594,7 +592,7 @@ public class MachineConfiguration {
 			tools[i].saveConfig(machinePreferences);
 		}*/
 
-		// TODO move these values to image filter root
+		// TODO move these values to image filter preferences?
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(current_tool));

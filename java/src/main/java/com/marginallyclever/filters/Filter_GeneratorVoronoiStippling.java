@@ -132,7 +132,9 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	}
 
 
-	// jiggle the dots until they make a nice picture
+	/**
+	 * Jiggle the dots until they make a nice picture
+	 */
 	protected void evolveCells() {
 		try {
 			mainGUI.log("<font color='green'>Mutating</font>\n");
@@ -146,8 +148,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				tessellateVoronoiDiagram();
 				change = adjustCentroids();
 
-				// do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-			} while(change>=1 && generation<MAX_GENERATIONS);  // TODO these are a guess. tweak?  user set?
+				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
+			} while(change>=1 && generation<MAX_GENERATIONS);
 			
 			mainGUI.log("<font color='green'>Last "+generation+"</font>\n");
 		}

@@ -47,6 +47,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -55,9 +56,9 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 
-// TODO while not drawing, in-app gCode editing with immediate visual feedback ?
-// TODO image processing options - cutoff, exposure, resolution, voronoi stippling, edge tracing ?
-// TODO vector output ?
+// TODO while not drawing, in-app gcode editing with immediate visual feedback ?
+// TODO image processing options - cutoff, exposure, resolution, edge tracing ?
+// TODO filters > vector output, vector output > gcode.
 /**
  * 
  * @author dan royer
@@ -227,7 +228,6 @@ public class MainGUI
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			logToFile.write("<h3>"+sdf.format(cal.getTime())+"</h3>\n");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -546,19 +546,19 @@ public class MainGUI
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
-									double x=(start.getX()-cx)*sx;
-									double y=(start.getY()-cy)*sy;
-									double x2=(end.getX()-cx)*sx;
-									double y2=(end.getY()-cy)*sy;
+									double x =(start.getX()-cx)*sx;
+									double y =(start.getY()-cy)*sy;
+									double x2=(end  .getX()-cx)*sx;
+									double y2=(end  .getY()-cy)*sy;
 									double dx,dy;
-									/*
+									//*
 									// is it worth drawing this line?
 									dx = x2-x;
 									dy = y2-y;
 									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
 										continue;
 									}
-									*/
+									//*/
 									dx = dxf_x2 - x;
 									dy = dxf_y2 - y;
 
@@ -653,7 +653,6 @@ public class MainGUI
 				} catch(IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
 					try {
@@ -893,7 +892,9 @@ public class MainGUI
 	    }
 	}
 	
-	// Adjust sound root
+	/**
+	 * Adjust sound preferences
+	 */
 	protected void adjustSounds() {
 		final JDialog driver = new JDialog(mainframe,translator.get("MenuSoundsTitle"),true);
 		driver.setLayout(new GridBagLayout());
@@ -959,8 +960,11 @@ public class MainGUI
 		driver.pack();
 		driver.setVisible(true);
 	}
+	
 
-    // Adjust graphics root
+    /**
+     * Adjust graphics preferences	
+     */
 	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		
@@ -1022,7 +1026,10 @@ public class MainGUI
 		driver.setVisible(true);
 	}
 	
-	// Send the machine configuration to the robot
+	
+	/**
+	 * Send the machine configuration to the robot
+	 */
 	public void sendConfig() {
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
@@ -1033,7 +1040,9 @@ public class MainGUI
 	}
 	
 	
-	// Take the next line from the file and send it to the robot, if permitted. 
+	/**
+	 * Take the next line from the file and send it to the robot, if permitted. 
+	 */
 	public void sendFileCommand() {
 		if(isRunning ==false || isPaused==true || gCode.fileOpened==false ||
 				(connectionToRobot!=null && connectionToRobot.isRobotConfirmed()==false) || gCode.linesProcessed>= gCode.linesTotal) return;
@@ -1046,11 +1055,11 @@ public class MainGUI
 			gCode.linesProcessed++;
 			line= gCode.lines.get(line_number).trim();
 
-			// TODO catch pen up/down status here
-			if(line.contains("G00 Z"+machineConfiguration.getPenUpString())) {
+			// catch pen up/down status here
+			if(line.contains("Z"+machineConfiguration.getPenUpString())) {
 				driveControls.raisePen();
 			}
-			if(line.contains("G00 Z"+machineConfiguration.getPenDownString())) {
+			if(line.contains("Z"+machineConfiguration.getPenDownString())) {
 				driveControls.lowerPen();
 			}
 			
@@ -1571,18 +1580,39 @@ public class MainGUI
         return menuBar;
 	}
 	
+	/**
+	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest redirect notice
+	 * to find the latest release tag.
+	 */
 	public void checkForUpdate() {
 		try {
-		    // Get Github info
-			URL github = new URL("https://www.marginallyclever.com/other/software-update-check.php?id=1");
-	        BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
-
+			URL github = new URL("https://github.com/MarginallyClever/Makelangelo/releases/latest");
+			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
+			conn.setInstanceFollowRedirects(false);  //you still need to handle redirect manully.
+			HttpURLConnection.setFollowRedirects(false);
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
-	        	if( inputLine.compareTo(version) !=0 ) {
-	        		JOptionPane.showMessageDialog(null,translator.get("UpdateNotice"));
-	        	} else {
-	        		JOptionPane.showMessageDialog(null,translator.get("UpToDate"));
+	        	// parse the URL in the text-only redirect
+	        	String matchStart = "<a href=\"";
+	        	String matchEnd = "\">";
+	        	int start = inputLine.indexOf(matchStart);
+	        	int end = inputLine.indexOf(matchEnd);
+	        	if(start != -1 && end != -1) {
+	        		inputLine = inputLine.substring(start+matchStart.length(),end);
+	        		// parse the last part of the redirect URL, which contains the release tag (which is the version)
+	        		inputLine = inputLine.substring(inputLine.lastIndexOf("/")+1);
+
+	        		System.out.println("last release: "+inputLine);
+	        		System.out.println("your version: "+version);
+	        		//System.out.println(inputLine.compareTo(version));
+	        		
+	        		if( inputLine.compareTo(version) > 0 ) {
+		        		JOptionPane.showMessageDialog(null,translator.get("UpdateNotice"));
+		        	} else {
+		        		JOptionPane.showMessageDialog(null,translator.get("UpToDate"));
+		        	}
 	        	}
 	        } else {
 	        	throw new Exception();

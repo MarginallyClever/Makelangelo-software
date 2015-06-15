@@ -106,7 +106,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 	
 	
 	/**
-	 * Depth-first flood fill 
+	 * queue-based flood fill 
 	 * @param color_index
 	 * @param img
 	 * @param out
@@ -120,7 +120,6 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 
 		
 		while(points_to_visit.size()>0) {
-			// TODO: pop the closest point to (last_x,last_y)
 			a = points_to_visit.removeLast();
 			
 			if( !doesQuantizedBlockMatch(color_index, a.x,a.y) ) {
@@ -132,8 +131,7 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 			// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
 			float dx=(float)(a.x-last_x);
 			float dy=(float)(a.y-last_y);
-			if(Math.sqrt(dx*dx+dy*dy) > diameter*4.5)
-			//if(blobSize==1)
+			if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0)
 			{
 				//System.out.print("Jump at "+x+", "+y+"\n");
 				moveTo(last_x, last_y, true);
@@ -148,13 +146,13 @@ public class Filter_GeneratorRGBFloodFill extends Filter {
 			last_y=(int)a.y;
 
 //			if( doesQuantizedBlockMatch(color_index, a.x,a.y+diameter) ) 
-				points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
-//			if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
-				points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
+			points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
 //			if( doesQuantizedBlockMatch(color_index, a.x+diameter,a.y) ) 
-				points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
+			points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
 //			if( doesQuantizedBlockMatch(color_index, a.x-diameter,a.y) ) 
-				points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+			points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+//			if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
+			points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
 		}
 	}
 

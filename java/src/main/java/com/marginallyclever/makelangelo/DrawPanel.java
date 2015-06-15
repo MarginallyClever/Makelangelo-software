@@ -380,6 +380,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		paintCenter(gl2);
 		
 		// TODO draw left motor, right motor, and control box
+		// TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
 
         gl2.glColor3f(0, 0, 0);
 
@@ -404,7 +405,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 switch(n.type) {
                 case TOOL:
                     tool = machine.getTool(n.tool_id);
-                    gl2.glLineWidth(tool.getDiameter());
+                    gl2.glLineWidth(tool.getDiameter()*(float)this.cameraZoom/10.0f);
                     break;
                 case COLOR:
                     if(!running || n.line_number>linesProcessed+look_ahead) {
@@ -455,15 +456,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		drawScale=0.1f;
 		
-		float px=0,py=0,pz=90;
+		float px=0,py=0,pz=90,oldz=pz;
 		float x,y,z,ai,aj;
 		int i,j;
 		boolean absMode=true;
 		String tool_change="M06 T";
 		Color tool_color=Color.BLACK;
 		
-		pz=0.5f;
-		
+
 		for(i=0;i<instructions.size();++i) {
 			String line=instructions.get(i);
 			String[] pieces=line.split(";");
@@ -521,19 +521,23 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             if(j<tokens.length) continue;
             //*
             // is pen up or down?
-            tool.drawZ(z);
-            if(tool.isDrawOff()) {
-                if(show_pen_up==false) {
-                    px=x;
-                    py=y;
-                    pz=z;
-                    continue;
-                }
-                addNodeColor(i, Color.BLUE );
-            } else if(tool.isDrawOn()) {
-                addNodeColor(i, tool_color );  // TODO use actual pen color
-            } else {
-                addNodeColor(i, Color.ORANGE );
+            //if(oldz!=z)
+            {
+            	//oldz=z;
+	            tool.drawZ(z);
+	            if(tool.isDrawOff()) {
+	                if(show_pen_up==false) {
+	                    px=x;
+	                    py=y;
+	                    pz=z;
+	                    continue;
+	                }
+	                addNodeColor(i, Color.BLUE );
+	            } else if(tool.isDrawOn()) {
+	                addNodeColor(i, tool_color );  // TODO use actual pen color
+	            } else {
+	                addNodeColor(i, Color.ORANGE );
+	            }
             }
             
             // what kind of motion are we going to make?
