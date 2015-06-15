@@ -1565,22 +1565,22 @@ public class MainGUI
 	 */
 	public void checkForUpdate() {
 		try {
-		    // Get Github info
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
 			conn.setInstanceFollowRedirects(false);  //you still need to handle redirect manully.
 			HttpURLConnection.setFollowRedirects(false);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			
-	       // BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
+	        	// parse the URL in the text-only redirect
 	        	String matchStart = "<a href=\"";
 	        	String matchEnd = "\">";
 	        	int start = inputLine.indexOf(matchStart);
 	        	int end = inputLine.indexOf(matchEnd);
 	        	if(start != -1 && end != -1) {
 	        		inputLine = inputLine.substring(start+matchStart.length(),end);
+	        		// parse the last part of the redirect URL, which contains the release tag (which is the version)
 	        		inputLine = inputLine.substring(inputLine.lastIndexOf("/")+1);
 
 	        		System.out.println("last release: "+inputLine);
