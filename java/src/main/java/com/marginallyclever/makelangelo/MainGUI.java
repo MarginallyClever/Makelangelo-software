@@ -47,6 +47,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -1558,18 +1559,39 @@ public class MainGUI
         return menuBar;
 	}
 	
+	/**
+	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest redirect notice
+	 * to find the latest release tag.
+	 */
 	public void checkForUpdate() {
 		try {
 		    // Get Github info
-			URL github = new URL("https://www.marginallyclever.com/other/software-update-check.php?id=1");
-	        BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
-
+			URL github = new URL("https://github.com/MarginallyClever/Makelangelo/releases/latest");
+			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
+			conn.setInstanceFollowRedirects(false);  //you still need to handle redirect manully.
+			HttpURLConnection.setFollowRedirects(false);
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			
+	       // BufferedReader in = new BufferedReader(new InputStreamReader(github.openStream()));
 	        String inputLine;
 	        if((inputLine = in.readLine()) != null) {
-	        	if( inputLine.compareTo(version) !=0 ) {
-	        		JOptionPane.showMessageDialog(null,translator.get("UpdateNotice"));
-	        	} else {
-	        		JOptionPane.showMessageDialog(null,translator.get("UpToDate"));
+	        	String matchStart = "<a href=\"";
+	        	String matchEnd = "\">";
+	        	int start = inputLine.indexOf(matchStart);
+	        	int end = inputLine.indexOf(matchEnd);
+	        	if(start != -1 && end != -1) {
+	        		inputLine = inputLine.substring(start+matchStart.length(),end);
+	        		inputLine = inputLine.substring(inputLine.lastIndexOf("/")+1);
+
+	        		System.out.println("last release: "+inputLine);
+	        		System.out.println("your version: "+version);
+	        		//System.out.println(inputLine.compareTo(version));
+	        		
+	        		if( inputLine.compareTo(version) > 0 ) {
+		        		JOptionPane.showMessageDialog(null,translator.get("UpdateNotice"));
+		        	} else {
+		        		JOptionPane.showMessageDialog(null,translator.get("UpToDate"));
+		        	}
 	        	}
 	        } else {
 	        	throw new Exception();
