@@ -1,21 +1,23 @@
+# Start Makelangelo specific #
 *.class
-*.DS_Store
 *.ngc
-
-*/log.html
-
+**/log.html
 gcode/*
-*/Thumbs.db
-java/src/Thumbs.db
-*/.classpath
-
 */temp.png
-
 java/Makelangelo.jar
+java/saved.png
+# End Makelangelo specific #
 
-last_official_release/Makelangelo/log.html
+# Start OS generated files #
+*/.DS_Store
+.DS_Store
+.DS_Store?
+Thumbs.db
+# End OS generated files #
+
+# Start Maven
 target/
-.settings/
+# End Maven
 
 # Start JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 *.iml
@@ -23,10 +25,17 @@ target/
 *.ipr
 *.iws
 .idea/
+# End JetBrains IDEs: IntelliJ, modified from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 
-java/.settings/org.eclipse.core.resources.prefs
-log.html
+# Start Eclipse IDE
+classes/
+bin/
+.settings/
+**/.project
+**/.classpath
+# End Eclipse IDE
 
-java/saved.png
-*/.project
+## Auto generated diff files from SourceTree
+*.orig
+
 *.log

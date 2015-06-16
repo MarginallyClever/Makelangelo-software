@@ -35,6 +35,7 @@ import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
  */
 public class MachineConfiguration {
 
+	private static final int NUMBER_OF_DRAWING_TOOLS = 6;
 	/**
 	 *
 	 */
@@ -95,7 +96,7 @@ public class MachineConfiguration {
 	protected List<DrawingTool> tools;
 	protected int current_tool=0;	
 	
-	protected String [] configurations_available = null;
+	protected String [] machineConfigurationsAvailable = null;
 	private MainGUI mainGUI = null;
 	private MultilingualSupport translator;
 	
@@ -109,7 +110,7 @@ public class MachineConfiguration {
 		mainGUI = gui;
 		translator = ms;
 		
-		tools = new ArrayList<>();
+		tools = new ArrayList<>(NUMBER_OF_DRAWING_TOOLS);
 		tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
@@ -121,10 +122,10 @@ public class MachineConfiguration {
 		
 		// which configurations are available?
 		try {
-			configurations_available = topLevelMachinesPreferenceNode.childrenNames();
+			machineConfigurationsAvailable = topLevelMachinesPreferenceNode.childrenNames();
 		}
 		catch(Exception e) {
-			configurations_available = new String[0];
+			machineConfigurationsAvailable = new String[0];
 		}
 		
 		// TODO load most recent config?
@@ -513,10 +514,10 @@ public class MachineConfiguration {
 		paper_top=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paper_top)));
 		paper_bottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paper_bottom)));
 		
-		// load each tool's settings
-		for (DrawingTool tool : tools) {
-			tool.loadConfig(uniqueMachinePreferencesNode);
-		}
+		// load each tool's settings TODO test if this is the culprit
+		/*for(int i=0;i<tools.length;++i) {
+			tools[i].loadConfig(machinePreferences);
+		}*/
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
@@ -587,9 +588,9 @@ public class MachineConfiguration {
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paper_bottom);
 
 		// save each tool's settings
-		for (DrawingTool tool : tools) {
-			tool.saveConfig(uniqueMachinePreferencesNode);
-		}
+		/*for(int i=0;i<tools.length;++i) {
+			tools[i].saveConfig(machinePreferences);
+		}*/
 
 		// TODO move these values to image filter preferences?
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
@@ -680,11 +681,11 @@ public class MachineConfiguration {
 			mainGUI.sendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
-			String [] new_list = new String[configurations_available.length+1];
-			for(int i=0;i<configurations_available.length;++i) {
-				new_list[i] = configurations_available[i];
+			String [] new_list = new String[machineConfigurationsAvailable.length+1];
+			for(int i=0;i< machineConfigurationsAvailable.length;++i) {
+				new_list[i] = machineConfigurationsAvailable[i];
 			}
-			new_list[configurations_available.length] = Long.toString(new_uid);
+			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
 		}
 		return new_uid;
 	}
@@ -695,7 +696,7 @@ public class MachineConfiguration {
 	 * @return the number of machine configurations that exist on this computer
 	 */
 	public int getMachineCount() {
-		return configurations_available.length;
+		return machineConfigurationsAvailable.length;
 	}
 	
 	
@@ -704,16 +705,15 @@ public class MachineConfiguration {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		assert(getMachineCount()>0);
-		String [] choices = new String[configurations_available.length-1];
-
-		int j=0;
-		for(int i=0;i<configurations_available.length;++i) {
-			if(configurations_available[i].equals("0")) continue;
-			choices[j++] = configurations_available[i];
+		final String [] availableMachineConfigurations = new String[machineConfigurationsAvailable.length];
+		for(int i=0;i < machineConfigurationsAvailable.length;i++) {
+			if(machineConfigurationsAvailable[i].equals("0")) {
+				continue;
+			}
+			availableMachineConfigurations[i] = machineConfigurationsAvailable[i];
 		}
 		
-		return choices;
+		return availableMachineConfigurations;
 	}
 	
 	/**
@@ -721,19 +721,16 @@ public class MachineConfiguration {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getAvailableConfigurations() {
-		return configurations_available;
+		return machineConfigurationsAvailable;
 	}
 
 	
 	public int getCurrentMachineIndex() {
-		assert(getMachineCount()>0);
-		int j=0;
-		for(int i=0;i<configurations_available.length;++i) {
-			if(configurations_available[i].equals("0")) continue;
-			if(configurations_available[i].equals(Long.toString(robot_uid))) {
-				return j;
+		for(int i=0;i< machineConfigurationsAvailable.length;i++) {
+			if(machineConfigurationsAvailable[i].equals("0")) continue;
+			if(machineConfigurationsAvailable[i].equals(Long.toString(robot_uid))) {
+				return i;
 			}
-			++j;
 		}
 		
 		return 0;
