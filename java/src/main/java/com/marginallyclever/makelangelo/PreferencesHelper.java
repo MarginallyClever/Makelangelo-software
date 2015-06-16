@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
  * Created on 5/17/15. FIXME Write Javadocs.
  *
  * @author Peter Colapietro
- * @since v7.1.3
+ * @since v7.1.4
  */
 public final class PreferencesHelper {
 
@@ -29,7 +29,7 @@ public final class PreferencesHelper {
         initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, makelangeloPreferenceNode);
         initialMap.put(MakelangeloPreferenceKey.GRAPHICS, makelangeloPreferenceNode.node("Graphics"));
         initialMap.put(MakelangeloPreferenceKey.MACHINES, makelangeloPreferenceNode.node("Machines"));
-        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, userRootPreferencesNode.node("Language"));
+        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, makelangeloPreferenceNode.node("Language"));
         CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(initialMap);
     }
 
