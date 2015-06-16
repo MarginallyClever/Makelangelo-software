@@ -8,18 +8,26 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.makelangelo.Point2D;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
+import java.util.Queue;
 
-
+/**
+ * 
+ * @author danroyer
+ * @since at least 7.1.4
+ */
 public class Filter_GeneratorColorFloodFill extends Filter {
 	ColorPalette palette;	
 	int diameter=0;
 	int last_x,last_y;
 	BufferedImage imgChanged;
+	BufferedImage imgMask;
 	OutputStreamWriter osw;
 	
 	
@@ -28,9 +36,11 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		super(gui, mc, ms);
 		
 		palette = new ColorPalette();
+		palette.addColor(new C3(0,0,0));
 		palette.addColor(new C3(127,0,0));
 		palette.addColor(new C3(0,127,0));
 		palette.addColor(new C3(0,0,127));
+		palette.addColor(new C3(255,255,255));
 	}
 
 	public String getName() { return translator.get("RGBFloodFillName"); }
@@ -48,7 +58,61 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		tool.writeMoveTo(osw, TX(x), TY(y));
 	}
 	
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
+	/**
+	 * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
+	 * @param x0 left
+	 * @param y0 top
+	 * @param x1 right
+	 * @param y1 bottom
+	 * @return true if all the pixels in this region are zero.
+	 */
+	protected boolean getMaskTouched(int x0,int y0) {
+		int x1 = x0 + diameter;
+		int y1 = y0 + diameter;
+		if(x0<0) x0=0;
+		if(x1>image_width-1) x1 = image_width-1;
+		if(y0<0) y0=0;
+		if(y1>image_height-1) y1 = image_height-1;
+
+		Color value;
+		int sum=0;
+		for(int y=y0;y<y1;++y) {
+			for(int x=x0;x<x1;++x) {
+				++sum;
+				value = new Color(imgMask.getRGB(x, y));
+				if(value.getRed()!=0) {
+					return true;
+				}
+			}
+		}
+
+		return (sum==0);
+	}
+
+	protected void setMaskTouched(int x0,int y0,int x1,int y1) {
+		if(x0<0) x0=0;
+		if(x1>image_width-1) x1 = image_width-1;
+		if(y0<0) y0=0;
+		if(y1>image_height-1) y1 = image_height-1;
+
+		int c = (new C3(255,255,255)).toInt();
+		for(int y=y0;y<y1;++y) {
+			for(int x=x0;x<x1;++x) {
+				imgMask.setRGB(x, y, c);
+			}
+		}
+		//imgMask.flush();
+	}
+	
+	
+	/**
+	 * sample the pixels from x0,y0 (top left) to x1,y1 (bottom right) and average the color.
+	 * @param x0
+	 * @param y0
+	 * @param x1
+	 * @param y1
+	 * @return the average color in the region.  if nothing is sampled, return white.
+	 */
 	protected C3 takeImageSampleBlock(int x0,int y0,int x1,int y1) {
 		// point sampling
 		C3 value = new C3(0,0,0);
@@ -71,21 +135,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		return value.mul(1.0f/sum);
 	}
 
-	protected void setImagePixelWhite(int x0,int y0,int x1,int y1) {
-		if(x0<0) x0=0;
-		if(x1>image_width-1) x1 = image_width-1;
-		if(y0<0) y0=0;
-		if(y1>image_height-1) y1 = image_height-1;
-
-		int c = (new C3(255,255,255)).toInt();
-		for(int y=y0;y<y1;++y) {
-			for(int x=x0;x<x1;++x) {
-				imgChanged.setRGB(x, y, c);
-			}
-		}
-		imgChanged.flush();
-	}
-
 
 	protected boolean doesQuantizedBlockMatch(int color_index,float x,float y) {
 		C3 original_color = takeImageSampleBlock((int)x, (int)y, (int)(x+diameter), (int)(y+diameter));
@@ -102,25 +151,23 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	 * @throws IOException
 	 */
 	protected void floodFillBlob(int color_index,int x,int y) throws IOException {
-		LinkedList<Point2D> points_to_visit = new LinkedList<Point2D>();
+		Queue<Point2D> points_to_visit = new LinkedList<Point2D>();
 		points_to_visit.add(new Point2D(x,y));
 		
 		Point2D a;
 
-		
-		while(points_to_visit.size()>0) {
-			a = points_to_visit.removeLast();
-			
-			if( !doesQuantizedBlockMatch(color_index, a.x,a.y) ) {
-				continue;
-			}
+		while(!points_to_visit.isEmpty()) {
+			a = points_to_visit.remove();
+
+			if( getMaskTouched((int)a.x, (int)a.y) ) continue;
+			if( !doesQuantizedBlockMatch(color_index, a.x,a.y) ) continue;
 			// mark this spot as visited.
-			setImagePixelWhite((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
+			setMaskTouched((int)a.x, (int)a.y, (int)(a.x+diameter), (int)(a.y+diameter));
 
 			// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
 			float dx=(float)(a.x-last_x);
 			float dy=(float)(a.y-last_y);
-			if(Math.sqrt(dx*dx+dy*dy) > diameter*2.0)
+			if((dx*dx+dy*dy) > diameter*diameter*2.0f)
 			{
 				//System.out.print("Jump at "+x+", "+y+"\n");
 				moveTo(last_x, last_y, true);
@@ -134,14 +181,14 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 			last_x=(int)a.x;
 			last_y=(int)a.y;
 
-//			if( doesQuantizedBlockMatch(color_index, a.x,a.y+diameter) ) 
-			points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
-//			if( doesQuantizedBlockMatch(color_index, a.x+diameter,a.y) ) 
-			points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
-//			if( doesQuantizedBlockMatch(color_index, a.x-diameter,a.y) ) 
-			points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
-//			if( doesQuantizedBlockMatch(color_index, a.x,a.y-diameter) ) 
-			points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
+//			if( !getMaskTouched((int)(a.x+diameter),(int)a.y           ) )
+				points_to_visit.add(new Point2D(a.x+diameter,a.y         ));
+//			if( !getMaskTouched((int)(a.x-diameter),(int)a.y           ) )
+				points_to_visit.add(new Point2D(a.x-diameter,a.y         ));
+//			if( !getMaskTouched((int)a.x           ,(int)(a.y+diameter)) )
+				points_to_visit.add(new Point2D(a.x         ,a.y+diameter));
+//			if( !getMaskTouched((int)a.x           ,(int)(a.y-diameter)) )
+				points_to_visit.add(new Point2D(a.x         ,a.y-diameter));
 		}
 	}
 
@@ -164,6 +211,8 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		
 		for(y=0;y<image_height;y+=diameter) {
 			for(x=0;x<image_width;x+=diameter) {
+				if( getMaskTouched(x,y) ) continue;
+				
 				original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
 				quantized_color = palette.quantizeIndex(original_color); 
 				if( quantized_color == color_index ) {
@@ -178,6 +227,18 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		System.out.println("Found "+z+" blobs.");
 	}
 	
+	private void scanColor(int i) throws IOException {
+		// "please change to tool X and press any key to continue"
+		tool = machine.getTool(i);
+		tool.writeChangeTo(osw);
+		// Make sure the pen is up for the first move
+		liftPen(osw);
+		
+		mainGUI.log("<font color='green'>Color "+i+"</font>\n");
+		
+		scanForContiguousBlocks(i);
+	}
+	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
@@ -186,6 +247,13 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
 		//img = bw.process(img);
+		
+		// create a color mask so we don't repeat any pixels
+		imgMask = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = imgMask.createGraphics();
+		g.setPaint ( new Color(0,0,0) );
+		g.fillRect ( 0, 0, imgMask.getWidth(), imgMask.getHeight() );
+		
 		
 		// Open the destination file
 		osw = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
@@ -209,18 +277,11 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		last_x=img.getWidth()/2;
 		last_y=img.getHeight()/2;
 		
-		int i;
-		for(i=0;i<4;++i) {
-			// "please change to tool X and press any key to continue"
-			tool = machine.getTool(i);
-			tool.writeChangeTo(osw);
-			// Make sure the pen is up for the first move
-			liftPen(osw);
-			
-			mainGUI.log("<font color='green'>Color "+i+"</font>\n");
-			
-			scanForContiguousBlocks(i);
-		}
+		scanColor(0);  // black
+		scanColor(1);  // red
+		scanColor(2);  // green
+		scanColor(3);  // blue
+		
 		mainGUI.log("<font color='green'>Signing my name</font>\n");
 		
 		// pen already lifted

@@ -454,7 +454,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		drawScale=0.1f;
 		
-		float px=0,py=0,pz=90,oldz=pz;
+		float px=0,py=0,pz=90;
+		//float oldz=pz;
 		float x,y,z,ai,aj;
 		int i,j;
 		boolean absMode=true;

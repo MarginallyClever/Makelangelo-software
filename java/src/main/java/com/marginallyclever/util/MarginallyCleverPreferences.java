@@ -1,8 +1,6 @@
 package com.marginallyclever.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
-import org.json.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 

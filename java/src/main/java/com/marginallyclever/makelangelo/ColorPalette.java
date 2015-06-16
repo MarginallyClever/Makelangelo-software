@@ -14,8 +14,8 @@ public class ColorPalette {
 	
 	public ColorPalette() {
 		colors = new ArrayList<C3>();
-		addColor(new C3(0,0,0));
-		addColor(new C3(255,255,255));
+		//addColor(new C3(0,0,0));
+		//addColor(new C3(255,255,255));
 	}
 	
 	public void addColor(C3 c) {
@@ -34,6 +34,11 @@ public class ColorPalette {
 			}
 			++index;
 		}
+	}
+	
+	
+	public int numColors() {
+		return colors.size();
 	}
 	
 	
@@ -59,11 +64,11 @@ public class ColorPalette {
 		
 		while(i.hasNext()) {
 			n = i.next();
+			++index;
 			if (n.diff(c) < nearest.diff(c)) {
 				nearest = n;
 				nearest_index = index;
 			}
-			++index;
 		}
 
 	    return nearest_index;
