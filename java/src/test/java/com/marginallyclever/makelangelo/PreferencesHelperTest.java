@@ -4,18 +4,13 @@ import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import org.json.JSONObject;
 import org.json.Property;
-import org.json.XML;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.prefs.AbstractPreferences;
