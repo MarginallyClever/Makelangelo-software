@@ -514,10 +514,10 @@ public class MachineConfiguration {
 		paper_top=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paper_top)));
 		paper_bottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paper_bottom)));
 		
-		// load each tool's settings TODO test if this is the culprit
-		/*for(int i=0;i<tools.length;++i) {
-			tools[i].loadConfig(machinePreferences);
-		}*/
+		// load each tool's settings
+		for (DrawingTool tool : tools) {
+			tool.loadConfig(uniqueMachinePreferencesNode);
+		}
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
@@ -588,9 +588,9 @@ public class MachineConfiguration {
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paper_bottom);
 
 		// save each tool's settings
-		/*for(int i=0;i<tools.length;++i) {
-			tools[i].saveConfig(machinePreferences);
-		}*/
+		for (DrawingTool tool : tools) {
+			tool.saveConfig(uniqueMachinePreferencesNode);
+		}
 
 		// TODO move these values to image filter preferences?
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));

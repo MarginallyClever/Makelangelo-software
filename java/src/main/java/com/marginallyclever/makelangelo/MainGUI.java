@@ -374,9 +374,9 @@ public class MainGUI
 		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
 		driver.setLayout(new GridBagLayout());
 		
-		final String[] knownMachineNames = machineConfiguration.getKnownMachineNames();
-		final JComboBox<String> machineChoice = new JComboBox<>(knownMachineNames);
-		machineChoice.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+		final String[] machineConfigurations = getAnyMachineConfigurations();
+		final JComboBox<String> machineChoices = new JComboBox<>(machineConfigurations);
+		machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
 		input_paper_margin.setMajorTickSpacing(10);
@@ -404,7 +404,7 @@ public class MainGUI
 
 		int y=0;
 		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("MenuLoadMachineConfig")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machineChoice,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machineChoices,c);
 
 		if(!isDXF) {
 			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(translator.get("ConversionStyle")),c);
@@ -424,7 +424,7 @@ public class MainGUI
 			  public void actionPerformed(ActionEvent e) {
 					Object subject = e.getSource();
 					if(subject == save) {
-						final int machine_choiceSelectedIndex = machineChoice.getSelectedIndex();
+						final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
 						long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
 						machineConfiguration.loadConfig(new_uid);
 						setDrawStyle(input_draw_style.getSelectedIndex());
