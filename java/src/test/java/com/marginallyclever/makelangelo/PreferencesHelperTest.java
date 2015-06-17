@@ -92,8 +92,8 @@ public class PreferencesHelperTest {
 
     /**
      *
-     * @param sourcePreferenceNode
-     * @param destinationPreferenceNode
+     * @param sourcePreferenceNode Preference node to be copied from.
+     * @param destinationPreferenceNode Preference node to be copied to.
      */
     private void copyPreferenceNode(Preferences sourcePreferenceNode, AbstractPreferences destinationPreferenceNode) {
         try {
@@ -114,7 +114,8 @@ public class PreferencesHelperTest {
 
     /**
      *
-     * @param preferenceNode
+     * @param preferenceNode Preference node whose name, and key values,
+     *                       as well as those of its children's are to be logged.
      */
     private void logPreferenceNode(Preferences preferenceNode) {
         try {
@@ -133,8 +134,8 @@ public class PreferencesHelperTest {
 
     /**
      *
-     * @param preferenceNode
      * @param keys
+     * @param preferenceNode Preference node to log key value pairs for.
      */
     private void logKeyValuesForPreferenceNode(Preferences preferenceNode, String[] keys) {
         for (String key : keys) {
@@ -146,7 +147,7 @@ public class PreferencesHelperTest {
      *
      * Recursively clears all the preferences (key-value associations) for a given node and its children.
      *
-     * @param preferenceNode
+     * @param preferenceNode Preference node that you want recursively cleared of all key value pairs.
      *
      * @see <a href="http://stackoverflow.com/a/6411855"></a>
      */
