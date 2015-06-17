@@ -120,8 +120,7 @@ public class PreferencesHelperTest {
     private void logPreferenceNode(Preferences preferenceNode) {
         try {
             logger.info("node name:{}", preferenceNode);
-            final String[] keys = preferenceNode.keys();
-            logKeyValuesForPreferenceNode(preferenceNode, keys);
+            logKeyValuesForPreferenceNode(preferenceNode);
             final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
             for (String childNodeName : childrenPreferenceNodeNames) {
                 final Preferences childNode = preferenceNode.node(childNodeName);
@@ -134,10 +133,10 @@ public class PreferencesHelperTest {
 
     /**
      *
-     * @param keys
      * @param preferenceNode Preference node to log key value pairs for.
      */
-    private void logKeyValuesForPreferenceNode(Preferences preferenceNode, String[] keys) {
+    private void logKeyValuesForPreferenceNode(Preferences preferenceNode) throws BackingStoreException {
+        final String[] keys = preferenceNode.keys();
         for (String key : keys) {
             logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
         }
