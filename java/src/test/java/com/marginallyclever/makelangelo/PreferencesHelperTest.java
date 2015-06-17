@@ -44,6 +44,7 @@ public class PreferencesHelperTest {
      *
      * @throws Exception
      */
+    @SuppressWarnings("EmptyMethod")
     @org.junit.Before
     public void setUp() throws Exception {
     }
@@ -84,7 +85,8 @@ public class PreferencesHelperTest {
         }
         final JSONObject jsonObject = Property.toJSONObject(p);
         logger.debug("{}", jsonObject);
-        final JSONObject object = new JSONObject(((Map<String,Object>)marginallyCleverJsonPreferenceNode.getChildren()));
+        @SuppressWarnings("unchecked")
+        final JSONObject object = new JSONObject((Map<String,Object>)marginallyCleverJsonPreferenceNode.getChildren());
         logger.debug("{}", object);
     }
 
@@ -169,6 +171,7 @@ public class PreferencesHelperTest {
      * preference node with no effect on any descendants
      * of this node.
      */
+    @SuppressWarnings("UnusedDeclaration")
     private void shallowClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
@@ -181,6 +184,7 @@ public class PreferencesHelperTest {
      * Removes all of the preferences (key-value associations) in this
      * preference node and any descendants of this node.
      */
+    @SuppressWarnings("UnusedDeclaration")
     private void deepClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();

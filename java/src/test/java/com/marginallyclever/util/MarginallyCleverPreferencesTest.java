@@ -12,61 +12,73 @@ import org.junit.Test;
  */
 public class MarginallyCleverPreferencesTest {
 
+    @SuppressWarnings("EmptyMethod")
     @Before
     public void setUp() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @After
     public void tearDown() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testPutSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testGetSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testRemoveSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testRemoveNodeSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testKeysSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testChildrenNamesSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testChildSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testSyncSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testFlushSpi() throws Exception {
 
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Test
     public void testIsRemoved() throws Exception {
 
