@@ -216,8 +216,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      * @param y position vertically
      */
     private void moveCamera(int x,int y) {
-        cameraOffsetX+=oldx-x;
-        cameraOffsetY+=oldy-y;
+        cameraOffsetX+=(oldx-x)/cameraZoom;
+        cameraOffsetY+=(oldy-y)/cameraZoom;
     }
 
     /**
@@ -250,15 +250,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      * scale the picture of the robot to fake a zoom.
      */
     public void zoomToFitPaper() {
-        final int drawPanelWidth = this.getWidth();
-        final int drawPanelHeight = this.getHeight();
-        final double widthOfPaper = machine.paper_right - machine.paper_left;
-        final double heightOfPaper = machine.paper_top - machine.paper_bottom;
-        final double drawPanelWidthZoom = drawPanelWidth / widthOfPaper;
-        final double drawPanelHeightZoom = drawPanelHeight / heightOfPaper;
-        final double magicScalar = 1.25d;
-        cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
-        cameraZoom *= magicScalar;
+        int drawPanelWidth = this.getWidth();
+        int drawPanelHeight = this.getHeight();
+        double widthOfPaper = machine.paper_right - machine.paper_left;
+        double heightOfPaper = machine.paper_top - machine.paper_bottom;
+        double drawPanelWidthZoom = drawPanelWidth / widthOfPaper;
+        double drawPanelHeightZoom = drawPanelHeight / heightOfPaper;
+        cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
         cameraOffsetX = 0;
         cameraOffsetY = 0;
         repaint();
@@ -297,8 +295,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private void paintCamera(GL2 gl2) {
         gl2.glMatrixMode(GL2.GL_MODELVIEW);
         gl2.glLoadIdentity();
-        gl2.glTranslated(-cameraOffsetX, cameraOffsetY,0);
         gl2.glScaled(cameraZoom, cameraZoom, 1.0d);
+        gl2.glTranslated(-cameraOffsetX, cameraOffsetY,0);
     }
   
     /**
@@ -456,7 +454,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		drawScale=0.1f;
 		
-		float px=0,py=0,pz=90,oldz=pz;
+		float px=0,py=0,pz=90;
+		//float oldz=pz;
 		float x,y,z,ai,aj;
 		int i,j;
 		boolean absMode=true;

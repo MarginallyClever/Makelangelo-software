@@ -9,9 +9,7 @@ import java.awt.image.BufferedImage;
 /**
  * Floyd/Steinberg dithering
  * @author Dan
- * @see
- * <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a>
- * <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
+ * @see <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
 public class Filter_DitherFloydSteinberg extends Filter {
 	private long tone;
@@ -85,7 +83,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 		// find the average color of the system
 		for(y=0;y<h;++y) {
 			for(x=0;x<w;++x) {
-				tone+=decode(img.getRGB(x,y));
+				tone += decode(img.getRGB(x,y));
 			}
 		}
 		

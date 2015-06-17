@@ -34,23 +34,17 @@ import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
  * @author dan royer
  */
 public class MachineConfiguration {
-
-	private static final int NUMBER_OF_DRAWING_TOOLS = 6;
 	/**
-	 *
-	 */
-	private final Preferences makelangeloPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
-
-	/**
-	 *
+	 * 
 	 */
 	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 	
-	static final String CURRENT_VERSION = "1";
-	// GUID
+	/**
+	 * Each robot has a global unique identifier
+	 */
 	protected long robot_uid=0;
 	
-	protected double INCH_TO_CM = 2.54;
+	protected final static double INCH_TO_CM = 2.54;
 	
 	// machine physical limits
 	public double limit_top=18*INCH_TO_CM;
@@ -73,7 +67,7 @@ public class MachineConfiguration {
 	private double bobbin_left_diameter=1.5;
 	private double bobbin_right_diameter=1.5;
 
-	private double max_feed_rate=3500;  // etch-a-sketch speed
+	private double max_feed_rate=11000;  // etch-a-sketch speed
 	
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
@@ -102,7 +96,7 @@ public class MachineConfiguration {
 	
 	
 	/**
-	 * 
+	 * TODO move tool names into translations & add a color palette system for quantizing colors
 	 * @param gui
 	 * @param ms
 	 */
@@ -110,15 +104,13 @@ public class MachineConfiguration {
 		mainGUI = gui;
 		translator = ms;
 		
-		tools = new ArrayList<>(NUMBER_OF_DRAWING_TOOLS);
+		tools = new ArrayList<>();
 		tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
 		tools.add(new DrawingTool_Pen("Pen (blue)",3,gui,ms,this));
 		tools.add(new DrawingTool_LED(gui,ms,this));
 		tools.add(new DrawingTool_Spraypaint(gui,ms,this));
-		
-		versionCheck();
 		
 		// which configurations are available?
 		try {
@@ -136,7 +128,7 @@ public class MachineConfiguration {
 	* Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
 	*/
 	public void adjustMachineSize() {
-		final JDialog driver = new JDialog(mainGUI.getParentFrame(),"Adjust machine & paper size",true);
+		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("MenuSettingsMachine"),true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
@@ -479,20 +471,16 @@ public class MachineConfiguration {
 		driver.pack();
 		driver.setVisible(true);
 	}
-
-	
-	protected void versionCheck() {
-		String version = makelangeloPreferenceNode.get("version", CURRENT_VERSION);
-		if( version.equals(CURRENT_VERSION) == false ) {
-			makelangeloPreferenceNode.put("version", CURRENT_VERSION);
-		}
-	}
 	
 	
-	// Load the machine configuration
+	/**
+	 * Load the machine configuration
+	 * @param uid the unique id of the robot to be loaded
+	 */
 	protected void loadConfig(long uid) {
 		robot_uid = uid;
-		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return; TODO once cloud logic is finished.
+		// once cloud logic is finished.
+		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return;
 		loadConfigFromLocal();
 	}
 	
@@ -527,11 +515,13 @@ public class MachineConfiguration {
 	
 	// Save the machine configuration
 	public void saveConfig() {
-		//if(GetCanUseCloud() && SaveConfigToCloud() ) return; TODO once cloud logic is finished.
+		// once cloud logic is finished.
+		//if(GetCanUseCloud() && SaveConfigToCloud() ) return;
 		saveConfigToLocal();
 	}
 
-	/* TODO finish these cloud storage methods.  Security will be a problem.
+	/*
+	// TODO finish these cloud storage methods.  Security will be a problem.
 
 	 public boolean GetCanUseCloud() {
 		return topLevelMachinesPreferenceNode.getBoolean("can_use_cloud", false);
