@@ -88,6 +88,15 @@ public class PreferencesHelperTest {
         logger.debug("{}", object);
     }
 
+    @Test
+    public void testMachineConfigurationNames() throws BackingStoreException {
+        logger.info("Node name: {}", preferenceNode.name());
+        for (String key : preferenceNode.keys()) {
+            logger.info("key name: {}", key);
+        }
+
+    }
+
     /**
      *
      * @param sourcePreferenceNode Preference node to be copied from.
