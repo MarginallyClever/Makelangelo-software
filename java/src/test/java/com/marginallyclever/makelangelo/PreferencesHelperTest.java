@@ -78,8 +78,6 @@ public class PreferencesHelperTest {
         final Properties p = new Properties();
         try(final FileInputStream inStream = new FileInputStream(preferencesFile)) {
             p.load(inStream);
-        } catch (FileNotFoundException e) {
-            logger.error("{}", e);
         } catch (IOException e) {
             logger.error("{}", e);
         }
