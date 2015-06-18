@@ -545,6 +545,9 @@ void motor_line(long n0,long n1,long n2,float new_feed_rate) {
     delay(1);
   }
 
+  // use LCD to adjust speed while drawing
+  new_feed_rate *= (float)speed_adjust * 0.01f;
+  
   int prev_segment = get_prev_segment(last_segment);
   Segment &new_seg = line_segments[last_segment];
   Segment &old_seg = line_segments[prev_segment];

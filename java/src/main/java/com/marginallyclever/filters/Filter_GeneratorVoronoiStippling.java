@@ -204,7 +204,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				
 				// filled circles
 				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				while(r>1) {
+				while(r>d) {
 					float detail=(float)(0.5*Math.PI*r/d);
 					if(detail<4) detail=4;
 					if(detail>20) detail=20;
@@ -213,7 +213,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
-					r-=(tool.getDiameter()/(scale*1.5f));
+					r-=(d/(scale*1.5f));
 				}
 				this.moveTo(out, x, y, false);
 				this.moveTo(out, x, y, true);
