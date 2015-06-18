@@ -5,8 +5,6 @@ import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +35,9 @@ public class Filter_GaussianBlur extends Filter {
 
 		BufferedImage dest = new BufferedImage(img.getWidth(),img.getHeight(),img.getType());
 		
-		float [] scales = new float[radius];
+		//float [] scales = new float[radius];
+		// TODO fill scales[] with a gaussian curve
+		float [] scales = new float[3];
 		scales[0] = 1.0f/4.0f;
 		scales[1] = 1.0f/2.0f;
 		scales[2] = 1.0f/4.0f;

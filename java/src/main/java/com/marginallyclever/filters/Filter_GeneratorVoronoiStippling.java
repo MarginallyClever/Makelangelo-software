@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class Filter_GeneratorVoronoiStippling extends Filter {
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
-	private int totalCells=1;
 	private VoronoiCell [] cells = new VoronoiCell[1];
 	private int w, h;
 	private BufferedImage src_img;
@@ -99,29 +98,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	protected void initializeCells(double minDistanceBetweenSites) {
 		mainGUI.log("<font color='green'>Initializing cells</font>\n");
 
-		totalCells=MAX_CELLS;
-
-		double totalArea = w*h;
-		double pointArea = totalArea/totalCells;
-		float length = (float)Math.sqrt(pointArea);
-		float x,y;
-		totalCells=0;
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				totalCells++;
-			}
-		}
-
-		cells = new VoronoiCell[totalCells];
+		cells = new VoronoiCell[MAX_CELLS];
 		int used=0;
 
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				cells[used]=new VoronoiCell();
-				//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
-				cells[used].centroid.set(x,y);
-				++used;
-			}
+		for(int i = 0; i < MAX_CELLS; ++i) {
+			cells[used]=new VoronoiCell();
+			cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);				
+			++used;
 		}
 
 		// convert the cells to sites used in the Voronoi class.
