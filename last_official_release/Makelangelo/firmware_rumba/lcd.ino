@@ -80,7 +80,7 @@ void (*current_menu)();
 
 // initialize the Smart controller LCD panel
 void LCD_init() {
-  lcd.begin(LCD_HEIGHT,LCD_WIDTH);
+  lcd.begin(LCD_WIDTH,LCD_HEIGHT);
   pinMode(BTN_EN1,INPUT);
   pinMode(BTN_EN2,INPUT);
   pinMode(BTN_ENC,INPUT);

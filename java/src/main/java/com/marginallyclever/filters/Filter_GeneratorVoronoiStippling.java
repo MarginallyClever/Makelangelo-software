@@ -172,6 +172,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			tool.writeChangeTo(out);
 			liftPen(out);
 
+			float d = tool.getDiameter();
+			
 			int i;
 /*
 			for(i=0;i<graphEdges.size();++i) {
@@ -191,54 +193,21 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				//if(least>cells[i].weight) least=cells[i].weight;
 			}
 
+			float modifier = MAX_DOT_SIZE / most;
 			for(i=0;i<cells.length;++i) {
-				float r = MAX_DOT_SIZE * cells[i].weight / most;
-				r/=scale;
+				float r = cells[i].weight * modifier;
 				if(r<MIN_DOT_SIZE) continue;
+				r/=scale;
 				//System.out.println(i+"\t"+v);
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;
-				/*
-				// boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-
-				// filled boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				for(float j=y-r;j<y+r;j+=step) {
-					this.MoveTo(out, x+r, j, false);
-					this.MoveTo(out, x-r, j, false);
-				}
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-
-				// circles
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				float detail=(float)(0.5*Math.PI*r);
-				if(detail<4) detail=4;
-				if(detail>20) detail=20;
-				for(float j=1;j<=detail;++j) {
-					this.MoveTo(out,
-							x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
-							y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
-				}
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), false);
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				*/
+				
 				// filled circles
 				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
 				while(r>1) {
-					float detail=(float)(0.5*Math.PI*r);
+					float detail=(float)(0.5*Math.PI*r/d);
 					if(detail<4) detail=4;
-					if(detail>10) detail=10;
+					if(detail>20) detail=20;
 					for(float j=1;j<=detail;++j) {
 						this.moveTo(out,
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
@@ -246,8 +215,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 					}
 					r-=(tool.getDiameter()/(scale*1.5f));
 				}
-				this.moveTo(out, x, y-r, false);
-				this.moveTo(out, x, y-r, true);
+				this.moveTo(out, x, y, false);
+				this.moveTo(out, x, y, true);
 			}
 
 			liftPen(out);
