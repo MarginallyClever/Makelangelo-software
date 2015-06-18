@@ -31,7 +31,7 @@ public class Filter_GaussianBlur extends Filter {
 	public BufferedImage process(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();
-		int x,y,i;
+		int x,y;
 
 		BufferedImage dest = new BufferedImage(img.getWidth(),img.getHeight(),img.getType());
 		
@@ -132,5 +132,5 @@ public class Filter_GaussianBlur extends Filter {
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

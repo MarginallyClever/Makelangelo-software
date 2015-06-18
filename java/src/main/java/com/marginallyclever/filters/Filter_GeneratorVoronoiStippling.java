@@ -25,6 +25,7 @@ import java.util.List;
  * @author Dan
  * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * http://skynet.ie/~sos/mapviewer/voronoi.php
+ * @since 7.0.0?
  */
 public class Filter_GeneratorVoronoiStippling extends Filter {
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -168,12 +169,9 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
 //*/
-			//float step = (int)Math.ceil(tool.GetDiameter()/scale);
 			float most=cells[0].weight;
-			//float least=cells[0].weight;
 			for(i=1;i<cells.length;++i) {
 				if(most<cells[i].weight) most=cells[i].weight;
-				//if(least>cells[i].weight) least=cells[i].weight;
 			}
 
 			float modifier = MAX_DOT_SIZE / most;
@@ -181,7 +179,6 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				float r = cells[i].weight * modifier;
 				if(r<MIN_DOT_SIZE) continue;
 				r/=scale;
-				//System.out.println(i+"\t"+v);
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;
 				
@@ -196,7 +193,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
-					r-=(d/(scale*1.5f));
+					//r-=(d/(scale*1.5f));
+					r-=d;
 				}
 				this.moveTo(out, x, y, false);
 				this.moveTo(out, x, y, true);
@@ -405,5 +403,5 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */
