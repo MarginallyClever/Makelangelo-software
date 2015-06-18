@@ -235,7 +235,6 @@ public class MainGUI
 	}
 
 	
-	//  data access
 	public ArrayList<String> getgCode() {
 		return gCode.lines;
 	}
@@ -704,6 +703,7 @@ public class MainGUI
 					log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 					// convert with style
 					img = ImageIO.read(new File(sourceFile));
+					
 					int style = getDrawStyle();
 					Filter f = image_converters.get(style);
 					tabToLog();

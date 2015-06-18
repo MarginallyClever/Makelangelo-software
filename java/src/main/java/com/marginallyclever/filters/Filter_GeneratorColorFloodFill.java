@@ -37,9 +37,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		
 		palette = new ColorPalette();
 		palette.addColor(new C3(0,0,0));
-		palette.addColor(new C3(127,0,0));
-		palette.addColor(new C3(0,127,0));
-		palette.addColor(new C3(0,0,127));
+		palette.addColor(new C3(255,0,0));
+		palette.addColor(new C3(0,255,0));
+		palette.addColor(new C3(0,0,255));
 		palette.addColor(new C3(255,255,255));
 	}
 
