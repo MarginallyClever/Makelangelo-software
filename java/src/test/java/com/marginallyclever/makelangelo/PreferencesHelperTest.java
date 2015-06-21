@@ -192,7 +192,7 @@ public class PreferencesHelperTest {
      * preference node with no effect on any descendants
      * of this node.
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     private void shallowClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
@@ -205,7 +205,7 @@ public class PreferencesHelperTest {
      * Removes all of the preferences (key-value associations) in this
      * preference node and any descendants of this node.
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     private void deepClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
