@@ -38,7 +38,7 @@
 #define MAX_FEEDRATE         (30000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (1000)
 #define DEFAULT_FEEDRATE     (8500.0)
-#define DEFAULT_ACCELERATION (1000)
+#define DEFAULT_ACCELERATION (250)
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
 

@@ -68,6 +68,7 @@ int lcd_rot_old  = 0;
 int lcd_turn     = 0;
 char lcd_click_old = HIGH;
 char lcd_click_now = false;
+uint8_t speed_adjust = 100;
 
 int menu_position_sum=0, menu_position=0, screen_position=0, num_menu_items=0, ty, screen_end;
 
@@ -80,7 +81,7 @@ void (*current_menu)();
 
 // initialize the Smart controller LCD panel
 void LCD_init() {
-  lcd.begin(LCD_HEIGHT,LCD_WIDTH);
+  lcd.begin(LCD_WIDTH,LCD_HEIGHT);
   pinMode(BTN_EN1,INPUT);
   pinMode(BTN_EN2,INPUT);
   pinMode(BTN_ENC,INPUT);
@@ -130,6 +131,8 @@ void LCD_update() {
   if(millis() >= lcd_draw_delay ) {
     lcd_draw_delay = millis() + LCD_DRAW_DELAY;
 
+    (*current_menu)();
+    
     if( lcd_turn ) {
       int op = menu_position_sum / LCD_TURN_PER_MENU;
       menu_position_sum += lcd_turn;
@@ -141,15 +144,13 @@ void LCD_update() {
       
       menu_position = menu_position_sum / LCD_TURN_PER_MENU;
       if(op != menu_position) lcd.clear();
-    }
     
-    if(menu_position>num_menu_items-1) menu_position=num_menu_items-1;
-    if(menu_position<0) menu_position=0;
-    if(screen_position>menu_position) screen_position=menu_position;
-    if(screen_position<menu_position-(LCD_HEIGHT-1)) screen_position=menu_position-(LCD_HEIGHT-1);
-    screen_end=screen_position+LCD_HEIGHT;
-
-    (*current_menu)();
+      if(menu_position>num_menu_items-1) menu_position=num_menu_items-1;
+      if(menu_position<0) menu_position=0;
+      if(screen_position>menu_position) screen_position=menu_position;
+      if(screen_position<menu_position-(LCD_HEIGHT-1)) screen_position=menu_position-(LCD_HEIGHT-1);
+      screen_end=screen_position+LCD_HEIGHT;
+    }
   }
 }
 
@@ -160,17 +161,20 @@ void LCD_status_menu() {
     // on click go to the main menu
     if(lcd_click_now) MENU_GOTO(LCD_main_menu);
 
+    if(lcd_turn) {
+      speed_adjust += lcd_turn;
+    }
     // update the current status
     lcd.setCursor( 0, 0);  lcd.print('X');  LCD_print_float(posx);
     lcd.setCursor(10, 0);  lcd.print('Y');  LCD_print_float(posy);
     lcd.setCursor( 0, 1);  lcd.print('Z');  LCD_print_float(posz);
     lcd.setCursor(10, 1);  lcd.print('F');  LCD_print_float(feed_rate);
-    lcd.setCursor( 0, 2);  lcd.print(F("Makelangelo.com "));  lcd.print(robot_uid);
+    lcd.setCursor( 0, 2);  lcd.print(F("Makelangelo.com #"));  lcd.print(robot_uid);
+    lcd.setCursor( 0, 3);  LCD_print_long(speed_adjust);  lcd.print(F("% "));
     if(sd_printing_now==true/* && sd_printing_paused==false*/) {
-      lcd.setCursor(0,3);  LCD_print_float(sd_percent_complete);
+      LCD_print_float(sd_percent_complete);
       lcd.print('%');
     } else {
-      lcd.setCursor(0,3);
       lcd.print(F("          "));
     }
   MENU_END

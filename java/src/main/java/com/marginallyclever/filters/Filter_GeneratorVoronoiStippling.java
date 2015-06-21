@@ -25,10 +25,10 @@ import java.util.List;
  * @author Dan
  * http://en.wikipedia.org/wiki/Fortune%27s_algorithm
  * http://skynet.ie/~sos/mapviewer/voronoi.php
+ * @since 7.0.0?
  */
 public class Filter_GeneratorVoronoiStippling extends Filter {
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
-	private int totalCells=1;
 	private VoronoiCell [] cells = new VoronoiCell[1];
 	private int w, h;
 	private BufferedImage src_img;
@@ -99,29 +99,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	protected void initializeCells(double minDistanceBetweenSites) {
 		mainGUI.log("<font color='green'>Initializing cells</font>\n");
 
-		totalCells=MAX_CELLS;
-
-		double totalArea = w*h;
-		double pointArea = totalArea/totalCells;
-		float length = (float)Math.sqrt(pointArea);
-		float x,y;
-		totalCells=0;
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				totalCells++;
-			}
-		}
-
-		cells = new VoronoiCell[totalCells];
+		cells = new VoronoiCell[MAX_CELLS];
 		int used=0;
 
-		for(y = length/2; y < h; y += length ) {
-			for(x = length/2; x < w; x += length ) {
-				cells[used]=new VoronoiCell();
-				//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
-				cells[used].centroid.set(x,y);
-				++used;
-			}
+		for(int i = 0; i < MAX_CELLS; ++i) {
+			cells[used]=new VoronoiCell();
+			cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);				
+			++used;
 		}
 
 		// convert the cells to sites used in the Voronoi class.
@@ -172,6 +156,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			tool.writeChangeTo(out);
 			liftPen(out);
 
+			float d = tool.getDiameter();
+			
 			int i;
 /*
 			for(i=0;i<graphEdges.size();++i) {
@@ -183,71 +169,35 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
 //*/
-			//float step = (int)Math.ceil(tool.GetDiameter()/scale);
 			float most=cells[0].weight;
-			//float least=cells[0].weight;
 			for(i=1;i<cells.length;++i) {
 				if(most<cells[i].weight) most=cells[i].weight;
-				//if(least>cells[i].weight) least=cells[i].weight;
 			}
 
+			float modifier = MAX_DOT_SIZE / most;
 			for(i=0;i<cells.length;++i) {
-				float r = MAX_DOT_SIZE * cells[i].weight / most;
-				r/=scale;
+				float r = cells[i].weight * modifier;
 				if(r<MIN_DOT_SIZE) continue;
-				//System.out.println(i+"\t"+v);
+				r/=scale;
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;
-				/*
-				// boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-
-				// filled boxes
-				this.MoveTo(out, x-r, y-r, true);
-				this.MoveTo(out, x+r, y-r, false);
-				this.MoveTo(out, x+r, y+r, false);
-				this.MoveTo(out, x-r, y+r, false);
-				this.MoveTo(out, x-r, y-r, false);
-				for(float j=y-r;j<y+r;j+=step) {
-					this.MoveTo(out, x+r, j, false);
-					this.MoveTo(out, x-r, j, false);
-				}
-				this.MoveTo(out, x-r, y-r, false);
-				this.MoveTo(out, x-r, y-r, true);
-
-				// circles
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				float detail=(float)(0.5*Math.PI*r);
-				if(detail<4) detail=4;
-				if(detail>20) detail=20;
-				for(float j=1;j<=detail;++j) {
-					this.MoveTo(out,
-							x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
-							y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
-				}
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), false);
-				this.MoveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				*/
+				
 				// filled circles
 				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				while(r>1) {
-					float detail=(float)(0.5*Math.PI*r);
+				while(r>d) {
+					float detail=(float)(0.5*Math.PI*r/d);
 					if(detail<4) detail=4;
-					if(detail>10) detail=10;
+					if(detail>20) detail=20;
 					for(float j=1;j<=detail;++j) {
 						this.moveTo(out,
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
-					r-=(tool.getDiameter()/(scale*1.5f));
+					//r-=(d/(scale*1.5f));
+					r-=d;
 				}
-				this.moveTo(out, x, y-r, false);
-				this.moveTo(out, x, y-r, true);
+				this.moveTo(out, x, y, false);
+				this.moveTo(out, x, y, true);
 			}
 
 			liftPen(out);
@@ -453,5 +403,5 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

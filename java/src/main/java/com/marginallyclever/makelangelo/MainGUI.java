@@ -84,7 +84,6 @@ public class MainGUI
 	// Image processing
 	// TODO use a ServiceLoader for plugins
 	private List<Filter> image_converters;
-	private boolean startConvertingNow;
 	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 	private RecentFiles recentFiles;
@@ -128,9 +127,8 @@ public class MainGUI
 	
 
 	// reading file
-	private boolean isRunning =false;
-	private boolean isPaused=true;
-	
+	private boolean isRunning = false;
+	private boolean isPaused = true;
 	private GCodeFile gCode = new GCodeFile();
 
 	private MachineConfiguration machineConfiguration;
@@ -237,7 +235,6 @@ public class MainGUI
 	}
 
 	
-	//  data access
 	public ArrayList<String> getgCode() {
 		return gCode.lines;
 	}
@@ -371,8 +368,7 @@ public class MainGUI
 	
 	
 	protected boolean chooseImageConversionOptions(boolean isDXF) {
-		final JDialog driver = new JDialog(mainframe,translator.get("ConversionOptions"),true);
-		driver.setLayout(new GridBagLayout());
+		final JPanel panel = new JPanel(new GridBagLayout());
 		
 		final String[] machineConfigurations = getAnyMachineConfigurations();
 		final JComboBox<String> machineChoices = new JComboBox<>(machineConfigurations);
@@ -386,8 +382,6 @@ public class MainGUI
 		
 		final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
 		reverse_h.setSelected(machineConfiguration.reverseForGlass);
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton save = new JButton(translator.get("Start"));
 
 		String [] filter_names = new String[image_converters.size()];
 		Iterator<Filter> fit = image_converters.iterator();
@@ -403,61 +397,43 @@ public class MainGUI
 		GridBagConstraints c = new GridBagConstraints();
 
 		int y=0;
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("MenuLoadMachineConfig")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  driver.add(machineChoices,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  panel.add(machineChoices,c);
 
 		if(!isDXF) {
-			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  driver.add(new JLabel(translator.get("ConversionStyle")),c);
-			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	driver.add(input_draw_style,c);
+			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  panel.add(new JLabel(translator.get("ConversionStyle")),c);
+			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	panel.add(input_draw_style,c);
 		}
 		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  driver.add(new JLabel(translator.get("PaperMargin")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  driver.add(input_paper_margin,c);
+		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  panel.add(new JLabel(translator.get("PaperMargin")),c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  panel.add(input_paper_margin,c);
 		
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  driver.add(reverse_h,c);
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=2;  c.gridy=y  ;  driver.add(save,c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;	c.gridx=3;  c.gridy=y++;  driver.add(cancel,c);
+		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  panel.add(reverse_h,c);
 
-		startConvertingNow = false;
-		
-		ActionListener driveButtons = new ActionListener() {
-			  public void actionPerformed(ActionEvent e) {
-					Object subject = e.getSource();
-					if(subject == save) {
-						final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-						long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
-						machineConfiguration.loadConfig(new_uid);
-						setDrawStyle(input_draw_style.getSelectedIndex());
-						machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
-						machineConfiguration.reverseForGlass=reverse_h.isSelected();
-						machineConfiguration.saveConfig();
-						
-						// if we aren't connected, don't show the new 
-						if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
-							// Force update of graphics layout.
-							previewPane.updateMachineConfig();
-							// update window title
-							mainframe.setTitle(translator.get("TitlePrefix") 
-									+ Long.toString(machineConfiguration.robot_uid) 
-									+ translator.get("TitleNotConnected"));
-						}
-						startConvertingNow=true;
-						driver.dispose();
-					}
-					if(subject == cancel) {
-						driver.dispose();
-					}
-			  }
-		};
+	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+			final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
+			long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
+			machineConfiguration.loadConfig(new_uid);
+			setDrawStyle(input_draw_style.getSelectedIndex());
+			machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
+			machineConfiguration.reverseForGlass=reverse_h.isSelected();
+			machineConfiguration.saveConfig();
 			
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-	    driver.getRootPane().setDefaultButton(save);
-		driver.pack();
-		driver.setVisible(true);
+			// if we are not connected, update the preview window to show the machine dimensions
+			if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
+				// Force update of graphics layout.
+				previewPane.updateMachineConfig();
+				// update window title
+				mainframe.setTitle(translator.get("TitlePrefix") 
+						+ Long.toString(machineConfiguration.robot_uid) 
+						+ translator.get("TitleNotConnected"));
+			}
+			return true;	    	
+	    }
 		
-		return startConvertingNow;
+		return false;
 	}
+	
 	
 	protected boolean loadDXF(String filename) {
 		if( chooseImageConversionOptions(true) == false ) return false;
@@ -727,6 +703,7 @@ public class MainGUI
 					log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
 					// convert with style
 					img = ImageIO.read(new File(sourceFile));
+					
 					int style = getDrawStyle();
 					Filter f = image_converters.get(style);
 					tabToLog();
@@ -1889,5 +1866,5 @@ public class MainGUI
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */
