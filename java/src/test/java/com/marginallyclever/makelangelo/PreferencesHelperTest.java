@@ -104,6 +104,9 @@ public class PreferencesHelperTest {
             logger.info("child node name: {}", childNodeName);
             final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
             Assert.assertTrue(isMachineNameAnInteger);
+            //Machine configurations numbered -1 and below should not exist.
+            final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
+            Assert.assertFalse(isMachineNameLessThanZero);
         }
         logger.info("end: {}", thisMethodsName);
     }
