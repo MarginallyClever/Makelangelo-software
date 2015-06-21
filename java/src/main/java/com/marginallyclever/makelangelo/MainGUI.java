@@ -73,7 +73,7 @@ public class MainGUI
 	static final long serialVersionUID=1L;
 
     /**
-     * software version. Defined in src/resources/version.properties and uses Maven's resource filtering to update
+     * software version. Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update
 	 * the version based upon version defined in POM.xml. In this way we only define the version once and prevent
 	 * violating DRY.
      */

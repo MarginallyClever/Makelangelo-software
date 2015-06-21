@@ -23,7 +23,7 @@ public final class PropertiesFileHelper {
     /**
      *
      */
-    private static final String VERSION_PROPERTIES_FILENAME = "version.properties";
+    private static final String MAKELANGELO_PROPERTIES_FILENAME = "makelangelo.properties";
 
     /**
      *
@@ -34,9 +34,9 @@ public final class PropertiesFileHelper {
     public static String getMakelangeloVersionPropertyValue() {
         final Properties prop = new Properties();
         String makelangeloVersionPropertyValue = "";
-        try (final InputStream input = MainGUI.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_FILENAME)) {
+        try (final InputStream input = MainGUI.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {
             if( input == null ){
-                final String unableToFilePropertiesFileErrorMessage = "Sorry, unable to find " + VERSION_PROPERTIES_FILENAME;
+                final String unableToFilePropertiesFileErrorMessage = "Sorry, unable to find " + MAKELANGELO_PROPERTIES_FILENAME;
                 throw new IllegalStateException(unableToFilePropertiesFileErrorMessage);
             }
             //load a properties file from class path, inside static method
