@@ -81,15 +81,15 @@ final class MarginallyCleverTranslationXmlFileHelper {
                             logger.error("{} contains all the default translation keys.", languageFile);
                         }
 
-                        final Set<String> keysInA = new HashSet<String>(defaultLanguageFilesKeys);
-                        final Set<String> keysInB = new HashSet<String>(thisLanguageFilesKeys);
+                        final Set<String> keysInA = new HashSet<>(defaultLanguageFilesKeys);
+                        final Set<String> keysInB = new HashSet<>(thisLanguageFilesKeys);
 
                         // Keys in A and not in B
-                        final Set<String> inANotB = new HashSet<String>(keysInA);
+                        final Set<String> inANotB = new HashSet<>(keysInA);
                         inANotB.removeAll(keysInB);
 
                         // Keys common to both maps
-                        final Set<String> commonKeys = new HashSet<String>(keysInA);
+                        final Set<String> commonKeys = new HashSet<>(keysInA);
                         commonKeys.retainAll(keysInB);
                         logger.error("Missing Keys: {}", inANotB);
 
