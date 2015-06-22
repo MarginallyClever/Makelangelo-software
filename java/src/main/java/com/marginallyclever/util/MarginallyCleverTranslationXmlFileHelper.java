@@ -64,7 +64,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
                 throw new AssertionError();
             }
             final File defaultLanguageFile = languageFiles[indexOfDefaultLanguageFile];
-            final Set<String> defaultLangugeFilesKeys = getKeySet(docBuilder.parse(defaultLanguageFile).getDocumentElement());
+            final Set<String> defaultLanguageFilesKeys = getKeySet(docBuilder.parse(defaultLanguageFile).getDocumentElement());
             for(final File languageFile : languageFiles) {
                 final String languageFileName = languageFile.getName();
                 final boolean isDefaultLanguageFile = languageFileName.equals(DEFAULT_LANGUAGE_XML_FILE);
@@ -73,14 +73,14 @@ final class MarginallyCleverTranslationXmlFileHelper {
                     final Document parseXmlLanguageDocument = docBuilder.parse(languageFile);
                     //doSomething(parseXmlLanguageDocument.getDocumentElement());
                     final Set<String> thisLanguageFilesKeys = getKeySet(parseXmlLanguageDocument.getDocumentElement());
-                    final boolean doesThisLanguageFileContainAllTheDefaultKeys = thisLanguageFilesKeys.containsAll(defaultLangugeFilesKeys);
+                    final boolean doesThisLanguageFileContainAllTheDefaultKeys = thisLanguageFilesKeys.containsAll(defaultLanguageFilesKeys);
                     if(!doesThisLanguageFileContainAllTheDefaultKeys) {
                         logger.error("{} does not contain all the default translation keys.", languageFileName);
                     } else {
                         logger.error("{} contains all the default translation keys.", languageFile);
                     }
 
-                    final Set<String> keysInA = new HashSet<String>(defaultLangugeFilesKeys);
+                    final Set<String> keysInA = new HashSet<String>(defaultLanguageFilesKeys);
                     final Set<String> keysInB = new HashSet<String>(thisLanguageFilesKeys);
 
                     // Keys in A and not in B
