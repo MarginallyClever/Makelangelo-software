@@ -51,11 +51,16 @@ final class MarginallyCleverTranslationXmlFileHelper {
      */
     public static void main(String[] args) {
         final ClassLoader thisClassesClassLoader = MarginallyCleverTranslationXmlFileHelper.class.getClassLoader();
-        final URL languagesFolderUrl = thisClassesClassLoader.getResource(LANGUAGES_FOLDER_LOCATION);
-        if(languagesFolderUrl != null) {
+        URL languagesFolderUrl = thisClassesClassLoader.getResource(LANGUAGES_FOLDER_LOCATION);
+        final String workingDirectory = System.getProperty("user.dir") + File.separator + "languages";
+        final File languageFolderUsingUserDirectory = new File(workingDirectory);
+        if(languagesFolderUrl != null || languageFolderUsingUserDirectory != null) {
             final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
             try {
+                if(languagesFolderUrl == null) {
+                    languagesFolderUrl = languageFolderUsingUserDirectory.toURI().toURL();
+                }
                 final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                 final File languagesFolder = new File(languagesFolderUrl.toURI());
                 final File[] languageFiles = languagesFolder.listFiles();
@@ -139,7 +144,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
         for (int i = 0; i < nodeList.getLength(); i++) {
             final Node currentNode = nodeList.item(i);
             if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                //calls this method for all the children which is Element
+                // calls this method for all the children which is Element
                 keySet.addAll(getKeySet(currentNode));
             }
         }
