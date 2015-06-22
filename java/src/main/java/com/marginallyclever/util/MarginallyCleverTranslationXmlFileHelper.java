@@ -46,6 +46,8 @@ final class MarginallyCleverTranslationXmlFileHelper {
     /**
      *
      * @param args command line arguments.
+     *
+     *             @see <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
      */
     public static void main(String[] args) {
         final ClassLoader thisClassesClassLoader = MarginallyCleverTranslationXmlFileHelper.class.getClassLoader();
