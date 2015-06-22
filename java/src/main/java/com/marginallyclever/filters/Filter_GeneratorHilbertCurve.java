@@ -105,9 +105,6 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 			
         	output.flush();
 	        output.close();
-	        
-			// open the file automatically to save a click.
-			mainGUI.openFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}
