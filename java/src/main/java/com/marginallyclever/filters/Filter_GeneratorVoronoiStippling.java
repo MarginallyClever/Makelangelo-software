@@ -1,15 +1,17 @@
 package com.marginallyclever.filters;
 
+import BasicTypes.Point2D;
+
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-import com.marginallyclever.makelangelo.Point2D;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;

@@ -1,6 +1,6 @@
 package com.marginallyclever.voronoi;
 
-import com.marginallyclever.makelangelo.Point2D;
+import BasicTypes.Point2D;
 
 public class VoronoiSite
 {

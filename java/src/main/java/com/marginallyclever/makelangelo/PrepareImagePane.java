@@ -65,6 +65,11 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
 public class PrepareImagePane
 extends JPanel
 implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4703402918904039337L;
+	
 	protected MultilingualSupport translator;
 	protected MachineConfiguration machineConfiguration;
 	protected MainGUI gui;

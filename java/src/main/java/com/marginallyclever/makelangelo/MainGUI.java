@@ -78,8 +78,6 @@ public class MainGUI
     private JMenuItem buttonRescan, buttonDisconnect;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
-    // settings pane
-    private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
 
     private JMenuItem [] buttonPorts;
 
@@ -99,8 +97,8 @@ public class MainGUI
     // menu tabs
     private PrepareImagePane prepareImage;
     private MakelangeloDriveControls driveControls;
+	private MakelangeloSettingsPanel settingsPane;
 	public StatusBar statusBar;
-	private JPanel settingsPane;
 	
 	// reading file
 	private boolean isRunning = false;
@@ -669,30 +667,6 @@ public class MainGUI
 			translator.chooseLanguage();
 			updateMenuBar();
 		}
-		if( subject == buttonAdjustMachineSize ) {
-			machineConfiguration.adjustMachineSize();
-			drawPanel.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonAdjustPulleySize ) {
-			machineConfiguration.adjustPulleySize();
-			drawPanel.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonChangeTool ) {
-			machineConfiguration.changeTool();
-			drawPanel.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonAdjustTool ) {
-			machineConfiguration.adjustTool();
-			drawPanel.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonJogMotors ) {
-			jogMotors();
-			return;
-		}
 		if( subject == buttonAbout ) {
 			displayAbout();
 			return;
@@ -814,96 +788,6 @@ public class MainGUI
 		}
 		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
-
-    // settings menu
-	public JPanel settingsPanel() {
-		JPanel panel = new JPanel(new GridLayout(0,1));
-
-        // TODO: move all these into a pop-up menu with tabs
-        buttonAdjustMachineSize = new JButton(translator.get("MenuSettingsMachine"));
-        buttonAdjustMachineSize.addActionListener(this);
-        panel.add(buttonAdjustMachineSize);
-
-        buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
-        buttonAdjustPulleySize.addActionListener(this);
-		panel.add(buttonAdjustPulleySize);
-        
-        buttonJogMotors = new JButton(translator.get("JogMotors"));
-        buttonJogMotors.addActionListener(this);
-		panel.add(buttonJogMotors);
-
-        panel.add(new JSeparator());
-        
-        buttonChangeTool = new JButton(translator.get("MenuSelectTool"));
-        buttonChangeTool.addActionListener(this);
-        panel.add(buttonChangeTool);
-
-        buttonAdjustTool = new JButton(translator.get("MenuAdjustTool"));
-        buttonAdjustTool.addActionListener(this);
-        panel.add(buttonAdjustTool);
-        
-        return panel;
-	}
-	
-	
-	protected void jogMotors() {
-		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
-		driver.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		final JButton buttonAneg = new JButton(translator.get("JogIn"));
-		final JButton buttonApos = new JButton(translator.get("JogOut"));
-		final JCheckBox m1i = new JCheckBox(translator.get("Invert"),machineConfiguration.m1invert);
-		
-		final JButton buttonBneg = new JButton(translator.get("JogIn"));
-		final JButton buttonBpos = new JButton(translator.get("JogOut"));
-		final JCheckBox m2i = new JCheckBox(translator.get("Invert"),machineConfiguration.m2invert);
-
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(translator.get("Left")),c);
-		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(translator.get("Right")),c);
-		
-		c.gridx=1;	c.gridy=0;	driver.add(buttonAneg,c);
-		c.gridx=1;	c.gridy=1;	driver.add(buttonBneg,c);
-		
-		c.gridx=2;	c.gridy=0;	driver.add(buttonApos,c);
-		c.gridx=2;	c.gridy=1;	driver.add(buttonBpos,c);
-
-		c.gridx=3;	c.gridy=0;	driver.add(m1i,c);
-		c.gridx=3;	c.gridy=1;	driver.add(m2i,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				if(subject == buttonApos) sendLineToRobot("D00 L100");
-				if(subject == buttonAneg) sendLineToRobot("D00 L-100");
-				if(subject == buttonBpos) sendLineToRobot("D00 R100");
-				if(subject == buttonBneg) sendLineToRobot("D00 R-100");
-				sendLineToRobot("M114");
-			}
-		};
-
-		ActionListener invertButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				machineConfiguration.m1invert = m1i.isSelected();
-				machineConfiguration.m2invert = m2i.isSelected();
-				machineConfiguration.saveConfig();
-				sendConfig();
-			}
-		};
-		
-		buttonApos.addActionListener(driveButtons);
-		buttonAneg.addActionListener(driveButtons);
-		
-		buttonBpos.addActionListener(driveButtons);
-		buttonBneg.addActionListener(driveButtons);
-		
-		m1i.addActionListener(invertButtons);
-		m2i.addActionListener(invertButtons);
-
-		sendLineToRobot("M114");
-		driver.pack();
-		driver.setVisible(true);
-	}
 	
 	public JMenuBar createMenuBar() {
         // If the menu bar exists, empty it.  If it doesn't exist, create it.
@@ -962,20 +846,17 @@ public class MainGUI
 		JMenu menu, subMenu;
 		ButtonGroup group;
         int i;
-        
+
+    	boolean isConfirmed = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
+    	
         if(settingsPane!=null) {
-            buttonAdjustMachineSize.setEnabled(!isRunning);
-            buttonAdjustPulleySize.setEnabled(!isRunning);
-            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isRunning);
-            buttonChangeTool.setEnabled(!isRunning);
-            buttonAdjustTool.setEnabled(!isRunning);
+        	settingsPane.updateButtonAccess(isConfirmed, isRunning);
         }
         if(prepareImage!=null) {
         	prepareImage.updateButtonAccess(isRunning);
         }
         if(driveControls!=null) {
-        	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	driveControls.updateButtonAccess(x, isRunning);
+        	driveControls.updateButtonAccess(isConfirmed, isRunning);
         }
         
         
@@ -1088,16 +969,21 @@ public class MainGUI
         c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         clearLog();
 
-        settingsPane = settingsPanel();
+        settingsPane = new MakelangeloSettingsPanel();
+        settingsPane.createPanel(this, translator, machineConfiguration);
+        
         drawPanel = new DrawPanel(machineConfiguration);
         drawPanel.setGCode(gCode);
+
         prepareImage = new PrepareImagePane();
         prepareImage.createPanel(this,translator,machineConfiguration);
         prepareImage.updateButtonAccess(false);
-		driveControls = new MakelangeloDriveControls();
+		
+        driveControls = new MakelangeloDriveControls();
 		driveControls.createPanel(this,translator,machineConfiguration);
 		driveControls.updateButtonAccess(false, false);
-        statusBar = new StatusBar(translator);
+        
+		statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
         contextMenu.addTab(translator.get("MenuSettings"),null,settingsPane,null);

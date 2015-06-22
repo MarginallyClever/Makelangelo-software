@@ -42,7 +42,7 @@ package com.marginallyclever.voronoi;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-import com.marginallyclever.makelangelo.Point2D;
+import BasicTypes.Point2D;
 
 import java.util.*;
 

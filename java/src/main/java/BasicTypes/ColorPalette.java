@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package BasicTypes;
 
 import java.util.ArrayList;
 import java.util.Iterator;
