@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 public class Line3D {
 	protected Point3D start = new Point3D();

@@ -14,6 +14,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+/**
+ * Controls related to configuring a makelangelo machine
+ * @author danroyer
+ * @since 7.1.4
+ */
 public class MakelangeloSettingsPanel
 extends JPanel
 implements ActionListener {

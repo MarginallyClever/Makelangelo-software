@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 
 import java.awt.Color;

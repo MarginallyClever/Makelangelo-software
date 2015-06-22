@@ -62,7 +62,13 @@ import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
 import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
 import com.marginallyclever.filters.Filter_GeneratorZigZag;
 
-public class PrepareImagePane
+
+/**
+ * Controls related to converting an image to gcode
+ * @author danroyer
+ * @since 7.1.4
+ */
+public class PrepareImagePanel
 extends JPanel
 implements ActionListener {
 	/**

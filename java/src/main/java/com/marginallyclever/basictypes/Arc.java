@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 public class Arc extends Line3D {
 	protected Point3D center;

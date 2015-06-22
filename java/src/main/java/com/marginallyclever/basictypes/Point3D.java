@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 public class Point3D {
 	public float x, y, z;

@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 import java.util.ArrayList;
 import java.util.Iterator;

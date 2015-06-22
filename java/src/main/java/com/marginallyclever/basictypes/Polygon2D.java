@@ -1,4 +1,4 @@
-package BasicTypes;
+package com.marginallyclever.basictypes;
 
 public class Polygon2D {
 	public Point2D [] list;
