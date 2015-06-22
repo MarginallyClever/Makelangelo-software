@@ -72,7 +72,6 @@ final class MarginallyCleverTranslationXmlFileHelper {
                     if (!isDefaultLanguageFile) {
                         logger.info("{}", languageFile);
                         final Document parseXmlLanguageDocument = docBuilder.parse(languageFile);
-                        //doSomething(parseXmlLanguageDocument.getDocumentElement());
                         final Set<String> thisLanguageFilesKeys = getKeySet(parseXmlLanguageDocument.getDocumentElement());
                         final boolean doesThisLanguageFileContainAllTheDefaultKeys = thisLanguageFilesKeys.containsAll(defaultLanguageFilesKeys);
                         if (!doesThisLanguageFileContainAllTheDefaultKeys) {
