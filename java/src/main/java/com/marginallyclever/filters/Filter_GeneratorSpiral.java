@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -29,7 +30,7 @@ public class Filter_GeneratorSpiral extends Filter {
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		tool.writeMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);

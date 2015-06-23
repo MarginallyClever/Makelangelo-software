@@ -128,13 +128,13 @@ public abstract class Filter {
 	}
 	
 
-	protected void liftPen(OutputStreamWriter out) throws IOException {
+	protected void liftPen(Writer out) throws IOException {
 		tool.writeOff(out);
 		lastup=true;
 	}
 	
 	
-	protected void lowerPen(OutputStreamWriter out) throws IOException {
+	protected void lowerPen(Writer out) throws IOException {
 		tool.writeOn(out);
 		lastup=false;
 	}
@@ -471,7 +471,7 @@ public abstract class Filter {
 	}
 
 	
-	protected void textCreateMessageNow(String text,OutputStreamWriter output) throws IOException {
+	protected void textCreateMessageNow(String text, Writer output) throws IOException {
 		if(chars_per_line<=0) return;
 
 		tool = machine.getCurrentTool();
@@ -515,7 +515,7 @@ public abstract class Filter {
 				output.write("G91;\n");
 			}
 			
-			textDrawLine(lines[i],output);
+			textDrawLine(lines[i], output);
 		}
 
 		output.write("G90;\n");
@@ -563,7 +563,7 @@ public abstract class Filter {
 		return len;
 	}
 	
- 	protected void textDrawLine(String a1,OutputStreamWriter output) throws IOException {
+ 	protected void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = alphabetFolder;//System.getProperty("user.dir") + "/" + alphabetFolder;
 		
 		//System.out.println(a1+" ("+a1.length()+")");
