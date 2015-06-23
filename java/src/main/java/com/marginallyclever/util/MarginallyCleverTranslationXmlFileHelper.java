@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  *
- * Created on 6/22/15. TODO refactor into a test class and write missing Javadoc tag descriptions.
+ * Created on 6/22/15. TODO write missing Javadoc tag descriptions.
  *
  * @author Peter Colapietro
  * @since v7.1.4
@@ -50,6 +50,13 @@ final class MarginallyCleverTranslationXmlFileHelper {
      *             @see <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
      */
     public static void main(String[] args) {
+        areLanguageFilesMissingKeys(false);
+    }
+
+    /**
+     *
+     */
+    public static boolean areLanguageFilesMissingKeys(boolean logMissingKeys) {
         final URL languagesFolderUrl = getLanguagesFolderUrl();
         if(languagesFolderUrl != null) {
             try {
@@ -70,15 +77,18 @@ final class MarginallyCleverTranslationXmlFileHelper {
 
                         final boolean doesThisLanguageFileContainAllTheDefaultKeys = doesThisLanguageFileContainAllTheDefaultKeys(defaultLanguageFilesKeys, thisLanguageFilesKeys, languageFileName);
                         if(!doesThisLanguageFileContainAllTheDefaultKeys) {
-                            logMissingKeys(defaultLanguageFilesKeys, thisLanguageFilesKeys);
+                            if(logMissingKeys) {
+                                logMissingKeys(defaultLanguageFilesKeys, thisLanguageFilesKeys);
+                            }
+                            return true;
                         }
-
                     }
                 }
             } catch (SAXException | IOException | URISyntaxException | ParserConfigurationException e) {
                 logger.error("{}", e);
             }
         }
+        return false;
     }
 
     /**
