@@ -46,22 +46,19 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	
 	
 	public void generate(final String dest) {
-		final JTextField field_size = new JTextField(Integer.toString((int)xmax));
 		final JTextField field_order = new JTextField(Integer.toString(order));
 
 	
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(translator.get("HilbertCurveSize")));
-		panel.add(field_size);
 		panel.add(new JLabel(translator.get("HilbertCurveOrder")));
 		panel.add(field_order);
 		
 	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
-			xmax = Integer.parseInt(field_size.getText())*2;
-			ymax= xmax;
-			xmin=0;
-			ymin=0;
+			xmax = (float)( machine.getPaperWidth() * machine.paperMargin );
+			ymax = xmax;
+			xmin = 0;
+			ymin = 0;
 			order = Integer.parseInt(field_order.getText());
 			createCurveNow(dest);
 	    }
@@ -106,9 +103,6 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 			
         	output.flush();
 	        output.close();
-	        
-			// open the file automatically to save a click.
-			mainGUI.openFileOnDemand(dest);
 		}
 		catch(IOException ex) {}
 	}

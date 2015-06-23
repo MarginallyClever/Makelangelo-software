@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.prefs.Preferences;
 
 import javax.swing.event.MouseInputListener;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -54,7 +54,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
    
     private final int look_ahead=500;
 
-    private ArrayList<String> instructions;
+    private GCodeFile instructions;
 	
 	protected MachineConfiguration machine;
 
@@ -101,11 +101,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      */
     @Override
     public void init( GLAutoDrawable drawable ) {
-        GL gl = drawable.getGL();
-        
         if(DEBUG_GL_ON) {
             try {
                 // Debug ..
+                GL gl = drawable.getGL();
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null) );
             } catch (Exception e) {
             	e.printStackTrace();
@@ -115,6 +114,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         if(TRACE_GL_ON) {
             try {
                 // Trace ..
+                GL gl = drawable.getGL();
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err } ) );
             } catch (Exception e) {
             	e.printStackTrace();
@@ -144,7 +144,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
     
-    public void setGCode(ArrayList<String> gcode) {
+    public void setGCode(GCodeFile gcode) {
         instructions = gcode;
         emptyNodeBuffer();
         // process the image into a buffer once rather than re-reading the gcode over and over again?
@@ -370,6 +370,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
 	
 	public void render( GL2 gl2 ) {
+		optimizeNodes();
+		
 		DrawingTool tool = machine.getTool(0);
 		
 		paintBackground(gl2);
@@ -449,6 +451,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	private void optimizeNodes() {
 		if(instructions == null) return;
+		if(instructions.changed==false) return;
+		instructions.changed=false;
+		
+		emptyNodeBuffer();
 		
 		DrawingTool tool = machine.getTool(0);
 		
@@ -462,9 +468,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		String tool_change="M06 T";
 		Color tool_color=Color.BLACK;
 		
-
-		for(i=0;i<instructions.size();++i) {
-			String line=instructions.get(i);
+		Iterator<String> commands = instructions.lines.iterator();
+		i=0;
+		while(commands.hasNext()) {
+			String line = commands.next();
+			++i;
 			String[] pieces=line.split(";");
 			if(pieces.length==0) continue;
 

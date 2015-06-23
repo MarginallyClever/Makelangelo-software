@@ -1,12 +1,12 @@
 package com.marginallyclever.filters;
 
 
-import com.marginallyclever.makelangelo.C3;
-import com.marginallyclever.makelangelo.ColorPalette;
+import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-import com.marginallyclever.makelangelo.Point2D;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 
 /**
  * 
@@ -144,14 +144,14 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	 * @param color_index
 	 * @throws IOException
 	 */
-	protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
-		Queue<Point2D> points_to_visit = new LinkedList<>();
+    protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
+        LinkedList<Point2D> points_to_visit = new LinkedList<>();
 		points_to_visit.add(new Point2D(x,y));
 		
 		Point2D a;
 
 		while(!points_to_visit.isEmpty()) {
-			a = points_to_visit.remove();
+			a = points_to_visit.removeLast();
 
 			if( getMaskTouched((int)a.x, (int)a.y) ) continue;
 			if( !doesQuantizedBlockMatch(color_index, a.x,a.y) ) continue;
@@ -239,6 +239,12 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
 		//img = bw.process(img);
+		
+		Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI,machine,translator,1);
+		img = blur.process(img);
+//		Histogram h = new Histogram();
+//		h.getHistogramOf(img);
+		
 		
 		// create a color mask so we don't repeat any pixels
 		imgMask = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);

@@ -9,30 +9,18 @@ package com.marginallyclever.makelangelo;
 
 
 // io functions
-import com.marginallyclever.filters.*;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
-import com.marginallyclever.drawingtools.DrawingTool;
 
 import org.apache.commons.io.IOUtils;
-import org.kabeja.dxf.*;
-import org.kabeja.parser.ParseException;
-import org.kabeja.dxf.helpers.DXFSplineConverter;
-import org.kabeja.dxf.helpers.Point;
-import org.kabeja.parser.DXFParser;
-import org.kabeja.parser.Parser;
-import org.kabeja.parser.ParserBuilder;
 
-import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
@@ -43,9 +31,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
@@ -53,7 +38,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 
@@ -62,7 +46,7 @@ import java.util.prefs.Preferences;
 // TODO filters > vector output, vector output > gcode.
 /**
  * 
- * @author dan royer
+ * @author danroyer
  * @since 0.0.1?
  */
 public class MainGUI
@@ -82,12 +66,7 @@ public class MainGUI
 			PropertiesFileHelper.getMakelangeloVersionPropertyValue();;
 
 	
-	// Image processing
-	// TODO use a ServiceLoader for plugins
-	private List<Filter> image_converters;
-	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
-	private RecentFiles recentFiles;
 	
 	private MarginallyCleverConnectionManager connectionManager;
 	private MarginallyCleverConnection connectionToRobot=null;
@@ -100,18 +79,8 @@ public class MainGUI
     private JMenuItem buttonRescan, buttonDisconnect;
     private JMenuItem buttonZoomIn,buttonZoomOut,buttonZoomToFit;
     private JMenuItem buttonAbout,buttonCheckForUpdate;
-    // settings pane
-    private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
-    // prepare pane
-    private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
-    // drive pane
-    private MakelangeloDriveControls driveControls;
-    
-    private JMenuItem [] buttonRecent = new JMenuItem[10];
-    private JMenuItem [] buttonPorts;
 
-    private JTabbedPane contextMenu;
-    private Splitter split_left_right;
+    private JMenuItem [] buttonPorts;
 
     // logging
     private JTextPane log;
@@ -119,18 +88,23 @@ public class MainGUI
     HTMLEditorKit kit;
     HTMLDocument doc;
     PrintWriter logToFile;
-    
-    // panels
-    private DrawPanel previewPane;
-	private StatusBar statusBar;
-	private JPanel preparePane;
-	private JPanel settingsPane;
-	
 
+    // main window layout
+    private Splitter split_left_right;
+    // opengl window
+    private DrawPanel drawPanel;
+    // context sensitive menu
+    private JTabbedPane contextMenu;
+    // menu tabs
+    private PrepareImagePanel prepareImage;
+    private MakelangeloDriveControls driveControls;
+	private MakelangeloSettingsPanel settingsPane;
+	public StatusBar statusBar;
+	
 	// reading file
 	private boolean isRunning = false;
 	private boolean isPaused = true;
-	private GCodeFile gCode = new GCodeFile();
+	public GCodeFile gCode = new GCodeFile();
 
 	private MachineConfiguration machineConfiguration;
 	private MultilingualSupport  translator;
@@ -140,9 +114,7 @@ public class MainGUI
 		startLog();
 		startTranslator();
 		machineConfiguration = new MachineConfiguration(this,translator);
-        recentFiles = new RecentFiles();
         connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
-        loadImageConverters();
         createAndShowGUI();
 	}
 
@@ -199,21 +171,6 @@ public class MainGUI
 	public boolean isRunning() { return isRunning; }
 	public boolean isPaused() { return isPaused; }
 	
-	
-	// TODO use a ServiceLoader instead?
-	protected void loadImageConverters() {
-		image_converters = new ArrayList<Filter>();
-		image_converters.add(new Filter_GeneratorZigZag(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorSpiral(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorCrosshatch(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorScanline(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorPulse(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorBoxes(this,machineConfiguration,translator));
-		image_converters.add(new Filter_GeneratorColorBoxes(this, machineConfiguration, translator));
-		image_converters.add(new Filter_GeneratorColorFloodFill(this, machineConfiguration, translator));  // not ready for public consumption
-		image_converters.add(new Filter_GeneratorVoronoiStippling(this, machineConfiguration, translator));
-	}
-	
 	protected void finalize() throws Throwable {
 		//do finalization here
 		endLog();
@@ -235,6 +192,13 @@ public class MainGUI
 		logToFile.close();
 	}
 
+	
+	public void updateMachineConfig() {
+		if(drawPanel!=null) {
+			drawPanel.updateMachineConfig();
+			drawPanel.zoomToFitPaper();
+		}
+	}
 	
 	public ArrayList<String> getgCode() {
 		return gCode.lines;
@@ -269,27 +233,6 @@ public class MainGUI
 	
 	private void playDawingFinishedSound() {
 		playSound(prefs.get("sound_drawing_finished", ""));
-	}
-		
-	private void setDrawStyle(int style) {
-		prefs.putInt("Draw Style", style);
-	}
-	private int getDrawStyle() {
-		return prefs.getInt("Draw Style", 0);
-	}
-	
-	
-	private void hilbertCurve() {
-		Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(this,machineConfiguration,translator);
-		msg.generate( getTempDestinationFile() );
-		tabToDraw();
-	}
-	
-	
-	private void textToGCODE() {
-		Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(this,machineConfiguration,translator);
-		msg.generate(getTempDestinationFile());
-		tabToDraw();
 	}
 	
 
@@ -326,29 +269,7 @@ public class MainGUI
 			// Do we care if it fails?
 		}
 	}
-
-	/**
-	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
-	 * @param filename what file to open
-	 */
-	public boolean loadGCode(String filename) {
-		try {
-			gCode.load(filename);
-		   	log("<font color='green'>" + gCode.estimate_count + translator.get("LineSegments")
-					+ "\n" + gCode.estimated_length + translator.get("Centimeters") + "\n"
-					+ translator.get("EstimatedTime") + statusBar.formatTime((long) (gCode.estimated_time)) + "s.</font>\n");
-	    }
-	    catch(IOException e) {
-	    	log("<span style='color:red'>"+translator.get("FileNotOpened") + e.getLocalizedMessage()+"</span>\n");
-	    	recentFiles.remove(filename);
-	    	updateMenuBar();
-	    	return false;
-	    }
-	    
-	    previewPane.setGCode(gCode.lines);
-	    halt();
-	    return true;
-	}
+	
 	
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
@@ -368,490 +289,8 @@ public class MainGUI
 	}
 	
 	
-	protected boolean chooseImageConversionOptions(boolean isDXF) {
-		final JPanel panel = new JPanel(new GridBagLayout());
-		
-		final String[] allMachineConfigurations = getAnyMachineConfigurations();
-		final JComboBox<String> machineChoices = new JComboBox<>(allMachineConfigurations);
-		machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
-		input_paper_margin.setMajorTickSpacing(10);
-		input_paper_margin.setMinorTickSpacing(5);
-		input_paper_margin.setPaintTicks(false);
-		input_paper_margin.setPaintLabels(true);
-		
-		final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
-		reverse_h.setSelected(machineConfiguration.reverseForGlass);
-
-		String [] filter_names = new String[image_converters.size()];
-		Iterator<Filter> fit = image_converters.iterator();
-		int i=0;
-		while(fit.hasNext()) {
-			Filter f = fit.next();
-			filter_names[i++] = f.getName();
-		}
-		
-		final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
-		input_draw_style.setSelectedIndex(getDrawStyle());
-		
-		GridBagConstraints c = new GridBagConstraints();
-
-		int y=0;
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  panel.add(machineChoices,c);
-
-		if(!isDXF) {
-			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  panel.add(new JLabel(translator.get("ConversionStyle")),c);
-			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	panel.add(input_draw_style,c);
-		}
-		
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  panel.add(new JLabel(translator.get("PaperMargin")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  panel.add(input_paper_margin,c);
-		
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  panel.add(reverse_h,c);
-
-	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	    if (result == JOptionPane.OK_OPTION) {
-			int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-			long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
-			machineConfiguration.loadConfig(new_uid);
-			setDrawStyle(input_draw_style.getSelectedIndex());
-			machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
-			machineConfiguration.reverseForGlass=reverse_h.isSelected();
-			machineConfiguration.saveConfig();
-			
-			// if we are not connected, update the preview window to show the machine dimensions
-			if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) {
-				// Force update of graphics layout.
-				previewPane.updateMachineConfig();
-				// update window title
-				mainframe.setTitle(translator.get("TitlePrefix") 
-						+ Long.toString(machineConfiguration.getUID())
-						+ translator.get("TitleNotConnected"));
-			}
-			return true;	    	
-	    }
-		
-		return false;
-	}
-	
-	
-	protected boolean loadDXF(String filename) {
-		if( chooseImageConversionOptions(true) == false ) return false;
-
-        // where to save temp output file?
-		final String destinationFile = getTempDestinationFile();
-		final String srcFile = filename;
-		
-		tabToLog();
-		
-		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
-		pm.setProgress(0);
-		pm.setMillisToPopup(0);
-		
-		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
-			public boolean ok=false;
-			
-			@SuppressWarnings("unchecked")
-			@Override
-			public Void doInBackground() {
-				log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
-
-				Parser parser = ParserBuilder.createDefaultParser();
-
-				double dxf_x2=0;
-				double dxf_y2=0;
-
-                try (
-                final OutputStream fileOutputStream = new FileOutputStream(destinationFile);
-                final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-                ) {
-                    DrawingTool tool = machineConfiguration.getCurrentTool();
-                    out.write(machineConfiguration.getConfigLine() + ";\n");
-                    out.write(machineConfiguration.getBobbinLine() + ";\n");
-                    out.write("G00 G90;\n");
-                    tool.writeChangeTo(out);
-                    tool.writeOff(out);
-
-                    parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
-                    DXFDocument doc = parser.getDocument();
-                    Bounds b = doc.getBounds();
-                    double width = b.getMaximumX() - b.getMinimumX();
-                    double height = b.getMaximumY() - b.getMinimumY();
-                    double cx = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
-                    double cy = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
-                    double wh = width > height ? width : height;
-                    double sy = machineConfiguration.getPaperHeight() * 10.0 / wh;
-                    double sx = machineConfiguration.getPaperWidth() * 10.0 / wh;
-                    double scale = (sx < sy ? sx : sy);
-                    sx = scale * (machineConfiguration.reverseForGlass ? -1 : 1);
-                    sx *= machineConfiguration.paperMargin;
-                    sy *= machineConfiguration.paperMargin;
-
-                    // count all entities in all layers
-                    Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
-                    int entity_total = 0;
-                    int entity_count = 0;
-                    while (layer_iter.hasNext()) {
-                        DXFLayer layer = (DXFLayer) layer_iter.next();
-                        log("<font color='yellow'>Found layer " + layer.getName() + "</font>\n");
-                        Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-                        while (entity_iter.hasNext()) {
-                            String entity_type = (String) entity_iter.next();
-                            List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
-                            log("<font color='yellow'>+ Found " + entity_list.size() + " of type " + entity_type + "</font>\n");
-                            entity_total += entity_list.size();
-                        }
-                    }
-                    // set the progress meter
-                    pm.setMinimum(0);
-                    pm.setMaximum(entity_total);
-
-                    // convert each entity
-                    layer_iter = doc.getDXFLayerIterator();
-                    while (layer_iter.hasNext()) {
-                        DXFLayer layer = (DXFLayer) layer_iter.next();
-
-                        Iterator<String> entity_type_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-                        while (entity_type_iter.hasNext()) {
-                            String entity_type = (String) entity_type_iter.next();
-                            List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
-
-                            if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-                                for (int i = 0; i < entity_list.size(); ++i) {
-                                    pm.setProgress(entity_count++);
-                                    DXFLine entity = (DXFLine) entity_list.get(i);
-                                    Point start = entity.getStartPoint();
-                                    Point end = entity.getEndPoint();
-
-                                    double x = (start.getX() - cx) * sx;
-                                    double y = (start.getY() - cy) * sy;
-                                    double x2 = (end.getX() - cx) * sx;
-                                    double y2 = (end.getY() - cy) * sy;
-                                    double dx, dy;
-                                    //*
-                                    // is it worth drawing this line?
-                                    dx = x2 - x;
-                                    dy = y2 - y;
-                                    if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
-                                        continue;
-                                    }
-                                    //*/
-                                    dx = dxf_x2 - x;
-                                    dy = dxf_y2 - y;
-
-                                    if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-                                        if (tool.isDrawOn()) {
-                                            tool.writeOff(out);
-                                        }
-                                        tool.writeMoveTo(out, (float) x, (float) y);
-                                    }
-                                    if (tool.isDrawOff()) {
-                                        tool.writeOn(out);
-                                    }
-                                    tool.writeMoveTo(out, (float) x2, (float) y2);
-                                    dxf_x2 = x2;
-                                    dxf_y2 = y2;
-                                }
-                            } else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-                                for (int i = 0; i < entity_list.size(); ++i) {
-                                    pm.setProgress(entity_count++);
-                                    DXFSpline entity = (DXFSpline) entity_list.get(i);
-                                    entity.setLineWeight(30);
-                                    DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-                                    boolean first = true;
-                                    for (int j = 0; j < polyLine.getVertexCount(); ++j) {
-                                        DXFVertex v = polyLine.getVertex(j);
-                                        double x = (v.getX() - cx) * sx;
-                                        double y = (v.getY() - cy) * sy;
-                                        double dx = dxf_x2 - x;
-                                        double dy = dxf_y2 - y;
-
-                                        if (first == true) {
-                                            first = false;
-                                            if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-                                                // line does not start at last tool location, lift and move.
-                                                if (tool.isDrawOn()) {
-                                                    tool.writeOff(out);
-                                                }
-                                                tool.writeMoveTo(out, (float) x, (float) y);
-                                            }
-                                            // else line starts right here, do nothing.
-                                        } else {
-                                            // not the first point, draw.
-                                            if (tool.isDrawOff()) tool.writeOn(out);
-                                            if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
-                                                continue;  // less than 1mm movement?  Skip it.
-                                            tool.writeMoveTo(out, (float) x, (float) y);
-                                        }
-                                        dxf_x2 = x;
-                                        dxf_y2 = y;
-                                    }
-                                }
-                            } else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-                                for (int i = 0; i < entity_list.size(); ++i) {
-                                    pm.setProgress(entity_count++);
-                                    DXFPolyline entity = (DXFPolyline) entity_list.get(i);
-                                    boolean first = true;
-                                    for (int j = 0; j < entity.getVertexCount(); ++j) {
-                                        DXFVertex v = entity.getVertex(j);
-                                        double x = (v.getX() - cx) * sx;
-                                        double y = (v.getY() - cy) * sy;
-                                        double dx = dxf_x2 - x;
-                                        double dy = dxf_y2 - y;
-
-                                        if (first == true) {
-                                            first = false;
-                                            if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-                                                // line does not start at last tool location, lift and move.
-                                                if (tool.isDrawOn()) {
-                                                    tool.writeOff(out);
-                                                }
-                                                tool.writeMoveTo(out, (float) x, (float) y);
-                                            }
-                                            // else line starts right here, do nothing.
-                                        } else {
-                                            // not the first point, draw.
-                                            if (tool.isDrawOff()) tool.writeOn(out);
-                                            if (j < entity.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
-                                                continue;  // less than 1mm movement?  Skip it.
-                                            tool.writeMoveTo(out, (float) x, (float) y);
-                                        }
-                                        dxf_x2 = x;
-                                        dxf_y2 = y;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // entities finished.  Close up file.
-                    tool.writeOff(out);
-                    tool.writeMoveTo(out, 0, 0);
-
-                    ok = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-				
-				pm.setProgress(100);
-			    return null;
-			}
-			
-			@Override
-			public void done() {
-				pm.close();
-				log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-				playConversionFinishedSound();
-				if(ok) {
-					loadGCode(destinationFile);
-					tabToDraw();
-				}
-				halt();
-			}
-		};
-		
-		s.addPropertyChangeListener(new PropertyChangeListener() {
-		    // Invoked when task's progress property changes.
-		    public void propertyChange(PropertyChangeEvent evt) {
-		        if ("progress" == evt.getPropertyName() ) {
-		            int progress = (Integer) evt.getNewValue();
-		            pm.setProgress(progress);
-		            String message = String.format("%d%%\n", progress);
-		            pm.setNote(message);
-		            if(s.isDone()) {
-	                	log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-		            } else if (s.isCancelled() || pm.isCanceled()) {
-		                if (pm.isCanceled()) {
-		                    s.cancel(true);
-		                }
-	                    log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
-		            }
-		        }
-		    }
-		});
-		
-		s.execute();
-		
-		return true;
-	}
-	
-	
-	public boolean loadImage(String filename) {
-        // where to save temp output file?
-		final String sourceFile = filename;
-		final String destinationFile = getTempDestinationFile();
-		
-		loadImageConverters();
-		if( chooseImageConversionOptions(false) == false ) return false;
-
-		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
-		pm.setProgress(0);
-		pm.setMillisToPopup(0);
-		
-		final SwingWorker<Void,Void> s = new SwingWorker<Void,Void>() {
-			@Override
-			public Void doInBackground() {
-				// read in image
-				BufferedImage img;
-				try {
-					log("<font color='green'>"+translator.get("Converting")+" "+destinationFile+"</font>\n");
-					// convert with style
-					img = ImageIO.read(new File(sourceFile));
-					
-					int style = getDrawStyle();
-					Filter f = image_converters.get(style);
-					tabToLog();
-					f.setParent(this);
-					f.setProgressMonitor(pm);
-					f.setDestinationFile(destinationFile);
-					f.convert(img);
-					tabToDraw();
-			        previewPane.zoomToFitPaper();
-				}
-				catch(IOException e) {
-					log("<font color='red'>"+translator.get("Failed")+e.getLocalizedMessage()+"</font>\n");
-					recentFiles.remove(sourceFile);
-					updateMenuBar();
-				}
-
-				pm.setProgress(100);
-			    return null;
-			}
-			
-			@Override
-			public void done() {
-				pm.close();
-				log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-				playConversionFinishedSound();
-				loadGCode(destinationFile);
-			}
-		};
-		
-		s.addPropertyChangeListener(new PropertyChangeListener() {
-		    // Invoked when task's progress property changes.
-		    public void propertyChange(PropertyChangeEvent evt) {
-		        if ("progress" == evt.getPropertyName() ) {
-		            int progress = (Integer) evt.getNewValue();
-		            pm.setProgress(progress);
-		            String message = String.format("%d%%.\n", progress);
-		            pm.setNote(message);
-		            if(s.isDone()) {
-	                	log("<font color='green'>"+translator.get("Finished")+"</font>\n");
-		            } else if (s.isCancelled() || pm.isCanceled()) {
-		                if (pm.isCanceled()) {
-		                    s.cancel(true);
-		                }
-	                    log("<font color='green'>"+translator.get("Cancelled")+"</font>\n");
-		            }
-		        }
-		    }
-		});
-		
-		s.execute();
-		
-		return true;
-	}
-	
-	
 	public boolean isFileLoaded() {
 		return ( gCode.fileOpened && gCode.lines != null && gCode.lines.size() > 0 );
-	}
-	
-	public boolean isFileGcode(String filename) {
-		String ext=filename.substring(filename.lastIndexOf('.'));
-    	return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
-	}
-	
-	public boolean isFileDXF(String filename) {
-		String ext=filename.substring(filename.lastIndexOf('.'));
-    	return (ext.equalsIgnoreCase(".dxf"));
-	}
-	
-	public boolean isFileImage(String filename) {
-		String ext=filename.substring(filename.lastIndexOf('.'));
-    	return ext.equalsIgnoreCase(".jpg")
-    			|| ext.equalsIgnoreCase(".png")
-    			|| ext.equalsIgnoreCase(".bmp")
-    			|| ext.equalsIgnoreCase(".gif");
-	}
-	
-	// User has asked that a file be opened.
-	public void openFileOnDemand(String filename) {
- 		log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
- 		boolean file_loaded_ok=false;
- 		
-	   	if(isFileGcode(filename)) {
-			file_loaded_ok = loadGCode(filename);
-    	} else if(isFileDXF(filename)) {
-    		file_loaded_ok = loadDXF(filename);
-    	} else if(isFileImage(filename)) {
-    		file_loaded_ok = loadImage(filename);
-    	} else {
-    		log("<font color='red'>"+translator.get("UnknownFileType")+"</font>\n");
-    	}
-
-	   	if(file_loaded_ok==true) {
-	   		recentFiles.add(filename);
-	   		updateMenuBar();
-	   	}
-    	statusBar.clear();
-	}
-
-	// creates a file open dialog. If you don't cancel it opens that file.
-	public void openFileDialog() {
-	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
-	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String s = recentFiles.get(0);
-		String filename = (s.length()>0) ? filename = s : "";
-
-		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
-		FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
-		FileFilter filterDXF   = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
-		 
-		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterImage);
-		fc.addChoosableFileFilter(filterDXF);
-		fc.addChoosableFileFilter(filterGCODE);
-	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
-
-	    	// if machine is not yet calibrated
-	    	if(machineConfiguration.isPaperConfigured() == false) {
-	    		JOptionPane.showMessageDialog(null,translator.get("SetPaperSize"));
-	    		return;
-	    	}
-	    	openFileOnDemand(selectedFile);
-	    }
-	}
-	
-	private void saveFileDialog() {
-	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
-	    // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String s = recentFiles.get(0);
-		String filename = (s.length()>0) ? filename = s : "";
-
-		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
-		
-		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterGCODE);
-	    if(fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
-
-			if(!selectedFile.toLowerCase().endsWith(".ngc")) {
-				selectedFile+=".ngc";
-			}
-
-	    	try {
-	    		gCode.save(selectedFile);
-	    	}
-		    catch(IOException e) {
-		    	log("<span style='color:red'>"+translator.get("Failed")+e.getMessage()+"</span>\n");
-		    	return;
-		    }
-	    }
 	}
 	
 	private String selectFile() {
@@ -984,7 +423,7 @@ public class MainGUI
 						graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
 						graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
 
-						previewPane.setShowPenUp(show_pen_up.isSelected());
+						drawPanel.setShowPenUp(show_pen_up.isSelected());
 						driver.dispose();
 					}
 					if(subject == cancel) {
@@ -1043,7 +482,7 @@ public class MainGUI
 			}
 			line += generateChecksum(line);
 			
-			previewPane.setLinesProcessed(gCode.linesProcessed);
+			drawPanel.setLinesProcessed(gCode.linesProcessed);
 			statusBar.setProgress(gCode.linesProcessed, gCode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
@@ -1062,7 +501,7 @@ public class MainGUI
 		long num_lines = gCode.linesProcessed;
 		
 		JOptionPane.showMessageDialog(null,
-				translator.get("Finished") +
+				translator.get("Finished") + " " +
 				num_lines +
 				translator.get("LineSegments") + 
 				"\n" +
@@ -1164,17 +603,17 @@ public class MainGUI
 	 * TODO add an e-stop command?
 	 */
 	public void halt() {
-		isRunning =false;
-		isPaused=false;
-	    previewPane.setLinesProcessed(0);
-		previewPane.setRunning(isRunning);
+		isRunning = false;
+		isPaused = false;
+	    drawPanel.setLinesProcessed(0);
+		drawPanel.setRunning(isRunning);
 		updateMenuBar();
 	}
 	
 	public void startAt(long lineNumber) {
 		gCode.linesProcessed=0;
 		sendLineToRobot("M110 N" + gCode.linesProcessed);
-		previewPane.setLinesProcessed(gCode.linesProcessed);
+		drawPanel.setLinesProcessed(gCode.linesProcessed);
 		startDrawing();
 	}
 	
@@ -1189,7 +628,7 @@ public class MainGUI
 	private void startDrawing() {
 		isPaused=false;
 		isRunning =true;
-		previewPane.setRunning(isRunning);
+		drawPanel.setRunning(isRunning);
 		updateMenuBar();
 		statusBar.start();
 		sendFileCommand();
@@ -1201,27 +640,15 @@ public class MainGUI
 		Object subject = e.getSource();
 		
 		if( subject == buttonZoomIn ) {
-			previewPane.zoomIn();
+			drawPanel.zoomIn();
 			return;
 		}
 		if( subject == buttonZoomOut ) {
-			previewPane.zoomOut();
+			drawPanel.zoomOut();
 			return;
 		}
 		if( subject == buttonZoomToFit ) {
-			previewPane.zoomToFitPaper();
-			return;
-		}
-		if( subject == buttonOpenFile ) {
-			openFileDialog();
-			return;
-		}
-		if( subject == buttonHilbertCurve ) {
-			hilbertCurve();
-			return;
-		}
-		if( subject == buttonText2GCODE ) {
-			textToGCODE();
+			drawPanel.zoomToFitPaper();
 			return;
 		}
 		if( subject == buttonRescan ) {
@@ -1233,7 +660,7 @@ public class MainGUI
 			connectionToRobot.closeConnection();
 			connectionToRobot=null;
 			clearLog();
-			previewPane.setConnected(false);
+			drawPanel.setConnected(false);
 			updateMenuBar();
 			playDisconnectSound();
 
@@ -1255,30 +682,6 @@ public class MainGUI
 			translator.chooseLanguage();
 			updateMenuBar();
 		}
-		if( subject == buttonAdjustMachineSize ) {
-			machineConfiguration.adjustMachineSize();
-			previewPane.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonAdjustPulleySize ) {
-			machineConfiguration.adjustPulleySize();
-			previewPane.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonChangeTool ) {
-			machineConfiguration.changeTool();
-			previewPane.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonAdjustTool ) {
-			machineConfiguration.adjustTool();
-			previewPane.updateMachineConfig();
-			return;
-		}
-		if( subject == buttonJogMotors ) {
-			jogMotors();
-			return;
-		}
 		if( subject == buttonAbout ) {
 			displayAbout();
 			return;
@@ -1288,26 +691,13 @@ public class MainGUI
 			return;
 		}
 		
-		if( subject == buttonSaveFile ) {
-			saveFileDialog();
-			return;
-		}
-		
 		if( subject == buttonExit ) {
 			System.exit(0);
 			return;
 		}
 		
-		int i;
-		for(i=0;i<10;++i) {
-			if(subject == buttonRecent[i]) {
-				openFileOnDemand(recentFiles.get(i));
-				return;
-			}
-		}
-
 		String [] connections = connectionManager.listConnections(); 
-		for(i=0;i<connections.length;++i) {
+		for(int i=0;i<connections.length;++i) {
 			if(subject == buttonPorts[i]) {
 
 				log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
@@ -1413,138 +803,6 @@ public class MainGUI
 		}
 		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
-
-    // settings menu
-	public JPanel settingsPanel() {
-		JPanel panel = new JPanel(new GridLayout(0,1));
-
-        // TODO: move all these into a pop-up menu with tabs
-        buttonAdjustMachineSize = new JButton(translator.get("MenuSettingsMachine"));
-        buttonAdjustMachineSize.addActionListener(this);
-        panel.add(buttonAdjustMachineSize);
-
-        buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
-        buttonAdjustPulleySize.addActionListener(this);
-		panel.add(buttonAdjustPulleySize);
-        
-        buttonJogMotors = new JButton(translator.get("JogMotors"));
-        buttonJogMotors.addActionListener(this);
-		panel.add(buttonJogMotors);
-
-        panel.add(new JSeparator());
-        
-        buttonChangeTool = new JButton(translator.get("MenuSelectTool"));
-        buttonChangeTool.addActionListener(this);
-        panel.add(buttonChangeTool);
-
-        buttonAdjustTool = new JButton(translator.get("MenuAdjustTool"));
-        buttonAdjustTool.addActionListener(this);
-        panel.add(buttonAdjustTool);
-        
-        return panel;
-	}
-	
-	
-	public JPanel processImages() {
-		JPanel driver = new JPanel(new GridLayout(0,1));
-
-        // File conversion menu
-        buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
-        buttonOpenFile.addActionListener(this);
-        driver.add(buttonOpenFile);
-/*        
-        subMenu = new JMenu(translator.get("MenuConvertImage"));
-        group = new ButtonGroup();
-
-	        // list recent files
-	        if(recentFiles != null && recentFiles.length>0) {	        	
-	        	for(i=0;i<recentFiles.length;++i) {
-	        		if(recentFiles[i] == null || recentFiles[i].length()==0) break;
-	            	buttonRecent[i] = new JMenuItem((1+i) + " "+recentFiles[i],KeyEvent.VK_1+i);
-	            	if(buttonRecent[i]!=null) {
-	            		buttonRecent[i].addActionListener(this);
-	            		subMenu.add(buttonRecent[i]);
-	            	}
-	        	}
-	        }
-        
-        menu.add(subMenu);
-
-        menu.addSeparator();
-*/
-        buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
-        buttonHilbertCurve.addActionListener(this);
-        driver.add(buttonHilbertCurve);
-        
-        buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
-        buttonText2GCODE.addActionListener(this);
-        driver.add(buttonText2GCODE);
-
-        buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
-        buttonSaveFile.addActionListener(this);
-        driver.add(buttonSaveFile);
-
-        return driver;
-	}
-	
-	protected void jogMotors() {
-		JDialog driver = new JDialog(mainframe,translator.get("JogMotors"),true);
-		driver.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		final JButton buttonAneg = new JButton(translator.get("JogIn"));
-		final JButton buttonApos = new JButton(translator.get("JogOut"));
-		final JCheckBox m1i = new JCheckBox(translator.get("Invert"),machineConfiguration.m1invert);
-		
-		final JButton buttonBneg = new JButton(translator.get("JogIn"));
-		final JButton buttonBpos = new JButton(translator.get("JogOut"));
-		final JCheckBox m2i = new JCheckBox(translator.get("Invert"),machineConfiguration.m2invert);
-
-		c.gridx=0;	c.gridy=0;	driver.add(new JLabel(translator.get("Left")),c);
-		c.gridx=0;	c.gridy=1;	driver.add(new JLabel(translator.get("Right")),c);
-		
-		c.gridx=1;	c.gridy=0;	driver.add(buttonAneg,c);
-		c.gridx=1;	c.gridy=1;	driver.add(buttonBneg,c);
-		
-		c.gridx=2;	c.gridy=0;	driver.add(buttonApos,c);
-		c.gridx=2;	c.gridy=1;	driver.add(buttonBpos,c);
-
-		c.gridx=3;	c.gridy=0;	driver.add(m1i,c);
-		c.gridx=3;	c.gridy=1;	driver.add(m2i,c);
-		
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				if(subject == buttonApos) sendLineToRobot("D00 L100");
-				if(subject == buttonAneg) sendLineToRobot("D00 L-100");
-				if(subject == buttonBpos) sendLineToRobot("D00 R100");
-				if(subject == buttonBneg) sendLineToRobot("D00 R-100");
-				sendLineToRobot("M114");
-			}
-		};
-
-		ActionListener invertButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				machineConfiguration.m1invert = m1i.isSelected();
-				machineConfiguration.m2invert = m2i.isSelected();
-				machineConfiguration.saveConfig();
-				sendConfig();
-			}
-		};
-		
-		buttonApos.addActionListener(driveButtons);
-		buttonAneg.addActionListener(driveButtons);
-		
-		buttonBpos.addActionListener(driveButtons);
-		buttonBneg.addActionListener(driveButtons);
-		
-		m1i.addActionListener(invertButtons);
-		m2i.addActionListener(invertButtons);
-
-		sendLineToRobot("M114");
-		driver.pack();
-		driver.setVisible(true);
-	}
 	
 	public JMenuBar createMenuBar() {
         // If the menu bar exists, empty it.  If it doesn't exist, create it.
@@ -1603,21 +861,17 @@ public class MainGUI
 		JMenu menu, subMenu;
 		ButtonGroup group;
         int i;
-        
+
+    	boolean isConfirmed = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
+    	
         if(settingsPane!=null) {
-            buttonAdjustMachineSize.setEnabled(!isRunning);
-            buttonAdjustPulleySize.setEnabled(!isRunning);
-            buttonJogMotors.setEnabled(connectionToRobot!=null && connectionToRobot.isRobotConfirmed() && !isRunning);
-            buttonChangeTool.setEnabled(!isRunning);
-            buttonAdjustTool.setEnabled(!isRunning);
+        	settingsPane.updateButtonAccess(isConfirmed, isRunning);
         }
-        if(preparePane!=null) {
-            buttonHilbertCurve.setEnabled(!isRunning);
-            buttonText2GCODE.setEnabled(!isRunning);
+        if(prepareImage!=null) {
+        	prepareImage.updateButtonAccess(isRunning);
         }
         if(driveControls!=null) {
-        	boolean x = connectionToRobot!=null && connectionToRobot.isRobotConfirmed();
-        	driveControls.updateButtonAccess(x, isRunning);
+        	driveControls.updateButtonAccess(isConfirmed, isRunning);
         }
         
         
@@ -1712,18 +966,7 @@ public class MainGUI
         menuBar.updateUI();
     }
 
-	// manages the vertical split in the GUI
-	public class Splitter extends JSplitPane {
-		static final long serialVersionUID=1;
-		
-		public Splitter(int split_direction) {
-			super(split_direction);
-			setResizeWeight(0.9);
-			setDividerLocation(0.9);
-		}
-	}
-	
-    public Container createContentPane() {
+	public Container createContentPane() {
         //Create the content-pane-to-be.
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setOpaque(true);
@@ -1741,23 +984,31 @@ public class MainGUI
         c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         clearLog();
 
-        settingsPane = settingsPanel();
-        previewPane = new DrawPanel(machineConfiguration);
-        preparePane = processImages();
-		driveControls = new MakelangeloDriveControls();
+        settingsPane = new MakelangeloSettingsPanel();
+        settingsPane.createPanel(this, translator, machineConfiguration);
+        
+        drawPanel = new DrawPanel(machineConfiguration);
+        drawPanel.setGCode(gCode);
+
+        prepareImage = new PrepareImagePanel();
+        prepareImage.createPanel(this,translator,machineConfiguration);
+        prepareImage.updateButtonAccess(false);
+		
+        driveControls = new MakelangeloDriveControls();
 		driveControls.createPanel(this,translator,machineConfiguration);
 		driveControls.updateButtonAccess(false, false);
-        statusBar = new StatusBar(translator);
+        
+		statusBar = new StatusBar(translator);
 
         contextMenu = new JTabbedPane();
         contextMenu.addTab(translator.get("MenuSettings"),null,settingsPane,null);
-        contextMenu.addTab(translator.get("MenuGCODE"),null,preparePane,null);
+        contextMenu.addTab(translator.get("MenuGCODE"),null,prepareImage,null);
         contextMenu.addTab(translator.get("MenuDraw"),null,driveControls,null);
-        contextMenu.addTab("Log",null,logPane,null);
+        contextMenu.addTab(translator.get("MenuLog"),null,logPane,null);
 
         // major layout
         split_left_right = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-        split_left_right.add(previewPane);
+        split_left_right.add(drawPanel);
         split_left_right.add(contextMenu);
 
         contentPane.add(statusBar,BorderLayout.SOUTH);
@@ -1765,27 +1016,7 @@ public class MainGUI
 		
         return contentPane;
     }
-    
-    // if the default file being opened in a g-code file, this is ok.  Otherwise it may take too long and look like a crash/hang.
-    private void reopenLastFile() {
-    	String s = recentFiles.get(0);
-		if(s.length()>0) {
-			openFileOnDemand(s);
-		}
-    }
 
-    //private void TabToSettings() {
-    //	contextMenu.setSelectedIndex(0);
-    //}
-    //private void TabToGcode() {
-    //	contextMenu.setSelectedIndex(1);
-    //}
-    private void tabToDraw() {
-    	contextMenu.setSelectedIndex(2);
-    }
-    private void tabToLog() {
-    	contextMenu.setSelectedIndex(3);
-    }
 
     public JFrame getParentFrame() {
     	return mainframe;
@@ -1808,11 +1039,10 @@ public class MainGUI
         mainframe.setSize(width,height);
         mainframe.setVisible(true);
         
-        previewPane.zoomToFitPaper();
+        drawPanel.zoomToFitPaper();
         
         // 2015-05-03: option is meaningless, connectionToRobot doesn't exist when software starts.
         // if(prefs.getBoolean("Reconnect to last port on start", false)) connectionToRobot.reconnect();
-        if(prefs.getBoolean("Open last file on start", false)) reopenLastFile();
         if(prefs.getBoolean("Check for updates", false)) checkForUpdate();
     }
 
@@ -1829,7 +1059,7 @@ public class MainGUI
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
 	public DrawPanel getPreviewPane() {
-		return previewPane;
+		return drawPanel;
 	}
 
 	/**

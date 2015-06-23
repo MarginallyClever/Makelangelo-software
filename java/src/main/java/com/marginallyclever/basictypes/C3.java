@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.basictypes;
 
 
 import java.awt.Color;

@@ -1,10 +1,10 @@
 package com.marginallyclever.filters;
 
 
+import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-import com.marginallyclever.makelangelo.Point2D;
 
 import java.awt.image.BufferedImage;
 import java.io.*;

@@ -45,8 +45,6 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			
 			// TODO Move to GUI?
 			mainGUI.log("<font color='green'>Completed.</font>\n");
-			mainGUI.playConversionFinishedSound();
-			mainGUI.loadGCode(dest);
 	    }
 	}
 
