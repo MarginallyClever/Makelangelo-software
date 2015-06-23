@@ -425,7 +425,7 @@ public class MainGUI
 				previewPane.updateMachineConfig();
 				// update window title
 				mainframe.setTitle(translator.get("TitlePrefix") 
-						+ Long.toString(machineConfiguration.robot_uid) 
+						+ Long.toString(machineConfiguration.getUID())
 						+ translator.get("TitleNotConnected"));
 			}
 			return true;	    	
@@ -1241,7 +1241,7 @@ public class MainGUI
 
 			// update window title
 			mainframe.setTitle(translator.get("TitlePrefix")
-					+ Long.toString(machineConfiguration.robot_uid)
+					+ Long.toString(machineConfiguration.getUID())
 					+ translator.get("TitleNotConnected"));
 			return;
 		}
