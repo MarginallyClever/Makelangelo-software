@@ -115,11 +115,10 @@ public final class MachineConfiguration {
 		// which configurations are available?
 		try {
 			machineConfigurationsAvailable = topLevelMachinesPreferenceNode.childrenNames();
+		} catch(Exception e) {
+            logger.error("{}", e);
+			machineConfigurationsAvailable = new String[1];
 		}
-		catch(Exception e) {
-			machineConfigurationsAvailable = new String[0];
-		}
-		
 		// TODO load most recent config?
 		loadConfig(0);
 	}
@@ -701,7 +700,7 @@ public final class MachineConfiguration {
 	 */
 	public String[] getKnownMachineNames() {
 		final String [] availableMachineConfigurations = new String[machineConfigurationsAvailable.length];
-		for(int i=0;i < machineConfigurationsAvailable.length;i++) {
+		for(int i = 0; i < machineConfigurationsAvailable.length; i++) {
 			if(machineConfigurationsAvailable[i].equals("0")) {
 				continue;
 			}
