@@ -371,8 +371,8 @@ public class MainGUI
 	protected boolean chooseImageConversionOptions(boolean isDXF) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		
-		final String[] machineConfigurations = getAnyMachineConfigurations();
-		final JComboBox<String> machineChoices = new JComboBox<>(machineConfigurations);
+		final String[] allMachineConfigurations = getAnyMachineConfigurations();
+		final JComboBox<String> machineChoices = new JComboBox<>(allMachineConfigurations);
 		machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
 		
 		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
