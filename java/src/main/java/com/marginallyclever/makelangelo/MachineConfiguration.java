@@ -29,6 +29,8 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author dan royer
@@ -93,9 +95,10 @@ public class MachineConfiguration {
 	protected String [] machineConfigurationsAvailable = null;
 	private MainGUI mainGUI = null;
 	private MultilingualSupport translator;
-	
-	
-	/**
+
+    private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
+
+    /**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
 	 * @param gui
 	 * @param ms
@@ -626,8 +629,9 @@ public class MachineConfiguration {
 		if(lines.length>0) {
 			try {
 				new_uid = Long.parseLong(lines[0]);
-			}
-			catch(NumberFormatException e) {}
+			} catch(NumberFormatException e) {
+                logger.error("{}", e);
+            }
 		}
 		
 		// new robots have UID=0
@@ -659,8 +663,8 @@ public class MachineConfiguration {
 		    new_uid = Long.parseLong(line);
 		    rd.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
+			logger.error("{}", e);
+            return 0;
 		}
 
 		// did read go ok?
