@@ -6,10 +6,8 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorBoxes extends Filter {
@@ -65,76 +63,77 @@ public class Filter_GeneratorBoxes extends Filter {
 		img = bw.process(img);
 
 		// Open the destination file
-		Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
-		// "please change to tool X and press any key to continue"
-		tool.writeChangeTo(out);
-		// Make sure the pen is up for the first move
-		liftPen(out);
-		
-		double pw = machine.getPaperWidth();
-		//double ph = machine.GetPaperHeight();
-		
-		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/tool.getDiameter());
-		if(steps<1) steps=1;
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
+            // Set up the conversion from image space to paper space, select the current tool, etc.
+            imageStart(img, out);
+            // "please change to tool X and press any key to continue"
+            tool.writeChangeTo(out);
+            // Make sure the pen is up for the first move
+            liftPen(out);
 
-		float blockSize=(int)(image_width / steps);
-		float halfstep = (float)blockSize/2.0f;
-		
-		// from top to bottom of the image...
-		float x,y,z;
-		int i=0;
-		for(y=0;y<image_height;y+=blockSize) {
-			++i;
-			if((i%2)==0) {
-				// every even line move left to right
-				//MoveTo(file,x,y,pen up?)]
-				for(x=0;x<image_width-blockSize;x+=blockSize) {
-					// read a block of the image and find the average intensity in this block
-					z=takeImageSampleBlock(img,(int)x,(int)(y-halfstep),(int)(x+blockSize),(int)(y+halfstep));
-					// scale the intensity value
-					float scale_z = (255.0f-(float)z)/255.0f;
-					float pulse_size = (halfstep-1.0f) * scale_z;
-					if( pulse_size>0.1f) {
-						// draw a square.  the diameter is relative to the intensity.
-						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
-						moveTo(out,x+halfstep+pulse_size,y+halfstep-pulse_size,false);
-						moveTo(out,x+halfstep+pulse_size,y+halfstep+pulse_size,false);
-						moveTo(out,x+halfstep-pulse_size,y+halfstep+pulse_size,false);
-						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,false);
-						moveTo(out,x+halfstep-pulse_size,y+halfstep-pulse_size,true);
-					}
-				}
-			} else {
-				// every odd line move right to left
-				//MoveTo(file,x,y,pen up?)]
-				for(x=image_width-blockSize;x>=0;x-=blockSize) {
-					// read a block of the image and find the average intensity in this block
-					z=takeImageSampleBlock(img,(int)(x-blockSize),(int)(y-halfstep),(int)x,(int)(y+halfstep));
-					// scale the intensity value
-					float scale_z = (255.0f-(float)z)/255.0f;
-					float pulse_size = (halfstep-1.0f) * scale_z;
-					if( pulse_size>0.1f) {
-						// draw a square.  the diameter is relative to the intensity.
-						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
-						moveTo(out,x-halfstep+pulse_size,y+halfstep-pulse_size,false);
-						moveTo(out,x-halfstep+pulse_size,y+halfstep+pulse_size,false);
-						moveTo(out,x-halfstep-pulse_size,y+halfstep+pulse_size,false);
-						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,false);
-						moveTo(out,x-halfstep-pulse_size,y+halfstep-pulse_size,true);
-					}
-				}
-			}
-		}
+            double pw = machine.getPaperWidth();
+            //double ph = machine.GetPaperHeight();
 
-		liftPen(out);
-		signName(out);
-		tool.writeMoveTo(out, 0, 0);
-		
-		// close the file
-		out.close();
+            // figure out how many lines we're going to have on this image.
+            float steps = (float) (pw / tool.getDiameter());
+            if (steps < 1) steps = 1;
+
+            float blockSize = (int) (image_width / steps);
+            float halfstep = (float) blockSize / 2.0f;
+
+            // from top to bottom of the image...
+            float x, y, z;
+            int i = 0;
+            for (y = 0; y < image_height; y += blockSize) {
+                ++i;
+                if ((i % 2) == 0) {
+                    // every even line move left to right
+                    //MoveTo(file,x,y,pen up?)]
+                    for (x = 0; x < image_width - blockSize; x += blockSize) {
+                        // read a block of the image and find the average intensity in this block
+                        z = takeImageSampleBlock(img, (int) x, (int) (y - halfstep), (int) (x + blockSize), (int) (y + halfstep));
+                        // scale the intensity value
+                        float scale_z = (255.0f - (float) z) / 255.0f;
+                        float pulse_size = (halfstep - 1.0f) * scale_z;
+                        if (pulse_size > 0.1f) {
+                            // draw a square.  the diameter is relative to the intensity.
+                            moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
+                            moveTo(out, x + halfstep + pulse_size, y + halfstep - pulse_size, false);
+                            moveTo(out, x + halfstep + pulse_size, y + halfstep + pulse_size, false);
+                            moveTo(out, x + halfstep - pulse_size, y + halfstep + pulse_size, false);
+                            moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, false);
+                            moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
+                        }
+                    }
+                } else {
+                    // every odd line move right to left
+                    //MoveTo(file,x,y,pen up?)]
+                    for (x = image_width - blockSize; x >= 0; x -= blockSize) {
+                        // read a block of the image and find the average intensity in this block
+                        z = takeImageSampleBlock(img, (int) (x - blockSize), (int) (y - halfstep), (int) x, (int) (y + halfstep));
+                        // scale the intensity value
+                        float scale_z = (255.0f - (float) z) / 255.0f;
+                        float pulse_size = (halfstep - 1.0f) * scale_z;
+                        if (pulse_size > 0.1f) {
+                            // draw a square.  the diameter is relative to the intensity.
+                            moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
+                            moveTo(out, x - halfstep + pulse_size, y + halfstep - pulse_size, false);
+                            moveTo(out, x - halfstep + pulse_size, y + halfstep + pulse_size, false);
+                            moveTo(out, x - halfstep - pulse_size, y + halfstep + pulse_size, false);
+                            moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, false);
+                            moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
+                        }
+                    }
+                }
+            }
+
+            liftPen(out);
+            signName(out);
+            tool.writeMoveTo(out, 0, 0);
+        }
 	}
 }
 

@@ -6,10 +6,8 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -34,23 +32,26 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		img = bw.process(img);
 
 		mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-		Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		
-		imageStart(img,out);
-		
-		// set absolute coordinates
-		out.write("G00 G90;\n");
-		tool.writeChangeTo(out);
-		liftPen(out);
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
 
-		convertImageSpace(img, out);
+            imageStart(img, out);
+
+            // set absolute coordinates
+            out.write("G00 G90;\n");
+            tool.writeChangeTo(out);
+            liftPen(out);
+
+            convertImageSpace(img, out);
 //		ConvertPaperSpace(img,out);
 
-		liftPen(out);
-		signName(out);
-		moveTo(out, 0, 0,true);
-		out.close();
-	}
+            liftPen(out);
+            signName(out);
+            moveTo(out, 0, 0, true);
+        }
+    }
 	
 	double xStart,yStart;
 	double xEnd,yEnd;

@@ -6,10 +6,8 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
@@ -71,9 +69,11 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	
 
 	private void createCurveNow(String dest) {
-		try {
-			Writer output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-			tool = machine.getCurrentTool();
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
+            tool = machine.getCurrentTool();
 			setupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
 			output.write(machine.getConfigLine()+";\n");
 			output.write(machine.getBobbinLine()+";\n");
