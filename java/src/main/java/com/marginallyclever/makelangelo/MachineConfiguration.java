@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author dan royer
  */
-public class MachineConfiguration {
+public final class MachineConfiguration {
 	/**
 	 * 
 	 */
@@ -675,8 +675,8 @@ public class MachineConfiguration {
 			mainGUI.sendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
-			String [] new_list = new String[machineConfigurationsAvailable.length+1];
-			for(int i=0;i< machineConfigurationsAvailable.length;++i) {
+			final String [] new_list = new String[machineConfigurationsAvailable.length+1];
+			for(int i = 0; i < machineConfigurationsAvailable.length; ++i) {
 				new_list[i] = machineConfigurationsAvailable[i];
 			}
 			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
