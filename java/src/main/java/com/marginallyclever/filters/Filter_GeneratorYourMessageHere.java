@@ -52,7 +52,6 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	}
 
 	protected void createMessage(String str,String dest) {
-		//System.out.println("output file = "+outputFile);
 
 		try {
 			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
