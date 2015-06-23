@@ -4,6 +4,8 @@ package com.marginallyclever.filters;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,8 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	static final String alphabetFolder = new String("ALPHABET/");
 	protected int chars_per_line=35;
 	protected static String lastMessage = "";
+
+    private final Logger logger = LoggerFactory.getLogger(Filter_GeneratorYourMessageHere.class);
 
 	public Filter_GeneratorYourMessageHere(MainGUI gui,
 			MachineConfiguration mc, MultilingualSupport ms) {
@@ -49,7 +53,6 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	}
 
 	protected void createMessage(String str,String dest) {
-		//System.out.println("output file = "+outputFile);
 
         try (final OutputStream fileOutputStream = new FileOutputStream(dest);
              final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
@@ -67,7 +70,9 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			textSetAlign(Align.RIGHT);
 			textSetVAlign(VAlign.TOP);
 			textSetPosition(image_width,image_height);
-		}
-		catch(IOException ex) {}
+			textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
+		} catch(IOException e) {
+            logger.error("{}", e);
+        }
 	}
 }

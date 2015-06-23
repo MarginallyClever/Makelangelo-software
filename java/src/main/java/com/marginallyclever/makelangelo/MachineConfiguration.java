@@ -29,11 +29,13 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author dan royer
  */
-public class MachineConfiguration {
+public final class MachineConfiguration {
 	/**
 	 * 
 	 */
@@ -42,7 +44,7 @@ public class MachineConfiguration {
 	/**
 	 * Each robot has a global unique identifier
 	 */
-	protected long robot_uid=0;
+	private long robot_uid = 0;
 	
 	protected final static double INCH_TO_CM = 2.54;
 	
@@ -93,9 +95,10 @@ public class MachineConfiguration {
 	protected String [] machineConfigurationsAvailable = null;
 	private MainGUI mainGUI = null;
 	private MultilingualSupport translator;
-	
-	
-	/**
+
+    private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
+
+    /**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
 	 * @param gui
 	 * @param ms
@@ -626,13 +629,14 @@ public class MachineConfiguration {
 		if(lines.length>0) {
 			try {
 				new_uid = Long.parseLong(lines[0]);
-			}
-			catch(NumberFormatException e) {}
+			} catch(NumberFormatException e) {
+                logger.error("{}", e);
+            }
 		}
 		
 		// new robots have UID=0
-		if(new_uid==0) {
-			new_uid=getNewRobotUID();
+		if(new_uid == 0) {
+			new_uid = getNewRobotUID();
 		}
 		
 		// load machine specific config
@@ -648,7 +652,7 @@ public class MachineConfiguration {
 	 * based on http://www.exampledepot.com/egs/java.net/Post.html
 	 */
 	private long getNewRobotUID() {
-		long new_uid=0;
+		long new_uid = 0;
 		
 		try {
 		    // Send data
@@ -662,23 +666,23 @@ public class MachineConfiguration {
 		    rd.close();
             }
 		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
+			logger.error("{}", e);
+            return 0;
 		}
 
 		// did read go ok?
-		if(new_uid!=0) {
+		if(new_uid != 0) {
 			// make sure a topLevelMachinesPreferenceNode node is created
 			topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
 			// tell the robot it's new UID.
 			mainGUI.sendLineToRobot("UID "+new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
-			String [] new_list = new String[machineConfigurationsAvailable.length+1];
-			for(int i=0;i< machineConfigurationsAvailable.length;++i) {
+			final String [] new_list = new String[machineConfigurationsAvailable.length+1];
+			for(int i = 0; i < machineConfigurationsAvailable.length; ++i) {
 				new_list[i] = machineConfigurationsAvailable[i];
 			}
-			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
+			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid); //TODO check this out as it smells.
 		}
 		return new_uid;
 	}
