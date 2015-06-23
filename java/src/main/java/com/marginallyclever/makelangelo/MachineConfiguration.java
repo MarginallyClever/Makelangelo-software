@@ -44,7 +44,7 @@ public class MachineConfiguration {
 	/**
 	 * Each robot has a global unique identifier
 	 */
-	protected long robot_uid=0;
+	private long robot_uid = 0;
 	
 	protected final static double INCH_TO_CM = 2.54;
 	
