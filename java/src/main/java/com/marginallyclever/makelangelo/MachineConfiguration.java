@@ -5,10 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
@@ -658,12 +655,13 @@ public final class MachineConfiguration {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
-            try(final InputStream connectionInputStream = conn.getInputStream();
+            try(
+            final InputStream connectionInputStream = conn.getInputStream();
             final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-            final BufferedReader rd = new BufferedReader(inputStreamReader)) {
-		    String line = rd.readLine();
-		    new_uid = Long.parseLong(line);
-		    rd.close();
+            final BufferedReader rd = new BufferedReader(inputStreamReader)
+            ) {
+                String line = rd.readLine();
+                new_uid = Long.parseLong(line);
             }
 		} catch (Exception e) {
 			logger.error("{}", e);
