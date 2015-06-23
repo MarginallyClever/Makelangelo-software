@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 
@@ -63,14 +64,28 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
     public static File getPreferencesFile()
     {
         if (preferencesFile == null) {
-            String prefsFile = System.getProperty(SYSTEM_PROPERTY_FILE);
-            if (prefsFile == null || prefsFile.length() == 0) {
-                prefsFile = System.getProperty("user.home") + File.separator + ".fileprefs";
+            String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
+            if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
+                preferenceFilePath = getDefaultPreferenceFilePath(preferenceFilePath);
             }
-            preferencesFile = new File(prefsFile).getAbsoluteFile();
+            preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
+            if(!preferencesFile.exists()) {
+                try {
+                    preferencesFile.createNewFile();
+                } catch (IOException e) {
+                    logger.error("{}", e);
+                }
+            }
             logger.info("Preferences file is {}", preferencesFile);
         }
         return preferencesFile;
+    }
+
+    private static String getDefaultPreferenceFilePath(String preferenceFilePath) {
+        final String defaultFilePathToPreferencesFile = System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
+        preferenceFilePath = defaultFilePathToPreferencesFile;
+        System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
+        return preferenceFilePath;
     }
 
 }
