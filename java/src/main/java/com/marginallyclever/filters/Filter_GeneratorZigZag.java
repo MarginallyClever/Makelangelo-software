@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.DecimalFormat;
 
 
@@ -312,7 +313,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	}
 	
 
-	private void moveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
+	private void moveTo(Writer out,int i,boolean up) throws IOException {
 		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 	
@@ -340,7 +341,7 @@ public class Filter_GeneratorZigZag extends Filter {
 		
 		// write
 		try {
-			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+			Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			out.write(machine.getConfigLine()+";\n");
 			out.write(machine.getBobbinLine()+";\n");
 

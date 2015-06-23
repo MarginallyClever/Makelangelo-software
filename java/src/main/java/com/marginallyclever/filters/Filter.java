@@ -140,7 +140,7 @@ public abstract class Filter {
 	}
 
 	
-	protected void imageStart(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void imageStart(BufferedImage img, Writer out) throws IOException {
 		tool = machine.getCurrentTool();
 
 		imageSetupTransform(img);
@@ -154,11 +154,11 @@ public abstract class Filter {
 		setAbsoluteMode(out);
 	}
 	
-	protected void setAbsoluteMode(OutputStreamWriter out) throws IOException {
+	protected void setAbsoluteMode(Writer out) throws IOException {
 		out.write("G00 G90;\n");
 	}
 	
-	protected void setRelativeMode(OutputStreamWriter out) throws IOException {
+	protected void setRelativeMode(Writer out) throws IOException {
 		out.write("G00 G91;\n");
 	}
 	
@@ -366,7 +366,7 @@ public abstract class Filter {
 	}
 	
 	
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		float x2 = TX(x);
 		float y2 = TY(y);
 		
@@ -673,7 +673,7 @@ public abstract class Filter {
 		}
 	}
 	
-	protected void signName(OutputStreamWriter out) throws IOException {
+	protected void signName(Writer out) throws IOException {
 		float desired_scale=0.5f;  // changes the size of the font.  large number = larger font
 		
 		textSetAlign(Align.RIGHT);

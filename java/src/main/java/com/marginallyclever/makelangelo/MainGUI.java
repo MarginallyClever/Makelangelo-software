@@ -460,7 +460,7 @@ public class MainGUI
 
 				double dxf_x2=0;
 				double dxf_y2=0;
-				OutputStreamWriter out=null;
+				Writer out=null;
 
 				try {
 					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");

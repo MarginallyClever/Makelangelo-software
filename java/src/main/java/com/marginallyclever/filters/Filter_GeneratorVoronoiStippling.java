@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -147,7 +148,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
 			mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+			Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 
 			imageStart(src_img,out);
 

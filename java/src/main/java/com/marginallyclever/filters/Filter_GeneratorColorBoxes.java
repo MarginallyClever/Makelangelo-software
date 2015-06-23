@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 
 /**
@@ -18,7 +19,7 @@ import java.io.OutputStreamWriter;
  */
 public class Filter_GeneratorColorBoxes extends Filter {
 	ColorPalette palette;
-	OutputStreamWriter out;
+	Writer out;
 	float step1;
 	float step2;
 	float step4;

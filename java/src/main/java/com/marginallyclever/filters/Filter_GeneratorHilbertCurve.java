@@ -9,6 +9,7 @@ import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 public class Filter_GeneratorHilbertCurve extends Filter {
 	float turtle_x,turtle_y;
@@ -71,7 +72,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 
 	private void createCurveNow(String dest) {
 		try {
-			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+			Writer output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 			tool = machine.getCurrentTool();
 			setupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));
 			output.write(machine.getConfigLine()+";\n");
@@ -114,7 +115,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 	
 	
     // Hilbert curve
-    private void hilbert(OutputStreamWriter output,int n) throws IOException {
+    private void hilbert(Writer output, int n) throws IOException {
         if (n == 0) return;
         turtle_turn(90);
         treblih(output,n-1);
@@ -131,7 +132,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 
 
     // evruc trebliH
-    public void treblih(OutputStreamWriter output,int n) throws IOException {
+    public void treblih(Writer output,int n) throws IOException {
         if (n == 0) return;
         turtle_turn(-90);
         hilbert(output,n-1);
@@ -158,7 +159,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
     }
 
     
-    public void turtle_goForward(OutputStreamWriter output) throws IOException {
+    public void turtle_goForward(Writer output) throws IOException {
     	//turtle_x += turtle_dx * distance;
     	//turtle_y += turtle_dy * distance;
     	//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());

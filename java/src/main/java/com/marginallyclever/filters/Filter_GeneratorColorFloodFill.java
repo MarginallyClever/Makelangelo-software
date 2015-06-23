@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -28,7 +29,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	int last_x,last_y;
 	BufferedImage imgChanged;
 	BufferedImage imgMask;
-	OutputStreamWriter osw;
+	Writer osw;
 	
 	
 	public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,

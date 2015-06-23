@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 
 /**
@@ -33,7 +34,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		img = bw.process(img);
 
 		mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+		Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		imageStart(img,out);
 		
@@ -42,7 +43,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 		tool.writeChangeTo(out);
 		liftPen(out);
 
-		convertImageSpace(img,out);
+		convertImageSpace(img, out);
 //		ConvertPaperSpace(img,out);
 
 		liftPen(out);
@@ -166,7 +167,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	}
 	
 	
-	protected void convertImageSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertImageSpace(BufferedImage img, Writer out) throws IOException {
 		int i,j,x,y,z=0;
 		double leveladd = 255.0/6.0;
 		double level=leveladd;

@@ -49,7 +49,7 @@ public class Filter_GeneratorSpiral extends Filter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.process(img);
 
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+		Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		
 		imageStart(img,out);
 

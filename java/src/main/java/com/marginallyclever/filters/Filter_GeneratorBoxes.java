@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 
 public class Filter_GeneratorBoxes extends Filter {
@@ -64,9 +65,9 @@ public class Filter_GeneratorBoxes extends Filter {
 		img = bw.process(img);
 
 		// Open the destination file
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+		Writer out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img,out);
+		imageStart(img, out);
 		// "please change to tool X and press any key to continue"
 		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
