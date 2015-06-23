@@ -361,7 +361,7 @@ public class MainGUI
 	 */
 	private String[] getAnyMachineConfigurations() {
 		String[] machineNames = machineConfiguration.getKnownMachineNames();
-		if(machineNames.length < 1) {
+		if(machineNames.length == 1 && machineNames[0] == null) {
 			machineNames = machineConfiguration.getAvailableConfigurations();
 		}
 		return machineNames;
