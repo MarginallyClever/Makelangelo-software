@@ -412,7 +412,7 @@ public class MainGUI
 
 	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
-			final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
+			int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
 			long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
 			machineConfiguration.loadConfig(new_uid);
 			setDrawStyle(input_draw_style.getSelectedIndex());
