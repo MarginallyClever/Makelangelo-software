@@ -60,8 +60,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	 * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
 	 * @param x0 left
 	 * @param y0 top
-	 * @param x1 right
-	 * @param y1 bottom
 	 * @return true if all the pixels in this region are zero.
 	 */
 	protected boolean getMaskTouched(int x0,int y0) {
@@ -144,8 +142,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	/**
 	 * queue-based flood fill 
 	 * @param color_index
-	 * @param img
-	 * @param out
 	 * @throws IOException
 	 */
 	protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
@@ -194,8 +190,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	/**
 	 * find blobs of color in the original image.  Send that to the flood fill system.
 	 * @param color_index index into the list of colors at the top of the class
-	 * @param img source bufferedimage
-	 * @param out output stream for writing gcode.
 	 * @throws IOException
 	 */
 	void scanForContiguousBlocks(int color_index, Writer osw) throws IOException {

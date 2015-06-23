@@ -260,8 +260,6 @@ public class Filter_GeneratorZigZag extends Filter {
 	/**
 	 * Get the length of a tour segment
 	 * @param list an array of indexes into the point list.  the order forms the tour sequence.
-	 * @param start the index of the first point of the tour segment
-	 * @param end the index of the last point of the tour segment
 	 * @return the length of the tour
 	 */
 	private double getTourLength(int[] list) {
