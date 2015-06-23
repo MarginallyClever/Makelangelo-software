@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
@@ -50,8 +51,8 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	protected void createMessage(String str,String dest) {
 		//System.out.println("output file = "+outputFile);
 
-		try {
-			OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+        try (final OutputStream fileOutputStream = new FileOutputStream(dest);
+             final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
 			tool = machine.getCurrentTool();
 			setupTransform();
@@ -66,9 +67,6 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			textSetAlign(Align.RIGHT);
 			textSetVAlign(VAlign.TOP);
 			textSetPosition(image_width,image_height);
-			textCreateMessageNow("Makelangelo #"+Long.toString(machine.getUID()),output);
-			
-			output.close();
 		}
 		catch(IOException ex) {}
 	}

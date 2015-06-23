@@ -654,10 +654,13 @@ public class MachineConfiguration {
 		    // Send data
 			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
 		    URLConnection conn = url.openConnection();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            try(final InputStream connectionInputStream = conn.getInputStream();
+            final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+            final BufferedReader rd = new BufferedReader(inputStreamReader)) {
 		    String line = rd.readLine();
 		    new_uid = Long.parseLong(line);
 		    rd.close();
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
