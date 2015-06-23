@@ -679,7 +679,7 @@ public final class MachineConfiguration {
 			for(int i = 0; i < machineConfigurationsAvailable.length; ++i) {
 				new_list[i] = machineConfigurationsAvailable[i];
 			}
-			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
+			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid); //TODO check this out as it smells.
 		}
 		return new_uid;
 	}
