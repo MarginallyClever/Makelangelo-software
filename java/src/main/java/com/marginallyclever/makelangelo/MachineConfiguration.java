@@ -635,8 +635,8 @@ public final class MachineConfiguration {
 		}
 		
 		// new robots have UID=0
-		if(new_uid==0) {
-			new_uid=getNewRobotUID();
+		if(new_uid == 0) {
+			new_uid = getNewRobotUID();
 		}
 		
 		// load machine specific config
@@ -652,7 +652,7 @@ public final class MachineConfiguration {
 	 * based on http://www.exampledepot.com/egs/java.net/Post.html
 	 */
 	private long getNewRobotUID() {
-		long new_uid=0;
+		long new_uid = 0;
 		
 		try {
 		    // Send data
@@ -668,7 +668,7 @@ public final class MachineConfiguration {
 		}
 
 		// did read go ok?
-		if(new_uid!=0) {
+		if(new_uid != 0) {
 			// make sure a topLevelMachinesPreferenceNode node is created
 			topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
 			// tell the robot it's new UID.
