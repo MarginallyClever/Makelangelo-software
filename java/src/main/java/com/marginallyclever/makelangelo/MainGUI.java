@@ -57,7 +57,7 @@ public class MainGUI
 	static final long serialVersionUID=1L;
 
     /**
-     * software version. Defined in src/resources/version.properties and uses Maven's resource filtering to update
+     * software version. Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update
 	 * the version based upon version defined in POM.xml. In this way we only define the version once and prevent
 	 * violating DRY.
      */
@@ -651,7 +651,7 @@ public class MainGUI
 
 			// update window title
 			mainframe.setTitle(translator.get("TitlePrefix")
-					+ Long.toString(machineConfiguration.robot_uid)
+					+ Long.toString(machineConfiguration.getUID())
 					+ translator.get("TitleNotConnected"));
 			return;
 		}

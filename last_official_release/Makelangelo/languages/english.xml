@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
 <language>
 	<meta>
 		<name>English</name>
@@ -747,6 +748,12 @@
 		<key>StatusRemaining</key>
 		<value>Estimated time left: </value>
 		<hint>time machine will be drawing</hint>
+	</string>
+	
+	<string>
+		<key>DisengageMotors</key>
+		<value>Disengage</value>
+		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 
   <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are

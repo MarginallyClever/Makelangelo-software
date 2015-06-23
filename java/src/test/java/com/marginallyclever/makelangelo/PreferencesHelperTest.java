@@ -104,6 +104,9 @@ public class PreferencesHelperTest {
             logger.info("child node name: {}", childNodeName);
             final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
             Assert.assertTrue(isMachineNameAnInteger);
+            //Machine configurations numbered -1 and below should not exist.
+            final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
+            Assert.assertFalse(isMachineNameLessThanZero);
         }
         logger.info("end: {}", thisMethodsName);
     }
@@ -189,7 +192,7 @@ public class PreferencesHelperTest {
      * preference node with no effect on any descendants
      * of this node.
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     private void shallowClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
@@ -202,7 +205,7 @@ public class PreferencesHelperTest {
      * Removes all of the preferences (key-value associations) in this
      * preference node and any descendants of this node.
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     private void deepClearPreferences(Preferences preferenceNode) {
         try {
             preferenceNode.clear();
