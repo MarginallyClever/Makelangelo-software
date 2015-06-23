@@ -83,9 +83,12 @@ implements ActionListener {
 	protected String lastFileIn="";
 	protected String lastFileOut="";
 	
-    // prepare pane
+	private String[] machineConfigurations;
+	private JComboBox<String> machineChoices;
+	private JSlider input_paper_margin;
     private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
-
+	
+	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
 	// Image processing
@@ -106,6 +109,19 @@ implements ActionListener {
 		image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
 		image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
 	}
+
+
+	/**
+	 *
+	 * @return
+	 */
+	private String[] getAnyMachineConfigurations() {
+		String[] machineNames = machineConfiguration.getKnownMachineNames();
+		if(machineNames.length < 1) {
+			machineNames = machineConfiguration.getAvailableConfigurations();
+		}
+		return machineNames;
+	}
 	
 
 	public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {
@@ -116,6 +132,21 @@ implements ActionListener {
 		this.setLayout(new GridLayout(0,1));
 		this.setPreferredSize(new Dimension(150,100));
 		
+		machineConfigurations = getAnyMachineConfigurations();
+		machineChoices = new JComboBox<>(machineConfigurations);
+		machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+		
+		input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
+		input_paper_margin.setMajorTickSpacing(10);
+		input_paper_margin.setMinorTickSpacing(5);
+		input_paper_margin.setPaintTicks(false);
+		input_paper_margin.setPaintLabels(true);
+
+		add(new JLabel(translator.get("MachineNumber")));
+		add(machineChoices);
+		add(new JLabel(translator.get("PaperMargin")));
+		add(input_paper_margin);
+
         // File conversion menu
         buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
         buttonOpenFile.addActionListener(this);
@@ -137,6 +168,11 @@ implements ActionListener {
 	// The user has done something.  respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
+
+		final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
+		long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
+		machineConfiguration.loadConfig(new_uid);
+		machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 		
 		if( subject == buttonOpenFile ) {
 			openFileDialog();
@@ -255,33 +291,10 @@ implements ActionListener {
 	   	
 	   	gui.statusBar.clear();
 	}
-
-
-	/**
-	 *
-	 * @return
-	 */
-	private String[] getAnyMachineConfigurations() {
-		String[] machineNames = machineConfiguration.getKnownMachineNames();
-		if(machineNames.length < 1) {
-			machineNames = machineConfiguration.getAvailableConfigurations();
-		}
-		return machineNames;
-	}
 	
 	
 	protected boolean chooseImageConversionOptions(boolean isDXF) {
 		final JPanel panel = new JPanel(new GridBagLayout());
-		
-		final String[] machineConfigurations = getAnyMachineConfigurations();
-		final JComboBox<String> machineChoices = new JComboBox<>(machineConfigurations);
-		machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-		
-		final JSlider input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
-		input_paper_margin.setMajorTickSpacing(10);
-		input_paper_margin.setMinorTickSpacing(5);
-		input_paper_margin.setPaintTicks(false);
-		input_paper_margin.setPaintLabels(true);
 		
 		final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
 		reverse_h.setSelected(machineConfiguration.reverseForGlass);
@@ -300,22 +313,15 @@ implements ActionListener {
 		GridBagConstraints c = new GridBagConstraints();
 
 		int y=0;
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=2;	c.gridx=1;	c.gridy=y++;  panel.add(machineChoices,c);
 		if(!isDXF) {
 			c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y;  panel.add(new JLabel(translator.get("ConversionStyle")),c);
 			c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;	c.gridy=y++;	panel.add(input_draw_style,c);
 		}
-		c.anchor=GridBagConstraints.EAST;	c.gridwidth=1;	c.gridx=0;  c.gridy=y  ;  panel.add(new JLabel(translator.get("PaperMargin")),c);
-		c.anchor=GridBagConstraints.WEST;	c.gridwidth=3;	c.gridx=1;  c.gridy=y++;  panel.add(input_paper_margin,c);
 		c.anchor=GridBagConstraints.WEST;	c.gridwidth=1;  c.gridx=1;  c.gridy=y++;  panel.add(reverse_h,c);
 		
 	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
-			final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-			long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
-			machineConfiguration.loadConfig(new_uid);
 			setDrawStyle(input_draw_style.getSelectedIndex());
-			machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 			machineConfiguration.reverseForGlass=reverse_h.isSelected();
 			machineConfiguration.saveConfig();
 			

@@ -589,8 +589,8 @@ public class MainGUI
 	 * TODO add an e-stop command?
 	 */
 	public void halt() {
-		isRunning =false;
-		isPaused=false;
+		isRunning = false;
+		isPaused = false;
 	    drawPanel.setLinesProcessed(0);
 		drawPanel.setRunning(isRunning);
 		updateMenuBar();
