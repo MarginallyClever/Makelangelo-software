@@ -1,15 +1,16 @@
 package com.marginallyclever.filters;
 
+import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-import com.marginallyclever.makelangelo.Point2D;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
@@ -88,7 +89,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			cellBorder = new ArrayList<VoronoiCellEdge>();
 	
 		    
-			initializeCells(MIN_DOT_SIZE);
+			initializeCells(MAX_DOT_SIZE);
 			evolveCells();
 			writeOutCells();
 	    }
@@ -169,6 +170,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
 			}
 //*/
+			// TODO sort cells top to bottom, left to right
+			
 			float most=cells[0].weight;
 			for(i=1;i<cells.length;++i) {
 				if(most<cells[i].weight) most=cells[i].weight;
@@ -185,16 +188,15 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				// filled circles
 				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
 				while(r>d) {
-					float detail=(float)(0.5*Math.PI*r/d);
+					float detail=(float)(r/d);
 					if(detail<4) detail=4;
-					if(detail>20) detail=20;
+					if(detail>10) detail=10;
 					for(float j=1;j<=detail;++j) {
 						this.moveTo(out,
 								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
 								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
 					}
-					//r-=(d/(scale*1.5f));
-					r-=d;
+					r-=d*2.0;
 				}
 				this.moveTo(out, x, y, false);
 				this.moveTo(out, x, y, true);

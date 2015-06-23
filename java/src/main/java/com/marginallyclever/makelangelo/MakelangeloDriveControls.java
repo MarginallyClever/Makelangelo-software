@@ -20,7 +20,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-
+/**
+ * The GUI for the live driving controls, the start/pause/stop buttons, and the "send gcode" dialog.
+ * @author danroyer
+ * @since 7.1.4
+ */
 public class MakelangeloDriveControls
 	extends JPanel
 	implements ActionListener, KeyListener {

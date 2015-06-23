@@ -1,6 +1,6 @@
 package com.marginallyclever.filters;
 
-import com.marginallyclever.makelangelo.C3;
+import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;

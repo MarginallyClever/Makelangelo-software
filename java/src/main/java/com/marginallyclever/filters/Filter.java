@@ -175,7 +175,7 @@ public abstract class Filter {
 	 */
 	protected void setupTransform() {
 		// 10mm = 1cm.  letters should be 1cm tall.
-		setupTransform( (int)machine.getPaperWidth()*10, (int)machine.getPaperHeight()*10 );
+		setupTransform( (int)(machine.getPaperWidth()*10.0f), (int)(machine.getPaperHeight()*10.0f) );
 	}
 	
 	protected void setupTransform(int width,int height) {
@@ -482,7 +482,8 @@ public abstract class Filter {
 		output.write("G90;\n");
 		liftPen(output);
 		
-		if(draw_bounding_box) {
+		if(true) {
+		//if(draw_bounding_box) {
 			// draw bounding box
 			output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
 			lowerPen(output);

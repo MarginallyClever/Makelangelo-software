@@ -42,9 +42,9 @@ package com.marginallyclever.voronoi;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-import com.marginallyclever.makelangelo.Point2D;
-
 import java.util.*;
+
+import com.marginallyclever.basictypes.Point2D;
 
 public class VoronoiTesselator {
     // ************* Private members ******************

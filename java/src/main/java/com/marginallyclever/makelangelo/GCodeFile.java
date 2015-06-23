@@ -24,6 +24,7 @@ public class GCodeFile {
 	public int estimate_count=0;
 	public float scale=1.0f;
 	public float feed_rate=1.0f;
+	public boolean changed=false;
 
 	
 	// returns angle of dy/dx as a value from 0...2PI
