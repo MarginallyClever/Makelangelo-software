@@ -8,9 +8,8 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -18,7 +17,6 @@ import java.io.OutputStreamWriter;
  */
 public class Filter_GeneratorColorBoxes extends Filter {
 	ColorPalette palette;
-	OutputStreamWriter out;
 	float step1;
 	float step2;
 	float step4;
@@ -57,7 +55,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	}
 	
 	
-	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) throws IOException {
+	private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction, Writer out) throws IOException {
 		float w = stepw;
 		C3 oldPixel = new C3(0,0,0);
 		C3 newPixel = new C3(0,0,0);
@@ -153,7 +151,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	}
 	
 	
-	protected void scan(int tool_index,BufferedImage img) throws IOException {
+	protected void scan(int tool_index, BufferedImage img, Writer out) throws IOException {
 		palette_mask=tool_index;
 		
 		// "please change to tool X and press any key to continue"
@@ -171,7 +169,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 
 		direction=1;
 		for(y=0;y<steph;++y) {
-			ditherDirection(img,y,error,nexterror,direction);
+			ditherDirection(img, y, error, nexterror, direction, out);
 			
 			direction = -direction;
 			C3 [] tmp = error;
@@ -187,45 +185,46 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	 */
 	public void convert(BufferedImage img) throws IOException {
 		// Open the destination file
-		out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img,out);
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
+            // Set up the conversion from image space to paper space, select the current tool, etc.
+            imageStart(img, out);
 
-		double pw = machine.getPaperWidth();
-		//double ph = machine.GetPaperHeight();
-		
-		// figure out how many lines we're going to have on this image.
-		float steps = (float)(pw/(tool.getDiameter()*1.75f));
+            double pw = machine.getPaperWidth();
+            //double ph = machine.GetPaperHeight();
 
-		if(steps<1) steps=1;
+            // figure out how many lines we're going to have on this image.
+            float steps = (float) (pw / (tool.getDiameter() * 1.75f));
 
-		step4 = (steps);
-		step2 = (step4/2.0f);
-		step1 = (step4/4.0f);
-		
-		// set up the error buffers for floyd/steinberg dithering
-		stepw=((float)image_width/step4);
-		steph=((float)image_height/step4);
-		error=new C3[(int)Math.ceil(stepw)];
-		nexterror=new C3[(int)Math.ceil(stepw)];
-		
-		try{
-			scan(0,img);  // black
-			scan(1,img);  // red
-			scan(2,img);  // green
-			scan(3,img);  // blue
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		liftPen(out);
-		signName(out);
-		
-		tool.writeMoveTo(out, 0, 0);
-		
-		// close the file
-		out.close();
-	}
+            if (steps < 1) steps = 1;
+
+            step4 = (steps);
+            step2 = (step4 / 2.0f);
+            step1 = (step4 / 4.0f);
+
+            // set up the error buffers for floyd/steinberg dithering
+            stepw = ((float) image_width / step4);
+            steph = ((float) image_height / step4);
+            error = new C3[(int) Math.ceil(stepw)];
+            nexterror = new C3[(int) Math.ceil(stepw)];
+
+            try {
+                scan(0, img, out);  // black
+                scan(1, img, out);  // red
+                scan(2, img, out);  // green
+                scan(3, img, out);  // blue
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            liftPen(out);
+            signName(out);
+
+            tool.writeMoveTo(out, 0, 0);
+        }
+    }
 }
 
 

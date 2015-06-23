@@ -6,9 +6,8 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorScanline extends Filter {
@@ -29,54 +28,55 @@ public class Filter_GeneratorScanline extends Filter {
 		img = bw.process(img);
 
 		// Open the destination file
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img,out);
-		// "please change to tool X and press any key to continue"
-		tool.writeChangeTo(out);
-		// Make sure the pen is up for the first move
-		liftPen(out);
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
+            // Set up the conversion from image space to paper space, select the current tool, etc.
+            imageStart(img, out);
+            // "please change to tool X and press any key to continue"
+            tool.writeChangeTo(out);
+            // Make sure the pen is up for the first move
+            liftPen(out);
 
-		// figure out how many lines we're going to have on this image.
-		int steps = (int)Math.ceil(tool.getDiameter()/(1.75*scale));
-		if(steps<1) steps=1;
+            // figure out how many lines we're going to have on this image.
+            int steps = (int) Math.ceil(tool.getDiameter() / (1.75 * scale));
+            if (steps < 1) steps = 1;
 
-		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
-		// Lift the pen any time the color value is > level (128 or more).
-		double level=255.0/2.0;
+            // Color values are from 0...255 inclusive.  255 is white, 0 is black.
+            // Lift the pen any time the color value is > level (128 or more).
+            double level = 255.0 / 2.0;
 
-		// from top to bottom of the image...
-		int x,y,z,i=0;
-		for(y=0;y<image_height;y+=steps) {
-			++i;
-			if((i%2)==0) {
-				// every even line move left to right
-				
-				//MoveTo(file,x,y,pen up?)
-				moveTo(out,(float)0,(float)y,true);
-				for(x=0;x<image_width;++x) {
-					// read the image at x,y
-					z=sample3x3(img,x,y);
-					moveTo(out,(float)x,(float)y,( z > level ));
-				}
-				moveTo(out,(float)image_width,(float)y,true);
-			} else {
-				// every odd line move right to left
-				moveTo(out,(float)image_width,(float)y,true);
-				for(x=image_width-1;x>=0;--x) {
-					z=sample3x3(img,x,y);
-					moveTo(out,(float)x,(float)y,( z > level ));
-				}
-				moveTo(out,(float)0,(float)y,true);
-			}
-		}
+            // from top to bottom of the image...
+            int x, y, z, i = 0;
+            for (y = 0; y < image_height; y += steps) {
+                ++i;
+                if ((i % 2) == 0) {
+                    // every even line move left to right
 
-		// pen already lifted
-		signName(out);
-		moveTo(out, 0, 0, true);
-		
-		// close the file
-		out.close();
+                    //MoveTo(file,x,y,pen up?)
+                    moveTo(out, (float) 0, (float) y, true);
+                    for (x = 0; x < image_width; ++x) {
+                        // read the image at x,y
+                        z = sample3x3(img, x, y);
+                        moveTo(out, (float) x, (float) y, (z > level));
+                    }
+                    moveTo(out, (float) image_width, (float) y, true);
+                } else {
+                    // every odd line move right to left
+                    moveTo(out, (float) image_width, (float) y, true);
+                    for (x = image_width - 1; x >= 0; --x) {
+                        z = sample3x3(img, x, y);
+                        moveTo(out, (float) x, (float) y, (z > level));
+                    }
+                    moveTo(out, (float) 0, (float) y, true);
+                }
+            }
+
+            // pen already lifted
+            signName(out);
+            moveTo(out, 0, 0, true);
+        }
 	}
 }
 

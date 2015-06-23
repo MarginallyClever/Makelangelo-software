@@ -6,9 +6,8 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -29,7 +28,7 @@ public class Filter_GeneratorSpiral extends Filter {
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		tool.writeMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);
@@ -48,77 +47,80 @@ public class Filter_GeneratorSpiral extends Filter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.process(img);
 
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		
-		imageStart(img,out);
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
 
-		double toolDiameter=tool.getDiameter()/scale;
-		tool.writeChangeTo(out);
-		liftPen(out);
+            imageStart(img, out);
 
-		//*
-		// create a spiral across the image
-		// raise and lower the pen to darken the appropriate areas
-		
-		// spiralize
-		int x,y,i,j;
-		final int steps=4;
-		double leveladd = 255.0/5.0f;
-		double level;
-		int z=0;
+            double toolDiameter = tool.getDiameter() / scale;
+            tool.writeChangeTo(out);
+            liftPen(out);
 
-		float maxr;
-		if(whole_image) {
-			// go right to the corners
-			maxr = (float)(Math.sqrt( h2*h2 + w2*w2 ) + 1.0f);
-		} else {
-			// do the largest circle that still fits in the image.
-			maxr = (h2>w2) ? w2 : h2;
-		}
-		maxr/=2;
+            //*
+            // create a spiral across the image
+            // raise and lower the pen to darken the appropriate areas
 
-		float r=maxr, d, f;
-		float fx,fy;
-		int numRings=0;
-		double [] each_level = new double[steps];
-		each_level[0]=leveladd*1;
-		each_level[1]=leveladd*3;
-		each_level[2]=leveladd*2;
-		each_level[3]=leveladd*4;
-		j=0;
-		while(r>toolDiameter) {
-			d=r*2.0f;
-			++j;
-			level = each_level[j%steps];
-			// find circumference of current circle
-			float circumference=(float)Math.floor((2.0f*d-toolDiameter)*Math.PI);
-			if(circumference>360.0f) circumference=360.0f;
+            // spiralize
+            int x, y, i, j;
+            final int steps = 4;
+            double leveladd = 255.0 / 5.0f;
+            double level;
+            int z = 0;
 
-			for(i=0;i<=circumference;++i) {
-				f = (float)Math.PI*2.0f*(i/circumference);
-				fx = w2 + (float)(Math.cos(f)*d);
-				fy = h2 + (float)(Math.sin(f)*d);
-				x = (int)fx;
-				y = (int)fy;
-				// clip to image boundaries
-				if( x>=0 && x<image_width && y>=0 && y<image_height ) {
-					z=sample3x3(img,x,y);
-					moveTo(out,fx,fy,( z >= level ));
-				} else {
-					moveTo(out,fx,fy,true);
-				}
-			}
-			r-=toolDiameter*0.5;
-			++numRings;
-		}
-		
-		mainGUI.log("<font color='yellow'>"+numRings+" rings.</font>\n");
+            float maxr;
+            if (whole_image) {
+                // go right to the corners
+                maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
+            } else {
+                // do the largest circle that still fits in the image.
+                maxr = (h2 > w2) ? w2 : h2;
+            }
+            maxr /= 2;
 
-		liftPen(out);
-		signName(out);
-		tool.writeMoveTo(out, 0, 0);
-		out.close();
-	}
+            float r = maxr, d, f;
+            float fx, fy;
+            int numRings = 0;
+            double[] each_level = new double[steps];
+            each_level[0] = leveladd * 1;
+            each_level[1] = leveladd * 3;
+            each_level[2] = leveladd * 2;
+            each_level[3] = leveladd * 4;
+            j = 0;
+            while (r > toolDiameter) {
+                d = r * 2.0f;
+                ++j;
+                level = each_level[j % steps];
+                // find circumference of current circle
+                float circumference = (float) Math.floor((2.0f * d - toolDiameter) * Math.PI);
+                if (circumference > 360.0f) circumference = 360.0f;
+
+                for (i = 0; i <= circumference; ++i) {
+                    f = (float) Math.PI * 2.0f * (i / circumference);
+                    fx = w2 + (float) (Math.cos(f) * d);
+                    fy = h2 + (float) (Math.sin(f) * d);
+                    x = (int) fx;
+                    y = (int) fy;
+                    // clip to image boundaries
+                    if (x >= 0 && x < image_width && y >= 0 && y < image_height) {
+                        z = sample3x3(img, x, y);
+                        moveTo(out, fx, fy, (z >= level));
+                    } else {
+                        moveTo(out, fx, fy, true);
+                    }
+                }
+                r -= toolDiameter * 0.5;
+                ++numRings;
+            }
+
+            mainGUI.log("<font color='yellow'>" + numRings + " rings.</font>\n");
+
+            liftPen(out);
+            signName(out);
+            tool.writeMoveTo(out, 0, 0);
+        }
+    }
 }
 
 

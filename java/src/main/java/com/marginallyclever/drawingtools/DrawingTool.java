@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.prefs.Preferences;
 
 
@@ -56,25 +57,25 @@ public class DrawingTool {
 	public String getName() { return name; }
 	public float getFeedRate() { return feed_rate; }
 	
-	public void writeChangeTo(OutputStreamWriter out) throws IOException {
+	public void writeChangeTo(Writer out) throws IOException {
 		out.write("M06 T"+tool_number+";\n");
 	}
 
-	public void writeOn(OutputStreamWriter out) throws IOException {
+	public void writeOn(Writer out) throws IOException {
 		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
 		out.write("G04 P50;\n");
 		out.write("G00 F"+getFeedRate()+";\n");
 		drawZ(z_on);
 	}
 
-	public void writeOff(OutputStreamWriter out) throws IOException {
+	public void writeOff(Writer out) throws IOException {
 		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
 		out.write("G04 P50;\n");
 		out.write("G00 F"+getFeedRate()+";\n");
 		drawZ(z_off);
 	}
 	
-	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(Writer out,float x,float y) throws IOException {
 		out.write("G00 X"+x+" Y"+y+";\n");
 	}
 	

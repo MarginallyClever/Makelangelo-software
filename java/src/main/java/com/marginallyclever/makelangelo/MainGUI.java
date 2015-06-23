@@ -50,6 +50,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -460,184 +461,180 @@ public class MainGUI
 
 				double dxf_x2=0;
 				double dxf_y2=0;
-				OutputStreamWriter out=null;
 
-				try {
-					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
-					DrawingTool tool = machineConfiguration.getCurrentTool();
-					out.write(machineConfiguration.getConfigLine()+";\n");
-					out.write(machineConfiguration.getBobbinLine()+";\n");
-					out.write("G00 G90;\n");
-					tool.writeChangeTo(out);
-					tool.writeOff(out);
-					
-					parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
-					DXFDocument doc = parser.getDocument();
-					Bounds b = doc.getBounds();
-					double width = b.getMaximumX() - b.getMinimumX();
-					double height = b.getMaximumY() - b.getMinimumY();
-					double cx = ( b.getMaximumX() + b.getMinimumX() ) / 2.0f;
-					double cy = ( b.getMaximumY() + b.getMinimumY() ) / 2.0f;
-					double wh = width>height ?  width:height;
-					double sy = machineConfiguration.getPaperHeight()*10.0/wh;
-					double sx = machineConfiguration.getPaperWidth()*10.0/wh;
-					double scale = (sx<sy? sx:sy );
-					sx = scale * (machineConfiguration.reverseForGlass? -1 : 1);
-					sx *= machineConfiguration.paperMargin;
-					sy *= machineConfiguration.paperMargin;
-					
-					// count all entities in all layers
-					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
-					int entity_total=0;
-					int entity_count=0;
-					while(layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer)layer_iter.next();
-						log("<font color='yellow'>Found layer "+layer.getName()+"</font>\n");
-						Iterator<String> entity_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
-						while(entity_iter.hasNext()) {
-							String entity_type = (String)entity_iter.next();
-							List<DXFEntity> entity_list = (List<DXFEntity>)layer.getDXFEntities(entity_type);
-							log("<font color='yellow'>+ Found "+entity_list.size()+" of type "+entity_type+"</font>\n");
-							entity_total+=entity_list.size();
-						}
-					}
-					// set the progress meter
-					pm.setMinimum(0);
-					pm.setMaximum(entity_total);
-							
-					// convert each entity
-					layer_iter = doc.getDXFLayerIterator();
-					while(layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer)layer_iter.next();
+                try (
+                final OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+                final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+                ) {
+                    DrawingTool tool = machineConfiguration.getCurrentTool();
+                    out.write(machineConfiguration.getConfigLine() + ";\n");
+                    out.write(machineConfiguration.getBobbinLine() + ";\n");
+                    out.write("G00 G90;\n");
+                    tool.writeChangeTo(out);
+                    tool.writeOff(out);
 
-						Iterator<String> entity_type_iter = (Iterator<String>)layer.getDXFEntityTypeIterator();
-						while(entity_type_iter.hasNext()) {
-							String entity_type = (String)entity_type_iter.next();
-							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
-							
-							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								for(int i=0;i<entity_list.size();++i) {
-									pm.setProgress(entity_count++);
-									DXFLine entity = (DXFLine)entity_list.get(i);
-									Point start = entity.getStartPoint();
-									Point end = entity.getEndPoint();
+                    parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
+                    DXFDocument doc = parser.getDocument();
+                    Bounds b = doc.getBounds();
+                    double width = b.getMaximumX() - b.getMinimumX();
+                    double height = b.getMaximumY() - b.getMinimumY();
+                    double cx = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
+                    double cy = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
+                    double wh = width > height ? width : height;
+                    double sy = machineConfiguration.getPaperHeight() * 10.0 / wh;
+                    double sx = machineConfiguration.getPaperWidth() * 10.0 / wh;
+                    double scale = (sx < sy ? sx : sy);
+                    sx = scale * (machineConfiguration.reverseForGlass ? -1 : 1);
+                    sx *= machineConfiguration.paperMargin;
+                    sy *= machineConfiguration.paperMargin;
 
-									double x =(start.getX()-cx)*sx;
-									double y =(start.getY()-cy)*sy;
-									double x2=(end  .getX()-cx)*sx;
-									double y2=(end  .getY()-cy)*sy;
-									double dx,dy;
-									//*
-									// is it worth drawing this line?
-									dx = x2-x;
-									dy = y2-y;
-									if(dx*dx+dy*dy < tool.getDiameter()/2.0) {
-										continue;
-									}
-									//*/
-									dx = dxf_x2 - x;
-									dy = dxf_y2 - y;
+                    // count all entities in all layers
+                    Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
+                    int entity_total = 0;
+                    int entity_count = 0;
+                    while (layer_iter.hasNext()) {
+                        DXFLayer layer = (DXFLayer) layer_iter.next();
+                        log("<font color='yellow'>Found layer " + layer.getName() + "</font>\n");
+                        Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+                        while (entity_iter.hasNext()) {
+                            String entity_type = (String) entity_iter.next();
+                            List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
+                            log("<font color='yellow'>+ Found " + entity_list.size() + " of type " + entity_type + "</font>\n");
+                            entity_total += entity_list.size();
+                        }
+                    }
+                    // set the progress meter
+                    pm.setMinimum(0);
+                    pm.setMaximum(entity_total);
 
-									if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
-										if(tool.isDrawOn()) {
-											tool.writeOff(out);
-										}
-										tool.writeMoveTo(out, (float)x,(float)y);
-									}
-									if(tool.isDrawOff()) {
-										tool.writeOn(out);
-									}
-									tool.writeMoveTo(out, (float)x2,(float)y2);
-									dxf_x2=x2;
-									dxf_y2=y2;
-								}
-							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								for(int i=0;i<entity_list.size();++i) {
-									pm.setProgress(entity_count++);
-									DXFSpline entity = (DXFSpline)entity_list.get(i);
-									entity.setLineWeight(30);
-									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-									boolean first=true;
-									for(int j=0;j<polyLine.getVertexCount();++j) {
-										DXFVertex v = polyLine.getVertex(j);
-										double x = (v.getX()-cx)*sx;
-										double y = (v.getY()-cy)*sy;
-										double dx = dxf_x2 - x;
-										double dy = dxf_y2 - y;
-										
-										if(first==true) {
-											first=false;
-											if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
-												// line does not start at last tool location, lift and move.
-												if(tool.isDrawOn()) {
-													tool.writeOff(out);
-												}
-												tool.writeMoveTo(out, (float)x,(float)y);
-											}
-											// else line starts right here, do nothing.
-										} else {
-											// not the first point, draw.
-											if(tool.isDrawOff()) tool.writeOn(out);
-											if(j<polyLine.getVertexCount()-1 && dx*dx+dy*dy<tool.getDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.writeMoveTo(out, (float)x,(float)y);
-										}
-										dxf_x2=x;
-										dxf_y2=y;
-									}
-								}
-							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								for(int i=0;i<entity_list.size();++i) {
-									pm.setProgress(entity_count++);
-									DXFPolyline entity = (DXFPolyline)entity_list.get(i);
-									boolean first=true;
-									for(int j=0;j<entity.getVertexCount();++j) {
-										DXFVertex v = entity.getVertex(j);
-										double x = (v.getX()-cx)*sx;
-										double y = (v.getY()-cy)*sy;
-										double dx = dxf_x2 - x;
-										double dy = dxf_y2 - y;
-										
-										if(first==true) {
-											first=false;
-											if(dx*dx+dy*dy > tool.getDiameter()/2.0) {
-												// line does not start at last tool location, lift and move.
-												if(tool.isDrawOn()) {
-													tool.writeOff(out);
-												}
-												tool.writeMoveTo(out, (float)x,(float)y);
-											}
-											// else line starts right here, do nothing.
-										} else {
-											// not the first point, draw.
-											if(tool.isDrawOff()) tool.writeOn(out);
-											if(j<entity.getVertexCount()-1 && dx*dx+dy*dy<tool.getDiameter()/2.0) continue;  // less than 1mm movement?  Skip it. 
-											tool.writeMoveTo(out, (float)x,(float)y);
-										}
-										dxf_x2=x;
-										dxf_y2=y;
-									}
-								}
-							}
-						}
-					}
+                    // convert each entity
+                    layer_iter = doc.getDXFLayerIterator();
+                    while (layer_iter.hasNext()) {
+                        DXFLayer layer = (DXFLayer) layer_iter.next();
 
-					// entities finished.  Close up file.
-					tool.writeOff(out);
-					tool.writeMoveTo(out, 0, 0);
-					
-					ok=true;
-				} catch(IOException e) {
-					e.printStackTrace();
-				} catch (ParseException e) {
-					e.printStackTrace();
-				} finally {
-					try {
-						if(out!=null) out.close();
-					} catch(IOException e) {
-						e.printStackTrace();
-					}
-						
-				}
+                        Iterator<String> entity_type_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+                        while (entity_type_iter.hasNext()) {
+                            String entity_type = (String) entity_type_iter.next();
+                            List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+
+                            if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
+                                for (int i = 0; i < entity_list.size(); ++i) {
+                                    pm.setProgress(entity_count++);
+                                    DXFLine entity = (DXFLine) entity_list.get(i);
+                                    Point start = entity.getStartPoint();
+                                    Point end = entity.getEndPoint();
+
+                                    double x = (start.getX() - cx) * sx;
+                                    double y = (start.getY() - cy) * sy;
+                                    double x2 = (end.getX() - cx) * sx;
+                                    double y2 = (end.getY() - cy) * sy;
+                                    double dx, dy;
+                                    //*
+                                    // is it worth drawing this line?
+                                    dx = x2 - x;
+                                    dy = y2 - y;
+                                    if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
+                                        continue;
+                                    }
+                                    //*/
+                                    dx = dxf_x2 - x;
+                                    dy = dxf_y2 - y;
+
+                                    if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
+                                        if (tool.isDrawOn()) {
+                                            tool.writeOff(out);
+                                        }
+                                        tool.writeMoveTo(out, (float) x, (float) y);
+                                    }
+                                    if (tool.isDrawOff()) {
+                                        tool.writeOn(out);
+                                    }
+                                    tool.writeMoveTo(out, (float) x2, (float) y2);
+                                    dxf_x2 = x2;
+                                    dxf_y2 = y2;
+                                }
+                            } else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+                                for (int i = 0; i < entity_list.size(); ++i) {
+                                    pm.setProgress(entity_count++);
+                                    DXFSpline entity = (DXFSpline) entity_list.get(i);
+                                    entity.setLineWeight(30);
+                                    DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+                                    boolean first = true;
+                                    for (int j = 0; j < polyLine.getVertexCount(); ++j) {
+                                        DXFVertex v = polyLine.getVertex(j);
+                                        double x = (v.getX() - cx) * sx;
+                                        double y = (v.getY() - cy) * sy;
+                                        double dx = dxf_x2 - x;
+                                        double dy = dxf_y2 - y;
+
+                                        if (first == true) {
+                                            first = false;
+                                            if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
+                                                // line does not start at last tool location, lift and move.
+                                                if (tool.isDrawOn()) {
+                                                    tool.writeOff(out);
+                                                }
+                                                tool.writeMoveTo(out, (float) x, (float) y);
+                                            }
+                                            // else line starts right here, do nothing.
+                                        } else {
+                                            // not the first point, draw.
+                                            if (tool.isDrawOff()) tool.writeOn(out);
+                                            if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
+                                                continue;  // less than 1mm movement?  Skip it.
+                                            tool.writeMoveTo(out, (float) x, (float) y);
+                                        }
+                                        dxf_x2 = x;
+                                        dxf_y2 = y;
+                                    }
+                                }
+                            } else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+                                for (int i = 0; i < entity_list.size(); ++i) {
+                                    pm.setProgress(entity_count++);
+                                    DXFPolyline entity = (DXFPolyline) entity_list.get(i);
+                                    boolean first = true;
+                                    for (int j = 0; j < entity.getVertexCount(); ++j) {
+                                        DXFVertex v = entity.getVertex(j);
+                                        double x = (v.getX() - cx) * sx;
+                                        double y = (v.getY() - cy) * sy;
+                                        double dx = dxf_x2 - x;
+                                        double dy = dxf_y2 - y;
+
+                                        if (first == true) {
+                                            first = false;
+                                            if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
+                                                // line does not start at last tool location, lift and move.
+                                                if (tool.isDrawOn()) {
+                                                    tool.writeOff(out);
+                                                }
+                                                tool.writeMoveTo(out, (float) x, (float) y);
+                                            }
+                                            // else line starts right here, do nothing.
+                                        } else {
+                                            // not the first point, draw.
+                                            if (tool.isDrawOff()) tool.writeOn(out);
+                                            if (j < entity.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
+                                                continue;  // less than 1mm movement?  Skip it.
+                                            tool.writeMoveTo(out, (float) x, (float) y);
+                                        }
+                                        dxf_x2 = x;
+                                        dxf_y2 = y;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // entities finished.  Close up file.
+                    tool.writeOff(out);
+                    tool.writeMoveTo(out, 0, 0);
+
+                    ok = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 				
 				pm.setProgress(100);
 			    return null;

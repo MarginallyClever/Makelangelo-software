@@ -7,9 +7,8 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.makelangelo.Point2D;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 
 
@@ -310,7 +309,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	}
 	
 
-	private void moveTo(OutputStreamWriter out,int i,boolean up) throws IOException {
+	private void moveTo(Writer out,int i,boolean up) throws IOException {
 		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 	
@@ -337,8 +336,10 @@ public class Filter_GeneratorZigZag extends Filter {
 		}
 		
 		// write
-		try {
-			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        ) {
 			out.write(machine.getConfigLine()+";\n");
 			out.write(machine.getBobbinLine()+";\n");
 
@@ -361,7 +362,6 @@ public class Filter_GeneratorZigZag extends Filter {
 			liftPen(out);
 			signName(out);
 			tool.writeMoveTo(out,0,0);
-			out.close();
 		}
 		catch(IOException e) {
 			mainGUI.log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");

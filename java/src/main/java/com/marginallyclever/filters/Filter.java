@@ -128,19 +128,19 @@ public abstract class Filter {
 	}
 	
 
-	protected void liftPen(OutputStreamWriter out) throws IOException {
+	protected void liftPen(Writer out) throws IOException {
 		tool.writeOff(out);
 		lastup=true;
 	}
 	
 	
-	protected void lowerPen(OutputStreamWriter out) throws IOException {
+	protected void lowerPen(Writer out) throws IOException {
 		tool.writeOn(out);
 		lastup=false;
 	}
 
 	
-	protected void imageStart(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void imageStart(BufferedImage img, Writer out) throws IOException {
 		tool = machine.getCurrentTool();
 
 		imageSetupTransform(img);
@@ -154,11 +154,11 @@ public abstract class Filter {
 		setAbsoluteMode(out);
 	}
 	
-	protected void setAbsoluteMode(OutputStreamWriter out) throws IOException {
+	protected void setAbsoluteMode(Writer out) throws IOException {
 		out.write("G00 G90;\n");
 	}
 	
-	protected void setRelativeMode(OutputStreamWriter out) throws IOException {
+	protected void setRelativeMode(Writer out) throws IOException {
 		out.write("G00 G91;\n");
 	}
 	
@@ -366,7 +366,7 @@ public abstract class Filter {
 	}
 	
 	
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		float x2 = TX(x);
 		float y2 = TY(y);
 		
@@ -471,7 +471,7 @@ public abstract class Filter {
 	}
 
 	
-	protected void textCreateMessageNow(String text,OutputStreamWriter output) throws IOException {
+	protected void textCreateMessageNow(String text, Writer output) throws IOException {
 		if(chars_per_line<=0) return;
 
 		tool = machine.getCurrentTool();
@@ -515,7 +515,7 @@ public abstract class Filter {
 				output.write("G91;\n");
 			}
 			
-			textDrawLine(lines[i],output);
+			textDrawLine(lines[i], output);
 		}
 
 		output.write("G90;\n");
@@ -563,7 +563,7 @@ public abstract class Filter {
 		return len;
 	}
 	
- 	protected void textDrawLine(String a1,OutputStreamWriter output) throws IOException {
+ 	protected void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = alphabetFolder;//System.getProperty("user.dir") + "/" + alphabetFolder;
 		
 		//System.out.println(a1+" ("+a1.length()+")");
@@ -673,7 +673,7 @@ public abstract class Filter {
 		}
 	}
 	
-	protected void signName(OutputStreamWriter out) throws IOException {
+	protected void signName(Writer out) throws IOException {
 		float desired_scale=0.5f;  // changes the size of the font.  large number = larger font
 		
 		textSetAlign(Align.RIGHT);
