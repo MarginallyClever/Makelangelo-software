@@ -68,6 +68,8 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 			textSetVAlign(VAlign.TOP);
 			textSetPosition(image_width,image_height);
 			textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
+			
+			output.close();
 		} catch(IOException e) {
             logger.error("{}", e);
         }
