@@ -110,18 +110,17 @@ implements ActionListener {
 		image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
 	}
 
-
-	/**
-	 *
-	 * @return
-	 */
-	private String[] getAnyMachineConfigurations() {
-		String[] machineNames = machineConfiguration.getKnownMachineNames();
-		if(machineNames.length < 1) {
-			machineNames = machineConfiguration.getAvailableConfigurations();
-		}
-		return machineNames;
-	}
+    /**
+     *
+     * @return
+     */
+    private String[] getAnyMachineConfigurations() {
+        String[] machineNames = machineConfiguration.getKnownMachineNames();
+        if(machineNames.length == 1 && machineNames[0] == null) {
+            machineNames = machineConfiguration.getAvailableConfigurations();
+        }
+        return machineNames;
+    }
 	
 
 	public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {

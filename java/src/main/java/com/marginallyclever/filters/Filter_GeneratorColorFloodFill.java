@@ -11,10 +11,10 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -27,7 +27,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	int last_x,last_y;
 	BufferedImage imgChanged;
 	BufferedImage imgMask;
-	OutputStreamWriter osw;
 	
 	
 	public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,
@@ -48,7 +47,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(float x,float y,boolean up) throws IOException {
+	protected void moveTo(float x, float y, boolean up, Writer osw) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(osw);
 			else   lowerPen(osw);
@@ -61,8 +60,6 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	 * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
 	 * @param x0 left
 	 * @param y0 top
-	 * @param x1 right
-	 * @param y1 bottom
 	 * @return true if all the pixels in this region are zero.
 	 */
 	protected boolean getMaskTouched(int x0,int y0) {
@@ -145,12 +142,10 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	/**
 	 * queue-based flood fill 
 	 * @param color_index
-	 * @param img
-	 * @param out
 	 * @throws IOException
 	 */
-	protected void floodFillBlob(int color_index,int x,int y) throws IOException {
-		LinkedList<Point2D> points_to_visit = new LinkedList<Point2D>();
+    protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
+        LinkedList<Point2D> points_to_visit = new LinkedList<>();
 		points_to_visit.add(new Point2D(x,y));
 		
 		Point2D a;
@@ -169,12 +164,12 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 			if((dx*dx+dy*dy) > diameter*diameter*2.0f)
 			{
 				//System.out.print("Jump at "+x+", "+y+"\n");
-				moveTo(last_x, last_y, true);
-				moveTo(a.x, a.y, true);
-				moveTo(a.x, a.y, false);
+				moveTo(last_x, last_y, true, osw);
+				moveTo(a.x, a.y, true, osw);
+				moveTo(a.x, a.y, false, osw);
 			} else {
 				//System.out.print("Move to "+x+", "+y+"\n");
-				moveTo(a.x, a.y, false);
+				moveTo(a.x, a.y, false, osw);
 			}
 			// update the last position.
 			last_x=(int)a.x;
@@ -195,11 +190,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	/**
 	 * find blobs of color in the original image.  Send that to the flood fill system.
 	 * @param color_index index into the list of colors at the top of the class
-	 * @param img source bufferedimage
-	 * @param out output stream for writing gcode.
 	 * @throws IOException
 	 */
-	void scanForContiguousBlocks(int color_index) throws IOException {
+	void scanForContiguousBlocks(int color_index, Writer osw) throws IOException {
 		C3 original_color;
 		int quantized_color;
 		
@@ -216,7 +209,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 				quantized_color = palette.quantizeIndex(original_color); 
 				if( quantized_color == color_index ) {
 					// found blob
-					floodFillBlob(color_index,x,y);
+					floodFillBlob(color_index, x, y, osw);
 					z++;
 					//if(z==20)
 //						return;
@@ -226,7 +219,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		System.out.println("Found "+z+" blobs.");
 	}
 	
-	private void scanColor(int i) throws IOException {
+	private void scanColor(int i, Writer osw) throws IOException {
 		// "please change to tool X and press any key to continue"
 		tool = machine.getTool(i);
 		tool.writeChangeTo(osw);
@@ -235,7 +228,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		
 		mainGUI.log("<font color='green'>Color "+i+"</font>\n");
 		
-		scanForContiguousBlocks(i);
+		scanForContiguousBlocks(i, osw);
 	}
 	
 	/**
@@ -261,50 +254,42 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		
 		
 		// Open the destination file
-		osw = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img,osw);
+        try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer osw = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
+        ) {
+            // Set up the conversion from image space to paper space, select the current tool, etc.
+            imageStart(img, osw);
 
 
-		float pw = (float)machine.getPaperWidth();
-		float df = tool.getDiameter() * (float)img.getWidth() / (4.0f*pw);
-		if(df<1) df=1;
+            float pw = (float) machine.getPaperWidth();
+            float df = tool.getDiameter() * (float) img.getWidth() / (4.0f * pw);
+            if (df < 1) df = 1;
 
 //		float steps = img.getWidth() / df;
-		
-		//System.out.println("Diameter = "+df);
-		//System.out.println("Steps = "+steps);
-		
-		diameter = (int)df;
-		
-		imgChanged=img;
 
-		last_x=img.getWidth()/2;
-		last_y=img.getHeight()/2;
-		
-		scanColor(0);  // black
-		scanColor(1);  // red
-		scanColor(2);  // green
-		scanColor(3);  // blue
-		
-		mainGUI.log("<font color='green'>Signing my name</font>\n");
-		
-		// pen already lifted
-		signName(osw);
-		moveTo(0, 0, true);
-		
-		// close the file
-		osw.close();
-		/*
-		try {
-		    // save image
-		    File outputfile = new File("saved.png");
-		    ImageIO.write(img, "png", outputfile);
-		} catch (IOException e) {
-		    e.printStackTrace();
-		}
-		*/
-	}
+            //System.out.println("Diameter = "+df);
+            //System.out.println("Steps = "+steps);
+
+            diameter = (int) df;
+
+            imgChanged = img;
+
+            last_x = img.getWidth() / 2;
+            last_y = img.getHeight() / 2;
+
+            scanColor(0, osw);  // black
+            scanColor(1, osw);  // red
+            scanColor(2, osw);  // green
+            scanColor(3, osw);  // blue
+
+            mainGUI.log("<font color='green'>Signing my name</font>\n");
+
+            // pen already lifted
+            signName(osw);
+            moveTo(0, 0, true, osw);
+        }
+    }
 }
 
 

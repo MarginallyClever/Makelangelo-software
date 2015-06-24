@@ -139,12 +139,12 @@
 	<string>
 		<key>ConversionOptions</key>
 		<value>Conversion options</value>
-		<hint>dialog title</hint>
+		<hint>Conversion options dialog title</hint>
 	</string>
 	<string>
 		<key>FlipForGlass</key>
 		<value>Flip for glass</value>
-		<hint>conversion options</hint>
+		<hint>conversion option to flip for glass</hint>
 	</string>
 
 	<string>
@@ -166,7 +166,7 @@
 	<string>
 		<key>PaperMargin</key>
 		<value>Margin at paper edge (%)</value>
-		<hint>conversion options</hint>
+		<hint>conversion option to adjust margin percentage at paper edge.</hint>
 	</string>
 	<string>
 		<key>Converting</key>
@@ -192,7 +192,7 @@
 	<string>
 		<key>ConversionStyle</key>
 		<value>Conversion style</value>
-		<hint>conversion options</hint>
+		<hint>conversion option to choose a filter aka conversion style.</hint>
 	</string>
 
 	<string>

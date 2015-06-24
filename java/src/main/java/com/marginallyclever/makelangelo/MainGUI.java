@@ -35,6 +35,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -273,7 +274,6 @@ public class MainGUI
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
-	
 	
 	public boolean isFileLoaded() {
 		return ( gCode.fileOpened && gCode.lines != null && gCode.lines.size() > 0 );
@@ -621,6 +621,7 @@ public class MainGUI
 	}
 	
 	// The user has done something.  respond to it.
+    @Override
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		

@@ -13,9 +13,8 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -148,18 +147,21 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
 			mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(dest),"UTF-8");
+            try(
+            final OutputStream fileOutputStream = new FileOutputStream(dest);
+            final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+            ) {
 
-			imageStart(src_img,out);
+                imageStart(src_img, out);
 
-			// set absolute coordinates
-			out.write("G00 G90;\n");
-			tool.writeChangeTo(out);
-			liftPen(out);
+                // set absolute coordinates
+                out.write("G00 G90;\n");
+                tool.writeChangeTo(out);
+                liftPen(out);
 
-			float d = tool.getDiameter();
-			
-			int i;
+                float d = tool.getDiameter();
+
+                int i;
 /*
 			for(i=0;i<graphEdges.size();++i) {
 				GraphEdge e= graphEdges.get(i);
@@ -184,29 +186,30 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 				r/=scale;
 				float x=cells[i].centroid.x;
 				float y=cells[i].centroid.y;
-				
-				// filled circles
-				this.moveTo(out, x-r*(float)Math.sin(0), y-r*(float)Math.cos(0), true);
-				while(r>d) {
-					float detail=(float)(r/d);
-					if(detail<4) detail=4;
-					if(detail>10) detail=10;
-					for(float j=1;j<=detail;++j) {
-						this.moveTo(out,
-								x-r*(float)Math.sin(j*(float)Math.PI*2.0f/detail),
-								y-r*(float)Math.cos(j*(float)Math.PI*2.0f/detail), false);
-					}
-					r-=d*2.0;
-				}
-				this.moveTo(out, x, y, false);
-				this.moveTo(out, x, y, true);
-			}
 
-			liftPen(out);
-			signName(out);
-			tool.writeMoveTo(out, 0, 0);
-			out.close();
-		}
+                    // filled circles
+                    this.moveTo(out, x - r * (float) Math.sin(0), y - r * (float) Math.cos(0), true);
+                    while (r > d) {
+                        float detail = (float) (0.5 * Math.PI * r / d);
+                        if (detail < 4) detail = 4;
+                        if (detail > 20) detail = 20;
+                        for (float j = 1; j <= detail; ++j) {
+                            this.moveTo(out,
+                                    x - r * (float) Math.sin(j * (float) Math.PI * 2.0f / detail),
+                                    y - r * (float) Math.cos(j * (float) Math.PI * 2.0f / detail), false);
+                        }
+                        //r-=(d/(scale*1.5f));
+                        r -= d;
+                    }
+                    this.moveTo(out, x, y, false);
+                    this.moveTo(out, x, y, true);
+                }
+
+                liftPen(out);
+                signName(out);
+                tool.writeMoveTo(out, 0, 0);
+            }
+        }
 	}
 
 
