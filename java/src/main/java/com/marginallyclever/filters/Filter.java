@@ -414,8 +414,8 @@ public abstract class Filter {
 	
 	
 	public void textFindCharsPerLine(double width) {
-		chars_per_line=(int)Math.floor( (float)(width - padding*2.0f) / (float)(letter_width+kerning) );
-		//System.out.println("MAX="+chars_per_line);
+		chars_per_line=(int)Math.floor( (float)(width*10.0f - padding*2.0f) / (float)(letter_width+kerning) );
+		System.out.println("MAX="+chars_per_line);
 	}
 	
 
@@ -482,8 +482,8 @@ public abstract class Filter {
 		output.write("G90;\n");
 		liftPen(output);
 		
-		if(true) {
-		//if(draw_bounding_box) {
+		//if(true) {
+		if(draw_bounding_box) {
 			// draw bounding box
 			output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
 			lowerPen(output);
