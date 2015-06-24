@@ -274,20 +274,6 @@ public class MainGUI
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir")+"/temp.ngc";
 	}
-
-
-	/**
-	 *
-	 * @return
-	 */
-	private String[] getAnyMachineConfigurations() {
-		String[] machineNames = machineConfiguration.getKnownMachineNames();
-		if(machineNames.length == 1 && machineNames[0] == null) {
-			machineNames = machineConfiguration.getAvailableConfigurations();
-		}
-		return machineNames;
-	}
-	
 	
 	public boolean isFileLoaded() {
 		return ( gCode.fileOpened && gCode.lines != null && gCode.lines.size() > 0 );
