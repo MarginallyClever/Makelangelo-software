@@ -67,7 +67,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
 		}
 	}
 	
-	
+	@Override
 	public BufferedImage process(BufferedImage img) {
 		int y,x;
 		int h = img.getHeight();

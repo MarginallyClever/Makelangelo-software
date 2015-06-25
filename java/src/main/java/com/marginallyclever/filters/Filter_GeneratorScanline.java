@@ -16,12 +16,14 @@ public class Filter_GeneratorScanline extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("ScanlineName"); }
 	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
