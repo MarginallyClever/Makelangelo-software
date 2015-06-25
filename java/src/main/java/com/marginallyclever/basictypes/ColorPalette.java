@@ -10,6 +10,12 @@ import java.util.List;
  * @since 7.1.4-SNAPSHOT
  */
 public class ColorPalette {
+	
+	/**
+	 * List of colors in the form of red, green, and blue data values.
+	 * 
+	 * @see C3
+	 */
 	private List<C3> colors;
 	
 	public ColorPalette() {
@@ -22,17 +28,20 @@ public class ColorPalette {
 		colors.add(c);
 	}
 	
+	/**
+	 * 
+	 * Removes a given color if it exists in {@link ColorPalette#colors}.
+	 * 
+	 * @param c color to remove.
+	 * 
+	 * @see <a href="http://stackoverflow.com/a/223929">Iterating through a list, avoiding ConcurrentModificationException when removing in loop</a>
+	 */
 	public void removeColor(C3 c) {
-		Iterator<C3> i = colors.iterator();
-		int index=0;
-		
-		while(i.hasNext()) {
-			i.next();
-			if(i.equals(c)) {
-				colors.remove(index);
-				return;
+		for(final Iterator<C3> colorsIterator = colors.iterator(); colorsIterator.hasNext();) {
+			final C3 nextColor = colorsIterator.next();
+			if(nextColor.equals(c)) {
+				colorsIterator.remove();
 			}
-			++index;
 		}
 	}
 	

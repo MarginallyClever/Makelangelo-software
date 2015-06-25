@@ -22,6 +22,7 @@ public class Filter_BlackAndWhite extends Filter {
 		levels = (double)_levels;
 	}
 	
+	@Override
 	public BufferedImage process(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();

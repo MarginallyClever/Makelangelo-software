@@ -16,12 +16,14 @@ public class Filter_GeneratorBoxes extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("BoxGeneratorName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
@@ -57,6 +59,7 @@ public class Filter_GeneratorBoxes extends Filter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);

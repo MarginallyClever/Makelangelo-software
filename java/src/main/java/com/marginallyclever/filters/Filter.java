@@ -381,7 +381,7 @@ public abstract class Filter {
 		}
 	}
 	
-	protected void moveToPaper(OutputStreamWriter out,double x,double y,boolean up) throws IOException {
+	protected void moveToPaper(Writer out,double x,double y,boolean up) throws IOException {
 		tool.writeMoveTo(out,(float)x,(float)y);
 		if(up) liftPen(out);
 		else   lowerPen(out);

@@ -115,6 +115,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
      * @param defaultLanguageFilesKeys
      * @throws IOException
      */
+    @SuppressWarnings("unused")
     private static void writeSetObjectToFile(Set<String> defaultLanguageFilesKeys) throws IOException {
         try(final OutputStream fos = new FileOutputStream("keys.dat");
             final ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -180,6 +181,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
      *
      * @see <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
      */
+    @SuppressWarnings("unused")
     private static void logNodeNameAndValue(Node node) {
         final String nodeName = node.getNodeName();
         if(nodeName.equals("key")) {

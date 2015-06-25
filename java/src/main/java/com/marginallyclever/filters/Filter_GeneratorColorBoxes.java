@@ -39,13 +39,14 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	}
 
 
-
+	@Override
 	public String getName() { return translator.get("RGBName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out1,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out1,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out1);
 			else   lowerPen(out1);
@@ -183,6 +184,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// Open the destination file
         try(

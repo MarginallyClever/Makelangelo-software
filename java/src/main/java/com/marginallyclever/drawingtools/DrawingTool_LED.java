@@ -4,8 +4,8 @@ import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 
 public class DrawingTool_LED extends DrawingTool {
@@ -19,21 +19,21 @@ public class DrawingTool_LED extends DrawingTool {
 		feed_rate=5000;
 	}
 	
-	public void writeChangeTo(OutputStreamWriter out) throws IOException {
+	public void writeChangeTo(Writer out) throws IOException {
 		out.write("M06 T1;\n");
 	}
 
-	public void writeOn(OutputStreamWriter out) throws IOException {
+	public void writeOn(Writer out) throws IOException {
 		out.write("G00 Z180 F500;\n");  // lower the pen.
 		out.write("G00 F"+feed_rate+";\n");
 	}
 
-	public void writeOff(OutputStreamWriter out) throws IOException {
+	public void writeOff(Writer out) throws IOException {
 		out.write("G00 Z0 F500;\n");  // lower the pen..
 		out.write("G00 F"+feed_rate+";\n");
 	}
 	
-	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(Writer out,float x,float y) throws IOException {
 		out.write("G00 X"+x+" Y"+y+";\n");
 	}
 }

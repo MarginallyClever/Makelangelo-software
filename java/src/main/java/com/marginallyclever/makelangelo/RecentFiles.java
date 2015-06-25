@@ -18,7 +18,7 @@ public class RecentFiles {
 		
 		int i,j=1;
 		for(i=0;i<fileList.length;++i) {
-			if(!filename.equals(fileList[i]) && fileList[i] != "") {
+			if(!filename.equals(fileList[i]) && !fileList[i].equals("")) {
 				newFiles[j++] = fileList[i];
 				if(j == fileList.length ) break;
 			}
@@ -51,7 +51,7 @@ public class RecentFiles {
 	public void remove(String filename) {
 		int i;
 		for(i=0;i<fileList.length-1;++i) {
-			if(fileList[i]==filename) {
+			if(fileList[i].equals(filename)) {
 				break;
 			}
 		}

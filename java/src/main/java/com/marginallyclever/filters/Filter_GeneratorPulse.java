@@ -26,12 +26,14 @@ public class Filter_GeneratorPulse extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("PulseLineName"); }
 
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);
@@ -67,6 +69,7 @@ public class Filter_GeneratorPulse extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		final JTextField field_size = new JTextField(Float.toString(blockScale));
 

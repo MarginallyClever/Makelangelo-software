@@ -70,7 +70,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
 		}
 	}
 	
-	
+	@Override
 	public BufferedImage process(BufferedImage img) {
 		int y;
 		int h = img.getHeight();

@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * 
@@ -41,6 +40,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 		palette.addColor(new C3(255,255,255));
 	}
 
+	@Override
 	public String getName() { return translator.get("RGBFloodFillName"); }
 
 
@@ -235,6 +235,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);

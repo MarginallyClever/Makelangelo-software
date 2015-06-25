@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +31,14 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("HilbertCurveName"); }
 	
 	/**
 	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		tool.writeMoveTo(out, TX(x), TY(y));
 		if(lastup!=up) {
 			if(up) liftPen(out);

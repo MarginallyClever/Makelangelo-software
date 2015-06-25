@@ -18,6 +18,8 @@ import java.text.DecimalFormat;
  * @author Dan
  */
 public class Filter_GeneratorZigZag extends Filter {
+	
+	@Override
 	public String getName() { return translator.get("ZigZagName"); }
 	
 	// processing tools
@@ -405,6 +407,7 @@ public class Filter_GeneratorZigZag extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) {
 		// resize & flip as needed
 		Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250); 

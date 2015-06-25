@@ -50,10 +50,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 		super(gui, mc, ms);
 	}
 
-
+	@Override
 	public String getName() { return translator.get("voronoiStipplingName"); }
 	
-	
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
@@ -216,7 +216,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out);
 			else   lowerPen(out);

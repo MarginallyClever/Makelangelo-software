@@ -57,7 +57,7 @@ public class GCodeFile {
 				if(tokens[j].equals("G21")) scale=0.10f;  // mm->cm
 				if(tokens[j].startsWith("F")) {
 					feed_rate=Float.valueOf(tokens[j].substring(1)) * scale;
-					assert(feed_rate!=Float.NaN && feed_rate!=0);
+					assert(!Float.isNaN(feed_rate) && feed_rate!=0);
 				}
 			}
 			
@@ -77,7 +77,7 @@ public class GCodeFile {
 			if(z!=pz) {
 				// pen up/down action
 				estimated_time+=(z-pz)/feed_rate;  // seconds?
-				assert(estimated_time!=Float.NaN);
+				assert(!Float.isNaN(estimated_time));
 			}
 			
 			if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
@@ -87,7 +87,7 @@ public class GCodeFile {
 				double ddy=y-py;
 				length=Math.sqrt(ddx*ddx+ddy*ddy);
 				estimated_time+=length/feed_rate;
-				assert(estimated_time!=Float.NaN);
+				assert(!Float.isNaN(estimated_time));
 				estimated_length+=length;
 				++estimate_count;
 				px=x;
@@ -113,7 +113,7 @@ public class GCodeFile {
 				// length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
 				length = theta * radius;
 				estimated_time+=length/feed_rate;
-				assert(estimated_time!=Float.NaN);
+				assert(!Float.isNaN(estimated_time));
 				estimated_length+=length;
 				++estimate_count;
 				px=x;
@@ -121,7 +121,7 @@ public class GCodeFile {
 				pz=z;
 			}
 		}  // for ( each instruction )
-		assert(estimated_time!=Float.NaN);
+		assert(!Float.isNaN(estimated_time));
 		// processing time for each instruction
 	   	estimated_time += estimate_count * 0.007617845117845f;
 	   	// conversion to ms?
