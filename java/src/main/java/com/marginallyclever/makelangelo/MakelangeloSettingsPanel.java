@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,7 +23,13 @@ import javax.swing.JSeparator;
 public class MakelangeloSettingsPanel
 extends JPanel
 implements ActionListener {
-    // settings pane
+    
+	/**
+	 * @see Serializable
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// settings pane
     private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
 
 	protected MultilingualSupport translator;
