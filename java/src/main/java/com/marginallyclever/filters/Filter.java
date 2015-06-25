@@ -145,9 +145,9 @@ public abstract class Filter {
 
 		imageSetupTransform(img);
 		
-		out.write(machine.getConfigLine()+";\n");
-		out.write(machine.getBobbinLine()+";\n");
-
+		out.write(machine.getConfigLine());
+		out.write(machine.getBobbinLine());
+		
 		previous_x=0;
 		previous_y=0;
 		
