@@ -57,7 +57,7 @@ public class GCodeFile {
 				if(tokens[j].equals("G21")) scale=0.10f;  // mm->cm
 				if(tokens[j].startsWith("F")) {
 					feed_rate=Float.valueOf(tokens[j].substring(1)) * scale;
-					assert(feed_rate!=Float.NaN && feed_rate!=0);
+					assert(!Float.isNaN(feed_rate) && feed_rate!=0);
 				}
 			}
 			
