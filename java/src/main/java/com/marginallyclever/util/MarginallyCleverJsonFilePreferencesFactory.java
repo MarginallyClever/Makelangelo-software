@@ -61,7 +61,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
      *
      * @return Preference file
      */
-    public static File getPreferencesFile()
+    public synchronized static File getPreferencesFile()
     {
         if (preferencesFile == null) {
             String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
