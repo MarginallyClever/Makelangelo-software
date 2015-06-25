@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -379,10 +381,11 @@ implements ActionListener {
 
 				double dxf_x2=0;
 				double dxf_y2=0;
-				OutputStreamWriter out=null;
-
-				try {
-					out = new OutputStreamWriter(new FileOutputStream(destinationFile),"UTF-8");
+				
+				try (
+				FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
+				) {
 					DrawingTool tool = machineConfiguration.getCurrentTool();
 					out.write(machineConfiguration.getConfigLine()+";\n");
 					out.write(machineConfiguration.getBobbinLine()+";\n");
@@ -545,17 +548,8 @@ implements ActionListener {
 					tool.writeMoveTo(out, 0, 0);
 					
 					ok=true;
-				} catch(IOException e) {
+				} catch(IOException | ParseException e) {
 					e.printStackTrace();
-				} catch (ParseException e) {
-					e.printStackTrace();
-				} finally {
-					try {
-						if(out!=null) out.close();
-					} catch(IOException e) {
-						e.printStackTrace();
-					}
-						
 				}
 				
 				pm.setProgress(100);

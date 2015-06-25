@@ -66,7 +66,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 				);
 	}
 	
-	protected void convertPaperSpace(BufferedImage img,OutputStreamWriter out) throws IOException {
+	protected void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
 		double leveladd = 255.0/6.0;
 		double level=leveladd;
 		

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 
 public class DrawingTool_Spraypaint extends DrawingTool {
@@ -34,15 +34,15 @@ public class DrawingTool_Spraypaint extends DrawingTool {
 		old_y=0;
 	}
 
-	public void writeOn(OutputStreamWriter out) throws IOException {
+	public void writeOn(Writer out) throws IOException {
 		is_up=false;
 	}
 
-	public void writeOff(OutputStreamWriter out) throws IOException {
+	public void writeOff(Writer out) throws IOException {
 		is_up=true;
 	}
 		
-	public void writeMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
+	public void writeMoveTo(Writer out,float x,float y) throws IOException {
 		if(is_up) {
 			out.write("G00 X"+x+" Y"+y+";\n");			
 		} else {

@@ -45,7 +45,8 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	/**
 	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
 	 */
-	protected void moveTo(OutputStreamWriter out1,float x,float y,boolean up) throws IOException {
+	@Override
+	protected void moveTo(Writer out1,float x,float y,boolean up) throws IOException {
 		if(lastup!=up) {
 			if(up) liftPen(out1);
 			else   lowerPen(out1);
