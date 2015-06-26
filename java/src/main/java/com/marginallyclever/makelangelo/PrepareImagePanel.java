@@ -171,7 +171,7 @@ implements ActionListener {
 		Object subject = e.getSource();
 
 		final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-		long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
+		long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
 		machineConfiguration.loadConfig(new_uid);
 		machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 		

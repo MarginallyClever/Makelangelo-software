@@ -145,8 +145,8 @@ public abstract class Filter {
 
 		imageSetupTransform(img);
 		
-		out.write(machine.getConfigLine());
-		out.write(machine.getBobbinLine());
+		out.write(machine.getConfigLine()+";\n");
+		out.write(machine.getBobbinLine()+";\n");
 		
 		previous_x=0;
 		previous_y=0;
@@ -155,11 +155,11 @@ public abstract class Filter {
 	}
 	
 	protected void setAbsoluteMode(Writer out) throws IOException {
-		out.write("G00 G90;\n");
+		out.write("G90;\n");
 	}
 	
 	protected void setRelativeMode(Writer out) throws IOException {
-		out.write("G00 G91;\n");
+		out.write("G91;\n");
 	}
 	
 	/**

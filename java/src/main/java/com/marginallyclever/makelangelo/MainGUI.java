@@ -432,9 +432,9 @@ public class MainGUI
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		sendLineToRobot(machineConfiguration.getConfigLine());
-		sendLineToRobot(machineConfiguration.getBobbinLine());
-		sendLineToRobot("G92 X0 Y0");
+		sendLineToRobot(machineConfiguration.getConfigLine()+"\n");
+		sendLineToRobot(machineConfiguration.getBobbinLine()+"\n");
+		sendLineToRobot("G92 X0 Y0\n");
 	}
 	
 	
