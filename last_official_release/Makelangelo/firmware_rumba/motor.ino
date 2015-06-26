@@ -183,7 +183,6 @@ void setPenAngle(int pen_angle) {
     if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
 
     servos[0].write(posz);
-    delay(PEN_DELAY);
   }
 }
 

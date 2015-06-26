@@ -267,21 +267,6 @@ void polargraph_line(float x,float y,float z,float new_feed_rate) {
   posy=y;
   posz=z;
   
-  Serial.print(x);
-  Serial.print(',');
-  Serial.print(y);
-  Serial.print(',');
-  Serial.print(z);
-  Serial.print(',');
-  Serial.print(current_tool);
-  
-  Serial.print(" L ");
-  Serial.print(laststep[0]);
-  Serial.print(",");
-  Serial.print(laststep[1]);
-  Serial.print(",");
-  Serial.println(laststep[2]);
-  
   feed_rate = new_feed_rate;
   motor_line(l1,l2,z,new_feed_rate);
 }
