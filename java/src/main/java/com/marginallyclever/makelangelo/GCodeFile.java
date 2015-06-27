@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 /**
@@ -36,7 +37,7 @@ public class GCodeFile {
 	
 	
 	void estimateDrawTime() {
-		int i,j;
+		int j;
 		
 		double px=0,py=0,pz=0, length=0, x,y,z,ai,aj;
 		feed_rate=1.0f;
@@ -45,8 +46,9 @@ public class GCodeFile {
 		estimated_length=0;
 		estimate_count=0;
 		
-		for(i=0;i<lines.size();++i) {
-			String line=lines.get(i);
+		Iterator<String> iLine = lines.iterator();
+		while(iLine.hasNext()) {
+			String line = iLine.next();
 			String[] pieces=line.split(";");  // comments come after a semicolon.
 			if(pieces.length==0) continue;
 			

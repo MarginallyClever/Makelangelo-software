@@ -451,7 +451,7 @@ public class MainGUI
 			// TODO: find out how far the pen moved each line and add it to the distance total.
 			int line_number = gCode.linesProcessed;
 			gCode.linesProcessed++;
-			line= gCode.lines.get(line_number).trim();
+			line = gCode.lines.get(line_number).trim();
 
 			// catch pen up/down status here
 			if(line.contains("Z"+machineConfiguration.getPenUpString())) {
