@@ -370,25 +370,27 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
 	
 	public void render( GL2 gl2 ) {
-		optimizeNodes();
-		
-		DrawingTool tool = machine.getTool(0);
-		
 		paintBackground(gl2);
 		paintCamera(gl2);
+		
 		paintLimits(gl2);
 		paintCenter(gl2);
 		
 		// TODO draw left motor, right motor, and control box
 		// TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
 
+		optimizeNodes();
+		
+		DrawingTool tool = machine.getTool(0);
+		
         gl2.glColor3f(0, 0, 0);
 
         // draw image        
         if(fast_nodes.size()>0) {
             // draw the nodes
-            for(int i=0;i<fast_nodes.size();++i) {
-                DrawPanelNode n=fast_nodes.get(i);
+        	Iterator<DrawPanelNode> nodes = fast_nodes.iterator();
+            while(nodes.hasNext()) {
+                DrawPanelNode n=nodes.next();
 
                 if(running) {
                     if(n.line_number<=linesProcessed) {
