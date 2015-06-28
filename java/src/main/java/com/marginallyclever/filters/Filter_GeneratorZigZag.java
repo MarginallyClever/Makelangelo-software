@@ -1,7 +1,9 @@
 package com.marginallyclever.filters;
 
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -10,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -17,7 +20,8 @@ import java.text.DecimalFormat;
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
-public class Filter_GeneratorZigZag extends Filter {
+public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
+	private ReentrantLock lock = new ReentrantLock();
 	
 	@Override
 	public String getName() { return translator.get("ZigZagName"); }
@@ -208,16 +212,41 @@ public class Filter_GeneratorZigZag extends Filter {
 				int finish=best_end;
 				int half=(finish-begin)/2;
 				int temp;
+				while(lock.isLocked());
+				
+				lock.lock();	
 				//DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
 				for(j=0;j<half;++j) {
 					temp = solution[begin+j];
 					solution[begin+j]=solution[finish-1-j];
 					solution[finish-1-j]=temp;
 				}
+				lock.unlock();
+				mainGUI.getDrawPanel().repaintNow();
 				updateProgress(len,1);
 			}
 		}
 		return once;
+	}
+	
+	
+	public void render(GL2 gl2, MachineConfiguration machine) {
+		if(points==null || solution==null ) return;
+		
+		while(lock.isLocked());
+		
+		lock.lock();
+		
+		gl2.glColor3f(0,0,0);
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		for(int i=0;i<points.length;++i) {
+			if(points[solution[i]]==null) break;
+			gl2.glVertex2f((points[solution[i]].x)*0.1f,
+						(points[solution[i]].y)*0.1f);
+		}
+		gl2.glEnd();
+		
+		lock.unlock();
 	}
 	
 	
@@ -247,7 +276,9 @@ public class Filter_GeneratorZigZag extends Filter {
 			//@TODO: make these optional for the very thorough people
 			//once|=transposeForwardTest();
 			//once|=transposeBackwardTest();
+		
 			once|=flipTests();
+			
 			updateProgress(len,2);
 		}
 		
@@ -409,6 +440,9 @@ public class Filter_GeneratorZigZag extends Filter {
 	 */
 	@Override
 	public void convert(BufferedImage img) {
+		
+		mainGUI.getDrawPanel().setDecorator(this);
+
 		// resize & flip as needed
 		Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250); 
 		img = rs.process(img);
@@ -422,6 +456,8 @@ public class Filter_GeneratorZigZag extends Filter {
 		connectTheDots(img);
 		// Shorten the line that connects the dots
 		generateTSP();
+
+		mainGUI.getDrawPanel().setDecorator(null);
 	}
 }
 

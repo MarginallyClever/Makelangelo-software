@@ -11,5 +11,5 @@ import com.jogamp.opengl.GL2;
  * @since 7.1.4
  */
 public interface DrawDecorator {
-	public void render(GL2 gl2);
+	public void render(GL2 gl2,MachineConfiguration machine);
 }

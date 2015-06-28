@@ -415,7 +415,7 @@ public abstract class Filter {
 	
 	public void textFindCharsPerLine(double width) {
 		chars_per_line=(int)Math.floor( (float)(width*10.0f - padding*2.0f) / (float)(letter_width+kerning) );
-		System.out.println("MAX="+chars_per_line);
+		//System.out.println("MAX="+chars_per_line);
 	}
 	
 

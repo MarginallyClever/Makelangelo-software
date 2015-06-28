@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -55,7 +57,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private final int look_ahead=500;
 
     private GCodeFile instructions;
-	
+
+    private DrawDecorator drawDecorator=null;
+    
 	protected MachineConfiguration machine;
 
 	// optimization - turn gcode into vectors once on load, draw vectors after that.
@@ -79,6 +83,15 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
 
+	/**
+	 * Set the current DrawDecorator.
+	 * @param dd the new DrawDecorator
+	 */
+	public void setDecorator(DrawDecorator dd) {
+		drawDecorator = dd;
+	}
+	
+	
 	/**
      * set up the correct projection so the image appears in the right location and aspect ratio.
 	 */
@@ -368,6 +381,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glEnd();
     }
     
+    public void repaintNow() {
+    	validate();
+    	repaint();
+    }
 	
 	public void render( GL2 gl2 ) {
 		paintBackground(gl2);
@@ -375,6 +392,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		paintLimits(gl2);
 		paintCenter(gl2);
+		
+		if(drawDecorator!=null) {
+			drawDecorator.render(gl2,machine);
+			return;
+		}
 		
 		// TODO draw left motor, right motor, and control box
 		// TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
@@ -578,7 +600,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 theta=angle2-angle1;
 
                 double len = Math.abs(theta) * radius;
-                double segments = len * STEPS_PER_DEGREE*2;
+                double segments = len * STEPS_PER_DEGREE*2.0;
                 double nx,ny,angle3,scale;
                 
                 // Draw the arc from a lot of little line segments.

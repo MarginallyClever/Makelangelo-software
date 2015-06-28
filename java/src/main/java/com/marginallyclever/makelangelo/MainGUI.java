@@ -1043,7 +1043,7 @@ public class MainGUI
 	 *
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
-	public DrawPanel getPreviewPane() {
+	public DrawPanel getDrawPanel() {
 		return drawPanel;
 	}
 
