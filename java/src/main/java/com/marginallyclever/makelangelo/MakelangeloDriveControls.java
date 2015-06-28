@@ -158,10 +158,10 @@ public class MakelangeloDriveControls
 		
 		JPanel corners = new JPanel();
 			corners.setLayout(new GridBagLayout());
-			goTop = new JButton(translator.get("Top"));		goTop.setPreferredSize(new Dimension(80,20));
+			goTop = new JButton(translator.get("Top"));			goTop.setPreferredSize(new Dimension(80,20));
 			goBottom = new JButton(translator.get("Bottom"));	goBottom.setPreferredSize(new Dimension(80,20));
 			goLeft = new JButton(translator.get("Left"));		goLeft.setPreferredSize(new Dimension(80,20));
-			goRight = new JButton(translator.get("Right"));	goRight.setPreferredSize(new Dimension(80,20));
+			goRight = new JButton(translator.get("Right"));		goRight.setPreferredSize(new Dimension(80,20));
 			goUp = new JButton(translator.get("PenUp"));		goUp.setPreferredSize(new Dimension(100,20));
 			goDown = new JButton(translator.get("PenDown"));	goDown.setPreferredSize(new Dimension(100,20));
 			c = new GridBagConstraints();

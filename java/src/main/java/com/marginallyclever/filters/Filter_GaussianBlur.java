@@ -28,6 +28,7 @@ public class Filter_GaussianBlur extends Filter {
 		radius = _radius;
 	}
 	
+	@Override
 	public BufferedImage process(BufferedImage img) {
 		int h = img.getHeight();
 		int w = img.getWidth();

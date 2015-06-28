@@ -171,7 +171,7 @@ implements ActionListener {
 		Object subject = e.getSource();
 
 		final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-		long new_uid = Long.parseLong(String.valueOf(machine_choiceSelectedIndex));
+		long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
 		machineConfiguration.loadConfig(new_uid);
 		machineConfiguration.paperMargin=(100-input_paper_margin.getValue())*0.01;
 		
@@ -438,9 +438,10 @@ implements ActionListener {
 							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
 							
 							if(entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								for(int i=0;i<entity_list.size();++i) {
+								Iterator<DXFEntity> iter = entity_list.iterator();
+								while(iter.hasNext()) {
 									pm.setProgress(entity_count++);
-									DXFLine entity = (DXFLine)entity_list.get(i);
+									DXFLine entity = (DXFLine)iter.next();
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
@@ -474,9 +475,10 @@ implements ActionListener {
 									dxf_y2=y2;
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								for(int i=0;i<entity_list.size();++i) {
+								Iterator<DXFEntity> iter = entity_list.iterator();
+								while(iter.hasNext()) {
 									pm.setProgress(entity_count++);
-									DXFSpline entity = (DXFSpline)entity_list.get(i);
+									DXFSpline entity = (DXFSpline)iter.next();
 									entity.setLineWeight(30);
 									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
 									boolean first=true;
@@ -508,9 +510,10 @@ implements ActionListener {
 									}
 								}
 							} else if(entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								for(int i=0;i<entity_list.size();++i) {
+								Iterator<DXFEntity> iter = entity_list.iterator();
+								while(iter.hasNext()) {
 									pm.setProgress(entity_count++);
-									DXFPolyline entity = (DXFPolyline)entity_list.get(i);
+									DXFPolyline entity = (DXFPolyline)iter.next();
 									boolean first=true;
 									for(int j=0;j<entity.getVertexCount();++j) {
 										DXFVertex v = entity.getVertex(j);

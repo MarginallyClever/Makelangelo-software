@@ -26,6 +26,7 @@ public class Filter_GeneratorPulse extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("PulseLineName"); }
 
 	/**
@@ -68,6 +69,7 @@ public class Filter_GeneratorPulse extends Filter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		final JTextField field_size = new JTextField(Float.toString(blockScale));
 

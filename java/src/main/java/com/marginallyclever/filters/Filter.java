@@ -147,7 +147,7 @@ public abstract class Filter {
 		
 		out.write(machine.getConfigLine()+";\n");
 		out.write(machine.getBobbinLine()+";\n");
-
+		
 		previous_x=0;
 		previous_y=0;
 		
@@ -155,11 +155,11 @@ public abstract class Filter {
 	}
 	
 	protected void setAbsoluteMode(Writer out) throws IOException {
-		out.write("G00 G90;\n");
+		out.write("G90;\n");
 	}
 	
 	protected void setRelativeMode(Writer out) throws IOException {
-		out.write("G00 G91;\n");
+		out.write("G91;\n");
 	}
 	
 	/**
@@ -415,7 +415,7 @@ public abstract class Filter {
 	
 	public void textFindCharsPerLine(double width) {
 		chars_per_line=(int)Math.floor( (float)(width*10.0f - padding*2.0f) / (float)(letter_width+kerning) );
-		System.out.println("MAX="+chars_per_line);
+		//System.out.println("MAX="+chars_per_line);
 	}
 	
 

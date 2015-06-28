@@ -38,7 +38,6 @@ char m2d='R';
 
 // calculate some numbers to help us find feed_rate
 float SPOOL_DIAMETER = 3.2;  // cm
-
 float THREAD_PER_STEP=0;
 
 // plotter position.
@@ -254,7 +253,32 @@ void test_kinematics(float x,float y) {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * Translate the XYZ through the IK to get the number of motor steps and move the motors.
+ * @input x destination x value
+ * @input y destination y value
+ * @input z destination z value
+ * @input new_feed_rate speed to travel along arc
+ */
+void polargraph_line(float x,float y,float z,float new_feed_rate) {
+  long l1,l2;
+  IK(x,y,l1,l2);
+  posx=x;
+  posy=y;
+  posz=z;
+  
+  feed_rate = new_feed_rate;
+  motor_line(l1,l2,z,new_feed_rate);
+}
+
+
+/**
+ * Move the pen holder in a straight line using bresenham's algorithm
+ * @input x destination x value
+ * @input y destination y value
+ * @input z destination z value
+ * @input new_feed_rate speed to travel along arc
+ */
 void line_safe(float x,float y,float z,float new_feed_rate) {
   x-=tool_offset[current_tool].x;
   y-=tool_offset[current_tool].y;
@@ -281,25 +305,18 @@ void line_safe(float x,float y,float z,float new_feed_rate) {
 }
 
 
-//------------------------------------------------------------------------------
-void polargraph_line(float x,float y,float z,float new_feed_rate) {
-  long l1,l2;
-  IK(x,y,l1,l2);
-  posx=x;
-  posy=y;
-  posz=z;
-  feed_rate = new_feed_rate;
-  motor_line(l1,l2,z,new_feed_rate);
-}
-
-
-//------------------------------------------------------------------------------
-// This method assumes the limits have already been checked.
-// This method assumes the start and end radius match.
-// This method assumes arcs are not >180 degrees (PI radians)
-// cx/cy - center of circle
-// x/y - end position
-// dir - ARC_CW or ARC_CCW to control direction of arc
+/**
+ * This method assumes the limits have already been checked.
+ * This method assumes the start and end radius match.
+ * This method assumes arcs are not >180 degrees (PI radians)
+ * @input cx center of circle x value
+ * @input cy center of circle y value
+ * @input x destination x value
+ * @input y destination y value
+ * @input z destination z value
+ * @input dir - ARC_CW or ARC_CCW to control direction of arc
+ * @input new_feed_rate speed to travel along arc
+ */
 void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate) {
   // get radius
   float dx = posx - cx;
@@ -342,9 +359,9 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
 }
 
 
-//------------------------------------------------------------------------------
-// instantly move the virtual plotter position
-// does not check if the move is valid
+/**
+ * Instantly move the virtual plotter position.  Does not check if the move is valid.
+ */
 void teleport(float x,float y) {
   posx=x;
   posy=y;
@@ -357,7 +374,9 @@ void teleport(float x,float y) {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * Print a helpful message to serial.  The first line must never be changed to play nice with the JAVA software.
+ */
 void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
@@ -370,8 +389,9 @@ void help() {
 }
 
 
-//------------------------------------------------------------------------------
-// find the current robot position and 
+/**
+ * if limit switches are installed, move to touch each switch so that the pen holder can move to home position.
+ */
 void FindHome() {
 #ifdef USE_LIMIT_SWITCH
   Serial.println(F("Homing..."));
@@ -437,7 +457,10 @@ void FindHome() {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * Print the X,Y,Z, feedrate, and acceleration to serial.
+ * Equivalent to gcode M114
+ */
 void where() {
   Serial.print(F("X"));
   Serial.print(posx);
@@ -452,7 +475,9 @@ void where() {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * Print the machine limits to serial.
+ */
 void printConfig() {
   Serial.print(limit_left);       Serial.print(F(","));
   Serial.print(limit_top);        Serial.print(F(" - "));
@@ -461,9 +486,13 @@ void printConfig() {
 }
 
 
-
-
-//------------------------------------------------------------------------------
+/**
+ * Set the relative tool offset
+ * @input axis the active tool id
+ * @input x the x offset
+ * @input y the y offset
+ * @input z the z offset
+ */
 void set_tool_offset(int axis,float x,float y,float z) {
   tool_offset[axis].x=x;
   tool_offset[axis].y=y;
@@ -471,7 +500,9 @@ void set_tool_offset(int axis,float x,float y,float z) {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * @return the position + active tool offset
+ */
 Vector3 get_end_plus_offset() {
   return Vector3(tool_offset[current_tool].x + posx,
                  tool_offset[current_tool].y + posy,
@@ -479,10 +510,12 @@ Vector3 get_end_plus_offset() {
 }
 
 
-//------------------------------------------------------------------------------
+/**
+ * Change the currently active tool
+ */
 void tool_change(int tool_id) {
   if(tool_id < 0) tool_id=0;
-  if(tool_id > NUM_TOOLS) tool_id=NUM_TOOLS;
+  if(tool_id >= NUM_TOOLS) tool_id=NUM_TOOLS-1;
   current_tool=tool_id;
 }
 

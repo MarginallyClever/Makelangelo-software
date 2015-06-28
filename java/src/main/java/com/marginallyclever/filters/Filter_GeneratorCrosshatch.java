@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
  * @author Dan
  */
 public class Filter_GeneratorCrosshatch extends Filter {
+	
+	@Override
 	public String getName() { return translator.get("Crosshatch"); }
 	
 	public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
@@ -27,6 +29,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 	 * The main entry point
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
 		img = bw.process(img);

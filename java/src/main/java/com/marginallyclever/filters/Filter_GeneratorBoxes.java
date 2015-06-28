@@ -16,6 +16,7 @@ public class Filter_GeneratorBoxes extends Filter {
 		super(gui, mc, ms);
 	}
 
+	@Override
 	public String getName() { return translator.get("BoxGeneratorName"); }
 
 	/**
@@ -58,6 +59,7 @@ public class Filter_GeneratorBoxes extends Filter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);

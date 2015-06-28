@@ -39,7 +39,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	}
 
 
-
+	@Override
 	public String getName() { return translator.get("RGBName"); }
 
 	/**
@@ -184,6 +184,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		// Open the destination file
         try(

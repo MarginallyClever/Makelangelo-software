@@ -432,9 +432,9 @@ public class MainGUI
 		if(connectionToRobot!=null && !connectionToRobot.isRobotConfirmed()) return;
 		
 		// Send a command to the robot with new configuration values
-		sendLineToRobot(machineConfiguration.getConfigLine());
-		sendLineToRobot(machineConfiguration.getBobbinLine());
-		sendLineToRobot("G92 X0 Y0");
+		sendLineToRobot(machineConfiguration.getConfigLine()+"\n");
+		sendLineToRobot(machineConfiguration.getBobbinLine()+"\n");
+		sendLineToRobot("G92 X0 Y0\n");
 	}
 	
 	
@@ -451,7 +451,7 @@ public class MainGUI
 			// TODO: find out how far the pen moved each line and add it to the distance total.
 			int line_number = gCode.linesProcessed;
 			gCode.linesProcessed++;
-			line= gCode.lines.get(line_number).trim();
+			line = gCode.lines.get(line_number).trim();
 
 			// catch pen up/down status here
 			if(line.contains("Z"+machineConfiguration.getPenUpString())) {
@@ -1043,7 +1043,7 @@ public class MainGUI
 	 *
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
-	public DrawPanel getPreviewPane() {
+	public DrawPanel getDrawPanel() {
 		return drawPanel;
 	}
 

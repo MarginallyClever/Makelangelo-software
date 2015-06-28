@@ -152,10 +152,10 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
                 + translator.get("TitlePostfix"));
 
         mainGUI.sendConfig();
-        mainGUI.getPreviewPane().updateMachineConfig();
+        mainGUI.getDrawPanel().updateMachineConfig();
 
         mainGUI.updateMenuBar();
-        mainGUI.getPreviewPane().setConnected(true);
+        mainGUI.getDrawPanel().setConnected(true);
 
         // rebuild the drive pane so that the feed rates are correct.
         mainGUI.updatedriveControls();

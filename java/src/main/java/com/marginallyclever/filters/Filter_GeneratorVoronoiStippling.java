@@ -50,10 +50,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 		super(gui, mc, ms);
 	}
 
-
+	@Override
 	public String getName() { return translator.get("voronoiStipplingName"); }
 	
-	
+	@Override
 	public void convert(BufferedImage img) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);

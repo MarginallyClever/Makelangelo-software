@@ -53,7 +53,7 @@ public class Filter_Resize extends Filter {
 	    return newImage;
 	}
 
-
+	@Override
 	public BufferedImage process(BufferedImage img) {
 		int w = img.getWidth();
 		int h = img.getHeight();
