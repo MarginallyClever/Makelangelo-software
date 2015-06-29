@@ -1,6 +1,8 @@
 package com.marginallyclever.filters;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -27,7 +30,9 @@ import java.util.List;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiStippling extends Filter {
+public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDecorator {
+	private ReentrantLock lock = new ReentrantLock();
+	
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private VoronoiCell [] cells = new VoronoiCell[1];
 	private int w, h;
@@ -86,14 +91,47 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			imageSetupTransform(img);
 	
 			cellBorder = new ArrayList<VoronoiCellEdge>();
-	
 		    
-			initializeCells(MAX_DOT_SIZE);
+			initializeCells(MIN_DOT_SIZE);
+			
+			mainGUI.getDrawPanel().setDecorator(this);
 			evolveCells();
+			mainGUI.getDrawPanel().setDecorator(null);
+			
 			writeOutCells();
 	    }
 	}
 
+	public void render(GL2 gl2,MachineConfiguration machine) {
+		if( graphEdges==null ) return;
+		
+		lock.lock();
+		
+		gl2.glScalef(0.1f, 0.1f, 1);
+
+		// draw cell edges
+		gl2.glColor3f(0.9f,0.9f,0.9f);
+		gl2.glBegin(GL2.GL_LINES);
+		Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
+		while(ig.hasNext()) {
+			VoronoiGraphEdge e = ig.next();
+			gl2.glVertex2d(TX((float)e.x1),TY((float)e.y1));
+			gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
+		}
+		gl2.glEnd();
+		
+		// draw cell centers
+		gl2.glPointSize(3);
+		gl2.glColor3f(0,0,0);
+		gl2.glBegin(GL2.GL_POINTS);
+		for(int i=0;i<cells.length;++i) {
+			VoronoiCell c = cells[i];
+			gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
+		}
+		gl2.glEnd();
+		
+		lock.unlock();
+	}
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
@@ -128,10 +166,14 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			do {
 				generation++;
 				mainGUI.log("<font color='green'>Generation "+generation+"</font>\n");
-	
+
+				lock.lock();
 				tessellateVoronoiDiagram();
+				lock.unlock();
 				change = adjustCentroids();
 
+				mainGUI.getDrawPanel().repaintNow();
+				
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(change>=1 && generation<MAX_GENERATIONS);
 			
@@ -162,16 +204,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
                 float d = tool.getDiameter();
 
                 int i;
-/*
-			for(i=0;i<graphEdges.size();++i) {
-				GraphEdge e= graphEdges.get(i);
-
-				this.MoveTo(out, (float)e.x1,(float)e.y1, true);
-				this.MoveTo(out, (float)e.x1,(float)e.y1, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
-			}
-//*/
+                
 			// TODO sort cells top to bottom, left to right
 			
 			float most=cells[0].weight;
