@@ -680,6 +680,7 @@ public final class MachineConfiguration {
 				new_list[i] = machineConfigurationsAvailable[i];
 			}
 			new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid); //TODO check this out as it smells.
+			machineConfigurationsAvailable = new_list;
 		}
 		return new_uid;
 	}
