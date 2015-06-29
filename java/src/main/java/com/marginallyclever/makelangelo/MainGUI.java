@@ -1019,8 +1019,8 @@ public class MainGUI
         mainframe.setContentPane(createContentPane());
  
         // Display the window.
-        int width =prefs.getInt("Default window width", 1200);
-        int height=prefs.getInt("Default window height", 700);
+        int width =prefs.getInt("Default window width", (int)(1200.0*5.0/5.0));
+        int height=prefs.getInt("Default window height", (int)(1020.0*5.0/5.0));
         mainframe.setSize(width,height);
         mainframe.setVisible(true);
         

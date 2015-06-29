@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -89,6 +87,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void setDecorator(DrawDecorator dd) {
 		drawDecorator = dd;
+		emptyNodeBuffer();
 	}
 	
 	
@@ -181,7 +180,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      */
     public void setShowPenUp(boolean state) {
         show_pen_up=state;
-        emptyNodeBuffer();
+        instructions.changed=true;
         repaint();
     }
     

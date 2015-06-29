@@ -1,6 +1,8 @@
 package com.marginallyclever.filters;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -16,8 +18,11 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -27,7 +32,9 @@ import java.util.List;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiStippling extends Filter {
+public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDecorator {
+	private ReentrantLock lock = new ReentrantLock();
+	
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private VoronoiCell [] cells = new VoronoiCell[1];
 	private int w, h;
@@ -86,28 +93,92 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			imageSetupTransform(img);
 	
 			cellBorder = new ArrayList<VoronoiCellEdge>();
-	
 		    
-			initializeCells(MAX_DOT_SIZE);
+			initializeCells(MIN_DOT_SIZE);
+			
+			mainGUI.getDrawPanel().setDecorator(this);
 			evolveCells();
+			mainGUI.getDrawPanel().setDecorator(null);
+			
 			writeOutCells();
 	    }
 	}
 
+	public void render(GL2 gl2,MachineConfiguration machine) {
+		if( graphEdges==null ) return;
+		
+		lock.lock();
+		
+		gl2.glScalef(0.1f, 0.1f, 1);
+
+		// draw cell edges
+		gl2.glColor3f(0.9f,0.9f,0.9f);
+		gl2.glBegin(GL2.GL_LINES);
+		Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
+		while(ig.hasNext()) {
+			VoronoiGraphEdge e = ig.next();
+			gl2.glVertex2d(TX((float)e.x1),TY((float)e.y1));
+			gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
+		}
+		gl2.glEnd();
+		
+		// draw cell centers
+		gl2.glPointSize(3);
+		gl2.glColor3f(0,0,0);
+		gl2.glBegin(GL2.GL_POINTS);
+		for(int i=0;i<cells.length;++i) {
+			VoronoiCell c = cells[i];
+			gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
+		}
+		gl2.glEnd();
+		
+		lock.unlock();
+	}
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
 		mainGUI.log("<font color='green'>Initializing cells</font>\n");
 
+		double totalArea = w*h;
+		double pointArea = totalArea/(double)MAX_CELLS;
+		float length = (float)Math.sqrt(pointArea);
+		float x,y;
+
 		cells = new VoronoiCell[MAX_CELLS];
 		int used=0;
+		int dir=1;
 
-		for(int i = 0; i < MAX_CELLS; ++i) {
-			cells[used]=new VoronoiCell();
-			cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);				
-			++used;
+		try {
+			
+			
+			for(y = 0; y < h; y += length ) {
+				if(dir==1) {
+					for(x = 0; x < w; x += length ) {
+						cells[used]=new VoronoiCell();
+						//cells[used].centroid.set(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
+						cells[used].centroid.set(x,y);
+						++used;
+						if(used==MAX_CELLS) break;
+					}
+					dir=-1;
+				} else {
+					for(x = w-1; x >= 0; x -= length ) {
+						cells[used]=new VoronoiCell();
+						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						//cells[used].centroid.set(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
+						cells[used].centroid.set(x,y);
+						++used;
+						if(used==MAX_CELLS) break;
+					}
+					dir=1;
+				}
+				if(used==MAX_CELLS) break;
+			}
 		}
-
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[cells.length];
 		yValuesIn = new double[cells.length];
@@ -128,10 +199,14 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 			do {
 				generation++;
 				mainGUI.log("<font color='green'>Generation "+generation+"</font>\n");
-	
+
+				lock.lock();
 				tessellateVoronoiDiagram();
+				lock.unlock();
 				change = adjustCentroids();
 
+				mainGUI.getDrawPanel().repaintNow();
+				
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(change>=1 && generation<MAX_GENERATIONS);
 			
@@ -142,7 +217,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
 		}
 	}
 
-
+    
 	// write cell centroids to gcode.
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
@@ -162,30 +237,19 @@ public class Filter_GeneratorVoronoiStippling extends Filter {
                 float d = tool.getDiameter();
 
                 int i;
-/*
-			for(i=0;i<graphEdges.size();++i) {
-				GraphEdge e= graphEdges.get(i);
-
-				this.MoveTo(out, (float)e.x1,(float)e.y1, true);
-				this.MoveTo(out, (float)e.x1,(float)e.y1, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, false);
-				this.MoveTo(out, (float)e.x2,(float)e.y2, true);
-			}
-//*/
-			// TODO sort cells top to bottom, left to right
-			
-			float most=cells[0].weight;
-			for(i=1;i<cells.length;++i) {
-				if(most<cells[i].weight) most=cells[i].weight;
-			}
-
-			float modifier = MAX_DOT_SIZE / most;
-			for(i=0;i<cells.length;++i) {
-				float r = cells[i].weight * modifier;
-				if(r<MIN_DOT_SIZE) continue;
-				r/=scale;
-				float x=cells[i].centroid.x;
-				float y=cells[i].centroid.y;
+				
+				float most=cells[0].weight;
+				for(i=1;i<cells.length;++i) {
+					if(most<cells[i].weight) most=cells[i].weight;
+				}
+	
+				float modifier = MAX_DOT_SIZE / most;
+				for(i=0;i<cells.length;++i) {
+					float r = cells[i].weight * modifier;
+					if(r<MIN_DOT_SIZE) continue;
+					r/=scale;
+					float x=cells[i].centroid.x;
+					float y=cells[i].centroid.y;
 
                     // filled circles
                     this.moveTo(out, x - r * (float) Math.sin(0), y - r * (float) Math.cos(0), true);
