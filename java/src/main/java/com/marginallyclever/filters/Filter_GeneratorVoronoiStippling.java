@@ -155,7 +155,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 				if(dir==1) {
 					for(x = 0; x < w; x += length ) {
 						cells[used]=new VoronoiCell();
-						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						//cells[used].centroid.set(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
 						cells[used].centroid.set(x,y);
 						++used;
 						if(used==MAX_CELLS) break;
@@ -165,6 +165,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 					for(x = w-1; x >= 0; x -= length ) {
 						cells[used]=new VoronoiCell();
 						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						//cells[used].centroid.set(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
 						cells[used].centroid.set(x,y);
 						++used;
 						if(used==MAX_CELLS) break;

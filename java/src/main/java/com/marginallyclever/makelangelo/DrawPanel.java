@@ -180,7 +180,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
      */
     public void setShowPenUp(boolean state) {
         show_pen_up=state;
-        emptyNodeBuffer();
+        instructions.changed=true;
         repaint();
     }
     
