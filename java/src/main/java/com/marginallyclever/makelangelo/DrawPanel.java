@@ -87,6 +87,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void setDecorator(DrawDecorator dd) {
 		drawDecorator = dd;
+		emptyNodeBuffer();
 	}
 	
 	

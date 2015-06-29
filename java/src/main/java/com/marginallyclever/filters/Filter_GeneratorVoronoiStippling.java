@@ -18,6 +18,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -137,15 +139,45 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 	protected void initializeCells(double minDistanceBetweenSites) {
 		mainGUI.log("<font color='green'>Initializing cells</font>\n");
 
+		double totalArea = w*h;
+		double pointArea = totalArea/(double)MAX_CELLS;
+		float length = (float)Math.sqrt(pointArea);
+		float x,y;
+
 		cells = new VoronoiCell[MAX_CELLS];
 		int used=0;
+		int dir=1;
 
-		for(int i = 0; i < MAX_CELLS; ++i) {
-			cells[used]=new VoronoiCell();
-			cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);				
-			++used;
+		try {
+			
+			
+			for(y = 0; y < h; y += length ) {
+				if(dir==1) {
+					for(x = 0; x < w; x += length ) {
+						cells[used]=new VoronoiCell();
+						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						cells[used].centroid.set(x,y);
+						++used;
+						if(used==MAX_CELLS) break;
+					}
+					dir=-1;
+				} else {
+					for(x = w-1; x >= 0; x -= length ) {
+						cells[used]=new VoronoiCell();
+						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						cells[used].centroid.set(x,y);
+						++used;
+						if(used==MAX_CELLS) break;
+					}
+					dir=1;
+				}
+				if(used==MAX_CELLS) break;
+			}
 		}
-
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[cells.length];
 		yValuesIn = new double[cells.length];
@@ -184,7 +216,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 		}
 	}
 
-
+    
 	// write cell centroids to gcode.
 	protected void writeOutCells() throws IOException {
 		if(graphEdges != null ) {
@@ -204,21 +236,19 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
                 float d = tool.getDiameter();
 
                 int i;
-                
-			// TODO sort cells top to bottom, left to right
-			
-			float most=cells[0].weight;
-			for(i=1;i<cells.length;++i) {
-				if(most<cells[i].weight) most=cells[i].weight;
-			}
-
-			float modifier = MAX_DOT_SIZE / most;
-			for(i=0;i<cells.length;++i) {
-				float r = cells[i].weight * modifier;
-				if(r<MIN_DOT_SIZE) continue;
-				r/=scale;
-				float x=cells[i].centroid.x;
-				float y=cells[i].centroid.y;
+				
+				float most=cells[0].weight;
+				for(i=1;i<cells.length;++i) {
+					if(most<cells[i].weight) most=cells[i].weight;
+				}
+	
+				float modifier = MAX_DOT_SIZE / most;
+				for(i=0;i<cells.length;++i) {
+					float r = cells[i].weight * modifier;
+					if(r<MIN_DOT_SIZE) continue;
+					r/=scale;
+					float x=cells[i].centroid.x;
+					float y=cells[i].centroid.y;
 
                     // filled circles
                     this.moveTo(out, x - r * (float) Math.sin(0), y - r * (float) Math.cos(0), true);
