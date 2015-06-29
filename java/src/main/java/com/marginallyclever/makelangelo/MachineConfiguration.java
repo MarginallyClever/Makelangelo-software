@@ -8,9 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -699,15 +697,11 @@ public final class MachineConfiguration {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		final String [] availableMachineConfigurations = new String[machineConfigurationsAvailable.length];
-		for(int i = 0; i < machineConfigurationsAvailable.length; i++) {
-			if(machineConfigurationsAvailable[i].equals("0")) {
-				continue;
-			}
-			availableMachineConfigurations[i] = machineConfigurationsAvailable[i];
-		}
-		
-		return availableMachineConfigurations;
+        final List<String> machineConfigurationsAvailableArrayAsList = new LinkedList<>(Arrays.asList(machineConfigurationsAvailable));
+        if(machineConfigurationsAvailableArrayAsList.contains("0")) {
+            machineConfigurationsAvailableArrayAsList.remove("0");
+        }
+		return Arrays.copyOf(machineConfigurationsAvailableArrayAsList.toArray(), machineConfigurationsAvailableArrayAsList.size(), String[].class);
 	}
 	
 	/**
