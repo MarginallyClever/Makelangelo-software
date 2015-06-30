@@ -144,7 +144,6 @@ public final class MachineConfiguration {
 		final JButton save = new JButton(translator.get("Save"));
 		
 		String limit_file = "limits.png";
-		
 		BufferedImage myPicture = null;
 		try {
 			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
@@ -152,10 +151,11 @@ public final class MachineConfiguration {
 		}
 		catch(IOException e) {
 			e.printStackTrace();
-			
 		}
-		if (myPicture == null) {System.err.println(translator.get("CouldNotFind")+limit_file); return;}
-		
+		if (myPicture == null) {
+			System.err.println(translator.get("CouldNotFind")+limit_file);
+			return;
+		}
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
 		
 		GridBagConstraints c = new GridBagConstraints();
