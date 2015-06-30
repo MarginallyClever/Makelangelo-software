@@ -69,26 +69,34 @@ public final class MachineConfiguration {
 	public boolean reverseForGlass=false;
 	public boolean motors_backwards=false;
 
-/*
-	// top left, bottom center, etc...
-	private String[] startingStrings = {
-			"Top Left",
-			"Top Center",
-			"Top Right",
-			"Left",
-			"Center",
-			"Right",
-			"Bottom Left",
-			"Bottom Center",
-			"Bottom Right" };*/
+    /**
+     * top left, bottom center, etc...
+     *
+     * <pre>
+     * {@code private String[] startingStrings =  {
+     *       "Top Left",
+     *       "Top Center",
+     *       "Top Right",
+     *       "Left",
+     *       "Center",
+     *       "Right",
+     *       "Bottom Left",
+     *       "Bottom Center",
+     *       "Bottom Right"
+     *   };}
+     * </pre>
+	 */
 	private int startingPositionIndex=4;
 
 	// TODO a way for users to create different tools for each machine
-	protected List<DrawingTool> tools;
-	protected int current_tool=0;
+	private List<DrawingTool> tools;
 
-	protected String [] machineConfigurationsAvailable = null;
+    private int current_tool=0;
+
+    private String [] machineConfigurationsAvailable = null;
+
 	private MainGUI mainGUI = null;
+
 	private MultilingualSupport translator;
 
     private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
