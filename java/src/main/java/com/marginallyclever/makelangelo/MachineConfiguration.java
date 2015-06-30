@@ -95,9 +95,9 @@ public final class MachineConfiguration {
 
     private String [] machineConfigurationsAvailable = null;
 
-	private MainGUI mainGUI = null;
+    private MainGUI mainGUI = null;
 
-	private MultilingualSupport translator;
+    private MultilingualSupport translator;
 
     private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
 
@@ -156,10 +156,10 @@ public final class MachineConfiguration {
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
-			e.printStackTrace();
+            logger.error("{}", e);
 		}
 		if (myPicture == null) {
-			System.err.println(translator.get("CouldNotFind")+limit_file);
+            logger.error("{}", translator.get("CouldNotFind")+limit_file);
 			return;
 		}
 		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
