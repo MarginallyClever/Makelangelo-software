@@ -115,7 +115,7 @@ public class MainGUI
 		machineConfiguration = new MachineConfiguration(this,translator);
         connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
         createAndShowGUI();
-
+//*
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Font[] fonts = ge.getAllFonts();
 
@@ -123,10 +123,7 @@ public class MainGUI
             System.out.print(font.getFontName() + " : ");
             System.out.println(font.getFamily());
         }
-/*
-		Font font = new Font("TimesRoman", Font.PLAIN, 18);
-	    GlyphVector glyphVector = font.createGlyphVector(frc, STRING);
-*/
+//*/
 	}
 
 
