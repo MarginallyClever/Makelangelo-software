@@ -22,7 +22,7 @@ public class MultilingualSupport {
 
 	public boolean isThisTheFirstTime() {
 		// Did the language file disappear?  Offer the language dialog.
-		if(!languages.keySet().contains(currentLanguage)) {
+		if(languages.keySet().contains(currentLanguage)) {
 			prefs.putBoolean(FIRST_TIME_KEY, false);
 		}
 
@@ -41,7 +41,7 @@ public class MultilingualSupport {
 	public void loadLanguages() {
 		// Scan folder for language files
         String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
-        //System.out.println(workingDirectory);
+        System.out.println(workingDirectory);
 		File f = new File(workingDirectory);
 		LanguageContainer lang;
 

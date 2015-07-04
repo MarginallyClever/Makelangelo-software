@@ -8,6 +8,29 @@ Makelangelo is a polargraph mural drawing robot.  It is intended to teach studen
 
 ## Instructions ##
 
+Download the software from IFL github. And once started make these setting changes.
+Machine settings
+Width 889.0 height 1143.0
+paper width These can be set to your paper size. Must be less then machine size
+invert left should be checked.
+
+Adjust pulley sizes they should both be 12.73
+
+select a tool. you should do this for each one of the pens.
+diameter for normal sharpie is about 1.
+Set max feed rate 3500
+Set pen up to 70.
+Set pen down to 130
+Set lift speed to 120
+
+
+You must set zero correctly before you start to draw. Zero is the center of the machine. There should be a
+divit or mark where the gondala should be placed. use the jog motor, or on the draw screen, use the X and Y motion
+commands. These will not be accurate until you set zero, but they will move the gondala around and you should be able
+to place the gondala at the zero mark and then set 0. 
+Once this is done the drawbot should now be able to draw a picture.
+
+
 For installation instructions, see
 http://learn.marginallyclever.com/index.php/Makelangelo_2_Software
 

@@ -12,8 +12,8 @@
 // CONSTANTS
 //------------------------------------------------------------------------------
 //#define VERBOSE           (1)  // add to get a lot more serial output.
-#define HAS_SD  // comment this out if there is no SD card
-#define HAS_LCD  // comment this out if there is no SMART LCD controller
+//#define HAS_SD  // comment this out if there is no SD card
+//#define HAS_LCD  // comment this out if there is no SMART LCD controller
 //#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
 
 // machine style
@@ -32,11 +32,11 @@
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 
 
-#define MICROSTEPS           (16.0)  // microstepping on this microcontroller
-#define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
-#define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
+#define MICROSTEPS           (8.0)  // microstepping on this microcontroller
+#define STEPS_PER_TURN       (200 * MICROSTEPS)  // default number of steps per turn * microsteps
+#define MAX_FEEDRATE         (4000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (1500)
-#define DEFAULT_FEEDRATE     (7000.0)
+#define DEFAULT_FEEDRATE     (3500.0)
 #define DEFAULT_ACCELERATION (8)
 
 #define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
@@ -82,12 +82,12 @@
 #define encrot3            1
 
 #define NUM_SERVOS         (1)
-#define SERVO0_PIN         (5)
+#define SERVO0_PIN         (1)
 #define SERVO1_PIN         (4)
 
 
-#define MOTHERBOARD 1 // RUMBA
-//#define MOTHERBOARD 2 // RAMPS
+//#define MOTHERBOARD 1 // RUMBA
+#define MOTHERBOARD 2 // RAMPS
 
 #if MOTHERBOARD == 1
 #define MOTOR_0_DIR_PIN    (16)
@@ -100,6 +100,13 @@
 #endif
 
 #if MOTHERBOARD == 2
+#define MOTOR_0_DIR_PIN    (23)
+#define MOTOR_0_STEP_PIN   (22)
+#define MOTOR_0_ENABLE_PIN (14)
+
+#define MOTOR_1_DIR_PIN    (21)
+#define MOTOR_1_STEP_PIN   (15)
+#define MOTOR_1_ENABLE_PIN (14)
 #endif
 
 

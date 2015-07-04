@@ -46,6 +46,14 @@
 
 #include "MServo.h"
 
+#if defined(SERVO_INVERT)
+# define SERVO_LOW HIGH
+# define SERVO_HIGH LOW
+#else
+# define SERVO_LOW LOW
+# define SERVO_HIGH HIGH
+#endif
+
 #define usToTicks(_us)    (( clockCyclesPerMicrosecond()* _us) / 8)     // converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
 #define ticksToUs(_ticks) (( (unsigned)_ticks * 8)/ clockCyclesPerMicrosecond() ) // converts from ticks back to microseconds
 
@@ -77,14 +85,14 @@ static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t
     *TCNTn = 0; // channel set to -1 indicated that refresh interval completed so reset the timer 
   else{
     if( SERVO_INDEX(timer,Channel[timer]) < ServoCount && SERVO(timer,Channel[timer]).Pin.isActive == true )  
-      digitalWrite( SERVO(timer,Channel[timer]).Pin.nbr,LOW); // pulse this channel low if activated   
+      digitalWrite( SERVO(timer,Channel[timer]).Pin.nbr,SERVO_LOW); // pulse this channel low if activated   
   }
 
   Channel[timer]++;    // increment to the next channel
   if( SERVO_INDEX(timer,Channel[timer]) < ServoCount && Channel[timer] < SERVOS_PER_TIMER) {
     *OCRnA = *TCNTn + SERVO(timer,Channel[timer]).ticks;
     if(SERVO(timer,Channel[timer]).Pin.isActive == true)     // check if activated
-      digitalWrite( SERVO(timer,Channel[timer]).Pin.nbr,HIGH); // its an active channel so pulse it high   
+      digitalWrite( SERVO(timer,Channel[timer]).Pin.nbr,SERVO_HIGH); // its an active channel so pulse it high   
   }  
   else { 
     // finished all channels so wait for the refresh period to expire before starting over 

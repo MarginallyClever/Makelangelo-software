@@ -822,6 +822,7 @@ public class MainGUI
 		fc.addChoosableFileFilter(filterImage);
 		fc.addChoosableFileFilter(filterDXF);
 		fc.addChoosableFileFilter(filterGCODE);
+		fc.setFileFilter(filterImage);
 	    if(fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 	    	String selectedFile=fc.getSelectedFile().getAbsolutePath();
 

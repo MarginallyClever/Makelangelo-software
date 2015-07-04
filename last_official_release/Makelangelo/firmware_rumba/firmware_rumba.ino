@@ -1,3 +1,4 @@
+
 //------------------------------------------------------------------------------
 // Makelangelo - supports raprapdiscount RUMBA controller
 // dan@marginallycelver.com 2013-12-26
@@ -22,22 +23,22 @@
 //------------------------------------------------------------------------------
 
 // robot UID
-int robot_uid=0;
+int robot_uid=1024;
 
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
 // (normally this is the center of the drawing area)
-float limit_top = 0;  // distance to top of drawing area.
-float limit_bottom = 0;  // Distance to bottom of drawing area.
-float limit_right = 0;  // Distance to right of drawing area.
-float limit_left = 0;  // Distance to left of drawing area.
+float limit_top = -437;  // distance to top of drawing area.
+float limit_bottom = 437;  // Distance to bottom of drawing area.
+float limit_right = 437;  // Distance to right of drawing area.
+float limit_left = -437;  // Distance to left of drawing area.
 
 // what are the motors called?
 char m1d='L';
 char m2d='R';
 
 // calculate some numbers to help us find feed_rate
-float SPOOL_DIAMETER = 3.2;  // cm
+float SPOOL_DIAMETER = 12.73;  // cm
 
 float MAX_VEL = 0;  // cm/s
 float THREAD_PER_STEP=0;
@@ -729,9 +730,12 @@ void Serial_listen() {
 //------------------------------------------------------------------------------
 void loop() {
   Serial_listen();
+  #ifdef HAS_SD
   SD_check();
+  #endif
+  #ifdef HAS_LCD
   LCD_update();
-  
+  #endif
   // The PC will wait forever for the ready signal.
   // if Arduino hasn't received a new instruction in a while, send ready() again
   // just in case USB garbled ready and each half is waiting on the other.

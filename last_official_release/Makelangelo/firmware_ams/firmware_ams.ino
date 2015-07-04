@@ -10,7 +10,8 @@
 // CONSTANTS
 //------------------------------------------------------------------------------
 //#define MOTHERBOARD 1  // Adafruit Motor Shield 1
-#define MOTHERBOARD 2  // Adafruit Motor Shield 2
+//#define MOTHERBOARD 2  // Adafruit Motor Shield 2
+#define MOTHERBOARD 3  // Azteeg X1
 
 // machine style
 #define POLARGRAPH2  // uncomment this line if you use a polargraph like the Makelangelo
@@ -36,9 +37,8 @@
 
 // stepper motor @ 200 steps per turn
 #define STEPPER_STEPS_PER_TURN    (200.0)
-#define MICROSTEPPING_MULTIPLIER  (1.0)
+#define MICROSTEPPING_MULTIPLIER  (2.0)
 #define STEPS_PER_TURN            (STEPPER_STEPS_PER_TURN*MICROSTEPPING_MULTIPLIER)
-
 
 #define NUM_TOOLS  (6)
 
@@ -60,6 +60,9 @@
 // 2.5132741228718345 / 200 = 0.0125663706 thread moved each step.
 // NEMA17 are rated up to 3000RPM.  Adafruit can handle >1000RPM.
 // These numbers directly affect the maximum velocity.
+#define MAX_RPM 1000
+
+
 #define MAX_STEPS_S     (STEPS_PER_TURN*MAX_RPM/60.0)  // steps/s
 
 #define MAX_FEEDRATE    (10000.0)
@@ -77,7 +80,7 @@
 #define MAX_BUF         (64)
 
 // servo pin differs based on device
-#define SERVO_PIN1      (10)
+#define SERVO_PIN1      (2)
 #define SERVO_PIN2      (9)
 #define SERVO_PIN       SERVO_PIN1  // switch if you want to use the other pin.  Thanks, Aleksey!
 
@@ -102,6 +105,28 @@
 // stacked motor shields have different addresses. The default is 0x60
 // 0x70 is the "all call" address - every shield will respond as one.
 #define SHIELD_ADDRESS (0x61)
+#endif
+
+#if MOTHERBOARD == 3
+#define M1_STEP_PIN 22
+#define M1_DIR_PIN  23
+
+#define M2_STEP_PIN 15
+#define M2_DIR_PIN  21
+
+#define M_EN_PIN     14
+
+#define BACKWARD 0
+#define FORWARD  1
+
+#define M1_STEP 
+#define M2_STEP
+
+
+#define STEP_DELAY 150  // 150 microsecs
+
+#define M1_ONESTEP(x) m1OneStep(x)
+#define M2_ONESTEP(x) m2OneStep(x)
 #endif
 
 //------------------------------------------------------------------------------
@@ -166,23 +191,23 @@ int robot_uid=0;
 // plotter limits
 // all distances are relative to the calibration point of the plotter.
 // (normally this is the center of the drawing area)
-static float limit_top = 0;  // distance to top of drawing area.
-static float limit_bottom = 0;  // Distance to bottom of drawing area.
-static float limit_right = 0;  // Distance to right of drawing area.
-static float limit_left = 0;  // Distance to left of drawing area.
+static float limit_top = -437;  // distance to top of drawing area.
+static float limit_bottom = 437;  // Distance to bottom of drawing area.
+static float limit_right = 437;  // Distance to right of drawing area.
+static float limit_left = -437;  // Distance to left of drawing area.
 
 // what are the motors called?
 char m1d='L';
 char m2d='R';
 
 // which way are the spools wound, relative to motor movement?
-int M1_REEL_IN  = FORWARD;
-int M1_REEL_OUT = BACKWARD;
+int M1_REEL_IN  = BACKWARD;
+int M1_REEL_OUT = FORWARD;
 int M2_REEL_IN  = FORWARD;
 int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
-float SPOOL_DIAMETER = 1.5;
+float SPOOL_DIAMETER = 12.73;
 float THREAD_PER_STEP;  // thread per step
 
 // plotter position.
@@ -215,6 +240,12 @@ long line_number;
 // METHODS
 //------------------------------------------------------------------------------
 
+#if MOTHERBOARD == 3
+void m1Step(int steps, int dir);
+void m2Step(int steps, int dir);
+void m1OneStep(int dir);
+void m2OneStep(int dir);
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -349,7 +380,10 @@ static void FK(float l1, float l2,float &x,float &y) {
 
 //------------------------------------------------------------------------------
 void pause(long us) {
-  delay(us/1000);
+  if (us/1000)
+  {
+    delay(us/1000);
+  }
   delayMicroseconds(us%1000);
 }
 
@@ -751,12 +785,20 @@ void disable_motors() {
   m1->release();
   m2->release();
 #endif
+#if MOTHERBOARD == 3
+  digitalWrite(M_EN_PIN, HIGH);
+#endif
 }
 
 
 void activate_motors() {
+#if MOTHERBOARD == 1 || MOTHERBOARD == 2
   M1_STEP(1,1);  M1_STEP(1,-1);
   M2_STEP(1,1);  M2_STEP(1,-1);
+#endif
+#if MOTHERBOARD == 3
+  digitalWrite(M_EN_PIN, HIGH);
+#endif
 }
 
 
@@ -1016,11 +1058,66 @@ void tools_setup() {
   }
 }
 
+#if MOTHERBOARD == 3
+void m1Step(int steps, int dir)
+{
+  while(steps > 0)
+  {
+    m1OneStep(dir);
+    if( steps > 0 )
+    {
+      pause(STEP_DELAY);
+    }
+    steps--;
+  }
+}
+
+void m2Step(int steps, int dir)
+{
+  while(steps > 0)
+  {
+    m2OneStep(dir);
+    if( steps > 0)
+    {
+      pause(STEP_DELAY);
+    }
+    steps--;
+  }
+}
+
+void m1OneStep(int dir)
+{
+  digitalWrite(M1_DIR_PIN, !dir);
+  digitalWrite(M1_STEP_PIN, HIGH);
+  digitalWrite(M1_STEP_PIN, 0);
+  pause(STEP_DELAY);
+}
+
+void m2OneStep(int dir)
+{
+  digitalWrite(M2_DIR_PIN, !dir);
+  digitalWrite(M2_STEP_PIN, HIGH);
+  digitalWrite(M2_STEP_PIN, LOW);
+  pause(STEP_DELAY);
+}
+#endif
 
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
+
+#if MOTHERBOARD == 3
+  pinMode(M1_STEP_PIN, OUTPUT);
+  pinMode(M1_DIR_PIN, OUTPUT);
+  pinMode(M2_STEP_PIN, OUTPUT);
+  pinMode(M2_DIR_PIN, OUTPUT);
+  pinMode(M_EN_PIN, OUTPUT);
   
+  digitalWrite(M_EN_PIN, LOW); // disable motors
+  digitalWrite(M1_STEP_PIN, LOW);
+  digitalWrite(M2_STEP_PIN, LOW);
+#endif
+
   // initialize the read buffer
   sofar=0;
   // start communications
