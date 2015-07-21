@@ -90,13 +90,11 @@ implements ActionListener {
 	private JSlider input_paper_margin;
     private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 	
-	
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
-
+	
 	// Image processing
 	// TODO use a ServiceLoader for plugins
 	private List<Filter> image_converters;
-	
 	
 	// TODO use a ServiceLoader instead?
 	protected void loadImageConverters() {
