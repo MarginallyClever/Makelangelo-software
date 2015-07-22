@@ -149,8 +149,10 @@ public final class MachineConfiguration {
 		final JButton cancel = new JButton(translator.get("Cancel"));
 		final JButton save = new JButton(translator.get("Save"));
 
-		String limit_file = "limits.png";
+		JLabel picLabel = null;
 		BufferedImage myPicture = null;
+		
+		String limit_file = "limits.png";
 		try {
 			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
 			myPicture = ImageIO.read(s);
@@ -162,7 +164,9 @@ public final class MachineConfiguration {
             logger.error("{}", translator.get("CouldNotFind")+limit_file);
 			return;
 		}
-		JLabel picLabel = new JLabel(new ImageIcon( myPicture ));
+		if (myPicture != null) {
+			picLabel = new JLabel(new ImageIcon( myPicture ));
+		}
 
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
@@ -174,6 +178,13 @@ public final class MachineConfiguration {
 		y+=5;
 
 		c.gridheight=1; c.gridwidth=1;
+		if (myPicture != null) {
+			c.weightx=0.25;
+			c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
+			y+=5;
+		}
+		
+		c.gridheight=1; c.gridwidth=1; 
 		c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
 		driver.add(new JLabel(translator.get("mmNotice")),c);
 		c.gridwidth=1;
