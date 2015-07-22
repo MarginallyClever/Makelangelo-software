@@ -394,7 +394,6 @@ void motor_onestep(int motor) {
 /**
  * Set the clock 2 timer frequency.
  * @input desired_freq_hz the desired frequency
- * Source: http://letsmakerobots.com/node/28278
  * Different clock sources can be selected for each timer independently. 
  * To calculate the timer frequency (for example 2Hz using timer1) you will need:
  */
@@ -402,10 +401,6 @@ FORCE_INLINE unsigned short calc_timer(unsigned short desired_freq_hz) {
   if( desired_freq_hz > MAX_FEEDRATE ) desired_freq_hz = MAX_FEEDRATE;
   if( desired_freq_hz < MIN_FEEDRATE ) desired_freq_hz = MIN_FEEDRATE;
   old_feed_rate = desired_freq_hz;
-
-  // Source: https://github.com/MarginallyClever/ArduinoTimerInterrupt
-  // Different clock sources can be selected for each timer independently. 
-  // To calculate the timer frequency (for example 2Hz using timer1) you will need:
   
   if( desired_freq_hz > 20000 ) {
     step_multiplier = 4;
@@ -469,7 +464,8 @@ ISR(TIMER1_COMPA_vect) {
       decel_after=working_seg->decel_after;
       return;
     } else {
-      OCR1A = 2000; // wait 1kHz
+      OCR1A = 2000; // wait 1ms
+      return;
     }
   }
   
