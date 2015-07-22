@@ -45,18 +45,38 @@ final class MarginallyCleverTranslationXmlFileHelper {
 
     /**
      *
+     */
+    private static final boolean LOG_MISSING_KEYS = true;
+
+    /**
+     *
+     */
+    private static final boolean DO_NOT_LOG_MISSING_KEYS = false;
+
+    /**
+     *
+     */
+    private static final boolean CHECK_ALL_LANGUAGE_FILES = true;
+
+    /**
+     *
+     */
+    private static final boolean DO_NOT_CHECK_ALL_LANGUAGE_FILES = false;
+
+    /**
+     *
      * @param args command line arguments.
      *
      *             @see <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
      */
     public static void main(String[] args) {
-        areLanguageFilesMissingKeys(false);
+        areLanguageFilesMissingKeys(DO_NOT_LOG_MISSING_KEYS, CHECK_ALL_LANGUAGE_FILES);
     }
 
     /**
      *
      */
-    public static boolean areLanguageFilesMissingKeys(boolean logMissingKeys) {
+    public static boolean areLanguageFilesMissingKeys(boolean logMissingKeys, boolean checkAllLanguageFiles) {
         final URL languagesFolderUrl = getLanguagesFolderUrl();
         if(languagesFolderUrl != null) {
             try {
@@ -67,6 +87,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
                 final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
                 final Set<String> defaultLanguageFilesKeys = getKeySet(docBuilder.parse(defaultLanguageFile).getDocumentElement());
+                Boolean doAllLanguageFilesContainAllTheDefaultKeys = null;
                 for (final File languageFile : languageFiles) {
                     final String languageFileName = languageFile.getName();
                     final boolean isDefaultLanguageFile = languageFileName.equals(DEFAULT_LANGUAGE_XML_FILE);
@@ -76,13 +97,19 @@ final class MarginallyCleverTranslationXmlFileHelper {
                         final Set<String> thisLanguageFilesKeys = getKeySet(parseXmlLanguageDocument.getDocumentElement());
 
                         final boolean doesThisLanguageFileContainAllTheDefaultKeys = doesThisLanguageFileContainAllTheDefaultKeys(defaultLanguageFilesKeys, thisLanguageFilesKeys, languageFileName);
-                        if(!doesThisLanguageFileContainAllTheDefaultKeys) {
-                            if(logMissingKeys) {
+                        if (!doesThisLanguageFileContainAllTheDefaultKeys) {
+                            if (logMissingKeys) {
                                 logMissingKeys(defaultLanguageFilesKeys, thisLanguageFilesKeys);
                             }
-                            return true;
+                            doAllLanguageFilesContainAllTheDefaultKeys = false;
+                        }
+                        if(!checkAllLanguageFiles) {
+                            break;
                         }
                     }
+                }
+                if(doAllLanguageFilesContainAllTheDefaultKeys != null) {
+                    return true;
                 }
             } catch (SAXException | IOException | URISyntaxException | ParserConfigurationException e) {
                 logger.error("{}", e);
@@ -117,7 +144,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
      */
     @SuppressWarnings("unused")
     private static void writeSetObjectToFile(Set<String> defaultLanguageFilesKeys) throws IOException {
-        try(final OutputStream fos = new FileOutputStream("keys.dat");
+        try(final OutputStream fos = new FileOutputStream("keys.txt");
             final ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(defaultLanguageFilesKeys);
         }
