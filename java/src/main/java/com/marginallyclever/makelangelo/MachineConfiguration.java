@@ -158,13 +158,10 @@ public final class MachineConfiguration {
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
-            logger.error("{}", e);
+      logger.error("{}", e);
 		}
 		if (myPicture == null) {
-            logger.error("{}", translator.get("CouldNotFind")+limit_file);
-			return;
-		}
-		if (myPicture != null) {
+      logger.error("{}", translator.get("CouldNotFind")+limit_file);
 			picLabel = new JLabel(new ImageIcon( myPicture ));
 		}
 
