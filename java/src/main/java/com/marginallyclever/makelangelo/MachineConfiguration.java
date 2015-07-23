@@ -368,9 +368,6 @@ public final class MachineConfiguration {
 		final JButton save = new JButton(translator.get("Save"));
 
 		GridBagConstraints c = new GridBagConstraints();
-
-		c.gridheight=1; c.gridwidth=1;
-
 		c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(translator.get("ToolType")),c);
 		c.anchor=GridBagConstraints.WEST;
 		c.gridx=2; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(toolCombo,c);
