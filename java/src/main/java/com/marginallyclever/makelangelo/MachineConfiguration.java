@@ -160,7 +160,7 @@ public final class MachineConfiguration {
 		catch(IOException e) {
       logger.error("{}", e);
 		}
-		if (myPicture == null) {
+		if (myPicture != null) {
       logger.error("{}", translator.get("CouldNotFind")+limit_file);
 			picLabel = new JLabel(new ImageIcon( myPicture ));
 		}
