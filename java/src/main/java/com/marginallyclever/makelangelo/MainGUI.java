@@ -14,6 +14,8 @@ import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -107,6 +109,11 @@ public class MainGUI
 
 	private MachineConfiguration machineConfiguration;
 	private MultilingualSupport  translator;
+
+    /**
+     * @see org.slf4j.Logger
+     */
+    private final Logger logger = LoggerFactory.getLogger(MainGUI.class);
 	
 	
 	public MainGUI() {
@@ -115,19 +122,20 @@ public class MainGUI
 		machineConfiguration = new MachineConfiguration(this,translator);
         connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
         createAndShowGUI();
-//*
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Font[] fonts = ge.getAllFonts();
-
-        for (Font font : fonts) {
-            System.out.print(font.getFontName() + " : ");
-            System.out.println(font.getFamily());
-        }
-//*/
+        logFonts();
 	}
 
+    private void logFonts() {
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final Font[] fonts = ge.getAllFonts();
+        logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
+        for (Font font : fonts) {
+            logger.info("{} : {}", font.getFontName(), font.getFamily());
+        }
+    }
 
-	public void startTranslator() {
+
+    public void startTranslator() {
 		translator = new MultilingualSupport();
 		if(translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
