@@ -152,17 +152,18 @@ public final class MachineConfiguration {
 		JLabel picLabel = null;
 		BufferedImage myPicture = null;
 		
-		String limit_file = "limits.png";
+		final String limit_file = "limits.png";
 		try {
 			InputStream s = MainGUI.class.getResourceAsStream("/"+limit_file);
 			myPicture = ImageIO.read(s);
 		}
 		catch(IOException e) {
-      logger.error("{}", e);
+      			logger.error("{}", e);
 		}
 		if (myPicture != null) {
-      logger.error("{}", translator.get("CouldNotFind")+limit_file);
 			picLabel = new JLabel(new ImageIcon( myPicture ));
+		} else {
+			logger.error("{}", translator.get("CouldNotFind")+limit_file);
 		}
 
 		GridBagConstraints c = new GridBagConstraints();
