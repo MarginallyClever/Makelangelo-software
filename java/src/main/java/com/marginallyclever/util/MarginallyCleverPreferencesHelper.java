@@ -4,9 +4,10 @@ import com.marginallyclever.makelangelo.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -47,8 +48,12 @@ final class MarginallyCleverPreferencesHelper {
         if(wereThereCommandLineArguments) {
             final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
             if (wasSaveFileFlagFound) {
-              PreferencesFactory filePreferencesFactory = new MarginallyCleverJsonFilePreferencesFactory();
-              filePreferencesFactory.systemRoot().sync();
+                final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+                try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
+                    PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
+                } catch (IOException e) {
+                    logger.error("{}", e);
+                }
             }
             final boolean wasPurgeFlagFound = wasSearchKeyFoundInArray(PURGE_FLAG, args);
             if (wasPurgeFlagFound) {
