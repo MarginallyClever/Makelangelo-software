@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
-
+  
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
   private VoronoiCell [] cells = new VoronoiCell[1];
   private int w, h;
@@ -48,8 +48,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   private List<VoronoiCellEdge> cellBorder = null;
   private double[] xValuesIn=null;
   private double[] yValuesIn=null;
-
-
+  
+  
   public Filter_GeneratorVoronoiStippling(MainGUI gui,
       MachineConfiguration mc, MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -57,7 +57,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
   @Override
   public String getName() { return translator.get("voronoiStipplingName"); }
-
+  
   @Override
   public void convert(BufferedImage img) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
@@ -86,27 +86,27 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       src_img = img;
       h = img.getHeight();
       w = img.getWidth();
-
+      
       tool = machine.getCurrentTool();
       imageSetupTransform(img);
-
+  
       cellBorder = new ArrayList<VoronoiCellEdge>();
-
+        
       initializeCells(MIN_DOT_SIZE);
-
+      
       mainGUI.getDrawPanel().setDecorator(this);
       evolveCells();
       mainGUI.getDrawPanel().setDecorator(null);
-
+      
       writeOutCells();
       }
   }
 
   public void render(GL2 gl2,MachineConfiguration machine) {
     if( graphEdges==null ) return;
-
+    
     lock.lock();
-
+    
     gl2.glScalef(0.1f, 0.1f, 1);
 
     // draw cell edges
@@ -119,7 +119,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
     }
     gl2.glEnd();
-
+    
     // draw cell centers
     gl2.glPointSize(3);
     gl2.glColor3f(0,0,0);
@@ -129,7 +129,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
     }
     gl2.glEnd();
-
+    
     lock.unlock();
   }
 
@@ -147,8 +147,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     int dir=1;
 
     try {
-
-
+      
+      
       for(y = 0; y < h; y += length ) {
         if(dir==1) {
           for(x = 0; x < w; x += length ) {
@@ -176,11 +176,11 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     catch(Exception e) {
       e.printStackTrace();
     }
-
+    
     // convert the cells to sites used in the Voronoi class.
     xValuesIn = new double[cells.length];
     yValuesIn = new double[cells.length];
-
+    
     voronoiTesselator.Init(minDistanceBetweenSites);
   }
 
@@ -191,7 +191,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   protected void evolveCells() {
     try {
       mainGUI.log("<font color='green'>Mutating</font>\n");
-
+  
       int generation=0;
       float change=0;
       do {
@@ -204,10 +204,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         change = adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
-
+        
         // Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
       } while(change>=1 && generation<MAX_GENERATIONS);
-
+      
       mainGUI.log("<font color='green'>Last "+generation+"</font>\n");
     }
     catch(Exception e) {
@@ -215,7 +215,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     }
   }
 
-
+    
   // write cell centroids to gcode.
   protected void writeOutCells() throws IOException {
     if(graphEdges != null ) {
@@ -235,12 +235,12 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
                 float d = tool.getDiameter();
 
                 int i;
-
+        
         float most=cells[0].weight;
         for(i=1;i<cells.length;++i) {
           if(most<cells[i].weight) most=cells[i].weight;
         }
-
+  
         float modifier = MAX_DOT_SIZE / most;
         for(i=0;i<cells.length;++i) {
           float r = cells[i].weight * modifier;
@@ -287,8 +287,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }
-
-
+  
+  
   // I have a set of points.  I want a list of cell borders.
   // cell borders are halfway between any point and it's nearest neighbors.
   protected void tessellateVoronoiDiagram() {
@@ -313,7 +313,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     double dx,dy,nx,ny,dot1;
 
     //long ta = System.nanoTime();
-
+    
     Iterator<VoronoiGraphEdge> ige = graphEdges.iterator();
     while(ige.hasNext()) {
       VoronoiGraphEdge e = ige.next();
@@ -384,7 +384,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     Iterator<VoronoiCellEdge> ice = cellBorder.iterator();
     for(i=0;i<numEdgesInCell;++i) {
       VoronoiCellEdge ce = ice.next();
-
+      
       // dot product the test point.
       dx = x-ce.px;
       dy = y-ce.py;

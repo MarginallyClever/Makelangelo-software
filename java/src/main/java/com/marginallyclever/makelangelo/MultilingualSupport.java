@@ -28,7 +28,7 @@ public final class MultilingualSupport {
   private static final String LANGUAGE_KEY = "language";
 
   /**
-   *
+   * 
    */
   private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
@@ -134,17 +134,17 @@ public final class MultilingualSupport {
       languages.put(lang.getName(), lang);
     }
   }
-
+  
   /**
    * Display a dialog box of available languages and let the user select their preference.
    */
   public void chooseLanguage() {
     final String [] choices = getLanguageList();
     final JComboBox<String> language_options = new JComboBox<String>(choices);
-
+  
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(language_options);
-
+    
       int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
       setCurrentLanguage(choices[language_options.getSelectedIndex()]);
@@ -175,11 +175,11 @@ public final class MultilingualSupport {
   protected String [] getLanguageList() {
     final String [] choices = new String[languages.keySet().size()];
     final Object[] lang_keys = languages.keySet().toArray();
-
+    
     for(int i=0;i<lang_keys.length;++i) {
       choices[i] = (String)lang_keys[i];
     }
-
+    
     return choices;
   }
 

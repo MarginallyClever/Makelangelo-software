@@ -25,12 +25,12 @@ public class Filter_GeneratorColorBoxes extends Filter {
   C3 [] nexterror=null;
   float stepw=0,steph=0;
   int direction=1;
-
+  
 
   public Filter_GeneratorColorBoxes(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
-
+    
     palette = new ColorPalette();
     palette.addColor(new C3(0,0,0));
     palette.addColor(new C3(255,0,0));
@@ -54,8 +54,8 @@ public class Filter_GeneratorColorBoxes extends Filter {
     }
     tool.writeMoveTo(out1, TX(x), TY(y));
   }
-
-
+  
+  
   private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction, Writer out) throws IOException {
     float w = stepw;
     C3 oldPixel = new C3(0,0,0);
@@ -64,7 +64,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
     int start, end, x;
 
     for(x=0;x<w;++x) nexterror[x].set(0,0,0);
-
+    
     if(direction>0) {
       start=0;
       end=(int)w;
@@ -72,10 +72,10 @@ public class Filter_GeneratorColorBoxes extends Filter {
       start=(int)(w-1);
       end=-1;
     }
-
+    
     // @TODO: make this a parameter
     boolean draw_filled=false;
-
+    
     // for each x from left to right
     for(x=start;x!=end;x+=direction) {
       // oldpixel := pixel[x][y]
@@ -109,7 +109,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
           moveTo(out,x*step4+step2-step1,y*step4+step2-step1,true);
         }
       }
-
+      
       // quant_error := oldpixel - newpixel
       quant_error.set( oldPixel.sub( newPixel ) );
       // pixel[x+1][y  ] += 7/16 * quant_error
@@ -127,13 +127,13 @@ public class Filter_GeneratorColorBoxes extends Filter {
     }
   }
 
-
+  
   // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
   protected C3 takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
     // point sampling
     C3 value = new C3(0,0,0);
     int sum=0;
-
+    
     if(x0<0) x0=0;
     if(x1>image_width-1) x1 = image_width-1;
     if(y0<0) y0=0;
@@ -147,14 +147,14 @@ public class Filter_GeneratorColorBoxes extends Filter {
     }
 
     if(sum==0) return new C3(255,255,255);
-
+    
     return value.mul(1.0f/sum);
   }
-
-
+  
+  
   protected void scan(int tool_index, BufferedImage img, Writer out) throws IOException {
     palette_mask=tool_index;
-
+    
     // "please change to tool X and press any key to continue"
     tool = machine.getTool(tool_index);
     tool.writeChangeTo(out);
@@ -162,7 +162,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
     liftPen(out);
 
     int y;
-
+    
     for(y=0;y<error.length;++y) {
       error[y] = new C3(0,0,0);
       nexterror[y] = new C3(0,0,0);
@@ -171,15 +171,15 @@ public class Filter_GeneratorColorBoxes extends Filter {
     direction=1;
     for(y=0;y<steph;++y) {
       ditherDirection(img, y, error, nexterror, direction, out);
-
+      
       direction = -direction;
       C3 [] tmp = error;
       error=nexterror;
       nexterror=tmp;
     }
   }
-
-
+  
+  
   /**
    * turn the image into a grid of boxes.  box size is affected by source image darkness.
    * @param img the image to convert.
@@ -237,12 +237,12 @@ public class Filter_GeneratorColorBoxes extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

@@ -23,7 +23,7 @@ import javax.swing.JSeparator;
 public class MakelangeloSettingsPanel
 extends JPanel
 implements ActionListener {
-
+    
   /**
    * @see Serializable
    */
@@ -35,8 +35,8 @@ implements ActionListener {
   protected MultilingualSupport translator;
   protected MachineConfiguration machineConfiguration;
   protected MainGUI gui;
-
-
+  
+  
 
     // settings menu
   public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {
@@ -55,13 +55,13 @@ implements ActionListener {
         buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
         buttonAdjustPulleySize.addActionListener(this);
     this.add(buttonAdjustPulleySize);
-
+        
         buttonJogMotors = new JButton(translator.get("JogMotors"));
         buttonJogMotors.addActionListener(this);
     this.add(buttonJogMotors);
 
         this.add(new JSeparator());
-
+        
         buttonChangeTool = new JButton(translator.get("MenuSelectTool"));
         buttonChangeTool.addActionListener(this);
         this.add(buttonChangeTool);
@@ -70,34 +70,34 @@ implements ActionListener {
         buttonAdjustTool.addActionListener(this);
         this.add(buttonAdjustTool);
   }
-
+  
 
 
   protected void jogMotors() {
     JDialog driver = new JDialog(gui.getMainframe(),translator.get("JogMotors"),true);
     driver.setLayout(new GridBagLayout());
     GridBagConstraints c = new GridBagConstraints();
-
+    
     final JButton buttonAneg = new JButton(translator.get("JogIn"));
     final JButton buttonApos = new JButton(translator.get("JogOut"));
     final JCheckBox m1i = new JCheckBox(translator.get("Invert"),machineConfiguration.m1invert);
-
+    
     final JButton buttonBneg = new JButton(translator.get("JogIn"));
     final JButton buttonBpos = new JButton(translator.get("JogOut"));
     final JCheckBox m2i = new JCheckBox(translator.get("Invert"),machineConfiguration.m2invert);
 
     c.gridx=0;  c.gridy=0;  driver.add(new JLabel(translator.get("Left")),c);
     c.gridx=0;  c.gridy=1;  driver.add(new JLabel(translator.get("Right")),c);
-
+    
     c.gridx=1;  c.gridy=0;  driver.add(buttonAneg,c);
     c.gridx=1;  c.gridy=1;  driver.add(buttonBneg,c);
-
+    
     c.gridx=2;  c.gridy=0;  driver.add(buttonApos,c);
     c.gridx=2;  c.gridy=1;  driver.add(buttonBpos,c);
 
     c.gridx=3;  c.gridy=0;  driver.add(m1i,c);
     c.gridx=3;  c.gridy=1;  driver.add(m2i,c);
-
+    
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
@@ -117,13 +117,13 @@ implements ActionListener {
         gui.sendConfig();
       }
     };
-
+    
     buttonApos.addActionListener(driveButtons);
     buttonAneg.addActionListener(driveButtons);
-
+    
     buttonBpos.addActionListener(driveButtons);
     buttonBneg.addActionListener(driveButtons);
-
+    
     m1i.addActionListener(invertButtons);
     m2i.addActionListener(invertButtons);
 
@@ -131,7 +131,7 @@ implements ActionListener {
     driver.pack();
     driver.setVisible(true);
   }
-
+  
   public void updateButtonAccess(boolean isConfirmed,boolean isRunning) {
         buttonAdjustMachineSize.setEnabled(!isRunning);
         buttonAdjustPulleySize.setEnabled(!isRunning);
@@ -139,8 +139,8 @@ implements ActionListener {
         buttonChangeTool.setEnabled(!isRunning);
         buttonAdjustTool.setEnabled(!isRunning);
   }
-
-
+  
+  
   // The user has done something.  respond to it.
   public void actionPerformed(ActionEvent e) {
     Object subject = e.getSource();
@@ -169,5 +169,5 @@ implements ActionListener {
       jogMotors();
       return;
     }
-  }
+  } 
 }

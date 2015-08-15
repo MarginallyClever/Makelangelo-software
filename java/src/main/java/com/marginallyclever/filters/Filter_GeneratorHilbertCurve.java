@@ -24,8 +24,8 @@ public class Filter_GeneratorHilbertCurve extends Filter {
   int order=4; // controls complexity of curve
   float x,y;
 
-
-
+  
+  
   public Filter_GeneratorHilbertCurve(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -33,7 +33,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
 
   @Override
   public String getName() { return translator.get("HilbertCurveName"); }
-
+  
   /**
    * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
    */
@@ -46,16 +46,16 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       lastup=up;
     }
   }
-
-
+  
+  
   public void generate(final String dest) {
     final JTextField field_order = new JTextField(Integer.toString(order));
 
-
+  
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JLabel(translator.get("HilbertCurveOrder")));
     panel.add(field_order);
-
+    
       int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
       xmax = (float)( machine.getPaperWidth() * machine.paperMargin );
@@ -66,7 +66,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       createCurveNow(dest);
       }
   }
-
+  
 
   private void createCurveNow(String dest) {
         try(
@@ -78,7 +78,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       output.write(machine.getConfigLine()+";\n");
       output.write(machine.getBobbinLine()+";\n");
       tool.writeChangeTo(output);
-
+            
       turtle_x=0;
       turtle_y=0;
       turtle_dx=0;
@@ -103,14 +103,14 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       // do the curve
       hilbert(output,order);
       liftPen(output);
-
+      
           output.flush();
           output.close();
     }
     catch(IOException ex) {}
   }
-
-
+  
+  
     // Hilbert curve
     private void hilbert(Writer output, int n) throws IOException {
         if (n == 0) return;
@@ -143,7 +143,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
         hilbert(output,n-1);
         turtle_turn(-90);
     }
-
+    
 
     public void turtle_turn(float degrees) {
       double n = degrees * Math.PI / 180.0;
@@ -155,7 +155,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       turtle_dy = (float)(newy/len);
     }
 
-
+    
     public void turtle_goForward(Writer output) throws IOException {
       //turtle_x += turtle_dx * distance;
       //turtle_y += turtle_dy * distance;

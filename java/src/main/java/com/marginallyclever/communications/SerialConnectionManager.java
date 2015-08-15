@@ -22,7 +22,7 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
   private MachineConfiguration machine;
   private Preferences prefs;
 
-
+  
     public SerialConnectionManager(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
         this.mainGUI = mainGUI;
         this.translator = translator;
@@ -54,13 +54,13 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
         }
         return portsDetected;
     }
-
+    
     /**
      * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
      */
     public MarginallyCleverConnection openConnection(String connectionName) {
        //if(connectionName.equals(recentPort)) return null;
-
+       
        SerialConnection serialConnection = new SerialConnection(mainGUI, translator, machine);
 
          try {
@@ -69,10 +69,10 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
          catch(Exception e) {
          return null;
          }
-
+         
        return serialConnection;
     }
-
+    
 
     // pull the last connected port from prefs
     private void loadRecentPortFromPreferences() {

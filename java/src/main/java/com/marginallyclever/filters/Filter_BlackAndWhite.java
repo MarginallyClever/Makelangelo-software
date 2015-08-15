@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
 
-
+  
 /**
  * Converts an image to N shades of grey.
  * @author Dan
@@ -21,7 +21,7 @@ public class Filter_BlackAndWhite extends Filter {
     super(gui, mc, ms);
     levels = (double)_levels;
   }
-
+  
   @Override
   public BufferedImage process(BufferedImage img) {
     int h = img.getHeight();
@@ -30,7 +30,7 @@ public class Filter_BlackAndWhite extends Filter {
 
     double max_intensity=-1000;
     double min_intensity=1000;
-
+    
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         i=decode(img.getRGB(x, y));
@@ -39,7 +39,7 @@ public class Filter_BlackAndWhite extends Filter {
       }
     }
     double intensity_range = max_intensity - min_intensity;
-
+    
     double ilevels=1;
     if( levels != 0 ) ilevels = 1.0 / levels;
 
@@ -47,13 +47,13 @@ public class Filter_BlackAndWhite extends Filter {
     //System.out.println("max_intensity="+max_intensity);
     //System.out.println("levels="+levels);
     //System.out.println("inverse="+ilevels);
-
+    
     double pixel;
-
+    
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         pixel=decode(img.getRGB(x, y));
-
+        
         double a = (pixel - min_intensity) / intensity_range;
         double c = Math.ceil( a * levels ) * ilevels;
         int b = (int)( c * 255.0 );
@@ -63,10 +63,10 @@ public class Filter_BlackAndWhite extends Filter {
         img.setRGB(x, y, encode(b));
       }
     }
-
+    
     return img;
   }
-
+  
 
   /**
    * An experimental black &#38; white converter that doesn't just greyscale to 4 levels, it also tries to divide by histogram frequency.
@@ -80,13 +80,13 @@ public class Filter_BlackAndWhite extends Filter {
     int w = img.getWidth();
 
     int x,y,i;
-
+    
     double [] histogram = new double[256];
 
     for(i=0;i<256;++i) {
       histogram[i]=0;
     }
-
+    
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         i=decode(img.getRGB(x, y));
@@ -101,8 +101,8 @@ public class Filter_BlackAndWhite extends Filter {
       histogram_area+=histogram[i];
     }
     double histogram_zone = histogram_area / (double)levels;
-    //System.out.println("histogram area: "+histogram_area);
-    //System.out.println("histogram zone: "+histogram_zone);
+    //System.out.println("histogram area: "+histogram_area);    
+    //System.out.println("histogram zone: "+histogram_zone);    
 
     double histogram_sum=0;
     x=0;
@@ -118,10 +118,10 @@ public class Filter_BlackAndWhite extends Filter {
       }
       histogram[i]=x;
     }
-
+    
     //System.out.println("y="+y+" x="+x);
     int pixel, b;
-
+    
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         pixel=decode(img.getRGB(x, y));
@@ -129,7 +129,7 @@ public class Filter_BlackAndWhite extends Filter {
         img.setRGB(x, y, encode(b));
       }
     }
-
+    
     return img;
   }
 }
@@ -141,12 +141,12 @@ public class Filter_BlackAndWhite extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

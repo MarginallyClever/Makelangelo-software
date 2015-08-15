@@ -34,18 +34,18 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
   @Override
   public String getName() { return translator.get("YourMsgHereName"); }
-
+  
   public void generate(String dest) {
     final JTextArea text = new JTextArea(lastMessage,6,60);
-
+  
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JScrollPane(text));
-
+    
       int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
       lastMessage = text.getText();
       createMessage(lastMessage,dest);
-
+      
       // TODO Move to GUI?
       mainGUI.log("<font color='green'>Completed.</font>\n");
       }
@@ -61,7 +61,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
       output.write(machine.getConfigLine()+";\n");
       output.write(machine.getBobbinLine()+";\n");
       tool.writeChangeTo(output);
-
+      
       textSetAlign(Align.CENTER);
       textSetVAlign(VAlign.MIDDLE);
       textCreateMessageNow(lastMessage,output);

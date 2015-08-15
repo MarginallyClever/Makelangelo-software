@@ -11,22 +11,22 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
+ * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
  * @author Dan
  */
 public class Filter_GeneratorSpiral extends Filter {
-
+  
   @Override
   public String getName() { return translator.get("SpiralName"); }
-
+  
   boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
-
-
+  
+  
   public Filter_GeneratorSpiral(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
     super(gui,mc,ms);
   }
-
-
+  
+  
   /**
    * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
    */
@@ -39,8 +39,8 @@ public class Filter_GeneratorSpiral extends Filter {
       lastup=up;
     }
   }
-
-
+  
+  
   /**
    * The main entry point
    * @param img the image to convert.
@@ -48,7 +48,7 @@ public class Filter_GeneratorSpiral extends Filter {
   @Override
   public void convert(BufferedImage img) throws IOException {
     // black and white
-    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
     img = bw.process(img);
 
         try(
@@ -135,12 +135,12 @@ public class Filter_GeneratorSpiral extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

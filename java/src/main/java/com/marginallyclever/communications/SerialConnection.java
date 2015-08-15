@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 /**
- * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation
+ * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation 
  *
  * @author Peter Colapietro
  * @since v7
@@ -16,29 +16,29 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 public final class SerialConnection implements SerialPortEventListener, MarginallyCleverConnection {
     private SerialPort serialPort;
     private static final int BAUD_RATE = 115200;
-
+    
     private String connectionName = new String();
     private boolean portOpened=false;
     private boolean portConfirmed=false;
-
+    
     private String robot_type_name = "DRAWBOT";  // FIXME doesn't belong in connection, should be a higher class
     private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";  // FIXME doesn't belong in connection, should be a higher class
-
+    
     static private String CUE = "> ";
     static private String NOCHECKSUM = "NOCHECKSUM ";
     static private String BADCHECKSUM = "BADCHECKSUM ";
     static private String BADLINENUM = "BADLINENUM ";
-
+    
     // parsing input from Makelangelo
     private String serial_recv_buffer="";
     // prevent repeating pings from appearing in console
     boolean lastLineWasCue=false;
-
+    
     private final MainGUI mainGUI;
     private final MultilingualSupport translator;
     private final MachineConfiguration machine;
 
-
+    
     public SerialConnection(MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
         this.mainGUI = mainGUI;
         this.translator = translator;
@@ -54,8 +54,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
       throw new Exception(e.getMessage());
     }
     }
-
-
+    
+    
     @Override
     public void closeConnection() {
         if(portOpened) {
@@ -104,7 +104,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
               err = Integer.decode(x);
             }
             catch(Exception e) {}
-
+            
             return err;
         }
         if( serial_recv_buffer.lastIndexOf(BADCHECKSUM) != -1 ) {
@@ -115,7 +115,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
               err = Integer.decode(x);
             }
             catch(Exception e) {}
-
+            
             return err;
         }
         if( serial_recv_buffer.lastIndexOf(BADLINENUM) != -1 ) {
@@ -126,7 +126,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
               err = Integer.decode(x);
             }
             catch(Exception e) {}
-
+            
             return err;
         }
 
@@ -162,7 +162,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
         return true;
     }
-
+    
 
     // Deal with something robot has sent.
     @Override
@@ -209,7 +209,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
         }
     }
 
-
+    
     // connect to the last port
     @Override
     public void reconnect() throws Exception {
@@ -252,7 +252,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     public boolean isConnectionOpen() {
         return portOpened;
     }
-
+    
     @Override
     public String getRecentConnection() {
       return connectionName;

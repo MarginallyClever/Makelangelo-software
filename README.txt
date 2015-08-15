@@ -1,6 +1,6 @@
 ##### Makelangelo #####
 
-http://www.makelangelo.com/
+http://www.makelangelo.com/ 
 
 A mural drawing robot and a gentle introduction to 3D printing
 
@@ -19,8 +19,8 @@ https://github.com/MarginallyClever/Makelangelo/wiki/Home/
 
 ## Get help ##
 
-Please visit the forums
-https://marginallyclever.com/forum
+Please visit the forums 
+https://marginallyclever.com/forum 
 
 ## Special thanks ##
 
