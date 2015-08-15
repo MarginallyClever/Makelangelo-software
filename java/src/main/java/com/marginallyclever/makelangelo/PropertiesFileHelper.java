@@ -18,7 +18,7 @@ public final class PropertiesFileHelper {
     /**
      *
      */
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesFileHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesFileHelper.class);
 
     /**
      *
@@ -44,10 +44,10 @@ public final class PropertiesFileHelper {
 
             //get the property value and print it out
             makelangeloVersionPropertyValue = prop.getProperty("makelangelo.version");
-            logger.info("makelangelo.version={}", makelangeloVersionPropertyValue);
+            LOGGER.info("makelangelo.version={}", makelangeloVersionPropertyValue);
 
         } catch (IllegalStateException | IOException ex) {
-            logger.error("{}", ex);
+            LOGGER.error("{}", ex);
         }
         return makelangeloVersionPropertyValue;
     }

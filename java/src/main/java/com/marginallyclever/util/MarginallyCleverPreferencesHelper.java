@@ -23,7 +23,7 @@ final class MarginallyCleverPreferencesHelper {
     /**
      *
      */
-    private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferencesHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MarginallyCleverPreferencesHelper.class);
 
     /**
      *
@@ -41,7 +41,7 @@ final class MarginallyCleverPreferencesHelper {
      */
     public static void main(String[] args) throws BackingStoreException {
         final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-        logger.info("node name: {}", machinesPreferenceNode.name());
+        LOGGER.info("node name: {}", machinesPreferenceNode.name());
         final boolean wereThereCommandLineArguments = args.length > 0;
         if(wereThereCommandLineArguments) {
             final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
@@ -50,7 +50,7 @@ final class MarginallyCleverPreferencesHelper {
                 try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
                     PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
                 } catch (IOException e) {
-                    logger.error("{}", e);
+                    LOGGER.error("{}", e);
                 }
             }
             final boolean wasPurgeFlagFound = wasSearchKeyFoundInArray(PURGE_FLAG, args);
@@ -93,12 +93,12 @@ final class MarginallyCleverPreferencesHelper {
     private static Set<String> getMachineNamesThatAreLessThanZero(String[] childrenPreferenceNodeNames) {
         final Set<String> lessThanZeroNames = new HashSet<>();
         for (String childNodeName : childrenPreferenceNodeNames) {
-            logger.info("child node name: {}", childNodeName);
+            LOGGER.info("child node name: {}", childNodeName);
             Long parsedMachineName = null;
             try {
                 parsedMachineName = Long.parseLong(childNodeName);
             } catch (NumberFormatException e) {
-                logger.error("{}", e);
+                LOGGER.error("{}", e);
             }
             boolean isMachineNameAnInteger = false;
             if(parsedMachineName != null) {
