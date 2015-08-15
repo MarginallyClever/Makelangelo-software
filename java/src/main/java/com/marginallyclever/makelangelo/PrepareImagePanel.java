@@ -1,48 +1,8 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.prefs.Preferences;
-
-import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.kabeja.dxf.Bounds;
-import org.kabeja.dxf.DXFConstants;
-import org.kabeja.dxf.DXFDocument;
-import org.kabeja.dxf.DXFEntity;
-import org.kabeja.dxf.DXFLayer;
-import org.kabeja.dxf.DXFLine;
-import org.kabeja.dxf.DXFPolyline;
-import org.kabeja.dxf.DXFSpline;
-import org.kabeja.dxf.DXFVertex;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.filters.*;
+import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
 import org.kabeja.parser.DXFParser;
@@ -50,19 +10,22 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.Filter;
-import com.marginallyclever.filters.Filter_GeneratorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
-import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
-import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
-import com.marginallyclever.filters.Filter_GeneratorPulse;
-import com.marginallyclever.filters.Filter_GeneratorScanline;
-import com.marginallyclever.filters.Filter_GeneratorSpiral;
-import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
-import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
-import com.marginallyclever.filters.Filter_GeneratorZigZag;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 
 /**

@@ -5,7 +5,6 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;

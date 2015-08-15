@@ -1,10 +1,8 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.text.DecimalFormat;
-
-import javax.swing.JLabel;
 
 
 // manages the status bar at the bottom of the application window

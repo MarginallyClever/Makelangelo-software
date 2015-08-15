@@ -1,8 +1,15 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.drawingtools.DrawingTool_LED;
+import com.marginallyclever.drawingtools.DrawingTool_Pen;
+import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -10,23 +17,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.List;
 import java.util.prefs.Preferences;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.drawingtools.DrawingTool_LED;
-import com.marginallyclever.drawingtools.DrawingTool_Pen;
-import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author dan royer

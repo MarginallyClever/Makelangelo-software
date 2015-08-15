@@ -1,7 +1,7 @@
 package com.marginallyclever.basictypes;
 
 
-import java.awt.Color;
+import java.awt.*;
 
 
 public class C3 {

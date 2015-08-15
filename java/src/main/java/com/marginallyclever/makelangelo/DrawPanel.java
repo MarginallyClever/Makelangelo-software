@@ -1,8 +1,11 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Shape;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLJPanel;
+import com.marginallyclever.drawingtools.DrawingTool;
+
+import javax.swing.event.MouseInputListener;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
@@ -11,17 +14,6 @@ import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.prefs.Preferences;
-
-import javax.swing.event.MouseInputListener;
-
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLPipelineFactory;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLJPanel;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener {

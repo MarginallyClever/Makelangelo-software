@@ -3,17 +3,14 @@ package com.marginallyclever.makelangelo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.

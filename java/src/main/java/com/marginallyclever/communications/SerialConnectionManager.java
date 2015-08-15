@@ -1,12 +1,11 @@
 package com.marginallyclever.communications;
 
-import java.util.prefs.Preferences;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+import jssc.SerialPortList;
 
-import jssc.*;
+import java.util.prefs.Preferences;
 
 /**
  * Lists available serial connections and opens a connection of that type
