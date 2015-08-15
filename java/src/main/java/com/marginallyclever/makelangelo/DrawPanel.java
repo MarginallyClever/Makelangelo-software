@@ -63,42 +63,42 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     private DrawDecorator drawDecorator=null;
     
-	protected MachineConfiguration machine;
+  protected MachineConfiguration machine;
 
-	// optimization - turn gcode into vectors once on load, draw vectors after that.
-	private enum NodeType { COLOR, POS, TOOL };
-	class DrawPanelNode {
-		double x1,y1,x2,y2;
-		Color c;
-		int tool_id;
-		int line_number;
-		NodeType type;
-	}
-	ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
-	
-	
-	public DrawPanel(MachineConfiguration mc) {
-		super();
-		machine = mc;
+  // optimization - turn gcode into vectors once on load, draw vectors after that.
+  private enum NodeType { COLOR, POS, TOOL };
+  class DrawPanelNode {
+    double x1,y1,x2,y2;
+    Color c;
+    int tool_id;
+    int line_number;
+    NodeType type;
+  }
+  ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
+  
+  
+  public DrawPanel(MachineConfiguration mc) {
+    super();
+    machine = mc;
         addMouseMotionListener(this);
         addMouseListener(this);
         addGLEventListener(this);
     }
     
 
-	/**
-	 * Set the current DrawDecorator.
-	 * @param dd the new DrawDecorator
-	 */
-	public void setDecorator(DrawDecorator dd) {
-		drawDecorator = dd;
-		emptyNodeBuffer();
-	}
-	
-	
-	/**
+  /**
+   * Set the current DrawDecorator.
+   * @param dd the new DrawDecorator
+   */
+  public void setDecorator(DrawDecorator dd) {
+    drawDecorator = dd;
+    emptyNodeBuffer();
+  }
+  
+  
+  /**
      * set up the correct projection so the image appears in the right location and aspect ratio.
-	 */
+   */
     @Override
     public void reshape( GLAutoDrawable glautodrawable, int x, int y, int width, int height ) {
         GL2 gl2 = glautodrawable.getGL().getGL2();
@@ -124,7 +124,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 GL gl = drawable.getGL();
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null) );
             } catch (Exception e) {
-            	e.printStackTrace();
+              e.printStackTrace();
             }
         }
 
@@ -134,7 +134,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 GL gl = drawable.getGL();
                 gl = gl.getContext().setGL( GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err } ) );
             } catch (Exception e) {
-            	e.printStackTrace();
+              e.printStackTrace();
             }
         }
     }
@@ -163,72 +163,72 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
     void renderFont(GL2 gl2, String font_name,String text,int size) {
-    	gl2.glPushMatrix();
+      gl2.glPushMatrix();
         gl2.glScalef(0.1f, -0.1f, 1);
         gl2.glLineWidth(3);
         gl2.glPointSize(4);
         
-		Font font = new Font(font_name, Font.PLAIN, size);
-		FontRenderContext frc = new FontRenderContext(null,true,true);
-		TextLayout textLayout = new TextLayout(text,font,frc);
-		Shape s = textLayout.getOutline(null);
-	    PathIterator pi = s.getPathIterator(null);
-    	float [] coords = new float[6];
-    	float [] coords2 = new float[6];
-    	float [] start = new float[6];
-	    while(pi.isDone() == false ) {
-	    	int type = pi.currentSegment(coords);
-	    	switch(type) {
-	    	case PathIterator.SEG_CLOSE:
-	        	gl2.glVertex2f(start[0], start[1]);
-	        	gl2.glEnd();
-	    		break;
-	    	case PathIterator.SEG_LINETO:
-	        	gl2.glVertex2f(coords[0], coords[1]);
-	    		coords2[0] = coords[0];
-	    		coords2[1] = coords[1];
-	    		break;
-	    	case PathIterator.SEG_MOVETO:
-	    		// move without drawing
-	    		start[0] = coords2[0] = coords[0];
-	    		start[1] = coords2[1] = coords[1];
-	        	gl2.glBegin(GL2.GL_LINE_STRIP);
-	        	gl2.glVertex2f(start[0], start[1]);
-	    		break;
-	    	case PathIterator.SEG_CUBICTO:
-	    		for(int i=0;i<10;++i) {
-	    			float t = (float)i/10.0f;
-					// p = a0 + a1*t + a2 * tt + a3*ttt;
-					float tt=t*t;
-					float ttt=tt*t;
-					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
-					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
-					gl2.glVertex2f(x,y);
-	    		}
-				gl2.glVertex2f(coords[4],coords[5]);
-	    		coords2[0] = coords[4];
-	    		coords2[1] = coords[5];
-	    		break;
-	    	case PathIterator.SEG_QUADTO:
-	    		for(int i=0;i<10;++i) {
-	    			float t = (float)i/10.0f;
-		    		//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
-	    			float u = (1.0f-t);
-					float tt=u*u;
-					float ttt=2.0f*t*u;
-					float tttt=t*t;
-					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
-					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					gl2.glVertex2f(x,y);
-	    		}
-				gl2.glVertex2f(coords[2],coords[3]);
-	    		coords2[0] = coords[2];
-	    		coords2[1] = coords[3];
-	    		break;
-	    	}
-	    	pi.next();
-	    }
-	    gl2.glPopMatrix();
+    Font font = new Font(font_name, Font.PLAIN, size);
+    FontRenderContext frc = new FontRenderContext(null,true,true);
+    TextLayout textLayout = new TextLayout(text,font,frc);
+    Shape s = textLayout.getOutline(null);
+      PathIterator pi = s.getPathIterator(null);
+      float [] coords = new float[6];
+      float [] coords2 = new float[6];
+      float [] start = new float[6];
+      while(pi.isDone() == false ) {
+        int type = pi.currentSegment(coords);
+        switch(type) {
+        case PathIterator.SEG_CLOSE:
+            gl2.glVertex2f(start[0], start[1]);
+            gl2.glEnd();
+          break;
+        case PathIterator.SEG_LINETO:
+            gl2.glVertex2f(coords[0], coords[1]);
+          coords2[0] = coords[0];
+          coords2[1] = coords[1];
+          break;
+        case PathIterator.SEG_MOVETO:
+          // move without drawing
+          start[0] = coords2[0] = coords[0];
+          start[1] = coords2[1] = coords[1];
+            gl2.glBegin(GL2.GL_LINE_STRIP);
+            gl2.glVertex2f(start[0], start[1]);
+          break;
+        case PathIterator.SEG_CUBICTO:
+          for(int i=0;i<10;++i) {
+            float t = (float)i/10.0f;
+          // p = a0 + a1*t + a2 * tt + a3*ttt;
+          float tt=t*t;
+          float ttt=tt*t;
+          float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
+          float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
+          gl2.glVertex2f(x,y);
+          }
+        gl2.glVertex2f(coords[4],coords[5]);
+          coords2[0] = coords[4];
+          coords2[1] = coords[5];
+          break;
+        case PathIterator.SEG_QUADTO:
+          for(int i=0;i<10;++i) {
+            float t = (float)i/10.0f;
+            //(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
+            float u = (1.0f-t);
+          float tt=u*u;
+          float ttt=2.0f*t*u;
+          float tttt=t*t;
+          float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
+          float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
+          gl2.glVertex2f(x,y);
+          }
+        gl2.glVertex2f(coords[2],coords[3]);
+          coords2[0] = coords[2];
+          coords2[1] = coords[3];
+          break;
+        }
+        pi.next();
+      }
+      gl2.glPopMatrix();
     }
     
     
@@ -415,32 +415,32 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         if(!connected) {
             gl2.glColor3f(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f);
             gl2.glBegin(GL2.GL_LINE_LOOP);
-			gl2.glVertex2d(machine.limit_left, machine.limit_top);
-			gl2.glVertex2d(machine.limit_right, machine.limit_top);
-			gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
-			gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
+      gl2.glVertex2d(machine.limit_left, machine.limit_top);
+      gl2.glVertex2d(machine.limit_right, machine.limit_top);
+      gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
+      gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
             gl2.glEnd();
             gl2.glColor3f(1,1,1);
             gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.paper_left, machine.paper_top);
-			gl2.glVertex2d(machine.paper_right, machine.paper_top);
-			gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
-			gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+      gl2.glVertex2d(machine.paper_left, machine.paper_top);
+      gl2.glVertex2d(machine.paper_right, machine.paper_top);
+      gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
+      gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
             gl2.glEnd();
         } else {
             gl2.glColor3f(194.0f/255.0f,133.0f/255.0f,71.0f/255.0f);
             gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.limit_left, machine.limit_top);
-			gl2.glVertex2d(machine.limit_right, machine.limit_top);
-			gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
-			gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
+      gl2.glVertex2d(machine.limit_left, machine.limit_top);
+      gl2.glVertex2d(machine.limit_right, machine.limit_top);
+      gl2.glVertex2d(machine.limit_right, machine.limit_bottom);
+      gl2.glVertex2d(machine.limit_left, machine.limit_bottom);
             gl2.glEnd();
             gl2.glColor3f(1,1,1);
             gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.paper_left, machine.paper_top);
-			gl2.glVertex2d(machine.paper_right, machine.paper_top);
-			gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
-			gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+      gl2.glVertex2d(machine.paper_left, machine.paper_top);
+      gl2.glVertex2d(machine.paper_right, machine.paper_top);
+      gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
+      gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
             gl2.glEnd();
         }
     }
@@ -457,35 +457,35 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     
     public void repaintNow() {
-    	validate();
-    	repaint();
+      validate();
+      repaint();
     }
-	
-	public void render( GL2 gl2 ) {
-		paintBackground(gl2);
-		paintCamera(gl2);
-		
-		paintLimits(gl2);
-		paintCenter(gl2);
-		
-		if(drawDecorator!=null) {
-			drawDecorator.render(gl2,machine);
-			return;
-		}
-		
-		// TODO draw left motor, right motor, and control box
-		// TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
+  
+  public void render( GL2 gl2 ) {
+    paintBackground(gl2);
+    paintCamera(gl2);
+    
+    paintLimits(gl2);
+    paintCenter(gl2);
+    
+    if(drawDecorator!=null) {
+      drawDecorator.render(gl2,machine);
+      return;
+    }
+    
+    // TODO draw left motor, right motor, and control box
+    // TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
 
-		optimizeNodes();
-		
-		DrawingTool tool = machine.getTool(0);
-		
+    optimizeNodes();
+    
+    DrawingTool tool = machine.getTool(0);
+    
         gl2.glColor3f(0, 0, 0);
 
         // draw image        
         if(fast_nodes.size()>0) {
             // draw the nodes
-        	Iterator<DrawPanelNode> nodes = fast_nodes.iterator();
+          Iterator<DrawPanelNode> nodes = fast_nodes.iterator();
             while(nodes.hasNext()) {
                 DrawPanelNode n=nodes.next();
 
@@ -548,32 +548,32 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         
     }
 
-	private void optimizeNodes() {
-		if(instructions == null) return;
-		if(instructions.changed==false) return;
-		instructions.changed=false;
-		
-		emptyNodeBuffer();
-		
-		DrawingTool tool = machine.getTool(0);
-		
-		drawScale=0.1f;
-		
-		float px=0,py=0,pz=90;
-		//float oldz=pz;
-		float x,y,z,ai,aj;
-		int i,j;
-		boolean absMode=true;
-		String tool_change="M06 T";
-		Color tool_color=Color.BLACK;
-		
-		Iterator<String> commands = instructions.lines.iterator();
-		i=0;
-		while(commands.hasNext()) {
-			String line = commands.next();
-			++i;
-			String[] pieces=line.split(";");
-			if(pieces.length==0) continue;
+  private void optimizeNodes() {
+    if(instructions == null) return;
+    if(instructions.changed==false) return;
+    instructions.changed=false;
+    
+    emptyNodeBuffer();
+    
+    DrawingTool tool = machine.getTool(0);
+    
+    drawScale=0.1f;
+    
+    float px=0,py=0,pz=90;
+    //float oldz=pz;
+    float x,y,z,ai,aj;
+    int i,j;
+    boolean absMode=true;
+    String tool_change="M06 T";
+    Color tool_color=Color.BLACK;
+    
+    Iterator<String> commands = instructions.lines.iterator();
+    i=0;
+    while(commands.hasNext()) {
+      String line = commands.next();
+      ++i;
+      String[] pieces=line.split(";");
+      if(pieces.length==0) continue;
 
             if(line.startsWith(tool_change)) {
                 String numberOnly= line.substring(tool_change.length()).replaceAll("[^0-9]", "");
@@ -629,21 +629,21 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             // is pen up or down?
             //if(oldz!=z)
             {
-            	//oldz=z;
-	            tool.drawZ(z);
-	            if(tool.isDrawOff()) {
-	                if(show_pen_up==false) {
-	                    px=x;
-	                    py=y;
-	                    pz=z;
-	                    continue;
-	                }
-	                addNodeColor(i, Color.BLUE );
-	            } else if(tool.isDrawOn()) {
-	                addNodeColor(i, tool_color );  // TODO use actual pen color
-	            } else {
-	                addNodeColor(i, Color.ORANGE );
-	            }
+              //oldz=z;
+              tool.drawZ(z);
+              if(tool.isDrawOff()) {
+                  if(show_pen_up==false) {
+                      px=x;
+                      py=y;
+                      pz=z;
+                      continue;
+                  }
+                  addNodeColor(i, Color.BLUE );
+              } else if(tool.isDrawOn()) {
+                  addNodeColor(i, tool_color );  // TODO use actual pen color
+              } else {
+                  addNodeColor(i, Color.ORANGE );
+              }
             }
             
             // what kind of motion are we going to make?

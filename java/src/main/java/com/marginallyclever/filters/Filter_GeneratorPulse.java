@@ -18,83 +18,83 @@ import javax.swing.JTextField;
 
 
 public class Filter_GeneratorPulse extends Filter {
-	float blockScale=4.0f;
-	int direction=0;
-	
-	public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
-			MultilingualSupport ms) {
-		super(gui, mc, ms);
-	}
+  float blockScale=4.0f;
+  int direction=0;
+  
+  public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
+      MultilingualSupport ms) {
+    super(gui, mc, ms);
+  }
 
-	@Override
-	public String getName() { return translator.get("PulseLineName"); }
+  @Override
+  public String getName() { return translator.get("PulseLineName"); }
 
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastup=up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
-	
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
-		// point sampling
-		int value=0;
-		int sum=0;
-		
-		if(x0<0) x0=0;
-		if(x1>image_width-1) x1 = image_width-1;
-		if(y0<0) y0=0;
-		if(y1>image_height-1) y1 = image_height-1;
+  /**
+   * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
+   */
+  @Override
+  protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
+    if(lastup!=up) {
+      if(up) liftPen(out);
+      else   lowerPen(out);
+      lastup=up;
+    }
+    tool.writeMoveTo(out, TX(x), TY(y));
+  }
+  
+  // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
+  protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
+    // point sampling
+    int value=0;
+    int sum=0;
+    
+    if(x0<0) x0=0;
+    if(x1>image_width-1) x1 = image_width-1;
+    if(y0<0) y0=0;
+    if(y1>image_height-1) y1 = image_height-1;
 
-		for(int y=y0;y<y1;++y) {
-			for(int x=x0;x<x1;++x) {
-				value += sample1x1(img,x, y);
-				++sum;
-			}
-		}
+    for(int y=y0;y<y1;++y) {
+      for(int x=x0;x<x1;++x) {
+        value += sample1x1(img,x, y);
+        ++sum;
+      }
+    }
 
-		if(sum==0) return 255;
-		
-		return value/sum;
-	}
-	
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 * @param img the image to convert.
-	 */
-	@Override
-	public void convert(BufferedImage img) throws IOException {
-		final JTextField field_size = new JTextField(Float.toString(blockScale));
+    if(sum==0) return 255;
+    
+    return value/sum;
+  }
+  
+  /**
+   * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+   * @param img the image to convert.
+   */
+  @Override
+  public void convert(BufferedImage img) throws IOException {
+    final JTextField field_size = new JTextField(Float.toString(blockScale));
 
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(translator.get("HilbertCurveSize")));
-		panel.add(field_size);
-		
-		String [] directions = { "horizontal", "vertical" };
-		final JComboBox<String> direction_choices = new JComboBox<String>(directions);
-		panel.add(direction_choices);
-		
-	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	    if (result == JOptionPane.OK_OPTION) {
-	    	blockScale = Float.parseFloat(field_size.getText());
-	    	direction = direction_choices.getSelectedIndex();
-			convertNow(img);
-	    }
-	}
-	
-	private void convertNow(BufferedImage img) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.process(img);
+    JPanel panel = new JPanel(new GridLayout(0,1));
+    panel.add(new JLabel(translator.get("HilbertCurveSize")));
+    panel.add(field_size);
+    
+    String [] directions = { "horizontal", "vertical" };
+    final JComboBox<String> direction_choices = new JComboBox<String>(directions);
+    panel.add(direction_choices);
+    
+      int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      if (result == JOptionPane.OK_OPTION) {
+        blockScale = Float.parseFloat(field_size.getText());
+        direction = direction_choices.getSelectedIndex();
+      convertNow(img);
+      }
+  }
+  
+  private void convertNow(BufferedImage img) throws IOException {
+    // The picture might be in color.  Smash it to 255 shades of grey.
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+    img = bw.process(img);
 
-		// Open the destination file
+    // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
         final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
@@ -262,7 +262,7 @@ public class Filter_GeneratorPulse extends Filter {
             signName(out);
             tool.writeMoveTo(out, 0, 0);
         }
-	}
+  }
 }
 
 

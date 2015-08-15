@@ -9,26 +9,26 @@ import java.awt.image.BufferedImage;
  * @since 7.1.4-SNAPSHOT?
  */
 public class Histogram {
-	public char [] red = new char[256];
-	public char [] green = new char[256];
-	public char [] blue = new char[256];
+  public char [] red = new char[256];
+  public char [] green = new char[256];
+  public char [] blue = new char[256];
 
-	public Histogram() {}
-	
-	public void getHistogramOf(BufferedImage img) {
-		int w = img.getWidth();
-		int h = img.getHeight();
-		int x, y;
-		
-		for(y=0;y<h;++y) {
-			for(x=0;x<w;++x) {
-				Color c = new Color(img.getRGB(x,y));
-				red[c.getRed()]++;
-				green[c.getGreen()]++;
-				blue[c.getBlue()]++;
-			}
-		}
-	}
+  public Histogram() {}
+  
+  public void getHistogramOf(BufferedImage img) {
+    int w = img.getWidth();
+    int h = img.getHeight();
+    int x, y;
+    
+    for(y=0;y<h;++y) {
+      for(x=0;x<w;++x) {
+        Color c = new Color(img.getRGB(x,y));
+        red[c.getRed()]++;
+        green[c.getGreen()]++;
+        blue[c.getBlue()]++;
+      }
+    }
+  }
 }
 
 

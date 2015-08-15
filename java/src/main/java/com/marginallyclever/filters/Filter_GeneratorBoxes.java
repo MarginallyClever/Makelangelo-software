@@ -11,61 +11,61 @@ import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorBoxes extends Filter {
-	public Filter_GeneratorBoxes(MainGUI gui, MachineConfiguration mc,
-			MultilingualSupport ms) {
-		super(gui, mc, ms);
-	}
+  public Filter_GeneratorBoxes(MainGUI gui, MachineConfiguration mc,
+      MultilingualSupport ms) {
+    super(gui, mc, ms);
+  }
 
-	@Override
-	public String getName() { return translator.get("BoxGeneratorName"); }
+  @Override
+  public String getName() { return translator.get("BoxGeneratorName"); }
 
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastup=up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
-	
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
-		// point sampling
-		int value=0;
-		int sum=0;
-		
-		if(x0<0) x0=0;
-		if(x1>image_width-1) x1 = image_width-1;
-		if(y0<0) y0=0;
-		if(y1>image_height-1) y1 = image_height-1;
+  /**
+   * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
+   */
+  @Override
+  protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
+    if(lastup!=up) {
+      if(up) liftPen(out);
+      else   lowerPen(out);
+      lastup=up;
+    }
+    tool.writeMoveTo(out, TX(x), TY(y));
+  }
+  
+  // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
+  protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
+    // point sampling
+    int value=0;
+    int sum=0;
+    
+    if(x0<0) x0=0;
+    if(x1>image_width-1) x1 = image_width-1;
+    if(y0<0) y0=0;
+    if(y1>image_height-1) y1 = image_height-1;
 
-		for(int y=y0;y<y1;++y) {
-			for(int x=x0;x<x1;++x) {
-				value += sample1x1(img,x, y);
-				++sum;
-			}
-		}
+    for(int y=y0;y<y1;++y) {
+      for(int x=x0;x<x1;++x) {
+        value += sample1x1(img,x, y);
+        ++sum;
+      }
+    }
 
-		if(sum==0) return 255;
-		
-		return value/sum;
-	}
-	
-	/**
-	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
-	 * @param img the image to convert.
-	 */
-	@Override
-	public void convert(BufferedImage img) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.process(img);
+    if(sum==0) return 255;
+    
+    return value/sum;
+  }
+  
+  /**
+   * turn the image into a grid of boxes.  box size is affected by source image darkness.
+   * @param img the image to convert.
+   */
+  @Override
+  public void convert(BufferedImage img) throws IOException {
+    // The picture might be in color.  Smash it to 255 shades of grey.
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+    img = bw.process(img);
 
-		// Open the destination file
+    // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
         final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
@@ -137,7 +137,7 @@ public class Filter_GeneratorBoxes extends Filter {
             signName(out);
             tool.writeMoveTo(out, 0, 0);
         }
-	}
+  }
 }
 
 

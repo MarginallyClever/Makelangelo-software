@@ -14,84 +14,84 @@ import java.awt.image.BufferedImage;
  * @author Dan
  */
 public class Filter_Resize extends Filter {
-	protected int maxWidth, maxHeight;
+  protected int maxWidth, maxHeight;
 
 
-	public Filter_Resize(MainGUI gui, MachineConfiguration mc,
-			MultilingualSupport ms) {
-		super(gui, mc, ms);
-		maxWidth=1000;
-		maxHeight=1000;
-	}
+  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+      MultilingualSupport ms) {
+    super(gui, mc, ms);
+    maxWidth=1000;
+    maxHeight=1000;
+  }
 
-	public Filter_Resize(MainGUI gui, MachineConfiguration mc,
-			MultilingualSupport ms,int max_width,int max_height) {
-		super(gui, mc, ms);
-		maxWidth=max_width;
-		maxHeight=max_height;
-		//maxWidth=1000;
-		//maxHeight=1000;
-	}
+  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+      MultilingualSupport ms,int max_width,int max_height) {
+    super(gui, mc, ms);
+    maxWidth=max_width;
+    maxHeight=max_height;
+    //maxWidth=1000;
+    //maxHeight=1000;
+  }
 
-	
-	protected BufferedImage scaleImage(BufferedImage img, int width, int height) {
-	    BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D g = newImage.createGraphics();
-	    try {
-	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-	                           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-	        g.setBackground(Color.WHITE);
-	        g.clearRect(0, 0, width, height);
-	        if(machine.reverseForGlass) {
-	        	g.drawImage(img, width, 0, 0, height, 0,0,img.getWidth(),img.getHeight(), null);
-	        } else {
-	        	g.drawImage(img, 0, 0, width, height, null);
-	        }
-	    } finally {
-	        g.dispose();
-	    }
-	    return newImage;
-	}
+  
+  protected BufferedImage scaleImage(BufferedImage img, int width, int height) {
+      BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+      Graphics2D g = newImage.createGraphics();
+      try {
+          g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                             RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+          g.setBackground(Color.WHITE);
+          g.clearRect(0, 0, width, height);
+          if(machine.reverseForGlass) {
+            g.drawImage(img, width, 0, 0, height, 0,0,img.getWidth(),img.getHeight(), null);
+          } else {
+            g.drawImage(img, 0, 0, width, height, null);
+          }
+      } finally {
+          g.dispose();
+      }
+      return newImage;
+  }
 
-	@Override
-	public BufferedImage process(BufferedImage img) {
-		int w = img.getWidth();
-		int h = img.getHeight();
-		
-		// cap the max_w and max_h so that enormous drawbot images don't break the software.
-		double paper_w= machine.getPaperWidth();
-		double paper_h= machine.getPaperHeight();
+  @Override
+  public BufferedImage process(BufferedImage img) {
+    int w = img.getWidth();
+    int h = img.getHeight();
+    
+    // cap the max_w and max_h so that enormous drawbot images don't break the software.
+    double paper_w= machine.getPaperWidth();
+    double paper_h= machine.getPaperHeight();
 
-		int max_w=maxWidth;
-		int max_h=maxHeight;
-		if(paper_w>paper_h) {
-			max_h *= paper_h/paper_w;
-		} else {
-			max_w *= paper_w/paper_h;
-		}
+    int max_w=maxWidth;
+    int max_h=maxHeight;
+    if(paper_w>paper_h) {
+      max_h *= paper_h/paper_w;
+    } else {
+      max_w *= paper_w/paper_h;
+    }
 
-		// adjust up
-		if(w<max_w && h<max_h) {
-			if(w>h) {
-				h*=(float)max_w/(float)w;
-				w=max_w;
-			} else {
-				w*=(float)max_h/(float)h;
-				h=max_h;
-			}
-		}
-		// adjust down
-		if(w>max_w) {
-			h*=(float)max_w/(float)w;
-			w=max_w;
-		}
-		if(h>max_h) {
-			w*=(float)max_h/(float)h;
-			h=max_h;
-		}
-		// now scale the image
-		return scaleImage(img, w,h);
-	}
+    // adjust up
+    if(w<max_w && h<max_h) {
+      if(w>h) {
+        h*=(float)max_w/(float)w;
+        w=max_w;
+      } else {
+        w*=(float)max_h/(float)h;
+        h=max_h;
+      }
+    }
+    // adjust down
+    if(w>max_w) {
+      h*=(float)max_w/(float)w;
+      w=max_w;
+    }
+    if(h>max_h) {
+      w*=(float)max_h/(float)h;
+      h=max_h;
+    }
+    // now scale the image
+    return scaleImage(img, w,h);
+  }
 }
 
 /**
