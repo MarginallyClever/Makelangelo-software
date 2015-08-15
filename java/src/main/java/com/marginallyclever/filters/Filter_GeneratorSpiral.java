@@ -15,41 +15,41 @@ import java.nio.charset.StandardCharsets;
  * @author Dan
  */
 public class Filter_GeneratorSpiral extends Filter {
-	
-	@Override
-	public String getName() { return translator.get("SpiralName"); }
-	
-	boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
-	
-	
-	public Filter_GeneratorSpiral(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
-		super(gui,mc,ms);
-	}
-	
-	
-	/**
-	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-		tool.writeMoveTo(out, TX(x), TY(y));
-		if(lastup!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastup=up;
-		}
-	}
-	
-	
-	/**
-	 * The main entry point
-	 * @param img the image to convert.
-	 */
-	@Override
-	public void convert(BufferedImage img) throws IOException {
-		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
-		img = bw.process(img);
+  
+  @Override
+  public String getName() { return translator.get("SpiralName"); }
+  
+  boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
+  
+  
+  public Filter_GeneratorSpiral(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+    super(gui,mc,ms);
+  }
+  
+  
+  /**
+   * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
+   */
+  @Override
+  protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
+    tool.writeMoveTo(out, TX(x), TY(y));
+    if(lastup!=up) {
+      if(up) liftPen(out);
+      else   lowerPen(out);
+      lastup=up;
+    }
+  }
+  
+  
+  /**
+   * The main entry point
+   * @param img the image to convert.
+   */
+  @Override
+  public void convert(BufferedImage img) throws IOException {
+    // black and white
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
+    img = bw.process(img);
 
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);

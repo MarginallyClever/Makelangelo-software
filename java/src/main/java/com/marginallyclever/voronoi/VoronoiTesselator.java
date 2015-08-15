@@ -79,10 +79,10 @@ public class VoronoiTesselator {
     public VoronoiTesselator() {}
 
     public void Init(double minDistanceBetweenSites) {
-		siteidx = 0;
-		this.sites = null;
-		this.allEdges = null;
-		this.minDistanceBetweenSites = minDistanceBetweenSites;
+    siteidx = 0;
+    this.sites = null;
+    this.allEdges = null;
+    this.minDistanceBetweenSites = minDistanceBetweenSites;
     }
     
     /**
@@ -167,7 +167,7 @@ public class VoronoiTesselator {
             @Override
             public final int compare(VoronoiSite p1, VoronoiSite p2)
             {
-            	Point2D s1 = p1.coord, s2 = p2.coord;
+              Point2D s1 = p1.coord, s2 = p2.coord;
                 if (s1.y < s2.y)
                 {
                     return (-1);
@@ -372,7 +372,7 @@ public class VoronoiTesselator {
 
     private Point2D PQ_min()
     {
-    	Point2D answer = new Point2D();
+      Point2D answer = new Point2D();
 
         while (PQhash[PQmin].PQnext == null)
         {

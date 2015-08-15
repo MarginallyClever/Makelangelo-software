@@ -1,772 +1,772 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
-	<meta>
-		<name>Deutsch</name>
-		<author>https://www.fiverr.com/erminho</author>
-	</meta>
+  <meta>
+    <name>Deutsch</name>
+    <author>https://www.fiverr.com/erminho</author>
+  </meta>
 
-	<string>
-		<key>Abbrechen</key>
-		<value>Abbrechen</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>Speichern</key>
-		<value>Speichern</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>Load</key>
-		<value>Load</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>CouldNotFind</key>
-		<value>konnte nicht gefunden</value>
-		<hint>wie in "konnte nicht gefunden FILEX". Halten Sie die Leerzeichen am Ende</hint>
-	</string>
-	<string>
-		<key>Maschinenbreite</key>
-		<value> Maschine breite</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>MachineHohe</key>
-		<value>Maschinenhöhe</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>PaperWidth</key>
-		<value>Papierbreite</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>PaperHeight</key>
-		<value> Papier Höhe</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>InvertLeft</key>
-		<value>Invertieren links</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>InvertRight</key>
-		<value>Invertieren recht</value>
-		<hint>Die Maschine einstellen Einstellungen</hint>
-	</string>
-	<string>
-		<key>Tooltypes</key>
-		<value> Werkzeug Typ</value>
-		<hint>Tool settings</hint>
-	</string>
-	<string>
-		<key>AdjustPulleySize</key>
-		<value>Einstellung Riemenscheibe size</value>
-		<hint>die verstellbaren Riemenscheiben</hint>
-	</string>
-	<string>
-		<key>Links</key>
-		<value>Links</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>Rechts</key>
-		<value>Rechts</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>Durchmesser</key>
-		<value>Durchmesser</value>
-		<hint>die verstellbaren Riemenscheiben</hint>
-	</string>
-	<string>
-		<key>Millimeter</key>
-		<value> mm</value>
-		<hint></hint>
-	</string>
+  <string>
+    <key>Abbrechen</key>
+    <value>Abbrechen</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>Speichern</key>
+    <value>Speichern</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>Load</key>
+    <value>Load</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>CouldNotFind</key>
+    <value>konnte nicht gefunden</value>
+    <hint>wie in "konnte nicht gefunden FILEX". Halten Sie die Leerzeichen am Ende</hint>
+  </string>
+  <string>
+    <key>Maschinenbreite</key>
+    <value> Maschine breite</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>MachineHohe</key>
+    <value>Maschinenhöhe</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>PaperWidth</key>
+    <value>Papierbreite</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>PaperHeight</key>
+    <value> Papier Höhe</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>InvertLeft</key>
+    <value>Invertieren links</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>InvertRight</key>
+    <value>Invertieren recht</value>
+    <hint>Die Maschine einstellen Einstellungen</hint>
+  </string>
+  <string>
+    <key>Tooltypes</key>
+    <value> Werkzeug Typ</value>
+    <hint>Tool settings</hint>
+  </string>
+  <string>
+    <key>AdjustPulleySize</key>
+    <value>Einstellung Riemenscheibe size</value>
+    <hint>die verstellbaren Riemenscheiben</hint>
+  </string>
+  <string>
+    <key>Links</key>
+    <value>Links</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>Rechts</key>
+    <value>Rechts</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>Durchmesser</key>
+    <value>Durchmesser</value>
+    <hint>die verstellbaren Riemenscheiben</hint>
+  </string>
+  <string>
+    <key>Millimeter</key>
+    <value> mm</value>
+    <hint></hint>
+  </string>
 
-	<string>
-		<key>ConnectierenZum</key>
-		<value> Verbinden </value>
-		<hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
-	<string>
-		<key>PortNichtKonfiguriert</key>
-		<value> Port konnte nicht konfiguriert werden: </value>
-		<hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
-	<string>
-		<key>PortOffnung</key>
-		<value> Port geöffnet.</value>
-		<hint>Status Meldung</hint>
-	</string>
-	<string>
-		<key>TitlePrefix</key>
-		<value>Makelangelo #</value>
-		<hint>Fenstertitel</hint>
-	</string>
-	<string>
-		<key>TitlePostfix</key>
-		<value> angeschlossen</value>
-		<hint>Fenstertitel</hint>
-	</string>
+  <string>
+    <key>ConnectierenZum</key>
+    <value> Verbinden </value>
+    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
+  <string>
+    <key>PortNichtKonfiguriert</key>
+    <value> Port konnte nicht konfiguriert werden: </value>
+    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
+  <string>
+    <key>PortOffnung</key>
+    <value> Port geöffnet.</value>
+    <hint>Status Meldung</hint>
+  </string>
+  <string>
+    <key>TitlePrefix</key>
+    <value>Makelangelo #</value>
+    <hint>Fenstertitel</hint>
+  </string>
+  <string>
+    <key>TitlePostfix</key>
+    <value> angeschlossen</value>
+    <hint>Fenstertitel</hint>
+  </string>
 
-	<string>
-		<key>Liniensegmente</key>
-		<value> Liniensegmente.</value>
-		<hint>Status Meldung</hint>
-	</string>
-	<string>
-		<key>Zentimeter</key>
-		<value> cm</value>
-		<hint></hint>
-	</string>
+  <string>
+    <key>Liniensegmente</key>
+    <value> Liniensegmente.</value>
+    <hint>Status Meldung</hint>
+  </string>
+  <string>
+    <key>Zentimeter</key>
+    <value> cm</value>
+    <hint></hint>
+  </string>
 
-	<string>
-		<key>zeichnenZeit</key>
-		<value> Geschätzte zeichnen Zeit: </value>
-		<hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
+  <string>
+    <key>zeichnenZeit</key>
+    <value> Geschätzte zeichnen Zeit: </value>
+    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
 
-	<string>
-		<key>FileNotOpened</key>
-		<value>Datei konnte nicht geöffnet werden: </value>
-		<hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
+  <string>
+    <key>FileNotOpened</key>
+    <value>Datei konnte nicht geöffnet werden: </value>
+    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
 
-	<string>
-		<key>ConversionOptions</key>
-		<value>Konvertierungsoptionen</value>
-		<hint>Dialog Titel</hint>
-	</string>
-	<string>
-		<key>FlipForGlass</key>
-		<value> Flip für Glas</value>
-		<hint>Konvertierungsoptionen</hint>
-	</string>
+  <string>
+    <key>ConversionOptions</key>
+    <value>Konvertierungsoptionen</value>
+    <hint>Dialog Titel</hint>
+  </string>
+  <string>
+    <key>FlipForGlass</key>
+    <value> Flip für Glas</value>
+    <hint>Konvertierungsoptionen</hint>
+  </string>
 
-	<string>
-		<key>Abbrechen</key>
-		<value>Abbrechen</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
-	<string>
-		<key>ANFANG</key>
-		<value>ANFANG</value>
-		<hint>Wie in "Zeichnung starten"</hint>
-	</string>
-	<string>
-		<key>Speichern</key>
-		<value>Speichern</value>
-		<hint>verwendet in vielen Orten</hint>
-	</string>
+  <string>
+    <key>Abbrechen</key>
+    <value>Abbrechen</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
+  <string>
+    <key>ANFANG</key>
+    <value>ANFANG</value>
+    <hint>Wie in "Zeichnung starten"</hint>
+  </string>
+  <string>
+    <key>Speichern</key>
+    <value>Speichern</value>
+    <hint>verwendet in vielen Orten</hint>
+  </string>
 
-	<string>
-		<key>PaperMargin</key>
-		<value> Marge auf Papier Rand (%)</value>
-		<hint>Konvertierungsoptionen</hint>
-	</string>
-	<string>
-		<key>konvertieren</key>
-		<value> Konvertieren</value>
-		<hint>Status aktualisieren</hint>
-	</string>
-	<string>
-		<key>Fertig</key>
-		<value>erledigt</value>
-		<hint>Status aktualisieren</hint>
-	</string>
-	<string>
-		<key>abgebrochen</key>
-		<value>abgebrochen</value>
-		<hint>Status aktualisieren</hint>
-	</string>
-	<string>
-		<key>FEHLGESCHLAGEN</key>
-		<value>fehlgeschlagen: </value>
-		<hint>Status aktualisieren. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
+  <string>
+    <key>PaperMargin</key>
+    <value> Marge auf Papier Rand (%)</value>
+    <hint>Konvertierungsoptionen</hint>
+  </string>
+  <string>
+    <key>konvertieren</key>
+    <value> Konvertieren</value>
+    <hint>Status aktualisieren</hint>
+  </string>
+  <string>
+    <key>Fertig</key>
+    <value>erledigt</value>
+    <hint>Status aktualisieren</hint>
+  </string>
+  <string>
+    <key>abgebrochen</key>
+    <value>abgebrochen</value>
+    <hint>Status aktualisieren</hint>
+  </string>
+  <string>
+    <key>FEHLGESCHLAGEN</key>
+    <value>fehlgeschlagen: </value>
+    <hint>Status aktualisieren. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
 
-	<string>
-		<key>ConversionStyle</key>
-		<value> Konvertierung style</value>
-		<hint>Konvertierungsoptionen</hint>
-	</string>
+  <string>
+    <key>ConversionStyle</key>
+    <value> Konvertierung style</value>
+    <hint>Konvertierungsoptionen</hint>
+  </string>
 
-	<string>
-		<key>OpeningFile</key>
-		<value>Öffnen </value>
-		<hint>Status aktualisieren. Halten Sie das Leerzeichen am Ende</hint>
-	</string>
-	<string>
-		<key>UnknownFileType</key>
-		<value> Unbekannter Dateityp</value>
-		<hint>Status aktualisieren</hint>
-	</string>
-	<string>
-		<key>SetPaperSize</key>
-		<value>Bitte stellen Sie ein Papierformat vor dem Import eines Bildes.</value>
-		<hint>Warnmeldung</hint>
-	</string>
+  <string>
+    <key>OpeningFile</key>
+    <value>Öffnen </value>
+    <hint>Status aktualisieren. Halten Sie das Leerzeichen am Ende</hint>
+  </string>
+  <string>
+    <key>UnknownFileType</key>
+    <value> Unbekannter Dateityp</value>
+    <hint>Status aktualisieren</hint>
+  </string>
+  <string>
+    <key>SetPaperSize</key>
+    <value>Bitte stellen Sie ein Papierformat vor dem Import eines Bildes.</value>
+    <hint>Warnmeldung</hint>
+  </string>
 
-	<string>
-		<key>FileTypeGCode</key>
-		<value>GCODE (NGC)</value>
-		<hint>Datei Öffnen Dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeImage</key>
-		<value>Bild (jpg/bmp/png/gif)</value>
-		<hint>Datei Öffnen Dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value> DXF R12 (dxf)</value>
-		<hint>Datei Öffnen Dialog</hint>
-	</string>
+  <string>
+    <key>FileTypeGCode</key>
+    <value>GCODE (NGC)</value>
+    <hint>Datei Öffnen Dialog</hint>
+  </string>
+  <string>
+    <key>FileTypeImage</key>
+    <value>Bild (jpg/bmp/png/gif)</value>
+    <hint>Datei Öffnen Dialog</hint>
+  </string>
+  <string>
+    <key>FileTypeDXF</key>
+    <value> DXF R12 (dxf)</value>
+    <hint>Datei Öffnen Dialog</hint>
+  </string>
 
-	<string>
-		<key>MenuSoundsTitle</key>
-		<value>Sounds</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuSoundsConnect</key>
-		<value>verbinden</value>
-		<hint>Ton einstellungen Dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsDisconnect</key>
-		<value> Trennen</value>
-		<hint>Ton einstellungen Dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsFinishConvert</key>
-		<value> Beendung konvertieren</value>
-		<hint>Ton einstellungen Dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsFinishDraw</key>
-		<value>Zeichnung beenden</value>
-		<hint>Ton einstellungen Dialog</hint>
-	</string>
+  <string>
+    <key>MenuSoundsTitle</key>
+    <value>Sounds</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuSoundsConnect</key>
+    <value>verbinden</value>
+    <hint>Ton einstellungen Dialog</hint>
+  </string>
+  <string>
+    <key>MenuSoundsDisconnect</key>
+    <value> Trennen</value>
+    <hint>Ton einstellungen Dialog</hint>
+  </string>
+  <string>
+    <key>MenuSoundsFinishConvert</key>
+    <value> Beendung konvertieren</value>
+    <hint>Ton einstellungen Dialog</hint>
+  </string>
+  <string>
+    <key>MenuSoundsFinishDraw</key>
+    <value>Zeichnung beenden</value>
+    <hint>Ton einstellungen Dialog</hint>
+  </string>
 
-	<string>
-		<key>MenuGraphicsTitle</key>
-		<value>Grafik</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuGraphicsPenUp</key>
-		<value> Show Pen up bewegt</value>
-		<hint>Graphics Settings Dialog</hint>
-	</string>
-	<string>
-		<key>MenuGraphicsAntialias</key>
-		<value> Antialias Zeilen</value>
-		<hint>Graphics Settings Dialog</hint>
-	</string>
-	<string>
-		<key>MenuGraphicsSpeedVSQuality</key>
-		<value> Geschwindigkeit über Qualität</value>
-		<hint>Graphics Settings Dialog</hint>
-	</string>
-	<string>
-		<key>MenuGraphicsDrawWhileRunning</key>
-		<value>zeigen gesamte Bild beim Zeichnen</value>
-		<hint>Graphics Settings Dialog</hint>
-	</string>
+  <string>
+    <key>MenuGraphicsTitle</key>
+    <value>Grafik</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuGraphicsPenUp</key>
+    <value> Show Pen up bewegt</value>
+    <hint>Graphics Settings Dialog</hint>
+  </string>
+  <string>
+    <key>MenuGraphicsAntialias</key>
+    <value> Antialias Zeilen</value>
+    <hint>Graphics Settings Dialog</hint>
+  </string>
+  <string>
+    <key>MenuGraphicsSpeedVSQuality</key>
+    <value> Geschwindigkeit über Qualität</value>
+    <hint>Graphics Settings Dialog</hint>
+  </string>
+  <string>
+    <key>MenuGraphicsDrawWhileRunning</key>
+    <value>zeigen gesamte Bild beim Zeichnen</value>
+    <hint>Graphics Settings Dialog</hint>
+  </string>
 
-	<string>
-		<key>MenuLanguageTitle</key>
-		<value>Sprache</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuLanguageTitle</key>
+    <value>Sprache</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>InvalidTool</key>
-		<value> Ungültige angeforderte Werkzeug #</value>
-		<hint>Warnmeldung</hint>
-	</string>
-	<string>
-		<key>ChangeToolPrefix</key>
-		<value> bereiten Sie bitte </value>
-		<hint>tool Ansage ändern. Halten Sie die Leerzeichen am Ende</hint>
-	</string>
-	<string>
-		<key>ChangeToolPostfix</key>
-		<value>, und klicken Sie anschließend auf eine beliebige Taste, um fortzufahren.</value>
-		<hint>tool Ansage ändern. Halten Sie den Platz am Start.</hint>
-	</string>
+  <string>
+    <key>InvalidTool</key>
+    <value> Ungültige angeforderte Werkzeug #</value>
+    <hint>Warnmeldung</hint>
+  </string>
+  <string>
+    <key>ChangeToolPrefix</key>
+    <value> bereiten Sie bitte </value>
+    <hint>tool Ansage ändern. Halten Sie die Leerzeichen am Ende</hint>
+  </string>
+  <string>
+    <key>ChangeToolPostfix</key>
+    <value>, und klicken Sie anschließend auf eine beliebige Taste, um fortzufahren.</value>
+    <hint>tool Ansage ändern. Halten Sie den Platz am Start.</hint>
+  </string>
 
-	<string>
-		<key>StartAt</key>
-		<value>Start bei</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>StartAtLine</key>
-		<value> Start in Zeile #</value>
-		<hint>Start bei dialog</hint>
-	</string>
+  <string>
+    <key>StartAt</key>
+    <value>Start bei</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>StartAtLine</key>
+    <value> Start in Zeile #</value>
+    <hint>Start bei dialog</hint>
+  </string>
 
-	<string>
-		<key>Pause</key>
-		<value>Pause</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>Beenden der Pause</key>
-		<value> Beenden der Pause</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>Pause</key>
+    <value>Pause</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>Beenden der Pause</key>
+    <value> Beenden der Pause</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>SetHome</key>
-		<value> SET HOME</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>GO HOME</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
+  <string>
+    <key>SetHome</key>
+    <value> SET HOME</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>GoHome</key>
+    <value>GO HOME</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
 
-	<string>
-		<key>Top</key>
-		<value>TOP</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>unten</key>
-		<value>unten</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>Links</key>
-		<value>Links</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>Rechts</key>
-		<value>Rechts</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>stifthoch</key>
-		<value> PEN UP</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>stiftrunter</key>
-		<value> PEN DOWN</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
+  <string>
+    <key>Top</key>
+    <value>TOP</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>unten</key>
+    <value>unten</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>Links</key>
+    <value>Links</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>Rechts</key>
+    <value>Rechts</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>stifthoch</key>
+    <value> PEN UP</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>stiftrunter</key>
+    <value> PEN DOWN</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
 
-	<string>
-		<key>Set</key>
-		<value> Set</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>Speed</key>
-		<value> Geschwindigkeit:</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
-	<string>
-		<key>Rate</key>
-		<value> Schritte/min</value>
-		<hint>Handbuch fahren Dialog</hint>
-	</string>
+  <string>
+    <key>Set</key>
+    <value> Set</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>Speed</key>
+    <value> Geschwindigkeit:</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
+  <string>
+    <key>Rate</key>
+    <value> Schritte/min</value>
+    <hint>Handbuch fahren Dialog</hint>
+  </string>
 
-	<string>
-		<key>JogMotors</key>
-		<value> Jog Motoren</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>JogIn</key>
-		<value>in</value>
-		<hint>jog Motoren Dialog</hint>
-	</string>
-	<string>
-		<key>JogOut</key>
-		<value>OUT</value>
-		<hint>jog Motoren Dialog</hint>
-	</string>
-	<string>
-		<key>Invert</key>
-		<value> Invert</value>
-		<hint>jog Motoren Dialog</hint>
-	</string>
+  <string>
+    <key>JogMotors</key>
+    <value> Jog Motoren</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>JogIn</key>
+    <value>in</value>
+    <hint>jog Motoren Dialog</hint>
+  </string>
+  <string>
+    <key>JogOut</key>
+    <value>OUT</value>
+    <hint>jog Motoren Dialog</hint>
+  </string>
+  <string>
+    <key>Invert</key>
+    <value> Invert</value>
+    <hint>jog Motoren Dialog</hint>
+  </string>
 
-	<string>
-		<key>UpdateNotice</key>
-		<value> Eine neue Version dieser Software ist verfügbar.\nbitte Http://makelangelo.com/ besuchen, um die neuen erhöhten Temperatur.</value>
-		<hint>Auf Update überprüfen Dialog</hint>
-	</string>
-	<string>
-		<key>Aktuell</key>
-		<value> dieser Software ist auf dem neuesten Stand.</value>
-		<hint>Auf Update überprüfen Dialog</hint>
-	</string>
-	<string>
-		<key>UpdateCheckFailed</key>
-		<value>Sorry, ich nicht. Bitte besuchen Http://www.marginallyclever.com/, selbst überprüfen.</value>
-		<hint>Auf Update überprüfen Dialog</hint>
-	</string>
+  <string>
+    <key>UpdateNotice</key>
+    <value> Eine neue Version dieser Software ist verfügbar.\nbitte Http://makelangelo.com/ besuchen, um die neuen erhöhten Temperatur.</value>
+    <hint>Auf Update überprüfen Dialog</hint>
+  </string>
+  <string>
+    <key>Aktuell</key>
+    <value> dieser Software ist auf dem neuesten Stand.</value>
+    <hint>Auf Update überprüfen Dialog</hint>
+  </string>
+  <string>
+    <key>UpdateCheckFailed</key>
+    <value>Sorry, ich nicht. Bitte besuchen Http://www.marginallyclever.com/, selbst überprüfen.</value>
+    <hint>Auf Update überprüfen Dialog</hint>
+  </string>
 
-	<string>
-		<key>Senden</key>
-		<value>Senden</value>
-		<hint>Antrieb manuell Dialog</hint>
-	</string>
-	<string>
-		<key>TitleNotConnected</key>
-		<value> nicht angeschlossen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuMakelangelo</key>
-		<value>Makelangelo</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>Voreinstellungen</key>
-		<value>Einstellungen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuUpdate</key>
-		<value> Auf Aktualisierungen prüfen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuAbout</key>
-		<value>Info</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuQuit</key>
-		<value>Quit</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>Senden</key>
+    <value>Senden</value>
+    <hint>Antrieb manuell Dialog</hint>
+  </string>
+  <string>
+    <key>TitleNotConnected</key>
+    <value> nicht angeschlossen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuMakelangelo</key>
+    <value>Makelangelo</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>Voreinstellungen</key>
+    <value>Einstellungen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuUpdate</key>
+    <value> Auf Aktualisierungen prüfen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuAbout</key>
+    <value>Info</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuQuit</key>
+    <value>Quit</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuConnect</key>
-		<value>verbinden</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuRescan</key>
-		<value>Rescan</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuDisconnect</key>
-		<value> Trennen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuConnect</key>
+    <value>verbinden</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuRescan</key>
+    <value>Rescan</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuDisconnect</key>
+    <value> Trennen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuLoadMachineConfig</key>
-		<value> laden Einstellungen für...</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuLoadMachineConfig</key>
+    <value> laden Einstellungen für...</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuSettings</key>
-		<value>Einstellungen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuSettingsMachine</key>
-		<value> Die Maschine einstellen &amp; Paper size</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuAdjustPulleys</key>
-		<value>Einstellung Riemenscheibe size</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuJogMotors</key>
-		<value> Jog Motoren</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuSettings</key>
+    <value>Einstellungen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuSettingsMachine</key>
+    <value> Die Maschine einstellen &amp; Paper size</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuAdjustPulleys</key>
+    <value>Einstellung Riemenscheibe size</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuJogMotors</key>
+    <value> Jog Motoren</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuSelectTool</key>
-		<value>Wählen Sie aktive Werkzeug</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuAdjustTool</key>
-		<value>Einstellen aktive Werkzeug</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuSelectTool</key>
+    <value>Wählen Sie aktive Werkzeug</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuAdjustTool</key>
+    <value>Einstellen aktive Werkzeug</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuGCODE</key>
-		<value>GCODE</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuHilbertCurve</key>
-		<value> Hilbert Curve</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuTextToGCODE</key>
-		<value>Text zu GCODE</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuConvertImage</key>
-		<value>Letzte öffnen...</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuOpenFile</key>
-		<value> Datei öffnen...</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>MenuSaveGCODEAs</key>
-		<value>SAVE GCODE als...</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuGCODE</key>
+    <value>GCODE</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuHilbertCurve</key>
+    <value> Hilbert Curve</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuTextToGCODE</key>
+    <value>Text zu GCODE</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuConvertImage</key>
+    <value>Letzte öffnen...</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuOpenFile</key>
+    <value> Datei öffnen...</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>MenuSaveGCODEAs</key>
+    <value>SAVE GCODE als...</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuDraw</key>
-		<value>Zeichnen</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>Halt</key>
-		<value>Halt</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
+  <string>
+    <key>MenuDraw</key>
+    <value>Zeichnen</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>Halt</key>
+    <value>Halt</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
 
-	<string>
-		<key>MenuPreview</key>
-		<value>Vorschau</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>ZoomIn</key>
-		<value> Zoom +</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>ZoomOut</key>
-		<value> Zoom -</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>ZoomFit</key>
-		<value> Zoom auf Fit</value>
-		<hint>Menü oder Dialogfeld Titel</hint>
-	</string>
-	<string>
-		<key>mmNotice</key>
-		<value>Alle Werte in mm.</value>
-		<hint>Die Maschine einstellen, size</hint>
-	</string>
+  <string>
+    <key>MenuPreview</key>
+    <value>Vorschau</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>ZoomIn</key>
+    <value> Zoom +</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>ZoomOut</key>
+    <value> Zoom -</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>ZoomFit</key>
+    <value> Zoom auf Fit</value>
+    <hint>Menü oder Dialogfeld Titel</hint>
+  </string>
+  <string>
+    <key>mmNotice</key>
+    <value>Alle Werte in mm.</value>
+    <hint>Die Maschine einstellen, size</hint>
+  </string>
 
-	<string>
-		<key>penToolAdjust</key>
-		<value>einstellen Stift</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolDiameter</key>
-		<value>Durchmesser</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolMaxFeedRate</key>
-		<value> Max. Förderleistung</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolUp</key>
-		<value>Up</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolDown</key>
-		<value> Down</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolLiftSpeed</key>
-		<value> Aufzug Geschwindigkeit</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
-	<string>
-		<key>penToolTest</key>
-		<value>Test</value>
-		<hint>einstellen Pen Tool</hint>
-	</string>
+  <string>
+    <key>penToolAdjust</key>
+    <value>einstellen Stift</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolDiameter</key>
+    <value>Durchmesser</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolMaxFeedRate</key>
+    <value> Max. Förderleistung</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolUp</key>
+    <value>Up</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolDown</key>
+    <value> Down</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolLiftSpeed</key>
+    <value> Aufzug Geschwindigkeit</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
+  <string>
+    <key>penToolTest</key>
+    <value>Test</value>
+    <hint>einstellen Pen Tool</hint>
+  </string>
 
 
-	<string>
-		<key>spraypaintToolTest</key>
-		<value> Spraypaint einstellen</value>
-		<hint>einstellen Spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolDiameter</key>
-		<value>Dot size</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolMaxFeedRate</key>
-		<value> Max. Förderleistung</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolUp</key>
-		<value>aus</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolDown</key>
-		<value>On</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolLiftSpeed</key>
-		<value>on/off speed</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolTest</key>
-		<value>Eine dot</value>
-		<hint>Einstellen spraypaint Tool</hint>
-	</string>
+  <string>
+    <key>spraypaintToolTest</key>
+    <value> Spraypaint einstellen</value>
+    <hint>einstellen Spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolDiameter</key>
+    <value>Dot size</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolMaxFeedRate</key>
+    <value> Max. Förderleistung</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolUp</key>
+    <value>aus</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolDown</key>
+    <value>On</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolLiftSpeed</key>
+    <value>on/off speed</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
+  <string>
+    <key>spraypaintToolTest</key>
+    <value>Eine dot</value>
+    <hint>Einstellen spraypaint Tool</hint>
+  </string>
 
-	<string>
-		<key>voronoiStipplingName</key>
-		<value> Voronoi stipples</value>
-		<hint>Voronoi punktieren Generator</hint>
-	</string>
-	<string>
-		<key>voronoiStipplingCellCount</key>
-		<value> Anzahl der Zellen</value>
-		<hint>Voronoi punktieren Generator</hint>
-	</string>
-	<string>
-		<key>voronoiStipplingGenCount</key>
-		<value> Anzahl der Generationen</value>
-		<hint>Voronoi punktieren Generator</hint>
-	</string>
-	<string>
-		<key>voronoiStipplingDotMax</key>
-		<value> Max dot size</value>
-		<hint>Voronoi punktieren Generator</hint>
-	</string>
-	<string>
-		<key>voronoiStipplingDotMin</key>
-		<value>Min dot size</value>
-		<hint>Voronoi punktieren Generator</hint>
-	</string>
+  <string>
+    <key>voronoiStipplingName</key>
+    <value> Voronoi stipples</value>
+    <hint>Voronoi punktieren Generator</hint>
+  </string>
+  <string>
+    <key>voronoiStipplingCellCount</key>
+    <value> Anzahl der Zellen</value>
+    <hint>Voronoi punktieren Generator</hint>
+  </string>
+  <string>
+    <key>voronoiStipplingGenCount</key>
+    <value> Anzahl der Generationen</value>
+    <hint>Voronoi punktieren Generator</hint>
+  </string>
+  <string>
+    <key>voronoiStipplingDotMax</key>
+    <value> Max dot size</value>
+    <hint>Voronoi punktieren Generator</hint>
+  </string>
+  <string>
+    <key>voronoiStipplingDotMin</key>
+    <value>Min dot size</value>
+    <hint>Voronoi punktieren Generator</hint>
+  </string>
 
-	<string>
-		<key>BoxGeneratorName</key>
-		<value>Boxxy</value>
-		<hint>Boxxy Generator</hint>
-	</string>
-	<string>
-		<key>CrosshatchName</key>
-		<value> Schraffur</value>
-		<hint>Schraffur Generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveName</key>
-		<value> Hilbert Curve</value>
-		<hint>Hilbert Curve Generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveSize</key>
-		<value> Size</value>
-		<hint>Hilbert Curve Generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveOrder</key>
-		<value>Bestellung</value>
-		<hint>Hilbert Curve Generator</hint>
-	</string>
+  <string>
+    <key>BoxGeneratorName</key>
+    <value>Boxxy</value>
+    <hint>Boxxy Generator</hint>
+  </string>
+  <string>
+    <key>CrosshatchName</key>
+    <value> Schraffur</value>
+    <hint>Schraffur Generator</hint>
+  </string>
+  <string>
+    <key>HilbertCurveName</key>
+    <value> Hilbert Curve</value>
+    <hint>Hilbert Curve Generator</hint>
+  </string>
+  <string>
+    <key>HilbertCurveSize</key>
+    <value> Size</value>
+    <hint>Hilbert Curve Generator</hint>
+  </string>
+  <string>
+    <key>HilbertCurveOrder</key>
+    <value>Bestellung</value>
+    <hint>Hilbert Curve Generator</hint>
+  </string>
 
-	<string>
-		<key>PulseLineName</key>
-		<value>Impuls Line</value>
-		<hint>Linie pulse generator</hint>
-	</string>
-	<string>
-		<key>ZigZagName</key>
-		<value> Big Zig Zag</value>
-		<hint>Zig Zag Generator</hint>
-	</string>
-	<string>
-		<key>YourMsgHereName</key>
-		<value> Ihre Nachricht hier</value>
-		<hint>hier Ihre Nachricht Generator</hint>
-	</string>
-	<string>
-		<key>SpiralName</key>
-		<value>Spirale</value>
-		<hint>Spiral Generator</hint>
-	</string>
-	<string>
-		<key>ScanlineName</key>
-		<value> Scanline</value>
-		<hint>Scanline Generator</hint>
-	</string>
-	<string>
-		<key>RGBName</key>
-		<value> Rot Grün Blau</value>
-		<hint>RGB-Generator</hint>
-	</string>
+  <string>
+    <key>PulseLineName</key>
+    <value>Impuls Line</value>
+    <hint>Linie pulse generator</hint>
+  </string>
+  <string>
+    <key>ZigZagName</key>
+    <value> Big Zig Zag</value>
+    <hint>Zig Zag Generator</hint>
+  </string>
+  <string>
+    <key>YourMsgHereName</key>
+    <value> Ihre Nachricht hier</value>
+    <hint>hier Ihre Nachricht Generator</hint>
+  </string>
+  <string>
+    <key>SpiralName</key>
+    <value>Spirale</value>
+    <hint>Spiral Generator</hint>
+  </string>
+  <string>
+    <key>ScanlineName</key>
+    <value> Scanline</value>
+    <hint>Scanline Generator</hint>
+  </string>
+  <string>
+    <key>RGBName</key>
+    <value> Rot Grün Blau</value>
+    <hint>RGB-Generator</hint>
+  </string>
 
-	<string>
-		<key>SharePromo</key>
-		<value> teilen Sie es auf Twitter @MarginallyC, um zu sehen, was andere geschaffen haben.</value>
-		<hint>Ihre Zeichnung ist fertig. Share it</hint>
-	</string>
+  <string>
+    <key>SharePromo</key>
+    <value> teilen Sie es auf Twitter @MarginallyC, um zu sehen, was andere geschaffen haben.</value>
+    <hint>Ihre Zeichnung ist fertig. Share it</hint>
+  </string>
 
-	<string>
-		<key>StatusSoFar</key>
-		<value>Zeit läuft: </value>
-		<hint>Time Machine wurde Zeichnung</hint>
-	</string>
+  <string>
+    <key>StatusSoFar</key>
+    <value>Zeit läuft: </value>
+    <hint>Time Machine wurde Zeichnung</hint>
+  </string>
 
-	<string>
-		<key>StatusRemaining</key>
-		<value> geschätzte Zeit Links: </value>
-		<hint>Time Machine wird Zeichnung</hint>
-	</string>
+  <string>
+    <key>StatusRemaining</key>
+    <value> geschätzte Zeit Links: </value>
+    <hint>Time Machine wird Zeichnung</hint>
+  </string>
 
-	<!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to German.
+  <!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to German.
 Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
 used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
 one big CDATA html blob. -->
-	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
-		<value><![CDATA[
+  <string>
+    <key>AboutHTMLBeforeVersionNumber</key>
+    <value><![CDATA[
     <html>
       <body>
         <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
+    </value>
+    <hint>HTML for About Dialog</hint>
+  </string>
 
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
+  <string>
+    <key>AboutHTMLAfterVersionNumber</key>
+    <value><![CDATA[
 </h1>
       <h3>
         <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
@@ -787,8 +787,8 @@ one big CDATA html blob. -->
       </body>
     </html>
     ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
+    </value>
+    <hint>HTML for About Dialog</hint>
+  </string>
 </language>
 

@@ -8,32 +8,32 @@ import javax.swing.JLabel;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JLabel {
-	static final long serialVersionUID=1;
-	
-	long t_start;
-	protected DecimalFormat fmt = new DecimalFormat("#0.00");
-	protected String sSoFar = "so far: ";
-	protected String sRemaining=" remaining: ";
-	protected String sElapsed="";
-	protected MultilingualSupport translator;
-	
-	
-	public String formatTime(long millis) {
-    	long s=millis/1000;
-    	long m=s/60;
-    	long h=m/60;
-    	m%=60;
-    	s%=60;
+  static final long serialVersionUID=1;
+  
+  long t_start;
+  protected DecimalFormat fmt = new DecimalFormat("#0.00");
+  protected String sSoFar = "so far: ";
+  protected String sRemaining=" remaining: ";
+  protected String sElapsed="";
+  protected MultilingualSupport translator;
+  
+  
+  public String formatTime(long millis) {
+      long s=millis/1000;
+      long m=s/60;
+      long h=m/60;
+      m%=60;
+      s%=60;
 
-    	String elapsed="";
-    	if(h>0) elapsed+=h+"h";
-    	if(h>0||m>0) elapsed+=m+"m";
-    	elapsed+=s+"s ";
-    	
-    	return elapsed;
-	}
-	
-	
+      String elapsed="";
+      if(h>0) elapsed+=h+"h";
+      if(h>0||m>0) elapsed+=m+"m";
+      elapsed+=s+"s ";
+      
+      return elapsed;
+  }
+  
+  
     public StatusBar(MultilingualSupport ms) {
         super();
         super.setPreferredSize(new Dimension(100, 16));
@@ -54,7 +54,7 @@ public class StatusBar extends JLabel {
     }
     
     public String getElapsed() {
-    	return sElapsed;
+      return sElapsed;
     }
     
     public void clear() {
@@ -62,23 +62,23 @@ public class StatusBar extends JLabel {
     }
     
     public void start() {
-    	t_start=System.currentTimeMillis();
+      t_start=System.currentTimeMillis();
     }
     
     public void setProgress(long sofar,long total) {
-    	float progress=0;
-    	sElapsed="";
-    	if(total>0) {
-    		progress = 100.0f*(float)sofar/(float)total;
-    		
-    		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
-    		long total_time = (long)( (float)t_draw_now * (float)total / (float)sofar );
-        	long remaining = total_time - t_draw_now;
-        	sElapsed = translator.get("StatusSoFar") + formatTime(t_draw_now) + 
-        			translator.get("StatusRemaining") + formatTime(remaining);
-    	}
+      float progress=0;
+      sElapsed="";
+      if(total>0) {
+        progress = 100.0f*(float)sofar/(float)total;
+        
+        long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
+        long total_time = (long)( (float)t_draw_now * (float)total / (float)sofar );
+          long remaining = total_time - t_draw_now;
+          sElapsed = translator.get("StatusSoFar") + formatTime(t_draw_now) + 
+              translator.get("StatusRemaining") + formatTime(remaining);
+      }
 
-	   	setMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);
+      setMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);
     }
 }
 
