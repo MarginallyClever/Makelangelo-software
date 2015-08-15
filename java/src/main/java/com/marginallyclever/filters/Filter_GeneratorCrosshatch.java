@@ -12,26 +12,26 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc 
+ * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
  * @author Dan
  */
 public class Filter_GeneratorCrosshatch extends Filter {
-  
+
   @Override
   public String getName() { return translator.get("Crosshatch"); }
-  
+
   public Filter_GeneratorCrosshatch(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
     super(gui,mc,ms);
   }
-  
-  
+
+
   /**
    * The main entry point
    * @param img the image to convert.
    */
   @Override
   public void convert(BufferedImage img) throws IOException {
-    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
     img = bw.process(img);
 
     mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
@@ -55,11 +55,11 @@ public class Filter_GeneratorCrosshatch extends Filter {
             moveTo(out, 0, 0, true);
         }
     }
-  
+
   double xStart,yStart;
   double xEnd,yEnd;
   double paperWidth,paperHeight;
-    
+
   protected int sampleScale(BufferedImage img,double x0,double y0,double x1,double y1) {
     return sample(img,
         (x0-xStart)/(xEnd-xStart) * image_width,
@@ -68,22 +68,22 @@ public class Filter_GeneratorCrosshatch extends Filter {
         image_height - (y0-yStart)/(yEnd-yStart) * image_height
         );
   }
-  
+
   protected void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
     double leveladd = 255.0/6.0;
     double level=leveladd;
-    
+
     // if the image were projected on the paper, where would the top left corner of the image be in paper space?
     // image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
-    
+
     paperWidth = machine.getPaperWidth();
     paperHeight = machine.getPaperHeight();
-    
+
     xStart = -paperWidth/2.0;
     yStart = xStart * (double)image_height/(double)image_width;
 
     if(yStart < -(paperHeight/2.0)) {
-      xStart *= (-(paperHeight/2.0)) / yStart;      
+      xStart *= (-(paperHeight/2.0)) / yStart;
       yStart = -(paperHeight/2.0);
     }
 
@@ -91,14 +91,14 @@ public class Filter_GeneratorCrosshatch extends Filter {
     yStart *= 10.0* machine.paperMargin;
     xEnd = -xStart;
     yEnd = -yStart;
-    
+
     previous_x=0;
     previous_y=0;
-    
+
     double stepSize = tool.getDiameter()*3.0;
     double halfStep = stepSize/2.0;
     double x,y;
-    
+
     for(y=yStart;y<yEnd;y+=stepSize) {
       moveToPaper(out,xStart,y,true);
       for(x=xStart;x<xEnd;x+=stepSize) {
@@ -116,11 +116,11 @@ public class Filter_GeneratorCrosshatch extends Filter {
       }
       moveToPaper(out,x,yEnd,true);
     }
-    
+
 
     double x2;
-    
-    
+
+
     level += leveladd;
     x=xStart;
     do {
@@ -137,7 +137,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
       }
       if(x2>=xStart && x2 <xEnd)
         moveToPaper(out,x2,yEnd,true);
-      
+
       x+=stepSize;
     } while(x2<xEnd);
 
@@ -157,7 +157,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
       }
       if(x2>=xStart && x2 <xEnd)
         moveToPaper(out,x2,yEnd,true);
-      
+
       x-=stepSize;
     } while(x2>xStart);
     /*
@@ -169,16 +169,16 @@ public class Filter_GeneratorCrosshatch extends Filter {
     moveToPaper(out,xStart,yStart,true);
     */
   }
-  
-  
+
+
   protected void convertImageSpace(BufferedImage img, Writer out) throws IOException {
     int i,j,x,y,z=0;
     double leveladd = 255.0/6.0;
     double level=leveladd;
-    
+
     int steps = (int)Math.ceil(2.5*tool.getDiameter()/scale);
     if(steps<1) steps=1;
-    
+
     mainGUI.log("<font color='green'>Generating layer 1</font>\n");
     // create horizontal lines across the image
     // raise and lower the pen to darken the appropriate areas
@@ -247,7 +247,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
         startx=0;
       }
       int delta=endy-starty;
-      
+
       if((i%2)==0)
       {
         moveTo(out,(float)startx,(float)starty,true);
@@ -287,7 +287,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
         startx=image_width-1;
       }
       int delta=endy-starty;
-      
+
       assert( (startx-endx) == (starty-endy) );
 
       ++i;
@@ -318,12 +318,12 @@ public class Filter_GeneratorCrosshatch extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

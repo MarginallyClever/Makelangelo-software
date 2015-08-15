@@ -36,56 +36,56 @@ public class MakelangeloDriveControls
 
   JFormattedTextField feedRate;
   JButton setFeedRate;
-  
+
   // command line
   private JPanel textInputArea;
   private JTextField commandLineText;
   private JButton commandLineSend;
   private JButton disengageMotors;
-  
+
   // to make sure pen isn't on the paper while the machine is paused
   private boolean penIsUp,penIsUpBeforePause;
-  
+
   protected MultilingualSupport translator;
   protected MachineConfiguration machineConfiguration;
   protected MainGUI gui;
-  
+
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
   public MakelangeloDriveControls() {
   }
-  
-  
+
+
   public void raisePen() {
     penIsUp=true;
   }
-  
+
   public void lowerPen() {
     penIsUp=false;
   }
-  
+
   public void updateButtonAccess(boolean isConnected,boolean isRunning) {
       buttonStart.setEnabled(isConnected && !isRunning);
         buttonStartAt.setEnabled(isConnected && !isRunning);
         buttonPause.setEnabled(isConnected && isRunning);
         buttonHalt.setEnabled(isConnected && isRunning);
   }
-  
+
   public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {
     translator=_translator;
     gui=_gui;
     machineConfiguration = _machineConfiguration;
-    
+
     GridBagConstraints c;
 
     this.setLayout(new GridLayout(0,1));
     this.setPreferredSize(new Dimension(150,100));
-    
+
     this.removeAll();
-    
+
       // Draw menu
     JPanel go = new JPanel(new GridBagLayout());
         buttonStart = new JButton(translator.get("Start"));
@@ -100,8 +100,8 @@ public class MakelangeloDriveControls
         buttonStartAt.addActionListener(this);
         buttonPause.addActionListener(this);
         buttonHalt.addActionListener(this);
-  
-    
+
+
     JPanel axisControl = new JPanel(new GridBagLayout());
       final JLabel yAxis = new JLabel("Y");     yAxis.setPreferredSize(new Dimension(60,20));     yAxis.setHorizontalAlignment(SwingConstants.CENTER);
       down100 = new JButton("-100");  down100.setPreferredSize(new Dimension(60,20));
@@ -110,21 +110,21 @@ public class MakelangeloDriveControls
       up1 = new JButton("1");       up1.setPreferredSize(new Dimension(60,20));
       up10 = new JButton("10");     up10.setPreferredSize(new Dimension(60,20));
       up100 = new JButton("100");     up100.setPreferredSize(new Dimension(60,20));
-      
+
       final JLabel xAxis = new JLabel("X");     xAxis.setPreferredSize(new Dimension(60,20));   xAxis.setHorizontalAlignment(SwingConstants.CENTER);
       left100 = new JButton("-100");  left100.setPreferredSize(new Dimension(60,20));
       left10 = new JButton("-10");    left10.setPreferredSize(new Dimension(60,20));
-      left1 = new JButton("-1");    left1.setPreferredSize(new Dimension(60,20)); 
+      left1 = new JButton("-1");    left1.setPreferredSize(new Dimension(60,20));
       right1 = new JButton("1");    right1.setPreferredSize(new Dimension(60,20));
       right10 = new JButton("10");    right10.setPreferredSize(new Dimension(60,20));
       right100 = new JButton("100");  right100.setPreferredSize(new Dimension(60,20));
-  
+
       //final JButton find = new JButton("FIND HOME");  find.setPreferredSize(new Dimension(100,20));
       center = new JButton(translator.get("SetHome"));  center.setPreferredSize(new Dimension(100,20));
       home = new JButton(translator.get("GoHome"));   home.setPreferredSize(new Dimension(100,20));
-      
+
       c = new GridBagConstraints();
-      //c.fill=GridBagConstraints.BOTH; 
+      //c.fill=GridBagConstraints.BOTH;
       c.gridx=0;  c.gridy=0;  axisControl.add(yAxis,c);
       c.gridx=1;  c.gridy=0;  axisControl.add(down100,c);
       c.gridx=2;  c.gridy=0;  axisControl.add(down10,c);
@@ -132,7 +132,7 @@ public class MakelangeloDriveControls
       c.gridx=4;  c.gridy=0;  axisControl.add(up1,c);
       c.gridx=5;  c.gridy=0;  axisControl.add(up10,c);
       c.gridx=6;  c.gridy=0;  axisControl.add(up100,c);
-      
+
       c.gridx=0;  c.gridy=1;  axisControl.add(xAxis,c);
       c.gridx=1;  c.gridy=1;  axisControl.add(left100,c);
       c.gridx=2;  c.gridy=1;  axisControl.add(left10,c);
@@ -154,8 +154,8 @@ public class MakelangeloDriveControls
       right100.addActionListener(this);
       center.addActionListener(this);
       home.addActionListener(this);
-    
-    
+
+
     JPanel corners = new JPanel();
       corners.setLayout(new GridBagLayout());
       goTop = new JButton(translator.get("Top"));     goTop.setPreferredSize(new Dimension(80,20));
@@ -181,8 +181,8 @@ public class MakelangeloDriveControls
       goRight.addActionListener(this);
       goUp.addActionListener(this);
       goDown.addActionListener(this);
-    
-      
+
+
     JPanel feedRateControl = new JPanel();
     feedRateControl.setLayout(new GridBagLayout());
       c = new GridBagConstraints();
@@ -190,14 +190,14 @@ public class MakelangeloDriveControls
       feedRate.setText(Double.toString(machineConfiguration.getFeedRate()));
       setFeedRate = new JButton(translator.get("Set"));
       disengageMotors = new JButton(translator.get("DisengageMotors"));
-  
+
       c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
       c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
       c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
       c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
       c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
-    
-  
+
+
     this.add(go);
       this.add(new JSeparator());
     this.add(axisControl);
@@ -205,17 +205,17 @@ public class MakelangeloDriveControls
     this.add(feedRateControl);
       this.add(new JSeparator());
       this.add(getTextInputField());
-      
+
     setFeedRate.addActionListener(this);
     disengageMotors.addActionListener(this);
   }
-    
+
 
     public void actionPerformed(ActionEvent e) {
       Object subject = e.getSource();
       JButton b = (JButton)subject;
 
-      
+
       if(gui.isFileLoaded() && !gui.isRunning()) {
         if( subject == buttonStart ) {
           gui.startAt(0);
@@ -227,7 +227,7 @@ public class MakelangeloDriveControls
             gui.startAt(lineNumber);
           }
           return;
-          
+
         }
       }
 
@@ -235,7 +235,7 @@ public class MakelangeloDriveControls
         gui.sendLineToRobot(commandLineText.getText());
         commandLineText.setText("");
       }
-      
+
       //if(gui.isRunning()) return;
 
       if( subject == buttonPause ) {
@@ -259,7 +259,7 @@ public class MakelangeloDriveControls
         gui.halt();
         return;
       }
-      
+
       if(b==home) gui.sendLineToRobot("G00 F"+feedRate.getText()+" X0 Y0");
       else if(b==center) gui.sendLineToRobot("G92 X0 Y0");
       else if(b==goLeft) gui.sendLineToRobot("G00 F"+feedRate.getText()+" X"+(machineConfiguration.paper_left *10));
@@ -278,7 +278,7 @@ public class MakelangeloDriveControls
         machineConfiguration.setFeedRate(feed_rate);
         feedRate.setText(Double.toString(feed_rate));
         gui.sendLineToRobot("G00 G21 F"+feed_rate);
-      } 
+      }
       else if(b==disengageMotors) gui.sendLineToRobot("M18");
       else {
         gui.sendLineToRobot("G91");  // set relative mode
@@ -296,7 +296,7 @@ public class MakelangeloDriveControls
         if(b==right100) gui.sendLineToRobot("G0 X100");
         if(b==right10) gui.sendLineToRobot("G0 X10");
         if(b==right1) gui.sendLineToRobot("G0 X1");
-        
+
         gui.sendLineToRobot("G90");  // return to absolute mode
       }
     }
@@ -309,7 +309,7 @@ public class MakelangeloDriveControls
     //commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
     textInputArea.add(commandLineText);
     textInputArea.add(commandLineSend);
-    
+
     commandLineText.addKeyListener(this);
     commandLineSend.addActionListener(this);
 
@@ -335,7 +335,7 @@ public class MakelangeloDriveControls
       commandLineText.setText("");
     }
   }
-    
+
 
 
   /**
@@ -343,12 +343,12 @@ public class MakelangeloDriveControls
    * @return <code>lineNumber</code> greater than or equal to zero if user hit ok.
    */
   private long getStartingLineNumber() {
-    final JPanel panel = new JPanel(new GridBagLayout());   
+    final JPanel panel = new JPanel(new GridBagLayout());
     final JTextField starting_line = new JTextField("0",8);
     GridBagConstraints c = new GridBagConstraints();
     c.gridwidth=2;  c.gridx=0;  c.gridy=0;  panel.add(new JLabel(translator.get("StartAtLine")),c);
     c.gridwidth=2;  c.gridx=2;  c.gridy=0;  panel.add(starting_line,c);
-    
+
       int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
         long lineNumber;
@@ -358,7 +358,7 @@ public class MakelangeloDriveControls
         catch(Exception e) {
           lineNumber = -1;
         }
-        
+
         return lineNumber;
       }
     return -1;
