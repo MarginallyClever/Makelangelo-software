@@ -388,12 +388,12 @@
 	</string>
 
 	<string>
-		
+
 		<key>MenuLoadMachineConfig</key>
-		
+
 		<value>Load settings for...</value>
 		<hint>menu or dialog title</hint>
-	
+
 	</string>
 
 	<string>

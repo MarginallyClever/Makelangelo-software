@@ -5,7 +5,7 @@
     <name>English</name>
     <author>Dan Royer (dan@marginallyclever.com)</author>
   </meta>
-  
+
   <string>
     <key>Cancel</key>
     <value>Cancel</value>
@@ -737,19 +737,19 @@
     <value>Share it on twitter to @MarginallyC to see what others have created.</value>
     <hint>Your drawing is finished.  Share it</hint>
   </string>
-  
+
   <string>
     <key>StatusSoFar</key>
     <value>Time running: </value>
     <hint>time machine has been drawing</hint>
   </string>
-  
+
   <string>
     <key>StatusRemaining</key>
     <value>Estimated time left: </value>
     <hint>time machine will be drawing</hint>
   </string>
-  
+
   <string>
     <key>DisengageMotors</key>
     <value>Disengage</value>

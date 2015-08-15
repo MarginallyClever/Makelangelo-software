@@ -18,10 +18,10 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_Pen extends DrawingTool {
-  
+
   public DrawingTool_Pen(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
     super(gui,ms,mc);
-    
+
     diameter=1.5f;
     z_rate=120;
     z_on=90;
@@ -30,10 +30,10 @@ public class DrawingTool_Pen extends DrawingTool {
     feed_rate=3500;
     name="Pen";
   }
-  
+
   public DrawingTool_Pen(String name2,int tool_id,MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
     super(gui,ms,mc);
-    
+
     diameter=1.5f;
     z_rate=120;
     z_on=90;
@@ -42,14 +42,14 @@ public class DrawingTool_Pen extends DrawingTool {
     feed_rate=3500;
     name=name2;
   }
-  
+
   public void adjust() {
     final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("penToolAdjust"),true);
     driver.setLayout(new GridBagLayout());
 
     final JTextField penDiameter   = new JTextField(Float.toString(getDiameter()),5);
     final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
-    
+
     final JTextField penUp   = new JTextField(Float.toString(z_off),5);
     final JTextField penDown = new JTextField(Float.toString(z_on),5);
     final JTextField penZRate = new JTextField(Float.toString(z_rate),5);
@@ -57,7 +57,7 @@ public class DrawingTool_Pen extends DrawingTool {
     final JButton buttonTestDown = new JButton(translator.get("penToolTest"));
     final JButton buttonSave = new JButton(translator.get("Save"));
     final JButton buttonCancel = new JButton(translator.get("Cancel"));
-  
+
     GridBagConstraints c = new GridBagConstraints();
     GridBagConstraints d = new GridBagConstraints();
 
@@ -89,11 +89,11 @@ public class DrawingTool_Pen extends DrawingTool {
     c.gridx=0;  c.gridy=y;  driver.add(new JLabel(translator.get("penToolLiftSpeed")),c);
     d.gridx=1;  d.gridy=y;  driver.add(penZRate,d);
     ++y;
-  
+
     c.gridx=1;  c.gridy=y;  driver.add(buttonSave,c);
     c.gridx=2;  c.gridy=y;  driver.add(buttonCancel,c);
     ++y;
-  
+
     c.gridwidth=2;
     c.insets=new Insets(0,5,5,5);
     c.anchor=GridBagConstraints.WEST;
@@ -106,7 +106,7 @@ public class DrawingTool_Pen extends DrawingTool {
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
-        
+
         if(subject == buttonTestUp) {
           mainGUI.sendLineToRobot("G00 Z"+penUp.getText());
         }
@@ -127,14 +127,14 @@ public class DrawingTool_Pen extends DrawingTool {
         }
       }
     };
-    
+
     buttonTestUp.addActionListener(driveButtons);
     buttonTestDown.addActionListener(driveButtons);
-    
+
     buttonSave.addActionListener(driveButtons);
     buttonCancel.addActionListener(driveButtons);
     driver.getRootPane().setDefaultButton(buttonSave);
-  
+
     mainGUI.sendLineToRobot("M114");
     driver.pack();
     driver.setVisible(true);

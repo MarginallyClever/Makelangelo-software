@@ -5,7 +5,7 @@
 		<name>Ελληνικά</name>
 		<author>John Kari (ioakar0@gmail.com)</author>
 	</meta>
-	
+
 	<string>
 		<key>Cancel</key>
 		<value>Ακύρωση</value>
@@ -607,19 +607,19 @@
 		<value>Δοκιμή</value>
 		<hint>Adjust pen tool</hint>
 	</string>
-	
+
 	<string>
 		<key>SharePromo</key>
 		<value>Μοιραστείτε το στο twitter με τον λογαρισμό @MarginallyC για να δείτε τι έχουν δημιουργήσει και άλλοι.</value>
 		<hint>Your drawing is finished.  Share it</hint>
 	</string>
-	
+
 	<string>
 		<key>StatusSoFar</key>
 		<value>Χρόνος λειτουργίας: </value>
 		<hint>time machine has been drawing</hint>
 	</string>
-	
+
 	<string>
 		<key>StatusRemaining</key>
 		<value>Εκτιμώμενος χρόνος που απομένει: </value>

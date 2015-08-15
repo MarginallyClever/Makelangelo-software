@@ -5,7 +5,7 @@
 		<name>Русский</name>
 		<author>George Rozhkov (george@camcreative.ru)</author>
 	</meta>
-	
+
 	<string>
 		<key>Cancel</key>
 		<value>Отмена</value>
@@ -606,7 +606,7 @@
 		<value>Тест</value>
 		<hint>Adjust pen tool</hint>
 	</string>
-	
+
 	<string>
 		<key>SharePromo</key>
 		<value>Поделитесь своим творением в Twitter @MarginallyC и посмотрите, что создали другие.</value>

@@ -1,14 +1,14 @@
 /******************************************************************
- This is the library for the Adafruit Motor Shield V2 for Arduino. 
+ This is the library for the Adafruit Motor Shield V2 for Arduino.
  It supports DC motors & Stepper motors with microstepping as well
  as stacking-support. It is *not* compatible with the V1 library!
 
  It will only work with https://www.adafruit.com/products/1483
- 
+
  Adafruit invests time and resources providing this open
  source code, please support Adafruit and open-source hardware
  by purchasing products from Adafruit!
- 
+
  Written by Limor Fried/Ladyada for Adafruit Industries.
  BSD license, check license.txt for more information.
  All text above must be included in any redistribution.
@@ -47,14 +47,14 @@ void Adafruit_MotorShield::begin(uint16_t freq) {
   _pwm.begin();
   _freq = freq;
   _pwm.setPWMFreq(_freq);  // This is the maximum PWM frequency
-  for (uint8_t i=0; i<16; i++) 
+  for (uint8_t i=0; i<16; i++)
     _pwm.setPWM(i, 0, 0);
 }
 
 void Adafruit_MotorShield::setPWM(uint8_t pin, uint16_t value) {
   if (value > 4095) {
     _pwm.setPWM(pin, 4096, 0);
-  } else 
+  } else
     _pwm.setPWM(pin, 0, value);
 }
 void Adafruit_MotorShield::setPin(uint8_t pin, boolean value) {
@@ -169,7 +169,7 @@ uint16_t steps, Adafruit_MotorShield controller)  {
   if (steppernum == 1) {
     latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B) &
       ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
-    
+
     // enable both H bridges
     pinMode(11, OUTPUT);
     pinMode(3, OUTPUT);
@@ -248,7 +248,7 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
       if (steppingcounter >= 1000) {
 	delay(1);
 	steppingcounter -= 1000;
-      } 
+      }
     }
   }
 }
@@ -297,7 +297,7 @@ uint8_t Adafruit_StepperMotor::onestep(uint8_t dir, uint8_t style) {
     } else {
        currentstep -= MICROSTEPS/2;
     }
-  } 
+  }
 
   if (style == MICROSTEP) {
     if (dir == FORWARD) {
@@ -331,12 +331,12 @@ uint8_t Adafruit_StepperMotor::onestep(uint8_t dir, uint8_t style) {
 
 #ifdef MOTORDEBUG
   Serial.print("current step: "); Serial.println(currentstep, DEC);
-  Serial.print(" pwmA = "); Serial.print(ocra, DEC); 
-  Serial.print(" pwmB = "); Serial.println(ocrb, DEC); 
+  Serial.print(" pwmA = "); Serial.print(ocra, DEC);
+  Serial.print(" pwmB = "); Serial.println(ocrb, DEC);
 #endif
   MC->setPWM(PWMApin, ocra*17);
   MC->setPWM(PWMBpin, ocrb*17);
-  
+
 
   // release all
   uint8_t latch_state = 0; // all motor pins to 0
@@ -367,7 +367,7 @@ uint8_t Adafruit_StepperMotor::onestep(uint8_t dir, uint8_t style) {
       break;
     case 4:
       latch_state |= 0x4; // energize coil 3 only
-      break; 
+      break;
     case 5:
       latch_state |= 0xC; // energize coil 3+4
       break;

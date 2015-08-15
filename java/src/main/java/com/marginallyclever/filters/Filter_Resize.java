@@ -33,7 +33,7 @@ public class Filter_Resize extends Filter {
     //maxHeight=1000;
   }
 
-  
+
   protected BufferedImage scaleImage(BufferedImage img, int width, int height) {
       BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
       Graphics2D g = newImage.createGraphics();
@@ -57,7 +57,7 @@ public class Filter_Resize extends Filter {
   public BufferedImage process(BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();
-    
+
     // cap the max_w and max_h so that enormous drawbot images don't break the software.
     double paper_w= machine.getPaperWidth();
     double paper_h= machine.getPaperHeight();
@@ -101,12 +101,12 @@ public class Filter_Resize extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */
