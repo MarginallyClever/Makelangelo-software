@@ -50,8 +50,8 @@
                         <configLocation>src/checkstyle/checkstyle.xml</configLocation>
                         <encoding>UTF-8</encoding>
                         <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
-                        <linkXRef>false</linkXRef>
+                        <failsOnError>false</failsOnError>
+                        <failOnViolation>false</failOnViolation>
                     </configuration>
                     <goals>
                         <goal>check</goal>
