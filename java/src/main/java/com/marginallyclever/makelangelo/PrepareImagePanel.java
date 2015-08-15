@@ -116,7 +116,7 @@ implements ActionListener {
      */
     private String[] getAnyMachineConfigurations() {
         String[] machineNames = machineConfiguration.getKnownMachineNames();
-        if(machineNames.length == 1 && machineNames[0] == null) {
+        if(machineNames.length ==  0) {
             machineNames = machineConfiguration.getAvailableConfigurations();
         }
         return machineNames;
