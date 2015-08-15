@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
+ *
  * @author dan royer
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
@@ -46,7 +47,7 @@ public final class MultilingualSupport {
   /**
    * a list of all languages and their translations strings
    */
-  private final Map<String,LanguageContainer> languages = new HashMap<>();
+  private final Map<String, LanguageContainer> languages = new HashMap<>();
 
   /**
    *
@@ -62,7 +63,6 @@ public final class MultilingualSupport {
   }
 
   /**
-   *
    * @return true if this is the first time loading language files (probably on install)
    */
   public boolean isThisTheFirstTimeLoadingLanguageFiles() {
@@ -72,18 +72,17 @@ public final class MultilingualSupport {
         return false;
       }
     } catch (BackingStoreException e) {
-      logger.error("{}",e);
+      logger.error("{}", e);
     }
     return true;
   }
 
   /**
-   *
    * @return true if a preferences node exists
    * @throws BackingStoreException
    */
   private boolean doesLanguagePreferenceExist() throws BackingStoreException {
-    if(Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
+    if (Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
       return true;
     }
     return false;
@@ -107,10 +106,10 @@ public final class MultilingualSupport {
    * Scan folder for language files.
    */
   public void loadLanguages() throws IllegalStateException {
-        String workingDirectory=System.getProperty("user.dir")+File.separator+"languages";
+    String workingDirectory = System.getProperty("user.dir") + File.separator + "languages";
     final File f = new File(workingDirectory);
-    final File [] all_files = f.listFiles();
-    if(all_files.length<=0) {
+    final File[] all_files = f.listFiles();
+    if (all_files.length <= 0) {
       throw new IllegalStateException("No language files found!");
     }
     createLanguageContainersFromLanguageFiles(all_files);
@@ -118,17 +117,19 @@ public final class MultilingualSupport {
 
   /**
    * scan a list of files, find all XML files, try to load them as languages.
+   *
    * @param all_files the list of files
    */
   private void createLanguageContainersFromLanguageFiles(File[] all_files) {
     LanguageContainer lang;
-    for(int i=0;i<all_files.length;++i) {
-      if(all_files[i].isHidden()) continue;
-      if(all_files[i].isDirectory()) continue;
+    for (int i = 0; i < all_files.length; ++i) {
+      if (all_files[i].isHidden()) continue;
+      if (all_files[i].isDirectory()) continue;
       // get extension
       int j = all_files[i].getPath().lastIndexOf('.');
       if (j <= 0) continue;  // no extension
-      if(all_files[i].getPath().substring(j+1).toLowerCase().equals("xml")==false) continue;  // only .XML or .xml files
+      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false)
+        continue;  // only .XML or .xml files
       lang = new LanguageContainer();
       lang.load(all_files[i].getAbsolutePath());
       languages.put(lang.getName(), lang);
@@ -139,52 +140,48 @@ public final class MultilingualSupport {
    * Display a dialog box of available languages and let the user select their preference.
    */
   public void chooseLanguage() {
-    final String [] choices = getLanguageList();
+    final String[] choices = getLanguageList();
     final JComboBox<String> language_options = new JComboBox<String>(choices);
 
-    JPanel panel = new JPanel(new GridLayout(0,1));
+    JPanel panel = new JPanel(new GridLayout(0, 1));
     panel.add(language_options);
 
-      int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-      if (result == JOptionPane.OK_OPTION) {
+    int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.OK_OPTION) {
       setCurrentLanguage(choices[language_options.getSelectedIndex()]);
       saveConfig();
-      }
+    }
   }
 
   /**
-   *
    * @param key
    * @return the translated value for key
    */
   public String get(String key) {
-    String value=null;
+    String value = null;
     try {
       value = languages.get(currentLanguage).get(key);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return value;
   }
 
   /**
-   *
    * @return the list of language names
    */
-  protected String [] getLanguageList() {
-    final String [] choices = new String[languages.keySet().size()];
+  protected String[] getLanguageList() {
+    final String[] choices = new String[languages.keySet().size()];
     final Object[] lang_keys = languages.keySet().toArray();
 
-    for(int i=0;i<lang_keys.length;++i) {
-      choices[i] = (String)lang_keys[i];
+    for (int i = 0; i < lang_keys.length; ++i) {
+      choices[i] = (String) lang_keys[i];
     }
 
     return choices;
   }
 
   /**
-   *
    * @param currentLanguage the name of the language to make active.
    */
   public void setCurrentLanguage(String currentLanguage) {

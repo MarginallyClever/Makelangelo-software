@@ -8,6 +8,7 @@ public final class Arc extends Line3D {
     center.set(p.x, p.y, p.z);
     // When does Arc#center get initialized? Won't this result in a NPE?
   }
+
   public Point3D getCenter() {
     return center;
   }

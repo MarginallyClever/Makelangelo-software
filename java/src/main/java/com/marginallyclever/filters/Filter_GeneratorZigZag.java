@@ -18,19 +18,22 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
+ *
  * @author Dan
  */
 public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
   @Override
-  public String getName() { return translator.get("ZigZagName"); }
+  public String getName() {
+    return translator.get("ZigZagName");
+  }
 
   // processing tools
-  long t_elapsed,t_start;
+  long t_elapsed, t_start;
   double progress;
-  double old_len,len;
-  long time_limit=10*60*1000;  // 10 minutes
+  double old_len, len;
+  long time_limit = 10 * 60 * 1000;  // 10 minutes
 
   int numPoints;
   Point2D[] points = null;
@@ -38,45 +41,53 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   int scount;
 
 
-  public Filter_GeneratorZigZag(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
-    super(gui,mc,ms);
+  public Filter_GeneratorZigZag(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+    super(gui, mc, ms);
   }
 
 
   public String formatTime(long millis) {
-      String elapsed="";
-      long s=millis/1000;
-      long m=s/60;
-      long h=m/60;
-      m%=60;
-      s%=60;
-      if(h>0) elapsed+=h+"h";
-      if(h>0||m>0) elapsed+=m+"m";
-      elapsed+=s+"s ";
-      return elapsed;
+    String elapsed = "";
+    long s = millis / 1000;
+    long m = s / 60;
+    long h = m / 60;
+    m %= 60;
+    s %= 60;
+    if (h > 0) elapsed += h + "h";
+    if (h > 0 || m > 0) elapsed += m + "m";
+    elapsed += s + "s ";
+    return elapsed;
   }
 
 
-  public void updateProgress(double len,int color) {
-    t_elapsed=System.currentTimeMillis()-t_start;
-    double new_progress = 100.0 * (double)t_elapsed / (double)time_limit;
-    if( new_progress > progress + 0.1 ) {
+  public void updateProgress(double len, int color) {
+    t_elapsed = System.currentTimeMillis() - t_start;
+    double new_progress = 100.0 * (double) t_elapsed / (double) time_limit;
+    if (new_progress > progress + 0.1) {
       // find the new tour length
-      len=getTourLength(solution);
-      if( old_len > len ) {
-        old_len=len;
-        DecimalFormat flen=new DecimalFormat("#.##");
+      len = getTourLength(solution);
+      if (old_len > len) {
+        old_len = len;
+        DecimalFormat flen = new DecimalFormat("#.##");
         String c;
-        switch(color) {
-        case  0: c="yellow";  break;
-        case  1: c="blue";    break;
-        case  2: c="red";   break;
-        default: c="white";   break;
+        switch (color) {
+          case 0:
+            c = "yellow";
+            break;
+          case 1:
+            c = "blue";
+            break;
+          case 2:
+            c = "red";
+            break;
+          default:
+            c = "white";
+            break;
         }
         mainGUI.log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
       }
       progress = new_progress;
-      pm.setProgress((int)progress);
+      pm.setProgress((int) progress);
     }
   }
 
@@ -184,46 +195,46 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   // we have s1,s2...e-1,e
   // check if s1,e-1,...s2,e is shorter
   public int flipTests() {
-    int start, end, j, once=0;
+    int start, end, j, once = 0;
 
-    for(start=0;start<numPoints-2 && !parent.isCancelled() && !pm.isCanceled();++start) {
-      float a=calculateWeight(solution[start],solution[start+1]);
-      int best_end=-1;
-      double best_diff=0;
+    for (start = 0; start < numPoints - 2 && !parent.isCancelled() && !pm.isCanceled(); ++start) {
+      float a = calculateWeight(solution[start], solution[start + 1]);
+      int best_end = -1;
+      double best_diff = 0;
 
-      for(end=start+2;end<=numPoints && !parent.isCancelled() && !pm.isCanceled();++end) {
+      for (end = start + 2; end <= numPoints && !parent.isCancelled() && !pm.isCanceled(); ++end) {
         // before
-        float b=calculateWeight(solution[end  ],solution[end  -1]);
+        float b = calculateWeight(solution[end], solution[end - 1]);
         // after
-        float c=calculateWeight(solution[start],solution[end  -1]);
-        float d=calculateWeight(solution[end  ],solution[start+1]);
+        float c = calculateWeight(solution[start], solution[end - 1]);
+        float d = calculateWeight(solution[end], solution[start + 1]);
 
-        double temp_diff=(a+b)-(c+d);
-        if(best_diff < temp_diff) {
+        double temp_diff = (a + b) - (c + d);
+        if (best_diff < temp_diff) {
           best_diff = temp_diff;
-          best_end=end;
+          best_end = end;
         }
       }
 
-      if(best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
+      if (best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
         once = 1;
         // do the flip
-        int begin=start+1;
-        int finish=best_end;
-        int half=(finish-begin)/2;
+        int begin = start + 1;
+        int finish = best_end;
+        int half = (finish - begin) / 2;
         int temp;
-        while(lock.isLocked());
+        while (lock.isLocked()) ;
 
         lock.lock();
         //DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
-        for(j=0;j<half;++j) {
-          temp = solution[begin+j];
-          solution[begin+j]=solution[finish-1-j];
-          solution[finish-1-j]=temp;
+        for (j = 0; j < half; ++j) {
+          temp = solution[begin + j];
+          solution[begin + j] = solution[finish - 1 - j];
+          solution[finish - 1 - j] = temp;
         }
         lock.unlock();
         mainGUI.getDrawPanel().repaintNow();
-        updateProgress(len,1);
+        updateProgress(len, 1);
       }
     }
     return once;
@@ -231,18 +242,18 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
 
 
   public void render(GL2 gl2, MachineConfiguration machine) {
-    if(points==null || solution==null ) return;
+    if (points == null || solution == null) return;
 
-    while(lock.isLocked());
+    while (lock.isLocked()) ;
 
     lock.lock();
 
-    gl2.glColor3f(0,0,0);
+    gl2.glColor3f(0, 0, 0);
     gl2.glBegin(GL2.GL_LINE_STRIP);
-    for(int i=0;i<points.length;++i) {
-      if(points[solution[i]]==null) break;
-      gl2.glVertex2f((points[solution[i]].x)*0.1f,
-            (points[solution[i]].y)*0.1f);
+    for (int i = 0; i < points.length; ++i) {
+      if (points[solution[i]] == null) break;
+      gl2.glVertex2f((points[solution[i]].x) * 0.1f,
+          (points[solution[i]].y) * 0.1f);
     }
     gl2.glEnd();
 
@@ -250,10 +261,10 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   }
 
 
-  protected float calculateWeight(int a,int b) {
+  protected float calculateWeight(int a, int b) {
     float x = points[a].x - points[b].x;
     float y = points[a].y - points[b].y;
-    return x*x+y*y;
+    return x * x + y * y;
   }
 
 
@@ -262,43 +273,44 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
 
     mainGUI.log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
 
-    len=getTourLength(solution);
-    old_len=len;
+    len = getTourLength(solution);
+    old_len = len;
 
-    t_elapsed=0;
+    t_elapsed = 0;
     t_start = System.currentTimeMillis();
-    progress=0;
-    updateProgress(len,2);
+    progress = 0;
+    updateProgress(len, 2);
 
-    int once=1;
-    while(once==1 && t_elapsed<time_limit && !parent.isCancelled()) {
-      once=0;
+    int once = 1;
+    while (once == 1 && t_elapsed < time_limit && !parent.isCancelled()) {
+      once = 0;
       //@TODO: make these optional for the very thorough people
       //once|=transposeForwardTest();
       //once|=transposeBackwardTest();
 
-      once|=flipTests();
+      once |= flipTests();
 
-      updateProgress(len,2);
+      updateProgress(len, 2);
     }
 
     convertAndSaveToGCode();
   }
 
 
-  private double calculateLength(int a,int b) {
-    return Math.sqrt(calculateWeight(a,b));
+  private double calculateLength(int a, int b) {
+    return Math.sqrt(calculateWeight(a, b));
   }
 
   /**
    * Get the length of a tour segment
+   *
    * @param list an array of indexes into the point list.  the order forms the tour sequence.
    * @return the length of the tour
    */
   private double getTourLength(int[] list) {
-    double w=0;
-    for(int i=0;i<numPoints-1;++i) {
-      w+=calculateLength(list[i],list[i+1]);
+    double w = 0;
+    for (int i = 0; i < numPoints - 1; ++i) {
+      w += calculateLength(list[i], list[i + 1]);
     }
     return w;
   }
@@ -314,35 +326,35 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     int besti;
 
     // put all the points in the solution in no particular order.
-    for(i=0;i<numPoints;++i) {
-      solution[i]=i;
+    for (i = 0; i < numPoints; ++i) {
+      solution[i] = i;
     }
 
 
-    int scount=0;
-    solution[scount]=solution[0];
+    int scount = 0;
+    solution[scount] = solution[0];
 
     do {
       // Find the nearest point not already in the line.
       // Any solution[n] where n>scount is not in the line.
-      bestw=calculateWeight(solution[scount],solution[scount+1]);
-      besti=scount+1;
-      for( i=scount+2; i<numPoints; ++i ) {
-        w=calculateWeight(solution[scount],solution[i]);
-        if( w < bestw ) {
-          bestw=w;
-          besti=i;
+      bestw = calculateWeight(solution[scount], solution[scount + 1]);
+      besti = scount + 1;
+      for (i = scount + 2; i < numPoints; ++i) {
+        w = calculateWeight(solution[scount], solution[i]);
+        if (w < bestw) {
+          bestw = w;
+          besti = i;
         }
       }
-      i=solution[scount+1];
-      solution[scount+1]=solution[besti];
-      solution[besti]=i;
+      i = solution[scount + 1];
+      solution[scount + 1] = solution[besti];
+      solution[besti] = i;
       scount++;
-    } while(scount<numPoints);
+    } while (scount < numPoints);
   }
 
 
-  private void moveTo(Writer out,int i,boolean up) throws IOException {
+  private void moveTo(Writer out, int i, boolean up) throws IOException {
     tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
   }
 
@@ -355,26 +367,26 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   private void convertAndSaveToGCode() {
     // find the tsp point closest to the calibration point
     int i;
-    int besti=-1;
-    float bestw=1000000;
-    float x,y,w;
-    for(i=0;i<numPoints;++i) {
-      x=points[solution[i]].x;
-      y=points[solution[i]].y;
-      w=x*x+y*y;
-      if(w<bestw) {
-        bestw=w;
-        besti=i;
+    int besti = -1;
+    float bestw = 1000000;
+    float x, y, w;
+    for (i = 0; i < numPoints; ++i) {
+      x = points[solution[i]].x;
+      y = points[solution[i]].y;
+      w = x * x + y * y;
+      if (w < bestw) {
+        bestw = w;
+        besti = i;
       }
     }
 
     // write
-        try(
+    try (
         final OutputStream fileOutputStream = new FileOutputStream(dest);
         final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-        ) {
-      out.write(machine.getConfigLine()+";\n");
-      out.write(machine.getBobbinLine()+";\n");
+    ) {
+      out.write(machine.getConfigLine() + ";\n");
+      out.write(machine.getBobbinLine() + ";\n");
 
       //MachineConfiguration mc = machine;
       //tool = mc.GetCurrentTool();
@@ -383,20 +395,19 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
       tool.writeChangeTo(out);
       liftPen(out);
       // move to the first point
-      moveTo(out,besti,false);
+      moveTo(out, besti, false);
       lowerPen(out);
 
-      for(i=1;i<numPoints;++i) {
-        moveTo(out,(besti+i)%numPoints,false);
+      for (i = 1; i < numPoints; ++i) {
+        moveTo(out, (besti + i) % numPoints, false);
       }
-      moveTo(out,besti,false);
+      moveTo(out, besti, false);
 
       // lift pen and return to home
       liftPen(out);
       signName(out);
-      tool.writeMoveTo(out,0,0);
-    }
-    catch(IOException e) {
+      tool.writeMoveTo(out, 0, 0);
+    } catch (IOException e) {
       mainGUI.log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");
     }
   }
@@ -406,29 +417,29 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     tool = machine.getCurrentTool();
     imageSetupTransform(img);
 
-    int x,y,i;
+    int x, y, i;
     // count the points
-    numPoints=0;
-    for(y=0;y<image_height;++y) {
-      for(x=0;x<image_width;++x) {
-        i=decode(img.getRGB(x,y));
-        if(i==0) {
+    numPoints = 0;
+    for (y = 0; y < image_height; ++y) {
+      for (x = 0; x < image_width; ++x) {
+        i = decode(img.getRGB(x, y));
+        if (i == 0) {
           ++numPoints;
         }
       }
     }
 
     mainGUI.log("<font color='green'>" + numPoints + " points,</font>\n");
-    points = new Point2D[numPoints+1];
-    solution = new int[numPoints+1];
+    points = new Point2D[numPoints + 1];
+    solution = new int[numPoints + 1];
 
     // collect the point data
-    numPoints=0;
-    for(y=0;y<image_height;++y) {
-      for(x=0;x<image_width;++x) {
-        i=decode(img.getRGB(x,y));
-        if(i==0) {
-          points[numPoints++]=new Point2D(TX(x),TY(y));
+    numPoints = 0;
+    for (y = 0; y < image_height; ++y) {
+      for (x = 0; x < image_width; ++x) {
+        i = decode(img.getRGB(x, y));
+        if (i == 0) {
+          points[numPoints++] = new Point2D(TX(x), TY(y));
         }
       }
     }
@@ -436,6 +447,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
 
   /**
    * The main entry point
+   *
    * @param img the image to convert.
    */
   @Override
@@ -444,13 +456,13 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     mainGUI.getDrawPanel().setDecorator(this);
 
     // resize & flip as needed
-    Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250);
+    Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
     img = rs.process(img);
     // make black & white
-    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.process(img);
     // dither
-    Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI,machine,translator);
+    Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI, machine, translator);
     img = dither.process(img);
     // connect the dots
     connectTheDots(img);
@@ -464,17 +476,17 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
 
 /**
  * This file is part of DrawbotGUI.
- *
+ * <p>
  * DrawbotGUI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

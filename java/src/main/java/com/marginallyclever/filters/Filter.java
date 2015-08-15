@@ -17,42 +17,47 @@ import java.util.StringTokenizer;
 
 /**
  * base class for image filtering
+ *
  * @author Dan
  */
 public abstract class Filter {
   // image properties
   protected int image_width, image_height;
-  protected float w2,h2,scale;
+  protected float w2, h2, scale;
   protected DrawingTool tool;
 
-  protected int color_channel=0;
+  protected int color_channel = 0;
 
   // text properties
-  protected float kerning=5.0f;
-  protected float letter_width=10.0f;
-  protected float letter_height=20.0f;
-  protected float line_spacing=5.0f;
-  protected float padding=5.0f;
+  protected float kerning = 5.0f;
+  protected float letter_width = 10.0f;
+  protected float letter_height = 20.0f;
+  protected float line_spacing = 5.0f;
+  protected float padding = 5.0f;
   static final String alphabetFolder = "ALPHABET/";
-  protected int chars_per_line=25;
-  protected boolean draw_bounding_box=false;
+  protected int chars_per_line = 25;
+  protected boolean draw_bounding_box = false;
 
   // text position and alignment
-  public enum VAlign { TOP, MIDDLE, BOTTOM }
-  public enum Align { LEFT, CENTER, RIGHT }
+  public enum VAlign {
+    TOP, MIDDLE, BOTTOM
+  }
+
+  public enum Align {LEFT, CENTER, RIGHT}
+
   protected VAlign align_vertical = VAlign.MIDDLE;
-  protected Align  align_horizontal = Align.CENTER;
-  protected float posx=0;
-  protected float posy=0;
+  protected Align align_horizontal = Align.CENTER;
+  protected float posx = 0;
+  protected float posy = 0;
 
   // file properties
   protected String dest;
   // pen position optimizing
   protected boolean lastup;
-  protected float previous_x,previous_y;
+  protected float previous_x, previous_y;
   // threading
   protected ProgressMonitor pm;
-  protected SwingWorker<Void,Void> parent;
+  protected SwingWorker<Void, Void> parent;
 
   protected MainGUI mainGUI;
   protected MultilingualSupport translator;
@@ -62,37 +67,42 @@ public abstract class Filter {
   protected float sampleSum;
 
 
-  public Filter(MainGUI gui,MachineConfiguration mc,MultilingualSupport ms) {
+  public Filter(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
     mainGUI = gui;
     translator = ms;
     machine = mc;
   }
 
-  public void setParent(SwingWorker<Void,Void> p) {
-    parent=p;
+  public void setParent(SwingWorker<Void, Void> p) {
+    parent = p;
   }
+
   public void setProgressMonitor(ProgressMonitor p) {
-    pm=p;
+    pm = p;
   }
+
   public void setDestinationFile(String _dest) {
-    dest=_dest;
+    dest = _dest;
   }
 
   /**
    * Called by filters that create GCODE from nothing.  Fractals might be one example.
    */
-  public void generate() {}
+  public void generate() {
+  }
 
   /**
    * Replace this with your generator/converter name.
-     *
-     * @return name of this filter.
-     *
+   *
+   * @return name of this filter.
    */
-  public String getName() {  return "Unnamed";  }
+  public String getName() {
+    return "Unnamed";
+  }
 
   /**
    * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
+   *
    * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
    * @return the altered image
    */
@@ -102,41 +112,43 @@ public abstract class Filter {
 
   /**
    * convert generates GCODE from a bufferedImage.
+   *
    * @param img image to filter.
    * @throws IOException
    */
-  public void convert(BufferedImage img) throws IOException {}
+  public void convert(BufferedImage img) throws IOException {
+  }
 
 
   protected int decode(int pixel) {
-    int r = ((pixel>>16)&0xff);
-    int g = ((pixel>> 8)&0xff);
-    int b = ((pixel    )&0xff);
-    return (r+g+b)/3;
+    int r = ((pixel >> 16) & 0xff);
+    int g = ((pixel >> 8) & 0xff);
+    int b = ((pixel) & 0xff);
+    return (r + g + b) / 3;
   }
 
   protected int decode(Color c) {
     int r = c.getRed();
     int g = c.getGreen();
     int b = c.getBlue();
-    return (r+g+b)/3;
+    return (r + g + b) / 3;
   }
 
 
   protected int encode(int i) {
-    return (0xff<<24) | (i<<16) | (i<< 8) | i;
+    return (0xff << 24) | (i << 16) | (i << 8) | i;
   }
 
 
   protected void liftPen(Writer out) throws IOException {
     tool.writeOff(out);
-    lastup=true;
+    lastup = true;
   }
 
 
   protected void lowerPen(Writer out) throws IOException {
     tool.writeOn(out);
-    lastup=false;
+    lastup = false;
   }
 
 
@@ -145,11 +157,11 @@ public abstract class Filter {
 
     imageSetupTransform(img);
 
-    out.write(machine.getConfigLine()+";\n");
-    out.write(machine.getBobbinLine()+";\n");
+    out.write(machine.getConfigLine() + ";\n");
+    out.write(machine.getBobbinLine() + ";\n");
 
-    previous_x=0;
-    previous_y=0;
+    previous_x = 0;
+    previous_y = 0;
 
     setAbsoluteMode(out);
   }
@@ -164,10 +176,11 @@ public abstract class Filter {
 
   /**
    * setup transform from source image dimensions to destination paper dimensions.
+   *
    * @param img source dimensions
    */
   protected void imageSetupTransform(BufferedImage img) {
-    setupTransform( img.getWidth(), img.getHeight() );
+    setupTransform(img.getWidth(), img.getHeight());
   }
 
   /**
@@ -175,28 +188,28 @@ public abstract class Filter {
    */
   protected void setupTransform() {
     // 10mm = 1cm.  letters should be 1cm tall.
-    setupTransform( (int)(machine.getPaperWidth()*10.0f), (int)(machine.getPaperHeight()*10.0f) );
+    setupTransform((int) (machine.getPaperWidth() * 10.0f), (int) (machine.getPaperHeight() * 10.0f));
   }
 
-  protected void setupTransform(int width,int height) {
+  protected void setupTransform(int width, int height) {
     image_height = height;
     image_width = width;
-    h2=image_height/2;
-    w2=image_width/2;
+    h2 = image_height / 2;
+    w2 = image_width / 2;
 
-    scale=10f;  // 10mm = 1cm
+    scale = 10f;  // 10mm = 1cm
 
     double new_width = image_width;
     double new_height = image_height;
 
-    if(image_width > machine.getPaperWidth()) {
-      float resize = (float)machine.getPaperWidth()/(float)image_width;
+    if (image_width > machine.getPaperWidth()) {
+      float resize = (float) machine.getPaperWidth() / (float) image_width;
       scale *= resize;
       new_height *= resize;
       new_width = machine.getPaperWidth();
     }
-    if(new_height > machine.getPaperHeight()) {
-      float resize = (float)machine.getPaperHeight()/(float)new_height;
+    if (new_height > machine.getPaperHeight()) {
+      float resize = (float) machine.getPaperHeight() / (float) new_height;
       scale *= resize;
       new_width *= resize;
       new_height = machine.getPaperHeight();
@@ -212,179 +225,188 @@ public abstract class Filter {
   }
 
 
-  protected int sample1x1(BufferedImage img,int x,int y) {
+  protected int sample1x1(BufferedImage img, int x, int y) {
     Color c = new Color(img.getRGB(x, y));
-    switch(color_channel) {
-    case 1: return c.getRed();
-    case 2: return c.getGreen();
-    case 3: return c.getBlue();
-    default: return decode(c);
+    switch (color_channel) {
+      case 1:
+        return c.getRed();
+      case 2:
+        return c.getGreen();
+      case 3:
+        return c.getBlue();
+      default:
+        return decode(c);
     }
   }
 
 
-  protected int sample3x3(BufferedImage img,int x,int y) {
-    int value=0, weight=0;
+  protected int sample3x3(BufferedImage img, int x, int y) {
+    int value = 0, weight = 0;
 
-    if(y>0) {
-      if(x>0) {
-        value+=sample1x1(img,x-1, y-1);
-        weight+=1;
+    if (y > 0) {
+      if (x > 0) {
+        value += sample1x1(img, x - 1, y - 1);
+        weight += 1;
       }
-      value+=sample1x1(img,x, y-1)*2;
-      weight+=2;
+      value += sample1x1(img, x, y - 1) * 2;
+      weight += 2;
 
-      if(x<image_width-1) {
-        value+=sample1x1(img,x+1, y-1);
-        weight+=1;
-      }
-    }
-
-    if(x>0) {
-      value+=sample1x1(img,x-1, y)*2;
-      weight+=2;
-    }
-    value+=sample1x1(img,x, y)*4;
-    weight+=4;
-    if(x<image_width-1) {
-      value+=sample1x1(img,x+1, y)*2;
-      weight+=2;
-    }
-
-    if(y<image_height-1) {
-      if(x>0) {
-        value+=sample1x1(img,x-1, y+1);
-        weight+=1;
-      }
-      value+=sample1x1(img,x, y+1)*2;
-      weight+=2;
-
-      if(x<image_width-1) {
-        value+=sample1x1(img,x+1, y+1);
-        weight+=1;
+      if (x < image_width - 1) {
+        value += sample1x1(img, x + 1, y - 1);
+        weight += 1;
       }
     }
 
-    return value/weight;
+    if (x > 0) {
+      value += sample1x1(img, x - 1, y) * 2;
+      weight += 2;
+    }
+    value += sample1x1(img, x, y) * 4;
+    weight += 4;
+    if (x < image_width - 1) {
+      value += sample1x1(img, x + 1, y) * 2;
+      weight += 2;
+    }
+
+    if (y < image_height - 1) {
+      if (x > 0) {
+        value += sample1x1(img, x - 1, y + 1);
+        weight += 1;
+      }
+      value += sample1x1(img, x, y + 1) * 2;
+      weight += 2;
+
+      if (x < image_width - 1) {
+        value += sample1x1(img, x + 1, y + 1);
+        weight += 1;
+      }
+    }
+
+    return value / weight;
   }
 
 
+  protected void sample1x1Safe(BufferedImage img, int x, int y, double scale) {
+    if (x < 0 || x >= image_width) return;
+    if (y < 0 || y >= image_height) return;
 
-  protected void sample1x1Safe(BufferedImage img,int x,int y,double scale) {
-    if(x<0 || x >= image_width) return;
-    if(y<0 || y >= image_height) return;
-
-    sampleValue += sample1x1(img,x,y) * scale;
+    sampleValue += sample1x1(img, x, y) * scale;
     sampleSum += scale;
   }
 
   /**
    * sample the image, taking into account fractions of pixels.
+   *
    * @param img the image to sample
-   * @param x0 top left corner
-   * @param y0 top left corner
-   * @param x1 bottom right corner
-   * @param y1 bottom right corner
+   * @param x0  top left corner
+   * @param y0  top left corner
+   * @param x1  bottom right corner
+   * @param y1  bottom right corner
    * @return greyscale intensity in this region. range 0...255 inclusive
    */
-  protected int sample(BufferedImage img,double x0,double y0,double x1,double y1) {
-    sampleValue=0;
-    sampleSum=0;
+  protected int sample(BufferedImage img, double x0, double y0, double x1, double y1) {
+    sampleValue = 0;
+    sampleSum = 0;
 
     double xceil = Math.ceil(x0);
-    double xweightstart = ( x0 != xceil ) ? xceil - x0 : 1;
+    double xweightstart = (x0 != xceil) ? xceil - x0 : 1;
 
     double xfloor = Math.floor(x1);
-    double xweightend = ( x1 != xceil ) ? xfloor - x1 : 0;
+    double xweightend = (x1 != xceil) ? xfloor - x1 : 0;
 
-    int left = (int)(x0+1);
-    int right = (int)x1;
+    int left = (int) (x0 + 1);
+    int right = (int) x1;
 
     // top edge
     double yceil = Math.ceil(y0);
-    if( y0 != yceil ) {
+    if (y0 != yceil) {
       double yweightstart = yceil - y0;
 
       // left edge
-      sample1x1Safe(img,(int)x0,(int)y0, xweightstart * yweightstart);
+      sample1x1Safe(img, (int) x0, (int) y0, xweightstart * yweightstart);
 
-      for(int i=left;i<right;++i) {
-        sample1x1Safe(img,i,(int)y0, yweightstart);
+      for (int i = left; i < right; ++i) {
+        sample1x1Safe(img, i, (int) y0, yweightstart);
       }
       // right edge
-      sample1x1Safe(img,right,(int)y0, xweightend * yweightstart);
+      sample1x1Safe(img, right, (int) y0, xweightend * yweightstart);
     }
 
-    int bottom = (int)(y0+1);
-    int top = (int)y1;
-    for(int j = bottom; j < top; ++j ) {
+    int bottom = (int) (y0 + 1);
+    int top = (int) y1;
+    for (int j = bottom; j < top; ++j) {
       // left edge
-      sample1x1Safe(img,(int)x0,j, xweightstart);
+      sample1x1Safe(img, (int) x0, j, xweightstart);
 
-      for(int i=left;i<right;++i) {
-        sample1x1Safe(img,i,j,1);
+      for (int i = left; i < right; ++i) {
+        sample1x1Safe(img, i, j, 1);
       }
       // right edge
-      sample1x1Safe(img,right,j, xweightend);
+      sample1x1Safe(img, right, j, xweightend);
     }
 
     // bottom edge
     double yfloor = Math.floor(y1);
-    if( y1 != yfloor ) {
+    if (y1 != yfloor) {
       double yweightend = yfloor - y1;
 
       // left edge
-      sample1x1Safe(img,(int)x0,(int)y1, xweightstart * yweightend);
+      sample1x1Safe(img, (int) x0, (int) y1, xweightstart * yweightend);
 
-      for(int i=left;i<right;++i) {
-        sample1x1Safe(img,i,(int)y1, yweightend);
+      for (int i = left; i < right; ++i) {
+        sample1x1Safe(img, i, (int) y1, yweightend);
       }
       // right edge
-      sample1x1Safe(img,right,(int)y1, xweightend * yweightend);
+      sample1x1Safe(img, right, (int) y1, xweightend * yweightend);
     }
 
-    return (int)(sampleValue/sampleSum);
+    return (int) (sampleValue / sampleSum);
   }
 
   protected float SX(float x) {
-    return x*scale;
+    return x * scale;
   }
+
   protected float SY(float y) {
-    return y*scale;
+    return y * scale;
   }
+
   protected float PX(float x) {
-    return x-w2;
+    return x - w2;
   }
+
   protected float PY(float y) {
-    return h2-y;
+    return h2 - y;
   }
+
   protected float TX(float x) {
     return SX(PX(x));
   }
+
   protected float TY(float y) {
     return SY(PY(y));
   }
 
 
-  protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
+  protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
     float x2 = TX(x);
     float y2 = TY(y);
 
-    if(up==lastup) {
-      previous_x=x2;
-      previous_y=y2;
+    if (up == lastup) {
+      previous_x = x2;
+      previous_y = y2;
     } else {
-      tool.writeMoveTo(out,previous_x,previous_y);
-      tool.writeMoveTo(out,x2,y2);
-      if(up) liftPen(out);
-      else   lowerPen(out);
+      tool.writeMoveTo(out, previous_x, previous_y);
+      tool.writeMoveTo(out, x2, y2);
+      if (up) liftPen(out);
+      else lowerPen(out);
     }
   }
 
-  protected void moveToPaper(Writer out,double x,double y,boolean up) throws IOException {
-    tool.writeMoveTo(out,(float)x,(float)y);
-    if(up) liftPen(out);
-    else   lowerPen(out);
+  protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
+    tool.writeMoveTo(out, (float) x, (float) y);
+    if (up) liftPen(out);
+    else lowerPen(out);
   }
 
 
@@ -393,9 +415,9 @@ public abstract class Filter {
   }
 
 
-  public void textSetPosition(float x,float y) {
-    posx=x;
-    posy=y;
+  public void textSetPosition(float x, float y) {
+    posx = x;
+    posy = y;
   }
 
   public void textSetAlign(Align x) {
@@ -414,49 +436,49 @@ public abstract class Filter {
 
 
   public void textFindCharsPerLine(double width) {
-    chars_per_line=(int)Math.floor( (float)(width*10.0f - padding*2.0f) / (float)(letter_width+kerning) );
+    chars_per_line = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letter_width + kerning));
     //System.out.println("MAX="+chars_per_line);
   }
 
 
   // TODO count newlines?
   protected Rectangle2D textCalculateBounds(String text) {
-    String [] lines = textWrapToLength(text);
+    String[] lines = textWrapToLength(text);
     int len = textLongestLine(lines);
 
     int num_lines = lines.length;
-    float h = padding*2 + ( letter_height + line_spacing ) * num_lines;//- line_spacing; removed because of letters that hang below the line
-    float w = padding*2 + ( letter_width + kerning ) * len - kerning;
-    float xmax=0, xmin=0, ymax=0, ymin=0;
+    float h = padding * 2 + (letter_height + line_spacing) * num_lines;//- line_spacing; removed because of letters that hang below the line
+    float w = padding * 2 + (letter_width + kerning) * len - kerning;
+    float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
 
-    switch(align_horizontal) {
-    case LEFT:
-      xmax=posx + w;
-      xmin=posx;
-      break;
-    case CENTER:
-      xmax = posx + w/2;
-      xmin = posx - w/2;
-      break;
-    case RIGHT:
-      xmax = posx;
-      xmin = posx - w;
-      break;
+    switch (align_horizontal) {
+      case LEFT:
+        xmax = posx + w;
+        xmin = posx;
+        break;
+      case CENTER:
+        xmax = posx + w / 2;
+        xmin = posx - w / 2;
+        break;
+      case RIGHT:
+        xmax = posx;
+        xmin = posx - w;
+        break;
     }
 
-    switch(align_vertical) {
-    case BOTTOM:
-      ymax=posy + h;
-      ymin=posy;
-      break;
-    case MIDDLE:
-      ymax = posy + h/2;
-      ymin = posy - h/2;
-      break;
-    case TOP:
-      ymax = posy;
-      ymin = posy - h;
-      break;
+    switch (align_vertical) {
+      case BOTTOM:
+        ymax = posy + h;
+        ymin = posy;
+        break;
+      case MIDDLE:
+        ymax = posy + h / 2;
+        ymin = posy - h / 2;
+        break;
+      case TOP:
+        ymax = posy;
+        ymin = posy - h;
+        break;
     }
     /*
     System.out.println(num_lines + " lines");
@@ -472,7 +494,7 @@ public abstract class Filter {
 
 
   protected void textCreateMessageNow(String text, Writer output) throws IOException {
-    if(chars_per_line<=0) return;
+    if (chars_per_line <= 0) return;
 
     tool = machine.getCurrentTool();
 
@@ -483,36 +505,36 @@ public abstract class Filter {
     liftPen(output);
 
     //if(true) {
-    if(draw_bounding_box) {
+    if (draw_bounding_box) {
       // draw bounding box
-      output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
+      output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
       lowerPen(output);
-      output.write("G0 X"+TX((float)r.getMaxX())+" Y"+TY((float)r.getMaxY())+";\n");
-      output.write("G0 X"+TX((float)r.getMaxX())+" Y"+TY((float)r.getMinY())+";\n");
-      output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMinY())+";\n");
-      output.write("G0 X"+TX((float)r.getMinX())+" Y"+TY((float)r.getMaxY())+";\n");
+      output.write("G0 X" + TX((float) r.getMaxX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
+      output.write("G0 X" + TX((float) r.getMaxX()) + " Y" + TY((float) r.getMinY()) + ";\n");
+      output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMinY()) + ";\n");
+      output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
       liftPen(output);
     }
 
     // move to first line height
     // assumes we are still G90
-    float message_start = TX((float)r.getMinX()) + SX(padding);
-    float firstline = TY((float)r.getMinY()) - SY(padding + letter_height);
+    float message_start = TX((float) r.getMinX()) + SX(padding);
+    float firstline = TY((float) r.getMinY()) - SY(padding + letter_height);
     float interline = -SY(letter_height + line_spacing);
 
-    output.write("G0 X"+message_start+" Y"+firstline+";\n");
+    output.write("G0 X" + message_start + " Y" + firstline + ";\n");
     output.write("G91;\n");
 
     // draw line of text
-    String [] lines = textWrapToLength(text);
-    for(int i=0; i<lines.length; i++) {
-      if(i>0) {
+    String[] lines = textWrapToLength(text);
+    for (int i = 0; i < lines.length; i++) {
+      if (i > 0) {
         // newline
-        output.write("G0 Y"+interline+";\n");
+        output.write("G0 Y" + interline + ";\n");
 
         // carriage return
         output.write("G90;\n");
-        output.write("G0 X"+message_start+";\n");
+        output.write("G0 X" + message_start + ";\n");
         output.write("G91;\n");
       }
 
@@ -525,28 +547,28 @@ public abstract class Filter {
 
 
   // break the text into an array of strings.  each string is one line of text made to fit into the chars_per_line limit.
-  protected String [] textWrapToLength(String src) {
-    String [] test_lines = src.split("\n");
-    int i,j;
+  protected String[] textWrapToLength(String src) {
+    String[] test_lines = src.split("\n");
+    int i, j;
 
     int num_lines = 0;
-    for(i=0;i<test_lines.length;++i) {
-      if( test_lines[i].length() > chars_per_line ) {
-        int x = (int)Math.ceil( (double)test_lines[i].length() / (double)chars_per_line );
+    for (i = 0; i < test_lines.length; ++i) {
+      if (test_lines[i].length() > chars_per_line) {
+        int x = (int) Math.ceil((double) test_lines[i].length() / (double) chars_per_line);
         num_lines += x;
       } else {
         num_lines++;
       }
     }
 
-    String [] lines = new String[num_lines];
-    j=0;
-    for(i=0;i<test_lines.length;++i) {
-      if(test_lines[i].length() <= chars_per_line) {
+    String[] lines = new String[num_lines];
+    j = 0;
+    for (i = 0; i < test_lines.length; ++i) {
+      if (test_lines[i].length() <= chars_per_line) {
         lines[j++] = test_lines[i];
       } else {
-        String [] temp = test_lines[i].split("(?<=\\G.{"+chars_per_line+"})");
-        for(int k=0;k<temp.length;++k) {
+        String[] temp = test_lines[i].split("(?<=\\G.{" + chars_per_line + "})");
+        for (int k = 0; k < temp.length; ++k) {
           lines[j++] = temp[k];
         }
       }
@@ -555,10 +577,10 @@ public abstract class Filter {
     return lines;
   }
 
-  protected int textLongestLine(String [] lines) {
-    int len=0;
-    for(int i=0;i<lines.length;++i) {
-      if(len < lines[i].length()) len = lines[i].length();
+  protected int textLongestLine(String[] lines) {
+    int len = 0;
+    for (int i = 0; i < lines.length; ++i) {
+      if (len < lines[i].length()) len = lines[i].length();
     }
 
     return len;
@@ -569,65 +591,135 @@ public abstract class Filter {
 
     //System.out.println(a1+" ("+a1.length()+")");
 
-    int i=0;
-    for(i=0;i<a1.length();++i) {
+    int i = 0;
+    for (i = 0; i < a1.length(); ++i) {
       char letter = a1.charAt(i);
 
-      if(letter=='\n' || letter=='\r') continue;
+      if (letter == '\n' || letter == '\r') continue;
 
       String name;
 
       // find the file that goes with this character
       // TODO load these from an XML description?
-      if('a'<= letter && letter <= 'z') {
-        name="SMALL_" + Character.toUpperCase(letter);
+      if ('a' <= letter && letter <= 'z') {
+        name = "SMALL_" + Character.toUpperCase(letter);
       } else {
-        switch(letter) {
-        case ' ':  name="SPACE";  break;
-        case '!':  name="EXCLAMATION";  break;
-        case '"':  name="DOUBLEQ";  break;
-        case '$':  name="DOLLAR";  break;
-        case '#':  name="POUND";  break;
-        case '%':  name="PERCENT";  break;
-        case '&':  name="AMPERSAND";  break;
-        case '\'':  name="SINGLEQ";  break;
-        case '(':  name="B1OPEN";  break;
-        case ')':  name="B1CLOSE";  break;
-        case '*':  name="ASTERIX";  break;
-        case '+':  name="PLUS";  break;
-        case ',':  name="COMMA";  break;
-        case '-':  name="HYPHEN";  break;
-        case '.':  name="PERIOD";  break;
-        case '/':  name="FSLASH";  break;
-        case ':':  name="COLON";  break;
-        case ';':  name="SEMICOLON";  break;
-        case '<':  name="GREATERTHAN";  break;
-        case '=':  name="EQUAL";  break;
-        case '>':  name="LESSTHAN";  break;
-        case '?':  name="QUESTION";  break;
-        case '@':  name="AT";  break;
-        case '[':  name="B2OPEN";  break;
-        case ']':  name="B2CLOSE";  break;
-        case '^':  name="CARET";  break;
-        case '_':  name="UNDERSCORE";  break;
-        case '`':  name="GRAVE";  break;
-        case '{':  name="B3OPEN";  break;
-        case '|':  name="BAR";  break;
-        case '}':  name="B3CLOSE";  break;
-        case '~':  name="TILDE";  break;
-        case '\\':  name="BSLASH";  break;
-        case '…':  name="SPACE";  break;
-        default: name=Character.toString(letter);  break;
+        switch (letter) {
+          case ' ':
+            name = "SPACE";
+            break;
+          case '!':
+            name = "EXCLAMATION";
+            break;
+          case '"':
+            name = "DOUBLEQ";
+            break;
+          case '$':
+            name = "DOLLAR";
+            break;
+          case '#':
+            name = "POUND";
+            break;
+          case '%':
+            name = "PERCENT";
+            break;
+          case '&':
+            name = "AMPERSAND";
+            break;
+          case '\'':
+            name = "SINGLEQ";
+            break;
+          case '(':
+            name = "B1OPEN";
+            break;
+          case ')':
+            name = "B1CLOSE";
+            break;
+          case '*':
+            name = "ASTERIX";
+            break;
+          case '+':
+            name = "PLUS";
+            break;
+          case ',':
+            name = "COMMA";
+            break;
+          case '-':
+            name = "HYPHEN";
+            break;
+          case '.':
+            name = "PERIOD";
+            break;
+          case '/':
+            name = "FSLASH";
+            break;
+          case ':':
+            name = "COLON";
+            break;
+          case ';':
+            name = "SEMICOLON";
+            break;
+          case '<':
+            name = "GREATERTHAN";
+            break;
+          case '=':
+            name = "EQUAL";
+            break;
+          case '>':
+            name = "LESSTHAN";
+            break;
+          case '?':
+            name = "QUESTION";
+            break;
+          case '@':
+            name = "AT";
+            break;
+          case '[':
+            name = "B2OPEN";
+            break;
+          case ']':
+            name = "B2CLOSE";
+            break;
+          case '^':
+            name = "CARET";
+            break;
+          case '_':
+            name = "UNDERSCORE";
+            break;
+          case '`':
+            name = "GRAVE";
+            break;
+          case '{':
+            name = "B3OPEN";
+            break;
+          case '|':
+            name = "BAR";
+            break;
+          case '}':
+            name = "B3CLOSE";
+            break;
+          case '~':
+            name = "TILDE";
+            break;
+          case '\\':
+            name = "BSLASH";
+            break;
+          case '…':
+            name = "SPACE";
+            break;
+          default:
+            name = Character.toString(letter);
+            break;
         }
       }
-      String fn = ud + name  + ".NGC";
+      String fn = ud + name + ".NGC";
       final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
-      if(inputStream != null) {
-        if(i>0 && kerning!=0) {
-          output.write("G0 X"+SX(kerning)+";\n");
+      if (inputStream != null) {
+        if (i > 0 && kerning != 0) {
+          output.write("G0 X" + SX(kerning) + ";\n");
         }
-        try ( final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            final BufferedReader in = new BufferedReader(inputStreamReader)) {
+        try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             final BufferedReader in = new BufferedReader(inputStreamReader)) {
 
           String b;
           while ((b = in.readLine()) != null) {
@@ -675,43 +767,43 @@ public abstract class Filter {
   }
 
   protected void signName(Writer out) throws IOException {
-    float desired_scale=0.5f;  // changes the size of the font.  large number = larger font
+    float desired_scale = 0.5f;  // changes the size of the font.  large number = larger font
 
     textSetAlign(Align.RIGHT);
     textSetVAlign(VAlign.BOTTOM);
-    textSetPosition(TX(image_width)*(1.0f/desired_scale),
-               -TY(image_height)*(1.0f/desired_scale));
+    textSetPosition(TX(image_width) * (1.0f / desired_scale),
+        -TY(image_height) * (1.0f / desired_scale));
 
-    float xx=w2;
-    float yy=h2;
+    float xx = w2;
+    float yy = h2;
     float old_scale = scale;
-    h2=0;
-    w2=0;
-    scale=desired_scale;
+    h2 = 0;
+    w2 = 0;
+    scale = desired_scale;
 
     textSetCharsPerLine(25);
 
-    textCreateMessageNow("Makelangelo #"+Long.toString(machine.getUID()),out);
+    textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), out);
     //TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
-    h2=yy;
-    w2=xx;
+    h2 = yy;
+    w2 = xx;
     scale = old_scale;
   }
 }
 
 /**
  * This file is part of DrawbotGUI.
- *
+ * <p>
  * DrawbotGUI is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

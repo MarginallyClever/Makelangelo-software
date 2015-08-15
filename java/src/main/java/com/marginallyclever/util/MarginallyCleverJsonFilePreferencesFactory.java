@@ -13,79 +13,75 @@ import java.util.prefs.PreferencesFactory;
  * Created on 6/7/15.
  *
  * @author Peter Colapietro
- * @since v7.1.4
- *
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
- *
+ * @since v7.1.4
  */
 public final class MarginallyCleverJsonFilePreferencesFactory implements PreferencesFactory {
 
-    /**
-     *
-     */
-    private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
+  /**
+   *
+   */
+  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
 
-    /**
-     *
-     */
-    private Preferences rootPreferences;
+  /**
+   *
+   */
+  private Preferences rootPreferences;
 
-    /**
-     *
-     */
-    private static final String SYSTEM_PROPERTY_FILE =
-            "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.file";
+  /**
+   *
+   */
+  private static final String SYSTEM_PROPERTY_FILE =
+      "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.file";
 
-    /**
-     *
-     */
-    private static File preferencesFile;
+  /**
+   *
+   */
+  private static File preferencesFile;
 
 
-    @Override
-    public Preferences systemRoot() {
-        return userRoot();
+  @Override
+  public Preferences systemRoot() {
+    return userRoot();
+  }
+
+  @NotNull
+  @Override
+  public Preferences userRoot() {
+    if (rootPreferences == null) {
+      logger.info("Instantiating root preferences");
+      rootPreferences = new MarginallyCleverPreferences(null, "");
     }
+    return rootPreferences;
+  }
 
-    @NotNull
-    @Override
-    public Preferences userRoot() {
-        if (rootPreferences == null) {
-            logger.info("Instantiating root preferences");
-            rootPreferences = new MarginallyCleverPreferences(null, "");
+  /**
+   * @return Preference file
+   */
+  public synchronized static File getPreferencesFile() {
+    if (preferencesFile == null) {
+      String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
+      if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
+        preferenceFilePath = getDefaultPreferenceFilePath(preferenceFilePath);
+      }
+      preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
+      if (!preferencesFile.exists()) {
+        try {
+          preferencesFile.createNewFile();
+        } catch (IOException e) {
+          logger.error("{}", e);
         }
-        return rootPreferences;
+      }
+      logger.info("Preferences file is {}", preferencesFile);
     }
+    return preferencesFile;
+  }
 
-    /**
-     *
-     * @return Preference file
-     */
-    public synchronized static File getPreferencesFile()
-    {
-        if (preferencesFile == null) {
-            String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
-            if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
-                preferenceFilePath = getDefaultPreferenceFilePath(preferenceFilePath);
-            }
-            preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
-            if(!preferencesFile.exists()) {
-                try {
-                    preferencesFile.createNewFile();
-                } catch (IOException e) {
-                    logger.error("{}", e);
-                }
-            }
-            logger.info("Preferences file is {}", preferencesFile);
-        }
-        return preferencesFile;
-    }
-
-    private static String getDefaultPreferenceFilePath(String preferenceFilePath) {
-        final String defaultFilePathToPreferencesFile = System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
-        preferenceFilePath = defaultFilePathToPreferencesFile;
-        System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
-        return preferenceFilePath;
-    }
+  private static String getDefaultPreferenceFilePath(String preferenceFilePath) {
+    final String defaultFilePathToPreferencesFile = System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
+    preferenceFilePath = defaultFilePathToPreferencesFile;
+    System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
+    return preferenceFilePath;
+  }
 
 }
