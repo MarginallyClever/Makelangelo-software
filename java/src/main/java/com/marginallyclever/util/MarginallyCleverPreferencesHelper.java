@@ -117,4 +117,6 @@ final class MarginallyCleverPreferencesHelper {
         return lessThanZeroNames;
     }
 
+    private MarginallyCleverPreferencesHelper() {}
+
 }

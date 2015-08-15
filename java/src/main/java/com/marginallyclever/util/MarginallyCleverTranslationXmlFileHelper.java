@@ -274,4 +274,6 @@ final class MarginallyCleverTranslationXmlFileHelper {
         return doesThisLanguageFileContainAllTheDefaultKeys;
     }
 
+    private MarginallyCleverTranslationXmlFileHelper() {}
+
 }

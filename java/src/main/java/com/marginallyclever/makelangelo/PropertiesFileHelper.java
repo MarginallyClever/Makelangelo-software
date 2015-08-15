@@ -51,4 +51,6 @@ public final class PropertiesFileHelper {
         }
         return makelangeloVersionPropertyValue;
     }
+
+    private PropertiesFileHelper() {}
 }

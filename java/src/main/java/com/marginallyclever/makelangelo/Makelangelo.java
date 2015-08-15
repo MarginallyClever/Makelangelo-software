@@ -12,4 +12,6 @@ public class Makelangelo {
           }
       });
   }
+
+  private Makelangelo() {}
 }
