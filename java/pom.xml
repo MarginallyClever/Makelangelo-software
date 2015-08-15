@@ -219,7 +219,7 @@
   </repositories>
   <url>http://www.makelangelo.com/</url>
   <organization>
-  	<name>Marginally Clever Robots, Inc.</name>
-  	<url>http://www.marginallyclever.com/</url>
+    <name>Marginally Clever Robots, Inc.</name>
+    <url>http://www.marginallyclever.com/</url>
   </organization>
 </project>
