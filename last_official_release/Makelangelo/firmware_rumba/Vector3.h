@@ -21,7 +21,7 @@ public:
 public:
   Vector3() {}
 
-
+  
   Vector3( float xx, float yy, float zz ) {
     x = xx;
     y = yy;
@@ -35,7 +35,7 @@ public:
     z = v[ 2 ];
   }
 
-
+  
   ~Vector3() {};
 
 
@@ -47,7 +47,7 @@ public:
     return *this;
   }
 
-
+  
   Vector3 &Set( float xx, float yy, float zz ) {
     x = xx;
     y = yy;
@@ -121,7 +121,7 @@ public:
 
   Vector3 operator ^= ( const Vector3 &v ) { // assigned cross product
     float nx, ny, nz;
-
+    
     nx = ( y * v.z - z * v.y );
     ny =-( x * v.z - z * v.x );
     nz = ( x * v.y - y * v.x );

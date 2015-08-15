@@ -41,7 +41,7 @@ void SD_init() {
   pinMode(SDSS, OUTPUT);
   pinMode(SDCARDDETECT,INPUT);
   digitalWrite(SDCARDDETECT,HIGH);
-
+  
   sd_inserted = false;
   sd_printing_now=false;
   sd_percent_complete=0;
@@ -74,7 +74,7 @@ void SD_check() {
     }
     sd_inserted = state;
   }
-
+  
   // read one line from the file.  don't read too fast or the LCD will appear to hang.
   if(sd_printing_now==true && sd_printing_paused==false && segment_buffer_full()==false ) {
     int c;
@@ -106,7 +106,7 @@ void SD_check() {
         break;
       }
     }
-
+    
     if(sd_print_file.peek() == -1) {
       sd_print_file.close();
       sd_printing_now=false;
@@ -125,7 +125,7 @@ void SD_StartPrintingFile(char *filename) {
     Serial.println(F(" not found."));
     return;
   }
-
+  
   // count the number of lines (\n characters) for displaying % complete.
   sd_file_size=sd_print_file.size();
   sd_bytes_read=0;
@@ -147,12 +147,12 @@ void SD_StartPrintingFile(char *filename) {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

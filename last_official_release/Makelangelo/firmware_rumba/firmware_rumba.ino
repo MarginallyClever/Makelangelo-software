@@ -170,7 +170,7 @@ void FK(long l1, long l2,float &x,float &y) {
   float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
   float c = (float)l2 * THREAD_PER_STEP;
-
+  
   // slow, uses trig
   // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
   // or cc - aa - bb = -2ab * cos( theta )
@@ -193,7 +193,7 @@ void processConfig() {
   limit_bottom=parsenumber('B',limit_bottom);
   limit_right=parsenumber('R',limit_right);
   limit_left=parsenumber('L',limit_left);
-
+  
   char gg=parsenumber('G',m1d);
   char hh=parsenumber('H',m2d);
   char i=parsenumber('I',0);
@@ -201,7 +201,7 @@ void processConfig() {
   if(i!=0) {
     if(i>0) {
       motors[0].reel_in  = HIGH;
-      motors[0].reel_out = LOW;
+      motors[0].reel_out = LOW; 
     } else {
       motors[0].reel_in  = LOW;
       motors[0].reel_out = HIGH;
@@ -216,10 +216,10 @@ void processConfig() {
       motors[1].reel_out = HIGH;
     }
   }
-
+  
   // @TODO: check t>b, r>l ?
   printConfig();
-
+  
   teleport(0,0);
 /*
   test_kinematics(0,0);
@@ -266,7 +266,7 @@ void polargraph_line(float x,float y,float z,float new_feed_rate) {
   posx=x;
   posy=y;
   posz=z;
-
+  
   feed_rate = new_feed_rate;
   motor_line(l1,l2,z,new_feed_rate);
 }
@@ -283,19 +283,19 @@ void line_safe(float x,float y,float z,float new_feed_rate) {
   x-=tool_offset[current_tool].x;
   y-=tool_offset[current_tool].y;
   z-=tool_offset[current_tool].z;
-
+  
   // split up long lines to make them straighter?
   Vector3 destination(x,y,z);
   Vector3 start(posx,posy,posz);
   Vector3 dp = destination - start;
   Vector3 temp;
-
+  
   float len=dp.Length();
   int pieces = ceil(dp.Length() * (float)MM_PER_SEGMENT );
-
+  
   float a;
   long j;
-
+  
   for(j=1;j<pieces;++j) {
     a=(float)j/(float)pieces;
     temp = dp * a + start;
@@ -327,12 +327,12 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
   float angle1=atan3(dy,dx);
   float angle2=atan3(y-cy,x-cx);
   float theta=angle2-angle1;
-
+  
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
-
+  
   theta=angle2-angle1;
-
+  
   // get length of arc
   // float circ=PI*2.0*radius;
   // float len=theta*circ/(PI*2.0);
@@ -340,13 +340,13 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
   float len = abs(theta) * radius;
 
   int i, segments = floor( len * MM_PER_SEGMENT );
-
+ 
   float nx, ny, nz, angle3, scale;
 
   for(i=0;i<segments;++i) {
     // interpolate around the arc
     scale = ((float)i)/((float)segments);
-
+    
     angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
@@ -354,7 +354,7 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
     // send it to the planner
     line_safe(nx,ny,nz,new_feed_rate);
   }
-
+  
   line_safe(x,y,z,new_feed_rate);
 }
 
@@ -365,11 +365,11 @@ void arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate
 void teleport(float x,float y) {
   posx=x;
   posy=y;
-
+  
   // @TODO: posz?
   long L1,L2;
   IK(posx,posy,L1,L2);
-
+  
   motor_set_step_count(L1,L2,0);
 }
 
@@ -395,14 +395,14 @@ void help() {
 void FindHome() {
 #ifdef USE_LIMIT_SWITCH
   Serial.println(F("Homing..."));
-
+  
   if(readSwitches()) {
     Serial.println(F("** ERROR **"));
     Serial.println(F("Problem: Plotter is already touching switches."));
     Serial.println(F("Solution: Please unwind the strings a bit and try again."));
     return;
   }
-
+  
   int safe_out=50;
 
   // reel in the left motor until contact is made.
@@ -417,7 +417,7 @@ void FindHome() {
     pause(STEP_DELAY);
   } while(!readSwitches());
   laststep1=0;
-
+  
   // back off so we don't get a false positive on the next motor
   int i;
   digitalWrite(motors[0].dir_pin,LOW);
@@ -427,7 +427,7 @@ void FindHome() {
     pause(STEP_DELAY);
   }
   laststep1=safe_out;
-
+  
   // reel in the right motor until contact is made
   Serial.println(F("Find right..."));
   digitalWrite(motors[0].dir_pin,LOW);
@@ -441,7 +441,7 @@ void FindHome() {
     laststep1++;
   } while(!readSwitches());
   laststep2=0;
-
+  
   // back off so we don't get a false positive that kills line()
   digitalWrite(motors[1].dir_pin,LOW);
   for(i=0;i<safe_out;++i) {
@@ -450,7 +450,7 @@ void FindHome() {
     pause(STEP_DELAY);
   }
   laststep2=safe_out;
-
+  
   Serial.println(F("Centering..."));
   line(0,0,posz);
 #endif // USE_LIMIT_SWITCH
@@ -544,9 +544,9 @@ float parsenumber(char code,float val) {
 void processCommand() {
   // blank lines
   if(buffer[0]==';') return;
-
+  
   long cmd;
-
+  
   // is there a line number?
   cmd=parsenumber('N',-1);
   if(cmd!=-1 && buffer[0]=='N') {  // line number must appear first on the line
@@ -556,7 +556,7 @@ void processCommand() {
       Serial.println(line_number);
       return;
     }
-
+  
     // is there a checksum?
     if(strchr(buffer,'*')!=0) {
       // yes.  is it valid?
@@ -569,22 +569,22 @@ void processCommand() {
         Serial.print(F("BADCHECKSUM "));
         Serial.println(line_number);
         return;
-      }
+      } 
     } else {
       Serial.print(F("NOCHECKSUM "));
       Serial.println(line_number);
       return;
     }
-
+    
     line_number++;
   }
-
+  
   if(!strncmp(buffer,"UID",3)) {
     robot_uid=atoi(strchr(buffer,' ')+1);
     SaveUID();
   }
 
-
+  
   cmd=parsenumber('M',-1);
   switch(cmd) {
   case 6:  tool_change(parsenumber('T',current_tool));  break;
@@ -665,7 +665,7 @@ void processCommand() {
         digitalWrite(MOTOR_0_STEP_PIN,LOW);
         pause(STEP_DELAY);
       }
-
+      
       amount=parsenumber(m2d,0);
       digitalWrite(MOTOR_1_DIR_PIN,amount < 0 ? motors[1].reel_in : motors[1].reel_out);
       amount = abs(amount);
@@ -679,7 +679,7 @@ void processCommand() {
   case 1: {
       // adjust spool diameters
       float amountL=parsenumber('L',SPOOL_DIAMETER);
-
+  
       float tps1=STEPS_PER_TURN;
       adjustSpoolDiameter(amountL);
       if(STEPS_PER_TURN != tps1) {
@@ -718,21 +718,21 @@ void tools_setup() {
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
-
+  
   // start communications
   Serial.begin(BAUD);
-
+  
   // display the help at startup.
   help();
-
+  
   motor_setup();
   motor_enable();
   tools_setup();
-
+  
   //easyPWM_init();
   SD_init();
   LCD_init();
-
+  
   // initialize the plotter position.
   teleport(0,0);
   setPenAngle(PEN_UP_ANGLE);
@@ -751,10 +751,10 @@ void Serial_listen() {
     if(sofar<MAX_BUF) buffer[sofar++]=c;
     if(c=='\n') {
       buffer[sofar]=0;
-
+      
       // echo confirmation
 //      Serial.println(F(buffer));
-
+   
       // do something with the command
       processCommand();
       ready();
@@ -768,7 +768,7 @@ void loop() {
   Serial_listen();
   SD_check();
   LCD_update();
-
+  
   // The PC will wait forever for the ready signal.
   // if Arduino hasn't received a new instruction in a while, send ready() again
   // just in case USB garbled ready and each half is waiting on the other.
@@ -785,12 +785,12 @@ void loop() {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

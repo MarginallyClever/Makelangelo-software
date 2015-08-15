@@ -1,17 +1,17 @@
-/***************************************************
+/*************************************************** 
   This is a library for our Adafruit 16-channel PWM & Servo driver
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/815
 
-  These displays use I2C to communicate, 2 pins are required to
+  These displays use I2C to communicate, 2 pins are required to  
   interface. For Arduino UNOs, thats SCL -> Analog 5, SDA -> Analog 4
 
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
+  Adafruit invests time and resources providing this open source code, 
+  please support Adafruit and open-source hardware by purchasing 
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.
+  Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -40,15 +40,15 @@ void Adafruit_PWMServoDriver::reset(void) {
 void Adafruit_PWMServoDriver::setPWMFreq(float freq) {
   //Serial.print("Attempting to set freq ");
   //Serial.println(freq);
-
+  
   float prescaleval = 25000000;
   prescaleval /= 4096;
   prescaleval /= freq;
   prescaleval -= 1;
   Serial.print("Estimated pre-scale: "); Serial.println(prescaleval);
   uint8_t prescale = floor(prescaleval + 0.5);
-  Serial.print("Final pre-scale: "); Serial.println(prescale);
-
+  Serial.print("Final pre-scale: "); Serial.println(prescale);  
+  
   uint8_t oldmode = read8(PCA9685_MODE1);
   uint8_t newmode = (oldmode&0x7F) | 0x10; // sleep
   write8(PCA9685_MODE1, newmode); // go to sleep
