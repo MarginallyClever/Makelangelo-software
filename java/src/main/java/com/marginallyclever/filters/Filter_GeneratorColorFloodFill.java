@@ -16,22 +16,22 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
 /**
- * 
+ *
  * @author danroyer
  * @since at least 7.1.4
  */
 public class Filter_GeneratorColorFloodFill extends Filter {
-  ColorPalette palette; 
+  ColorPalette palette;
   int diameter=0;
   int last_x,last_y;
   BufferedImage imgChanged;
   BufferedImage imgMask;
-  
-  
+
+
   public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
-    
+
     palette = new ColorPalette();
     palette.addColor(new C3(0,0,0));
     palette.addColor(new C3(255,0,0));
@@ -55,7 +55,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     }
     tool.writeMoveTo(osw, TX(x), TY(y));
   }
-  
+
   /**
    * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
    * @param x0 left
@@ -99,8 +99,8 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     }
     //imgMask.flush();
   }
-  
-  
+
+
   /**
    * sample the pixels from x0,y0 (top left) to x1,y1 (bottom right) and average the color.
    * @param x0
@@ -113,7 +113,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     // point sampling
     C3 value = new C3(0,0,0);
     int sum=0;
-    
+
     if(x0<0) x0=0;
     if(x1>image_width-1) x1 = image_width-1;
     if(y0<0) y0=0;
@@ -127,7 +127,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     }
 
     if(sum==0) return new C3(255,255,255);
-    
+
     return value.mul(1.0f/sum);
   }
 
@@ -137,17 +137,17 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     int quantized_color = palette.quantizeIndex(original_color);
     return ( quantized_color == color_index );
   }
-  
-  
+
+
   /**
-   * queue-based flood fill 
+   * queue-based flood fill
    * @param color_index
    * @throws IOException
    */
     protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
         LinkedList<Point2D> points_to_visit = new LinkedList<>();
     points_to_visit.add(new Point2D(x,y));
-    
+
     Point2D a;
 
     while(!points_to_visit.isEmpty()) {
@@ -186,7 +186,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     }
   }
 
-  
+
   /**
    * find blobs of color in the original image.  Send that to the flood fill system.
    * @param color_index index into the list of colors at the top of the class
@@ -195,18 +195,18 @@ public class Filter_GeneratorColorFloodFill extends Filter {
   void scanForContiguousBlocks(int color_index, Writer osw) throws IOException {
     C3 original_color;
     int quantized_color;
-    
+
     int x,y;
     int z=0;
 
     mainGUI.log("<font color='orange'>Palette color "+palette.getColor(color_index).toString()+"</font>\n");
-    
+
     for(y=0;y<image_height;y+=diameter) {
       for(x=0;x<image_width;x+=diameter) {
         if( getMaskTouched(x,y) ) continue;
-        
+
         original_color = takeImageSampleBlock(x, y, x+diameter, y+diameter);
-        quantized_color = palette.quantizeIndex(original_color); 
+        quantized_color = palette.quantizeIndex(original_color);
         if( quantized_color == color_index ) {
           // found blob
           floodFillBlob(color_index, x, y, osw);
@@ -218,19 +218,19 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     }
     System.out.println("Found "+z+" blobs.");
   }
-  
+
   private void scanColor(int i, Writer osw) throws IOException {
     // "please change to tool X and press any key to continue"
     tool = machine.getTool(i);
     tool.writeChangeTo(osw);
     // Make sure the pen is up for the first move
     liftPen(osw);
-    
+
     mainGUI.log("<font color='green'>Color "+i+"</font>\n");
-    
+
     scanForContiguousBlocks(i, osw);
   }
-  
+
   /**
    * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
    * @param img the image to convert.
@@ -240,20 +240,20 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     // The picture might be in color.  Smash it to 255 shades of grey.
     //Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
     //img = bw.process(img);
-    
+
     Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI,machine,translator,1);
     img = blur.process(img);
 //    Histogram h = new Histogram();
 //    h.getHistogramOf(img);
-    
-    
+
+
     // create a color mask so we don't repeat any pixels
     imgMask = new BufferedImage(img.getWidth(),img.getHeight(),BufferedImage.TYPE_INT_RGB);
     Graphics2D g = imgMask.createGraphics();
     g.setPaint ( new Color(0,0,0) );
     g.fillRect ( 0, 0, imgMask.getWidth(), imgMask.getHeight() );
-    
-    
+
+
     // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
@@ -301,12 +301,12 @@ public class Filter_GeneratorColorFloodFill extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

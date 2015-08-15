@@ -7,7 +7,7 @@ package com.marginallyclever.communications;
  */
 public interface MarginallyCleverConnectionManager {
   /**
-   * 
+   *
    * @return a list of addresses of a connection type at which robots are likely to exist.
    */
     public String[] listConnections();
@@ -18,9 +18,9 @@ public interface MarginallyCleverConnectionManager {
      * @return a connection to the device at address <code>connectionName</code>
      */
     public MarginallyCleverConnection openConnection(String connectionName);
-    
+
     /**
-     * 
+     *
      * @return the name of the most recently opened connection.
      */
     public String getRecentConnection();

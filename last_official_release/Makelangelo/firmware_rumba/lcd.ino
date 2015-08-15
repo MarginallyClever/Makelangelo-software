@@ -25,7 +25,7 @@
 
 #define MENU_END \
   num_menu_items=ty; \
-  
+
 #define MENU_ITEM_START(key) \
   if(ty>=screen_position && ty<screen_end) { \
     lcd.setCursor(0,ty-screen_position); \
@@ -42,7 +42,7 @@
     MENU_ITEM_START(menu_label) \
     if(menu_position==ty && lcd_click_now) MENU_GOTO(menu_method); \
     MENU_ITEM_END()
-    
+
 #define MENU_ACTION(menu_label,menu_method) MENU_SUBMENU(menu_label,menu_method)
 
 #define MENU_LONG(key,value) \
@@ -115,7 +115,7 @@ void LCD_read() {
     break;
   }
   lcd_rot_old = rot;
-  
+
   // find click state
   int btn = digitalRead(BTN_ENC);
   if( btn != lcd_click_old && btn == HIGH ) {
@@ -127,24 +127,24 @@ void LCD_read() {
 
 void LCD_update() {
   LCD_read();
- 
+
   if(millis() >= lcd_draw_delay ) {
     lcd_draw_delay = millis() + LCD_DRAW_DELAY;
 
     (*current_menu)();
-    
+
     if( lcd_turn ) {
       int op = menu_position_sum / LCD_TURN_PER_MENU;
       menu_position_sum += lcd_turn;
       lcd_turn=0;
-      
+
       if(num_menu_items>0) {
         if( menu_position_sum > (num_menu_items-1) * LCD_TURN_PER_MENU ) menu_position_sum = (num_menu_items-1) * LCD_TURN_PER_MENU;
       }
-      
+
       menu_position = menu_position_sum / LCD_TURN_PER_MENU;
       if(op != menu_position) lcd.clear();
-    
+
       if(menu_position>num_menu_items-1) menu_position=num_menu_items-1;
       if(menu_position<0) menu_position=0;
       if(screen_position>menu_position) screen_position=menu_position;
@@ -244,7 +244,7 @@ void LCD_start_menu() {
 
   MENU_START
     MENU_SUBMENU("Back",LCD_main_menu);
-    
+
     root.rewindDirectory();
     while(1) {
       File entry =  root.openNextFile();
@@ -340,12 +340,12 @@ void LCD_menu() {}
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

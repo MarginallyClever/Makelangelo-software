@@ -3,9 +3,9 @@ package com.marginallyclever.basictypes;
 public class Line3D {
   protected Point3D start = new Point3D();
   protected Point3D end = new Point3D();
-  
+
   public Line3D() {}
-  
+
   public void setStart(Point3D p) {
     start.set(p.x, p.y, p.z);
   }
@@ -16,19 +16,19 @@ public class Line3D {
   public void setEnd(Point3D p) {
     end.set(p.x, p.y, p.z);
   }
-  
+
   public Point3D getEnd() {
     return end;
   }
-  
+
   public float length() {
     float x = end.x - start.x;
     float y = end.y - start.y;
     float z = end.z - start.z;
-    
+
     return (float)Math.sqrt(x*x+y*y+z*z);
   }
-  
+
   /**
    * get a point (end-start) * v + start where v=0...1
    */

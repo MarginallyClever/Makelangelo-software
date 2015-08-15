@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 public class Filter_GeneratorPulse extends Filter {
   float blockScale=4.0f;
   int direction=0;
-  
+
   public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -41,13 +41,13 @@ public class Filter_GeneratorPulse extends Filter {
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }
-  
+
   // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
   protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
     // point sampling
     int value=0;
     int sum=0;
-    
+
     if(x0<0) x0=0;
     if(x1>image_width-1) x1 = image_width-1;
     if(y0<0) y0=0;
@@ -61,10 +61,10 @@ public class Filter_GeneratorPulse extends Filter {
     }
 
     if(sum==0) return 255;
-    
+
     return value/sum;
   }
-  
+
   /**
    * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
    * @param img the image to convert.
@@ -76,11 +76,11 @@ public class Filter_GeneratorPulse extends Filter {
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JLabel(translator.get("HilbertCurveSize")));
     panel.add(field_size);
-    
+
     String [] directions = { "horizontal", "vertical" };
     final JComboBox<String> direction_choices = new JComboBox<String>(directions);
     panel.add(direction_choices);
-    
+
       int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
         blockScale = Float.parseFloat(field_size.getText());
@@ -88,7 +88,7 @@ public class Filter_GeneratorPulse extends Filter {
       convertNow(img);
       }
   }
-  
+
   private void convertNow(BufferedImage img) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
@@ -273,12 +273,12 @@ public class Filter_GeneratorPulse extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

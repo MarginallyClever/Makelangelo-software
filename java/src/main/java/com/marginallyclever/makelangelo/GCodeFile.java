@@ -27,31 +27,31 @@ public class GCodeFile {
   public float feed_rate=1.0f;
   public boolean changed=false;
 
-  
+
   // returns angle of dy/dx as a value from 0...2PI
   private double atan3(double dy,double dx) {
     double a=Math.atan2(dy,dx);
     if(a<0) a=(Math.PI*2.0)+a;
     return a;
   }
-  
-  
+
+
   void estimateDrawTime() {
     int j;
-    
+
     double px=0,py=0,pz=0, length=0, x,y,z,ai,aj;
     feed_rate=1.0f;
     scale=0.1f;
     estimated_time=0;
     estimated_length=0;
     estimate_count=0;
-    
+
     Iterator<String> iLine = lines.iterator();
     while(iLine.hasNext()) {
       String line = iLine.next();
       String[] pieces=line.split(";");  // comments come after a semicolon.
       if(pieces.length==0) continue;
-      
+
       String[] tokens = pieces[0].split("\\s");
 
       for(j=0;j<tokens.length;++j) {
@@ -62,7 +62,7 @@ public class GCodeFile {
           assert(!Float.isNaN(feed_rate) && feed_rate!=0);
         }
       }
-      
+
       x=px;
       y=py;
       z=pz;
@@ -75,13 +75,13 @@ public class GCodeFile {
         if(tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
         if(tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
       }
-      
+
       if(z!=pz) {
         // pen up/down action
         estimated_time+=(z-pz)/feed_rate;  // seconds?
         assert(!Float.isNaN(estimated_time));
       }
-      
+
       if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
          tokens[0].equals("G01") || tokens[0].equals("G1")) {
         // draw a line
@@ -129,21 +129,21 @@ public class GCodeFile {
       // conversion to ms?
       estimated_time *= 10000;
   }
-  
-  
+
+
   // close the file, clear the preview tab
   public void closeFile() {
     if(fileOpened==true) {
       fileOpened=false;
     }
   }
-  
-  
+
+
   public void load(String filename) throws IOException {
     closeFile();
 
       Scanner scanner = new Scanner(new FileInputStream(filename));
-      
+
       linesTotal=0;
       lines = new ArrayList<String>();
       try {
@@ -158,12 +158,12 @@ public class GCodeFile {
       fileOpened=true;
       estimateDrawTime();
   }
-  
-  
+
+
   public void save(String filename) throws IOException {
     FileOutputStream out = new FileOutputStream(filename);
     String temp;
-    
+
     for(int i=0;i<linesTotal;++i) {
       temp=lines.get(i);
       if(!temp.endsWith(";") && !temp.endsWith(";\n")) {
@@ -186,12 +186,12 @@ public class GCodeFile {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

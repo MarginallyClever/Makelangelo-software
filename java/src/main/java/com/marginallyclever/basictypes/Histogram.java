@@ -14,12 +14,12 @@ public class Histogram {
   public char [] blue = new char[256];
 
   public Histogram() {}
-  
+
   public void getHistogramOf(BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();
     int x, y;
-    
+
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         Color c = new Color(img.getRGB(x,y));
@@ -39,12 +39,12 @@ public class Histogram {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */
