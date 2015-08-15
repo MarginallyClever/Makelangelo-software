@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 public class Makelangelo {
-  public static MainGUI gui;
+  private static MainGUI gui;
 
   public static void main(String[] argv) {
       //Schedule a job for the event-dispatching thread:
