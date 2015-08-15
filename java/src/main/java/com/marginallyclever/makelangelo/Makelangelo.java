@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-public class Makelangelo {
+public final class Makelangelo {
   private static MainGUI gui;
 
   public static void main(String[] argv) {
