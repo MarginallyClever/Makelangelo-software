@@ -15,6 +15,6 @@ public interface MarginallyCleverConnection {
     boolean isConnectionOpen();
     boolean isRobotConfirmed();  // FIXME doesn't really belong in MarginallyCleverConnection
     String getRecentConnection();
-    
+
     public void sendMessage(String msg) throws Exception;
 }

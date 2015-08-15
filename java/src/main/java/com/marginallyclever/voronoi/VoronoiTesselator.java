@@ -14,7 +14,7 @@ package com.marginallyclever.voronoi;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-/* 
+/*
  * This code was originally written by Stephan Fortune in C code.  I, Shane O'Sullivan,
  * have since modified it, encapsulating it in a C++ class and, fixing memory leaks and
  * adding accessors to the Voronoi Edges.
@@ -29,7 +29,7 @@ package com.marginallyclever.voronoi;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-/* 
+/*
  * Java Version by Zhenyu Pan
  * Permission to use, copy, modify, and distribute this software for any
  * purpose without fee is hereby granted, provided that this entire notice
@@ -70,7 +70,7 @@ public class VoronoiTesselator {
     private VoronoiHalfEdge ELhash[];
     private VoronoiHalfEdge ELleftend, ELrightend;
     private List<VoronoiGraphEdge> allEdges;
-    
+
 
     /*********************************************************
      * Public methods
@@ -84,9 +84,9 @@ public class VoronoiTesselator {
     this.allEdges = null;
     this.minDistanceBetweenSites = minDistanceBetweenSites;
     }
-    
+
     /**
-     * 
+     *
      * @param xValuesIn Array of X values for each site.
      * @param yValuesIn Array of Y values for each site. Must be identical length to yValuesIn
      * @param minX The minimum X of the bounding box around the voronoi
@@ -126,7 +126,7 @@ public class VoronoiTesselator {
     }
 
 
-    
+
      /*********************************************************
      * Private methods - implementation details
      ********************************************************/

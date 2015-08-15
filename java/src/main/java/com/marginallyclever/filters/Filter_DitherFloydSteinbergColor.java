@@ -10,13 +10,13 @@ import java.awt.image.BufferedImage;
 
 
 /**
- * Floyd/Steinberg dithering 
+ * Floyd/Steinberg dithering
  * @author Dan
  * @see <a href="http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering">http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering</a>
  */
 public class Filter_DitherFloydSteinbergColor extends Filter {
   public ColorPalette palette;
-  
+
   public Filter_DitherFloydSteinbergColor(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -27,7 +27,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
     palette.addColor(new C3(0,0,255));
   }
 
-  
+
   private void ditherDirection(BufferedImage img,int y,C3[] error,C3[] nexterror,int direction) {
     int w = img.getWidth();
     C3 oldPixel = new C3(0,0,0);
@@ -36,7 +36,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
     int start, end, x;
 
     for(x=0;x<w;++x) nexterror[x].set(0,0,0);
-    
+
     if(direction>0) {
       start=0;
       end=w;
@@ -44,7 +44,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
       start=w-1;
       end=-1;
     }
-    
+
     // for each x from left to right
     for(x=start;x!=end;x+=direction) {
       // oldpixel := pixel[x][y]
@@ -69,7 +69,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
       }
     }
   }
-  
+
   @Override
   public BufferedImage process(BufferedImage img) {
     int y;
@@ -78,22 +78,22 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
     int direction=1;
     C3 [] error=new C3[w];
     C3 [] nexterror=new C3[w];
-    
+
     for(y=0;y<w;++y) {
       error[y] = new C3(0,0,0);
       nexterror[y] = new C3(0,0,0);
     }
-    
+
     // for each y from top to bottom
     for(y=0;y<h;++y) {
       ditherDirection(img,y,error,nexterror,direction);
-      
+
       direction = -direction;
       C3 [] tmp = error;
       error=nexterror;
       nexterror=tmp;
     }
-    
+
     return img;
   }
 }
@@ -106,12 +106,12 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */
