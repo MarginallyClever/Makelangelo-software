@@ -49,7 +49,7 @@ import java.util.prefs.Preferences;
  * @author danroyer
  * @since 0.0.1?
  */
-public class MainGUI
+public final class MainGUI
     extends JPanel
     implements ActionListener {
 
@@ -57,14 +57,11 @@ public class MainGUI
   static final long serialVersionUID = 1L;
 
   /**
-   * software version. Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update
-   * the version based upon version defined in POM.xml. In this way we only define the version once and prevent
+   * software VERSION. Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update
+   * the VERSION based upon VERSION defined in POM.xml. In this way we only define the VERSION once and prevent
    * violating DRY.
    */
-  public static final String version =
-      PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-  ;
-
+  public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
@@ -85,9 +82,12 @@ public class MainGUI
   // logging
   private JTextPane log;
   private JScrollPane logPane;
-  HTMLEditorKit kit;
-  HTMLDocument doc;
-  PrintWriter logToFile;
+  private HTMLEditorKit kit;
+  private HTMLDocument doc;
+  /**
+   * <b>Seriously</b> consider not having this as a member variable and using try with resources statement.
+   */
+  private Writer logToFile;
 
   // main window layout
   private Splitter split_left_right;
@@ -206,18 +206,18 @@ public class MainGUI
   }
 
   private void startLog() {
-    try {
-      logToFile = new PrintWriter(new FileWriter("log.html"));
+    try (final Writer fileWriter = new FileWriter("log.html")) {
+      logToFile = new PrintWriter(fileWriter);
       Calendar cal = Calendar.getInstance();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
       logToFile.write("<h3>" + sdf.format(cal.getTime()) + "</h3>\n");
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("{}", e);
     }
   }
 
   private void endLog() {
-    logToFile.close();
+    IOUtils.closeQuietly(logToFile);
   }
 
 
@@ -271,18 +271,17 @@ public class MainGUI
 
     msg = msg.replace("\n", "<br>\n") + "\n";
     msg = msg.replace("\n\n", "\n");
-    logToFile.write(msg);
-    logToFile.flush();
-
     try {
+      logToFile.write(msg);
+      logToFile.flush();
       kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
       int over_length = doc.getLength() - msg.length() - 5000;
       doc.remove(0, over_length);
       //logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
     } catch (BadLocationException e) {
-      // Do we care if it fails?
+      logger.error("{}", e);
     } catch (IOException e) {
-      // Do we care if it fails?
+      logger.error("{}", e);
     }
   }
 
@@ -292,7 +291,7 @@ public class MainGUI
       kit.insertHTML(doc, 0, "", 0, 0, null);
       //logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
     } catch (BadLocationException e) {
-      // Do we care if it fails?
+
     } catch (IOException e) {
       // Do we care if it fails?
     }
@@ -826,7 +825,7 @@ public class MainGUI
    * <p>
    * The summation of {@link String#length()} for each of the respective values retrieved with the
    * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link MultilingualSupport} keys,
-   * in conjunction with {@link MainGUI#version} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
+   * in conjunction with {@link MainGUI#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
    * </p>
    *
    * @return An HTML string used for the About Message Dialog.
@@ -835,12 +834,12 @@ public class MainGUI
     final String aboutHtmlBeforeVersionNumber = translator.get("AboutHTMLBeforeVersionNumber");
     final String aboutHmlAfterVersionNumber = translator.get("AboutHTMLAfterVersionNumber");
     final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
-    final int versionNumberStringLength = version.length();
+    final int versionNumberStringLength = VERSION.length();
     final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
     final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
     final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
     aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
-    aboutHtmlStringBuilder.append(version);
+    aboutHtmlStringBuilder.append(VERSION);
     aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
     return aboutHtmlStringBuilder.toString();
   }
@@ -919,14 +918,14 @@ public class MainGUI
         int end = inputLine.indexOf(matchEnd);
         if (start != -1 && end != -1) {
           inputLine = inputLine.substring(start + matchStart.length(), end);
-          // parse the last part of the redirect URL, which contains the release tag (which is the version)
+          // parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
           inputLine = inputLine.substring(inputLine.lastIndexOf("/") + 1);
 
           System.out.println("last release: " + inputLine);
-          System.out.println("your version: " + version);
-          //System.out.println(inputLine.compareTo(version));
+          System.out.println("your VERSION: " + VERSION);
+          //System.out.println(inputLine.compareTo(VERSION));
 
-          if (inputLine.compareTo(version) > 0) {
+          if (inputLine.compareTo(VERSION) > 0) {
             JOptionPane.showMessageDialog(null, translator.get("UpdateNotice"));
           } else {
             JOptionPane.showMessageDialog(null, translator.get("UpToDate"));
