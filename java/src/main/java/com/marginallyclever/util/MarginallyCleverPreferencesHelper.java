@@ -23,7 +23,7 @@ final class MarginallyCleverPreferencesHelper {
     /**
      *
      */
-    private final static Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferencesHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferencesHelper.class);
 
     /**
      *
