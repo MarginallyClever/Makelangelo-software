@@ -121,16 +121,6 @@ public final class MainGUI
     machineConfiguration = new MachineConfiguration(this, translator);
     connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
     createAndShowGUI();
-    logFonts();
-  }
-
-  private void logFonts() {
-    final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final Font[] fonts = ge.getAllFonts();
-    logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
-    for (Font font : fonts) {
-      logger.info("{} : {}", font.getFontName(), font.getFamily());
-    }
   }
 
 
