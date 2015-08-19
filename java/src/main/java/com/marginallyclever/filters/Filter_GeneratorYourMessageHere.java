@@ -30,7 +30,20 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	public Filter_GeneratorYourMessageHere(MainGUI gui,
 			MachineConfiguration mc, MultilingualSupport ms) {
 		super(gui, mc, ms);
+		
+		//logFonts();
 	}
+
+	
+    private void logFonts() {
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final Font[] fonts = ge.getAllFonts();
+        logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
+        for (Font font : fonts) {
+            logger.info("{} : {}", font.getFontName(), font.getFamily());
+        }
+    }
+    
 
 	@Override
 	public String getName() { return translator.get("YourMsgHereName"); }
