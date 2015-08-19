@@ -27,29 +27,39 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
     private final Logger logger = LoggerFactory.getLogger(Filter_GeneratorYourMessageHere.class);
 
-  public Filter_GeneratorYourMessageHere(MainGUI gui,
-      MachineConfiguration mc, MultilingualSupport ms) {
-    super(gui, mc, ms);
-  }
+	public Filter_GeneratorYourMessageHere(MainGUI gui,
+			MachineConfiguration mc, MultilingualSupport ms) {
+		super(gui, mc, ms);
+    logFonts();
+	}
 
-  @Override
-  public String getName() { return translator.get("YourMsgHereName"); }
-  
-  public void generate(String dest) {
-    final JTextArea text = new JTextArea(lastMessage,6,60);
-  
-    JPanel panel = new JPanel(new GridLayout(0,1));
-    panel.add(new JScrollPane(text));
-    
-      int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-      if (result == JOptionPane.OK_OPTION) {
-      lastMessage = text.getText();
-      createMessage(lastMessage,dest);
-      
-      // TODO Move to GUI?
-      mainGUI.log("<font color='green'>Completed.</font>\n");
+  private void logFonts() {
+      final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      final Font[] fonts = ge.getAllFonts();
+      logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
+      for (Font font : fonts) {
+          logger.info("{} : {}", font.getFontName(), font.getFamily());
       }
   }
+
+	@Override
+	public String getName() { return translator.get("YourMsgHereName"); }
+	
+	public void generate(String dest) {
+		final JTextArea text = new JTextArea(lastMessage,6,60);
+	
+		JPanel panel = new JPanel(new GridLayout(0,1));
+		panel.add(new JScrollPane(text));
+		
+	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+			lastMessage = text.getText();
+			createMessage(lastMessage,dest);
+			
+			// TODO Move to GUI?
+			mainGUI.log("<font color='green'>Completed.</font>\n");
+	    }
+	}
 
   protected void createMessage(String str,String dest) {
 
