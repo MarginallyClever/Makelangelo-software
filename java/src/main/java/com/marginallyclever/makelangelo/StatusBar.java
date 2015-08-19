@@ -1,13 +1,19 @@
 package com.marginallyclever.makelangelo;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.text.DecimalFormat;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.Border;
 
 
 // manages the status bar at the bottom of the application window
-public class StatusBar extends JLabel {
+public class StatusBar extends JPanel {
 	static final long serialVersionUID=1;
 	
 	long t_start;
@@ -16,7 +22,8 @@ public class StatusBar extends JLabel {
 	protected String sRemaining=" remaining: ";
 	protected String sElapsed="";
 	protected MultilingualSupport translator;
-	
+	protected JLabel message;
+	protected JProgressBar bar;
 	
 	public String formatTime(long millis) {
     	long s=millis/1000;
@@ -36,21 +43,34 @@ public class StatusBar extends JLabel {
 	
     public StatusBar(MultilingualSupport ms) {
         super();
-        super.setPreferredSize(new Dimension(100, 16));
+        this.setBorder(BorderFactory.createEmptyBorder(1,5,1,5));
+        GridBagLayout gridbag = new GridBagLayout();
+        setLayout(gridbag);
 
         translator = ms;
+
+        GridBagConstraints c = new GridBagConstraints();
+        message = new JLabel();
+        bar = new JProgressBar();
+        c.fill=GridBagConstraints.BOTH;
+        c.weightx=1;
+        //c.anchor=GridBagConstraints.WEST;
+        gridbag.setConstraints(bar, c);
+        this.add(bar);
+        //c.anchor=GridBagConstraints.EAST;
+        c.weightx=10;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(message, c);
+        this.add(message);
         
         Font f = getFont();
         setFont(f.deriveFont(Font.BOLD,15));
-        Dimension d=getMinimumSize();
-        d.setSize(d.getWidth(), d.getHeight()+30);
-        setMinimumSize(d);
         
         clear();
     }
     
-    public void setMessage(String message) {
-        setText(" "+message);        
+    public void setMessage(String text) {
+        message.setText(" "+text);        
     }
     
     public String getElapsed() {
@@ -66,10 +86,10 @@ public class StatusBar extends JLabel {
     }
     
     public void setProgress(long sofar,long total) {
-    	float progress=0;
     	sElapsed="";
     	if(total>0) {
-    		progress = 100.0f*(float)sofar/(float)total;
+    		bar.setMaximum((int)total);
+    		bar.setValue((int)sofar);
     		
     		long t_draw_now= (sofar>0) ? System.currentTimeMillis()-t_start : 0;
     		long total_time = (long)( (float)t_draw_now * (float)total / (float)sofar );
@@ -78,7 +98,7 @@ public class StatusBar extends JLabel {
         			translator.get("StatusRemaining") + formatTime(remaining);
     	}
 
-	   	setMessage(fmt.format(progress)+"% ("+sofar+"/"+total+") "+sElapsed);
+	   	setMessage("% ("+sofar+"/"+total+") "+sElapsed);
     }
 }
 
