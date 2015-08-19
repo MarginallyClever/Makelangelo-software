@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 
@@ -122,9 +123,10 @@ public class MainGUI
 		machineConfiguration = new MachineConfiguration(this,translator);
         connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
         createAndShowGUI();
-        logFonts();
+        //logFonts();
 	}
 
+	
     private void logFonts() {
         final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final Font[] fonts = ge.getAllFonts();
