@@ -46,6 +46,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
     /**
      *
      */
+    @SuppressWarnings("unused")
     private static final boolean LOG_MISSING_KEYS = true;
 
     /**
@@ -61,6 +62,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
     /**
      *
      */
+    @SuppressWarnings("unused")
     private static final boolean DO_NOT_CHECK_ALL_LANGUAGE_FILES = false;
 
     /**
