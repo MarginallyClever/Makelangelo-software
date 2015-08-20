@@ -6,10 +6,10 @@ package com.marginallyclever.communications;
  * @since v7.1.0.0
  */
 public interface MarginallyCleverConnectionManager {
-	/**
-	 * 
-	 * @return a list of addresses of a connection type at which robots are likely to exist.
-	 */
+  /**
+   * 
+   * @return a list of addresses of a connection type at which robots are likely to exist.
+   */
     public String[] listConnections();
 
     /**

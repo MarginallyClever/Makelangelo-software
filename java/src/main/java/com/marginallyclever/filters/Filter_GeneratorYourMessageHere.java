@@ -16,34 +16,31 @@ import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {
-	protected float kerning=-0.50f;
-	protected float letter_width=2.0f;
-	protected float letter_height=2.0f;
-	protected float line_spacing=0.5f;
-	protected float margin=1.0f;
-	static final String alphabetFolder = new String("ALPHABET/");
-	protected int chars_per_line=35;
-	protected static String lastMessage = "";
+  protected float kerning=-0.50f;
+  protected float letter_width=2.0f;
+  protected float letter_height=2.0f;
+  protected float line_spacing=0.5f;
+  protected float margin=1.0f;
+  static final String alphabetFolder = new String("ALPHABET/");
+  protected int chars_per_line=35;
+  protected static String lastMessage = "";
 
     private final Logger logger = LoggerFactory.getLogger(Filter_GeneratorYourMessageHere.class);
 
 	public Filter_GeneratorYourMessageHere(MainGUI gui,
 			MachineConfiguration mc, MultilingualSupport ms) {
 		super(gui, mc, ms);
-		
-		//logFonts();
+    logFonts();
 	}
 
-	
-    private void logFonts() {
-        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final Font[] fonts = ge.getAllFonts();
-        logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
-        for (Font font : fonts) {
-            logger.info("{} : {}", font.getFontName(), font.getFamily());
-        }
-    }
-    
+  private void logFonts() {
+      final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      final Font[] fonts = ge.getAllFonts();
+      logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
+      for (Font font : fonts) {
+          logger.info("{} : {}", font.getFontName(), font.getFamily());
+      }
+  }
 
 	@Override
 	public String getName() { return translator.get("YourMsgHereName"); }
@@ -64,27 +61,27 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 	    }
 	}
 
-	protected void createMessage(String str,String dest) {
+  protected void createMessage(String str,String dest) {
 
         try (final OutputStream fileOutputStream = new FileOutputStream(dest);
              final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
-			tool = machine.getCurrentTool();
-			setupTransform();
-			output.write(machine.getConfigLine()+";\n");
-			output.write(machine.getBobbinLine()+";\n");
-			tool.writeChangeTo(output);
-			
-			textSetAlign(Align.CENTER);
-			textSetVAlign(VAlign.MIDDLE);
-			textCreateMessageNow(lastMessage,output);
+      tool = machine.getCurrentTool();
+      setupTransform();
+      output.write(machine.getConfigLine()+";\n");
+      output.write(machine.getBobbinLine()+";\n");
+      tool.writeChangeTo(output);
+      
+      textSetAlign(Align.CENTER);
+      textSetVAlign(VAlign.MIDDLE);
+      textCreateMessageNow(lastMessage,output);
 
-			textSetAlign(Align.RIGHT);
-			textSetVAlign(VAlign.TOP);
-			textSetPosition(image_width,image_height);
-			textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
-		} catch(IOException e) {
+      textSetAlign(Align.RIGHT);
+      textSetVAlign(VAlign.TOP);
+      textSetPosition(image_width,image_height);
+      textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
+    } catch(IOException e) {
             logger.error("{}", e);
         }
-	}
+  }
 }

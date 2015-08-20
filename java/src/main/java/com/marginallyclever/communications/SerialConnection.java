@@ -47,12 +47,12 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
     @Override
     public void sendMessage(String msg) throws Exception {
-		try {
-			serialPort.writeBytes(msg.getBytes());
-		}
-		catch(SerialPortException e) {
-			throw new Exception(e.getMessage());
-		}
+    try {
+      serialPort.writeBytes(msg.getBytes());
+    }
+    catch(SerialPortException e) {
+      throw new Exception(e.getMessage());
+    }
     }
     
     
@@ -101,7 +101,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
             String x=getNumberPortion(after_error);
             int err=0;
             try {
-            	err = Integer.decode(x);
+              err = Integer.decode(x);
             }
             catch(Exception e) {}
             
@@ -112,7 +112,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
             String x=getNumberPortion(after_error);
             int err=0;
             try {
-            	err = Integer.decode(x);
+              err = Integer.decode(x);
             }
             catch(Exception e) {}
             
@@ -123,7 +123,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
             String x=getNumberPortion(after_error);
             int err=0;
             try {
-            	err = Integer.decode(x);
+              err = Integer.decode(x);
             }
             catch(Exception e) {}
             
@@ -222,7 +222,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
      * @return the portion of the string that is actually a number
      */
     private String getNumberPortion(String src) {
-    	src = src.trim();
+      src = src.trim();
         int length = src.length();
         String result = "";
         for (int i = 0; i < length; i++) {
@@ -255,6 +255,6 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     
     @Override
     public String getRecentConnection() {
-    	return connectionName;
+      return connectionName;
     }
 }

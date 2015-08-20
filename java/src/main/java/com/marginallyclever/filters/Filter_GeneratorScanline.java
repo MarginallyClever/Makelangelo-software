@@ -11,25 +11,25 @@ import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorScanline extends Filter {
-	public Filter_GeneratorScanline(MainGUI gui, MachineConfiguration mc,
-			MultilingualSupport ms) {
-		super(gui, mc, ms);
-	}
+  public Filter_GeneratorScanline(MainGUI gui, MachineConfiguration mc,
+      MultilingualSupport ms) {
+    super(gui, mc, ms);
+  }
 
-	@Override
-	public String getName() { return translator.get("ScanlineName"); }
-	
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 * @param img the image to convert.
-	 */
-	@Override
-	public void convert(BufferedImage img) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-		img = bw.process(img);
+  @Override
+  public String getName() { return translator.get("ScanlineName"); }
+  
+  /**
+   * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+   * @param img the image to convert.
+   */
+  @Override
+  public void convert(BufferedImage img) throws IOException {
+    // The picture might be in color.  Smash it to 255 shades of grey.
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+    img = bw.process(img);
 
-		// Open the destination file
+    // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
         final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
@@ -79,7 +79,7 @@ public class Filter_GeneratorScanline extends Filter {
             signName(out);
             moveTo(out, 0, 0, true);
         }
-	}
+  }
 }
 
 
