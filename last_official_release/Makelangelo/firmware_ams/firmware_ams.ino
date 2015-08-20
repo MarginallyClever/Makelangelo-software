@@ -34,9 +34,10 @@
 #define L_PIN           (A3)
 #define R_PIN           (A5)
 
-// stepper motor @ 200 steps per turn
-#define STEPPER_STEPS_PER_TURN    (200.0)
-#define MICROSTEPPING_MULTIPLIER  (1.0)
+// Marginally Clever steppers are 400 steps per turn.
+#define STEPPER_STEPS_PER_TURN    (400.0)
+// We don't use microstepping on the AMS shield.
+#define MICROSTEPPING_MULTIPLIER  (16.0)
 #define STEPS_PER_TURN            (STEPPER_STEPS_PER_TURN*MICROSTEPPING_MULTIPLIER)
 
 
@@ -97,10 +98,10 @@
 #define M2_ONESTEP(x)  m2.step(1,x)
 #endif
 #if MOTHERBOARD == 2
-#define M1_STEP  m1->step
-#define M2_STEP  m2->step
-#define M1_ONESTEP(x)  m1->onestep(x,SINGLE)
-#define M2_ONESTEP(x)  m2->onestep(x,SINGLE)
+#define M1_STEP(a,b)  m1->step(a,b,MICROSTEP)
+#define M2_STEP(a,b)  m2->step(a,b,MICROSTEP)
+#define M1_ONESTEP(x)  m1->onestep(x,MICROSTEP)
+#define M2_ONESTEP(x)  m2->onestep(x,MICROSTEP)
 // stacked motor shields have different addresses. The default is 0x60
 // 0x70 is the "all call" address - every shield will respond as one.
 #define SHIELD_ADDRESS (0x61)

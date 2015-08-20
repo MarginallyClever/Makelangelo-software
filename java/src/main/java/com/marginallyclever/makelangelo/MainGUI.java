@@ -39,7 +39,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 

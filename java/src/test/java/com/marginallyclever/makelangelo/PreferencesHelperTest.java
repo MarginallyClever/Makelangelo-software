@@ -63,7 +63,7 @@ public class PreferencesHelperTest {
     /**
      *
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     public void logPreferences() {
         logPreferenceNode(preferenceNode);
     }
@@ -71,7 +71,7 @@ public class PreferencesHelperTest {
     /**
      *
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({ "UnusedDeclaration", "unused" })
     public void testCopyPreferenceNode() {
         try {
             clearAll(marginallyCleverJsonPreferenceNode);

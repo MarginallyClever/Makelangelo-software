@@ -7,11 +7,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.prefs.PreferencesFactory;
 
 /**
  * Created on 6/23/15.
