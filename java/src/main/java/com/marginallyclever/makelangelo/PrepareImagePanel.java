@@ -93,10 +93,9 @@ implements ActionListener {
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 	
 	// Image processing
-	// TODO use a ServiceLoader for plugins
 	private List<Filter> image_converters;
 	
-	// TODO use a ServiceLoader instead?
+	// TODO use a ServiceLoader and find generator plugins in nearby folders
 	protected void loadImageConverters() {
 		image_converters = new ArrayList<Filter>();
 		image_converters.add(new Filter_GeneratorZigZag(gui,machineConfiguration,translator));
@@ -106,8 +105,8 @@ implements ActionListener {
 		image_converters.add(new Filter_GeneratorPulse(gui,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorBoxes(gui,machineConfiguration,translator));
 		image_converters.add(new Filter_GeneratorColorBoxes(gui, machineConfiguration, translator));
-		image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
 		image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
+		//image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
 	}
 
     /**
