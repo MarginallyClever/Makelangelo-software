@@ -90,7 +90,7 @@ implements ActionListener {
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
   private JSlider input_paper_margin;
-    private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
+  private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
