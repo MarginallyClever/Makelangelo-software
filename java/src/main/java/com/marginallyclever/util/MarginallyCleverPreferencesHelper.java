@@ -34,29 +34,54 @@ final class MarginallyCleverPreferencesHelper {
      *
      */
     private static final String SAVE_FILE_FLAG = "-f";
+    
+    /**
+     *
+     */
+    private static final String NUKE_PREFERENCES_FLAG = "-n";
 
     /**
      *
      * @param args command line arguments.
      */
     public static void main(String[] args) throws BackingStoreException {
-        final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-        LOGGER.info("node name: {}", machinesPreferenceNode.name());
         final boolean wereThereCommandLineArguments = args.length > 0;
         if(wereThereCommandLineArguments) {
             final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
             if (wasSaveFileFlagFound) {
+                /*
                 final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
                 try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
                     PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
                 } catch (IOException e) {
                     LOGGER.error("{}", e);
                 }
+                 */
+                final String userRootFilePath = System.getProperty("user.home") + File.separator + "userRoot" + ".fileprefs";
+                final File preferencesFile = new File(userRootFilePath).getAbsoluteFile();
+                try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
+                    Preferences.userRoot().exportSubtree(fileOutputStream);
+                } catch (IOException e) {
+                    LOGGER.error("{}", e);
+                }
             }
             final boolean wasPurgeFlagFound = wasSearchKeyFoundInArray(PURGE_FLAG, args);
             if (wasPurgeFlagFound) {
+                final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+                LOGGER.info("node name: {}", machinesPreferenceNode.name());
                 final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
                 purgeMachineNamesThatAreLessThanZero(machinesPreferenceNode, childrenPreferenceNodeNames);
+            }
+            final boolean wasNuclearLaunchDetected = wasSearchKeyFoundInArray(NUKE_PREFERENCES_FLAG, args);
+            if (wasNuclearLaunchDetected) {
+                final Preferences userRoot = Preferences.userRoot();
+                Preferences makelangeloNode = userRoot.node("DrawBot");
+                MarginallyCleverPreferencesHelper.removeAll(makelangeloNode);
+                makelangeloNode.flush();
+                userRoot.flush();
+                makelangeloNode = null;
+                userRoot.remove("DrawBot");
+                userRoot.remove("Language");
             }
         }
     }
@@ -113,6 +138,55 @@ final class MarginallyCleverPreferencesHelper {
             }
         }
         return lessThanZeroNames;
+    }
+    
+    /**
+     *
+     * Recursively clears all the preferences (key-value associations) for a given node and its children.
+     *
+     * @param preferenceNode Preference node that you want recursively cleared of all key value pairs.
+     *
+     * @see <a href="http://stackoverflow.com/a/6411855"></a>
+     */
+    private static void clearAll(Preferences preferenceNode) throws BackingStoreException {
+        final String[] childrenNames = preferenceNode.childrenNames();
+        for(String childNodeName : childrenNames) {
+            final Preferences childNode = preferenceNode.node(childNodeName);
+            final String[] childNodesChildren = childNode.childrenNames();
+            if(childNodesChildren != null) {
+                final boolean hasChildren = childNodesChildren.length != 0;
+                if(hasChildren) {
+                    clearAll(childNode);
+                }
+                childNode.clear();
+            }
+        }
+        preferenceNode.clear();
+    }
+    
+    /**
+     *
+     * Recursively removes a preference nodes and its children.
+     *
+     * @param preferenceNode Preference node that you want recursively removed.
+     *
+     */
+    private static void removeAll(Preferences preferenceNode) throws BackingStoreException {
+        final String[] childrenNames = preferenceNode.childrenNames();
+        for(String childNodeName : childrenNames) {
+            final Preferences childNode = preferenceNode.node(childNodeName);
+            final String[] childNodesChildren = childNode.childrenNames();
+            if(childNodesChildren != null) {
+                final boolean hasChildren = childNodesChildren.length != 0;
+                if(hasChildren) {
+                    MarginallyCleverPreferencesHelper.removeAll(childNode);
+                }
+                childNode.removeNode();
+                childNode.flush();
+            }
+        }
+        preferenceNode.removeNode();
+        preferenceNode.flush();
     }
 
     private MarginallyCleverPreferencesHelper() {}
