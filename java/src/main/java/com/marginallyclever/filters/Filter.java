@@ -297,8 +297,8 @@ public abstract class Filter {
     double xfloor = Math.floor(x1);
     double xweightend = ( x1 != xceil ) ? xfloor - x1 : 0;
     
-    int left = (int)(x0+1);
-    int right = (int)x1;
+    int left = (int)Math.floor(x0);
+    int right = (int)Math.ceil(x1);
     
     // top edge
     double yceil = Math.ceil(y0);
@@ -315,8 +315,8 @@ public abstract class Filter {
       sample1x1Safe(img,right,(int)y0, xweightend * yweightstart);
     }
     
-    int bottom = (int)(y0+1);
-    int top = (int)y1;
+    int bottom = (int)Math.floor(y0);
+    int top = (int)Math.ceil(y1);
     for(int j = bottom; j < top; ++j ) {
       // left edge
       sample1x1Safe(img,(int)x0,j, xweightstart);

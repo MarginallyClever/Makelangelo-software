@@ -47,8 +47,8 @@ public class Filter_GeneratorCrosshatch extends Filter {
             tool.writeChangeTo(out);
             liftPen(out);
 
-            convertImageSpace(img, out);
-//    ConvertPaperSpace(img,out);
+//            convertImageSpace(img, out);
+    		convertPaperSpace(img,out);
 
             liftPen(out);
             signName(out);
@@ -62,10 +62,10 @@ public class Filter_GeneratorCrosshatch extends Filter {
     
   protected int sampleScale(BufferedImage img,double x0,double y0,double x1,double y1) {
     return sample(img,
-        (x0-xStart)/(xEnd-xStart) * image_width,
-        image_height - (y1-yStart)/(yEnd-yStart) * image_height,
-        (x1-xStart)/(xEnd-xStart) * image_width,
-        image_height - (y0-yStart)/(yEnd-yStart) * image_height
+        (x0-xStart)/(xEnd-xStart) * (double)image_width,
+        (double)image_height - (y1-yStart)/(yEnd-yStart) * (double)image_height,
+        (x1-xStart)/(xEnd-xStart) * (double)image_width,
+        (double)image_height - (y0-yStart)/(yEnd-yStart) * (double)image_height
         );
   }
   
@@ -99,6 +99,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
     double halfStep = stepSize/2.0;
     double x,y;
     
+    // vertical
     for(y=yStart;y<yEnd;y+=stepSize) {
       moveToPaper(out,xStart,y,true);
       for(x=xStart;x<xEnd;x+=stepSize) {
@@ -107,6 +108,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
       }
       moveToPaper(out,xEnd,y,true);
     }
+    // horizontal
     level += leveladd;
     for(x=xStart;x<xEnd;x+=stepSize) {
       moveToPaper(out,x,yStart,true);
@@ -120,7 +122,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
 
     double x2;
     
-    
+    // diagonal 1
     level += leveladd;
     x=xStart;
     do {
@@ -135,12 +137,13 @@ public class Filter_GeneratorCrosshatch extends Filter {
         int v = sampleScale(img,x2-halfStep,y-halfStep,x2+halfStep,y+halfStep);
         moveToPaper(out,x2,y,v>=level);
       }
-      if(x2>=xStart && x2 <xEnd)
+      //if(x2>=xStart && x2 <xEnd)
         moveToPaper(out,x2,yEnd,true);
       
       x+=stepSize;
     } while(x2<xEnd);
 
+    // diagonal 2
     level += leveladd;
     x=xEnd;
     do {
@@ -155,19 +158,11 @@ public class Filter_GeneratorCrosshatch extends Filter {
         int v = sampleScale(img,x2-halfStep,y-halfStep,x2+halfStep,y+halfStep);
         moveToPaper(out,x2,y,v>=level);
       }
-      if(x2>=xStart && x2 <xEnd)
+      //if(x2>=xStart && x2 <xEnd)
         moveToPaper(out,x2,yEnd,true);
       
       x-=stepSize;
     } while(x2>xStart);
-    /*
-    moveToPaper(out,xStart,yStart,false);
-    moveToPaper(out,xEnd  ,yStart,false);
-    moveToPaper(out,xEnd  ,yEnd  ,false);
-    moveToPaper(out,xStart,yEnd  ,false);
-    moveToPaper(out,xStart,yStart,false);
-    moveToPaper(out,xStart,yStart,true);
-    */
   }
   
   
