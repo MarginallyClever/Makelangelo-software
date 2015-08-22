@@ -49,6 +49,8 @@ import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
@@ -88,9 +90,14 @@ implements ActionListener {
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
   private JSlider input_paper_margin;
-    private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
+  private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+
+  /**
+   * @see org.slf4j.Logger
+   */
+  private final Logger logger = LoggerFactory.getLogger(PrepareImagePanel.class);
 
   /**
    * Image processing
@@ -134,7 +141,12 @@ implements ActionListener {
 
     machineConfigurations = getAnyMachineConfigurations();
     machineChoices = new JComboBox<>(machineConfigurations);
-    machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+    try {
+      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+    } catch (IllegalArgumentException e) {
+        // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
+        logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
+    }
 
     input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100-(int)(machineConfiguration.paperMargin*100));
     input_paper_margin.setMajorTickSpacing(10);

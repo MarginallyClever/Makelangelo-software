@@ -1042,7 +1042,7 @@ public final class MainGUI
 
   public Container createContentPane() {
     //Create the content-pane-to-be.
-    JPanel contentPane = new JPanel(new BorderLayout());
+    final JPanel contentPane = new JPanel(new BorderLayout());
     contentPane.setOpaque(true);
 
     // the log panel
