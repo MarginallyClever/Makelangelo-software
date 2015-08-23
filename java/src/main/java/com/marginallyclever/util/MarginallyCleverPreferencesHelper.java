@@ -28,12 +28,12 @@ final class MarginallyCleverPreferencesHelper {
     /**
      *
      */
-    public static final String PURGE_FLAG = "-p";
+    private static final String PURGE_FLAG = "-p";
 
     /**
      *
      */
-    public static final String SAVE_FILE_FLAG = "-f";
+    private static final String SAVE_FILE_FLAG = "-f";
 
     /**
      *
