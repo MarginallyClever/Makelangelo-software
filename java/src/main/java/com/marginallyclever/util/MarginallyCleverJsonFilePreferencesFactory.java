@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.prefs.AbstractPreferences;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 
@@ -18,7 +19,7 @@ import java.util.prefs.PreferencesFactory;
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  *
  */
-public final class MarginallyCleverJsonFilePreferencesFactory implements PreferencesFactory {
+public final class MarginallyCleverJsonFilePreferencesFactory<A extends AbstractPreferences> implements PreferencesFactory {
 
     /**
      *
@@ -28,7 +29,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
     /**
      *
      */
-    private Preferences rootPreferences;
+    private A rootPreferences;
 
     /**
      *
@@ -52,7 +53,9 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
     public Preferences userRoot() {
         if (rootPreferences == null) {
             logger.info("Instantiating root preferences");
-            rootPreferences = new MarginallyCleverPreferences(null, "");
+            @SuppressWarnings("unchecked")
+            final A castedPreferences = (A)new MarginallyCleverPreferences(null, "");
+            rootPreferences = castedPreferences;
         }
         return rootPreferences;
     }

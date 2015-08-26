@@ -126,8 +126,8 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    */
     @NotNull
     @Override
-    protected AbstractPreferences childSpi(@NotNull String name) {
-        A childPreferenceNode = children.get(name);
+    protected A childSpi(@NotNull String name) {
+      A childPreferenceNode = children.get(name);
       boolean isRemoved = false;
       try {
         isRemoved = getIsRemoved(childPreferenceNode);
@@ -135,10 +135,12 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
         logger.error("{}", e.getMessage());
       }
       if (childPreferenceNode == null || isRemoved) {
-            childPreferenceNode = (A) new MarginallyCleverPreferences(this, name);
-            children.put(name, childPreferenceNode);
-        }
-        return childPreferenceNode;
+        @SuppressWarnings("unchecked")
+        final A castedPreferences = (A)new MarginallyCleverPreferences(this, name);
+        childPreferenceNode = castedPreferences;
+        children.put(name, childPreferenceNode);
+      }
+      return childPreferenceNode;
     }
 
   private boolean getIsRemoved(A abstractPreference) throws ReflectiveOperationException {

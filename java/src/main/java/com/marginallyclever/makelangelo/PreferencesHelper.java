@@ -219,6 +219,7 @@ public final class PreferencesHelper {
   /**
    *
    */
+  @SuppressWarnings("unchecked")
   public  <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void testCopyPreferenceNode(M marginallyCleverJsonPreferenceNode, A preferenceNode) {
     try {
       PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
