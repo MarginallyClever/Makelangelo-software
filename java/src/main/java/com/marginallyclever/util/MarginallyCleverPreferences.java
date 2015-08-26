@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  * Created on 6/7/15.
@@ -21,7 +22,7 @@ import java.util.prefs.BackingStoreException;
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  * @see <a href="http://stackoverflow.com/a/25548386">SO answer to: How to synchronize file access in a Java servlet?</a>
  */
-public class MarginallyCleverPreferences extends AbstractPreferences {
+public class MarginallyCleverPreferences<P extends Preferences> extends AbstractPreferences {
 
     /**
      *
@@ -60,8 +61,8 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
      *                                  (<tt>'/'</tt>),  or <tt>parent</tt> is <tt>null</tt> and
      *                                  name isn't <tt>""</tt>.
      */
-    public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
-        super(parent, name);
+    public MarginallyCleverPreferences(P parent, String name) {
+        super((AbstractPreferences) parent, name);
         logger.info("Instantiating node {}", name);
         root = new TreeMap<>();
         children = new TreeMap<>();

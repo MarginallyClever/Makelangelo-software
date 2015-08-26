@@ -35,7 +35,7 @@ public class PreferencesHelperTest {
     /**
      *
      */
-    private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) preferenceNode, "JSON");
+    private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
     /**
      *
