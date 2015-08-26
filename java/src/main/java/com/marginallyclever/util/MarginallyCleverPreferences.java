@@ -227,17 +227,21 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
                         p.setProperty(path + s, root.get(s));
                     }
                 }
-                final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
-                try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                    p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
-                }
+              storePreferencesInFile(file, p);
             } catch (IOException e) {
                 throw new BackingStoreException(e);
             }
         }
     }
 
-    /**
+  private void storePreferencesInFile(File file, Properties p) throws IOException {
+    final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
+    try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+        p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+    }
+  }
+
+  /**
      *
      * @param sb String builder
      */
