@@ -25,7 +25,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
   protected float letter_height=2.0f;
   protected float line_spacing=0.5f;
   protected float margin=1.0f;
-  static final String alphabetFolder = new String("ALPHABET/");
+  static final String alphabetFolder = "ALPHABET/";
   protected int chars_per_line=35;
   protected static String lastMessage = "";
 

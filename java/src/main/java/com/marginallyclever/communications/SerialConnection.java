@@ -17,7 +17,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     private SerialPort serialPort;
     private static final int BAUD_RATE = 115200;
 
-    private String connectionName = new String();
+    private String connectionName = "";
     private boolean portOpened=false;
     private boolean portConfirmed=false;
 
