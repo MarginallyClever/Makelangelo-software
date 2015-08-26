@@ -4,15 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  * Created on 6/7/15.
@@ -101,8 +99,8 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
 
     @Override
     protected void removeNodeSpi() throws BackingStoreException {
-        thisIsRemoved = true;
         flush();
+        thisIsRemoved = true;
     }
 
     @NotNull
@@ -128,13 +126,13 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
     @Override
     protected A childSpi(@NotNull String name) {
       A childPreferenceNode = children.get(name);
-      boolean isRemoved = false;
+      boolean isChildRemoved = false;
       try {
-        isRemoved = getIsRemoved(childPreferenceNode);
+        isChildRemoved = getIsRemoved(childPreferenceNode);
       } catch (ReflectiveOperationException e) {
         logger.error("{}", e.getMessage());
       }
-      if (childPreferenceNode == null || isRemoved) {
+      if (childPreferenceNode == null || isChildRemoved) {
         @SuppressWarnings("unchecked")
         final A castedPreferences = (A)new MarginallyCleverPreferences(this, name);
         childPreferenceNode = castedPreferences;
@@ -143,6 +141,14 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
       return childPreferenceNode;
     }
 
+  /**
+   *
+   * FIXME - Pure hack to get around erasure.
+   *
+   * @param abstractPreference
+   * @return
+   * @throws ReflectiveOperationException
+   */
   private boolean getIsRemoved(A abstractPreference) throws ReflectiveOperationException {
     Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
     Object isRemoved = declaredMethod.invoke(abstractPreference);
@@ -169,9 +175,9 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
                 getPath(sb);
                 final String path = sb.toString();
 
-                final Enumeration<?> pnen = p.propertyNames();
-                while (pnen.hasMoreElements()) {
-                    final String propKey = (String) pnen.nextElement();
+                final Enumeration<?> propertyNames = p.propertyNames();
+                while (propertyNames.hasMoreElements()) {
+                    final String propKey = (String) propertyNames.nextElement();
                     if (propKey.startsWith(path)) {
                         final String subKey = propKey.substring(path.length());
                         // Only load immediate descendants
@@ -197,7 +203,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
                 getPath(sb);
                 final String path = sb.toString();
                 if (file.exists()) {
-                    try (final FileInputStream fileInputStream = new FileInputStream(file)) {
+                    try (final InputStream fileInputStream = new FileInputStream(file)) {
                         p.load(fileInputStream);
                     }
 
@@ -236,7 +242,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
 
   private void storePreferencesInFile(File file, Properties p) throws IOException {
     final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
-    try (final FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+    try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
         p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
     }
   }
@@ -260,7 +266,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
         sb.append(name()).append('.');
     }
 
-    /**
+  /**
      *
      * @return
      */
