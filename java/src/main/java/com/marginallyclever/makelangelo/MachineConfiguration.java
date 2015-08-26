@@ -680,9 +680,7 @@ public final class MachineConfiguration {
 
       // if this is a new robot UID, update the list of available configurations
       final String [] new_list = new String[machineConfigurationsAvailable.length+1];
-      for(int i = 0; i < machineConfigurationsAvailable.length; ++i) {
-        new_list[i] = machineConfigurationsAvailable[i];
-      }
+      System.arraycopy(machineConfigurationsAvailable, 0, new_list, 0, machineConfigurationsAvailable.length);
       new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
       machineConfigurationsAvailable = new_list;
     }
