@@ -22,7 +22,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     private boolean portConfirmed=false;
     
     private String robot_type_name = "DRAWBOT";  // FIXME doesn't belong in connection, should be a higher class
-    private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";  // FIXME doesn't belong in connection, should be a higher class
+    private String hello = "HELLO WORLD! I AM "+ robot_type_name +" #";  // FIXME doesn't belong in connection, should be a higher class
     
     static private String CUE = "> ";
     static private String NOCHECKSUM = "NOCHECKSUM ";
