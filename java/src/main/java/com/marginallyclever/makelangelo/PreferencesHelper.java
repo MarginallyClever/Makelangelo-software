@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.util.Ancestryable;
 import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
+import com.marginallyclever.util.MarginallyCleverPreferences;
 import org.json.JSONObject;
 import org.json.Property;
 import org.slf4j.Logger;
@@ -14,8 +15,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.*;
 
 /**
  * Created on 5/17/15. FIXME Write Javadocs.
@@ -33,22 +37,46 @@ public final class PreferencesHelper {
     /**
      *
      */
-    private static final Map<MakelangeloPreferenceKey, ? super Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+    private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
-    /**
-     * @see <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
-     */
-    static {
-        final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
-        final Preferences userRootPreferencesNode = Preferences.userRoot();
-        //final String thisPackageName = PreferencesHelper.class.getPackage().getName();
-        final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node("DrawBot");// thisPackageName); FIXME write unit test/tool to view import/export machine configurations.
-        initialMap.put(MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT, makelangeloPreferenceNode);
-        initialMap.put(MakelangeloPreferenceKey.GRAPHICS, makelangeloPreferenceNode.node("Graphics"));
-        initialMap.put(MakelangeloPreferenceKey.MACHINES, makelangeloPreferenceNode.node("Machines"));
-        initialMap.put(MakelangeloPreferenceKey.LANGUAGE, makelangeloPreferenceNode.node("Language"));
-        CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap((Map<? extends MakelangeloPreferenceKey, ? extends Preferences>)initialMap);
-    }
+  /**
+   *
+   */
+  private static final String LEGACY_MAKELANGELO_ROOT_PATH_NAME = "DrawBot";
+
+  /**
+   *
+   */
+  private static final String GRAPHICS_PATH_NAME = "Graphics";
+
+  /**
+   *
+   */
+  private static final String MACHINES_PATH_NAME = "Machines";
+
+  /**
+   *
+   */
+  private static final String LANGUAGE_PATH_NAME = "Language";
+
+  /**
+   * @see <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
+   */
+  static {
+    final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
+    final Preferences userRootPreferencesNode = Preferences.userRoot();
+    final String thisPackageName = PreferencesHelper.class.getPackage().getName();
+    final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(thisPackageName); //FIXME write unit test/tool to view import/export machine configurations.
+    final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);
+    initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
+    initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
+    initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
+    initialMap.put(MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
+    initialMap.put(LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
+    @SuppressWarnings("unchecked")
+    final Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
+    CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
+  }
 
     /**
      * NOOP Constructor.
@@ -62,6 +90,7 @@ public final class PreferencesHelper {
      * @param key enumeration key used to look up a Makelangelo preference value.
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static <P extends Preferences> P getPreferenceNode(MakelangeloPreferenceKey key) {
         return (P) CLASS_TO_PREFERENCE_NODE_MAP.get(key);
     }
@@ -190,7 +219,7 @@ public final class PreferencesHelper {
   /**
    *
    */
-  public  <P extends Preferences> void testCopyPreferenceNode(P marginallyCleverJsonPreferenceNode, P preferenceNode) {
+  public  <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void testCopyPreferenceNode(M marginallyCleverJsonPreferenceNode, A preferenceNode) {
     try {
       PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
     } catch (BackingStoreException e) {
@@ -205,7 +234,7 @@ public final class PreferencesHelper {
       logger.error("{}", e.getMessage());
     }
     logPropertiesNode(p);
-    //logAncestryable(marginallyCleverJsonPreferenceNode);
+    logAncestryable(marginallyCleverJsonPreferenceNode);
   }
 
   /**
