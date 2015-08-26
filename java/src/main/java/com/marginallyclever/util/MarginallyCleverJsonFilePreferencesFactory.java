@@ -95,4 +95,10 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
         return System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
     }
 
+    /**
+     * NOOP Constructor
+     *
+     * @throws IllegalStateException
+     */
+    private MarginallyCleverJsonFilePreferencesFactory() throws IllegalStateException { throw new IllegalStateException(); }
 }
