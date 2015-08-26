@@ -1,20 +1,12 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.UnitTestHelper;
-import org.json.JSONObject;
-import org.json.Property;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -25,12 +17,12 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @since v7.1.4
  */
-public class PreferencesHelperTest {
+public class PreferencesHelperTest<A extends AbstractPreferences> {
 
     /**
      *
      */
-    private final Preferences preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+    private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
 
     /**
      *
@@ -46,43 +38,9 @@ public class PreferencesHelperTest {
      *
      * @throws Exception
      */
-    @SuppressWarnings("EmptyMethod")
-    @org.junit.Before
-    public void setUp() throws Exception {
-    }
-
-    /**
-     *
-     * @throws Exception
-     */
     @org.junit.After
     public void tearDown() throws Exception {
         marginallyCleverJsonPreferenceNode.removeNode();
-    }
-
-    /**
-     *
-     */
-    @SuppressWarnings({ "UnusedDeclaration", "unused" })
-    public void testCopyPreferenceNode() {
-        try {
-            PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
-        } catch (BackingStoreException e) {
-            logger.error("{}", e);
-        }
-        PreferencesHelper.copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
-        final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-        final Properties p = new Properties();
-        try(final FileInputStream inStream = new FileInputStream(preferencesFile)) {
-            p.load(inStream);
-        } catch (IOException e) {
-            logger.error("{}", e);
-        }
-        final JSONObject jsonObject = Property.toJSONObject(p);
-        logger.debug("{}", jsonObject);
-        @SuppressWarnings("unchecked")
-        final JSONObject object = new JSONObject(marginallyCleverJsonPreferenceNode.getChildren());
-        logger.debug("{}", object);
     }
 
     @Test
