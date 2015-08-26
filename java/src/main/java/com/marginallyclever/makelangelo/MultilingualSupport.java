@@ -145,11 +145,11 @@ public final class MultilingualSupport {
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(language_options);
 
-      int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-      if (result == JOptionPane.OK_OPTION) {
+    final int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.YES_NO_OPTION) {
       setCurrentLanguage(choices[language_options.getSelectedIndex()]);
       saveConfig();
-      }
+    }
   }
 
   /**
