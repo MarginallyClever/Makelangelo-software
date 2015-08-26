@@ -40,6 +40,7 @@
           <useIncrementalCompilation>false</useIncrementalCompilation>
           <compilerArgs>
             <compilerArg>-Xlint:unchecked</compilerArg>
+            <compilerArg>-Xlint:deprecation</compilerArg>
           </compilerArgs>
         </configuration>
       </plugin>

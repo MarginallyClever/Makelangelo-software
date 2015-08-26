@@ -39,6 +39,7 @@ final class MarginallyCleverPreferencesHelper {
      *
      * @param args command line arguments.
      */
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) throws BackingStoreException {
         final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
         LOGGER.info("node name: {}", machinesPreferenceNode.name());

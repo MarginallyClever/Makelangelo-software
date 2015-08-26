@@ -22,6 +22,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
     /**
      *
      */
+    @SuppressWarnings("deprecation")
     private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
     /**

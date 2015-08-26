@@ -64,6 +64,7 @@ public final class MainGUI
    */
   public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
+  @SuppressWarnings("deprecation")
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   private MarginallyCleverConnectionManager connectionManager;

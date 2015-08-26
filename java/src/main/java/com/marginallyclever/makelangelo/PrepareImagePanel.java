@@ -92,6 +92,7 @@ implements ActionListener {
   private JSlider input_paper_margin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
+  @SuppressWarnings("deprecation")
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   /**
