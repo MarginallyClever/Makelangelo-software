@@ -69,7 +69,8 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
         if (preferencesFile == null) {
             String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
             if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
-                preferenceFilePath = getDefaultPreferenceFilePath(preferenceFilePath);
+                preferenceFilePath = getDefaultPreferenceFilePath();
+                System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
             }
             preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
             if(!preferencesFile.exists()) {
@@ -86,11 +87,12 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
         return preferencesFile;
     }
 
-    private static String getDefaultPreferenceFilePath(String preferenceFilePath) {
-        final String defaultFilePathToPreferencesFile = System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
-        preferenceFilePath = defaultFilePathToPreferencesFile;
-        System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
-        return preferenceFilePath;
+    /**
+     *
+     * @return
+     */
+    private static String getDefaultPreferenceFilePath() {
+        return System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
     }
 
 }
