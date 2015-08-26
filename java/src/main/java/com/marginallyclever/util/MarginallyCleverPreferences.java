@@ -239,7 +239,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences {
      *
      * @return
      */
-    public Map<String, ? extends Object> getChildren() {
+    public Map<String, ? extends AbstractPreferences> getChildren() {
         return new TreeMap<>(children);
     }
 
