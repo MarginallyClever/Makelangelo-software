@@ -5,7 +5,7 @@
 		<name>Nederlands</name>
 		<author>Raymond Philippe (iamraymondphilippe@gmail.com)</author>
 	</meta>
-	
+
 	<string>
 		<key>Cancel</key>
 		<value>Annuleren</value>
@@ -737,13 +737,13 @@
 		<value>Deel het op twitter om @MarginallyC om te zien wat anderen hebben gemaakt.</value>
 		<hint>Your drawing is finished.  Share it</hint>
 	</string>
-	
+
 	<string>
 		<key>StatusSoFar</key>
 		<value>Gebruikte tijd: </value>
 		<hint>time machine has been drawing</hint>
 	</string>
-	
+
 	<string>
 		<key>StatusRemaining</key>
 		<value>Geschatte resterende tijd: </value>

@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 public class Filter_GeneratorPulse extends Filter {
   float blockScale=6.0f;
   int direction=0;
-  
+
   public Filter_GeneratorPulse(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -41,7 +41,7 @@ public class Filter_GeneratorPulse extends Filter {
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }
-  
+
   /**
    * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
    * @param img the image to convert.
@@ -53,11 +53,11 @@ public class Filter_GeneratorPulse extends Filter {
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JLabel(translator.get("HilbertCurveSize")));
     panel.add(field_size);
-    
+
     String [] directions = { "horizontal", "vertical" };
     final JComboBox<String> direction_choices = new JComboBox<String>(directions);
     panel.add(direction_choices);
-    
+
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
       blockScale = Float.parseFloat(field_size.getText());
@@ -66,11 +66,11 @@ public class Filter_GeneratorPulse extends Filter {
     }
   }
 
-  
+
   double xStart,yStart;
   double xEnd,yEnd;
   double paperWidth,paperHeight;
-    
+
   protected int sampleScale(BufferedImage img,double x0,double y0,double x1,double y1) {
     return sample(img,
         (x0-xStart)/(xEnd-xStart) * (double)image_width,
@@ -79,13 +79,13 @@ public class Filter_GeneratorPulse extends Filter {
         (double)image_height - (y0-yStart)/(yEnd-yStart) * (double)image_height
         );
   }
-  
+
   // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
   protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
     // point sampling
     int value=0;
     int sum=0;
-    
+
     if(x0<0) x0=0;
     if(x1>image_width-1) x1 = image_width-1;
     if(y0<0) y0=0;
@@ -99,10 +99,10 @@ public class Filter_GeneratorPulse extends Filter {
     }
 
     if(sum==0) return 255;
-    
+
     return value/sum;
   }
-  
+
 
   /**
    * Converts images into zigzags in paper space instead of image space
@@ -110,7 +110,7 @@ public class Filter_GeneratorPulse extends Filter {
    * @throws IOException couldn't open output file
    */
   private void convertNow(BufferedImage img) throws IOException {
-	    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
+	    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
 	    img = bw.process(img);
 
 	    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
@@ -134,20 +134,20 @@ public class Filter_GeneratorPulse extends Filter {
 	            moveTo(out, 0, 0, true);
 	        }
   }
-  
-  
+
+
   private void convertPaperSpace(BufferedImage img,Writer out) throws IOException {
     // if the image were projected on the paper, where would the top left corner of the image be in paper space?
     // image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
-    
+
     paperWidth = machine.getPaperWidth();
     paperHeight = machine.getPaperHeight();
-    
+
     xStart = -paperWidth/2.0;
     yStart = xStart * (double)image_height/(double)image_width;
 
     if(yStart < -(paperHeight/2.0)) {
-      xStart *= (-(paperHeight/2.0)) / yStart;      
+      xStart *= (-(paperHeight/2.0)) / yStart;
       yStart = -(paperHeight/2.0);
     }
 
@@ -155,7 +155,7 @@ public class Filter_GeneratorPulse extends Filter {
     yStart *= 10.0* machine.paperMargin;
     xEnd = -xStart;
     yEnd = -yStart;
-    
+
     double PULSE_MINIMUM=0.5;
 
     // figure out how many lines we're going to have on this image.
@@ -251,8 +251,8 @@ public class Filter_GeneratorPulse extends Filter {
         }
     }
   }
-  
-  
+
+
   /**
    * TODO he detail level on the zigzags cannot be increased beyond the resolution of the bufferedimage because this entire \
    * method was written in image space.  It should be upgraded to paper space to fix the issue.
@@ -419,12 +419,12 @@ public class Filter_GeneratorPulse extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

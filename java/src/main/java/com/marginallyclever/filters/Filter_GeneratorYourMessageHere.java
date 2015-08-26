@@ -48,13 +48,13 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
 	@Override
 	public String getName() { return translator.get("YourMsgHereName"); }
-	
+
 	public void generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage,6,60);
-	
+
 		JPanel panel = new JPanel(new GridLayout(0,1));
 		panel.add(new JScrollPane(text));
-		
+
 	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 			lastMessage = text.getText();
@@ -62,19 +62,19 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
 	        //renderFont(gl2,"TimesRoman","مرحبا بالعالم",18);
 	        //renderFont(gl2,"TimesRoman","Makelangelo",36);
-			
+
 			// TODO Move to GUI?
 			mainGUI.log("<font color='green'>Completed.</font>\n");
 	    }
 	}
-	
+
 	/*
     void renderFont(GL2 gl2, String font_name,String text,int size) {
       gl2.glPushMatrix();
         gl2.glScalef(0.1f, -0.1f, 1);
         gl2.glLineWidth(3);
         gl2.glPointSize(4);
-        
+
     Font font = new Font(font_name, Font.PLAIN, size);
     FontRenderContext frc = new FontRenderContext(null,true,true);
     TextLayout textLayout = new TextLayout(text,font,frc);
@@ -149,7 +149,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
       output.write(machine.getConfigLine()+";\n");
       output.write(machine.getBobbinLine()+";\n");
       tool.writeChangeTo(output);
-      
+
       textSetAlign(Align.CENTER);
       textSetVAlign(VAlign.MIDDLE);
       textCreateMessageNow(lastMessage,output);

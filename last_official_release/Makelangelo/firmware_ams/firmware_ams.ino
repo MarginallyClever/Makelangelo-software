@@ -132,7 +132,7 @@
 #endif
 
 // Default servo library
-#include <Servo.h> 
+#include <Servo.h>
 
 // SD card library
 #ifdef USE_SD_CARD
@@ -226,7 +226,7 @@ static void adjustSpoolDiameter(float diameter1) {
   SPOOL_DIAMETER = diameter1;
   float SPOOL_CIRC = SPOOL_DIAMETER*PI;  // circumference
   THREAD_PER_STEP = SPOOL_CIRC/STEPS_PER_TURN;  // thread per step
-  
+
 #if VERBOSE > 2
   Serial.print(F("SpoolDiameter = "));  Serial.println(SPOOL_DIAMETER,3);
   Serial.print(F("THREAD_PER_STEP="));  Serial.println(THREAD_PER_STEP,3);
@@ -259,10 +259,10 @@ static char readSwitches() {
 static void setFeedRate(float v) {
   if(feed_rate==v) return;
   feed_rate=v;
-  
+
   if(v > MAX_FEEDRATE) v = MAX_FEEDRATE;
   if(v < MIN_FEEDRATE) v = MIN_FEEDRATE;
-  
+
   step_delay = 1000000.0 / v;
 
 #if VERBOSE > 1
@@ -284,7 +284,7 @@ static void printFeedRate() {
 static void setPenAngle(int pen_angle) {
   if(posz!=pen_angle) {
     posz=pen_angle;
-    
+
     if(posz<PEN_DOWN_ANGLE) posz=PEN_DOWN_ANGLE;
     if(posz>PEN_UP_ANGLE  ) posz=PEN_UP_ANGLE;
 
@@ -339,7 +339,7 @@ static void FK(float l1, float l2,float &x,float &y) {
   float a = (float)l1 * THREAD_PER_STEP;
   float b = (limit_right-limit_left);
   float c = (float)l2 * THREAD_PER_STEP;
-  
+
   // slow, uses trig
   // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
   // or cc - aa - bb = -2ab * cos( theta )
@@ -376,7 +376,7 @@ static void line(float x,float y,float z) {
   int dir2=d2<0?M2_REEL_IN:M2_REEL_OUT;
   long over=0;
   long i;
-  
+
   long ad = max(ad1,ad2);
   /*
   long d = 1500;
@@ -393,7 +393,7 @@ static void line(float x,float y,float z) {
   */
 
   setPenAngle((int)z);
-  
+
   // bresenham's line algorithm.
   if(ad1>ad2) {
     for(i=0;i<ad1;++i) {
@@ -405,7 +405,7 @@ static void line(float x,float y,float z) {
         M2_ONESTEP(dir2);
         delay(2);
       }
-      
+
       //if(i<accelerate_until) d--;
       //if(i>=decelerate_after) d++;
       //pause(d);
@@ -423,7 +423,7 @@ static void line(float x,float y,float z) {
         M1_ONESTEP(dir1);
         delay(2);
       }
-      
+
       //if(i<accelerate_until) d--;
       //if(i>=decelerate_after) d++;
       //pause(d);
@@ -447,7 +447,7 @@ static void line_safe(float x,float y,float z) {
   float dx=x-posx;
   float dy=y-posy;
   float dz=z-posz;
-  
+
   float x0=posx;
   float y0=posy;
   float z0=posz;
@@ -456,7 +456,7 @@ static void line_safe(float x,float y,float z) {
   float len=sqrt(dx*dx+dy*dy);
   // too long!
   long pieces=ceil(len / MM_PER_SEGMENT);
-  
+
   for(long j=1;j<pieces;++j) {
     a=(float)j/(float)pieces;
 
@@ -485,12 +485,12 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
   float angle1=atan3(dy,dx);
   float angle2=atan3(y-cy,x-cx);
   float theta=angle2-angle1;
-  
+
   if(dir>0 && theta<0) angle2+=2*PI;
   else if(dir<0 && theta>0) angle1+=2*PI;
-  
+
   theta=angle2-angle1;
-  
+
   // get length of arc
   // float circ=PI*2.0*radius;
   // float len=theta*circ/(PI*2.0);
@@ -498,13 +498,13 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
   float len = abs(theta) * radius;
 
   int i, segments = ceil( len * MM_PER_SEGMENT );
- 
+
   float nx, ny, nz, angle3, scale;
 
   for(i=0;i<segments;++i) {
     // interpolate around the arc
     scale = ((float)i)/((float)segments);
-    
+
     angle3 = ( theta * scale ) + angle1;
     nx = cx + cos(angle3) * radius;
     ny = cy + sin(angle3) * radius;
@@ -512,7 +512,7 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
     // send it to the planner
     line(nx,ny,nz);
   }
-  
+
   line(x,y,z);
 }
 
@@ -523,7 +523,7 @@ static void arc(float cx,float cy,float x,float y,float z,float dir) {
 static void teleport(float x,float y) {
   posx=x;
   posy=y;
-  
+
   // @TODO: posz?
   long L1,L2;
   IK(posx,posy,L1,L2);
@@ -545,21 +545,21 @@ static void help() {
 
 
 //------------------------------------------------------------------------------
-// find the current robot position and 
+// find the current robot position and
 static void FindHome() {
 #ifdef USE_LIMIT_SWITCH
   Serial.println(F("Homing..."));
-  
+
   if(readSwitches()) {
     Serial.println(F("** ERROR **"));
     Serial.println(F("Problem: Plotter is already touching switches."));
     Serial.println(F("Solution: Please unwind the strings a bit and try again."));
     return;
   }
-  
+
   int home_step_delay=300;
   int safe_out=50;
-  
+
   // reel in the left motor until contact is made.
   Serial.println(F("Find left..."));
   do {
@@ -568,7 +568,7 @@ static void FindHome() {
     delayMicroseconds(home_step_delay);
   } while(!readSwitches());
   laststep1=0;
-  
+
   // back off so we don't get a false positive on the next motor
   int i;
   for(i=0;i<safe_out;++i) {
@@ -576,7 +576,7 @@ static void FindHome() {
     delayMicroseconds(home_step_delay);
   }
   laststep1=safe_out;
-  
+
   // reel in the right motor until contact is made
   Serial.println(F("Find right..."));
   do {
@@ -586,14 +586,14 @@ static void FindHome() {
     laststep1++;
   } while(!readSwitches());
   laststep2=0;
-  
+
   // back off so we don't get a false positive that kills line()
   for(i=0;i<safe_out;++i) {
     M2_STEP(1,M2_REEL_OUT);
     delay(step_delay);
   }
   laststep2=safe_out;
-  
+
   Serial.println(F("Centering..."));
   line(0,0,posz);
 #endif // USE_LIMIT_SWITCH
@@ -616,10 +616,10 @@ static void where() {
 
 //------------------------------------------------------------------------------
 static void printConfig() {
-  Serial.print(m1d);              Serial.print(F("="));  
+  Serial.print(m1d);              Serial.print(F("="));
   Serial.print(limit_top);        Serial.print(F(","));
   Serial.print(limit_left);       Serial.print(F("\n"));
-  Serial.print(m2d);              Serial.print(F("="));  
+  Serial.print(m2d);              Serial.print(F("="));
   Serial.print(limit_top);        Serial.print(F(","));
   Serial.print(limit_right);      Serial.print(F("\n"));
   Serial.print(F("Bottom="));     Serial.println(limit_bottom);
@@ -675,7 +675,7 @@ static void LoadConfig() {
   if(version_number==3) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough
     // save the new data so the next load doesn't screw up one bobbin size
     SaveSpoolDiameter();
     // update the EEPROM version
@@ -683,7 +683,7 @@ static void LoadConfig() {
   } else if(version_number==EEPROM_VERSION) {
     // Retrieve Stored Configuration
     robot_uid=EEPROM_readLong(ADDR_UUID);
-    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough   
+    adjustSpoolDiameter((float)EEPROM_readLong(ADDR_SPOOL_DIA1)/10000.0f);   //3 decimal places of percision is enough
   } else {
     // Code should not get here if it does we should display some meaningful error message
     Serial.println(F("An Error Occurred during LoadConfig"));
@@ -733,7 +733,7 @@ static void SD_ProcessFile(char *filename) {
     Serial.println(F(" not found."));
     return;
   }
-  
+
   int c;
   while(f.peek() != -1) {
     c=f.read();
@@ -750,7 +750,7 @@ static void SD_ProcessFile(char *filename) {
       sofar=0;
     }
   }
-  
+
   f.close();
 }
 #endif // USE_SD_CARD
@@ -825,7 +825,7 @@ void processConfig() {
   limit_bottom=parsenumber('B',limit_bottom);
   limit_right=parsenumber('R',limit_right);
   limit_left=parsenumber('L',limit_left);
-  
+
   char gg=parsenumber('G',m1d);
   char hh=parsenumber('H',m2d);
   char i=parsenumber('I',0);
@@ -848,10 +848,10 @@ void processConfig() {
       M2_REEL_OUT = FORWARD;
     }
   }
-  
+
   // @TODO: check t>b, r>l ?
   printConfig();
-  
+
   teleport(0,0);
 }
 
@@ -869,8 +869,8 @@ static void processCommand() {
       Serial.println(line_number);
       return;
     }
-    
-    
+
+
     // is there a checksum?
     if(strchr(serial_buffer,'*')!=0) {
       // Yes.  Is it valid?
@@ -889,10 +889,10 @@ static void processCommand() {
       Serial.println(line_number);
       return;
     }
-  
+
     line_number++;
   }
-  
+
   if(!strncmp(serial_buffer,"UID",3)) {
     robot_uid=atoi(strchr(serial_buffer,' ')+1);
     SaveUID();
@@ -1004,7 +1004,7 @@ static void processCommand() {
       // adjust spool diameters
       float amountL=parsenumber('L',SPOOL_DIAMETER);
       float amountR=parsenumber('R',SPOOL_DIAMETER);
-  
+
       float tps1=THREAD_PER_STEP;
       adjustSpoolDiameter(amountL);
       if(THREAD_PER_STEP != tps1) {
@@ -1047,14 +1047,14 @@ void tools_setup() {
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
-  
+
   // initialize the read buffer
   sofar=0;
   // start communications
   Serial.begin(BAUD);
   Serial.print(F("\n\nHELLO WORLD! I AM DRAWBOT #"));
   Serial.println(robot_uid);
-  
+
 #ifdef USE_SD_CARD
   SD.begin();
   SD_ListFiles();
@@ -1074,18 +1074,18 @@ void setup() {
 #if MOTHERBOARD == 2
   // Change the i2c clock from 100KHz to 400KHz
   // https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/faq
-  //TWBR = ((F_CPU /400000l) - 16) / 2; 
+  //TWBR = ((F_CPU /400000l) - 16) / 2;
 #endif
 
   setFeedRate(MAX_FEEDRATE);  // *30 because i also /2
 
   // servo should be on SER1, pin 10.
   s1.attach(SERVO_PIN);
-  
+
   // turn on the pull up resistor
   digitalWrite(L_PIN,HIGH);
   digitalWrite(R_PIN,HIGH);
-  
+
   tools_setup();
 
   // initialize the plotter position.
@@ -1093,7 +1093,7 @@ void setup() {
   velx=0;
   vely=0;
   setPenAngle(PEN_UP_ANGLE);
-  
+
   // display the help at startup.
   help();
   ready();
@@ -1109,12 +1109,12 @@ void Serial_listen() {
     if(sofar<MAX_BUF) serial_buffer[sofar++]=c;
     if(c=='\n') {
       serial_buffer[sofar]=0;
-      
+
 #if VERBOSE > 0
       // echo confirmation
       Serial.println(serial_buffer);
 #endif
-   
+
       // do something with the command
       processCommand();
       ready();
@@ -1127,7 +1127,7 @@ void Serial_listen() {
 //------------------------------------------------------------------------------
 void loop() {
   Serial_listen();
-  
+
   // The PC will wait forever for the ready signal.
   // if Arduino hasn't received a new instruction in a while, send ready() again
   // just in case USB garbled ready and each half is waiting on the other.
@@ -1144,12 +1144,12 @@ void loop() {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */

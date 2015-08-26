@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo;
 
 public class Makelangelo {
   public static MainGUI gui;
-  
+
   public static void main(String[] argv) {
       //Schedule a job for the event-dispatching thread:
       //creating and showing this application's GUI.
