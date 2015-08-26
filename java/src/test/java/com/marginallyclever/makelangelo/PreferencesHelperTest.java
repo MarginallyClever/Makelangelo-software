@@ -22,7 +22,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
     /**
      *
      */
-    private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+    private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
     /**
      *

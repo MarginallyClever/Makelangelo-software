@@ -43,7 +43,7 @@ public final class PreferencesHelper {
         final Preferences userRootPreferencesNode = Preferences.userRoot();
         //final String thisPackageName = PreferencesHelper.class.getPackage().getName();
         final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node("DrawBot");// thisPackageName); FIXME write unit test/tool to view import/export machine configurations.
-        initialMap.put(MakelangeloPreferenceKey.MAKELANGELO_ROOT, makelangeloPreferenceNode);
+        initialMap.put(MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT, makelangeloPreferenceNode);
         initialMap.put(MakelangeloPreferenceKey.GRAPHICS, makelangeloPreferenceNode.node("Graphics"));
         initialMap.put(MakelangeloPreferenceKey.MACHINES, makelangeloPreferenceNode.node("Machines"));
         initialMap.put(MakelangeloPreferenceKey.LANGUAGE, makelangeloPreferenceNode.node("Language"));
@@ -66,12 +66,17 @@ public final class PreferencesHelper {
         return (P) CLASS_TO_PREFERENCE_NODE_MAP.get(key);
     }
 
-    public enum MakelangeloPreferenceKey {
-        GRAPHICS,
-        MACHINES,
-        LANGUAGE,
-        MAKELANGELO_ROOT
-    }
+  /**
+   *
+   */
+  public enum MakelangeloPreferenceKey {
+    GRAPHICS,
+    MACHINES,
+    LANGUAGE,
+    @Deprecated
+    LEGACY_MAKELANGELO_ROOT,
+    MAKELANGELO_ROOT
+  }
 
     /**
      *

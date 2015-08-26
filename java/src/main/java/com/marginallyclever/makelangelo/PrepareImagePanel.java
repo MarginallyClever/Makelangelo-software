@@ -57,7 +57,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_GeneratorBoxes;
 import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
 import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
 import com.marginallyclever.filters.Filter_GeneratorPulse;
@@ -93,7 +92,7 @@ implements ActionListener {
   private JSlider input_paper_margin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   /**
    * @see org.slf4j.Logger

@@ -48,7 +48,7 @@ final class MarginallyCleverPreferencesHelper {
             if (wasSaveFileFlagFound) {
                 final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
                 try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
-                    PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
+                    PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
                 } catch (IOException e) {
                     LOGGER.error("{}", e);
                 }

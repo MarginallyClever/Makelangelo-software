@@ -64,7 +64,7 @@ public final class MainGUI
    */
   public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   private MarginallyCleverConnectionManager connectionManager;
   private MarginallyCleverConnection connectionToRobot = null;
