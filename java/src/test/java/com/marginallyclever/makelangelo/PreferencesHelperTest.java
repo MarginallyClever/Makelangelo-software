@@ -81,7 +81,7 @@ public class PreferencesHelperTest {
         final JSONObject jsonObject = Property.toJSONObject(p);
         logger.debug("{}", jsonObject);
         @SuppressWarnings("unchecked")
-        final JSONObject object = new JSONObject((Map<String,Object>)marginallyCleverJsonPreferenceNode.getChildren());
+        final JSONObject object = new JSONObject(marginallyCleverJsonPreferenceNode.getChildren());
         logger.debug("{}", object);
     }
 
