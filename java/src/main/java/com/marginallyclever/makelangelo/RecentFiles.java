@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import java.util.prefs.Preferences;
 
-public class RecentFiles {
+public final class RecentFiles {
   @SuppressWarnings("deprecation")
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
   private String[] fileList;
