@@ -71,7 +71,9 @@ public final class MarginallyCleverJsonFilePreferencesFactory implements Prefere
             preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
             if(!preferencesFile.exists()) {
                 try {
-                    preferencesFile.createNewFile();
+                    if(preferencesFile.createNewFile()) {
+                        logger.info("Preferences file was created.");
+                    }
                 } catch (IOException e) {
                     logger.error("{}", e);
                 }
