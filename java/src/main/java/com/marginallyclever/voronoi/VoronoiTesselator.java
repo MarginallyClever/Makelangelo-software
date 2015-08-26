@@ -157,10 +157,7 @@ public class VoronoiTesselator {
     private void qsort(VoronoiSite[] sites)
     {
         List<VoronoiSite> listSites = new ArrayList<VoronoiSite>(sites.length);
-        for (VoronoiSite s: sites)
-        {
-            listSites.add(s);
-        }
+        Collections.addAll(listSites, sites);
 
         Collections.sort(listSites, new Comparator<VoronoiSite>()
         {
