@@ -222,7 +222,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
             try(
             final OutputStream fileOutputStream = new FileOutputStream(dest);
-            final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+            final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
             ) {
 
                 imageStart(src_img, out);

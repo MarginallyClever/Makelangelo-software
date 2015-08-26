@@ -189,7 +189,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
     // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
             // Set up the conversion from image space to paper space, select the current tool, etc.
             imageStart(img, out);

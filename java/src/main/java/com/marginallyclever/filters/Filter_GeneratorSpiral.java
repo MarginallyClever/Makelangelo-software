@@ -53,7 +53,7 @@ public class Filter_GeneratorSpiral extends Filter {
 
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
 
             imageStart(img, out);

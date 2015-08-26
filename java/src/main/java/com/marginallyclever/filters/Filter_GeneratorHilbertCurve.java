@@ -71,7 +71,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
   private void createCurveNow(String dest) {
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
             tool = machine.getCurrentTool();
       setupTransform((int)Math.ceil(xmax-xmin),(int)Math.ceil(ymax-ymin));

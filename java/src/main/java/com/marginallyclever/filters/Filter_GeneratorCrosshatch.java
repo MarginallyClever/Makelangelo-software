@@ -37,7 +37,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
     mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
 
             imageStart(img, out);

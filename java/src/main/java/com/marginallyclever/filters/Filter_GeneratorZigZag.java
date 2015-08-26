@@ -371,7 +371,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     // write
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
       out.write(machine.getConfigLine()+";\n");
       out.write(machine.getBobbinLine()+";\n");
