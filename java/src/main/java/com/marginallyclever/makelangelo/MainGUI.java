@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 
@@ -623,7 +624,7 @@ public final class MainGUI
     }
 
     // end of program?
-    if (tokens[0] == "M02" || tokens[0] == "M2" || tokens[0] == "M30") {
+    if (Objects.equals(tokens[0], "M02")  || Objects.equals(tokens[0], "M2" ) || Objects.equals(tokens[0], "M30")) {
       playDawingFinishedSound();
       halt();
       return false;

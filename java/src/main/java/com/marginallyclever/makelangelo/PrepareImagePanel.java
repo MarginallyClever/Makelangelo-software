@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -585,7 +586,7 @@ implements ActionListener {
     s.addPropertyChangeListener(new PropertyChangeListener() {
         // Invoked when task's progress property changes.
         public void propertyChange(PropertyChangeEvent evt) {
-            if ("progress" == evt.getPropertyName() ) {
+            if (Objects.equals("progress", evt.getPropertyName())) {
                 int progress = (Integer) evt.getNewValue();
                 pm.setProgress(progress);
                 String message = String.format("%d%%\n", progress);
@@ -659,7 +660,7 @@ implements ActionListener {
     s.addPropertyChangeListener(new PropertyChangeListener() {
         // Invoked when task's progress property changes.
         public void propertyChange(PropertyChangeEvent evt) {
-            if ("progress" == evt.getPropertyName() ) {
+            if (Objects.equals("progress", evt.getPropertyName())) {
                 int progress = (Integer) evt.getNewValue();
                 pm.setProgress(progress);
                 String message = String.format("%d%%.\n", progress);
