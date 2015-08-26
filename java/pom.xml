@@ -38,6 +38,9 @@
           <source>${minimum.java.version}</source>
           <target>${minimum.java.version}</target>
           <useIncrementalCompilation>false</useIncrementalCompilation>
+          <compilerArgs>
+            <compilerArg>-Xlint:unchecked</compilerArg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
