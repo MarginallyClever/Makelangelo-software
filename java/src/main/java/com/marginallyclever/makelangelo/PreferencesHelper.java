@@ -34,9 +34,11 @@ public final class PreferencesHelper {
     }
 
     /**
+     * NOOP Constructor.
      *
+     * @throws IllegalStateException
      */
-    private PreferencesHelper() {}
+    private PreferencesHelper() throws IllegalStateException { throw new IllegalStateException(); }
 
     /**
      *

@@ -42,4 +42,10 @@ public final class UnitTestHelper {
         return true;
     }
 
+    /**
+     * NOOP Constructor.
+     *
+     * @throws IllegalStateException
+     */
+    private UnitTestHelper() throws IllegalStateException  { throw new IllegalStateException(); }
 }
