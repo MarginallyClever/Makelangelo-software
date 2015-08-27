@@ -32,7 +32,7 @@ public final class PreferencesHelper {
   /**
    *
    */
-  private static final Logger logger = LoggerFactory.getLogger(PreferencesHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PreferencesHelper.class);
 
   /**
    *
@@ -75,7 +75,7 @@ public final class PreferencesHelper {
     try {
       legacyMakelangeloPreferenceNode.sync();
     } catch (BackingStoreException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
     //initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
     initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
@@ -123,7 +123,7 @@ public final class PreferencesHelper {
    */
   public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
     try {
-      logger.info("node name:{}", preferenceNode);
+      LOG.info("node name:{}", preferenceNode);
       logKeyValuesForPreferenceNode(preferenceNode);
       final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
       for (String childNodeName : childrenPreferenceNodeNames) {
@@ -131,7 +131,7 @@ public final class PreferencesHelper {
         logPreferenceNode(childNode);
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -142,7 +142,7 @@ public final class PreferencesHelper {
   public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
     final String[] keys = preferenceNode.keys();
     for (String key : keys) {
-      logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
+      LOG.info("key:{} value:{}", key, preferenceNode.get(key, null));
     }
   }
 
@@ -164,7 +164,7 @@ public final class PreferencesHelper {
         copyPreferenceNode(sourcePreferenceNode.node(childName), destinationChildNode);
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -200,7 +200,7 @@ public final class PreferencesHelper {
     try {
       preferenceNode.clear();
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -217,7 +217,7 @@ public final class PreferencesHelper {
         childNode.clear();
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -229,7 +229,7 @@ public final class PreferencesHelper {
     try {
       PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
     } catch (BackingStoreException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
     PreferencesHelper.copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
     final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
@@ -237,7 +237,7 @@ public final class PreferencesHelper {
     try (final FileInputStream inStream = new FileInputStream(preferencesFile)) {
       p.load(inStream);
     } catch (IOException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
     logPropertiesNode(p);
     logAncestryable(marginallyCleverJsonPreferenceNode);
@@ -248,7 +248,7 @@ public final class PreferencesHelper {
    */
   public static <P extends Preferences> void logAncestryable(Ancestryable<P> marginallyCleverJsonPreferenceNode) {
     final JSONObject object = new JSONObject(marginallyCleverJsonPreferenceNode.getChildren());
-    logger.debug("{}", object);
+    LOG.debug("{}", object);
   }
 
   /**
@@ -256,7 +256,7 @@ public final class PreferencesHelper {
    */
   public static <P extends Properties> void logPropertiesNode(P p) {
     final JSONObject jsonObject = Property.toJSONObject(p);
-    logger.debug("{}", jsonObject);
+    LOG.debug("{}", jsonObject);
   }
 
 }
