@@ -626,7 +626,7 @@ public final class MainGUI<P extends Preferences>
     }
 
     // end of program?
-    if (Objects.equals(tokens[0], "M02")  || Objects.equals(tokens[0], "M2" ) || Objects.equals(tokens[0], "M30")) {
+    if (Objects.equals(tokens[0], "M02") || Objects.equals(tokens[0], "M2") || Objects.equals(tokens[0], "M30")) {
       playDawingFinishedSound();
       halt();
       return false;
