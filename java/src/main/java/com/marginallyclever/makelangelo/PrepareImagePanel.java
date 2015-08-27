@@ -70,9 +70,10 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
 /**
  * Controls related to converting an image to gcode
  * @author danroyer
+ * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PrepareImagePanel
+public class PrepareImagePanel<P extends Preferences>
 extends JPanel
 implements ActionListener {
   /**
@@ -93,7 +94,7 @@ implements ActionListener {
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
   @SuppressWarnings("deprecation")
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   /**
    * @see org.slf4j.Logger

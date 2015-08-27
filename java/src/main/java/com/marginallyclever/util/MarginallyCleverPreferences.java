@@ -127,10 +127,12 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
     protected A childSpi(@NotNull String name) {
       A childPreferenceNode = children.get(name);
       boolean isChildRemoved = false;
-      try {
-        isChildRemoved = getIsRemoved(childPreferenceNode);
-      } catch (ReflectiveOperationException e) {
-        logger.error("{}", e.getMessage());
+      if(childPreferenceNode != null) {
+        try {
+          isChildRemoved = getIsRemoved(childPreferenceNode);
+        } catch (ReflectiveOperationException e) {
+          logger.error("{}", e.getMessage());
+        }
       }
       if (childPreferenceNode == null || isChildRemoved) {
         @SuppressWarnings("unchecked")
@@ -150,24 +152,26 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    * @throws ReflectiveOperationException
    */
   private boolean getIsRemoved(A abstractPreference) throws ReflectiveOperationException {
-    Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
-    Object isRemoved = declaredMethod.invoke(abstractPreference);
+    logger.info("{}", abstractPreference);
+    final Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
+    declaredMethod.setAccessible(true);
+    Object isRemoved = declaredMethod.invoke(abstractPreference, new Object[]{null});
     return (boolean) isRemoved;
   }
 
   @Override
-    protected void syncSpi() throws BackingStoreException {
-        if(isRemoved()) {
-            return;
-        }
-        File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
-        if (!file.exists()) {
+  protected void syncSpi() throws BackingStoreException {
+    if(isRemoved()) {
+      return;
+    }
+    final File propertiesPreferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
+    if (!propertiesPreferencesFile.exists()) {
             return;
         }
         synchronized (mutex) {
             final Properties p = new Properties();
             try {
-                try(final FileInputStream inStream = new FileInputStream(file)) {
+                try(final InputStream inStream = new FileInputStream(propertiesPreferencesFile)) {
                     p.load(inStream);
                 }
 
@@ -195,7 +199,8 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
 
     @Override
     protected void flushSpi() throws BackingStoreException {
-        final File file = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+      final File xmlPreferencesFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferencesFile();
+      final File file = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
         synchronized (mutex) {
             try {
                 final Properties p = new Properties();
@@ -229,21 +234,45 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
                 }
                 // If this node hasn't been removed, add back in any values
                 if (!thisIsRemoved) {
-                    for (String s : root.keySet()) {
-                        p.setProperty(path + s, root.get(s));
-                    }
+                  for (String s : root.keySet()) {
+                    p.setProperty(path + s, root.get(s));
+                  }
+                  storePreferencesInFile(file, p);
+                  storeNodeInFile(xmlPreferencesFile);
                 }
-              storePreferencesInFile(file, p);
             } catch (IOException e) {
                 throw new BackingStoreException(e);
             }
         }
     }
 
-  private void storePreferencesInFile(File file, Properties p) throws IOException {
+  private void storeNodeInFile(File file) throws IOException, BackingStoreException {
+    final Preferences parent = recursiveGetParent(this.parent() != null ? this.parent() : this);
+    try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
+      parent.exportNode(fileOutputStream);
+    }
+  }
+
+  private Preferences recursiveGetParent(Preferences node) {
+    Preferences parent = node.parent();
+    if(parent == null) {
+      node = parent;
+    } else {
+      recursiveGetParent(parent);
+    }
+    return node;
+  }
+
+  /**
+   *
+   * @param file
+   * @param p
+   * @throws IOException
+   */
+  private void storePreferencesInFile(File file, Properties p) throws IOException, BackingStoreException {
     final String marginallyCleverPreferencesFileComments = "MarginallyCleverPreferences";
     try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
-        p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
+      p.store(fileOutputStream, marginallyCleverPreferencesFileComments);
     }
   }
 
@@ -283,4 +312,5 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
     public Map<String, String> getRoot() {
         return new TreeMap<>(root);
     }
+
 }

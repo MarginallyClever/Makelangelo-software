@@ -42,13 +42,13 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
      */
     @org.junit.After
     public void tearDown() throws Exception {
-        marginallyCleverJsonPreferenceNode.removeNode();
+      marginallyCleverJsonPreferenceNode.removeNode();
     }
 
     @Test
     public void testMachineConfigurationNames() throws BackingStoreException {
         final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-        logger.info("start: {}", thisMethodsName);
+        logger.info("start: {}#{}", PreferencesHelperTest.class.getName(), thisMethodsName);
         final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
         logger.info("node name: {}", machinesPreferenceNode.name());
         final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();

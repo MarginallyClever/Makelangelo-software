@@ -64,10 +64,15 @@ public final class PreferencesHelper {
    */
   static {
     final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
-    final Preferences userRootPreferencesNode = Preferences.userRoot();
+    final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
     final String thisPackageName = PreferencesHelper.class.getPackage().getName();
-    final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(thisPackageName); //FIXME write unit test/tool to view import/export machine configurations.
-    final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);
+    final Preferences makelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences)userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
+    final Preferences legacyMakelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences)userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
+    try {
+      legacyMakelangeloPreferenceNode.sync();
+    } catch (BackingStoreException e) {
+      logger.error("{}", e.getMessage());
+    }
     initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
     initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
     initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
@@ -78,7 +83,7 @@ public final class PreferencesHelper {
     CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
   }
 
-    /**
+  /**
      * NOOP Constructor.
      *
      * @throws IllegalStateException
@@ -227,7 +232,7 @@ public final class PreferencesHelper {
       logger.error("{}", e.getMessage());
     }
     PreferencesHelper.copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
-    final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+    final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
     final Properties p = new Properties();
     try(final FileInputStream inStream = new FileInputStream(preferencesFile)) {
       p.load(inStream);

@@ -1,24 +1,4 @@
 package com.marginallyclever.makelangelo;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-import java.util.prefs.Preferences;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_LED;
@@ -27,14 +7,27 @@ import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.*;
+import java.util.List;
+import java.util.prefs.Preferences;
+
 /**
  * @author dan royer
  */
-public final class MachineConfiguration {
+public final class MachineConfiguration<P extends Preferences> {
   /**
    *
    */
-  private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+  private final P topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
   /**
    * Each robot has a global unique identifier

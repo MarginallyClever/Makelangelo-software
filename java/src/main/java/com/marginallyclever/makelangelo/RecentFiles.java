@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo;
 
 import java.util.prefs.Preferences;
 
-public final class RecentFiles {
+public final class RecentFiles<P extends Preferences> {
   @SuppressWarnings("deprecation")
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
   private String[] fileList;
   final int MAX_FILES = 10;
 

@@ -34,14 +34,24 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
     /**
      *
      */
-    private static final String SYSTEM_PROPERTY_FILE =
-            "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.file";
+    private static final String SYSTEM_PROPERTY_KEY_FOR_XML_FILE =
+            "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
 
     /**
      *
      */
-    private static File preferencesFile;
+    private static final String SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE =
+        "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
 
+    /**
+     *
+     */
+    private static File xmlPreferencesFile;
+
+    /**
+     *
+     */
+    private static File propertiesPreferencesFile;
 
     @Override
     public Preferences systemRoot() {
@@ -64,13 +74,24 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
      *
      * @return Preference file
      */
-    public synchronized static File getPreferencesFile()
-    {
+    public synchronized static File getXmlPreferencesFile() {
+        return getPreferenceFile(xmlPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_XML_FILE, getDefaultXmlPreferenceFilePath());
+    }
+
+    /**
+     *
+     * @return Preference file
+     */
+    public synchronized static File getPropertiesPreferencesFile() {
+        return getPreferenceFile(xmlPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE, getDefaultPropertiesPreferenceFilePath());
+    }
+
+    private static File getPreferenceFile(File preferencesFile, String systemPropertyKey, String defaultFilePath) {
         if (preferencesFile == null) {
-            String preferenceFilePath = System.getProperty(SYSTEM_PROPERTY_FILE);
+            String preferenceFilePath = System.getProperty(systemPropertyKey);
             if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
-                preferenceFilePath = getDefaultPreferenceFilePath();
-                System.setProperty(SYSTEM_PROPERTY_FILE, preferenceFilePath);
+                preferenceFilePath = defaultFilePath;
+                System.setProperty(systemPropertyKey, preferenceFilePath);
             }
             preferencesFile = new File(preferenceFilePath).getAbsoluteFile();
             if(!preferencesFile.exists()) {
@@ -91,8 +112,16 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
      *
      * @return
      */
-    private static String getDefaultPreferenceFilePath() {
-        return System.getProperty("user.home") + File.separator + "makelangelo" + ".fileprefs";
+    private static String getDefaultXmlPreferenceFilePath() {
+        return System.getProperty("user.home") + File.separator + "makelangelo" + ".xml";
+    }
+
+    /**
+     *
+     * @return
+     */
+    private static String getDefaultPropertiesPreferenceFilePath() {
+        return System.getProperty("user.home") + File.separator + "makelangelo" + ".properties";
     }
 
     /**
