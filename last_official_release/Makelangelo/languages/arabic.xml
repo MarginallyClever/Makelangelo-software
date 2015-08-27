@@ -5,7 +5,7 @@
 			<name>العربية</name>
 			<author>Adeeb Haddad (adeeb.ak.haddad@gmail.com)</author>
 		</meta>
-		
+
 		<string>
 			<key>Cancel</key>
 			<value>إلغاء</value>
@@ -86,7 +86,7 @@
 			<value>مم</value>
 			<hint></hint>
 		</string>
-	
+
 		<string>
 			<key>ConnectingTo</key>
 			<value> الاتصال ب</value>
@@ -112,7 +112,7 @@
 			<value>تم الاتصال</value>
 			<hint>window title</hint>
 		</string>
-	
+
 		<string>
 			<key>LineSegments</key>
 			<value>.شرائح الخط</value>
@@ -123,19 +123,19 @@
 			<value>سم</value>
 			<hint></hint>
 		</string>
-	
+
 		<string>
 			<key>EstimatedTime</key>
 			<value> :الوقت التقديري المتوقع للرسم</value>
 			<hint>status message.  keep the space at the end.</hint>
 		</string>
-	
+
 		<string>
 			<key>FileNotOpened</key>
 			<value> :لم يتم التمكن من فتح الملف</value>
 			<hint>status message.  keep the space at the end.</hint>
 		</string>
-	
+
 		<string>
 			<key>ConversionOptions</key>
 			<value>خيارات التحويل</value>
@@ -146,7 +146,7 @@
 			<value>القلب للزجاج</value>
 			<hint>conversion options</hint>
 		</string>
-	
+
 		<string>
 			<key>Cancel</key>
 			<value>إلغاء</value>
@@ -162,7 +162,7 @@
 			<value>حفظ</value>
 			<hint>used in many places</hint>
 		</string>
-	
+
 		<string>
 			<key>PaperMargin</key>
 			<value> )٪( الهامش على حافة الورقة </value>
@@ -188,13 +188,13 @@
 			<value> :فشلت العلية</value>
 			<hint>status update.  keep the space at the end.</hint>
 		</string>
-	
+
 		<string>
 			<key>ConversionStyle</key>
 			<value>أسلوب التحويل</value>
 			<hint>conversion options</hint>
 		</string>
-	
+
 		<string>
 			<key>OpeningFile</key>
 			<value> يجري الفتح</value>
@@ -210,7 +210,7 @@
 			<value>.يرجى تحديد حجم الورق قبل استيراد صورة</value>
 			<hint>warning message</hint>
 		</string>
-	
+
 		<string>
 			<key>FileTypeGCode</key>
 			<value>GCODE (ngc)</value>
@@ -226,7 +226,7 @@
 			<value>DXF R12 (dxf)</value>
 			<hint>file open dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuSoundsTitle</key>
 			<value>الأصوات</value>
@@ -252,7 +252,7 @@
 			<value>تم الانتهاء من الرسم</value>
 			<hint>sound settings dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuGraphicsTitle</key>
 			<value>الرسومات</value>
@@ -278,13 +278,13 @@
 			<value>إظهار الصورة كاملة عند الرسم</value>
 			<hint>graphics settings dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuLanguageTitle</key>
 			<value>اللغة</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>InvalidTool</key>
 			<value># طلب أداة غير صالحة</value>
@@ -300,7 +300,7 @@
 			<value>.وانقر على أي زر للمتابعة </value>
 			<hint>tool change prompt.  keep the space at the start.</hint>
 		</string>
-	
+
 		<string>
 			<key>StartAt</key>
 			<value>البدء عند</value>
@@ -311,7 +311,7 @@
 			<value># البدء عند الخط</value>
 			<hint>start at dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>Pause</key>
 			<value>التوقف</value>
@@ -322,7 +322,7 @@
 			<value>التراجع عن التوقف</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>SetHome</key>
 			<value>الإعداد كصفحة رئيسية</value>
@@ -333,7 +333,7 @@
 			<value>الذهاب إلى الصفحة الرئيسية</value>
 			<hint>manual driving dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>Top</key>
 			<value>العليا</value>
@@ -364,7 +364,7 @@
 			<value>إنزال القلم </value>
 			<hint>manual driving dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>Set</key>
 			<value>الضبط</value>
@@ -380,7 +380,7 @@
 			<value>خطوة/دقيقة</value>
 			<hint>manual driving dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>JogMotors</key>
 			<value>محرك الدفع</value>
@@ -401,7 +401,7 @@
 			<value>العكس</value>
 			<hint>jog motors dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>UpdateNotice</key>
 			<value><![CDATA[<html><body>.نسخة جديدة من هذا البرنامج متاحة حالياً<br/>الرجاء زيارة <a href="http://makelangelo.com/#productDescription">http://makelangelo.com/</a> to get the new hotness.</html></body>]]></value>
@@ -417,7 +417,7 @@
 			<value>عذراً، لقد فشلت المحاولة. الرجاء زيارة http://www.marginallyclever.com/ to check yourself.</value>
 			<hint>check for update dialog</hint>
 		</string>
-	
+
 		<string>
 			<key>Send</key>
 			<value>إرسال</value>
@@ -453,7 +453,7 @@
 			<value>إغلاق</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuConnect</key>
 			<value>الاتصال</value>
@@ -469,13 +469,13 @@
 			<value>قطع الاتصال</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuLoadMachineConfig</key>
 			<value>...تحميل الإعدادات ل</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuSettings</key>
 			<value>الإعدادات</value>
@@ -496,7 +496,7 @@
 			<value>محرك الدفع</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuSelectTool</key>
 			<value>اختيار الأداة النشطة</value>
@@ -507,7 +507,7 @@
 			<value>ضبط الأداة النشطة</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuGCODE</key>
 			<value>GCODE</value>
@@ -538,7 +538,7 @@
 			<value>باسم GCODEحفظ ال</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuDraw</key>
 			<value>رسم</value>
@@ -549,7 +549,7 @@
 			<value>توقف</value>
 			<hint>menu or dialog title</hint>
 		</string>
-	
+
 		<string>
 			<key>MenuPreview</key>
 			<value>استعراض</value>
@@ -575,7 +575,7 @@
 			<value>جميع القيم بال(مم).</value>
 			<hint>Adjust machine size</hint>
 		</string>
-	
+
 		<string>
 			<key>penToolAdjust</key>
 			<value>ضبط القلم</value>
@@ -611,8 +611,8 @@
 			<value>اختبار</value>
 			<hint>Adjust pen tool</hint>
 		</string>
-	
-	
+
+
 		<string>
 			<key>spraypaintToolTest</key>
 			<value>ضبط علبة الطلاء</value>
@@ -648,7 +648,7 @@
 			<value>إنشاء نقطة</value>
 			<hint>Adjust spraypaint tool</hint>
 		</string>
-	
+
 		<string>
 			<key>voronoiStipplingName</key>
 			<value>تنقيط فوروني</value>
@@ -674,7 +674,7 @@
 			<value>حجم النقطى الأدنى</value>
 			<hint>voronoi stippling generator</hint>
 		</string>
-	
+
 		<string>
 			<key>BoxGeneratorName</key>
 			<value>صندوقي</value>
@@ -700,7 +700,7 @@
 			<value>الترتيب</value>
 			<hint>Hilbert Curve generator</hint>
 		</string>
-	
+
 		<string>
 			<key>PulseLineName</key>
 			<value>سطر النبض</value>
@@ -731,25 +731,25 @@
 			<value>أحمر أخضر أزرق</value>
 			<hint>RGB generator</hint>
 		</string>
-	
+
 		<string>
 			<key>SharePromo</key>
 			<value>لمشاهدة ما قام به الآخرون أيضا  @MarginallyC شاركها على تويتر إلى</value>
 			<hint>Your drawing is finished.  Share it</hint>
 		</string>
-		
+
 		<string>
 			<key>StatusSoFar</key>
 			<value>:زمن التشغيل</value>
 			<hint>time machine has been drawing</hint>
 		</string>
-		
+
 		<string>
 			<key>StatusRemaining</key>
 			<value>:الوقت المتوقع المتبقي</value>
 			<hint>time machine will be drawing</hint>
 		</string>
-	
+
 	  <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
 	  used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
 	  one big CDATA html blob. -->
@@ -762,7 +762,7 @@
 	    </value>
 	    <hint>HTML for About Dialog</hint>
 	  </string>
-	
+
 	  <string>
 	    <key>AboutHTMLAfterVersionNumber</key>
 	    <value><![CDATA[
@@ -789,6 +789,6 @@
 	    </value>
 	    <hint>HTML for About Dialog</hint>
 	  </string>
-	
+
 	</language>
 

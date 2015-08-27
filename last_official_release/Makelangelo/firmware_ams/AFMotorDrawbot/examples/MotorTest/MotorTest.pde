@@ -12,39 +12,39 @@ void setup() {
 
   // turn on motor
   motor.setSpeed(200);
- 
+
   motor.run(RELEASE);
 }
 
 void loop() {
   uint8_t i;
-  
+
   Serial.print("tick");
-  
+
   motor.run(FORWARD);
   for (i=0; i<255; i++) {
-    motor.setSpeed(i);  
+    motor.setSpeed(i);
     delay(10);
  }
- 
+
   for (i=255; i!=0; i--) {
-    motor.setSpeed(i);  
+    motor.setSpeed(i);
     delay(10);
  }
-  
+
   Serial.print("tock");
 
   motor.run(BACKWARD);
   for (i=0; i<255; i++) {
-    motor.setSpeed(i);  
+    motor.setSpeed(i);
     delay(10);
  }
- 
+
   for (i=255; i!=0; i--) {
-    motor.setSpeed(i);  
+    motor.setSpeed(i);
     delay(10);
  }
-  
+
 
   Serial.print("tech");
   motor.run(RELEASE);

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -56,7 +57,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_GeneratorBoxes;
 import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
 import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
 import com.marginallyclever.filters.Filter_GeneratorPulse;
@@ -70,9 +70,10 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
 /**
  * Controls related to converting an image to gcode
  * @author danroyer
+ * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PrepareImagePanel
+public class PrepareImagePanel<P extends Preferences>
 extends JPanel
 implements ActionListener {
   /**
@@ -92,7 +93,8 @@ implements ActionListener {
   private JSlider input_paper_margin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+  @SuppressWarnings("deprecation")
+  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   /**
    * @see org.slf4j.Logger
@@ -585,7 +587,7 @@ implements ActionListener {
     s.addPropertyChangeListener(new PropertyChangeListener() {
         // Invoked when task's progress property changes.
         public void propertyChange(PropertyChangeEvent evt) {
-            if ("progress" == evt.getPropertyName() ) {
+            if (Objects.equals("progress", evt.getPropertyName())) {
                 int progress = (Integer) evt.getNewValue();
                 pm.setProgress(progress);
                 String message = String.format("%d%%\n", progress);
@@ -659,7 +661,7 @@ implements ActionListener {
     s.addPropertyChangeListener(new PropertyChangeListener() {
         // Invoked when task's progress property changes.
         public void propertyChange(PropertyChangeEvent evt) {
-            if ("progress" == evt.getPropertyName() ) {
+            if (Objects.equals("progress", evt.getPropertyName())) {
                 int progress = (Integer) evt.getNewValue();
                 pm.setProgress(progress);
                 String message = String.format("%d%%.\n", progress);

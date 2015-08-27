@@ -18,9 +18,10 @@ import javax.swing.JPanel;
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
  * @author dan royer
+ * @author Peter Colapietro
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
-public final class MultilingualSupport {
+public final class MultilingualSupport<P extends Preferences> {
 
   /**
    * The name of the preferences node containing the user's choice.
@@ -28,9 +29,9 @@ public final class MultilingualSupport {
   private static final String LANGUAGE_KEY = "language";
 
   /**
-   * 
+   *
    */
-  private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+  private final P languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
 
   /**
@@ -134,22 +135,22 @@ public final class MultilingualSupport {
       languages.put(lang.getName(), lang);
     }
   }
-  
+
   /**
    * Display a dialog box of available languages and let the user select their preference.
    */
   public void chooseLanguage() {
     final String [] choices = getLanguageList();
     final JComboBox<String> language_options = new JComboBox<String>(choices);
-  
+
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(language_options);
-    
-      int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
-      if (result == JOptionPane.OK_OPTION) {
+
+    final int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.YES_NO_OPTION) {
       setCurrentLanguage(choices[language_options.getSelectedIndex()]);
       saveConfig();
-      }
+    }
   }
 
   /**
@@ -175,11 +176,11 @@ public final class MultilingualSupport {
   protected String [] getLanguageList() {
     final String [] choices = new String[languages.keySet().size()];
     final Object[] lang_keys = languages.keySet().toArray();
-    
+
     for(int i=0;i<lang_keys.length;++i) {
       choices[i] = (String)lang_keys[i];
     }
-    
+
     return choices;
   }
 

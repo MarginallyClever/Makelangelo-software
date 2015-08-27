@@ -31,13 +31,13 @@ public class Filter_GeneratorBoxes extends Filter {
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }
-  
+
   // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
   protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
     // point sampling
     int value=0;
     int sum=0;
-    
+
     if(x0<0) x0=0;
     if(x1>image_width-1) x1 = image_width-1;
     if(y0<0) y0=0;
@@ -51,10 +51,10 @@ public class Filter_GeneratorBoxes extends Filter {
     }
 
     if(sum==0) return 255;
-    
+
     return value/sum;
   }
-  
+
   /**
    * turn the image into a grid of boxes.  box size is affected by source image darkness.
    * @param img the image to convert.
@@ -68,7 +68,7 @@ public class Filter_GeneratorBoxes extends Filter {
     // Open the destination file
         try(
         final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
             // Set up the conversion from image space to paper space, select the current tool, etc.
             imageStart(img, out);
@@ -148,12 +148,12 @@ public class Filter_GeneratorBoxes extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

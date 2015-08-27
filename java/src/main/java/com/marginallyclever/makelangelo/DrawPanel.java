@@ -1,38 +1,27 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Shape;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLJPanel;
+import com.marginallyclever.drawingtools.DrawingTool;
+
+import javax.swing.event.MouseInputListener;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.prefs.Preferences;
 
-import javax.swing.event.MouseInputListener;
-
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLPipelineFactory;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLJPanel;
-
     // Custom drawing panel written as an inner class to access the instance variables.
-public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
+public class DrawPanel<P extends Preferences> extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
     static final long serialVersionUID=2;
 
-    private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+    private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
     // Use debug pipeline?
     private static final boolean DEBUG_GL_ON=false;
     private static final boolean TRACE_GL_ON=false;
-    
+
     // arc smoothness - increase to make more smooth and run slower.
     private static final double STEPS_PER_DEGREE=1;
 
@@ -43,7 +32,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     // config
     private boolean show_pen_up=false;
-    
+
     // motion control
     //private boolean mouseIn=false;
     private int buttonPressed=MouseEvent.NOBUTTON;
@@ -56,13 +45,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private float drawScale = 0.1f;
     private int window_width=0;
     private int window_height=0;
-   
+
     private final int look_ahead=500;
 
     private GCodeFile instructions;
 
     private DrawDecorator drawDecorator=null;
-    
+
   protected MachineConfiguration machine;
 
   // optimization - turn gcode into vectors once on load, draw vectors after that.
@@ -75,8 +64,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     NodeType type;
   }
   ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
-  
-  
+
+
   public DrawPanel(MachineConfiguration mc) {
     super();
     machine = mc;
@@ -84,7 +73,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         addMouseListener(this);
         addGLEventListener(this);
     }
-    
+
 
   /**
    * Set the current DrawDecorator.
@@ -94,8 +83,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     drawDecorator = dd;
     emptyNodeBuffer();
   }
-  
-  
+
+
   /**
      * set up the correct projection so the image appears in the right location and aspect ratio.
    */
@@ -112,7 +101,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glLoadIdentity();
         gl2.glOrtho(-window_width / 2.0d, window_width / 2.0d, -window_height / 2.0d, window_height / 2.0d, 1.0d, -1.0d);
     }
-    
+
     /**
      * turn on debug pipeline(s) if needed.
      */
@@ -138,12 +127,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             }
         }
     }
-    
-    
+
+
     @Override
     public void dispose( GLAutoDrawable glautodrawable ) {}
-    
-    
+
+
     /**
      * refresh the image in the view
      */
@@ -153,34 +142,34 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         //float dt = (now_time - last_time)*0.001f;
         //last_time = now_time;
         //System.out.println(dt);
-        
+
         GL2 gl2 = glautodrawable.getGL().getGL2();
 
         // draw the world
         render( gl2 );
     }
-    
-    
+
+
     public void setGCode(GCodeFile gcode) {
         instructions = gcode;
         emptyNodeBuffer();
         // process the image into a buffer once rather than re-reading the gcode over and over again?
         repaint();
     }
-    
+
     public void emptyNodeBuffer() {
         fast_nodes.clear();
         optimizeNodes();
     }
-    
-    
+
+
     public void updateMachineConfig() {
         repaint();
     }
-    
-    
+
+
     /**
-     * toggle pen up moves.  
+     * toggle pen up moves.
      * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
      */
     public void setShowPenUp(boolean state) {
@@ -188,32 +177,32 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         instructions.changed=true;
         repaint();
     }
-    
+
     /**
      * @return the "show pen up" flag
      */
     public boolean getShowPenUp() {
         return show_pen_up;
     }
-    
-    
+
+
     public void setLinesProcessed(long c) {
         linesProcessed=c;
         if((linesProcessed%10)==0) repaint();
     }
-    
+
     public void setConnected(boolean state) {
         connected=state;
         repaint();
     }
-    
+
     public void setRunning(boolean state) {
         running=state;
         if(running==false) {
             linesProcessed=0;
         }
     }
-    
+
     /**
      * returns angle of dy/dx as a value from 0...2PI
      * @param dy a value from -1...1 inclusive
@@ -278,7 +267,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         cameraOffsetY = 0;
         repaint();
     }
-    
+
     public void mousePressed(MouseEvent e) {
         buttonPressed=e.getButton();
         oldx=e.getX();
@@ -304,7 +293,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     }
     public void mouseMoved(MouseEvent e) {}
 
-    
+
     /**
      * set up the correct modelview so the robot appears where it hsould.
      * @param gl2
@@ -315,7 +304,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glScaled(cameraZoom, cameraZoom, 1.0d);
         gl2.glTranslated(-cameraOffsetX, cameraOffsetY,0);
     }
-  
+
     /**
      * clear the panel
      * @param gl2
@@ -323,7 +312,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     private void paintBackground( GL2 gl2 ) {
         // Clear The Screen And The Depth Buffer
         gl2.glClearColor(0.5f,0.5f,0.5f, 0);
-        
+
         // Special handling for the case where the GLJPanel is translucent
         // and wants to be composited with other Java 2D content
         if (GLProfile.isAWTAvailable() &&
@@ -335,7 +324,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
           gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         }
     }
-  
+
     /**
      * draw the machine edges and paper edges
      * @param gl2
@@ -373,7 +362,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             gl2.glEnd();
         }
     }
-    
+
     // draw calibration point
     private void paintCenter(GL2 gl2) {
         gl2.glColor3f(1,0,0);
@@ -384,34 +373,34 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glVertex2f(0.0f, 0.25f);
         gl2.glEnd();
     }
-    
+
     public void repaintNow() {
       validate();
       repaint();
     }
-  
+
   public void render( GL2 gl2 ) {
     paintBackground(gl2);
     paintCamera(gl2);
-    
+
     paintLimits(gl2);
     paintCenter(gl2);
-    
+
     if(drawDecorator!=null) {
       drawDecorator.render(gl2,machine);
       return;
     }
-    
+
     // TODO draw left motor, right motor, and control box
     // TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
 
     optimizeNodes();
-    
+
     DrawingTool tool = machine.getTool(0);
-    
+
         gl2.glColor3f(0, 0, 0);
 
-        // draw image        
+        // draw image
         if(fast_nodes.size()>0) {
             // draw the nodes
           Iterator<DrawPanelNode> nodes = fast_nodes.iterator();
@@ -429,7 +418,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                         break;
                     }
                 }
-                
+
                 switch(n.type) {
                 case TOOL:
                     tool = machine.getTool(n.tool_id);
@@ -448,7 +437,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
             }
         }
     }
-    
+
     private void addNodePos(int i,double x1,double y1,double x2,double y2) {
         DrawPanelNode n = new DrawPanelNode();
         n.line_number=i;
@@ -459,7 +448,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         n.type=NodeType.POS;
         fast_nodes.add(n);
     }
-    
+
     private void addNodeColor(int i,Color c) {
         DrawPanelNode n = new DrawPanelNode();
         n.line_number=i;
@@ -467,27 +456,27 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         n.type=NodeType.COLOR;
         fast_nodes.add(n);
     }
-    
+
     private void addNodeTool(int i,int tool_id) {
         DrawPanelNode n = new DrawPanelNode();
         n.line_number=i;
         n.tool_id=tool_id;
         n.type=NodeType.TOOL;
         fast_nodes.add(n);
-        
+
     }
 
   private void optimizeNodes() {
     if(instructions == null) return;
     if(instructions.changed==false) return;
     instructions.changed=false;
-    
+
     emptyNodeBuffer();
-    
+
     DrawingTool tool = machine.getTool(0);
-    
+
     drawScale=0.1f;
-    
+
     float px=0,py=0,pz=90;
     //float oldz=pz;
     float x,y,z,ai,aj;
@@ -495,7 +484,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     boolean absMode=true;
     String tool_change="M06 T";
     Color tool_color=Color.BLACK;
-    
+
     Iterator<String> commands = instructions.lines.iterator();
     i=0;
     while(commands.hasNext()) {
@@ -516,10 +505,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 }
                 continue;
             }
-            
+
             String[] tokens = pieces[0].split("\\s");
             if(tokens.length==0) continue;
-            
+
             // have we changed scale?
             // what are our coordinates?
             x=px;
@@ -540,15 +529,15 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 else if(tokens[j].equals("G54")) break;
                 else if(tokens[j].startsWith("X")) {
                     float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
-                    x = absMode ? tx : x + tx; 
+                    x = absMode ? tx : x + tx;
                 }
                 else if(tokens[j].startsWith("Y")) {
                     float ty = Float.valueOf(tokens[j].substring(1)) * drawScale;
-                    y = absMode ? ty : y + ty; 
+                    y = absMode ? ty : y + ty;
                 }
                 else if(tokens[j].startsWith("Z")) {
                     float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
-                    z =  absMode ? tz : z + tz; 
+                    z =  absMode ? tz : z + tz;
                 }
                 if(tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
                 if(tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
@@ -574,18 +563,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                   addNodeColor(i, Color.ORANGE );
               }
             }
-            
+
             // what kind of motion are we going to make?
             if(tokens[0].equals("G00") || tokens[0].equals("G0") ||
                tokens[0].equals("G01") || tokens[0].equals("G1")) {
                 //if(z==pz)
                 {
-                    addNodePos(i,px,py,x,y);    
+                    addNodePos(i,px,py,x,y);
                 }
             } else if(tokens[0].equals("G02") || tokens[0].equals("G2") ||
                       tokens[0].equals("G03") || tokens[0].equals("G3")) {
                 // draw an arc
-                
+
                 // clockwise or counter-clockwise?
                 int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
 
@@ -606,7 +595,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                 double len = Math.abs(theta) * radius;
                 double segments = len * STEPS_PER_DEGREE*2.0;
                 double nx,ny,angle3,scale;
-                
+
                 // Draw the arc from a lot of little line segments.
                 for(int k=0;k<segments;++k) {
                     scale = (double)k / segments;
@@ -618,9 +607,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                     px=(float)nx;
                     py=(float)ny;
                 }
-                addNodePos(i,px,py,x,y);    
+                addNodePos(i,px,py,x,y);
             }
-            
+
             px=x;
             py=y;
             pz=z;
@@ -637,12 +626,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

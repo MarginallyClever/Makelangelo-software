@@ -13,27 +13,27 @@ import java.awt.image.BufferedImage;
  */
 public class Filter_DitherFloydSteinberg extends Filter {
   private long tone;
-  
-  
+
+
   public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
       MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
-  
+
   private int quantizeColor(int original) {
     int i=(int)Math.min(Math.max(original, 0),255);
     return ( i > tone ) ? 255 : 0;
   }
-  
-  
+
+
   private void ditherDirection(BufferedImage img,int y,int[] error,int[] nexterror,int direction) {
     int w = img.getWidth();
     int oldPixel, newPixel, quant_error;
     int start, end, x;
 
     for(x=0;x<w;++x) nexterror[x]=0;
-    
+
     if(direction>0) {
       start=0;
       end=w;
@@ -41,7 +41,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
       start=w-1;
       end=-1;
     }
-    
+
     // for each x from left to right
     for(x=start;x!=end;x+=direction) {
       // oldpixel := pixel[x][y]
@@ -66,7 +66,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
       }
     }
   }
-  
+
   @Override
   public BufferedImage process(BufferedImage img) {
     int y,x;
@@ -75,31 +75,31 @@ public class Filter_DitherFloydSteinberg extends Filter {
     int direction=1;
     int[] error=new int[w];
     int[] nexterror=new int[w];
-    
+
     for(y=0;y<w;++y) {
       error[y]=nexterror[y]=0;
     }
-    
+
     // find the average color of the system
     for(y=0;y<h;++y) {
       for(x=0;x<w;++x) {
         tone += decode(img.getRGB(x,y));
       }
     }
-    
+
     tone /= (w*h);
-    
-    
+
+
     // for each y from top to bottom
     for(y=0;y<h;++y) {
       ditherDirection(img,y,error,nexterror,direction);
-      
+
       direction = direction> 0 ? -1 : 1;
       int [] tmp = error;
       error=nexterror;
       nexterror=tmp;
     }
-    
+
     return img;
   }
 }
@@ -112,12 +112,12 @@ public class Filter_DitherFloydSteinberg extends Filter {
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DrawbotGUI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
  */

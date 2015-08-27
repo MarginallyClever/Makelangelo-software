@@ -1,29 +1,28 @@
 package com.marginallyclever.communications;
 
-import java.util.prefs.Preferences;
-
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+import jssc.SerialPortList;
 
-import jssc.*;
+import java.util.prefs.Preferences;
 
 /**
  * Lists available serial connections and opens a connection of that type
  * @author Dan
  * @since v7.1.0.0
  */
-public class SerialConnectionManager implements MarginallyCleverConnectionManager {
+public class SerialConnectionManager<P extends Preferences> implements MarginallyCleverConnectionManager {
     private String[] portsDetected;
     private String recentPort;
 
   private MainGUI mainGUI;
   private MultilingualSupport translator;
   private MachineConfiguration machine;
-  private Preferences prefs;
+  private P prefs;
 
-  
-    public SerialConnectionManager(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
+
+    public SerialConnectionManager(P prefs, MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
         this.mainGUI = mainGUI;
         this.translator = translator;
         this.machine = machine;
@@ -54,13 +53,13 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
         }
         return portsDetected;
     }
-    
+
     /**
      * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
      */
     public MarginallyCleverConnection openConnection(String connectionName) {
        //if(connectionName.equals(recentPort)) return null;
-       
+
        SerialConnection serialConnection = new SerialConnection(mainGUI, translator, machine);
 
          try {
@@ -69,10 +68,10 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
          catch(Exception e) {
          return null;
          }
-         
+
        return serialConnection;
     }
-    
+
 
     // pull the last connected port from prefs
     private void loadRecentPortFromPreferences() {

@@ -39,6 +39,7 @@ final class MarginallyCleverPreferencesHelper {
      *
      * @param args command line arguments.
      */
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) throws BackingStoreException {
         final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
         LOGGER.info("node name: {}", machinesPreferenceNode.name());
@@ -46,9 +47,9 @@ final class MarginallyCleverPreferencesHelper {
         if(wereThereCommandLineArguments) {
             final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
             if (wasSaveFileFlagFound) {
-                final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPreferencesFile();
+                final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferencesFile();
                 try(final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
-                    PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
+                    PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
                 } catch (IOException e) {
                     LOGGER.error("{}", e);
                 }

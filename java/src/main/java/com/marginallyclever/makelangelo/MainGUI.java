@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 
@@ -47,9 +48,10 @@ import java.util.prefs.Preferences;
 
 /**
  * @author danroyer
+ * @author Peter Colapietro
  * @since 0.0.1?
  */
-public final class MainGUI
+public final class MainGUI<P extends Preferences>
     extends JPanel
     implements ActionListener {
 
@@ -63,7 +65,8 @@ public final class MainGUI
    */
   public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
-  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MAKELANGELO_ROOT);
+  @SuppressWarnings("deprecation")
+  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   private MarginallyCleverConnectionManager connectionManager;
   private MarginallyCleverConnection connectionToRobot = null;
@@ -623,7 +626,7 @@ public final class MainGUI
     }
 
     // end of program?
-    if (tokens[0] == "M02" || tokens[0] == "M2" || tokens[0] == "M30") {
+    if (Objects.equals(tokens[0], "M02")  || Objects.equals(tokens[0], "M2" ) || Objects.equals(tokens[0], "M30")) {
       playDawingFinishedSound();
       halt();
       return false;
