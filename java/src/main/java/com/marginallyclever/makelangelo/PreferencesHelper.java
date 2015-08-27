@@ -42,6 +42,11 @@ public final class PreferencesHelper {
   /**
    *
    */
+  private static final String MAKELANGELO_ROOT_PATH_NAME = PreferencesHelper.class.getPackage().getName();
+
+  /**
+   *
+   */
   private static final String LEGACY_MAKELANGELO_ROOT_PATH_NAME = "DrawBot";
 
   /**
@@ -65,15 +70,14 @@ public final class PreferencesHelper {
   static {
     final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
     final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
-    final String thisPackageName = PreferencesHelper.class.getPackage().getName();
-    final Preferences makelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
-    final Preferences legacyMakelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
+    //final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
+    final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
     try {
       legacyMakelangeloPreferenceNode.sync();
     } catch (BackingStoreException e) {
       logger.error("{}", e.getMessage());
     }
-    initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
+    //initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
     initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
     initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
     initialMap.put(MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
