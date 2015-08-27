@@ -59,11 +59,10 @@ void AFMotorController::latch_tx() {
 
   //SER_PORT &= ~_BV(SER);
   digitalWrite(MOTORDATA, LOW);
-
+/*
   for (i=0; i<8; i++) {
     //CLK_PORT &= ~_BV(CLK);
     digitalWrite(MOTORCLK, LOW);
-
     if (latch_state & _BV(7-i)) {
       //SER_PORT |= _BV(SER);
       digitalWrite(MOTORDATA, HIGH);
@@ -74,6 +73,15 @@ void AFMotorController::latch_tx() {
     //CLK_PORT |= _BV(CLK);
     digitalWrite(MOTORCLK, HIGH);
   }
+*/
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(7)) >> (7) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(6)) >> (6) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(5)) >> (5) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(4)) >> (4) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(3)) >> (3) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(2)) >> (2) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(1)) >> (1) ) );    digitalWrite(MOTORCLK, HIGH);
+    digitalWrite(MOTORCLK, LOW);    digitalWrite(MOTORDATA, HIGH * ( (latch_state & _BV(0)) >> (0) ) );    digitalWrite(MOTORCLK, HIGH);
   //LATCH_PORT |= _BV(LATCH);
   digitalWrite(MOTORLATCH, HIGH);
 }
@@ -95,7 +103,7 @@ AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
 
   if (steppernum == 1) {
     latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B) &
-      ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
+                   ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
     MC.latch_tx();
 
     // enable both H bridges
@@ -110,7 +118,7 @@ AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
     d = _BV(MOTOR2_B);
   } else if (steppernum == 2) {
     latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B) &
-      ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // all motor pins to 0
+                   ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // all motor pins to 0
     MC.latch_tx();
 
     // enable both H bridges
@@ -142,10 +150,9 @@ void AF_Stepper::release() {
 
 void AF_Stepper::step(uint16_t steps, uint8_t dir) {
   uint32_t uspers = usperstep;
-  uint8_t ret = 0;
 
   while (steps--) {
-    ret = onestep(dir);
+    onestep(dir);
 //*
     delay(uspers/1000);  // in ms
     steppingcounter += (uspers % 1000);
@@ -158,7 +165,7 @@ void AF_Stepper::step(uint16_t steps, uint8_t dir) {
 }
 
 
-uint8_t AF_Stepper::onestep(uint8_t dir) {
+void AF_Stepper::onestep(uint8_t dir) {
   /*
   if((currentstep/(MICROSTEPS/2)) % 2) { // we're at an odd step, weird
     if(dir == FORWARD) currentstep += MICROSTEPS/2;
@@ -167,10 +174,62 @@ uint8_t AF_Stepper::onestep(uint8_t dir) {
     if(dir == FORWARD) currentstep += MICROSTEPS;
     else               currentstep -= MICROSTEPS;
   }
-  */
+  *//*
   currentstep += ( dir * MICROSTEPS );
   currentstep += MICROSTEPS*4;
   currentstep %= MICROSTEPS*4;
+*/
+/*
+  // next determine what sort of stepping procedure we're up to
+  if (style == SINGLE) {
+    if ((currentstep/(MICROSTEPS/2)) % 2) { // we're at an odd step, weird
+      if (dir == FORWARD) {
+  currentstep += MICROSTEPS/2;
+      }
+      else {
+  currentstep -= MICROSTEPS/2;
+      }
+    } else {           // go to the next even step
+      if (dir == FORWARD) {
+  currentstep += MICROSTEPS;
+      }
+      else {
+  currentstep -= MICROSTEPS;
+      }
+    }
+  } else if (style == DOUBLE) {
+    if (! (currentstep/(MICROSTEPS/2) % 2)) { // we're at an even step, weird
+      if (dir == FORWARD) {
+  currentstep += MICROSTEPS/2;
+      } else {
+  currentstep -= MICROSTEPS/2;
+      }
+    } else {           // go to the next odd step
+      if (dir == FORWARD) {
+  currentstep += MICROSTEPS;
+      } else {
+  currentstep -= MICROSTEPS;
+      }
+    }
+  } else if (style == INTERLEAVE) {
+    if (dir == FORWARD) {
+       currentstep += MICROSTEPS/2;
+    } else {
+       currentstep -= MICROSTEPS/2;
+    }
+  } 
+
+  if (style == MICROSTEP) {*/
+    if (dir == FORWARD) {
+      currentstep++;
+    } else {
+      // BACKWARDS
+      currentstep--;
+    }
+
+    currentstep += MICROSTEPS*4;
+    currentstep %= MICROSTEPS*4;
+//  }
 
 #ifdef MOTORDEBUG
   Serial.print("current step: "); Serial.println(currentstep, DEC);

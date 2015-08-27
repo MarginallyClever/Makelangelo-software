@@ -25,9 +25,9 @@
 #define MOTOR3_B 7
 
 #define FORWARD 1
-#define BACKWARD 2
-#define BRAKE 3
-#define RELEASE 4
+#define BACKWARD -1
+#define BRAKE 0
+#define RELEASE 2
 
 // Arduino pin names
 #define MOTORLATCH 12
@@ -51,7 +51,7 @@ public:
   AF_Stepper(uint16_t, uint8_t);
   void step(uint16_t steps, uint8_t dir);
   void setSpeed(uint16_t);
-  uint8_t onestep(uint8_t dir);
+  void onestep(uint8_t dir);
   void release();
   uint16_t revsteps; // # steps per revolution
   uint8_t steppernum;

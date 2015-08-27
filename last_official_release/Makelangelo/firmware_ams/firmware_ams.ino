@@ -73,7 +73,7 @@
 #define MM_PER_SEGMENT  (10)
 
 // Serial communication bitrate
-#define BAUD            (57600)
+#define BAUD            (115200)
 // Maximum length of serial input message.
 #define MAX_BUF         (64)
 
@@ -186,7 +186,7 @@ int M2_REEL_OUT = BACKWARD;
 
 // calculate some numbers to help us find feed_rate
 float SPOOL_DIAMETER = 1.5;
-float THREAD_PER_STEP;  // thread per step
+float THREAD_PER_STEP=0;  // thread per step
 
 // plotter position.
 static float posx, velx;
@@ -264,6 +264,14 @@ static void setFeedRate(float v) {
   if(v < MIN_FEEDRATE) v = MIN_FEEDRATE;
 
   step_delay = 1000000.0 / v;
+#if MOTHERBOARD == 1
+  m1.setSpeed(v);
+  m2.setSpeed(v);
+#endif
+#if MOTHERBOARD == 2
+  m1->setSpeed(v);
+  m2->setSpeed(v);
+#endif
 
 #if VERBOSE > 1
   Serial.print(F("feed_rate="));  Serial.println(feed_rate);
@@ -398,12 +406,12 @@ static void line(float x,float y,float z) {
   if(ad1>ad2) {
     for(i=0;i<ad1;++i) {
       M1_ONESTEP(dir1);
-      delay(2);
+//      delay(2);
       over+=ad2;
       if(over>=ad1) {
         over-=ad1;
         M2_ONESTEP(dir2);
-        delay(2);
+//        delay(2);
       }
 
       //if(i<accelerate_until) d--;
@@ -416,12 +424,12 @@ static void line(float x,float y,float z) {
   } else {
     for(i=0;i<ad2;++i) {
       M2_ONESTEP(dir2);
-      delay(2);
+//      delay(2);
       over+=ad1;
       if(over>=ad2) {
         over-=ad2;
         M1_ONESTEP(dir1);
-        delay(2);
+//        delay(2);
       }
 
       //if(i<accelerate_until) d--;
