@@ -25,7 +25,15 @@ import static com.marginallyclever.makelangelo.MultilingualSupport.WORKING_DIREC
  * @author Peter Colapietro
  * @since v7.1.4
  */
-final class MarginallyCleverTranslationXmlFileHelper {
+public final class MarginallyCleverTranslationXmlFileHelper {
+
+  /**
+   * NOOP Constructor
+   * @throws IllegalStateException
+   */
+  private MarginallyCleverTranslationXmlFileHelper() throws IllegalStateException {
+    throw new IllegalStateException();
+  }
 
   /**
    * SLF4J log.
@@ -56,7 +64,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
    * Used when writing a set to disk.
    * @see #writeSetObjectToFile
    */
-  public static final String SET_OBJECT_FILE_NAME = "keys.txt";
+  private static final String SET_OBJECT_FILE_NAME = "keys.txt";
 
   /**
    * @param args command line arguments.
@@ -78,7 +86,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
     if (languagesFolderUrl != null) {
       try {
         final File[] languageFiles = getLanguageFiles(languagesFolderUrl);
-        final File defaultLanguageFile = getDefaultLanguageFile(languagesFolderUrl, languageFiles);
+        final File defaultLanguageFile = searchForDefaultLanguageInLanguagesFolder(languagesFolderUrl, languageFiles);
 
         final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -168,7 +176,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
    * @see #DEFAULT_LANGUAGE_XML_FILE
    * @throws AssertionError
    */
-  private static File getDefaultLanguageFile(URL languagesFolderUrl, File[] languageFiles) throws AssertionError {
+  private static File searchForDefaultLanguageInLanguagesFolder(URL languagesFolderUrl, File[] languageFiles) throws AssertionError {
     final String defaultLanguagePathName = languagesFolderUrl.getPath() + '/' + DEFAULT_LANGUAGE_XML_FILE;
     final int indexOfDefaultLanguageFile = Arrays.binarySearch(languageFiles, new File(defaultLanguagePathName));
     if (indexOfDefaultLanguageFile < 0) {
@@ -210,7 +218,7 @@ final class MarginallyCleverTranslationXmlFileHelper {
    * @see #LANGUAGES_FOLDER_LOCATION
    * @see java.lang.ClassLoader#getResource(String)
    */
-  private static URL getLanguagesFolderUrlRelativeToClasspath() {
+  public static URL getLanguagesFolderUrlRelativeToClasspath() {
     final ClassLoader thisClassesClassLoader = MarginallyCleverTranslationXmlFileHelper.class.getClassLoader();
     return thisClassesClassLoader.getResource(LANGUAGES_FOLDER_LOCATION);
   }
@@ -292,4 +300,11 @@ final class MarginallyCleverTranslationXmlFileHelper {
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }
 
+  public static File getDefaultLanguageFileFromClasspath() {
+    return getDefaultLanguageFile(getLanguagesFolderUrlRelativeToClasspath());
+  }
+
+  private static File getDefaultLanguageFile(URL languagesFolderUrl) {
+    return new File(languagesFolderUrl.getPath() + '/' + DEFAULT_LANGUAGE_XML_FILE);
+  }
 }

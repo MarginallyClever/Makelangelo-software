@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,7 @@ public final class MultilingualSupport<P extends Preferences> {
       loadLanguages();
     } catch (IllegalStateException e) {
       logger.error("{}. Defaulting to English.", e.getMessage());
+      createLanguageContainersFromLanguageFiles(new File[] { MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFileFromClasspath() });
     }
     loadConfig();
   }
