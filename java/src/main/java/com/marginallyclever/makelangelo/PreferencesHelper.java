@@ -22,35 +22,43 @@ import java.util.prefs.Preferences;
 import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.*;
 
 /**
- * Created on 5/17/15. FIXME Write Javadocs.
- *
+ * Helper class to be used when accessing preferences.
  * @author Peter Colapietro
  * @since v7.1.4
  */
 public final class PreferencesHelper {
 
   /**
-   *
+   * log using SLF4J.
    */
-  private static final Logger logger = LoggerFactory.getLogger(PreferencesHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PreferencesHelper.class);
 
   /**
-   *
+   * Internal mapping of all Makelangelo preference nodes.
    */
   private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
   /**
-   *
+   * Future Makelagelo root preference node path name.
    */
+  private static final String MAKELANGELO_ROOT_PATH_NAME = PreferencesHelper.class.getPackage().getName();
+
+  /**
+   * Legacy preference node path.
+   */
+  @Deprecated
   private static final String LEGACY_MAKELANGELO_ROOT_PATH_NAME = "DrawBot";
 
   /**
-   *
+   * Graphics preference node path, used to store things such as {@code "Draw all while running"} used when OpenGL
+   * renders the application.
    */
   private static final String GRAPHICS_PATH_NAME = "Graphics";
 
   /**
-   *
+   * Machine preference node path, used to store things such as paper height and width, invert left and right motors,
+   * etc.
+   * @see com.marginallyclever.makelangelo.MachineConfiguration
    */
   private static final String MACHINES_PATH_NAME = "Machines";
 
@@ -60,20 +68,21 @@ public final class PreferencesHelper {
   private static final String LANGUAGE_PATH_NAME = "Language";
 
   /**
+   * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
+   *
    * @see <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
    */
   static {
     final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
     final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
-    final String thisPackageName = PreferencesHelper.class.getPackage().getName();
-    final Preferences makelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
-    final Preferences legacyMakelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
+    //final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
+    final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
     try {
       legacyMakelangeloPreferenceNode.sync();
     } catch (BackingStoreException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
-    initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
+    //initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
     initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
     initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
     initialMap.put(MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
@@ -94,7 +103,7 @@ public final class PreferencesHelper {
 
   /**
    * @param key enumeration key used to look up a Makelangelo preference value.
-   * @return
+   * @return preference node associated with the given key.
    */
   @SuppressWarnings("unchecked")
   public static <P extends Preferences> P getPreferenceNode(MakelangeloPreferenceKey key) {
@@ -102,7 +111,8 @@ public final class PreferencesHelper {
   }
 
   /**
-   *
+   * Enumeration used when getting a specific preference node.
+   * @see #getPreferenceNode(MakelangeloPreferenceKey)
    */
   public enum MakelangeloPreferenceKey {
     GRAPHICS,
@@ -119,7 +129,7 @@ public final class PreferencesHelper {
    */
   public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
     try {
-      logger.info("node name:{}", preferenceNode);
+      LOG.info("node name:{}", preferenceNode);
       logKeyValuesForPreferenceNode(preferenceNode);
       final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
       for (String childNodeName : childrenPreferenceNodeNames) {
@@ -127,7 +137,7 @@ public final class PreferencesHelper {
         logPreferenceNode(childNode);
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -138,7 +148,7 @@ public final class PreferencesHelper {
   public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
     final String[] keys = preferenceNode.keys();
     for (String key : keys) {
-      logger.info("key:{} value:{}", key, preferenceNode.get(key, null));
+      LOG.info("key:{} value:{}", key, preferenceNode.get(key, null));
     }
   }
 
@@ -160,7 +170,7 @@ public final class PreferencesHelper {
         copyPreferenceNode(sourcePreferenceNode.node(childName), destinationChildNode);
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -196,7 +206,7 @@ public final class PreferencesHelper {
     try {
       preferenceNode.clear();
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
@@ -213,46 +223,53 @@ public final class PreferencesHelper {
         childNode.clear();
       }
     } catch (BackingStoreException e) {
-      logger.error("{}", e);
+      LOG.error("{}", e);
     }
   }
 
   /**
-   *
+   * @param sourcePreferenceNode      Preference node to be copied from.
+   * @param destinationPreferenceNode Preference node to be copied to and logged.
+   * <br>
+   *   {@link #copyPreferenceNode(Preferences, Preferences)}
+   * <br>
+   *   {@link #logPropertiesNode(Properties)}
+   * <br>
+   *   {@link #logAncestryable(Ancestryable)}
    */
   @SuppressWarnings("unchecked")
-  public <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void testCopyPreferenceNode(M marginallyCleverJsonPreferenceNode, A preferenceNode) {
+  private <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void copyAndLogPreferenceNode(A sourcePreferenceNode, M destinationPreferenceNode) {
     try {
-      PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
+      PreferencesHelper.clearAll(destinationPreferenceNode);
     } catch (BackingStoreException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
-    PreferencesHelper.copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
+    PreferencesHelper.copyPreferenceNode(sourcePreferenceNode, destinationPreferenceNode);
     final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
     final Properties p = new Properties();
     try (final FileInputStream inStream = new FileInputStream(preferencesFile)) {
       p.load(inStream);
     } catch (IOException e) {
-      logger.error("{}", e.getMessage());
+      LOG.error("{}", e.getMessage());
     }
     logPropertiesNode(p);
-    logAncestryable(marginallyCleverJsonPreferenceNode);
+    logAncestryable(destinationPreferenceNode);
   }
 
   /**
-   * @param marginallyCleverJsonPreferenceNode
+   * @param preferenceNode preference node to be logged.
    */
-  public static <P extends Preferences> void logAncestryable(Ancestryable<P> marginallyCleverJsonPreferenceNode) {
-    final JSONObject object = new JSONObject(marginallyCleverJsonPreferenceNode.getChildren());
-    logger.debug("{}", object);
+  public static <P extends Preferences> void logAncestryable(Ancestryable<P> preferenceNode) {
+    final JSONObject object = new JSONObject(preferenceNode.getChildren());
+    LOG.debug("{}", object);
   }
 
   /**
-   * @param p
+   * @param properties Properties to be logged.
    */
-  public static <P extends Properties> void logPropertiesNode(P p) {
-    final JSONObject jsonObject = Property.toJSONObject(p);
-    logger.debug("{}", jsonObject);
+  public static <P extends Properties> void logPropertiesNode(P properties) {
+    final JSONObject jsonObject = Property.toJSONObject(properties);
+    LOG.debug("{}", jsonObject);
   }
 
 }
