@@ -15,8 +15,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * Created on 6/23/15.
- *
  * @author Peter Colapietro
  * @since v7.1.4
  */
@@ -114,7 +112,8 @@ final class MarginallyCleverPreferencesHelper {
     return lessThanZeroNames;
   }
 
-  private MarginallyCleverPreferencesHelper() {
+  private MarginallyCleverPreferencesHelper() throws IllegalStateException {
+    throw new IllegalStateException();
   }
 
 }
