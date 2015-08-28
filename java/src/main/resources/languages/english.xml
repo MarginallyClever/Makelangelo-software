@@ -4,6 +4,7 @@
   <meta>
     <name>English</name>
     <author>Dan Royer (dan@marginallyclever.com)</author>
+    <author>Peter Colapietro (petercolapietro@gmail.com)</author>
   </meta>
 
   <string>
@@ -794,6 +795,37 @@
     ]]>
     </value>
     <hint>HTML for About Dialog</hint>
+  </string>
+
+  <string>
+    <key>MenuExportMachinePreferences</key>
+    <value>Export Preferences</value>
+    <hint>Label for button to export preferences</hint>
+  </string>
+
+  <string>
+    <key>MenuImportMachinePreferences</key>
+    <value>Import Preferences</value>
+    <hint>Label for button to import preferences</hint>
+  </string>
+
+  <string>
+    <key>MenuResetMachinePreferences</key>
+    <value>Reset Preferences</value>
+    <hint>Label for button to reset preferences</hint>
+  </string>
+
+  <string>
+    <key>MenuResetMachinePreferencesWarning</key>
+    <value>Are you sure you want to reset all your machine preferences?</value>
+    <hint>Warning message to let user know they are reseting their preferences.</hint>
+  </string>
+
+
+  <string>
+    <key>MenuResetMachinePreferencesWarningHeader</key>
+    <value>Warning</value>
+    <hint>header used in dialog</hint>
   </string>
 
 </language>

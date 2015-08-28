@@ -11,6 +11,7 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 
@@ -75,7 +78,7 @@ public final class MainGUI<P extends Preferences>
   private static JFrame mainframe;
   private JMenuBar menuBar;
   private JMenuItem buttonExit;
-  private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage;
+  private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
   private JMenuItem buttonRescan, buttonDisconnect;
   private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
   private JMenuItem buttonAbout, buttonCheckForUpdate;
@@ -762,6 +765,42 @@ public final class MainGUI<P extends Preferences>
       translator.chooseLanguage();
       updateMenuBar();
     }
+    if (subject == buttonExportMachinePreferences) {
+      final JFileChooser fc = new JFileChooser();
+      int returnVal = fc.showSaveDialog(this);
+      if(returnVal == JFileChooser.APPROVE_OPTION) {
+        final File file = fc.getSelectedFile();
+        try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
+          prefs.exportSubtree(fileOutputStream);
+        } catch (IOException | BackingStoreException pe) {
+          logger.error("{}", pe.getMessage());
+        }
+      }
+      return;
+    }
+    if (subject == buttonImportMachinePreferences) {
+      final JFileChooser fc = new JFileChooser();
+      int returnVal = fc.showOpenDialog(this);
+      if(returnVal == JFileChooser.APPROVE_OPTION) {
+        final File file = fc.getSelectedFile();
+        try (final InputStream fileInputStream = new FileInputStream(file)) {
+          prefs.importPreferences(fileInputStream);
+        } catch (IOException | InvalidPreferencesFormatException pe) {
+          logger.error("{}", pe.getMessage());
+        }
+      }
+    }
+    if (subject == buttonResetMachinePreferences) {
+      int dialogResult = JOptionPane.showConfirmDialog (null, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_CANCEL_OPTION);
+      if(dialogResult == JOptionPane.YES_OPTION){
+        try {
+          prefs.removeNode();
+          Preferences.userRoot().flush();
+        } catch (BackingStoreException e1) {
+          logger.error("{}", e1.getMessage());
+        }
+      }
+    }
     if (subject == buttonAbout) {
       displayAbout();
       return;
@@ -960,19 +999,8 @@ public final class MainGUI<P extends Preferences>
     menu.setMnemonic(KeyEvent.VK_F);
     menuBar.add(menu);
 
-    preferencesSubMenu = new JMenu(translator.get("MenuPreferences"));
+    preferencesSubMenu = getPreferencesSubMenu();
 
-    buttonAdjustSounds = new JMenuItem(translator.get("MenuSoundsTitle"));
-    buttonAdjustSounds.addActionListener(this);
-    preferencesSubMenu.add(buttonAdjustSounds);
-
-    buttonAdjustGraphics = new JMenuItem(translator.get("MenuGraphicsTitle"));
-    buttonAdjustGraphics.addActionListener(this);
-    preferencesSubMenu.add(buttonAdjustGraphics);
-
-    buttonAdjustLanguage = new JMenuItem(translator.get("MenuLanguageTitle"));
-    buttonAdjustLanguage.addActionListener(this);
-    preferencesSubMenu.add(buttonAdjustLanguage);
     menu.add(preferencesSubMenu);
 
     buttonCheckForUpdate = new JMenuItem(translator.get("MenuUpdate"), KeyEvent.VK_U);
@@ -1041,6 +1069,27 @@ public final class MainGUI<P extends Preferences>
 
     // finish
     menuBar.updateUI();
+  }
+
+  private JMenu getPreferencesSubMenu() {
+    final JMenu preferencesSubMenu;
+    preferencesSubMenu = new JMenu(translator.get("MenuPreferences"));
+
+    buttonAdjustSounds = initializeSubMenuButton(preferencesSubMenu, "MenuSoundsTitle");
+    buttonAdjustGraphics = initializeSubMenuButton(preferencesSubMenu, "MenuGraphicsTitle");
+    buttonAdjustLanguage = initializeSubMenuButton(preferencesSubMenu, "MenuLanguageTitle");
+    buttonExportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuExportMachinePreferences");
+    buttonImportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuImportMachinePreferences");
+    buttonResetMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuResetMachinePreferences");
+
+    return preferencesSubMenu;
+  }
+
+  private JMenuItem initializeSubMenuButton(JMenu preferencesSubMenu, String translationKey) {
+    final JMenuItem jMenuItem = new JMenuItem(translator.get(translationKey));
+    jMenuItem.addActionListener(this);
+    preferencesSubMenu.add(jMenuItem);
+    return jMenuItem;
   }
 
   public Container createContentPane() {
