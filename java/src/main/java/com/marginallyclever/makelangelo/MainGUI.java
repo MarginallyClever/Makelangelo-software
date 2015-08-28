@@ -784,8 +784,10 @@ public final class MainGUI<P extends Preferences>
       if(returnVal == JFileChooser.APPROVE_OPTION) {
         final File file = fc.getSelectedFile();
         try (final InputStream fileInputStream = new FileInputStream(file)) {
+          prefs.flush();
           prefs.importPreferences(fileInputStream);
-        } catch (IOException | InvalidPreferencesFormatException pe) {
+          prefs.flush();
+        } catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
           logger.error("{}", pe.getMessage());
         }
       }
