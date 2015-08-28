@@ -17,12 +17,12 @@ import java.util.prefs.PreferencesFactory;
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  * @since v7.1.4
  */
-public final class MarginallyCleverJsonFilePreferencesFactory<A extends AbstractPreferences> implements PreferencesFactory {
+public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPreferences> implements PreferencesFactory {
 
   /**
    *
    */
-  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferencesFileFactory.class);
 
   /**
    *
@@ -123,7 +123,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
    *
    * @throws IllegalStateException
    */
-  private MarginallyCleverJsonFilePreferencesFactory() throws IllegalStateException {
+  private MarginallyCleverPreferencesFileFactory() throws IllegalStateException {
     throw new IllegalStateException();
   }
 }

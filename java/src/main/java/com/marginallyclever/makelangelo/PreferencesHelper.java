@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.util.Ancestryable;
-import com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory;
+import com.marginallyclever.util.MarginallyCleverPreferencesFileFactory;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import org.json.JSONObject;
 import org.json.Property;
@@ -245,7 +245,7 @@ public final class PreferencesHelper {
       LOG.error("{}", e.getMessage());
     }
     PreferencesHelper.copyPreferenceNode(sourcePreferenceNode, destinationPreferenceNode);
-    final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
+    final File preferencesFile = MarginallyCleverPreferencesFileFactory.getPropertiesPreferencesFile();
     final Properties p = new Properties();
     try (final FileInputStream inStream = new FileInputStream(preferencesFile)) {
       p.load(inStream);
