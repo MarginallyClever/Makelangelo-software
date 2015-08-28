@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,8 +68,14 @@ public final class MultilingualSupport<P extends Preferences> {
     try {
       loadLanguages();
     } catch (IllegalStateException e) {
-      logger.error("{}. Defaulting to English.", e.getMessage());
-      createLanguageContainersFromLanguageFiles(new File[] { MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFileFromClasspath() });
+      logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), DEFAULT_LANGUAGE, WORKING_DIRECTORY);
+      final LanguageContainer languageContainer  = new LanguageContainer();
+      try (InputStream s = getClass().getClassLoader().getResourceAsStream(MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath())) {
+        languageContainer.loadFromInputStream(s);
+      } catch (IOException ie) {
+        logger.error("{}", ie.getMessage());
+      }
+      languages.put(languageContainer.getName(), languageContainer);
     }
     loadConfig();
   }
@@ -147,15 +155,22 @@ public final class MultilingualSupport<P extends Preferences> {
   private void createLanguageContainersFromLanguageFiles(File[] all_files) {
     LanguageContainer lang;
     for (int i = 0; i < all_files.length; ++i) {
-      if (all_files[i].isHidden()) continue;
-      if (all_files[i].isDirectory()) continue;
+      if (all_files[i].isHidden()) {
+        continue;
+      }
+      if (all_files[i].isDirectory()) {
+        continue;
+      }
       // get extension
       int j = all_files[i].getPath().lastIndexOf('.');
-      if (j <= 0) continue;  // no extension
-      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false)
+      if (j <= 0) {
+        continue;  // no extension
+      }
+      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false) {
         continue;  // only .XML or .xml files
+      }
       lang = new LanguageContainer();
-      lang.load(all_files[i].getAbsolutePath());
+      lang.loadFromString(all_files[i].getAbsolutePath());
       languages.put(lang.getName(), lang);
     }
   }
