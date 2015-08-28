@@ -11,8 +11,6 @@ import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 
 /**
- * Created on 6/7/15.
- *
  * @author Peter Colapietro
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  * @since v7.1.4
@@ -22,7 +20,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
   /**
    *
    */
-  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferencesFileFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MarginallyCleverPreferencesFileFactory.class);
 
   /**
    *
@@ -60,7 +58,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
   @Override
   public Preferences userRoot() {
     if (rootPreferences == null) {
-      logger.info("Instantiating root preferences");
+      LOG.info("Instantiating root preferences");
       @SuppressWarnings("unchecked")
       final A castedPreferences = (A) new MarginallyCleverPreferences(null, "");
       rootPreferences = castedPreferences;
@@ -93,13 +91,13 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
       if (!preferencesFile.exists()) {
         try {
           if (preferencesFile.createNewFile()) {
-            logger.info("Preferences file was created.");
+            LOG.info("Preferences file was created.");
           }
         } catch (IOException e) {
-          logger.error("{}", e);
+          LOG.error("{}", e);
         }
       }
-      logger.info("Preferences file is {}", preferencesFile);
+      LOG.info("Preferences file is {}", preferencesFile);
     }
     return preferencesFile;
   }
