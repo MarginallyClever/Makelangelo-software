@@ -789,9 +789,10 @@ public final class MainGUI<P extends Preferences>
           logger.error("{}", pe.getMessage());
         }
       }
+      return;
     }
     if (subject == buttonResetMachinePreferences) {
-      int dialogResult = JOptionPane.showConfirmDialog (null, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_CANCEL_OPTION);
+      int dialogResult = JOptionPane.showConfirmDialog(this, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
       if(dialogResult == JOptionPane.YES_OPTION){
         try {
           prefs.removeNode();
@@ -800,6 +801,7 @@ public final class MainGUI<P extends Preferences>
           logger.error("{}", e1.getMessage());
         }
       }
+      return;
     }
     if (subject == buttonAbout) {
       displayAbout();

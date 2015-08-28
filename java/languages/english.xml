@@ -818,12 +818,12 @@
   <string>
     <key>MenuResetMachinePreferencesWarning</key>
     <value>Are you sure you want to reset all your machine preferences?</value>
-    <hint>Warning message to let user know they are reseting their preferences.</hint>
+    <hint>Warning message to let user know they are resetting their preferences.</hint>
   </string>
 
 
   <string>
-    <key>MenuResetMachinePreferencesWarningLabel</key>
+    <key>MenuResetMachinePreferencesWarningHeader</key>
     <value>Warning</value>
     <hint>header used in dialog</hint>
   </string>
