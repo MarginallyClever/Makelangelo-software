@@ -935,7 +935,7 @@ public final class MainGUI<P extends Preferences>
 
   // Rebuild the contents of the menu based on current program state
   public void updateMenuBar() {
-    JMenu menu, subMenu;
+    JMenu menu, preferencesSubMenu;
     ButtonGroup group;
     int i;
 
@@ -960,20 +960,20 @@ public final class MainGUI<P extends Preferences>
     menu.setMnemonic(KeyEvent.VK_F);
     menuBar.add(menu);
 
-    subMenu = new JMenu(translator.get("MenuPreferences"));
+    preferencesSubMenu = new JMenu(translator.get("MenuPreferences"));
 
     buttonAdjustSounds = new JMenuItem(translator.get("MenuSoundsTitle"));
     buttonAdjustSounds.addActionListener(this);
-    subMenu.add(buttonAdjustSounds);
+    preferencesSubMenu.add(buttonAdjustSounds);
 
     buttonAdjustGraphics = new JMenuItem(translator.get("MenuGraphicsTitle"));
     buttonAdjustGraphics.addActionListener(this);
-    subMenu.add(buttonAdjustGraphics);
+    preferencesSubMenu.add(buttonAdjustGraphics);
 
     buttonAdjustLanguage = new JMenuItem(translator.get("MenuLanguageTitle"));
     buttonAdjustLanguage.addActionListener(this);
-    subMenu.add(buttonAdjustLanguage);
-    menu.add(subMenu);
+    preferencesSubMenu.add(buttonAdjustLanguage);
+    menu.add(preferencesSubMenu);
 
     buttonCheckForUpdate = new JMenuItem(translator.get("MenuUpdate"), KeyEvent.VK_U);
     buttonCheckForUpdate.addActionListener(this);
@@ -992,8 +992,8 @@ public final class MainGUI<P extends Preferences>
 
 
     // Connect menu
-    subMenu = new JMenu(translator.get("MenuConnect"));
-    subMenu.setEnabled(!isRunning);
+    preferencesSubMenu = new JMenu(translator.get("MenuConnect"));
+    preferencesSubMenu.setEnabled(!isRunning);
     group = new ButtonGroup();
 
     String[] connections = connectionManager.listConnections();
@@ -1005,21 +1005,21 @@ public final class MainGUI<P extends Preferences>
       }
       buttonPorts[i].addActionListener(this);
       group.add(buttonPorts[i]);
-      subMenu.add(buttonPorts[i]);
+      preferencesSubMenu.add(buttonPorts[i]);
     }
 
-    subMenu.addSeparator();
+    preferencesSubMenu.addSeparator();
 
     buttonRescan = new JMenuItem(translator.get("MenuRescan"), KeyEvent.VK_N);
     buttonRescan.addActionListener(this);
-    subMenu.add(buttonRescan);
+    preferencesSubMenu.add(buttonRescan);
 
     buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"), KeyEvent.VK_D);
     buttonDisconnect.addActionListener(this);
     buttonDisconnect.setEnabled(connectionToRobot != null && connectionToRobot.isConnectionOpen());
-    subMenu.add(buttonDisconnect);
+    preferencesSubMenu.add(buttonDisconnect);
 
-    menuBar.add(subMenu);
+    menuBar.add(preferencesSubMenu);
 
     // view menu
     menu = new JMenu(translator.get("MenuPreview"));
