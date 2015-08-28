@@ -177,7 +177,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * @throws AssertionError
    */
   private static File searchForDefaultLanguageInLanguagesFolder(URL languagesFolderUrl, File[] languageFiles) throws AssertionError {
-    final String defaultLanguagePathName = languagesFolderUrl.getPath() + '/' + DEFAULT_LANGUAGE_XML_FILE;
+    final String defaultLanguagePathName = buildDefaultLanguageFilePathName(languagesFolderUrl);
     final int indexOfDefaultLanguageFile = Arrays.binarySearch(languageFiles, new File(defaultLanguagePathName));
     if (indexOfDefaultLanguageFile < 0) {
       throw new AssertionError();
@@ -300,11 +300,23 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }
 
-  public static File getDefaultLanguageFileFromClasspath() {
+  private static File getDefaultLanguageFileFromClasspath() {
     return getDefaultLanguageFile(getLanguagesFolderUrlRelativeToClasspath());
   }
 
+  public static String getDefaultLanguageFilePathNameFromClassPath() {
+    return buildDefaultLanguageFilePathName(getLanguagesFolderUrlRelativeToClasspath());
+  }
+
   private static File getDefaultLanguageFile(URL languagesFolderUrl) {
-    return new File(languagesFolderUrl.getPath() + '/' + DEFAULT_LANGUAGE_XML_FILE);
+    return new File(buildDefaultLanguageFilePathName(languagesFolderUrl));
+  }
+
+  public static String buildDefaultLanguageFilePathName(URL languagesFolderUrl) {
+    return languagesFolderUrl.getPath() + '/' + DEFAULT_LANGUAGE_XML_FILE;
+  }
+
+  public static String getDefaultLanguageFilePath() {
+    return LANGUAGES_FOLDER_LOCATION + File.separator + DEFAULT_LANGUAGE_XML_FILE;
   }
 }
