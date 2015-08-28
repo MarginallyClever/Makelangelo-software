@@ -22,32 +22,27 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
    */
   private static final Logger LOG = LoggerFactory.getLogger(MarginallyCleverPreferencesFileFactory.class);
 
+  private static final String PREFERENCES_DIRECTORY_PATH = System.getProperty("user.home") + File.separator + "makelangelo";
+
   /**
    *
    */
   private A rootPreferences;
 
-  /**
-   *
-   */
   private static final String SYSTEM_PROPERTY_KEY_FOR_XML_FILE =
       "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
 
-  /**
-   *
-   */
   private static final String SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE =
       "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
 
-  /**
-   *
-   */
+  private static final String SYSTEM_PROPERTY_KEY_FOR_JSON_FILE =
+      "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
+
   private static File xmlPreferencesFile;
 
-  /**
-   *
-   */
   private static File propertiesPreferencesFile;
+
+  private static File jsonPreferencesFile;
 
   @Override
   public Preferences systemRoot() {
@@ -77,7 +72,11 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
    * @return Preference file
    */
   public synchronized static File getPropertiesPreferencesFile() {
-    return getPreferenceFile(xmlPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE, getDefaultPropertiesPreferenceFilePath());
+    return getPreferenceFile(propertiesPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE, getDefaultPropertiesPreferenceFilePath());
+  }
+
+  public synchronized static File getJsonPreferencesFile() {
+    return getPreferenceFile(jsonPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_JSON_FILE, getDefaultJsonPreferenceFilePath());
   }
 
   private static File getPreferenceFile(File preferencesFile, String systemPropertyKey, String defaultFilePath) {
@@ -106,14 +105,21 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
    * @return
    */
   private static String getDefaultXmlPreferenceFilePath() {
-    return System.getProperty("user.home") + File.separator + "makelangelo" + ".xml";
+    return PREFERENCES_DIRECTORY_PATH+ ".xml";
   }
 
   /**
    * @return
    */
   private static String getDefaultPropertiesPreferenceFilePath() {
-    return System.getProperty("user.home") + File.separator + "makelangelo" + ".properties";
+    return PREFERENCES_DIRECTORY_PATH + ".properties";
+  }
+
+  /**
+   * @return
+   */
+  private static String getDefaultJsonPreferenceFilePath() {
+    return PREFERENCES_DIRECTORY_PATH + ".json";
   }
 
   /**
