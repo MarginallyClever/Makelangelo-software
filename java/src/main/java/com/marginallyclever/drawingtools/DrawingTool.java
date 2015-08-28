@@ -11,12 +11,11 @@ import java.io.Writer;
 import java.util.prefs.Preferences;
 
 
-
 public class DrawingTool {
   // every tool must have a unique number.
   protected int tool_number;
 
-  protected float diameter=1; // mm
+  protected float diameter = 1; // mm
   protected float feed_rate;
   protected float z_on;
   protected float z_off;
@@ -24,21 +23,26 @@ public class DrawingTool {
   protected String name;
 
   // used while drawing to the GUI
-  protected float draw_z=0;
+  protected float draw_z = 0;
 
   protected MainGUI mainGUI;
   protected MultilingualSupport translator;
   protected MachineConfiguration machine;
 
 
-  public DrawingTool(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
+  public DrawingTool(MainGUI gui, MultilingualSupport ms, MachineConfiguration mc) {
     mainGUI = gui;
     translator = ms;
     machine = mc;
   }
 
-  public float getZOn() { return z_on; }
-  public float getZOff() { return z_off; }
+  public float getZOn() {
+    return z_on;
+  }
+
+  public float getZOff() {
+    return z_off;
+  }
 
   // Load a configure menu and let people adjust the tool settings
   public void adjust() {
@@ -53,42 +57,55 @@ public class DrawingTool {
     return diameter;
   }
 
-  public String getName() { return name; }
-  public float getFeedRate() { return feed_rate; }
+  public String getName() {
+    return name;
+  }
+
+  public float getFeedRate() {
+    return feed_rate;
+  }
 
   public void writeChangeTo(Writer out) throws IOException {
-    out.write("M06 T"+tool_number+";\n");
+    out.write("M06 T" + tool_number + ";\n");
   }
 
   public void writeOn(Writer out) throws IOException {
-    out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
+    out.write("G00 Z" + z_on + " F" + z_rate + ";\n");  // lower the pen.
     out.write("G04 P50;\n");
-    out.write("G00 F"+getFeedRate()+";\n");
+    out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(z_on);
   }
 
   public void writeOff(Writer out) throws IOException {
-    out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
+    out.write("G00 Z" + z_off + " F" + z_rate + ";\n");  // lift the pen.
     out.write("G04 P50;\n");
-    out.write("G00 F"+getFeedRate()+";\n");
+    out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(z_off);
   }
 
-  public void writeMoveTo(Writer out,float x,float y) throws IOException {
-    out.write("G00 X"+x+" Y"+y+";\n");
+  public void writeMoveTo(Writer out, float x, float y) throws IOException {
+    out.write("G00 X" + x + " Y" + y + ";\n");
   }
 
   public BasicStroke getStroke() {
-    return new BasicStroke(diameter*10,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
+    return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
   }
 
-  public void drawZ(float z) { draw_z=z; }
-  public boolean isDrawOn() { return z_on==draw_z; }
-  public boolean isDrawOff() { return z_off==draw_z; }
+  public void drawZ(float z) {
+    draw_z = z;
+  }
 
-  public void drawLine(GL2 gl2,double x1,double y1,double x2,double y2) {
+  public boolean isDrawOn() {
+    return z_on == draw_z;
+  }
+
+  public boolean isDrawOff() {
+    return z_off == draw_z;
+  }
+
+  public void drawLine(GL2 gl2, double x1, double y1, double x2, double y2) {
     gl2.glBegin(GL2.GL_LINES);
-    gl2.glVertex2d(x1,y1);
+    gl2.glVertex2d(x1, y1);
     gl2.glVertex2d(x2, y2);
     gl2.glEnd();
   }
@@ -96,12 +113,12 @@ public class DrawingTool {
 
   public void loadConfig(Preferences prefs) {
     prefs = prefs.node(name);
-    setDiameter(Float.parseFloat(prefs.get("diameter",Float.toString(diameter))));
-    z_rate = Float.parseFloat(prefs.get("z_rate",Float.toString(z_rate)));
-    z_on = Float.parseFloat(prefs.get("z_on",Float.toString(z_on)));
-    z_off = Float.parseFloat(prefs.get("z_off",Float.toString(z_off)));
+    setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
+    z_rate = Float.parseFloat(prefs.get("z_rate", Float.toString(z_rate)));
+    z_on = Float.parseFloat(prefs.get("z_on", Float.toString(z_on)));
+    z_off = Float.parseFloat(prefs.get("z_off", Float.toString(z_off)));
     //tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-    feed_rate = Float.parseFloat(prefs.get("feed_rate",Float.toString(feed_rate)));
+    feed_rate = Float.parseFloat(prefs.get("feed_rate", Float.toString(feed_rate)));
   }
 
   public void saveConfig(Preferences prefs) {

@@ -29,15 +29,15 @@ import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPref
  */
 public final class PreferencesHelper {
 
-    /**
-     *
-     */
-    private static final Logger logger = LoggerFactory.getLogger(PreferencesHelper.class);
+  /**
+   *
+   */
+  private static final Logger logger = LoggerFactory.getLogger(PreferencesHelper.class);
 
-    /**
-     *
-     */
-    private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+  /**
+   *
+   */
+  private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
   /**
    *
@@ -66,8 +66,8 @@ public final class PreferencesHelper {
     final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
     final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
     final String thisPackageName = PreferencesHelper.class.getPackage().getName();
-    final Preferences makelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences)userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
-    final Preferences legacyMakelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences)userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
+    final Preferences makelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
+    final Preferences legacyMakelangeloPreferenceNode = new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
     try {
       legacyMakelangeloPreferenceNode.sync();
     } catch (BackingStoreException e) {
@@ -84,21 +84,22 @@ public final class PreferencesHelper {
   }
 
   /**
-     * NOOP Constructor.
-     *
-     * @throws IllegalStateException
-     */
-    private PreferencesHelper() throws IllegalStateException { throw new IllegalStateException(); }
+   * NOOP Constructor.
+   *
+   * @throws IllegalStateException
+   */
+  private PreferencesHelper() throws IllegalStateException {
+    throw new IllegalStateException();
+  }
 
-    /**
-     *
-     * @param key enumeration key used to look up a Makelangelo preference value.
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static <P extends Preferences> P getPreferenceNode(MakelangeloPreferenceKey key) {
-        return (P) CLASS_TO_PREFERENCE_NODE_MAP.get(key);
-    }
+  /**
+   * @param key enumeration key used to look up a Makelangelo preference value.
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <P extends Preferences> P getPreferenceNode(MakelangeloPreferenceKey key) {
+    return (P) CLASS_TO_PREFERENCE_NODE_MAP.get(key);
+  }
 
   /**
    *
@@ -112,28 +113,26 @@ public final class PreferencesHelper {
     MAKELANGELO_ROOT
   }
 
-    /**
-     *
-     * @param preferenceNode Preference node whose name, and key values,
-     *                       as well as those of its children's are to be logged.
-     */
-    public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
-        try {
-            logger.info("node name:{}", preferenceNode);
-            logKeyValuesForPreferenceNode(preferenceNode);
-            final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
-            for (String childNodeName : childrenPreferenceNodeNames) {
-                final Preferences childNode = preferenceNode.node(childNodeName);
-                logPreferenceNode(childNode);
-            }
-        } catch (BackingStoreException e) {
-            logger.error("{}",e);
-        }
+  /**
+   * @param preferenceNode Preference node whose name, and key values,
+   *                       as well as those of its children's are to be logged.
+   */
+  public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
+    try {
+      logger.info("node name:{}", preferenceNode);
+      logKeyValuesForPreferenceNode(preferenceNode);
+      final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
+      for (String childNodeName : childrenPreferenceNodeNames) {
+        final Preferences childNode = preferenceNode.node(childNodeName);
+        logPreferenceNode(childNode);
+      }
+    } catch (BackingStoreException e) {
+      logger.error("{}", e);
     }
+  }
 
 
   /**
-   *
    * @param preferenceNode Preference node to log key value pairs for.
    */
   public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
@@ -145,19 +144,18 @@ public final class PreferencesHelper {
 
 
   /**
-   *
-   * @param sourcePreferenceNode Preference node to be copied from.
+   * @param sourcePreferenceNode      Preference node to be copied from.
    * @param destinationPreferenceNode Preference node to be copied to.
    */
   public static <P extends Preferences> void copyPreferenceNode(P sourcePreferenceNode, P destinationPreferenceNode) {
     try {
       final String[] keys = sourcePreferenceNode.keys();
-      for (String key: keys) {
+      for (String key : keys) {
         final String value = sourcePreferenceNode.get(key, null);
         destinationPreferenceNode.put(key, value);
       }
       final String[] childNames = sourcePreferenceNode.childrenNames();
-      for (String childName: childNames) {
+      for (String childName : childNames) {
         final Preferences destinationChildNode = destinationPreferenceNode.node(childName);
         copyPreferenceNode(sourcePreferenceNode.node(childName), destinationChildNode);
       }
@@ -168,21 +166,19 @@ public final class PreferencesHelper {
 
 
   /**
-   *
    * Recursively clears all the preferences (key-value associations) for a given node and its children.
    *
    * @param preferenceNode Preference node that you want recursively cleared of all key value pairs.
-   *
    * @see <a href="http://stackoverflow.com/a/6411855"></a>
    */
   public static <P extends Preferences> void clearAll(P preferenceNode) throws BackingStoreException {
     final String[] childrenNames = preferenceNode.childrenNames();
-    for(String childNodeName : childrenNames) {
+    for (String childNodeName : childrenNames) {
       final Preferences childNode = preferenceNode.node(childNodeName);
       final String[] childNodesChildren = childNode.childrenNames();
-      if(childNodesChildren != null) {
+      if (childNodesChildren != null) {
         final boolean hasChildren = childNodesChildren.length != 0;
-        if(hasChildren) {
+        if (hasChildren) {
           clearAll(childNode);
         }
         childNode.clear();
@@ -225,7 +221,7 @@ public final class PreferencesHelper {
    *
    */
   @SuppressWarnings("unchecked")
-  public  <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void testCopyPreferenceNode(M marginallyCleverJsonPreferenceNode, A preferenceNode) {
+  public <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void testCopyPreferenceNode(M marginallyCleverJsonPreferenceNode, A preferenceNode) {
     try {
       PreferencesHelper.clearAll(marginallyCleverJsonPreferenceNode);
     } catch (BackingStoreException e) {
@@ -234,7 +230,7 @@ public final class PreferencesHelper {
     PreferencesHelper.copyPreferenceNode(preferenceNode, marginallyCleverJsonPreferenceNode);
     final File preferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
     final Properties p = new Properties();
-    try(final FileInputStream inStream = new FileInputStream(preferencesFile)) {
+    try (final FileInputStream inStream = new FileInputStream(preferencesFile)) {
       p.load(inStream);
     } catch (IOException e) {
       logger.error("{}", e.getMessage());
@@ -244,7 +240,6 @@ public final class PreferencesHelper {
   }
 
   /**
-   *
    * @param marginallyCleverJsonPreferenceNode
    */
   public static <P extends Preferences> void logAncestryable(Ancestryable<P> marginallyCleverJsonPreferenceNode) {
@@ -253,7 +248,6 @@ public final class PreferencesHelper {
   }
 
   /**
-   *
    * @param p
    */
   public static <P extends Properties> void logPropertiesNode(P p) {
