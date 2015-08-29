@@ -28,6 +28,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
@@ -56,7 +57,7 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_GeneratorBoxes;
 import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
+//import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
 import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
 import com.marginallyclever.filters.Filter_GeneratorPulse;
@@ -73,7 +74,7 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
  * @since 7.1.4
  */
 public class PrepareImagePanel
-extends JPanel
+extends JScrollPane
 implements ActionListener {
   /**
    *
@@ -136,8 +137,8 @@ implements ActionListener {
     gui=_gui;
     machineConfiguration = _machineConfiguration;
 
-    this.setLayout(new GridLayout(0,1));
-    this.setPreferredSize(new Dimension(150,100));
+    JPanel p = new JPanel(new GridLayout(0,1));
+    this.setViewportView(p);
 
     machineConfigurations = getAnyMachineConfigurations();
     machineChoices = new JComboBox<>(machineConfigurations);
@@ -154,27 +155,32 @@ implements ActionListener {
     input_paper_margin.setPaintTicks(false);
     input_paper_margin.setPaintLabels(true);
 
-    add(new JLabel(translator.get("MachineNumber")));
-    add(machineChoices);
-    add(new JLabel(translator.get("PaperMargin")));
-    add(input_paper_margin);
+    JPanel machineNumberPanel = new JPanel(new GridLayout(1,0));
+    p.add(machineNumberPanel);
+    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+    machineNumberPanel.add(machineChoices);
+    
+    JPanel marginPanel = new JPanel(new GridLayout(1,0));
+    p.add(marginPanel);
+    marginPanel.add(new JLabel(translator.get("PaperMargin")));
+    marginPanel.add(input_paper_margin);
 
         // File conversion menu
         buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
         buttonOpenFile.addActionListener(this);
-        add(buttonOpenFile);
+        p.add(buttonOpenFile);
 
         buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
         buttonHilbertCurve.addActionListener(this);
-        add(buttonHilbertCurve);
+        p.add(buttonHilbertCurve);
 
         buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
         buttonText2GCODE.addActionListener(this);
-        add(buttonText2GCODE);
+        p.add(buttonText2GCODE);
 
         buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
         buttonSaveFile.addActionListener(this);
-        add(buttonSaveFile);
+        p.add(buttonSaveFile);
   }
 
   // The user has done something.  respond to it.

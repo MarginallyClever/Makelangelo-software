@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -13,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
 /**
@@ -21,7 +21,7 @@ import javax.swing.JSeparator;
  * @since 7.1.4
  */
 public class MakelangeloSettingsPanel
-extends JPanel
+extends JScrollPane
 implements ActionListener {
     
   /**
@@ -44,31 +44,31 @@ implements ActionListener {
     gui=_gui;
     machineConfiguration = _machineConfiguration;
 
-    this.setLayout(new GridLayout(0,1));
-    this.setPreferredSize(new Dimension(150,100));
-
+    JPanel p = new JPanel(new GridLayout(0,1));
+    this.setViewportView(p);
+    
         // TODO: move all these into a pop-up menu with tabs
         buttonAdjustMachineSize = new JButton(translator.get("MenuSettingsMachine"));
         buttonAdjustMachineSize.addActionListener(this);
-        this.add(buttonAdjustMachineSize);
+        p.add(buttonAdjustMachineSize);
 
         buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
         buttonAdjustPulleySize.addActionListener(this);
-    this.add(buttonAdjustPulleySize);
+    p.add(buttonAdjustPulleySize);
         
         buttonJogMotors = new JButton(translator.get("JogMotors"));
         buttonJogMotors.addActionListener(this);
-    this.add(buttonJogMotors);
+    p.add(buttonJogMotors);
 
-        this.add(new JSeparator());
+        //p.add(new JSeparator());
         
         buttonChangeTool = new JButton(translator.get("MenuSelectTool"));
         buttonChangeTool.addActionListener(this);
-        this.add(buttonChangeTool);
+        p.add(buttonChangeTool);
 
         buttonAdjustTool = new JButton(translator.get("MenuAdjustTool"));
         buttonAdjustTool.addActionListener(this);
-        this.add(buttonAdjustTool);
+        p.add(buttonAdjustTool);
   }
   
 

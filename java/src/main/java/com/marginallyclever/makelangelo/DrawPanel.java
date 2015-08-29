@@ -1,13 +1,8 @@
 package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.prefs.Preferences;

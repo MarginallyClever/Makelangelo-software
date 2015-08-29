@@ -1075,6 +1075,7 @@ public final class MainGUI
     statusBar = new StatusBar(translator);
 
     contextMenu = new JTabbedPane();
+    contextMenu.setPreferredSize(new Dimension(450,100));
     contextMenu.addTab(translator.get("MenuSettings"), null, settingsPane, null);
     contextMenu.addTab(translator.get("MenuGCODE"), null, prepareImage, null);
     contextMenu.addTab(translator.get("MenuDraw"), null, driveControls, null);

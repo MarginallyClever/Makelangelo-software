@@ -16,8 +16,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 
 /**
@@ -26,7 +28,7 @@ import javax.swing.SwingConstants;
  * @since 7.1.4
  */
 public class MakelangeloDriveControls
-  extends JPanel
+  extends JScrollPane
   implements ActionListener, KeyListener {
   protected JButton down100,down10,down1,up1,up10,up100;
   protected JButton left100,left10,left1,right1,right10,right100;
@@ -68,10 +70,10 @@ public class MakelangeloDriveControls
   }
   
   public void updateButtonAccess(boolean isConnected,boolean isRunning) {
-      buttonStart.setEnabled(isConnected && !isRunning);
-        buttonStartAt.setEnabled(isConnected && !isRunning);
-        buttonPause.setEnabled(isConnected && isRunning);
-        buttonHalt.setEnabled(isConnected && isRunning);
+    buttonStart.setEnabled(isConnected && !isRunning);
+    buttonStartAt.setEnabled(isConnected && !isRunning);
+    buttonPause.setEnabled(isConnected && isRunning);
+    buttonHalt.setEnabled(isConnected && isRunning);
   }
   
   public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {
@@ -79,14 +81,9 @@ public class MakelangeloDriveControls
     gui=_gui;
     machineConfiguration = _machineConfiguration;
     
-    GridBagConstraints c;
+    GridBagConstraints c = new GridBagConstraints();
 
-    this.setLayout(new GridLayout(0,1));
-    this.setPreferredSize(new Dimension(150,100));
-    
-    this.removeAll();
-    
-      // Draw menu
+    // Draw menu
     JPanel go = new JPanel(new GridBagLayout());
         buttonStart = new JButton(translator.get("Start"));
         go.add(buttonStart);
@@ -117,29 +114,24 @@ public class MakelangeloDriveControls
       left1 = new JButton("-1");    left1.setPreferredSize(new Dimension(60,20)); 
       right1 = new JButton("1");    right1.setPreferredSize(new Dimension(60,20));
       right10 = new JButton("10");    right10.setPreferredSize(new Dimension(60,20));
-      right100 = new JButton("100");  right100.setPreferredSize(new Dimension(60,20));
-  
-      //final JButton find = new JButton("FIND HOME");  find.setPreferredSize(new Dimension(100,20));
-      center = new JButton(translator.get("SetHome"));  center.setPreferredSize(new Dimension(100,20));
-      home = new JButton(translator.get("GoHome"));   home.setPreferredSize(new Dimension(100,20));
-      
-      c = new GridBagConstraints();
+      right100 = new JButton("100");  right100.setPreferredSize(new Dimension(60,20));     
+
       //c.fill=GridBagConstraints.BOTH; 
-      c.gridx=0;  c.gridy=0;  axisControl.add(yAxis,c);
-      c.gridx=1;  c.gridy=0;  axisControl.add(down100,c);
-      c.gridx=2;  c.gridy=0;  axisControl.add(down10,c);
-      c.gridx=3;  c.gridy=0;  axisControl.add(down1,c);
-      c.gridx=4;  c.gridy=0;  axisControl.add(up1,c);
-      c.gridx=5;  c.gridy=0;  axisControl.add(up10,c);
-      c.gridx=6;  c.gridy=0;  axisControl.add(up100,c);
+      c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
+      c.gridx=4;  c.gridy=7;  axisControl.add(down100,c);
+      c.gridx=4;  c.gridy=6;  axisControl.add(down10,c);
+      c.gridx=4;  c.gridy=5;  axisControl.add(down1,c);
+      c.gridx=4;  c.gridy=3;  axisControl.add(up1,c);
+      c.gridx=4;  c.gridy=2;  axisControl.add(up10,c);
+      c.gridx=4;  c.gridy=1;  axisControl.add(up100,c);
       
-      c.gridx=0;  c.gridy=1;  axisControl.add(xAxis,c);
-      c.gridx=1;  c.gridy=1;  axisControl.add(left100,c);
-      c.gridx=2;  c.gridy=1;  axisControl.add(left10,c);
-      c.gridx=3;  c.gridy=1;  axisControl.add(left1,c);
-      c.gridx=4;  c.gridy=1;  axisControl.add(right1,c);
-      c.gridx=5;  c.gridy=1;  axisControl.add(right10,c);
-      c.gridx=6;  c.gridy=1;  axisControl.add(right100,c);
+      c.gridx=0;  c.gridy=4;  axisControl.add(xAxis,c);
+      c.gridx=1;  c.gridy=4;  axisControl.add(left100,c);
+      c.gridx=2;  c.gridy=4;  axisControl.add(left10,c);
+      c.gridx=3;  c.gridy=4;  axisControl.add(left1,c);
+      c.gridx=5;  c.gridy=4;  axisControl.add(right1,c);
+      c.gridx=6;  c.gridy=4;  axisControl.add(right10,c);
+      c.gridx=7;  c.gridy=4;  axisControl.add(right100,c);
       up1.addActionListener(this);
       up10.addActionListener(this);
       up100.addActionListener(this);
@@ -152,18 +144,19 @@ public class MakelangeloDriveControls
       right1.addActionListener(this);
       right10.addActionListener(this);
       right100.addActionListener(this);
-      center.addActionListener(this);
-      home.addActionListener(this);
     
     
     JPanel corners = new JPanel();
       corners.setLayout(new GridBagLayout());
-      goTop = new JButton(translator.get("Top"));     goTop.setPreferredSize(new Dimension(80,20));
+      goTop = new JButton(translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
       goBottom = new JButton(translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
-      goLeft = new JButton(translator.get("Left"));   goLeft.setPreferredSize(new Dimension(80,20));
+      goLeft = new JButton(translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
       goRight = new JButton(translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
-      goUp = new JButton(translator.get("PenUp"));    goUp.setPreferredSize(new Dimension(100,20));
+      goUp = new JButton(translator.get("PenUp"));      goUp.setPreferredSize(new Dimension(100,20));
       goDown = new JButton(translator.get("PenDown"));  goDown.setPreferredSize(new Dimension(100,20));
+      center = new JButton(translator.get("SetHome"));  center.setPreferredSize(new Dimension(100,20));
+      home = new JButton(translator.get("GoHome"));     home.setPreferredSize(new Dimension(100,20)); 
+      //final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
       c = new GridBagConstraints();
       c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
       c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
@@ -181,6 +174,8 @@ public class MakelangeloDriveControls
       goRight.addActionListener(this);
       goUp.addActionListener(this);
       goDown.addActionListener(this);
+      center.addActionListener(this);
+      home.addActionListener(this);
     
       
     JPanel feedRateControl = new JPanel();
@@ -197,14 +192,25 @@ public class MakelangeloDriveControls
       c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
       c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
     
-  
-    this.add(go);
-      this.add(new JSeparator());
-    this.add(axisControl);
-    this.add(corners);
-    this.add(feedRateControl);
-      this.add(new JSeparator());
-      this.add(getTextInputField());
+      
+    // assemble the components
+    //this.removeAll();
+	
+    JPanel p = new JPanel(new GridBagLayout());
+    this.setViewportView(p);
+	
+    p.setLayout(new GridLayout(0,1));
+
+    p.add(go,c);
+    //p.add(new JSeparator());
+    c.gridheight=2;
+    p.add(axisControl,c);
+    c.gridheight=1;
+    p.add(corners,c);
+    c.gridheight=1;
+    p.add(feedRateControl,c);
+    //p.add(new JSeparator());
+    p.add(getTextInputField());
       
     setFeedRate.addActionListener(this);
     disengageMotors.addActionListener(this);

@@ -1,7 +1,5 @@
 package com.marginallyclever.filters;
 
-
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -12,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.PathIterator;
+import java.awt.Font;
+//import java.awt.Shape;
+//import java.awt.font.FontRenderContext;
+//import java.awt.font.TextLayout;
+//import java.awt.geom.PathIterator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
