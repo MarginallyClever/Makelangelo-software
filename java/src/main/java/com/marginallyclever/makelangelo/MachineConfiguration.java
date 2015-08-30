@@ -189,10 +189,10 @@ public final class MachineConfiguration {
     c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("PaperWidth")),c);   d.gridx=1;  d.gridy=y;  driver.add(pw,d);
     c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("PaperHeight")),c);    d.gridx=3;  d.gridy=y;  driver.add(ph,d);
     y++;
-
+/*
     c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("InvertLeft")),c);   d.gridx=1;  d.gridy=y;  driver.add(m1i,d);
     c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("InvertRight")),c);    d.gridx=3;  d.gridy=y;  driver.add(m2i,d);
-    y++;
+    y++;*/
 
     //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
     //driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
@@ -316,8 +316,8 @@ public final class MachineConfiguration {
               break;
             }
 
-            m1invert = m1i.isSelected();
-            m2invert = m2i.isSelected();
+            //m1invert = m1i.isSelected();
+            //m2invert = m2i.isSelected();
 
             saveConfig();
             mainGUI.sendConfig();

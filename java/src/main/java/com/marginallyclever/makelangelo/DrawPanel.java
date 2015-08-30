@@ -440,9 +440,16 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     private void paintGondola( GL2 gl2 ) {
   	  if(running) {
-  		  
+  		  // TODO test me!
+  		  gl2.glBegin(GL2.GL_LINES);
+  		  gl2.glColor3f(0, 0, 1);
+  		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
+  		  gl2.glVertex2d(gondola_x,gondola_y);
+  		  gl2.glVertex2d(machine.limit_right, machine.limit_top);
+  		  gl2.glVertex2d(gondola_x,gondola_y);
+  		  gl2.glEnd();
   	  } else {
-  		  double gx=(gondola_x/cameraZoom+cameraOffsetX);
+  		  double gx=( gondola_x/cameraZoom+cameraOffsetX);
   		  double gy=(-gondola_y/cameraZoom-cameraOffsetY);
   		  if(gx<machine.limit_left) return;
   		  if(gx>machine.limit_right) return;
@@ -454,6 +461,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
   		  gl2.glVertex2d(gx,gy);
   		  gl2.glVertex2d(machine.limit_right, machine.limit_top);
   		  gl2.glVertex2d(gx,gy);
+  		  gl2.glEnd();
+  		  gl2.glBegin(GL2.GL_LINE_LOOP);
+  		  gl2.glColor3f(0, 0, 1);
+  		  float f;
+  		  float r=2; // circle radius
+  		  for(f=0;f<2.0*Math.PI;f+=0.3f) {
+  			  gl2.glVertex2d(gx+Math.cos(f)*r,gy+Math.sin(f)*r);
+  		  }
   		  gl2.glEnd();
   	  }
     }
@@ -501,6 +516,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
                         gl2.glColor3f(1, 0, 0);
                         //g2d.setColor(Color.RED);
                     } else if(n.line_number<=linesProcessed+look_ahead) {
+                    	if( n.line_number == linesProcessed+look_ahead ) {
+                    		gondola_x=n.x1;
+                    		gondola_y=n.y1;
+                    	}
                         gl2.glColor3f(0, 1, 0);
                         //g2d.setColor(Color.GREEN);
                     } else if(prefs.getBoolean("Draw all while running", true) == false) {
