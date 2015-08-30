@@ -43,7 +43,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     //private boolean mouseIn=false;
     private int buttonPressed=MouseEvent.NOBUTTON;
     private int oldx, oldy;
-    private float gondola_x,gondola_y;
+    private double gondola_x,gondola_y;
 
     // scale + position
     private double cameraOffsetX = 0.0d;
@@ -301,8 +301,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     public void mouseMoved(MouseEvent e) {
         int x=e.getX();
         int y=e.getY();
-        gondola_x=x*0.1f;
-        gondola_y=y*0.1f;
+        gondola_x=x-window_width/2;
+        gondola_y=y-window_height/2;
+        repaint();
     }
 
     
@@ -436,6 +437,28 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         gl2.glEnd();
     }
   
+
+    private void paintGondola( GL2 gl2 ) {
+  	  if(running) {
+  		  
+  	  } else {
+  		  double gx=(gondola_x/cameraZoom+cameraOffsetX);
+  		  double gy=(-gondola_y/cameraZoom-cameraOffsetY);
+  		  if(gx<machine.limit_left) return;
+  		  if(gx>machine.limit_right) return;
+  		  if(gy>machine.limit_top) return;
+  		  if(gy<machine.limit_bottom) return;
+  		  gl2.glBegin(GL2.GL_LINES);
+  		  gl2.glColor3f(0, 0, 1);
+  		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
+  		  gl2.glVertex2d(gx,gy);
+  		  gl2.glVertex2d(machine.limit_right, machine.limit_top);
+  		  gl2.glVertex2d(gx,gy);
+  		  gl2.glEnd();
+  	  }
+    }
+    
+    
   public void render( GL2 gl2 ) {
     paintBackground(gl2);
     paintCamera(gl2);
@@ -456,19 +479,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
   }
   
   
-  private void paintGondola( GL2 gl2 ) {
-	  if(running) {
-		  
-	  } else {
-		  gl2.glColor3f(0, 0, 1);
-		  gl2.glBegin(GL2.GL_LINES);
-		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
-		  gl2.glVertex2d(gondola_x,gondola_y);
-		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
-		  gl2.glVertex2d(gondola_x,gondola_y);
-		  gl2.glEnd();
-	  }
-  }
   
   private void paintGcode( GL2 gl2 ) {
     // TODO move all robot drawing to a class
