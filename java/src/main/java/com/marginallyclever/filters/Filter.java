@@ -5,6 +5,8 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +36,7 @@ public abstract class Filter {
   protected float letter_height = 20.0f;
   protected float line_spacing = 5.0f;
   protected float padding = 5.0f;
-  static final String alphabetFolder = "ALPHABET/";
+  static final String ALPHABET_FOLDER = "ALPHABET/";
   protected int chars_per_line = 25;
   protected boolean draw_bounding_box = false;
 
@@ -66,6 +68,7 @@ public abstract class Filter {
   protected float sampleValue;
   protected float sampleSum;
 
+  private final Logger log = LoggerFactory.getLogger(Filter.class);
 
   public Filter(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
     mainGUI = gui;
@@ -587,9 +590,9 @@ public abstract class Filter {
   }
 
   protected void textDrawLine(String a1, Writer output) throws IOException {
-    String ud = alphabetFolder;//System.getProperty("user.dir") + "/" + alphabetFolder;
+    String ud = ALPHABET_FOLDER;
 
-    //System.out.println(a1+" ("+a1.length()+")");
+    log.info("{} ({})", a1, a1.length());
 
     int i = 0;
     for (i = 0; i < a1.length(); ++i) {

@@ -11,45 +11,38 @@ import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 
 /**
- * Created on 6/7/15.
- *
  * @author Peter Colapietro
  * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  * @since v7.1.4
  */
-public final class MarginallyCleverJsonFilePreferencesFactory<A extends AbstractPreferences> implements PreferencesFactory {
+public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPreferences> implements PreferencesFactory {
 
   /**
    *
    */
-  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverJsonFilePreferencesFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MarginallyCleverPreferencesFileFactory.class);
+
+  private static final String PREFERENCES_DIRECTORY_PATH = System.getProperty("user.home") + File.separator + "makelangelo";
 
   /**
    *
    */
   private A rootPreferences;
 
-  /**
-   *
-   */
   private static final String SYSTEM_PROPERTY_KEY_FOR_XML_FILE =
       "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
 
-  /**
-   *
-   */
   private static final String SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE =
       "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
 
-  /**
-   *
-   */
+  private static final String SYSTEM_PROPERTY_KEY_FOR_JSON_FILE =
+      "com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
+
   private static File xmlPreferencesFile;
 
-  /**
-   *
-   */
   private static File propertiesPreferencesFile;
+
+  private static File jsonPreferencesFile;
 
   @Override
   public Preferences systemRoot() {
@@ -60,7 +53,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
   @Override
   public Preferences userRoot() {
     if (rootPreferences == null) {
-      logger.info("Instantiating root preferences");
+      LOG.info("Instantiating root preferences");
       @SuppressWarnings("unchecked")
       final A castedPreferences = (A) new MarginallyCleverPreferences(null, "");
       rootPreferences = castedPreferences;
@@ -79,7 +72,11 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
    * @return Preference file
    */
   public synchronized static File getPropertiesPreferencesFile() {
-    return getPreferenceFile(xmlPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE, getDefaultPropertiesPreferenceFilePath());
+    return getPreferenceFile(propertiesPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE, getDefaultPropertiesPreferenceFilePath());
+  }
+
+  public synchronized static File getJsonPreferencesFile() {
+    return getPreferenceFile(jsonPreferencesFile, SYSTEM_PROPERTY_KEY_FOR_JSON_FILE, getDefaultJsonPreferenceFilePath());
   }
 
   private static File getPreferenceFile(File preferencesFile, String systemPropertyKey, String defaultFilePath) {
@@ -93,13 +90,13 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
       if (!preferencesFile.exists()) {
         try {
           if (preferencesFile.createNewFile()) {
-            logger.info("Preferences file was created.");
+            LOG.info("Preferences file was created.");
           }
         } catch (IOException e) {
-          logger.error("{}", e);
+          LOG.error("{}", e);
         }
       }
-      logger.info("Preferences file is {}", preferencesFile);
+      LOG.info("Preferences file is {}", preferencesFile);
     }
     return preferencesFile;
   }
@@ -108,14 +105,21 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
    * @return
    */
   private static String getDefaultXmlPreferenceFilePath() {
-    return System.getProperty("user.home") + File.separator + "makelangelo" + ".xml";
+    return PREFERENCES_DIRECTORY_PATH+ ".xml";
   }
 
   /**
    * @return
    */
   private static String getDefaultPropertiesPreferenceFilePath() {
-    return System.getProperty("user.home") + File.separator + "makelangelo" + ".properties";
+    return PREFERENCES_DIRECTORY_PATH + ".properties";
+  }
+
+  /**
+   * @return
+   */
+  private static String getDefaultJsonPreferenceFilePath() {
+    return PREFERENCES_DIRECTORY_PATH + ".json";
   }
 
   /**
@@ -123,7 +127,7 @@ public final class MarginallyCleverJsonFilePreferencesFactory<A extends Abstract
    *
    * @throws IllegalStateException
    */
-  private MarginallyCleverJsonFilePreferencesFactory() throws IllegalStateException {
+  private MarginallyCleverPreferencesFileFactory() throws IllegalStateException {
     throw new IllegalStateException();
   }
 }

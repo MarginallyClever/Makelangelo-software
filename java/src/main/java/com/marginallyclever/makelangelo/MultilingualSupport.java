@@ -1,11 +1,14 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,12 @@ import java.util.prefs.Preferences;
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
 public final class MultilingualSupport<P extends Preferences> {
+
+  /**
+   * Working directory. This represents the directory where the java executable launched the jar from.
+   */
+  public static final String WORKING_DIRECTORY = System.getProperty("user.dir") + File.separator + "languages";
+
 
   /**
    * The name of the preferences node containing the user's choice.
@@ -56,7 +65,18 @@ public final class MultilingualSupport<P extends Preferences> {
    *
    */
   public MultilingualSupport() {
-    loadLanguages();
+    try {
+      loadLanguages();
+    } catch (IllegalStateException e) {
+      logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), DEFAULT_LANGUAGE, WORKING_DIRECTORY);
+      final LanguageContainer languageContainer  = new LanguageContainer();
+      try (InputStream s = getClass().getClassLoader().getResourceAsStream(MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath())) {
+        languageContainer.loadFromInputStream(s);
+      } catch (IOException ie) {
+        logger.error("{}", ie.getMessage());
+      }
+      languages.put(languageContainer.getName(), languageContainer);
+    }
     loadConfig();
   }
 
@@ -100,17 +120,31 @@ public final class MultilingualSupport<P extends Preferences> {
     currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, DEFAULT_LANGUAGE);
   }
 
+
   /**
    * Scan folder for language files.
+   * @throws IllegalStateException No language files found
    */
   public void loadLanguages() throws IllegalStateException {
-    String workingDirectory = System.getProperty("user.dir") + File.separator + "languages";
-    final File f = new File(workingDirectory);
-    final File[] all_files = f.listFiles();
-    if (all_files.length <= 0) {
-      throw new IllegalStateException("No language files found!");
+    final File f = new File(WORKING_DIRECTORY);
+    final File[] allLanguageFiles = f.listFiles();
+    checkLanguagesDirectoryExists(allLanguageFiles);
+    createLanguageContainersFromLanguageFiles(allLanguageFiles);
+  }
+
+  /**
+   * Checks to make sure the language folder exists.
+   * @param allLanguageFiles - Array of all language files in the user's working directory.
+   * @throws IllegalStateException No language files found
+   */
+  private void checkLanguagesDirectoryExists(File[] allLanguageFiles) throws IllegalStateException {
+    final IllegalStateException illegalStateException = new IllegalStateException("No language files found!");
+    if (allLanguageFiles == null) {
+      throw illegalStateException;
     }
-    createLanguageContainersFromLanguageFiles(all_files);
+    if (allLanguageFiles.length <= 0) {
+      throw illegalStateException;
+    }
   }
 
   /**
@@ -121,15 +155,22 @@ public final class MultilingualSupport<P extends Preferences> {
   private void createLanguageContainersFromLanguageFiles(File[] all_files) {
     LanguageContainer lang;
     for (int i = 0; i < all_files.length; ++i) {
-      if (all_files[i].isHidden()) continue;
-      if (all_files[i].isDirectory()) continue;
+      if (all_files[i].isHidden()) {
+        continue;
+      }
+      if (all_files[i].isDirectory()) {
+        continue;
+      }
       // get extension
       int j = all_files[i].getPath().lastIndexOf('.');
-      if (j <= 0) continue;  // no extension
-      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false)
+      if (j <= 0) {
+        continue;  // no extension
+      }
+      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false) {
         continue;  // only .XML or .xml files
+      }
       lang = new LanguageContainer();
-      lang.load(all_files[i].getAbsolutePath());
+      lang.loadFromString(all_files[i].getAbsolutePath());
       languages.put(lang.getName(), lang);
     }
   }

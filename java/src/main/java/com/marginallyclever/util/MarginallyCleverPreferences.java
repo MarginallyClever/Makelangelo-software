@@ -162,7 +162,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
     if (isRemoved()) {
       return;
     }
-    final File propertiesPreferencesFile = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
+    final File propertiesPreferencesFile = MarginallyCleverPreferencesFileFactory.getPropertiesPreferencesFile();
     if (!propertiesPreferencesFile.exists()) {
       return;
     }
@@ -196,8 +196,8 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
 
   @Override
   protected void flushSpi() throws BackingStoreException {
-    final File xmlPreferencesFile = MarginallyCleverJsonFilePreferencesFactory.getXmlPreferencesFile();
-    final File file = MarginallyCleverJsonFilePreferencesFactory.getPropertiesPreferencesFile();
+    final File xmlPreferencesFile = MarginallyCleverPreferencesFileFactory.getXmlPreferencesFile();
+    final File file = MarginallyCleverPreferencesFileFactory.getPropertiesPreferencesFile();
     synchronized (mutex) {
       try {
         final Properties p = new Properties();

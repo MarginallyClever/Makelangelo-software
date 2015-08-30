@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -9,34 +11,59 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LanguageContainer {
-  protected String name = "";
-  protected String author = "";
-  protected Map<String, String> strings = new HashMap<String, String>();
+  private String name = "";
+  private String author = "";
+  private Map<String, String> strings = new HashMap<>();
 
-  void load(String language_file) {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+  private final Logger log = LoggerFactory.getLogger(LanguageContainer.class);
+
+
+  /**
+   * @param language_file
+   */
+  public void loadFromString(String language_file) {
+    final DocumentBuilder db = getDocumentBuilder();
+    if (db == null) {
+      return;
+    }
     Document dom = null;
-
     try {
       //Using factory get an instance of document builder
-      DocumentBuilder db = dbf.newDocumentBuilder();
       //parse using builder to get DOM representation of the XML file
       dom = db.parse(language_file);
-    } catch (ParserConfigurationException pce) {
-      pce.printStackTrace();
-    } catch (SAXException se) {
-      se.printStackTrace();
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
+    } catch (SAXException | IOException e) {
+      log.error("{}", e.getMessage());
     }
+    if (dom == null) {
+      return;
+    }
+    load(dom);
+  }
 
-    if (dom == null) return;
+  /**
+   * @param defaultLanguageFileFallback
+   */
+  public void loadFromInputStream(InputStream defaultLanguageFileFallback) {
+    final DocumentBuilder db = getDocumentBuilder();
+    if (db == null) {
+      return;
+    }
+    Document dom = null;
+    try {
+      dom = db.parse(defaultLanguageFileFallback);
+    } catch (SAXException | IOException e) {
+      log.error("{}", e);
+    }
+    load(dom);
+  }
 
-    Element docEle = dom.getDocumentElement();
+  private void load(Document dom) {
+    final Element docEle = dom.getDocumentElement();
 
     name = docEle.getElementsByTagName("name").item(0).getFirstChild().getNodeValue();
     author = docEle.getElementsByTagName("author").item(0).getFirstChild().getNodeValue();
@@ -55,6 +82,23 @@ public class LanguageContainer {
         strings.put(key, value);
       }
     }
+  }
+
+  private DocumentBuilder getDocumentBuilder() {
+    DocumentBuilder db = null;
+    try {
+      db = buildDocumentBuilder().newDocumentBuilder();
+    } catch (ParserConfigurationException e) {
+      log.error("{}", e);
+    }
+    if(db == null) {
+      return null;
+    }
+    return db;
+  }
+
+  private DocumentBuilderFactory buildDocumentBuilder() {
+    return DocumentBuilderFactory.newInstance();
   }
 
   public String get(String key) {
