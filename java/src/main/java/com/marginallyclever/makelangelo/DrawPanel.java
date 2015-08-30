@@ -294,6 +294,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         } else if(buttonPressed==MouseEvent.BUTTON3) {
             zoomCamera(y);
         }
+        gondola_x=x-window_width/2;
+        gondola_y=y-window_height/2;
         oldx=x;
         oldy=y;
         repaint();
