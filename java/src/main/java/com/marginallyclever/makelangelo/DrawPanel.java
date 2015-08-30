@@ -43,6 +43,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     //private boolean mouseIn=false;
     private int buttonPressed=MouseEvent.NOBUTTON;
     private int oldx, oldy;
+    private float gondola_x,gondola_y;
 
     // scale + position
     private double cameraOffsetX = 0.0d;
@@ -297,7 +298,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         oldy=y;
         repaint();
     }
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+        int x=e.getX();
+        int y=e.getY();
+        gondola_x=x*0.1f;
+        gondola_y=y*0.1f;
+    }
 
     
     /**
@@ -369,7 +375,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         }
     }
     
-    // draw calibration point
+    /**
+     * draw calibration point
+     * @param gl2
+     */
     private void paintCenter(GL2 gl2) {
         gl2.glColor3f(1,0,0);
         gl2.glBegin(GL2.GL_LINES);
@@ -384,6 +393,48 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
       validate();
       repaint();
     }
+
+    // draw left motor, right motor
+    private void paintMotors( GL2 gl2 ) {
+    	gl2.glColor3f(1,0.8f,0.5f);
+    	// left frame
+    	gl2.glPushMatrix();
+    	gl2.glTranslatef(-2.1f, 2.1f, 0);
+        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+        gl2.glVertex2d(machine.limit_left-5f, machine.limit_top+5f);
+        gl2.glVertex2d(machine.limit_left+5f, machine.limit_top+5f);
+        gl2.glVertex2d(machine.limit_left+5f, machine.limit_top);
+        gl2.glVertex2d(machine.limit_left   , machine.limit_top-5f);
+        gl2.glVertex2d(machine.limit_left-5f, machine.limit_top-5f);
+    	gl2.glEnd();
+    	gl2.glPopMatrix();
+
+    	// right frame
+    	gl2.glPushMatrix();
+    	gl2.glTranslatef(2.1f, 2.1f, 0);
+        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+        gl2.glVertex2d(machine.limit_right+5f, machine.limit_top+5f);
+        gl2.glVertex2d(machine.limit_right-5f, machine.limit_top+5f);
+        gl2.glVertex2d(machine.limit_right-5f, machine.limit_top);
+        gl2.glVertex2d(machine.limit_right   , machine.limit_top-5f);
+        gl2.glVertex2d(machine.limit_right+5f, machine.limit_top-5f);
+    	gl2.glEnd();
+    	gl2.glPopMatrix();
+    	
+    	// left motor
+        gl2.glColor3f(0,0,0);
+        gl2.glBegin(GL2.GL_QUADS);
+        gl2.glVertex2d(machine.limit_left-4.2f, machine.limit_top+4.2f);
+        gl2.glVertex2d(machine.limit_left     , machine.limit_top+4.2f);
+        gl2.glVertex2d(machine.limit_left     , machine.limit_top);
+        gl2.glVertex2d(machine.limit_left-4.2f, machine.limit_top);
+        // right motor
+        gl2.glVertex2d(machine.limit_right     , machine.limit_top+4.2f);
+        gl2.glVertex2d(machine.limit_right+4.2f, machine.limit_top+4.2f);
+        gl2.glVertex2d(machine.limit_right+4.2f, machine.limit_top);
+        gl2.glVertex2d(machine.limit_right     , machine.limit_top);
+        gl2.glEnd();
+    }
   
   public void render( GL2 gl2 ) {
     paintBackground(gl2);
@@ -391,14 +442,36 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     
     paintLimits(gl2);
     paintCenter(gl2);
+    paintMotors(gl2);
+    // TODO draw control box?
     
     if(drawDecorator!=null) {
+    	// filters can also draw WYSIWYG previews while converting.
       drawDecorator.render(gl2,machine);
       return;
     }
     
-    // TODO draw left motor, right motor, and control box
-    // TODO move all robot drawing to a class so that filters can also draw WYSIWYG previews while converting.
+    paintGcode(gl2);
+    paintGondola(gl2);
+  }
+  
+  
+  private void paintGondola( GL2 gl2 ) {
+	  if(running) {
+		  
+	  } else {
+		  gl2.glColor3f(0, 0, 1);
+		  gl2.glBegin(GL2.GL_LINES);
+		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
+		  gl2.glVertex2d(gondola_x,gondola_y);
+		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
+		  gl2.glVertex2d(gondola_x,gondola_y);
+		  gl2.glEnd();
+	  }
+  }
+  
+  private void paintGcode( GL2 gl2 ) {
+    // TODO move all robot drawing to a class
 
     optimizeNodes();
     

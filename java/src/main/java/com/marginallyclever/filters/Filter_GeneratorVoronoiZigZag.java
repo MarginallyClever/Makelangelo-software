@@ -17,6 +17,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDecorator {
+public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
   
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -38,51 +39,56 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   private int w, h;
   private BufferedImage src_img;
   private List<VoronoiGraphEdge> graphEdges = null;
-  private int MAX_GENERATIONS=40;
-  private int MAX_CELLS=5000;
-  private float MAX_DOT_SIZE = 5.0f;
-  private float MIN_DOT_SIZE = 1.0f;
+  private int MAX_GENERATIONS=200;
+  private int MAX_CELLS=3000;
+  private float CUTOFF=0.125f;
+  private float CUTOFF_TELEPORT=1.0f;
   private Point2D bound_min = new Point2D();
   private Point2D bound_max = new Point2D();
   private int numEdgesInCell;
   private List<VoronoiCellEdge> cellBorder = null;
   private double[] xValuesIn=null;
   private double[] yValuesIn=null;
+  int[] solution = null;
+  int solution_contains;
+  int render_mode;
+
+  // processing tools
+  long t_elapsed,t_start;
+  double progress;
+  double old_len,len;
+  long time_limit=10*60*1000;  // 10 minutes
   
   
-  public Filter_GeneratorVoronoiStippling(MainGUI gui,
+  public Filter_GeneratorVoronoiZigZag(MainGUI gui,
       MachineConfiguration mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
   @Override
-  public String getName() { return translator.get("voronoiStipplingName"); }
+  public String getName() { return translator.get("ZigZagName")+" 2"; }
   
   @Override
   public void convert(BufferedImage img) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
-    JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
-    JTextField text_dot_min = new JTextField(Float.toString(MIN_DOT_SIZE), 8);
 
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JLabel(translator.get("voronoiStipplingCellCount")));
     panel.add(text_cells);
     panel.add(new JLabel(translator.get("voronoiStipplingGenCount")));
     panel.add(text_gens);
-    panel.add(new JLabel(translator.get("voronoiStipplingDotMax")));
-    panel.add(text_dot_max);
-    panel.add(new JLabel(translator.get("voronoiStipplingDotMin")));
-    panel.add(text_dot_min);
 
 
       int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (result == JOptionPane.OK_OPTION) {
         MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
         MAX_CELLS = Integer.parseInt(text_cells.getText());
-        MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
-        MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
+        // make black & white
+        Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+        img = bw.process(img);
+        
         src_img = img;
         h = img.getHeight();
         w = img.getWidth();
@@ -92,46 +98,275 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   
         cellBorder = new ArrayList<VoronoiCellEdge>();
         
-        initializeCells(MIN_DOT_SIZE);
+        initializeCells(0.01);
       
+        render_mode=0;
         mainGUI.getDrawPanel().setDecorator(this);
         evolveCells();
+        greedyTour();
+        render_mode=1;
+        optimizeTour();
         mainGUI.getDrawPanel().setDecorator(null);
-      
         writeOutCells();
       }
   }
 
   public void render(GL2 gl2,MachineConfiguration machine) {
-    if( graphEdges==null ) return;
-    
     lock.lock();
-    
     gl2.glScalef(0.1f, 0.1f, 1);
-
-    // draw cell edges
-    gl2.glColor3f(0.9f,0.9f,0.9f);
-    gl2.glBegin(GL2.GL_LINES);
-    Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
-    while(ig.hasNext()) {
-      VoronoiGraphEdge e = ig.next();
-      gl2.glVertex2d(TX((float)e.x1),TY((float)e.y1));
-      gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
-    }
-    gl2.glEnd();
+    int i;
     
-    // draw cell centers
-    gl2.glPointSize(3);
-    gl2.glColor3f(0,0,0);
-    gl2.glBegin(GL2.GL_POINTS);
-    for(int i=0;i<cells.length;++i) {
-      VoronoiCell c = cells[i];
-      gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
+    if( graphEdges!=null ) {
+	    // draw cell edges
+	    gl2.glColor3f(0.9f,0.9f,0.9f);
+	    gl2.glBegin(GL2.GL_LINES);
+	    Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
+	    while(ig.hasNext()) {
+	      VoronoiGraphEdge e = ig.next();
+	      gl2.glVertex2d(TX((float)e.x1),TY((float)e.y1));
+	      gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
+	    }
+	    gl2.glEnd();
     }
-    gl2.glEnd();
-    
+    if( render_mode==0 ) {
+	    // draw cell centers
+	    gl2.glPointSize(3);   	  
+	    gl2.glBegin(GL2.GL_POINTS);
+	    
+        float most=cells[0].weight;
+        for(i=1;i<cells.length;++i) {
+          if(most<cells[i].weight) most=cells[i].weight;
+        }
+        
+	    for(i=0;i<cells.length;++i) {
+	      VoronoiCell c = cells[i];
+	      if(cells[i].weight/most <= CUTOFF) {
+	    	    gl2.glColor3f(0.8f,0.8f,0.8f);	 
+	      } else {
+	    	    gl2.glColor3f(0,0,0);	 
+	      }
+	      gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
+	    }
+	    gl2.glEnd();
+    }
+    if( render_mode==1 && solution!=null ) {
+	    // draw tour
+	    gl2.glColor3f(0,0,0);
+	    gl2.glBegin(GL2.GL_LINE_LOOP);
+	    for(i=0;i<solution_contains;++i) {
+	      VoronoiCell c = cells[solution[i]];
+	      gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
+	    }
+	    gl2.glEnd();
+    }
     lock.unlock();
   }
+
+  
+  private void optimizeTour() {
+    int gen=0;
+    int once=1;
+
+    mainGUI.log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+
+    old_len = getTourLength(solution);
+    updateProgress(old_len,2);
+    
+    progress=0;
+    
+    t_elapsed=0;
+    t_start = System.currentTimeMillis();
+    while(once==1 && t_elapsed<time_limit && !parent.isCancelled()) {
+      once=0;
+      //@TODO: make these optional for the very thorough people
+      //once|=transposeForwardTest();
+      //once|=transposeBackwardTest();
+    
+      once|=flipTests();
+      mainGUI.getDrawPanel().repaintNow();
+      gen++;
+      mainGUI.log("<font color='green'>Generation "+gen+"</font>\n");
+    }
+
+    mainGUI.log("<font color='green'>Finished @ "+gen+"</font>\n");
+  }
+
+
+  public String formatTime(long millis) {
+      String elapsed="";
+      long s=millis/1000;
+      long m=s/60;
+      long h=m/60;
+      m%=60;
+      s%=60;
+      if(h>0) elapsed+=h+"h";
+      if(h>0||m>0) elapsed+=m+"m";
+      elapsed+=s+"s ";
+      return elapsed;
+  }
+  
+
+  public void updateProgress(double len,int color) {
+    t_elapsed=System.currentTimeMillis()-t_start;
+    double new_progress = 100.0 * (double)t_elapsed / (double)time_limit;
+    if( new_progress > progress + 0.1 ) {
+      // find the new tour length
+      len=getTourLength(solution);
+      if( old_len > len ) {
+        old_len=len;
+        DecimalFormat flen=new DecimalFormat("#.##");
+        String c;
+        switch(color) {
+        case  0: c="yellow";  break;
+        case  1: c="blue";    break;
+        case  2: c="red";   break;
+        default: c="white";   break;
+        }
+        mainGUI.log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
+      }
+      progress = new_progress;
+      pm.setProgress((int)progress);
+    }
+  }
+  
+  
+  private int ti(int x) {
+	  return (x+solution_contains)%solution_contains;
+  }
+  
+  // we have s1,s2...e-1,e
+  // check if s1,e-1,...s2,e is shorter
+  public int flipTests() {
+    int start, end, j, once=0, best_end;
+    float a,b,c,d,temp_diff,best_diff;
+    
+    for(start=0;start<solution_contains*2-2 && !parent.isCancelled() && !pm.isCanceled();++start) {
+      a=calculateWeight(solution[ti(start)],solution[ti(start+1)]);
+      best_end=-1;
+      best_diff=0;
+      
+      for(end=start+2;end<start+solution_contains && !parent.isCancelled() && !pm.isCanceled();++end) {
+        // before
+        b=calculateWeight(solution[ti(end  )],solution[ti(end  -1)]);
+        // after
+        c=calculateWeight(solution[ti(start)],solution[ti(end  -1)]);
+        d=calculateWeight(solution[ti(end  )],solution[ti(start+1)]);
+        
+        temp_diff=(a+b)-(c+d);
+        if(best_diff < temp_diff) {
+          best_diff = temp_diff;
+          best_end=end;
+        }
+      }
+      
+      if(best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
+        once = 1;
+        // do the flip
+        int begin=start+1;
+        int finish=best_end;
+        if(best_end<begin) finish+=solution_contains;
+        int half=(finish-begin)/2;
+        int temp;
+        while(lock.isLocked());
+        
+        lock.lock();  
+        //DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
+        for(j=0;j<half;++j) {
+          temp = solution[ti(begin+j)];
+          solution[ti(begin+j)]=solution[ti(finish-1-j)];
+          solution[ti(finish-1-j)]=temp;
+        }
+        lock.unlock();
+        updateProgress(len,1);
+      }
+    }
+    return once;
+  }
+
+    
+  private double calculateLength(int a,int b) {
+    return Math.sqrt(calculateWeight(a,b));
+  }
+  
+  /**
+   * Get the length of a tour segment
+   * @param list an array of indexes into the point list.  the order forms the tour sequence.
+   * @return the length of the tour
+   */
+  private double getTourLength(int[] list) {
+    double w=0;
+    for(int i=0;i<solution_contains-1;++i) {
+      w+=calculateLength(list[i],list[i+1]);
+    }
+    return w;
+  }
+
+  
+  /**
+   * Starting with point 0, find the next nearest point and repeat until all points have been "found".
+   */
+  private void greedyTour() {
+    mainGUI.log("<font color='green'>Finding greedy tour solution...</font>\n");
+
+    int i,j;
+    float w, bestw;
+    int besti;
+
+    
+    float most=cells[0].weight;
+    for(i=1;i<cells.length;++i) {
+      if(most<cells[i].weight) most=cells[i].weight;
+    }
+    solution_contains=0;
+    for(i=0;i<cells.length;++i) {
+    	if(cells[i].weight/most > CUTOFF ) solution_contains++;
+    }
+    
+    
+    try {
+	    solution = new int[solution_contains];
+	    
+	    // put all the points in the solution in no particular order.
+	    j=0;
+	    for(i=0;i<cells.length;++i) {
+	    	if(cells[i].weight/most > CUTOFF ) {
+	    		solution[j++]=i;
+	    	}
+	    }
+	    
+	    int scount=0;
+	    
+	    do {
+	      // Find the nearest point not already in the line.
+	      // Any solution[n] where n>scount is not in the line.
+	      bestw=calculateWeight(solution[scount],solution[scount+1]);
+	      besti=scount+1;
+	      for( i=scount+2; i<solution_contains; ++i ) {
+	        w=calculateWeight(solution[scount],solution[i]);
+	        if( w < bestw ) {
+	          bestw=w;
+	          besti=i;
+	        }
+	      }
+	      i=solution[scount+1];
+	      solution[scount+1]=solution[besti];
+	      solution[besti]=i;
+	      scount++;
+	    } while(scount<solution_contains-2);
+    } catch(Exception e) {
+    	e.printStackTrace();
+    }
+  }
+
+  
+  protected float calculateWeight(int a,int b) {
+	  assert(a>=0 && a < cells.length);
+	  assert(b>=0 && b < cells.length);
+    float x = cells[a].centroid.x - cells[b].centroid.x;
+    float y = cells[a].centroid.y - cells[b].centroid.y;
+    return x*x+y*y;
+  }
+  
 
   // set some starting points in a grid
   protected void initializeCells(double minDistanceBetweenSites) {
@@ -148,29 +383,33 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
     try {
       
-      
-      for(y = 0; y < h; y += length ) {
-        if(dir==1) {
-          for(x = 0; x < w; x += length ) {
+      boolean place_at_random=false;//true;
+      if(place_at_random) {
+          for(used = 0; used < MAX_CELLS; used++ ) {
             cells[used]=new VoronoiCell();
-            //cells[used].centroid.set(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
-            cells[used].centroid.set(x,y);
-            ++used;
-            if(used==MAX_CELLS) break;
+            cells[used].centroid.set(((float)Math.random()*(float)w),((float)Math.random()*(float)h));
           }
-          dir=-1;
-        } else {
-          for(x = w-1; x >= 0; x -= length ) {
-            cells[used]=new VoronoiCell();
-            //cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
-            //cells[used].centroid.set(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
-            cells[used].centroid.set(x,y);
-            ++used;
-            if(used==MAX_CELLS) break;
-          }
-          dir=1;
-        }
-        if(used==MAX_CELLS) break;
+      } else {
+	      for(y = 0; y < h; y += length ) {
+	        if(dir==1) {
+	          for(x = 0; x < w; x += length ) {
+	            cells[used]=new VoronoiCell();
+	            cells[used].centroid.set(x,y);
+	            ++used;
+	            if(used==MAX_CELLS) break;
+	          }
+	          dir=-1;
+	        } else {
+	          for(x = w-1; x >= 0; x -= length ) {
+	            cells[used]=new VoronoiCell();
+	            cells[used].centroid.set(x,y);
+	            ++used;
+	            if(used==MAX_CELLS) break;
+	          }
+	          dir=1;
+	        }
+	        if(used==MAX_CELLS) break;
+	      }
       }
     }
     catch(Exception e) {
@@ -220,58 +459,46 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   protected void writeOutCells() throws IOException {
     if(graphEdges != null ) {
       mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-            try(
-            final OutputStream fileOutputStream = new FileOutputStream(dest);
-            final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-            ) {
+	    try(
+	    final OutputStream fileOutputStream = new FileOutputStream(dest);
+	    final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+	    ) {
+	        imageStart(src_img, out);
+	
+	        // set absolute coordinates
+	        out.write("G00 G90;\n");
+	        tool.writeChangeTo(out);
+	        liftPen(out);
 
-                imageStart(src_img, out);
-
-                // set absolute coordinates
-                out.write("G00 G90;\n");
-                tool.writeChangeTo(out);
-                liftPen(out);
-
-                float d = tool.getDiameter();
-
-                int i;
-        
-        float most=cells[0].weight;
-        for(i=1;i<cells.length;++i) {
-          if(most<cells[i].weight) most=cells[i].weight;
-        }
-  
-        float modifier = MAX_DOT_SIZE / most;
-        for(i=0;i<cells.length;++i) {
-          float r = cells[i].weight * modifier;
-          if(r<MIN_DOT_SIZE) continue;
-          r/=scale;
-          float x=cells[i].centroid.x;
-          float y=cells[i].centroid.y;
-
-                    // filled circles
-                    this.moveTo(out, x - r * (float) Math.sin(0), y - r * (float) Math.cos(0), true);
-                    while (r > d) {
-                        float detail = (float) (0.5 * Math.PI * r / d);
-                        if (detail < 4) detail = 4;
-                        if (detail > 20) detail = 20;
-                        for (float j = 1; j <= detail; ++j) {
-                            this.moveTo(out,
-                                    x - r * (float) Math.sin(j * (float) Math.PI * 2.0f / detail),
-                                    y - r * (float) Math.cos(j * (float) Math.PI * 2.0f / detail), false);
-                        }
-                        //r-=(d/(scale*1.5f));
-                        r -= d;
-                    }
-                    this.moveTo(out, x, y, false);
-                    this.moveTo(out, x, y, true);
-                }
-
-                liftPen(out);
-                signName(out);
-                tool.writeMoveTo(out, 0, 0);
-            }
-        }
+	        // find the tsp point closest to the calibration point
+	        int i;
+	        int besti=-1;
+	        float bestw=1000000;
+	        float x,y,w;
+	        for(i=0;i<solution_contains;++i) {
+	          x=w2-cells[solution[i]].centroid.x;
+	          y=h2-cells[solution[i]].centroid.y;
+	          w=x*x+y*y;
+	          if(w<bestw) {
+	            bestw=w;
+	            besti=i;
+	          }
+	        }
+	        
+	        // write the entire sequence
+	        for(i=0;i<=solution_contains;++i) {
+	          int v= (besti+i)%solution_contains;
+	          x=cells[solution[v]].centroid.x;
+	          y=cells[solution[v]].centroid.y;
+	
+	          this.moveTo(out,x,y, false);
+	        }
+	
+		    liftPen(out);
+		    signName(out);
+	        tool.writeMoveTo(out, 0, 0);
+	    }
+    }
   }
 
 
@@ -403,7 +630,6 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     int i,x,y;
     float change=0;
     float weight,wx,wy;
-    int step = (int)Math.ceil(tool.getDiameter()/(1.0*scale));
 
     for(i=0;i<cells.length;++i) {
       generateBounds(i);
@@ -418,8 +644,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       wx=0;
       wy=0;
 
-      for(y = sy; y <= ey; y+=step) {
-        for(x = sx; x <= ex; x+=step) {
+      for(y = sy; y <= ey; y++) {
+        for(x = sx; x <= ex; x++) {
           if(insideBorder(x, y)) {
             float val = (float)sample1x1(src_img,x,y) / 255.0f;
             val = 1.0f - val;
@@ -429,7 +655,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
           }
         }
       }
-      if( weight > 0 ) {
+
+      if( weight > CUTOFF_TELEPORT ) {
         wx /= weight;
         wy /= weight;
 
@@ -441,14 +668,12 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         if(wx>=w) wx = w-1;
         if(wy>=h) wy = h-1;
 
-        float dx = wx - cells[i].centroid.x;
-        float dy = wy - cells[i].centroid.y;
-
-        change += dx*dx+dy*dy;
-        //change = (float)Math.sqrt(change);
-
+        change++;
         // use the new center
         cells[i].centroid.set(wx, wy);
+      } else {
+    	  // this cell is white, move it.
+    	  cells[i].centroid.set((float)(Math.random()*w),(float)(Math.random()*h));
       }
     }
 

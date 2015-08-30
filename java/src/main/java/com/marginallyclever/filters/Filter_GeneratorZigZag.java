@@ -80,7 +80,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     }
   }
     
-/*
+
   // does moving a point to somewhere else in the series shorten the series?
   // @TODO: Debug, it doesn't seem to work.
   // we have s1,s2,s3...e-1,e
@@ -88,10 +88,10 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   private int transposeForwardTest() {
     int start, end, j, once=0;
     
-    for(start=0;start<numPoints-4 && !isCancelled();++start) {
-      float a=CalculateWeight(solution[start],solution[start+1]);  // s1->s2
-      float b=CalculateWeight(solution[start+1],solution[start+2]);  // s2->s3
-      float d=CalculateWeight(solution[start],solution[start+2]);  // s1->s3
+    for(start=0;start<numPoints-4 && !parent.isCancelled();++start) {
+      float a=calculateWeight(solution[start],solution[start+1]);  // s1->s2
+      float b=calculateWeight(solution[start+1],solution[start+2]);  // s2->s3
+      float d=calculateWeight(solution[start],solution[start+2]);  // s1->s3
       // a+b > d always true, the line gets shorter at this end
       //assert(a+b>d);
       float abd=a+b-d;
@@ -99,12 +99,12 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
       int best_end=-1;
       double best_diff=0;
       
-      for(end=start+4;end<numPoints && !isCancelled();++end) {
+      for(end=start+4;end<numPoints && !parent.isCancelled();++end) {
         // before
-        float c=CalculateWeight(solution[end-1],solution[end]);  // e-1->e
+        float c=calculateWeight(solution[end-1],solution[end]);  // e-1->e
         // after
-        float e=CalculateWeight(solution[end-1],solution[start+1]);  // e-1->s2
-        float f=CalculateWeight(solution[start+1],solution[end]);  // s2->e
+        float e=calculateWeight(solution[end-1],solution[start+1]);  // e-1->s2
+        float f=calculateWeight(solution[start+1],solution[end]);  // s2->e
         // e+f > c always true, the line gets longer at this end
         //assert(e+f>c);
         float efc = e+f-c;
@@ -117,7 +117,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
         }
       }
       
-      if(best_end != -1 && !isCancelled()) {
+      if(best_end != -1 && !parent.isCancelled()) {
         once = 1;
         // move start+1 to just before end
         int temp=solution[start+1];
@@ -126,12 +126,12 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
         }
         solution[best_end-1]=temp;
 
-        UpdateProgress(len,0);
+        updateProgress(len,0);
       }
     }
     return once;
-  }*/
-/*
+  }
+
   // does moving a point to somewhere else in the series shorten the series?
   // @TODO: Debug, it doesn't seem to work.
   // we have s1,s2...e-2,e-1,e
@@ -139,22 +139,22 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   private int transposeBackwardTest() {
     int start, end, j, once=0;
     
-    for(start=0;start<numPoints-4 && !isCancelled();++start) {
-      float a=CalculateWeight(solution[start],solution[start+1]);  // s1->s2
+    for(start=0;start<numPoints-4 && !parent.isCancelled();++start) {
+      float a=calculateWeight(solution[start],solution[start+1]);  // s1->s2
 
       int best_end=-1;
       double best_diff=0;
       
-      for(end=start+4;end<numPoints && !isCancelled();++end) {
-        float b=CalculateWeight(solution[end-2],solution[end-1]);  // e2->e1
-        float c=CalculateWeight(solution[end-1],solution[end]);  // e1->e
-        float f=CalculateWeight(solution[end-2],solution[end]);  // e2->e
+      for(end=start+4;end<numPoints && !parent.isCancelled();++end) {
+        float b=calculateWeight(solution[end-2],solution[end-1]);  // e2->e1
+        float c=calculateWeight(solution[end-1],solution[end]);  // e1->e
+        float f=calculateWeight(solution[end-2],solution[end]);  // e2->e
         // b+c > f, this end is getting shorter
         assert(b+c>f);
         float bcf=b+c-f;
         
-        float d=CalculateWeight(solution[start],solution[end-1]);  // s1->e1
-        float e=CalculateWeight(solution[end-1],solution[start+1]);  // e1->s2
+        float d=calculateWeight(solution[start],solution[end-1]);  // s1->e1
+        float e=calculateWeight(solution[end-1],solution[start+1]);  // e1->s2
         // d+e>a, this end is getting longer
         assert(d+e>a);
         float dea=d+e-a;
@@ -166,7 +166,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
         }
       }
       
-      if(best_end != -1 && !isCancelled()) {
+      if(best_end != -1 && !parent.isCancelled()) {
         once = 1;
         // move best_end-1 to just after start
         int temp=solution[best_end-1];
@@ -175,11 +175,11 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
         }
         solution[start+1]=temp;
 
-        UpdateProgress(len,3);
+        updateProgress(len,3);
       }
     }
     return once;
-  }*/
+  }
 
   // we have s1,s2...e-1,e
   // check if s1,e-1,...s2,e is shorter
@@ -446,12 +446,15 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
     // resize & flip as needed
     Filter_Resize rs = new Filter_Resize(mainGUI,machine,translator,250,250); 
     img = rs.process(img);
+
     // make black & white
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
     img = bw.process(img);
+    
     // dither
     Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI,machine,translator);
     img = dither.process(img);
+    
     // connect the dots
     connectTheDots(img);
     // Shorten the line that connects the dots

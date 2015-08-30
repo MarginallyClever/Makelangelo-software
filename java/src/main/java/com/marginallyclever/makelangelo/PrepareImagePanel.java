@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -64,6 +63,7 @@ import com.marginallyclever.filters.Filter_GeneratorPulse;
 import com.marginallyclever.filters.Filter_GeneratorScanline;
 import com.marginallyclever.filters.Filter_GeneratorSpiral;
 import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
+import com.marginallyclever.filters.Filter_GeneratorVoronoiZigZag;
 import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
 import com.marginallyclever.filters.Filter_GeneratorZigZag;
 
@@ -116,6 +116,7 @@ implements ActionListener {
     image_converters.add(new Filter_GeneratorBoxes(gui,machineConfiguration,translator));
     image_converters.add(new Filter_GeneratorColorBoxes(gui, machineConfiguration, translator));
     image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
+    image_converters.add(new Filter_GeneratorVoronoiZigZag(gui,machineConfiguration,translator));
     //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
