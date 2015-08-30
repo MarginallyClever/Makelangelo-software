@@ -4,6 +4,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -21,6 +23,7 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +66,18 @@ public final class MachineConfiguration {
 
   private double max_feed_rate=11000;  // etch-a-sketch speed
 
+  private String commonPaperSizes [] = { "",
+		"4A0 (1682 x 2378)",
+		"2A0 (1189 x 1682)",
+		"A0 (841 x 1189)",
+		"A1 (594 x 841)",
+		"A2 (420 x 594)",
+		"A3 (297 x 420)",
+		"A4 (210 x 297)",
+		"A5 (148 x 210)",
+		"A6 (105 x 148)",
+		"A7 (74 x 105)",};
+  
   public boolean reverseForGlass=false;
   public boolean motors_backwards=false;
 
@@ -98,7 +113,7 @@ public final class MachineConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
 
-    /**
+  /**
    * TODO move tool names into translations & add a color palette system for quantizing colors
    * @param gui
    * @param ms
@@ -107,6 +122,8 @@ public final class MachineConfiguration {
     mainGUI = gui;
     translator = ms;
 
+    commonPaperSizes[0] = ms.get("Other");
+    
     tools = new ArrayList<>();
     tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
     tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
@@ -125,6 +142,25 @@ public final class MachineConfiguration {
     // TODO load most recent config?
     loadConfig(0);
   }
+  
+  /**
+   * Must match commonPaperSizes
+   * @return
+   */
+  private int getCurrentPaperSizeChoice(double pw,double ph) {
+	    if( pw == 1682 && ph == 2378 ) return 1;
+	    if( pw == 1189 && ph == 1682 ) return 2;
+	    if( pw == 841 && ph == 1189 ) return 3;
+	    if( pw == 594 && ph == 841 ) return 4;
+	    if( pw == 420 && ph == 594 ) return 5;
+	    if( pw == 297 && ph == 420 ) return 6;
+	    if( pw == 210 && ph == 297 ) return 7;
+	    if( pw == 148 && ph == 210 ) return 8;
+	    if( pw == 105 && ph == 148 ) return 9;
+	    if( pw == 74 && ph == 105 ) return 10;
+	    
+	    return 0;
+  }
 
   /**
   * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
@@ -132,13 +168,6 @@ public final class MachineConfiguration {
   public void adjustMachineSize() {
     final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("MenuSettingsMachine"),true);
     driver.setLayout(new GridBagLayout());
-
-    final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
-    final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
-    final JTextField pw = new JTextField(String.valueOf((paper_right-paper_left)*10));
-    final JTextField ph = new JTextField(String.valueOf((paper_top-paper_bottom)*10));
-    final JCheckBox m1i = new JCheckBox(translator.get("Invert"),this.m1invert);
-    final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
 
     //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
     //startPos.setSelectedIndex(startingPositionIndex);
@@ -183,28 +212,44 @@ public final class MachineConfiguration {
     c.anchor=GridBagConstraints.EAST;
     d.anchor=GridBagConstraints.WEST;
 
+    final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
+    final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
     c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("MachineWidth")),c);   d.gridx=1;  d.gridy=y;  driver.add(mw,d);
-    c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("MachineHeight")),c);  d.gridx=3;  d.gridy=y;  driver.add(mh,d);
     y++;
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("PaperWidth")),c);   d.gridx=1;  d.gridy=y;  driver.add(pw,d);
-    c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("PaperHeight")),c);    d.gridx=3;  d.gridy=y;  driver.add(ph,d);
+    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("MachineHeight")),c);  d.gridx=1;  d.gridy=y;  driver.add(mh,d);
+    y++;
+    
+
+    final JComboBox<String> paperSizes = new JComboBox<>(commonPaperSizes);
+    paperSizes.setSelectedIndex(getCurrentPaperSizeChoice( (paper_right-paper_left)*10, (paper_top-paper_bottom)*10) );
+    
+    final JTextField pw = new JTextField(Integer.toString((int)((paper_right-paper_left)*10)));
+    final JTextField ph = new JTextField(Integer.toString((int)((paper_top-paper_bottom)*10)));
+    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("PaperSize")),c);  d.gridx=1;  d.gridy=y;  driver.add(paperSizes,d);
+    y++;
+    d.gridx=1;  d.gridy=y;  driver.add(pw,d); 
+    y++;
+    c.gridx=0; c.gridy=y; driver.add(new JLabel(" x "),c);
+    d.gridx=1;  d.gridy=y;  driver.add(ph,d);
     y++;
 /*
+    //final JCheckBox m1i = new JCheckBox(translator.get("Invert"),this.m1invert);
+    //final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
     c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("InvertLeft")),c);   d.gridx=1;  d.gridy=y;  driver.add(m1i,d);
     c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("InvertRight")),c);    d.gridx=3;  d.gridy=y;  driver.add(m2i,d);
-    y++;*/
-
+    y++;
+*/
     //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
     //driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
     //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel("Pen starts at paper"),c);
     //c.anchor=GridBagConstraints.WEST;
     //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(startPos,c);
 
-
+    
     c.anchor=GridBagConstraints.EAST;
     c.gridy=13;
-    c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
-    c.gridx=2; c.gridwidth=1; driver.add(save,c);
+    c.gridx=2; c.gridwidth=1; driver.add(cancel,c);
+    c.gridx=1; c.gridwidth=1; driver.add(save,c);
 
     Dimension s=ph.getPreferredSize();
     s.width=80;
@@ -213,21 +258,49 @@ public final class MachineConfiguration {
     pw.setPreferredSize(s);
     ph.setPreferredSize(s);
 
+    KeyListener driveKeys = new KeyListener() {
+    	public void keyPressed(KeyEvent e) {}
+    	public void keyReleased(KeyEvent e) { Event(e); }
+    	public void keyTyped(KeyEvent e) { Event(e); }
+    	
+    	private void Event(KeyEvent e) {
+        	double w=0;
+        	double h=0;
+        	try {
+        		w = Double.parseDouble(pw.getText());
+        		h = Double.parseDouble(ph.getText());
+        	} catch(Exception err) {
+        		err.getMessage();
+        	}
+        	paperSizes.setSelectedIndex(getCurrentPaperSizeChoice(w,h));	
+    	}
+    };
+    
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
 
-        double pwf = Double.valueOf(pw.getText()) / 10.0;
-        double phf = Double.valueOf(ph.getText()) / 10.0;
-        double mwf = Double.valueOf(mw.getText()) / 10.0;
-        double mhf = Double.valueOf(mh.getText()) / 10.0;
-        boolean data_is_sane=true;
-        if( pwf<=0 ) data_is_sane=false;
-        if( phf<=0 ) data_is_sane=false;
-        if( mwf<=0 ) data_is_sane=false;
-        if( mhf<=0 ) data_is_sane=false;
-
+        if(subject == paperSizes) {
+            final int selectedIndex = paperSizes.getSelectedIndex();
+            if(selectedIndex!= 0) {
+            	String str = paperSizes.getItemAt(selectedIndex);
+            	String sw = str.substring(str.indexOf('(')+1, str.indexOf('x')).trim();
+            	String sh = str.substring(str.indexOf('x')+1, str.indexOf(')')).trim();
+            	pw.setText(sw);
+            	ph.setText(sh);
+            }
+        }
+        
         if(subject == save) {
+            double pwf = Double.valueOf(pw.getText()) / 10.0;
+            double phf = Double.valueOf(ph.getText()) / 10.0;
+            double mwf = Double.valueOf(mw.getText()) / 10.0;
+            double mhf = Double.valueOf(mh.getText()) / 10.0;
+            boolean data_is_sane=true;
+            if( pwf<=0 ) data_is_sane=false;
+            if( phf<=0 ) data_is_sane=false;
+            if( mwf<=0 ) data_is_sane=false;
+            if( mhf<=0 ) data_is_sane=false;
 
           if(data_is_sane) {
             //startingPositionIndex = startPos.getSelectedIndex();
@@ -330,10 +403,13 @@ public final class MachineConfiguration {
       }
     };
 
-    save.addActionListener(driveButtons);
-    cancel.addActionListener(driveButtons);
-    driver.getRootPane().setDefaultButton(save);
     mainGUI.sendLineToRobot("M114"); // "where" command
+    save.addActionListener(driveButtons);
+    driver.getRootPane().setDefaultButton(save);
+    cancel.addActionListener(driveButtons);
+    paperSizes.addActionListener(driveButtons);
+    pw.addKeyListener(driveKeys);
+    ph.addKeyListener(driveKeys);
     driver.pack();
     driver.setVisible(true);
   }
@@ -492,17 +568,21 @@ public final class MachineConfiguration {
     limit_bottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limit_bottom)));
     limit_left = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limit_left)));
     limit_right = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limit_right)));
-    m1invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", m1invert?"true":"false"));
-    m2invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", m2invert?"true":"false"));
-    bobbin_left_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
-    bobbin_right_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
-    max_feed_rate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(max_feed_rate)));
-    startingPositionIndex=Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
-
+    
     paper_left=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paper_left)));
     paper_right=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paper_right)));
     paper_top=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paper_top)));
     paper_bottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paper_bottom)));
+
+    m1invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", m1invert?"true":"false"));
+    m2invert=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", m2invert?"true":"false"));
+    
+    bobbin_left_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(bobbin_left_diameter)));
+    bobbin_right_diameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(bobbin_right_diameter)));
+    
+    max_feed_rate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(max_feed_rate)));
+    
+    startingPositionIndex=Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
     // load each tool's settings
     for (DrawingTool tool : tools) {
