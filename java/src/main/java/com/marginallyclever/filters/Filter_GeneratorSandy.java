@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 
 
 public class Filter_GeneratorSandy extends Filter {
-  float blockScale=6.0f;
+  float blockScale=50.0f;
   int direction=0;
   
   public Filter_GeneratorSandy(MainGUI gui, MachineConfiguration mc,
@@ -53,15 +53,15 @@ public class Filter_GeneratorSandy extends Filter {
     JPanel panel = new JPanel(new GridLayout(0,1));
     panel.add(new JLabel(translator.get("HilbertCurveSize")));
     panel.add(field_size);
-    /*
-    String [] directions = { "left", "right" };
+    
+    String [] directions = { "top right", "top left", "bottom left", "bottom right", "center" };
     final JComboBox<String> direction_choices = new JComboBox<String>(directions);
     panel.add(direction_choices);
-    */
+    
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
       blockScale = Float.parseFloat(field_size.getText());
-      //direction = direction_choices.getSelectedIndex();
+      direction = direction_choices.getSelectedIndex();
       convertNow(img);
     }
   }
@@ -136,6 +136,15 @@ public class Filter_GeneratorSandy extends Filter {
   }
   
   
+  private boolean isInsideLimits(double x,double y) {
+	  if(x<xStart) return false;
+	  if(x>=xEnd) return false;
+	  if(y<yStart) return false;
+	  if(y>=yEnd) return false;
+	  return true;
+  }
+  
+  
   private void convertPaperSpace(BufferedImage img,Writer out) throws IOException {
     // if the image were projected on the paper, where would the top left corner of the image be in paper space?
     // image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
@@ -158,97 +167,78 @@ public class Filter_GeneratorSandy extends Filter {
     
     double PULSE_MINIMUM=0.5;
 
-    // figure out how many lines we're going to have on this image.
-	double stepSize = tool.getDiameter() * blockScale;
-    double halfStep = stepSize/2.0;
-    double zigZagSpacing = tool.getDiameter();
-
     // from top to bottom of the image...
-    double x, y, z, scale_z,pulse_size, i = 0;
-    double n=1;
+    double x, y, z, scale_z, pulse_size;
+    
+    double dx = xEnd - machine.limit_right*10; 
+    double dy = yEnd - machine.limit_top*10;
+    double r_min = Math.sqrt(dx*dx+dy*dy);
+    
+    dx = xStart - machine.limit_right*10; 
+    dy = yStart - machine.limit_top*10;
+    double r_max = Math.sqrt(dx*dx+dy*dy);
+    
+	double cx,cy;
+	
+	switch(direction) {
+	case 0:
+		cx = machine.limit_right*10;
+		cy = machine.limit_top*10;
+		break;
+	case 1:
+		cx = machine.limit_left*10;
+		cy = machine.limit_top*10;
+		break;
+	case 2:
+		cx = machine.limit_left*10;
+		cy = machine.limit_bottom*10;
+		break;
+	case 3:
+		cx = machine.limit_left*10;
+		cy = machine.limit_bottom*10;
+		break;
+	default:
+		cx = 0;
+		cy = 0;
+		r_min=0;
+		break;
+	}
+
+    double r_step = (r_max-r_min)/blockScale;
+    double r;
+	double t_dir=1;
+	double pulse_flip=1;
+	double x2,y2,t,t_step;
+    
+    for(r=r_min;r<r_max;r+=r_step) {
+    	// go around in a circle
+    	t=0;
+    	t_step = tool.getDiameter()/(r);
+    	for(t=0;t<Math.PI*2;t+=t_step) {
+    		dx = Math.cos(t_dir *t);
+    		dy = Math.sin(t_dir *t);
+	    	x = cx + dx * r;
+	    	y = cy + dy * r;
+		    if(!isInsideLimits(x,y)) continue;
+		    
+            // read a block of the image and find the average intensity in this block
+            z = sampleScale( img, x-r_step/2, y-r_step/2,x+r_step/2,y + r_step/2 );
+            // scale the intensity value
+            assert(z>=0);
+            assert(z<=255.0);
+            scale_z = (255.0 -  z) / 255.0;
+            pulse_size = r_step *0.6 * scale_z;
+            
+	    	x2 = x + dx * pulse_size*pulse_flip;
+	    	y2 = y + dy * pulse_size*pulse_flip;
+	    	pulse_flip=-pulse_flip;
+    		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
+    	}
+    	t_dir=-t_dir;
+    }
 /*
     if (direction == 0) {
-        // horizontal
-        for (y = yStart; y < yEnd; y += stepSize) {
-            ++i;
-
-            if ((i % 2) == 0) {
-                // every even line move left to right
-                //moveToPaper(file,x,y,pen up?)]
-                moveToPaper(out,  xStart,  y + halfStep, true);
-
-                for (x = xStart; x < xEnd; x += zigZagSpacing) {
-                    // read a block of the image and find the average intensity in this block
-                    z = sampleScale( img, x-zigZagSpacing, y - halfStep,x+zigZagSpacing,y + halfStep );
-                    // scale the intensity value
-                    assert(z>=0);
-                    assert(z<=255.0);
-                    scale_z = (255.0 -  z) / 255.0;
-                    //scale_z *= scale_z;  // quadratic curve
-                    pulse_size = halfStep * scale_z;
-
-                    moveToPaper(out, x,  (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-                    n = n>0? -1:1;
-                }
-                moveToPaper(out, xEnd,  y + halfStep, true);
-            } else {
-                // every odd line move right to left
-                //moveToPaper(file,x,y,pen up?)]
-                moveToPaper(out,  xEnd,  y + halfStep, true);
-
-                for (x = xEnd; x >= xStart; x -= zigZagSpacing) {
-                    // read a block of the image and find the average intensity in this block
-                    z = sampleScale( img, x - zigZagSpacing,y - halfStep, x+zigZagSpacing, y + halfStep );
-                    // scale the intensity value
-                    scale_z = (255.0 -  z) / 255.0;
-                    //scale_z *= scale_z;  // quadratic curve
-                    assert(scale_z<=1.0);
-                    pulse_size = halfStep * scale_z;
-                    moveToPaper(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-                    n = n>0? -1:1;
-                }
-                moveToPaper(out,  xStart,  y + halfStep, true);
-            }
-        }
     } else {
-        // vertical
-        for (x = xStart; x < xEnd; x += stepSize) {
-            ++i;
-
-            if ((i % 2) == 0) {
-                // every even line move top to bottom
-                //moveToPaper(file,x,y,pen up?)]
-                moveToPaper(out,  x + halfStep,  yStart, true);
-
-                for (y = yStart; y < yEnd; y += zigZagSpacing) {
-                    // read a block of the image and find the average intensity in this block
-                    z = sampleScale(img, x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing );
-                    // scale the intensity value
-                    scale_z = (255.0f -  z) / 255.0f;
-                    //scale_z *= scale_z;  // quadratic curve
-                    pulse_size = halfStep * scale_z;
-                    moveToPaper(out,  (x + halfStep + pulse_size * n),  y, pulse_size < PULSE_MINIMUM);
-                	n *= -1;
-                }
-                moveToPaper(out,  x + halfStep,  yEnd, true);
-            } else {
-                // every odd line move bottom to top
-                //moveToPaper(file,x,y,pen up?)]
-                moveToPaper(out,  x + halfStep,  yEnd, true);
-
-                for (y = yEnd; y >= yStart; y -= zigZagSpacing) {
-                    // read a block of the image and find the average intensity in this block
-                    z = sampleScale(img, x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing );
-                    // scale the intensity value
-                    scale_z = (255.0f -  z) / 255.0f;
-                    //scale_z *= scale_z;  // quadratic curve
-                    pulse_size = halfStep * scale_z;
-                    moveToPaper(out,  (x + halfStep + pulse_size * n),  y, pulse_size < PULSE_MINIMUM);
-                	n *= -1;
-                }
-                moveToPaper(out,  x + halfStep,  yStart, true);
-            }
-        }
     }*/
     
     
