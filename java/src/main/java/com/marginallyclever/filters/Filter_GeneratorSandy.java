@@ -170,13 +170,11 @@ public class Filter_GeneratorSandy extends Filter {
     // from top to bottom of the image...
     double x, y, z, scale_z, pulse_size;
     
-    double dx = xEnd - machine.limit_right*10; 
-    double dy = yEnd - machine.limit_top*10;
-    double r_min = Math.sqrt(dx*dx+dy*dy);
     
-    dx = xStart - machine.limit_right*10; 
-    dy = yStart - machine.limit_top*10;
+    double dx = xStart - machine.limit_right*10; 
+    double dy = yStart - machine.limit_top*10;
     double r_max = Math.sqrt(dx*dx+dy*dy);
+    double r_min = 0;
     
 	double cx,cy;
 	
@@ -200,7 +198,6 @@ public class Filter_GeneratorSandy extends Filter {
 	default:
 		cx = 0;
 		cy = 0;
-		r_min=0;
 		break;
 	}
 
@@ -208,18 +205,22 @@ public class Filter_GeneratorSandy extends Filter {
     double r;
 	double t_dir=1;
 	double pulse_flip=1;
-	double x2,y2,t,t_step;
+	double x2,y2,t,t_step, t_step2;
     
     for(r=r_min;r<r_max;r+=r_step) {
     	// go around in a circle
     	t=0;
-    	t_step = tool.getDiameter()/(r);
-    	for(t=0;t<Math.PI*2;t+=t_step) {
+    	t_step = tool.getDiameter()/r;
+    	for(t=0;t<Math.PI*2;t+=t_step2) {
     		dx = Math.cos(t_dir *t);
     		dy = Math.sin(t_dir *t);
 	    	x = cx + dx * r;
 	    	y = cy + dy * r;
-		    if(!isInsideLimits(x,y)) continue;
+	    	t_step2=t_step;
+		    if(!isInsideLimits(x,y)) {
+	    		moveToPaper(out,x,y,true);
+		    	continue;
+		    }
 		    
             // read a block of the image and find the average intensity in this block
             z = sampleScale( img, x-r_step/2, y-r_step/2,x+r_step/2,y + r_step/2 );
@@ -227,21 +228,21 @@ public class Filter_GeneratorSandy extends Filter {
             assert(z>=0);
             assert(z<=255.0);
             scale_z = (255.0 -  z) / 255.0;
-            pulse_size = r_step *0.6 * scale_z;
+            scale_z = 1-scale_z;
+            pulse_size = r_step*0.5;//r_step * 0.6 * scale_z;
+	    	t_step2=t_step*pulse_size*scale_z;
+	    	if(t_step2<t_step) t_step2=t_step;
             
 	    	x2 = x + dx * pulse_size*pulse_flip;
 	    	y2 = y + dy * pulse_size*pulse_flip;
 	    	pulse_flip=-pulse_flip;
     		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
+	    	x2 = x + dx * pulse_size*pulse_flip;
+	    	y2 = y + dy * pulse_size*pulse_flip;
+    		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
     	}
     	t_dir=-t_dir;
     }
-/*
-    if (direction == 0) {
-    } else {
-    }*/
-    
-    
   }
 }
 
