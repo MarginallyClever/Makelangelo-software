@@ -454,27 +454,28 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     private void paintGondolaAndCounterweights( GL2 gl2 ) {
     	double dx,dy;
+    	double gx,gy;
   	  if(running) {
   		  // TODO test me!
-  		  gl2.glBegin(GL2.GL_LINES);
-  		  gl2.glColor3f(0, 0, 1);
-  		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
-  		  gl2.glVertex2d(gondola_x,gondola_y);
-  		  gl2.glVertex2d(machine.limit_right, machine.limit_top);
-  		  gl2.glVertex2d(gondola_x,gondola_y);
-  		  gl2.glEnd();
+  		  gx=gondola_x;
+  		  gy=gondola_y;
   	  } else {
-  		  double gx=( gondola_x/cameraZoom+cameraOffsetX);
-  		  double gy=(-gondola_y/cameraZoom-cameraOffsetY);
-  		  
+  		  gx=( gondola_x/cameraZoom+cameraOffsetX);
+  		  gy=(-gondola_y/cameraZoom-cameraOffsetY);
+  	  }
+  	  
+  	  double mw = machine.limit_right-machine.limit_left;
+  	  double mh = machine.limit_top-machine.limit_bottom;
+  	  double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
+  	  
   		  dx = gx - machine.limit_left;
   		  dy = gy - machine.limit_top;
   		  double left_a = Math.sqrt(dx*dx+dy*dy);
-  		  double left_b = 300 - left_a;
+  		  double left_b = suggested_length - left_a;
   		  
   		  dx = gx - machine.limit_right;
   		  double right_a = Math.sqrt(dx*dx+dy*dy);
-  		  double right_b = 300 - right_a;
+  		  double right_b = suggested_length - right_a;
 
   		  if(gx<machine.limit_left) return;
   		  if(gx>machine.limit_right) return;
@@ -486,14 +487,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
   		  gl2.glVertex2d(machine.limit_left, machine.limit_top);
   		  gl2.glVertex2d(gx,gy);
   		  // motor to counterweight left
-  		  gl2.glVertex2d(machine.limit_left-0.75, machine.limit_top);
-  		  gl2.glVertex2d(machine.limit_left-0.75, machine.limit_top-left_b);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75, machine.limit_top);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75, machine.limit_top-left_b);
   		  // motor to gondola right
   		  gl2.glVertex2d(machine.limit_right, machine.limit_top);
   		  gl2.glVertex2d(gx,gy);
   		  // motor to counterweight right
-  		  gl2.glVertex2d(machine.limit_right+0.75, machine.limit_top);
-  		  gl2.glVertex2d(machine.limit_right+0.75, machine.limit_top-right_b);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75, machine.limit_top);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75, machine.limit_top-right_b);
   		  gl2.glEnd();
   		  // gondola
   		  gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -504,7 +505,22 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
   			  gl2.glVertex2d(gx+Math.cos(f)*r,gy+Math.sin(f)*r);
   		  }
   		  gl2.glEnd();
-  	  }
+  		  // counterweight left
+  		  gl2.glBegin(GL2.GL_LINE_LOOP);
+  		  gl2.glColor3f(0, 0, 1);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75-1.5,machine.limit_top-left_b);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75+1.5,machine.limit_top-left_b);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75+1.5,machine.limit_top-left_b-15);
+  		  gl2.glVertex2d(machine.limit_left-2.1-0.75-1.5,machine.limit_top-left_b-15);
+  		  gl2.glEnd();
+  		  // counterweight right
+  		  gl2.glBegin(GL2.GL_LINE_LOOP);
+  		  gl2.glColor3f(0, 0, 1);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75-1.5,machine.limit_top-right_b);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75+1.5,machine.limit_top-right_b);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75+1.5,machine.limit_top-right_b-15);
+  		  gl2.glVertex2d(machine.limit_right+2.1+0.75-1.5,machine.limit_top-right_b-15);
+  		  gl2.glEnd();
     }
     
 
