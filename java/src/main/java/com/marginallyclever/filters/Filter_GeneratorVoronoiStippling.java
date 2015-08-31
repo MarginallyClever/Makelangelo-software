@@ -107,6 +107,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   public void render(GL2 gl2, MachineConfiguration machine) {
     if (graphEdges == null) return;
 
+    while(lock.isLocked());
     lock.lock();
 
     gl2.glScalef(0.1f, 0.1f, 1);
@@ -125,12 +126,20 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell centers
     gl2.glPointSize(3);
     gl2.glColor3f(0, 0, 0);
-    gl2.glBegin(GL2.GL_POINTS);
+    float most=0;
+    for (int i = 0; i < cells.length; ++i) {
+        if(most<cells[i].weight) most=cells[i].weight;
+    }
     for (int i = 0; i < cells.length; ++i) {
       VoronoiCell c = cells[i];
-      gl2.glVertex2d(TX((float) c.centroid.x), TY((float) c.centroid.y));
+      float r = ((c.weight/most)*MAX_DOT_SIZE) / scale;
+      gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+      for(float j=0;j<Math.PI*2;j+=(Math.PI/4)) {
+    	  gl2.glVertex2d(TX((float)(c.centroid.x+Math.cos(j)*r)), 
+    			  		 TY((float)(c.centroid.y+Math.sin(j)*r)));
+      }
+      gl2.glEnd();
     }
-    gl2.glEnd();
 
     lock.unlock();
   }
@@ -250,15 +259,15 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
           float y = cells[i].centroid.y;
 
           // filled circles
-          this.moveTo(out, x - r * (float) Math.sin(0), y - r * (float) Math.cos(0), true);
+          this.moveTo(out, x + (float) Math.cos(0) * r, y + (float) Math.cos(0) * r, true);
           while (r > d) {
             float detail = (float) (0.5 * Math.PI * r / d);
             if (detail < 4) detail = 4;
             if (detail > 20) detail = 20;
             for (float j = 1; j <= detail; ++j) {
               this.moveTo(out,
-                  x - r * (float) Math.sin(j * (float) Math.PI * 2.0f / detail),
-                  y - r * (float) Math.cos(j * (float) Math.PI * 2.0f / detail), false);
+                  x + r * (float) Math.cos((float) Math.PI * 2.0f * j / detail),
+                  y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail), false);
             }
             //r-=(d/(scale*1.5f));
             r -= d;

@@ -145,6 +145,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 	      } else {
 	    	    gl2.glColor3f(0,0,0);	 
 	      }
+	      
 	      gl2.glVertex2d(TX((float)c.centroid.x),TY((float)c.centroid.y));
 	    }
 	    gl2.glEnd();
