@@ -60,6 +60,7 @@ import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
 import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
 import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
 import com.marginallyclever.filters.Filter_GeneratorPulse;
+import com.marginallyclever.filters.Filter_GeneratorSandy;
 import com.marginallyclever.filters.Filter_GeneratorScanline;
 import com.marginallyclever.filters.Filter_GeneratorSpiral;
 import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
@@ -117,6 +118,7 @@ implements ActionListener {
     image_converters.add(new Filter_GeneratorColorBoxes(gui, machineConfiguration, translator));
     image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
     image_converters.add(new Filter_GeneratorVoronoiZigZag(gui,machineConfiguration,translator));
+    image_converters.add(new Filter_GeneratorSandy(gui,machineConfiguration,translator));
     //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
