@@ -1,7 +1,15 @@
 package com.marginallyclever.makelangelo;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.drawingtools.DrawingTool_LED;
+import com.marginallyclever.drawingtools.DrawingTool_Pen;
+import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +18,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -30,11 +39,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author dan royer
  */
-public final class MachineConfiguration {
+public final class MachineConfiguration<P extends Preferences> {
   /**
    *
    */
-  private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+  private final P topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
   /**
    * Each robot has a global unique identifier
@@ -44,21 +53,21 @@ public final class MachineConfiguration {
   protected final static double INCH_TO_CM = 2.54;
 
   // machine physical limits
-  public double limit_top=18*INCH_TO_CM;
-  public double limit_bottom=-18*INCH_TO_CM;
-  public double limit_left=-18*INCH_TO_CM;
-  public double limit_right=18*INCH_TO_CM;
+  public double limit_top = 18 * INCH_TO_CM;
+  public double limit_bottom = -18 * INCH_TO_CM;
+  public double limit_left = -18 * INCH_TO_CM;
+  public double limit_right = 18 * INCH_TO_CM;
 
   // paper area
-  public double paper_top=12*INCH_TO_CM;
-  public double paper_bottom=-12*INCH_TO_CM;
-  public double paper_left=-9*INCH_TO_CM;
-  public double paper_right=9*INCH_TO_CM;
-  public double paperMargin=0.9;
+  public double paper_top = 12 * INCH_TO_CM;
+  public double paper_bottom = -12 * INCH_TO_CM;
+  public double paper_left = -9 * INCH_TO_CM;
+  public double paper_right = 9 * INCH_TO_CM;
+  public double paperMargin = 0.9;
 
   // pulleys turning backwards?
-  public boolean m1invert=false;
-  public boolean m2invert=false;
+  public boolean m1invert = false;
+  public boolean m2invert = false;
 
   // pulley diameter
   private double bobbin_left_diameter=1.5;
@@ -97,46 +106,73 @@ public final class MachineConfiguration {
      *       "Bottom Right"
      *   };}
      * </pre>
+=======
+  private double bobbin_left_diameter = 1.5;
+  private double bobbin_right_diameter = 1.5;
+
+  private double max_feed_rate = 11000;  // etch-a-sketch speed
+
+  public boolean reverseForGlass = false;
+  public boolean motors_backwards = false;
+
+  /**
+   * top left, bottom center, etc...
+   * <p>
+   * <pre>
+   * {@code private String[] startingStrings =  {
+   *       "Top Left",
+   *       "Top Center",
+   *       "Top Right",
+   *       "Left",
+   *       "Center",
+   *       "Right",
+   *       "Bottom Left",
+   *       "Bottom Center",
+   *       "Bottom Right"
+   *   };}
+   * </pre>
+>>>>>>> origin/dev
    */
-  private int startingPositionIndex=4;
+  private int startingPositionIndex = 4;
 
   // TODO a way for users to create different tools for each machine
   private List<DrawingTool> tools;
 
-    private int current_tool=0;
+  private int current_tool = 0;
 
-    private String [] machineConfigurationsAvailable = null;
+  private String[] machineConfigurationsAvailable = null;
 
-    private MainGUI mainGUI = null;
+  private MainGUI mainGUI = null;
 
-    private MultilingualSupport translator;
+  private MultilingualSupport translator;
 
-    private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
+  private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
 
   /**
    * TODO move tool names into translations & add a color palette system for quantizing colors
+   *
    * @param gui
    * @param ms
    */
-  protected MachineConfiguration(MainGUI gui,MultilingualSupport ms) {
+  protected MachineConfiguration(MainGUI gui, MultilingualSupport ms) {
     mainGUI = gui;
     translator = ms;
 
     commonPaperSizes[0] = ms.get("Other");
     
     tools = new ArrayList<>();
-    tools.add(new DrawingTool_Pen("Pen (black)",0,gui,ms,this));
-    tools.add(new DrawingTool_Pen("Pen (red)",1,gui,ms,this));
-    tools.add(new DrawingTool_Pen("Pen (green)",2,gui,ms,this));
-    tools.add(new DrawingTool_Pen("Pen (blue)",3,gui,ms,this));
-    tools.add(new DrawingTool_LED(gui,ms,this));
-    tools.add(new DrawingTool_Spraypaint(gui,ms,this));
+    tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, ms, this));
+    tools.add(new DrawingTool_Pen("Pen (red)", 1, gui, ms, this));
+    tools.add(new DrawingTool_Pen("Pen (green)", 2, gui, ms, this));
+    tools.add(new DrawingTool_Pen("Pen (blue)", 3, gui, ms, this));
+    tools.add(new DrawingTool_LED(gui, ms, this));
+    tools.add(new DrawingTool_Spraypaint(gui, ms, this));
 
     // which configurations are available?
     try {
       machineConfigurationsAvailable = topLevelMachinesPreferenceNode.childrenNames();
-    } catch(Exception e) {
-            logger.error("{}", e);
+    } catch (Exception e) {
+      logger.error("{}", e);
       machineConfigurationsAvailable = new String[1];
     }
     // TODO load most recent config?
@@ -163,12 +199,14 @@ public final class MachineConfiguration {
   }
 
   /**
-  * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-  */
+   * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
+   */
   public void adjustMachineSize() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("MenuSettingsMachine"),true);
+    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("MenuSettingsMachine"), true);
     driver.setLayout(new GridBagLayout());
 
+    //final JCheckBox m1i = new JCheckBox(translator.get("Invert"), this.m1invert);
+    //final JCheckBox m2i = new JCheckBox(translator.get("Invert"), this.m2invert);
     //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
     //startPos.setSelectedIndex(startingPositionIndex);
 
@@ -187,7 +225,7 @@ public final class MachineConfiguration {
     }
     
     if (myPicture != null) {
-      picLabel = new JLabel(new ImageIcon( myPicture ));
+      picLabel = new JLabel(new ImageIcon(myPicture));
     } else {
       logger.error("{}", translator.get("CouldNotFind")+limit_file);
     }*/
@@ -195,12 +233,17 @@ public final class MachineConfiguration {
     GridBagConstraints c = new GridBagConstraints();
     GridBagConstraints d = new GridBagConstraints();
 
-    int y=0;
+    int y = 0;
 /*
     if (myPicture != null) {
-      c.weightx=0.25;
-      c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=4; c.anchor=GridBagConstraints.CENTER; driver.add( picLabel,c );
-      y+=5;
+      c.weightx = 0.25;
+      c.gridx = 0;
+      c.gridy = y;
+      c.gridwidth = 4;
+      c.gridheight = 4;
+      c.anchor = GridBagConstraints.CENTER;
+      driver.add(picLabel, c);
+      y += 5;
     }
 */
     c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
@@ -237,6 +280,59 @@ public final class MachineConfiguration {
     //final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
     c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("InvertLeft")),c);   d.gridx=1;  d.gridy=y;  driver.add(m1i,d);
     c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("InvertRight")),c);    d.gridx=3;  d.gridy=y;  driver.add(m2i,d);
+=======
+    c.gridx = 0;
+    c.gridy = y;
+    c.gridwidth = 4;
+    c.gridheight = 1;
+    driver.add(new JLabel(translator.get("mmNotice")), c);
+    c.gridwidth = 1;
+    y++;
+
+    c.ipadx = 3;
+    c.anchor = GridBagConstraints.EAST;
+    d.anchor = GridBagConstraints.WEST;
+
+    c.gridx = 0;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("MachineWidth")), c);
+    d.gridx = 1;
+    d.gridy = y;
+    driver.add(mw, d);
+    c.gridx = 2;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("MachineHeight")), c);
+    d.gridx = 3;
+    d.gridy = y;
+    driver.add(mh, d);
+    y++;
+    c.gridx = 0;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("PaperWidth")), c);
+    d.gridx = 1;
+    d.gridy = y;
+    driver.add(pw, d);
+    c.gridx = 2;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("PaperHeight")), c);
+    d.gridx = 3;
+    d.gridy = y;
+    driver.add(ph, d);
+    y++;
+
+    c.gridx = 0;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("InvertLeft")), c);
+    d.gridx = 1;
+    d.gridy = y;
+    driver.add(m1i, d);
+    c.gridx = 2;
+    c.gridy = y;
+    driver.add(new JLabel(translator.get("InvertRight")), c);
+    d.gridx = 3;
+    d.gridy = y;
+    driver.add(m2i, d);
+>>>>>>> origin/dev
     y++;
 */
     //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
@@ -244,15 +340,14 @@ public final class MachineConfiguration {
     //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel("Pen starts at paper"),c);
     //c.anchor=GridBagConstraints.WEST;
     //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(startPos,c);
-
     
     c.anchor=GridBagConstraints.EAST;
     c.gridy=13;
     c.gridx=2; c.gridwidth=1; driver.add(cancel,c);
     c.gridx=1; c.gridwidth=1; driver.add(save,c);
 
-    Dimension s=ph.getPreferredSize();
-    s.width=80;
+    Dimension s = ph.getPreferredSize();
+    s.width = 80;
     mw.setPreferredSize(s);
     mh.setPreferredSize(s);
     pw.setPreferredSize(s);
@@ -302,7 +397,7 @@ public final class MachineConfiguration {
             if( mwf<=0 ) data_is_sane=false;
             if( mhf<=0 ) data_is_sane=false;
 
-          if(data_is_sane) {
+          if (data_is_sane) {
             //startingPositionIndex = startPos.getSelectedIndex();
             /*// relative to machine limits
             switch(startingPositionIndex%3) {
@@ -346,47 +441,47 @@ public final class MachineConfiguration {
               break;
             }
             */
-            startingPositionIndex=4;
+            startingPositionIndex = 4;
             // relative to paper limits
-            switch(startingPositionIndex%3) {
-            case 0:
-              paper_left=0;
-              paper_right=pwf;
-              limit_left=-(mwf-pwf)/2.0f;
-              limit_right=(mwf-pwf)/2.0f + pwf;
-              break;
-            case 1:
-              paper_left = -pwf/2.0f;
-              paper_right = pwf/2.0f;
-              limit_left = -mwf/2.0f;
-              limit_right = mwf/2.0f;
-              break;
-            case 2:
-              paper_right=0;
-              paper_left=-pwf;
-              limit_left=-pwf - (mwf-pwf)/2.0f;
-              limit_right=(mwf-pwf)/2.0f;
-              break;
+            switch (startingPositionIndex % 3) {
+              case 0:
+                paper_left = 0;
+                paper_right = pwf;
+                limit_left = -(mwf - pwf) / 2.0f;
+                limit_right = (mwf - pwf) / 2.0f + pwf;
+                break;
+              case 1:
+                paper_left = -pwf / 2.0f;
+                paper_right = pwf / 2.0f;
+                limit_left = -mwf / 2.0f;
+                limit_right = mwf / 2.0f;
+                break;
+              case 2:
+                paper_right = 0;
+                paper_left = -pwf;
+                limit_left = -pwf - (mwf - pwf) / 2.0f;
+                limit_right = (mwf - pwf) / 2.0f;
+                break;
             }
-            switch(startingPositionIndex/3) {
-            case 0:
-              paper_top=0;
-              paper_bottom=-phf;
-              limit_top=(mhf-phf)/2.0f;
-              limit_bottom=-phf - (mhf-phf)/2.0f;
-              break;
-            case 1:
-              paper_top=phf/2.0f;
-              paper_bottom=-phf/2.0f;
-              limit_top=mhf/2.0f;
-              limit_bottom=-mhf/2.0f;
-              break;
-            case 2:
-              paper_bottom=0;
-              paper_top=phf;
-              limit_top=phf + (mhf-phf)/2.0f;
-              limit_bottom= - (mhf-phf)/2.0f;
-              break;
+            switch (startingPositionIndex / 3) {
+              case 0:
+                paper_top = 0;
+                paper_bottom = -phf;
+                limit_top = (mhf - phf) / 2.0f;
+                limit_bottom = -phf - (mhf - phf) / 2.0f;
+                break;
+              case 1:
+                paper_top = phf / 2.0f;
+                paper_bottom = -phf / 2.0f;
+                limit_top = mhf / 2.0f;
+                limit_bottom = -mhf / 2.0f;
+                break;
+              case 2:
+                paper_bottom = 0;
+                paper_top = phf;
+                limit_top = phf + (mhf - phf) / 2.0f;
+                limit_bottom = -(mhf - phf) / 2.0f;
+                break;
             }
 
             //m1invert = m1i.isSelected();
@@ -397,7 +492,7 @@ public final class MachineConfiguration {
             driver.dispose();
           }
         }
-        if(subject == cancel) {
+        if (subject == cancel) {
           driver.dispose();
         }
       }
@@ -415,11 +510,11 @@ public final class MachineConfiguration {
   }
 
 
-  public String [] getToolNames() {
+  public String[] getToolNames() {
     String[] toolNames = new String[tools.size()];
     Iterator<DrawingTool> i = tools.iterator();
-    int c=0;
-    while(i.hasNext()) {
+    int c = 0;
+    while (i.hasNext()) {
       DrawingTool t = i.next();
       toolNames[c++] = t.getName();
     }
@@ -431,7 +526,7 @@ public final class MachineConfiguration {
    * dialog to adjust the pen up & pen down values
    */
   protected void changeTool() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustMachineSize"),true);
+    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("AdjustMachineSize"), true);
     driver.setLayout(new GridBagLayout());
 
     final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
@@ -441,27 +536,39 @@ public final class MachineConfiguration {
     final JButton save = new JButton(translator.get("Save"));
 
     GridBagConstraints c = new GridBagConstraints();
-    c.gridx=0; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel(translator.get("ToolType")),c);
-    c.anchor=GridBagConstraints.WEST;
-    c.gridx=2; c.gridy=1; c.gridwidth=2; c.gridheight=1;  driver.add(toolCombo,c);
+    c.gridx = 0;
+    c.gridy = 1;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    driver.add(new JLabel(translator.get("ToolType")), c);
+    c.anchor = GridBagConstraints.WEST;
+    c.gridx = 2;
+    c.gridy = 1;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    driver.add(toolCombo, c);
 
 
-    c.anchor=GridBagConstraints.EAST;
-    c.gridy=3;
-    c.gridx=3; c.gridwidth=1; driver.add(cancel,c);
-    c.gridx=2; c.gridwidth=1; driver.add(save,c);
+    c.anchor = GridBagConstraints.EAST;
+    c.gridy = 3;
+    c.gridx = 3;
+    c.gridwidth = 1;
+    driver.add(cancel, c);
+    c.gridx = 2;
+    c.gridwidth = 1;
+    driver.add(save, c);
 
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
-        if(subject == save) {
+        if (subject == save) {
           current_tool = toolCombo.getSelectedIndex();
 
           saveConfig();
           mainGUI.sendConfig();
           driver.dispose();
         }
-        if(subject == cancel) {
+        if (subject == cancel) {
           driver.dispose();
         }
       }
@@ -495,52 +602,70 @@ public final class MachineConfiguration {
    * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
    */
   public void adjustPulleySize() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("AdjustPulleySize"),true);
+    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("AdjustPulleySize"), true);
     driver.setLayout(new GridBagLayout());
 
-    final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter*10));
-    final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter*10));
+    final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter * 10));
+    final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter * 10));
 
     final JButton cancel = new JButton(translator.get("Cancel"));
     final JButton save = new JButton(translator.get("Save"));
 
     GridBagConstraints c = new GridBagConstraints();
-    c.weightx=50;
-    c.gridx=0;  c.gridy=1;  driver.add(new JLabel(translator.get("Left")),c);
-    c.gridx=0;  c.gridy=2;  driver.add(new JLabel(translator.get("Right")),c);
-    c.gridx=1;  c.gridy=0;  driver.add(new JLabel(translator.get("Diameter")),c);
-    c.gridx=1;  c.gridy=1;  driver.add(mBobbin1,c);
-    c.gridx=1;  c.gridy=2;  driver.add(mBobbin2,c);
-    c.gridx=2;  c.gridy=1;  driver.add(new JLabel(translator.get("Millimeters")),c);
-    c.gridx=2;  c.gridy=2;  driver.add(new JLabel(translator.get("Millimeters")),c);
-    c.gridx=0;  c.gridy=3;  driver.add(save,c);
-    c.gridx=1;  c.gridy=3;  driver.add(cancel,c);
+    c.weightx = 50;
+    c.gridx = 0;
+    c.gridy = 1;
+    driver.add(new JLabel(translator.get("Left")), c);
+    c.gridx = 0;
+    c.gridy = 2;
+    driver.add(new JLabel(translator.get("Right")), c);
+    c.gridx = 1;
+    c.gridy = 0;
+    driver.add(new JLabel(translator.get("Diameter")), c);
+    c.gridx = 1;
+    c.gridy = 1;
+    driver.add(mBobbin1, c);
+    c.gridx = 1;
+    c.gridy = 2;
+    driver.add(mBobbin2, c);
+    c.gridx = 2;
+    c.gridy = 1;
+    driver.add(new JLabel(translator.get("Millimeters")), c);
+    c.gridx = 2;
+    c.gridy = 2;
+    driver.add(new JLabel(translator.get("Millimeters")), c);
+    c.gridx = 0;
+    c.gridy = 3;
+    driver.add(save, c);
+    c.gridx = 1;
+    c.gridy = 3;
+    driver.add(cancel, c);
 
-    Dimension s=mBobbin1.getPreferredSize();
-    s.width=80;
+    Dimension s = mBobbin1.getPreferredSize();
+    s.width = 80;
     mBobbin1.setPreferredSize(s);
     mBobbin2.setPreferredSize(s);
 
     ActionListener driveButtons = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Object subject = e.getSource();
-          if(subject == save) {
-            bobbin_left_diameter = Double.valueOf(mBobbin1.getText())/10.0;
-            bobbin_right_diameter = Double.valueOf(mBobbin2.getText())/10.0;
-            boolean data_is_sane=true;
-            if( bobbin_left_diameter <= 0 ) data_is_sane=false;
-            if( bobbin_right_diameter <= 0 ) data_is_sane=false;
-            if(data_is_sane ) {
-              saveConfig();
-              mainGUI.sendConfig();
-              driver.dispose();
-            }
-          }
-          if(subject == cancel) {
+      public void actionPerformed(ActionEvent e) {
+        Object subject = e.getSource();
+        if (subject == save) {
+          bobbin_left_diameter = Double.valueOf(mBobbin1.getText()) / 10.0;
+          bobbin_right_diameter = Double.valueOf(mBobbin2.getText()) / 10.0;
+          boolean data_is_sane = true;
+          if (bobbin_left_diameter <= 0) data_is_sane = false;
+          if (bobbin_right_diameter <= 0) data_is_sane = false;
+          if (data_is_sane) {
+            saveConfig();
+            mainGUI.sendConfig();
             driver.dispose();
           }
         }
-      };
+        if (subject == cancel) {
+          driver.dispose();
+        }
+      }
+    };
 
     save.addActionListener(driveButtons);
     cancel.addActionListener(driveButtons);
@@ -553,6 +678,7 @@ public final class MachineConfiguration {
 
   /**
    * Load the machine configuration
+   *
    * @param uid the unique id of the robot to be loaded
    */
   protected void loadConfig(long uid) {
@@ -589,9 +715,9 @@ public final class MachineConfiguration {
       tool.loadConfig(uniqueMachinePreferencesNode);
     }
 
-    paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin",Double.toString(paperMargin)));
-    reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass",reverseForGlass?"true":"false"));
-    current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",Integer.toString(current_tool)));
+    paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
+    reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", reverseForGlass ? "true" : "false"));
+    current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(current_tool)));
   }
 
 
@@ -671,19 +797,18 @@ public final class MachineConfiguration {
   }
 
 
-
   public String getBobbinLine() {
-    return new String("D1 L"+bobbin_left_diameter+" R"+bobbin_right_diameter);
+    return "D1 L" + bobbin_left_diameter + " R" + bobbin_right_diameter;
   }
 
 
   public String getConfigLine() {
-    return new String("M101 T"+limit_top
-    +" B"+limit_bottom
-    +" L"+limit_left
-    +" R"+limit_right
-    +" I"+(m1invert?"-1":"1")
-    +" J"+(m2invert?"-1":"1"));
+    return "M101 T" + limit_top
+        + " B" + limit_bottom
+        + " L" + limit_left
+        + " R" + limit_right
+        + " I" + (m1invert ? "-1" : "1")
+        + " J" + (m2invert ? "-1" : "1");
   }
 
 
@@ -696,7 +821,7 @@ public final class MachineConfiguration {
   }
 
   public boolean isPaperConfigured() {
-    return (paper_top>paper_bottom && paper_right>paper_left);
+    return (paper_top > paper_bottom && paper_right > paper_left);
   }
 
   public void parseRobotUID(String line) {
@@ -704,24 +829,24 @@ public final class MachineConfiguration {
 
     // get the UID reported by the robot
     String[] lines = line.split("\\r?\\n");
-    long new_uid=0;
-    if(lines.length>0) {
+    long new_uid = 0;
+    if (lines.length > 0) {
       try {
         new_uid = Long.parseLong(lines[0]);
-      } catch(NumberFormatException e) {
-                logger.error("{}", e);
-            }
+      } catch (NumberFormatException e) {
+        logger.error("{}", e);
+      }
     }
 
     // new robots have UID=0
-    if(new_uid == 0) {
+    if (new_uid == 0) {
       new_uid = getNewRobotUID();
     }
 
     // load machine specific config
     loadConfig(new_uid);
 
-    if(limit_top==0 && limit_bottom==0 && limit_left==0 && limit_right==0) {
+    if (limit_top == 0 && limit_bottom == 0 && limit_left == 0 && limit_right == 0) {
       // probably first time turning on, adjust the machine size
       adjustMachineSize();
     }
@@ -734,34 +859,32 @@ public final class MachineConfiguration {
     long new_uid = 0;
 
     try {
-        // Send data
+      // Send data
       URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
-        URLConnection conn = url.openConnection();
-            try(
-            final InputStream connectionInputStream = conn.getInputStream();
-            final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-            final BufferedReader rd = new BufferedReader(inputStreamReader)
-            ) {
-                String line = rd.readLine();
-                new_uid = Long.parseLong(line);
-            }
+      URLConnection conn = url.openConnection();
+      try (
+          final InputStream connectionInputStream = conn.getInputStream();
+          final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+          final BufferedReader rd = new BufferedReader(inputStreamReader)
+      ) {
+        String line = rd.readLine();
+        new_uid = Long.parseLong(line);
+      }
     } catch (Exception e) {
       logger.error("{}", e);
-            return 0;
+      return 0;
     }
 
     // did read go ok?
-    if(new_uid != 0) {
+    if (new_uid != 0) {
       // make sure a topLevelMachinesPreferenceNode node is created
       topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
       // tell the robot it's new UID.
-      mainGUI.sendLineToRobot("UID "+new_uid);
+      mainGUI.sendLineToRobot("UID " + new_uid);
 
       // if this is a new robot UID, update the list of available configurations
-      final String [] new_list = new String[machineConfigurationsAvailable.length+1];
-      for(int i = 0; i < machineConfigurationsAvailable.length; ++i) {
-        new_list[i] = machineConfigurationsAvailable[i];
-      }
+      final String[] new_list = new String[machineConfigurationsAvailable.length + 1];
+      System.arraycopy(machineConfigurationsAvailable, 0, new_list, 0, machineConfigurationsAvailable.length);
       new_list[machineConfigurationsAvailable.length] = Long.toString(new_uid);
       machineConfigurationsAvailable = new_list;
     }
@@ -770,7 +893,6 @@ public final class MachineConfiguration {
 
 
   /**
-   *
    * @return the number of machine configurations that exist on this computer
    */
   public int getMachineCount() {
@@ -780,18 +902,20 @@ public final class MachineConfiguration {
 
   /**
    * Get the UID of every machine this computer recognizes EXCEPT machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
+   *
    * @return an array of strings, each string is a machine UID.
    */
   public String[] getKnownMachineNames() {
-        final List<String> machineConfigurationsAvailableArrayAsList = new LinkedList<>(Arrays.asList(machineConfigurationsAvailable));
-        if(machineConfigurationsAvailableArrayAsList.contains("0")) {
-            machineConfigurationsAvailableArrayAsList.remove("0");
-        }
+    final List<String> machineConfigurationsAvailableArrayAsList = new LinkedList<>(Arrays.asList(machineConfigurationsAvailable));
+    if (machineConfigurationsAvailableArrayAsList.contains("0")) {
+      machineConfigurationsAvailableArrayAsList.remove("0");
+    }
     return Arrays.copyOf(machineConfigurationsAvailableArrayAsList.toArray(), machineConfigurationsAvailableArrayAsList.size(), String[].class);
   }
 
   /**
    * Get the UID of every machine this computer recognizes INCLUDING machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
+   *
    * @return an array of strings, each string is a machine UID.
    */
   public String[] getAvailableConfigurations() {
@@ -800,9 +924,9 @@ public final class MachineConfiguration {
 
 
   public int getCurrentMachineIndex() {
-    for(int i=0;i< machineConfigurationsAvailable.length;i++) {
-      if(machineConfigurationsAvailable[i].equals("0")) continue;
-      if(machineConfigurationsAvailable[i].equals(Long.toString(robot_uid))) {
+    for (int i = 0; i < machineConfigurationsAvailable.length; i++) {
+      if (machineConfigurationsAvailable[i].equals("0")) continue;
+      if (machineConfigurationsAvailable[i].equals(Long.toString(robot_uid))) {
         return i;
       }
     }
@@ -817,18 +941,18 @@ public final class MachineConfiguration {
 
 
   public double getPaperHeight() {
-    return paper_top -paper_bottom;
+    return paper_top - paper_bottom;
   }
 
 
   public double getPaperScale() {
-    double paper_w=getPaperWidth();
-    double paper_h=getPaperHeight();
+    double paper_w = getPaperWidth();
+    double paper_h = getPaperHeight();
 
-    if(paper_w>paper_h) {
-      return paper_h/paper_w;
+    if (paper_w > paper_h) {
+      return paper_h / paper_w;
     } else {
-      return paper_w/paper_h;
+      return paper_w / paper_h;
     }
   }
 

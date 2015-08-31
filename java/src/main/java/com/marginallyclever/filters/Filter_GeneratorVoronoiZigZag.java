@@ -630,7 +630,8 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
     int i,x,y;
     float change=0;
     float weight,wx,wy;
-
+    float most=0;
+    
     for(i=0;i<cells.length;++i) {
       generateBounds(i);
       int sx = (int)Math.floor(bound_min.x);
@@ -668,15 +669,21 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         if(wx>=w) wx = w-1;
         if(wy>=h) wy = h-1;
 
+        if(most < weight) most = weight;
+        
         change++;
         // use the new center
         cells[i].centroid.set(wx, wy);
-      } else {
-    	  // this cell is white, move it.
-    	  cells[i].centroid.set((float)(Math.random()*w),(float)(Math.random()*h));
       }
     }
-
+    
+    for(i=0;i<cells.length;++i) {
+        VoronoiCell c = cells[i];
+        if(c.weight/most <= CUTOFF) {
+      	  // this cell is white, move it.
+      	  c.centroid.set((float)(Math.random()*w),(float)(Math.random()*h));
+        }
+    }
     return change;
   }
 }

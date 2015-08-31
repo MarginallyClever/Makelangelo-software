@@ -5,7 +5,7 @@
 		<name>Francais</name>
 		<author>Hugobiwan Zolnir (@hugobiwan)</author>
 	</meta>
-	
+
 	<string>
 		<key>Cancel</key>
 		<value>Annuler</value>
@@ -607,7 +607,7 @@
 		<value>Test</value>
 		<hint>Adjust pen tool</hint>
 	</string>
-	
+
 	<string>
 		<key>SharePromo</key>
 		<value>Partagez sur twitter avec @MarginallyC pour découvrir ce que les autres ont créé.</value>

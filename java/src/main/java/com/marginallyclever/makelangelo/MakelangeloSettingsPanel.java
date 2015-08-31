@@ -3,6 +3,9 @@ package com.marginallyclever.makelangelo;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -16,6 +19,7 @@ import javax.swing.JScrollPane;
 
 /**
  * Controls related to configuring a makelangelo machine
+ *
  * @author danroyer
  * @since 7.1.4
  */
@@ -29,18 +33,17 @@ implements ActionListener {
   private static final long serialVersionUID = 1L;
 
   // settings pane
-    private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
+  private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
 
   protected MultilingualSupport translator;
   protected MachineConfiguration machineConfiguration;
   protected MainGUI gui;
-  
-  
 
-    // settings menu
-  public void createPanel(MainGUI _gui,MultilingualSupport _translator,MachineConfiguration _machineConfiguration) {
-    translator=_translator;
-    gui=_gui;
+
+  // settings menu
+  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+    translator = _translator;
+    gui = _gui;
     machineConfiguration = _machineConfiguration;
 
     JPanel p = new JPanel(new GridLayout(0,1));
@@ -69,41 +72,56 @@ implements ActionListener {
         buttonAdjustTool.addActionListener(this);
         p.add(buttonAdjustTool);
   }
-  
 
 
   protected void jogMotors() {
-    JDialog driver = new JDialog(gui.getMainframe(),translator.get("JogMotors"),true);
+    JDialog driver = new JDialog(gui.getMainframe(), translator.get("JogMotors"), true);
     driver.setLayout(new GridBagLayout());
     GridBagConstraints c = new GridBagConstraints();
-    
+
     final JButton buttonAneg = new JButton(translator.get("JogIn"));
     final JButton buttonApos = new JButton(translator.get("JogOut"));
-    final JCheckBox m1i = new JCheckBox(translator.get("Invert"),machineConfiguration.m1invert);
-    
+    final JCheckBox m1i = new JCheckBox(translator.get("Invert"), machineConfiguration.m1invert);
+
     final JButton buttonBneg = new JButton(translator.get("JogIn"));
     final JButton buttonBpos = new JButton(translator.get("JogOut"));
-    final JCheckBox m2i = new JCheckBox(translator.get("Invert"),machineConfiguration.m2invert);
+    final JCheckBox m2i = new JCheckBox(translator.get("Invert"), machineConfiguration.m2invert);
 
-    c.gridx=0;  c.gridy=0;  driver.add(new JLabel(translator.get("Left")),c);
-    c.gridx=0;  c.gridy=1;  driver.add(new JLabel(translator.get("Right")),c);
-    
-    c.gridx=1;  c.gridy=0;  driver.add(buttonAneg,c);
-    c.gridx=1;  c.gridy=1;  driver.add(buttonBneg,c);
-    
-    c.gridx=2;  c.gridy=0;  driver.add(buttonApos,c);
-    c.gridx=2;  c.gridy=1;  driver.add(buttonBpos,c);
+    c.gridx = 0;
+    c.gridy = 0;
+    driver.add(new JLabel(translator.get("Left")), c);
+    c.gridx = 0;
+    c.gridy = 1;
+    driver.add(new JLabel(translator.get("Right")), c);
 
-    c.gridx=3;  c.gridy=0;  driver.add(m1i,c);
-    c.gridx=3;  c.gridy=1;  driver.add(m2i,c);
-    
+    c.gridx = 1;
+    c.gridy = 0;
+    driver.add(buttonAneg, c);
+    c.gridx = 1;
+    c.gridy = 1;
+    driver.add(buttonBneg, c);
+
+    c.gridx = 2;
+    c.gridy = 0;
+    driver.add(buttonApos, c);
+    c.gridx = 2;
+    c.gridy = 1;
+    driver.add(buttonBpos, c);
+
+    c.gridx = 3;
+    c.gridy = 0;
+    driver.add(m1i, c);
+    c.gridx = 3;
+    c.gridy = 1;
+    driver.add(m2i, c);
+
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
-        if(subject == buttonApos) gui.sendLineToRobot("D00 L100");
-        if(subject == buttonAneg) gui.sendLineToRobot("D00 L-100");
-        if(subject == buttonBpos) gui.sendLineToRobot("D00 R100");
-        if(subject == buttonBneg) gui.sendLineToRobot("D00 R-100");
+        if (subject == buttonApos) gui.sendLineToRobot("D00 L100");
+        if (subject == buttonAneg) gui.sendLineToRobot("D00 L-100");
+        if (subject == buttonBpos) gui.sendLineToRobot("D00 R100");
+        if (subject == buttonBneg) gui.sendLineToRobot("D00 R-100");
         gui.sendLineToRobot("M114");
       }
     };
@@ -116,13 +134,13 @@ implements ActionListener {
         gui.sendConfig();
       }
     };
-    
+
     buttonApos.addActionListener(driveButtons);
     buttonAneg.addActionListener(driveButtons);
-    
+
     buttonBpos.addActionListener(driveButtons);
     buttonBneg.addActionListener(driveButtons);
-    
+
     m1i.addActionListener(invertButtons);
     m2i.addActionListener(invertButtons);
 
@@ -130,43 +148,43 @@ implements ActionListener {
     driver.pack();
     driver.setVisible(true);
   }
-  
-  public void updateButtonAccess(boolean isConfirmed,boolean isRunning) {
-        buttonAdjustMachineSize.setEnabled(!isRunning);
-        buttonAdjustPulleySize.setEnabled(!isRunning);
-        buttonJogMotors.setEnabled(isConfirmed && !isRunning);
-        buttonChangeTool.setEnabled(!isRunning);
-        buttonAdjustTool.setEnabled(!isRunning);
+
+  public void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
+    buttonAdjustMachineSize.setEnabled(!isRunning);
+    buttonAdjustPulleySize.setEnabled(!isRunning);
+    buttonJogMotors.setEnabled(isConfirmed && !isRunning);
+    buttonChangeTool.setEnabled(!isRunning);
+    buttonAdjustTool.setEnabled(!isRunning);
   }
-  
-  
+
+
   // The user has done something.  respond to it.
   public void actionPerformed(ActionEvent e) {
     Object subject = e.getSource();
 
-    if( subject == buttonAdjustMachineSize ) {
+    if (subject == buttonAdjustMachineSize) {
       machineConfiguration.adjustMachineSize();
       gui.updateMachineConfig();
       return;
     }
-    if( subject == buttonAdjustPulleySize ) {
+    if (subject == buttonAdjustPulleySize) {
       machineConfiguration.adjustPulleySize();
       gui.updateMachineConfig();
       return;
     }
-    if( subject == buttonChangeTool ) {
+    if (subject == buttonChangeTool) {
       machineConfiguration.changeTool();
       gui.updateMachineConfig();
       return;
     }
-    if( subject == buttonAdjustTool ) {
+    if (subject == buttonAdjustTool) {
       machineConfiguration.adjustTool();
       gui.updateMachineConfig();
       return;
     }
-    if( subject == buttonJogMotors ) {
+    if (subject == buttonJogMotors) {
       jogMotors();
       return;
     }
-  } 
+  }
 }

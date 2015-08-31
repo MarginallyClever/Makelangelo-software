@@ -105,7 +105,7 @@ AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
     latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B) &
                    ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
     MC.latch_tx();
-    
+
     // enable both H bridges
     pinMode(11, OUTPUT);
     pinMode(3, OUTPUT);
@@ -252,5 +252,7 @@ void AF_Stepper::onestep(uint8_t dir) {
 
   // change the energized state now
   MC.latch_tx();
+
+  return currentstep;
 }
 
