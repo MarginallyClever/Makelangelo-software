@@ -110,8 +110,10 @@ public class Filter_GeneratorSandy extends Filter {
    * @throws IOException couldn't open output file
    */
   private void convertNow(BufferedImage img) throws IOException {
-	    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255); 
-	    img = bw.process(img);
+      // make black & white
+      Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+      img = bw.process(img);
+      
 
 	    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
 	        try(
@@ -206,6 +208,8 @@ public class Filter_GeneratorSandy extends Filter {
 	double t_dir=1;
 	double pulse_flip=1;
 	double x2,y2,t,t_step, t_step2;
+	double last_x=0,last_y=0;
+	boolean was_drawing=true;
     
     for(r=r_min;r<r_max;r+=r_step) {
     	// go around in a circle
@@ -218,10 +222,15 @@ public class Filter_GeneratorSandy extends Filter {
 	    	y = cy + dy * r;
 	    	t_step2=t_step;
 		    if(!isInsideLimits(x,y)) {
-	    		moveToPaper(out,x,y,true);
+		    	if(was_drawing) {
+		    		moveToPaper(out,last_x,last_y,true);
+		    		was_drawing=false;
+		    	}
 		    	continue;
 		    }
 		    
+		    last_x=x;
+		    last_y=y;
             // read a block of the image and find the average intensity in this block
             z = sampleScale( img, x-r_step/2, y-r_step/2,x+r_step/2,y + r_step/2 );
             // scale the intensity value
@@ -236,6 +245,10 @@ public class Filter_GeneratorSandy extends Filter {
 	    	x2 = x + dx * pulse_size*pulse_flip;
 	    	y2 = y + dy * pulse_size*pulse_flip;
 	    	pulse_flip=-pulse_flip;
+	    	if(was_drawing == false) {
+	    		moveToPaper(out,last_x,last_y,pulse_size<PULSE_MINIMUM);
+	    		was_drawing=true;
+	    	}
     		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
 	    	x2 = x + dx * pulse_size*pulse_flip;
 	    	y2 = y + dy * pulse_size*pulse_flip;

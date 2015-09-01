@@ -54,10 +54,6 @@ implements ActionListener {
         buttonAdjustMachineSize.addActionListener(this);
         p.add(buttonAdjustMachineSize);
 
-        buttonAdjustPulleySize = new JButton(translator.get("MenuAdjustPulleys"));
-        buttonAdjustPulleySize.addActionListener(this);
-    p.add(buttonAdjustPulleySize);
-        
         buttonJogMotors = new JButton(translator.get("JogMotors"));
         buttonJogMotors.addActionListener(this);
     p.add(buttonJogMotors);
@@ -118,10 +114,10 @@ implements ActionListener {
     ActionListener driveButtons = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Object subject = e.getSource();
-        if (subject == buttonApos) gui.sendLineToRobot("D00 L100");
-        if (subject == buttonAneg) gui.sendLineToRobot("D00 L-100");
-        if (subject == buttonBpos) gui.sendLineToRobot("D00 R100");
-        if (subject == buttonBneg) gui.sendLineToRobot("D00 R-100");
+        if (subject == buttonApos) gui.sendLineToRobot("D00 L400");
+        if (subject == buttonAneg) gui.sendLineToRobot("D00 L-400");
+        if (subject == buttonBpos) gui.sendLineToRobot("D00 R400");
+        if (subject == buttonBneg) gui.sendLineToRobot("D00 R-400");
         gui.sendLineToRobot("M114");
       }
     };
@@ -164,11 +160,6 @@ implements ActionListener {
 
     if (subject == buttonAdjustMachineSize) {
       machineConfiguration.adjustMachineSize();
-      gui.updateMachineConfig();
-      return;
-    }
-    if (subject == buttonAdjustPulleySize) {
-      machineConfiguration.adjustPulleySize();
       gui.updateMachineConfig();
       return;
     }

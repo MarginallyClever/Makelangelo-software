@@ -203,13 +203,19 @@ public final class MachineConfiguration<P extends Preferences> {
    */
   public void adjustMachineSize() {
     final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("MenuSettingsMachine"), true);
-    driver.setLayout(new GridBagLayout());
+    JPanel container = new JPanel();
 
-    //final JCheckBox m1i = new JCheckBox(translator.get("Invert"), this.m1invert);
-    //final JCheckBox m2i = new JCheckBox(translator.get("Invert"), this.m2invert);
-    //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
-    //startPos.setSelectedIndex(startingPositionIndex);
+    container.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
+    driver.add(container);
+    //container.setLayout(new GridLayout(0,1,8,8));
+    container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
 
+
+    GridBagConstraints c = new GridBagConstraints();
+    GridBagConstraints d = new GridBagConstraints();
+
+    int y = 0;
+    
     final JButton cancel = new JButton(translator.get("Cancel"));
     final JButton save = new JButton(translator.get("Save"));
 /*
@@ -230,10 +236,6 @@ public final class MachineConfiguration<P extends Preferences> {
       logger.error("{}", translator.get("CouldNotFind")+limit_file);
     }*/
 
-    GridBagConstraints c = new GridBagConstraints();
-    GridBagConstraints d = new GridBagConstraints();
-
-    int y = 0;
 /*
     if (myPicture != null) {
       c.weightx = 0.25;
@@ -242,111 +244,109 @@ public final class MachineConfiguration<P extends Preferences> {
       c.gridwidth = 4;
       c.gridheight = 4;
       c.anchor = GridBagConstraints.CENTER;
-      driver.add(picLabel, c);
+      container.add(picLabel, c);
       y += 5;
     }
-*/
-    c.gridx=0; c.gridy=y; c.gridwidth=4; c.gridheight=1;
-    driver.add(new JLabel(translator.get("mmNotice")),c);
+*/    
+    JPanel p = new JPanel(new GridBagLayout());
+    container.add(p);
+    
+    c.gridwidth=3;
+    p.add(new JLabel("1\" = 25.4mm",SwingConstants.CENTER),c);
     c.gridwidth=1;
-    y++;
+    
+    y=1;
 
-    c.ipadx=3;
     c.anchor=GridBagConstraints.EAST;
     d.anchor=GridBagConstraints.WEST;
 
     final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
     final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("MachineWidth")),c);   d.gridx=1;  d.gridy=y;  driver.add(mw,d);
+    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineWidth")),c);
+    d.gridx=1;  d.gridy=y;  p.add(mw,d);
+    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
     y++;
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("MachineHeight")),c);  d.gridx=1;  d.gridy=y;  driver.add(mh,d);
+    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineHeight")),c);
+    d.gridx=1;  d.gridy=y;  p.add(mh,d);
+    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
     y++;
-    
 
+    container.add(new JSeparator(SwingConstants.HORIZONTAL));
+    p = new JPanel(new GridBagLayout());
+    container.add(p);
+    y=0;
     final JComboBox<String> paperSizes = new JComboBox<>(commonPaperSizes);
     paperSizes.setSelectedIndex(getCurrentPaperSizeChoice( (paper_right-paper_left)*10, (paper_top-paper_bottom)*10) );
     
     final JTextField pw = new JTextField(Integer.toString((int)((paper_right-paper_left)*10)));
     final JTextField ph = new JTextField(Integer.toString((int)((paper_top-paper_bottom)*10)));
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("PaperSize")),c);  d.gridx=1;  d.gridy=y;  driver.add(paperSizes,d);
-    y++;
-    d.gridx=1;  d.gridy=y;  driver.add(pw,d); 
-    y++;
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(" x "),c);
-    d.gridx=1;  d.gridy=y;  driver.add(ph,d);
-    y++;
-/*
-    //final JCheckBox m1i = new JCheckBox(translator.get("Invert"),this.m1invert);
-    //final JCheckBox m2i = new JCheckBox(translator.get("Invert"),this.m2invert);
-    c.gridx=0; c.gridy=y; driver.add(new JLabel(translator.get("InvertLeft")),c);   d.gridx=1;  d.gridy=y;  driver.add(m1i,d);
-    c.gridx=2; c.gridy=y; driver.add(new JLabel(translator.get("InvertRight")),c);    d.gridx=3;  d.gridy=y;  driver.add(m2i,d);
-=======
-    c.gridx = 0;
-    c.gridy = y;
-    c.gridwidth = 4;
-    c.gridheight = 1;
-    driver.add(new JLabel(translator.get("mmNotice")), c);
-    c.gridwidth = 1;
-    y++;
+    
+    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
+    d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
+    y=1;
+    d.gridwidth=1;
 
-    c.ipadx = 3;
-    c.anchor = GridBagConstraints.EAST;
-    d.anchor = GridBagConstraints.WEST;
-
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("MachineWidth")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(mw, d);
-    c.gridx = 2;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("MachineHeight")), c);
-    d.gridx = 3;
-    d.gridy = y;
-    driver.add(mh, d);
+    c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
+    d.gridx=1;  d.gridy=y;  p.add(pw,d); 
+    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
     y++;
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("PaperWidth")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(pw, d);
-    c.gridx = 2;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("PaperHeight")), c);
-    d.gridx = 3;
-    d.gridy = y;
-    driver.add(ph, d);
+    c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
+    d.gridx=1;  d.gridy=y;  p.add(ph,d);
+    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
     y++;
-
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("InvertLeft")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(m1i, d);
-    c.gridx = 2;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("InvertRight")), c);
-    d.gridx = 3;
-    d.gridy = y;
-    driver.add(m2i, d);
->>>>>>> origin/dev
-    y++;
-*/
+    
     //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
-    //driver.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
-    //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(new JLabel("Pen starts at paper"),c);
+    //container.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
+    //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  container.add(new JLabel("Pen starts at paper"),c);
     //c.anchor=GridBagConstraints.WEST;
-    //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  driver.add(startPos,c);
+    //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  container.add(startPos,c);
+
+    //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
+    //startPos.setSelectedIndex(startingPositionIndex);
+
+    
+    container.add(new JSeparator());
+    p = new JPanel(new GridBagLayout());
+    container.add(p);
+    
+    c = new GridBagConstraints();
+    c.gridwidth=3;
+    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
+    c.gridwidth=1;
+    
+    final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter * 10));
+    final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter * 10));
+    y=2;
+    c.weightx = 0;
+    c.anchor=GridBagConstraints.EAST;
+    d.anchor=GridBagConstraints.WEST;
+    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("Left")), c);
+    d.gridx = 1;    d.gridy = y;    p.add(mBobbin1, d);
+    d.gridx = 2;    d.gridy = y;    p.add(new JLabel(translator.get("Millimeters")), d);
+    y++;
+    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("Right")), c);
+    d.gridx = 1;    d.gridy = y;    p.add(mBobbin2, d);
+    d.gridx = 2;    d.gridy = y;    p.add(new JLabel(translator.get("Millimeters")), d);
+
+    Dimension s = mBobbin1.getPreferredSize();
+    s.width = 80;
+    mBobbin1.setPreferredSize(s);
+    mBobbin2.setPreferredSize(s);
+
+
+    p = new JPanel(new GridBagLayout());
+    container.add(p);
     
     c.anchor=GridBagConstraints.EAST;
-    c.gridy=13;
-    c.gridx=2; c.gridwidth=1; driver.add(cancel,c);
-    c.gridx=1; c.gridwidth=1; driver.add(save,c);
+    c.gridy=0;
+    c.weightx=0;
+    c.weighty=1;
+    c.gridx=1; c.gridwidth=1; p.add(save,c);
+    c.gridx=2; c.gridwidth=1; p.add(cancel,c);
+    c.weightx=1;
+    c.gridx=0; c.gridwidth=1; p.add(Box.createGlue(),c);
 
-    Dimension s = ph.getPreferredSize();
+    s = ph.getPreferredSize();
     s.width = 80;
     mw.setPreferredSize(s);
     mh.setPreferredSize(s);
@@ -397,7 +397,15 @@ public final class MachineConfiguration<P extends Preferences> {
             if( mwf<=0 ) data_is_sane=false;
             if( mhf<=0 ) data_is_sane=false;
 
+            double bld = Double.valueOf(mBobbin1.getText()) / 10.0;
+            double brd = Double.valueOf(mBobbin2.getText()) / 10.0;
+
+            if (bld <= 0) data_is_sane = false;
+            if (brd <= 0) data_is_sane = false;
+
           if (data_is_sane) {
+        	  bobbin_left_diameter = bld;
+        	  bobbin_right_diameter = brd;
             //startingPositionIndex = startPos.getSelectedIndex();
             /*// relative to machine limits
             switch(startingPositionIndex%3) {
@@ -483,9 +491,6 @@ public final class MachineConfiguration<P extends Preferences> {
                 limit_bottom = -(mhf - phf) / 2.0f;
                 break;
             }
-
-            //m1invert = m1i.isSelected();
-            //m2invert = m2i.isSelected();
 
             saveConfig();
             mainGUI.sendConfig();
@@ -595,84 +600,6 @@ public final class MachineConfiguration<P extends Preferences> {
 
   public DrawingTool getCurrentTool() {
     return getTool(current_tool);
-  }
-
-
-  /**
-   * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-   */
-  public void adjustPulleySize() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("AdjustPulleySize"), true);
-    driver.setLayout(new GridBagLayout());
-
-    final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter * 10));
-    final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter * 10));
-
-    final JButton cancel = new JButton(translator.get("Cancel"));
-    final JButton save = new JButton(translator.get("Save"));
-
-    GridBagConstraints c = new GridBagConstraints();
-    c.weightx = 50;
-    c.gridx = 0;
-    c.gridy = 1;
-    driver.add(new JLabel(translator.get("Left")), c);
-    c.gridx = 0;
-    c.gridy = 2;
-    driver.add(new JLabel(translator.get("Right")), c);
-    c.gridx = 1;
-    c.gridy = 0;
-    driver.add(new JLabel(translator.get("Diameter")), c);
-    c.gridx = 1;
-    c.gridy = 1;
-    driver.add(mBobbin1, c);
-    c.gridx = 1;
-    c.gridy = 2;
-    driver.add(mBobbin2, c);
-    c.gridx = 2;
-    c.gridy = 1;
-    driver.add(new JLabel(translator.get("Millimeters")), c);
-    c.gridx = 2;
-    c.gridy = 2;
-    driver.add(new JLabel(translator.get("Millimeters")), c);
-    c.gridx = 0;
-    c.gridy = 3;
-    driver.add(save, c);
-    c.gridx = 1;
-    c.gridy = 3;
-    driver.add(cancel, c);
-
-    Dimension s = mBobbin1.getPreferredSize();
-    s.width = 80;
-    mBobbin1.setPreferredSize(s);
-    mBobbin2.setPreferredSize(s);
-
-    ActionListener driveButtons = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Object subject = e.getSource();
-        if (subject == save) {
-          bobbin_left_diameter = Double.valueOf(mBobbin1.getText()) / 10.0;
-          bobbin_right_diameter = Double.valueOf(mBobbin2.getText()) / 10.0;
-          boolean data_is_sane = true;
-          if (bobbin_left_diameter <= 0) data_is_sane = false;
-          if (bobbin_right_diameter <= 0) data_is_sane = false;
-          if (data_is_sane) {
-            saveConfig();
-            mainGUI.sendConfig();
-            driver.dispose();
-          }
-        }
-        if (subject == cancel) {
-          driver.dispose();
-        }
-      }
-    };
-
-    save.addActionListener(driveButtons);
-    cancel.addActionListener(driveButtons);
-    driver.getRootPane().setDefaultButton(save);
-
-    driver.pack();
-    driver.setVisible(true);
   }
 
 

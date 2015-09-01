@@ -39,22 +39,22 @@
 	<string>
 		<key>PaperWidth</key>
 		<value>Paper width</value>
-		<hint>adjust machine settings</hint>
+		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>PaperHeight</key>
 		<value>Paper height</value>
-		<hint>adjust machine settings</hint>
+		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>InvertLeft</key>
 		<value>Invert left</value>
-		<hint>adjust machine settings</hint>
+		<hint>jog motor control panel</hint>
 	</string>
 	<string>
 		<key>InvertRight</key>
 		<value>Invert right</value>
-		<hint>adjust machine settings</hint>
+		<hint>jog motor control panel</hint>
 	</string>
 	<string>
 		<key>ToolType</key>
@@ -62,9 +62,14 @@
 		<hint>tool settings</hint>
 	</string>
 	<string>
+		<key>PaperSize</key>
+		<value>Paper Size</value>
+		<hint>machine size control panel</hint>
+	</string>
+	<string>
 		<key>AdjustPulleySize</key>
-		<value>Adjust pulley size</value>
-		<hint>Adjust pulleys</hint>
+		<value>Adjust pulley diameter</value>
+		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>Left</key>
@@ -75,11 +80,6 @@
 		<key>Right</key>
 		<value>Right</value>
 		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Diameter</key>
-		<value>Diameter</value>
-		<hint>Adjust pulleys</hint>
 	</string>
 	<string>
 		<key>Millimeters</key>
@@ -325,43 +325,43 @@
 
 	<string>
 		<key>SetHome</key>
-		<value>SET HOME</value>
+		<value>Set home</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>GoHome</key>
-		<value>GO HOME</value>
+		<value>Go home</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
 		<key>Top</key>
-		<value>TOP</value>
+		<value>Top</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Bottom</key>
-		<value>BOTTOM</value>
+		<value>Bottom</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Left</key>
-		<value>LEFT</value>
+		<value>Left</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
-		<value>RIGHT</value>
+		<value>Right</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenUp</key>
-		<value>PEN UP</value>
+		<value>Pen up</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenDown</key>
-		<value>PEN DOWN</value>
+		<value>Pen down</value>
 		<hint>manual driving dialog</hint>
 	</string>
 

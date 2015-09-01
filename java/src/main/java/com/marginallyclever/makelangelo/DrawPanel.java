@@ -7,7 +7,6 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.marginallyclever.drawingtools.DrawingTool;
 
 import javax.swing.event.MouseInputListener;
-import java.awt.*;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -560,9 +559,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
         DrawPanelNode n = nodes.next();
 
         if (running) {
-          if (n.line_number <= linesProcessed) {
+          if (n.line_number < linesProcessed) {
             gl2.glColor3f(1, 0, 0);
             //g2d.setColor(Color.RED);
+	      	  if(n.type==NodeType.POS) {
+	    		  gondola_x=n.x1;
+	    		  gondola_y=n.y1;
+	    	  }
           } else if (n.line_number <= linesProcessed + look_ahead) {
             gl2.glColor3f(0, 1, 0);
             //g2d.setColor(Color.GREEN);
