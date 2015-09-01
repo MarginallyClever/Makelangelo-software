@@ -148,19 +148,9 @@
 	</string>
 
 	<string>
-		<key>Cancel</key>
-		<value>Cancel</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
 		<key>Start</key>
 		<value>Start</value>
 		<hint>As in "start drawing"</hint>
-	</string>
-	<string>
-		<key>Save</key>
-		<value>Save</value>
-		<hint>used in many places</hint>
 	</string>
 
 	<string>
@@ -279,6 +269,11 @@
 		<hint>graphics settings dialog</hint>
 	</string>
 
+	<string>
+		<key>MenuResetMachinePreferences</key>
+		<value>Reset Preferences</value>
+		<hint>Preferences menu</value>
+	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
 		<value>Language</value>

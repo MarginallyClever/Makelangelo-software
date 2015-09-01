@@ -1081,8 +1081,9 @@ public final class MainGUI<P extends Preferences>
     buttonAdjustSounds = initializeSubMenuButton(preferencesSubMenu, "MenuSoundsTitle");
     buttonAdjustGraphics = initializeSubMenuButton(preferencesSubMenu, "MenuGraphicsTitle");
     buttonAdjustLanguage = initializeSubMenuButton(preferencesSubMenu, "MenuLanguageTitle");
-    buttonExportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuExportMachinePreferences");
-    buttonImportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuImportMachinePreferences");
+    preferencesSubMenu.add(new JSeparator());
+    buttonExportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "Save");
+    buttonImportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "Load");
     buttonResetMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuResetMachinePreferences");
 
     return preferencesSubMenu;

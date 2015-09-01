@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -46,6 +47,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -93,7 +96,7 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
  */
 public class PrepareImagePanel<P extends Preferences>
 extends JScrollPane
-implements ActionListener {
+implements ActionListener, ChangeListener {
   /**
    *
    */
@@ -184,6 +187,7 @@ implements ActionListener {
     p.add(marginPanel);
     marginPanel.add(new JLabel(translator.get("PaperMargin")));
     marginPanel.add(input_paper_margin);
+    input_paper_margin.addChangeListener(this);
 
     // File conversion menu
     buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
@@ -203,6 +207,18 @@ implements ActionListener {
     p.add(buttonSaveFile);
   }
 
+  
+  public void stateChanged(ChangeEvent e) {
+	e.getSource();
+    double pm=(100 - input_paper_margin.getValue()) * 0.01;
+    if( machineConfiguration.paperMargin != pm ) {
+    	machineConfiguration.paperMargin = pm;
+    	machineConfiguration.saveConfig();
+    	gui.getDrawPanel().repaint();
+    }
+  }
+  
+  
   // The user has done something.  respond to it.
   public void actionPerformed(ActionEvent e) {
     Object subject = e.getSource();
@@ -210,7 +226,6 @@ implements ActionListener {
     final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
     long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
     machineConfiguration.loadConfig(new_uid);
-    machineConfiguration.paperMargin = (100 - input_paper_margin.getValue()) * 0.01;
 
     if (subject == buttonOpenFile) {
       openFileDialog();

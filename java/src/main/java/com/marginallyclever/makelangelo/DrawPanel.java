@@ -384,9 +384,21 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
       gl2.glVertex2d(machine.paper_right, machine.paper_top);
       gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
       gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
-            gl2.glEnd();
-        }
+      gl2.glEnd();
     }
+    // margin settings
+    gl2.glPushMatrix();
+    gl2.glColor3f(0.9f,0.9f,0.9f);
+    gl2.glLineWidth(1);
+    gl2.glScaled(machine.paperMargin,machine.paperMargin,1);
+    gl2.glBegin(GL2.GL_LINE_LOOP);
+    gl2.glVertex2d(machine.paper_left, machine.paper_top);
+    gl2.glVertex2d(machine.paper_right, machine.paper_top);
+    gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
+    gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+    gl2.glEnd();
+    gl2.glPopMatrix();
+  }
 
   
     /**
