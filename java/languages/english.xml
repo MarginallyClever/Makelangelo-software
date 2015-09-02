@@ -272,7 +272,7 @@
 	<string>
 		<key>MenuResetMachinePreferences</key>
 		<value>Reset Preferences</value>
-		<hint>Preferences menu</value>
+		<hint>Preferences menu</hint>
 	</string>
 	<string>
 		<key>MenuLanguageTitle</key>

@@ -33,7 +33,7 @@ implements ActionListener {
   private static final long serialVersionUID = 1L;
 
   // settings pane
-  private JButton buttonAdjustMachineSize, buttonAdjustPulleySize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
+  private JButton buttonAdjustMachineSize, buttonJogMotors, buttonChangeTool, buttonAdjustTool;
 
   protected MultilingualSupport translator;
   protected MachineConfiguration machineConfiguration;
@@ -147,7 +147,6 @@ implements ActionListener {
 
   public void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
     buttonAdjustMachineSize.setEnabled(!isRunning);
-    buttonAdjustPulleySize.setEnabled(!isRunning);
     buttonJogMotors.setEnabled(isConfirmed && !isRunning);
     buttonChangeTool.setEnabled(!isRunning);
     buttonAdjustTool.setEnabled(!isRunning);
