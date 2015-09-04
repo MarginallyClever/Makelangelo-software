@@ -44,7 +44,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
@@ -114,8 +116,13 @@ implements ActionListener, ChangeListener {
   private JSlider input_paper_margin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
+  protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
+  
   @SuppressWarnings("deprecation")
   private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+
+  // to make sure pen isn't on the paper while the machine is paused
+  private boolean penIsUp, penIsUpBeforePause;
 
   /**
    * @see org.slf4j.Logger
@@ -127,6 +134,14 @@ implements ActionListener, ChangeListener {
    */
   private List<Filter> image_converters;
 
+  public void raisePen() {
+    penIsUp = true;
+  }
+
+  public void lowerPen() {
+    penIsUp = false;
+  }
+  
   // TODO use a ServiceLoader and find generator plugins in nearby folders
   protected void loadImageConverters() {
     image_converters = new ArrayList<Filter>();
@@ -205,6 +220,25 @@ implements ActionListener, ChangeListener {
     buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
     buttonSaveFile.addActionListener(this);
     p.add(buttonSaveFile);
+    
+    p.add(new JSeparator());
+    
+    JPanel drivePanel = new JPanel(new GridLayout(1,0));
+    p.add(drivePanel);
+    // Draw menu
+    buttonStart = new JButton(translator.get("Start"));
+    buttonStartAt = new JButton(translator.get("StartAtLine"));
+    buttonPause = new JButton(translator.get("Pause"));
+    buttonHalt = new JButton(translator.get("Halt"));
+    drivePanel.add(buttonStart);
+    drivePanel.add(buttonStartAt);
+    drivePanel.add(buttonPause);
+    drivePanel.add(buttonHalt);
+    buttonStart.addActionListener(this);
+    buttonStartAt.addActionListener(this);
+    buttonPause.addActionListener(this);
+    buttonHalt.addActionListener(this);
+
   }
 
   
@@ -244,11 +278,85 @@ implements ActionListener, ChangeListener {
       saveFileDialog();
       return;
     }
+    
+
+    if (gui.isFileLoaded() && !gui.isRunning()) {
+      if (subject == buttonStart) {
+        gui.startAt(0);
+        return;
+      }
+      if (subject == buttonStartAt) {
+        Long lineNumber = getStartingLineNumber();
+        if (lineNumber != -1) {
+          gui.startAt(lineNumber);
+        }
+        return;
+      }
+      if (subject == buttonPause) {
+        if (gui.isPaused() == true) {
+          if (!penIsUpBeforePause) {
+            gui.lowerPen();
+          }
+          buttonPause.setText(translator.get("Pause"));
+          gui.unPause();
+          // TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
+          gui.sendFileCommand();
+        } else {
+          penIsUpBeforePause = penIsUp;
+          gui.raisePen();
+          buttonPause.setText(translator.get("Unpause"));
+          gui.pause();
+        }
+        return;
+      }
+      if (subject == buttonHalt) {
+        gui.halt();
+        return;
+      }
+    }
   }
 
-  void updateButtonAccess(boolean isRunning) {
+
+  /**
+   * open a dialog to ask for the line number.
+   *
+   * @return <code>lineNumber</code> greater than or equal to zero if user hit ok.
+   */
+  private long getStartingLineNumber() {
+    final JPanel panel = new JPanel(new GridBagLayout());
+    final JTextField starting_line = new JTextField("0", 8);
+    GridBagConstraints c = new GridBagConstraints();
+    c.gridwidth = 2;
+    c.gridx = 0;
+    c.gridy = 0;
+    panel.add(new JLabel(translator.get("StartAtLine")), c);
+    c.gridwidth = 2;
+    c.gridx = 2;
+    c.gridy = 0;
+    panel.add(starting_line, c);
+
+    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.OK_OPTION) {
+      long lineNumber;
+      try {
+        lineNumber = Long.decode(starting_line.getText());
+      } catch (Exception e) {
+        lineNumber = -1;
+      }
+
+      return lineNumber;
+    }
+    return -1;
+  }
+
+  void updateButtonAccess(boolean isConnected,boolean isRunning) {
     if (buttonHilbertCurve != null) buttonHilbertCurve.setEnabled(!isRunning);
     if (buttonText2GCODE != null) buttonText2GCODE.setEnabled(!isRunning);
+
+    buttonStart.setEnabled(isConnected && !isRunning);
+    buttonStartAt.setEnabled(isConnected && !isRunning);
+    buttonPause.setEnabled(isConnected && isRunning);
+    buttonHalt.setEnabled(isConnected && isRunning);
   }
 
   // creates a file open dialog. If you don't cancel it opens that file.

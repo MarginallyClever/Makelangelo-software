@@ -178,12 +178,12 @@ public final class MainGUI<P extends Preferences>
 
   public void raisePen() {
     sendLineToRobot("G00 Z" + machineConfiguration.getPenUpString());
-    driveControls.raisePen();
+    prepareImage.raisePen();
   }
 
   public void lowerPen() {
     sendLineToRobot("G00 Z" + machineConfiguration.getPenDownString());
-    driveControls.lowerPen();
+    prepareImage.lowerPen();
   }
 
   public boolean isRunning() {
@@ -551,10 +551,10 @@ public final class MainGUI<P extends Preferences>
 
       // catch pen up/down status here
       if (line.contains("Z" + machineConfiguration.getPenUpString())) {
-        driveControls.raisePen();
+        prepareImage.raisePen();
       }
       if (line.contains("Z" + machineConfiguration.getPenDownString())) {
-        driveControls.lowerPen();
+        prepareImage.lowerPen();
       }
 
 
@@ -987,7 +987,7 @@ public final class MainGUI<P extends Preferences>
       settingsPane.updateButtonAccess(isConfirmed, isRunning);
     }
     if (prepareImage != null) {
-      prepareImage.updateButtonAccess(isRunning);
+      prepareImage.updateButtonAccess(isConfirmed, isRunning);
     }
     if (driveControls != null) {
       driveControls.updateButtonAccess(isConfirmed, isRunning);
@@ -1122,7 +1122,7 @@ public final class MainGUI<P extends Preferences>
 
     prepareImage = new PrepareImagePanel();
     prepareImage.createPanel(this, translator, machineConfiguration);
-    prepareImage.updateButtonAccess(false);
+    prepareImage.updateButtonAccess(false, false);
 
     driveControls = new MakelangeloDriveControls();
     driveControls.createPanel(this, translator, machineConfiguration);

@@ -1,21 +1,25 @@
 package com.marginallyclever.makelangelo;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.text.NumberFormat;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import java.awt.event.MouseListener;
 
 /**
  * The GUI for the live driving controls, the start/pause/stop buttons, and the "send gcode" dialog.
@@ -25,11 +29,10 @@ import javax.swing.SwingConstants;
  */
 public class MakelangeloDriveControls
   extends JScrollPane
-  implements ActionListener, KeyListener {
+  implements ActionListener, KeyListener, MouseListener, MouseMotionListener {
   protected JButton down100,down10,down1,up1,up10,up100;
   protected JButton left100,left10,left1,right1,right10,right100;
   protected JButton home,center;
-  protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
   protected JButton goTop,goBottom,goLeft,goRight,goUp,goDown;
 
   JFormattedTextField feedRate;
@@ -40,13 +43,15 @@ public class MakelangeloDriveControls
   private JTextField commandLineText;
   private JButton commandLineSend;
   private JButton disengageMotors;
-
-  // to make sure pen isn't on the paper while the machine is paused
-  private boolean penIsUp, penIsUpBeforePause;
-
+  private JPanel dragAndDrive;
+  private JLabel coordinates;
+  
   protected MultilingualSupport translator;
   protected MachineConfiguration machineConfiguration;
   protected MainGUI gui;
+
+  private boolean mouseInside,mouseOn;
+  double last_x,last_y;
 
   /**
    *
@@ -54,22 +59,20 @@ public class MakelangeloDriveControls
   private static final long serialVersionUID = 1L;
 
   public MakelangeloDriveControls() {
+	  mouseInside=false;
+	  mouseOn=false;
+	  last_x=last_y=0;
   }
 
-
-  public void raisePen() {
-    penIsUp = true;
-  }
-
-  public void lowerPen() {
-    penIsUp = false;
+  public void updateButtonAccess(boolean isConnected,boolean isRunning) {
+	  
   }
   
-  public void updateButtonAccess(boolean isConnected,boolean isRunning) {
-    buttonStart.setEnabled(isConnected && !isRunning);
-    buttonStartAt.setEnabled(isConnected && !isRunning);
-    buttonPause.setEnabled(isConnected && isRunning);
-    buttonHalt.setEnabled(isConnected && isRunning);
+  public JButton tightJButton(String label) {
+	  JButton b = new JButton(label);
+	  b.setMargin(new Insets(0,0,0,0));
+	  b.setPreferredSize(new Dimension(60,20));
+	  return b;
   }
 
   public void createPanel(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
@@ -79,41 +82,26 @@ public class MakelangeloDriveControls
     
     GridBagConstraints c = new GridBagConstraints();
 
-
-    // Draw menu
-    JPanel go = new JPanel(new GridBagLayout());
-    buttonStart = new JButton(translator.get("Start"));
-    go.add(buttonStart);
-    buttonStartAt = new JButton(translator.get("StartAtLine"));
-    go.add(buttonStartAt);
-    buttonPause = new JButton(translator.get("Pause"));
-    go.add(buttonPause);
-    buttonHalt = new JButton(translator.get("Halt"));
-    go.add(buttonHalt);
-    buttonStart.addActionListener(this);
-    buttonStartAt.addActionListener(this);
-    buttonPause.addActionListener(this);
-    buttonHalt.addActionListener(this);
-
-
     JPanel axisControl = new JPanel(new GridBagLayout());
-      final JLabel yAxis = new JLabel("Y");     yAxis.setPreferredSize(new Dimension(60,20));     yAxis.setHorizontalAlignment(SwingConstants.CENTER);
-      down100 = new JButton("-100");  down100.setPreferredSize(new Dimension(60,20));
-      down10 = new JButton("-10");    down10.setPreferredSize(new Dimension(60,20));
-      down1 = new JButton("-1");    down1.setPreferredSize(new Dimension(60,20));
-      up1 = new JButton("1");       up1.setPreferredSize(new Dimension(60,20));
-      up10 = new JButton("10");     up10.setPreferredSize(new Dimension(60,20));
-      up100 = new JButton("100");     up100.setPreferredSize(new Dimension(60,20));
+    int w=60, h=20;
+      final JLabel yAxis = new JLabel("Y");     yAxis.setPreferredSize(new Dimension(w,h));     yAxis.setHorizontalAlignment(SwingConstants.CENTER);
+      down100 = tightJButton("-100");
+      down10 = tightJButton("-10");
+      down1 = tightJButton("-1");
+      up1 = tightJButton("1");
+      up10 = tightJButton("10");
+      up100 = tightJButton("100");
       
-      final JLabel xAxis = new JLabel("X");     xAxis.setPreferredSize(new Dimension(60,20));   xAxis.setHorizontalAlignment(SwingConstants.CENTER);
-      left100 = new JButton("-100");  left100.setPreferredSize(new Dimension(60,20));
-      left10 = new JButton("-10");    left10.setPreferredSize(new Dimension(60,20));
-      left1 = new JButton("-1");    left1.setPreferredSize(new Dimension(60,20)); 
-      right1 = new JButton("1");    right1.setPreferredSize(new Dimension(60,20));
-      right10 = new JButton("10");    right10.setPreferredSize(new Dimension(60,20));
-      right100 = new JButton("100");  right100.setPreferredSize(new Dimension(60,20));     
+      final JLabel xAxis = new JLabel("X");     xAxis.setPreferredSize(new Dimension(w,h));   xAxis.setHorizontalAlignment(SwingConstants.CENTER);
+      left100 = tightJButton("-100");
+      left10 = tightJButton("-10");
+      left1 = tightJButton("-1");
+      right1 = tightJButton("1");
+      right10 = tightJButton("10");
+      right100 = tightJButton("100");
+      center = tightJButton(translator.get("SetHome"));
 
-      //c.fill=GridBagConstraints.BOTH; 
+      c.fill=GridBagConstraints.BOTH; 
       c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
       c.gridx=4;  c.gridy=7;  axisControl.add(down100,c);
       c.gridx=4;  c.gridy=6;  axisControl.add(down10,c);
@@ -126,6 +114,7 @@ public class MakelangeloDriveControls
       c.gridx=1;  c.gridy=4;  axisControl.add(left100,c);
       c.gridx=2;  c.gridy=4;  axisControl.add(left10,c);
       c.gridx=3;  c.gridy=4;  axisControl.add(left1,c);
+      c.gridx=4;  c.gridy=4;  axisControl.add(center,c);
       c.gridx=5;  c.gridy=4;  axisControl.add(right1,c);
       c.gridx=6;  c.gridy=4;  axisControl.add(right10,c);
       c.gridx=7;  c.gridy=4;  axisControl.add(right100,c);
@@ -138,6 +127,7 @@ public class MakelangeloDriveControls
       left1.addActionListener(this);
       left10.addActionListener(this);
       left100.addActionListener(this);
+      center.addActionListener(this);
       right1.addActionListener(this);
       right10.addActionListener(this);
       right100.addActionListener(this);
@@ -151,19 +141,15 @@ public class MakelangeloDriveControls
       goRight = new JButton(translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
       goUp = new JButton(translator.get("PenUp"));      goUp.setPreferredSize(new Dimension(100,20));
       goDown = new JButton(translator.get("PenDown"));  goDown.setPreferredSize(new Dimension(100,20));
-      center = new JButton(translator.get("SetHome"));  center.setPreferredSize(new Dimension(100,20));
-      home = new JButton(translator.get("GoHome"));     home.setPreferredSize(new Dimension(100,20)); 
       //final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
-      c = new GridBagConstraints();
-      c.gridx=3;  c.gridy=0;  corners.add(goTop,c);
-      c.gridx=3;  c.gridy=1;  corners.add(goBottom,c);
-      c.gridx=4;  c.gridy=0;  corners.add(goLeft,c);
-      c.gridx=4;  c.gridy=1;  corners.add(goRight,c);
-      c.insets = new Insets(0,5,0,0);
+      home = new JButton(translator.get("GoHome"));     home.setPreferredSize(new Dimension(100,20)); 
+      c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
+      c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
+      c.gridx=1;  c.gridy=1;  corners.add(goLeft,c);
+      c.gridx=2;  c.gridy=1;  corners.add(home,c);
+      c.gridx=3;  c.gridy=1;  corners.add(goRight,c);
       c.gridx=5;  c.gridy=0;  corners.add(goUp,c);
-      c.gridx=5;  c.gridy=1;  corners.add(goDown,c);
-      c.gridx=6;  c.gridy=0;  corners.add(home,c);
-      c.gridx=6;  c.gridy=1;  corners.add(center,c);
+      c.gridx=5;  c.gridy=3;  corners.add(goDown,c);
       c.insets = new Insets(0,0,0,0);
       goTop.addActionListener(this);
       goBottom.addActionListener(this);
@@ -171,7 +157,6 @@ public class MakelangeloDriveControls
       goRight.addActionListener(this);
       goUp.addActionListener(this);
       goDown.addActionListener(this);
-      center.addActionListener(this);
       home.addActionListener(this);
     
       
@@ -189,23 +174,26 @@ public class MakelangeloDriveControls
       c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
       c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
     
-      
-    // assemble the components
-    //this.removeAll();
-      
-    JPanel p = new JPanel(new GridBagLayout());
-    this.setViewportView(p);
-	
-    p.setLayout(new GridLayout(0,1));
+    dragAndDrive = new JPanel(new GridBagLayout());
+    dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    dragAndDrive.addMouseListener(this);
+    dragAndDrive.addMouseMotionListener(this);
 
+    coordinates = new JLabel("click & drag");
+    c.anchor = GridBagConstraints.CENTER;
+    dragAndDrive.add(coordinates,c);
+      
+    JPanel p = new JPanel(new GridLayout(0,1));
+    this.setViewportView(p);
     c = new GridBagConstraints();
 
-    p.add(go,c);
+    
     //p.add(new JSeparator());
     c.gridheight=2;
     p.add(axisControl,c);
     c.gridheight=1;
-    p.add(corners,c);
+    //p.add(corners,c);
+    p.add(dragAndDrive,c);
     c.gridheight=1;
     p.add(feedRateControl,c);
     //p.add(new JSeparator());
@@ -214,6 +202,56 @@ public class MakelangeloDriveControls
     setFeedRate.addActionListener(this);
     disengageMotors.addActionListener(this);
   }
+  
+  public void mouseClicked(MouseEvent e) {}
+  public void mouseDragged(MouseEvent e) {
+	  mouseAction(e);
+  }
+  public void mouseEntered(MouseEvent e) {
+	  mouseInside=true;
+  }
+  public void mouseExited(MouseEvent e) {
+	  mouseInside=false;
+	  mouseOn=false;
+  }
+  public void mouseMoved(MouseEvent e) {
+	  mouseAction(e);
+  }
+  public void mousePressed(MouseEvent e) {
+	  mouseOn=true;
+	  mouseAction(e);
+  }
+  public void mouseReleased(MouseEvent e) {
+	  mouseOn=false;
+  }
+  public void mouseWheelMoved(MouseEvent e) {}
+  
+  public void mouseAction(MouseEvent e) {
+	  if(mouseInside && mouseOn) {
+		  double x = (double)e.getX();
+		  double y = (double)e.getY();
+		  Dimension d = dragAndDrive.getSize();
+		  double w = d.getWidth();
+		  double h = d.getHeight();
+		  double cx = w/2.0;
+		  double cy = h/2.0;
+		  x = x - cx;
+		  y = cy - y;
+		  x *= 10 * ((machineConfiguration.paper_right-machineConfiguration.paper_left)/2.0) / (w/2.0);
+		  y *= 10 * ((machineConfiguration.paper_top-machineConfiguration.paper_bottom)/2.0) / (h/2.0);
+		  double dx = x-last_x;
+		  double dy = y-last_y;
+		  if(Math.sqrt(dx*dx+dy*dy)>=1) {
+			  last_x=x;
+			  last_y=y;
+			  String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
+			  gui.sendLineToRobot("G00 "+text);
+			  coordinates.setText(text);
+		  } else {
+			  coordinates.setText("");
+		  }
+	  }
+  }
 
 
   public void actionPerformed(ActionEvent e) {
@@ -221,20 +259,6 @@ public class MakelangeloDriveControls
     JButton b = (JButton) subject;
 
 
-    if (gui.isFileLoaded() && !gui.isRunning()) {
-      if (subject == buttonStart) {
-        gui.startAt(0);
-        return;
-      }
-      if (subject == buttonStartAt) {
-        Long lineNumber = getStartingLineNumber();
-        if (lineNumber != -1) {
-          gui.startAt(lineNumber);
-        }
-        return;
-
-      }
-    }
 
     if (subject == commandLineSend) {
       gui.sendLineToRobot(commandLineText.getText());
@@ -242,28 +266,6 @@ public class MakelangeloDriveControls
     }
 
     //if(gui.isRunning()) return;
-
-    if (subject == buttonPause) {
-      if (gui.isPaused() == true) {
-        if (!penIsUpBeforePause) {
-          gui.lowerPen();
-        }
-        buttonPause.setText(translator.get("Pause"));
-        gui.unPause();
-        // TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang.
-        gui.sendFileCommand();
-      } else {
-        penIsUpBeforePause = penIsUp;
-        gui.raisePen();
-        buttonPause.setText(translator.get("Unpause"));
-        gui.pause();
-      }
-      return;
-    }
-    if (subject == buttonHalt) {
-      gui.halt();
-      return;
-    }
 
     if (b == home) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
     else if (b == center) gui.sendLineToRobot("G92 X0 Y0");
@@ -348,38 +350,5 @@ public class MakelangeloDriveControls
       gui.processLine(commandLineText.getText());
       commandLineText.setText("");
     }
-  }
-
-
-  /**
-   * open a dialog to ask for the line number.
-   *
-   * @return <code>lineNumber</code> greater than or equal to zero if user hit ok.
-   */
-  private long getStartingLineNumber() {
-    final JPanel panel = new JPanel(new GridBagLayout());
-    final JTextField starting_line = new JTextField("0", 8);
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridwidth = 2;
-    c.gridx = 0;
-    c.gridy = 0;
-    panel.add(new JLabel(translator.get("StartAtLine")), c);
-    c.gridwidth = 2;
-    c.gridx = 2;
-    c.gridy = 0;
-    panel.add(starting_line, c);
-
-    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-    if (result == JOptionPane.OK_OPTION) {
-      long lineNumber;
-      try {
-        lineNumber = Long.decode(starting_line.getText());
-      } catch (Exception e) {
-        lineNumber = -1;
-      }
-
-      return lineNumber;
-    }
-    return -1;
   }
 }
