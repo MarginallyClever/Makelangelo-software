@@ -126,17 +126,16 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell centers
     gl2.glPointSize(3);
     gl2.glColor3f(0, 0, 0);
-    float most=0;
-    for (int i = 0; i < cells.length; ++i) {
-        if(most<cells[i].weight) most=cells[i].weight;
-    }
     for (int i = 0; i < cells.length; ++i) {
       VoronoiCell c = cells[i];
-      float r = ((c.weight/most)*MAX_DOT_SIZE) / scale;
+      float x = c.centroid.x;
+      float y = c.centroid.y;
+      float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
+      float r = (val*MAX_DOT_SIZE) / scale;
       gl2.glBegin(GL2.GL_TRIANGLE_FAN);
       for(float j=0;j<Math.PI*2;j+=(Math.PI/4)) {
-    	  gl2.glVertex2d(TX((float)(c.centroid.x+Math.cos(j)*r)), 
-    			  		 TY((float)(c.centroid.y+Math.sin(j)*r)));
+    	  gl2.glVertex2d(TX((float)(x+Math.cos(j)*r)), 
+    			  		 TY((float)(y+Math.sin(j)*r)));
       }
       gl2.glEnd();
     }
@@ -203,7 +202,6 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       mainGUI.log("<font color='green'>Mutating</font>\n");
 
       int generation = 0;
-      float change = 0;
       do {
         generation++;
         mainGUI.log("<font color='green'>Generation " + generation + "</font>\n");
@@ -211,12 +209,12 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         lock.lock();
         tessellateVoronoiDiagram();
         lock.unlock();
-        change = adjustCentroids();
+        adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
 
         // Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-      } while (change >= 1 && generation < MAX_GENERATIONS);
+      } while (generation < MAX_GENERATIONS);
 
       mainGUI.log("<font color='green'>Last " + generation + "</font>\n");
     } catch (Exception e) {
@@ -245,23 +243,18 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
         int i;
 
-        float most = cells[0].weight;
-        for (i = 1; i < cells.length; ++i) {
-          if (most < cells[i].weight) most = cells[i].weight;
-        }
-
-        float modifier = MAX_DOT_SIZE / most;
         for (i = 0; i < cells.length; ++i) {
-          float r = cells[i].weight * modifier;
-          if (r < MIN_DOT_SIZE) continue;
-          r /= scale;
           float x = cells[i].centroid.x;
           float y = cells[i].centroid.y;
+          float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
+          float r = val * MAX_DOT_SIZE;
+          if (r < MIN_DOT_SIZE) continue;
+          r /= scale;
 
           // filled circles
           this.moveTo(out, x + (float) Math.cos(0) * r, y + (float) Math.cos(0) * r, true);
           while (r > d) {
-            float detail = (float) (0.5 * Math.PI * r / d);
+            float detail = (float) (1.0 * Math.PI * r / d);
             if (detail < 4) detail = 4;
             if (detail > 20) detail = 20;
             for (float j = 1; j <= detail; ++j) {
@@ -387,7 +380,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   }
 
 
-  protected boolean insideBorder(int x, int y) {
+  protected boolean insideBorder(double x, double y) {
     double dx, dy;
     int i;
     Iterator<VoronoiCellEdge> ice = cellBorder.iterator();
@@ -408,18 +401,20 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   // find the weighted center of each cell.
   // weight is based on the intensity of the color of each pixel inside the cell
   // the center of the pixel must be inside the cell to be counted.
-  protected float adjustCentroids() {
-    int i, x, y;
-    float change = 0;
-    float weight, wx, wy;
-    int step = (int) Math.ceil(tool.getDiameter() / (1.0 * scale));
+  protected void adjustCentroids() {
+    int i;
+    double weight, wx, wy, x, y;
+    //int step = (int) Math.ceil(tool.getDiameter() / (1.0 * scale));
+    double stepSize = 2.0;
 
     for (i = 0; i < cells.length; ++i) {
       generateBounds(i);
-      int sx = (int) Math.floor(bound_min.x);
-      int sy = (int) Math.floor(bound_min.y);
-      int ex = (int) Math.floor(bound_max.x);
-      int ey = (int) Math.floor(bound_max.y);
+      double sx = Math.floor(bound_min.x);
+      double sy = Math.floor(bound_min.y);
+      double ex = Math.floor(bound_max.x);
+      double ey = Math.floor(bound_max.y);
+      
+
       //System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+", "+ey);
       //System.out.println("centroid "+cells[i].centroid.x+", "+cells[i].centroid.y);
 
@@ -427,10 +422,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       wx = 0;
       wy = 0;
 
-      for (y = sy; y <= ey; y += step) {
-        for (x = sx; x <= ex; x += step) {
+      for (y = sy; y <= ey; y += stepSize) {
+        for (x = sx; x <= ex; x += stepSize) {
           if (insideBorder(x, y)) {
-            float val = (float) sample1x1(src_img, x, y) / 255.0f;
+            float val = (float) sample1x1(src_img, (int)x, (int)y) / 255.0f;
             val = 1.0f - val;
             weight += val;
             wx += x * val;
@@ -441,27 +436,17 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       if (weight > 0) {
         wx /= weight;
         wy /= weight;
-
-        cells[i].weight = weight;
-
-        // make sure centroid can't leave image bounds
-        if (wx < 0) wx = 0;
-        if (wy < 0) wy = 0;
-        if (wx >= w) wx = w - 1;
-        if (wy >= h) wy = h - 1;
-
-        float dx = wx - cells[i].centroid.x;
-        float dy = wy - cells[i].centroid.y;
-
-        change += dx * dx + dy * dy;
-        //change = (float)Math.sqrt(change);
-
-        // use the new center
-        cells[i].centroid.set(wx, wy);
       }
-    }
 
-    return change;
+	  // make sure centroid can't leave image bounds
+      if (wx < 0) wx = 0;
+      if (wy < 0) wy = 0;
+      if (wx >= w) wx = w - 1;
+      if (wy >= h) wy = h - 1;
+	
+      // use the new center
+      cells[i].centroid.set((float)wx, (float)wy);
+    }
   }
 }
 

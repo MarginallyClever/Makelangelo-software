@@ -41,8 +41,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   private List<VoronoiGraphEdge> graphEdges = null;
   private int MAX_GENERATIONS=200;
   private int MAX_CELLS=3000;
-  private float CUTOFF=0.125f;
-  private float CUTOFF_TELEPORT=1.0f;
+  private float CUTOFF=1.0f;
   private Point2D bound_min = new Point2D();
   private Point2D bound_max = new Point2D();
   private int numEdgesInCell;
@@ -132,15 +131,11 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 	    // draw cell centers
 	    gl2.glPointSize(3);   	  
 	    gl2.glBegin(GL2.GL_POINTS);
-	    
-        float most=cells[0].weight;
-        for(i=1;i<cells.length;++i) {
-          if(most<cells[i].weight) most=cells[i].weight;
-        }
-        
+	            
 	    for(i=0;i<cells.length;++i) {
 	      VoronoiCell c = cells[i];
-	      if(cells[i].weight/most <= CUTOFF) {
+	      float v = 1.0f - (float)sample1x1(src_img,(int)c.centroid.x,(int)c.centroid.y) / 255.0f;
+	      if(v*5 <= CUTOFF) {
 	    	    gl2.glColor3f(0.8f,0.8f,0.8f);	 
 	      } else {
 	    	    gl2.glColor3f(0,0,0);	 
@@ -314,13 +309,11 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
     int besti;
 
     
-    float most=cells[0].weight;
-    for(i=1;i<cells.length;++i) {
-      if(most<cells[i].weight) most=cells[i].weight;
-    }
     solution_contains=0;
     for(i=0;i<cells.length;++i) {
-    	if(cells[i].weight/most > CUTOFF ) solution_contains++;
+    	VoronoiCell c = cells[i];
+	    float v = 1.0f - (float)sample1x1(src_img,(int)c.centroid.x,(int)c.centroid.y) / 255.0f;
+    	if( v*5 > CUTOFF ) solution_contains++;
     }
     
     
@@ -330,7 +323,9 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 	    // put all the points in the solution in no particular order.
 	    j=0;
 	    for(i=0;i<cells.length;++i) {
-	    	if(cells[i].weight/most > CUTOFF ) {
+	    	VoronoiCell c = cells[i];
+		    float v = 1.0f - (float)sample1x1(src_img,(int)c.centroid.x,(int)c.centroid.y) / 255.0f;
+	    	if( v*5 > CUTOFF ) {
 	    		solution[j++]=i;
 	    	}
 	    }
@@ -433,7 +428,6 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
       mainGUI.log("<font color='green'>Mutating</font>\n");
   
       int generation=0;
-      float change=0;
       do {
         generation++;
         mainGUI.log("<font color='green'>Generation "+generation+"</font>\n");
@@ -441,12 +435,12 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         lock.lock();
         tessellateVoronoiDiagram();
         lock.unlock();
-        change = adjustCentroids();
+        adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
         
         // Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-      } while(change>=1 && generation<MAX_GENERATIONS);
+      } while(generation<MAX_GENERATIONS);
       
       mainGUI.log("<font color='green'>Last "+generation+"</font>\n");
     }
@@ -606,7 +600,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   }
 
 
-  protected boolean insideBorder(int x,int y) {
+  protected boolean insideBorder(float x,float y) {
     double dx,dy;
     int i;
     Iterator<VoronoiCellEdge> ice = cellBorder.iterator();
@@ -627,11 +621,10 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   // find the weighted center of each cell.
   // weight is based on the intensity of the color of each pixel inside the cell
   // the center of the pixel must be inside the cell to be counted.
-  protected float adjustCentroids() {
-    int i,x,y;
-    float change=0;
-    float weight,wx,wy;
-    float most=0;
+  protected void adjustCentroids() {
+    int i;
+    float weight,wx,wy,x,y;
+    float stepSize=2;
     
     for(i=0;i<cells.length;++i) {
       generateBounds(i);
@@ -646,10 +639,10 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
       wx=0;
       wy=0;
 
-      for(y = sy; y <= ey; y++) {
-        for(x = sx; x <= ex; x++) {
-          if(insideBorder(x, y)) {
-            float val = (float)sample1x1(src_img,x,y) / 255.0f;
+      for(y = sy; y <= ey; y+=stepSize) {
+        for(x = sx; x <= ex; x+=stepSize) {
+          if(insideBorder(x,y)) {
+            float val = (float)sample1x1(src_img,(int)x, (int)y) / 255.0f;
             val = 1.0f - val;
             weight += val;
             wx += x * val;
@@ -658,34 +651,20 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         }
       }
 
-      if( weight > CUTOFF_TELEPORT ) {
+      if( weight > 0.0f ) {
         wx /= weight;
         wy /= weight;
-
-        cells[i].weight = weight;
-
-        // make sure centroid can't leave image bounds
-        if(wx<0) wx=0;
-        if(wy<0) wy=0;
-        if(wx>=w) wx = w-1;
-        if(wy>=h) wy = h-1;
-
-        if(most < weight) most = weight;
-        
-        change++;
-        // use the new center
-        cells[i].centroid.set(wx, wy);
       }
+
+      // make sure centroid can't leave image bounds
+      if(wx<0) wx=0;
+      if(wy<0) wy=0;
+      if(wx>=w) wx = w-1;
+      if(wy>=h) wy = h-1;
+
+      // use the new center
+      cells[i].centroid.set(wx, wy);
     }
-    
-    for(i=0;i<cells.length;++i) {
-        VoronoiCell c = cells[i];
-        if(c.weight/most <= CUTOFF) {
-      	  // this cell is white, move it.
-      	  c.centroid.set((float)(Math.random()*w),(float)(Math.random()*h));
-        }
-    }
-    return change;
   }
 }
 
