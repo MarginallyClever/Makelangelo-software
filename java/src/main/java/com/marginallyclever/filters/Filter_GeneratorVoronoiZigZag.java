@@ -95,7 +95,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         tool = machine.getCurrentTool();
         imageSetupTransform(img);
   
-        cellBorder = new ArrayList<VoronoiCellEdge>();
+        cellBorder = new ArrayList<>();
         
         initializeCells(0.01);
       

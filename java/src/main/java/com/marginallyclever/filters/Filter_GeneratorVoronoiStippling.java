@@ -92,7 +92,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         tool = machine.getCurrentTool();
         imageSetupTransform(img);
   
-        cellBorder = new ArrayList<VoronoiCellEdge>();
+        cellBorder = new ArrayList<>();
         
         initializeCells(MIN_DOT_SIZE);
       

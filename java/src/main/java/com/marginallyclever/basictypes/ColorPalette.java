@@ -20,7 +20,7 @@ public class ColorPalette {
   private List<C3> colors;
 
   public ColorPalette() {
-    colors = new ArrayList<C3>();
+    colors = new ArrayList<>();
     //addColor(new C3(0,0,0));
     //addColor(new C3(255,255,255));
   }

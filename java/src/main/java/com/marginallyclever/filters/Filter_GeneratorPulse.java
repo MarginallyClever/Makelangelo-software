@@ -53,7 +53,7 @@ public class Filter_GeneratorPulse extends Filter {
     panel.add(field_size);
 
     String[] directions = {"horizontal", "vertical"};
-    final JComboBox<String> direction_choices = new JComboBox<String>(directions);
+    final JComboBox<String> direction_choices = new JComboBox<>(directions);
     panel.add(direction_choices);
 
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
