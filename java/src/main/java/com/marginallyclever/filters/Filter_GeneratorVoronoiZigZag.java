@@ -95,7 +95,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         tool = machine.getCurrentTool();
         imageSetupTransform(img);
   
-        cellBorder = new ArrayList<VoronoiCellEdge>();
+        cellBorder = new ArrayList<>();
         
         initializeCells(0.01);
       
@@ -119,12 +119,10 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 	    // draw cell edges
 	    gl2.glColor3f(0.9f,0.9f,0.9f);
 	    gl2.glBegin(GL2.GL_LINES);
-	    Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
-	    while(ig.hasNext()) {
-	      VoronoiGraphEdge e = ig.next();
-	      gl2.glVertex2d(TX((float)e.x1),TY((float)e.y1));
-	      gl2.glVertex2d(TX((float)e.x2),TY((float)e.y2));
-	    }
+      for (VoronoiGraphEdge e : graphEdges) {
+        gl2.glVertex2d(TX((float) e.x1), TY((float) e.y1));
+        gl2.glVertex2d(TX((float) e.x2), TY((float) e.y2));
+      }
 	    gl2.glEnd();
     }
     if( render_mode==0 ) {
@@ -535,57 +533,55 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
     double dx,dy,nx,ny,dot1;
 
     //long ta = System.nanoTime();
-    
-    Iterator<VoronoiGraphEdge> ige = graphEdges.iterator();
-    while(ige.hasNext()) {
-      VoronoiGraphEdge e = ige.next();
-      if(e.site1 != cellIndex && e.site2 != cellIndex ) continue;
-      if(numEdgesInCell==0) {
-        if(e.x1<e.x2) {
-          bound_min.x=(float)e.x1;
-          bound_max.x=(float)e.x2;
+
+    for (VoronoiGraphEdge e : graphEdges) {
+      if (e.site1 != cellIndex && e.site2 != cellIndex) continue;
+      if (numEdgesInCell == 0) {
+        if (e.x1 < e.x2) {
+          bound_min.x = (float) e.x1;
+          bound_max.x = (float) e.x2;
         } else {
-          bound_min.x=(float)e.x2;
-          bound_max.x=(float)e.x1;
+          bound_min.x = (float) e.x2;
+          bound_max.x = (float) e.x1;
         }
-        if(e.y1<e.y2) {
-          bound_min.y=(float)e.y1;
-          bound_max.y=(float)e.y2;
+        if (e.y1 < e.y2) {
+          bound_min.y = (float) e.y1;
+          bound_max.y = (float) e.y2;
         } else {
-          bound_min.y=(float)e.y2;
-          bound_max.y=(float)e.y1;
+          bound_min.y = (float) e.y2;
+          bound_max.y = (float) e.y1;
         }
       } else {
-        if(bound_min.x>e.x1) bound_min.x=(float)e.x1;
-        if(bound_min.x>e.x2) bound_min.x=(float)e.x2;
-        if(bound_max.x<e.x1) bound_max.x=(float)e.x1;
-        if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
+        if (bound_min.x > e.x1) bound_min.x = (float) e.x1;
+        if (bound_min.x > e.x2) bound_min.x = (float) e.x2;
+        if (bound_max.x < e.x1) bound_max.x = (float) e.x1;
+        if (bound_max.y < e.y2) bound_max.y = (float) e.y2;
 
-        if(bound_min.y>e.y1) bound_min.y=(float)e.y1;
-        if(bound_min.y>e.y2) bound_min.y=(float)e.y2;
-        if(bound_max.y<e.y1) bound_max.y=(float)e.y1;
-        if(bound_max.y<e.y2) bound_max.y=(float)e.y2;
+        if (bound_min.y > e.y1) bound_min.y = (float) e.y1;
+        if (bound_min.y > e.y2) bound_min.y = (float) e.y2;
+        if (bound_max.y < e.y1) bound_max.y = (float) e.y1;
+        if (bound_max.y < e.y2) bound_max.y = (float) e.y2;
       }
 
       // make a unnormalized vector along the edge of e
       dx = e.x2 - e.x1;
       dy = e.y2 - e.y1;
       // find a line orthogonal to dx/dy
-      nx=dy;
-      ny=-dx;
+      nx = dy;
+      ny = -dx;
       // dot product the centroid and the normal.
-      dx = cx-e.x1;
-      dy = cy-e.y1;
-      dot1=(dx*nx+dy*ny);
+      dx = cx - e.x1;
+      dy = cy - e.y1;
+      dot1 = (dx * nx + dy * ny);
 
-      if(cellBorder.size()==numEdgesInCell) {
+      if (cellBorder.size() == numEdgesInCell) {
         cellBorder.add(new VoronoiCellEdge());
       }
 
-      VoronoiCellEdge ce=cellBorder.get(numEdgesInCell++);
+      VoronoiCellEdge ce = cellBorder.get(numEdgesInCell++);
       ce.px = e.x1;
       ce.py = e.y1;
-      if(dot1<0) {
+      if (dot1 < 0) {
         ce.nx = -nx;
         ce.ny = -ny;
       } else {
