@@ -273,9 +273,7 @@ public final class MainGUI<P extends Preferences>
       int over_length = doc.getLength() - msg.length() - 5000;
       doc.remove(0, over_length);
       //logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-    } catch (BadLocationException e) {
-      logger.error("{}", e);
-    } catch (IOException e) {
+    } catch (BadLocationException | IOException e) {
       logger.error("{}", e);
     }
   }
@@ -285,10 +283,8 @@ public final class MainGUI<P extends Preferences>
       doc.replace(0, doc.getLength(), "", null);
       kit.insertHTML(doc, 0, "", 0, 0, null);
       //logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-    } catch (BadLocationException e) {
+    } catch (BadLocationException | IOException e) {
 
-    } catch (IOException e) {
-      // Do we care if it fails?
     }
   }
 
