@@ -115,9 +115,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell edges
     gl2.glColor3f(0.9f, 0.9f, 0.9f);
     gl2.glBegin(GL2.GL_LINES);
-    Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
-    while (ig.hasNext()) {
-      VoronoiGraphEdge e = ig.next();
+    for (VoronoiGraphEdge e : graphEdges) {
       gl2.glVertex2d(TX((float) e.x1), TY((float) e.y1));
       gl2.glVertex2d(TX((float) e.x2), TY((float) e.y2));
     }
@@ -315,9 +313,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
     //long ta = System.nanoTime();
 
-    Iterator<VoronoiGraphEdge> ige = graphEdges.iterator();
-    while (ige.hasNext()) {
-      VoronoiGraphEdge e = ige.next();
+    for (VoronoiGraphEdge e : graphEdges) {
       if (e.site1 != cellIndex && e.site2 != cellIndex) continue;
       if (numEdgesInCell == 0) {
         if (e.x1 < e.x2) {
