@@ -126,16 +126,15 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell centers
     gl2.glPointSize(3);
     gl2.glColor3f(0, 0, 0);
-    for (int i = 0; i < cells.length; ++i) {
-      VoronoiCell c = cells[i];
+    for (VoronoiCell c : cells) {
       float x = c.centroid.x;
       float y = c.centroid.y;
-      float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
-      float r = (val*MAX_DOT_SIZE) / scale;
+      float val = 1.0f - (sample1x1(src_img, (int) x, (int) y) / 255.0f);
+      float r = (val * MAX_DOT_SIZE) / scale;
       gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-      for(float j=0;j<Math.PI*2;j+=(Math.PI/4)) {
-    	  gl2.glVertex2d(TX((float)(x+Math.cos(j)*r)), 
-    			  		 TY((float)(y+Math.sin(j)*r)));
+      for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
+        gl2.glVertex2d(TX((float) (x + Math.cos(j) * r)),
+                TY((float) (y + Math.sin(j) * r)));
       }
       gl2.glEnd();
     }

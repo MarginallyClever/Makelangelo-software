@@ -571,8 +571,8 @@ public abstract class Filter {
         lines[j++] = test_lines[i];
       } else {
         String[] temp = test_lines[i].split("(?<=\\G.{" + chars_per_line + "})");
-        for (int k = 0; k < temp.length; ++k) {
-          lines[j++] = temp[k];
+        for (String aTemp : temp) {
+          lines[j++] = aTemp;
         }
       }
     }
@@ -582,8 +582,8 @@ public abstract class Filter {
 
   protected int textLongestLine(String[] lines) {
     int len = 0;
-    for (int i = 0; i < lines.length; ++i) {
-      if (len < lines[i].length()) len = lines[i].length();
+    for (String line : lines) {
+      if (len < line.length()) len = line.length();
     }
 
     return len;

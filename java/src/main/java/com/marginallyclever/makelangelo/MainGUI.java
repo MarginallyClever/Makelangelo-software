@@ -620,9 +620,9 @@ public final class MainGUI<P extends Preferences>
 
     // tool change?
     if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
-      for (int i = 0; i < tokens.length; ++i) {
-        if (tokens[i].startsWith("T")) {
-          changeToTool(tokens[i].substring(1));
+      for (String token : tokens) {
+        if (token.startsWith("T")) {
+          changeToTool(token.substring(1));
         }
       }
     }
