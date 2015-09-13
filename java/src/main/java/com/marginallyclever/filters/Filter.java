@@ -728,35 +728,39 @@ public abstract class Filter {
           while ((b = in.readLine()) != null) {
             if (b.trim().length() == 0)
               continue;
-            if (b.equals("UP")) {
-              output.write("G90;\n");
-              liftPen(output);
-              output.write("G91;\n");
-            } else if (b.equals("DOWN")) {
-              output.write("G90;\n");
-              lowerPen(output);
-              output.write("G91;\n");
-            } else {
-              StringTokenizer st = new StringTokenizer(b);
-              String gap = "";
-              while (st.hasMoreTokens()) {
-                String c = st.nextToken();
-                if (c.startsWith("G")) {
-                  output.write(gap + c);
-                } else if (c.startsWith("X")) {
-                  // translate coordinates
-                  final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-                  output.write(gap + "X" + SX(x));
-                } else if (c.startsWith("Y")) {
-                  // translate coordinates
-                  final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-                  output.write(gap + "Y" + SY(y));
-                } else {
-                  output.write(gap + c);
+            switch (b) {
+              case "UP":
+                output.write("G90;\n");
+                liftPen(output);
+                output.write("G91;\n");
+                break;
+              case "DOWN":
+                output.write("G90;\n");
+                lowerPen(output);
+                output.write("G91;\n");
+                break;
+              default:
+                StringTokenizer st = new StringTokenizer(b);
+                String gap = "";
+                while (st.hasMoreTokens()) {
+                  String c = st.nextToken();
+                  if (c.startsWith("G")) {
+                    output.write(gap + c);
+                  } else if (c.startsWith("X")) {
+                    // translate coordinates
+                    final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+                    output.write(gap + "X" + SX(x));
+                  } else if (c.startsWith("Y")) {
+                    // translate coordinates
+                    final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+                    output.write(gap + "Y" + SY(y));
+                  } else {
+                    output.write(gap + c);
+                  }
+                  gap = " ";
                 }
-                gap = " ";
-              }
-              output.write(";\n");
+                output.write(";\n");
+                break;
             }
           }
         }
