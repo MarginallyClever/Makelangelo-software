@@ -4,7 +4,7 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>v7.1.4-SNAPSHOT</version>
+  <version>v7.1.5-SNAPSHOT</version>
   <name>Makelangelo</name>
   <description>Wall-hanging polargraph robot that draws murals</description>
   <url>http://www.makelangelo.com/</url>
@@ -25,6 +25,7 @@
   <scm>
     <url>https://github.com/MarginallyClever/Makelangelo</url>
     <connection>scm:git:git@github.com:MarginallyClever/Makelangelo.git</connection>
+    <tag>HEAD</tag>
   </scm>
 
   <organization>

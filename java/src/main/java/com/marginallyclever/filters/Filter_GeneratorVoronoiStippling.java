@@ -92,7 +92,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         tool = machine.getCurrentTool();
         imageSetupTransform(img);
   
-        cellBorder = new ArrayList<VoronoiCellEdge>();
+        cellBorder = new ArrayList<>();
         
         initializeCells(MIN_DOT_SIZE);
       
@@ -115,9 +115,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell edges
     gl2.glColor3f(0.9f, 0.9f, 0.9f);
     gl2.glBegin(GL2.GL_LINES);
-    Iterator<VoronoiGraphEdge> ig = graphEdges.iterator();
-    while (ig.hasNext()) {
-      VoronoiGraphEdge e = ig.next();
+    for (VoronoiGraphEdge e : graphEdges) {
       gl2.glVertex2d(TX((float) e.x1), TY((float) e.y1));
       gl2.glVertex2d(TX((float) e.x2), TY((float) e.y2));
     }
@@ -126,16 +124,15 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
     // draw cell centers
     gl2.glPointSize(3);
     gl2.glColor3f(0, 0, 0);
-    for (int i = 0; i < cells.length; ++i) {
-      VoronoiCell c = cells[i];
+    for (VoronoiCell c : cells) {
       float x = c.centroid.x;
       float y = c.centroid.y;
-      float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
-      float r = (val*MAX_DOT_SIZE) / scale;
+      float val = 1.0f - (sample1x1(src_img, (int) x, (int) y) / 255.0f);
+      float r = (val * MAX_DOT_SIZE) / scale;
       gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-      for(float j=0;j<Math.PI*2;j+=(Math.PI/4)) {
-    	  gl2.glVertex2d(TX((float)(x+Math.cos(j)*r)), 
-    			  		 TY((float)(y+Math.sin(j)*r)));
+      for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
+        gl2.glVertex2d(TX((float) (x + Math.cos(j) * r)),
+                TY((float) (y + Math.sin(j) * r)));
       }
       gl2.glEnd();
     }
@@ -316,9 +313,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
     //long ta = System.nanoTime();
 
-    Iterator<VoronoiGraphEdge> ige = graphEdges.iterator();
-    while (ige.hasNext()) {
-      VoronoiGraphEdge e = ige.next();
+    for (VoronoiGraphEdge e : graphEdges) {
       if (e.site1 != cellIndex && e.site2 != cellIndex) continue;
       if (numEdgesInCell == 0) {
         if (e.x1 < e.x2) {
