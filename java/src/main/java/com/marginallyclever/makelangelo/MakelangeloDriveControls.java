@@ -35,7 +35,7 @@ public class MakelangeloDriveControls
   implements ActionListener, KeyListener, MouseListener, MouseMotionListener {
   protected JButton down100,down10,down1,up1,up10,up100;
   protected JButton left100,left10,left1,right1,right10,right100;
-  protected JButton home,center;
+  protected JButton home,setHome;
   protected JButton goTop,goBottom,goLeft,goRight,goUp,goDown;
 
   JFormattedTextField feedRate;
@@ -102,7 +102,10 @@ public class MakelangeloDriveControls
       right1 = tightJButton("1");
       right10 = tightJButton("10");
       right100 = tightJButton("100");
-      center = tightJButton(translator.get("SetHome"));
+      setHome = tightJButton(translator.get("SetHome"));
+//      goHome = tightJButton(translator.get("GoHome"));
+//      penUp = tightJButton(translator.get("PenUp"));
+//      penDown = tightJButton(translator.get("PenDown"));
 
       c.fill=GridBagConstraints.BOTH; 
       c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
@@ -117,7 +120,7 @@ public class MakelangeloDriveControls
       c.gridx=1;  c.gridy=4;  axisControl.add(left100,c);
       c.gridx=2;  c.gridy=4;  axisControl.add(left10,c);
       c.gridx=3;  c.gridy=4;  axisControl.add(left1,c);
-      c.gridx=4;  c.gridy=4;  axisControl.add(center,c);
+      c.gridx=4;  c.gridy=4;  axisControl.add(setHome,c);
       c.gridx=5;  c.gridy=4;  axisControl.add(right1,c);
       c.gridx=6;  c.gridy=4;  axisControl.add(right10,c);
       c.gridx=7;  c.gridy=4;  axisControl.add(right100,c);
@@ -130,7 +133,7 @@ public class MakelangeloDriveControls
       left1.addActionListener(this);
       left10.addActionListener(this);
       left100.addActionListener(this);
-      center.addActionListener(this);
+      setHome.addActionListener(this);
       right1.addActionListener(this);
       right10.addActionListener(this);
       right100.addActionListener(this);
@@ -271,7 +274,7 @@ public class MakelangeloDriveControls
     //if(gui.isRunning()) return;
 
     if (b == home) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
-    else if (b == center) gui.sendLineToRobot("G92 X0 Y0");
+    else if (b == setHome) gui.sendLineToRobot("G92 X0 Y0");
     else if (b == goLeft)
       gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paper_left * 10));
     else if (b == goRight)

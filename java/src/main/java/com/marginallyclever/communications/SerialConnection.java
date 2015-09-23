@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  */
 public final class SerialConnection implements SerialPortEventListener, MarginallyCleverConnection {
   private SerialPort serialPort;
-  private static final int BAUD_RATE = 115200;
+  private static final int BAUD_RATE = 57600;
 
   private String connectionName = "";
   private boolean portOpened = false;
