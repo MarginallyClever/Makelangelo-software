@@ -22,7 +22,7 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
-public final class MultilingualSupport<P extends Preferences> {
+public final class MultilingualSupport {
 
   /**
    * Working directory. This represents the directory where the java executable launched the jar from.
@@ -38,7 +38,7 @@ public final class MultilingualSupport<P extends Preferences> {
   /**
    *
    */
-  private final P languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+  private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
 
   /**

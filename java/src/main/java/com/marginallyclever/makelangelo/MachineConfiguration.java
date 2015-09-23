@@ -39,11 +39,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author dan royer
  */
-public final class MachineConfiguration<P extends Preferences> {
+public final class MachineConfiguration {
   /**
    *
    */
-  private final P topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+  private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
   /**
    * Each robot has a global unique identifier
