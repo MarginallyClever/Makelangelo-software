@@ -35,8 +35,8 @@ public class MakelangeloDriveControls
   implements ActionListener, KeyListener, MouseListener, MouseMotionListener {
   protected JButton down100,down10,down1,up1,up10,up100;
   protected JButton left100,left10,left1,right1,right10,right100;
-  protected JButton home,setHome;
-  protected JButton goTop,goBottom,goLeft,goRight,goUp,goDown;
+  protected JButton goHome,setHome;
+  protected JButton goTop,goBottom,goLeft,goRight,penUp,penDown;
 
   JFormattedTextField feedRate;
   JButton setFeedRate;
@@ -102,10 +102,6 @@ public class MakelangeloDriveControls
       right1 = tightJButton("1");
       right10 = tightJButton("10");
       right100 = tightJButton("100");
-      setHome = tightJButton(translator.get("SetHome"));
-//      goHome = tightJButton(translator.get("GoHome"));
-//      penUp = tightJButton(translator.get("PenUp"));
-//      penDown = tightJButton(translator.get("PenDown"));
 
       c.fill=GridBagConstraints.BOTH; 
       c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
@@ -120,7 +116,6 @@ public class MakelangeloDriveControls
       c.gridx=1;  c.gridy=4;  axisControl.add(left100,c);
       c.gridx=2;  c.gridy=4;  axisControl.add(left10,c);
       c.gridx=3;  c.gridy=4;  axisControl.add(left1,c);
-      c.gridx=4;  c.gridy=4;  axisControl.add(setHome,c);
       c.gridx=5;  c.gridy=4;  axisControl.add(right1,c);
       c.gridx=6;  c.gridy=4;  axisControl.add(right10,c);
       c.gridx=7;  c.gridy=4;  axisControl.add(right100,c);
@@ -133,7 +128,6 @@ public class MakelangeloDriveControls
       left1.addActionListener(this);
       left10.addActionListener(this);
       left100.addActionListener(this);
-      setHome.addActionListener(this);
       right1.addActionListener(this);
       right10.addActionListener(this);
       right100.addActionListener(this);
@@ -145,25 +139,29 @@ public class MakelangeloDriveControls
       goBottom = new JButton(translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
       goLeft = new JButton(translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
       goRight = new JButton(translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
-      goUp = new JButton(translator.get("PenUp"));      goUp.setPreferredSize(new Dimension(100,20));
-      goDown = new JButton(translator.get("PenDown"));  goDown.setPreferredSize(new Dimension(100,20));
+      penUp = new JButton(translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
+      penDown = new JButton(translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
       //final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
-      home = new JButton(translator.get("GoHome"));     home.setPreferredSize(new Dimension(100,20)); 
+      setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20)); 
+      goHome = new JButton(translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20)); 
       c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
       c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
       c.gridx=1;  c.gridy=1;  corners.add(goLeft,c);
-      c.gridx=2;  c.gridy=1;  corners.add(home,c);
       c.gridx=3;  c.gridy=1;  corners.add(goRight,c);
-      c.gridx=5;  c.gridy=0;  corners.add(goUp,c);
-      c.gridx=5;  c.gridy=3;  corners.add(goDown,c);
+      c.gridx=5;  c.gridy=0;  corners.add(penUp,c);
+      c.gridx=5;  c.gridy=2;  corners.add(penDown,c);
+      
+      c.gridx=0;  c.gridy=0;  corners.add(setHome,c);
+      c.gridx=0;  c.gridy=2;  corners.add(goHome,c);
       c.insets = new Insets(0,0,0,0);
       goTop.addActionListener(this);
       goBottom.addActionListener(this);
       goLeft.addActionListener(this);
       goRight.addActionListener(this);
-      goUp.addActionListener(this);
-      goDown.addActionListener(this);
-      home.addActionListener(this);
+      penUp.addActionListener(this); 
+      penDown.addActionListener(this);
+      setHome.addActionListener(this);
+      goHome.addActionListener(this);
     
       
     JPanel feedRateControl = new JPanel();
@@ -185,7 +183,7 @@ public class MakelangeloDriveControls
     dragAndDrive.addMouseListener(this);
     dragAndDrive.addMouseMotionListener(this);
 
-    coordinates = new JLabel("click & drag");
+    coordinates = new JLabel(translator.get("ClickAndDrag"));
     c.anchor = GridBagConstraints.CENTER;
     dragAndDrive.add(coordinates,c);
       
@@ -198,7 +196,7 @@ public class MakelangeloDriveControls
     c.gridheight=2;
     p.add(axisControl,c);
     c.gridheight=1;
-    //p.add(corners,c);
+    p.add(corners,c);
     p.add(dragAndDrive,c);
     c.gridheight=1;
     p.add(feedRateControl,c);
@@ -273,7 +271,7 @@ public class MakelangeloDriveControls
 
     //if(gui.isRunning()) return;
 
-    if (b == home) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
+    if (b == goHome) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
     else if (b == setHome) gui.sendLineToRobot("G92 X0 Y0");
     else if (b == goLeft)
       gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paper_left * 10));
@@ -285,8 +283,8 @@ public class MakelangeloDriveControls
       gui.sendLineToRobot("G00 F" + feedRate.getText() + " Y" + (machineConfiguration.paper_bottom * 10));
       //} else if(b==find) {
       //  gui.SendLineToRobot("G28");
-    else if (b == goUp) gui.raisePen();
-    else if (b == goDown) gui.lowerPen();
+    else if (b == penUp) gui.raisePen();
+    else if (b == penDown) gui.lowerPen();
     else if (b == setFeedRate) {
       String fr = feedRate.getText();
       fr = fr.replaceAll("[ ,]", "");
@@ -318,17 +316,27 @@ public class MakelangeloDriveControls
   }
 
   private JPanel getTextInputField() {
-    textInputArea = new JPanel(new GridLayout(0, 1));
+    textInputArea = new JPanel();
+    textInputArea.setLayout(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+    
     commandLineText = new JTextField(0);
-    commandLineText.setPreferredSize(new Dimension(10, 10));
+    //commandLineText.setPreferredSize(new Dimension(10, 10));
     commandLineSend = new JButton(translator.get("Send"));
     //commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
-    textInputArea.add(commandLineText);
-    textInputArea.add(commandLineSend);
+    c.gridwidth=4;
+    c.weightx=1;
+    c.fill=GridBagConstraints.HORIZONTAL;
+    c.gridx=c.gridy=0;
+    textInputArea.add(commandLineText,c);
+    c.gridwidth=1;
+    c.gridx=4;
+    c.weightx=0;
+    textInputArea.add(commandLineSend,c);
 
     commandLineText.addKeyListener(this);
     commandLineSend.addActionListener(this);
-
+    
     //textInputArea.setMinimumSize(new Dimension(100,50));
     //textInputArea.setMaximumSize(new Dimension(10000,50));
 
