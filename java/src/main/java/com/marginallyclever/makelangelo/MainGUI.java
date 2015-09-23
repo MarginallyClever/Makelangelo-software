@@ -821,7 +821,7 @@ public final class MainGUI
         final File file = fc.getSelectedFile();
         try (final InputStream fileInputStream = new FileInputStream(file)) {
           prefs.flush();
-          prefs.importPreferences(fileInputStream);
+          Preferences.importPreferences(fileInputStream);
           prefs.flush();
         } catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
           logger.error("{}", pe.getMessage());
