@@ -1,11 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.

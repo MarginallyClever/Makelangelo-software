@@ -1,22 +1,30 @@
 package com.marginallyclever.filters;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
-
-import java.awt.Font;
+import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 //import java.awt.Shape;
 //import java.awt.font.FontRenderContext;
 //import java.awt.font.TextLayout;
 //import java.awt.geom.PathIterator;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 
 public class Filter_GeneratorYourMessageHere extends Filter {

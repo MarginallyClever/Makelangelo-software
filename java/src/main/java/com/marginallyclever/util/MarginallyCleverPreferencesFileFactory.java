@@ -1,14 +1,14 @@
 package com.marginallyclever.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
+
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Peter Colapietro

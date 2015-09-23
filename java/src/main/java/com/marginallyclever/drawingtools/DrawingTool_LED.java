@@ -1,11 +1,11 @@
 package com.marginallyclever.drawingtools;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.io.IOException;
-import java.io.Writer;
 
 
 public class DrawingTool_LED extends DrawingTool {

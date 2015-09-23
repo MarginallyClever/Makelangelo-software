@@ -1,14 +1,14 @@
 package com.marginallyclever.drawingtools;
 
+import java.awt.BasicStroke;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.prefs.Preferences;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.MachineConfiguration;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.*;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.prefs.Preferences;
 
 
 public class DrawingTool {

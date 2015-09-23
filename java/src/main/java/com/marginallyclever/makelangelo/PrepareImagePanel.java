@@ -21,21 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.*;
-
-import org.kabeja.dxf.*;
-import org.kabeja.dxf.helpers.DXFSplineConverter;
-import org.kabeja.dxf.helpers.Point;
-import org.kabeja.parser.DXFParser;
-import org.kabeja.parser.ParseException;
-import org.kabeja.parser.Parser;
-import org.kabeja.parser.ParserBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -76,7 +62,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_GeneratorBoxes;
 import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-//import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
 import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
 import com.marginallyclever.filters.Filter_GeneratorPulse;
@@ -87,6 +72,7 @@ import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
 import com.marginallyclever.filters.Filter_GeneratorVoronoiZigZag;
 import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
 import com.marginallyclever.filters.Filter_GeneratorZigZag;
+//import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 
 
 /**

@@ -40,3 +40,7 @@ bin/
 
 *.log
 java/.project
+
+## Auto generated documentation
+latex/
+html/
