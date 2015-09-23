@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.util.Ancestryable;
 import com.marginallyclever.util.MarginallyCleverPreferencesFileFactory;
 import com.marginallyclever.util.MarginallyCleverPreferences;
+
 import org.json.JSONObject;
 import org.json.Property;
 import org.slf4j.Logger;
@@ -237,8 +238,8 @@ public final class PreferencesHelper {
    * <br>
    *   {@link #logAncestryable(Ancestryable)}
    */
-  @SuppressWarnings("unchecked")
-  private <M extends MarginallyCleverPreferences<A>, A extends AbstractPreferences> void copyAndLogPreferenceNode(A sourcePreferenceNode, M destinationPreferenceNode) {
+  @SuppressWarnings("unused")
+  private void copyAndLogPreferenceNode(AbstractPreferences sourcePreferenceNode, MarginallyCleverPreferences destinationPreferenceNode) {
     try {
       PreferencesHelper.clearAll(destinationPreferenceNode);
     } catch (BackingStoreException e) {
@@ -259,7 +260,7 @@ public final class PreferencesHelper {
   /**
    * @param preferenceNode preference node to be logged.
    */
-  public static <P extends Preferences> void logAncestryable(Ancestryable<P> preferenceNode) {
+  public static void logAncestryable(Ancestryable preferenceNode) {
     final JSONObject object = new JSONObject(preferenceNode.getChildren());
     LOG.debug("{}", object);
   }

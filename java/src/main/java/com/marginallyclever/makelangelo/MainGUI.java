@@ -53,7 +53,7 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @since 0.0.1?
  */
-public final class MainGUI<P extends Preferences>
+public final class MainGUI
     extends JPanel
     implements ActionListener {
 
@@ -68,7 +68,7 @@ public final class MainGUI<P extends Preferences>
   public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
   @SuppressWarnings("deprecation")
-  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   private MarginallyCleverConnectionManager connectionManager;
   private MarginallyCleverConnection connectionToRobot = null;
