@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -17,7 +17,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Filter_Resize extends ImageManipulator {
+public class Filter_Resize extends ImageFilter {
   protected int maxWidth, maxHeight;
 
 
@@ -46,7 +46,7 @@ public class Filter_Resize extends ImageManipulator {
           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       g.setBackground(Color.WHITE);
       g.clearRect(0, 0, width, height);
-      if (machine.reverseForGlass) {
+      if (machine.isReverseForGlass()) {
         g.drawImage(img, width, 0, 0, height, 0, 0, img.getWidth(), img.getHeight(), null);
       } else {
         g.drawImage(img, 0, 0, width, height, null);
@@ -57,7 +57,7 @@ public class Filter_Resize extends ImageManipulator {
     return newImage;
   }
 
-  @Override
+
   public BufferedImage filter(BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();

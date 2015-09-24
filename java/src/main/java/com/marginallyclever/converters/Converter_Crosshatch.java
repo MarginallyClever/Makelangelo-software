@@ -39,7 +39,6 @@ public class Converter_Crosshatch extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) throws IOException {
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);

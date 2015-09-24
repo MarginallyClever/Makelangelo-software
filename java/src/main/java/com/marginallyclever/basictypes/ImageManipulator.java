@@ -96,9 +96,7 @@ public abstract class ImageManipulator {
 
   
   /**
-   * Replace this with your generator/converter name.
-   *
-   * @return name of this filter.
+   * @return the translation key of your derived class.
    */
   public String getName() {
     return "Unnamed";

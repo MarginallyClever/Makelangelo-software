@@ -33,7 +33,6 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 public class Converter_ZigZag extends ImageConverter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
-  @Override
   public String getName() {
     return translator.get("ZigZagName");
   }
@@ -359,7 +358,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawDecorator {
    *
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) {
 
     mainGUI.getDrawPanel().setDecorator(this);

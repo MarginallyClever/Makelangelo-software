@@ -22,8 +22,6 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -74,7 +72,6 @@ import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.generators.Generator_HilbertCurve;
-//import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 
 
@@ -463,16 +460,16 @@ implements ActionListener, ChangeListener {
     final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
     reverse_h.setSelected(machineConfiguration.reverseForGlass);
 
-    String[] filter_names = new String[imageConverters.size()];
-    Iterator<ImageConverter> fit = imageConverters.iterator();
+    String[] imageConverterNames = new String[imageConverters.size()];
+    Iterator<ImageConverter> ici = imageConverters.iterator();
     int i = 0;
-    while (fit.hasNext()) {
-      ImageManipulator f = fit.next();
-      filter_names[i++] = f.getName();
+    while (ici.hasNext()) {
+      ImageManipulator f = ici.next();
+      imageConverterNames[i++] = f.getName();
     }
 
-    final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
-    input_draw_style.setSelectedIndex(getDrawStyle());
+    final JComboBox<String> inputDrawStyle = new JComboBox<String>(imageConverterNames);
+    inputDrawStyle.setSelectedIndex(getPreferredDrawStyle());
 
     GridBagConstraints c = new GridBagConstraints();
 
@@ -487,7 +484,7 @@ implements ActionListener, ChangeListener {
       c.gridwidth = 3;
       c.gridx = 1;
       c.gridy = y++;
-      panel.add(input_draw_style, c);
+      panel.add(inputDrawStyle, c);
     }
     c.anchor = GridBagConstraints.WEST;
     c.gridwidth = 1;
@@ -497,7 +494,7 @@ implements ActionListener, ChangeListener {
 
     int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-      setDrawStyle(input_draw_style.getSelectedIndex());
+      setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
       machineConfiguration.reverseForGlass = reverse_h.isSelected();
       machineConfiguration.saveConfig();
 
@@ -796,8 +793,7 @@ implements ActionListener, ChangeListener {
           // convert with style
           img = ImageIO.read(new File(sourceFile));
 
-          int style = getDrawStyle();
-          ImageConverter f = imageConverters.get(style);
+          ImageConverter f = imageConverters.get(getPreferredDrawStyle());
           f.setParent(this);
           f.setProgressMonitor(pm);
           f.setDestinationFile(destinationFile);
@@ -846,11 +842,11 @@ implements ActionListener, ChangeListener {
     return true;
   }
 
-  private void setDrawStyle(int style) {
+  private void setPreferredDrawStyle(int style) {
     prefs.putInt("Draw Style", style);
   }
 
-  private int getDrawStyle() {
+  private int getPreferredDrawStyle() {
     return prefs.getInt("Draw Style", 0);
   }
 

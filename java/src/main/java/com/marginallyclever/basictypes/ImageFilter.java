@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author danroyer
  *
  */
-public class ImageFilter extends ImageManipulator {
+public abstract class ImageFilter extends ImageManipulator {
 	  public ImageFilter(MainGUI gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
@@ -19,7 +19,7 @@ public class ImageFilter extends ImageManipulator {
 	  }
 
 	  /**
-	   * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
+	   * Process should be called by filters that modify a bufferedimage.  Think photoshop filters.
 	   *
 	   * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
 	   * @return the altered image

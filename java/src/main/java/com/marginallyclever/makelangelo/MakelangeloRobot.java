@@ -73,7 +73,7 @@ public final class MakelangeloRobot {
 		"A6 (105 x 148)",
 		"A7 (74 x 105)",};
   
-  public boolean reverseForGlass=false;
+  protected boolean reverseForGlass=false;
   public boolean motors_backwards=false;
 
     /**
@@ -512,5 +512,13 @@ public final class MakelangeloRobot {
 	}
 	public int getCurrentToolNumber() {
 		return current_tool;
+	}
+
+	public boolean isReverseForGlass() {
+		return reverseForGlass;
+	}
+
+	public void setReverseForGlass(boolean reverseForGlass) {
+		this.reverseForGlass = reverseForGlass;
 	}
 }

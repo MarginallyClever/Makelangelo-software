@@ -52,7 +52,6 @@ public class Converter_Sandy extends ImageConverter {
    * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) throws IOException {
     final JTextField field_size = new JTextField(Float.toString(blockScale));
 

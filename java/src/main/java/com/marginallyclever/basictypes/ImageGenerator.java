@@ -9,7 +9,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author danroyer
  *
  */
-public class ImageGenerator extends ImageManipulator {
+public abstract class ImageGenerator extends ImageManipulator {
 	  public ImageGenerator(MainGUI gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);

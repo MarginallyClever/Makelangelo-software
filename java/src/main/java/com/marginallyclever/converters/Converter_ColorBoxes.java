@@ -44,7 +44,6 @@ public class Converter_ColorBoxes extends ImageConverter {
   }
 
 
-  @Override
   public String getName() {
     return translator.get("RGBName");
   }
@@ -192,7 +191,6 @@ public class Converter_ColorBoxes extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) throws IOException {
     // Open the destination file
     try (

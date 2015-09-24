@@ -55,7 +55,6 @@ public class Converter_Pulse extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) throws IOException {
     final JTextField field_size = new JTextField(Float.toString(blockScale));
 

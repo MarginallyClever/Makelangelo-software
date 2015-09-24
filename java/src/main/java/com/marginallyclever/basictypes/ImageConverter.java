@@ -12,8 +12,8 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author danroyer
  *
  */
-public class ImageConverter extends ImageManipulator {
-	  public ImageConverter(MainGUI gui, MakelangeloRobot mc,
+public abstract class ImageConverter extends ImageManipulator {
+	public ImageConverter(MainGUI gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
 		// TODO Auto-generated constructor stub
@@ -23,7 +23,7 @@ public class ImageConverter extends ImageManipulator {
 	   * Called by filters that create GCODE from nothing.  Fractals might be one example.
 	   * @return true if conversion succeeded.
 	   */
-	  public boolean convert(BufferedImage img) throws IOException {
+	public boolean convert(BufferedImage img) throws IOException {
 		  return false;
-	  }
+	}
 }

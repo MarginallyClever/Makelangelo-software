@@ -2,7 +2,7 @@ package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Filter_BlackAndWhite extends ImageManipulator {
+public class Filter_BlackAndWhite extends ImageFilter {
   double levels = 2;
 
 
@@ -23,7 +23,7 @@ public class Filter_BlackAndWhite extends ImageManipulator {
     levels = (double) _levels;
   }
 
-  @Override
+
   public BufferedImage filter(BufferedImage img) {
     int h = img.getHeight();
     int w = img.getWidth();

@@ -246,7 +246,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  @Override
   public boolean convert(BufferedImage img) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     //Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
