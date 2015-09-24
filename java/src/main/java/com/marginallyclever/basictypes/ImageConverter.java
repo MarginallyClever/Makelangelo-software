@@ -20,9 +20,9 @@ public abstract class ImageConverter extends ImageManipulator {
 	}
 
 	/**
-	   * Called by filters that create GCODE from nothing.  Fractals might be one example.
-	   * @return true if conversion succeeded.
-	   */
+	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
+	 * @return true if conversion succeeded.
+	 */
 	public boolean convert(BufferedImage img) throws IOException {
 		  return false;
 	}

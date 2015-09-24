@@ -57,7 +57,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     private GCodeFile instructions;
 
-    private DrawDecorator drawDecorator=null;
+    private DrawPanelDecorator drawDecorator=null;
     
   protected MakelangeloRobot machine;
 
@@ -93,7 +93,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
    *
    * @param dd the new DrawDecorator
    */
-  public void setDecorator(DrawDecorator dd) {
+  public void setDecorator(DrawPanelDecorator dd) {
     drawDecorator = dd;
     emptyNodeBuffer();
   }

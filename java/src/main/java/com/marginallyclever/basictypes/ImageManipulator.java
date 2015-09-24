@@ -34,7 +34,7 @@ public abstract class ImageManipulator {
   protected float w2, h2, scale;
   protected DrawingTool tool;
 
-  protected int color_channel = 0;
+  protected int colorChannel = 0;
 
   // text properties
   protected float kerning = 5.0f;
@@ -62,7 +62,7 @@ public abstract class ImageManipulator {
   protected String dest;
   // pen position optimizing
   protected boolean lastup;
-  protected float previous_x, previous_y;
+  protected float previousX, previousY;
   // threading
   protected ProgressMonitor pm;
   protected SwingWorker<Void, Void> parent;
@@ -143,8 +143,8 @@ public abstract class ImageManipulator {
     out.write(machine.getConfigLine() + ";\n");
     out.write(machine.getBobbinLine() + ";\n");
 
-    previous_x = 0;
-    previous_y = 0;
+    previousX = 0;
+    previousY = 0;
 
     setAbsoluteMode(out);
   }
@@ -210,7 +210,7 @@ public abstract class ImageManipulator {
 
   protected int sample1x1(BufferedImage img, int x, int y) {
     Color c = new Color(img.getRGB(x, y));
-    switch (color_channel) {
+    switch (colorChannel) {
       case 1:
         return c.getRed();
       case 2:
@@ -376,10 +376,10 @@ public abstract class ImageManipulator {
     float y2 = TY(y);
 
     if (up == lastup) {
-      previous_x = x2;
-      previous_y = y2;
+      previousX = x2;
+      previousY = y2;
     } else {
-      tool.writeMoveTo(out, previous_x, previous_y);
+      tool.writeMoveTo(out, previousX, previousY);
       tool.writeMoveTo(out, x2, y2);
       if (up) liftPen(out);
       else lowerPen(out);
@@ -583,7 +583,6 @@ public abstract class ImageManipulator {
       String name;
 
       // find the file that goes with this character
-      // TODO load these from an XML description?
       if ('a' <= letter && letter <= 'z') {
         name = "SMALL_" + Character.toUpperCase(letter);
       } else {

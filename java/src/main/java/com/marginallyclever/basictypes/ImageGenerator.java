@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
- * Generates gcode from user input.
+ * Generates gcode from user input.  Fractals might be one example.
  * @author danroyer
  *
  */
@@ -17,9 +17,8 @@ public abstract class ImageGenerator extends ImageManipulator {
 	  }
 
 	/**
-	   * Called by filters that create GCODE from nothing.  Fractals might be one example.
-	   * @return true if generate succeeded.
-	   */
+	  * @return true if generate succeeded.
+	  */
 	  public boolean generate() {
 		  return false;
 	  }

@@ -102,8 +102,8 @@ public class Converter_Crosshatch extends ImageConverter {
     xEnd = -xStart;
     yEnd = -yStart;
 
-    previous_x = 0;
-    previous_y = 0;
+    previousX = 0;
+    previousY = 0;
 
     double stepSize = tool.getDiameter() * 3.0;
     double halfStep = stepSize / 2.0;

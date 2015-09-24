@@ -24,7 +24,7 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.DrawDecorator;
+import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -41,7 +41,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends ImageConverter implements DrawDecorator {
+public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanelDecorator {
   private ReentrantLock lock = new ReentrantLock();
   
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
