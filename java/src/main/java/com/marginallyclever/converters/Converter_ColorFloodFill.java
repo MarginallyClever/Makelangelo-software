@@ -14,8 +14,8 @@ import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -25,7 +25,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author danroyer
  * @since at least 7.1.4
  */
-public class Converter_ColorFloodFill extends Filter {
+public class Converter_ColorFloodFill extends ImageConverter {
   ColorPalette palette;
   int diameter = 0;
   int last_x, last_y;
@@ -247,13 +247,13 @@ public class Converter_ColorFloodFill extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     //Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
     //img = bw.process(img);
 
     Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI, machine, translator, 1);
-    img = blur.process(img);
+    img = blur.filter(img);
 //    Histogram h = new Histogram();
 //    h.getHistogramOf(img);
 
@@ -301,6 +301,7 @@ public class Converter_ColorFloodFill extends Filter {
       signName(osw);
       moveTo(0, 0, true, osw);
     }
+    return true;
   }
 }
 

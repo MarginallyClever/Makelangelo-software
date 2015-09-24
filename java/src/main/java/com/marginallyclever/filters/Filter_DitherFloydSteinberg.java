@@ -2,6 +2,7 @@ package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
 
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -12,7 +13,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author Dan
  * @see <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
-public class Filter_DitherFloydSteinberg extends Filter {
+public class Filter_DitherFloydSteinberg extends ImageManipulator {
   private long tone;
 
 
@@ -69,7 +70,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
   }
 
   @Override
-  public BufferedImage process(BufferedImage img) {
+  public BufferedImage filter(BufferedImage img) {
     int y, x;
     int h = img.getHeight();
     int w = img.getWidth();

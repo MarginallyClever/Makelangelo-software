@@ -9,14 +9,14 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class Converter_Boxes extends Filter {
+public class Converter_Boxes extends ImageConverter {
   public Converter_Boxes(MainGUI gui, MakelangeloRobot mc,
                                MultilingualSupport ms) {
     super(gui, mc, ms);
@@ -69,10 +69,10 @@ public class Converter_Boxes extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.process(img);
+    img = bw.filter(img);
 
     // Open the destination file
     try (
@@ -146,6 +146,7 @@ public class Converter_Boxes extends Filter {
       signName(out);
       tool.writeMoveTo(out, 0, 0);
     }
+    return true;
   }
 }
 

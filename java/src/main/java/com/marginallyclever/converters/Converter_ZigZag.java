@@ -12,8 +12,9 @@ import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.filters.Filter_Resize;
@@ -29,7 +30,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Converter_ZigZag extends Filter implements DrawDecorator {
+public class Converter_ZigZag extends ImageConverter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
   @Override
@@ -359,21 +360,21 @@ public class Converter_ZigZag extends Filter implements DrawDecorator {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) {
+  public boolean convert(BufferedImage img) {
 
     mainGUI.getDrawPanel().setDecorator(this);
 
     // resize & flip as needed
     Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
-    img = rs.process(img);
+    img = rs.filter(img);
 
     // make black & white
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.process(img);
+    img = bw.filter(img);
     
     // dither
     Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI, machine, translator);
-    img = dither.process(img);
+    img = dither.filter(img);
     
     // connect the dots
     connectTheDots(img);
@@ -381,6 +382,7 @@ public class Converter_ZigZag extends Filter implements DrawDecorator {
     generateTSP();
 
     mainGUI.getDrawPanel().setDecorator(null);
+    return true;
   }
 }
 

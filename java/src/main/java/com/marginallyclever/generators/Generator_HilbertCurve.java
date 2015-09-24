@@ -13,12 +13,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-public class Generator_HilbertCurve extends Filter {
+public class Generator_HilbertCurve extends ImageGenerator {
   float turtle_x, turtle_y;
   float turtle_dx, turtle_dy;
   float turtle_step = 10.0f;

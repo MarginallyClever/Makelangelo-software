@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -17,7 +18,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Filter_GaussianBlur extends Filter {
+public class Filter_GaussianBlur extends ImageManipulator {
   int radius = 1;
 
 
@@ -29,7 +30,7 @@ public class Filter_GaussianBlur extends Filter {
   }
 
   @Override
-  public BufferedImage process(BufferedImage img) {
+  public BufferedImage filter(BufferedImage img) {
     int h = img.getHeight();
     int w = img.getWidth();
     int x, y;

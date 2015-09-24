@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.basictypes;
 
 
 import java.awt.Color;
@@ -19,17 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 /**
- * base class for image filtering
- *
+ * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class Filter {
+public abstract class ImageManipulator {
   // image properties
   protected int image_width, image_height;
   protected float w2, h2, scale;
@@ -75,9 +74,9 @@ public abstract class Filter {
   protected float sampleValue;
   protected float sampleSum;
 
-  private final Logger log = LoggerFactory.getLogger(Filter.class);
+  private final Logger log = LoggerFactory.getLogger(ImageManipulator.class);
 
-  public Filter(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public ImageManipulator(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     mainGUI = gui;
     translator = ms;
     machine = mc;
@@ -95,14 +94,7 @@ public abstract class Filter {
     dest = _dest;
   }
 
-  /**
-   * Called by filters that create GCODE from nothing.  Fractals might be one example.
-   * @return true if generate succeeded.
-   */
-  public boolean generate() {
-	  return false;
-  }
-
+  
   /**
    * Replace this with your generator/converter name.
    *
@@ -110,25 +102,6 @@ public abstract class Filter {
    */
   public String getName() {
     return "Unnamed";
-  }
-
-  /**
-   * process should be called by filters that modify a bufferedimage.  Think photoshop filters.
-   *
-   * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
-   * @return the altered image
-   */
-  public BufferedImage process(BufferedImage img) {
-    return img;
-  }
-
-  /**
-   * convert generates GCODE from a bufferedImage.
-   *
-   * @param img image to filter.
-   * @throws IOException
-   */
-  public void convert(BufferedImage img) throws IOException {
   }
 
 

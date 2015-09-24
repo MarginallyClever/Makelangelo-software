@@ -20,8 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.filters.Filter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
@@ -40,7 +41,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends Filter implements DrawDecorator {
+public class Converter_VoronoiZigZag extends ImageConverter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
   
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -77,7 +78,7 @@ public class Converter_VoronoiZigZag extends Filter implements DrawDecorator {
   public String getName() { return translator.get("ZigZagName")+" 2"; }
   
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
 
@@ -95,7 +96,7 @@ public class Converter_VoronoiZigZag extends Filter implements DrawDecorator {
 
         // make black & white
         Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-        img = bw.process(img);
+        img = bw.filter(img);
         
         src_img = img;
         h = img.getHeight();
@@ -116,7 +117,9 @@ public class Converter_VoronoiZigZag extends Filter implements DrawDecorator {
         optimizeTour();
         mainGUI.getDrawPanel().setDecorator(null);
         writeOutCells();
+        return true;
       }
+      return false;
   }
 
   public void render(GL2 gl2,MakelangeloRobot machine) {

@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -22,7 +22,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Converter_Crosshatch extends Filter {
+public class Converter_Crosshatch extends ImageConverter {
 
   @Override
   public String getName() {
@@ -40,9 +40,9 @@ public class Converter_Crosshatch extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.process(img);
+    img = bw.filter(img);
 
     mainGUI.log("<font color='green'>Converting to gcode and saving " + dest + "</font>\n");
     try (
@@ -64,6 +64,7 @@ public class Converter_Crosshatch extends Filter {
       signName(out);
       moveTo(out, 0, 0, true);
     }
+    return true;
   }
 
   double xStart, yStart;

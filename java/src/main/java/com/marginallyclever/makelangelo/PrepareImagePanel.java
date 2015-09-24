@@ -60,6 +60,8 @@ import org.kabeja.parser.ParserBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.converters.Converter_Boxes;
 import com.marginallyclever.converters.Converter_ColorBoxes;
 import com.marginallyclever.converters.Converter_Crosshatch;
@@ -71,7 +73,6 @@ import com.marginallyclever.converters.Converter_VoronoiStippling;
 import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.Filter;
 import com.marginallyclever.generators.Generator_HilbertCurve;
 //import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
 import com.marginallyclever.generators.Generator_YourMessageHere;
@@ -121,7 +122,7 @@ implements ActionListener, ChangeListener {
   /**
    * Image processing
    */
-  private List<Filter> image_converters;
+  private List<ImageConverter> imageConverters;
 
   public void raisePen() {
     penIsUp = true;
@@ -133,17 +134,17 @@ implements ActionListener, ChangeListener {
   
   // TODO use a ServiceLoader and find generator plugins in nearby folders
   protected void loadImageConverters() {
-    image_converters = new ArrayList<Filter>();
-    image_converters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_Spiral(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_Crosshatch(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_Scanline(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_Pulse(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_Boxes(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_ColorBoxes(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
-    image_converters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
-    image_converters.add(new Converter_Sandy(gui,machineConfiguration,translator));
+    imageConverters = new ArrayList<ImageConverter>();
+    imageConverters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Spiral(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Crosshatch(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Scanline(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Pulse(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Boxes(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_ColorBoxes(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
+    imageConverters.add(new Converter_Sandy(gui,machineConfiguration,translator));
     //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
@@ -462,11 +463,11 @@ implements ActionListener, ChangeListener {
     final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
     reverse_h.setSelected(machineConfiguration.reverseForGlass);
 
-    String[] filter_names = new String[image_converters.size()];
-    Iterator<Filter> fit = image_converters.iterator();
+    String[] filter_names = new String[imageConverters.size()];
+    Iterator<ImageConverter> fit = imageConverters.iterator();
     int i = 0;
     while (fit.hasNext()) {
-      Filter f = fit.next();
+      ImageManipulator f = fit.next();
       filter_names[i++] = f.getName();
     }
 
@@ -796,7 +797,7 @@ implements ActionListener, ChangeListener {
           img = ImageIO.read(new File(sourceFile));
 
           int style = getDrawStyle();
-          Filter f = image_converters.get(style);
+          ImageConverter f = imageConverters.get(style);
           f.setParent(this);
           f.setProgressMonitor(pm);
           f.setDestinationFile(destinationFile);

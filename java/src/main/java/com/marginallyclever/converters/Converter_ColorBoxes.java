@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -20,7 +20,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 /**
  * @author Dan
  */
-public class Converter_ColorBoxes extends Filter {
+public class Converter_ColorBoxes extends ImageConverter {
   ColorPalette palette;
   float step1;
   float step2;
@@ -193,7 +193,7 @@ public class Converter_ColorBoxes extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     // Open the destination file
     try (
         final OutputStream fileOutputStream = new FileOutputStream(dest);
@@ -234,6 +234,7 @@ public class Converter_ColorBoxes extends Filter {
 
       tool.writeMoveTo(out, 0, 0);
     }
+    return true;
   }
 }
 

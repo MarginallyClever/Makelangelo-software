@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -15,7 +16,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author Dan
  * @see <a href="http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering">http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering</a>
  */
-public class Filter_DitherFloydSteinbergColor extends Filter {
+public class Filter_DitherFloydSteinbergColor extends ImageManipulator {
   public ColorPalette palette;
 
   public Filter_DitherFloydSteinbergColor(MainGUI gui, MakelangeloRobot mc,
@@ -72,7 +73,7 @@ public class Filter_DitherFloydSteinbergColor extends Filter {
   }
 
   @Override
-  public BufferedImage process(BufferedImage img) {
+  public BufferedImage filter(BufferedImage img) {
     int y;
     int h = img.getHeight();
     int w = img.getWidth();

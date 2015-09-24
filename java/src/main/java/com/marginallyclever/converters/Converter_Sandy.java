@@ -16,14 +16,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class Converter_Sandy extends Filter {
+public class Converter_Sandy extends ImageConverter {
   float blockScale=50.0f;
   int direction=0;
   
@@ -53,7 +53,7 @@ public class Converter_Sandy extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     final JTextField field_size = new JTextField(Float.toString(blockScale));
 
     JPanel panel = new JPanel(new GridLayout(0,1));
@@ -69,7 +69,9 @@ public class Converter_Sandy extends Filter {
       blockScale = Float.parseFloat(field_size.getText());
       direction = direction_choices.getSelectedIndex();
       convertNow(img);
+      return true;
     }
+    return false;
   }
 
   
@@ -118,7 +120,7 @@ public class Converter_Sandy extends Filter {
   private void convertNow(BufferedImage img) throws IOException {
       // make black & white
       Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-      img = bw.process(img);
+      img = bw.filter(img);
       
 
 	    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");

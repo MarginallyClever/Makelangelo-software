@@ -18,13 +18,13 @@ import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.filters.Filter;
+import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class Generator_YourMessageHere extends Filter {
+public class Generator_YourMessageHere extends ImageGenerator {
   protected float kerning = -0.50f;
   protected float letter_width = 2.0f;
   protected float letter_height = 2.0f;

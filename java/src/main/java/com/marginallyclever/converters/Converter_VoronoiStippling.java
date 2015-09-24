@@ -19,8 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.filters.Filter;
 import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -39,7 +40,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends Filter implements DrawDecorator {
+public class Converter_VoronoiStippling extends ImageConverter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -70,7 +71,7 @@ public class Converter_VoronoiStippling extends Filter implements DrawDecorator 
   }
 
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
     JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
@@ -89,10 +90,10 @@ public class Converter_VoronoiStippling extends Filter implements DrawDecorator 
 
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-      MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-      MAX_CELLS = Integer.parseInt(text_cells.getText());
-      MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
-      MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
+	  MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
+	  MAX_CELLS = Integer.parseInt(text_cells.getText());
+	  MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
+	  MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
         src_img = img;
         h = img.getHeight();
@@ -110,7 +111,9 @@ public class Converter_VoronoiStippling extends Filter implements DrawDecorator 
         mainGUI.getDrawPanel().setDecorator(null);
       
         writeOutCells();
-      }
+        return true;
+      	}
+    return false;
   }
 
   public void render(GL2 gl2, MakelangeloRobot machine) {
