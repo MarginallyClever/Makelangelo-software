@@ -28,10 +28,10 @@ implements ActionListener {
 
 	protected MainGUI gui;
 	protected MultilingualSupport translator;
-	protected MachineConfiguration machineConfiguration;
+	protected MakelangeloRobot machineConfiguration;
 
 
-	public PanelJogMotors(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+	public PanelJogMotors(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

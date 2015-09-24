@@ -28,7 +28,7 @@ implements ActionListener, KeyListener {
 	
 	protected MainGUI gui;
 	protected MultilingualSupport translator;
-	protected MachineConfiguration machineConfiguration;
+	protected MakelangeloRobot machineConfiguration;
 	
 	protected JComboBox<String> paperSizes;
 	protected JTextField mw, mh;
@@ -37,7 +37,7 @@ implements ActionListener, KeyListener {
 	protected JTextField mBobbin1,mBobbin2;
    
 	
-	public PanelAdjustMachineSize(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+	public PanelAdjustMachineSize(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

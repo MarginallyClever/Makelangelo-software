@@ -91,7 +91,7 @@ implements ActionListener, ChangeListener {
   private static final long serialVersionUID = -4703402918904039337L;
 
   protected MultilingualSupport translator;
-  protected MachineConfiguration machineConfiguration;
+  protected MakelangeloRobot machineConfiguration;
   protected MainGUI gui;
 
   protected String lastFileIn = "";
@@ -157,7 +157,7 @@ implements ActionListener, ChangeListener {
   }
 
 
-  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;

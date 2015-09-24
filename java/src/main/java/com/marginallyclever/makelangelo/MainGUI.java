@@ -151,7 +151,7 @@ public final class MainGUI
   private boolean isPaused = true;
   public GCodeFile gCode = new GCodeFile();
 
-  private MachineConfiguration machineConfiguration;
+  private MakelangeloRobot machineConfiguration;
   private MultilingualSupport translator;
 
   /**
@@ -163,7 +163,7 @@ public final class MainGUI
   public MainGUI() {
     startLog();
     startTranslator();
-    machineConfiguration = new MachineConfiguration(this, translator);
+    machineConfiguration = new MakelangeloRobot(this, translator);
     connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
     createAndShowGUI();
   }

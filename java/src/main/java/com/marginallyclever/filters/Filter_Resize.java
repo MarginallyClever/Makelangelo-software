@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -20,14 +20,14 @@ public class Filter_Resize extends Filter {
   protected int maxWidth, maxHeight;
 
 
-  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
                        MultilingualSupport ms) {
     super(gui, mc, ms);
     maxWidth = 1000;
     maxHeight = 1000;
   }
 
-  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
                        MultilingualSupport ms, int max_width, int max_height) {
     super(gui, mc, ms);
     maxWidth = max_width;

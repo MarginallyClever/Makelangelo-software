@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -31,7 +31,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
   int direction = 1;
 
 
-  public Filter_GeneratorColorBoxes(MainGUI gui, MachineConfiguration mc,
+  public Filter_GeneratorColorBoxes(MainGUI gui, MakelangeloRobot mc,
                                     MultilingualSupport ms) {
     super(gui, mc, ms);
 

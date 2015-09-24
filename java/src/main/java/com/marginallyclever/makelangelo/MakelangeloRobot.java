@@ -25,7 +25,7 @@ import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 /**
  * @author dan royer
  */
-public final class MachineConfiguration {
+public final class MakelangeloRobot {
   /**
    *
    */
@@ -131,7 +131,7 @@ public final class MachineConfiguration {
   private MainGUI gui = null;
   private MultilingualSupport translator = null;
 
-  private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
+  private final Logger logger = LoggerFactory.getLogger(MakelangeloRobot.class);
 
   /**
    * TODO move tool names into translations & add a color palette system for quantizing colors
@@ -139,7 +139,7 @@ public final class MachineConfiguration {
    * @param gui
    * @param translator
    */
-  protected MachineConfiguration(MainGUI _gui, MultilingualSupport _translator) {
+  protected MakelangeloRobot(MainGUI _gui, MultilingualSupport _translator) {
     gui = _gui;
     translator = _translator;
 

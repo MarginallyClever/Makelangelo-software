@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawDecorator;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -45,7 +45,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   int scount;
 
 
-  public Filter_GeneratorZigZag(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+  public Filter_GeneratorZigZag(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -145,7 +145,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   }
 
 
-  public void render(GL2 gl2, MachineConfiguration machine) {
+  public void render(GL2 gl2, MakelangeloRobot machine) {
     if (points == null || solution == null) return;
 
     while (lock.isLocked()) ;

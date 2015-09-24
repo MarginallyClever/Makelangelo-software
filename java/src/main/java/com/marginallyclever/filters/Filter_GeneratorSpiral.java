@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -29,7 +29,7 @@ public class Filter_GeneratorSpiral extends Filter {
   boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 
 
-  public Filter_GeneratorSpiral(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+  public Filter_GeneratorSpiral(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 

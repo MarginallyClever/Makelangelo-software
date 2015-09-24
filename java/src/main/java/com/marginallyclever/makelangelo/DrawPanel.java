@@ -59,7 +59,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
     private DrawDecorator drawDecorator=null;
     
-  protected MachineConfiguration machine;
+  protected MakelangeloRobot machine;
 
   // optimization - turn gcode into vectors once on load, draw vectors after that.
   private enum NodeType {
@@ -79,7 +79,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
   ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
 
 
-  public DrawPanel(MachineConfiguration mc) {
+  public DrawPanel(MakelangeloRobot mc) {
     super();
     machine = mc;
     addMouseMotionListener(this);

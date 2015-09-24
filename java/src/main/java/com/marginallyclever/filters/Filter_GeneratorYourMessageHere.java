@@ -18,7 +18,7 @@ import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 //import java.awt.Shape;
@@ -40,7 +40,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
   private final Logger logger = LoggerFactory.getLogger(Filter_GeneratorYourMessageHere.class);
 
   public Filter_GeneratorYourMessageHere(MainGUI gui,
-                                         MachineConfiguration mc, MultilingualSupport ms) {
+                                         MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
     logFonts();
   }

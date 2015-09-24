@@ -50,7 +50,7 @@ public class MakelangeloDriveControls
   private JLabel coordinates;
   
   protected MultilingualSupport translator;
-  protected MachineConfiguration machineConfiguration;
+  protected MakelangeloRobot machineConfiguration;
   protected MainGUI gui;
 
   private boolean mouseInside,mouseOn;
@@ -78,7 +78,7 @@ public class MakelangeloDriveControls
 	  return b;
   }
 
-  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;

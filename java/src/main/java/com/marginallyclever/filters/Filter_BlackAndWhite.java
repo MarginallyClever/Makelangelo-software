@@ -2,7 +2,7 @@ package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -17,7 +17,7 @@ public class Filter_BlackAndWhite extends Filter {
 
 
   public Filter_BlackAndWhite(MainGUI gui,
-                              MachineConfiguration mc, MultilingualSupport ms, int _levels) {
+                              MakelangeloRobot mc, MultilingualSupport ms, int _levels) {
     super(gui, mc, ms);
     levels = (double) _levels;
   }

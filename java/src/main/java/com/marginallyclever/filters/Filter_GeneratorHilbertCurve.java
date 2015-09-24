@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -32,7 +32,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
   float x, y;
 
 
-  public Filter_GeneratorHilbertCurve(MainGUI gui, MachineConfiguration mc,
+  public Filter_GeneratorHilbertCurve(MainGUI gui, MakelangeloRobot mc,
                                       MultilingualSupport ms) {
     super(gui, mc, ms);
   }

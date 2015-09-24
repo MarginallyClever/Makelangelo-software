@@ -17,12 +17,12 @@ extends JPanel {
 	private static final long serialVersionUID = 8256498380663422463L;
 	protected MainGUI gui;
 	protected MultilingualSupport translator;
-	protected MachineConfiguration machineConfiguration;
+	protected MakelangeloRobot machineConfiguration;
 
 	protected JComboBox<String> toolCombo;
 
 	
-	public PanelSelectTool(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+	public PanelSelectTool(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

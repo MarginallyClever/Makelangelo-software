@@ -14,7 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -24,7 +24,7 @@ public class DrawingTool_Spraypaint extends DrawingTool {
   float old_x, old_y;
   float overlap = 0.3f;
 
-  public DrawingTool_Spraypaint(MainGUI gui, MultilingualSupport ms, MachineConfiguration mc) {
+  public DrawingTool_Spraypaint(MainGUI gui, MultilingualSupport ms, MakelangeloRobot mc) {
     super(gui, ms, mc);
 
     diameter = 40;

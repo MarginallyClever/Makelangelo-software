@@ -29,7 +29,7 @@ implements ActionListener {
   private static final long serialVersionUID = 1L;
 
   protected MultilingualSupport translator;
-  protected MachineConfiguration machineConfiguration;
+  protected MakelangeloRobot machineConfiguration;
   protected MainGUI gui;
 
   protected JTabbedPane panes;
@@ -41,7 +41,7 @@ implements ActionListener {
   protected PanelSelectTool panelSelectTool;
   
   
-  public MakelangeloSettingsDialog(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+  public MakelangeloSettingsDialog(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 	super(_gui.getParentFrame(),_translator.get("AdjustMachineSize"),true);
 
 	translator = _translator;

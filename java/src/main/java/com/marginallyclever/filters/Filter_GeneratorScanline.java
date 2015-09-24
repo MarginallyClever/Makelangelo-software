@@ -9,13 +9,13 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class Filter_GeneratorScanline extends Filter {
-  public Filter_GeneratorScanline(MainGUI gui, MachineConfiguration mc,
+  public Filter_GeneratorScanline(MainGUI gui, MakelangeloRobot mc,
                                   MultilingualSupport ms) {
     super(gui, mc, ms);
   }

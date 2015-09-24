@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.marginallyclever.basictypes.C3;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -22,7 +22,7 @@ public class Filter_GaussianBlur extends Filter {
 
 
   public Filter_GaussianBlur(MainGUI gui,
-                             MachineConfiguration mc, MultilingualSupport ms, int _radius) {
+                             MakelangeloRobot mc, MultilingualSupport ms, int _radius) {
     super(gui, mc, ms);
     assert (radius > 0);
     radius = _radius;

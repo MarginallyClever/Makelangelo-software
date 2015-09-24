@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -27,7 +27,7 @@ public class Filter_GeneratorCrosshatch extends Filter {
     return translator.get("Crosshatch");
   }
 
-  public Filter_GeneratorCrosshatch(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+  public Filter_GeneratorCrosshatch(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 

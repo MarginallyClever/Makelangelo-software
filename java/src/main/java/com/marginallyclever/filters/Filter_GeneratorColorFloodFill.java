@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -31,7 +31,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
   BufferedImage imgMask;
 
 
-  public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,
+  public Filter_GeneratorColorFloodFill(MainGUI gui, MakelangeloRobot mc,
                                         MultilingualSupport ms) {
     super(gui, mc, ms);
 

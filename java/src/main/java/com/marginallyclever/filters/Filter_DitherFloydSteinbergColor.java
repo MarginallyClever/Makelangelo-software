@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 public class Filter_DitherFloydSteinbergColor extends Filter {
   public ColorPalette palette;
 
-  public Filter_DitherFloydSteinbergColor(MainGUI gui, MachineConfiguration mc,
+  public Filter_DitherFloydSteinbergColor(MainGUI gui, MakelangeloRobot mc,
                                           MultilingualSupport ms) {
     super(gui, mc, ms);
 

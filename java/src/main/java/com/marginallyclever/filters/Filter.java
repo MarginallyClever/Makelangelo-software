@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -70,14 +70,14 @@ public abstract class Filter {
 
   protected MainGUI mainGUI;
   protected MultilingualSupport translator;
-  protected MachineConfiguration machine;
+  protected MakelangeloRobot machine;
 
   protected float sampleValue;
   protected float sampleSum;
 
   private final Logger log = LoggerFactory.getLogger(Filter.class);
 
-  public Filter(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+  public Filter(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     mainGUI = gui;
     translator = ms;
     machine = mc;

@@ -3,13 +3,13 @@ package com.marginallyclever.drawingtools;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_LED extends DrawingTool {
-  public DrawingTool_LED(MainGUI gui, MultilingualSupport ms, MachineConfiguration mc) {
+  public DrawingTool_LED(MainGUI gui, MultilingualSupport ms, MakelangeloRobot mc) {
     super(gui, ms, mc);
 
     diameter = 4;

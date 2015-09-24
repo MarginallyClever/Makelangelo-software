@@ -2,7 +2,7 @@ package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -16,7 +16,7 @@ public class Filter_DitherFloydSteinberg extends Filter {
   private long tone;
 
 
-  public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
+  public Filter_DitherFloydSteinberg(MainGUI gui, MakelangeloRobot mc,
                                      MultilingualSupport ms) {
     super(gui, mc, ms);
   }
