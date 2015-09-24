@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
@@ -9,13 +9,15 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class Filter_GeneratorScanline extends Filter {
-  public Filter_GeneratorScanline(MainGUI gui, MakelangeloRobot mc,
+public class Converter_Scanline extends Filter {
+  public Converter_Scanline(MainGUI gui, MakelangeloRobot mc,
                                   MultilingualSupport ms) {
     super(gui, mc, ms);
   }

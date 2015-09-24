@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.GridLayout;
@@ -16,16 +16,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class Filter_GeneratorPulse extends Filter {
+public class Converter_Pulse extends Filter {
   float blockScale = 6.0f;
   int direction = 0;
 
-  public Filter_GeneratorPulse(MainGUI gui, MakelangeloRobot mc,
+  public Converter_Pulse(MainGUI gui, MakelangeloRobot mc,
                                MultilingualSupport ms) {
     super(gui, mc, ms);
   }

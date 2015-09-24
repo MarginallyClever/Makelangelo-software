@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.filters.Filter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -19,7 +20,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 /**
  * @author Dan
  */
-public class Filter_GeneratorColorBoxes extends Filter {
+public class Converter_ColorBoxes extends Filter {
   ColorPalette palette;
   float step1;
   float step2;
@@ -31,7 +32,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
   int direction = 1;
 
 
-  public Filter_GeneratorColorBoxes(MainGUI gui, MakelangeloRobot mc,
+  public Converter_ColorBoxes(MainGUI gui, MakelangeloRobot mc,
                                     MultilingualSupport ms) {
     super(gui, mc, ms);
 

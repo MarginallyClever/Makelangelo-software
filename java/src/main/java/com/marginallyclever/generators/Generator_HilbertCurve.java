@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.generators;
 
 import java.awt.GridLayout;
 import java.io.FileOutputStream;
@@ -13,11 +13,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.marginallyclever.filters.Filter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-public class Filter_GeneratorHilbertCurve extends Filter {
+public class Generator_HilbertCurve extends Filter {
   float turtle_x, turtle_y;
   float turtle_dx, turtle_dy;
   float turtle_step = 10.0f;
@@ -32,7 +33,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
   float x, y;
 
 
-  public Filter_GeneratorHilbertCurve(MainGUI gui, MakelangeloRobot mc,
+  public Generator_HilbertCurve(MainGUI gui, MakelangeloRobot mc,
                                       MultilingualSupport ms) {
     super(gui, mc, ms);
   }

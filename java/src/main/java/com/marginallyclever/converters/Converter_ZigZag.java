@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
@@ -13,6 +13,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
+import com.marginallyclever.filters.Filter_Resize;
 import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -25,7 +29,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
+public class Converter_ZigZag extends Filter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
   @Override
@@ -45,7 +49,7 @@ public class Filter_GeneratorZigZag extends Filter implements DrawDecorator {
   int scount;
 
 
-  public Filter_GeneratorZigZag(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public Converter_ZigZag(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 

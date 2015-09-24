@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.generators;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -18,16 +18,13 @@ import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.filters.Filter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-//import java.awt.Shape;
-//import java.awt.font.FontRenderContext;
-//import java.awt.font.TextLayout;
-//import java.awt.geom.PathIterator;
 
 
-public class Filter_GeneratorYourMessageHere extends Filter {
+public class Generator_YourMessageHere extends Filter {
   protected float kerning = -0.50f;
   protected float letter_width = 2.0f;
   protected float letter_height = 2.0f;
@@ -37,9 +34,9 @@ public class Filter_GeneratorYourMessageHere extends Filter {
   protected int chars_per_line = 35;
   protected static String lastMessage = "";
 
-  private final Logger logger = LoggerFactory.getLogger(Filter_GeneratorYourMessageHere.class);
+  private final Logger logger = LoggerFactory.getLogger(Generator_YourMessageHere.class);
 
-  public Filter_GeneratorYourMessageHere(MainGUI gui,
+  public Generator_YourMessageHere(MainGUI gui,
                                          MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
     logFonts();

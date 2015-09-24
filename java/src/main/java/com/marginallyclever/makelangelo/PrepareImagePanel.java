@@ -60,21 +60,21 @@ import org.kabeja.parser.ParserBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.converters.Converter_Boxes;
+import com.marginallyclever.converters.Converter_ColorBoxes;
+import com.marginallyclever.converters.Converter_Crosshatch;
+import com.marginallyclever.converters.Converter_Pulse;
+import com.marginallyclever.converters.Converter_Sandy;
+import com.marginallyclever.converters.Converter_Scanline;
+import com.marginallyclever.converters.Converter_Spiral;
+import com.marginallyclever.converters.Converter_VoronoiStippling;
+import com.marginallyclever.converters.Converter_VoronoiZigZag;
+import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.filters.Filter;
-import com.marginallyclever.filters.Filter_GeneratorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
-import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
-import com.marginallyclever.filters.Filter_GeneratorPulse;
-import com.marginallyclever.filters.Filter_GeneratorSandy;
-import com.marginallyclever.filters.Filter_GeneratorScanline;
-import com.marginallyclever.filters.Filter_GeneratorSpiral;
-import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
-import com.marginallyclever.filters.Filter_GeneratorVoronoiZigZag;
-import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
-import com.marginallyclever.filters.Filter_GeneratorZigZag;
+import com.marginallyclever.generators.Generator_HilbertCurve;
 //import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
+import com.marginallyclever.generators.Generator_YourMessageHere;
 
 
 /**
@@ -134,16 +134,16 @@ implements ActionListener, ChangeListener {
   // TODO use a ServiceLoader and find generator plugins in nearby folders
   protected void loadImageConverters() {
     image_converters = new ArrayList<Filter>();
-    image_converters.add(new Filter_GeneratorZigZag(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorSpiral(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorCrosshatch(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorScanline(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorPulse(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorBoxes(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorColorBoxes(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorVoronoiZigZag(gui,machineConfiguration,translator));
-    image_converters.add(new Filter_GeneratorSandy(gui,machineConfiguration,translator));
+    image_converters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_Spiral(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_Crosshatch(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_Scanline(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_Pulse(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_Boxes(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_ColorBoxes(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
+    image_converters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
+    image_converters.add(new Converter_Sandy(gui,machineConfiguration,translator));
     //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
@@ -855,7 +855,7 @@ implements ActionListener, ChangeListener {
 
 
   public void hilbertCurve() {
-    Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(gui, machineConfiguration, translator);
+    Generator_HilbertCurve msg = new Generator_HilbertCurve(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
 	    loadGCode(gui.getTempDestinationFile());
 	    gui.playConversionFinishedSound();
@@ -864,7 +864,7 @@ implements ActionListener, ChangeListener {
 
 
   public void textToGCODE() {
-    Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(gui, machineConfiguration, translator);
+    Generator_YourMessageHere msg = new Generator_YourMessageHere(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
 	    loadGCode(gui.getTempDestinationFile());
 	    gui.playConversionFinishedSound();

@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.Color;
@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -23,7 +25,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author danroyer
  * @since at least 7.1.4
  */
-public class Filter_GeneratorColorFloodFill extends Filter {
+public class Converter_ColorFloodFill extends Filter {
   ColorPalette palette;
   int diameter = 0;
   int last_x, last_y;
@@ -31,7 +33,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
   BufferedImage imgMask;
 
 
-  public Filter_GeneratorColorFloodFill(MainGUI gui, MakelangeloRobot mc,
+  public Converter_ColorFloodFill(MainGUI gui, MakelangeloRobot mc,
                                         MultilingualSupport ms) {
     super(gui, mc, ms);
 

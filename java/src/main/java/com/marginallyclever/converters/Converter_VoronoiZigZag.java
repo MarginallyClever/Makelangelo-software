@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
@@ -21,6 +21,8 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
@@ -38,7 +40,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorator {
+public class Converter_VoronoiZigZag extends Filter implements DrawDecorator {
   private ReentrantLock lock = new ReentrantLock();
   
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -66,7 +68,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   long time_limit=10*60*1000;  // 10 minutes
   
   
-  public Filter_GeneratorVoronoiZigZag(MainGUI gui,
+  public Converter_VoronoiZigZag(MainGUI gui,
       MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }

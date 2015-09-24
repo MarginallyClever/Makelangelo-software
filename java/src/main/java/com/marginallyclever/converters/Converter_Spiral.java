@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
+import com.marginallyclever.filters.Filter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -19,7 +21,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  * @author Dan
  */
-public class Filter_GeneratorSpiral extends Filter {
+public class Converter_Spiral extends Filter {
 
   @Override
   public String getName() {
@@ -29,7 +31,7 @@ public class Filter_GeneratorSpiral extends Filter {
   boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 
 
-  public Filter_GeneratorSpiral(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public Converter_Spiral(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
