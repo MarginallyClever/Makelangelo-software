@@ -144,7 +144,6 @@ public final class MainGUI
   // menu tabs
   private PrepareImagePanel prepareImage;
   private MakelangeloDriveControls driveControls;
-  private MakelangeloSettingsPanel settingsPane;
   public StatusBar statusBar;
 
   // reading file
@@ -1020,9 +1019,6 @@ public final class MainGUI
 
     boolean isConfirmed = connectionToRobot != null && connectionToRobot.isRobotConfirmed();
 
-    if (settingsPane != null) {
-      settingsPane.updateButtonAccess(isConfirmed, isRunning);
-    }
     if (prepareImage != null) {
       prepareImage.updateButtonAccess(isConfirmed, isRunning);
     }
@@ -1151,9 +1147,6 @@ public final class MainGUI
     c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     clearLog();
 
-    settingsPane = new MakelangeloSettingsPanel();
-    settingsPane.createPanel(this, translator, machineConfiguration);
-
     drawPanel = new DrawPanel(machineConfiguration);
     drawPanel.setGCode(gCode);
 
@@ -1169,7 +1162,6 @@ public final class MainGUI
 
     contextMenu = new JTabbedPane();
     contextMenu.setPreferredSize(new Dimension(450,100));
-    contextMenu.addTab(translator.get("MenuSettings"), null, settingsPane, null);
     contextMenu.addTab(translator.get("MenuGCODE"), null, prepareImage, null);
     contextMenu.addTab(translator.get("MenuDraw"), null, driveControls, null);
     contextMenu.addTab(translator.get("MenuLog"), null, logPane, null);

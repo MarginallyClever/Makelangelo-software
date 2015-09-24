@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -99,6 +100,7 @@ implements ActionListener, ChangeListener {
 
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
+  private JButton openConfig;
   private JSlider input_paper_margin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
@@ -172,19 +174,23 @@ implements ActionListener, ChangeListener {
       // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
       logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
     }
-
+    
     input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
     input_paper_margin.setMajorTickSpacing(10);
     input_paper_margin.setMinorTickSpacing(5);
     input_paper_margin.setPaintTicks(false);
     input_paper_margin.setPaintLabels(true);
 
-    JPanel machineNumberPanel = new JPanel(new GridLayout(1,0));
+    JPanel machineNumberPanel = new JPanel(new GridLayout(0,1));
     p.add(machineNumberPanel);
     machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
     machineNumberPanel.add(machineChoices);
+
+    openConfig = new JButton(translator.get("configureMachine"));
+    p.add(openConfig);
+    openConfig.addActionListener(this);
     
-    JPanel marginPanel = new JPanel(new GridLayout(1,0));
+    JPanel marginPanel = new JPanel(new GridLayout(0,1));
     p.add(marginPanel);
     marginPanel.add(new JLabel(translator.get("PaperMargin")));
     marginPanel.add(input_paper_margin);
@@ -209,7 +215,7 @@ implements ActionListener, ChangeListener {
     
     p.add(new JSeparator());
     
-    JPanel drivePanel = new JPanel(new GridLayout(1,0));
+    JPanel drivePanel = new JPanel(new GridLayout(2,2));
     p.add(drivePanel);
     // Draw menu
     buttonStart = new JButton(translator.get("Start"));
@@ -247,6 +253,11 @@ implements ActionListener, ChangeListener {
     long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
     machineConfiguration.loadConfig(new_uid);
 
+    if( subject == openConfig ) {
+    	openConfigDialog();
+    	return;
+    }
+    
     if (subject == buttonOpenFile) {
       openFileDialog();
       return;
@@ -302,6 +313,14 @@ implements ActionListener, ChangeListener {
     }
   }
 
+  
+  /**
+   * open a dialog to configure the machine
+   */
+  private void openConfigDialog() {
+	  
+  }
+  
 
   /**
    * open a dialog to ask for the line number.
