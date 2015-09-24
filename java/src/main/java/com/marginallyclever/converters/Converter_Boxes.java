@@ -2,12 +2,8 @@ package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
@@ -67,16 +63,11 @@ public class Converter_Boxes extends ImageConverter {
    * turn the image into a grid of boxes.  box size is affected by source image darkness.
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
 
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
       // Set up the conversion from image space to paper space, select the current tool, etc.
       imageStart(img, out);
       // "please change to tool X and press any key to continue"
@@ -138,7 +129,6 @@ public class Converter_Boxes extends ImageConverter {
             }
           }
         }
-      }
 
       liftPen(out);
       signName(out);

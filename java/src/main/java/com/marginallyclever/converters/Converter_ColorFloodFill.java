@@ -4,12 +4,8 @@ package com.marginallyclever.converters;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
@@ -246,7 +242,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     //Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
     //img = bw.process(img);
@@ -264,13 +260,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
     g.fillRect(0, 0, imgMask.getWidth(), imgMask.getHeight());
 
 
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer osw = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+
       // Set up the conversion from image space to paper space, select the current tool, etc.
-      imageStart(img, osw);
+      imageStart(img, out);
 
 
       float pw = (float) machine.getPaperWidth();
@@ -289,17 +281,16 @@ public class Converter_ColorFloodFill extends ImageConverter {
       last_x = img.getWidth() / 2;
       last_y = img.getHeight() / 2;
 
-      scanColor(0, osw);  // black
-      scanColor(1, osw);  // red
-      scanColor(2, osw);  // green
-      scanColor(3, osw);  // blue
+      scanColor(0, out);  // black
+      scanColor(1, out);  // red
+      scanColor(2, out);  // green
+      scanColor(3, out);  // blue
 
       mainGUI.log("<font color='green'>Signing my name</font>\n");
 
       // pen already lifted
-      signName(osw);
-      moveTo(0, 0, true, osw);
-    }
+      signName(out);
+      moveTo(0, 0, true, out);
     return true;
   }
 }

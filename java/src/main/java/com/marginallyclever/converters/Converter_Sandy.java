@@ -33,7 +33,9 @@ public class Converter_Sandy extends ImageConverter {
   }
 
   @Override
-  public String getName() { return translator.get("SandyNobleName"); }
+  public String getName() {
+	  return translator.get("Sandy Noble Style");
+  }
 
   /**
    * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
@@ -52,7 +54,7 @@ public class Converter_Sandy extends ImageConverter {
    * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     final JTextField field_size = new JTextField(Float.toString(blockScale));
 
     JPanel panel = new JPanel(new GridLayout(0,1));
@@ -67,7 +69,7 @@ public class Converter_Sandy extends ImageConverter {
     if (result == JOptionPane.OK_OPTION) {
       blockScale = Float.parseFloat(field_size.getText());
       direction = direction_choices.getSelectedIndex();
-      convertNow(img);
+      convertNow(img,out);
       return true;
     }
     return false;
@@ -79,18 +81,11 @@ public class Converter_Sandy extends ImageConverter {
    * @param img the buffered image to convert
    * @throws IOException couldn't open output file
    */
-  private void convertNow(BufferedImage img) throws IOException {
+  private void convertNow(BufferedImage img,Writer out) throws IOException {
     // make black & white
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
   
-
-    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-    try(
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-	) {
-
         imageStart(img, out);
 
         // set absolute coordinates
@@ -104,7 +99,6 @@ public class Converter_Sandy extends ImageConverter {
         liftPen(out);
         signName(out);
         moveTo(out, 0, 0, true);
-	}
   }
   
   

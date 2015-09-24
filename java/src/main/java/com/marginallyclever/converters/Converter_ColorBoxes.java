@@ -2,12 +2,8 @@ package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
@@ -191,12 +187,7 @@ public class Converter_ColorBoxes extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
       // Set up the conversion from image space to paper space, select the current tool, etc.
       imageStart(img, out);
 
@@ -231,7 +222,7 @@ public class Converter_ColorBoxes extends ImageConverter {
       signName(out);
 
       tool.writeMoveTo(out, 0, 0);
-    }
+
     return true;
   }
 }

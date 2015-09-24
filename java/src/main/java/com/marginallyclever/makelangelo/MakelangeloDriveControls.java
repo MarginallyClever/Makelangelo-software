@@ -22,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 /**
  * The GUI for the live driving controls, the start/pause/stop buttons, and the "send gcode" dialog.

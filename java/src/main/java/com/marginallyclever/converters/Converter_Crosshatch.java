@@ -2,12 +2,8 @@ package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
@@ -39,15 +35,9 @@ public class Converter_Crosshatch extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
-
-    mainGUI.log("<font color='green'>Converting to gcode and saving " + dest + "</font>\n");
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
 
       imageStart(img, out);
 
@@ -62,7 +52,7 @@ public class Converter_Crosshatch extends ImageConverter {
       liftPen(out);
       signName(out);
       moveTo(out, 0, 0, true);
-    }
+
     return true;
   }
 

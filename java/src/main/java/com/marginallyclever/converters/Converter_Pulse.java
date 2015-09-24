@@ -3,12 +3,8 @@ package com.marginallyclever.converters;
 
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -55,7 +51,7 @@ public class Converter_Pulse extends ImageConverter {
    *
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     final JTextField field_size = new JTextField(Float.toString(blockScale));
 
     JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -70,7 +66,7 @@ public class Converter_Pulse extends ImageConverter {
     if (result == JOptionPane.OK_OPTION) {
       blockScale = Float.parseFloat(field_size.getText());
       direction = direction_choices.getSelectedIndex();
-      convertNow(img);
+      convertNow(img,out);
       return true;
     }
     return false;
@@ -84,15 +80,9 @@ public class Converter_Pulse extends ImageConverter {
    * @param img the buffered image to convert
    * @throws IOException couldn't open output file
    */
-  private void convertNow(BufferedImage img) throws IOException {
+  private void convertNow(BufferedImage img,Writer out) throws IOException {
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
-
-    mainGUI.log("<font color='green'>Converting to gcode and saving " + dest + "</font>\n");
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
 
       imageStart(img, out);
 
@@ -106,7 +96,6 @@ public class Converter_Pulse extends ImageConverter {
       liftPen(out);
       signName(out);
       moveTo(out, 0, 0, true);
-    }
   }
 
 

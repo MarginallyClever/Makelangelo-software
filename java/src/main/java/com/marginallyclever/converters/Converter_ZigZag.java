@@ -175,7 +175,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   }
 
 
-  private void generateTSP() {
+  private void generateTSP(Writer out) throws IOException {
     greedyTour();
 
     mainGUI.log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
@@ -200,7 +200,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
       updateProgress(len, 2);
     }
 
-    convertAndSaveToGCode();
+    convertAndSaveToGCode(out);
   }
 
 
@@ -271,7 +271,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    * Since all the points are connected in a single loop,
    * start at the tsp point closest to the calibration point and go around until you get back to the start.
    */
-  private void convertAndSaveToGCode() {
+  private void convertAndSaveToGCode(Writer out) throws IOException {
     // find the tsp point closest to the calibration point
     int i;
     int besti = -1;
@@ -287,11 +287,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
       }
     }
 
-    // write
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+
       out.write(machine.getConfigLine() + ";\n");
       out.write(machine.getBobbinLine() + ";\n");
 
@@ -314,9 +310,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
       liftPen(out);
       signName(out);
       tool.writeMoveTo(out, 0, 0);
-    } catch (IOException e) {
-      mainGUI.log("<font color='red'>Error saving " + dest + ": " + e.getMessage() + "</font>");
-    }
   }
 
 
@@ -357,7 +350,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    *
    * @param img the image to convert.
    */
-  public boolean convert(BufferedImage img) {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     mainGUI.getDrawPanel().setDecorator(this);
 
     // resize & flip as needed
@@ -376,7 +369,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
     // connect the dots
     connectTheDots(img);
     // Shorten the line that connects the dots
-    generateTSP();
+    generateTSP(out);
 
     mainGUI.getDrawPanel().setDecorator(null);
     return true;

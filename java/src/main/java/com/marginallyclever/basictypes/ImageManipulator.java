@@ -3,7 +3,6 @@ package com.marginallyclever.basictypes;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +92,7 @@ public abstract class ImageManipulator {
 
   
   /**
-   * @return the translation key of your derived class.
+   * @return the translated name of the manipulator.
    */
   public String getName() {
     return "Unnamed";

@@ -2,12 +2,8 @@ package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
