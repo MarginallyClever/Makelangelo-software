@@ -1,12 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,18 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.Preferences;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,12 +56,12 @@ public final class MachineConfiguration {
   public boolean m2invert = false;
 
   // pulley diameter
-  private double bobbin_left_diameter=1.5;
-  private double bobbin_right_diameter=1.5;
+  public double bobbin_left_diameter=1.5;
+  public double bobbin_right_diameter=1.5;
 
-  private double max_feed_rate=11000;  // etch-a-sketch speed
+  public double max_feed_rate=11000;  // etch-a-sketch speed
 
-  private String commonPaperSizes [] = { "",
+  public final String commonPaperSizes [] = { "",
 		"4A0 (1682 x 2378)",
 		"2A0 (1189 x 1682)",
 		"A0 (841 x 1189)",
@@ -138,7 +119,7 @@ public final class MachineConfiguration {
    * </pre>
 >>>>>>> origin/dev
    */
-  private int startingPositionIndex = 4;
+  public int startingPositionIndex = 4;
 
   // TODO a way for users to create different tools for each machine
   private List<DrawingTool> tools;
@@ -147,9 +128,8 @@ public final class MachineConfiguration {
 
   private String[] machineConfigurationsAvailable = null;
 
-  private MainGUI mainGUI = null;
-
-  private MultilingualSupport translator;
+  private MainGUI gui = null;
+  private MultilingualSupport translator = null;
 
   private final Logger logger = LoggerFactory.getLogger(MachineConfiguration.class);
 
@@ -157,21 +137,21 @@ public final class MachineConfiguration {
    * TODO move tool names into translations & add a color palette system for quantizing colors
    *
    * @param gui
-   * @param ms
+   * @param translator
    */
-  protected MachineConfiguration(MainGUI gui, MultilingualSupport ms) {
-    mainGUI = gui;
-    translator = ms;
+  protected MachineConfiguration(MainGUI _gui, MultilingualSupport _translator) {
+    gui = _gui;
+    translator = _translator;
 
-    commonPaperSizes[0] = ms.get("Other");
+    commonPaperSizes[0] = translator.get("Other");
     
     tools = new ArrayList<>();
-    tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, ms, this));
-    tools.add(new DrawingTool_Pen("Pen (red)", 1, gui, ms, this));
-    tools.add(new DrawingTool_Pen("Pen (green)", 2, gui, ms, this));
-    tools.add(new DrawingTool_Pen("Pen (blue)", 3, gui, ms, this));
-    tools.add(new DrawingTool_LED(gui, ms, this));
-    tools.add(new DrawingTool_Spraypaint(gui, ms, this));
+    tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, translator, this));
+    tools.add(new DrawingTool_Pen("Pen (red)", 1, gui, translator, this));
+    tools.add(new DrawingTool_Pen("Pen (green)", 2, gui, translator, this));
+    tools.add(new DrawingTool_Pen("Pen (blue)", 3, gui, translator, this));
+    tools.add(new DrawingTool_LED(gui, translator, this));
+    tools.add(new DrawingTool_Spraypaint(gui, translator, this));
 
     // which configurations are available?
     try {
@@ -188,7 +168,7 @@ public final class MachineConfiguration {
    * Must match commonPaperSizes
    * @return
    */
-  private int getCurrentPaperSizeChoice(double pw,double ph) {
+  public int getCurrentPaperSizeChoice(double pw,double ph) {
 	    if( pw == 1682 && ph == 2378 ) return 1;
 	    if( pw == 1189 && ph == 1682 ) return 2;
 	    if( pw == 841 && ph == 1189 ) return 3;
@@ -203,322 +183,6 @@ public final class MachineConfiguration {
 	    return 0;
   }
 
-  /**
-   * Open the config dialog, send the config update to the robot, save it for future, and refresh the preview tab.
-   */
-  public void adjustMachineSize() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("MenuSettingsMachine"), true);
-    JPanel container = new JPanel();
-
-    container.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
-    driver.add(container);
-    //container.setLayout(new GridLayout(0,1,8,8));
-    container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
-
-
-    GridBagConstraints c = new GridBagConstraints();
-    GridBagConstraints d = new GridBagConstraints();
-
-    int y = 0;
-    
-    final JButton cancel = new JButton(translator.get("Cancel"));
-    final JButton save = new JButton(translator.get("Save"));
-/*
-    JLabel picLabel = null;
-    BufferedImage myPicture = null;
-    final String limit_file = "limits.png";
-    try (final InputStream s = getClass().getClassLoader().getResourceAsStream(limit_file)) {
-      myPicture = ImageIO.read(s);
-    }
-    catch(IOException e) {
-      logger.error("{}", e);
-      myPicture=null;
-    }
-    
-    if (myPicture != null) {
-      picLabel = new JLabel(new ImageIcon(myPicture));
-    } else {
-      logger.error("{}", translator.get("CouldNotFind")+limit_file);
-    }*/
-
-/*
-    if (myPicture != null) {
-      c.weightx = 0.25;
-      c.gridx = 0;
-      c.gridy = y;
-      c.gridwidth = 4;
-      c.gridheight = 4;
-      c.anchor = GridBagConstraints.CENTER;
-      container.add(picLabel, c);
-      y += 5;
-    }
-*/    
-    JPanel p = new JPanel(new GridBagLayout());
-    container.add(p);
-    
-    c.gridwidth=3;
-    p.add(new JLabel("1\" = 25.4mm",SwingConstants.CENTER),c);
-    c.gridwidth=1;
-    
-    y=1;
-
-    c.anchor=GridBagConstraints.EAST;
-    d.anchor=GridBagConstraints.WEST;
-
-    final JTextField mw = new JTextField(String.valueOf((limit_right-limit_left)*10));
-    final JTextField mh = new JTextField(String.valueOf((limit_top-limit_bottom)*10));
-    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineWidth")),c);
-    d.gridx=1;  d.gridy=y;  p.add(mw,d);
-    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
-    y++;
-    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineHeight")),c);
-    d.gridx=1;  d.gridy=y;  p.add(mh,d);
-    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
-    y++;
-
-    container.add(new JSeparator(SwingConstants.HORIZONTAL));
-    p = new JPanel(new GridBagLayout());
-    container.add(p);
-    y=0;
-    final JComboBox<String> paperSizes = new JComboBox<>(commonPaperSizes);
-    paperSizes.setSelectedIndex(getCurrentPaperSizeChoice( (paper_right-paper_left)*10, (paper_top-paper_bottom)*10) );
-    
-    final JTextField pw = new JTextField(Integer.toString((int)((paper_right-paper_left)*10)));
-    final JTextField ph = new JTextField(Integer.toString((int)((paper_top-paper_bottom)*10)));
-    
-    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
-    d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
-    y=1;
-    d.gridwidth=1;
-
-    c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
-    d.gridx=1;  d.gridy=y;  p.add(pw,d); 
-    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
-    y++;
-    c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
-    d.gridx=1;  d.gridy=y;  p.add(ph,d);
-    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
-    y++;
-    
-    //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
-    //container.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
-    //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  container.add(new JLabel("Pen starts at paper"),c);
-    //c.anchor=GridBagConstraints.WEST;
-    //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  container.add(startPos,c);
-
-    //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
-    //startPos.setSelectedIndex(startingPositionIndex);
-
-    
-    container.add(new JSeparator());
-    p = new JPanel(new GridBagLayout());
-    container.add(p);
-    
-    c = new GridBagConstraints();
-    c.gridwidth=3;
-    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
-    c.gridwidth=1;
-    
-    final JTextField mBobbin1 = new JTextField(String.valueOf(bobbin_left_diameter * 10));
-    final JTextField mBobbin2 = new JTextField(String.valueOf(bobbin_right_diameter * 10));
-    y=2;
-    c.weightx = 0;
-    c.anchor=GridBagConstraints.EAST;
-    d.anchor=GridBagConstraints.WEST;
-    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("Left")), c);
-    d.gridx = 1;    d.gridy = y;    p.add(mBobbin1, d);
-    d.gridx = 2;    d.gridy = y;    p.add(new JLabel(translator.get("Millimeters")), d);
-    y++;
-    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("Right")), c);
-    d.gridx = 1;    d.gridy = y;    p.add(mBobbin2, d);
-    d.gridx = 2;    d.gridy = y;    p.add(new JLabel(translator.get("Millimeters")), d);
-
-    Dimension s = mBobbin1.getPreferredSize();
-    s.width = 80;
-    mBobbin1.setPreferredSize(s);
-    mBobbin2.setPreferredSize(s);
-
-
-    p = new JPanel(new GridBagLayout());
-    container.add(p);
-    
-    c.anchor=GridBagConstraints.EAST;
-    c.gridy=0;
-    c.weightx=0;
-    c.weighty=1;
-    c.gridx=1; c.gridwidth=1; p.add(save,c);
-    c.gridx=2; c.gridwidth=1; p.add(cancel,c);
-    c.weightx=1;
-    c.gridx=0; c.gridwidth=1; p.add(Box.createGlue(),c);
-
-    s = ph.getPreferredSize();
-    s.width = 80;
-    mw.setPreferredSize(s);
-    mh.setPreferredSize(s);
-    pw.setPreferredSize(s);
-    ph.setPreferredSize(s);
-
-    KeyListener driveKeys = new KeyListener() {
-    	public void keyPressed(KeyEvent e) {}
-    	public void keyReleased(KeyEvent e) { Event(e); }
-    	public void keyTyped(KeyEvent e) { Event(e); }
-    	
-    	private void Event(KeyEvent e) {
-        	double w=0;
-        	double h=0;
-        	try {
-        		w = Double.parseDouble(pw.getText());
-        		h = Double.parseDouble(ph.getText());
-        	} catch(Exception err) {
-        		err.getMessage();
-        	}
-        	paperSizes.setSelectedIndex(getCurrentPaperSizeChoice(w,h));	
-    	}
-    };
-    
-    ActionListener driveButtons = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Object subject = e.getSource();
-
-        if(subject == paperSizes) {
-            final int selectedIndex = paperSizes.getSelectedIndex();
-            if(selectedIndex!= 0) {
-            	String str = paperSizes.getItemAt(selectedIndex);
-            	String sw = str.substring(str.indexOf('(')+1, str.indexOf('x')).trim();
-            	String sh = str.substring(str.indexOf('x')+1, str.indexOf(')')).trim();
-            	pw.setText(sw);
-            	ph.setText(sh);
-            }
-        }
-        
-        if(subject == save) {
-            double pwf = Double.valueOf(pw.getText()) / 10.0;
-            double phf = Double.valueOf(ph.getText()) / 10.0;
-            double mwf = Double.valueOf(mw.getText()) / 10.0;
-            double mhf = Double.valueOf(mh.getText()) / 10.0;
-            boolean data_is_sane=true;
-            if( pwf<=0 ) data_is_sane=false;
-            if( phf<=0 ) data_is_sane=false;
-            if( mwf<=0 ) data_is_sane=false;
-            if( mhf<=0 ) data_is_sane=false;
-
-            double bld = Double.valueOf(mBobbin1.getText()) / 10.0;
-            double brd = Double.valueOf(mBobbin2.getText()) / 10.0;
-
-            if (bld <= 0) data_is_sane = false;
-            if (brd <= 0) data_is_sane = false;
-
-          if (data_is_sane) {
-        	  bobbin_left_diameter = bld;
-        	  bobbin_right_diameter = brd;
-            //startingPositionIndex = startPos.getSelectedIndex();
-            /*// relative to machine limits
-            switch(startingPositionIndex%3) {
-            case 0:
-              paper_left=(mwf-pwf)/2.0f;
-              paper_right=mwf-paper_left;
-              limit_left=0;
-              limit_right=mwf;
-              break;
-            case 1:
-              paper_left = -pwf/2.0f;
-              paper_right = pwf/2.0f;
-              limit_left = -mwf/2.0f;
-              limit_right = mwf/2.0f;
-              break;
-            case 2:
-              paper_right=-(mwf-pwf)/2.0f;
-              paper_left=-mwf-paper_right;
-              limit_left=-mwf;
-              limit_right=0;
-              break;
-            }
-            switch(startingPositionIndex/3) {
-            case 0:
-              paper_top=-(mhf-phf)/2;
-              paper_bottom=-mhf-paper_top;
-              limit_top=0;
-              limit_bottom=-mhf;
-              break;
-            case 1:
-              paper_top=phf/2;
-              paper_bottom=-phf/2;
-              limit_top=mhf/2;
-              limit_bottom=-mhf/2;
-              break;
-            case 2:
-              paper_bottom=(mhf-phf)/2;
-              paper_top=mhf-paper_bottom;
-              limit_top=mhf;
-              limit_bottom=0;
-              break;
-            }
-            */
-            startingPositionIndex = 4;
-            // relative to paper limits
-            switch (startingPositionIndex % 3) {
-              case 0:
-                paper_left = 0;
-                paper_right = pwf;
-                limit_left = -(mwf - pwf) / 2.0f;
-                limit_right = (mwf - pwf) / 2.0f + pwf;
-                break;
-              case 1:
-                paper_left = -pwf / 2.0f;
-                paper_right = pwf / 2.0f;
-                limit_left = -mwf / 2.0f;
-                limit_right = mwf / 2.0f;
-                break;
-              case 2:
-                paper_right = 0;
-                paper_left = -pwf;
-                limit_left = -pwf - (mwf - pwf) / 2.0f;
-                limit_right = (mwf - pwf) / 2.0f;
-                break;
-            }
-            switch (startingPositionIndex / 3) {
-              case 0:
-                paper_top = 0;
-                paper_bottom = -phf;
-                limit_top = (mhf - phf) / 2.0f;
-                limit_bottom = -phf - (mhf - phf) / 2.0f;
-                break;
-              case 1:
-                paper_top = phf / 2.0f;
-                paper_bottom = -phf / 2.0f;
-                limit_top = mhf / 2.0f;
-                limit_bottom = -mhf / 2.0f;
-                break;
-              case 2:
-                paper_bottom = 0;
-                paper_top = phf;
-                limit_top = phf + (mhf - phf) / 2.0f;
-                limit_bottom = -(mhf - phf) / 2.0f;
-                break;
-            }
-
-            saveConfig();
-            mainGUI.sendConfig();
-            driver.dispose();
-          }
-        }
-        if (subject == cancel) {
-          driver.dispose();
-        }
-      }
-    };
-
-    mainGUI.sendLineToRobot("M114"); // "where" command
-    save.addActionListener(driveButtons);
-    driver.getRootPane().setDefaultButton(save);
-    cancel.addActionListener(driveButtons);
-    paperSizes.addActionListener(driveButtons);
-    pw.addKeyListener(driveKeys);
-    ph.addKeyListener(driveKeys);
-    driver.pack();
-    driver.setVisible(true);
-  }
-
 
   public String[] getToolNames() {
     String[] toolNames = new String[tools.size()];
@@ -529,66 +193,6 @@ public final class MachineConfiguration {
       toolNames[c++] = t.getName();
     }
     return toolNames;
-  }
-
-
-  /**
-   * dialog to adjust the pen up & pen down values
-   */
-  protected void changeTool() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("AdjustMachineSize"), true);
-    driver.setLayout(new GridBagLayout());
-
-    final JComboBox<String> toolCombo = new JComboBox<String>(getToolNames());
-    toolCombo.setSelectedIndex(current_tool);
-
-    final JButton cancel = new JButton(translator.get("Cancel"));
-    final JButton save = new JButton(translator.get("Save"));
-
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridx = 0;
-    c.gridy = 1;
-    c.gridwidth = 2;
-    c.gridheight = 1;
-    driver.add(new JLabel(translator.get("ToolType")), c);
-    c.anchor = GridBagConstraints.WEST;
-    c.gridx = 2;
-    c.gridy = 1;
-    c.gridwidth = 2;
-    c.gridheight = 1;
-    driver.add(toolCombo, c);
-
-
-    c.anchor = GridBagConstraints.EAST;
-    c.gridy = 3;
-    c.gridx = 3;
-    c.gridwidth = 1;
-    driver.add(cancel, c);
-    c.gridx = 2;
-    c.gridwidth = 1;
-    driver.add(save, c);
-
-    ActionListener driveButtons = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Object subject = e.getSource();
-        if (subject == save) {
-          current_tool = toolCombo.getSelectedIndex();
-
-          saveConfig();
-          mainGUI.sendConfig();
-          driver.dispose();
-        }
-        if (subject == cancel) {
-          driver.dispose();
-        }
-      }
-    };
-
-    save.addActionListener(driveButtons);
-    cancel.addActionListener(driveButtons);
-    driver.getRootPane().setDefaultButton(save);
-    driver.pack();
-    driver.setVisible(true);
   }
 
 
@@ -649,7 +253,7 @@ public final class MachineConfiguration {
 
     paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
     reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", reverseForGlass ? "true" : "false"));
-    current_tool = Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(current_tool)));
+    setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
   }
 
 
@@ -725,7 +329,7 @@ public final class MachineConfiguration {
     // TODO move these values to image filter preferences?
     uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
     uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
-    uniqueMachinePreferencesNode.put("current_tool", Integer.toString(current_tool));
+    uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
   }
 
 
@@ -745,11 +349,11 @@ public final class MachineConfiguration {
 
 
   public String getPenUpString() {
-    return Float.toString(tools.get(current_tool).getZOff());
+    return Float.toString(getCurrentTool().getZOff());
   }
 
   public String getPenDownString() {
-    return Float.toString(tools.get(current_tool).getZOn());
+    return Float.toString(getCurrentTool().getZOn());
   }
 
   public boolean isPaperConfigured() {
@@ -780,7 +384,9 @@ public final class MachineConfiguration {
 
     if (limit_top == 0 && limit_bottom == 0 && limit_left == 0 && limit_right == 0) {
       // probably first time turning on, adjust the machine size
-      adjustMachineSize();
+    	MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui,translator,this);
+    	m.run();
+
     }
   }
 
@@ -812,7 +418,7 @@ public final class MachineConfiguration {
       // make sure a topLevelMachinesPreferenceNode node is created
       topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
       // tell the robot it's new UID.
-      mainGUI.sendLineToRobot("UID " + new_uid);
+      gui.sendLineToRobot("UID " + new_uid);
 
       // if this is a new robot UID, update the list of available configurations
       final String[] new_list = new String[machineConfigurationsAvailable.length + 1];
@@ -900,4 +506,11 @@ public final class MachineConfiguration {
   public long getUID() {
     return robot_uid;
   }
+
+	public void setCurrentToolNumber(int current_tool) {
+		this.current_tool = current_tool;
+	}
+	public int getCurrentToolNumber() {
+		return current_tool;
+	}
 }

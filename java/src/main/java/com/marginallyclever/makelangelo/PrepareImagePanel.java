@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo;
 
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -318,7 +317,8 @@ implements ActionListener, ChangeListener {
    * open a dialog to configure the machine
    */
   private void openConfigDialog() {
-	  
+	  MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
+	  m.run();
   }
   
 
@@ -358,6 +358,8 @@ implements ActionListener, ChangeListener {
     if (buttonHilbertCurve != null) buttonHilbertCurve.setEnabled(!isRunning);
     if (buttonText2GCODE != null) buttonText2GCODE.setEnabled(!isRunning);
 
+    openConfig.setEnabled(!isRunning);
+    
     buttonStart.setEnabled(isConnected && !isRunning);
     buttonStartAt.setEnabled(isConnected && !isRunning);
     buttonPause.setEnabled(isConnected && isRunning);
