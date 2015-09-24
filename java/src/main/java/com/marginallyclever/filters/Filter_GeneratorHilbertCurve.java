@@ -56,7 +56,7 @@ public class Filter_GeneratorHilbertCurve extends Filter {
   }
 
 
-  public void generate(final String dest) {
+  public boolean generate(final String dest) {
     final JTextField field_order = new JTextField(Integer.toString(order));
 
 
@@ -72,7 +72,9 @@ public class Filter_GeneratorHilbertCurve extends Filter {
       ymin = 0;
       order = Integer.parseInt(field_order.getText());
       createCurveNow(dest);
+      return true;
     }
+    return false;
   }
 
 

@@ -86,8 +86,8 @@ public class MakelangeloDriveControls
     GridBagConstraints c = new GridBagConstraints();
 
     JPanel axisControl = new JPanel(new GridBagLayout());
-    int w=60, h=20;
-      final JLabel yAxis = new JLabel("Y");     yAxis.setPreferredSize(new Dimension(w,h));     yAxis.setHorizontalAlignment(SwingConstants.CENTER);
+//    int w=60, h=20;
+//      final JLabel yAxis = new JLabel("Y");     yAxis.setPreferredSize(new Dimension(w,h));     yAxis.setHorizontalAlignment(SwingConstants.CENTER);
       down100 = tightJButton("-100");
       down10 = tightJButton("-10");
       down1 = tightJButton("-1");
@@ -95,7 +95,7 @@ public class MakelangeloDriveControls
       up10 = tightJButton("10");
       up100 = tightJButton("100");
       
-      final JLabel xAxis = new JLabel("X");     xAxis.setPreferredSize(new Dimension(w,h));   xAxis.setHorizontalAlignment(SwingConstants.CENTER);
+//      final JLabel xAxis = new JLabel("X");     xAxis.setPreferredSize(new Dimension(w,h));   xAxis.setHorizontalAlignment(SwingConstants.CENTER);
       left100 = tightJButton("-100");
       left10 = tightJButton("-10");
       left1 = tightJButton("-1");
@@ -104,7 +104,7 @@ public class MakelangeloDriveControls
       right100 = tightJButton("100");
 
       c.fill=GridBagConstraints.BOTH; 
-      c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
+      //c.gridx=4;  c.gridy=0;  axisControl.add(yAxis,c);
       c.gridx=4;  c.gridy=7;  axisControl.add(down100,c);
       c.gridx=4;  c.gridy=6;  axisControl.add(down10,c);
       c.gridx=4;  c.gridy=5;  axisControl.add(down1,c);
@@ -112,7 +112,7 @@ public class MakelangeloDriveControls
       c.gridx=4;  c.gridy=2;  axisControl.add(up10,c);
       c.gridx=4;  c.gridy=1;  axisControl.add(up100,c);
       
-      c.gridx=0;  c.gridy=4;  axisControl.add(xAxis,c);
+      //c.gridx=0;  c.gridy=4;  axisControl.add(xAxis,c);
       c.gridx=1;  c.gridy=4;  axisControl.add(left100,c);
       c.gridx=2;  c.gridy=4;  axisControl.add(left10,c);
       c.gridx=3;  c.gridy=4;  axisControl.add(left1,c);

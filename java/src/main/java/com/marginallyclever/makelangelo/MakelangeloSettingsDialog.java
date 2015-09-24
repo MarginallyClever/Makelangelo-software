@@ -72,12 +72,12 @@ implements ActionListener {
     	d.gridy=0;
     	d.weightx=1;
     	d.weighty=1;
-    	panes.setPreferredSize(new Dimension(400,400));
+    	panes.setPreferredSize(new Dimension(600,500));
     	this.add(panes,d);
 	
         // save and cancel buttons
-    	final JButton cancel = new JButton(translator.get("Cancel"));
-        final JButton save = new JButton(translator.get("Save"));
+    	cancel = new JButton(translator.get("Cancel"));
+        save = new JButton(translator.get("Save"));
 
 	    JPanel p = new JPanel(new GridBagLayout());
 	    GridBagConstraints c = new GridBagConstraints();

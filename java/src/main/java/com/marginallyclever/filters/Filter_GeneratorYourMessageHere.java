@@ -59,7 +59,7 @@ public class Filter_GeneratorYourMessageHere extends Filter {
     return translator.get("YourMsgHereName");
   }
 
-  public void generate(String dest) {
+  public boolean generate(String dest) {
     final JTextArea text = new JTextArea(lastMessage, 6, 60);
 
     JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -75,7 +75,10 @@ public class Filter_GeneratorYourMessageHere extends Filter {
 
       // TODO Move to GUI?
       mainGUI.log("<font color='green'>Completed.</font>\n");
+      
+      return true;
     }
+    return false;
   }
 
 	/*

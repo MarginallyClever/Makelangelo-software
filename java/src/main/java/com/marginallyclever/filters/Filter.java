@@ -97,8 +97,10 @@ public abstract class Filter {
 
   /**
    * Called by filters that create GCODE from nothing.  Fractals might be one example.
+   * @return true if generate succeeded.
    */
-  public void generate() {
+  public boolean generate() {
+	  return false;
   }
 
   /**

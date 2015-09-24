@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -100,7 +102,7 @@ implements ActionListener, ChangeListener {
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
   private JButton openConfig;
-  private JSlider input_paper_margin;
+  private JSlider paperMargin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
   protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
@@ -162,80 +164,82 @@ implements ActionListener, ChangeListener {
     gui = _gui;
     machineConfiguration = _machineConfiguration;
 
-    JPanel p = new JPanel(new GridLayout(0,1));
-    this.setViewportView(p);
-
-    machineConfigurations = getAnyMachineConfigurations();
-    machineChoices = new JComboBox<>(machineConfigurations);
-    try {
-      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-    } catch (IllegalArgumentException e) {
-      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
-      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
-    }
+    JPanel panel = new JPanel(new GridLayout(0,1));
+    this.setViewportView(panel);
     
-    input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
-    input_paper_margin.setMajorTickSpacing(10);
-    input_paper_margin.setMinorTickSpacing(5);
-    input_paper_margin.setPaintTicks(false);
-    input_paper_margin.setPaintLabels(true);
-
-    JPanel machineNumberPanel = new JPanel(new GridLayout(0,1));
-    p.add(machineNumberPanel);
-    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
-    machineNumberPanel.add(machineChoices);
-
-    openConfig = new JButton(translator.get("configureMachine"));
-    p.add(openConfig);
-    openConfig.addActionListener(this);
+    JPanel machineNumberPanel = new JPanel(new GridLayout(1,0));
+	    machineConfigurations = getAnyMachineConfigurations();
+	    machineChoices = new JComboBox<>(machineConfigurations);
+	    try {
+	      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+	    } catch (IllegalArgumentException e) {
+	      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
+	      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
+	    }
+	    
+	    openConfig = new JButton(translator.get("configureMachine"));
+	    openConfig.addActionListener(this);
+	    openConfig.setPreferredSize(openConfig.getPreferredSize());
+	
+	    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+	    machineNumberPanel.add(machineChoices);
+	    machineNumberPanel.add(openConfig);
+    panel.add(machineNumberPanel);
     
-    JPanel marginPanel = new JPanel(new GridLayout(0,1));
-    p.add(marginPanel);
-    marginPanel.add(new JLabel(translator.get("PaperMargin")));
-    marginPanel.add(input_paper_margin);
-    input_paper_margin.addChangeListener(this);
+    JPanel marginPanel = new JPanel(new GridLayout(1,0));
+	    paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
+	    paperMargin.setMajorTickSpacing(10);
+	    paperMargin.setMinorTickSpacing(5);
+	    paperMargin.setPaintTicks(false);
+	    paperMargin.setPaintLabels(true);
+	    paperMargin.addChangeListener(this);
+	    marginPanel.add(new JLabel(translator.get("PaperMargin")));
+	    marginPanel.add(paperMargin);
+    panel.add(marginPanel);
 
-    // File conversion menu
+    panel.add(new JSeparator());
+
+    // File conversion
     buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
     buttonOpenFile.addActionListener(this);
-    p.add(buttonOpenFile);
+    panel.add(buttonOpenFile);
 
     buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
     buttonHilbertCurve.addActionListener(this);
-    p.add(buttonHilbertCurve);
+    panel.add(buttonHilbertCurve);
 
     buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
     buttonText2GCODE.addActionListener(this);
-    p.add(buttonText2GCODE);
+    panel.add(buttonText2GCODE);
 
     buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
     buttonSaveFile.addActionListener(this);
-    p.add(buttonSaveFile);
-    
-    p.add(new JSeparator());
-    
-    JPanel drivePanel = new JPanel(new GridLayout(2,2));
-    p.add(drivePanel);
-    // Draw menu
-    buttonStart = new JButton(translator.get("Start"));
-    buttonStartAt = new JButton(translator.get("StartAtLine"));
-    buttonPause = new JButton(translator.get("Pause"));
-    buttonHalt = new JButton(translator.get("Halt"));
-    drivePanel.add(buttonStart);
-    drivePanel.add(buttonStartAt);
-    drivePanel.add(buttonPause);
-    drivePanel.add(buttonHalt);
-    buttonStart.addActionListener(this);
-    buttonStartAt.addActionListener(this);
-    buttonPause.addActionListener(this);
-    buttonHalt.addActionListener(this);
+    panel.add(buttonSaveFile);
 
+    panel.add(new JSeparator());
+
+    // drive menu
+    JPanel drivePanel = new JPanel(new GridLayout(2,2));
+	    buttonStart = new JButton(translator.get("Start"));
+	    buttonStartAt = new JButton(translator.get("StartAtLine"));
+	    buttonPause = new JButton(translator.get("Pause"));
+	    buttonHalt = new JButton(translator.get("Halt"));
+	    drivePanel.add(buttonStart);
+	    drivePanel.add(buttonStartAt);
+	    drivePanel.add(buttonPause);
+	    drivePanel.add(buttonHalt);
+	    buttonStart.addActionListener(this);
+	    buttonStartAt.addActionListener(this);
+	    buttonPause.addActionListener(this);
+	    buttonHalt.addActionListener(this);
+	panel.add(drivePanel);
+    
   }
 
   
   public void stateChanged(ChangeEvent e) {
 	e.getSource();
-    double pm=(100 - input_paper_margin.getValue()) * 0.01;
+    double pm=(100 - paperMargin.getValue()) * 0.01;
     if( machineConfiguration.paperMargin != pm ) {
     	machineConfiguration.paperMargin = pm;
     	machineConfiguration.saveConfig();
@@ -253,7 +257,8 @@ implements ActionListener, ChangeListener {
     machineConfiguration.loadConfig(new_uid);
 
     if( subject == openConfig ) {
-    	openConfigDialog();
+    	MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
+    	m.run();
     	return;
     }
     
@@ -310,15 +315,6 @@ implements ActionListener, ChangeListener {
         return;
       }
     }
-  }
-
-  
-  /**
-   * open a dialog to configure the machine
-   */
-  private void openConfigDialog() {
-	  MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
-	  m.run();
   }
   
 
@@ -860,18 +856,18 @@ implements ActionListener, ChangeListener {
 
   public void hilbertCurve() {
     Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(gui, machineConfiguration, translator);
-    msg.generate(gui.getTempDestinationFile());
-
-    loadGCode(gui.getTempDestinationFile());
-    gui.playConversionFinishedSound();
+    if(msg.generate(gui.getTempDestinationFile())) {
+	    loadGCode(gui.getTempDestinationFile());
+	    gui.playConversionFinishedSound();
+    }
   }
 
 
   public void textToGCODE() {
     Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(gui, machineConfiguration, translator);
-    msg.generate(gui.getTempDestinationFile());
-
-    loadGCode(gui.getTempDestinationFile());
-    gui.playConversionFinishedSound();
+    if(msg.generate(gui.getTempDestinationFile())) {
+	    loadGCode(gui.getTempDestinationFile());
+	    gui.playConversionFinishedSound();
+    }
   }
 }
