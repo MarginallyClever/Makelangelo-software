@@ -33,16 +33,12 @@ public class Converter_Scanline extends ImageConverter {
    * @param img the image to convert.
    */
   @Override
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
 
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+
       // Set up the conversion from image space to paper space, select the current tool, etc.
       imageStart(img, out);
       // "please change to tool X and press any key to continue"
@@ -60,23 +56,23 @@ public class Converter_Scanline extends ImageConverter {
 
       // from top to bottom of the image...
       int x, y, z, i = 0;
-      for (y = 0; y < image_height; y += steps) {
+      for (y = 0; y < imageHeight; y += steps) {
         ++i;
         if ((i % 2) == 0) {
           // every even line move left to right
 
           //MoveTo(file,x,y,pen up?)
           moveTo(out, (float) 0, (float) y, true);
-          for (x = 0; x < image_width; ++x) {
+          for (x = 0; x < imageWidth; ++x) {
             // read the image at x,y
             z = sample3x3(img, x, y);
             moveTo(out, (float) x, (float) y, (z > level));
           }
-          moveTo(out, (float) image_width, (float) y, true);
+          moveTo(out, (float) imageWidth, (float) y, true);
         } else {
           // every odd line move right to left
-          moveTo(out, (float) image_width, (float) y, true);
-          for (x = image_width - 1; x >= 0; --x) {
+          moveTo(out, (float) imageWidth, (float) y, true);
+          for (x = imageWidth - 1; x >= 0; --x) {
             z = sample3x3(img, x, y);
             moveTo(out, (float) x, (float) y, (z > level));
           }
@@ -87,7 +83,7 @@ public class Converter_Scanline extends ImageConverter {
       // pen already lifted
       signName(out);
       moveTo(out, 0, 0, true);
-    }
+
     return true;
   }
 }

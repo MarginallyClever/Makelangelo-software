@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -142,7 +143,7 @@ implements ActionListener, ChangeListener {
     imageConverters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
     imageConverters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
     imageConverters.add(new Converter_Sandy(gui,machineConfiguration,translator));
-    //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
+    //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
   /**
@@ -792,12 +793,16 @@ implements ActionListener, ChangeListener {
           gui.log("<font color='green'>" + translator.get("Converting") + " " + destinationFile + "</font>\n");
           // convert with style
           img = ImageIO.read(new File(sourceFile));
+  	  	  OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+  	  	  Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
 
-          ImageConverter f = imageConverters.get(getPreferredDrawStyle());
-          f.setParent(this);
-          f.setProgressMonitor(pm);
-          f.setDestinationFile(destinationFile);
-          f.convert(img);
+          ImageConverter converter = imageConverters.get(getPreferredDrawStyle());
+          converter.setParent(this);
+          converter.setProgressMonitor(pm);
+          converter.convert(img,out);
+
+          // TODO sign name here instead of in every converter
+          
           gui.updateMachineConfig();
         } catch (IOException e) {
           gui.log("<font color='red'>" + translator.get("Failed") + e.getLocalizedMessage() + "</font>\n");

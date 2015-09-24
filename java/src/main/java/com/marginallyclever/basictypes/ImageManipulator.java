@@ -29,21 +29,22 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author Dan
  */
 public abstract class ImageManipulator {
-  // image properties
-  protected int image_width, image_height;
+  
+  // helpers
   protected float w2, h2, scale;
+  
   protected DrawingTool tool;
 
   protected int colorChannel = 0;
 
   // text properties
   protected float kerning = 5.0f;
-  protected float letter_width = 10.0f;
-  protected float letter_height = 20.0f;
-  protected float line_spacing = 5.0f;
+  protected float letterWidth = 10.0f;
+  protected float letterHeight = 20.0f;
+  protected float lineSpacing = 5.0f;
   protected float padding = 5.0f;
   static final String ALPHABET_FOLDER = "ALPHABET/";
-  protected int chars_per_line = 25;
+  protected int charsPerLine = 25;
   protected boolean draw_bounding_box = false;
 
   // text position and alignment
@@ -90,10 +91,6 @@ public abstract class ImageManipulator {
     pm = p;
   }
 
-  public void setDestinationFile(String _dest) {
-    dest = _dest;
-  }
-
   
   /**
    * @return the translation key of your derived class.
@@ -134,21 +131,6 @@ public abstract class ImageManipulator {
     lastup = false;
   }
 
-
-  protected void imageStart(BufferedImage img, Writer out) throws IOException {
-    tool = machine.getCurrentTool();
-
-    imageSetupTransform(img);
-
-    out.write(machine.getConfigLine() + ";\n");
-    out.write(machine.getBobbinLine() + ";\n");
-
-    previousX = 0;
-    previousY = 0;
-
-    setAbsoluteMode(out);
-  }
-
   protected void setAbsoluteMode(Writer out) throws IOException {
     out.write("G90;\n");
   }
@@ -157,193 +139,36 @@ public abstract class ImageManipulator {
     out.write("G91;\n");
   }
 
-  /**
-   * setup transform from source image dimensions to destination paper dimensions.
-   *
-   * @param img source dimensions
-   */
-  protected void imageSetupTransform(BufferedImage img) {
-    setupTransform(img.getWidth(), img.getHeight());
-  }
-
-  /**
-   * setup transform when there is no image to convert from.  Essentially a 1:1 transform.
-   */
   protected void setupTransform() {
-    // 10mm = 1cm.  letters should be 1cm tall.
-    setupTransform((int) (machine.getPaperWidth() * 10.0f), (int) (machine.getPaperHeight() * 10.0f));
-  }
+    double imageHeight = machine.getPaperHeight()*machine.paperMargin;
+    double imageWidth = machine.getPaperWidth()*machine.paperMargin;
+    h2 = (float)imageHeight / 2.0f;
+    w2 = (float)imageWidth / 2.0f;
 
-  protected void setupTransform(int width, int height) {
-    image_height = height;
-    image_width = width;
-    h2 = image_height / 2;
-    w2 = image_width / 2;
+    scale = 1;  // 10mm = 1cm
 
-    scale = 10f;  // 10mm = 1cm
+    double newWidth = imageWidth;
+    double newHeight = imageHeight;
 
-    double new_width = image_width;
-    double new_height = image_height;
-
-    if (image_width > machine.getPaperWidth()) {
-      float resize = (float) machine.getPaperWidth() / (float) image_width;
+    if (imageWidth > machine.getPaperWidth()) {
+      float resize = (float) machine.getPaperWidth() / (float) imageWidth;
       scale *= resize;
-      new_height *= resize;
-      new_width = machine.getPaperWidth();
+      newHeight *= resize;
+      newWidth = machine.getPaperWidth();
     }
-    if (new_height > machine.getPaperHeight()) {
-      float resize = (float) machine.getPaperHeight() / (float) new_height;
+    if (newHeight > machine.getPaperHeight()) {
+      float resize = (float) machine.getPaperHeight() / (float) newHeight;
       scale *= resize;
-      new_width *= resize;
-      new_height = machine.getPaperHeight();
+      newWidth *= resize;
+      newHeight = machine.getPaperHeight();
     }
-    scale *= machine.paperMargin;
-    new_width *= machine.paperMargin;
-    new_height *= machine.paperMargin;
+    newWidth *= machine.paperMargin;
+    newHeight *= machine.paperMargin;
 
-    textFindCharsPerLine(new_width);
+    textFindCharsPerLine(newWidth);
 
     posx = w2;
     posy = h2;
-  }
-
-
-  protected int sample1x1(BufferedImage img, int x, int y) {
-    Color c = new Color(img.getRGB(x, y));
-    switch (colorChannel) {
-      case 1:
-        return c.getRed();
-      case 2:
-        return c.getGreen();
-      case 3:
-        return c.getBlue();
-      default:
-        return decode(c);
-    }
-  }
-
-
-  protected int sample3x3(BufferedImage img, int x, int y) {
-    int value = 0, weight = 0;
-
-    if (y > 0) {
-      if (x > 0) {
-        value += sample1x1(img, x - 1, y - 1);
-        weight += 1;
-      }
-      value += sample1x1(img, x, y - 1) * 2;
-      weight += 2;
-
-      if (x < image_width - 1) {
-        value += sample1x1(img, x + 1, y - 1);
-        weight += 1;
-      }
-    }
-
-    if (x > 0) {
-      value += sample1x1(img, x - 1, y) * 2;
-      weight += 2;
-    }
-    value += sample1x1(img, x, y) * 4;
-    weight += 4;
-    if (x < image_width - 1) {
-      value += sample1x1(img, x + 1, y) * 2;
-      weight += 2;
-    }
-
-    if (y < image_height - 1) {
-      if (x > 0) {
-        value += sample1x1(img, x - 1, y + 1);
-        weight += 1;
-      }
-      value += sample1x1(img, x, y + 1) * 2;
-      weight += 2;
-
-      if (x < image_width - 1) {
-        value += sample1x1(img, x + 1, y + 1);
-        weight += 1;
-      }
-    }
-
-    return value / weight;
-  }
-
-
-  protected void sample1x1Safe(BufferedImage img, int x, int y, double scale) {
-    if (x < 0 || x >= image_width) return;
-    if (y < 0 || y >= image_height) return;
-
-    sampleValue += sample1x1(img, x, y) * scale;
-    sampleSum += scale;
-  }
-
-  /**
-   * sample the image, taking into account fractions of pixels.
-   *
-   * @param img the image to sample
-   * @param x0  top left corner
-   * @param y0  top left corner
-   * @param x1  bottom right corner
-   * @param y1  bottom right corner
-   * @return greyscale intensity in this region. range 0...255 inclusive
-   */
-  protected int sample(BufferedImage img, double x0, double y0, double x1, double y1) {
-    sampleValue = 0;
-    sampleSum = 0;
-
-    double xceil = Math.ceil(x0);
-    double xweightstart = (x0 != xceil) ? xceil - x0 : 1;
-
-    double xfloor = Math.floor(x1);
-    double xweightend = (x1 != xceil) ? xfloor - x1 : 0;
-
-    int left = (int) Math.floor(x0);
-    int right = (int) Math.ceil(x1);
-
-    // top edge
-    double yceil = Math.ceil(y0);
-    if (y0 != yceil) {
-      double yweightstart = yceil - y0;
-
-      // left edge
-      sample1x1Safe(img, (int) x0, (int) y0, xweightstart * yweightstart);
-
-      for (int i = left; i < right; ++i) {
-        sample1x1Safe(img, i, (int) y0, yweightstart);
-      }
-      // right edge
-      sample1x1Safe(img, right, (int) y0, xweightend * yweightstart);
-    }
-
-    int bottom = (int) Math.floor(y0);
-    int top = (int) Math.ceil(y1);
-    for (int j = bottom; j < top; ++j) {
-      // left edge
-      sample1x1Safe(img, (int) x0, j, xweightstart);
-
-      for (int i = left; i < right; ++i) {
-        sample1x1Safe(img, i, j, 1);
-      }
-      // right edge
-      sample1x1Safe(img, right, j, xweightend);
-    }
-
-    // bottom edge
-    double yfloor = Math.floor(y1);
-    if (y1 != yfloor) {
-      double yweightend = yfloor - y1;
-
-      // left edge
-      sample1x1Safe(img, (int) x0, (int) y1, xweightstart * yweightend);
-
-      for (int i = left; i < right; ++i) {
-        sample1x1Safe(img, i, (int) y1, yweightend);
-      }
-      // right edge
-      sample1x1Safe(img, right, (int) y1, xweightend * yweightend);
-    }
-
-    return (int) (sampleValue / sampleSum);
   }
 
   protected float SX(float x) {
@@ -392,12 +217,6 @@ public abstract class ImageManipulator {
     else lowerPen(out);
   }
 
-
-  protected double roundOff(double value) {
-    return Math.floor(value * 100.0) / 100.0;
-  }
-
-
   public void textSetPosition(float x, float y) {
     posx = x;
     posy = y;
@@ -413,13 +232,13 @@ public abstract class ImageManipulator {
 
 
   public void textSetCharsPerLine(int numChars) {
-    chars_per_line = numChars;
+    charsPerLine = numChars;
     //System.out.println("MAX="+numChars);
   }
 
 
   public void textFindCharsPerLine(double width) {
-    chars_per_line = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letter_width + kerning));
+    charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letterWidth + kerning));
     //System.out.println("MAX="+chars_per_line);
   }
 
@@ -430,8 +249,8 @@ public abstract class ImageManipulator {
     int len = textLongestLine(lines);
 
     int num_lines = lines.length;
-    float h = padding * 2 + (letter_height + line_spacing) * num_lines;//- line_spacing; removed because of letters that hang below the line
-    float w = padding * 2 + (letter_width + kerning) * len - kerning;
+    float h = padding * 2 + (letterHeight + lineSpacing) * num_lines;//- line_spacing; removed because of letters that hang below the line
+    float w = padding * 2 + (letterWidth + kerning) * len - kerning;
     float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
 
     switch (align_horizontal) {
@@ -477,7 +296,7 @@ public abstract class ImageManipulator {
 
 
   protected void textCreateMessageNow(String text, Writer output) throws IOException {
-    if (chars_per_line <= 0) return;
+    if (charsPerLine <= 0) return;
 
     tool = machine.getCurrentTool();
 
@@ -487,7 +306,6 @@ public abstract class ImageManipulator {
     output.write("G90;\n");
     liftPen(output);
 
-    //if(true) {
     if (draw_bounding_box) {
       // draw bounding box
       output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
@@ -502,8 +320,8 @@ public abstract class ImageManipulator {
     // move to first line height
     // assumes we are still G90
     float message_start = TX((float) r.getMinX()) + SX(padding);
-    float firstline = TY((float) r.getMinY()) - SY(padding + letter_height);
-    float interline = -SY(letter_height + line_spacing);
+    float firstline = TY((float) r.getMinY()) - SY(padding + letterHeight);
+    float interline = -SY(letterHeight + lineSpacing);
 
     output.write("G0 X" + message_start + " Y" + firstline + ";\n");
     output.write("G91;\n");
@@ -536,8 +354,8 @@ public abstract class ImageManipulator {
 
     int num_lines = 0;
     for (i = 0; i < test_lines.length; ++i) {
-      if (test_lines[i].length() > chars_per_line) {
-        int x = (int) Math.ceil((double) test_lines[i].length() / (double) chars_per_line);
+      if (test_lines[i].length() > charsPerLine) {
+        int x = (int) Math.ceil((double) test_lines[i].length() / (double) charsPerLine);
         num_lines += x;
       } else {
         num_lines++;
@@ -547,10 +365,10 @@ public abstract class ImageManipulator {
     String[] lines = new String[num_lines];
     j = 0;
     for (i = 0; i < test_lines.length; ++i) {
-      if (test_lines[i].length() <= chars_per_line) {
+      if (test_lines[i].length() <= charsPerLine) {
         lines[j++] = test_lines[i];
       } else {
-        String[] temp = test_lines[i].split("(?<=\\G.{" + chars_per_line + "})");
+        String[] temp = test_lines[i].split("(?<=\\G.{" + charsPerLine + "})");
         for (String aTemp : temp) {
           lines[j++] = aTemp;
         }
@@ -757,8 +575,8 @@ public abstract class ImageManipulator {
 
     textSetAlign(Align.RIGHT);
     textSetVAlign(VAlign.BOTTOM);
-    textSetPosition(TX(image_width) * (1.0f / desired_scale),
-        -TY(image_height) * (1.0f / desired_scale));
+    textSetPosition((float)(machine.getPaperWidth() *10.0f*machine.paperMargin),
+    				(float)(machine.getPaperHeight()*10.0f*machine.paperMargin));
 
     float xx = w2;
     float yy = h2;

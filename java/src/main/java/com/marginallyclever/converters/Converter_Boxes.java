@@ -47,9 +47,9 @@ public class Converter_Boxes extends ImageConverter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -91,18 +91,18 @@ public class Converter_Boxes extends ImageConverter {
       float steps = (float) (pw / tool.getDiameter());
       if (steps < 1) steps = 1;
 
-      float blockSize = (int) (image_width / steps);
+      float blockSize = (int) (imageWidth / steps);
       float halfstep = (float) blockSize / 2.0f;
 
       // from top to bottom of the image...
       float x, y, z;
       int i = 0;
-      for (y = 0; y < image_height; y += blockSize) {
+      for (y = 0; y < imageHeight; y += blockSize) {
         ++i;
         if ((i % 2) == 0) {
           // every even line move left to right
           //MoveTo(file,x,y,pen up?)]
-          for (x = 0; x < image_width - blockSize; x += blockSize) {
+          for (x = 0; x < imageWidth - blockSize; x += blockSize) {
             // read a block of the image and find the average intensity in this block
             z = takeImageSampleBlock(img, (int) x, (int) (y - halfstep), (int) (x + blockSize), (int) (y + halfstep));
             // scale the intensity value
@@ -121,7 +121,7 @@ public class Converter_Boxes extends ImageConverter {
         } else {
           // every odd line move right to left
           //MoveTo(file,x,y,pen up?)]
-          for (x = image_width - blockSize; x >= 0; x -= blockSize) {
+          for (x = imageWidth - blockSize; x >= 0; x -= blockSize) {
             // read a block of the image and find the average intensity in this block
             z = takeImageSampleBlock(img, (int) (x - blockSize), (int) (y - halfstep), (int) x, (int) (y + halfstep));
             // scale the intensity value

@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageConverter;
-import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
@@ -328,8 +327,8 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
     int x, y, i;
     // count the points
     numPoints = 0;
-    for (y = 0; y < image_height; ++y) {
-      for (x = 0; x < image_width; ++x) {
+    for (y = 0; y < imageHeight; ++y) {
+      for (x = 0; x < imageWidth; ++x) {
         i = decode(img.getRGB(x, y));
         if (i == 0) {
           ++numPoints;
@@ -343,8 +342,8 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 
     // collect the point data
     numPoints = 0;
-    for (y = 0; y < image_height; ++y) {
-      for (x = 0; x < image_width; ++x) {
+    for (y = 0; y < imageHeight; ++y) {
+      for (x = 0; x < imageWidth; ++x) {
         i = decode(img.getRGB(x, y));
         if (i == 0) {
           points[numPoints++] = new Point2D(TX(x), TY(y));
@@ -359,10 +358,10 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    * @param img the image to convert.
    */
   public boolean convert(BufferedImage img) {
-
     mainGUI.getDrawPanel().setDecorator(this);
 
     // resize & flip as needed
+    // TODO just a note that changing 250/250 here changes the number of dots a lot.
     Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
     img = rs.filter(img);
 
@@ -370,7 +369,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
     
-    // dither
+    // Dither
     Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI, machine, translator);
     img = dither.filter(img);
     

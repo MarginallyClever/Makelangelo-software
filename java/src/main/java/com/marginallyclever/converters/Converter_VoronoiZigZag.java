@@ -21,7 +21,6 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageConverter;
-import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
@@ -78,7 +77,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
   public String getName() { return translator.get("ZigZagName")+" 2"; }
   
   @Override
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
 
@@ -116,7 +115,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
         render_mode=1;
         optimizeTour();
         mainGUI.getDrawPanel().setDecorator(null);
-        writeOutCells();
+        writeOutCells(out);
         return true;
       }
       return false;
@@ -461,49 +460,44 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 
     
   // write cell centroids to gcode.
-  protected void writeOutCells() throws IOException {
-    if(graphEdges != null ) {
-      mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-	    try(
-	    final OutputStream fileOutputStream = new FileOutputStream(dest);
-	    final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-	    ) {
-	        imageStart(src_img, out);
-	
-	        // set absolute coordinates
-	        out.write("G00 G90;\n");
-	        tool.writeChangeTo(out);
-	        liftPen(out);
-
-	        // find the tsp point closest to the calibration point
-	        int i;
-	        int besti=-1;
-	        float bestw=1000000;
-	        float x,y,w;
-	        for(i=0;i<solution_contains;++i) {
-	          x=w2-cells[solution[i]].centroid.x;
-	          y=h2-cells[solution[i]].centroid.y;
-	          w=x*x+y*y;
-	          if(w<bestw) {
-	            bestw=w;
-	            besti=i;
-	          }
-	        }
-	        
-	        // write the entire sequence
-	        for(i=0;i<=solution_contains;++i) {
-	          int v= (besti+i)%solution_contains;
-	          x=cells[solution[v]].centroid.x;
-	          y=cells[solution[v]].centroid.y;
-	
-	          this.moveTo(out,x,y, false);
-	        }
-	
-		    liftPen(out);
-		    signName(out);
-	        tool.writeMoveTo(out, 0, 0);
-	    }
-    }
+  protected void writeOutCells(Writer out) throws IOException {
+	  if(graphEdges != null ) {
+	      mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
+	      imageStart(src_img, out);
+		
+		  // set absolute coordinates
+	      out.write("G00 G90;\n");
+	      tool.writeChangeTo(out);
+	      liftPen(out);
+		
+	      // find the tsp point closest to the calibration point
+	      int i;
+	      int besti=-1;
+	      float bestw=1000000;
+	      float x,y,w;
+	      for(i=0;i<solution_contains;++i) {
+		      x=w2-cells[solution[i]].centroid.x;
+		      y=h2-cells[solution[i]].centroid.y;
+		      w=x*x+y*y;
+		      if(w<bestw) {
+		    	  bestw=w;
+		    	  besti=i;
+		      }
+	      }
+		    
+	      // write the entire sequence
+	      for(i=0;i<=solution_contains;++i) {
+		      int v= (besti+i)%solution_contains;
+		      x=cells[solution[v]].centroid.x;
+		      y=cells[solution[v]].centroid.y;
+		
+		      this.moveTo(out,x,y, false);
+	      }
+		
+	      liftPen(out);
+	      signName(out);
+	      tool.writeMoveTo(out, 0, 0);
+	  }
   }
 
 

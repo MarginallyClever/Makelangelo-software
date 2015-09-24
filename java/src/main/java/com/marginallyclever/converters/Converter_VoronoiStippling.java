@@ -20,7 +20,6 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageConverter;
-import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
@@ -71,7 +70,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
   }
 
   @Override
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
     JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
@@ -90,10 +89,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-	  MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-	  MAX_CELLS = Integer.parseInt(text_cells.getText());
-	  MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
-	  MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
+    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
+    	MAX_CELLS = Integer.parseInt(text_cells.getText());
+    	MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
+    	MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
         src_img = img;
         h = img.getHeight();
@@ -110,9 +109,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
         evolveCells();
         mainGUI.getDrawPanel().setDecorator(null);
       
-        writeOutCells();
+        writeOutCells(out);
         return true;
-      	}
+    }
     return false;
   }
 
@@ -233,26 +232,22 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 
   // write cell centroids to gcode.
-  protected void writeOutCells() throws IOException {
+  protected void writeOutCells(Writer out) throws IOException {
     if (graphEdges != null) {
       mainGUI.log("<font color='green'>Writing gcode to " + dest + "</font>\n");
-      try (
-          final OutputStream fileOutputStream = new FileOutputStream(dest);
-          final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-      ) {
 
-        imageStart(src_img, out);
+      imageStart(src_img, out);
 
-        // set absolute coordinates
-        out.write("G00 G90;\n");
-        tool.writeChangeTo(out);
-        liftPen(out);
+      // set absolute coordinates
+      out.write("G00 G90;\n");
+      tool.writeChangeTo(out);
+      liftPen(out);
 
-        float d = tool.getDiameter();
+      float d = tool.getDiameter();
 
-        int i;
+      int i;
 
-        for (i = 0; i < cells.length; ++i) {
+      for (i = 0; i < cells.length; ++i) {
           float x = cells[i].centroid.x;
           float y = cells[i].centroid.y;
           float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
@@ -263,25 +258,24 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
           // filled circles
           this.moveTo(out, x + (float) Math.cos(0) * r, y + (float) Math.cos(0) * r, true);
           while (r > d) {
-            float detail = (float) (1.0 * Math.PI * r / d);
-            if (detail < 4) detail = 4;
-            if (detail > 20) detail = 20;
-            for (float j = 1; j <= detail; ++j) {
-              this.moveTo(out,
+        	  float detail = (float) (1.0 * Math.PI * r / d);
+        	  if (detail < 4) detail = 4;
+        	  if (detail > 20) detail = 20;
+        	  for (float j = 1; j <= detail; ++j) {
+        		  this.moveTo(out,
                   x + r * (float) Math.cos((float) Math.PI * 2.0f * j / detail),
                   y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail), false);
-            }
-            //r-=(d/(scale*1.5f));
-            r -= d;
+        	  }
+        	  //r-=(d/(scale*1.5f));
+        	  r -= d;
           }
           this.moveTo(out, x, y, false);
           this.moveTo(out, x, y, true);
-        }
-
-        liftPen(out);
-        signName(out);
-        tool.writeMoveTo(out, 0, 0);
       }
+
+      liftPen(out);
+      signName(out);
+      tool.writeMoveTo(out, 0, 0);
     }
   }
 

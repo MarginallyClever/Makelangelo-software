@@ -150,12 +150,19 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	 */
 
   protected void createMessage(String str, String dest) {
-
     try (final OutputStream fileOutputStream = new FileOutputStream(dest);
          final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
       tool = machine.getCurrentTool();
-      setupTransform();
+      
+      w2=0;
+      h2=0;
+      posx=0;
+      posy=0;
+      scale=1;
+
+      textFindCharsPerLine(machine.getPaperWidth()*machine.paperMargin);
+
       output.write(machine.getConfigLine() + ";\n");
       output.write(machine.getBobbinLine() + ";\n");
       tool.writeChangeTo(output);
@@ -164,9 +171,15 @@ public class Generator_YourMessageHere extends ImageGenerator {
       textSetVAlign(VAlign.MIDDLE);
       textCreateMessageNow(lastMessage, output);
 
+      w2=0;
+      h2=0;
+      posx=0;
+      posy=0;
+      scale=1;
       textSetAlign(Align.RIGHT);
       textSetVAlign(VAlign.TOP);
-      textSetPosition(image_width, image_height);
+      textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.paperMargin),
+					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.paperMargin));
       textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
     } catch (IOException e) {
       logger.error("{}", e);

@@ -22,13 +22,12 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author Dan
  */
 public class Converter_Spiral extends ImageConverter {
+	boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
   @Override
   public String getName() {
     return translator.get("SpiralName");
   }
-
-  boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 
 
   public Converter_Spiral(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
@@ -56,15 +55,10 @@ public class Converter_Spiral extends ImageConverter {
    * @param img the image to convert.
    */
   @Override
-  public boolean convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // black and white
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
     img = bw.filter(img);
-
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
 
       imageStart(img, out);
 
@@ -84,7 +78,7 @@ public class Converter_Spiral extends ImageConverter {
       int z = 0;
 
       float maxr;
-      if (whole_image) {
+      if (convertToCorners) {
         // go right to the corners
         maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
       } else {
@@ -117,7 +111,7 @@ public class Converter_Spiral extends ImageConverter {
           x = (int) fx;
           y = (int) fy;
           // clip to image boundaries
-          if (x >= 0 && x < image_width && y >= 0 && y < image_height) {
+          if (x >= 0 && x < imageWidth && y >= 0 && y < imageHeight) {
             z = sample3x3(img, x, y);
             moveTo(out, fx, fy, (z >= level));
           } else {
@@ -133,7 +127,7 @@ public class Converter_Spiral extends ImageConverter {
       liftPen(out);
       signName(out);
       tool.writeMoveTo(out, 0, 0);
-    }
+
     return true;
   }
 }

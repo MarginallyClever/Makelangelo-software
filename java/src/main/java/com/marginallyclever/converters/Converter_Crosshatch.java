@@ -72,10 +72,10 @@ public class Converter_Crosshatch extends ImageConverter {
 
   protected int sampleScale(BufferedImage img, double x0, double y0, double x1, double y1) {
     return sample(img,
-        (x0 - xStart) / (xEnd - xStart) * (double) image_width,
-        (double) image_height - (y1 - yStart) / (yEnd - yStart) * (double) image_height,
-        (x1 - xStart) / (xEnd - xStart) * (double) image_width,
-        (double) image_height - (y0 - yStart) / (yEnd - yStart) * (double) image_height
+        (x0 - xStart) / (xEnd - xStart) * (double) imageWidth,
+        (double) imageHeight - (y1 - yStart) / (yEnd - yStart) * (double) imageHeight,
+        (x1 - xStart) / (xEnd - xStart) * (double) imageWidth,
+        (double) imageHeight - (y0 - yStart) / (yEnd - yStart) * (double) imageHeight
     );
   }
 
@@ -90,7 +90,7 @@ public class Converter_Crosshatch extends ImageConverter {
     paperHeight = machine.getPaperHeight();
 
     xStart = -paperWidth / 2.0;
-    yStart = xStart * (double) image_height / (double) image_width;
+    yStart = xStart * (double) imageHeight / (double) imageWidth;
 
     if (yStart < -(paperHeight / 2.0)) {
       xStart *= (-(paperHeight / 2.0)) / yStart;
@@ -188,18 +188,18 @@ public class Converter_Crosshatch extends ImageConverter {
     // create horizontal lines across the image
     // raise and lower the pen to darken the appropriate areas
     i = 0;
-    for (y = 0; y < image_height; y += steps) {
+    for (y = 0; y < imageHeight; y += steps) {
       ++i;
       if ((i % 2) == 0) {
         moveTo(out, (float) 0, (float) y, true);
-        for (x = 0; x < image_width; ++x) {
+        for (x = 0; x < imageWidth; ++x) {
           z = sample3x3(img, x, y);
           moveTo(out, (float) x, (float) y, (z >= level));
         }
-        moveTo(out, (float) image_width, (float) y, true);
+        moveTo(out, (float) imageWidth, (float) y, true);
       } else {
-        moveTo(out, (float) image_width, (float) y, true);
-        for (x = image_width - 1; x >= 0; --x) {
+        moveTo(out, (float) imageWidth, (float) y, true);
+        for (x = imageWidth - 1; x >= 0; --x) {
           z = sample3x3(img, x, y);
           moveTo(out, (float) x, (float) y, (z >= level));
         }
@@ -213,18 +213,18 @@ public class Converter_Crosshatch extends ImageConverter {
     // create vertical lines across the image
     // raise and lower the pen to darken the appropriate areas
     i = 0;
-    for (x = 0; x < image_width; x += steps) {
+    for (x = 0; x < imageWidth; x += steps) {
       ++i;
       if ((i % 2) == 0) {
         moveTo(out, (float) x, (float) 0, true);
-        for (y = 0; y < image_height; ++y) {
+        for (y = 0; y < imageHeight; ++y) {
           z = sample3x3(img, x, y);
           moveTo(out, (float) x, (float) y, (z >= level));
         }
-        moveTo(out, (float) x, (float) image_height, true);
+        moveTo(out, (float) x, (float) imageHeight, true);
       } else {
-        moveTo(out, (float) x, (float) image_height, true);
-        for (y = image_height - 1; y >= 0; --y) {
+        moveTo(out, (float) x, (float) imageHeight, true);
+        for (y = imageHeight - 1; y >= 0; --y) {
           z = sample3x3(img, x, y);
           moveTo(out, (float) x, (float) y, (z >= level));
         }
@@ -238,12 +238,12 @@ public class Converter_Crosshatch extends ImageConverter {
     // create diagonal \ lines across the image
     // raise and lower the pen to darken the appropriate areas
     i = 0;
-    for (x = -(image_height - 1); x < image_width; x += steps) {
-      int endx = image_height - 1 + x;
-      int endy = image_height - 1;
-      if (endx >= image_width) {
-        endy -= endx - (image_width - 1);
-        endx = image_width - 1;
+    for (x = -(imageHeight - 1); x < imageWidth; x += steps) {
+      int endx = imageHeight - 1 + x;
+      int endy = imageHeight - 1;
+      if (endx >= imageWidth) {
+        endy -= endx - (imageWidth - 1);
+        endx = imageWidth - 1;
       }
       int startx = x;
       int starty = 0;
@@ -277,18 +277,18 @@ public class Converter_Crosshatch extends ImageConverter {
     // create diagonal / lines across the image
     // raise and lower the pen to darken the appropriate areas
     i = 0;
-    for (x = 0; x < image_width + image_height; x += steps) {
+    for (x = 0; x < imageWidth + imageHeight; x += steps) {
       int endx = 0;
       int endy = x;
-      if (endy >= image_height) {
-        endx += endy - (image_height - 1);
-        endy = image_height - 1;
+      if (endy >= imageHeight) {
+        endx += endy - (imageHeight - 1);
+        endy = imageHeight - 1;
       }
       int startx = x;
       int starty = 0;
-      if (startx >= image_width) {
-        starty += startx - (image_width - 1);
-        startx = image_width - 1;
+      if (startx >= imageWidth) {
+        starty += startx - (imageWidth - 1);
+        startx = imageWidth - 1;
       }
       int delta = endy - starty;
 

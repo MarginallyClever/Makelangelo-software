@@ -141,9 +141,9 @@ public class Converter_ColorBoxes extends ImageConverter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -213,8 +213,8 @@ public class Converter_ColorBoxes extends ImageConverter {
       step1 = (step4 / 4.0f);
 
       // set up the error buffers for floyd/steinberg dithering
-      stepw = ((float) image_width / step4);
-      steph = ((float) image_height / step4);
+      stepw = ((float) imageWidth / step4);
+      steph = ((float) imageHeight / step4);
       error = new C3[(int) Math.ceil(stepw)];
       nexterror = new C3[(int) Math.ceil(stepw)];
 

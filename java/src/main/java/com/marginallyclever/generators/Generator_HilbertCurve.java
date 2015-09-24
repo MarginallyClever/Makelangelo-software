@@ -60,17 +60,12 @@ public class Generator_HilbertCurve extends ImageGenerator {
   public boolean generate(final String dest) {
     final JTextField field_order = new JTextField(Integer.toString(order));
 
-
     JPanel panel = new JPanel(new GridLayout(0, 1));
     panel.add(new JLabel(translator.get("HilbertCurveOrder")));
     panel.add(field_order);
 
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-      xmax = (float) (machine.getPaperWidth() * machine.paperMargin);
-      ymax = xmax;
-      xmin = 0;
-      ymin = 0;
       order = Integer.parseInt(field_order.getText());
       createCurveNow(dest);
       return true;
@@ -85,16 +80,26 @@ public class Generator_HilbertCurve extends ImageGenerator {
         final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
     ) {
       tool = machine.getCurrentTool();
-      setupTransform((int) Math.ceil(xmax - xmin), (int) Math.ceil(ymax - ymin));
       output.write(machine.getConfigLine() + ";\n");
       output.write(machine.getBobbinLine() + ";\n");
       tool.writeChangeTo(output);
+      
+      w2=0;
+      h2=0;
+      scale=1;
 
+      float v = Math.min((float)(machine.getPaperWidth() * 10.0f * machine.paperMargin)/2.0f,
+    		  			(float)(machine.getPaperHeight() * 10.0f * machine.paperMargin)/2.0f);
+      xmax = v;
+      ymax = v;
+      xmin = -v;
+      ymin = -v;
+
+      turtle_step = (float) ((xmax - xmin) / (Math.pow(2, order)));
       turtle_x = 0;
       turtle_y = 0;
       turtle_dx = 0;
       turtle_dy = -1;
-      turtle_step = (float) ((xmax - xmin) / (Math.pow(2, order)));
 
       // Draw bounding box
       //SetAbsoluteMode(output);

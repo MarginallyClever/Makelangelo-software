@@ -75,43 +75,7 @@ public class Converter_Pulse extends ImageConverter {
     }
     return false;
   }
-
-
-  double xStart, yStart;
-  double xEnd, yEnd;
-  double paperWidth, paperHeight;
-
-  protected int sampleScale(BufferedImage img, double x0, double y0, double x1, double y1) {
-    return sample(img,
-        (x0 - xStart) / (xEnd - xStart) * (double) image_width,
-        (double) image_height - (y1 - yStart) / (yEnd - yStart) * (double) image_height,
-        (x1 - xStart) / (xEnd - xStart) * (double) image_width,
-        (double) image_height - (y0 - yStart) / (yEnd - yStart) * (double) image_height
-    );
-  }
-
-  // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-  protected int takeImageSampleBlock(BufferedImage img, int x0, int y0, int x1, int y1) {
-    // point sampling
-    int value = 0;
-    int sum = 0;
-
-    if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
-    if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
-
-    for (int y = y0; y < y1; ++y) {
-      for (int x = x0; x < x1; ++x) {
-        value += sample1x1(img, x, y);
-        ++sum;
-      }
-    }
-
-    if (sum == 0) return 255;
-
-    return value / sum;
-  }
+  
 
 
   /**
@@ -137,7 +101,6 @@ public class Converter_Pulse extends ImageConverter {
       tool.writeChangeTo(out);
       liftPen(out);
 
-//	            convertImageSpace(img, out);
       convertPaperSpace(img, out);
 
       liftPen(out);
@@ -148,24 +111,7 @@ public class Converter_Pulse extends ImageConverter {
 
 
   private void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
-    // if the image were projected on the paper, where would the top left corner of the image be in paper space?
-    // image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
-
-    paperWidth = machine.getPaperWidth();
-    paperHeight = machine.getPaperHeight();
-
-    xStart = -paperWidth / 2.0;
-    yStart = xStart * (double) image_height / (double) image_width;
-
-    if (yStart < -(paperHeight / 2.0)) {
-      xStart *= (-(paperHeight / 2.0)) / yStart;
-      yStart = -(paperHeight / 2.0);
-    }
-
-    xStart *= 10.0 * machine.paperMargin;
-    yStart *= 10.0 * machine.paperMargin;
-    xEnd = -xStart;
-    yEnd = -yStart;
+	setupPaperImageTransform();
 
     double PULSE_MINIMUM = 0.5;
 

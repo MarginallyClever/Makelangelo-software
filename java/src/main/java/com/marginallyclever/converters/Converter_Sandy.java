@@ -72,43 +72,6 @@ public class Converter_Sandy extends ImageConverter {
     }
     return false;
   }
-
-  
-  double xStart,yStart;
-  double xEnd,yEnd;
-  double paperWidth,paperHeight;
-    
-  protected int sampleScale(BufferedImage img,double x0,double y0,double x1,double y1) {
-    return sample(img,
-        (x0-xStart)/(xEnd-xStart) * (double)image_width,
-        (double)image_height - (y1-yStart)/(yEnd-yStart) * (double)image_height,
-        (x1-xStart)/(xEnd-xStart) * (double)image_width,
-        (double)image_height - (y0-yStart)/(yEnd-yStart) * (double)image_height
-        );
-  }
-  
-  // sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-  protected int takeImageSampleBlock(BufferedImage img,int x0,int y0,int x1,int y1) {
-    // point sampling
-    int value=0;
-    int sum=0;
-    
-    if(x0<0) x0=0;
-    if(x1>image_width-1) x1 = image_width-1;
-    if(y0<0) y0=0;
-    if(y1>image_height-1) y1 = image_height-1;
-
-    for(int y=y0;y<y1;++y) {
-      for(int x=x0;x<x1;++x) {
-        value += sample1x1(img,x, y);
-        ++sum;
-      }
-    }
-
-    if(sum==0) return 255;
-    
-    return value/sum;
-  }
   
 
   /**
@@ -117,73 +80,49 @@ public class Converter_Sandy extends ImageConverter {
    * @throws IOException couldn't open output file
    */
   private void convertNow(BufferedImage img) throws IOException {
-      // make black & white
-      Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-      img = bw.filter(img);
-      
-
-	    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
-	        try(
-	        final OutputStream fileOutputStream = new FileOutputStream(dest);
-	        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-	        ) {
-
-	            imageStart(img, out);
-
-	            // set absolute coordinates
-	            out.write("G00 G90;\n");
-	            tool.writeChangeTo(out);
-	            liftPen(out);
-
-//	            convertImageSpace(img, out);
-	    		convertPaperSpace(img,out);
-
-	            liftPen(out);
-	            signName(out);
-	            moveTo(out, 0, 0, true);
-	        }
-  }
+    // make black & white
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+    img = bw.filter(img);
   
-  
-  private boolean isInsideLimits(double x,double y) {
-	  if(x<xStart) return false;
-	  if(x>=xEnd) return false;
-	  if(y<yStart) return false;
-	  if(y>=yEnd) return false;
-	  return true;
+
+    mainGUI.log("<font color='green'>Converting to gcode and saving "+dest+"</font>\n");
+    try(
+        final OutputStream fileOutputStream = new FileOutputStream(dest);
+        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+	) {
+
+        imageStart(img, out);
+
+        // set absolute coordinates
+        out.write("G00 G90;\n");
+        tool.writeChangeTo(out);
+        liftPen(out);
+
+//	      convertImageSpace(img, out);
+		convertPaperSpace(img,out);
+
+        liftPen(out);
+        signName(out);
+        moveTo(out, 0, 0, true);
+	}
   }
   
   
   private void convertPaperSpace(BufferedImage img,Writer out) throws IOException {
     // if the image were projected on the paper, where would the top left corner of the image be in paper space?
     // image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
-    
-    paperWidth = machine.getPaperWidth();
-    paperHeight = machine.getPaperHeight();
-    
-    xStart = -paperWidth/2.0;
-    yStart = xStart * (double)image_height/(double)image_width;
-
-    if(yStart < -(paperHeight/2.0)) {
-      xStart *= (-(paperHeight/2.0)) / yStart;      
-      yStart = -(paperHeight/2.0);
-    }
-
-    xStart *= 10.0* machine.paperMargin;
-    yStart *= 10.0* machine.paperMargin;
-    xEnd = -xStart;
-    yEnd = -yStart;
+	setupPaperImageTransform();
     
     double PULSE_MINIMUM=0.5;
 
     // from top to bottom of the image...
-    double x, y, z, scale_z, pulse_size;
+    double x, y, z, scaleZ, pulseSize;
     
     
     double dx = xStart - machine.limit_right*10; 
     double dy = yStart - machine.limit_top*10;
-    double r_max = Math.sqrt(dx*dx+dy*dy);
-    double r_min = 0;
+    double rMax = Math.sqrt(dx*dx+dy*dy);
+    double rMin = 0;
     
 	double cx,cy;
 	
@@ -210,15 +149,15 @@ public class Converter_Sandy extends ImageConverter {
 		break;
 	}
 
-    double r_step = (r_max-r_min)/blockScale;
+    double rStep = (rMax-rMin)/blockScale;
     double r;
 	double t_dir=1;
-	double pulse_flip=1;
+	double pulseFlip=1;
 	double x2,y2,t,t_step, t_step2;
 	double last_x=0,last_y=0;
-	boolean was_drawing=true;
+	boolean wasDrawing=true;
     
-    for(r=r_min;r<r_max;r+=r_step) {
+    for(r=rMin;r<rMax;r+=rStep) {
     	// go around in a circle
     	t=0;
     	t_step = tool.getDiameter()/r;
@@ -229,9 +168,9 @@ public class Converter_Sandy extends ImageConverter {
 	    	y = cy + dy * r;
 	    	t_step2=t_step;
 		    if(!isInsideLimits(x,y)) {
-		    	if(was_drawing) {
+		    	if(wasDrawing) {
 		    		moveToPaper(out,last_x,last_y,true);
-		    		was_drawing=false;
+		    		wasDrawing=false;
 		    	}
 		    	continue;
 		    }
@@ -239,27 +178,27 @@ public class Converter_Sandy extends ImageConverter {
 		    last_x=x;
 		    last_y=y;
             // read a block of the image and find the average intensity in this block
-            z = sampleScale( img, x-r_step/2, y-r_step/2,x+r_step/2,y + r_step/2 );
+            z = sampleScale( img, x-rStep/2, y-rStep/2,x+rStep/2,y + rStep/2 );
             // scale the intensity value
             assert(z>=0);
             assert(z<=255.0);
-            scale_z = (255.0 -  z) / 255.0;
-            scale_z = 1-scale_z;
-            pulse_size = r_step*0.5;//r_step * 0.6 * scale_z;
-	    	t_step2=t_step*pulse_size*scale_z;
+            scaleZ = (255.0 -  z) / 255.0;
+            scaleZ = 1-scaleZ;
+            pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
+	    	t_step2=t_step*pulseSize*scaleZ;
 	    	if(t_step2<t_step) t_step2=t_step;
             
-	    	x2 = x + dx * pulse_size*pulse_flip;
-	    	y2 = y + dy * pulse_size*pulse_flip;
-	    	pulse_flip=-pulse_flip;
-	    	if(was_drawing == false) {
-	    		moveToPaper(out,last_x,last_y,pulse_size<PULSE_MINIMUM);
-	    		was_drawing=true;
+	    	x2 = x + dx * pulseSize*pulseFlip;
+	    	y2 = y + dy * pulseSize*pulseFlip;
+	    	pulseFlip=-pulseFlip;
+	    	if(wasDrawing == false) {
+	    		moveToPaper(out,last_x,last_y,pulseSize<PULSE_MINIMUM);
+	    		wasDrawing=true;
 	    	}
-    		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
-	    	x2 = x + dx * pulse_size*pulse_flip;
-	    	y2 = y + dy * pulse_size*pulse_flip;
-    		moveToPaper(out,x2,y2,pulse_size<PULSE_MINIMUM);
+    		moveToPaper(out,x2,y2,pulseSize<PULSE_MINIMUM);
+	    	x2 = x + dx * pulseSize*pulseFlip;
+	    	y2 = y + dy * pulseSize*pulseFlip;
+    		moveToPaper(out,x2,y2,pulseSize<PULSE_MINIMUM);
     	}
     	t_dir=-t_dir;
     }

@@ -74,9 +74,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
     int x1 = x0 + diameter;
     int y1 = y0 + diameter;
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     Color value;
     int sum = 0;
@@ -95,9 +95,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
   protected void setMaskTouched(int x0, int y0, int x1, int y1) {
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     int c = (new C3(255, 255, 255)).toInt();
     for (int y = y0; y < y1; ++y) {
@@ -124,9 +124,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -211,8 +211,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
     mainGUI.log("<font color='orange'>Palette color " + palette.getColor(color_index).toString() + "</font>\n");
 
-    for (y = 0; y < image_height; y += diameter) {
-      for (x = 0; x < image_width; x += diameter) {
+    for (y = 0; y < imageHeight; y += diameter) {
+      for (x = 0; x < imageWidth; x += diameter) {
         if (getMaskTouched(x, y)) continue;
 
         original_color = takeImageSampleBlock(x, y, x + diameter, y + diameter);
