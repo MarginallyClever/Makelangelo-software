@@ -3,12 +3,8 @@ package com.marginallyclever.converters;
 
 import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;

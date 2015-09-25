@@ -102,7 +102,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
   
         cellBorder = new ArrayList<>();
         
-        initializeCells(0.01);
+        initializeCells(0.001);
       
         render_mode=0;
         mainGUI.getDrawPanel().setDecorator(this);
