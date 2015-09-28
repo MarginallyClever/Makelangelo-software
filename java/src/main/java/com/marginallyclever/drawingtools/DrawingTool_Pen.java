@@ -23,11 +23,11 @@ public class DrawingTool_Pen extends DrawingTool {
     super(gui, ms, mc);
 
     diameter = 1.5f;
-    z_rate = 120;
-    z_on = 90;
-    z_off = 50;
-    tool_number = 0;
-    feed_rate = 3500;
+    zRate = 120;
+    zOn = 90;
+    zOff = 50;
+    toolNumber = 0;
+    feedRate = 3500;
     name = "Pen";
   }
 
@@ -35,11 +35,11 @@ public class DrawingTool_Pen extends DrawingTool {
     super(gui, ms, mc);
 
     diameter = 1.5f;
-    z_rate = 120;
-    z_on = 90;
-    z_off = 50;
-    tool_number = tool_id;
-    feed_rate = 3500;
+    zRate = 120;
+    zOn = 90;
+    zOff = 50;
+    toolNumber = tool_id;
+    feedRate = 3500;
     name = name2;
   }
 
@@ -48,11 +48,11 @@ public class DrawingTool_Pen extends DrawingTool {
     driver.setLayout(new GridBagLayout());
 
     final JTextField penDiameter = new JTextField(Float.toString(getDiameter()), 5);
-    final JTextField penFeedRate = new JTextField(Float.toString(feed_rate), 5);
+    final JTextField penFeedRate = new JTextField(Float.toString(feedRate), 5);
 
-    final JTextField penUp = new JTextField(Float.toString(z_off), 5);
-    final JTextField penDown = new JTextField(Float.toString(z_on), 5);
-    final JTextField penZRate = new JTextField(Float.toString(z_rate), 5);
+    final JTextField penUp = new JTextField(Float.toString(zOff), 5);
+    final JTextField penDown = new JTextField(Float.toString(zOn), 5);
+    final JTextField penZRate = new JTextField(Float.toString(zRate), 5);
     final JButton buttonTestUp = new JButton(translator.get("penToolTest"));
     final JButton buttonTestDown = new JButton(translator.get("penToolTest"));
     final JButton buttonSave = new JButton(translator.get("Save"));
@@ -143,10 +143,10 @@ public class DrawingTool_Pen extends DrawingTool {
         }
         if (subject == buttonSave) {
           setDiameter(Float.valueOf(penDiameter.getText()));
-          feed_rate = Float.valueOf(penFeedRate.getText());
-          z_rate = Float.valueOf(penZRate.getText());
-          z_off = Float.valueOf(penUp.getText());
-          z_on = Float.valueOf(penDown.getText());
+          feedRate = Float.valueOf(penFeedRate.getText());
+          zRate = Float.valueOf(penZRate.getText());
+          zOff = Float.valueOf(penUp.getText());
+          zOn = Float.valueOf(penDown.getText());
           machine.saveConfig();
           driver.dispose();
         }

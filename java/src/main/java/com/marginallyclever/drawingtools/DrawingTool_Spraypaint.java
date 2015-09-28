@@ -20,62 +20,64 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class DrawingTool_Spraypaint extends DrawingTool {
-  boolean is_up;
-  float old_x, old_y;
-  float overlap = 0.3f;
+  boolean isUp;
+  float oldX, oldY;
+  float overlap;
+  
 
   public DrawingTool_Spraypaint(MainGUI gui, MultilingualSupport ms, MakelangeloRobot mc) {
     super(gui, ms, mc);
 
     diameter = 40;
-    z_rate = 80;
-    z_on = 50;
-    z_off = 90;
-    tool_number = 2;
+    zRate = 80;
+    zOn = 50;
+    zOff = 90;
+    toolNumber = 2;
     name = "Spray paint";
-    feed_rate = 3000;
+    feedRate = 3000;
+    overlap = 0.3f;
 
-    old_x = 0;
-    old_y = 0;
+    oldX = 0;
+    oldY = 0;
   }
 
   public void writeOn(Writer out) throws IOException {
-    is_up = false;
+    isUp = false;
   }
 
   public void writeOff(Writer out) throws IOException {
-    is_up = true;
+    isUp = true;
   }
 
   public void writeMoveTo(Writer out, float x, float y) throws IOException {
-    if (is_up) {
+    if (isUp) {
       out.write("G00 X" + x + " Y" + y + ";\n");
     } else {
       // Make a set of dots in a row, instead of a single continuous line
       //out.write("G00 X"+x+" Y"+y+";\n");
-      float dx = x - old_x;
-      float dy = y - old_y;
+      float dx = x - oldX;
+      float dy = y - oldY;
       float len = (float) Math.sqrt(dx * dx + dy * dy);
       float step = diameter * (1 - overlap);
       float r = step / 2;
       float d, px, py;
 
       for (d = r; d < len - r; d += step) {
-        px = old_x + dx * d / len;
-        py = old_y + dy * d / len;
-        out.write("G00 X" + px + " Y" + py + " F" + feed_rate + ";\n");
+        px = oldX + dx * d / len;
+        py = oldY + dy * d / len;
+        out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
         super.writeOn(out);
         super.writeOff(out);
       }
       d = len - r;
-      px = old_x + dx * d / len;
-      py = old_y + dy * d / len;
-      out.write("G00 X" + px + " Y" + py + " F" + feed_rate + ";\n");
+      px = oldX + dx * d / len;
+      py = oldY + dy * d / len;
+      out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
       super.writeOn(out);
       super.writeOff(out);
     }
-    old_x = x;
-    old_y = y;
+    oldX = x;
+    oldY = y;
   }
 
   public void adjust() {
@@ -83,11 +85,11 @@ public class DrawingTool_Spraypaint extends DrawingTool {
     driver.setLayout(new GridBagLayout());
 
     final JTextField spraypaintDiameter = new JTextField(Float.toString(diameter), 5);
-    final JTextField spraypaintFeedRate = new JTextField(Float.toString(feed_rate), 5);
+    final JTextField spraypaintFeedRate = new JTextField(Float.toString(feedRate), 5);
 
-    final JTextField spraypaintUp = new JTextField(Float.toString(z_off), 5);
-    final JTextField spraypaintDown = new JTextField(Float.toString(z_on), 5);
-    final JTextField spraypaintZRate = new JTextField(Float.toString(z_rate), 5);
+    final JTextField spraypaintUp = new JTextField(Float.toString(zOff), 5);
+    final JTextField spraypaintDown = new JTextField(Float.toString(zOn), 5);
+    final JTextField spraypaintZRate = new JTextField(Float.toString(zRate), 5);
     final JButton buttonTestDot = new JButton("Test");
     final JButton buttonSave = new JButton("Save");
     final JButton buttonCancel = new JButton("Cancel");
@@ -177,10 +179,10 @@ public class DrawingTool_Spraypaint extends DrawingTool {
         }
         if (subject == buttonSave) {
           diameter = Float.valueOf(spraypaintDiameter.getText());
-          feed_rate = Float.valueOf(spraypaintFeedRate.getText());
-          z_off = Float.valueOf(spraypaintUp.getText());
-          z_on = Float.valueOf(spraypaintDown.getText());
-          z_rate = Float.valueOf(spraypaintZRate.getText());
+          feedRate = Float.valueOf(spraypaintFeedRate.getText());
+          zOff = Float.valueOf(spraypaintUp.getText());
+          zOn = Float.valueOf(spraypaintDown.getText());
+          zRate = Float.valueOf(spraypaintZRate.getText());
           machine.saveConfig();
           driver.dispose();
         }

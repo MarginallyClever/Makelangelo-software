@@ -14,9 +14,9 @@ public class DrawingTool_LED extends DrawingTool {
 
     diameter = 4;
     name = "LED";
-    z_on = 180;
-    z_off = 0;
-    feed_rate = 5000;
+    zOn = 180;
+    zOff = 0;
+    feedRate = 5000;
   }
 
   public void writeChangeTo(Writer out) throws IOException {
@@ -25,12 +25,12 @@ public class DrawingTool_LED extends DrawingTool {
 
   public void writeOn(Writer out) throws IOException {
     out.write("G00 Z180 F500;\n");  // lower the pen.
-    out.write("G00 F" + feed_rate + ";\n");
+    out.write("G00 F" + feedRate + ";\n");
   }
 
   public void writeOff(Writer out) throws IOException {
     out.write("G00 Z0 F500;\n");  // lower the pen..
-    out.write("G00 F" + feed_rate + ";\n");
+    out.write("G00 F" + feedRate + ";\n");
   }
 
   public void writeMoveTo(Writer out, float x, float y) throws IOException {

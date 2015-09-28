@@ -336,7 +336,7 @@ public final class MakelangeloRobot {
 	public boolean isPaperConfigured() {
 		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
-
+	
 	public void parseRobotUID(String line) {
 		saveConfig();
 
