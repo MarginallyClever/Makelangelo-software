@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
- * Filters manipulate a BufferedImage
+ * Modifies a BufferedImage
  * @author danroyer
  *
  */
@@ -15,7 +15,6 @@ public abstract class ImageFilter extends ImageManipulator {
 	  public ImageFilter(MainGUI gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	  }
 
 	  /**

@@ -52,30 +52,31 @@ public final class MakelangeloRobot {
 			"A7 (74 x 105)",};
 
 	// machine physical limits
-	protected double limitTop = 18 * INCH_TO_CM;
-	protected double limitBottom = -18 * INCH_TO_CM;
-	protected double limitLeft = -18 * INCH_TO_CM;
-	protected double limitRight = 18 * INCH_TO_CM;
+	protected double limitTop;
+	protected double limitBottom;
+	protected double limitLeft;
+	protected double limitRight;
 
 	// paper area
-	protected double paperTop = 12 * INCH_TO_CM;
-	protected double paperBottom = -12 * INCH_TO_CM;
-	protected double paperLeft = -9 * INCH_TO_CM;
-	protected double paperRight = 9 * INCH_TO_CM;
-	protected double paperMargin = 0.9;
+	protected double paperTop;
+	protected double paperBottom;
+	protected double paperLeft;
+	protected double paperRight;
+	protected double paperMargin;
 
 	// pulleys turning backwards?
-	protected boolean invertMotor1 = false;
-	protected boolean invertMotor2 = false;
+	protected boolean invertMotor1;
+	protected boolean invertMotor2;
 
 	// pulley diameter
-	protected double bobbinDiameterLeft=1.5;
-	protected double bobbinDiameterRight=1.5;
+	protected double bobbinDiameterLeft;
+	protected double bobbinDiameterRight;
+	
+	// maximum speed
+	protected double maxFeedRate;
 
-	protected double maxFeedRate=11000;  // etch-a-sketch speed
-
-	protected boolean reverseForGlass=false;
-	protected boolean areMotorsBackwards=false;
+	protected boolean reverseForGlass;
+	protected boolean areMotorsBackwards;
 
 	/**
 	 * top left, bottom center, etc...
@@ -94,13 +95,12 @@ public final class MakelangeloRobot {
 	 *   };}
 	 * </pre>
 	 */
-	protected int startingPositionIndex = 4;
-
+	protected int startingPositionIndex;
 
 	// TODO a way for users to create different tools for each machine
 	private List<DrawingTool> tools;
 
-	private int currentToolIndex = 0;
+	private int currentToolIndex;
 
 	private String[] machineConfigurationsAvailable = null;
 
@@ -122,6 +122,31 @@ public final class MakelangeloRobot {
 
 		commonPaperSizes[0] = translator.get("Other");
 
+		limitTop = 18 * INCH_TO_CM;
+		limitBottom = -18 * INCH_TO_CM;
+		limitLeft = -18 * INCH_TO_CM;
+		limitRight = 18 * INCH_TO_CM;
+
+		// paper area
+		paperTop = 12 * INCH_TO_CM;
+		paperBottom = -12 * INCH_TO_CM;
+		paperLeft = -9 * INCH_TO_CM;
+		paperRight = 9 * INCH_TO_CM;
+		paperMargin = 0.9;
+
+		maxFeedRate=11000;
+		startingPositionIndex = 4;
+		currentToolIndex = 0;
+		maxFeedRate = 11000;
+		bobbinDiameterLeft=1.5;
+		bobbinDiameterRight=1.5;
+
+		invertMotor1 = false;
+		invertMotor2 = false;
+
+		reverseForGlass=false;
+		areMotorsBackwards=false;
+		
 		tools = new ArrayList<>();
 		tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, translator, this));
 		tools.add(new DrawingTool_Pen("Pen (red)", 1, gui, translator, this));
@@ -137,7 +162,8 @@ public final class MakelangeloRobot {
 			logger.error("{}", e);
 			machineConfigurationsAvailable = new String[1];
 		}
-		// TODO load most recent config?
+		
+		// Load most recent config
 		loadConfig(0);
 	}
 
@@ -303,7 +329,6 @@ public final class MakelangeloRobot {
 			tool.saveConfig(uniqueMachinePreferencesNode);
 		}
 
-		// TODO move these values to image filter preferences?
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));

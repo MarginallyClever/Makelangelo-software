@@ -22,10 +22,7 @@ public abstract class ImageManipulator {
   
   // helpers
   protected float w2, h2, scale;
-  
   protected DrawingTool tool;
-
-  protected int colorChannel = 0;
 
   // file properties
   protected String dest;

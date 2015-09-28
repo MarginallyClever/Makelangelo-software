@@ -19,16 +19,16 @@ import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class Generator_HilbertCurve extends ImageGenerator {
-  float turtle_x, turtle_y;
-  float turtle_dx, turtle_dy;
-  float turtle_step = 10.0f;
+  float turtleX, turtleY;
+  float turtleDx, turtleDy;
+  float turtleStep = 10.0f;
   float xmax = 7;
   float xmin = -7;
   float ymax = 7;
   float ymin = -7;
-  float tool_offset_z = 1.25f;
-  float z_down = 40;
-  float z_up = 90;
+  float toolOffsetZ = 1.25f;
+  float zDown = 40;
+  float zUp = 90;
   int order = 4; // controls complexity of curve
   float x, y;
 
@@ -44,7 +44,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
   }
 
   /**
-   * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
+   * Overrides the basic MoveTo() because optimizing for spirals is different logic than straight lines.
    */
   @Override
   protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
@@ -95,11 +95,11 @@ public class Generator_HilbertCurve extends ImageGenerator {
       xmin = -v;
       ymin = -v;
 
-      turtle_step = (float) ((xmax - xmin) / (Math.pow(2, order)));
-      turtle_x = 0;
-      turtle_y = 0;
-      turtle_dx = 0;
-      turtle_dy = -1;
+      turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
+      turtleX = 0;
+      turtleY = 0;
+      turtleDx = 0;
+      turtleDy = -1;
 
       // Draw bounding box
       //SetAbsoluteMode(output);
@@ -112,8 +112,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
       liftPen(output);
 
       // move to starting position
-      x = (xmax - turtle_step / 2);
-      y = (ymax - turtle_step / 2);
+      x = (xmax - turtleStep / 2);
+      y = (ymax - turtleStep / 2);
       moveTo(output, x, y, true);
       lowerPen(output);
       // do the curve
@@ -163,12 +163,12 @@ public class Generator_HilbertCurve extends ImageGenerator {
 
   public void turtle_turn(float degrees) {
     double n = degrees * Math.PI / 180.0;
-    double newx = Math.cos(n) * turtle_dx + Math.sin(n) * turtle_dy;
-    double newy = -Math.sin(n) * turtle_dx + Math.cos(n) * turtle_dy;
+    double newx = Math.cos(n) * turtleDx + Math.sin(n) * turtleDy;
+    double newy = -Math.sin(n) * turtleDx + Math.cos(n) * turtleDy;
     double len = Math.sqrt(newx * newx + newy * newy);
     assert (len > 0);
-    turtle_dx = (float) (newx / len);
-    turtle_dy = (float) (newy / len);
+    turtleDx = (float) (newx / len);
+    turtleDy = (float) (newy / len);
   }
 
 
@@ -176,8 +176,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
     //turtle_x += turtle_dx * distance;
     //turtle_y += turtle_dy * distance;
     //output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-    x += (turtle_dx * turtle_step);
-    y += (turtle_dy * turtle_step);
+    x += (turtleDx * turtleStep);
+    y += (turtleDy * turtleStep);
     moveTo(output, x, y, false);
   }
 }

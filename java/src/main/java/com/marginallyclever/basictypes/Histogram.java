@@ -14,8 +14,7 @@ public class Histogram {
   public char[] green = new char[256];
   public char[] blue = new char[256];
 
-  public Histogram() {
-  }
+  public Histogram() {}
 
   public void getHistogramOf(BufferedImage img) {
     int w = img.getWidth();

@@ -29,11 +29,12 @@ public abstract class ImageConverter extends ImageManipulator {
 	protected float sampleValue;
 	protected float sampleSum;
 
+	protected int colorChannel = 0;
+
 	
 	public ImageConverter(MainGUI gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
