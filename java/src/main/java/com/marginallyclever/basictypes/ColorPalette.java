@@ -17,14 +17,17 @@ public class ColorPalette {
    *
    * @see C3
    */
-  private List<C3> colors;
+  protected List<C3> colors;
+  
 
   public ColorPalette() {
     colors = new ArrayList<>();
-    //addColor(new C3(0,0,0));
-    //addColor(new C3(255,255,255));
   }
 
+  /**
+   * add a color to the palette.  Does not check for duplicates.
+   * @param c
+   */
   public void addColor(C3 c) {
     colors.add(c);
   }
@@ -45,16 +48,30 @@ public class ColorPalette {
   }
 
 
+  /**
+   * 
+   * @return the number of colors in this palette
+   */
   public int numColors() {
     return colors.size();
   }
 
 
-  public C3 getColor(int index) {
+  /**
+   * get the color at a given index.
+   * @param index
+   * @return
+   */
+  public C3 getColor(int index) throws IndexOutOfBoundsException {
     return colors.get(index);
   }
 
 
+  /**
+   * find the color in the palette that most closely matches a given color.
+   * @param c the color to match
+   * @return the closest match
+   */
   public C3 quantize(C3 c) {
     int i = quantizeIndex(c);
 
@@ -62,23 +79,28 @@ public class ColorPalette {
   }
 
 
+  /**
+   * Find the index of the color in the palette that most closely matches a given color.
+   * @param c the color to match
+   * @return the index into the color palette of the closest match 
+   */
   public int quantizeIndex(C3 c) {
     Iterator<C3> i = colors.iterator();
     assert (i.hasNext());
 
-    C3 n, nearest = i.next();
+    C3 color, nearestColor = i.next();
     int index = 0;
-    int nearest_index = 0;
+    int nearestIndex = 0;
 
     while (i.hasNext()) {
-      n = i.next();
+      color = i.next();
       ++index;
-      if (n.diff(c) < nearest.diff(c)) {
-        nearest = n;
-        nearest_index = index;
+      if (color.diff(c) < nearestColor.diff(c)) {
+        nearestColor = color;
+        nearestIndex = index;
       }
     }
 
-    return nearest_index;
+    return nearestIndex;
   }
 }
