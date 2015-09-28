@@ -41,11 +41,11 @@ implements ActionListener {
 	
 	    buttonAneg = new JButton(_translator.get("JogIn"));
 	    buttonApos = new JButton(_translator.get("JogOut"));
-	    m1i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.m1invert);
+	    m1i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.invertMotor1);
 	
 	    buttonBneg = new JButton(_translator.get("JogIn"));
 	    buttonBpos = new JButton(_translator.get("JogOut"));
-	    m2i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.m2invert);
+	    m2i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.invertMotor2);
 	
 	    c.gridx = 0;
 	    c.gridy = 0;
@@ -93,8 +93,8 @@ implements ActionListener {
       if (subject == buttonBneg) gui.sendLineToRobot("D00 R-400");
     
       if (subject == m1i || subject == m2i) {
-        machineConfiguration.m1invert = m1i.isSelected();
-        machineConfiguration.m2invert = m2i.isSelected();
+        machineConfiguration.invertMotor1 = m1i.isSelected();
+        machineConfiguration.invertMotor2 = m2i.isSelected();
         machineConfiguration.saveConfig();
         gui.sendConfig();
       }

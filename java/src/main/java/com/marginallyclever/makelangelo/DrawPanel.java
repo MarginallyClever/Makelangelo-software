@@ -170,8 +170,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     public void zoomToFitPaper() {
         int drawPanelWidth = this.getWidth();
         int drawPanelHeight = this.getHeight();
-        double widthOfPaper = machine.paper_right - machine.paper_left;
-        double heightOfPaper = machine.paper_top - machine.paper_bottom;
+        double widthOfPaper = machine.paperRight - machine.paperLeft;
+        double heightOfPaper = machine.paperTop - machine.paperBottom;
         double drawPanelWidthZoom = drawPanelWidth / widthOfPaper;
         double drawPanelHeightZoom = drawPanelHeight / heightOfPaper;
         cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
@@ -369,10 +369,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
       gl2.glEnd();
       gl2.glColor3f(1, 1, 1);
       gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-      gl2.glVertex2d(machine.paper_left, machine.paper_top);
-      gl2.glVertex2d(machine.paper_right, machine.paper_top);
-      gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
-      gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+      gl2.glVertex2d(machine.paperLeft, machine.paperTop);
+      gl2.glVertex2d(machine.paperRight, machine.paperTop);
+      gl2.glVertex2d(machine.paperRight, machine.paperBottom);
+      gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
       gl2.glEnd();
     } else {
       gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
@@ -384,10 +384,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
       gl2.glEnd();
       gl2.glColor3f(1, 1, 1);
       gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-      gl2.glVertex2d(machine.paper_left, machine.paper_top);
-      gl2.glVertex2d(machine.paper_right, machine.paper_top);
-      gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
-      gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+      gl2.glVertex2d(machine.paperLeft, machine.paperTop);
+      gl2.glVertex2d(machine.paperRight, machine.paperTop);
+      gl2.glVertex2d(machine.paperRight, machine.paperBottom);
+      gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
       gl2.glEnd();
     }
     // margin settings
@@ -396,10 +396,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
     gl2.glLineWidth(1);
     gl2.glScaled(machine.paperMargin,machine.paperMargin,1);
     gl2.glBegin(GL2.GL_LINE_LOOP);
-    gl2.glVertex2d(machine.paper_left, machine.paper_top);
-    gl2.glVertex2d(machine.paper_right, machine.paper_top);
-    gl2.glVertex2d(machine.paper_right, machine.paper_bottom);
-    gl2.glVertex2d(machine.paper_left, machine.paper_bottom);
+    gl2.glVertex2d(machine.paperLeft, machine.paperTop);
+    gl2.glVertex2d(machine.paperRight, machine.paperTop);
+    gl2.glVertex2d(machine.paperRight, machine.paperBottom);
+    gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
     gl2.glEnd();
     gl2.glPopMatrix();
   }

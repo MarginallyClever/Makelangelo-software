@@ -109,10 +109,10 @@ implements ActionListener, KeyListener {
 	    this.add(p);
 	    y=0;
 	    paperSizes = new JComboBox<>(machineConfiguration.commonPaperSizes);
-	    paperSizes.setSelectedIndex(machineConfiguration.getCurrentPaperSizeChoice( (machineConfiguration.paper_right-machineConfiguration.paper_left)*10, (machineConfiguration.paper_top-machineConfiguration.paper_bottom)*10) );
+	    paperSizes.setSelectedIndex(machineConfiguration.getCurrentPaperSizeChoice( (machineConfiguration.paperRight-machineConfiguration.paperLeft)*10, (machineConfiguration.paperTop-machineConfiguration.paperBottom)*10) );
 	    
-	    pw = new JTextField(Integer.toString((int)((machineConfiguration.paper_right-machineConfiguration.paper_left)*10)));
-	    ph = new JTextField(Integer.toString((int)((machineConfiguration.paper_top-machineConfiguration.paper_bottom)*10)));
+	    pw = new JTextField(Integer.toString((int)((machineConfiguration.paperRight-machineConfiguration.paperLeft)*10)));
+	    ph = new JTextField(Integer.toString((int)((machineConfiguration.paperTop-machineConfiguration.paperBottom)*10)));
 	    
 	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
 	    d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
@@ -147,8 +147,8 @@ implements ActionListener, KeyListener {
 	    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
 	    c.gridwidth=1;
  
-	    mBobbin1 = new JTextField(String.valueOf(machineConfiguration.bobbin_left_diameter * 10));
-	    mBobbin2 = new JTextField(String.valueOf(machineConfiguration.bobbin_right_diameter * 10));
+	    mBobbin1 = new JTextField(String.valueOf(machineConfiguration.bobbinDiameterLeft * 10));
+	    mBobbin2 = new JTextField(String.valueOf(machineConfiguration.bobbinDiameterRight * 10));
 	    y=2;
 	    c.weightx = 0;
 	    c.anchor=GridBagConstraints.EAST;
@@ -232,8 +232,8 @@ implements ActionListener, KeyListener {
           if (brd <= 0) data_is_sane = false;
 
         if (data_is_sane) {
-        	machineConfiguration.bobbin_left_diameter = bld;
-        	machineConfiguration.bobbin_right_diameter = brd;
+        	machineConfiguration.bobbinDiameterLeft = bld;
+        	machineConfiguration.bobbinDiameterRight = brd;
           //startingPositionIndex = startPos.getSelectedIndex();
           /*// relative to machine limits
           switch(startingPositionIndex%3) {
@@ -281,40 +281,40 @@ implements ActionListener, KeyListener {
           // relative to paper limits
           switch (machineConfiguration.startingPositionIndex % 3) {
             case 0:
-            	machineConfiguration.paper_left = 0;
-            	machineConfiguration.paper_right = pwf;
+            	machineConfiguration.paperLeft = 0;
+            	machineConfiguration.paperRight = pwf;
             	machineConfiguration.limitLeft = -(mwf - pwf) / 2.0f;
             	machineConfiguration.limitRight = (mwf - pwf) / 2.0f + pwf;
               break;
             case 1:
-            	machineConfiguration.paper_left = -pwf / 2.0f;
-            	machineConfiguration.paper_right = pwf / 2.0f;
+            	machineConfiguration.paperLeft = -pwf / 2.0f;
+            	machineConfiguration.paperRight = pwf / 2.0f;
             	machineConfiguration.limitLeft = -mwf / 2.0f;
             	machineConfiguration.limitRight = mwf / 2.0f;
               break;
             case 2:
-            	machineConfiguration.paper_right = 0;
-              machineConfiguration.paper_left = -pwf;
+            	machineConfiguration.paperRight = 0;
+              machineConfiguration.paperLeft = -pwf;
               machineConfiguration.limitLeft = -pwf - (mwf - pwf) / 2.0f;
               machineConfiguration.limitRight = (mwf - pwf) / 2.0f;
               break;
           }
           switch (machineConfiguration.startingPositionIndex / 3) {
             case 0:
-            	machineConfiguration.paper_top = 0;
-	            machineConfiguration.paper_bottom = -phf;
+            	machineConfiguration.paperTop = 0;
+	            machineConfiguration.paperBottom = -phf;
 	            machineConfiguration.limitTop = (mhf - phf) / 2.0f;
 	            machineConfiguration.limitBottom = -phf - (mhf - phf) / 2.0f;
               break;
             case 1:
-            	machineConfiguration.paper_top = phf / 2.0f;
-            	machineConfiguration.paper_bottom = -phf / 2.0f;
+            	machineConfiguration.paperTop = phf / 2.0f;
+            	machineConfiguration.paperBottom = -phf / 2.0f;
             	machineConfiguration.limitTop = mhf / 2.0f;
             	machineConfiguration.limitBottom = -mhf / 2.0f;
               break;
             case 2:
-            	machineConfiguration.paper_bottom = 0;
-            	machineConfiguration.paper_top = phf;
+            	machineConfiguration.paperBottom = 0;
+            	machineConfiguration.paperTop = phf;
               machineConfiguration.limitTop = phf + (mhf - phf) / 2.0f;
               machineConfiguration.limitBottom = -(mhf - phf) / 2.0f;
               break;

@@ -240,8 +240,8 @@ public class MakelangeloDriveControls
 		  double cy = h/2.0;
 		  x = x - cx;
 		  y = cy - y;
-		  x *= 10 * ((machineConfiguration.paper_right-machineConfiguration.paper_left)/2.0) / (w/2.0);
-		  y *= 10 * ((machineConfiguration.paper_top-machineConfiguration.paper_bottom)/2.0) / (h/2.0);
+		  x *= 10 * ((machineConfiguration.paperRight-machineConfiguration.paperLeft)/2.0) / (w/2.0);
+		  y *= 10 * ((machineConfiguration.paperTop-machineConfiguration.paperBottom)/2.0) / (h/2.0);
 		  double dx = x-last_x;
 		  double dy = y-last_y;
 		  if(Math.sqrt(dx*dx+dy*dy)>=1) {
@@ -273,13 +273,13 @@ public class MakelangeloDriveControls
     if (b == goHome) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
     else if (b == setHome) gui.sendLineToRobot("G92 X0 Y0");
     else if (b == goLeft)
-      gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paper_left * 10));
+      gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paperLeft * 10));
     else if (b == goRight)
-      gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paper_right * 10));
+      gui.sendLineToRobot("G00 F" + feedRate.getText() + " X" + (machineConfiguration.paperRight * 10));
     else if (b == goTop)
-      gui.sendLineToRobot("G00 F" + feedRate.getText() + " Y" + (machineConfiguration.paper_top * 10));
+      gui.sendLineToRobot("G00 F" + feedRate.getText() + " Y" + (machineConfiguration.paperTop * 10));
     else if (b == goBottom)
-      gui.sendLineToRobot("G00 F" + feedRate.getText() + " Y" + (machineConfiguration.paper_bottom * 10));
+      gui.sendLineToRobot("G00 F" + feedRate.getText() + " Y" + (machineConfiguration.paperBottom * 10));
       //} else if(b==find) {
       //  gui.SendLineToRobot("G28");
     else if (b == penUp) gui.raisePen();
