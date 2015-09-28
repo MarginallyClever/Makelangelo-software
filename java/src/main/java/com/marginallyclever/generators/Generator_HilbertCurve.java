@@ -86,10 +86,10 @@ public class Generator_HilbertCurve extends ImageGenerator {
       
       w2=0;
       h2=0;
-      scale=1;
+      scale=10.0f;
 
-      float v = Math.min((float)(machine.getPaperWidth() * 10.0f * machine.paperMargin)/2.0f,
-    		  			(float)(machine.getPaperHeight() * 10.0f * machine.paperMargin)/2.0f);
+      float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin())/2.0f,
+    		  			(float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f);
       xmax = v;
       ymax = v;
       xmin = -v;

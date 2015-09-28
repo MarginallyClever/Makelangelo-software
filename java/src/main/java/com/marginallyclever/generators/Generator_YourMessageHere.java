@@ -79,8 +79,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
   protected void setupTransform() {
 	  super.setupTransform();
 
-	    double imageHeight = machine.getPaperHeight()*machine.paperMargin;
-	    double imageWidth = machine.getPaperWidth()*machine.paperMargin;
+	    double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
+	    double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
 	    h2 = (float)imageHeight / 2.0f;
 	    w2 = (float)imageWidth / 2.0f;
 
@@ -101,8 +101,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	      newWidth *= resize;
 	      newHeight = machine.getPaperHeight();
 	    }
-	    newWidth *= machine.paperMargin;
-	    newHeight *= machine.paperMargin;
+	    newWidth *= machine.getPaperMargin();
+	    newHeight *= machine.getPaperMargin();
 	    
 	  textFindCharsPerLine(newWidth);
 
@@ -134,9 +134,9 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	      newWidth *= resize;
 	      newHeight = machine.getPaperHeight();
 	    }
-	    scale *= machine.paperMargin;
-	    newWidth *= machine.paperMargin;
-	    newHeight *= machine.paperMargin;
+	    scale *= machine.getPaperMargin();
+	    newWidth *= machine.getPaperMargin();
+	    newHeight *= machine.getPaperMargin();
 
 	    textFindCharsPerLine(newWidth);
 
@@ -250,7 +250,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
       posy=0;
       scale=1;
 
-      textFindCharsPerLine(machine.getPaperWidth()*machine.paperMargin);
+      textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
 
       output.write(machine.getConfigLine() + ";\n");
       output.write(machine.getBobbinLine() + ";\n");
@@ -267,8 +267,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
       scale=1;
       textSetAlign(Align.RIGHT);
       textSetVAlign(VAlign.TOP);
-      textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.paperMargin),
-					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.paperMargin));
+      textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
+					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
       textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
     } catch (IOException e) {
       logger.error("{}", e);
@@ -634,8 +634,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 	    textSetAlign(Align.RIGHT);
 	    textSetVAlign(VAlign.BOTTOM);
-	    textSetPosition((float)(machine.getPaperWidth() *10.0f*machine.paperMargin),
-	    				(float)(machine.getPaperHeight()*10.0f*machine.paperMargin));
+	    textSetPosition((float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
+	    				(float)(machine.getPaperHeight()*10.0f*machine.getPaperMargin()));
 
 	    float xx = w2;
 	    float yy = h2;

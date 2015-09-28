@@ -84,8 +84,8 @@ public class Converter_Crosshatch extends ImageConverter {
       yStart = -(paperHeight / 2.0);
     }
 
-    xStart *= 10.0 * machine.paperMargin;
-    yStart *= 10.0 * machine.paperMargin;
+    xStart *= 10.0 * machine.getPaperMargin();
+    yStart *= 10.0 * machine.getPaperMargin();
     xEnd = -xStart;
     yEnd = -yStart;
 

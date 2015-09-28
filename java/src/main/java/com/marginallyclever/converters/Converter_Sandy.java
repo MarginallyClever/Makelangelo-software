@@ -107,8 +107,8 @@ public class Converter_Sandy extends ImageConverter {
     double x, y, z, scaleZ, pulseSize;
     
     
-    double dx = xStart - machine.limit_right*10; 
-    double dy = yStart - machine.limit_top*10;
+    double dx = xStart - machine.getLimitRight()*10; 
+    double dy = yStart - machine.getLimitTop()*10;
     double rMax = Math.sqrt(dx*dx+dy*dy);
     double rMin = 0;
     
@@ -116,20 +116,20 @@ public class Converter_Sandy extends ImageConverter {
 	
 	switch(direction) {
 	case 0:
-		cx = machine.limit_right*10;
-		cy = machine.limit_top*10;
+		cx = machine.getLimitRight()*10;
+		cy = machine.getLimitTop()*10;
 		break;
 	case 1:
-		cx = machine.limit_left*10;
-		cy = machine.limit_top*10;
+		cx = machine.getLimitLeft()*10;
+		cy = machine.getLimitTop()*10;
 		break;
 	case 2:
-		cx = machine.limit_left*10;
-		cy = machine.limit_bottom*10;
+		cx = machine.getLimitLeft()*10;
+		cy = machine.getLimitBottom()*10;
 		break;
 	case 3:
-		cx = machine.limit_left*10;
-		cy = machine.limit_bottom*10;
+		cx = machine.getLimitLeft()*10;
+		cy = machine.getLimitBottom()*10;
 		break;
 	default:
 		cx = 0;

@@ -36,30 +36,7 @@ public final class MakelangeloRobot {
    */
   private long robot_uid = 0;
 
-  protected final static double INCH_TO_CM = 2.54;
-
-  // machine physical limits
-  public double limit_top = 18 * INCH_TO_CM;
-  public double limit_bottom = -18 * INCH_TO_CM;
-  public double limit_left = -18 * INCH_TO_CM;
-  public double limit_right = 18 * INCH_TO_CM;
-
-  // paper area
-  public double paper_top = 12 * INCH_TO_CM;
-  public double paper_bottom = -12 * INCH_TO_CM;
-  public double paper_left = -9 * INCH_TO_CM;
-  public double paper_right = 9 * INCH_TO_CM;
-  public double paperMargin = 0.9;
-
-  // pulleys turning backwards?
-  public boolean m1invert = false;
-  public boolean m2invert = false;
-
-  // pulley diameter
-  public double bobbin_left_diameter=1.5;
-  public double bobbin_right_diameter=1.5;
-
-  public double max_feed_rate=11000;  // etch-a-sketch speed
+  public final static double INCH_TO_CM = 2.54;
 
   public final String commonPaperSizes [] = { "",
 		"4A0 (1682 x 2378)",
@@ -72,9 +49,32 @@ public final class MakelangeloRobot {
 		"A5 (148 x 210)",
 		"A6 (105 x 148)",
 		"A7 (74 x 105)",};
+
+  // machine physical limits
+  protected double limitTop = 18 * INCH_TO_CM;
+  protected double limitBottom = -18 * INCH_TO_CM;
+  protected double limitLeft = -18 * INCH_TO_CM;
+  protected double limitRight = 18 * INCH_TO_CM;
+
+  // paper area
+  protected double paper_top = 12 * INCH_TO_CM;
+  protected double paper_bottom = -12 * INCH_TO_CM;
+  protected double paper_left = -9 * INCH_TO_CM;
+  protected double paper_right = 9 * INCH_TO_CM;
+  protected double paperMargin = 0.9;
+
+  // pulleys turning backwards?
+  protected boolean m1invert = false;
+  protected boolean m2invert = false;
+
+  // pulley diameter
+  protected double bobbin_left_diameter=1.5;
+  protected double bobbin_right_diameter=1.5;
+
+  protected double max_feed_rate=11000;  // etch-a-sketch speed
   
   protected boolean reverseForGlass=false;
-  public boolean motors_backwards=false;
+  protected boolean motors_backwards=false;
 
     /**
      * top left, bottom center, etc...
@@ -121,7 +121,15 @@ public final class MakelangeloRobot {
    */
   public int startingPositionIndex = 4;
 
-  // TODO a way for users to create different tools for each machine
+  public double getPaperMargin() {
+	  return paperMargin;
+  }
+
+  public void setPaperMargin(double paperMargin) {
+	  this.paperMargin = paperMargin;
+  }
+
+// TODO a way for users to create different tools for each machine
   private List<DrawingTool> tools;
 
   private int current_tool = 0;
@@ -226,10 +234,10 @@ public final class MakelangeloRobot {
 
   protected void loadConfigFromLocal() {
     final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robot_uid));
-    limit_top = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limit_top)));
-    limit_bottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limit_bottom)));
-    limit_left = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limit_left)));
-    limit_right = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limit_right)));
+    limitTop = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
+    limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
+    limitLeft = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
+    limitRight = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
     
     paper_left=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paper_left)));
     paper_right=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paper_right)));
@@ -305,10 +313,10 @@ public final class MakelangeloRobot {
 
   protected void saveConfigToLocal() {
     final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robot_uid));
-    uniqueMachinePreferencesNode.put("limit_top", Double.toString(limit_top));
-    uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limit_bottom));
-    uniqueMachinePreferencesNode.put("limit_right", Double.toString(limit_right));
-    uniqueMachinePreferencesNode.put("limit_left", Double.toString(limit_left));
+    uniqueMachinePreferencesNode.put("limit_top", Double.toString(limitTop));
+    uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
+    uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
+    uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
     uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(m1invert));
     uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(m2invert));
     uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(bobbin_left_diameter));
@@ -339,10 +347,10 @@ public final class MakelangeloRobot {
 
 
   public String getConfigLine() {
-    return "M101 T" + limit_top
-        + " B" + limit_bottom
-        + " L" + limit_left
-        + " R" + limit_right
+    return "M101 T" + limitTop
+        + " B" + limitBottom
+        + " L" + limitLeft
+        + " R" + limitRight
         + " I" + (m1invert ? "-1" : "1")
         + " J" + (m2invert ? "-1" : "1");
   }
@@ -382,7 +390,7 @@ public final class MakelangeloRobot {
     // load machine specific config
     loadConfig(new_uid);
 
-    if (limit_top == 0 && limit_bottom == 0 && limit_left == 0 && limit_right == 0) {
+    if (limitTop == 0 && limitBottom == 0 && limitLeft == 0 && limitRight == 0) {
       // probably first time turning on, adjust the machine size
     	MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui,translator,this);
     	m.run();
@@ -521,4 +529,36 @@ public final class MakelangeloRobot {
 	public void setReverseForGlass(boolean reverseForGlass) {
 		this.reverseForGlass = reverseForGlass;
 	}
+	
+	  public double getLimitTop() {
+			return limitTop;
+		}
+
+		public void setLimitTop(double limitTop) {
+			this.limitTop = limitTop;
+		}
+
+		public double getLimitBottom() {
+			return limitBottom;
+		}
+
+		public void setLimitBottom(double limitBottom) {
+			this.limitBottom = limitBottom;
+		}
+
+		public double getLimitLeft() {
+			return limitLeft;
+		}
+
+		public void setLimitLeft(double limitLeft) {
+			this.limitLeft = limitLeft;
+		}
+
+		public double getLimitRight() {
+			return limitRight;
+		}
+
+		public void setLimitRight(double limitRight) {
+			this.limitRight = limitRight;
+		}
 }

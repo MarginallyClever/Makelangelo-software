@@ -93,8 +93,8 @@ implements ActionListener, KeyListener {
 	    c.anchor=GridBagConstraints.EAST;
 	    d.anchor=GridBagConstraints.WEST;
 
-	    mw = new JTextField(String.valueOf((machineConfiguration.limit_right-machineConfiguration.limit_left)*10));
-	    mh = new JTextField(String.valueOf((machineConfiguration.limit_top-machineConfiguration.limit_bottom)*10));
+	    mw = new JTextField(String.valueOf((machineConfiguration.limitRight-machineConfiguration.limitLeft)*10));
+	    mh = new JTextField(String.valueOf((machineConfiguration.limitTop-machineConfiguration.limitBottom)*10));
 	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineWidth")),c);
 	    d.gridx=1;  d.gridy=y;  p.add(mw,d);
 	    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
@@ -283,40 +283,40 @@ implements ActionListener, KeyListener {
             case 0:
             	machineConfiguration.paper_left = 0;
             	machineConfiguration.paper_right = pwf;
-            	machineConfiguration.limit_left = -(mwf - pwf) / 2.0f;
-            	machineConfiguration.limit_right = (mwf - pwf) / 2.0f + pwf;
+            	machineConfiguration.limitLeft = -(mwf - pwf) / 2.0f;
+            	machineConfiguration.limitRight = (mwf - pwf) / 2.0f + pwf;
               break;
             case 1:
             	machineConfiguration.paper_left = -pwf / 2.0f;
             	machineConfiguration.paper_right = pwf / 2.0f;
-            	machineConfiguration.limit_left = -mwf / 2.0f;
-            	machineConfiguration.limit_right = mwf / 2.0f;
+            	machineConfiguration.limitLeft = -mwf / 2.0f;
+            	machineConfiguration.limitRight = mwf / 2.0f;
               break;
             case 2:
             	machineConfiguration.paper_right = 0;
               machineConfiguration.paper_left = -pwf;
-              machineConfiguration.limit_left = -pwf - (mwf - pwf) / 2.0f;
-              machineConfiguration.limit_right = (mwf - pwf) / 2.0f;
+              machineConfiguration.limitLeft = -pwf - (mwf - pwf) / 2.0f;
+              machineConfiguration.limitRight = (mwf - pwf) / 2.0f;
               break;
           }
           switch (machineConfiguration.startingPositionIndex / 3) {
             case 0:
             	machineConfiguration.paper_top = 0;
 	            machineConfiguration.paper_bottom = -phf;
-	            machineConfiguration.limit_top = (mhf - phf) / 2.0f;
-	            machineConfiguration.limit_bottom = -phf - (mhf - phf) / 2.0f;
+	            machineConfiguration.limitTop = (mhf - phf) / 2.0f;
+	            machineConfiguration.limitBottom = -phf - (mhf - phf) / 2.0f;
               break;
             case 1:
             	machineConfiguration.paper_top = phf / 2.0f;
             	machineConfiguration.paper_bottom = -phf / 2.0f;
-            	machineConfiguration.limit_top = mhf / 2.0f;
-            	machineConfiguration.limit_bottom = -mhf / 2.0f;
+            	machineConfiguration.limitTop = mhf / 2.0f;
+            	machineConfiguration.limitBottom = -mhf / 2.0f;
               break;
             case 2:
             	machineConfiguration.paper_bottom = 0;
             	machineConfiguration.paper_top = phf;
-              machineConfiguration.limit_top = phf + (mhf - phf) / 2.0f;
-              machineConfiguration.limit_bottom = -(mhf - phf) / 2.0f;
+              machineConfiguration.limitTop = phf + (mhf - phf) / 2.0f;
+              machineConfiguration.limitBottom = -(mhf - phf) / 2.0f;
               break;
           }
 

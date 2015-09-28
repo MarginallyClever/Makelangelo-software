@@ -107,8 +107,8 @@ public abstract class ImageManipulator {
   }
 
   protected void setupTransform() {
-    double imageHeight = machine.getPaperHeight()*machine.paperMargin;
-    double imageWidth = machine.getPaperWidth()*machine.paperMargin;
+    double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
+    double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
     h2 = (float)imageHeight / 2.0f;
     w2 = (float)imageWidth / 2.0f;
 

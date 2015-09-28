@@ -96,7 +96,7 @@ public abstract class ImageConverter extends ImageManipulator {
 	      scale *= resize;
 	      newHeight = machine.getPaperHeight();
 	    }
-	    scale *= machine.paperMargin;
+	    scale *= machine.getPaperMargin();
 	  }
 
 
@@ -259,7 +259,7 @@ public abstract class ImageConverter extends ImageManipulator {
 
     /**
      *  if the image were projected on the paper, where would the top left corner of the image be in paper space?
-     *  image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
+     *  image(0,0) is (-paperWidth/2,-paperHeight/2)*machine.getPaperMargin()
      */
 	protected void setupPaperImageTransform() {
 	    paperWidth = machine.getPaperWidth();
@@ -273,8 +273,8 @@ public abstract class ImageConverter extends ImageManipulator {
 	      yStart = -(paperHeight / 2.0);
 	    }
 
-	    xStart *= 10.0 * machine.paperMargin;
-	    yStart *= 10.0 * machine.paperMargin;
+	    xStart *= 10.0 * machine.getPaperMargin();
+	    yStart *= 10.0 * machine.getPaperMargin();
 	    xEnd = -xStart;
 	    yEnd = -yStart;
 	}
