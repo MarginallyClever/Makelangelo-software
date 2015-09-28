@@ -121,8 +121,6 @@ public class Converter_Spiral extends ImageConverter {
       mainGUI.log("<font color='yellow'>" + numRings + " rings.</font>\n");
 
       liftPen(out);
-      signName(out);
-      tool.writeMoveTo(out, 0, 0);
 
     return true;
   }

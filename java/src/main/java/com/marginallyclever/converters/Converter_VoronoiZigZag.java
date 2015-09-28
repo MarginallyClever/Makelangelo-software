@@ -491,8 +491,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	      }
 		
 	      liftPen(out);
-	      signName(out);
-	      tool.writeMoveTo(out, 0, 0);
 	  }
   }
 

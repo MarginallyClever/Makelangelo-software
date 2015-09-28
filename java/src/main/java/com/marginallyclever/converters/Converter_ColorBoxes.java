@@ -8,6 +8,7 @@ import java.io.Writer;
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -219,9 +220,6 @@ public class Converter_ColorBoxes extends ImageConverter {
       }
 
       liftPen(out);
-      signName(out);
-
-      tool.writeMoveTo(out, 0, 0);
 
     return true;
   }

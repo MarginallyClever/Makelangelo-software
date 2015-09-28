@@ -270,8 +270,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
       }
 
       liftPen(out);
-      signName(out);
-      tool.writeMoveTo(out, 0, 0);
     }
   }
 

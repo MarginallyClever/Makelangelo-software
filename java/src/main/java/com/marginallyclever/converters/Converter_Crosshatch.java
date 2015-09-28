@@ -46,12 +46,9 @@ public class Converter_Crosshatch extends ImageConverter {
       tool.writeChangeTo(out);
       liftPen(out);
 
-//            convertImageSpace(img, out);
       convertPaperSpace(img, out);
 
       liftPen(out);
-      signName(out);
-      moveTo(out, 0, 0, true);
 
     return true;
   }
@@ -163,144 +160,6 @@ public class Converter_Crosshatch extends ImageConverter {
 
       x -= stepSize;
     } while (x2 > xStart);
-  }
-
-
-  protected void convertImageSpace(BufferedImage img, Writer out) throws IOException {
-    int i, j, x, y, z = 0;
-    double leveladd = 255.0 / 6.0;
-    double level = leveladd;
-
-    int steps = (int) Math.ceil(2.5 * tool.getDiameter() / scale);
-    if (steps < 1) steps = 1;
-
-    mainGUI.log("<font color='green'>Generating layer 1</font>\n");
-    // create horizontal lines across the image
-    // raise and lower the pen to darken the appropriate areas
-    i = 0;
-    for (y = 0; y < imageHeight; y += steps) {
-      ++i;
-      if ((i % 2) == 0) {
-        moveTo(out, (float) 0, (float) y, true);
-        for (x = 0; x < imageWidth; ++x) {
-          z = sample3x3(img, x, y);
-          moveTo(out, (float) x, (float) y, (z >= level));
-        }
-        moveTo(out, (float) imageWidth, (float) y, true);
-      } else {
-        moveTo(out, (float) imageWidth, (float) y, true);
-        for (x = imageWidth - 1; x >= 0; --x) {
-          z = sample3x3(img, x, y);
-          moveTo(out, (float) x, (float) y, (z >= level));
-        }
-        moveTo(out, (float) 0, (float) y, true);
-      }
-    }
-    level += leveladd;
-
-
-    mainGUI.log("<font color='green'>Generating layer 2</font>\n");
-    // create vertical lines across the image
-    // raise and lower the pen to darken the appropriate areas
-    i = 0;
-    for (x = 0; x < imageWidth; x += steps) {
-      ++i;
-      if ((i % 2) == 0) {
-        moveTo(out, (float) x, (float) 0, true);
-        for (y = 0; y < imageHeight; ++y) {
-          z = sample3x3(img, x, y);
-          moveTo(out, (float) x, (float) y, (z >= level));
-        }
-        moveTo(out, (float) x, (float) imageHeight, true);
-      } else {
-        moveTo(out, (float) x, (float) imageHeight, true);
-        for (y = imageHeight - 1; y >= 0; --y) {
-          z = sample3x3(img, x, y);
-          moveTo(out, (float) x, (float) y, (z >= level));
-        }
-        moveTo(out, (float) x, (float) 0, true);
-      }
-    }
-    level += leveladd;
-
-
-    mainGUI.log("<font color='green'>Generating layer 3</font>\n");
-    // create diagonal \ lines across the image
-    // raise and lower the pen to darken the appropriate areas
-    i = 0;
-    for (x = -(imageHeight - 1); x < imageWidth; x += steps) {
-      int endx = imageHeight - 1 + x;
-      int endy = imageHeight - 1;
-      if (endx >= imageWidth) {
-        endy -= endx - (imageWidth - 1);
-        endx = imageWidth - 1;
-      }
-      int startx = x;
-      int starty = 0;
-      if (startx < 0) {
-        starty -= startx;
-        startx = 0;
-      }
-      int delta = endy - starty;
-
-      if ((i % 2) == 0) {
-        moveTo(out, (float) startx, (float) starty, true);
-        for (j = 0; j <= delta; ++j) {
-          z = sample3x3(img, startx + j, starty + j);
-          moveTo(out, (float) (startx + j), (float) (starty + j), (z >= level));
-        }
-        moveTo(out, (float) endx, (float) endy, true);
-      } else {
-        moveTo(out, (float) endx, (float) endy, true);
-        for (j = 0; j <= delta; ++j) {
-          z = sample3x3(img, endx - j, endy - j);
-          moveTo(out, (float) (endx - j), (float) (endy - j), (z >= level));
-        }
-        moveTo(out, (float) startx, (float) starty, true);
-      }
-      ++i;
-    }
-    level += leveladd;
-
-
-    mainGUI.log("<font color='green'>Generating layer 4</font>\n");
-    // create diagonal / lines across the image
-    // raise and lower the pen to darken the appropriate areas
-    i = 0;
-    for (x = 0; x < imageWidth + imageHeight; x += steps) {
-      int endx = 0;
-      int endy = x;
-      if (endy >= imageHeight) {
-        endx += endy - (imageHeight - 1);
-        endy = imageHeight - 1;
-      }
-      int startx = x;
-      int starty = 0;
-      if (startx >= imageWidth) {
-        starty += startx - (imageWidth - 1);
-        startx = imageWidth - 1;
-      }
-      int delta = endy - starty;
-
-      assert ((startx - endx) == (starty - endy));
-
-      ++i;
-      if ((i % 2) == 0) {
-        moveTo(out, (float) startx, (float) starty, true);
-        for (j = 0; j <= delta; ++j) {
-          z = sample3x3(img, startx - j, starty + j);
-          moveTo(out, (float) (startx - j), (float) (starty + j), (z > level));
-        }
-        moveTo(out, (float) endx, (float) endy, true);
-      } else {
-        moveTo(out, (float) endx, (float) endy, true);
-        for (j = 0; j < delta; ++j) {
-          z = sample3x3(img, endx + j, endy - j);
-          moveTo(out, (float) (endx + j), (float) (endy - j), (z > level));
-        }
-        moveTo(out, (float) startx, (float) starty, true);
-      }
-    }
   }
 }
 

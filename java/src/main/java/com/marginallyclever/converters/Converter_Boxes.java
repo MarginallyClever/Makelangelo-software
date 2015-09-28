@@ -7,6 +7,7 @@ import java.io.Writer;
 
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -131,7 +132,9 @@ public class Converter_Boxes extends ImageConverter {
         }
 
       liftPen(out);
-      signName(out);
+      
+      Generator_YourMessageHere ymh = new Generator_YourMessageHere(mainGUI, machine, translator);
+      ymh.signName(out);
       tool.writeMoveTo(out, 0, 0);
     }
     return true;

@@ -286,11 +286,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
       scanColor(2, out);  // green
       scanColor(3, out);  // blue
 
-      mainGUI.log("<font color='green'>Signing my name</font>\n");
-
-      // pen already lifted
-      signName(out);
-      moveTo(0, 0, true, out);
     return true;
   }
 }

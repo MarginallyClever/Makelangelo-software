@@ -84,29 +84,19 @@ public abstract class ImageConverter extends ImageManipulator {
 
 	    scale = 10f;  // 10mm = 1cm
 
-	    double newWidth = imageWidth;
 	    double newHeight = imageHeight;
 
 	    if (imageWidth > machine.getPaperWidth()) {
 	      float resize = (float) machine.getPaperWidth() / (float) imageWidth;
 	      scale *= resize;
 	      newHeight *= resize;
-	      newWidth = machine.getPaperWidth();
 	    }
 	    if (newHeight > machine.getPaperHeight()) {
 	      float resize = (float) machine.getPaperHeight() / (float) newHeight;
 	      scale *= resize;
-	      newWidth *= resize;
 	      newHeight = machine.getPaperHeight();
 	    }
 	    scale *= machine.paperMargin;
-	    newWidth *= machine.paperMargin;
-	    newHeight *= machine.paperMargin;
-
-	    textFindCharsPerLine(newWidth);
-
-	    posx = w2;
-	    posy = h2;
 	  }
 
 

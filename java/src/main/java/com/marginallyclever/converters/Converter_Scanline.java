@@ -76,10 +76,6 @@ public class Converter_Scanline extends ImageConverter {
         }
       }
 
-      // pen already lifted
-      signName(out);
-      moveTo(out, 0, 0, true);
-
     return true;
   }
 }

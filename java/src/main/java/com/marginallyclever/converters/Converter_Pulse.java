@@ -94,8 +94,6 @@ public class Converter_Pulse extends ImageConverter {
       convertPaperSpace(img, out);
 
       liftPen(out);
-      signName(out);
-      moveTo(out, 0, 0, true);
   }
 
 

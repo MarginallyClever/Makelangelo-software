@@ -268,44 +268,41 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    * start at the tsp point closest to the calibration point and go around until you get back to the start.
    */
   private void convertAndSaveToGCode(Writer out) throws IOException {
-    // find the tsp point closest to the calibration point
-    int i;
-    int besti = -1;
-    float bestw = 1000000;
-    float x, y, w;
-    for (i = 0; i < numPoints; ++i) {
-      x = points[solution[i]].x;
-      y = points[solution[i]].y;
-      w = x * x + y * y;
-      if (w < bestw) {
-        bestw = w;
-        besti = i;
-      }
-    }
+	  // find the tsp point closest to the calibration point
+	  int i;
+	  int besti = -1;
+	  float bestw = 1000000;
+	  float x, y, w;
+	  for (i = 0; i < numPoints; ++i) {
+		  x = points[solution[i]].x;
+		  y = points[solution[i]].y;
+		  w = x * x + y * y;
+		  if (w < bestw) {
+			  bestw = w;
+			  besti = i;
+		  }
+	  }
 
-
-      out.write(machine.getConfigLine() + ";\n");
-      out.write(machine.getBobbinLine() + ";\n");
-
-      //MachineConfiguration mc = machine;
-      //tool = mc.GetCurrentTool();
-
-      setAbsoluteMode(out);
-      tool.writeChangeTo(out);
-      liftPen(out);
-      // move to the first point
-      moveTo(out, besti, false);
-      lowerPen(out);
-
-      for (i = 1; i < numPoints; ++i) {
-        moveTo(out, (besti + i) % numPoints, false);
-      }
-      moveTo(out, besti, false);
-
-      // lift pen and return to home
-      liftPen(out);
-      signName(out);
-      tool.writeMoveTo(out, 0, 0);
+	  out.write(machine.getConfigLine() + ";\n");
+	  out.write(machine.getBobbinLine() + ";\n");
+	
+	  //MachineConfiguration mc = machine;
+	  //tool = mc.GetCurrentTool();
+	
+	  setAbsoluteMode(out);
+	  tool.writeChangeTo(out);
+	  liftPen(out);
+	  // move to the first point
+	  moveTo(out, besti, false);
+	  lowerPen(out);
+	
+	  for (i = 1; i < numPoints; ++i) {
+	    moveTo(out, (besti + i) % numPoints, false);
+	  }
+	  moveTo(out, besti, false);
+	
+	  // lift pen and return to home
+	  liftPen(out);
   }
 
 
