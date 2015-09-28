@@ -8,7 +8,6 @@ import java.io.Writer;
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.ImageConverter;
-import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
@@ -193,7 +192,6 @@ public class Converter_ColorBoxes extends ImageConverter {
       imageStart(img, out);
 
       double pw = machine.getPaperWidth();
-      //double ph = machine.GetPaperHeight();
 
       // figure out how many lines we're going to have on this image.
       float steps = (float) (pw / (tool.getDiameter() * 1.75f));

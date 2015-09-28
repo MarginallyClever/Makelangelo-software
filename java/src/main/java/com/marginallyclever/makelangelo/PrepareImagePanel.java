@@ -800,9 +800,10 @@ implements ActionListener, ChangeListener {
           converter.setProgressMonitor(pm);
           converter.convert(img,out);
 
-          // TODO sign name here instead of in every converter
+          // Sign name
           Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
           ymh.signName(out);
+
           
           out.flush();
           out.close();

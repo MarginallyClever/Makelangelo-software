@@ -286,9 +286,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	  out.write(machine.getConfigLine() + ";\n");
 	  out.write(machine.getBobbinLine() + ";\n");
 	
-	  //MachineConfiguration mc = machine;
-	  //tool = mc.GetCurrentTool();
-	
 	  setAbsoluteMode(out);
 	  tool.writeChangeTo(out);
 	  liftPen(out);
