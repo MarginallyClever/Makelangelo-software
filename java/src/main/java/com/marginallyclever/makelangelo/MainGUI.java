@@ -142,7 +142,7 @@ public final class MainGUI
   // context sensitive menu
   private JTabbedPane contextMenu;
   // menu tabs
-  private PrepareImagePanel prepareImage;
+  private PanelPrepareImage prepareImage;
   private MakelangeloDriveControls driveControls;
   public StatusBar statusBar;
 
@@ -1150,7 +1150,7 @@ public final class MainGUI
     drawPanel = new DrawPanel(machineConfiguration);
     drawPanel.setGCode(gCode);
 
-    prepareImage = new PrepareImagePanel();
+    prepareImage = new PanelPrepareImage();
     prepareImage.createPanel(this, translator, machineConfiguration);
     prepareImage.updateButtonAccess(false, false);
 

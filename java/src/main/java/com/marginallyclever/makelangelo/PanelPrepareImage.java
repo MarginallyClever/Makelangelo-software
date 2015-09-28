@@ -82,7 +82,7 @@ import com.marginallyclever.generators.Generator_YourMessageHere;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PrepareImagePanel<P extends Preferences>
+public class PanelPrepareImage<P extends Preferences>
 extends JScrollPane
 implements ActionListener, ChangeListener {
   /**
@@ -114,7 +114,7 @@ implements ActionListener, ChangeListener {
   /**
    * @see org.slf4j.Logger
    */
-  private final Logger logger = LoggerFactory.getLogger(PrepareImagePanel.class);
+  private final Logger logger = LoggerFactory.getLogger(PanelPrepareImage.class);
 
   /**
    * Image processing
