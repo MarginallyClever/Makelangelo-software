@@ -1,10 +1,11 @@
 package com.marginallyclever.filters;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import java.awt.image.BufferedImage;
+
+import com.marginallyclever.basictypes.ImageFilter;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.image.BufferedImage;
 
 /**
  * Floyd/Steinberg dithering
@@ -12,11 +13,11 @@ import java.awt.image.BufferedImage;
  * @author Dan
  * @see <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
-public class Filter_DitherFloydSteinberg extends Filter {
+public class Filter_DitherFloydSteinberg extends ImageFilter {
   private long tone;
 
 
-  public Filter_DitherFloydSteinberg(MainGUI gui, MachineConfiguration mc,
+  public Filter_DitherFloydSteinberg(MainGUI gui, MakelangeloRobot mc,
                                      MultilingualSupport ms) {
     super(gui, mc, ms);
   }
@@ -68,8 +69,8 @@ public class Filter_DitherFloydSteinberg extends Filter {
     }
   }
 
-  @Override
-  public BufferedImage process(BufferedImage img) {
+  
+  public BufferedImage filter(BufferedImage img) {
     int y, x;
     int h = img.getHeight();
     int w = img.getWidth();

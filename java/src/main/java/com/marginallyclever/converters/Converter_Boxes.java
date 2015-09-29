@@ -1,17 +1,20 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Writer;
+
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.generators.Generator_YourMessageHere;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 
-
-public class Filter_GeneratorBoxes extends Filter {
-  public Filter_GeneratorBoxes(MainGUI gui, MachineConfiguration mc,
+public class Converter_Boxes extends ImageConverter {
+  public Converter_Boxes(MainGUI gui, MakelangeloRobot mc,
                                MultilingualSupport ms) {
     super(gui, mc, ms);
   }
@@ -41,9 +44,9 @@ public class Filter_GeneratorBoxes extends Filter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -59,20 +62,13 @@ public class Filter_GeneratorBoxes extends Filter {
 
   /**
    * turn the image into a grid of boxes.  box size is affected by source image darkness.
-   *
    * @param img the image to convert.
    */
-  @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.process(img);
+    img = bw.filter(img);
 
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
       // Set up the conversion from image space to paper space, select the current tool, etc.
       imageStart(img, out);
       // "please change to tool X and press any key to continue"
@@ -87,18 +83,18 @@ public class Filter_GeneratorBoxes extends Filter {
       float steps = (float) (pw / tool.getDiameter());
       if (steps < 1) steps = 1;
 
-      float blockSize = (int) (image_width / steps);
+      float blockSize = (int) (imageWidth / steps);
       float halfstep = (float) blockSize / 2.0f;
 
       // from top to bottom of the image...
       float x, y, z;
       int i = 0;
-      for (y = 0; y < image_height; y += blockSize) {
+      for (y = 0; y < imageHeight; y += blockSize) {
         ++i;
         if ((i % 2) == 0) {
           // every even line move left to right
           //MoveTo(file,x,y,pen up?)]
-          for (x = 0; x < image_width - blockSize; x += blockSize) {
+          for (x = 0; x < imageWidth - blockSize; x += blockSize) {
             // read a block of the image and find the average intensity in this block
             z = takeImageSampleBlock(img, (int) x, (int) (y - halfstep), (int) (x + blockSize), (int) (y + halfstep));
             // scale the intensity value
@@ -117,7 +113,7 @@ public class Filter_GeneratorBoxes extends Filter {
         } else {
           // every odd line move right to left
           //MoveTo(file,x,y,pen up?)]
-          for (x = image_width - blockSize; x >= 0; x -= blockSize) {
+          for (x = imageWidth - blockSize; x >= 0; x -= blockSize) {
             // read a block of the image and find the average intensity in this block
             z = takeImageSampleBlock(img, (int) (x - blockSize), (int) (y - halfstep), (int) x, (int) (y + halfstep));
             // scale the intensity value
@@ -134,12 +130,14 @@ public class Filter_GeneratorBoxes extends Filter {
             }
           }
         }
-      }
 
       liftPen(out);
-      signName(out);
+      
+      Generator_YourMessageHere ymh = new Generator_YourMessageHere(mainGUI, machine, translator);
+      ymh.signName(out);
       tool.writeMoveTo(out, 0, 0);
     }
+    return true;
   }
 }
 

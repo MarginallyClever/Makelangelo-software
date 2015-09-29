@@ -1,13 +1,15 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
-
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.Writer;
+
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -15,17 +17,16 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Dan
  */
-public class Filter_GeneratorSpiral extends Filter {
+public class Converter_Spiral extends ImageConverter {
+	boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
   @Override
   public String getName() {
     return translator.get("SpiralName");
   }
 
-  boolean whole_image = false;  // draw the spiral right out to the edges of the square bounds.
 
-
-  public Filter_GeneratorSpiral(MainGUI gui, MachineConfiguration mc, MultilingualSupport ms) {
+  public Converter_Spiral(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -50,15 +51,10 @@ public class Filter_GeneratorSpiral extends Filter {
    * @param img the image to convert.
    */
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // black and white
     Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.process(img);
-
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+    img = bw.filter(img);
 
       imageStart(img, out);
 
@@ -78,7 +74,7 @@ public class Filter_GeneratorSpiral extends Filter {
       int z = 0;
 
       float maxr;
-      if (whole_image) {
+      if (convertToCorners) {
         // go right to the corners
         maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
       } else {
@@ -111,7 +107,7 @@ public class Filter_GeneratorSpiral extends Filter {
           x = (int) fx;
           y = (int) fy;
           // clip to image boundaries
-          if (x >= 0 && x < image_width && y >= 0 && y < image_height) {
+          if (x >= 0 && x < imageWidth && y >= 0 && y < imageHeight) {
             z = sample3x3(img, x, y);
             moveTo(out, fx, fy, (z >= level));
           } else {
@@ -125,9 +121,8 @@ public class Filter_GeneratorSpiral extends Filter {
       mainGUI.log("<font color='yellow'>" + numRings + " rings.</font>\n");
 
       liftPen(out);
-      signName(out);
-      tool.writeMoveTo(out, 0, 0);
-    }
+
+    return true;
   }
 }
 

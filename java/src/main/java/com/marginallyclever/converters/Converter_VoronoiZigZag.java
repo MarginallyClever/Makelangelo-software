@@ -1,27 +1,32 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
+
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.makelangelo.DrawDecorator;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
-
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -31,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorator {
+public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanelDecorator {
   private ReentrantLock lock = new ReentrantLock();
   
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -59,8 +64,8 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   long time_limit=10*60*1000;  // 10 minutes
   
   
-  public Filter_GeneratorVoronoiZigZag(MainGUI gui,
-      MachineConfiguration mc, MultilingualSupport ms) {
+  public Converter_VoronoiZigZag(MainGUI gui,
+      MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -68,7 +73,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   public String getName() { return translator.get("ZigZagName")+" 2"; }
   
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
 
@@ -86,7 +91,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 
         // make black & white
         Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
-        img = bw.process(img);
+        img = bw.filter(img);
         
         src_img = img;
         h = img.getHeight();
@@ -97,7 +102,7 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
   
         cellBorder = new ArrayList<>();
         
-        initializeCells(0.01);
+        initializeCells(0.001);
       
         render_mode=0;
         mainGUI.getDrawPanel().setDecorator(this);
@@ -106,11 +111,13 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
         render_mode=1;
         optimizeTour();
         mainGUI.getDrawPanel().setDecorator(null);
-        writeOutCells();
+        writeOutCells(out);
+        return true;
       }
+      return false;
   }
 
-  public void render(GL2 gl2,MachineConfiguration machine) {
+  public void render(GL2 gl2,MakelangeloRobot machine) {
     lock.lock();
     gl2.glScalef(0.1f, 0.1f, 1);
     int i;
@@ -449,49 +456,42 @@ public class Filter_GeneratorVoronoiZigZag extends Filter implements DrawDecorat
 
     
   // write cell centroids to gcode.
-  protected void writeOutCells() throws IOException {
-    if(graphEdges != null ) {
-      mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
-	    try(
-	    final OutputStream fileOutputStream = new FileOutputStream(dest);
-	    final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-	    ) {
-	        imageStart(src_img, out);
-	
-	        // set absolute coordinates
-	        out.write("G00 G90;\n");
-	        tool.writeChangeTo(out);
-	        liftPen(out);
-
-	        // find the tsp point closest to the calibration point
-	        int i;
-	        int besti=-1;
-	        float bestw=1000000;
-	        float x,y,w;
-	        for(i=0;i<solution_contains;++i) {
-	          x=w2-cells[solution[i]].centroid.x;
-	          y=h2-cells[solution[i]].centroid.y;
-	          w=x*x+y*y;
-	          if(w<bestw) {
-	            bestw=w;
-	            besti=i;
-	          }
-	        }
-	        
-	        // write the entire sequence
-	        for(i=0;i<=solution_contains;++i) {
-	          int v= (besti+i)%solution_contains;
-	          x=cells[solution[v]].centroid.x;
-	          y=cells[solution[v]].centroid.y;
-	
-	          this.moveTo(out,x,y, false);
-	        }
-	
-		    liftPen(out);
-		    signName(out);
-	        tool.writeMoveTo(out, 0, 0);
-	    }
-    }
+  protected void writeOutCells(Writer out) throws IOException {
+	  if(graphEdges != null ) {
+	      mainGUI.log("<font color='green'>Writing gcode to "+dest+"</font>\n");
+	      imageStart(src_img, out);
+		
+		  // set absolute coordinates
+	      out.write("G00 G90;\n");
+	      tool.writeChangeTo(out);
+	      liftPen(out);
+		
+	      // find the tsp point closest to the calibration point
+	      int i;
+	      int besti=-1;
+	      float bestw=1000000;
+	      float x,y,w;
+	      for(i=0;i<solution_contains;++i) {
+		      x=w2-cells[solution[i]].centroid.x;
+		      y=h2-cells[solution[i]].centroid.y;
+		      w=x*x+y*y;
+		      if(w<bestw) {
+		    	  bestw=w;
+		    	  besti=i;
+		      }
+	      }
+		    
+	      // write the entire sequence
+	      for(i=0;i<=solution_contains;++i) {
+		      int v= (besti+i)%solution_contains;
+		      x=cells[solution[v]].centroid.x;
+		      y=cells[solution[v]].centroid.y;
+		
+		      this.moveTo(out,x,y, false);
+	      }
+		
+	      liftPen(out);
+	  }
   }
 
 

@@ -10,6 +10,6 @@ import com.jogamp.opengl.GL2;
  * @author danroyer
  * @since 7.1.4
  */
-public interface DrawDecorator {
-  void render(GL2 gl2, MachineConfiguration machine);
+public interface DrawPanelDecorator {
+  void render(GL2 gl2, MakelangeloRobot machine);
 }

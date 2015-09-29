@@ -1,25 +1,30 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
+
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.makelangelo.DrawDecorator;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -30,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDecorator {
+public class Converter_VoronoiStippling extends ImageConverter implements DrawPanelDecorator {
   private ReentrantLock lock = new ReentrantLock();
 
   private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -50,8 +55,8 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   private double[] yValuesIn = null;
 
 
-  public Filter_GeneratorVoronoiStippling(MainGUI gui,
-                                          MachineConfiguration mc, MultilingualSupport ms) {
+  public Converter_VoronoiStippling(MainGUI gui,
+                                          MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -61,7 +66,7 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
   }
 
   @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
     JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
     JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
@@ -80,10 +85,10 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
 
     int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-      MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-      MAX_CELLS = Integer.parseInt(text_cells.getText());
-      MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
-      MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
+    	MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
+    	MAX_CELLS = Integer.parseInt(text_cells.getText());
+    	MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
+    	MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
         src_img = img;
         h = img.getHeight();
@@ -100,11 +105,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         evolveCells();
         mainGUI.getDrawPanel().setDecorator(null);
       
-        writeOutCells();
-      }
+        writeOutCells(out);
+        return true;
+    }
+    return false;
   }
 
-  public void render(GL2 gl2, MachineConfiguration machine) {
+  public void render(GL2 gl2, MakelangeloRobot machine) {
     if (graphEdges == null) return;
 
     while(lock.isLocked());
@@ -203,9 +210,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         generation++;
         mainGUI.log("<font color='green'>Generation " + generation + "</font>\n");
 
+        assert !lock.isHeldByCurrentThread();
         lock.lock();
-        tessellateVoronoiDiagram();
-        lock.unlock();
+        try {
+        	tessellateVoronoiDiagram();
+        } finally {
+        	lock.unlock();
+        }
         adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
@@ -216,31 +227,30 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       mainGUI.log("<font color='green'>Last " + generation + "</font>\n");
     } catch (Exception e) {
       e.printStackTrace();
+      if(lock.isHeldByCurrentThread() && lock.isLocked()) {
+    	  lock.unlock();
+      }
     }
   }
 
 
   // write cell centroids to gcode.
-  protected void writeOutCells() throws IOException {
+  protected void writeOutCells(Writer out) throws IOException {
     if (graphEdges != null) {
       mainGUI.log("<font color='green'>Writing gcode to " + dest + "</font>\n");
-      try (
-          final OutputStream fileOutputStream = new FileOutputStream(dest);
-          final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-      ) {
 
-        imageStart(src_img, out);
+      imageStart(src_img, out);
 
-        // set absolute coordinates
-        out.write("G00 G90;\n");
-        tool.writeChangeTo(out);
-        liftPen(out);
+      // set absolute coordinates
+      out.write("G00 G90;\n");
+      tool.writeChangeTo(out);
+      liftPen(out);
 
-        float d = tool.getDiameter();
+      float d = tool.getDiameter();
 
-        int i;
+      int i;
 
-        for (i = 0; i < cells.length; ++i) {
+      for (i = 0; i < cells.length; ++i) {
           float x = cells[i].centroid.x;
           float y = cells[i].centroid.y;
           float val = 1.0f - (sample1x1(src_img,(int)x,(int)y) / 255.0f);
@@ -251,25 +261,22 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
           // filled circles
           this.moveTo(out, x + (float) Math.cos(0) * r, y + (float) Math.cos(0) * r, true);
           while (r > d) {
-            float detail = (float) (1.0 * Math.PI * r / d);
-            if (detail < 4) detail = 4;
-            if (detail > 20) detail = 20;
-            for (float j = 1; j <= detail; ++j) {
-              this.moveTo(out,
+        	  float detail = (float) (1.0 * Math.PI * r / d);
+        	  if (detail < 4) detail = 4;
+        	  if (detail > 20) detail = 20;
+        	  for (float j = 1; j <= detail; ++j) {
+        		  this.moveTo(out,
                   x + r * (float) Math.cos((float) Math.PI * 2.0f * j / detail),
                   y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail), false);
-            }
-            //r-=(d/(scale*1.5f));
-            r -= d;
+        	  }
+        	  //r-=(d/(scale*1.5f));
+        	  r -= d;
           }
           this.moveTo(out, x, y, false);
           this.moveTo(out, x, y, true);
-        }
-
-        liftPen(out);
-        signName(out);
-        tool.writeMoveTo(out, 0, 0);
       }
+
+      liftPen(out);
     }
   }
 

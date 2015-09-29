@@ -1,24 +1,27 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.filters.Filter_GaussianBlur;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
 
 /**
  * @author danroyer
  * @since at least 7.1.4
  */
-public class Filter_GeneratorColorFloodFill extends Filter {
+public class Converter_ColorFloodFill extends ImageConverter {
   ColorPalette palette;
   int diameter = 0;
   int last_x, last_y;
@@ -26,7 +29,7 @@ public class Filter_GeneratorColorFloodFill extends Filter {
   BufferedImage imgMask;
 
 
-  public Filter_GeneratorColorFloodFill(MainGUI gui, MachineConfiguration mc,
+  public Converter_ColorFloodFill(MainGUI gui, MakelangeloRobot mc,
                                         MultilingualSupport ms) {
     super(gui, mc, ms);
 
@@ -67,9 +70,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     int x1 = x0 + diameter;
     int y1 = y0 + diameter;
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     Color value;
     int sum = 0;
@@ -88,9 +91,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 
   protected void setMaskTouched(int x0, int y0, int x1, int y1) {
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     int c = (new C3(255, 255, 255)).toInt();
     for (int y = y0; y < y1; ++y) {
@@ -117,9 +120,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -204,8 +207,8 @@ public class Filter_GeneratorColorFloodFill extends Filter {
 
     mainGUI.log("<font color='orange'>Palette color " + palette.getColor(color_index).toString() + "</font>\n");
 
-    for (y = 0; y < image_height; y += diameter) {
-      for (x = 0; x < image_width; x += diameter) {
+    for (y = 0; y < imageHeight; y += diameter) {
+      for (x = 0; x < imageWidth; x += diameter) {
         if (getMaskTouched(x, y)) continue;
 
         original_color = takeImageSampleBlock(x, y, x + diameter, y + diameter);
@@ -239,14 +242,13 @@ public class Filter_GeneratorColorFloodFill extends Filter {
    *
    * @param img the image to convert.
    */
-  @Override
-  public void convert(BufferedImage img) throws IOException {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
     // The picture might be in color.  Smash it to 255 shades of grey.
     //Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
     //img = bw.process(img);
 
     Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI, machine, translator, 1);
-    img = blur.process(img);
+    img = blur.filter(img);
 //    Histogram h = new Histogram();
 //    h.getHistogramOf(img);
 
@@ -258,13 +260,9 @@ public class Filter_GeneratorColorFloodFill extends Filter {
     g.fillRect(0, 0, imgMask.getWidth(), imgMask.getHeight());
 
 
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer osw = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+
       // Set up the conversion from image space to paper space, select the current tool, etc.
-      imageStart(img, osw);
+      imageStart(img, out);
 
 
       float pw = (float) machine.getPaperWidth();
@@ -283,17 +281,12 @@ public class Filter_GeneratorColorFloodFill extends Filter {
       last_x = img.getWidth() / 2;
       last_y = img.getHeight() / 2;
 
-      scanColor(0, osw);  // black
-      scanColor(1, osw);  // red
-      scanColor(2, osw);  // green
-      scanColor(3, osw);  // blue
+      scanColor(0, out);  // black
+      scanColor(1, out);  // red
+      scanColor(2, out);  // green
+      scanColor(3, out);  // blue
 
-      mainGUI.log("<font color='green'>Signing my name</font>\n");
-
-      // pen already lifted
-      signName(osw);
-      moveTo(0, 0, true, osw);
-    }
+    return true;
   }
 }
 

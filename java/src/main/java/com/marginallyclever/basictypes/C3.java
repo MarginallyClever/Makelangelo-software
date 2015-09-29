@@ -1,9 +1,14 @@
 package com.marginallyclever.basictypes;
 
 
-import java.awt.*;
+import java.awt.Color;
 
 
+/**
+ * RGB color class
+ * @author danroyer
+ *
+ */
 public class C3 {
   int red = 0;
   int green = 0;
@@ -71,10 +76,10 @@ public class C3 {
   }
 
   public float diff(C3 o) {
-    int Rdiff = o.red - this.red;
-    int Gdiff = o.green - this.green;
-    int Bdiff = o.blue - this.blue;
-    int distanceSquared = Rdiff * Rdiff + Gdiff * Gdiff + Bdiff * Bdiff;
+    int rDiff = o.red - this.red;
+    int gDiff = o.green - this.green;
+    int bDiff = o.blue - this.blue;
+    int distanceSquared = rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
     return (float) Math.sqrt(distanceSquared);
   }
 

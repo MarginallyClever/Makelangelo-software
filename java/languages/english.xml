@@ -27,14 +27,24 @@
 		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
 	</string>
 	<string>
+		<key>ClickAndDrag</key>
+		<value>Click &amp; Drag</value>
+		<hint>live drawing panel</hint>
+	</string>
+	<string>
+		<key>configureMachine</key>
+		<value>Settings</value>
+		<hint>open machine settings dialog</hint>
+	</string>
+	<string>
 		<key>MachineWidth</key>
 		<value>Machine width</value>
-		<hint>adjust machine settings</hint>
+		<hint>Machine settings</hint>
 	</string>
 	<string>
 		<key>MachineHeight</key>
 		<value>Machine height</value>
-		<hint>adjust machine settings</hint>
+		<hint>Machine settings</hint>
 	</string>
 	<string>
 		<key>PaperWidth</key>
@@ -434,6 +444,11 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
+		<key>MenuLog</key>
+		<value>Log</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
 		<key>MenuUpdate</key>
 		<value>Check for updates</value>
 		<hint>menu or dialog title</hint>
@@ -478,12 +493,12 @@
 	</string>
 	<string>
 		<key>MenuSettingsMachine</key>
-		<value>Adjust machine &amp; paper size</value>
+		<value>Machine &amp; paper size</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAdjustPulleys</key>
-		<value>Adjust pulley size</value>
+		<value>Pulley size</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -499,23 +514,23 @@
 	</string>
 	<string>
 		<key>MenuAdjustTool</key>
-		<value>Adjust active tool</value>
+		<value>Tools</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuGCODE</key>
-		<value>GCODE</value>
+		<value>Convert</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuHilbertCurve</key>
-		<value>Hilbert Curve</value>
+		<value>Hilbert curve fractal</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuTextToGCODE</key>
-		<value>Text to GCODE</value>
+		<value>Your message here</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -530,7 +545,7 @@
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value>Save GCODE as...</value>
+		<value>Save results as...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -568,12 +583,12 @@
 	<string>
 		<key>mmNotice</key>
 		<value>All values in mm.</value>
-		<hint>Adjust machine size</hint>
+		<hint>Machine size</hint>
 	</string>
 
 	<string>
 		<key>penToolAdjust</key>
-		<value>Adjust Pen</value>
+		<value>Pen</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -610,38 +625,38 @@
 
 	<string>
 		<key>spraypaintToolTest</key>
-		<value>Adjust Spraypaint</value>
-		<hint>Adjust Spraypaint tool</hint>
+		<value>Spraypaint</value>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDiameter</key>
 		<value>Dot size</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolMaxFeedRate</key>
 		<value>Max feed rate</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolUp</key>
 		<value>Off</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDown</key>
 		<value>On</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolLiftSpeed</key>
 		<value>On/off speed</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolTest</key>
 		<value>Make a dot</value>
-		<hint>Adjust spraypaint tool</hint>
+		<hint>Spraypaint tool</hint>
 	</string>
 
 	<string>

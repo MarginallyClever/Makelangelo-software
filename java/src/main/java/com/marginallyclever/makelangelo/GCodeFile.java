@@ -59,7 +59,12 @@ public class GCodeFile {
         if (tokens[j].equals("G20")) scale = 2.54f;  // in->cm
         if (tokens[j].equals("G21")) scale = 0.10f;  // mm->cm
         if (tokens[j].startsWith("F")) {
+        	try {
           feed_rate = Float.valueOf(tokens[j].substring(1)) * scale;
+        	}
+        	catch(Exception e) {
+        		e.printStackTrace(); 
+        	}
           assert (!Float.isNaN(feed_rate) && feed_rate != 0);
         }
       }

@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -21,21 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.*;
-
-import org.kabeja.dxf.*;
-import org.kabeja.dxf.helpers.DXFSplineConverter;
-import org.kabeja.dxf.helpers.Point;
-import org.kabeja.parser.DXFParser;
-import org.kabeja.parser.ParseException;
-import org.kabeja.parser.Parser;
-import org.kabeja.parser.ParserBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -72,21 +59,20 @@ import org.kabeja.parser.ParserBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.converters.Converter_Boxes;
+import com.marginallyclever.converters.Converter_Crosshatch;
+import com.marginallyclever.converters.Converter_Pulse;
+import com.marginallyclever.converters.Converter_Sandy;
+import com.marginallyclever.converters.Converter_Scanline;
+import com.marginallyclever.converters.Converter_Spiral;
+import com.marginallyclever.converters.Converter_VoronoiStippling;
+import com.marginallyclever.converters.Converter_VoronoiZigZag;
+import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.filters.Filter;
-import com.marginallyclever.filters.Filter_GeneratorBoxes;
-import com.marginallyclever.filters.Filter_GeneratorColorBoxes;
-//import com.marginallyclever.filters.Filter_GeneratorColorFloodFill;
-import com.marginallyclever.filters.Filter_GeneratorCrosshatch;
-import com.marginallyclever.filters.Filter_GeneratorHilbertCurve;
-import com.marginallyclever.filters.Filter_GeneratorPulse;
-import com.marginallyclever.filters.Filter_GeneratorSandy;
-import com.marginallyclever.filters.Filter_GeneratorScanline;
-import com.marginallyclever.filters.Filter_GeneratorSpiral;
-import com.marginallyclever.filters.Filter_GeneratorVoronoiStippling;
-import com.marginallyclever.filters.Filter_GeneratorVoronoiZigZag;
-import com.marginallyclever.filters.Filter_GeneratorYourMessageHere;
-import com.marginallyclever.filters.Filter_GeneratorZigZag;
+import com.marginallyclever.generators.Generator_HilbertCurve;
+import com.marginallyclever.generators.Generator_YourMessageHere;
 
 
 /**
@@ -96,7 +82,7 @@ import com.marginallyclever.filters.Filter_GeneratorZigZag;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PrepareImagePanel<P extends Preferences>
+public class PanelPrepareImage
 extends JScrollPane
 implements ActionListener, ChangeListener {
   /**
@@ -105,7 +91,7 @@ implements ActionListener, ChangeListener {
   private static final long serialVersionUID = -4703402918904039337L;
 
   protected MultilingualSupport translator;
-  protected MachineConfiguration machineConfiguration;
+  protected MakelangeloRobot machineConfiguration;
   protected MainGUI gui;
 
   protected String lastFileIn = "";
@@ -113,13 +99,14 @@ implements ActionListener, ChangeListener {
 
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
-  private JSlider input_paper_margin;
+  private JButton openConfig;
+  private JSlider paperMargin;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
 
   protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
   
   @SuppressWarnings("deprecation")
-  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   // to make sure pen isn't on the paper while the machine is paused
   private boolean penIsUp, penIsUpBeforePause;
@@ -127,12 +114,12 @@ implements ActionListener, ChangeListener {
   /**
    * @see org.slf4j.Logger
    */
-  private final Logger logger = LoggerFactory.getLogger(PrepareImagePanel.class);
+  private final Logger logger = LoggerFactory.getLogger(PanelPrepareImage.class);
 
   /**
    * Image processing
    */
-  private List<Filter> image_converters;
+  private List<ImageConverter> imageConverters;
 
   public void raisePen() {
     penIsUp = true;
@@ -144,18 +131,18 @@ implements ActionListener, ChangeListener {
   
   // TODO use a ServiceLoader and find generator plugins in nearby folders
   protected void loadImageConverters() {
-    image_converters = new ArrayList<Filter>();
-    image_converters.add(new Filter_GeneratorZigZag(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorSpiral(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorCrosshatch(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorScanline(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorPulse(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorBoxes(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorColorBoxes(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorVoronoiStippling(gui, machineConfiguration, translator));
-    image_converters.add(new Filter_GeneratorVoronoiZigZag(gui,machineConfiguration,translator));
-    image_converters.add(new Filter_GeneratorSandy(gui,machineConfiguration,translator));
-    //image_converters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
+    imageConverters = new ArrayList<ImageConverter>();
+    imageConverters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Spiral(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Crosshatch(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Scanline(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Pulse(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_Boxes(gui, machineConfiguration, translator));
+    //imageConverters.add(new Converter_ColorBoxes(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
+    imageConverters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
+    imageConverters.add(new Converter_Sandy(gui,machineConfiguration,translator));
+    //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
   /**
@@ -170,82 +157,88 @@ implements ActionListener, ChangeListener {
   }
 
 
-  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MachineConfiguration _machineConfiguration) {
+  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;
 
-    JPanel p = new JPanel(new GridLayout(0,1));
-    this.setViewportView(p);
-
-    machineConfigurations = getAnyMachineConfigurations();
-    machineChoices = new JComboBox<>(machineConfigurations);
-    try {
-      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-    } catch (IllegalArgumentException e) {
-      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
-      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
-    }
-
-    input_paper_margin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
-    input_paper_margin.setMajorTickSpacing(10);
-    input_paper_margin.setMinorTickSpacing(5);
-    input_paper_margin.setPaintTicks(false);
-    input_paper_margin.setPaintLabels(true);
-
+    JPanel panel = new JPanel(new GridLayout(0,1));
+    this.setViewportView(panel);
+    
     JPanel machineNumberPanel = new JPanel(new GridLayout(1,0));
-    p.add(machineNumberPanel);
-    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
-    machineNumberPanel.add(machineChoices);
+	    machineConfigurations = getAnyMachineConfigurations();
+	    machineChoices = new JComboBox<>(machineConfigurations);
+	    try {
+	      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+	    } catch (IllegalArgumentException e) {
+	      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
+	      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
+	    }
+	    
+	    openConfig = new JButton(translator.get("configureMachine"));
+	    openConfig.addActionListener(this);
+	    openConfig.setPreferredSize(openConfig.getPreferredSize());
+	
+	    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+	    machineNumberPanel.add(machineChoices);
+	    machineNumberPanel.add(openConfig);
+    panel.add(machineNumberPanel);
     
     JPanel marginPanel = new JPanel(new GridLayout(1,0));
-    p.add(marginPanel);
-    marginPanel.add(new JLabel(translator.get("PaperMargin")));
-    marginPanel.add(input_paper_margin);
-    input_paper_margin.addChangeListener(this);
+	    paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
+	    paperMargin.setMajorTickSpacing(10);
+	    paperMargin.setMinorTickSpacing(5);
+	    paperMargin.setPaintTicks(false);
+	    paperMargin.setPaintLabels(true);
+	    paperMargin.addChangeListener(this);
+	    marginPanel.add(new JLabel(translator.get("PaperMargin")));
+	    marginPanel.add(paperMargin);
+    panel.add(marginPanel);
 
-    // File conversion menu
+    panel.add(new JSeparator());
+
+    // File conversion
     buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
     buttonOpenFile.addActionListener(this);
-    p.add(buttonOpenFile);
+    panel.add(buttonOpenFile);
 
     buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
     buttonHilbertCurve.addActionListener(this);
-    p.add(buttonHilbertCurve);
+    panel.add(buttonHilbertCurve);
 
     buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
     buttonText2GCODE.addActionListener(this);
-    p.add(buttonText2GCODE);
+    panel.add(buttonText2GCODE);
 
     buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
     buttonSaveFile.addActionListener(this);
-    p.add(buttonSaveFile);
-    
-    p.add(new JSeparator());
-    
-    JPanel drivePanel = new JPanel(new GridLayout(1,0));
-    p.add(drivePanel);
-    // Draw menu
-    buttonStart = new JButton(translator.get("Start"));
-    buttonStartAt = new JButton(translator.get("StartAtLine"));
-    buttonPause = new JButton(translator.get("Pause"));
-    buttonHalt = new JButton(translator.get("Halt"));
-    drivePanel.add(buttonStart);
-    drivePanel.add(buttonStartAt);
-    drivePanel.add(buttonPause);
-    drivePanel.add(buttonHalt);
-    buttonStart.addActionListener(this);
-    buttonStartAt.addActionListener(this);
-    buttonPause.addActionListener(this);
-    buttonHalt.addActionListener(this);
+    panel.add(buttonSaveFile);
 
+    panel.add(new JSeparator());
+
+    // drive menu
+    JPanel drivePanel = new JPanel(new GridLayout(2,2));
+	    buttonStart = new JButton(translator.get("Start"));
+	    buttonStartAt = new JButton(translator.get("StartAtLine"));
+	    buttonPause = new JButton(translator.get("Pause"));
+	    buttonHalt = new JButton(translator.get("Halt"));
+	    drivePanel.add(buttonStart);
+	    drivePanel.add(buttonStartAt);
+	    drivePanel.add(buttonPause);
+	    drivePanel.add(buttonHalt);
+	    buttonStart.addActionListener(this);
+	    buttonStartAt.addActionListener(this);
+	    buttonPause.addActionListener(this);
+	    buttonHalt.addActionListener(this);
+	panel.add(drivePanel);
+    
   }
 
   
   public void stateChanged(ChangeEvent e) {
 	e.getSource();
-    double pm=(100 - input_paper_margin.getValue()) * 0.01;
-    if( machineConfiguration.paperMargin != pm ) {
+    double pm = (100 - paperMargin.getValue()) * 0.01;
+    if ( Double.compare(machineConfiguration.paperMargin , pm) != 0) {
     	machineConfiguration.paperMargin = pm;
     	machineConfiguration.saveConfig();
     	gui.getDrawPanel().repaint();
@@ -261,6 +254,12 @@ implements ActionListener, ChangeListener {
     long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
     machineConfiguration.loadConfig(new_uid);
 
+    if( subject == openConfig ) {
+    	MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
+    	m.run();
+    	return;
+    }
+    
     if (subject == buttonOpenFile) {
       openFileDialog();
       return;
@@ -315,7 +314,7 @@ implements ActionListener, ChangeListener {
       }
     }
   }
-
+  
 
   /**
    * open a dialog to ask for the line number.
@@ -353,6 +352,8 @@ implements ActionListener, ChangeListener {
     if (buttonHilbertCurve != null) buttonHilbertCurve.setEnabled(!isRunning);
     if (buttonText2GCODE != null) buttonText2GCODE.setEnabled(!isRunning);
 
+    openConfig.setEnabled(!isRunning);
+    
     buttonStart.setEnabled(isConnected && !isRunning);
     buttonStartAt.setEnabled(isConnected && !isRunning);
     buttonPause.setEnabled(isConnected && isRunning);
@@ -459,16 +460,16 @@ implements ActionListener, ChangeListener {
     final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
     reverse_h.setSelected(machineConfiguration.reverseForGlass);
 
-    String[] filter_names = new String[image_converters.size()];
-    Iterator<Filter> fit = image_converters.iterator();
+    String[] imageConverterNames = new String[imageConverters.size()];
+    Iterator<ImageConverter> ici = imageConverters.iterator();
     int i = 0;
-    while (fit.hasNext()) {
-      Filter f = fit.next();
-      filter_names[i++] = f.getName();
+    while (ici.hasNext()) {
+      ImageManipulator f = ici.next();
+      imageConverterNames[i++] = f.getName();
     }
 
-    final JComboBox<String> input_draw_style = new JComboBox<String>(filter_names);
-    input_draw_style.setSelectedIndex(getDrawStyle());
+    final JComboBox<String> inputDrawStyle = new JComboBox<String>(imageConverterNames);
+    inputDrawStyle.setSelectedIndex(getPreferredDrawStyle());
 
     GridBagConstraints c = new GridBagConstraints();
 
@@ -483,7 +484,7 @@ implements ActionListener, ChangeListener {
       c.gridwidth = 3;
       c.gridx = 1;
       c.gridy = y++;
-      panel.add(input_draw_style, c);
+      panel.add(inputDrawStyle, c);
     }
     c.anchor = GridBagConstraints.WEST;
     c.gridwidth = 1;
@@ -493,7 +494,7 @@ implements ActionListener, ChangeListener {
 
     int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
-      setDrawStyle(input_draw_style.getSelectedIndex());
+      setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
       machineConfiguration.reverseForGlass = reverse_h.isSelected();
       machineConfiguration.saveConfig();
 
@@ -791,13 +792,22 @@ implements ActionListener, ChangeListener {
           gui.log("<font color='green'>" + translator.get("Converting") + " " + destinationFile + "</font>\n");
           // convert with style
           img = ImageIO.read(new File(sourceFile));
+  	  	  OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+  	  	  Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
 
-          int style = getDrawStyle();
-          Filter f = image_converters.get(style);
-          f.setParent(this);
-          f.setProgressMonitor(pm);
-          f.setDestinationFile(destinationFile);
-          f.convert(img);
+          ImageConverter converter = imageConverters.get(getPreferredDrawStyle());
+          converter.setParent(this);
+          converter.setProgressMonitor(pm);
+          converter.convert(img,out);
+
+          // Sign name
+          Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
+          ymh.signName(out);
+
+          
+          out.flush();
+          out.close();
+          
           gui.updateMachineConfig();
         } catch (IOException e) {
           gui.log("<font color='red'>" + translator.get("Failed") + e.getLocalizedMessage() + "</font>\n");
@@ -842,29 +852,29 @@ implements ActionListener, ChangeListener {
     return true;
   }
 
-  private void setDrawStyle(int style) {
+  private void setPreferredDrawStyle(int style) {
     prefs.putInt("Draw Style", style);
   }
 
-  private int getDrawStyle() {
+  private int getPreferredDrawStyle() {
     return prefs.getInt("Draw Style", 0);
   }
 
 
   public void hilbertCurve() {
-    Filter_GeneratorHilbertCurve msg = new Filter_GeneratorHilbertCurve(gui, machineConfiguration, translator);
-    msg.generate(gui.getTempDestinationFile());
-
-    loadGCode(gui.getTempDestinationFile());
-    gui.playConversionFinishedSound();
+    Generator_HilbertCurve msg = new Generator_HilbertCurve(gui, machineConfiguration, translator);
+    if(msg.generate(gui.getTempDestinationFile())) {
+	    loadGCode(gui.getTempDestinationFile());
+	    gui.playConversionFinishedSound();
+    }
   }
 
 
   public void textToGCODE() {
-    Filter_GeneratorYourMessageHere msg = new Filter_GeneratorYourMessageHere(gui, machineConfiguration, translator);
-    msg.generate(gui.getTempDestinationFile());
-
-    loadGCode(gui.getTempDestinationFile());
-    gui.playConversionFinishedSound();
+    Generator_YourMessageHere msg = new Generator_YourMessageHere(gui, machineConfiguration, translator);
+    if(msg.generate(gui.getTempDestinationFile())) {
+	    loadGCode(gui.getTempDestinationFile());
+	    gui.playConversionFinishedSound();
+    }
   }
 }

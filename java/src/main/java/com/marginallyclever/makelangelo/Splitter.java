@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import javax.swing.*;
+import javax.swing.JSplitPane;
 
 // manages the vertical split in the GUI
 public class Splitter extends JSplitPane {

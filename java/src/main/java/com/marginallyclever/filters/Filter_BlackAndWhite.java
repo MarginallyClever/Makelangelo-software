@@ -1,10 +1,11 @@
 package com.marginallyclever.filters;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import java.awt.image.BufferedImage;
+
+import com.marginallyclever.basictypes.ImageFilter;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.image.BufferedImage;
 
 
 /**
@@ -12,18 +13,18 @@ import java.awt.image.BufferedImage;
  *
  * @author Dan
  */
-public class Filter_BlackAndWhite extends Filter {
+public class Filter_BlackAndWhite extends ImageFilter {
   double levels = 2;
 
 
   public Filter_BlackAndWhite(MainGUI gui,
-                              MachineConfiguration mc, MultilingualSupport ms, int _levels) {
+                              MakelangeloRobot mc, MultilingualSupport ms, int _levels) {
     super(gui, mc, ms);
     levels = (double) _levels;
   }
 
-  @Override
-  public BufferedImage process(BufferedImage img) {
+
+  public BufferedImage filter(BufferedImage img) {
     int h = img.getHeight();
     int w = img.getWidth();
     int x, y, i;

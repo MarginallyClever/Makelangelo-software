@@ -1,13 +1,9 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.Ancestryable;
-import com.marginallyclever.util.MarginallyCleverPreferencesFileFactory;
-import com.marginallyclever.util.MarginallyCleverPreferences;
-
-import org.json.JSONObject;
-import org.json.Property;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS;
+import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE;
+import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT;
+import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.MACHINES;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +16,14 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import static com.marginallyclever.makelangelo.PreferencesHelper.MakelangeloPreferenceKey.*;
+import org.json.JSONObject;
+import org.json.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.marginallyclever.util.Ancestryable;
+import com.marginallyclever.util.MarginallyCleverPreferences;
+import com.marginallyclever.util.MarginallyCleverPreferencesFileFactory;
 
 /**
  * Helper class to be used when accessing preferences.
@@ -42,6 +45,7 @@ public final class PreferencesHelper {
   /**
    * Future Makelagelo root preference node path name.
    */
+  @SuppressWarnings("unused")
   private static final String MAKELANGELO_ROOT_PATH_NAME = PreferencesHelper.class.getPackage().getName();
 
   /**
@@ -59,7 +63,7 @@ public final class PreferencesHelper {
   /**
    * Machine preference node path, used to store things such as paper height and width, invert left and right motors,
    * etc.
-   * @see com.marginallyclever.makelangelo.MachineConfiguration
+   * @see com.marginallyclever.makelangelo.MakelangeloRobot
    */
   private static final String MACHINES_PATH_NAME = "Machines";
 
@@ -203,6 +207,7 @@ public final class PreferencesHelper {
    * preference node with no effect on any descendants
    * of this node.
    */
+  @SuppressWarnings("unused")
   private static <P extends Preferences> void shallowClearPreferences(P preferenceNode) {
     try {
       preferenceNode.clear();
@@ -215,6 +220,7 @@ public final class PreferencesHelper {
    * Removes all of the preferences (key-value associations) in this
    * preference node and any descendants of this node.
    */
+  @SuppressWarnings("unused")
   private static <P extends Preferences> void deepClearPreferences(P preferenceNode) {
     try {
       preferenceNode.clear();
