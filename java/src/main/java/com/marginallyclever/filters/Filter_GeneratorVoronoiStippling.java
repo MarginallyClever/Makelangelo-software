@@ -203,9 +203,13 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
         generation++;
         mainGUI.log("<font color='green'>Generation " + generation + "</font>\n");
 
+        assert !lock.isHeldByCurrentThread();
         lock.lock();
-        tessellateVoronoiDiagram();
-        lock.unlock();
+        try {
+        	tessellateVoronoiDiagram();
+        } finally {
+        	lock.unlock();
+        }
         adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
@@ -216,6 +220,9 @@ public class Filter_GeneratorVoronoiStippling extends Filter implements DrawDeco
       mainGUI.log("<font color='green'>Last " + generation + "</font>\n");
     } catch (Exception e) {
       e.printStackTrace();
+      if(lock.isHeldByCurrentThread() && lock.isLocked()) {
+    	  lock.unlock();
+      }
     }
   }
 
