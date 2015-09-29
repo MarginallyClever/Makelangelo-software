@@ -1,15 +1,26 @@
 package com.marginallyclever.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created on 6/7/15.
@@ -19,7 +30,7 @@ import java.util.prefs.Preferences;
  * @see <a href="http://stackoverflow.com/a/25548386">SO answer to: How to synchronize file access in a Java servlet?</a>
  * @since v7.1.4
  */
-public class MarginallyCleverPreferences<A extends AbstractPreferences> extends AbstractPreferences implements Ancestryable {
+public class MarginallyCleverPreferences extends AbstractPreferences implements Ancestryable {
 
   /**
    *
@@ -34,7 +45,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
   /**
    *
    */
-  private final Map<String, A> children;
+  private final Map<String, Preferences> children;
 
   /**
    *
@@ -58,7 +69,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    *                                  (<tt>'/'</tt>),  or <tt>parent</tt> is <tt>null</tt> and
    *                                  name isn't <tt>""</tt>.
    */
-  public MarginallyCleverPreferences(A parent, String name) {
+  public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);
     logger.info("Instantiating node {}", name);
     root = new TreeMap<>();
@@ -123,8 +134,8 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    */
   @NotNull
   @Override
-  protected A childSpi(@NotNull String name) {
-    A childPreferenceNode = children.get(name);
+  protected AbstractPreferences childSpi(@NotNull String name) {
+	AbstractPreferences childPreferenceNode = (AbstractPreferences) children.get(name);
     boolean isChildRemoved = false;
     if (childPreferenceNode != null) {
       try {
@@ -134,8 +145,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
       }
     }
     if (childPreferenceNode == null || isChildRemoved) {
-      @SuppressWarnings("unchecked")
-      final A castedPreferences = (A) new MarginallyCleverPreferences(this, name);
+      final AbstractPreferences castedPreferences = new MarginallyCleverPreferences(this, name);
       childPreferenceNode = castedPreferences;
       children.put(name, childPreferenceNode);
     }
@@ -149,7 +159,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    * @return
    * @throws ReflectiveOperationException
    */
-  private boolean getIsRemoved(A abstractPreference) throws ReflectiveOperationException {
+  private boolean getIsRemoved(AbstractPreferences abstractPreference) throws ReflectiveOperationException {
     logger.info("{}", abstractPreference);
     final Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
     declaredMethod.setAccessible(true);
@@ -293,7 +303,7 @@ public class MarginallyCleverPreferences<A extends AbstractPreferences> extends 
    * @return
    */
   @Override
-  public Map<String, A> getChildren() {
+  public Map<String, Preferences> getChildren() {
     return new TreeMap<>(children);
   }
 

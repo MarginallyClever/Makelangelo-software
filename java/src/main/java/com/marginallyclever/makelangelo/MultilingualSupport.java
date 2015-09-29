@@ -1,11 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +10,15 @@ import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
+
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
  *
@@ -22,7 +26,7 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
-public final class MultilingualSupport<P extends Preferences> {
+public final class MultilingualSupport {
 
   /**
    * Working directory. This represents the directory where the java executable launched the jar from.
@@ -38,7 +42,7 @@ public final class MultilingualSupport<P extends Preferences> {
   /**
    *
    */
-  private final P languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+  private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
 
   /**

@@ -1,12 +1,15 @@
 package com.marginallyclever.filters;
 
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+
+import com.marginallyclever.basictypes.ImageFilter;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
 
 
 /**
@@ -14,18 +17,18 @@ import java.awt.image.BufferedImage;
  *
  * @author Dan
  */
-public class Filter_Resize extends Filter {
+public class Filter_Resize extends ImageFilter {
   protected int maxWidth, maxHeight;
 
 
-  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
                        MultilingualSupport ms) {
     super(gui, mc, ms);
     maxWidth = 1000;
     maxHeight = 1000;
   }
 
-  public Filter_Resize(MainGUI gui, MachineConfiguration mc,
+  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
                        MultilingualSupport ms, int max_width, int max_height) {
     super(gui, mc, ms);
     maxWidth = max_width;
@@ -43,7 +46,7 @@ public class Filter_Resize extends Filter {
           RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       g.setBackground(Color.WHITE);
       g.clearRect(0, 0, width, height);
-      if (machine.reverseForGlass) {
+      if (machine.isReverseForGlass()) {
         g.drawImage(img, width, 0, 0, height, 0, 0, img.getWidth(), img.getHeight(), null);
       } else {
         g.drawImage(img, 0, 0, width, height, null);
@@ -54,8 +57,8 @@ public class Filter_Resize extends Filter {
     return newImage;
   }
 
-  @Override
-  public BufferedImage process(BufferedImage img) {
+
+  public BufferedImage filter(BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();
 

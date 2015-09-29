@@ -1,21 +1,22 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.converters;
 
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Writer;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.makelangelo.MachineConfiguration;
+import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MainGUI;
 import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 
 /**
  * @author Dan
  */
-public class Filter_GeneratorColorBoxes extends Filter {
+public class Converter_ColorBoxes extends ImageConverter {
   ColorPalette palette;
   float step1;
   float step2;
@@ -27,7 +28,7 @@ public class Filter_GeneratorColorBoxes extends Filter {
   int direction = 1;
 
 
-  public Filter_GeneratorColorBoxes(MainGUI gui, MachineConfiguration mc,
+  public Converter_ColorBoxes(MainGUI gui, MakelangeloRobot mc,
                                     MultilingualSupport ms) {
     super(gui, mc, ms);
 
@@ -39,7 +40,6 @@ public class Filter_GeneratorColorBoxes extends Filter {
   }
 
 
-  @Override
   public String getName() {
     return translator.get("RGBName");
   }
@@ -137,9 +137,9 @@ public class Filter_GeneratorColorBoxes extends Filter {
     int sum = 0;
 
     if (x0 < 0) x0 = 0;
-    if (x1 > image_width - 1) x1 = image_width - 1;
+    if (x1 > imageWidth - 1) x1 = imageWidth - 1;
     if (y0 < 0) y0 = 0;
-    if (y1 > image_height - 1) y1 = image_height - 1;
+    if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
     for (int y = y0; y < y1; ++y) {
       for (int x = x0; x < x1; ++x) {
@@ -187,18 +187,11 @@ public class Filter_GeneratorColorBoxes extends Filter {
    *
    * @param img the image to convert.
    */
-  @Override
-  public void convert(BufferedImage img) throws IOException {
-    // Open the destination file
-    try (
-        final OutputStream fileOutputStream = new FileOutputStream(dest);
-        final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-    ) {
+  public boolean convert(BufferedImage img,Writer out) throws IOException {
       // Set up the conversion from image space to paper space, select the current tool, etc.
       imageStart(img, out);
 
       double pw = machine.getPaperWidth();
-      //double ph = machine.GetPaperHeight();
 
       // figure out how many lines we're going to have on this image.
       float steps = (float) (pw / (tool.getDiameter() * 1.75f));
@@ -210,8 +203,8 @@ public class Filter_GeneratorColorBoxes extends Filter {
       step1 = (step4 / 4.0f);
 
       // set up the error buffers for floyd/steinberg dithering
-      stepw = ((float) image_width / step4);
-      steph = ((float) image_height / step4);
+      stepw = ((float) imageWidth / step4);
+      steph = ((float) imageHeight / step4);
       error = new C3[(int) Math.ceil(stepw)];
       nexterror = new C3[(int) Math.ceil(stepw)];
 
@@ -225,10 +218,8 @@ public class Filter_GeneratorColorBoxes extends Filter {
       }
 
       liftPen(out);
-      signName(out);
 
-      tool.writeMoveTo(out, 0, 0);
-    }
+    return true;
   }
 }
 

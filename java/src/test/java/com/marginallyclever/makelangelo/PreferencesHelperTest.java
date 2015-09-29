@@ -1,15 +1,16 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.MarginallyCleverPreferences;
-import com.marginallyclever.util.UnitTestHelper;
+import java.util.prefs.AbstractPreferences;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.prefs.AbstractPreferences;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import com.marginallyclever.util.MarginallyCleverPreferences;
+import com.marginallyclever.util.UnitTestHelper;
 
 /**
  * Created on 5/25/15.

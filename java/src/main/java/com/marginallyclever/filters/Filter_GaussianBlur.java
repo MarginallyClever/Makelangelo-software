@@ -1,14 +1,16 @@
 package com.marginallyclever.filters;
 
-import com.marginallyclever.basictypes.C3;
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ImageFilter;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 /**
@@ -16,19 +18,19 @@ import java.io.IOException;
  *
  * @author Dan
  */
-public class Filter_GaussianBlur extends Filter {
+public class Filter_GaussianBlur extends ImageFilter {
   int radius = 1;
 
 
   public Filter_GaussianBlur(MainGUI gui,
-                             MachineConfiguration mc, MultilingualSupport ms, int _radius) {
+                             MakelangeloRobot mc, MultilingualSupport ms, int _radius) {
     super(gui, mc, ms);
     assert (radius > 0);
     radius = _radius;
   }
 
-  @Override
-  public BufferedImage process(BufferedImage img) {
+
+  public BufferedImage filter(BufferedImage img) {
     int h = img.getHeight();
     int w = img.getWidth();
     int x, y;

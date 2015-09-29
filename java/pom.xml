@@ -81,7 +81,7 @@
                   <artifactId>checkstyle</artifactId>
                   <version>6.9</version>
               </dependency>
-          </dependencies>
+          </dependencies><!-- 
           <executions>
               <execution>
                   <id>validate</id>
@@ -97,7 +97,7 @@
                       <goal>check</goal>
                   </goals>
               </execution>
-          </executions>
+          </executions> -->
       </plugin>
       <plugin>
           <artifactId>maven-compiler-plugin</artifactId>

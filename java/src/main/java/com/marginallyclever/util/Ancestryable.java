@@ -7,12 +7,12 @@ import java.util.prefs.Preferences;
  * @author Peter Colapietro
  * @since v7.1.4
  */
-public interface Ancestryable<P extends Preferences> {
+public interface Ancestryable {
 
   /**
    * @return
    */
-  Map<String, P> getChildren();
+  Map<String, Preferences> getChildren();
 
   /**
    * @return
