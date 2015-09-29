@@ -81,7 +81,7 @@
                   <artifactId>checkstyle</artifactId>
                   <version>6.9</version>
               </dependency>
-          </dependencies><!-- 
+          </dependencies><!--
           <executions>
               <execution>
                   <id>validate</id>
@@ -217,7 +217,7 @@
       <plugin>
         <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
-        <version>1.1.6</version>
+        <version>1.1.7</version>
         <configuration>
           <targetClasses>
             <param>com.marginallyclever*</param>
@@ -312,7 +312,7 @@
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <minimum.maven.version>2.2.1</minimum.maven.version>
+    <minimum.maven.version>3</minimum.maven.version>
     <minimum.java.version>1.7</minimum.java.version>
     <jogl.version>2.3.1</jogl.version>
     <maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
