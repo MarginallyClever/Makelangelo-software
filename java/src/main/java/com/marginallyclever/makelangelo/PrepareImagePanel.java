@@ -245,7 +245,7 @@ implements ActionListener, ChangeListener {
   public void stateChanged(ChangeEvent e) {
 	e.getSource();
     double pm=(100 - input_paper_margin.getValue()) * 0.01;
-    if( machineConfiguration.paperMargin != pm ) {
+    if ( Double.compare(machineConfiguration.paperMargin , pm) != 0) {
     	machineConfiguration.paperMargin = pm;
     	machineConfiguration.saveConfig();
     	gui.getDrawPanel().repaint();
