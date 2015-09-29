@@ -40,6 +40,8 @@ bin/
 
 *.log
 java/.project
+## Auto Eclipse Checkstyle configuration
+.checkstyle
 
 ## Auto generated documentation
 latex/

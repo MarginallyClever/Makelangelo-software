@@ -14,17 +14,17 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  * @author Dan
  * @since v7.1.0.0
  */
-public class SerialConnectionManager<P extends Preferences> implements MarginallyCleverConnectionManager {
+public class SerialConnectionManager implements MarginallyCleverConnectionManager {
   private String[] portsDetected;
   private String recentPort;
 
   private MainGUI mainGUI;
   private MultilingualSupport translator;
   private MakelangeloRobot machine;
-  private P prefs;
+  private Preferences prefs;
 
 
-  public SerialConnectionManager(P prefs, MainGUI mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
+  public SerialConnectionManager(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
     this.mainGUI = mainGUI;
     this.translator = translator;
     this.machine = machine;

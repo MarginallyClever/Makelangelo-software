@@ -210,9 +210,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
         generation++;
         mainGUI.log("<font color='green'>Generation " + generation + "</font>\n");
 
+        assert !lock.isHeldByCurrentThread();
         lock.lock();
-        tessellateVoronoiDiagram();
-        lock.unlock();
+        try {
+        	tessellateVoronoiDiagram();
+        } finally {
+        	lock.unlock();
+        }
         adjustCentroids();
 
         mainGUI.getDrawPanel().repaintNow();
@@ -223,6 +227,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
       mainGUI.log("<font color='green'>Last " + generation + "</font>\n");
     } catch (Exception e) {
       e.printStackTrace();
+      if(lock.isHeldByCurrentThread() && lock.isLocked()) {
+    	  lock.unlock();
+      }
     }
   }
 

@@ -45,6 +45,7 @@ public final class PreferencesHelper {
   /**
    * Future Makelagelo root preference node path name.
    */
+  @SuppressWarnings("unused")
   private static final String MAKELANGELO_ROOT_PATH_NAME = PreferencesHelper.class.getPackage().getName();
 
   /**
@@ -206,6 +207,7 @@ public final class PreferencesHelper {
    * preference node with no effect on any descendants
    * of this node.
    */
+  @SuppressWarnings("unused")
   private static <P extends Preferences> void shallowClearPreferences(P preferenceNode) {
     try {
       preferenceNode.clear();
@@ -218,6 +220,7 @@ public final class PreferencesHelper {
    * Removes all of the preferences (key-value associations) in this
    * preference node and any descendants of this node.
    */
+  @SuppressWarnings("unused")
   private static <P extends Preferences> void deepClearPreferences(P preferenceNode) {
     try {
       preferenceNode.clear();
