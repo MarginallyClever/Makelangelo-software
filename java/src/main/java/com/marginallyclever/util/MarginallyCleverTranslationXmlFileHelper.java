@@ -305,6 +305,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }
 
+  @SuppressWarnings("unused")
   private static File getDefaultLanguageFileFromClasspath() {
     return getDefaultLanguageFile(getLanguagesFolderUrlRelativeToClasspath());
   }

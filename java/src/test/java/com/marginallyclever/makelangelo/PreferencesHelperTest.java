@@ -29,7 +29,6 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
   /**
    *
    */
-  @SuppressWarnings("unchecked")
   private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
   /**

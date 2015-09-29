@@ -82,7 +82,7 @@ import com.marginallyclever.generators.Generator_YourMessageHere;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PanelPrepareImage<P extends Preferences>
+public class PanelPrepareImage
 extends JScrollPane
 implements ActionListener, ChangeListener {
   /**
@@ -106,7 +106,7 @@ implements ActionListener, ChangeListener {
   protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
   
   @SuppressWarnings("deprecation")
-  private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+  private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
   // to make sure pen isn't on the paper while the machine is paused
   private boolean penIsUp, penIsUpBeforePause;
