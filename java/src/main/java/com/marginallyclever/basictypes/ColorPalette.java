@@ -103,4 +103,53 @@ public class ColorPalette {
 
     return nearestIndex;
   }
+  
+  /**
+   * The black key (K) color is calculated from the red (R'), green (G') and blue (B') colors:
+   * K = 1-max(R', G', B')
+   * The cyan color (C) is calculated from the red (R') and black (K) colors:
+   * C = (1-R'-K) / (1-K)
+   * The magenta color (M) is calculated from the green (G') and black (K) colors:
+   * M = (1-G'-K) / (1-K)
+   * The yellow color (Y) is calculated from the blue (B') and black (K) colors:
+   * Y = (1-B'-K) / (1-K)
+   * see http://www.rapidtables.com/convert/color/rgb-to-cmyk.htm
+   * @param r in the range 0...255
+   * @param g in the range 0...255
+   * @param b in the range 0...255
+   */
+  public double[] convertRGBtoCMYK(double r,double g,double b) {
+	  r/=255;
+	  g/=255;
+	  b/=255;
+	  
+	  double k = 1 - Math.max(r,Math.max(g,b));
+	  double c = (1-r-k) / (1-k);
+	  double m = (1-g-k) / (1-k);
+	  double y = (1-b-k) / (1-k);
+	  
+	  return new double[]{c,m,y,k};
+  }
+  
+  /**
+   * The R,G,B values are given in the range of 0..255.
+   * The red (R) color is calculated from the cyan (C) and black (K) colors:
+   * R = 255 × (1-C) × (1-K)
+   * The green color (G) is calculated from the magenta (M) and black (K) colors:
+   * G = 255 × (1-M) × (1-K)
+   * The blue color (B) is calculated from the yellow (Y) and black (K) colors:
+   * B = 255 × (1-Y) × (1-K)
+   * see http://www.rapidtables.com/convert/color/cmyk-to-rgb.htm
+   * @param c
+   * @param m
+   * @param y
+   * @param k
+   */
+  public double[] convertCMYKtoRGB(double c,double m,double y,double k) {
+	  double r = 255 * (1-c)*(1-k);
+	  double g = 255 * (1-m)*(1-k);
+	  double b = 255 * (1-y)*(1-k);
+	  
+	  return new double[]{r,g,b};
+  }
 }
