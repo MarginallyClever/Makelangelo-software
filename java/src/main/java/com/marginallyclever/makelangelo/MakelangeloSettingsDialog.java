@@ -91,6 +91,7 @@ implements ActionListener {
 		    c.gridx=0; c.gridwidth=1; p.add(Box.createGlue(),c);
 	        this.getRootPane().setDefaultButton(save);
 	        cancel.addActionListener(this);
+	        save.addActionListener(this);
 
     	d.weightx=1;
     	d.weighty=0;

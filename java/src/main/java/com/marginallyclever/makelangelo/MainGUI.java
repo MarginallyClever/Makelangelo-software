@@ -864,6 +864,7 @@ public final class MainGUI
         if (connectionToRobot != null) {
           log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
           updateMenuBar();
+          prepareImage.updateMachineNumberPanel();
           playConnectSound();
         } else {
           log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");

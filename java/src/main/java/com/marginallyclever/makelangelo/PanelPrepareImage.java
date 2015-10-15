@@ -101,9 +101,9 @@ implements ActionListener, ChangeListener {
   private JComboBox<String> machineChoices;
   private JButton openConfig;
   private JSlider paperMargin;
+  private JPanel machineNumberPanel;
   private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
-
-  protected JButton buttonStart,buttonStartAt,buttonPause,buttonHalt;
+  protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
   
   @SuppressWarnings("deprecation")
   private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
@@ -165,23 +165,8 @@ implements ActionListener, ChangeListener {
     JPanel panel = new JPanel(new GridLayout(0,1));
     this.setViewportView(panel);
     
-    JPanel machineNumberPanel = new JPanel(new GridLayout(1,0));
-	    machineConfigurations = getAnyMachineConfigurations();
-	    machineChoices = new JComboBox<>(machineConfigurations);
-	    try {
-	      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-	    } catch (IllegalArgumentException e) {
-	      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
-	      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
-	    }
-	    
-	    openConfig = new JButton(translator.get("configureMachine"));
-	    openConfig.addActionListener(this);
-	    openConfig.setPreferredSize(openConfig.getPreferredSize());
-	
-	    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
-	    machineNumberPanel.add(machineChoices);
-	    machineNumberPanel.add(openConfig);
+    machineNumberPanel = new JPanel(new GridLayout(1,0));
+    updateMachineNumberPanel();
     panel.add(machineNumberPanel);
     
     JPanel marginPanel = new JPanel(new GridLayout(1,0));
@@ -234,6 +219,25 @@ implements ActionListener, ChangeListener {
     
   }
 
+  public void updateMachineNumberPanel() {
+	  machineNumberPanel.removeAll();
+	    machineConfigurations = getAnyMachineConfigurations();
+	    machineChoices = new JComboBox<>(machineConfigurations);
+	    try {
+	      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+	    } catch (IllegalArgumentException e) {
+	      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
+	      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
+	    }
+	    
+	    openConfig = new JButton(translator.get("configureMachine"));
+	    openConfig.addActionListener(this);
+	    openConfig.setPreferredSize(openConfig.getPreferredSize());
+	
+	    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+	    machineNumberPanel.add(machineChoices);
+	    machineNumberPanel.add(openConfig);
+  }
   
   public void stateChanged(ChangeEvent e) {
 	e.getSource();
@@ -279,39 +283,42 @@ implements ActionListener, ChangeListener {
     }
     
 
-    if (gui.isFileLoaded() && !gui.isRunning()) {
-      if (subject == buttonStart) {
-        gui.startAt(0);
-        return;
-      }
-      if (subject == buttonStartAt) {
-        Long lineNumber = getStartingLineNumber();
-        if (lineNumber != -1) {
-          gui.startAt(lineNumber);
-        }
-        return;
-      }
-      if (subject == buttonPause) {
-        if (gui.isPaused() == true) {
-          if (!penIsUpBeforePause) {
-            gui.lowerPen();
-          }
-          buttonPause.setText(translator.get("Pause"));
-          gui.unPause();
-          // TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
-          gui.sendFileCommand();
-        } else {
-          penIsUpBeforePause = penIsUp;
-          gui.raisePen();
-          buttonPause.setText(translator.get("Unpause"));
-          gui.pause();
-        }
-        return;
-      }
-      if (subject == buttonHalt) {
-        gui.halt();
-        return;
-      }
+    if (gui.isFileLoaded() ) {
+    	if(!gui.isRunning()) {
+    		if (subject == buttonStart) {
+    			gui.startAt(0);
+    			return;
+    		}
+    		if (subject == buttonStartAt) {
+    			Long lineNumber = getStartingLineNumber();
+    			if (lineNumber != -1) {
+    				gui.startAt(lineNumber);
+    			}
+    			return;
+    		}
+    	} else {
+    		if (subject == buttonPause) {
+    			if (gui.isPaused() == true) {
+    				if (!penIsUpBeforePause) {
+    					gui.lowerPen();
+    				}
+    				buttonPause.setText(translator.get("Pause"));
+    				gui.unPause();
+    				// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
+    				gui.sendFileCommand();
+    			} else {
+    				penIsUpBeforePause = penIsUp;
+    				gui.raisePen();
+    				buttonPause.setText(translator.get("Unpause"));
+    				gui.pause();
+    			}
+    			return;
+    		}
+    		if (subject == buttonHalt) {
+    			gui.halt();
+    			return;
+    		}
+    	}
     }
   }
   
