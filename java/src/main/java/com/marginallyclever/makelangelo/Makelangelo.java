@@ -931,7 +931,7 @@ public final class Makelangelo
    * @param html String of valid HTML.
    * @return a
    */
-  private JTextComponent createHyperlinkListenableJEditorPane(String html) {
+  public JTextComponent createHyperlinkListenableJEditorPane(String html) {
     final JEditorPane bottomText = new JEditorPane();
     bottomText.setContentType("text/html");
     bottomText.setEditable(false);

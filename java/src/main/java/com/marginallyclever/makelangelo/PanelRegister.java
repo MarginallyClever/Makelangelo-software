@@ -4,13 +4,17 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.text.JTextComponent;
 
 public class PanelRegister
 extends JPanel
 implements ActionListener {
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -785395804156632991L;
+	
 	protected Makelangelo gui;
 	protected MultilingualSupport translator;
 	protected MakelangeloRobot machineConfiguration;
@@ -22,8 +26,9 @@ implements ActionListener {
 		machineConfiguration = _machineConfiguration;
 
 	    setLayout(new FlowLayout());
-	
-	    this.add(new JLabel(_translator.get("PleaseRegister")));
+	    String html = _translator.get("PleaseRegister");
+	    JTextComponent decoratedText = _gui.createHyperlinkListenableJEditorPane(html);
+	    this.add(decoratedText);
 	}
 
     public void actionPerformed(ActionEvent e) {

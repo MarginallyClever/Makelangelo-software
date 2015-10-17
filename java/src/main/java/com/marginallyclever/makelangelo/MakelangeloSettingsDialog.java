@@ -51,7 +51,7 @@ implements ActionListener {
   }
 
   
-// settings menu
+  // settings menu
   public void run() {
     panes = new JTabbedPane();
     

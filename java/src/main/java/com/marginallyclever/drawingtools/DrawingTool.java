@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
-public class DrawingTool {
+public abstract class DrawingTool {
   // Every tool must have a unique number.
   protected int toolNumber;
 
@@ -46,9 +46,7 @@ public class DrawingTool {
   }
 
   // Load a configure menu and let people adjust the tool settings
-  public void adjust() {
-    //final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust pulley size",true);
-  }
+  public void adjust() {}
 
   public void setDiameter(float d) {
     diameter = d;

@@ -77,6 +77,8 @@ public final class MakelangeloRobot {
 
 	protected boolean reverseForGlass;
 	protected boolean areMotorsBackwards;
+	
+	protected boolean shouldSignName = true;
 
 	/**
 	 * top left, bottom center, etc...
@@ -561,5 +563,9 @@ public final class MakelangeloRobot {
 
 	public void setPaperMargin(double paperMargin) {
 		this.paperMargin = paperMargin;	
+	}
+	
+	public boolean shouldSignName() {
+		return shouldSignName;
 	}
 }
