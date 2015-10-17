@@ -26,12 +26,12 @@ implements ActionListener {
 	protected JCheckBox m1i;
 	protected JCheckBox m2i;
 
-	protected MainGUI gui;
+	protected Makelangelo gui;
 	protected MultilingualSupport translator;
 	protected MakelangeloRobot machineConfiguration;
 
 
-	public PanelJogMotors(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelJogMotors(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

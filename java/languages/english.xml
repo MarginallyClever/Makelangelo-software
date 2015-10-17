@@ -806,4 +806,15 @@
     <hint>HTML for About Dialog</hint>
   </string>
 
+	<string>
+		<key>MenuSettingsRegister</key>
+		<value>Register</value>
+		<hint>Machine Configuration > Register tab title</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegister</key>
+		<value><![CDATA[<html><body><p></p>Please show your support for Makelangelo and Marginally Clever by registering your robot at <a href=''></a>.</p></body></html>]]></value>
+		<hint>Machine Configuration > Register content</hint>
+	</string>
 </language>

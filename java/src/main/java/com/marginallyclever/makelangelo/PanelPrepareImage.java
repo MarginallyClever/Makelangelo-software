@@ -92,7 +92,7 @@ implements ActionListener, ChangeListener {
 
   protected MultilingualSupport translator;
   protected MakelangeloRobot machineConfiguration;
-  protected MainGUI gui;
+  protected Makelangelo gui;
 
   protected String lastFileIn = "";
   protected String lastFileOut = "";
@@ -157,7 +157,7 @@ implements ActionListener, ChangeListener {
   }
 
 
-  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+  public void createPanel(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;

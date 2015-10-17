@@ -26,7 +26,7 @@ implements ActionListener, KeyListener {
 	 */
 	private static final long serialVersionUID = -84665452555208524L;
 	
-	protected MainGUI gui;
+	protected Makelangelo gui;
 	protected MultilingualSupport translator;
 	protected MakelangeloRobot machineConfiguration;
 	
@@ -37,7 +37,7 @@ implements ActionListener, KeyListener {
 	protected JTextField mBobbin1,mBobbin2;
    
 	
-	public PanelAdjustMachineSize(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelAdjustMachineSize(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

@@ -21,7 +21,7 @@ import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
@@ -64,7 +64,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
   long time_limit=10*60*1000;  // 10 minutes
   
   
-  public Converter_VoronoiZigZag(MainGUI gui,
+  public Converter_VoronoiZigZag(Makelangelo gui,
       MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }

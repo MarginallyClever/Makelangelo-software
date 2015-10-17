@@ -6,7 +6,7 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
@@ -37,12 +37,12 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
   // prevent repeating pings from appearing in console
   boolean lastLineWasCue = false;
 
-  private final MainGUI mainGUI;
+  private final Makelangelo mainGUI;
   private final MultilingualSupport translator;
   private final MakelangeloRobot machine;
 
 
-  public SerialConnection(MainGUI mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
+  public SerialConnection(Makelangelo mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
     this.mainGUI = mainGUI;
     this.translator = translator;
     this.machine = machine;

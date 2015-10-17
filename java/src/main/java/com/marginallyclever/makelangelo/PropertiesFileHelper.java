@@ -32,7 +32,7 @@ public final class PropertiesFileHelper {
   public static String getMakelangeloVersionPropertyValue() {
     final Properties prop = new Properties();
     String makelangeloVersionPropertyValue = "";
-    try (final InputStream input = MainGUI.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {
+    try (final InputStream input = Makelangelo.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {
       if (input == null) {
         final String unableToFilePropertiesFileErrorMessage = "Sorry, unable to find " + MAKELANGELO_PROPERTIES_FILENAME;
         throw new IllegalStateException(unableToFilePropertiesFileErrorMessage);

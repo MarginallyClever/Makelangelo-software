@@ -30,7 +30,7 @@ implements ActionListener {
 
   protected MultilingualSupport translator;
   protected MakelangeloRobot machineConfiguration;
-  protected MainGUI gui;
+  protected Makelangelo gui;
 
   protected JTabbedPane panes;
   protected JButton save, cancel;
@@ -39,9 +39,10 @@ implements ActionListener {
   protected PanelJogMotors panelJogMotors;
   protected PanelAdjustTools panelAdjustTools;
   protected PanelSelectTool panelSelectTool;
+  protected PanelRegister panelRegister;
   
   
-  public MakelangeloSettingsDialog(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+  public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 	super(_gui.getParentFrame(),_translator.get("AdjustMachineSize"),true);
 
 	translator = _translator;
@@ -58,11 +59,13 @@ implements ActionListener {
     panelJogMotors = new PanelJogMotors(gui,translator,machineConfiguration);
     panelAdjustTools = new PanelAdjustTools(gui,translator,machineConfiguration);
     panelSelectTool = new PanelSelectTool(gui,translator,machineConfiguration);
+    panelRegister = new PanelRegister(gui,translator,machineConfiguration);
     
     panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachineSize);
     panes.addTab(translator.get("JogMotors"),panelJogMotors);
     panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
     panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
+    panes.addTab(translator.get("MenuSettingsRegister"),panelRegister);
     
 	this.setLayout(new GridBagLayout());
     GridBagConstraints d = new GridBagConstraints();

@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
@@ -25,12 +25,12 @@ public class DrawingTool {
   // used while drawing to the GUI
   protected float draw_z = 0;
 
-  protected MainGUI mainGUI;
+  protected Makelangelo mainGUI;
   protected MultilingualSupport translator;
   protected MakelangeloRobot machine;
 
 
-  public DrawingTool(MainGUI gui, MultilingualSupport ms, MakelangeloRobot mc) {
+  public DrawingTool(Makelangelo gui, MultilingualSupport ms, MakelangeloRobot mc) {
     mainGUI = gui;
     translator = ms;
     machine = mc;

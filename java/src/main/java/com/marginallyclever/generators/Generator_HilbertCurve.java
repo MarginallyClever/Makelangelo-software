@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class Generator_HilbertCurve extends ImageGenerator {
@@ -33,7 +33,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
   float x, y;
 
 
-  public Generator_HilbertCurve(MainGUI gui, MakelangeloRobot mc,
+  public Generator_HilbertCurve(Makelangelo gui, MakelangeloRobot mc,
                                       MultilingualSupport ms) {
     super(gui, mc, ms);
   }

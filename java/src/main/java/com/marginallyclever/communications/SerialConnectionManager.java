@@ -5,7 +5,7 @@ import java.util.prefs.Preferences;
 import jssc.SerialPortList;
 
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
@@ -18,13 +18,13 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
   private String[] portsDetected;
   private String recentPort;
 
-  private MainGUI mainGUI;
+  private Makelangelo mainGUI;
   private MultilingualSupport translator;
   private MakelangeloRobot machine;
   private Preferences prefs;
 
 
-  public SerialConnectionManager(Preferences prefs, MainGUI mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
+  public SerialConnectionManager(Preferences prefs, Makelangelo mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
     this.mainGUI = mainGUI;
     this.translator = translator;
     this.machine = machine;

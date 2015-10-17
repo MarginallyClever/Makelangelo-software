@@ -104,7 +104,7 @@ public final class MakelangeloRobot {
 
 	private String[] machineConfigurationsAvailable = null;
 
-	private MainGUI gui = null;
+	private Makelangelo gui = null;
 	private MultilingualSupport translator = null;
 
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobot.class);
@@ -116,7 +116,7 @@ public final class MakelangeloRobot {
 	 * @param gui
 	 * @param translator
 	 */
-	protected MakelangeloRobot(MainGUI _gui, MultilingualSupport _translator) {
+	protected MakelangeloRobot(Makelangelo _gui, MultilingualSupport _translator) {
 		gui = _gui;
 		translator = _translator;
 

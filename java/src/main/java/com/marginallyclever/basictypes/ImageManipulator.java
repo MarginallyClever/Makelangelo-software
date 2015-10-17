@@ -9,7 +9,7 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -33,7 +33,7 @@ public abstract class ImageManipulator {
   protected ProgressMonitor pm;
   protected SwingWorker<Void, Void> parent;
 
-  protected MainGUI mainGUI;
+  protected Makelangelo mainGUI;
   protected MultilingualSupport translator;
   protected MakelangeloRobot machine;
 
@@ -41,7 +41,7 @@ public abstract class ImageManipulator {
   protected float sampleSum;
 
   
-  public ImageManipulator(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public ImageManipulator(Makelangelo gui, MakelangeloRobot mc, MultilingualSupport ms) {
     mainGUI = gui;
     translator = ms;
     machine = mc;

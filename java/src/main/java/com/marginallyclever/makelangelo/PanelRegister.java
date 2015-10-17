@@ -1,37 +1,32 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class PanelAdjustTools
+public class PanelRegister
 extends JPanel
 implements ActionListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4061412413141577960L;
 
 	protected Makelangelo gui;
 	protected MultilingualSupport translator;
 	protected MakelangeloRobot machineConfiguration;
 
 
-	public PanelAdjustTools(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelRegister(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;
 
-	}
+	    setLayout(new FlowLayout());
 	
+	    this.add(new JLabel(_translator.get("PleaseRegister")));
+	}
 
     public void actionPerformed(ActionEvent e) {
-//      Object subject = e.getSource();
-    }
-    
-    void save() {
-    	
+      //Object subject = e.getSource();
     }
 }

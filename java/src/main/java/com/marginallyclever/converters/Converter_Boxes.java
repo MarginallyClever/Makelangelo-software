@@ -9,12 +9,12 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
 public class Converter_Boxes extends ImageConverter {
-  public Converter_Boxes(MainGUI gui, MakelangeloRobot mc,
+  public Converter_Boxes(Makelangelo gui, MakelangeloRobot mc,
                                MultilingualSupport ms) {
     super(gui, mc, ms);
   }

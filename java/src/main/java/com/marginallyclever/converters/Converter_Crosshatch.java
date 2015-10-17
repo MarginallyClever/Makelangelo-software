@@ -8,7 +8,7 @@ import java.io.Writer;
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
@@ -25,7 +25,7 @@ public class Converter_Crosshatch extends ImageConverter {
     return translator.get("Crosshatch");
   }
 
-  public Converter_Crosshatch(MainGUI gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public Converter_Crosshatch(Makelangelo gui, MakelangeloRobot mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 

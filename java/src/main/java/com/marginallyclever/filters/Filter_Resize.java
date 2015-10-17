@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MainGUI;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
@@ -21,14 +21,14 @@ public class Filter_Resize extends ImageFilter {
   protected int maxWidth, maxHeight;
 
 
-  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
+  public Filter_Resize(Makelangelo gui, MakelangeloRobot mc,
                        MultilingualSupport ms) {
     super(gui, mc, ms);
     maxWidth = 1000;
     maxHeight = 1000;
   }
 
-  public Filter_Resize(MainGUI gui, MakelangeloRobot mc,
+  public Filter_Resize(Makelangelo gui, MakelangeloRobot mc,
                        MultilingualSupport ms, int max_width, int max_height) {
     super(gui, mc, ms);
     maxWidth = max_width;

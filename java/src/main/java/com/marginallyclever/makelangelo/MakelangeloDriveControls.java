@@ -50,7 +50,7 @@ public class MakelangeloDriveControls
   
   protected MultilingualSupport translator;
   protected MakelangeloRobot machineConfiguration;
-  protected MainGUI gui;
+  protected Makelangelo gui;
 
   private boolean mouseInside,mouseOn;
   double last_x,last_y;
@@ -77,7 +77,7 @@ public class MakelangeloDriveControls
 	  return b;
   }
 
-  public void createPanel(MainGUI _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+  public void createPanel(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;
