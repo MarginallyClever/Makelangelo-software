@@ -164,13 +164,22 @@ implements ActionListener, ChangeListener {
     machineConfiguration = _machineConfiguration;
 
     this.setBorder(BorderFactory.createEmptyBorder());
-    
-    JPanel panel = new JPanel(new GridLayout(0,1));
+
+    JPanel panel = new JPanel(new GridBagLayout());	
     this.setViewportView(panel);
+	GridBagConstraints con1 = new GridBagConstraints();
+	con1.gridx=0;
+	con1.gridy=0;
+	con1.weightx=1;
+	con1.weighty=0;
+	con1.fill=GridBagConstraints.HORIZONTAL;
+	con1.anchor=GridBagConstraints.NORTHWEST;
+
     
     machineNumberPanel = new JPanel(new GridLayout(1,0));
     updateMachineNumberPanel();
-    panel.add(machineNumberPanel);
+    panel.add(machineNumberPanel,con1);
+    con1.gridy++;
     
     JPanel marginPanel = new JPanel(new GridLayout(1,0));
 	    paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
@@ -181,28 +190,35 @@ implements ActionListener, ChangeListener {
 	    paperMargin.addChangeListener(this);
 	    marginPanel.add(new JLabel(translator.get("PaperMargin")));
 	    marginPanel.add(paperMargin);
-    panel.add(marginPanel);
+    panel.add(marginPanel,con1);
+    con1.gridy++;
 
-    panel.add(new JSeparator());
+    panel.add(new JSeparator(),con1);
+    con1.gridy++;
 
     // File conversion
     buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
     buttonOpenFile.addActionListener(this);
-    panel.add(buttonOpenFile);
+    panel.add(buttonOpenFile,con1);
+    con1.gridy++;
 
     buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
     buttonHilbertCurve.addActionListener(this);
-    panel.add(buttonHilbertCurve);
+    panel.add(buttonHilbertCurve,con1);
+    con1.gridy++;
 
     buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
     buttonText2GCODE.addActionListener(this);
-    panel.add(buttonText2GCODE);
+    panel.add(buttonText2GCODE,con1);
+    con1.gridy++;
 
     buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
     buttonSaveFile.addActionListener(this);
-    panel.add(buttonSaveFile);
+    panel.add(buttonSaveFile,con1);
+    con1.gridy++;
 
-    panel.add(new JSeparator());
+    panel.add(new JSeparator(),con1);
+    con1.gridy++;
 
     // drive menu
     JPanel drivePanel = new JPanel(new GridLayout(2,2));
@@ -218,8 +234,11 @@ implements ActionListener, ChangeListener {
 	    buttonStartAt.addActionListener(this);
 	    buttonPause.addActionListener(this);
 	    buttonHalt.addActionListener(this);
-	panel.add(drivePanel);
+	panel.add(drivePanel,con1);
+    con1.gridy++;
     
+    con1.weighty=1;
+    panel.add(new JLabel(),con1);
   }
 
   public void updateMachineNumberPanel() {

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +20,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 /**
@@ -171,7 +171,9 @@ public class MakelangeloDriveControls
       feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
       feedRate.setText(Double.toString(machineConfiguration.getFeedRate()));
       setFeedRate = new JButton(translator.get("Set"));
+      setFeedRate.addActionListener(this);
       disengageMotors = new JButton(translator.get("DisengageMotors"));
+      disengageMotors.addActionListener(this);
   
       c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
       c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
@@ -180,32 +182,56 @@ public class MakelangeloDriveControls
       c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
     
     dragAndDrive = new JPanel(new GridBagLayout());
-    dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-    dragAndDrive.addMouseListener(this);
-    dragAndDrive.addMouseMotionListener(this);
+	    dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	    dragAndDrive.addMouseListener(this);
+	    dragAndDrive.addMouseMotionListener(this);
 
-    coordinates = new JLabel(translator.get("ClickAndDrag"));
-    c.anchor = GridBagConstraints.CENTER;
-    dragAndDrive.add(coordinates,c);
-      
-    JPanel p = new JPanel(new GridLayout(0,1));
+	    coordinates = new JLabel(translator.get("ClickAndDrag"));
+	    c.anchor = GridBagConstraints.CENTER;
+	
+	    // TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
+	    Dimension dims = new Dimension();
+	    dims.setSize( 150,
+	    				150 * (double)machineConfiguration.getPaperWidth()/(double)machineConfiguration.getPaperHeight());
+	    dragAndDrive.setPreferredSize(dims);
+	    dragAndDrive.add(coordinates,c);
+
+    // Now put all the parts together
+    JPanel p = new JPanel(new GridBagLayout());
     this.setViewportView(p);
-    c = new GridBagConstraints();
+    GridBagConstraints con1 = new GridBagConstraints();
+	con1.gridx=0;
+	con1.gridy=0;
+	con1.weightx=1;
+	con1.weighty=0;
+	con1.fill=GridBagConstraints.HORIZONTAL;
+	con1.anchor=GridBagConstraints.NORTHWEST;
 
     
-    //p.add(new JSeparator());
-    c.gridheight=2;
-    p.add(axisControl,c);
-    c.gridheight=1;
-    p.add(corners,c);
-    p.add(dragAndDrive,c);
-    c.gridheight=1;
-    p.add(feedRateControl,c);
-    //p.add(new JSeparator());
-    p.add(getTextInputField());
+    p.add(axisControl,con1);
+    con1.gridy++;
+    p.add(new JSeparator(),con1);
+    con1.gridy++;
+    p.add(corners,con1);
+    con1.gridy++;
+    p.add(new JSeparator(),con1);
+    con1.gridy++;
+    //con1.weighty=1;
+    //p.add(dragAndDrive,con1);
+    //con1.weighty=0;
+    //con1.gridy++;
+    p.add(new JSeparator(),con1);
+    con1.gridy++;
+    p.add(feedRateControl,con1);
+    con1.gridy++;
+    p.add(new JSeparator(),con1);
+    con1.gridy++;
+    p.add(getTextInputField(),con1);
+    con1.gridy++;
 
-    setFeedRate.addActionListener(this);
-    disengageMotors.addActionListener(this);
+
+    con1.weighty=1;
+    p.add(new JLabel(),con1);
   }
   
   public void mouseClicked(MouseEvent e) {}
