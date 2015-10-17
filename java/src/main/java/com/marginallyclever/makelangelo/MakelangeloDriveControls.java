@@ -81,6 +81,8 @@ public class MakelangeloDriveControls
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;
+
+    this.setBorder(BorderFactory.createEmptyBorder());
     
     GridBagConstraints c = new GridBagConstraints();
 

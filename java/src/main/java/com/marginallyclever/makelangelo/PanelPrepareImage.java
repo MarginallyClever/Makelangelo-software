@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -162,6 +163,8 @@ implements ActionListener, ChangeListener {
     gui = _gui;
     machineConfiguration = _machineConfiguration;
 
+    this.setBorder(BorderFactory.createEmptyBorder());
+    
     JPanel panel = new JPanel(new GridLayout(0,1));
     this.setViewportView(panel);
     
@@ -807,10 +810,11 @@ implements ActionListener, ChangeListener {
           converter.setProgressMonitor(pm);
           converter.convert(img,out);
 
-          // Sign name
-          Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
-          ymh.signName(out);
-
+          if(!machineConfiguration.shouldSignName()) {
+	          // Sign name
+	          Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
+	          ymh.signName(out);
+          }
           
           out.flush();
           out.close();

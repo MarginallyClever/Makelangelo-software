@@ -43,7 +43,7 @@ implements ActionListener {
   
   
   public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
-	super(_gui.getParentFrame(),_translator.get("AdjustMachineSize"),true);
+	super(_gui.getParentFrame(),_translator.get("configureMachine"),true);
 
 	translator = _translator;
 	gui = _gui;

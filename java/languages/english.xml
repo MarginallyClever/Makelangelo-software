@@ -78,7 +78,7 @@
 	</string>
 	<string>
 		<key>AdjustPulleySize</key>
-		<value>Adjust pulley diameter</value>
+		<value>Pulley diameter</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
@@ -493,7 +493,7 @@
 	</string>
 	<string>
 		<key>MenuSettingsMachine</key>
-		<value>Machine &amp; paper size</value>
+		<value>Size</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -817,4 +817,11 @@
 		<value><![CDATA[<html><body><p></p>Please show your support for Makelangelo and Marginally Clever by registering your robot at <a href=''></a>.</p></body></html>]]></value>
 		<hint>Machine Configuration > Register content</hint>
 	</string>
+
+	<string>
+		<key>MachineNumber</key>
+		<value>Machine #</value>
+		<hint>Prepare image panel</hint>
+	</string>
+	
 </language>
