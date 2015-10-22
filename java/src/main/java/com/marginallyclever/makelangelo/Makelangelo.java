@@ -15,6 +15,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -1208,6 +1209,8 @@ public final class Makelangelo
     // Display the window.
     int width = prefs.getInt("Default window width", (int) (1200.0));
     int height = prefs.getInt("Default window height", (int) (1020.0));
+	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
     mainframe.setSize(width, height);
     mainframe.setVisible(true);
 
