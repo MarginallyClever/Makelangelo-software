@@ -337,7 +337,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	private void paintBackground(GL2 gl2) {
 		// Clear The Screen And The Depth Buffer
-		gl2.glClearColor(0.5f, 0.5f, 0.5f, 0);
+    	gl2.glClearColor(212.0f/255.0f, 233.0f/255.0f, 255.0f/255.0f, 0.0f);
 
 		// Special handling for the case where the GLJPanel is translucent
 		// and wants to be composited with other Java 2D content
@@ -357,14 +357,16 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * @param gl2
 	 */
 	private void paintLimits(GL2 gl2) {
+		gl2.glColor3f(0.7f, 0.7f, 0.7f);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(machine.limitLeft, machine.limitTop);
+		gl2.glVertex2d(machine.limitRight, machine.limitTop);
+		gl2.glVertex2d(machine.limitRight, machine.limitBottom);
+		gl2.glVertex2d(machine.limitLeft, machine.limitBottom);
+		gl2.glEnd();
+		
 		if (!connected) {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
-			gl2.glBegin(GL2.GL_LINE_LOOP);
-			gl2.glVertex2d(machine.limitLeft, machine.limitTop);
-			gl2.glVertex2d(machine.limitRight, machine.limitTop);
-			gl2.glVertex2d(machine.limitRight, machine.limitBottom);
-			gl2.glVertex2d(machine.limitLeft, machine.limitBottom);
-			gl2.glEnd();
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 			gl2.glVertex2d(machine.paperLeft, machine.paperTop);
@@ -374,12 +376,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 			gl2.glEnd();
 		} else {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.limitLeft, machine.limitTop);
-			gl2.glVertex2d(machine.limitRight, machine.limitTop);
-			gl2.glVertex2d(machine.limitRight, machine.limitBottom);
-			gl2.glVertex2d(machine.limitLeft, machine.limitBottom);
-			gl2.glEnd();
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 			gl2.glVertex2d(machine.paperLeft, machine.paperTop);
@@ -495,7 +491,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		if(gy>machine.limitTop) return;
 		if(gy<machine.limitBottom) return;
 		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3f(0, 0, 1);
+		gl2.glColor3d(0.2,0.2,0.2);
 		// motor to gondola left
 		gl2.glVertex2d(machine.limitLeft, machine.limitTop);
 		gl2.glVertex2d(gx,gy);
@@ -534,6 +530,37 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glVertex2d(machine.limitRight+2.1+0.75+1.5,machine.limitTop-right_b-15);
 		gl2.glVertex2d(machine.limitRight+2.1+0.75-1.5,machine.limitTop-right_b-15);
 		gl2.glEnd();
+		
+		/*
+		// bottom clearance arcs
+		// right
+		gl2.glColor3d(0.6, 0.6, 0.6);
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		double w = machine.limitRight - machine.limitLeft+2.1;
+		double h = machine.limitTop - machine.limitBottom + 2.1;
+		r=(float)Math.sqrt(h*h + w*w); // circle radius
+		gx = machine.limitLeft - 2.1;
+		gy = machine.limitTop + 2.1;
+		double start = (float)1.5*(float)Math.PI;
+		double end = (2*Math.PI-Math.atan(h/w));
+		double v;
+		for(v=0;v<=1.0;v+=0.1) {
+			double vi = (end-start)*v + start;
+			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		}
+		gl2.glEnd();
+		
+		// left
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		gx = machine.limitRight + 2.1;
+		start = (float)(1*Math.PI+Math.atan(h/w));
+		end = (float)1.5*(float)Math.PI;
+		for(v=0;v<=1.0;v+=0.1) {
+			double vi = (end-start)*v + start;
+			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		}
+		gl2.glEnd();
+		*/
 	}
 
 

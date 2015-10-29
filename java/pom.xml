@@ -4,9 +4,11 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>v7.2.0-alpha</version>
+  <version>v7.2.1-alpha</version>
   <name>Makelangelo</name>
-  <description>Wall-hanging polargraph robot that draws murals.
+  <description>A mural drawing robot.
+
+More technically, a wall-hanging polargraph robot.
 
 If you like this project, please support us by buying Marginally Clever products.</description>
   <url>http://www.makelangelo.com/</url>

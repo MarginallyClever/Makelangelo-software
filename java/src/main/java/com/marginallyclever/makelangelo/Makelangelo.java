@@ -96,7 +96,6 @@ import com.marginallyclever.communications.SerialConnectionManager;
  * @since 0.0.1?
  */
 public final class Makelangelo
-    extends JPanel
     implements ActionListener {
 
   // Java required?
@@ -116,7 +115,7 @@ public final class Makelangelo
   private MarginallyCleverConnection connectionToRobot = null;
 
   // GUI elements
-  private static JFrame mainframe;
+  private JFrame mainframe;
   private JMenuBar menuBar;
   private JMenuItem buttonExit;
   private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
@@ -190,7 +189,7 @@ public final class Makelangelo
 
   // display a dialog box of available languages and let the user select their preference.
   public void chooseLanguage() {
-    final JDialog driver = new JDialog(mainframe, "Language", true);
+    final JDialog driver = new JDialog(this.mainframe, "Language", true);
     driver.setLayout(new GridBagLayout());
 
     final String[] languageList = translator.getLanguageList();
@@ -351,7 +350,7 @@ public final class Makelangelo
 
   private String selectFile() {
     JFileChooser choose = new JFileChooser();
-    int returnVal = choose.showOpenDialog(this);
+    int returnVal = choose.showOpenDialog(this.mainframe);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       File file = choose.getSelectedFile();
       return file.getAbsolutePath();
@@ -365,7 +364,7 @@ public final class Makelangelo
    * Adjust sound preferences
    */
   protected void adjustSounds() {
-    final JDialog driver = new JDialog(mainframe, translator.get("MenuSoundsTitle"), true);
+    final JDialog driver = new JDialog(this.mainframe, translator.get("MenuSoundsTitle"), true);
     driver.setLayout(new GridBagLayout());
 
     final JTextField sound_connect = new JTextField(prefs.get("sound_connect", ""), 32);
@@ -481,7 +480,7 @@ public final class Makelangelo
   protected void adjustGraphics() {
     final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
-    final JDialog driver = new JDialog(mainframe, translator.get("MenuGraphicsTitle"), true);
+    final JDialog driver = new JDialog(this.mainframe, translator.get("MenuGraphicsTitle"), true);
     driver.setLayout(new GridBagLayout());
 
     //final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
@@ -795,7 +794,7 @@ public final class Makelangelo
       playDisconnectSound();
 
       // update window title
-      mainframe.setTitle(translator.get("TitlePrefix")
+      this.mainframe.setTitle(translator.get("TitlePrefix")
           + Long.toString(machineConfiguration.getUID())
           + translator.get("TitleNotConnected"));
       return;
@@ -814,7 +813,7 @@ public final class Makelangelo
     }
     if (subject == buttonExportMachinePreferences) {
       final JFileChooser fc = new JFileChooser();
-      int returnVal = fc.showSaveDialog(this);
+      int returnVal = fc.showSaveDialog(this.mainframe);
       if(returnVal == JFileChooser.APPROVE_OPTION) {
         final File file = fc.getSelectedFile();
         try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
@@ -827,7 +826,7 @@ public final class Makelangelo
     }
     if (subject == buttonImportMachinePreferences) {
       final JFileChooser fc = new JFileChooser();
-      int returnVal = fc.showOpenDialog(this);
+      int returnVal = fc.showOpenDialog(this.mainframe);
       if(returnVal == JFileChooser.APPROVE_OPTION) {
         final File file = fc.getSelectedFile();
         try (final InputStream fileInputStream = new FileInputStream(file)) {
@@ -841,7 +840,7 @@ public final class Makelangelo
       return;
     }
     if (subject == buttonResetMachinePreferences) {
-      int dialogResult = JOptionPane.showConfirmDialog(this, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
+      int dialogResult = JOptionPane.showConfirmDialog(this.mainframe, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
       if(dialogResult == JOptionPane.YES_OPTION){
         try {
           prefs.removeNode();
@@ -1192,27 +1191,27 @@ public final class Makelangelo
 
 
   public JFrame getParentFrame() {
-    return mainframe;
+    return this.mainframe;
   }
 
 
   // Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
   private void createAndShowGUI() {
     // Create and set up the window.
-    mainframe = new JFrame("Makelangelo");
-    mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    this.mainframe = new JFrame("Makelangelo");
+    this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     // Create and set up the content pane.
-    mainframe.setJMenuBar(createMenuBar());
-    mainframe.setContentPane(createContentPane());
+    this.mainframe.setJMenuBar(createMenuBar());
+    this.mainframe.setContentPane(createContentPane());
 
     // Display the window.
     int width = prefs.getInt("Default window width", (int) (1200.0));
     int height = prefs.getInt("Default window height", (int) (1020.0));
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
-    mainframe.setSize(width, height);
-    mainframe.setVisible(true);
+	this.mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
+    this.mainframe.setSize(width, height);
+    this.mainframe.setVisible(true);
 
     drawPanel.zoomToFitPaper();
 
@@ -1225,7 +1224,7 @@ public final class Makelangelo
    * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
    */
   public JFrame getMainframe() {
-    return mainframe;
+    return this.mainframe;
   }
 
   /**
