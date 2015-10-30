@@ -814,8 +814,26 @@
 
 	<string>
 		<key>PleaseRegister</key>
-		<value><![CDATA[<html><body><p></p>Please show your support for Makelangelo and Marginally Clever by registering your robot at <a href=''></a>.</p></body></html>]]></value>
-		<hint>Machine Configuration > Register content</hint>
+		<value><![CDATA[<p>Register your robot with your Marginally Clever user account to Unlock features and show your support.</p>]]></value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterCreateAccountButton</key>
+		<value>Create an account</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+	
+	<string>
+		<key>PleaseRegisterUsername</key>
+		<value>User name</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterPassword</key>
+		<value>Password</value>
+		<hint>Machine Configuration > Register robot</hint>
 	</string>
 
 	<string>

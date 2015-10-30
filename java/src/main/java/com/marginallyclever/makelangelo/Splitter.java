@@ -8,7 +8,7 @@ public class Splitter extends JSplitPane {
 
   public Splitter(int split_direction) {
     super(split_direction);
-    setResizeWeight(0.9);
-    setDividerLocation(0.9);
+    setResizeWeight(0.95);
+    setDividerLocation(0.95);
   }
 }
