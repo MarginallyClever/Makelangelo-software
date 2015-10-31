@@ -28,8 +28,9 @@ public final class PropertiesFileHelper {
   /**
    * @return version number in the form of vX.Y.Z where X is MAJOR, Y is MINOR version, and Z is PATCH
    * @see <a href="http://semver.org/">Semantic Versioning 2.0.0</a>
+   * @throws IllegalStateException
    */
-  public static String getMakelangeloVersionPropertyValue() {
+  public static String getMakelangeloVersionPropertyValue() throws IllegalStateException {
     final Properties prop = new Properties();
     String makelangeloVersionPropertyValue = "";
     try (final InputStream input = Makelangelo.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {

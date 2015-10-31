@@ -893,8 +893,8 @@ public final class Makelangelo
     try {
       final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
       icon = new ImageIcon(imageData);
-    } catch (NullPointerException | IOException exceptionLoadingIconImage) {
-      System.err.print(exceptionLoadingIconImage);
+    } catch (NullPointerException | IOException e) {
+      logger.error("Error getting image icon: {}", e);
     }
     return icon;
   }
