@@ -76,6 +76,23 @@ If you like this project, please support us by buying Marginally Clever products
       </resources>
     <plugins>
       <plugin>
+        <groupId>org.colapietro.maven.plugins</groupId>
+        <artifactId>nativedependencies-maven-plugin</artifactId>
+        <version>0.1.1</version>
+        <executions>
+                <execution>
+                        <id>unpacknatives</id>
+                        <goals>
+                                <goal>copy</goal>
+                        </goals>
+                </execution>
+        </executions>
+        <configuration>
+          <nativesTargetDir>target/natives</nativesTargetDir>
+          <separateDirs>true</separateDirs>
+        </configuration>
+      </plugin>
+      <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.16</version>
