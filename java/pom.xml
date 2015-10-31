@@ -127,11 +127,10 @@ If you like this project, please support us by buying Marginally Clever products
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
             </manifest>
           </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
+          <descriptors>
+            <descriptor>src/main/assembly/application.xml</descriptor>
+          </descriptors>
         </configuration>
-        <!-- see http://stackoverflow.com/a/574650 -->
         <executions>
           <execution>
             <id>make-assembly</id>
@@ -266,19 +265,12 @@ If you like this project, please support us by buying Marginally Clever products
     </dependency>
     <dependency>
       <groupId>org.jogamp.gluegen</groupId>
-        <artifactId>gluegen-rt-main</artifactId>
-        <version>${jogl.version}</version>
-        <scope>runtime</scope>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>${jogl.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jogamp.jogl</groupId>
-        <artifactId>jogl-all-main</artifactId>
-        <version>${jogl.version}</version>
-        <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.jogl</groupId>
-      <artifactId>jogl-all</artifactId>
+      <artifactId>jogl-all-main</artifactId>
       <version>${jogl.version}</version>
     </dependency>
     <dependency>
