@@ -17,9 +17,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -90,6 +92,18 @@ implements ActionListener, ChangeListener {
    *
    */
   private static final long serialVersionUID = -4703402918904039337L;
+
+  private static final Set<String> imageFileExtentions;
+
+  static {
+    imageFileExtentions = new HashSet<>();
+    imageFileExtentions.add("jpg");
+    imageFileExtentions.add("jpeg");
+    imageFileExtentions.add("png");
+    imageFileExtentions.add("wbmp");
+    imageFileExtentions.add("bmp");
+    imageFileExtentions.add("gif");
+  }
 
   protected MultilingualSupport translator;
   protected MakelangeloRobot machineConfiguration;
@@ -165,15 +179,15 @@ implements ActionListener, ChangeListener {
 
     this.setBorder(BorderFactory.createEmptyBorder());
 
-    JPanel panel = new JPanel(new GridBagLayout());	
+    JPanel panel = new JPanel(new GridBagLayout());  
     this.setViewportView(panel);
-	GridBagConstraints con1 = new GridBagConstraints();
-	con1.gridx=0;
-	con1.gridy=0;
-	con1.weightx=1;
-	con1.weighty=0;
-	con1.fill=GridBagConstraints.HORIZONTAL;
-	con1.anchor=GridBagConstraints.NORTHWEST;
+  GridBagConstraints con1 = new GridBagConstraints();
+  con1.gridx=0;
+  con1.gridy=0;
+  con1.weightx=1;
+  con1.weighty=0;
+  con1.fill=GridBagConstraints.HORIZONTAL;
+  con1.anchor=GridBagConstraints.NORTHWEST;
 
     
     machineNumberPanel = new JPanel(new GridLayout(1,0));
@@ -182,14 +196,14 @@ implements ActionListener, ChangeListener {
     con1.gridy++;
     
     JPanel marginPanel = new JPanel(new GridLayout(1,0));
-	    paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
-	    paperMargin.setMajorTickSpacing(10);
-	    paperMargin.setMinorTickSpacing(5);
-	    paperMargin.setPaintTicks(false);
-	    paperMargin.setPaintLabels(true);
-	    paperMargin.addChangeListener(this);
-	    marginPanel.add(new JLabel(translator.get("PaperMargin")));
-	    marginPanel.add(paperMargin);
+      paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
+      paperMargin.setMajorTickSpacing(10);
+      paperMargin.setMinorTickSpacing(5);
+      paperMargin.setPaintTicks(false);
+      paperMargin.setPaintLabels(true);
+      paperMargin.addChangeListener(this);
+      marginPanel.add(new JLabel(translator.get("PaperMargin")));
+      marginPanel.add(paperMargin);
     panel.add(marginPanel,con1);
     con1.gridy++;
 
@@ -222,19 +236,19 @@ implements ActionListener, ChangeListener {
 
     // drive menu
     JPanel drivePanel = new JPanel(new GridLayout(2,2));
-	    buttonStart = new JButton(translator.get("Start"));
-	    buttonStartAt = new JButton(translator.get("StartAtLine"));
-	    buttonPause = new JButton(translator.get("Pause"));
-	    buttonHalt = new JButton(translator.get("Halt"));
-	    drivePanel.add(buttonStart);
-	    drivePanel.add(buttonStartAt);
-	    drivePanel.add(buttonPause);
-	    drivePanel.add(buttonHalt);
-	    buttonStart.addActionListener(this);
-	    buttonStartAt.addActionListener(this);
-	    buttonPause.addActionListener(this);
-	    buttonHalt.addActionListener(this);
-	panel.add(drivePanel,con1);
+      buttonStart = new JButton(translator.get("Start"));
+      buttonStartAt = new JButton(translator.get("StartAtLine"));
+      buttonPause = new JButton(translator.get("Pause"));
+      buttonHalt = new JButton(translator.get("Halt"));
+      drivePanel.add(buttonStart);
+      drivePanel.add(buttonStartAt);
+      drivePanel.add(buttonPause);
+      drivePanel.add(buttonHalt);
+      buttonStart.addActionListener(this);
+      buttonStartAt.addActionListener(this);
+      buttonPause.addActionListener(this);
+      buttonHalt.addActionListener(this);
+  panel.add(drivePanel,con1);
     con1.gridy++;
     
     con1.weighty=1;
@@ -242,32 +256,32 @@ implements ActionListener, ChangeListener {
   }
 
   public void updateMachineNumberPanel() {
-	  machineNumberPanel.removeAll();
-	    machineConfigurations = getAnyMachineConfigurations();
-	    machineChoices = new JComboBox<>(machineConfigurations);
-	    try {
-	      machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
-	    } catch (IllegalArgumentException e) {
-	      // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
-	      logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
-	    }
-	    
-	    openConfig = new JButton(translator.get("configureMachine"));
-	    openConfig.addActionListener(this);
-	    openConfig.setPreferredSize(openConfig.getPreferredSize());
-	
-	    machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
-	    machineNumberPanel.add(machineChoices);
-	    machineNumberPanel.add(openConfig);
+    machineNumberPanel.removeAll();
+      machineConfigurations = getAnyMachineConfigurations();
+      machineChoices = new JComboBox<>(machineConfigurations);
+      try {
+        machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+      } catch (IllegalArgumentException e) {
+        // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
+        logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
+      }
+      
+      openConfig = new JButton(translator.get("configureMachine"));
+      openConfig.addActionListener(this);
+      openConfig.setPreferredSize(openConfig.getPreferredSize());
+  
+      machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+      machineNumberPanel.add(machineChoices);
+      machineNumberPanel.add(openConfig);
   }
   
   public void stateChanged(ChangeEvent e) {
-	e.getSource();
+  e.getSource();
     double pm = (100 - paperMargin.getValue()) * 0.01;
     if ( Double.compare(machineConfiguration.paperMargin , pm) != 0) {
-    	machineConfiguration.paperMargin = pm;
-    	machineConfiguration.saveConfig();
-    	gui.getDrawPanel().repaint();
+      machineConfiguration.paperMargin = pm;
+      machineConfiguration.saveConfig();
+      gui.getDrawPanel().repaint();
     }
   }
   
@@ -281,9 +295,9 @@ implements ActionListener, ChangeListener {
     machineConfiguration.loadConfig(new_uid);
 
     if( subject == openConfig ) {
-    	MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
-    	m.run();
-    	return;
+      MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
+      m.run();
+      return;
     }
     
     if (subject == buttonOpenFile) {
@@ -306,41 +320,41 @@ implements ActionListener, ChangeListener {
     
 
     if (gui.isFileLoaded() ) {
-    	if(!gui.isRunning()) {
-    		if (subject == buttonStart) {
-    			gui.startAt(0);
-    			return;
-    		}
-    		if (subject == buttonStartAt) {
-    			Long lineNumber = getStartingLineNumber();
-    			if (lineNumber != -1) {
-    				gui.startAt(lineNumber);
-    			}
-    			return;
-    		}
-    	} else {
-    		if (subject == buttonPause) {
-    			if (gui.isPaused() == true) {
-    				if (!penIsUpBeforePause) {
-    					gui.lowerPen();
-    				}
-    				buttonPause.setText(translator.get("Pause"));
-    				gui.unPause();
-    				// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
-    				gui.sendFileCommand();
-    			} else {
-    				penIsUpBeforePause = penIsUp;
-    				gui.raisePen();
-    				buttonPause.setText(translator.get("Unpause"));
-    				gui.pause();
-    			}
-    			return;
-    		}
-    		if (subject == buttonHalt) {
-    			gui.halt();
-    			return;
-    		}
-    	}
+      if(!gui.isRunning()) {
+        if (subject == buttonStart) {
+          gui.startAt(0);
+          return;
+        }
+        if (subject == buttonStartAt) {
+          Long lineNumber = getStartingLineNumber();
+          if (lineNumber != -1) {
+            gui.startAt(lineNumber);
+          }
+          return;
+        }
+      } else {
+        if (subject == buttonPause) {
+          if (gui.isPaused() == true) {
+            if (!penIsUpBeforePause) {
+              gui.lowerPen();
+            }
+            buttonPause.setText(translator.get("Pause"));
+            gui.unPause();
+            // TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
+            gui.sendFileCommand();
+          } else {
+            penIsUpBeforePause = penIsUp;
+            gui.raisePen();
+            buttonPause.setText(translator.get("Unpause"));
+            gui.pause();
+          }
+          return;
+        }
+        if (subject == buttonHalt) {
+          gui.halt();
+          return;
+        }
+      }
     }
   }
   
@@ -397,7 +411,7 @@ implements ActionListener, ChangeListener {
     String filename = lastFileIn;
 
     FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
-    FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"), "jpg", "jpeg", "png", "wbmp", "bmp", "gif");
+    final FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"), imageFileExtentions.toArray(new String[imageFileExtentions.size()]));
     FileFilter filterDXF = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
 
     JFileChooser fc = new JFileChooser(new File(filename));
@@ -452,11 +466,8 @@ implements ActionListener, ChangeListener {
   }
 
   public boolean isFileImage(String filename) {
-    String ext = filename.substring(filename.lastIndexOf('.'));
-    return ext.equalsIgnoreCase(".jpg")
-        || ext.equalsIgnoreCase(".png")
-        || ext.equalsIgnoreCase(".bmp")
-        || ext.equalsIgnoreCase(".gif");
+    String ext = filename.substring(filename.lastIndexOf('.') + 1);
+    return imageFileExtentions.contains(ext);
   }
 
   // User has asked that a file be opened.
@@ -815,29 +826,23 @@ implements ActionListener, ChangeListener {
     final SwingWorker<Void, Void> s = new SwingWorker<Void, Void>() {
       @Override
       public Void doInBackground() {
-        // read in image
-        BufferedImage img;
-        try {
+        try (OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+             Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)){
+          // read in image
           gui.log("<font color='green'>" + translator.get("Converting") + " " + destinationFile + "</font>\n");
           // convert with style
-          img = ImageIO.read(new File(sourceFile));
-  	  	  OutputStream fileOutputStream = new FileOutputStream(destinationFile);
-  	  	  Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-
+          final BufferedImage img = ImageIO.read(new File(sourceFile));
+          
           ImageConverter converter = imageConverters.get(getPreferredDrawStyle());
           converter.setParent(this);
           converter.setProgressMonitor(pm);
-          converter.convert(img,out);
+          converter.convert(img, out);
 
           if(!machineConfiguration.shouldSignName()) {
-	          // Sign name
-	          Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
-	          ymh.signName(out);
+            // Sign name
+            Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
+            ymh.signName(out);
           }
-          
-          out.flush();
-          out.close();
-          
           gui.updateMachineConfig();
         } catch (IOException e) {
           gui.log("<font color='red'>" + translator.get("Failed") + e.getLocalizedMessage() + "</font>\n");
@@ -894,8 +899,8 @@ implements ActionListener, ChangeListener {
   public void hilbertCurve() {
     Generator_HilbertCurve msg = new Generator_HilbertCurve(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
-	    loadGCode(gui.getTempDestinationFile());
-	    gui.playConversionFinishedSound();
+      loadGCode(gui.getTempDestinationFile());
+      gui.playConversionFinishedSound();
     }
   }
 
@@ -903,8 +908,8 @@ implements ActionListener, ChangeListener {
   public void textToGCODE() {
     Generator_YourMessageHere msg = new Generator_YourMessageHere(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
-	    loadGCode(gui.getTempDestinationFile());
-	    gui.playConversionFinishedSound();
+      loadGCode(gui.getTempDestinationFile());
+      gui.playConversionFinishedSound();
     }
   }
 }
