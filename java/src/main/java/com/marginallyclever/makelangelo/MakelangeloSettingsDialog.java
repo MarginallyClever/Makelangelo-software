@@ -3,12 +3,14 @@ package com.marginallyclever.makelangelo;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -35,12 +37,17 @@ implements ActionListener {
   protected JTabbedPane panes;
   protected JButton save, cancel;
 
+  private String[] machineConfigurations;
+  private JComboBox<String> machineChoices;
+  
   protected PanelAdjustMachineSize panelAdjustMachineSize;
   protected PanelJogMotors panelJogMotors;
   protected PanelAdjustTools panelAdjustTools;
   protected PanelSelectTool panelSelectTool;
   protected PanelRegister panelRegister;
   
+  protected int dialogWidth = 350;
+  protected int dialogHeight = 500;
   
   public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
 	super(_gui.getParentFrame(),_translator.get("configureMachine"),true);
@@ -70,12 +77,15 @@ implements ActionListener {
 	this.setLayout(new GridBagLayout());
     GridBagConstraints d = new GridBagConstraints();
 
+    	// choice of machine configuration, save, save as, delete.
+
+    	// the panes for the selected machine configuration
     	d.fill=GridBagConstraints.BOTH;
     	d.gridx=0;
     	d.gridy=0;
     	d.weightx=1;
     	d.weighty=1;
-    	panes.setPreferredSize(new Dimension(600,500));
+    	panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
     	this.add(panes,d);
 	
         // save and cancel buttons
@@ -101,7 +111,9 @@ implements ActionListener {
 	    d.gridy=1;
 	    d.fill=GridBagConstraints.HORIZONTAL;
 	    this.add(p,d);
-        
+
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation((screenSize.width - dialogWidth) / 2, (screenSize.height - dialogHeight) / 2);
         this.pack();
         this.setVisible(true);
   }

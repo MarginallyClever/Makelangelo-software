@@ -140,8 +140,8 @@ public final class MakelangeloRobot {
 		startingPositionIndex = 4;
 		currentToolIndex = 0;
 		maxFeedRate = 11000;
-		bobbinDiameterLeft=1.5;
-		bobbinDiameterRight=1.5;
+		bobbinDiameterLeft=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		bobbinDiameterRight=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
 		invertMotor1 = false;
 		invertMotor2 = false;
@@ -163,10 +163,11 @@ public final class MakelangeloRobot {
 		} catch (Exception e) {
 			logger.error("{}", e);
 			machineConfigurationsAvailable = new String[1];
+			machineConfigurationsAvailable[0] = "Default";
 		}
 		
 		// Load most recent config
-		loadConfig(0);
+		//loadConfig(last_machine_id);
 	}
 
 	/**

@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -189,8 +191,11 @@ public final class MultilingualSupport {
     JPanel panel = new JPanel(new GridLayout(0, 1));
     panel.add(language_options);
 
-    final int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-    if (result == JOptionPane.YES_NO_OPTION) {
+	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	panel.setLocation((screenSize.width - panel.getWidth()) / 2, (screenSize.height - panel.getHeight()) / 2);
+
+    final int result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (result == JOptionPane.OK_OPTION) {
       setCurrentLanguage(choices[language_options.getSelectedIndex()]);
       saveConfig();
     }
