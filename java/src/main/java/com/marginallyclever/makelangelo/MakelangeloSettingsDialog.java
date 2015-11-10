@@ -37,6 +37,7 @@ implements ActionListener {
   protected JTabbedPane panes;
   protected JButton save, cancel;
 
+  // Make these emulate Repetier-host config dialog
   private String[] machineConfigurations;
   private JComboBox<String> machineChoices;
   
