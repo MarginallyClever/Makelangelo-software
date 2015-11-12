@@ -7,8 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -21,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
 
 /**
  * The GUI for the live driving controls, the start/pause/stop buttons, and the "send gcode" dialog.
@@ -31,7 +28,7 @@ import javax.swing.JTextField;
  */
 public class MakelangeloDriveControls
   extends JScrollPane
-  implements ActionListener, KeyListener, MouseListener, MouseMotionListener {
+  implements ActionListener, MouseListener, MouseMotionListener {
   protected JButton down100,down10,down1,up1,up10,up100;
   protected JButton left100,left10,left1,right1,right10,right100;
   protected JButton goHome,setHome;
@@ -40,10 +37,6 @@ public class MakelangeloDriveControls
   JFormattedTextField feedRate;
   JButton setFeedRate;
 
-  // command line
-  private JPanel textInputArea;
-  private JTextField commandLineText;
-  private JButton commandLineSend;
   private JButton disengageMotors;
   private JPanel dragAndDrive;
   private JLabel coordinates;
@@ -226,9 +219,6 @@ public class MakelangeloDriveControls
     con1.gridy++;
     p.add(new JSeparator(),con1);
     con1.gridy++;
-    p.add(getTextInputField(),con1);
-    con1.gridy++;
-
 
     con1.weighty=1;
     p.add(new JLabel(),con1);
@@ -289,13 +279,6 @@ public class MakelangeloDriveControls
     Object subject = e.getSource();
     JButton b = (JButton) subject;
 
-
-
-    if (subject == commandLineSend) {
-      gui.sendLineToRobot(commandLineText.getText());
-      commandLineText.setText("");
-    }
-
     //if(gui.isRunning()) return;
 
     if (b == goHome) gui.sendLineToRobot("G00 F" + feedRate.getText() + " X0 Y0");
@@ -320,8 +303,9 @@ public class MakelangeloDriveControls
       machineConfiguration.setFeedRate(feed_rate);
       feedRate.setText(Double.toString(feed_rate));
       gui.sendLineToRobot("G00 G21 F" + feed_rate);
-    } else if (b == disengageMotors) gui.sendLineToRobot("M18");
-    else {
+    } else if (b == disengageMotors) {
+    	gui.sendLineToRobot("M18");
+    } else {
       gui.sendLineToRobot("G91");  // set relative mode
 
       if (b == down100) gui.sendLineToRobot("G0 Y-100");
@@ -339,57 +323,6 @@ public class MakelangeloDriveControls
       if (b == right1) gui.sendLineToRobot("G0 X1");
 
       gui.sendLineToRobot("G90");  // return to absolute mode
-    }
-  }
-
-  private JPanel getTextInputField() {
-    textInputArea = new JPanel();
-    textInputArea.setLayout(new GridBagLayout());
-    GridBagConstraints c = new GridBagConstraints();
-    
-    commandLineText = new JTextField(0);
-    //commandLineText.setPreferredSize(new Dimension(10, 10));
-    commandLineSend = new JButton(translator.get("Send"));
-    //commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
-    c.gridwidth=4;
-    c.weightx=1;
-    c.fill=GridBagConstraints.HORIZONTAL;
-    c.gridx=c.gridy=0;
-    textInputArea.add(commandLineText,c);
-    c.gridwidth=1;
-    c.gridx=4;
-    c.weightx=0;
-    textInputArea.add(commandLineSend,c);
-
-    commandLineText.addKeyListener(this);
-    commandLineSend.addActionListener(this);
-    
-    //textInputArea.setMinimumSize(new Dimension(100,50));
-    //textInputArea.setMaximumSize(new Dimension(10000,50));
-
-    return textInputArea;
-  }
-
-
-  @Override
-  public void keyTyped(KeyEvent e) {
-  }
-
-  /**
-   * Handle the key-pressed event from the text field.
-   */
-  @Override
-  public void keyPressed(KeyEvent e) {
-  }
-
-  /**
-   * Handle the key-released event from the text field.
-   */
-  @Override
-  public void keyReleased(KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-      gui.processLine(commandLineText.getText());
-      commandLineText.setText("");
     }
   }
 }
