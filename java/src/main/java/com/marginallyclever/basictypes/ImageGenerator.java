@@ -18,8 +18,9 @@ public abstract class ImageGenerator extends ImageManipulator {
 
 	/**
 	  * @return true if generate succeeded.
+	  * @param dest the file where the results will be saved.
 	  */
-	  public boolean generate() {
+	  public boolean generate(final String dest) {
 		  return false;
 	  }
 }

@@ -63,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.basictypes.ImageConverter;
+import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.converters.Converter_Boxes;
 import com.marginallyclever.converters.Converter_Crosshatch;
@@ -119,7 +120,7 @@ implements ActionListener, ChangeListener {
   private JButton openConfig;
   private JSlider paperMargin;
   private JPanel machineNumberPanel;
-  private JButton buttonOpenFile, buttonHilbertCurve, buttonLSystemTree, buttonKochCurve, buttonText2GCODE, buttonSaveFile;
+  private JButton buttonOpenFile, buttonGenerate, buttonSaveFile;
   protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
   
   @SuppressWarnings("deprecation")
@@ -137,6 +138,7 @@ implements ActionListener, ChangeListener {
    * Image processing
    */
   private List<ImageConverter> imageConverters;
+  private List<ImageGenerator> imageGenerators;
 
   public void raisePen() {
     penIsUp = true;
@@ -162,6 +164,14 @@ implements ActionListener, ChangeListener {
     //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
+  protected void loadImageGenerators() {
+	  imageGenerators = new ArrayList<ImageGenerator>();
+	  imageGenerators.add(new Generator_HilbertCurve(gui,machineConfiguration,translator));
+	  imageGenerators.add(new Generator_LSystemTree(gui,machineConfiguration,translator));
+	  imageGenerators.add(new Generator_KochCurve(gui,machineConfiguration,translator));
+	  imageGenerators.add(new Generator_YourMessageHere(gui,machineConfiguration,translator));
+  }
+  
   /**
    * @return
    */
@@ -218,24 +228,9 @@ implements ActionListener, ChangeListener {
     panel.add(buttonOpenFile,con1);
     con1.gridy++;
 
-    buttonHilbertCurve = new JButton(translator.get("MenuHilbertCurve"));
-    buttonHilbertCurve.addActionListener(this);
-    panel.add(buttonHilbertCurve,con1);
-    con1.gridy++;
-
-    buttonLSystemTree = new JButton(translator.get("MenuLSystemTree"));
-    buttonLSystemTree.addActionListener(this);
-    panel.add(buttonLSystemTree,con1);
-    con1.gridy++;
-
-    buttonKochCurve = new JButton(translator.get("MenuKochCurve"));
-    buttonKochCurve.addActionListener(this);
-    panel.add(buttonKochCurve,con1);
-    con1.gridy++;
-
-    buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
-    buttonText2GCODE.addActionListener(this);
-    panel.add(buttonText2GCODE,con1);
+    buttonGenerate = new JButton(translator.get("MenuGenerate"));
+    buttonGenerate.addActionListener(this);
+    panel.add(buttonGenerate,con1);
     con1.gridy++;
 
     buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
@@ -316,23 +311,10 @@ implements ActionListener, ChangeListener {
       openFileDialog();
       return;
     }
-    if (subject == buttonHilbertCurve) {
-      hilbertCurve();
-      return;
-    }
-    if (subject == buttonLSystemTree) {
-    	lSystemTree();
+    if(subject == buttonGenerate) {
+    	generateImage();
     	return;
     }
-    if(subject == buttonKochCurve) {
-    	kochCurve();
-    	return;
-    }
-    if (subject == buttonText2GCODE) {
-      textToGCODE();
-      return;
-    }
-
     if (subject == buttonSaveFile) {
       saveFileDialog();
       return;
@@ -412,8 +394,7 @@ implements ActionListener, ChangeListener {
   }
 
   void updateButtonAccess(boolean isConnected,boolean isRunning) {
-    if (buttonHilbertCurve != null) buttonHilbertCurve.setEnabled(!isRunning);
-    if (buttonText2GCODE != null) buttonText2GCODE.setEnabled(!isRunning);
+    if (buttonGenerate != null) buttonGenerate.setEnabled(!isRunning);
 
     openConfig.setEnabled(!isRunning);
     
@@ -450,6 +431,60 @@ implements ActionListener, ChangeListener {
     }
   }
 
+  public void generateImage() {
+	    final JPanel panel = new JPanel(new GridBagLayout());
+
+	    final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
+	    reverse_h.setSelected(machineConfiguration.reverseForGlass);
+
+	    loadImageGenerators();
+	    String[] imageGeneratorNames = new String[imageGenerators.size()];
+	    Iterator<ImageGenerator> ici = imageGenerators.iterator();
+	    int i = 0;
+	    while (ici.hasNext()) {
+	      ImageManipulator f = ici.next();
+	      imageGeneratorNames[i++] = f.getName();
+	    }
+
+	    final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
+
+	    GridBagConstraints c = new GridBagConstraints();
+
+	    int y = 0;
+		  c.anchor = GridBagConstraints.EAST;
+		  c.gridwidth = 1;
+		  c.gridx = 0;
+		  c.gridy = y;
+		  panel.add(new JLabel(translator.get("ConversionStyle")), c);
+		  c.anchor = GridBagConstraints.WEST;
+		  c.gridwidth = 3;
+		  c.gridx = 1;
+		  c.gridy = y++;
+		  panel.add(options, c);
+	    c.anchor = GridBagConstraints.WEST;
+	    c.gridwidth = 1;
+	    c.gridx = 1;
+	    c.gridy = y++;
+	    panel.add(reverse_h, c);
+
+	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    if (result == JOptionPane.OK_OPTION) {
+	    	int choice = options.getSelectedIndex();
+	    	
+	    	ImageGenerator chosenGenerator = imageGenerators.get(choice);
+	    	machineConfiguration.reverseForGlass = reverse_h.isSelected();
+	    	machineConfiguration.saveConfig();
+
+	        String destinationFile = gui.getTempDestinationFile();
+	    	chosenGenerator.generate(destinationFile);
+	        loadGCode(destinationFile);
+	        gui.playConversionFinishedSound();
+
+	    	// Force update of graphics layout.
+	    	gui.updateMachineConfig();
+	    }
+  }
+  
   public void saveFileDialog() {
     // Note: source for ExampleFileFilter can be found in FileChooserDemo,
     // under the demo/jfc directory in the Java 2 SDK, Standard Edition.
@@ -913,41 +948,5 @@ implements ActionListener, ChangeListener {
 
   private int getPreferredDrawStyle() {
     return prefs.getInt("Draw Style", 0);
-  }
-
-
-  public void hilbertCurve() {
-    Generator_HilbertCurve msg = new Generator_HilbertCurve(gui, machineConfiguration, translator);
-    if(msg.generate(gui.getTempDestinationFile())) {
-      loadGCode(gui.getTempDestinationFile());
-      gui.playConversionFinishedSound();
-    }
-  }
-
-
-  public void lSystemTree() {
-    Generator_LSystemTree msg = new Generator_LSystemTree(gui, machineConfiguration, translator);
-    if(msg.generate(gui.getTempDestinationFile())) {
-      loadGCode(gui.getTempDestinationFile());
-      gui.playConversionFinishedSound();
-    }
-  }
-
-
-  public void kochCurve() {
-	Generator_KochCurve msg = new Generator_KochCurve(gui, machineConfiguration, translator);
-    if(msg.generate(gui.getTempDestinationFile())) {
-      loadGCode(gui.getTempDestinationFile());
-      gui.playConversionFinishedSound();
-    }
-  }
-
-
-  public void textToGCODE() {
-    Generator_YourMessageHere msg = new Generator_YourMessageHere(gui, machineConfiguration, translator);
-    if(msg.generate(gui.getTempDestinationFile())) {
-      loadGCode(gui.getTempDestinationFile());
-      gui.playConversionFinishedSound();
-    }
   }
 }
