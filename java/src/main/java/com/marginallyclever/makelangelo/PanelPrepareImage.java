@@ -75,6 +75,7 @@ import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.generators.Generator_HilbertCurve;
+import com.marginallyclever.generators.Generator_LSystemTree;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 
 
@@ -117,7 +118,7 @@ implements ActionListener, ChangeListener {
   private JButton openConfig;
   private JSlider paperMargin;
   private JPanel machineNumberPanel;
-  private JButton buttonOpenFile, buttonHilbertCurve, buttonText2GCODE, buttonSaveFile;
+  private JButton buttonOpenFile, buttonHilbertCurve, buttonLSystemTree, buttonText2GCODE, buttonSaveFile;
   protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
   
   @SuppressWarnings("deprecation")
@@ -221,6 +222,11 @@ implements ActionListener, ChangeListener {
     panel.add(buttonHilbertCurve,con1);
     con1.gridy++;
 
+    buttonLSystemTree = new JButton(translator.get("MenuLSystemTree"));
+    buttonLSystemTree.addActionListener(this);
+    panel.add(buttonLSystemTree,con1);
+    con1.gridy++;
+
     buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
     buttonText2GCODE.addActionListener(this);
     panel.add(buttonText2GCODE,con1);
@@ -307,6 +313,10 @@ implements ActionListener, ChangeListener {
     if (subject == buttonHilbertCurve) {
       hilbertCurve();
       return;
+    }
+    if (subject == buttonLSystemTree) {
+    	lSystemTree();
+    	return;
     }
     if (subject == buttonText2GCODE) {
       textToGCODE();
@@ -898,6 +908,15 @@ implements ActionListener, ChangeListener {
 
   public void hilbertCurve() {
     Generator_HilbertCurve msg = new Generator_HilbertCurve(gui, machineConfiguration, translator);
+    if(msg.generate(gui.getTempDestinationFile())) {
+      loadGCode(gui.getTempDestinationFile());
+      gui.playConversionFinishedSound();
+    }
+  }
+
+
+  public void lSystemTree() {
+    Generator_LSystemTree msg = new Generator_LSystemTree(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
       loadGCode(gui.getTempDestinationFile());
       gui.playConversionFinishedSound();
