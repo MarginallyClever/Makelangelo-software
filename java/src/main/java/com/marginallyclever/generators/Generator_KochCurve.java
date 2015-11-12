@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
-public class Generator_LSystemTree extends ImageGenerator {
+public class Generator_KochCurve extends ImageGenerator {
   float turtleX, turtleY;
   float turtleDx, turtleDy;
   float turtleStep = 10.0f;
@@ -33,12 +33,8 @@ public class Generator_LSystemTree extends ImageGenerator {
   float x, y;
 
   float maxSize;
-  
-  float angleSpan = 120;
-  int numBranches=3;
 
-
-  public Generator_LSystemTree(Makelangelo gui, MakelangeloRobot mc,
+  public Generator_KochCurve(Makelangelo gui, MakelangeloRobot mc,
                                       MultilingualSupport ms) {
     super(gui, mc, ms);
   }
@@ -66,24 +62,14 @@ public class Generator_LSystemTree extends ImageGenerator {
     boolean tryAgain=false;
     do {
 	    final JTextField field_order = new JTextField(Integer.toString(order));
-	    final JTextField field_angle = new JTextField(Float.toString(angleSpan));
-	    final JTextField field_branches = new JTextField(Integer.toString(numBranches));
 	
 	    JPanel panel = new JPanel(new GridLayout(0, 1));
 	    panel.add(new JLabel(translator.get("HilbertCurveOrder")));
 	    panel.add(field_order);
 	
-	    panel.add(new JLabel(translator.get("HilbertCurveAngle")));
-	    panel.add(field_angle);
-	    
-	    panel.add(new JLabel(translator.get("HilbertCurveBranches")));
-	    panel.add(field_branches);
-	
 	    int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 	      order = Integer.parseInt(field_order.getText());
-	      numBranches = Integer.parseInt(field_branches.getText());
-	      angleSpan = Float.parseFloat(field_angle.getText());
 	      
 	      // TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
 	      
@@ -136,15 +122,16 @@ public class Generator_LSystemTree extends ImageGenerator {
       moveTo(output, xmin, ymin, false);
       moveTo(output, xmin, ymax, false);
       moveTo(output, xmax, ymax, false);
-      liftPen(output);
 */
+      liftPen(output);
       // move to starting position
-      x = 0;//(xmax - turtleStep / 2);
-      y = (ymax - turtleStep / 2);
+      x = xmax;//(xmax - turtleStep / 2);
+      y = 0;
       moveTo(output, x, y, true);
       lowerPen(output);
       // do the curve
-      lSystemTree(output, order, maxSize/2);
+      turtle_turn(90);
+      kochCurve(output, order, maxSize);
       liftPen(output);
 
       output.flush();
@@ -155,21 +142,22 @@ public class Generator_LSystemTree extends ImageGenerator {
 
 
   // L System tree
-  private void lSystemTree(Writer output, int n, float distance) throws IOException {
-    if (n == 0) return;
-    turtle_goForward(output,distance);
-    if(n>1) {
-    	float angleStep = angleSpan / (float)(numBranches-1);
-    	
-    	turtle_turn(-(angleSpan/2.0f));
-    	for(int i=0;i<numBranches;++i) {
-    		lSystemTree(output,n-1,distance*2.0f/3.0f);
-    		turtle_turn(angleStep);
-    	}
-    	turtle_turn(-(angleSpan/2.0f)-angleStep);
-    	
+  private void kochCurve(Writer output, int n, float distance) throws IOException {
+    if (n == 0) {
+        turtle_goForward(output,distance);
+    	return;
     }
-    turtle_goForward(output,-distance);
+    kochCurve(output,n-1,distance/3.0f);
+    if(n>1) {
+    	turtle_turn(-60);
+    	kochCurve(output,n-1,distance/3.0f);
+    	turtle_turn(120);
+    	kochCurve(output,n-1,distance/3.0f);
+    	turtle_turn(-60);
+    } else {
+        turtle_goForward(output,distance/3.0f);
+    }
+    kochCurve(output,n-1,distance/3.0f);
   }
 
 

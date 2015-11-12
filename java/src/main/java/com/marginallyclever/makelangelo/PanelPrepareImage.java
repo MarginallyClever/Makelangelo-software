@@ -75,6 +75,7 @@ import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.generators.Generator_HilbertCurve;
+import com.marginallyclever.generators.Generator_KochCurve;
 import com.marginallyclever.generators.Generator_LSystemTree;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 
@@ -118,7 +119,7 @@ implements ActionListener, ChangeListener {
   private JButton openConfig;
   private JSlider paperMargin;
   private JPanel machineNumberPanel;
-  private JButton buttonOpenFile, buttonHilbertCurve, buttonLSystemTree, buttonText2GCODE, buttonSaveFile;
+  private JButton buttonOpenFile, buttonHilbertCurve, buttonLSystemTree, buttonKochCurve, buttonText2GCODE, buttonSaveFile;
   protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
   
   @SuppressWarnings("deprecation")
@@ -227,6 +228,11 @@ implements ActionListener, ChangeListener {
     panel.add(buttonLSystemTree,con1);
     con1.gridy++;
 
+    buttonKochCurve = new JButton(translator.get("MenuKochCurve"));
+    buttonKochCurve.addActionListener(this);
+    panel.add(buttonKochCurve,con1);
+    con1.gridy++;
+
     buttonText2GCODE = new JButton(translator.get("MenuTextToGCODE"));
     buttonText2GCODE.addActionListener(this);
     panel.add(buttonText2GCODE,con1);
@@ -316,6 +322,10 @@ implements ActionListener, ChangeListener {
     }
     if (subject == buttonLSystemTree) {
     	lSystemTree();
+    	return;
+    }
+    if(subject == buttonKochCurve) {
+    	kochCurve();
     	return;
     }
     if (subject == buttonText2GCODE) {
@@ -917,6 +927,15 @@ implements ActionListener, ChangeListener {
 
   public void lSystemTree() {
     Generator_LSystemTree msg = new Generator_LSystemTree(gui, machineConfiguration, translator);
+    if(msg.generate(gui.getTempDestinationFile())) {
+      loadGCode(gui.getTempDestinationFile());
+      gui.playConversionFinishedSound();
+    }
+  }
+
+
+  public void kochCurve() {
+	Generator_KochCurve msg = new Generator_KochCurve(gui, machineConfiguration, translator);
     if(msg.generate(gui.getTempDestinationFile())) {
       loadGCode(gui.getTempDestinationFile());
       gui.playConversionFinishedSound();
