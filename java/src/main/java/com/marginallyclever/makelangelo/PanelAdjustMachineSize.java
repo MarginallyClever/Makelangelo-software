@@ -168,9 +168,14 @@ implements ActionListener, KeyListener {
 	    mBobbin1.setPreferredSize(s);
 	    mBobbin2.setPreferredSize(s);
 
+	    this.add(new JSeparator());
+	    c.fill=GridBagConstraints.HORIZONTAL;
+	    c.anchor=GridBagConstraints.CENTER;
+	    c.gridx=0;
+	    c.gridy++;
 	    JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
 	    reverse_h.setSelected(machineConfiguration.reverseForGlass);
-	    p.add(reverse_h,c);
+	    this.add(reverse_h,c);
 
 	    s = ph.getPreferredSize();
 	    s.width = 80;
