@@ -11,6 +11,7 @@ import java.awt.event.KeyListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,6 +35,7 @@ implements ActionListener, KeyListener {
 	protected JTextField mw, mh;
 	protected JTextField pw, ph;
 
+	protected JCheckBox reverse_h;
 	protected JTextField mBobbin1,mBobbin2;
    
 	
@@ -166,7 +168,9 @@ implements ActionListener, KeyListener {
 	    mBobbin1.setPreferredSize(s);
 	    mBobbin2.setPreferredSize(s);
 
-
+	    JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
+	    reverse_h.setSelected(machineConfiguration.reverseForGlass);
+	    p.add(reverse_h,c);
 
 	    s = ph.getPreferredSize();
 	    s.width = 80;
@@ -232,6 +236,7 @@ implements ActionListener, KeyListener {
           if (brd <= 0) data_is_sane = false;
 
         if (data_is_sane) {
+	    	machineConfiguration.reverseForGlass = reverse_h.isSelected();
         	machineConfiguration.bobbinDiameterLeft = bld;
         	machineConfiguration.bobbinDiameterRight = brd;
           //startingPositionIndex = startPos.getSelectedIndex();

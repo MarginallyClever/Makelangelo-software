@@ -27,7 +27,6 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -75,6 +74,7 @@ import com.marginallyclever.converters.Converter_VoronoiStippling;
 import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.generators.Generator_Dragon;
 import com.marginallyclever.generators.Generator_HilbertCurve;
 import com.marginallyclever.generators.Generator_KochCurve;
 import com.marginallyclever.generators.Generator_LSystemTree;
@@ -148,7 +148,7 @@ implements ActionListener, ChangeListener {
     penIsUp = false;
   }
   
-  // TODO use a ServiceLoader and find generator plugins in nearby folders
+  // TODO use a ServiceLoader and find plugins in nearby folders
   protected void loadImageConverters() {
     imageConverters = new ArrayList<ImageConverter>();
     imageConverters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
@@ -164,12 +164,14 @@ implements ActionListener, ChangeListener {
     //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
   }
 
+  // TODO use a ServiceLoader and find plugins in nearby folders
   protected void loadImageGenerators() {
 	  imageGenerators = new ArrayList<ImageGenerator>();
+	  imageGenerators.add(new Generator_YourMessageHere(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_HilbertCurve(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_LSystemTree(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_KochCurve(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_YourMessageHere(gui,machineConfiguration,translator));
+	  imageGenerators.add(new Generator_Dragon(gui,machineConfiguration,translator));
   }
   
   /**
@@ -434,9 +436,6 @@ implements ActionListener, ChangeListener {
   public void generateImage() {
 	    final JPanel panel = new JPanel(new GridBagLayout());
 
-	    final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
-	    reverse_h.setSelected(machineConfiguration.reverseForGlass);
-
 	    loadImageGenerators();
 	    String[] imageGeneratorNames = new String[imageGenerators.size()];
 	    Iterator<ImageGenerator> ici = imageGenerators.iterator();
@@ -461,18 +460,12 @@ implements ActionListener, ChangeListener {
 		  c.gridx = 1;
 		  c.gridy = y++;
 		  panel.add(options, c);
-	    c.anchor = GridBagConstraints.WEST;
-	    c.gridwidth = 1;
-	    c.gridx = 1;
-	    c.gridy = y++;
-	    panel.add(reverse_h, c);
 
 	    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	    if (result == JOptionPane.OK_OPTION) {
 	    	int choice = options.getSelectedIndex();
 	    	
 	    	ImageGenerator chosenGenerator = imageGenerators.get(choice);
-	    	machineConfiguration.reverseForGlass = reverse_h.isSelected();
 	    	machineConfiguration.saveConfig();
 
 	        String destinationFile = gui.getTempDestinationFile();
@@ -552,9 +545,6 @@ implements ActionListener, ChangeListener {
   protected boolean chooseImageConversionOptions(boolean isDXF) {
     final JPanel panel = new JPanel(new GridBagLayout());
 
-    final JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
-    reverse_h.setSelected(machineConfiguration.reverseForGlass);
-
     String[] imageConverterNames = new String[imageConverters.size()];
     Iterator<ImageConverter> ici = imageConverters.iterator();
     int i = 0;
@@ -581,16 +571,10 @@ implements ActionListener, ChangeListener {
       c.gridy = y++;
       panel.add(inputDrawStyle, c);
     }
-    c.anchor = GridBagConstraints.WEST;
-    c.gridwidth = 1;
-    c.gridx = 1;
-    c.gridy = y++;
-    panel.add(reverse_h, c);
 
     int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
       setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
-      machineConfiguration.reverseForGlass = reverse_h.isSelected();
       machineConfiguration.saveConfig();
 
       // Force update of graphics layout.
