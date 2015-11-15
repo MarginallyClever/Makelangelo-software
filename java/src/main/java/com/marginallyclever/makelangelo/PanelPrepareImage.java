@@ -79,6 +79,7 @@ import com.marginallyclever.generators.Generator_HilbertCurve;
 import com.marginallyclever.generators.Generator_KochCurve;
 import com.marginallyclever.generators.Generator_LSystemTree;
 import com.marginallyclever.generators.Generator_YourMessageHere;
+import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.settings;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,6 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class PanelJogMotors
 extends JPanel
@@ -41,11 +45,11 @@ implements ActionListener {
 	
 	    buttonAneg = new JButton(_translator.get("JogIn"));
 	    buttonApos = new JButton(_translator.get("JogOut"));
-	    m1i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.invertMotor1);
+	    m1i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.isMotor1Backwards());
 	
 	    buttonBneg = new JButton(_translator.get("JogIn"));
 	    buttonBpos = new JButton(_translator.get("JogOut"));
-	    m2i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.invertMotor2);
+	    m2i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.isMotor2Backwards());
 	
 	    c.gridx = 0;
 	    c.gridy = 0;
@@ -93,8 +97,8 @@ implements ActionListener {
       if (subject == buttonBneg) gui.sendLineToRobot("D00 R-400");
     
       if (subject == m1i || subject == m2i) {
-        machineConfiguration.invertMotor1 = m1i.isSelected();
-        machineConfiguration.invertMotor2 = m2i.isSelected();
+        machineConfiguration.setMotor1Backwards( m1i.isSelected() );
+        machineConfiguration.setMotor2Backwards( m2i.isSelected() );
         machineConfiguration.saveConfig();
         gui.sendConfig();
       }

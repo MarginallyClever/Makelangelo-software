@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.settings;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -14,6 +14,10 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
  * Controls related to configuring a makelangelo machine

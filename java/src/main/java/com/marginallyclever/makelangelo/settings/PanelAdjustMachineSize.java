@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.settings;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -18,6 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class PanelAdjustMachineSize
 extends JPanel
@@ -95,8 +99,8 @@ implements ActionListener, KeyListener {
 	    c.anchor=GridBagConstraints.EAST;
 	    d.anchor=GridBagConstraints.WEST;
 
-	    mw = new JTextField(String.valueOf((machineConfiguration.limitRight-machineConfiguration.limitLeft)*10));
-	    mh = new JTextField(String.valueOf((machineConfiguration.limitTop-machineConfiguration.limitBottom)*10));
+	    mw = new JTextField(String.valueOf((machineConfiguration.getLimitRight()-machineConfiguration.getLimitLeft())*10));
+	    mh = new JTextField(String.valueOf((machineConfiguration.getLimitTop()-machineConfiguration.getLimitBottom())*10));
 	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineWidth")),c);
 	    d.gridx=1;  d.gridy=y;  p.add(mw,d);
 	    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
@@ -111,10 +115,10 @@ implements ActionListener, KeyListener {
 	    this.add(p);
 	    y=0;
 	    paperSizes = new JComboBox<>(machineConfiguration.commonPaperSizes);
-	    paperSizes.setSelectedIndex(machineConfiguration.getCurrentPaperSizeChoice( (machineConfiguration.paperRight-machineConfiguration.paperLeft)*10, (machineConfiguration.paperTop-machineConfiguration.paperBottom)*10) );
+	    paperSizes.setSelectedIndex(machineConfiguration.getCurrentPaperSizeChoice( machineConfiguration.getPaperWidth()*10, machineConfiguration.getPaperHeight()*10 ));
 	    
-	    pw = new JTextField(Integer.toString((int)((machineConfiguration.paperRight-machineConfiguration.paperLeft)*10)));
-	    ph = new JTextField(Integer.toString((int)((machineConfiguration.paperTop-machineConfiguration.paperBottom)*10)));
+	    pw = new JTextField(Double.toString(machineConfiguration.getPaperWidth()*10));
+	    ph = new JTextField(Double.toString(machineConfiguration.getPaperHeight()*10));
 	    
 	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
 	    d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
@@ -149,8 +153,8 @@ implements ActionListener, KeyListener {
 	    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
 	    c.gridwidth=1;
  
-	    mBobbin1 = new JTextField(String.valueOf(machineConfiguration.bobbinDiameterLeft * 10));
-	    mBobbin2 = new JTextField(String.valueOf(machineConfiguration.bobbinDiameterRight * 10));
+	    mBobbin1 = new JTextField(String.valueOf(machineConfiguration.getPulleyDiameterLeft() * 10));
+	    mBobbin2 = new JTextField(String.valueOf(machineConfiguration.getPulleyDiameterRight() * 10));
 	    y=2;
 	    c.weightx = 0;
 	    c.anchor=GridBagConstraints.EAST;
@@ -174,7 +178,7 @@ implements ActionListener, KeyListener {
 	    c.gridx=0;
 	    c.gridy++;
 	    JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
-	    reverse_h.setSelected(machineConfiguration.reverseForGlass);
+	    reverse_h.setSelected(machineConfiguration.isReverseForGlass());
 	    this.add(reverse_h,c);
 
 	    s = ph.getPreferredSize();
@@ -241,97 +245,12 @@ implements ActionListener, KeyListener {
           if (brd <= 0) data_is_sane = false;
 
         if (data_is_sane) {
-	    	machineConfiguration.reverseForGlass = reverse_h.isSelected();
-        	machineConfiguration.bobbinDiameterLeft = bld;
-        	machineConfiguration.bobbinDiameterRight = brd;
-          //startingPositionIndex = startPos.getSelectedIndex();
-          /*// relative to machine limits
-          switch(startingPositionIndex%3) {
-          case 0:
-            paper_left=(mwf-pwf)/2.0f;
-            paper_right=mwf-paper_left;
-            limit_left=0;
-            limit_right=mwf;
-            break;
-          case 1:
-            paper_left = -pwf/2.0f;
-            paper_right = pwf/2.0f;
-            limit_left = -mwf/2.0f;
-            limit_right = mwf/2.0f;
-            break;
-          case 2:
-            paper_right=-(mwf-pwf)/2.0f;
-            paper_left=-mwf-paper_right;
-            limit_left=-mwf;
-            limit_right=0;
-            break;
-          }
-          switch(startingPositionIndex/3) {
-          case 0:
-            paper_top=-(mhf-phf)/2;
-            paper_bottom=-mhf-paper_top;
-            limit_top=0;
-            limit_bottom=-mhf;
-            break;
-          case 1:
-            paper_top=phf/2;
-            paper_bottom=-phf/2;
-            limit_top=mhf/2;
-            limit_bottom=-mhf/2;
-            break;
-          case 2:
-            paper_bottom=(mhf-phf)/2;
-            paper_top=mhf-paper_bottom;
-            limit_top=mhf;
-            limit_bottom=0;
-            break;
-          }
-          */
-        	machineConfiguration.startingPositionIndex = 4;
-          // relative to paper limits
-          switch (machineConfiguration.startingPositionIndex % 3) {
-            case 0:
-            	machineConfiguration.paperLeft = 0;
-            	machineConfiguration.paperRight = pwf;
-            	machineConfiguration.limitLeft = -(mwf - pwf) / 2.0f;
-            	machineConfiguration.limitRight = (mwf - pwf) / 2.0f + pwf;
-              break;
-            case 1:
-            	machineConfiguration.paperLeft = -pwf / 2.0f;
-            	machineConfiguration.paperRight = pwf / 2.0f;
-            	machineConfiguration.limitLeft = -mwf / 2.0f;
-            	machineConfiguration.limitRight = mwf / 2.0f;
-              break;
-            case 2:
-            	machineConfiguration.paperRight = 0;
-              machineConfiguration.paperLeft = -pwf;
-              machineConfiguration.limitLeft = -pwf - (mwf - pwf) / 2.0f;
-              machineConfiguration.limitRight = (mwf - pwf) / 2.0f;
-              break;
-          }
-          switch (machineConfiguration.startingPositionIndex / 3) {
-            case 0:
-            	machineConfiguration.paperTop = 0;
-	            machineConfiguration.paperBottom = -phf;
-	            machineConfiguration.limitTop = (mhf - phf) / 2.0f;
-	            machineConfiguration.limitBottom = -phf - (mhf - phf) / 2.0f;
-              break;
-            case 1:
-            	machineConfiguration.paperTop = phf / 2.0f;
-            	machineConfiguration.paperBottom = -phf / 2.0f;
-            	machineConfiguration.limitTop = mhf / 2.0f;
-            	machineConfiguration.limitBottom = -mhf / 2.0f;
-              break;
-            case 2:
-            	machineConfiguration.paperBottom = 0;
-            	machineConfiguration.paperTop = phf;
-              machineConfiguration.limitTop = phf + (mhf - phf) / 2.0f;
-              machineConfiguration.limitBottom = -(mhf - phf) / 2.0f;
-              break;
-          }
-
-          machineConfiguration.saveConfig();
-          gui.sendConfig();
+	    	machineConfiguration.setReverseForGlass(reverse_h.isSelected());
+	    	machineConfiguration.setPulleyDiameter(bld,brd);
+	    	machineConfiguration.setPaperSize(pwf,phf);
+	    	machineConfiguration.setMachineSize(mwf,mhf);
+        	machineConfiguration.saveConfig();
+        	gui.sendConfig();
         }
       }
 }
