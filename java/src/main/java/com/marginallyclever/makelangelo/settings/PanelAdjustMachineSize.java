@@ -177,7 +177,7 @@ implements ActionListener, KeyListener {
 	    c.anchor=GridBagConstraints.CENTER;
 	    c.gridx=0;
 	    c.gridy++;
-	    JCheckBox reverse_h = new JCheckBox(translator.get("FlipForGlass"));
+	    reverse_h = new JCheckBox(translator.get("FlipForGlass"));
 	    reverse_h.setSelected(machineConfiguration.isReverseForGlass());
 	    this.add(reverse_h,c);
 

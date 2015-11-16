@@ -51,7 +51,7 @@ implements ActionListener {
   protected PanelSelectTool panelSelectTool;
   protected PanelRegister panelRegister;
   
-  protected int dialogWidth = 350;
+  protected int dialogWidth = 450;
   protected int dialogHeight = 500;
   
   public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
