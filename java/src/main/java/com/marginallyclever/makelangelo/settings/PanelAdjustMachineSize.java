@@ -99,8 +99,12 @@ implements ActionListener, KeyListener {
 	    c.anchor=GridBagConstraints.EAST;
 	    d.anchor=GridBagConstraints.WEST;
 
-	    mw = new JTextField(String.valueOf((machineConfiguration.getLimitRight()-machineConfiguration.getLimitLeft())*10));
-	    mh = new JTextField(String.valueOf((machineConfiguration.getLimitTop()-machineConfiguration.getLimitBottom())*10));
+	    double r = machineConfiguration.getLimitRight();
+	    double l = machineConfiguration.getLimitLeft(); 
+	    double w = (r-l)*10;
+	    double h = (machineConfiguration.getLimitTop()-machineConfiguration.getLimitBottom())*10;
+	    mw = new JTextField(String.valueOf(w));
+	    mh = new JTextField(String.valueOf(h));
 	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("MachineWidth")),c);
 	    d.gridx=1;  d.gridy=y;  p.add(mw,d);
 	    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);

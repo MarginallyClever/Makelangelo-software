@@ -251,7 +251,7 @@ public final class MakelangeloRobot {
 
 		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
 
-		setStartingPositionIndex(Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex))));
+		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
 		// load each tool's settings
 		for (DrawingTool tool : tools) {
@@ -579,10 +579,10 @@ public final class MakelangeloRobot {
 	}
 	
 	public void setMachineSize(double width, double height) {
-		this.limitLeft = -width/2;
-		this.limitRight = width/2;
-		this.limitTop = height/2;
-		this.limitBottom = -height/2;
+		this.limitLeft = -width/2.0;
+		this.limitRight = width/2.0;
+		this.limitBottom = -height/2.0;
+		this.limitTop = height/2.0;
 	}
 	
 	public void setStartingPositionIndex(int index) {
