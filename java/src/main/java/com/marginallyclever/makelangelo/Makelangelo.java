@@ -346,7 +346,7 @@ implements ActionListener {
 	protected void adjustSounds() {
 		final JDialog driver = new JDialog(this.mainframe, translator.get("MenuSoundsTitle"), true);
 		driver.setLayout(new GridBagLayout());
-
+		
 		final JTextField sound_connect = new JTextField(prefs.get("sound_connect", ""), 32);
 		final JTextField sound_disconnect = new JTextField(prefs.get("sound_disconnect", ""), 32);
 		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""), 32);
@@ -460,8 +460,7 @@ implements ActionListener {
 	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
-		final JDialog driver = new JDialog(this.mainframe, translator.get("MenuGraphicsTitle"), true);
-		driver.setLayout(new GridBagLayout());
+		final JPanel driver = new JPanel(new GridBagLayout());
 
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
@@ -519,31 +518,17 @@ implements ActionListener {
 		c.gridx = 3;
 		c.gridy = y;
 		driver.add(cancel, c);
+		
+		int result = JOptionPane.showConfirmDialog(null, this.mainframe, translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (result == JOptionPane.OK_OPTION) {
+			//allowMetrics = allow_metrics.isSelected();
+			graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
+			graphics_prefs.putBoolean("antialias", antialias_on.isSelected());
+			graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
+			graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
 
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				if (subject == save) {
-					//allowMetrics = allow_metrics.isSelected();
-					graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
-					graphics_prefs.putBoolean("antialias", antialias_on.isSelected());
-					graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
-					graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
-
-					drawPanel.setShowPenUp(show_pen_up.isSelected());
-					driver.dispose();
-				}
-				if (subject == cancel) {
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		driver.getRootPane().setDefaultButton(save);
-		driver.pack();
-		driver.setVisible(true);
+			drawPanel.setShowPenUp(show_pen_up.isSelected());
+		}
 	}
 
 
