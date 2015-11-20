@@ -121,7 +121,7 @@ implements ActionListener, ChangeListener {
   private JButton openConfig;
   private JSlider paperMargin;
   private JPanel machineNumberPanel;
-  private JButton buttonOpenFile, buttonGenerate, buttonSaveFile;
+  private JButton buttonOpenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
   protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
   
   @SuppressWarnings("deprecation")
@@ -226,6 +226,11 @@ implements ActionListener, ChangeListener {
     con1.gridy++;
 
     // File conversion
+    buttonNewFile = new JButton(translator.get("MenuNewFile"));
+    buttonNewFile.addActionListener(this);
+    panel.add(buttonNewFile,con1);
+    con1.gridy++;
+    
     buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
     buttonOpenFile.addActionListener(this);
     panel.add(buttonOpenFile,con1);
@@ -310,6 +315,10 @@ implements ActionListener, ChangeListener {
       return;
     }
     
+    if (subject == buttonNewFile ) {
+    	newFile();
+    	return;
+    }
     if (subject == buttonOpenFile) {
       openFileDialog();
       return;
@@ -407,6 +416,13 @@ implements ActionListener, ChangeListener {
     buttonHalt.setEnabled(isConnected && isRunning);
   }
 
+  public void newFile() {
+	  gui.gCode.reset();
+	  gui.updateMenuBar();
+	  gui.gCode.changed=true;
+	  gui.updateMachineConfig();
+  }
+  
   // creates a file open dialog. If you don't cancel it opens that file.
   public void openFileDialog() {
     // Note: source for ExampleFileFilter can be found in FileChooserDemo,

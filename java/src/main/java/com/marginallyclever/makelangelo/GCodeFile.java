@@ -29,6 +29,19 @@ public class GCodeFile {
   public boolean changed = false;
 
 
+  public void reset() {
+	  linesTotal = 0;
+	  linesProcessed = 0;
+	  fileOpened = false;
+	  lines = new ArrayList<String>();
+	  estimated_time = 0;
+	  estimated_length = 0;
+	  estimate_count = 0;
+	  scale = 1.0f;
+	  feed_rate = 1.0f;
+	  changed = false;
+  }
+  
   // returns angle of dy/dx as a value from 0...2PI
   private double atan3(double dy, double dx) {
     double a = Math.atan2(dy, dx);
