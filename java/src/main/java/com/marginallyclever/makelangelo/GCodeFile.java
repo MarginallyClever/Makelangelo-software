@@ -20,7 +20,7 @@ public class GCodeFile {
   public int linesTotal = 0;
   public int linesProcessed = 0;
   public boolean fileOpened = false;
-  public ArrayList<String> lines;
+  public ArrayList<String> lines = new ArrayList<String>();
   public float estimated_time = 0;
   public float estimated_length = 0;
   public int estimate_count = 0;

@@ -99,6 +99,9 @@ public final class MakelangeloRobot {
 	 * </pre>
 	 */
 	protected int startingPositionIndex;
+	// TODO leave the origin at the center of the paper and make a G92 (teleport) call when at the starting position
+	protected float startingPositionX;
+	protected float startingPositionY;
 
 	// TODO a way for users to create different tools for each machine
 	private List<DrawingTool> tools;
@@ -138,9 +141,6 @@ public final class MakelangeloRobot {
 		paperMargin = 0.9;
 
 		maxFeedRate=11000;
-		startingPositionIndex = 4;
-		currentToolIndex = 0;
-		maxFeedRate = 11000;
 		pulleyDiameterLeft=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 		pulleyDiameterRight=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
@@ -149,6 +149,8 @@ public final class MakelangeloRobot {
 
 		reverseForGlass=false;
 		areMotorsBackwards=false;
+
+		startingPositionIndex = 4;
 		
 		tools = new ArrayList<>();
 		tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, translator, this));
@@ -157,6 +159,7 @@ public final class MakelangeloRobot {
 		tools.add(new DrawingTool_Pen("Pen (blue)", 3, gui, translator, this));
 		tools.add(new DrawingTool_LED(gui, translator, this));
 		tools.add(new DrawingTool_Spraypaint(gui, translator, this));
+		currentToolIndex = 0;
 
 		// which configurations are available?
 		try {

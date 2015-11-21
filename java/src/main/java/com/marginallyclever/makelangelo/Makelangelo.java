@@ -90,8 +90,6 @@ import com.marginallyclever.communications.SerialConnectionManager;
  */
 public final class Makelangelo
 implements ActionListener {
-
-	// Java required?
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -130,7 +128,7 @@ implements ActionListener {
 	private Writer logToFile;
 	
 	// main window layout
-	private Splitter split_left_right;
+	private Splitter splitLeftRight;
 	// opengl window
 	private DrawPanel drawPanel;
 	// context sensitive menu
@@ -1135,12 +1133,12 @@ implements ActionListener {
 		contextMenu.addTab(translator.get("MenuLog"), null, logPanel, null);
 
 		// major layout
-		split_left_right = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		split_left_right.add(drawPanel);
-		split_left_right.add(contextMenu);
+		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+		splitLeftRight.add(drawPanel);
+		splitLeftRight.add(contextMenu);
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);
-		contentPane.add(split_left_right, BorderLayout.CENTER);
+		contentPane.add(splitLeftRight, BorderLayout.CENTER);
 
 		return contentPane;
 	}

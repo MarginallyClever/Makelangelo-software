@@ -24,7 +24,7 @@
 	<string>
 		<key>CouldNotFind</key>
 		<value>Could not find </value>
-		<hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>ClickAndDrag</key>
@@ -100,12 +100,12 @@
 	<string>
 		<key>ConnectingTo</key>
 		<value>Connecting to </value>
-		<hint>status message.  keep the space at the end.</hint>
+		<hint>status message. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortNotConfigured</key>
 		<value>Port could not be configured: </value>
-		<hint>status message.  keep the space at the end.</hint>
+		<hint>status message. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortOpened</key>
@@ -137,13 +137,13 @@
 	<string>
 		<key>EstimatedTime</key>
 		<value>Estimated draw time: </value>
-		<hint>status message.  keep the space at the end.</hint>
+		<hint>status message. keep the space at the end.</hint>
 	</string>
 
 	<string>
 		<key>FileNotOpened</key>
 		<value>File could not be opened: </value>
-		<hint>status message.  keep the space at the end.</hint>
+		<hint>status message. keep the space at the end.</hint>
 	</string>
 
 	<string>
@@ -186,7 +186,7 @@
 	<string>
 		<key>Failed</key>
 		<value>Failed: </value>
-		<hint>status update.  keep the space at the end.</hint>
+		<hint>status update. keep the space at the end.</hint>
 	</string>
 
 	<string>
@@ -198,7 +198,7 @@
 	<string>
 		<key>OpeningFile</key>
 		<value>Opening </value>
-		<hint>status update.  keep the space at the end.</hint>
+		<hint>status update. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>UnknownFileType</key>
@@ -298,12 +298,12 @@
 	<string>
 		<key>ChangeToolPrefix</key>
 		<value>Please prepare </value>
-		<hint>tool change prompt.  keep the space at the end.</hint>
+		<hint>tool change prompt. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>ChangeToolPostfix</key>
 		<value> and click any button to continue.</value>
-		<hint>tool change prompt.  keep the space at the start.</hint>
+		<hint>tool change prompt. keep the space at the start.</hint>
 	</string>
 
 	<string>
@@ -419,7 +419,8 @@
 	</string>
 	<string>
 		<key>UpdateCheckFailed</key>
-		<value>Sorry, I failed.  Please visit http://www.marginallyclever.com/ to check yourself.</value>
+		<value>Sorry, I failed. Please visit http://www.marginallyclever.com/
+			to check yourself.</value>
 		<hint>check for update dialog</hint>
 	</string>
 
@@ -521,11 +522,6 @@
 	<string>
 		<key>MenuGCODE</key>
 		<value>Convert</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuHilbertCurve</key>
-		<value>Hilbert curve fractal</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -744,8 +740,9 @@
 
 	<string>
 		<key>SharePromo</key>
-		<value>Share it on twitter to @MarginallyC to see what others have created.</value>
-		<hint>Your drawing is finished.  Share it</hint>
+		<value>Share it on twitter to @MarginallyC to see what others have
+			created.</value>
+		<hint>Your drawing is finished. Share it</hint>
 	</string>
 
 	<string>
@@ -766,22 +763,23 @@
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 
-  <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
-  used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
-  one big CDATA html blob. -->
-  <string>
-    <key>AboutHTMLBeforeVersionNumber</key>
-    <value><![CDATA[
+	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
+		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
+		the about message dialog using the version string. This is why there is not 
+		one big CDATA html blob. -->
+	<string>
+		<key>AboutHTMLBeforeVersionNumber</key>
+		<value><![CDATA[
     <html>
       <body>
         <h1>Makelangelo ]]>
-    </value>
-    <hint>HTML for About Dialog</hint>
-  </string>
+		</value>
+		<hint>HTML for About Dialog</hint>
+	</string>
 
-  <string>
-    <key>AboutHTMLAfterVersionNumber</key>
-    <value><![CDATA[
+	<string>
+		<key>AboutHTMLAfterVersionNumber</key>
+		<value><![CDATA[
 </h1>
       <h3>
         <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
@@ -802,9 +800,9 @@
       </body>
     </html>
     ]]>
-    </value>
-    <hint>HTML for About Dialog</hint>
-  </string>
+		</value>
+		<hint>HTML for About Dialog</hint>
+	</string>
 
 	<string>
 		<key>MenuSettingsRegister</key>
@@ -823,7 +821,7 @@
 		<value>Create an account</value>
 		<hint>Machine Configuration > Register robot</hint>
 	</string>
-	
+
 	<string>
 		<key>PleaseRegisterUsername</key>
 		<value>User name</value>
@@ -859,5 +857,23 @@
 		<value>New</value>
 		<hint></hint>
 	</string>
-	
+
+	<string>
+		<key>LSystemTreeName</key>
+		<value>L System Tree Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>KochCurveName</key>
+		<value>Koch Curve Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>DragonName</key>
+		<value>Dragon Fractal</value>
+		<hint></hint>
+	</string>
+
 </language>
