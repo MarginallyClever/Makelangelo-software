@@ -79,6 +79,7 @@ public final class MakelangeloRobot {
 	protected boolean reverseForGlass;
 	protected boolean areMotorsBackwards;
 	
+	protected boolean isRegistered = false;
 	protected boolean shouldSignName = true;
 
 	/**
@@ -246,8 +247,8 @@ public final class MakelangeloRobot {
 		paperTop=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 
-		invertMotor1=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", invertMotor1?"true":"false"));
-		invertMotor2=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", invertMotor2?"true":"false"));
+		invertMotor1=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(invertMotor1)));
+		invertMotor2=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(invertMotor2)));
 
 		pulleyDiameterLeft=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameterLeft)));
 		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));
@@ -262,8 +263,9 @@ public final class MakelangeloRobot {
 		}
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", reverseForGlass ? "true" : "false"));
+		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
 		setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
+		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
 	}
 
 
@@ -339,6 +341,8 @@ public final class MakelangeloRobot {
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
+		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered));
+		
 	}
 
 
@@ -660,5 +664,13 @@ public final class MakelangeloRobot {
 	}
 	public void setMotor2Backwards(boolean backwards) {
 		invertMotor2 = backwards;
+	}
+	
+	public boolean isRegistered() {
+		return isRegistered;
+	}
+
+	public void setRegistered(boolean isRegistered) {
+		this.isRegistered = isRegistered;
 	}
 }
