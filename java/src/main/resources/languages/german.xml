@@ -6,36 +6,39 @@
     <author>https://www.fiverr.com/erminho</author>
   </meta>
 
-  <string>
-    <key>Abbrechen</key>
+	<string>
+    <key>Cancel</key>
     <value>Abbrechen</value>
-    <hint>verwendet in vielen Orten</hint>
+    <hint>used in many places</hint>
   </string>
   <string>
-    <key>Speichern</key>
+    <key>Save</key>
     <value>Speichern</value>
-    <hint>verwendet in vielen Orten</hint>
+    <hint>used in many places</hint>
   </string>
+  
   <string>
     <key>Load</key>
     <value>Load</value>
-    <hint>verwendet in vielen Orten</hint>
+    <hint>used in many places</hint>
   </string>
   <string>
     <key>CouldNotFind</key>
     <value>konnte nicht gefunden</value>
     <hint>wie in "konnte nicht gefunden FILEX". Halten Sie die Leerzeichen am Ende</hint>
   </string>
+  
   <string>
-    <key>Maschinenbreite</key>
+    <key>MachineWidth</key>
     <value> Maschine breite</value>
     <hint>Die Maschine einstellen Einstellungen</hint>
   </string>
   <string>
-    <key>MachineHohe</key>
+    <key>MachineHeight</key>
     <value>Maschinenhöhe</value>
     <hint>Die Maschine einstellen Einstellungen</hint>
   </string>
+  
   <string>
     <key>PaperWidth</key>
     <value>Papierbreite</value>
@@ -57,48 +60,50 @@
     <hint>Die Maschine einstellen Einstellungen</hint>
   </string>
   <string>
-    <key>Tooltypes</key>
+    <key>ToolType</key>
     <value> Werkzeug Typ</value>
     <hint>Tool settings</hint>
   </string>
+  
+	<string>
+		<key>PaperSize</key>
+		<value>Papier größe</value>
+		<hint>machine size control panel</hint>
+	</string>
+	
   <string>
     <key>AdjustPulleySize</key>
     <value>Einstellung Riemenscheibe size</value>
     <hint>die verstellbaren Riemenscheiben</hint>
   </string>
   <string>
-    <key>Links</key>
+    <key>Left</key>
     <value>Links</value>
-    <hint>verwendet in vielen Orten</hint>
+    <hint>used in many places</hint>
   </string>
   <string>
-    <key>Rechts</key>
+    <key>Right</key>
     <value>Rechts</value>
-    <hint>verwendet in vielen Orten</hint>
+    <hint>used in many places</hint>
   </string>
   <string>
-    <key>Durchmesser</key>
-    <value>Durchmesser</value>
-    <hint>die verstellbaren Riemenscheiben</hint>
-  </string>
-  <string>
-    <key>Millimeter</key>
+    <key>Millimeters</key>
     <value> mm</value>
     <hint></hint>
   </string>
 
   <string>
-    <key>ConnectierenZum</key>
+    <key>ConnectingTo</key>
     <value> Verbinden </value>
-    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+    <hint>status message. keep the space at the end.</hint>
   </string>
   <string>
-    <key>PortNichtKonfiguriert</key>
+    <key>PortNotConfigured</key>
     <value> Port konnte nicht konfiguriert werden: </value>
-    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+    <hint>status message. keep the space at the end.</hint>
   </string>
   <string>
-    <key>PortOffnung</key>
+    <key>PortOpened</key>
     <value> Port geöffnet.</value>
     <hint>Status Meldung</hint>
   </string>
@@ -114,26 +119,26 @@
   </string>
 
   <string>
-    <key>Liniensegmente</key>
+    <key>LineSegments</key>
     <value> Liniensegmente.</value>
     <hint>Status Meldung</hint>
   </string>
   <string>
-    <key>Zentimeter</key>
+    <key>Centimeters</key>
     <value> cm</value>
     <hint></hint>
   </string>
 
   <string>
-    <key>zeichnenZeit</key>
+    <key>EstimatedTime</key>
     <value> Geschätzte zeichnen Zeit: </value>
-    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+    <hint>status message. keep the space at the end.</hint>
   </string>
 
   <string>
     <key>FileNotOpened</key>
     <value>Datei konnte nicht geöffnet werden: </value>
-    <hint>Status Meldung. Halten Sie das Leerzeichen am Ende</hint>
+    <hint>status message. keep the space at the end.</hint>
   </string>
 
   <string>
@@ -148,19 +153,9 @@
   </string>
 
   <string>
-    <key>Abbrechen</key>
-    <value>Abbrechen</value>
-    <hint>verwendet in vielen Orten</hint>
-  </string>
-  <string>
-    <key>ANFANG</key>
-    <value>ANFANG</value>
-    <hint>Wie in "Zeichnung starten"</hint>
-  </string>
-  <string>
-    <key>Speichern</key>
-    <value>Speichern</value>
-    <hint>verwendet in vielen Orten</hint>
+    <key>Start</key>
+    <value>Start</value>
+    <hint>Wie in "Start"</hint>
   </string>
 
   <string>
@@ -169,22 +164,22 @@
     <hint>Konvertierungsoptionen</hint>
   </string>
   <string>
-    <key>konvertieren</key>
+    <key>Converting</key>
     <value> Konvertieren</value>
     <hint>Status aktualisieren</hint>
   </string>
   <string>
-    <key>Fertig</key>
+    <key>Finished</key>
     <value>erledigt</value>
     <hint>Status aktualisieren</hint>
   </string>
   <string>
-    <key>abgebrochen</key>
-    <value>abgebrochen</value>
+    <key>Cancelled</key>
+    <value>Abgebrochen</value>
     <hint>Status aktualisieren</hint>
   </string>
   <string>
-    <key>FEHLGESCHLAGEN</key>
+    <key>Failed</key>
     <value>fehlgeschlagen: </value>
     <hint>Status aktualisieren. Halten Sie das Leerzeichen am Ende</hint>
   </string>
@@ -230,7 +225,7 @@
   <string>
     <key>MenuSoundsTitle</key>
     <value>Sounds</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuSoundsConnect</key>
@@ -256,7 +251,7 @@
   <string>
     <key>MenuGraphicsTitle</key>
     <value>Grafik</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuGraphicsPenUp</key>
@@ -279,10 +274,15 @@
     <hint>Graphics Settings Dialog</hint>
   </string>
 
+	<string>
+		<key>MenuResetMachinePreferences</key>
+		<value>Einstellungen zurücksetzen</value>
+		<hint>Preferences menu</hint>
+	</string>
   <string>
     <key>MenuLanguageTitle</key>
     <value>Sprache</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
@@ -304,7 +304,7 @@
   <string>
     <key>StartAt</key>
     <value>Start bei</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>StartAtLine</key>
@@ -315,22 +315,22 @@
   <string>
     <key>Pause</key>
     <value>Pause</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
-    <key>Beenden der Pause</key>
+    <key>Unpause</key>
     <value> Beenden der Pause</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>SetHome</key>
-    <value> SET HOME</value>
+    <value>eingestellt Hause</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
     <key>GoHome</key>
-    <value>GO HOME</value>
+    <value>geh nach Hause</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
 
@@ -340,51 +340,51 @@
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
-    <key>unten</key>
+    <key>Bottom</key>
     <value>unten</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
-    <key>Links</key>
+    <key>Left</key>
     <value>Links</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
-    <key>Rechts</key>
+    <key>Right</key>
     <value>Rechts</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
-    <key>stifthoch</key>
-    <value> PEN UP</value>
+    <key>PenUp</key>
+    <value>einsperren</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
-    <key>stiftrunter</key>
-    <value> PEN DOWN</value>
+    <key>PenDown</key>
+    <value>Stift nach unten</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
 
   <string>
     <key>Set</key>
-    <value> Set</value>
+    <value>Set</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
     <key>Speed</key>
-    <value> Geschwindigkeit:</value>
+    <value>Geschwindigkeit:</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
   <string>
     <key>Rate</key>
-    <value> Schritte/min</value>
+    <value>Schritte/min</value>
     <hint>Handbuch fahren Dialog</hint>
   </string>
 
   <string>
     <key>JogMotors</key>
-    <value> Jog Motoren</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <value>Jog Motoren</value>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>JogIn</key>
@@ -408,167 +408,168 @@
     <hint>Auf Update überprüfen Dialog</hint>
   </string>
   <string>
-    <key>Aktuell</key>
+    <key>UpToDate</key>
     <value> dieser Software ist auf dem neuesten Stand.</value>
     <hint>Auf Update überprüfen Dialog</hint>
   </string>
   <string>
     <key>UpdateCheckFailed</key>
-    <value>Sorry, ich nicht. Bitte besuchen Http://www.marginallyclever.com/, selbst überprüfen.</value>
+    <value>Sorry, ich nicht. Bitte besuchen Http://www.marginallyclever.com/,
+selbst überprüfen.</value>
     <hint>Auf Update überprüfen Dialog</hint>
   </string>
 
   <string>
-    <key>Senden</key>
+    <key>Send</key>
     <value>Senden</value>
     <hint>Antrieb manuell Dialog</hint>
   </string>
   <string>
     <key>TitleNotConnected</key>
     <value> nicht angeschlossen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuMakelangelo</key>
     <value>Makelangelo</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
-    <key>Voreinstellungen</key>
+    <key>MenuPreferences</key>
     <value>Einstellungen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
+  </string>
+  <string>
+    <key>MenuLog</key>
+    <value>Logdatei</value>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuUpdate</key>
     <value> Auf Aktualisierungen prüfen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuAbout</key>
     <value>Info</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuQuit</key>
     <value>Quit</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuConnect</key>
     <value>verbinden</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuRescan</key>
     <value>Rescan</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuDisconnect</key>
     <value> Trennen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuLoadMachineConfig</key>
     <value> laden Einstellungen für...</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuSettings</key>
     <value>Einstellungen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuSettingsMachine</key>
     <value> Die Maschine einstellen &amp; Paper size</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuAdjustPulleys</key>
     <value>Einstellung Riemenscheibe size</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuJogMotors</key>
     <value> Jog Motoren</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuSelectTool</key>
     <value>Wählen Sie aktive Werkzeug</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuAdjustTool</key>
     <value>Einstellen aktive Werkzeug</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuGCODE</key>
     <value>GCODE</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
-  </string>
-  <string>
-    <key>MenuHilbertCurve</key>
-    <value> Hilbert Curve</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuTextToGCODE</key>
     <value>Text zu GCODE</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuConvertImage</key>
     <value>Letzte öffnen...</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuOpenFile</key>
     <value> Datei öffnen...</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>MenuSaveGCODEAs</key>
     <value>SAVE GCODE als...</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuDraw</key>
     <value>Zeichnen</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>Halt</key>
     <value>Halt</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
 
   <string>
     <key>MenuPreview</key>
     <value>Vorschau</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>ZoomIn</key>
     <value> Zoom +</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>ZoomOut</key>
     <value> Zoom -</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>ZoomFit</key>
     <value> Zoom auf Fit</value>
-    <hint>Menü oder Dialogfeld Titel</hint>
+    <hint>menu or dialog title</hint>
   </string>
   <string>
     <key>mmNotice</key>
@@ -750,30 +751,38 @@
     <hint>Time Machine wird Zeichnung</hint>
   </string>
 
-  <!-- FIXME Translate AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber to German.
-Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
-used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
-one big CDATA html blob. -->
-  <string>
-    <key>AboutHTMLBeforeVersionNumber</key>
-    <value><![CDATA[
+	<string>
+		<key>DisengageMotors</key>
+		<value>Disengage</value>
+		<hint>Disengage Button on manual driving dialog</hint>
+	</string>
+
+	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
+		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
+		the about message dialog using the version string. This is why there is not
+		one big CDATA html blob. -->
+	<string>
+		<key>AboutHTMLBeforeVersionNumber</key>
+		<value><![CDATA[
     <html>
       <body>
         <h1>Makelangelo ]]>
-    </value>
-    <hint>HTML for About Dialog</hint>
-  </string>
+		</value>
+		<hint>HTML for About Dialog</hint>
+	</string>
 
-  <string>
-    <key>AboutHTMLAfterVersionNumber</key>
-    <value><![CDATA[
+	<string>
+		<key>AboutHTMLAfterVersionNumber</key>
+		<value><![CDATA[
 </h1>
       <h3>
         <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
       </h3>
         <p>
           Created by Dan Royer (<a href="mailto:dan@marginallyclever.com">dan@marginallyclever.com</a>).<br>
-          Additional contributions by Joseph Cottam and <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>.
+          Additional contributions by Joseph Cottam,
+           <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>,
+            and Mark Raynsford.
         </p>
         <br>
         <p>
@@ -787,8 +796,92 @@ one big CDATA html blob. -->
       </body>
     </html>
     ]]>
-    </value>
-    <hint>HTML for About Dialog</hint>
-  </string>
+        </value>
+        <hint>HTML for About Dialog</hint>
+    </string>
+
+	<string>
+		<key>MenuSettingsRegister</key>
+		<value>Register</value>
+		<hint>Machine Configuration > Register tab title</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegister</key>
+		<value><![CDATA[<p>Register your robot with your Marginally Clever user account to Unlock features and show your support.</p>]]></value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterCreateAccountButton</key>
+		<value>Create an account</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterUsername</key>
+		<value>User name</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterPassword</key>
+		<value>Password</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>MachineNumber</key>
+		<value>Machine #</value>
+		<hint>Prepare image panel</hint>
+	</string>
+
+	<string>
+		<key>MenuResetMachinePreferencesWarning</key>
+		<value>Are you sure you want to erase all your preferences?</value>
+		<hint>Makelangelo > preferences > reset preferences</hint>
+	</string>
+
+	<string>
+		<key>MenuGenerate</key>
+		<value>Generate art</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>MenuNewFile</key>
+		<value>New</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>LSystemTreeName</key>
+		<value>L System Tree Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>KochCurveName</key>
+		<value>Koch Curve Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>DragonName</key>
+		<value>Dragon Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ClickAndDrag</key>
+		<value>Click &amp; Drag</value>
+		<hint>live drawing panel</hint>
+	</string>
+	<string>
+		<key>configureMachine</key>
+		<value>Settings</value>
+		<hint>open machine settings dialog</hint>
+	</string>
+  
 </language>
 

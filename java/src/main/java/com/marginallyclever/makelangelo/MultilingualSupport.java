@@ -33,7 +33,7 @@ public final class MultilingualSupport {
   /**
    * Working directory. This represents the directory where the java executable launched the jar from.
    */
-  public static final String WORKING_DIRECTORY = System.getProperty("user.dir") + File.separator + "languages";
+  public static final String WORKING_DIRECTORY = System.getProperty("user.dir")+ File.separator + "src"+ File.separator + "main"+ File.separator + "resources"+ File.separator + "languages";
 
 
   /**

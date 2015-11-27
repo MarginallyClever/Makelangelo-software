@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -299,6 +300,13 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     final boolean doesThisLanguageFileContainAllTheDefaultKeys = thisLanguageFilesKeys.containsAll(defaultLanguageFilesKeys);
     if (!doesThisLanguageFileContainAllTheDefaultKeys) {
       log.error("{} does not contain all the default translation keys.", thisLanguageFilesName);
+      Iterator<String> k = defaultLanguageFilesKeys.iterator();
+      while(k.hasNext()) {
+    	  String s = k.next();
+    	  if(!thisLanguageFilesKeys.contains(s)) {
+    		  log.error("missing " + s);
+    	  }
+      }
     } else {
       log.error("{} contains all the default translation keys.", thisLanguageFilesName);
     }
