@@ -308,7 +308,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     	  }
       }
     } else {
-      log.error("{} contains all the default translation keys.", thisLanguageFilesName);
+      log.info("{} contains all the default translation keys.", thisLanguageFilesName);
     }
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }

@@ -783,5 +783,106 @@ one big CDATA html blob. -->
 		<value>On</value>
 		<hint>Spraypaint tool</hint>
 	</string>
+	<string>
+		<key>PulseLineName</key>
+		<value>Pulse Line</value>
+		<hint>Pulse Line generator</hint>
+	</string>
+	<string>
+		<key>ZigZagName</key>
+		<value>Big zig zag</value>
+		<hint>Zig Zag generator</hint>
+	</string>
+	<string>
+		<key>YourMsgHereName</key>
+		<value>Your message here</value>
+		<hint>Your message here generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveSize</key>
+		<value>Size</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>HilbertCurveOrder</key>
+		<value>Order</value>
+		<hint>Hilbert Curve generator</hint>
+	</string>
+	
+	<string>
+		<key>spraypaintToolLiftSpeed</key>
+		<value>On/off speed</value>
+		<hint>Spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolTest</key>
+		<value>Make a dot</value>
+		<hint>Spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolDiameter</key>
+		<value>Dot size</value>
+		<hint>Spraypaint tool</hint>
+	</string>
+	<string>
+		<key>spraypaintToolMaxFeedRate</key>
+		<value>Max feed rate</value>
+		<hint>Spraypaint tool</hint>
+	</string>
+	
+	<string>
+		<key>voronoiStipplingName</key>
+		<value>Voronoi stipples</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingCellCount</key>
+		<value>Number of Cells</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingGenCount</key>
+		<value>Number of Generations</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMax</key>
+		<value>Max dot size</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+	<string>
+		<key>voronoiStipplingDotMin</key>
+		<value>Min dot size</value>
+		<hint>voronoi stippling generator</hint>
+	</string>
+
+	<string>
+		<key>BoxGeneratorName</key>
+		<value>Boxxy</value>
+		<hint>Boxxy generator</hint>
+	</string>
+	<string>
+		<key>CrosshatchName</key>
+		<value>Crosshatch</value>
+		<hint>Crosshatch generator</hint>
+	</string>
+
+	<string>
+		<key>StatusSoFar</key>
+		<value>Time running: </value>
+		<hint>time machine has been drawing</hint>
+	</string>
+
+	<string>
+		<key>StatusRemaining</key>
+		<value>Estimated time left: </value>
+		<hint>time machine will be drawing</hint>
+	</string>
+	<string>
+		<key>penToolAdjust</key>
+		<value>Pen</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	
   
 </language>
