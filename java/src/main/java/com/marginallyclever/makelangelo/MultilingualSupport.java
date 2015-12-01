@@ -6,16 +6,28 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +45,7 @@ public final class MultilingualSupport {
   /**
    * Working directory. This represents the directory where the java executable launched the jar from.
    */
-  public static final String WORKING_DIRECTORY = System.getProperty("user.dir")+ File.separator + "src"+ File.separator + "main"+ File.separator + "resources"+ File.separator + "languages";
+  public static final String WORKING_DIRECTORY = /*File.separator + */"languages"/*+File.separator*/;
 
 
   /**
@@ -76,7 +88,11 @@ public final class MultilingualSupport {
     } catch (IllegalStateException e) {
       logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), DEFAULT_LANGUAGE, WORKING_DIRECTORY);
       final LanguageContainer languageContainer  = new LanguageContainer();
-      try (InputStream s = getClass().getClassLoader().getResourceAsStream(MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath())) {
+      String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
+      System.out.println("default path requested: "+path);
+      URL pathFound = getClass().getClassLoader().getResource(path);
+      System.out.println("path found: "+pathFound);
+      try (InputStream s = pathFound.openStream()) {
         languageContainer.loadFromInputStream(s);
       } catch (IOException ie) {
         logger.error("{}", ie.getMessage());
@@ -129,57 +145,70 @@ public final class MultilingualSupport {
 
   /**
    * Scan folder for language files.
+   * @see http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
    * @throws IllegalStateException No language files found
    */
-  public void loadLanguages() throws IllegalStateException {
-    final File f = new File(WORKING_DIRECTORY);
-    final File[] allLanguageFiles = f.listFiles();
-    checkLanguagesDirectoryExists(allLanguageFiles);
-    createLanguageContainersFromLanguageFiles(allLanguageFiles);
-  }
+  	public void loadLanguages() throws IllegalStateException {
+  		// iterate and find all language files
+  		URI uri = null;
+		try {
+			uri = getClass().getClassLoader().getResource(WORKING_DIRECTORY).toURI();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  	    Path myPath;
+  	    if (uri.getScheme().equals("jar")) {
+  	        FileSystem fileSystem = null;
+			try {
+				fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+  	        myPath = fileSystem.getPath(WORKING_DIRECTORY);
+  	    } else {
+  	        myPath = Paths.get(uri);
+  	    }
+  	    Stream<Path> walk = null;
+		try {
+			walk = Files.walk(myPath, 1);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-  /**
-   * Checks to make sure the language folder exists.
-   * @param allLanguageFiles - Array of all language files in the user's working directory.
-   * @throws IllegalStateException No language files found
-   */
-  private void checkLanguagesDirectoryExists(File[] allLanguageFiles) throws IllegalStateException {
-    final IllegalStateException illegalStateException = new IllegalStateException("No language files found!");
-    if (allLanguageFiles == null) {
-      throw illegalStateException;
-    }
-    if (allLanguageFiles.length <= 0) {
-      throw illegalStateException;
-    }
-  }
-
-  /**
-   * scan a list of files, find all XML files, try to load them as languages.
-   *
-   * @param all_files the list of files
-   */
-  private void createLanguageContainersFromLanguageFiles(File[] all_files) {
-    LanguageContainer lang;
-    for (int i = 0; i < all_files.length; ++i) {
-      if (all_files[i].isHidden()) {
-        continue;
-      }
-      if (all_files[i].isDirectory()) {
-        continue;
-      }
-      // get extension
-      int j = all_files[i].getPath().lastIndexOf('.');
-      if (j <= 0) {
-        continue;  // no extension
-      }
-      if (all_files[i].getPath().substring(j + 1).toLowerCase().equals("xml") == false) {
-        continue;  // only .XML or .xml files
-      }
-      lang = new LanguageContainer();
-      lang.loadFromString(all_files[i].getAbsolutePath());
-      languages.put(lang.getName(), lang);
-    }
-  }
+		int found=0;
+		Iterator<Path> it = walk.iterator();
+  	    while( it.hasNext() ) {
+  	    	Path p = it.next();
+  	    	String name = p.toString();
+  	    	//System.out.println("testing "+name);
+  	    	//if( f.isDirectory() || f.isHidden() ) continue;
+  	    	String ext = FilenameUtils.getExtension(name).toLowerCase(); 
+  	    	if( ext.equals("xml") == false ) {
+  	    		continue;
+  	    	}
+  	    	
+  	    	// found an XML file in the /languages folder.  Good sign!
+  	    	++found;
+  	    	name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+  	        //System.out.println("found: "+name);
+  	        
+  	    	InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
+  	    	//if( stream != null ) 
+  	    	{
+  	  	    	LanguageContainer lang = new LanguageContainer();
+				lang.loadFromInputStream(stream);
+				languages.put(lang.getName(), lang);
+  	    	}
+  	    }
+    	//System.out.println("total found: "+found);
+  	    
+  	    if(found==0) {
+  	    	throw new IllegalStateException();
+  	    }
+  	}
 
   /**
    * Display a dialog box of available languages and let the user select their preference.
