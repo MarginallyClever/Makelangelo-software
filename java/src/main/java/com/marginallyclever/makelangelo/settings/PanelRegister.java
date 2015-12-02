@@ -110,10 +110,8 @@ implements ActionListener {
 				uri = new URI("https://www.marginallyclever.com/shop/index.php?main_page=login");
 	    		java.awt.Desktop.getDesktop().browse(uri);
 			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
     	}

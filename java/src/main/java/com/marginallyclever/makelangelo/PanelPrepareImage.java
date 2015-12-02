@@ -263,7 +263,7 @@ implements ActionListener, ChangeListener {
       buttonStartAt.addActionListener(this);
       buttonPause.addActionListener(this);
       buttonHalt.addActionListener(this);
-  panel.add(drivePanel,con1);
+      panel.add(drivePanel,con1);
     con1.gridy++;
     
     con1.weighty=1;
@@ -271,7 +271,7 @@ implements ActionListener, ChangeListener {
   }
 
   public void updateMachineNumberPanel() {
-    machineNumberPanel.removeAll();
+      machineNumberPanel.removeAll();
       machineConfigurations = getAnyMachineConfigurations();
       machineChoices = new JComboBox<>(machineConfigurations);
       try {

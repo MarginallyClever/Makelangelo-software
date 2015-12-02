@@ -37,8 +37,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 
     BufferedImage dest = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
 
-    //float [] scales = new float[radius];
-    // TODO fill scales[] with a gaussian curve
+    // scales could be filled with a gaussian curve: float[] scales = new float[radius];
     float[] scales = new float[3];
     scales[0] = 1.0f / 4.0f;
     scales[1] = 1.0f / 2.0f;

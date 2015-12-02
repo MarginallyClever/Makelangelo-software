@@ -344,7 +344,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
     mainGUI.getDrawPanel().setDecorator(this);
 
     // resize & flip as needed
-    // TODO just a note that changing 250/250 here changes the number of dots a lot.
+    // Note that changing 250/250 here changes the number of dots a lot.
     Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
     img = rs.filter(img);
 

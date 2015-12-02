@@ -13,7 +13,6 @@ public abstract class ImageGenerator extends ImageManipulator {
 	  public ImageGenerator(Makelangelo gui, MakelangeloRobot mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
-		// TODO Auto-generated constructor stub
 	  }
 
 	/**

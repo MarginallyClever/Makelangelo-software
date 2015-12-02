@@ -1,29 +1,36 @@
 package com.marginallyclever.basictypes;
 
 public class Point3D {
-  public float x, y, z;
+	public float x, y, z;
 
-  public Point3D() {
-    set(0, 0, 0);
-  }
+	public Point3D() {
+		set(0, 0, 0);
+	}
 
-  public Point3D(Point3D p) {
-    set(p.x, p.y, p.z);
-  }
+	public Point3D(Point3D p) {
+		set(p.x, p.y, p.z);
+	}
 
-  public Point3D(float xx, float yy, float zz) {
-    set(xx, yy, zz);
-  }
+	public Point3D(float xx, float yy, float zz) {
+		set(xx, yy, zz);
+	}
 
-  public Point3D(double xx, double yy, double zz) {
-    set((float) xx, (float) yy, (float) zz);
-  }
+	public Point3D(double xx, double yy, double zz) {
+		set((float) xx, (float) yy, (float) zz);
+	}
 
-  public void set(float xx, float yy, float zz) {
-    x = xx;
-    y = yy;
-    z = zz;
-  }
+	public void set(float xx, float yy, float zz) {
+		x = xx;
+		y = yy;
+		z = zz;
+	}
+
+	public void normalize() {
+		double d = Math.sqrt(x*x+y*y+z*z);
+		x/=d;
+		y/=d;
+		z/=d;
+	}
 }
 
 /**

@@ -301,7 +301,11 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	}
 
 
-	// TODO count newlines?
+	/**
+	 * calculate the smallest rectangle that would fit around the string of text
+	 * @param text the message to fit around
+	 * @return a Rectangle2D that describes the minimum fit
+	 */
 	protected Rectangle2D textCalculateBounds(String text) {
 		String[] lines = textWrapToLength(text);
 		int len = textLongestLine(lines);

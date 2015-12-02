@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -40,10 +39,6 @@ implements ActionListener {
 
   protected JTabbedPane panes;
   protected JButton save, cancel;
-
-  // Make these emulate Repetier-host config dialog
-  private String[] machineConfigurations;
-  private JComboBox<String> machineChoices;
   
   protected PanelAdjustMachineSize panelAdjustMachineSize;
   protected PanelJogMotors panelJogMotors;

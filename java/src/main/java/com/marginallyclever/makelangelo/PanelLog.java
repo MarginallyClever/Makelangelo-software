@@ -119,10 +119,7 @@ implements ActionListener, ChangeListener, KeyListener {
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	public void stateChanged(ChangeEvent e) {}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

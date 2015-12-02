@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -154,7 +153,6 @@ public final class MultilingualSupport {
 		try {
 			uri = getClass().getClassLoader().getResource(WORKING_DIRECTORY).toURI();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
   	    Path myPath;
@@ -163,7 +161,6 @@ public final class MultilingualSupport {
 			try {
 				fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
   	        myPath = fileSystem.getPath(WORKING_DIRECTORY);
@@ -174,7 +171,6 @@ public final class MultilingualSupport {
 		try {
 			walk = Files.walk(myPath, 1);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
