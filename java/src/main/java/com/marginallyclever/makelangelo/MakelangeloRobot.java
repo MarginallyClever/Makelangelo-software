@@ -80,7 +80,7 @@ public final class MakelangeloRobot {
 	protected boolean areMotorsBackwards;
 	
 	protected boolean isRegistered = false;
-	protected boolean shouldSignName = true;
+	protected boolean shouldSignName = false;
 
 	/**
 	 * top left, bottom center, etc...

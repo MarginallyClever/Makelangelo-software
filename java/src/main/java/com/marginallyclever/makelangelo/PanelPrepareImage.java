@@ -488,6 +488,7 @@ implements ActionListener, ChangeListener {
 
 	        String destinationFile = gui.getTempDestinationFile();
 	    	chosenGenerator.generate(destinationFile);
+	    	
 	        loadGCode(destinationFile);
 	        gui.playConversionFinishedSound();
 
@@ -899,7 +900,7 @@ implements ActionListener, ChangeListener {
           converter.setProgressMonitor(pm);
           converter.convert(img, out);
 
-          if(!machineConfiguration.shouldSignName()) {
+          if(machineConfiguration.shouldSignName()) {
             // Sign name
             Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
             ymh.signName(out);
