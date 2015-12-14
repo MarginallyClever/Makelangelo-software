@@ -275,7 +275,8 @@ implements ActionListener, ChangeListener {
       machineConfigurations = getAnyMachineConfigurations();
       machineChoices = new JComboBox<>(machineConfigurations);
       try {
-        machineChoices.setSelectedIndex(machineConfiguration.getCurrentMachineIndex());
+    	  int index = machineConfiguration.getCurrentMachineIndex();
+        machineChoices.setSelectedIndex(index);
       } catch (IllegalArgumentException e) {
         // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
         logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());

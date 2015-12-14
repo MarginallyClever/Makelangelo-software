@@ -38,13 +38,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
   boolean lastLineWasCue = false;
 
   private final Makelangelo mainGUI;
-  private final MultilingualSupport translator;
   private final MakelangeloRobot machine;
 
 
   public SerialConnection(Makelangelo mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
     this.mainGUI = mainGUI;
-    this.translator = translator;
     this.machine = machine;
   }
 
@@ -152,19 +150,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
     String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
     machine.parseRobotUID(after_hello);
 
-    mainGUI.getMainframe().setTitle(translator.get("TitlePrefix")
-        + Long.toString(machine.getUID())
-        + translator.get("TitlePostfix"));
-
-    mainGUI.sendConfig();
-    mainGUI.getDrawPanel().updateMachineConfig();
-
-    mainGUI.updateMenuBar();
-    mainGUI.getDrawPanel().setConnected(true);
-
-    // rebuild the drive pane so that the feed rates are correct.
-    mainGUI.updatedriveControls();
-
+    mainGUI.confirmConnected();
+    
     return true;
   }
 

@@ -109,7 +109,7 @@ public final class MakelangeloRobot {
 
 	private int currentToolIndex;
 
-	private String[] thissAvailable = null;
+	private String[] configsAvailable = null;
 
 	private Makelangelo gui = null;
 	private MultilingualSupport translator = null;
@@ -164,11 +164,11 @@ public final class MakelangeloRobot {
 
 		// which configurations are available?
 		try {
-			thissAvailable = topLevelMachinesPreferenceNode.childrenNames();
+			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
 		} catch (Exception e) {
 			logger.error("{}", e);
-			thissAvailable = new String[1];
-			thissAvailable[0] = "Default";
+			configsAvailable = new String[1];
+			configsAvailable[0] = "Default";
 		}
 		
 		// Load most recent config
@@ -435,10 +435,10 @@ public final class MakelangeloRobot {
 			gui.sendLineToRobot("UID " + new_uid);
 
 			// if this is a new robot UID, update the list of available configurations
-			final String[] new_list = new String[thissAvailable.length + 1];
-			System.arraycopy(thissAvailable, 0, new_list, 0, thissAvailable.length);
-			new_list[thissAvailable.length] = Long.toString(new_uid);
-			thissAvailable = new_list;
+			final String[] new_list = new String[configsAvailable.length + 1];
+			System.arraycopy(configsAvailable, 0, new_list, 0, configsAvailable.length);
+			new_list[configsAvailable.length] = Long.toString(new_uid);
+			configsAvailable = new_list;
 		}
 		return new_uid;
 	}
@@ -448,7 +448,7 @@ public final class MakelangeloRobot {
 	 * @return the number of machine configurations that exist on this computer
 	 */
 	public int getMachineCount() {
-		return thissAvailable.length;
+		return configsAvailable.length;
 	}
 
 
@@ -458,7 +458,7 @@ public final class MakelangeloRobot {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		final List<String> thissAvailableArrayAsList = new LinkedList<>(Arrays.asList(thissAvailable));
+		final List<String> thissAvailableArrayAsList = new LinkedList<>(Arrays.asList(configsAvailable));
 		if (thissAvailableArrayAsList.contains("0")) {
 			thissAvailableArrayAsList.remove("0");
 		}
@@ -471,14 +471,15 @@ public final class MakelangeloRobot {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getAvailableConfigurations() {
-		return thissAvailable;
+		return configsAvailable;
 	}
 
 
 	public int getCurrentMachineIndex() {
-		for (int i = 0; i < thissAvailable.length; i++) {
-			if (thissAvailable[i].equals("0")) continue;
-			if (thissAvailable[i].equals(Long.toString(robotUID))) {
+		String [] list = getKnownMachineNames();
+		for (int i = 0; i < list.length; i++) {
+			if (list[i].equals("0")) continue;
+			if (list[i].equals(Long.toString(robotUID))) {
 				return i;
 			}
 		}

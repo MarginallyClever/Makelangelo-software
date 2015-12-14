@@ -838,7 +838,6 @@ implements ActionListener {
 				if (connectionToRobot != null) {
 					log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
 					updateMenuBar();
-					prepareImage.updateMachineNumberPanel();
 					playConnectSound();
 				} else {
 					log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
@@ -848,6 +847,22 @@ implements ActionListener {
 		}
 	}
 
+	public void confirmConnected() {
+	    this.getMainframe().setTitle(translator.get("TitlePrefix")
+	        + Long.toString(this.machineConfiguration.getUID())
+	        + translator.get("TitlePostfix"));
+
+	    this.sendConfig();
+	    this.getDrawPanel().updateMachineConfig();
+
+	    this.prepareImage.updateMachineNumberPanel();
+	    
+	    this.updateMenuBar();
+	    this.getDrawPanel().setConnected(true);
+
+	    // rebuild the drive pane so that the feed rates are correct.
+	    this.updatedriveControls();
+	}
 	/**
 	 * @return byte array containing data for image icon.
 	 */
