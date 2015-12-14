@@ -347,7 +347,9 @@ public final class MakelangeloRobot {
 
 
 	public String getBobbinLine() {
-		return "D1 L" + pulleyDiameterLeft + " R" + pulleyDiameterRight;
+		String left = String.format("%.4f", pulleyDiameterLeft);
+		String right = String.format("%.4f", pulleyDiameterRight);
+		return "D1 L" + left + " R" + right;
 	}
 
 
