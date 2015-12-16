@@ -560,48 +560,46 @@ implements ActionListener, ChangeListener {
   }
 
 
-  protected boolean chooseImageConversionOptions(boolean isDXF) {
-    final JPanel panel = new JPanel(new GridBagLayout());
+  protected boolean chooseImageConversionOptions() {
+	  final JPanel panel = new JPanel(new GridBagLayout());
 
-    String[] imageConverterNames = new String[imageConverters.size()];
-    Iterator<ImageConverter> ici = imageConverters.iterator();
-    int i = 0;
-    while (ici.hasNext()) {
-      ImageManipulator f = ici.next();
-      imageConverterNames[i++] = f.getName();
-    }
+	  String[] imageConverterNames = new String[imageConverters.size()];
+	  Iterator<ImageConverter> ici = imageConverters.iterator();
+	  int i = 0;
+	  while (ici.hasNext()) {
+		  ImageManipulator f = ici.next();
+		  imageConverterNames[i++] = f.getName();
+	  }
 
-    final JComboBox<String> inputDrawStyle = new JComboBox<String>(imageConverterNames);
-    inputDrawStyle.setSelectedIndex(getPreferredDrawStyle());
+	  final JComboBox<String> inputDrawStyle = new JComboBox<String>(imageConverterNames);
+	  inputDrawStyle.setSelectedIndex(getPreferredDrawStyle());
 
-    GridBagConstraints c = new GridBagConstraints();
+	  GridBagConstraints c = new GridBagConstraints();
 
-    int y = 0;
-    if (!isDXF) {
-      c.anchor = GridBagConstraints.EAST;
-      c.gridwidth = 1;
-      c.gridx = 0;
-      c.gridy = y;
-      panel.add(new JLabel(translator.get("ConversionStyle")), c);
-      c.anchor = GridBagConstraints.WEST;
-      c.gridwidth = 3;
-      c.gridx = 1;
-      c.gridy = y++;
-      panel.add(inputDrawStyle, c);
-    }
+	  int y = 0;
+	  c.anchor = GridBagConstraints.EAST;
+	  c.gridwidth = 1;
+	  c.gridx = 0;
+	  c.gridy = y;
+	  panel.add(new JLabel(translator.get("ConversionStyle")), c);
+	  c.anchor = GridBagConstraints.WEST;
+	  c.gridwidth = 3;
+	  c.gridx = 1;
+	  c.gridy = y++;
+	  panel.add(inputDrawStyle, c);
 
-    int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-    if (result == JOptionPane.OK_OPTION) {
-      setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
-      machineConfiguration.saveConfig();
+	  int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	  if (result == JOptionPane.OK_OPTION) {
+		  setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
+		  machineConfiguration.saveConfig();
 
-      // Force update of graphics layout.
-      gui.updateMachineConfig();
+		  // Force update of graphics layout.
+		  gui.updateMachineConfig();
 
-      return true;
-    }
+		  return true;
+	  }
 
-    return false;
+	  return false;
   }
 
   /**
@@ -628,8 +626,6 @@ implements ActionListener, ChangeListener {
 
 
   protected boolean loadDXF(String filename) {
-    if (chooseImageConversionOptions(true) == false) return false;
-
     // where to save temp output file?
     final String destinationFile = gui.getTempDestinationFile();
     final String srcFile = filename;
@@ -665,17 +661,25 @@ implements ActionListener, ChangeListener {
           parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
           DXFDocument doc = parser.getDocument();
           Bounds b = doc.getBounds();
-          double width = b.getMaximumX() - b.getMinimumX();
-          double height = b.getMaximumY() - b.getMinimumY();
-          double cx = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
-          double cy = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
-          double wh = width > height ? width : height;
-          double sy = machineConfiguration.getPaperHeight() * 10.0 / wh;
-          double sx = machineConfiguration.getPaperWidth() * 10.0 / wh;
-          double scale = (sx < sy ? sx : sy);
-          sx = scale * (machineConfiguration.reverseForGlass ? -1 : 1);
-          sx *= machineConfiguration.paperMargin;
-          sy *= machineConfiguration.paperMargin;
+          double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
+          double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
+
+          // find the scale to fit the image on the paper without altering the aspect ratio
+          double imageWidth = (b.getMaximumX() - b.getMinimumX());
+          double imageHeight = (b.getMaximumY() - b.getMinimumY());
+          double paperHeight = machineConfiguration.getPaperHeight()*10 * machineConfiguration.paperMargin;
+          double paperWidth = machineConfiguration.getPaperWidth() *10* machineConfiguration.paperMargin;
+          //double scale = Math.min( scaleX/imageWidth, scaleY/imageHeight);
+          //double scale = (scaleX / imageWidth);
+          //if (imageHeight * scale > scaleX) scale = scaleY / imageHeight;
+          
+          double innerAspectRatio = imageWidth / imageHeight;
+          double outerAspectRatio = paperWidth / paperHeight;
+          double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth) : (paperHeight / imageHeight);
+          
+          scale *= (machineConfiguration.reverseForGlass ? -1 : 1);
+          //double scaleX = imageWidth * scale;
+          //double scaleY = imageHeight * scale;
 
           // count all entities in all layers
           Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
@@ -714,10 +718,10 @@ implements ActionListener, ChangeListener {
                   Point start = entity.getStartPoint();
                   Point end = entity.getEndPoint();
 
-                  double x = (start.getX() - cx) * sx;
-                  double y = (start.getY() - cy) * sy;
-                  double x2 = (end.getX() - cx) * sx;
-                  double y2 = (end.getY() - cy) * sy;
+                  double x = (start.getX() - imageCenterX) * scale;
+                  double y = (start.getY() - imageCenterY) * scale;
+                  double x2 = (end.getX() - imageCenterX) * scale;
+                  double y2 = (end.getY() - imageCenterY) * scale;
                   double dx, dy;
                   //*
                   // is it worth drawing this line?
@@ -753,8 +757,8 @@ implements ActionListener, ChangeListener {
                   boolean first = true;
                   for (int j = 0; j < polyLine.getVertexCount(); ++j) {
                     DXFVertex v = polyLine.getVertex(j);
-                    double x = (v.getX() - cx) * sx;
-                    double y = (v.getY() - cy) * sy;
+                    double x = (v.getX() - imageCenterX) * scale;
+                    double y = (v.getY() - imageCenterY) * scale;
                     double dx = dxf_x2 - x;
                     double dy = dxf_y2 - y;
 
@@ -787,8 +791,8 @@ implements ActionListener, ChangeListener {
                   boolean first = true;
                   for (int j = 0; j < entity.getVertexCount(); ++j) {
                     DXFVertex v = entity.getVertex(j);
-                    double x = (v.getX() - cx) * sx;
-                    double y = (v.getY() - cy) * sy;
+                    double x = (v.getX() - imageCenterX) * scale;
+                    double y = (v.getY() - imageCenterY) * scale;
                     double dx = dxf_x2 - x;
                     double dy = dxf_y2 - y;
 
@@ -874,7 +878,7 @@ implements ActionListener, ChangeListener {
     final String destinationFile = gui.getTempDestinationFile();
 
     loadImageConverters();
-    if (chooseImageConversionOptions(false) == false) return false;
+    if (chooseImageConversionOptions() == false) return false;
 
     final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
     pm.setProgress(0);
