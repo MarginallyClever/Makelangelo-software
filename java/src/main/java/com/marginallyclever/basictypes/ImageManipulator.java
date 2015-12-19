@@ -166,8 +166,11 @@ public abstract class ImageManipulator {
 
   protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
     tool.writeMoveTo(out, (float) x, (float) y);
-    if (up) liftPen(out);
-    else lowerPen(out);
+    if(lastUp != up) {
+	    if (up) liftPen(out);
+	    else lowerPen(out);
+	    lastUp = up;
+    }
   }
 }
 

@@ -144,17 +144,22 @@ public class Converter_Sandy extends ImageConverter {
 	double x2,y2,t,t_step, t_step2;
 	double last_x=0,last_y=0;
 	boolean wasDrawing=true;
+	double flipSum;
+    pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
     
+	// make concentric circles that get bigger and bigger.
     for(r=rMin;r<rMax;r+=rStep) {
     	// go around in a circle
     	t=0;
     	t_step = tool.getDiameter()/r;
-    	for(t=0;t<Math.PI*2;t+=t_step2) {
+    	t_step2 = t_step;
+    	flipSum=0;
+    	// go around the circle
+    	for(t=0;t<Math.PI*2;t+=t_step) {
     		dx = Math.cos(t_dir *t);
     		dy = Math.sin(t_dir *t);
 	    	x = cx + dx * r;
 	    	y = cy + dy * r;
-	    	t_step2=t_step;
 		    if(!isInsideLimits(x,y)) {
 		    	if(wasDrawing) {
 		    		moveToPaper(out,last_x,last_y,true);
@@ -166,19 +171,25 @@ public class Converter_Sandy extends ImageConverter {
 		    last_x=x;
 		    last_y=y;
             // read a block of the image and find the average intensity in this block
-            z = sampleScale( img, x-rStep/2, y-rStep/2,x+rStep/2,y + rStep/2 );
+            z = sampleScale( img, x-rStep/4.0, y-rStep/4.0,x+rStep/4.0,y + rStep/4.0 );
             // scale the intensity value
-            assert(z>=0);
-            assert(z<=255.0);
+            //assert(z>=0);
+            //assert(z<=255.0);
+            if(z<0) z=0;
+            if(z>255) z=255;
             scaleZ = (255.0 -  z) / 255.0;
-            scaleZ = 1-scaleZ;
-            pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
-	    	t_step2=t_step*pulseSize*scaleZ;
-	    	if(t_step2<t_step) t_step2=t_step;
+            //scaleZ = 1-scaleZ;
+            flipSum+=scaleZ;
+            if(flipSum >= 1) {
+            	flipSum-=1;
+            	pulseFlip = -pulseFlip;
+            }
+	    	//t_step2=t_step*pulseSize*scaleZ;
+	    	//if(t_step2<t_step) t_step2=t_step;
             
 	    	x2 = x + dx * pulseSize*pulseFlip;
 	    	y2 = y + dy * pulseSize*pulseFlip;
-	    	pulseFlip=-pulseFlip;
+	    	//pulseFlip=-pulseFlip;
 	    	if(wasDrawing == false) {
 	    		moveToPaper(out,last_x,last_y,pulseSize<PULSE_MINIMUM);
 	    		wasDrawing=true;
