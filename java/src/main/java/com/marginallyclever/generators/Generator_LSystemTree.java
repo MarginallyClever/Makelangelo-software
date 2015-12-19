@@ -55,10 +55,10 @@ public class Generator_LSystemTree extends ImageGenerator {
 	@Override
 	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
 		tool.writeMoveTo(out, TX(x), TY(y));
-		if (lastup != up) {
+		if (lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
-			lastup = up;
+			lastUp = up;
 		}
 	}
 

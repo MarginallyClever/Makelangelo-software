@@ -36,11 +36,11 @@ public class Converter_Spiral extends ImageConverter {
    */
   @Override
   protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-    tool.writeMoveTo(out, TX(x), TY(y));
-    if (lastup != up) {
+	tool.writeMoveTo(out, TX(x), TY(y));
+    if (lastUp != up) {
       if (up) liftPen(out);
       else lowerPen(out);
-      lastup = up;
+      lastUp = up;
     }
   }
 
@@ -74,6 +74,7 @@ public class Converter_Spiral extends ImageConverter {
       int z = 0;
 
       float maxr;
+      convertToCorners=false;
       if (convertToCorners) {
         // go right to the corners
         maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);

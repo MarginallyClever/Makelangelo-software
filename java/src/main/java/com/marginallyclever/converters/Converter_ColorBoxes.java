@@ -49,10 +49,10 @@ public class Converter_ColorBoxes extends ImageConverter {
    */
   @Override
   protected void moveTo(Writer out1, float x, float y, boolean up) throws IOException {
-    if (lastup != up) {
+    if (lastUp != up) {
       if (up) liftPen(out1);
       else lowerPen(out1);
-      lastup = up;
+      lastUp = up;
     }
     tool.writeMoveTo(out1, TX(x), TY(y));
   }

@@ -27,7 +27,7 @@ public abstract class ImageManipulator {
   // file properties
   protected String dest;
   // pen position optimizing
-  protected boolean lastup;
+  protected boolean lastUp;
   protected float previousX, previousY;
   // threading
   protected ProgressMonitor pm;
@@ -86,13 +86,13 @@ public abstract class ImageManipulator {
 
   protected void liftPen(Writer out) throws IOException {
     tool.writeOff(out);
-    lastup = true;
+    lastUp = true;
   }
 
 
   protected void lowerPen(Writer out) throws IOException {
     tool.writeOn(out);
-    lastup = false;
+    lastUp = false;
   }
 
   protected void setAbsoluteMode(Writer out) throws IOException {
@@ -153,7 +153,7 @@ public abstract class ImageManipulator {
     float x2 = TX(x);
     float y2 = TY(y);
 
-    if (up == lastup) {
+    if (up == lastUp) {
       previousX = x2;
       previousY = y2;
     } else {

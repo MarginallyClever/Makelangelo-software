@@ -51,10 +51,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
    * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
    */
   protected void moveTo(float x, float y, boolean up, Writer osw) throws IOException {
-    if (lastup != up) {
+    if (lastUp != up) {
       if (up) liftPen(osw);
       else lowerPen(osw);
-      lastup = up;
+      lastUp = up;
     }
     tool.writeMoveTo(osw, TX(x), TY(y));
   }

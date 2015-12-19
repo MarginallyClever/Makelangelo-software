@@ -500,10 +500,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
    */
   @Override
   protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-    if(lastup!=up) {
+    if(lastUp!=up) {
       if(up) liftPen(out);
       else   lowerPen(out);
-      lastup=up;
+      lastUp=up;
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }

@@ -286,10 +286,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
    */
   @Override
   protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-    if (lastup != up) {
+    if (lastUp != up) {
       if (up) liftPen(out);
       else lowerPen(out);
-      lastup = up;
+      lastUp = up;
     }
     tool.writeMoveTo(out, TX(x), TY(y));
   }
