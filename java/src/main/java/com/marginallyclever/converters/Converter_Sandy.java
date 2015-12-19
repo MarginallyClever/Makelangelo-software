@@ -146,6 +146,7 @@ public class Converter_Sandy extends ImageConverter {
 	boolean wasDrawing=true;
 	double flipSum;
     pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
+    boolean isDown = pulseSize < PULSE_MINIMUM;
     
 	// make concentric circles that get bigger and bigger.
     for(r=rMin;r<rMax;r+=rStep) {
@@ -191,13 +192,13 @@ public class Converter_Sandy extends ImageConverter {
 	    	y2 = y + dy * pulseSize*pulseFlip;
 	    	//pulseFlip=-pulseFlip;
 	    	if(wasDrawing == false) {
-	    		moveToPaper(out,last_x,last_y,pulseSize<PULSE_MINIMUM);
+	    		moveToPaper(out,last_x,last_y,isDown);
 	    		wasDrawing=true;
 	    	}
-    		moveToPaper(out,x2,y2,pulseSize<PULSE_MINIMUM);
+    		moveToPaper(out,x2,y2,isDown);
 	    	x2 = x + dx * pulseSize*pulseFlip;
 	    	y2 = y + dy * pulseSize*pulseFlip;
-    		moveToPaper(out,x2,y2,pulseSize<PULSE_MINIMUM);
+    		moveToPaper(out,x2,y2,isDown);
     	}
     	t_dir=-t_dir;
     }
