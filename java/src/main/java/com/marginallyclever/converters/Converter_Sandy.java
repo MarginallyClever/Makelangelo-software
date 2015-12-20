@@ -141,7 +141,7 @@ public class Converter_Sandy extends ImageConverter {
     double r;
 	double t_dir=1;
 	double pulseFlip=1;
-	double x2,y2,t,t_step, t_step2;
+	double x2,y2,t,t_step;
 	double last_x=0,last_y=0;
 	boolean wasDrawing=true;
 	double flipSum;
@@ -153,7 +153,6 @@ public class Converter_Sandy extends ImageConverter {
     	// go around in a circle
     	t=0;
     	t_step = tool.getDiameter()/r;
-    	t_step2 = t_step;
     	flipSum=0;
     	// go around the circle
     	for(t=0;t<Math.PI*2;t+=t_step) {
@@ -174,31 +173,27 @@ public class Converter_Sandy extends ImageConverter {
             // read a block of the image and find the average intensity in this block
             z = sampleScale( img, x-rStep/4.0, y-rStep/4.0,x+rStep/4.0,y + rStep/4.0 );
             // scale the intensity value
-            //assert(z>=0);
-            //assert(z<=255.0);
             if(z<0) z=0;
             if(z>255) z=255;
             scaleZ = (255.0 -  z) / 255.0;
-            //scaleZ = 1-scaleZ;
-            flipSum+=scaleZ;
-            if(flipSum >= 1) {
-            	flipSum-=1;
-            	pulseFlip = -pulseFlip;
-            }
-	    	//t_step2=t_step*pulseSize*scaleZ;
-	    	//if(t_step2<t_step) t_step2=t_step;
+
             
-	    	x2 = x + dx * pulseSize*pulseFlip;
-	    	y2 = y + dy * pulseSize*pulseFlip;
-	    	//pulseFlip=-pulseFlip;
 	    	if(wasDrawing == false) {
 	    		moveToPaper(out,last_x,last_y,isDown);
 	    		wasDrawing=true;
 	    	}
-    		moveToPaper(out,x2,y2,isDown);
-	    	x2 = x + dx * pulseSize*pulseFlip;
-	    	y2 = y + dy * pulseSize*pulseFlip;
-    		moveToPaper(out,x2,y2,isDown);
+	    	
+            flipSum+=scaleZ;
+            if(flipSum >= 1) {
+            	flipSum-=1;
+    	    	x2 = x + dx * pulseSize*pulseFlip;
+    	    	y2 = y + dy * pulseSize*pulseFlip;
+        		moveToPaper(out,x2,y2,isDown);
+            	pulseFlip = -pulseFlip;
+    	    	x2 = x + dx * pulseSize*pulseFlip;
+    	    	y2 = y + dy * pulseSize*pulseFlip;
+        		moveToPaper(out,x2,y2,isDown);
+            }
     	}
     	t_dir=-t_dir;
     }
