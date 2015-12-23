@@ -1,5 +1,6 @@
 /*
  * https://en.wikipedia.org/wiki/Maze_generation_algorithm
+ * Recursive backtracker algorithm
  */
 package com.marginallyclever.generators;
 
@@ -98,9 +99,8 @@ public class Generator_Maze extends ImageGenerator {
 				final OutputStream fileOutputStream = new FileOutputStream(dest);
 				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
 				) {
-			// build the graph
+			// build the cells
 			cells = new MazeCell[rows*columns];
-			walls = new MazeWall[((rows-1)*columns) + ((columns-1)*rows)];
 
 			int x,y,i=0;
 			for(y=0;y<rows;++y) {
@@ -114,7 +114,9 @@ public class Generator_Maze extends ImageGenerator {
 					++i;
 				}
 			}
-			
+
+			// build the graph
+			walls = new MazeWall[((rows-1)*columns) + ((columns-1)*rows)];
 			i=0;
 			for(y=0;y<rows;++y) {
 				for(x=0;x<columns;++x) {
