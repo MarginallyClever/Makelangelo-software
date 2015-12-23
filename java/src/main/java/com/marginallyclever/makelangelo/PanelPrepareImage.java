@@ -78,6 +78,7 @@ import com.marginallyclever.generators.Generator_Dragon;
 import com.marginallyclever.generators.Generator_HilbertCurve;
 import com.marginallyclever.generators.Generator_KochCurve;
 import com.marginallyclever.generators.Generator_LSystemTree;
+import com.marginallyclever.generators.Generator_Maze;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
@@ -168,6 +169,7 @@ implements ActionListener, ChangeListener {
   // TODO use a ServiceLoader and find plugins in nearby folders
   protected void loadImageGenerators() {
 	  imageGenerators = new ArrayList<ImageGenerator>();
+	  imageGenerators.add(new Generator_Maze(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_YourMessageHere(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_HilbertCurve(gui,machineConfiguration,translator));
 	  imageGenerators.add(new Generator_LSystemTree(gui,machineConfiguration,translator));
@@ -911,6 +913,8 @@ implements ActionListener, ChangeListener {
           gui.updateMenuBar();
         }
 
+        // out closed when scope of try() ended.
+        
         pm.setProgress(100);
         return null;
       }

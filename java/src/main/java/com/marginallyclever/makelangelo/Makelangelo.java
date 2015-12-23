@@ -141,7 +141,7 @@ implements ActionListener {
 	// reading file
 	private boolean isRunning = false;
 	private boolean isPaused = true;
-	public GCodeFile gCode = new GCodeFile();
+	public GCodeFile gCode;
 
 	private MakelangeloRobot machineConfiguration;
 	private MultilingualSupport translator;
@@ -161,6 +161,7 @@ implements ActionListener {
 	public Makelangelo() {
 		startLog();
 		startTranslator();
+		gCode = new GCodeFile();
 		machineConfiguration = new MakelangeloRobot(this, translator);
 		connectionManager = new SerialConnectionManager(prefs, this, translator, machineConfiguration);
 		createAndShowGUI();
@@ -301,12 +302,12 @@ implements ActionListener {
 	public void log(String msg) {
 		if(logPanel!=null) {
 			logPanel.log(msg);
+			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		}
 		
 		try {
 			logToFile.write(msg);
 			logToFile.flush();
-			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (IOException e) {
 			logger.error("{}", e);
 		}

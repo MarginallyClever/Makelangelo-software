@@ -701,6 +701,21 @@ to check yourself.</value>
 		<value>Order</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
+	<string>
+		<key>MazeName</key>
+		<value>Maze</value>
+		<hint>Maze generator</hint>
+	</string>
+	<string>
+		<key>MazeRows</key>
+		<value>Rows</value>
+		<hint>Maze generator</hint>
+	</string>
+	<string>
+		<key>MazeColumns</key>
+		<value>Columns</value>
+		<hint>Maze generator</hint>
+	</string>
 
 	<string>
 		<key>PulseLineName</key>
