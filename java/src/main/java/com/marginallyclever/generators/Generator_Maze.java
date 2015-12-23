@@ -1,6 +1,5 @@
 /*
- * https://en.wikipedia.org/wiki/Maze_generation_algorithm
- * Recursive backtracker algorithm
+ * https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
  */
 package com.marginallyclever.generators;
 
@@ -24,7 +23,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class Generator_Maze extends ImageGenerator {
 	protected class MazeCell {
-		int i,x,y;
+		int x,y;
 		boolean visited;
 		boolean onStack;
 	}
@@ -108,7 +107,6 @@ public class Generator_Maze extends ImageGenerator {
 					cells[i] = new MazeCell();
 					cells[i].visited=false;
 					cells[i].onStack=false;
-					cells[i].i=i;
 					cells[i].x=x;
 					cells[i].y=y;
 					++i;
@@ -138,28 +136,27 @@ public class Generator_Maze extends ImageGenerator {
 					}
 				}
 			}
+
+			int unvisitedCells = cells.length;  // -1 for initial cell.
+			int cellsOnStack = 0;
 			
 //		    Make the initial cell the current cell and mark it as visited
 			int currentCell = 0;
 			cells[currentCell].visited=true;
-
-			int cellsOnStack = 0;
+			--unvisitedCells;
 			
 //		    While there are unvisited cells
-			int unvisitedCells = cells.length-1;
 			while( unvisitedCells>0 ) {
 //		        If the current cell has any neighbours which have not been visited
 //		            Choose randomly one of the unvisited neighbours
-				int nextCell = findUnvisitedNeighbor(currentCell);
+				int nextCell = chooseUnvisitedNeighbor(currentCell);
 				if( nextCell != -1 ) {
 //		            Push the current cell to the stack
 					cells[currentCell].onStack=true;
 					++cellsOnStack;
 //		            Remove the wall between the current cell and the chosen cell
 					int wallIndex = findWallBetween(currentCell,nextCell);
-					if(wallIndex == -1) {
-						assert(false);
-					}
+					assert(wallIndex != -1);
 					walls[wallIndex].removed=true;
 //		            Make the chosen cell the current cell and mark it as visited
 					currentCell = nextCell;
@@ -177,7 +174,7 @@ public class Generator_Maze extends ImageGenerator {
 							break;
 						}
 					}
-				} else assert(unvisitedCells>0 || cellsOnStack>0);
+				}
 			}
 			
 			// draw the maze
@@ -207,6 +204,7 @@ public class Generator_Maze extends ImageGenerator {
 
 		// Draw outside edge
 		liftPen(output);
+		moveTo(output, xmin, ymax, true);
 		moveTo(output, xmin, ymax, false);
 		moveTo(output, xmax, ymax, false);
 		moveTo(output, xmax, ymin+h, false);
@@ -215,7 +213,7 @@ public class Generator_Maze extends ImageGenerator {
 		moveTo(output, xmax, ymin, true);
 		moveTo(output, xmax, ymin, false);
 		moveTo(output, xmin, ymin, false);
-		// top-left gap for entrace is left here
+		// top-left gap for entrance is left here
 		moveTo(output, xmin, ymax-h, false);
 		moveTo(output, xmin, ymax-h, true);
 
@@ -240,19 +238,11 @@ public class Generator_Maze extends ImageGenerator {
 				moveTo(output,xmin+(ax+0)*w,ymin+(ay+1)*h,false);
 				moveTo(output,xmin+(ax+1)*w,ymin+(ay+1)*h,false);
 				moveTo(output,xmin+(ax+1)*w,ymin+(ay+1)*h,true);
-			} else assert( false );
+			}
 		}
-		/*
-		liftPen(output);
-
-		liftPen(output);
-        moveTo(output,x,y,true);
-        */
-		liftPen(output);
-		
 	}
 	
-	private int findUnvisitedNeighbor(int currentCell) {
+	private int chooseUnvisitedNeighbor(int currentCell) {
 		int x = cells[currentCell].x;
 		int y = cells[currentCell].y;
 
