@@ -1008,7 +1008,9 @@ implements ActionListener {
 		ButtonGroup group;
 		int i;
 
-		boolean isConfirmed = connectionToRobot != null && connectionToRobot.isRobotConfirmed();
+		boolean isConfirmed = connectionToRobot != null 
+				&& connectionToRobot.isConnectionOpen()
+				&& connectionToRobot.isRobotConfirmed();
 
 		if (prepareImage != null) {
 			prepareImage.updateButtonAccess(isConfirmed, isRunning);

@@ -417,6 +417,10 @@ implements ActionListener, ChangeListener {
     buttonStartAt.setEnabled(isConnected && !isRunning);
     buttonPause.setEnabled(isConnected && isRunning);
     buttonHalt.setEnabled(isConnected && isRunning);
+    
+    if(!isConnected) {
+        buttonPause.setText(translator.get("Pause"));
+    }
   }
 
   public void newFile() {
