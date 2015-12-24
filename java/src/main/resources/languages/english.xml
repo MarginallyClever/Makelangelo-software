@@ -553,7 +553,7 @@ to check yourself.</value>
 
 	<string>
 		<key>MenuPreview</key>
-		<value>Preview</value>
+		<value>View</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
