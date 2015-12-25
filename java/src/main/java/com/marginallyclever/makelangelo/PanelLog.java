@@ -129,13 +129,11 @@ implements ActionListener, ChangeListener, KeyListener {
 			gui.sendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
-
 	}
 
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-	}
+	public void keyTyped(KeyEvent e) {}
 
 	/**
 	 * Handle the key-pressed event from the text field.
@@ -150,7 +148,7 @@ implements ActionListener, ChangeListener, KeyListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			gui.processLine(commandLineText.getText());
+			gui.sendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
 	}

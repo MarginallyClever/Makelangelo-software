@@ -141,9 +141,9 @@ public final class MakelangeloRobot {
 		paperRight = 9 * INCH_TO_CM;
 		paperMargin = 0.9;
 
-		maxFeedRate=11000;
-		pulleyDiameterLeft=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
-		pulleyDiameterRight=20.0*2.0/Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		maxFeedRate=8000;
+		pulleyDiameterLeft=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
+		pulleyDiameterRight=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
 
 		invertMotor1 = false;
 		invertMotor2 = false;
