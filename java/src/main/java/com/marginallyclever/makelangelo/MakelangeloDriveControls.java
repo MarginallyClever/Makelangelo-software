@@ -302,7 +302,7 @@ public class MakelangeloDriveControls
       if (feed_rate < 0.001) feed_rate = 0.001;
       machineConfiguration.setFeedRate(feed_rate);
       feedRate.setText(Double.toString(feed_rate));
-      gui.sendLineToRobot("G00 G21 F" + feed_rate);
+      gui.sendLineToRobot("G00 F" + feed_rate);
     } else if (b == disengageMotors) {
     	gui.sendLineToRobot("M18");
     } else {
