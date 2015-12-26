@@ -70,12 +70,17 @@
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
-	
 	<string>
 		<key>AdjustPulleySize</key>
 		<value>Pulley diameter</value>
 		<hint>machine size control panel</hint>
 	</string>
+	<string>
+		<key>AdjustAcceleration</key>
+		<value>Acceleration</value>
+		<hint>machine size control panel</hint>
+	</string>
+	
 	<string>
 		<key>Left</key>
 		<value>Left</value>

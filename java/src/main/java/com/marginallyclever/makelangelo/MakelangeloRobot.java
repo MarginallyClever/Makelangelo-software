@@ -75,7 +75,8 @@ public final class MakelangeloRobot {
 	
 	// maximum speed
 	protected double maxFeedRate;
-
+	protected double maxAcceleration;
+	
 	protected boolean reverseForGlass;
 	protected boolean areMotorsBackwards;
 	
@@ -142,6 +143,7 @@ public final class MakelangeloRobot {
 		paperMargin = 0.9;
 
 		maxFeedRate=8000;
+		maxAcceleration=100;
 		pulleyDiameterLeft=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
 		pulleyDiameterRight=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
 
@@ -254,6 +256,7 @@ public final class MakelangeloRobot {
 		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));
 
 		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
+		maxAcceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(maxAcceleration)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
@@ -326,6 +329,7 @@ public final class MakelangeloRobot {
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameterLeft));
 		uniqueMachinePreferencesNode.put("bobbin_right_diameter", Double.toString(pulleyDiameterRight));
 		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
+		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
@@ -515,6 +519,15 @@ public final class MakelangeloRobot {
 
 	public void setFeedRate(double f) {
 		maxFeedRate = f;
+		saveConfig();
+	}
+	
+	public double getAcceleration() {
+		return maxAcceleration;
+	}
+
+	public void setAcceleration(double f) {
+		maxAcceleration = f;
 		saveConfig();
 	}
 

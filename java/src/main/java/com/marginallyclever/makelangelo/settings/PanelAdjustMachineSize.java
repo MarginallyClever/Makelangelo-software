@@ -38,7 +38,8 @@ implements ActionListener, KeyListener {
 	protected JComboBox<String> paperSizes;
 	protected JTextField mw, mh;
 	protected JTextField pw, ph;
-
+	protected JTextField acceleration;
+	
 	protected JCheckBox reverse_h;
 	protected JTextField mBobbin1,mBobbin2;
    
@@ -55,6 +56,8 @@ implements ActionListener, KeyListener {
 
 	    GridBagConstraints c = new GridBagConstraints();
 	    GridBagConstraints d = new GridBagConstraints();
+	    c.ipadx=5;
+	    c.ipady=0;
 
 	    int y = 0;
 	/*
@@ -153,6 +156,8 @@ implements ActionListener, KeyListener {
 	    this.add(p);
 	    
 	    c = new GridBagConstraints();
+	    c.ipadx=5;
+	    c.ipady=0;
 	    c.gridwidth=3;
 	    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
 	    c.gridwidth=1;
@@ -176,6 +181,21 @@ implements ActionListener, KeyListener {
 	    mBobbin1.setPreferredSize(s);
 	    mBobbin2.setPreferredSize(s);
 
+	    this.add(new JSeparator());
+	    p = new JPanel(new GridBagLayout());
+	    this.add(p);
+
+	    acceleration = new JTextField(Double.toString(machineConfiguration.getAcceleration()));
+
+	    y=0;
+	    c.weightx = 0;
+	    c.anchor=GridBagConstraints.EAST;
+	    d.anchor=GridBagConstraints.WEST;
+	    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("AdjustAcceleration")), c);
+	    d.gridx = 1;    d.gridy = y;    p.add(acceleration, d);
+	    y++;
+	    
+	    
 	    this.add(new JSeparator());
 	    c.fill=GridBagConstraints.HORIZONTAL;
 	    c.anchor=GridBagConstraints.CENTER;
@@ -232,29 +252,31 @@ implements ActionListener, KeyListener {
     }
      
     public void save() {
-          double pwf = Double.valueOf(pw.getText()) / 10.0;
-          double phf = Double.valueOf(ph.getText()) / 10.0;
-          double mwf = Double.valueOf(mw.getText()) / 10.0;
-          double mhf = Double.valueOf(mh.getText()) / 10.0;
-          boolean data_is_sane=true;
-          if( pwf<=0 ) data_is_sane=false;
-          if( phf<=0 ) data_is_sane=false;
-          if( mwf<=0 ) data_is_sane=false;
-          if( mhf<=0 ) data_is_sane=false;
+    	double pwf = Double.valueOf(pw.getText()) / 10.0;
+    	double phf = Double.valueOf(ph.getText()) / 10.0;
+    	double mwf = Double.valueOf(mw.getText()) / 10.0;
+    	double mhf = Double.valueOf(mh.getText()) / 10.0;
+    	boolean data_is_sane=true;
+    	if( pwf<=0 ) data_is_sane=false;
+    	if( phf<=0 ) data_is_sane=false;
+    	if( mwf<=0 ) data_is_sane=false;
+    	if( mhf<=0 ) data_is_sane=false;
 
-          double bld = Double.valueOf(mBobbin1.getText()) / 10.0;
-          double brd = Double.valueOf(mBobbin2.getText()) / 10.0;
+    	double bld = Double.valueOf(mBobbin1.getText()) / 10.0;
+    	double brd = Double.valueOf(mBobbin2.getText()) / 10.0;
+    	double accel = Double.valueOf(acceleration.getText());
+    	
+    	if (bld <= 0) data_is_sane = false;
+    	if (brd <= 0) data_is_sane = false;
 
-          if (bld <= 0) data_is_sane = false;
-          if (brd <= 0) data_is_sane = false;
-
-        if (data_is_sane) {
-	    	machineConfiguration.setReverseForGlass(reverse_h.isSelected());
-	    	machineConfiguration.setPulleyDiameter(bld,brd);
-	    	machineConfiguration.setPaperSize(pwf,phf);
-	    	machineConfiguration.setMachineSize(mwf,mhf);
-        	machineConfiguration.saveConfig();
-        	gui.sendConfig();
-        }
-      }
+    	if (data_is_sane) {
+    		machineConfiguration.setReverseForGlass(reverse_h.isSelected());
+    		machineConfiguration.setPulleyDiameter(bld,brd);
+    		machineConfiguration.setPaperSize(pwf,phf);
+    		machineConfiguration.setMachineSize(mwf,mhf);
+    		machineConfiguration.setAcceleration(accel);
+    		machineConfiguration.saveConfig();
+    		gui.sendConfig();
+    	}
+    }
 }
