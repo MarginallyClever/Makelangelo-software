@@ -231,7 +231,13 @@ implements ActionListener, MakelangeloRobotListener {
 
 		save.addActionListener(driveButtons);
 
+		// arrange everything and calculate sizes
 		driver.pack();
+		// center the dialog
+		Dimension size = driver.getSize();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		driver.setLocation((screenSize.width - size.width) / 2, (screenSize.height - size.height) / 2);
+		// show it
 		driver.setVisible(true);
 	}
 
