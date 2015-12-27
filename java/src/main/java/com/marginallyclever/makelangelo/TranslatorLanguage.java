@@ -16,12 +16,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class LanguageContainer {
+public class TranslatorLanguage {
   private String name = "";
   private String author = "";
   private Map<String, String> strings = new HashMap<>();
 
-  private final Logger log = LoggerFactory.getLogger(LanguageContainer.class);
+  private final Logger log = LoggerFactory.getLogger(TranslatorLanguage.class);
 
 
   /**

@@ -71,7 +71,7 @@ public final class Translator {
   /**
    * a list of all languages and their translations strings
    */
-  private final Map<String, LanguageContainer> languages = new HashMap<>();
+  private final Map<String, TranslatorLanguage> languages = new HashMap<>();
 
   /**
    *
@@ -86,7 +86,7 @@ public final class Translator {
       loadLanguages();
     } catch (IllegalStateException e) {
       logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), DEFAULT_LANGUAGE, WORKING_DIRECTORY);
-      final LanguageContainer languageContainer  = new LanguageContainer();
+      final TranslatorLanguage languageContainer  = new TranslatorLanguage();
       String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
       System.out.println("default path requested: "+path);
       URL pathFound = getClass().getClassLoader().getResource(path);
@@ -194,7 +194,7 @@ public final class Translator {
   	    	InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
   	    	//if( stream != null ) 
   	    	{
-  	  	    	LanguageContainer lang = new LanguageContainer();
+  	  	    	TranslatorLanguage lang = new TranslatorLanguage();
 				lang.loadFromInputStream(stream);
 				languages.put(lang.getName(), lang);
   	    	}
