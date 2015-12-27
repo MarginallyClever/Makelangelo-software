@@ -14,7 +14,7 @@ import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.filters.Filter_Resize;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -44,7 +44,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   int scount;
 
 
-  public Converter_ZigZag(Makelangelo gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public Converter_ZigZag(Makelangelo gui, MakelangeloRobotSettings mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -144,7 +144,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   }
 
 
-  public void render(GL2 gl2, MakelangeloRobot machine) {
+  public void render(GL2 gl2, MakelangeloRobotSettings machine) {
     if (points == null || solution == null) return;
 
     while (lock.isLocked()) ;

@@ -3,7 +3,7 @@ package com.marginallyclever.basictypes;
 import java.awt.image.BufferedImage;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  *
  */
 public abstract class ImageFilter extends ImageManipulator {
-	  public ImageFilter(Makelangelo gui, MakelangeloRobot mc,
+	  public ImageFilter(Makelangelo gui, MakelangeloRobotSettings mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
 	  }

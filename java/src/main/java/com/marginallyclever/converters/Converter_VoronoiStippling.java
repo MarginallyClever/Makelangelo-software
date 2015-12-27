@@ -18,7 +18,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -56,7 +56,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 
   public Converter_VoronoiStippling(Makelangelo gui,
-                                          MakelangeloRobot mc, MultilingualSupport ms) {
+                                          MakelangeloRobotSettings mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -111,7 +111,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
     return false;
   }
 
-  public void render(GL2 gl2, MakelangeloRobot machine) {
+  public void render(GL2 gl2, MakelangeloRobotSettings machine) {
     if (graphEdges == null) return;
 
     while(lock.isLocked());

@@ -4,9 +4,6 @@ import java.util.prefs.Preferences;
 
 import jssc.SerialPortList;
 
-import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
  * Lists available serial connections and opens a connection of that type
@@ -18,16 +15,10 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
   private String[] portsDetected;
   private String recentPort;
 
-  private Makelangelo mainGUI;
-  private MultilingualSupport translator;
-  private MakelangeloRobot machine;
   private Preferences prefs;
 
 
-  public SerialConnectionManager(Preferences prefs, Makelangelo mainGUI, MultilingualSupport translator, MakelangeloRobot machine) {
-    this.mainGUI = mainGUI;
-    this.translator = translator;
-    this.machine = machine;
+  public SerialConnectionManager(Preferences prefs) {
     this.prefs = prefs;
     loadRecentPortFromPreferences(); //FIXME smelly
   }
@@ -63,7 +54,7 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
   public MarginallyCleverConnection openConnection(String connectionName) {
     //if(connectionName.equals(recentPort)) return null;
 
-    SerialConnection serialConnection = new SerialConnection(mainGUI, translator, machine);
+    SerialConnection serialConnection = new SerialConnection();
 
     try {
       serialConnection.openConnection(connectionName);

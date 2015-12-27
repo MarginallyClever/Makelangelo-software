@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class PanelAdjustTools
@@ -24,10 +24,10 @@ implements ActionListener {
 
 	protected Makelangelo gui;
 	protected MultilingualSupport translator;
-	protected MakelangeloRobot machineConfiguration;
+	protected MakelangeloRobotSettings machineConfiguration;
 	protected ArrayList<JButton> buttons = new ArrayList<JButton>();
 
-	public PanelAdjustTools(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelAdjustTools(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

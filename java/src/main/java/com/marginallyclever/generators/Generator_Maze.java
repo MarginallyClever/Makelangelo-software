@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.basictypes.ImageGenerator;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -41,7 +41,7 @@ public class Generator_Maze extends ImageGenerator {
 	
 
 	
-	public Generator_Maze(Makelangelo gui, MakelangeloRobot mc,
+	public Generator_Maze(Makelangelo gui, MakelangeloRobotSettings mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
 	}

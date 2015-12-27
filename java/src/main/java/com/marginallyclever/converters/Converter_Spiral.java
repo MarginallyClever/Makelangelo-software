@@ -7,7 +7,7 @@ import java.io.Writer;
 
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -26,7 +26,7 @@ public class Converter_Spiral extends ImageConverter {
   }
 
 
-  public Converter_Spiral(Makelangelo gui, MakelangeloRobot mc, MultilingualSupport ms) {
+  public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 

@@ -20,7 +20,7 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -65,7 +65,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
   
   
   public Converter_VoronoiZigZag(Makelangelo gui,
-      MakelangeloRobot mc, MultilingualSupport ms) {
+      MakelangeloRobotSettings mc, MultilingualSupport ms) {
     super(gui, mc, ms);
   }
 
@@ -117,7 +117,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
       return false;
   }
 
-  public void render(GL2 gl2,MakelangeloRobot machine) {
+  public void render(GL2 gl2,MakelangeloRobotSettings machine) {
     lock.lock();
     gl2.glScalef(0.1f, 0.1f, 1);
     int i;

@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
@@ -34,7 +34,7 @@ implements ActionListener {
   private static final long serialVersionUID = 1L;
 
   protected MultilingualSupport translator;
-  protected MakelangeloRobot machineConfiguration;
+  protected MakelangeloRobotSettings machineConfiguration;
   protected Makelangelo gui;
 
   protected JTabbedPane panes;
@@ -48,7 +48,7 @@ implements ActionListener {
   protected int dialogWidth = 450;
   protected int dialogHeight = 500;
   
-  public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+  public MakelangeloSettingsDialog(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
 	super(_gui.getParentFrame(),_translator.get("configureMachine"),true);
 
 	translator = _translator;

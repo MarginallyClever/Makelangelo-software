@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 
@@ -21,12 +21,12 @@ extends JPanel {
 	private static final long serialVersionUID = 8256498380663422463L;
 	protected Makelangelo gui;
 	protected MultilingualSupport translator;
-	protected MakelangeloRobot machineConfiguration;
+	protected MakelangeloRobotSettings machineConfiguration;
 
 	protected JComboBox<String> toolCombo;
 
 	
-	public PanelSelectTool(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelSelectTool(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

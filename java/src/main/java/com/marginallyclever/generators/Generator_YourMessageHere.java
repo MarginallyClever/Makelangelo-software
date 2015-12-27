@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.basictypes.ImageGenerator;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
@@ -57,7 +57,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	private final Logger logger = LoggerFactory.getLogger(Generator_YourMessageHere.class);
 
 	public Generator_YourMessageHere(Makelangelo gui,
-			MakelangeloRobot mc, MultilingualSupport ms) {
+			MakelangeloRobotSettings mc, MultilingualSupport ms) {
 		super(gui, mc, ms);
 		logFonts();
 	}

@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 public class PanelAdjustMachineSize
@@ -33,7 +33,7 @@ implements ActionListener, KeyListener {
 	
 	protected Makelangelo gui;
 	protected MultilingualSupport translator;
-	protected MakelangeloRobot machineConfiguration;
+	protected MakelangeloRobotSettings machineConfiguration;
 	
 	protected JComboBox<String> paperSizes;
 	protected JTextField mw, mh;
@@ -44,7 +44,7 @@ implements ActionListener, KeyListener {
 	protected JTextField mBobbin1,mBobbin2;
    
 	
-	public PanelAdjustMachineSize(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobot _machineConfiguration) {
+	public PanelAdjustMachineSize(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

@@ -1,5 +1,6 @@
 package com.marginallyclever.communications;
 
+
 /**
  * Created on 4/12/15.
  *
@@ -7,17 +8,21 @@ package com.marginallyclever.communications;
  * @since v7
  */
 public interface MarginallyCleverConnection {
-  void closeConnection();
+	void closeConnection();
 
-  void openConnection(String portName) throws Exception;
+	void openConnection(String portName) throws Exception;
 
-  void reconnect() throws Exception;
+	void reconnect() throws Exception;
 
-  boolean isConnectionOpen();
+	boolean isConnectionOpen();
 
-  boolean isRobotConfirmed();  // FIXME doesn't really belong in MarginallyCleverConnection
+	boolean isRobotConfirmed();  // FIXME doesn't really belong in MarginallyCleverConnection
 
-  String getRecentConnection();
+	String getRecentConnection();
 
-  void sendMessage(String msg) throws Exception;
+	void sendMessage(String msg) throws Exception;
+
+	public void addListener(MarginallyCleverConnectionReadyListener listener);
+
+	public void removeListener(MarginallyCleverConnectionReadyListener listener);
 }

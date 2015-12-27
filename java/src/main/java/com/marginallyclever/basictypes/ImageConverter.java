@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.MultilingualSupport;
 
 /**
@@ -32,7 +32,7 @@ public abstract class ImageConverter extends ImageManipulator {
 	protected int colorChannel = 0;
 
 	
-	public ImageConverter(Makelangelo gui, MakelangeloRobot mc,
+	public ImageConverter(Makelangelo gui, MakelangeloRobotSettings mc,
 			MultilingualSupport ms) {
 		super(gui, mc, ms);
 	}
