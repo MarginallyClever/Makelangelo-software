@@ -52,4 +52,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		if(mainGUI != null) mainGUI.confirmConnected();
 	}
+	
+	public boolean isPortConfirmed() {
+		return portConfirmed;
+	}
 }

@@ -22,7 +22,6 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 	private String connectionName = "";
 	private boolean portOpened = false;
-	private boolean portConfirmed = false;
 	private boolean waitingForCue = false;
 
 
@@ -67,7 +66,6 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 				}
 			}
 			portOpened = false;
-			portConfirmed = false;
 		}
 	}
 
@@ -96,8 +94,6 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	 * @return -1 if there was no error, otherwise the line number containing the error.
 	 */
 	protected int errorReported() {
-		if (portConfirmed == false) return -1;
-
 		if (inputBuffer.lastIndexOf(NOCHECKSUM) != -1) {
 			String after_error = inputBuffer.substring(inputBuffer.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
 			String x = getNumberPortion(after_error);
@@ -225,20 +221,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		return result;
 	}
 
-
-	/**
-	 * @return <code>true</code> if the serial port has been confirmed; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isRobotConfirmed() {
-		return portConfirmed;
-	}
-
 	/**
 	 * @return the port open for this serial connection.
 	 */
 	@Override
-	public boolean isConnectionOpen() {
+	public boolean isOpen() {
 		return portOpened;
 	}
 

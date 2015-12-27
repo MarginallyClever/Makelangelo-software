@@ -535,7 +535,7 @@ implements ActionListener {
 	 * Send the machine configuration to the robot
 	 */
 	public void sendConfig() {
-		if (robot.getConnection() != null && !robot.getConnection().isRobotConfirmed()) return;
+		if (robot.getConnection() != null && !robot.isPortConfirmed()) return;
 
 		// Send a command to the robot with new configuration values
 		sendLineToRobot(robot.settings.getConfigLine() + "\n");
@@ -549,7 +549,7 @@ implements ActionListener {
 	 */
 	public void sendFileCommand() {
 		if (isRunning == false || isPaused == true || gCode.fileOpened == false ||
-				(robot.getConnection() != null && robot.getConnection().isRobotConfirmed() == false) || gCode.linesProcessed >= gCode.linesTotal)
+				(robot.getConnection() != null && robot.isPortConfirmed() == false) || gCode.linesProcessed >= gCode.linesTotal)
 			return;
 
 		String line;
@@ -624,7 +624,7 @@ implements ActionListener {
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean processLine(String line) {
-		if (robot.getConnection() == null || !robot.getConnection().isRobotConfirmed() || !isRunning) return false;
+		if (robot.getConnection() == null || !robot.isPortConfirmed() || !isRunning) return false;
 
 		// tool change request?
 		String[] tokens = line.split("(\\s|;)");
@@ -671,7 +671,7 @@ implements ActionListener {
 	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
 	 */
 	public boolean sendLineToRobot(String line) {
-		if (robot.getConnection() == null || !robot.getConnection().isRobotConfirmed()) return false;
+		if (robot.getConnection() == null || !robot.isPortConfirmed()) return false;
 
 		if (line.trim().equals("")) return false;
 		String reportedline = line;
@@ -1011,8 +1011,8 @@ implements ActionListener {
 		int i;
 
 		boolean isConfirmed = robot.getConnection() != null 
-				&& robot.getConnection().isConnectionOpen()
-				&& robot.getConnection().isRobotConfirmed();
+				&& robot.getConnection().isOpen()
+				&& robot.isPortConfirmed();
 
 		if (prepareImage != null) {
 			prepareImage.updateButtonAccess(isConfirmed, isRunning);
@@ -1060,7 +1060,7 @@ implements ActionListener {
 		for (i = 0; i < connections.length; ++i) {
 			buttonPorts[i] = new JRadioButtonMenuItem(connections[i]);
 			if (robot.getConnection() != null 
-					&& robot.getConnection().isConnectionOpen() 
+					&& robot.getConnection().isOpen() 
 					&& robot.getConnection().getRecentConnection().equals(connections[i]) ) {
 				buttonPorts[i].setSelected(true);
 			}
@@ -1077,7 +1077,7 @@ implements ActionListener {
 
 		buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"), KeyEvent.VK_D);
 		buttonDisconnect.addActionListener(this);
-		buttonDisconnect.setEnabled(robot.getConnection() != null && robot.getConnection().isConnectionOpen());
+		buttonDisconnect.setEnabled(robot.getConnection() != null && robot.getConnection().isOpen());
 		preferencesSubMenu.add(buttonDisconnect);
 
 		menuBar.add(preferencesSubMenu);
