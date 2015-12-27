@@ -39,7 +39,7 @@ import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
  * @author Peter Colapietro
  * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
-public final class MultilingualSupport {
+public final class Translator {
 
   /**
    * Working directory. This represents the directory where the java executable launched the jar from.
@@ -76,12 +76,12 @@ public final class MultilingualSupport {
   /**
    *
    */
-  private final Logger logger = LoggerFactory.getLogger(MultilingualSupport.class);
+  private final Logger logger = LoggerFactory.getLogger(Translator.class);
 
   /**
    *
    */
-  public MultilingualSupport() {
+  public Translator() {
     try {
       loadLanguages();
     } catch (IllegalStateException e) {

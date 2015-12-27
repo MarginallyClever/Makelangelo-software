@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Floyd/Steinberg dithering
@@ -18,7 +18,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
 
 
   public Filter_DitherFloydSteinberg(Makelangelo gui, MakelangeloRobotSettings mc,
-                                     MultilingualSupport ms) {
+                                     Translator ms) {
     super(gui, mc, ms);
   }
 

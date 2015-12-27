@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Modifies a BufferedImage
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  */
 public abstract class ImageFilter extends ImageManipulator {
 	  public ImageFilter(Makelangelo gui, MakelangeloRobotSettings mc,
-			MultilingualSupport ms) {
+			Translator ms) {
 		super(gui, mc, ms);
 	  }
 

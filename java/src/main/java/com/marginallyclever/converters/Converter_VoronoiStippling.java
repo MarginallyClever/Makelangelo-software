@@ -20,7 +20,7 @@ import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
@@ -56,7 +56,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 
   public Converter_VoronoiStippling(Makelangelo gui,
-                                          MakelangeloRobotSettings mc, MultilingualSupport ms) {
+                                          MakelangeloRobotSettings mc, Translator ms) {
     super(gui, mc, ms);
   }
 

@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 public class PanelJogMotors
 extends JPanel
@@ -31,11 +31,11 @@ implements ActionListener {
 	protected JCheckBox m2i;
 
 	protected Makelangelo gui;
-	protected MultilingualSupport translator;
+	protected Translator translator;
 	protected MakelangeloRobotSettings machineConfiguration;
 
 
-	public PanelJogMotors(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public PanelJogMotors(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

@@ -9,7 +9,7 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -26,7 +26,7 @@ public class Converter_Spiral extends ImageConverter {
   }
 
 
-  public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc, MultilingualSupport ms) {
+  public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
     super(gui, mc, ms);
   }
 

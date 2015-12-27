@@ -7,7 +7,7 @@ import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 /**
@@ -20,7 +20,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
   public ColorPalette palette;
 
   public Filter_DitherFloydSteinbergColor(Makelangelo gui, MakelangeloRobotSettings mc,
-                                          MultilingualSupport ms) {
+                                          Translator ms) {
     super(gui, mc, ms);
 
     palette = new ColorPalette();

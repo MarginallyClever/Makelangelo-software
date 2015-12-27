@@ -15,7 +15,7 @@ import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * @author danroyer
@@ -30,7 +30,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 
   public Converter_ColorFloodFill(Makelangelo gui, MakelangeloRobotSettings mc,
-                                        MultilingualSupport ms) {
+                                        Translator ms) {
     super(gui, mc, ms);
 
     palette = new ColorPalette();

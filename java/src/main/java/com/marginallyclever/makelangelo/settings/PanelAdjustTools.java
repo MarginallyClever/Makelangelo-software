@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 public class PanelAdjustTools
 extends JPanel
@@ -23,11 +23,11 @@ implements ActionListener {
 	private static final long serialVersionUID = 4061412413141577960L;
 
 	protected Makelangelo gui;
-	protected MultilingualSupport translator;
+	protected Translator translator;
 	protected MakelangeloRobotSettings machineConfiguration;
 	protected ArrayList<JButton> buttons = new ArrayList<JButton>();
 
-	public PanelAdjustTools(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public PanelAdjustTools(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
 		gui = _gui;
 		translator = _translator;
 		machineConfiguration = _machineConfiguration;

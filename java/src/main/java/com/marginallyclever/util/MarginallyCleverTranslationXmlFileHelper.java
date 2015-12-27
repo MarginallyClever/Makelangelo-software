@@ -1,6 +1,6 @@
 package com.marginallyclever.util;
 
-import static com.marginallyclever.makelangelo.MultilingualSupport.WORKING_DIRECTORY;
+import static com.marginallyclever.makelangelo.Translator.WORKING_DIRECTORY;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -213,7 +213,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * @return url object representing the language folder in the user's working directory.
-   * @see com.marginallyclever.makelangelo.MultilingualSupport#WORKING_DIRECTORY
+   * @see com.marginallyclever.makelangelo.Translator#WORKING_DIRECTORY
    */
   private static URL getLanguagesFolderUrlFromUserDirectory() {
     URL languageFolderUsingUserDirectoryUrl = null;

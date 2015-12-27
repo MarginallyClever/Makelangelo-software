@@ -9,12 +9,12 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Scanline extends ImageConverter {
   public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc,
-                                  MultilingualSupport ms) {
+                                  Translator ms) {
     super(gui, mc, ms);
   }
 

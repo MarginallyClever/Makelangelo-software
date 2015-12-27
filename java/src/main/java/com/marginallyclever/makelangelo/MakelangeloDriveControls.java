@@ -41,7 +41,7 @@ public class MakelangeloDriveControls
   private JPanel dragAndDrive;
   private JLabel coordinates;
   
-  protected MultilingualSupport translator;
+  protected Translator translator;
   protected MakelangeloRobotSettings machineConfiguration;
   protected Makelangelo gui;
 
@@ -70,7 +70,7 @@ public class MakelangeloDriveControls
 	  return b;
   }
 
-  public void createPanel(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
+  public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;

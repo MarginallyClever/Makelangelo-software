@@ -19,7 +19,7 @@ public class StatusBar extends JPanel {
   protected String sSoFar = "so far: ";
   protected String sRemaining = " remaining: ";
   protected String sElapsed = "";
-  protected MultilingualSupport translator;
+  protected Translator translator;
   protected JLabel message;
   protected JProgressBar bar;
 
@@ -39,7 +39,7 @@ public class StatusBar extends JPanel {
   }
 
 
-  public StatusBar(MultilingualSupport ms) {
+  public StatusBar(Translator ms) {
     super();
     this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
     GridBagLayout gridbag = new GridBagLayout();

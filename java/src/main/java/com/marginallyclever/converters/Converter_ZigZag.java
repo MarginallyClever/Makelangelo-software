@@ -16,7 +16,7 @@ import com.marginallyclever.filters.Filter_Resize;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 /**
@@ -44,7 +44,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   int scount;
 
 
-  public Converter_ZigZag(Makelangelo gui, MakelangeloRobotSettings mc, MultilingualSupport ms) {
+  public Converter_ZigZag(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
     super(gui, mc, ms);
   }
 

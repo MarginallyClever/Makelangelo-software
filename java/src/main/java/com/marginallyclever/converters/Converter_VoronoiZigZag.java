@@ -22,7 +22,7 @@ import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
@@ -65,7 +65,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
   
   
   public Converter_VoronoiZigZag(Makelangelo gui,
-      MakelangeloRobotSettings mc, MultilingualSupport ms) {
+      MakelangeloRobotSettings mc, Translator ms) {
     super(gui, mc, ms);
   }
 

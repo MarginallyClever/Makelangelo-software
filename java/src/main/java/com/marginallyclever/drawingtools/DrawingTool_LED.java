@@ -5,11 +5,11 @@ import java.io.Writer;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 public class DrawingTool_LED extends DrawingTool {
-  public DrawingTool_LED(Makelangelo gui, MultilingualSupport ms, MakelangeloRobotSettings mc) {
+  public DrawingTool_LED(Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
     super(gui, ms, mc);
 
     diameter = 4;

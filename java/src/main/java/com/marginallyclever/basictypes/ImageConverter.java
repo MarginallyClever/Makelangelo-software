@@ -7,7 +7,7 @@ import java.io.Writer;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Converts a BufferedImage to gcode
@@ -33,7 +33,7 @@ public abstract class ImageConverter extends ImageManipulator {
 
 	
 	public ImageConverter(Makelangelo gui, MakelangeloRobotSettings mc,
-			MultilingualSupport ms) {
+			Translator ms) {
 		super(gui, mc, ms);
 	}
 

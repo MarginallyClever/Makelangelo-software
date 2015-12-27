@@ -10,7 +10,7 @@ import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 /**
@@ -29,7 +29,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 
 
   public Converter_ColorBoxes(Makelangelo gui, MakelangeloRobotSettings mc,
-                                    MultilingualSupport ms) {
+                                    Translator ms) {
     super(gui, mc, ms);
 
     palette = new ColorPalette();

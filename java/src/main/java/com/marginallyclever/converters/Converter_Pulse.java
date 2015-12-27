@@ -16,7 +16,7 @@ import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Pulse extends ImageConverter {
@@ -24,7 +24,7 @@ public class Converter_Pulse extends ImageConverter {
   int direction = 0;
 
   public Converter_Pulse(Makelangelo gui, MakelangeloRobotSettings mc,
-                               MultilingualSupport ms) {
+                               Translator ms) {
     super(gui, mc, ms);
   }
 

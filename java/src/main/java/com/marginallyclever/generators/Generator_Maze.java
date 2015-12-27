@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Maze extends ImageGenerator {
 	protected class MazeCell {
@@ -42,7 +42,7 @@ public class Generator_Maze extends ImageGenerator {
 
 	
 	public Generator_Maze(Makelangelo gui, MakelangeloRobotSettings mc,
-			MultilingualSupport ms) {
+			Translator ms) {
 		super(gui, mc, ms);
 	}
 

@@ -14,11 +14,11 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 
 public class DrawingTool_Pen extends DrawingTool {
-	public DrawingTool_Pen(Makelangelo gui, MultilingualSupport ms, MakelangeloRobotSettings mc) {
+	public DrawingTool_Pen(Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
 		super(gui, ms, mc);
 
 		diameter = 1.5f;
@@ -30,7 +30,7 @@ public class DrawingTool_Pen extends DrawingTool {
 		name = "Pen";
 	}
 
-	public DrawingTool_Pen(String name2, int tool_id, Makelangelo gui, MultilingualSupport ms, MakelangeloRobotSettings mc) {
+	public DrawingTool_Pen(String name2, int tool_id, Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
 		super(gui, ms, mc);
 
 		diameter = 1.5f;

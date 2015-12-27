@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_HilbertCurve extends ImageGenerator {
 	float turtleX, turtleY;
@@ -34,7 +34,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 
 
 	public Generator_HilbertCurve(Makelangelo gui, MakelangeloRobotSettings mc,
-			MultilingualSupport ms) {
+			Translator ms) {
 		super(gui, mc, ms);
 	}
 

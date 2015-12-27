@@ -110,7 +110,7 @@ implements ActionListener, ChangeListener {
     imageFileExtentions.add("gif");
   }
 
-  protected MultilingualSupport translator;
+  protected Translator translator;
   protected MakelangeloRobotSettings machineConfiguration;
   protected Makelangelo gui;
 
@@ -189,7 +189,7 @@ implements ActionListener, ChangeListener {
   }
 
 
-  public void createPanel(Makelangelo _gui, MultilingualSupport _translator, MakelangeloRobotSettings _machineConfiguration) {
+  public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
     translator = _translator;
     gui = _gui;
     machineConfiguration = _machineConfiguration;

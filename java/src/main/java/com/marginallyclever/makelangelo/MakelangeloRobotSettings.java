@@ -113,7 +113,7 @@ public final class MakelangeloRobotSettings {
 	private String[] configsAvailable = null;
 
 	private Makelangelo gui = null;
-	private MultilingualSupport translator = null;
+	private Translator translator = null;
 
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobotSettings.class);
 
@@ -124,7 +124,7 @@ public final class MakelangeloRobotSettings {
 	 * @param gui
 	 * @param translator
 	 */
-	protected MakelangeloRobotSettings(Makelangelo _gui, MultilingualSupport _translator) {
+	protected MakelangeloRobotSettings(Makelangelo _gui, Translator _translator) {
 		gui = _gui;
 		translator = _translator;
 

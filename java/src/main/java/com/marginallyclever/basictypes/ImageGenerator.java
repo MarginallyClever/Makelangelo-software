@@ -2,7 +2,7 @@ package com.marginallyclever.basictypes;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Generates gcode from user input.  Fractals might be one example.
@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.MultilingualSupport;
  */
 public abstract class ImageGenerator extends ImageManipulator {
 	  public ImageGenerator(Makelangelo gui, MakelangeloRobotSettings mc,
-			MultilingualSupport ms) {
+			Translator ms) {
 		super(gui, mc, ms);
 	  }
 

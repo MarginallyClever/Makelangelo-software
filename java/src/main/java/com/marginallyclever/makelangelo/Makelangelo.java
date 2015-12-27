@@ -103,6 +103,7 @@ implements ActionListener {
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	private MarginallyCleverConnectionManager connectionManager;
+	private MakelangeloRobot robot;
 	
 	// GUI elements
 	private JFrame mainframe;
@@ -142,8 +143,8 @@ implements ActionListener {
 	private boolean isPaused = true;
 	public GCodeFile gCode;
 
-	private MakelangeloRobot robot;
-	private MultilingualSupport translator;
+	// translations
+	private Translator translator;
 
 
 	public static void main(String[] argv) {
@@ -185,7 +186,7 @@ implements ActionListener {
 	}
 	
 	public void startTranslator() {
-		translator = new MultilingualSupport();
+		translator = new Translator();
 		if (translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
@@ -888,7 +889,7 @@ implements ActionListener {
 	 * <p>
 	 * <p>
 	 * The summation of {@link String#length()} for each of the respective values retrieved with the
-	 * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link MultilingualSupport} keys,
+	 * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link Translator} keys,
 	 * in conjunction with {@link Makelangelo#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
 	 * </p>
 	 *
