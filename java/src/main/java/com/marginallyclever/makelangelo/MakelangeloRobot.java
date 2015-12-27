@@ -141,8 +141,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (newUID != 0) {
 			settings.createNewUID(newUID);
 
-			// tell the robot it's new UID.
-			connection.sendMessage("UID " + newUID);
+			try {
+				// Tell the robot it's new UID.
+				connection.sendMessage("UID " + newUID);
+			} catch(Exception e) {
+				//FIXME deal with this rare and smelly problem.
+			}
 		}
 		return newUID;
 	}
