@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ?
@@ -89,7 +90,7 @@ import com.marginallyclever.communications.SerialConnectionManager;
  * @since 0.0.1?
  */
 public final class Makelangelo
-implements ActionListener {
+implements ActionListener, MakelangeloRobotListener {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -117,7 +118,6 @@ implements ActionListener {
 	private JMenuItem[] buttonPorts;
 
 	// logging
-	private PanelLog logPanel;
 	/**
 	 * @see org.slf4j.Logger
 	 */
@@ -127,15 +127,18 @@ implements ActionListener {
 	 */
 	private Writer logToFile;
 	
+	
 	// main window layout
 	private Splitter splitLeftRight;
-	// opengl window
+	// OpenGL window
 	private DrawPanel drawPanel;
 	// context sensitive menu
 	private JTabbedPane contextMenu;
 	// menu tabs
 	private PanelPrepareImage prepareImage;
 	private MakelangeloDriveControls driveControls;
+	private PanelLog logPanel;
+	// bottom of window
 	public StatusBar statusBar;
 
 	// reading file
@@ -143,7 +146,7 @@ implements ActionListener {
 	private boolean isPaused = true;
 	public GCodeFile gCode;
 
-	// translations
+	
 	private Translator translator;
 
 
@@ -163,7 +166,7 @@ implements ActionListener {
 		startTranslator();
 		gCode = new GCodeFile();
 		robot = new MakelangeloRobot();
-		robot.settings = new MakelangeloRobotSettings(this, translator);
+		robot.settings = new MakelangeloRobotSettings(this, translator);  //FIXME smelly
 		connectionManager = new SerialConnectionManager(prefs);
 		createAndShowGUI();
 	}
@@ -1223,6 +1226,12 @@ implements ActionListener {
 	 */
 	public GCodeFile getGcodeFile() {
 		return gCode;
+	}
+	
+	public void portConfirmed(MakelangeloRobot r) {
+		// TODO notify Makelangelo when unknown robot connected so that GUI can respond.
+		MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,robot.settings);
+		m.run();
 	}
 }
 

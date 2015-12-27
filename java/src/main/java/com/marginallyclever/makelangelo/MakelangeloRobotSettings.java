@@ -1,11 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,7 +14,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
-import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 
 /**
@@ -177,6 +170,17 @@ public final class MakelangeloRobotSettings {
 		//loadConfig(last_machine_id);
 	}
 
+	public void createNewUID(long newUID) {
+		// make sure a topLevelMachinesPreferenceNode node is created
+		topLevelMachinesPreferenceNode.node(Long.toString(newUID));
+		
+		// if this is a new robot UID, update the list of available configurations
+		final String[] new_list = new String[configsAvailable.length + 1];
+		System.arraycopy(configsAvailable, 0, new_list, 0, configsAvailable.length);
+		new_list[configsAvailable.length] = Long.toString(newUID);
+		configsAvailable = new_list;
+	}
+	
 	/**
 	 * Must match commonPaperSizes
 	 * @return
@@ -377,74 +381,6 @@ public final class MakelangeloRobotSettings {
 
 	public boolean isPaperConfigured() {
 		return (paperTop > paperBottom && paperRight > paperLeft);
-	}
-	
-	public void parseRobotUID(String line) {
-		saveConfig();
-
-		// get the UID reported by the robot
-		String[] lines = line.split("\\r?\\n");
-		long new_uid = 0;
-		if (lines.length > 0) {
-			try {
-				new_uid = Long.parseLong(lines[0]);
-			} catch (NumberFormatException e) {
-				logger.error("{}", e);
-			}
-		}
-
-		// new robots have UID=0
-		if (new_uid == 0) {
-			new_uid = getNewRobotUID();
-		}
-
-		// load machine specific config
-		loadConfig(new_uid);
-
-		if (limitTop == 0 && limitBottom == 0 && limitLeft == 0 && limitRight == 0) {
-			// probably first time turning on, adjust the machine size
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui,translator,this);
-			m.run();
-		}
-	}
-
-	/**
-	 * based on http://www.exampledepot.com/egs/java.net/Post.html
-	 */
-	private long getNewRobotUID() {
-		long new_uid = 0;
-
-		try {
-			// Send data
-			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
-			URLConnection conn = url.openConnection();
-			try (
-					final InputStream connectionInputStream = conn.getInputStream();
-					final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-					final BufferedReader rd = new BufferedReader(inputStreamReader)
-					) {
-				String line = rd.readLine();
-				new_uid = Long.parseLong(line);
-			}
-		} catch (Exception e) {
-			logger.error("{}", e);
-			return 0;
-		}
-
-		// did read go ok?
-		if (new_uid != 0) {
-			// make sure a topLevelMachinesPreferenceNode node is created
-			topLevelMachinesPreferenceNode.node(Long.toString(new_uid));
-			// tell the robot it's new UID.
-			gui.sendLineToRobot("UID " + new_uid);
-
-			// if this is a new robot UID, update the list of available configurations
-			final String[] new_list = new String[configsAvailable.length + 1];
-			System.arraycopy(configsAvailable, 0, new_list, 0, configsAvailable.length);
-			new_list[configsAvailable.length] = Long.toString(new_uid);
-			configsAvailable = new_list;
-		}
-		return new_uid;
 	}
 
 
