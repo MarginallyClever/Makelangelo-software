@@ -167,6 +167,7 @@ implements ActionListener, MakelangeloRobotListener {
 		gCode = new GCodeFile();
 		robot = new MakelangeloRobot();
 		robot.settings = new MakelangeloRobotSettings(this, translator);  //FIXME smelly
+		robot.addListener(this);
 		connectionManager = new SerialConnectionManager(prefs);
 		createAndShowGUI();
 	}
@@ -852,23 +853,6 @@ implements ActionListener, MakelangeloRobotListener {
 			}
 		}
 	}
-
-	public void confirmConnected() {
-	    this.getMainframe().setTitle(translator.get("TitlePrefix")
-	        + Long.toString(this.robot.settings.getUID())
-	        + translator.get("TitlePostfix"));
-
-	    this.sendConfig();
-	    this.getDrawPanel().updateMachineConfig();
-
-	    this.prepareImage.updateMachineNumberPanel();
-	    
-	    this.updateMenuBar();
-	    this.getDrawPanel().setConnected(true);
-
-	    // rebuild the drive pane so that the feed rates are correct.
-	    this.updatedriveControls();
-	}
 	
 	/**
 	 * @return byte array containing data for image icon.
@@ -1229,9 +1213,28 @@ implements ActionListener, MakelangeloRobotListener {
 	}
 	
 	public void portConfirmed(MakelangeloRobot r) {
-		// TODO notify Makelangelo when unknown robot connected so that GUI can respond.
-		MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,robot.settings);
-		m.run();
+		if(r.settings.getLimitBottom()==0 
+				&& r.settings.getLimitTop()==0
+				&& r.settings.getLimitLeft()==0
+				&& r.settings.getLimitRight()==0) {
+			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,r.settings);
+			m.run();
+		}
+		
+	    getMainframe().setTitle(translator.get("TitlePrefix")
+	        + Long.toString(this.robot.settings.getUID())
+	        + translator.get("TitlePostfix"));
+
+	    sendConfig();
+	    getDrawPanel().updateMachineConfig();
+
+	    prepareImage.updateMachineNumberPanel();
+	    
+	    updateMenuBar();
+	    getDrawPanel().setConnected(true);
+
+	    // rebuild the drive pane so that the feed rates are correct.
+	    updatedriveControls();
 	}
 }
 

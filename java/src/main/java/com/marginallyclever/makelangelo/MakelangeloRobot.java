@@ -23,9 +23,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// constants
 	private String robotTypeName = "DRAWBOT";
 	private String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
-
-	// god object!
-	private final Makelangelo mainGUI=null;
 		
 	// settings go here
 	public MakelangeloRobotSettings settings = null;
@@ -68,8 +65,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		String after_hello = data.substring(data.lastIndexOf(hello) + hello.length());
 		parseRobotUID(after_hello);
 		notifyPortConfirmed();
-
-		if(mainGUI != null) mainGUI.confirmConnected();
 	}
 	
 	public boolean isPortConfirmed() {
@@ -99,6 +94,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		settings.loadConfig(new_uid);
 	}
 
+	// Notify when unknown robot connected so that Makelangelo GUI can respond.
 	void notifyPortConfirmed() {
 		for (MakelangeloRobotListener listener : listeners) {
 			listener.portConfirmed(this);

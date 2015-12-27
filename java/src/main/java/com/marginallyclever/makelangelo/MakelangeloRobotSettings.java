@@ -135,16 +135,15 @@ public final class MakelangeloRobotSettings {
 		paperRight = 9 * INCH_TO_CM;
 		paperMargin = 0.9;
 
-		maxFeedRate=8000;
-		maxAcceleration=100;
-		pulleyDiameterLeft=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
-		pulleyDiameterRight=(20.0*2.0/Math.PI)*0.1;  // 20 teeth on the pulley, 2mm per tooth, * mm to cm.
+		maxFeedRate     = 7500;
+		maxAcceleration = 100;
+		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
-		invertMotor1 = false;
-		invertMotor2 = false;
-
-		reverseForGlass=false;
-		areMotorsBackwards=false;
+		invertMotor1       = false;
+		invertMotor2       = true;
+		reverseForGlass    = false;
+		areMotorsBackwards = false;
 
 		startingPositionIndex = 4;
 		
@@ -180,6 +179,7 @@ public final class MakelangeloRobotSettings {
 		new_list[configsAvailable.length] = Long.toString(newUID);
 		configsAvailable = new_list;
 	}
+	
 	
 	/**
 	 * Must match commonPaperSizes
