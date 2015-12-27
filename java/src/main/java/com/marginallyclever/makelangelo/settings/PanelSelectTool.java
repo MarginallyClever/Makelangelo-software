@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -21,20 +21,20 @@ extends JPanel {
 	private static final long serialVersionUID = 8256498380663422463L;
 	protected Makelangelo gui;
 	protected Translator translator;
-	protected MakelangeloRobotSettings machineConfiguration;
+	protected MakelangeloRobot robot;
 
 	protected JComboBox<String> toolCombo;
 
 	
-	public PanelSelectTool(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public PanelSelectTool(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
 		gui = _gui;
 		translator = _translator;
-		machineConfiguration = _machineConfiguration;
+		this.robot = robot;
 
 	    this.setLayout(new GridBagLayout());
 
-	   	toolCombo = new JComboBox<String>(machineConfiguration.getToolNames());
-	    toolCombo.setSelectedIndex(machineConfiguration.getCurrentToolNumber());
+	   	toolCombo = new JComboBox<String>(robot.settings.getToolNames());
+	    toolCombo.setSelectedIndex(robot.settings.getCurrentToolNumber());
 
 	    GridBagConstraints c = new GridBagConstraints();
 	    c.gridx = 0;
@@ -54,6 +54,6 @@ extends JPanel {
 	
 
     void save() {
-        machineConfiguration.setCurrentToolNumber(toolCombo.getSelectedIndex());
+    	robot.settings.setCurrentToolNumber(toolCombo.getSelectedIndex());
     }
 }

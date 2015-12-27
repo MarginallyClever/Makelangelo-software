@@ -543,19 +543,6 @@ implements ActionListener, MakelangeloRobotListener {
 
 
 	/**
-	 * Send the machine configuration to the robot
-	 */
-	public void sendConfig() {
-		if (robot.getConnection() != null && !robot.isPortConfirmed()) return;
-
-		// Send a command to the robot with new configuration values
-		sendLineToRobot(robot.settings.getConfigLine() + "\n");
-		sendLineToRobot(robot.settings.getBobbinLine() + "\n");
-		sendLineToRobot("G92 X0 Y0\n");
-	}
-
-
-	/**
 	 * Take the next line from the file and send it to the robot, if permitted.
 	 */
 	public void sendFileCommand() {
@@ -583,7 +570,7 @@ implements ActionListener, MakelangeloRobotListener {
 			if (line.length() > 3) {
 				line = "N" + line_number + " " + line;
 			}
-			line += generateChecksum(line);
+			line += robot.generateChecksum(line);
 
 			drawPanel.setLinesProcessed(gCode.linesProcessed);
 			statusBar.setProgress(gCode.linesProcessed, gCode.linesTotal);
@@ -664,17 +651,6 @@ implements ActionListener, MakelangeloRobotListener {
 	}
 
 
-	protected String generateChecksum(String line) {
-		byte checksum = 0;
-
-		for (int i = 0; i < line.length(); ++i) {
-			checksum ^= line.charAt(i);
-		}
-
-		return "*" + ((int) checksum);
-	}
-
-
 	/**
 	 * Sends a single command the robot.  Could be anything.
 	 *
@@ -686,15 +662,18 @@ implements ActionListener, MakelangeloRobotListener {
 
 		if (line.trim().equals("")) return false;
 		String reportedline = line;
-		if (line.contains(";")) {
+		if (reportedline.contains(";")) {
 			String[] lines = line.split(";");
 			reportedline = lines[0];
 		}
+		if(reportedline.trim().equals("")) return false;
+		
+		//FIXME: without this smelly log line sendLineToRobot() could be moved into MakelangeloRobot
 		log("<font color='white'>" + reportedline + "</font>");
-		line += "\n";
+		reportedline += "\n";
 
 		try {
-			robot.getConnection().sendMessage(line);
+			robot.getConnection().sendMessage(reportedline);
 		} catch (Exception e) {
 			log(e.getMessage());
 			return false;
@@ -1218,12 +1197,15 @@ implements ActionListener, MakelangeloRobotListener {
 		return gCode;
 	}
 	
+	/**
+	 * Notice received from MakelangeloRobot when serial connection is confirmed to point at something that speaks Makelangelo-firmware. 
+	 */
 	public void portConfirmed(MakelangeloRobot r) {
 		if(r.settings.getLimitBottom()==0 
 				&& r.settings.getLimitTop()==0
 				&& r.settings.getLimitLeft()==0
 				&& r.settings.getLimitRight()==0) {
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,r.settings);
+			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,r);
 			m.run();
 		}
 		
@@ -1231,7 +1213,8 @@ implements ActionListener, MakelangeloRobotListener {
 	        + Long.toString(this.robot.settings.getUID())
 	        + translator.get("TitlePostfix"));
 
-	    sendConfig();
+	    robot.sendConfig();
+	    
 	    getDrawPanel().updateMachineConfig();
 
 	    prepareImage.updateMachineNumberPanel();

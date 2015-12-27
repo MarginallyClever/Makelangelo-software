@@ -111,7 +111,7 @@ implements ActionListener, ChangeListener {
   }
 
   protected Translator translator;
-  protected MakelangeloRobotSettings machineConfiguration;
+  protected MakelangeloRobot robot;
   protected Makelangelo gui;
 
   protected String lastFileIn = "";
@@ -153,37 +153,37 @@ implements ActionListener, ChangeListener {
   // TODO use a ServiceLoader and find plugins in nearby folders
   protected void loadImageConverters() {
     imageConverters = new ArrayList<ImageConverter>();
-    imageConverters.add(new Converter_ZigZag(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_Spiral(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_Crosshatch(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_Scanline(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_Pulse(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_Boxes(gui, machineConfiguration, translator));
-    //imageConverters.add(new Converter_ColorBoxes(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_VoronoiStippling(gui, machineConfiguration, translator));
-    imageConverters.add(new Converter_VoronoiZigZag(gui,machineConfiguration,translator));
-    imageConverters.add(new Converter_Sandy(gui,machineConfiguration,translator));
-    //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, machineConfiguration, translator));  // not ready for public consumption
+    imageConverters.add(new Converter_ZigZag(gui, robot.settings, translator));
+    imageConverters.add(new Converter_Spiral(gui, robot.settings, translator));
+    imageConverters.add(new Converter_Crosshatch(gui, robot.settings, translator));
+    imageConverters.add(new Converter_Scanline(gui, robot.settings, translator));
+    imageConverters.add(new Converter_Pulse(gui, robot.settings, translator));
+    imageConverters.add(new Converter_Boxes(gui, robot.settings, translator));
+    //imageConverters.add(new Converter_ColorBoxes(gui, robot.settings, translator));
+    imageConverters.add(new Converter_VoronoiStippling(gui, robot.settings, translator));
+    imageConverters.add(new Converter_VoronoiZigZag(gui,robot.settings,translator));
+    imageConverters.add(new Converter_Sandy(gui,robot.settings,translator));
+    //imageConverters.add(new Filter_GeneratorColorFloodFill(gui, robot.settings, translator));  // not ready for public consumption
   }
 
   // TODO use a ServiceLoader and find plugins in nearby folders
   protected void loadImageGenerators() {
 	  imageGenerators = new ArrayList<ImageGenerator>();
-	  imageGenerators.add(new Generator_Maze(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_YourMessageHere(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_HilbertCurve(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_LSystemTree(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_KochCurve(gui,machineConfiguration,translator));
-	  imageGenerators.add(new Generator_Dragon(gui,machineConfiguration,translator));
+	  imageGenerators.add(new Generator_Maze(gui,robot.settings,translator));
+	  imageGenerators.add(new Generator_YourMessageHere(gui,robot.settings,translator));
+	  imageGenerators.add(new Generator_HilbertCurve(gui,robot.settings,translator));
+	  imageGenerators.add(new Generator_LSystemTree(gui,robot.settings,translator));
+	  imageGenerators.add(new Generator_KochCurve(gui,robot.settings,translator));
+	  imageGenerators.add(new Generator_Dragon(gui,robot.settings,translator));
   }
   
   /**
    * @return
    */
   private String[] getAnyMachineConfigurations() {
-    String[] machineNames = machineConfiguration.getKnownMachineNames();
+    String[] machineNames = robot.settings.getKnownMachineNames();
     if (machineNames.length == 0) {
-      machineNames = machineConfiguration.getAvailableConfigurations();
+      machineNames = robot.settings.getAvailableConfigurations();
     }
     return machineNames;
   }
@@ -192,7 +192,7 @@ implements ActionListener, ChangeListener {
   public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
     translator = _translator;
     gui = _gui;
-    machineConfiguration = _machineConfiguration;
+    robot.settings = _machineConfiguration;
 
     this.setBorder(BorderFactory.createEmptyBorder());
 
@@ -213,7 +213,7 @@ implements ActionListener, ChangeListener {
     con1.gridy++;
     
     JPanel marginPanel = new JPanel(new GridLayout(1,0));
-      paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (machineConfiguration.paperMargin * 100));
+      paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.settings.paperMargin * 100));
       paperMargin.setMajorTickSpacing(10);
       paperMargin.setMinorTickSpacing(5);
       paperMargin.setPaintTicks(false);
@@ -277,7 +277,7 @@ implements ActionListener, ChangeListener {
       machineConfigurations = getAnyMachineConfigurations();
       machineChoices = new JComboBox<>(machineConfigurations);
       try {
-    	  int index = machineConfiguration.getCurrentMachineIndex();
+    	  int index = robot.settings.getCurrentMachineIndex();
         machineChoices.setSelectedIndex(index);
       } catch (IllegalArgumentException e) {
         // TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
@@ -296,9 +296,9 @@ implements ActionListener, ChangeListener {
   public void stateChanged(ChangeEvent e) {
   e.getSource();
     double pm = (100 - paperMargin.getValue()) * 0.01;
-    if ( Double.compare(machineConfiguration.paperMargin , pm) != 0) {
-      machineConfiguration.paperMargin = pm;
-      machineConfiguration.saveConfig();
+    if ( Double.compare(robot.settings.paperMargin , pm) != 0) {
+      robot.settings.paperMargin = pm;
+      robot.settings.saveConfig();
       gui.getDrawPanel().repaint();
     }
   }
@@ -310,10 +310,10 @@ implements ActionListener, ChangeListener {
 
     final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
     long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
-    machineConfiguration.loadConfig(new_uid);
+    robot.settings.loadConfig(new_uid);
 
     if( subject == openConfig ) {
-      MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, machineConfiguration);
+      MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, robot);
       m.run();
       return;
     }
@@ -449,7 +449,7 @@ implements ActionListener, ChangeListener {
       String selectedFile = fc.getSelectedFile().getAbsolutePath();
 
       // if machine is not yet calibrated
-      if (machineConfiguration.isPaperConfigured() == false) {
+      if (robot.settings.isPaperConfigured() == false) {
         JOptionPane.showMessageDialog(null, translator.get("SetPaperSize"));
         return;
       }
@@ -490,7 +490,7 @@ implements ActionListener, ChangeListener {
 	    	int choice = options.getSelectedIndex();
 	    	
 	    	ImageGenerator chosenGenerator = imageGenerators.get(choice);
-	    	machineConfiguration.saveConfig();
+	    	robot.settings.saveConfig();
 
 	        String destinationFile = gui.getTempDestinationFile();
 	    	chosenGenerator.generate(destinationFile);
@@ -598,7 +598,7 @@ implements ActionListener, ChangeListener {
 	  int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	  if (result == JOptionPane.OK_OPTION) {
 		  setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
-		  machineConfiguration.saveConfig();
+		  robot.settings.saveConfig();
 
 		  // Force update of graphics layout.
 		  gui.updateMachineConfig();
@@ -658,9 +658,9 @@ implements ActionListener, ChangeListener {
             FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
             Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
         ) {
-          DrawingTool tool = machineConfiguration.getCurrentTool();
-          out.write(machineConfiguration.getConfigLine() + ";\n");
-          out.write(machineConfiguration.getBobbinLine() + ";\n");
+          DrawingTool tool = robot.settings.getCurrentTool();
+          out.write(robot.settings.getConfigLine() + ";\n");
+          out.write(robot.settings.getBobbinLine() + ";\n");
           out.write("G00 G90;\n");
           tool.writeChangeTo(out);
           tool.writeOff(out);
@@ -674,8 +674,8 @@ implements ActionListener, ChangeListener {
           // find the scale to fit the image on the paper without altering the aspect ratio
           double imageWidth = (b.getMaximumX() - b.getMinimumX());
           double imageHeight = (b.getMaximumY() - b.getMinimumY());
-          double paperHeight = machineConfiguration.getPaperHeight()*10 * machineConfiguration.paperMargin;
-          double paperWidth = machineConfiguration.getPaperWidth() *10* machineConfiguration.paperMargin;
+          double paperHeight = robot.settings.getPaperHeight()*10 * robot.settings.paperMargin;
+          double paperWidth = robot.settings.getPaperWidth() *10* robot.settings.paperMargin;
           //double scale = Math.min( scaleX/imageWidth, scaleY/imageHeight);
           //double scale = (scaleX / imageWidth);
           //if (imageHeight * scale > scaleX) scale = scaleY / imageHeight;
@@ -684,7 +684,7 @@ implements ActionListener, ChangeListener {
           double outerAspectRatio = paperWidth / paperHeight;
           double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth) : (paperHeight / imageHeight);
           
-          scale *= (machineConfiguration.reverseForGlass ? -1 : 1);
+          scale *= (robot.settings.reverseForGlass ? -1 : 1);
           //double scaleX = imageWidth * scale;
           //double scaleY = imageHeight * scale;
 
@@ -906,9 +906,9 @@ implements ActionListener, ChangeListener {
           converter.setProgressMonitor(pm);
           converter.convert(img, out);
 
-          if(machineConfiguration.shouldSignName()) {
+          if(robot.settings.shouldSignName()) {
             // Sign name
-            Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, machineConfiguration, translator);
+            Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, robot.settings, translator);
             ymh.signName(out);
           }
           gui.updateMachineConfig();

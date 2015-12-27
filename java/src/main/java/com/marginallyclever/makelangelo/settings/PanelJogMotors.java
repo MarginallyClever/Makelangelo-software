@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 public class PanelJogMotors
@@ -32,31 +32,31 @@ implements ActionListener {
 
 	protected Makelangelo gui;
 	protected Translator translator;
-	protected MakelangeloRobotSettings machineConfiguration;
+	protected MakelangeloRobot robot;
 
 
-	public PanelJogMotors(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
-		gui = _gui;
-		translator = _translator;
-		machineConfiguration = _machineConfiguration;
+	public PanelJogMotors(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
+		this.gui = gui;
+		this.translator = translator;
+		this.robot = robot;
 
 	    setLayout(new GridBagLayout());
 	    GridBagConstraints c = new GridBagConstraints();
 	
-	    buttonAneg = new JButton(_translator.get("JogIn"));
-	    buttonApos = new JButton(_translator.get("JogOut"));
-	    m1i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.isMotor1Backwards());
+	    buttonAneg = new JButton(translator.get("JogIn"));
+	    buttonApos = new JButton(translator.get("JogOut"));
+	    m1i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor1Backwards());
 	
-	    buttonBneg = new JButton(_translator.get("JogIn"));
-	    buttonBpos = new JButton(_translator.get("JogOut"));
-	    m2i = new JCheckBox(_translator.get("Invert"), _machineConfiguration.isMotor2Backwards());
+	    buttonBneg = new JButton(translator.get("JogIn"));
+	    buttonBpos = new JButton(translator.get("JogOut"));
+	    m2i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor2Backwards());
 	
 	    c.gridx = 0;
 	    c.gridy = 0;
-	    add(new JLabel(_translator.get("Left")), c);
+	    add(new JLabel(translator.get("Left")), c);
 	    c.gridx = 0;
 	    c.gridy = 1;
-	    add(new JLabel(_translator.get("Right")), c);
+	    add(new JLabel(translator.get("Right")), c);
 	
 	    c.gridx = 1;
 	    c.gridy = 0;
@@ -97,10 +97,10 @@ implements ActionListener {
       if (subject == buttonBneg) gui.sendLineToRobot("D00 R-400");
     
       if (subject == m1i || subject == m2i) {
-        machineConfiguration.setMotor1Backwards( m1i.isSelected() );
-        machineConfiguration.setMotor2Backwards( m2i.isSelected() );
-        machineConfiguration.saveConfig();
-        gui.sendConfig();
+        robot.settings.setMotor1Backwards( m1i.isSelected() );
+        robot.settings.setMotor2Backwards( m2i.isSelected() );
+        robot.settings.saveConfig();
+        robot.sendConfig();
       }
     }
 }

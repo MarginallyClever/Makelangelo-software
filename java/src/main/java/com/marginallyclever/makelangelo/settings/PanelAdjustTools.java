@@ -10,8 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.MakelangeloRobot;import com.marginallyclever.makelangelo.Translator;
 
 public class PanelAdjustTools
 extends JPanel
@@ -24,13 +23,13 @@ implements ActionListener {
 
 	protected Makelangelo gui;
 	protected Translator translator;
-	protected MakelangeloRobotSettings machineConfiguration;
+	protected MakelangeloRobot robot;
 	protected ArrayList<JButton> buttons = new ArrayList<JButton>();
 
-	public PanelAdjustTools(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public PanelAdjustTools(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
 		gui = _gui;
 		translator = _translator;
-		machineConfiguration = _machineConfiguration;
+		this.robot = robot;
 
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints con1 = new GridBagConstraints();
@@ -43,7 +42,7 @@ implements ActionListener {
 		
 		buttons.clear();
 		
-    	String [] names = machineConfiguration.getToolNames();
+    	String [] names = robot.settings.getToolNames();
     	for(int i=0;i<names.length;++i) {
     		JButton b = new JButton(names[i]);
     		b.addActionListener(this);
@@ -58,7 +57,7 @@ implements ActionListener {
     	Object subject = e.getSource();
     	for(int i=0;i<buttons.size();++i) {
     		if(subject == buttons.get(i)) {
-    			machineConfiguration.getTool(i).adjust();
+    			robot.settings.getTool(i).adjust();
     			return;
     		}
     	}

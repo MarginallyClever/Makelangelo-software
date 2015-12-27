@@ -15,11 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * Controls related to configuring a makelangelo machine
+ * Controls related to configuring a Makelangelo machine
  *
  * @author danroyer
  * @since 7.1.4
@@ -34,7 +34,7 @@ implements ActionListener {
   private static final long serialVersionUID = 1L;
 
   protected Translator translator;
-  protected MakelangeloRobotSettings machineConfiguration;
+  protected MakelangeloRobot robot;
   protected Makelangelo gui;
 
   protected JTabbedPane panes;
@@ -48,12 +48,12 @@ implements ActionListener {
   protected int dialogWidth = 450;
   protected int dialogHeight = 500;
   
-  public MakelangeloSettingsDialog(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
-	super(_gui.getParentFrame(),_translator.get("configureMachine"),true);
+  public MakelangeloSettingsDialog(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
+	super(gui.getParentFrame(),translator.get("configureMachine"),true);
 
-	translator = _translator;
-	gui = _gui;
-	machineConfiguration = _machineConfiguration;
+	this.translator = translator;
+	this.gui = gui;
+	this.robot = robot;
   }
 
   
@@ -61,10 +61,10 @@ implements ActionListener {
   public void run() {
     panes = new JTabbedPane();
     
-    panelAdjustMachineSize = new PanelAdjustMachineSize(gui,translator,machineConfiguration);
-    panelJogMotors = new PanelJogMotors(gui,translator,machineConfiguration);
-    panelAdjustTools = new PanelAdjustTools(gui,translator,machineConfiguration);
-    panelSelectTool = new PanelSelectTool(gui,translator,machineConfiguration);
+    panelAdjustMachineSize = new PanelAdjustMachineSize(translator,robot);
+    panelJogMotors = new PanelJogMotors(gui,translator,robot);
+    panelAdjustTools = new PanelAdjustTools(gui,translator,robot);
+    panelSelectTool = new PanelSelectTool(gui,translator,robot);
     
     panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachineSize);
     panes.addTab(translator.get("JogMotors"),panelJogMotors);

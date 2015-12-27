@@ -20,14 +20,14 @@ import com.marginallyclever.communications.MarginallyCleverConnectionReadyListen
  *
  */
 public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener {
-	// constants
-	private String robotTypeName = "DRAWBOT";
-	private String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+	// Constants
+	final String robotTypeName = "DRAWBOT";
+	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 		
-	// settings go here
+	// Settings go here
 	public MakelangeloRobotSettings settings = null;
 	
-	// current state goes here
+	// Current state goes here
 	private MarginallyCleverConnection connection = null;
 	private boolean portConfirmed = false;
 
@@ -145,5 +145,31 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			}
 		}
 		return newUID;
+	}
+
+
+	protected String generateChecksum(String line) {
+		byte checksum = 0;
+
+		for (int i = 0; i < line.length(); ++i) {
+			checksum ^= line.charAt(i);
+		}
+
+		return "*" + ((int) checksum);
+	}
+
+
+	/**
+	 * Send the machine configuration to the robot
+	 */
+	public void sendConfig() {
+		if (getConnection() != null && !isPortConfirmed()) return;
+
+		// Send  new configuration values to the robot.
+		try {
+			connection.sendMessage(settings.getConfigLine() + "\n");
+			connection.sendMessage(settings.getBobbinLine() + "\n");
+			connection.sendMessage("G92 X0 Y0\n");
+		} catch(Exception e) {}
 	}
 }
