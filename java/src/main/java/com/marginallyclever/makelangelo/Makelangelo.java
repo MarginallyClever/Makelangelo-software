@@ -273,7 +273,7 @@ implements ActionListener, MakelangeloRobotListener {
 		}
 	}
 
-	public ArrayList<String> getgCode() {
+	public ArrayList<String> getGCode() {
 		return gCode.lines;
 	}
 
@@ -912,7 +912,7 @@ implements ActionListener, MakelangeloRobotListener {
 
 
 	/**
-	 * display the about dialog.
+	 * Display the about dialog.
 	 */
 	private void displayAbout() {
 		final String aboutHtml = getAboutHtmlFromMultilingualString();
@@ -925,8 +925,11 @@ implements ActionListener, MakelangeloRobotListener {
 		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
 
+	/**
+	 * If the menu bar exists, empty it.  If it doesn't exist, create it.
+	 * @return the refreshed menu bar
+	 */
 	public JMenuBar createMenuBar() {
-		// If the menu bar exists, empty it.  If it doesn't exist, create it.
 		menuBar = new JMenuBar();
 
 		updateMenuBar();
@@ -977,7 +980,9 @@ implements ActionListener, MakelangeloRobotListener {
 		}
 	}
 
-	// Rebuild the contents of the menu based on current program state
+	/**
+	 * Rebuild the contents of the menu based on current program state
+	 */
 	public void updateMenuBar() {
 		JMenu menu, preferencesSubMenu;
 		ButtonGroup group;
