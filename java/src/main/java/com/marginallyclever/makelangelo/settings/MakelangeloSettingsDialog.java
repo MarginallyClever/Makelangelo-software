@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
@@ -42,8 +43,9 @@ implements ActionListener {
   
   protected PanelAdjustMachineSize panelAdjustMachineSize;
   protected PanelJogMotors panelJogMotors;
-  protected PanelAdjustTools panelAdjustTools;
-  protected PanelSelectTool panelSelectTool;
+  protected DrawingTool panelAdjustPen;
+  //protected PanelAdjustTools panelAdjustTools;
+  //protected PanelSelectTool panelSelectTool;
   
   protected int dialogWidth = 450;
   protected int dialogHeight = 500;
@@ -63,13 +65,15 @@ implements ActionListener {
     
     panelAdjustMachineSize = new PanelAdjustMachineSize(translator,robot);
     panelJogMotors = new PanelJogMotors(gui,translator,robot);
-    panelAdjustTools = new PanelAdjustTools(gui,translator,robot);
-    panelSelectTool = new PanelSelectTool(gui,translator,robot);
+    panelAdjustPen = robot.settings.getTool(0);
+    //panelAdjustTools = new PanelAdjustTools(gui,translator,robot);
+    //panelSelectTool = new PanelSelectTool(gui,translator,robot);
     
     panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachineSize);
     panes.addTab(translator.get("JogMotors"),panelJogMotors);
-    panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
-    panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
+    panes.addTab(translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
+    //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
+    //panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
     
 	this.setLayout(new GridBagLayout());
     GridBagConstraints d = new GridBagConstraints();
@@ -120,8 +124,9 @@ implements ActionListener {
 	  
 	  if(src == save) {
 		  panelAdjustMachineSize.save();
-		  panelAdjustTools.save();
-		  panelSelectTool.save();
+		  panelAdjustPen.save();
+		  //panelAdjustTools.save();
+		  //panelSelectTool.save();
 		  this.dispose();
 	  }
 	  if(src == cancel) {

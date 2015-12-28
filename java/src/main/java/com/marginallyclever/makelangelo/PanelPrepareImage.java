@@ -190,10 +190,10 @@ implements ActionListener, ChangeListener {
 	}
 
 
-	public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
 		translator = _translator;
 		gui = _gui;
-		robot.settings = _machineConfiguration;
+		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder());
 

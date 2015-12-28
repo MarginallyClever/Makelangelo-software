@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.prefs.Preferences;
 
+import javax.swing.JPanel;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -47,6 +49,11 @@ public abstract class DrawingTool {
 
   // Load a configure menu and let people adjust the tool settings
   public void adjust() {}
+  
+  // load a configure menu and return it to the caller for embedding.
+  public JPanel getPanel() {
+	  return null;
+  }
 
   public void setDiameter(float d) {
     diameter = d;
@@ -66,19 +73,20 @@ public abstract class DrawingTool {
 
   public void writeChangeTo(Writer out) throws IOException {
     out.write("M06 T" + toolNumber + ";\n");
+    out.write("G00 F" + getFeedRate() + ";\n");
   }
 
   public void writeOn(Writer out) throws IOException {
-    out.write("G00 Z" + zOn + " F" + zRate + ";\n");  // lower the pen.
-    out.write("G04 P50;\n");
-    out.write("G00 F" + getFeedRate() + ";\n");
+    out.write("G00 Z" + zOn + ";\n");  // lower the pen.
+    out.write("G04 P" + zRate + ";\n");
+    //out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(zOn);
   }
 
   public void writeOff(Writer out) throws IOException {
-    out.write("G00 Z" + zOff + " F" + zRate + ";\n");  // lift the pen.
-    out.write("G04 P50;\n");
-    out.write("G00 F" + getFeedRate() + ";\n");
+    out.write("G00 Z" + zOff + ";\n");  // lift the pen.
+    out.write("G04 P" + zRate + ";\n");
+    //out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(zOff);
   }
 
@@ -129,4 +137,6 @@ public abstract class DrawingTool {
     prefs.put("tool_number", Integer.toString(toolNumber));
     prefs.put("feed_rate", Float.toString(feedRate));
   }
+  
+  public void save() {}
 }

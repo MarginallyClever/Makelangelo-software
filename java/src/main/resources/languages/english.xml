@@ -388,7 +388,7 @@
 
 	<string>
 		<key>JogMotors</key>
-		<value>Jog Motors</value>
+		<value>Motors</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -515,7 +515,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>MenuAdjustTool</key>
-		<value>Tools</value>
+		<value>Pen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -609,7 +609,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift speed</value>
+		<value>Lift delay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>

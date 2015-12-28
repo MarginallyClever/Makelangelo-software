@@ -1117,7 +1117,7 @@ implements ActionListener, MakelangeloRobotListener {
 		drawPanel.setGCode(gCode);
 
 		prepareImage = new PanelPrepareImage();
-		prepareImage.createPanel(this, translator, robot.settings);
+		prepareImage.createPanel(this, translator, robot);
 		prepareImage.updateButtonAccess(false, false);
 
 		driveControls = new MakelangeloDriveControls();
