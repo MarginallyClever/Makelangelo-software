@@ -1,6 +1,7 @@
 package com.marginallyclever.drawingtools;
 
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -77,6 +78,11 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		buttonTestUp = new JButton(translator.get("penToolTest"));
 		buttonTestDown = new JButton(translator.get("penToolTest"));
 
+	    Dimension s = buttonTestUp.getPreferredSize();
+	    s.width = 80;
+	    buttonTestUp.setPreferredSize(s);
+	    buttonTestDown.setPreferredSize(s);
+
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
 
@@ -138,7 +144,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		c.gridwidth = 2;
 		c.insets = new Insets(0, 5, 5, 5);
 		c.anchor = GridBagConstraints.WEST;
-
+		
 		buttonTestUp.addActionListener(this);
 		buttonTestDown.addActionListener(this);
 		

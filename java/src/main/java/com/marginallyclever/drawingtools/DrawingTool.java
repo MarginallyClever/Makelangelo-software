@@ -73,20 +73,20 @@ public abstract class DrawingTool {
 
   public void writeChangeTo(Writer out) throws IOException {
     out.write("M06 T" + toolNumber + ";\n");
-    out.write("G00 F" + getFeedRate() + ";\n");
+    out.write("G00 F" + getFeedRate() + " A"+ machine.getAcceleration() + ";\n");
   }
 
+  // lower the pen.
   public void writeOn(Writer out) throws IOException {
-    out.write("G00 Z" + zOn + ";\n");  // lower the pen.
+    out.write("G00 Z" + zOn + ";\n");
     out.write("G04 P" + zRate + ";\n");
-    //out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(zOn);
   }
 
+  // lift the pen.
   public void writeOff(Writer out) throws IOException {
-    out.write("G00 Z" + zOff + ";\n");  // lift the pen.
+    out.write("G00 Z" + zOff + ";\n");
     out.write("G04 P" + zRate + ";\n");
-    //out.write("G00 F" + getFeedRate() + ";\n");
     drawZ(zOff);
   }
 

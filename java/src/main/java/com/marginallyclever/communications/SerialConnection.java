@@ -145,14 +145,13 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 				byte [] buffer = serialPort.readBytes(len);
 				if( len>0 ) {
 					rawInput = new String(buffer,0,len);
-//					Log(rawInput);
 					inputBuffer+=rawInput;
 					// each line ends with a \n.
 					for( x=inputBuffer.indexOf("\n"); x!=-1; x=inputBuffer.indexOf("\n") ) {
 						x=x+1;
 						oneLine = inputBuffer.substring(0,x);
 						inputBuffer = inputBuffer.substring(x);
-						processLine(oneLine);
+						notifyDataAvailable(oneLine);
 						// wait for the cue to send another command
 						if(oneLine.indexOf(CUE)==0) {
 							waitingForCue=false;
@@ -171,7 +170,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		if(!portOpened || waitingForCue) return;
 		
 		if(commandQueue.size()==0) {
-		      notifyListeners();
+		      notifyConnectionReady();
 		      return;
 		}
 		
@@ -236,26 +235,24 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 	@Override
 	public void addListener(MarginallyCleverConnectionReadyListener listener) {
-		// TODO Auto-generated method stub
-
+		listeners.add(listener);
 	}
 
 	@Override
 	public void removeListener(MarginallyCleverConnectionReadyListener listener) {
-		// TODO Auto-generated method stub
-
+		listeners.remove(listener);
 	}
 
-    private void notifyListeners() {
+    private void notifyConnectionReady() {
       for (MarginallyCleverConnectionReadyListener listener : listeners) {
-        listener.serialConnectionReady(this);
+        listener.connectionReady(this);
       }
     }
 	
 	// tell all listeners data has arrived
-	private void processLine(String line) {
+	private void notifyDataAvailable(String line) {
 	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
-	        listener.serialDataAvailable(this,line);
+	        listener.dataAvailable(this,line);
 	      }
 	}
 }

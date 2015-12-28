@@ -45,19 +45,26 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void setConnection(MarginallyCleverConnection c) {
+		if( this.connection != null ) {
+			this.connection.removeListener(this);
+		}
 		this.connection = c;
 		
-		this.connection.addListener(this);
+		if( this.connection != null ) {
+			this.connection.addListener(this);
+		}
 	}
 
 	@Override
-	public void serialConnectionReady(MarginallyCleverConnection arg0) {
+	public void connectionReady(MarginallyCleverConnection arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void serialDataAvailable(MarginallyCleverConnection arg0, String data) {
+	public void dataAvailable(MarginallyCleverConnection arg0, String data) {
+		notifyDataAvailable(data);
+		
 		if (portConfirmed == true) return;
 		if (data.lastIndexOf(hello) < 0) return;
 
@@ -95,9 +102,15 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
-	void notifyPortConfirmed() {
+	private void notifyPortConfirmed() {
 		for (MakelangeloRobotListener listener : listeners) {
 			listener.portConfirmed(this);
+		}
+	}
+	
+	private void notifyDataAvailable(String data) {
+		for(MakelangeloRobotListener listener : listeners) {
+			listener.dataAvailable(this,data);
 		}
 	}
 

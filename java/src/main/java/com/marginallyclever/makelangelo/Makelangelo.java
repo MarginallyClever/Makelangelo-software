@@ -569,14 +569,14 @@ implements ActionListener, MakelangeloRobotListener {
 
 			if (line.length() > 3) {
 				line = "N" + line_number + " " + line;
+				line += robot.generateChecksum(line);
 			}
-			line += robot.generateChecksum(line);
 
 			drawPanel.setLinesProcessed(gCode.linesProcessed);
 			statusBar.setProgress(gCode.linesProcessed, gCode.linesTotal);
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while (processLine(line) && gCode.linesProcessed < gCode.linesTotal);
+		} while (prepareToSendLine(line) && gCode.linesProcessed < gCode.linesTotal);
 
 		if (gCode.linesProcessed == gCode.linesTotal) {
 			// end of file
@@ -621,7 +621,7 @@ implements ActionListener, MakelangeloRobotListener {
 	 * @param line command to send
 	 * @return true if the robot is ready for another command to be sent.
 	 */
-	public boolean processLine(String line) {
+	public boolean prepareToSendLine(String line) {
 		if (robot.getConnection() == null || !robot.isPortConfirmed() || !isRunning) return false;
 
 		// tool change request?
@@ -662,18 +662,19 @@ implements ActionListener, MakelangeloRobotListener {
 
 		if (line.trim().equals("")) return false;
 		String reportedline = line;
+		// does it have a checksum?  hide it in the log
 		if (reportedline.contains(";")) {
 			String[] lines = line.split(";");
 			reportedline = lines[0];
 		}
 		if(reportedline.trim().equals("")) return false;
-		
-		//FIXME: without this smelly log line sendLineToRobot() could be moved into MakelangeloRobot
+				
 		log("<font color='white'>" + reportedline + "</font>");
-		reportedline += "\n";
+		line += "\n";
 
+		// send unmodified line
 		try {
-			robot.getConnection().sendMessage(reportedline);
+			robot.getConnection().sendMessage(line);
 		} catch (Exception e) {
 			log(e.getMessage());
 			return false;
@@ -1229,6 +1230,10 @@ implements ActionListener, MakelangeloRobotListener {
 
 	    // rebuild the drive pane so that the feed rates are correct.
 	    updatedriveControls();
+	}
+	
+	public void dataAvailable(MakelangeloRobot r,String data) {
+		log("<font color='#ffa500'>"+data+"</font>");
 	}
 }
 
