@@ -57,8 +57,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	@Override
 	public void connectionReady(MarginallyCleverConnection arg0) {
-		// TODO Auto-generated method stub
-		
+		notifyConnectionReady();
 	}
 
 	@Override
@@ -111,6 +110,22 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private void notifyDataAvailable(String data) {
 		for(MakelangeloRobotListener listener : listeners) {
 			listener.dataAvailable(this,data);
+		}
+	}
+	
+	private void notifyConnectionReady() {
+		for(MakelangeloRobotListener listener : listeners) {
+			listener.connectionReady(this);
+		}
+	}
+	
+	public void lineError(MarginallyCleverConnection arg0,int lineNumber) {
+		notifyLineError(lineNumber);
+	}
+	
+	private void notifyLineError(int lineNumber) {
+		for(MakelangeloRobotListener listener : listeners) {
+			listener.lineError(this,lineNumber);
 		}
 	}
 

@@ -554,9 +554,9 @@ implements ActionListener, MakelangeloRobotListener {
 		do {
 			// are there any more commands?
 			// TODO: find out how far the pen moved each line and add it to the distance total.
-			int line_number = gCode.linesProcessed;
+			int lineNumber = gCode.linesProcessed;
 			gCode.linesProcessed++;
-			line = gCode.lines.get(line_number).trim();
+			line = gCode.lines.get(lineNumber).trim();
 
 			// catch pen up/down status here
 			if (line.contains("Z" + robot.settings.getPenUpString())) {
@@ -568,7 +568,7 @@ implements ActionListener, MakelangeloRobotListener {
 
 
 			if (line.length() > 3) {
-				line = "N" + line_number + " " + line;
+				line = "N" + lineNumber + " " + line;
 				line += robot.generateChecksum(line);
 			}
 
@@ -1234,6 +1234,15 @@ implements ActionListener, MakelangeloRobotListener {
 	
 	public void dataAvailable(MakelangeloRobot r,String data) {
 		log("<font color='#ffa500'>"+data+"</font>");
+	}
+	
+	public void connectionReady(MakelangeloRobot r) {
+		sendFileCommand();
+	}
+	
+	public void lineError(MakelangeloRobot r,int lineNumber) {
+        getGcodeFile().linesProcessed = lineNumber;
+        sendFileCommand();
 	}
 }
 

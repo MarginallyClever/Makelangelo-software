@@ -35,9 +35,6 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
     ArrayList<String> commandQueue = new ArrayList<String>();
-    
-	// prevent repeating pings from appearing in console
-	boolean lastLineWasCue = false;
 
     // Listeners which should be notified of a change to the percentage.
     private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
@@ -47,11 +44,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 	@Override
 	public void sendMessage(String msg) throws Exception {
-		try {
-			serialPort.writeBytes(msg.getBytes());
-		} catch (SerialPortException e) {
-			throw new Exception(e.getMessage());
-		}
+		commandQueue.add(msg);
+		sendQueuedCommand();
 	}
 
 
@@ -84,7 +78,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 		connectionName = portName;
 		portOpened = true;
-		lastLineWasCue = false;
+		waitingForCue = true;
+		
 	}
 
 
@@ -93,9 +88,9 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	 *
 	 * @return -1 if there was no error, otherwise the line number containing the error.
 	 */
-	protected int errorReported() {
-		if (inputBuffer.lastIndexOf(NOCHECKSUM) != -1) {
-			String after_error = inputBuffer.substring(inputBuffer.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
+	protected int errorReported(String line) {
+		if (line.lastIndexOf(NOCHECKSUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
 			String x = getNumberPortion(after_error);
 			int err = 0;
 			try {
@@ -105,8 +100,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 			return err;
 		}
-		if (inputBuffer.lastIndexOf(BADCHECKSUM) != -1) {
-			String after_error = inputBuffer.substring(inputBuffer.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
+		if (line.lastIndexOf(BADCHECKSUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
 			String x = getNumberPortion(after_error);
 			int err = 0;
 			try {
@@ -116,8 +111,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 			return err;
 		}
-		if (inputBuffer.lastIndexOf(BADLINENUM) != -1) {
-			String after_error = inputBuffer.substring(inputBuffer.lastIndexOf(BADLINENUM) + BADLINENUM.length());
+		if (line.lastIndexOf(BADLINENUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(BADLINENUM) + BADLINENUM.length());
 			String x = getNumberPortion(after_error);
 			int err = 0;
 			try {
@@ -151,10 +146,18 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 						x=x+1;
 						oneLine = inputBuffer.substring(0,x);
 						inputBuffer = inputBuffer.substring(x);
-						notifyDataAvailable(oneLine);
 						// wait for the cue to send another command
 						if(oneLine.indexOf(CUE)==0) {
+							if(waitingForCue) {
+								notifyDataAvailable(oneLine);
+							}
 							waitingForCue=false;
+						} else {
+							int error_line = errorReported(oneLine);
+		                    if(error_line != -1) {
+		                    	notifyLineError(error_line);
+		                    }
+		                    notifyDataAvailable(oneLine);
 						}
 					}
 					if(waitingForCue==false) {
@@ -182,8 +185,9 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 				String [] lines = line.split(COMMENT_START);
 				command = lines[0];
 			}
-			//log(command+NEWLINE);
-			line+=NEWLINE;
+			if(line.endsWith("\n") == false) {
+				line+=NEWLINE;
+			}
 			serialPort.writeBytes(line.getBytes());
 			waitingForCue=true;
 		}
@@ -243,6 +247,12 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		listeners.remove(listener);
 	}
 
+	private void notifyLineError(int lineNumber) {
+	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
+	          listener.lineError(this,lineNumber);
+	        }
+	}
+	
     private void notifyConnectionReady() {
       for (MarginallyCleverConnectionReadyListener listener : listeners) {
         listener.connectionReady(this);
