@@ -11,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.drawingtools.DrawingTool_LED;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
-import com.marginallyclever.drawingtools.DrawingTool_Spraypaint;
 
 
 /**
@@ -105,7 +103,6 @@ public final class MakelangeloRobotSettings {
 
 	private String[] configsAvailable = null;
 
-	private Makelangelo gui = null;
 	private Translator translator = null;
 
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobotSettings.class);
@@ -117,8 +114,7 @@ public final class MakelangeloRobotSettings {
 	 * @param gui
 	 * @param translator
 	 */
-	protected MakelangeloRobotSettings(Makelangelo _gui, Translator _translator) {
-		gui = _gui;
+	protected MakelangeloRobotSettings(Translator _translator, MakelangeloRobot robot) {
 		translator = _translator;
 
 		commonPaperSizes[0] = translator.get("Other");
@@ -148,12 +144,7 @@ public final class MakelangeloRobotSettings {
 		startingPositionIndex = 4;
 		
 		tools = new ArrayList<>();
-		tools.add(new DrawingTool_Pen("Pen (black)", 0, gui, translator, this));
-		tools.add(new DrawingTool_Pen("Pen (red)", 1, gui, translator, this));
-		tools.add(new DrawingTool_Pen("Pen (green)", 2, gui, translator, this));
-		tools.add(new DrawingTool_Pen("Pen (blue)", 3, gui, translator, this));
-		tools.add(new DrawingTool_LED(gui, translator, this));
-		tools.add(new DrawingTool_Spraypaint(gui, translator, this));
+		tools.add(new DrawingTool_Pen("Pen", 0, translator, robot));
 		currentToolIndex = 0;
 
 		// which configurations are available?
@@ -210,12 +201,6 @@ public final class MakelangeloRobotSettings {
 			toolNames[c++] = t.getName();
 		}
 		return toolNames;
-	}
-
-
-	// dialog to adjust the pen up & pen down values
-	protected void adjustTool() {
-		getCurrentTool().adjust();
 	}
 
 

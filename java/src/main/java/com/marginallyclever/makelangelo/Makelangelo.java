@@ -141,9 +141,6 @@ implements ActionListener, MakelangeloRobotListener {
 	// bottom of window
 	public StatusBar statusBar;
 
-	// reading file
-	private boolean isRunning = false;
-	private boolean isPaused = true;
 	public GCodeFile gCode;
 
 	
@@ -166,7 +163,7 @@ implements ActionListener, MakelangeloRobotListener {
 		startTranslator();
 		gCode = new GCodeFile();
 		robot = new MakelangeloRobot();
-		robot.settings = new MakelangeloRobotSettings(this, translator);  //FIXME smelly
+		robot.settings = new MakelangeloRobotSettings(translator, robot);  //FIXME smelly
 		robot.addListener(this);
 		connectionManager = new SerialConnectionManager(prefs);
 		createAndShowGUI();
@@ -250,14 +247,6 @@ implements ActionListener, MakelangeloRobotListener {
 	public void lowerPen() {
 		sendLineToRobot("G00 Z" + robot.settings.getPenDownString());
 		prepareImage.lowerPen();
-	}
-
-	public boolean isRunning() {
-		return isRunning;
-	}
-
-	public boolean isPaused() {
-		return isPaused;
 	}
 
 	protected void finalize() throws Throwable {
@@ -546,8 +535,10 @@ implements ActionListener, MakelangeloRobotListener {
 	 * Take the next line from the file and send it to the robot, if permitted.
 	 */
 	public void sendFileCommand() {
-		if (isRunning == false || isPaused == true || gCode.fileOpened == false ||
-				(robot.getConnection() != null && robot.isPortConfirmed() == false) || gCode.linesProcessed >= gCode.linesTotal)
+		if (robot.isRunning() == false 
+				|| robot.isPaused() == true 
+				|| gCode.fileOpened == false 
+				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) || gCode.linesProcessed >= gCode.linesTotal)
 			return;
 
 		String line;
@@ -622,7 +613,7 @@ implements ActionListener, MakelangeloRobotListener {
 	 * @return true if the robot is ready for another command to be sent.
 	 */
 	public boolean prepareToSendLine(String line) {
-		if (robot.getConnection() == null || !robot.isPortConfirmed() || !isRunning) return false;
+		if (robot.getConnection() == null || !robot.isPortConfirmed() || !robot.isRunning()) return false;
 
 		// tool change request?
 		String[] tokens = line.split("(\\s|;)");
@@ -669,14 +660,14 @@ implements ActionListener, MakelangeloRobotListener {
 		}
 		if(reportedline.trim().equals("")) return false;
 				
-		log("<font color='white'>" + reportedline + "</font>");
+		log("<font color='0xFFFFFF'>" + reportedline + "</font>");
 		line += "\n";
 
 		// send unmodified line
 		try {
 			robot.getConnection().sendMessage(line);
 		} catch (Exception e) {
-			log(e.getMessage());
+			log("<font color='FF0000'>" + e.getMessage() + "</font>");
 			return false;
 		}
 		return true;
@@ -687,10 +678,10 @@ implements ActionListener, MakelangeloRobotListener {
 	 * TODO add an e-stop command?
 	 */
 	public void halt() {
-		isRunning = false;
-		isPaused = false;
+		robot.setRunning(false);
+		robot.unPause();
 		drawPanel.setLinesProcessed(0);
-		drawPanel.setRunning(isRunning);
+		drawPanel.setRunning(false);
 		updateMenuBar();
 	}
 
@@ -701,18 +692,10 @@ implements ActionListener, MakelangeloRobotListener {
 		startDrawing();
 	}
 
-	public void pause() {
-		isPaused = true;
-	}
-
-	public void unPause() {
-		isPaused = false;
-	}
-
 	private void startDrawing() {
-		isPaused = false;
-		isRunning = true;
-		drawPanel.setRunning(isRunning);
+		robot.unPause();
+		robot.setRunning(true);
+		drawPanel.setRunning(true);
 		updateMenuBar();
 		statusBar.start();
 		sendFileCommand();
@@ -997,10 +980,10 @@ implements ActionListener, MakelangeloRobotListener {
 				&& robot.isPortConfirmed();
 
 		if (prepareImage != null) {
-			prepareImage.updateButtonAccess(isConfirmed, isRunning);
+			prepareImage.updateButtonAccess(isConfirmed, robot.isRunning());
 		}
 		if (driveControls != null) {
-			driveControls.updateButtonAccess(isConfirmed, isRunning);
+			driveControls.updateButtonAccess(isConfirmed, robot.isRunning());
 		}
 
 
@@ -1034,7 +1017,7 @@ implements ActionListener, MakelangeloRobotListener {
 
 		// Connect menu
 		preferencesSubMenu = new JMenu(translator.get("MenuConnect"));
-		preferencesSubMenu.setEnabled(!isRunning);
+		preferencesSubMenu.setEnabled(!robot.isRunning());
 		group = new ButtonGroup();
 
 		String[] connections = connectionManager.listConnections();

@@ -37,6 +37,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobot.class);
+	// reading file
+	private boolean isRunning = false;
+	private boolean isPaused = true;
 
 	
 	
@@ -200,5 +203,25 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			connection.sendMessage(settings.getBobbinLine() + "\n");
 			connection.sendMessage("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
 		} catch(Exception e) {}
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public boolean isPaused() {
+		return isPaused;
+	}
+
+	public void pause() {
+		isPaused = true;
+	}
+
+	public void unPause() {
+		isPaused = false;
+	}
+	
+	public void setRunning(boolean running) {
+		isRunning = running;
 	}
 }

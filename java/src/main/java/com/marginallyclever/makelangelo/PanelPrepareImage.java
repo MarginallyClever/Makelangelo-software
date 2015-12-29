@@ -338,7 +338,7 @@ implements ActionListener, ChangeListener {
 
 
 		if (gui.isFileLoaded() ) {
-			if(!gui.isRunning()) {
+			if(!robot.isRunning()) {
 				if (subject == buttonStart) {
 					gui.startAt(0);
 					return;
@@ -352,19 +352,19 @@ implements ActionListener, ChangeListener {
 				}
 			} else {
 				if (subject == buttonPause) {
-					if (gui.isPaused() == true) {
+					if (robot.isPaused() == true) {
 						if (!penIsUpBeforePause) {
 							gui.lowerPen();
 						}
 						buttonPause.setText(translator.get("Pause"));
-						gui.unPause();
+						robot.unPause();
 						// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
 						gui.sendFileCommand();
 					} else {
 						penIsUpBeforePause = penIsUp;
 						gui.raisePen();
 						buttonPause.setText(translator.get("Unpause"));
-						gui.pause();
+						robot.pause();
 					}
 					return;
 				}

@@ -8,8 +8,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -27,15 +26,13 @@ public abstract class DrawingTool {
   // used while drawing to the GUI
   protected float draw_z = 0;
 
-  protected Makelangelo mainGUI;
   protected Translator translator;
-  protected MakelangeloRobotSettings machine;
+  protected MakelangeloRobot robot;
 
 
-  public DrawingTool(Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
-    mainGUI = gui;
+  public DrawingTool(Translator ms, MakelangeloRobot robot) {
     translator = ms;
-    machine = mc;
+    this.robot = robot;
     diameter = 1;
   }
 
@@ -47,9 +44,6 @@ public abstract class DrawingTool {
     return zOff;
   }
 
-  // Load a configure menu and let people adjust the tool settings
-  public void adjust() {}
-  
   // load a configure menu and return it to the caller for embedding.
   public JPanel getPanel() {
 	  return null;
@@ -73,7 +67,7 @@ public abstract class DrawingTool {
 
   public void writeChangeTo(Writer out) throws IOException {
     out.write("M06 T" + toolNumber + ";\n");
-    out.write("G00 F" + getFeedRate() + " A"+ machine.getAcceleration() + ";\n");
+    out.write("G00 F" + getFeedRate() + " A"+ robot.settings.getAcceleration() + ";\n");
   }
 
   // lower the pen.

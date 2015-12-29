@@ -14,8 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -34,8 +33,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JButton buttonCancel;
 
 	
-	public DrawingTool_Pen(Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
-		super(gui, ms, mc);
+	public DrawingTool_Pen(Translator ms, MakelangeloRobot robot) {
+		super(ms, robot);
 
 		diameter = 1.5f;
 		zRate = 50;
@@ -46,8 +45,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		name = "Pen";
 	}
 
-	public DrawingTool_Pen(String name2, int tool_id, Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
-		super(gui, ms, mc);
+	public DrawingTool_Pen(String name2, int tool_id, Translator ms, MakelangeloRobot robot) {
+		super(ms, robot);
 
 		diameter = 1.5f;
 		zRate = 120;
@@ -58,15 +57,6 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		name = name2;
 	}
 
-	public void adjust() {
-		dialog = new JDialog(mainGUI.getParentFrame(), translator.get("penToolAdjust"), true);
-		panel = getPanel();
-		dialog.add(panel);
-
-		dialog.pack();
-		dialog.setVisible(true);
-	}
-	
 	public JPanel getPanel() {
 		panel = new JPanel(new GridBagLayout());
 
@@ -152,14 +142,22 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	}
 	
 	
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
+	public void actionPerformed(ActionEvent event) {
+		Object subject = event.getSource();
 
 		if (subject == buttonTestUp) {
-			mainGUI.sendLineToRobot("G00 Z" + penUp.getText());
+			if(robot.isPortConfirmed()) {
+				try {
+				robot.getConnection().sendMessage("G00 Z" + penUp.getText());
+				} catch(Exception e) {}
+			}
 		}
 		if (subject == buttonTestDown) {
-			mainGUI.sendLineToRobot("G00 Z" + penDown.getText());
+			if(robot.isPortConfirmed()) {
+				try {
+					robot.getConnection().sendMessage("G00 Z" + penDown.getText());
+				} catch(Exception e) {}
+			}
 		}
 	}
 	
@@ -169,7 +167,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		zRate = Float.valueOf(penZRate.getText());
 		zOff = Float.valueOf(penUp.getText());
 		zOn = Float.valueOf(penDown.getText());
-		machine.saveConfig();
+		robot.settings.saveConfig();
 	}
 
 }

@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.settings;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -13,8 +11,7 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;import com.marginallyclever.makelangelo.Translator;
 
 public class PanelAdjustTools
-extends JPanel
-implements ActionListener {
+extends JPanel {
 
 	/**
 	 * 
@@ -45,23 +42,12 @@ implements ActionListener {
     	String [] names = robot.settings.getToolNames();
     	for(int i=0;i<names.length;++i) {
     		JButton b = new JButton(names[i]);
-    		b.addActionListener(this);
     		buttons.add(b);
     		this.add(b,con1);
     		con1.gridy++;
     	}
 	}
 	
-
-    public void actionPerformed(ActionEvent e) {
-    	Object subject = e.getSource();
-    	for(int i=0;i<buttons.size();++i) {
-    		if(subject == buttons.get(i)) {
-    			robot.settings.getTool(i).adjust();
-    			return;
-    		}
-    	}
-    }
     
     void save() {}
 }

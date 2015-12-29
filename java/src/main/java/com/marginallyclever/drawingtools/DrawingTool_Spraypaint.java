@@ -10,196 +10,196 @@ import java.io.IOException;
 import java.io.Writer;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
 
-public class DrawingTool_Spraypaint extends DrawingTool {
-  boolean isUp;
-  float oldX, oldY;
-  float overlap;
-  
+public class DrawingTool_Spraypaint extends DrawingTool implements ActionListener {
+	private boolean isUp;
+	private float oldX, oldY;
+	private float overlap;
 
-  public DrawingTool_Spraypaint(Makelangelo gui, Translator ms, MakelangeloRobotSettings mc) {
-    super(gui, ms, mc);
+	private JPanel panel;
+	private JTextField spraypaintDiameter;
+	private JTextField spraypaintFeedRate;
 
-    diameter = 40;
-    zRate = 80;
-    zOn = 50;
-    zOff = 90;
-    toolNumber = 2;
-    name = "Spray paint";
-    feedRate = 3000;
-    overlap = 0.3f;
+	private JTextField spraypaintUp;
+	private JTextField spraypaintDown;
+	private JTextField spraypaintZRate;
+	private JButton buttonTestDot;
+	private JButton buttonSave;
+	private JButton buttonCancel;
 
-    oldX = 0;
-    oldY = 0;
-  }
 
-  public void writeOn(Writer out) throws IOException {
-    isUp = false;
-  }
 
-  public void writeOff(Writer out) throws IOException {
-    isUp = true;
-  }
+	public DrawingTool_Spraypaint(Translator ms, MakelangeloRobot robot) {
+		super(ms, robot);
 
-  public void writeMoveTo(Writer out, float x, float y) throws IOException {
-    if (isUp) {
-      out.write("G00 X" + x + " Y" + y + ";\n");
-    } else {
-      // Make a set of dots in a row, instead of a single continuous line
-      //out.write("G00 X"+x+" Y"+y+";\n");
-      float dx = x - oldX;
-      float dy = y - oldY;
-      float len = (float) Math.sqrt(dx * dx + dy * dy);
-      float step = diameter * (1 - overlap);
-      float r = step / 2;
-      float d, px, py;
+		diameter = 40;
+		zRate = 80;
+		zOn = 50;
+		zOff = 90;
+		toolNumber = 2;
+		name = "Spray paint";
+		feedRate = 3000;
+		overlap = 0.3f;
 
-      for (d = r; d < len - r; d += step) {
-        px = oldX + dx * d / len;
-        py = oldY + dy * d / len;
-        out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
-        super.writeOn(out);
-        super.writeOff(out);
-      }
-      d = len - r;
-      px = oldX + dx * d / len;
-      py = oldY + dy * d / len;
-      out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
-      super.writeOn(out);
-      super.writeOff(out);
-    }
-    oldX = x;
-    oldY = y;
-  }
+		oldX = 0;
+		oldY = 0;
+	}
 
-  public void adjust() {
-    final JDialog driver = new JDialog(mainGUI.getParentFrame(), translator.get("spraypaintToolAdjust"), true);
-    driver.setLayout(new GridBagLayout());
+	public void writeOn(Writer out) throws IOException {
+		isUp = false;
+	}
 
-    final JTextField spraypaintDiameter = new JTextField(Float.toString(diameter), 5);
-    final JTextField spraypaintFeedRate = new JTextField(Float.toString(feedRate), 5);
+	public void writeOff(Writer out) throws IOException {
+		isUp = true;
+	}
 
-    final JTextField spraypaintUp = new JTextField(Float.toString(zOff), 5);
-    final JTextField spraypaintDown = new JTextField(Float.toString(zOn), 5);
-    final JTextField spraypaintZRate = new JTextField(Float.toString(zRate), 5);
-    final JButton buttonTestDot = new JButton("Test");
-    final JButton buttonSave = new JButton("Save");
-    final JButton buttonCancel = new JButton("Cancel");
+	public void writeMoveTo(Writer out, float x, float y) throws IOException {
+		if (isUp) {
+			out.write("G00 X" + x + " Y" + y + ";\n");
+		} else {
+			// Make a set of dots in a row, instead of a single continuous line
+			//out.write("G00 X"+x+" Y"+y+";\n");
+			float dx = x - oldX;
+			float dy = y - oldY;
+			float len = (float) Math.sqrt(dx * dx + dy * dy);
+			float step = diameter * (1 - overlap);
+			float r = step / 2;
+			float d, px, py;
 
-    GridBagConstraints c = new GridBagConstraints();
-    GridBagConstraints d = new GridBagConstraints();
+			for (d = r; d < len - r; d += step) {
+				px = oldX + dx * d / len;
+				py = oldY + dy * d / len;
+				out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
+				super.writeOn(out);
+				super.writeOff(out);
+			}
+			d = len - r;
+			px = oldX + dx * d / len;
+			py = oldY + dy * d / len;
+			out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
+			super.writeOn(out);
+			super.writeOff(out);
+		}
+		oldX = x;
+		oldY = y;
+	}
 
-    c.anchor = GridBagConstraints.EAST;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    d.anchor = GridBagConstraints.WEST;
-    d.fill = GridBagConstraints.HORIZONTAL;
-    d.weightx = 50;
-    int y = 0;
+	public JPanel getPanel() {
+		panel = new JPanel(new GridBagLayout());
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolDiameter")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(spraypaintDiameter, d);
-    ++y;
+		spraypaintDiameter = new JTextField(Float.toString(diameter), 5);
+		spraypaintFeedRate = new JTextField(Float.toString(feedRate), 5);
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolMaxFeedRate")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(spraypaintFeedRate, d);
-    ++y;
+		spraypaintUp = new JTextField(Float.toString(zOff), 5);
+		spraypaintDown = new JTextField(Float.toString(zOn), 5);
+		spraypaintZRate = new JTextField(Float.toString(zRate), 5);
+		buttonTestDot = new JButton("Test");
+		buttonSave = new JButton("Save");
+		buttonCancel = new JButton("Cancel");
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolUp")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(spraypaintUp, d);
-    ++y;
+		GridBagConstraints c = new GridBagConstraints();
+		GridBagConstraints d = new GridBagConstraints();
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolDown")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(spraypaintDown, d);
-    ++y;
+		c.anchor = GridBagConstraints.EAST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		d.anchor = GridBagConstraints.WEST;
+		d.fill = GridBagConstraints.HORIZONTAL;
+		d.weightx = 50;
+		int y = 0;
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolLiftSpeed")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(spraypaintZRate, d);
-    ++y;
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolDiameter")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(spraypaintDiameter, d);
+		++y;
 
-    c.gridx = 0;
-    c.gridy = y;
-    driver.add(new JLabel(translator.get("spraypaintToolTest")), c);
-    d.gridx = 1;
-    d.gridy = y;
-    driver.add(buttonTestDot, d);
-    ++y;
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolMaxFeedRate")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(spraypaintFeedRate, d);
+		++y;
 
-    c.gridx = 1;
-    c.gridy = y;
-    driver.add(buttonSave, c);
-    c.gridx = 2;
-    c.gridy = y;
-    driver.add(buttonCancel, c);
-    ++y;
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolUp")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(spraypaintUp, d);
+		++y;
 
-    c.gridwidth = 2;
-    c.insets = new Insets(0, 5, 5, 5);
-    c.anchor = GridBagConstraints.WEST;
-    /*
-    c.gridheight=4;
-    c.gridx=0;  c.gridy=y;
-    driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
-                 "raise and lower the pen."),c);
-    */
-    ActionListener driveButtons = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        Object subject = e.getSource();
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolDown")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(spraypaintDown, d);
+		++y;
 
-        if (subject == buttonTestDot) {
-          mainGUI.sendLineToRobot("G00 Z" + spraypaintUp.getText() + " F" + spraypaintZRate.getText());
-          mainGUI.sendLineToRobot("G00 Z" + spraypaintDown.getText() + " F" + spraypaintZRate.getText());
-        }
-        if (subject == buttonSave) {
-          diameter = Float.valueOf(spraypaintDiameter.getText());
-          feedRate = Float.valueOf(spraypaintFeedRate.getText());
-          zOff = Float.valueOf(spraypaintUp.getText());
-          zOn = Float.valueOf(spraypaintDown.getText());
-          zRate = Float.valueOf(spraypaintZRate.getText());
-          machine.saveConfig();
-          driver.dispose();
-        }
-        if (subject == buttonCancel) {
-          driver.dispose();
-        }
-      }
-    };
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolLiftSpeed")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(spraypaintZRate, d);
+		++y;
 
-    buttonTestDot.addActionListener(driveButtons);
+		c.gridx = 0;
+		c.gridy = y;
+		panel.add(new JLabel(translator.get("spraypaintToolTest")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		panel.add(buttonTestDot, d);
+		++y;
 
-    buttonSave.addActionListener(driveButtons);
-    buttonCancel.addActionListener(driveButtons);
-    driver.getRootPane().setDefaultButton(buttonSave);
+		c.gridx = 1;
+		c.gridy = y;
+		panel.add(buttonSave, c);
+		c.gridx = 2;
+		c.gridy = y;
+		panel.add(buttonCancel, c);
+		++y;
 
-    mainGUI.sendLineToRobot("M114");
-    driver.pack();
-    driver.setVisible(true);
-  }
+		c.gridwidth = 2;
+		c.insets = new Insets(0, 5, 5, 5);
+		c.anchor = GridBagConstraints.WEST;
+
+		buttonTestDot.addActionListener(this);
+		buttonSave.addActionListener(this);
+		buttonCancel.addActionListener(this);
+
+		return panel;
+	}
+
+	public void actionPerformed(ActionEvent event) {
+		Object subject = event.getSource();
+
+		if (subject == buttonTestDot) {
+			if(robot.isPortConfirmed()) {
+				try {
+					robot.getConnection().sendMessage("G00 Z" + spraypaintUp.getText() + " F" + spraypaintZRate.getText());
+					robot.getConnection().sendMessage("G00 Z" + spraypaintDown.getText() + " F" + spraypaintZRate.getText());
+				} catch(Exception e) {}
+			}
+		}
+	}
+
+	public void save() {
+		diameter = Float.valueOf(spraypaintDiameter.getText());
+		feedRate = Float.valueOf(spraypaintFeedRate.getText());
+		zOff = Float.valueOf(spraypaintUp.getText());
+		zOn = Float.valueOf(spraypaintDown.getText());
+		zRate = Float.valueOf(spraypaintZRate.getText());
+		robot.settings.saveConfig();	  
+	}
 }
