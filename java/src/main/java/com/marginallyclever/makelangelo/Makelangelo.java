@@ -741,17 +741,7 @@ implements ActionListener, MakelangeloRobotListener {
 			return;
 		}
 		if (subject == buttonDisconnect) {
-			robot.getConnection().closeConnection();
-			robot.setConnection(null);
-			clearLog();
-			drawPanel.setConnected(false);
-			updateMenuBar();
-			playDisconnectSound();
-
-			// update window title
-			this.mainframe.setTitle(translator.get("TitlePrefix")
-					+ Long.toString(robot.settings.getUID())
-					+ translator.get("TitleNotConnected"));
+			disconnect();
 			return;
 		}
 		if (subject == buttonAdjustSounds) {
@@ -823,7 +813,7 @@ implements ActionListener, MakelangeloRobotListener {
 		String[] connections = connectionManager.listConnections();
 		for (int i = 0; i < connections.length; ++i) {
 			if (subject == buttonPorts[i]) {
-
+				clearLog();
 				log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
 
 				MarginallyCleverConnection c = connectionManager.openConnection(connections[i]); 
@@ -838,6 +828,19 @@ implements ActionListener, MakelangeloRobotListener {
 				return;
 			}
 		}
+	}
+	
+	private void disconnect() {
+		robot.getConnection().closeConnection();
+		robot.setConnection(null);
+		drawPanel.setConnected(false);
+		updateMenuBar();
+		playDisconnectSound();
+
+		// update window title
+		this.mainframe.setTitle(translator.get("TitlePrefix")
+				+ Long.toString(robot.settings.getUID())
+				+ translator.get("TitleNotConnected"));
 	}
 	
 	/**
