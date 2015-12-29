@@ -104,9 +104,13 @@ implements ActionListener, MakelangeloRobotListener {
 
 	private MarginallyCleverConnectionManager connectionManager;
 	private MakelangeloRobot robot;
+	public GCodeFile gCode;
+	
+	private Translator translator;
 	
 	// GUI elements
 	private JFrame mainframe;
+	// Top of window
 	private JMenuBar menuBar;
 	private JMenuItem buttonExit;
 	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
@@ -114,10 +118,26 @@ implements ActionListener, MakelangeloRobotListener {
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
 	private JMenuItem buttonAbout, buttonCheckForUpdate;
 
-	private JMenuItem[] buttonPorts;
-
-	// logging
 	/**
+	 * buttons that represent connections to real robots attached to the computer.
+	 */
+	private JMenuItem[] buttonConnections;
+	
+	// main window layout
+	private Splitter splitLeftRight;
+	// OpenGL window
+	private DrawPanel drawPanel;
+	// Context sensitive menu
+	private JTabbedPane contextMenu;
+	// Menu tabs
+	private PanelPrepareImage prepareImage;
+	private MakelangeloDriveControls driveControls;
+	private PanelLog logPanel;
+	// Bottom of window
+	public StatusBar statusBar;
+
+	/**
+	 * logging
 	 * @see org.slf4j.Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
@@ -126,24 +146,6 @@ implements ActionListener, MakelangeloRobotListener {
 	 */
 	private Writer logToFile;
 	
-	
-	// main window layout
-	private Splitter splitLeftRight;
-	// OpenGL window
-	private DrawPanel drawPanel;
-	// context sensitive menu
-	private JTabbedPane contextMenu;
-	// menu tabs
-	private PanelPrepareImage prepareImage;
-	private MakelangeloDriveControls driveControls;
-	private PanelLog logPanel;
-	// bottom of window
-	public StatusBar statusBar;
-
-	public GCodeFile gCode;
-
-	
-	private Translator translator;
 
 
 	public static void main(String[] argv) {
@@ -317,9 +319,6 @@ implements ActionListener, MakelangeloRobotListener {
 		return System.getProperty("user.dir") + "/temp.ngc";
 	}
 
-	public boolean isFileLoaded() {
-		return (gCode.fileOpened && gCode.getLines() != null && gCode.getLines().size() > 0);
-	}
 
 	private String selectFile() {
 		JFileChooser choose = new JFileChooser();
@@ -531,7 +530,7 @@ implements ActionListener, MakelangeloRobotListener {
 	public void sendFileCommand() {
 		if (robot.isRunning() == false 
 				|| robot.isPaused() == true 
-				|| gCode.fileOpened == false 
+				|| gCode.isFileOpened() == false 
 				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
 			return;
 
@@ -785,7 +784,7 @@ implements ActionListener, MakelangeloRobotListener {
 
 		String[] connections = connectionManager.listConnections();
 		for (int i = 0; i < connections.length; ++i) {
-			if (subject == buttonPorts[i]) {
+			if (subject == buttonConnections[i]) {
 				clearLog();
 				log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
 
@@ -1011,17 +1010,17 @@ implements ActionListener, MakelangeloRobotListener {
 		group = new ButtonGroup();
 
 		String[] connections = connectionManager.listConnections();
-		buttonPorts = new JRadioButtonMenuItem[connections.length];
+		buttonConnections = new JRadioButtonMenuItem[connections.length];
 		for (i = 0; i < connections.length; ++i) {
-			buttonPorts[i] = new JRadioButtonMenuItem(connections[i]);
+			buttonConnections[i] = new JRadioButtonMenuItem(connections[i]);
 			if (robot.getConnection() != null 
 					&& robot.getConnection().isOpen() 
 					&& robot.getConnection().getRecentConnection().equals(connections[i]) ) {
-				buttonPorts[i].setSelected(true);
+				buttonConnections[i].setSelected(true);
 			}
-			buttonPorts[i].addActionListener(this);
-			group.add(buttonPorts[i]);
-			preferencesSubMenu.add(buttonPorts[i]);
+			buttonConnections[i].addActionListener(this);
+			group.add(buttonConnections[i]);
+			preferencesSubMenu.add(buttonConnections[i]);
 		}
 
 		preferencesSubMenu.addSeparator();

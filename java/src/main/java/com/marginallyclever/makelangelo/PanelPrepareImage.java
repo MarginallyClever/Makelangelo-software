@@ -190,8 +190,8 @@ implements ActionListener, ChangeListener {
 	}
 
 
-	public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
-		translator = _translator;
+	public void createPanel(Makelangelo _gui, Translator translator, MakelangeloRobot robot) {
+		this.translator = translator;
 		gui = _gui;
 		this.robot = robot;
 
@@ -337,7 +337,7 @@ implements ActionListener, ChangeListener {
 		}
 
 
-		if (gui.isFileLoaded() ) {
+		if (gui.gCode.isLoaded() ) {
 			if(!robot.isRunning()) {
 				if (subject == buttonStart) {
 					gui.startAt(0);
@@ -427,7 +427,6 @@ implements ActionListener, ChangeListener {
 	public void newFile() {
 		gui.gCode.reset();
 		gui.updateMenuBar();
-		gui.gCode.changed=true;
 		gui.updateMachineConfig();
 	}
 
@@ -547,19 +546,19 @@ implements ActionListener, ChangeListener {
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
 		gui.log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
-		boolean file_loaded_ok = false;
+		boolean success = false;
 
 		if (isFileGcode(filename)) {
-			file_loaded_ok = loadGCode(filename);
+			success = loadGCode(filename);
 		} else if (isFileDXF(filename)) {
-			file_loaded_ok = loadDXF(filename);
+			success = loadDXF(filename);
 		} else if (isFileImage(filename)) {
-			file_loaded_ok = loadImage(filename);
+			success = loadImage(filename);
 		} else {
 			gui.log("<font color='red'>" + translator.get("UnknownFileType") + "</font>\n");
 		}
 
-		if (file_loaded_ok == true) {
+		if (success == true) {
 			lastFileIn = filename;
 			gui.updateMenuBar();
 		}

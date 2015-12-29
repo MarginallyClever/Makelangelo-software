@@ -19,27 +19,27 @@ import java.util.Scanner;
 public class GCodeFile {
 	private int linesTotal = 0;
 	private int linesProcessed = 0;
-	public boolean fileOpened = false;
+	private boolean fileOpened = false;
 	private ArrayList<String> lines = new ArrayList<String>();
 	public float estimatedTime = 0;
 	public float estimatedLength = 0;
 	public int estimateCount = 0;
 	public float scale = 1.0f;
-	public float feed_rate = 1.0f;
+	public float feedRate = 1.0f;
 	public boolean changed = false;
 
 
 	public void reset() {
 		setLinesTotal(0);
 		setLinesProcessed(0);
-		fileOpened = false;
+		setFileOpened(false);
 		setLines(new ArrayList<String>());
 		estimatedTime = 0;
 		estimatedLength = 0;
 		estimateCount = 0;
 		scale = 1.0f;
-		feed_rate = 1.0f;
-		changed = false;
+		feedRate = 1.0f;
+		changed = true;
 	}
 
 	// returns angle of dy/dx as a value from 0...2PI
@@ -50,11 +50,15 @@ public class GCodeFile {
 	}
 
 
-	void estimateDrawTime() {
+	/**
+	 * Estimate the time required to execute all the gcode commands.
+	 * Requires machine settings, and should probably be moved into MakelangeloRobot
+	 */
+	private void estimateDrawTime() {
 		int j;
 
 		double px = 0, py = 0, pz = 0, length = 0, x, y, z, ai, aj;
-		feed_rate = 1.0f;
+		feedRate = 1.0f;
 		scale = 0.1f;
 		estimatedTime = 0;
 		estimatedLength = 0;
@@ -73,12 +77,12 @@ public class GCodeFile {
 				if (tokens[j].equals("G21")) scale = 0.10f;  // mm->cm
 				if (tokens[j].startsWith("F")) {
 					try {
-						feed_rate = Float.valueOf(tokens[j].substring(1)) * scale;
+						feedRate = Float.valueOf(tokens[j].substring(1)) * scale;
 					}
 					catch(Exception e) {
 						e.printStackTrace(); 
 					}
-					assert (!Float.isNaN(feed_rate) && feed_rate != 0);
+					assert (!Float.isNaN(feedRate) && feedRate != 0);
 				}
 			}
 
@@ -97,7 +101,7 @@ public class GCodeFile {
 
 			if (z != pz) {
 				// pen up/down action
-				estimatedTime += (z - pz) / feed_rate;  // seconds?
+				estimatedTime += (z - pz) / feedRate;  // seconds?
 				assert (!Float.isNaN(estimatedTime));
 			}
 
@@ -107,7 +111,7 @@ public class GCodeFile {
 				double ddx = x - px;
 				double ddy = y - py;
 				length = Math.sqrt(ddx * ddx + ddy * ddy);
-				estimatedTime += length / feed_rate;
+				estimatedTime += length / feedRate;
 				assert (!Float.isNaN(estimatedTime));
 				estimatedLength += length;
 				++estimateCount;
@@ -133,7 +137,7 @@ public class GCodeFile {
 				theta = Math.abs(angle2 - angle1);
 				// length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
 				length = theta * radius;
-				estimatedTime += length / feed_rate;
+				estimatedTime += length / feedRate;
 				assert (!Float.isNaN(estimatedTime));
 				estimatedLength += length;
 				++estimateCount;
@@ -152,8 +156,9 @@ public class GCodeFile {
 
 	// close the file, clear the preview tab
 	public void closeFile() {
-		if (fileOpened == true) {
-			fileOpened = false;
+		if (isFileOpened() == true) {
+			setFileOpened(false);
+			lines.clear();
 		}
 	}
 
@@ -173,7 +178,7 @@ public class GCodeFile {
 		} finally {
 			scanner.close();
 		}
-		fileOpened = true;
+		setFileOpened(true);
 		estimateDrawTime();
 	}
 
@@ -207,7 +212,7 @@ public class GCodeFile {
 		return linesTotal;
 	}
 
-	public void setLinesTotal(int linesTotal) {
+	private void setLinesTotal(int linesTotal) {
 		this.linesTotal = linesTotal;
 	}
 
@@ -215,12 +220,12 @@ public class GCodeFile {
 		return lines;
 	}
 
-	public void setLines(ArrayList<String> lines) {
+	private void setLines(ArrayList<String> lines) {
 		this.lines = lines;
 	}
 
 	public boolean moreLinesAvailable() {
-		if( fileOpened == false ) return false;
+		if( isFileOpened() == false ) return false;
 		if( getLinesProcessed() >= getLinesTotal() ) return false;
 		
 		return true;
@@ -231,6 +236,18 @@ public class GCodeFile {
 		setLinesProcessed(lineNumber + 1);
 		String line = getLines().get(lineNumber).trim();
 		return line;
+	}
+
+	public boolean isFileOpened() {
+		return fileOpened;
+	}
+
+	private void setFileOpened(boolean fileOpened) {
+		this.fileOpened = fileOpened;
+	}
+
+	public boolean isLoaded() {
+		return (isFileOpened() && getLines() != null && getLines().size() > 0);
 	}
 }
 
