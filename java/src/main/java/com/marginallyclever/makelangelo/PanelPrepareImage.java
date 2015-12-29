@@ -494,7 +494,7 @@ implements ActionListener, ChangeListener {
 			String destinationFile = gui.getTempDestinationFile();
 			gui.getDrawPanel().setDecorator(chosenGenerator);
 			chosenGenerator.generate(destinationFile);
-			gui.getDrawPanel().setDecorator(chosenGenerator);
+			gui.getDrawPanel().setDecorator(null);
 
 			loadGCode(destinationFile);
 			gui.playConversionFinishedSound();
@@ -905,7 +905,10 @@ implements ActionListener, ChangeListener {
 					ImageConverter converter = imageConverters.get(getPreferredDrawStyle());
 					converter.setParent(this);
 					converter.setProgressMonitor(pm);
+
+					gui.getDrawPanel().setDecorator(converter);
 					converter.convert(img, out);
+					gui.getDrawPanel().setDecorator(null);
 
 					if(robot.settings.shouldSignName()) {
 						// Sign name
