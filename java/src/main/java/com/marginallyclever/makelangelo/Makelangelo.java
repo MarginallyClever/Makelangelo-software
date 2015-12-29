@@ -33,6 +33,9 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -141,11 +144,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	 * @see org.slf4j.Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
-	/**
-	 * <b>Seriously</b> consider not having this as a member variable and using try with resources statement.
-	 */
-	private Writer logToFile;
-	
 
 
 	public static void main(String[] argv) {
@@ -173,19 +171,40 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 
 	public void startLog() {
-		try (final Writer fileWriter = new FileWriter("log.html")) {
-			logToFile = new PrintWriter(fileWriter);
-			Calendar cal = Calendar.getInstance();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			logToFile.write("<h3>" + sdf.format(cal.getTime()) + "</h3>\n");
+		Path p = FileSystems.getDefault().getPath("log.html");
+		try {
+			Files.deleteIfExists(p);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		// print starting time
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		log("<h3>" + sdf.format(cal.getTime()) + "</h3>\n");
+	}
+
+
+	// appends a message to the log tab and system out.
+	public void log(String msg) {
+		try (Writer fileWriter = new FileWriter("log.html", true)) {
+			PrintWriter logToFile = new PrintWriter(fileWriter);
+			logToFile.write(msg);
+			logToFile.flush();
 		} catch (IOException e) {
 			logger.error("{}", e);
 		}
+		
+		if(logPanel!=null) {
+			logPanel.log(msg);
+		}		
 	}
 
-	public void endLog() {
-		IOUtils.closeQuietly(logToFile);
+	public void clearLog() {
+		logPanel.clearLog();
 	}
+	
 	
 	public void startTranslator() {
 		translator = new Translator();
@@ -230,12 +249,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		prepareImage.lowerPen();
 	}
 
-	protected void finalize() throws Throwable {
-		//do finalization here
-		endLog();
-		super.finalize(); //not necessary if extending Object.
-	}
-
 	public void updateMachineConfig() {
 		if (drawPanel != null) {
 			drawPanel.updateMachineConfig();
@@ -272,27 +285,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	private void playDrawingFinishedSound() {
 		playSound(prefs.get("sound_drawing_finished", ""));
-	}
-
-
-	// appends a message to the log tab and system out.
-	public void log(String msg) {
-		if(logPanel!=null) {
-			logPanel.log(msg);
-			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-		}
-		
-		try {
-			logToFile.write(msg);
-			logToFile.flush();
-		} catch (IOException e) {
-			logger.error("{}", e);
-		}
-		
-	}
-
-	public void clearLog() {
-		logPanel.clearLog();
 	}
 
 
