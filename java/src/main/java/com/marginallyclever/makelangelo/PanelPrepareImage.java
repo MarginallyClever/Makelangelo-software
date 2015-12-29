@@ -497,7 +497,7 @@ implements ActionListener, ChangeListener {
 			gui.getDrawPanel().setDecorator(null);
 
 			loadGCode(destinationFile);
-			gui.playConversionFinishedSound();
+			gui.soundSystem.playConversionFinishedSound();
 
 			// Force update of graphics layout.
 			gui.updateMachineConfig();
@@ -846,7 +846,7 @@ implements ActionListener, ChangeListener {
 			public void done() {
 				pm.close();
 				gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
-				gui.playConversionFinishedSound();
+				gui.soundSystem.playConversionFinishedSound();
 				if (ok) {
 					loadGCode(destinationFile);
 				}
@@ -932,7 +932,7 @@ implements ActionListener, ChangeListener {
 				pm.close();
 				gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
 				loadGCode(destinationFile);
-				gui.playConversionFinishedSound();
+				gui.soundSystem.playConversionFinishedSound();
 			}
 		};
 

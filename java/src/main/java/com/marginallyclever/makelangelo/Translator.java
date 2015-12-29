@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -22,10 +19,6 @@ import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
-
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -86,7 +79,7 @@ public final class Translator {
 		// find the english name of the default language.
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		System.out.println("Default language = "+defaultLanguage);
+		//System.out.println("Default language = "+defaultLanguage);
 		
 		// load the languages
 		try {

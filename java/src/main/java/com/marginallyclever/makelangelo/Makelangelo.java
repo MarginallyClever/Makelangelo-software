@@ -18,7 +18,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,21 +38,16 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -66,7 +60,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
@@ -139,6 +132,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// Bottom of window
 	public StatusBar statusBar;
 
+	public SoundSystem soundSystem = new SoundSystem();
+	
 	/**
 	 * logging
 	 * @see org.slf4j.Logger
@@ -256,166 +251,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		}
 	}
 
-	private void playSound(String url) {
-		if (url.isEmpty()) return;
-
-		try {
-			Clip clip = AudioSystem.getClip();
-			BufferedInputStream x = new BufferedInputStream(new FileInputStream(url));
-			AudioInputStream inputStream = AudioSystem.getAudioInputStream(x);
-			clip.open(inputStream);
-			clip.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-		}
-	}
-
-	public void playConnectSound() {
-		playSound(prefs.get("sound_connect", ""));
-	}
-
-	private void playDisconnectSound() {
-		playSound(prefs.get("sound_disconnect", ""));
-	}
-
-	public void playConversionFinishedSound() {
-		playSound(prefs.get("sound_conversion_finished", ""));
-	}
-
-	private void playDrawingFinishedSound() {
-		playSound(prefs.get("sound_drawing_finished", ""));
-	}
-
 
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir") + "/temp.ngc";
-	}
-
-
-	private String selectFile() {
-		JFileChooser choose = new JFileChooser();
-		int returnVal = choose.showOpenDialog(this.mainframe);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = choose.getSelectedFile();
-			return file.getAbsolutePath();
-		} else {
-			//System.out.println("File access cancelled by user.");
-			return "";
-		}
-	}
-
-	/**
-	 * Adjust sound preferences
-	 */
-	protected void adjustSounds() {
-		final JDialog driver = new JDialog(this.mainframe, translator.get("MenuSoundsTitle"), true);
-		driver.setLayout(new GridBagLayout());
-		
-		final JTextField sound_connect = new JTextField(prefs.get("sound_connect", ""), 32);
-		final JTextField sound_disconnect = new JTextField(prefs.get("sound_disconnect", ""), 32);
-		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""), 32);
-		final JTextField sound_drawing_finished = new JTextField(prefs.get("sound_drawing_finished", ""), 32);
-
-		final JButton change_sound_connect = new JButton(translator.get("MenuSoundsConnect"));
-		final JButton change_sound_disconnect = new JButton(translator.get("MenuSoundsDisconnect"));
-		final JButton change_sound_conversion_finished = new JButton(translator.get("MenuSoundsFinishConvert"));
-		final JButton change_sound_drawing_finished = new JButton(translator.get("MenuSoundsFinishDraw"));
-
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
-
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton save = new JButton(translator.get("Save"));
-
-		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 3;
-		driver.add(change_sound_connect, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = 3;
-		driver.add(sound_connect, c);
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 4;
-		driver.add(change_sound_disconnect, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = 4;
-		driver.add(sound_disconnect, c);
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 5;
-		driver.add(change_sound_conversion_finished, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = 5;
-		driver.add(sound_conversion_finished, c);
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 6;
-		driver.add(change_sound_drawing_finished, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = 6;
-		driver.add(sound_drawing_finished, c);
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 2;
-		c.gridy = 12;
-		driver.add(save, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 3;
-		c.gridy = 12;
-		driver.add(cancel, c);
-
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				if (subject == change_sound_connect) sound_connect.setText(selectFile());
-				if (subject == change_sound_disconnect) sound_disconnect.setText(selectFile());
-				if (subject == change_sound_conversion_finished) sound_conversion_finished.setText(selectFile());
-				if (subject == change_sound_drawing_finished) sound_drawing_finished.setText(selectFile());
-
-				if (subject == save) {
-					//allowMetrics = allow_metrics.isSelected();
-					prefs.put("sound_connect", sound_connect.getText());
-					prefs.put("sound_disconnect", sound_disconnect.getText());
-					prefs.put("sound_conversion_finished", sound_conversion_finished.getText());
-					prefs.put("sound_drawing_finished", sound_drawing_finished.getText());
-					robot.settings.saveConfig();
-					driver.dispose();
-				}
-				if (subject == cancel) {
-					driver.dispose();
-				}
-			}
-		};
-
-		change_sound_connect.addActionListener(driveButtons);
-		change_sound_disconnect.addActionListener(driveButtons);
-		change_sound_conversion_finished.addActionListener(driveButtons);
-		change_sound_drawing_finished.addActionListener(driveButtons);
-
-		save.addActionListener(driveButtons);
-		cancel.addActionListener(driveButtons);
-		driver.getRootPane().setDefaultButton(save);
-		driver.pack();
-		driver.setVisible(true);
 	}
 
 
@@ -537,7 +375,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 		if (gCode.moreLinesAvailable() == false) {
 			// end of file
-			playDrawingFinishedSound();
+			soundSystem.playDrawingFinishedSound();
 			halt();
 			sayHooray();
 		}
@@ -591,7 +429,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 		// end of program?
 		if (Objects.equals(tokens[0], "M02") || Objects.equals(tokens[0], "M2") || Objects.equals(tokens[0], "M30")) {
-			playDrawingFinishedSound();
+			soundSystem.playDrawingFinishedSound();
 			halt();
 			return false;
 		}
@@ -690,7 +528,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonAdjustSounds) {
-			adjustSounds();
+			soundSystem.adjust(this.mainframe,translator);
 			return;
 		}
 		if (subject == buttonAdjustGraphics) {
@@ -769,7 +607,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 					robot.setConnection(c);
 					log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
 					updateMenuBar();
-					playConnectSound();
+					soundSystem.playConnectSound();
 				}
 				return;
 			}
@@ -781,7 +619,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		robot.setConnection(null);
 		drawPanel.setConnected(false);
 		updateMenuBar();
-		playDisconnectSound();
+		soundSystem.playDisconnectSound();
 
 		// update window title
 		this.mainframe.setTitle(translator.get("TitlePrefix")
