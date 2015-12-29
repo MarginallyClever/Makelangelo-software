@@ -36,6 +36,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -108,7 +109,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private Translator translator;
 	
 	// GUI elements
-	private JFrame mainframe;
+	private JFrame mainframe = null;
 	// Top of window
 	private JMenuBar menuBar;
 	private JMenuItem buttonExit;
@@ -195,47 +196,27 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	// display a dialog box of available languages and let the user select their preference.
 	public void chooseLanguage() {
-		final JDialog driver = new JDialog(this.mainframe, "Language", true);
-		driver.setLayout(new GridBagLayout());
+		JPanel panel = new JPanel(new GridBagLayout());
 
 		final String[] languageList = translator.getLanguageList();
 		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
-		final JButton save = new JButton(">>>");
+		int currentIndex = translator.getCurrentLanguageIndex();
+		languageOptions.setSelectedIndex(currentIndex);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 2;
 		c.gridx = 0;
 		c.gridy = 0;
-		driver.add(languageOptions, c);
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 2;
-		c.gridy = 0;
-		driver.add(save, c);
+		panel.add(languageOptions, c);
 
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				// TODO prevent "close" icon.  Must press save to continue!
-				if (subject == save) {
-					translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
-					translator.saveConfig();
-					driver.dispose();
-				}
-			}
-		};
-
-		save.addActionListener(driveButtons);
-
-		// arrange everything and calculate sizes
-		driver.pack();
-		// center the dialog
-		Dimension size = driver.getSize();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		driver.setLocation((screenSize.width - size.width) / 2, (screenSize.height - size.height) / 2);
-		// show it
-		driver.setVisible(true);
+		int result;
+		do {
+			result = JOptionPane.showConfirmDialog(this.mainframe, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+		} while(result != JOptionPane.OK_OPTION);
+		
+		translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
+		translator.saveConfig();
 	}
 
 
@@ -725,8 +706,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonAdjustLanguage) {
-			translator.chooseLanguage();
+			chooseLanguage();
 			updateMenuBar();
+			return;
 		}
 		if (subject == buttonExportMachinePreferences) {
 			final JFileChooser fc = new JFileChooser();
