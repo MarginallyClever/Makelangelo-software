@@ -31,7 +31,7 @@ public final class MakelangeloRobotSettings {
 
 	public final static double INCH_TO_CM = 2.54;
 
-	public final String commonPaperSizes [] = { "",
+	public final String commonPaperSizes [] = { "---",
 			"4A0 (1682 x 2378)",
 			"2A0 (1189 x 1682)",
 			"A0 (841 x 1189)",
@@ -103,8 +103,6 @@ public final class MakelangeloRobotSettings {
 
 	private String[] configsAvailable = null;
 
-	private Translator translator = null;
-
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobotSettings.class);
 
 
@@ -114,11 +112,7 @@ public final class MakelangeloRobotSettings {
 	 * @param gui
 	 * @param translator
 	 */
-	protected MakelangeloRobotSettings(Translator _translator, MakelangeloRobot robot) {
-		translator = _translator;
-
-		commonPaperSizes[0] = translator.get("Other");
-
+	protected MakelangeloRobotSettings(Translator translator, MakelangeloRobot robot) {
 		limitTop = 18 * INCH_TO_CM;
 		limitBottom = -18 * INCH_TO_CM;
 		limitLeft = -18 * INCH_TO_CM;
@@ -144,7 +138,7 @@ public final class MakelangeloRobotSettings {
 		startingPositionIndex = 4;
 		
 		tools = new ArrayList<>();
-		tools.add(new DrawingTool_Pen("Pen", 0, translator, robot));
+		tools.add(new DrawingTool_Pen(translator, robot));
 		currentToolIndex = 0;
 
 		// which configurations are available?

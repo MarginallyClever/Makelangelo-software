@@ -162,8 +162,7 @@ implements ActionListener, MakelangeloRobotListener {
 		startLog();
 		startTranslator();
 		gCode = new GCodeFile();
-		robot = new MakelangeloRobot();
-		robot.settings = new MakelangeloRobotSettings(translator, robot);  //FIXME smelly
+		robot = new MakelangeloRobot(translator);
 		robot.addListener(this);
 		connectionManager = new SerialConnectionManager(prefs);
 		createAndShowGUI();

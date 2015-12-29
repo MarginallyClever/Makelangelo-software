@@ -42,6 +42,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean isPaused = true;
 
 	
+	public MakelangeloRobot(Translator translator) {
+		settings = new MakelangeloRobotSettings(translator, this);
+	}
 	
 	public MarginallyCleverConnection getConnection() {
 		return connection;

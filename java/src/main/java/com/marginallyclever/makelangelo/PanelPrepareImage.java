@@ -309,9 +309,9 @@ implements ActionListener, ChangeListener {
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		final int machine_choiceSelectedIndex = machineChoices.getSelectedIndex();
-		long new_uid = Long.parseLong(machineChoices.getItemAt(machine_choiceSelectedIndex));
-		robot.settings.loadConfig(new_uid);
+		int selectedIndex = machineChoices.getSelectedIndex();
+		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
+		robot.settings.loadConfig(newUID);
 
 		if( subject == openConfig ) {
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, robot);
