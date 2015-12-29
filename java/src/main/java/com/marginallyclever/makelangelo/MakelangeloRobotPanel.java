@@ -104,16 +104,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	/**
 	 * Set of image file extensions.
 	 */
-	private static final Set<String> imageFileExtentions;
+	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 
 	static {
-		imageFileExtentions = new HashSet<>();
-		imageFileExtentions.add("jpg");
-		imageFileExtentions.add("jpeg");
-		imageFileExtentions.add("png");
-		imageFileExtentions.add("wbmp");
-		imageFileExtentions.add("bmp");
-		imageFileExtentions.add("gif");
+		IMAGE_FILE_EXTENSIONS = new HashSet<>();
+		IMAGE_FILE_EXTENSIONS.add("jpg");
+		IMAGE_FILE_EXTENSIONS.add("jpeg");
+		IMAGE_FILE_EXTENSIONS.add("png");
+		IMAGE_FILE_EXTENSIONS.add("wbmp");
+		IMAGE_FILE_EXTENSIONS.add("bmp");
+		IMAGE_FILE_EXTENSIONS.add("gif");
 	}
 
 	// god objects ?
@@ -149,7 +149,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private boolean mouseInside,mouseOn;
 	double last_x,last_y;
 
-	
+
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
@@ -159,7 +159,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	private List<ImageConverter> imageConverters;
 	private List<ImageGenerator> imageGenerators;
-	
+
 	// TODO use a ServiceLoader and find plugins in nearby folders
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
@@ -206,7 +206,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		JPanel panel = new JPanel(new GridBagLayout());
 		this.setViewportView(panel);
-		
+
 		GridBagConstraints con1 = new GridBagConstraints();
 		con1.gridx = 0;
 		con1.gridy = 0;
@@ -215,8 +215,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		
-		
+
+
 		// settings
 		machineNumberPanel = new JPanel(new GridLayout(1, 0));
 		updateMachineNumberPanel();
@@ -238,8 +238,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(new JSeparator(), con1);
 		con1.gridy++;
 
-		
-		
+
+
 		// Driving controls
 		mouseInside=false;
 		mouseOn=false;
@@ -251,9 +251,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		down100 = tightJButton("-100");
 		down10 = tightJButton("-10");
 		down1 = tightJButton("-1");
-		
+
 		setHome = tightJButton(translator.get("SetHome"));
-		
+
 		up1 = tightJButton("1");
 		up10 = tightJButton("10");
 		up100 = tightJButton("100");
@@ -265,11 +265,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right10 = tightJButton("10");
 		right100 = tightJButton("100");
 
-		c.fill=GridBagConstraints.BOTH; 
+		c.fill=GridBagConstraints.BOTH;
 		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
 		c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
 		c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
-		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);     setHome.setPreferredSize(new Dimension(100,20)); 
+		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);     setHome.setPreferredSize(new Dimension(100,20));
 		c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
 		c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
 		c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
@@ -292,7 +292,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right1.addActionListener(this);
 		right10.addActionListener(this);
 		right100.addActionListener(this);
-		
+
 		JPanel corners = new JPanel();
 		corners.setLayout(new GridBagLayout());
 		goTop = new JButton(translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
@@ -302,9 +302,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penUp = new JButton(translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
 		penDown = new JButton(translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
 		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
-		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20)); 
-		goHome = new JButton(translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20)); 
-		JLabel horizontalFiller = new JLabel(" ");  
+		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20));
+		goHome = new JButton(translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
+		JLabel horizontalFiller = new JLabel(" ");
 		c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
 		c.gridx=2;  c.gridy=1;  corners.add(goHome,c);
 		c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
@@ -322,7 +322,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goBottom.addActionListener(this);
 		goLeft.addActionListener(this);
 		goRight.addActionListener(this);
-		penUp.addActionListener(this); 
+		penUp.addActionListener(this);
 		penDown.addActionListener(this);
 		setHome.addActionListener(this);
 		goHome.addActionListener(this);
@@ -383,8 +383,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(new JSeparator(),con1);
 		con1.gridy++;
 
-		
-		
+
+
 		// File conversion
 		buttonNewFile = new JButton(translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener(this);
@@ -428,11 +428,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		panel.add(new JSeparator(), con1);
 		con1.gridy++;
-		
-		
 
-		
-		
+
+
+
+
 		// always have one extra empty at the end to push everything up.
 		con1.weighty = 1;
 		panel.add(new JLabel(), con1);
@@ -449,7 +449,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
 			machineNumberPanel.add(machineChoices);
 		}
-		
+
 		openConfig = new JButton(translator.get("configureMachine"));
 		openConfig.addActionListener(this);
 		openConfig.setPreferredSize(openConfig.getPreferredSize());
@@ -642,14 +642,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		buttonNewFile.setEnabled(!isRunning);
 		buttonOpenFile.setEnabled(!isRunning);
 		buttonGenerate.setEnabled(!isRunning);
-		
+
 		down100.setEnabled(isConfirmed && !isRunning);
 		down10.setEnabled(isConfirmed && !isRunning);
 		down1.setEnabled(isConfirmed && !isRunning);
 		up1.setEnabled(isConfirmed && !isRunning);
 		up10.setEnabled(isConfirmed && !isRunning);
 		up100.setEnabled(isConfirmed && !isRunning);
-		
+
 		left100.setEnabled(isConfirmed && !isRunning);
 		left10.setEnabled(isConfirmed && !isRunning);
 		left1.setEnabled(isConfirmed && !isRunning);
@@ -661,13 +661,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goBottom.setEnabled(isConfirmed && !isRunning);
 		goLeft.setEnabled(isConfirmed && !isRunning);
 		goRight.setEnabled(isConfirmed && !isRunning);
-		
+
 		setHome.setEnabled(isConfirmed && !isRunning);
 		goHome.setEnabled(isConfirmed && !isRunning);
-		
+
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
-		
+
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
 	}
 
@@ -686,7 +686,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
 		final FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"),
-				imageFileExtentions.toArray(new String[imageFileExtentions.size()]));
+		IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 		FileFilter filterDXF = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
 
 		JFileChooser fc = new JFileChooser(new File(filename));
@@ -794,12 +794,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 *
 	 * @param filename - image filename.
 	 * @return if the file is one of the acceptable image types.
-	 * @see PanelPrepareImage#imageFileExtentions
+	 * @see PanelPrepareImage#IMAGE_FILE_EXTENSIONS
 	 * @see String#toLowerCase()
 	 */
 	public boolean isFileImage(final String filename) {
 		final String ext = filename.substring(filename.lastIndexOf('.') + 1);
-		return imageFileExtentions.contains(ext.toLowerCase());
+		return IMAGE_FILE_EXTENSIONS.contains(ext.toLowerCase());
 	}
 
 	// User has asked that a file be opened.
