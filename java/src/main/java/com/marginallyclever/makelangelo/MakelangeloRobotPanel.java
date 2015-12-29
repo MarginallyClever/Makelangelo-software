@@ -786,8 +786,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	public boolean isFileImage(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.') + 1);
+	public boolean isFileImage(final String filename) {
+		final String ext = filename.substring(filename.lastIndexOf('.') + 1);
 		return imageFileExtentions.contains(ext);
 	}
 
