@@ -17,183 +17,221 @@ import java.util.Scanner;
  * @author danroyer
  */
 public class GCodeFile {
-  public int linesTotal = 0;
-  public int linesProcessed = 0;
-  public boolean fileOpened = false;
-  public ArrayList<String> lines = new ArrayList<String>();
-  public float estimated_time = 0;
-  public float estimated_length = 0;
-  public int estimate_count = 0;
-  public float scale = 1.0f;
-  public float feed_rate = 1.0f;
-  public boolean changed = false;
+	private int linesTotal = 0;
+	private int linesProcessed = 0;
+	public boolean fileOpened = false;
+	private ArrayList<String> lines = new ArrayList<String>();
+	public float estimatedTime = 0;
+	public float estimatedLength = 0;
+	public int estimateCount = 0;
+	public float scale = 1.0f;
+	public float feed_rate = 1.0f;
+	public boolean changed = false;
 
 
-  public void reset() {
-	  linesTotal = 0;
-	  linesProcessed = 0;
-	  fileOpened = false;
-	  lines = new ArrayList<String>();
-	  estimated_time = 0;
-	  estimated_length = 0;
-	  estimate_count = 0;
-	  scale = 1.0f;
-	  feed_rate = 1.0f;
-	  changed = false;
-  }
-  
-  // returns angle of dy/dx as a value from 0...2PI
-  private double atan3(double dy, double dx) {
-    double a = Math.atan2(dy, dx);
-    if (a < 0) a = (Math.PI * 2.0) + a;
-    return a;
-  }
+	public void reset() {
+		setLinesTotal(0);
+		setLinesProcessed(0);
+		fileOpened = false;
+		setLines(new ArrayList<String>());
+		estimatedTime = 0;
+		estimatedLength = 0;
+		estimateCount = 0;
+		scale = 1.0f;
+		feed_rate = 1.0f;
+		changed = false;
+	}
+
+	// returns angle of dy/dx as a value from 0...2PI
+	private double atan3(double dy, double dx) {
+		double a = Math.atan2(dy, dx);
+		if (a < 0) a = (Math.PI * 2.0) + a;
+		return a;
+	}
 
 
-  void estimateDrawTime() {
-    int j;
+	void estimateDrawTime() {
+		int j;
 
-    double px = 0, py = 0, pz = 0, length = 0, x, y, z, ai, aj;
-    feed_rate = 1.0f;
-    scale = 0.1f;
-    estimated_time = 0;
-    estimated_length = 0;
-    estimate_count = 0;
+		double px = 0, py = 0, pz = 0, length = 0, x, y, z, ai, aj;
+		feed_rate = 1.0f;
+		scale = 0.1f;
+		estimatedTime = 0;
+		estimatedLength = 0;
+		estimateCount = 0;
 
-    Iterator<String> iLine = lines.iterator();
-    while (iLine.hasNext()) {
-      String line = iLine.next();
-      String[] pieces = line.split(";");  // comments come after a semicolon.
-      if (pieces.length == 0) continue;
+		Iterator<String> iLine = getLines().iterator();
+		while (iLine.hasNext()) {
+			String line = iLine.next();
+			String[] pieces = line.split(";");  // comments come after a semicolon.
+			if (pieces.length == 0) continue;
 
-      String[] tokens = pieces[0].split("\\s");
+			String[] tokens = pieces[0].split("\\s");
 
-      for (j = 0; j < tokens.length; ++j) {
-        if (tokens[j].equals("G20")) scale = 2.54f;  // in->cm
-        if (tokens[j].equals("G21")) scale = 0.10f;  // mm->cm
-        if (tokens[j].startsWith("F")) {
-        	try {
-          feed_rate = Float.valueOf(tokens[j].substring(1)) * scale;
-        	}
-        	catch(Exception e) {
-        		e.printStackTrace(); 
-        	}
-          assert (!Float.isNaN(feed_rate) && feed_rate != 0);
-        }
-      }
+			for (j = 0; j < tokens.length; ++j) {
+				if (tokens[j].equals("G20")) scale = 2.54f;  // in->cm
+				if (tokens[j].equals("G21")) scale = 0.10f;  // mm->cm
+				if (tokens[j].startsWith("F")) {
+					try {
+						feed_rate = Float.valueOf(tokens[j].substring(1)) * scale;
+					}
+					catch(Exception e) {
+						e.printStackTrace(); 
+					}
+					assert (!Float.isNaN(feed_rate) && feed_rate != 0);
+				}
+			}
 
-      x = px;
-      y = py;
-      z = pz;
-      ai = px;
-      aj = py;
-      for (j = 1; j < tokens.length; ++j) {
-        if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
-        if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
-        if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
-        if (tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
-        if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
-      }
+			x = px;
+			y = py;
+			z = pz;
+			ai = px;
+			aj = py;
+			for (j = 1; j < tokens.length; ++j) {
+				if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
+				if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
+				if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
+				if (tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
+				if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
+			}
 
-      if (z != pz) {
-        // pen up/down action
-        estimated_time += (z - pz) / feed_rate;  // seconds?
-        assert (!Float.isNaN(estimated_time));
-      }
+			if (z != pz) {
+				// pen up/down action
+				estimatedTime += (z - pz) / feed_rate;  // seconds?
+				assert (!Float.isNaN(estimatedTime));
+			}
 
-      if (tokens[0].equals("G00") || tokens[0].equals("G0") ||
-          tokens[0].equals("G01") || tokens[0].equals("G1")) {
-        // draw a line
-        double ddx = x - px;
-        double ddy = y - py;
-        length = Math.sqrt(ddx * ddx + ddy * ddy);
-        estimated_time += length / feed_rate;
-        assert (!Float.isNaN(estimated_time));
-        estimated_length += length;
-        ++estimate_count;
-        px = x;
-        py = y;
-        pz = z;
-      } else if (tokens[0].equals("G02") || tokens[0].equals("G2") ||
-          tokens[0].equals("G03") || tokens[0].equals("G3")) {
-        // draw an arc
-        int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
-        double dx = px - ai;
-        double dy = py - aj;
-        double radius = Math.sqrt(dx * dx + dy * dy);
+			if (tokens[0].equals("G00") || tokens[0].equals("G0") ||
+					tokens[0].equals("G01") || tokens[0].equals("G1")) {
+				// draw a line
+				double ddx = x - px;
+				double ddy = y - py;
+				length = Math.sqrt(ddx * ddx + ddy * ddy);
+				estimatedTime += length / feed_rate;
+				assert (!Float.isNaN(estimatedTime));
+				estimatedLength += length;
+				++estimateCount;
+				px = x;
+				py = y;
+				pz = z;
+			} else if (tokens[0].equals("G02") || tokens[0].equals("G2") ||
+					tokens[0].equals("G03") || tokens[0].equals("G3")) {
+				// draw an arc
+				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
+				double dx = px - ai;
+				double dy = py - aj;
+				double radius = Math.sqrt(dx * dx + dy * dy);
 
-        // find angle of arc (sweep)
-        double angle1 = atan3(dy, dx);
-        double angle2 = atan3(y - aj, x - ai);
-        double theta = angle2 - angle1;
+				// find angle of arc (sweep)
+				double angle1 = atan3(dy, dx);
+				double angle2 = atan3(y - aj, x - ai);
+				double theta = angle2 - angle1;
 
-        if (dir > 0 && theta < 0) angle2 += 2.0 * Math.PI;
-        else if (dir < 0 && theta > 0) angle1 += 2.0 * Math.PI;
+				if (dir > 0 && theta < 0) angle2 += 2.0 * Math.PI;
+				else if (dir < 0 && theta > 0) angle1 += 2.0 * Math.PI;
 
-        theta = Math.abs(angle2 - angle1);
-        // length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
-        length = theta * radius;
-        estimated_time += length / feed_rate;
-        assert (!Float.isNaN(estimated_time));
-        estimated_length += length;
-        ++estimate_count;
-        px = x;
-        py = y;
-        pz = z;
-      }
-    }  // for ( each instruction )
-    assert (!Float.isNaN(estimated_time));
-    // processing time for each instruction
-    estimated_time += estimate_count * 0.007617845117845f;
-    // conversion to ms?
-    estimated_time *= 10000;
-  }
-
-
-  // close the file, clear the preview tab
-  public void closeFile() {
-    if (fileOpened == true) {
-      fileOpened = false;
-    }
-  }
+				theta = Math.abs(angle2 - angle1);
+				// length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
+				length = theta * radius;
+				estimatedTime += length / feed_rate;
+				assert (!Float.isNaN(estimatedTime));
+				estimatedLength += length;
+				++estimateCount;
+				px = x;
+				py = y;
+				pz = z;
+			}
+		}  // for ( each instruction )
+		assert (!Float.isNaN(estimatedTime));
+		// processing time for each instruction
+		estimatedTime += estimateCount * 0.007617845117845f;
+		// conversion to ms?
+		estimatedTime *= 10000;
+	}
 
 
-  public void load(String filename) throws IOException {
-    closeFile();
-
-    Scanner scanner = new Scanner(new FileInputStream(filename));
-
-    linesTotal = 0;
-    lines = new ArrayList<String>();
-    try {
-      while (scanner.hasNextLine()) {
-        lines.add(scanner.nextLine());
-        ++linesTotal;
-      }
-    } finally {
-      scanner.close();
-    }
-    fileOpened = true;
-    estimateDrawTime();
-  }
+	// close the file, clear the preview tab
+	public void closeFile() {
+		if (fileOpened == true) {
+			fileOpened = false;
+		}
+	}
 
 
-  public void save(String filename) throws IOException {
-    FileOutputStream out = new FileOutputStream(filename);
-    String temp;
+	public void load(String filename) throws IOException {
+		closeFile();
 
-    for (int i = 0; i < linesTotal; ++i) {
-      temp = lines.get(i);
-      if (!temp.endsWith(";") && !temp.endsWith(";\n")) {
-        temp += ";";
-      }
-      if (!temp.endsWith("\n")) temp += "\n";
-      out.write(temp.getBytes());
-    }
+		Scanner scanner = new Scanner(new FileInputStream(filename));
 
-    out.flush();
-    out.close();
-  }
+		setLinesTotal(0);
+		setLines(new ArrayList<String>());
+		try {
+			while (scanner.hasNextLine()) {
+				getLines().add(scanner.nextLine());
+				setLinesTotal(getLinesTotal() + 1);
+			}
+		} finally {
+			scanner.close();
+		}
+		fileOpened = true;
+		estimateDrawTime();
+	}
+
+
+	public void save(String filename) throws IOException {
+		FileOutputStream out = new FileOutputStream(filename);
+		String temp;
+
+		for (int i = 0; i < getLinesTotal(); ++i) {
+			temp = getLines().get(i);
+			if (!temp.endsWith(";") && !temp.endsWith(";\n")) {
+				temp += ";";
+			}
+			if (!temp.endsWith("\n")) temp += "\n";
+			out.write(temp.getBytes());
+		}
+
+		out.flush();
+		out.close();
+	}
+
+	public int getLinesProcessed() {
+		return linesProcessed;
+	}
+
+	public void setLinesProcessed(int linesProcessed) {
+		this.linesProcessed = linesProcessed;
+	}
+
+	public int getLinesTotal() {
+		return linesTotal;
+	}
+
+	public void setLinesTotal(int linesTotal) {
+		this.linesTotal = linesTotal;
+	}
+
+	public ArrayList<String> getLines() {
+		return lines;
+	}
+
+	public void setLines(ArrayList<String> lines) {
+		this.lines = lines;
+	}
+
+	public boolean moreLinesAvailable() {
+		if( fileOpened == false ) return false;
+		if( getLinesProcessed() >= getLinesTotal() ) return false;
+		
+		return true;
+	}
+	
+	public String nextLine() {
+		int lineNumber = getLinesProcessed();
+		setLinesProcessed(lineNumber + 1);
+		String line = getLines().get(lineNumber).trim();
+		return line;
+	}
 }
 
 

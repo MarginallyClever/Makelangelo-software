@@ -681,7 +681,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		String tool_change = "M06 T";
 		Color tool_color = Color.BLACK;
 
-		Iterator<String> commands = instructions.lines.iterator();
+		Iterator<String> commands = instructions.getLines().iterator();
 		i = 0;
 		while (commands.hasNext()) {
 			String line = commands.next();

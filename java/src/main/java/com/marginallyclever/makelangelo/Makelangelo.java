@@ -34,7 +34,6 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
@@ -261,10 +260,6 @@ implements ActionListener, MakelangeloRobotListener {
 		}
 	}
 
-	public ArrayList<String> getGCode() {
-		return gCode.lines;
-	}
-
 	private void playSound(String url) {
 		if (url.isEmpty()) return;
 
@@ -292,7 +287,7 @@ implements ActionListener, MakelangeloRobotListener {
 		playSound(prefs.get("sound_conversion_finished", ""));
 	}
 
-	private void playDawingFinishedSound() {
+	private void playDrawingFinishedSound() {
 		playSound(prefs.get("sound_drawing_finished", ""));
 	}
 
@@ -323,7 +318,7 @@ implements ActionListener, MakelangeloRobotListener {
 	}
 
 	public boolean isFileLoaded() {
-		return (gCode.fileOpened && gCode.lines != null && gCode.lines.size() > 0);
+		return (gCode.fileOpened && gCode.getLines() != null && gCode.getLines().size() > 0);
 	}
 
 	private String selectFile() {
@@ -537,16 +532,16 @@ implements ActionListener, MakelangeloRobotListener {
 		if (robot.isRunning() == false 
 				|| robot.isPaused() == true 
 				|| gCode.fileOpened == false 
-				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) || gCode.linesProcessed >= gCode.linesTotal)
+				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
 			return;
 
 		String line;
 		do {
 			// are there any more commands?
-			// TODO: find out how far the pen moved each line and add it to the distance total.
-			int lineNumber = gCode.linesProcessed;
-			gCode.linesProcessed++;
-			line = gCode.lines.get(lineNumber).trim();
+			if( gCode.moreLinesAvailable() == false ) break;
+			
+			int lineNumber = gCode.getLinesProcessed();
+			line = gCode.nextLine();
 
 			// catch pen up/down status here
 			if (line.contains("Z" + robot.settings.getPenUpString())) {
@@ -562,15 +557,15 @@ implements ActionListener, MakelangeloRobotListener {
 				line += robot.generateChecksum(line);
 			}
 
-			drawPanel.setLinesProcessed(gCode.linesProcessed);
-			statusBar.setProgress(gCode.linesProcessed, gCode.linesTotal);
+			drawPanel.setLinesProcessed(lineNumber);
+			statusBar.setProgress(lineNumber, gCode.getLinesTotal());
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while (prepareToSendLine(line) && gCode.linesProcessed < gCode.linesTotal);
+		} while ( tweakAndSendLine(line) );
 
-		if (gCode.linesProcessed == gCode.linesTotal) {
+		if (gCode.moreLinesAvailable() == false) {
 			// end of file
-			playDawingFinishedSound();
+			playDrawingFinishedSound();
 			halt();
 			sayHooray();
 		}
@@ -578,15 +573,11 @@ implements ActionListener, MakelangeloRobotListener {
 
 
 	private void sayHooray() {
-		long num_lines = gCode.linesProcessed;
-
 		JOptionPane.showMessageDialog(null,
 				translator.get("Finished") + " " +
-						num_lines +
-						translator.get("LineSegments") +
-						"\n" +
-						statusBar.getElapsed() +
-						"\n" +
+						gCode.getLinesProcessed() +
+						translator.get("LineSegments") + "\n" +
+						statusBar.getElapsed() + "\n" +
 						translator.get("SharePromo")
 				);
 	}
@@ -611,7 +602,7 @@ implements ActionListener, MakelangeloRobotListener {
 	 * @param line command to send
 	 * @return true if the robot is ready for another command to be sent.
 	 */
-	public boolean prepareToSendLine(String line) {
+	public boolean tweakAndSendLine(String line) {
 		if (robot.getConnection() == null || !robot.isPortConfirmed() || !robot.isRunning()) return false;
 
 		// tool change request?
@@ -628,7 +619,7 @@ implements ActionListener, MakelangeloRobotListener {
 
 		// end of program?
 		if (Objects.equals(tokens[0], "M02") || Objects.equals(tokens[0], "M2") || Objects.equals(tokens[0], "M30")) {
-			playDawingFinishedSound();
+			playDrawingFinishedSound();
 			halt();
 			return false;
 		}
@@ -685,9 +676,9 @@ implements ActionListener, MakelangeloRobotListener {
 	}
 
 	public void startAt(long lineNumber) {
-		gCode.linesProcessed = 0;
-		sendLineToRobot("M110 N" + gCode.linesProcessed);
-		drawPanel.setLinesProcessed(gCode.linesProcessed);
+		gCode.setLinesProcessed(0);
+		sendLineToRobot("M110 N" + gCode.getLinesProcessed());
+		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();
 	}
 
@@ -1226,7 +1217,7 @@ implements ActionListener, MakelangeloRobotListener {
 	}
 	
 	public void lineError(MakelangeloRobot r,int lineNumber) {
-        getGcodeFile().linesProcessed = lineNumber;
+        getGcodeFile().setLinesProcessed(lineNumber);
         sendFileCommand();
 	}
 }

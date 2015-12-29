@@ -618,9 +618,9 @@ implements ActionListener, ChangeListener {
 	public boolean loadGCode(String filename) {
 		try {
 			gui.gCode.load(filename);
-			gui.log("<font color='green'>" + gui.gCode.estimate_count + translator.get("LineSegments")
-			+ "\n" + gui.gCode.estimated_length + translator.get("Centimeters") + "\n"
-			+ translator.get("EstimatedTime") + gui.statusBar.formatTime((long) (gui.gCode.estimated_time)) + "s.</font>\n");
+			gui.log("<font color='green'>" + gui.gCode.estimateCount + translator.get("LineSegments")
+			+ "\n" + gui.gCode.estimatedLength + translator.get("Centimeters") + "\n"
+			+ translator.get("EstimatedTime") + gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.</font>\n");
 		} catch (IOException e) {
 			gui.log("<span style='color:red'>" + translator.get("FileNotOpened") + e.getLocalizedMessage() + "</span>\n");
 			gui.updateMenuBar();
