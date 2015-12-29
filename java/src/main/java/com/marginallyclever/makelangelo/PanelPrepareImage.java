@@ -300,7 +300,6 @@ implements ActionListener, ChangeListener {
 		if ( Double.compare(robot.settings.paperMargin , pm) != 0) {
 			robot.settings.paperMargin = pm;
 			robot.settings.saveConfig();
-			gui.getDrawPanel().repaint();
 		}
 	}
 
@@ -493,7 +492,9 @@ implements ActionListener, ChangeListener {
 			robot.settings.saveConfig();
 
 			String destinationFile = gui.getTempDestinationFile();
+			gui.getDrawPanel().setDecorator(chosenGenerator);
 			chosenGenerator.generate(destinationFile);
+			gui.getDrawPanel().setDecorator(chosenGenerator);
 
 			loadGCode(destinationFile);
 			gui.playConversionFinishedSound();

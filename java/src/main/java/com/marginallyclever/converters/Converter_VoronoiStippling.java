@@ -100,12 +100,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
         cellBorder = new ArrayList<>();
         
         initializeCells(MIN_DOT_SIZE);
-      
-        mainGUI.getDrawPanel().setDecorator(this);
         evolveCells();
-        mainGUI.getDrawPanel().setDecorator(null);
-      
         writeOutCells(out);
+        
         return true;
     }
     return false;

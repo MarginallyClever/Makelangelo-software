@@ -79,9 +79,8 @@ import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 
-// TODO while not drawing, in-app gcode editing with immediate visual feedback ?
-// TODO image processing options - cutoff, exposure, resolution, edge tracing ?
-// TODO filters > vector output, vector output > gcode.
+// TODO while not drawing, in-app gcode editing with immediate visual feedback ? edge tracing ?
+// TODO filters -> vectors, vector <-> gcode.
 
 /**
  * @author danroyer
@@ -89,7 +88,7 @@ import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
  * @since 0.0.1?
  */
 public final class Makelangelo
-implements ActionListener, MakelangeloRobotListener {
+implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -165,6 +164,7 @@ implements ActionListener, MakelangeloRobotListener {
 		gCode = new GCodeFile();
 		robot = new MakelangeloRobot(translator);
 		robot.addListener(this);
+		robot.settings.addListener(this);
 		connectionManager = new SerialConnectionManager(prefs);
 		createAndShowGUI();
 	}
@@ -1197,11 +1197,11 @@ implements ActionListener, MakelangeloRobotListener {
 	    robot.sendConfig();
 	    
 	    getDrawPanel().updateMachineConfig();
+	    getDrawPanel().setConnected(true);
 
 	    prepareImage.updateMachineNumberPanel();
 	    
 	    updateMenuBar();
-	    getDrawPanel().setConnected(true);
 
 	    // rebuild the drive pane so that the feed rates are correct.
 	    updatedriveControls();
@@ -1218,6 +1218,10 @@ implements ActionListener, MakelangeloRobotListener {
 	public void lineError(MakelangeloRobot r,int lineNumber) {
         getGcodeFile().setLinesProcessed(lineNumber);
         sendFileCommand();
+	}
+	
+	public void settingsChanged(MakelangeloRobotSettings settings) {
+		getDrawPanel().repaint();
 	}
 }
 

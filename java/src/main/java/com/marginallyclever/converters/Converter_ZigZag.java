@@ -341,8 +341,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    * @param img the image to convert.
    */
   public boolean convert(BufferedImage img,Writer out) throws IOException {
-    mainGUI.getDrawPanel().setDecorator(this);
-
     // resize & flip as needed
     // Note that changing 250/250 here changes the number of dots a lot.
     Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
@@ -361,7 +359,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
     // Shorten the line that connects the dots
     generateTSP(out);
 
-    mainGUI.getDrawPanel().setDecorator(null);
     return true;
   }
 }

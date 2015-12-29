@@ -13,71 +13,71 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Scanline extends ImageConverter {
-  public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc,
-                                  Translator ms) {
-    super(gui, mc, ms);
-  }
+	public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc,
+			Translator ms) {
+		super(gui, mc, ms);
+	}
 
-  @Override
-  public String getName() {
-    return translator.get("ScanlineName");
-  }
+	@Override
+	public String getName() {
+		return translator.get("ScanlineName");
+	}
 
-  /**
-   * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-   *
-   * @param img the image to convert.
-   */
-  @Override
-  public boolean convert(BufferedImage img,Writer out) throws IOException {
-    // The picture might be in color.  Smash it to 255 shades of grey.
-    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
-    img = bw.filter(img);
+	/**
+	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+	 *
+	 * @param img the image to convert.
+	 */
+	@Override
+	public boolean convert(BufferedImage img,Writer out) throws IOException {
+		// The picture might be in color.  Smash it to 255 shades of grey.
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		img = bw.filter(img);
 
 
-      // Set up the conversion from image space to paper space, select the current tool, etc.
-      imageStart(img, out);
-      // "please change to tool X and press any key to continue"
-      tool.writeChangeTo(out);
-      // Make sure the pen is up for the first move
-      liftPen(out);
+		// Set up the conversion from image space to paper space, select the current tool, etc.
+		imageStart(img, out);
+		// "please change to tool X and press any key to continue"
+		tool.writeChangeTo(out);
+		// Make sure the pen is up for the first move
+		liftPen(out);
 
-      // figure out how many lines we're going to have on this image.
-      int steps = (int) Math.ceil(tool.getDiameter() / (1.75 * scale));
-      if (steps < 1) steps = 1;
+		// figure out how many lines we're going to have on this image.
+		int steps = (int) Math.ceil(tool.getDiameter() / (1.75 * scale));
+		if (steps < 1) steps = 1;
 
-      // Color values are from 0...255 inclusive.  255 is white, 0 is black.
-      // Lift the pen any time the color value is > level (128 or more).
-      double level = 255.0 / 2.0;
+		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
+		// Lift the pen any time the color value is > level (128 or more).
+		double level = 255.0 / 2.0;
 
-      // from top to bottom of the image...
-      int x, y, z, i = 0;
-      for (y = 0; y < imageHeight; y += steps) {
-        ++i;
-        if ((i % 2) == 0) {
-          // every even line move left to right
+		// from top to bottom of the image...
+		int x, y, z, i = 0;
+		for (y = 0; y < imageHeight; y += steps) {
+			++i;
+			if ((i % 2) == 0) {
+				// every even line move left to right
 
-          //MoveTo(file,x,y,pen up?)
-          moveTo(out, (float) 0, (float) y, true);
-          for (x = 0; x < imageWidth; ++x) {
-            // read the image at x,y
-            z = sample3x3(img, x, y);
-            moveTo(out, (float) x, (float) y, (z > level));
-          }
-          moveTo(out, (float) imageWidth, (float) y, true);
-        } else {
-          // every odd line move right to left
-          moveTo(out, (float) imageWidth, (float) y, true);
-          for (x = imageWidth - 1; x >= 0; --x) {
-            z = sample3x3(img, x, y);
-            moveTo(out, (float) x, (float) y, (z > level));
-          }
-          moveTo(out, (float) 0, (float) y, true);
-        }
-      }
+				//MoveTo(file,x,y,pen up?)
+				moveTo(out, (float) 0, (float) y, true);
+				for (x = 0; x < imageWidth; ++x) {
+					// read the image at x,y
+					z = sample3x3(img, x, y);
+					moveTo(out, (float) x, (float) y, (z > level));
+				}
+				moveTo(out, (float) imageWidth, (float) y, true);
+			} else {
+				// every odd line move right to left
+				moveTo(out, (float) imageWidth, (float) y, true);
+				for (x = imageWidth - 1; x >= 0; --x) {
+					z = sample3x3(img, x, y);
+					moveTo(out, (float) x, (float) y, (z > level));
+				}
+				moveTo(out, (float) 0, (float) y, true);
+			}
+		}
 
-    return true;
-  }
+		return true;
+	}
 }
 
 

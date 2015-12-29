@@ -105,7 +105,26 @@ public final class MakelangeloRobotSettings {
 
 	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobotSettings.class);
 
+	private ArrayList<MakelangeloRobotSettingsListener> listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 
+	
+	
+	public void addListener(MakelangeloRobotSettingsListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeListener(MakelangeloRobotSettingsListener listener) {
+		listeners.remove(listener);
+	}
+	
+	public void notifySettingsChanged() {
+		for( MakelangeloRobotSettingsListener listener : listeners ) {
+			listener.settingsChanged(this);
+		}
+	}
+	
+	
+	
 	/**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
 	 *
@@ -260,6 +279,7 @@ public final class MakelangeloRobotSettings {
 		// once cloud logic is finished.
 		//if(GetCanUseCloud() && SaveConfigToCloud() ) return;
 		saveConfigToLocal();
+		notifySettingsChanged();
 	}
 
 	/*
