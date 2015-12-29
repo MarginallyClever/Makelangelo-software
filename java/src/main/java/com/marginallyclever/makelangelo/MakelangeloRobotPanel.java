@@ -799,7 +799,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	public boolean isFileImage(final String filename) {
 		final String ext = filename.substring(filename.lastIndexOf('.') + 1);
-		return imageFileExtentions.contains(ext);
+		return imageFileExtentions.contains(ext.toLowerCase());
 	}
 
 	// User has asked that a file be opened.
