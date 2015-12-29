@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;

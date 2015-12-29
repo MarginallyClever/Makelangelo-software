@@ -61,8 +61,6 @@ import org.kabeja.parser.ParserBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.basictypes.ImageConverter;
-import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.converters.Converter_Boxes;
 import com.marginallyclever.converters.Converter_Crosshatch;
@@ -73,6 +71,7 @@ import com.marginallyclever.converters.Converter_Spiral;
 import com.marginallyclever.converters.Converter_VoronoiStippling;
 import com.marginallyclever.converters.Converter_VoronoiZigZag;
 import com.marginallyclever.converters.Converter_ZigZag;
+import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.generators.Generator_Dragon;
 import com.marginallyclever.generators.Generator_HilbertCurve;
@@ -80,6 +79,7 @@ import com.marginallyclever.generators.Generator_KochCurve;
 import com.marginallyclever.generators.Generator_LSystemTree;
 import com.marginallyclever.generators.Generator_Maze;
 import com.marginallyclever.generators.Generator_YourMessageHere;
+import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 

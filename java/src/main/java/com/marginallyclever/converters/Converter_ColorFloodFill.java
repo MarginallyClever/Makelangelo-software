@@ -10,7 +10,6 @@ import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;

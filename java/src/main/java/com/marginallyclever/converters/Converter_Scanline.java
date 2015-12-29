@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;

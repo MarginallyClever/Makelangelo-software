@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;

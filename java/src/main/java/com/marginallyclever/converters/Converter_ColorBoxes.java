@@ -7,7 +7,6 @@ import java.io.Writer;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;

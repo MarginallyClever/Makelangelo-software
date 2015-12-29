@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
@@ -210,19 +209,17 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 				assert !lock.isHeldByCurrentThread();
 				lock.lock();
-				try {
+				//try {
 					tessellateVoronoiDiagram();
-				} finally {
+				//} finally {
 					lock.unlock();
-				}
+				//}
 				adjustCentroids();
 
 				mainGUI.getDrawPanel().repaintNow();
 
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while (generation < MAX_GENERATIONS);
-
-			mainGUI.log("<font color='green'>Last " + generation + "</font>\n");
 		} catch (Exception e) {
 			e.printStackTrace();
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {

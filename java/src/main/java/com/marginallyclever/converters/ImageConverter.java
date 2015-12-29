@@ -1,4 +1,4 @@
-package com.marginallyclever.basictypes;
+package com.marginallyclever.converters;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;

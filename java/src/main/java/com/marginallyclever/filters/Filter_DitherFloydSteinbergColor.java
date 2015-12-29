@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.ImageFilter;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;

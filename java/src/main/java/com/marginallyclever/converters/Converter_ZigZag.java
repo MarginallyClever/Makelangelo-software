@@ -8,7 +8,6 @@ import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;

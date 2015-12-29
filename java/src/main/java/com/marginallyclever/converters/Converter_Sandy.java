@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.basictypes.ImageConverter;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;

@@ -23,7 +23,6 @@ import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.basictypes.ImageGenerator;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
