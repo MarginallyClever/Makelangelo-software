@@ -101,6 +101,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	private static final long serialVersionUID = -4703402918904039337L;
 
+	/**
+	 * Set of image file extensions.
+	 */
 	private static final Set<String> imageFileExtentions;
 
 	static {
@@ -786,6 +789,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
+	/**
+	 * Checks a string's filename, which includes the file extension, (e.g. foo.jpg).
+	 *
+	 * @param filename - image filename.
+	 * @return if the file is one of the acceptable image types.
+	 * @see PanelPrepareImage#imageFileExtentions
+	 * @see String#toLowerCase()
+	 */
 	public boolean isFileImage(final String filename) {
 		final String ext = filename.substring(filename.lastIndexOf('.') + 1);
 		return imageFileExtentions.contains(ext);
