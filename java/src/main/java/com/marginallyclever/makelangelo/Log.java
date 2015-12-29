@@ -14,6 +14,11 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * static log methods available everywhere
+ * @author danroyer
+ * @since 7.3.0
+ */
 public class Log {
 	/**
 	 * logging
@@ -30,6 +35,10 @@ public class Log {
 		listeners.remove(listener);
 	}
 	
+	/**
+	 * wipe the log file
+	 * @author danroyer
+	 */
 	public static void clear() {
 		Path p = FileSystems.getDefault().getPath("log.html");
 		try {
@@ -46,7 +55,10 @@ public class Log {
 	}
 
 
-	// appends a message to the log tab and system out.
+	/**
+	 * Appends a message to the log file
+	 * @param msg
+	 */
 	public static void write(String msg) {
 		try (Writer fileWriter = new FileWriter("log.html", true)) {
 			PrintWriter logToFile = new PrintWriter(fileWriter);
@@ -62,16 +74,27 @@ public class Log {
 	}
 
 
-	// appends a message to the log tab and system out.
+	/**
+	 * Appends a message to the log file
+	 * @param color the hex code or HTML name of the color for this message
+	 * @param msg the text
+	 */
 	public static void write(String color, String msg) {
 		write("<font color='"+color+"'>"+msg+"</font>\n");
 	}
 
-	
+	/**
+	 * Appends a message to the log file.  Color will be red.
+	 * @param message
+	 */
 	static void error(String message) {
 		write("red",message);
 	}
-	
+
+	/**
+	 * Appends a message to the log file.  Color will be green.
+	 * @param message
+	 */
 	static void message(String message) {
 		write("green",message);		
 	}

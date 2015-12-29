@@ -10,7 +10,6 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Objects;
@@ -36,11 +34,9 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -54,11 +50,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.JTextComponent;
-
-import org.apache.commons.io.IOUtils;
 
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
@@ -528,7 +519,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonAbout) {
-			displayAbout();
+			DialogAbout about = new DialogAbout();
+			about.display(translator,Makelangelo.VERSION);
 			return;
 		}
 		if (subject == buttonCheckForUpdate) {
@@ -574,92 +566,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 				+ translator.get("TitleNotConnected"));
 	}
 	
-	/**
-	 * @return byte array containing data for image icon.
-	 */
-	private ImageIcon getImageIcon(String iconResourceName) {
-		ImageIcon icon = null;
-		try {
-			final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
-			icon = new ImageIcon(imageData);
-		} catch (NullPointerException | IOException e) {
-			Log.error("Error getting image icon: " + e);
-		}
-		return icon;
-	}
-
-	/**
-	 * <p>
-	 * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
-	 * representing the About Message Dialog's HTML.
-	 * </p>
-	 * <p>
-	 * <p>
-	 * The summation of {@link String#length()} for each of the respective values retrieved with the
-	 * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link Translator} keys,
-	 * in conjunction with {@link Makelangelo#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
-	 * </p>
-	 *
-	 * @return An HTML string used for the About Message Dialog.
-	 */
-	private String getAboutHtmlFromMultilingualString() {
-		final String aboutHtmlBeforeVersionNumber = translator.get("AboutHTMLBeforeVersionNumber");
-		final String aboutHmlAfterVersionNumber = translator.get("AboutHTMLAfterVersionNumber");
-		final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
-		final int versionNumberStringLength = VERSION.length();
-		final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
-		final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
-		final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
-		aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
-		aboutHtmlStringBuilder.append(VERSION);
-		aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
-		return aboutHtmlStringBuilder.toString();
-	}
-
-	/**
-	 * @param html String of valid HTML.
-	 * @return a
-	 */
-	public JTextComponent createHyperlinkListenableJEditorPane(String html) {
-		final JEditorPane bottomText = new JEditorPane();
-		bottomText.setContentType("text/html");
-		bottomText.setEditable(false);
-		bottomText.setText(html);
-		bottomText.setOpaque(false);
-		final HyperlinkListener hyperlinkListener = new HyperlinkListener() {
-			public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-				if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					if (Desktop.isDesktopSupported()) {
-						try {
-							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
-						} catch (IOException | URISyntaxException exception) {
-							// Auto-generated catch block
-							exception.printStackTrace();
-						}
-					}
-
-				}
-			}
-		};
-		bottomText.addHyperlinkListener(hyperlinkListener);
-		return bottomText;
-	}
-
-
-	/**
-	 * Display the about dialog.
-	 */
-	private void displayAbout() {
-		final String aboutHtml = getAboutHtmlFromMultilingualString();
-		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-		ImageIcon icon = getImageIcon("logo.png");
-		final String menuAboutValue = translator.get("MenuAbout");
-		if (icon == null) {
-			icon = getImageIcon("resources/logo.png");
-		}
-		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
-	}
-
 	/**
 	 * If the menu bar exists, empty it.  If it doesn't exist, create it.
 	 * @return the refreshed menu bar
