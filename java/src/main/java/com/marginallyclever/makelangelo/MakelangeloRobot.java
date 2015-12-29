@@ -188,7 +188,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 
 	/**
-	 * Send the machine configuration to the robot
+	 * Send the machine configuration to the robot.
+	 * @author danroyer
 	 */
 	public void sendConfig() {
 		if (getConnection() != null && !isPortConfirmed()) return;
@@ -197,7 +198,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		try {
 			connection.sendMessage(settings.getConfigLine() + "\n");
 			connection.sendMessage(settings.getBobbinLine() + "\n");
-			connection.sendMessage("G92 X0 Y0\n");
+			connection.sendMessage("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
 		} catch(Exception e) {}
 	}
 }
