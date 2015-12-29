@@ -22,12 +22,10 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PanelLog
 extends JPanel
-implements ActionListener, ChangeListener, KeyListener {
+implements ActionListener, ChangeListener, KeyListener, LogListener {
 
 	/**
 	 * 
@@ -38,11 +36,6 @@ implements ActionListener, ChangeListener, KeyListener {
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
 
-	/**
-	 * @see org.slf4j.Logger
-	 */
-	private final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
-
 	// command line
 	private JPanel textInputArea;
 	private JTextField commandLineText;
@@ -52,8 +45,14 @@ implements ActionListener, ChangeListener, KeyListener {
 	protected MakelangeloRobotSettings machineConfiguration;
 	protected Makelangelo gui;
 
+	public void finalize() throws Throwable  {
+		super.finalize();
+		Log.removeListener(this);
+	}
 
-	public void createPanel(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+	public PanelLog(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+		Log.addListener(this);
+		
 		translator = _translator;
 		gui = _gui;
 		machineConfiguration = _machineConfiguration;
@@ -154,7 +153,8 @@ implements ActionListener, ChangeListener, KeyListener {
 	}
 
 	// appends a message to the log tab and system out.
-	public void log(String msg) {
+	@Override
+	public void logEvent(String msg) {
 		// remove the
 		if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
 
@@ -166,7 +166,8 @@ implements ActionListener, ChangeListener, KeyListener {
 			doc.remove(0, over_length);
 			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException | IOException e) {
-			logger.error("{}", e);
+			// FIXME: failure here logs new error, causes infinite loop?
+			Log.error(e.getMessage());
 		}
 	}
 

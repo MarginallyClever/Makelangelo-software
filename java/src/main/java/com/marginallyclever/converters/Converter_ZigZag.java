@@ -13,6 +13,7 @@ import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.filters.Filter_Resize;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -86,7 +87,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
             c = "white";
             break;
         }
-        mainGUI.log("<font color='" + c + "'>" + formatTime(t_elapsed) + ": " + flen.format(len) + "mm</font>\n");
+        Log.write( c , formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
       }
       progress = new_progress;
       pm.setProgress((int) progress);
@@ -173,7 +174,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   private void generateTSP(Writer out) throws IOException {
     greedyTour();
 
-    mainGUI.log("<font color='green'>Running Lin/Kerighan optimization...</font>\n");
+    Log.write("green","Running Lin/Kerighan optimization...");
 
     len = getTourLength(solution);
     old_len = len;
@@ -221,7 +222,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
    * Starting with point 0, find the next nearest point and repeat until all points have been "found".
    */
   private void greedyTour() {
-    mainGUI.log("<font color='green'>Finding greedy tour solution...</font>\n");
+    Log.write("green","Finding greedy tour solution...");
 
     int i;
     float w, bestw;
@@ -318,7 +319,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
       }
     }
 
-    mainGUI.log("<font color='green'>" + numPoints + " points,</font>\n");
+    Log.write("green", numPoints + " points.");
     points = new Point2D[numPoints + 1];
     solution = new int[numPoints + 1];
 

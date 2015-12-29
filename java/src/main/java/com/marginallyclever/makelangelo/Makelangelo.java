@@ -22,22 +22,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -67,8 +59,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
@@ -102,7 +92,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private MakelangeloRobot robot;
 	public GCodeFile gCode;
 	
-	private Translator translator;
+	private Translator translator = new Translator();
+	public SoundSystem soundSystem = new SoundSystem();
 	
 	// GUI elements
 	private JFrame mainframe = null;
@@ -132,15 +123,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// Bottom of window
 	public StatusBar statusBar;
 
-	public SoundSystem soundSystem = new SoundSystem();
 	
-	/**
-	 * logging
-	 * @see org.slf4j.Logger
-	 */
-	private final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
-
-
 	public static void main(String[] argv) {
 		//Schedule a job for the event-dispatching thread:
 		//creating and showing this application's GUI.
@@ -153,7 +136,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 
 	public Makelangelo() {
-		startLog();
+		Log.clear();
 		startTranslator();
 		gCode = new GCodeFile();
 		robot = new MakelangeloRobot(translator);
@@ -163,46 +146,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		createAndShowGUI();
 	}
 
-
-
-	public void startLog() {
-		Path p = FileSystems.getDefault().getPath("log.html");
-		try {
-			Files.deleteIfExists(p);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		// print starting time
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		log("<h3>" + sdf.format(cal.getTime()) + "</h3>\n");
-	}
-
-
-	// appends a message to the log tab and system out.
-	public void log(String msg) {
-		try (Writer fileWriter = new FileWriter("log.html", true)) {
-			PrintWriter logToFile = new PrintWriter(fileWriter);
-			logToFile.write(msg);
-			logToFile.flush();
-		} catch (IOException e) {
-			logger.error("{}", e);
-		}
-		
-		if(logPanel!=null) {
-			logPanel.log(msg);
-		}		
-	}
-
-	public void clearLog() {
-		logPanel.clearLog();
-	}
-	
 	
 	public void startTranslator() {
-		translator = new Translator();
 		if (translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
@@ -233,6 +178,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		translator.saveConfig();
 	}
 
+	
+	
 
 	public void raisePen() {
 		sendLineToRobot("G00 Z" + robot.settings.getPenUpString());
@@ -399,7 +346,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		String[] toolNames = robot.settings.getToolNames();
 
 		if (i < 0 || i > toolNames.length) {
-			log("<span style='color:red'>" + translator.get("InvalidTool") + i + "</span>");
+			Log.error( translator.get("InvalidTool") + i );
 			i = 0;
 		}
 		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
@@ -460,14 +407,14 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		}
 		if(reportedline.trim().equals("")) return false;
 				
-		log("<font color='0xFFFFFF'>" + reportedline + "</font>");
+		Log.write("white", reportedline );
 		line += "\n";
 
 		// send unmodified line
 		try {
 			robot.getConnection().sendMessage(line);
 		} catch (Exception e) {
-			log("<font color='FF0000'>" + e.getMessage() + "</font>");
+			Log.error( e.getMessage() );
 			return false;
 		}
 		return true;
@@ -548,7 +495,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 				try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
 					prefs.exportSubtree(fileOutputStream);
 				} catch (IOException | BackingStoreException pe) {
-					logger.error("{}", pe.getMessage());
+					Log.error(pe.getMessage());
 				}
 			}
 			return;
@@ -563,7 +510,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 					Preferences.importPreferences(fileInputStream);
 					prefs.flush();
 				} catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
-					logger.error("{}", pe.getMessage());
+					Log.error(pe.getMessage());
 				}
 			}
 			return;
@@ -575,7 +522,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 					prefs.removeNode();
 					Preferences.userRoot().flush();
 				} catch (BackingStoreException e1) {
-					logger.error("{}", e1.getMessage());
+					Log.error(e1.getMessage());
 				}
 			}
 			return;
@@ -597,15 +544,15 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		String[] connections = connectionManager.listConnections();
 		for (int i = 0; i < connections.length; ++i) {
 			if (subject == buttonConnections[i]) {
-				clearLog();
-				log("<font color='green'>" + translator.get("ConnectingTo") + connections[i] + "...</font>\n");
+				logPanel.clearLog();
+				Log.message(translator.get("ConnectingTo") + connections[i] + "...");
 
 				MarginallyCleverConnection c = connectionManager.openConnection(connections[i]); 
 				if (c == null) {
-					log("<span style='color:red'>" + translator.get("PortOpenFailed") + "</span>\n");
+					Log.error(translator.get("PortOpenFailed"));
 				} else {
 					robot.setConnection(c);
-					log("<span style='color:green'>" + translator.get("PortOpened") + "</span>\n");
+					Log.message( translator.get("PortOpened") );
 					updateMenuBar();
 					soundSystem.playConnectSound();
 				}
@@ -636,7 +583,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
 			icon = new ImageIcon(imageData);
 		} catch (NullPointerException | IOException e) {
-			logger.error("Error getting image icon: {}", e);
+			Log.error("Error getting image icon: " + e);
 		}
 		return icon;
 	}
@@ -897,9 +844,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		logPanel = new PanelLog();
-		logPanel.createPanel(this, translator, robot.settings);
-		clearLog();
+		logPanel = new PanelLog(this, translator, robot.settings);
+		logPanel.clearLog();
 
 		drawPanel = new DrawPanel(robot.settings);
 		drawPanel.setGCode(gCode);
@@ -1020,7 +966,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	}
 	
 	public void dataAvailable(MakelangeloRobot r,String data) {
-		log("<font color='#ffa500'>"+data+"</font>");
+		Log.write( "#ffa500",data );
 	}
 	
 	public void connectionReady(MakelangeloRobot r) {

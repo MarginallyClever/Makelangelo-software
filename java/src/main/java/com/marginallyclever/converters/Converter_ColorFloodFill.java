@@ -13,6 +13,7 @@ import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -204,7 +205,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		int x, y;
 		int z = 0;
 
-		mainGUI.log("<font color='orange'>Palette color " + palette.getColor(color_index).toString() + "</font>\n");
+		Log.write("orange", "Palette color " + palette.getColor(color_index).toString() );
 
 		for (y = 0; y < imageHeight; y += diameter) {
 			for (x = 0; x < imageWidth; x += diameter) {
@@ -231,7 +232,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		// Make sure the pen is up for the first move
 		liftPen(osw);
 
-		mainGUI.log("<font color='green'>Color " + i + "</font>\n");
+		Log.write("green", "Color " + i );
 
 		scanForContiguousBlocks(i, osw);
 	}

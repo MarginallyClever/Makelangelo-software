@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -160,7 +161,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			//renderFont(gl2,"TimesRoman","Makelangelo",36);
 
 			// TODO Move to GUI?
-			mainGUI.log("<font color='green'>Completed.</font>\n");
+			Log.write("green","Completed.");
 
 			return true;
 		}

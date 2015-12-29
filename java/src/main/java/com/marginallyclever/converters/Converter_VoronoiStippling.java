@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -146,7 +147,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		mainGUI.log("<font color='green'>Initializing cells</font>\n");
+		Log.write("green","Initializing cells");
 
 		double totalArea = w * h;
 		double pointArea = totalArea / (double) MAX_CELLS;
@@ -200,12 +201,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	 */
 	protected void evolveCells() {
 		try {
-			mainGUI.log("<font color='green'>Mutating</font>\n");
+			Log.write("green","Mutating");
 
 			int generation = 0;
 			do {
 				generation++;
-				mainGUI.log("<font color='green'>Generation " + generation + "</font>\n");
+				Log.write("green","Generation " + generation);
 
 				assert !lock.isHeldByCurrentThread();
 				lock.lock();
@@ -232,7 +233,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	// write cell centroids to gcode.
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges != null) {
-			mainGUI.log("<font color='green'>Writing gcode to " + dest + "</font>\n");
+			Log.write("green","Writing gcode to " + dest);
 
 			imageStart(src_img, out);
 

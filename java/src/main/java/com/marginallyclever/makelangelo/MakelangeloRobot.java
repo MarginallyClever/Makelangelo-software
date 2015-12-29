@@ -227,4 +227,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void setRunning(boolean running) {
 		isRunning = running;
 	}
+	
+	public void raisePen() {
+	
+	}
+	public void lowerPen() {
+	
+	}
 }

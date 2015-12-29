@@ -523,7 +523,7 @@ implements ActionListener, ChangeListener {
 			try {
 				gui.gCode.save(selectedFile);
 			} catch (IOException e) {
-				gui.log("<span style='color:red'>" + translator.get("Failed") + e.getMessage() + "</span>\n");
+				Log.error( translator.get("Failed") + e.getMessage() );
 				return;
 			}
 		}
@@ -546,7 +546,7 @@ implements ActionListener, ChangeListener {
 
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
-		gui.log("<font color='green'>" + translator.get("OpeningFile") + filename + "...</font>\n");
+		Log.message( translator.get("OpeningFile") + filename + "...");
 		boolean success = false;
 
 		if (isFileGcode(filename)) {
@@ -556,7 +556,7 @@ implements ActionListener, ChangeListener {
 		} else if (isFileImage(filename)) {
 			success = loadImage(filename);
 		} else {
-			gui.log("<font color='red'>" + translator.get("UnknownFileType") + "</font>\n");
+			Log.error( translator.get("UnknownFileType") );
 		}
 
 		if (success == true) {
@@ -618,11 +618,11 @@ implements ActionListener, ChangeListener {
 	public boolean loadGCode(String filename) {
 		try {
 			gui.gCode.load(filename);
-			gui.log("<font color='green'>" + gui.gCode.estimateCount + translator.get("LineSegments")
+			Log.message( gui.gCode.estimateCount + translator.get("LineSegments")
 			+ "\n" + gui.gCode.estimatedLength + translator.get("Centimeters") + "\n"
-			+ translator.get("EstimatedTime") + gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.</font>\n");
+			+ translator.get("EstimatedTime") + gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
 		} catch (IOException e) {
-			gui.log("<span style='color:red'>" + translator.get("FileNotOpened") + e.getLocalizedMessage() + "</span>\n");
+			Log.error( translator.get("FileNotOpened") + e.getLocalizedMessage() );
 			gui.updateMenuBar();
 			return false;
 		}
@@ -648,7 +648,7 @@ implements ActionListener, ChangeListener {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void doInBackground() {
-				gui.log("<font color='green'>" + translator.get("Converting") + " " + destinationFile + "</font>\n");
+				Log.message( translator.get("Converting") + " " + destinationFile );
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
@@ -695,12 +695,12 @@ implements ActionListener, ChangeListener {
 					int entity_count = 0;
 					while (layer_iter.hasNext()) {
 						DXFLayer layer = (DXFLayer) layer_iter.next();
-						gui.log("<font color='yellow'>Found layer " + layer.getName() + "</font>\n");
+						Log.message( "Found layer " + layer.getName() );
 						Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 						while (entity_iter.hasNext()) {
 							String entity_type = (String) entity_iter.next();
 							List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
-							gui.log("<font color='yellow'>+ Found " + entity_list.size() + " of type " + entity_type + "</font>\n");
+							Log.message( "Found " + entity_list.size() + " of type " + entity_type );
 							entity_total += entity_list.size();
 						}
 					}
@@ -845,7 +845,7 @@ implements ActionListener, ChangeListener {
 			@Override
 			public void done() {
 				pm.close();
-				gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
+				Log.message( translator.get("Finished") );
 				gui.soundSystem.playConversionFinishedSound();
 				if (ok) {
 					loadGCode(destinationFile);
@@ -863,12 +863,12 @@ implements ActionListener, ChangeListener {
 					String message = String.format("%d%%\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
+						Log.message( translator.get("Finished") );
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						gui.log("<font color='green'>" + translator.get("Cancelled") + "</font>\n");
+						Log.message( translator.get("Cancelled") );
 					}
 				}
 			}
@@ -898,7 +898,7 @@ implements ActionListener, ChangeListener {
 				try (OutputStream fileOutputStream = new FileOutputStream(destinationFile);
 						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)){
 					// read in image
-					gui.log("<font color='green'>" + translator.get("Converting") + " " + destinationFile + "</font>\n");
+					Log.message( translator.get("Converting") + " " + destinationFile );
 					// convert with style
 					final BufferedImage img = ImageIO.read(new File(sourceFile));
 
@@ -917,7 +917,7 @@ implements ActionListener, ChangeListener {
 					}
 					gui.updateMachineConfig();
 				} catch (IOException e) {
-					gui.log("<font color='red'>" + translator.get("Failed") + e.getLocalizedMessage() + "</font>\n");
+					Log.error( translator.get("Failed") + e.getLocalizedMessage() );
 					gui.updateMenuBar();
 				}
 
@@ -930,7 +930,7 @@ implements ActionListener, ChangeListener {
 			@Override
 			public void done() {
 				pm.close();
-				gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
+				Log.message( translator.get("Finished") );
 				loadGCode(destinationFile);
 				gui.soundSystem.playConversionFinishedSound();
 			}
@@ -945,12 +945,12 @@ implements ActionListener, ChangeListener {
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						gui.log("<font color='green'>" + translator.get("Finished") + "</font>\n");
+						Log.message( translator.get("Finished") );
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						gui.log("<font color='green'>" + translator.get("Cancelled") + "</font>\n");
+						Log.message( translator.get("Cancelled") );
 					}
 				}
 			}
