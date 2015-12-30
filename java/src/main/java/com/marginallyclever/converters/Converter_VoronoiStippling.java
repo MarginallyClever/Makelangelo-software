@@ -242,7 +242,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 			tool.writeChangeTo(out);
 			liftPen(out);
 
-			float d = tool.getDiameter();
+			float toolDiameter = tool.getDiameter();
 
 			int i;
 
@@ -254,19 +254,19 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				if (r < MIN_DOT_SIZE) continue;
 				r /= scale;
 
+				boolean first=true;
 				// filled circles
-				this.moveTo(out, x + (float) Math.cos(0) * r, y + (float) Math.cos(0) * r, true);
-				while (r > d) {
-					float detail = (float) (1.0 * Math.PI * r / d);
+				while (r > toolDiameter) {
+					float detail = (float)Math.ceil(Math.PI * r / toolDiameter);
 					if (detail < 4) detail = 4;
 					if (detail > 20) detail = 20;
-					for (float j = 1; j <= detail; ++j) {
+					for (float j = 0; j <= detail; ++j) {
 						this.moveTo(out,
 								x + r * (float) Math.cos((float) Math.PI * 2.0f * j / detail),
-								y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail), false);
+								y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail), first);
+						first=false;
 					}
-					//r-=(d/(scale*1.5f));
-					r -= d;
+					r -= toolDiameter;
 				}
 				this.moveTo(out, x, y, false);
 				this.moveTo(out, x, y, true);

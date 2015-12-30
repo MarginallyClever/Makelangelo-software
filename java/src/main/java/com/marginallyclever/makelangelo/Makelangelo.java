@@ -27,8 +27,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -295,12 +293,13 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			statusBar.setProgress(lineNumber, gCode.getLinesTotal());
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
-		} while ( tweakAndSendLine(line) );
+		} while ( robot.tweakAndSendLine( line, translator ) );
 
 		if (gCode.moreLinesAvailable() == false) {
 			// end of file
-			soundSystem.playDrawingFinishedSound();
+			// stop robot
 			halt();
+			// bask in the glory
 			sayHooray();
 		}
 	}
@@ -314,55 +313,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 						statusBar.getElapsed() + "\n" +
 						translator.get("SharePromo")
 				);
-	}
-
-
-	private void changeToTool(String changeToolString) {
-		int i = Integer.decode(changeToolString);
-
-		String[] toolNames = robot.settings.getToolNames();
-
-		if (i < 0 || i > toolNames.length) {
-			Log.error( translator.get("InvalidTool") + i );
-			i = 0;
-		}
-		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
-	}
-
-
-	/**
-	 * removes comments, processes commands drawbot shouldn't have to handle.
-	 *
-	 * @param line command to send
-	 * @return true if the robot is ready for another command to be sent.
-	 */
-	public boolean tweakAndSendLine(String line) {
-		if (robot.getConnection() == null || !robot.isPortConfirmed() || !robot.isRunning()) return false;
-
-		// tool change request?
-		String[] tokens = line.split("(\\s|;)");
-
-		// tool change?
-		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
-			for (String token : tokens) {
-				if (token.startsWith("T")) {
-					changeToTool(token.substring(1));
-				}
-			}
-		}
-
-		// end of program?
-		if (Objects.equals(tokens[0], "M02") || Objects.equals(tokens[0], "M2") || Objects.equals(tokens[0], "M30")) {
-			soundSystem.playDrawingFinishedSound();
-			halt();
-			return false;
-		}
-
-
-		// send relevant part of line to the robot
-		robot.sendLineToRobot(line);
-
-		return false;
+		soundSystem.playDrawingFinishedSound();
 	}
 
 	/**
@@ -837,6 +788,10 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
 		getDrawPanel().repaint();
+	}
+	
+	public void fileFinished(MakelangeloRobot r) {
+		
 	}
 }
 

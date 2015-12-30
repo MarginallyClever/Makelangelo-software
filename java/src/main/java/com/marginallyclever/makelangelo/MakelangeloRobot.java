@@ -7,6 +7,9 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.swing.JOptionPane;
 
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
@@ -241,6 +244,47 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	public void lowerPen() {
 		sendLineToRobot("G00 Z" + settings.getPenDownString());
+	}
+
+
+	/**
+	 * removes comments, processes commands drawbot shouldn't have to handle.
+	 *
+	 * @param line command to send
+	 * @return true if the robot is ready for another command to be sent.
+	 */
+	public boolean tweakAndSendLine(String line,Translator translator) {
+		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return false;
+
+		// tool change request?
+		String[] tokens = line.split("(\\s|;)");
+
+		// tool change?
+		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
+			for (String token : tokens) {
+				if (token.startsWith("T")) {
+					changeToTool(token.substring(1),translator);
+				}
+			}
+		}
+
+		// send relevant part of line to the robot
+		sendLineToRobot(line);
+
+		return false;
+	}
+
+
+	private void changeToTool(String changeToolString,Translator translator) {
+		int i = Integer.decode(changeToolString);
+
+		String[] toolNames = settings.getToolNames();
+
+		if (i < 0 || i > toolNames.length) {
+			Log.error( translator.get("InvalidTool") + i );
+			i = 0;
+		}
+		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
 	}
 
 
