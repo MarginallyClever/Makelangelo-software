@@ -19,12 +19,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.marginallyclever.makelangelo.Log;
 
 /**
  * Helper utility class to aid in loading of language files.
@@ -40,11 +40,6 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private MarginallyCleverTranslationXmlFileHelper() throws IllegalStateException {
     throw new IllegalStateException();
   }
-
-  /**
-   * SLF4J log.
-   */
-  private static final Logger log = LoggerFactory.getLogger(MarginallyCleverTranslationXmlFileHelper.class);
 
   /**
    * Languages folder location relative to the user's working directory.
@@ -103,7 +98,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
           final String languageFileName = languageFile.getName();
           final boolean isDefaultLanguageFile = languageFileName.equals(DEFAULT_LANGUAGE_XML_FILE);
           if (!isDefaultLanguageFile) {
-            log.info("{}", languageFile);
+            Log.message(languageFile.getAbsolutePath());
             final Document parseXmlLanguageDocument = docBuilder.parse(languageFile);
             final Set<String> thisLanguageFilesKeys = getKeySet(parseXmlLanguageDocument.getDocumentElement());
 
@@ -123,7 +118,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
           return true;
         }
       } catch (SAXException | IOException | URISyntaxException | ParserConfigurationException e) {
-        log.error("{}", e);
+        Log.error( e.getMessage() );
       }
     }
     return false;
@@ -136,7 +131,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    */
   private static void logMissingKeys(Set<String> expected, Set<String> actual) {
     final Set<String> inANotB = getMissingKeys(expected, actual);
-    log.error("Missing Keys: {}", inANotB);
+    Log.error("Missing Keys: " + inANotB.toString());
   }
 
   /**
@@ -199,11 +194,11 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private static URL getLanguagesFolderUrl() {
     URL languagesFolderUrl = getLanguagesFolderUrlRelativeToClasspath();
     if( languagesFolderUrl!=null ) {
-    	log.debug("languages relative to classpath: "+languagesFolderUrl.toString());
+    	Log.message("languages relative to classpath: "+languagesFolderUrl.toString());
     }
     URL languageFolderUsingUserDirectory = getLanguagesFolderUrlFromUserDirectory();
     if( languageFolderUsingUserDirectory!=null ) {
-    	log.debug("languages via user directory: "+languageFolderUsingUserDirectory.toString());
+    	Log.message("languages via user directory: "+languageFolderUsingUserDirectory.toString());
     }
     if (languagesFolderUrl == null) {
       languagesFolderUrl = languageFolderUsingUserDirectory;
@@ -221,7 +216,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     	File f = new File(WORKING_DIRECTORY);
       languageFolderUsingUserDirectoryUrl = f.toURI().toURL();
     } catch (MalformedURLException e) {
-      log.error("{}", e);
+      Log.error( e.getMessage() );
     }
     return languageFolderUsingUserDirectoryUrl;
   }
@@ -262,7 +257,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private static void logNodeNameAndValue(Node node) {
     final String nodeName = node.getNodeName();
     if (nodeName.equals("key")) {
-      log.info("node name: {}, node value: {}", nodeName, node.getTextContent());
+      Log.message("node name: "+nodeName+", node value: "+node.getTextContent());
     }
   }
 
@@ -306,16 +301,16 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private static boolean doesThisLanguageFileContainAllTheDefaultKeys(Set<String> defaultLanguageFilesKeys, Set<String> thisLanguageFilesKeys, String thisLanguageFilesName) {
     final boolean doesThisLanguageFileContainAllTheDefaultKeys = thisLanguageFilesKeys.containsAll(defaultLanguageFilesKeys);
     if (!doesThisLanguageFileContainAllTheDefaultKeys) {
-      log.error("{} does not contain all the default translation keys.", thisLanguageFilesName);
+      Log.error(thisLanguageFilesName+" does not contain all the default translation keys.");
       Iterator<String> k = defaultLanguageFilesKeys.iterator();
       while(k.hasNext()) {
     	  String s = k.next();
     	  if(!thisLanguageFilesKeys.contains(s)) {
-    		  log.error("missing " + s);
+    		  Log.error("missing " + s);
     	  }
       }
     } else {
-      log.info("{} contains all the default translation keys.", thisLanguageFilesName);
+      Log.message(thisLanguageFilesName+" contains all the default translation keys.");
     }
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }

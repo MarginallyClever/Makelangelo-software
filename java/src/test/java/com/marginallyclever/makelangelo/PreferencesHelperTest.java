@@ -6,8 +6,6 @@ import java.util.prefs.Preferences;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.UnitTestHelper;
@@ -32,11 +30,6 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
   private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
   /**
-   *
-   */
-  private final Logger logger = LoggerFactory.getLogger(PreferencesHelperTest.class);
-
-  /**
    * @throws Exception
    */
   @org.junit.After
@@ -47,19 +40,19 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
   @Test
   public void testMachineConfigurationNames() throws BackingStoreException {
     final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-    logger.info("start: {}#{}", PreferencesHelperTest.class.getName(), thisMethodsName);
+    Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
     final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-    logger.info("node name: {}", machinesPreferenceNode.name());
+    Log.message("node name: " + machinesPreferenceNode.name());
     final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
     for (String childNodeName : childrenPreferenceNodeNames) {
-      logger.info("child node name: {}", childNodeName);
+      Log.message("child node name: "+ childNodeName);
       final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
       Assert.assertTrue(isMachineNameAnInteger);
       //Machine configurations numbered -1 and below should not exist.
       final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
       Assert.assertFalse(isMachineNameLessThanZero);
     }
-    logger.info("end: {}", thisMethodsName);
+    Log.message("end: "+ thisMethodsName);
   }
 
   /**

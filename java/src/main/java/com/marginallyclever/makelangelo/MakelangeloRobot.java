@@ -8,9 +8,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 
@@ -35,12 +32,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
-
-	private final Logger logger = LoggerFactory.getLogger(MakelangeloRobot.class);
 	// reading file
 	private boolean isRunning = false;
 	private boolean isPaused = true;
-
+	
+	// current pen state
+	private boolean penIsUp = false;
+	private boolean penIsUpBeforePause = false;
+	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
@@ -93,7 +92,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			try {
 				new_uid = Long.parseLong(lines[0]);
 			} catch (NumberFormatException e) {
-				logger.error("{}", e);
+				Log.error( e.getMessage() );
 			}
 		}
 
@@ -163,7 +162,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				newUID = Long.parseLong(line);
 			}
 		} catch (Exception e) {
-			logger.error("{}", e);
+			Log.error( e.getMessage() );
 			return 0;
 		}
 
@@ -218,9 +217,18 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	public void pause() {
 		isPaused = true;
+		// remember for later if the pen is down
+		penIsUpBeforePause = penIsUp;
+		// raise it if needed.
+		raisePen();
 	}
 
 	public void unPause() {
+		// if pen was down before pause, lower it
+		if (!penIsUpBeforePause) {
+			lowerPen();
+		}
+		
 		isPaused = false;
 	}
 	
@@ -229,9 +237,56 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void raisePen() {
-	
+		sendLineToRobot("G00 Z" + settings.getPenUpString());
 	}
 	public void lowerPen() {
-	
+		sendLineToRobot("G00 Z" + settings.getPenDownString());
+	}
+
+
+	/**
+	 * Sends a single command the robot.  Could be anything.
+	 *
+	 * @param line command to send.
+	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
+	 */
+	public boolean sendLineToRobot(String line) {
+		if (getConnection() == null || !isPortConfirmed()) return false;
+
+		if (line.trim().equals("")) return false;
+		String reportedline = line;
+		// does it have a checksum?  hide it in the log
+		if (reportedline.contains(";")) {
+			String[] lines = line.split(";");
+			reportedline = lines[0];
+		}
+		if(reportedline.trim().equals("")) return false;
+
+		// catch pen up/down status here
+		if (line.contains("Z" + settings.getPenUpString())) {
+			penIsUp=true;
+		}
+		if (line.contains("Z" + settings.getPenDownString())) {
+			penIsUp=false;
+		}
+
+		Log.write("white", reportedline );
+		line += "\n";
+
+		// send unmodified line
+		try {
+			getConnection().sendMessage(line);
+		} catch (Exception e) {
+			Log.error( e.getMessage() );
+			return false;
+		}
+		return true;
+	}
+
+	public void setFeedRate(double parsedFeedRate) {
+		// remember it
+		settings.setFeedRate(parsedFeedRate);
+		// tell the robot
+		sendLineToRobot("G00 F" + parsedFeedRate);
 	}
 }

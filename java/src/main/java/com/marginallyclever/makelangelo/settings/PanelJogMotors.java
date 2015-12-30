@@ -10,7 +10,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -30,13 +29,11 @@ implements ActionListener {
 	protected JCheckBox m1i;
 	protected JCheckBox m2i;
 
-	protected Makelangelo gui;
 	protected Translator translator;
 	protected MakelangeloRobot robot;
 
 
-	public PanelJogMotors(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
-		this.gui = gui;
+	public PanelJogMotors(Translator translator, MakelangeloRobot robot) {
 		this.translator = translator;
 		this.robot = robot;
 
@@ -91,10 +88,10 @@ implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
       Object subject = e.getSource();
-      if (subject == buttonApos) gui.sendLineToRobot("D00 L400");
-      if (subject == buttonAneg) gui.sendLineToRobot("D00 L-400");
-      if (subject == buttonBpos) gui.sendLineToRobot("D00 R400");
-      if (subject == buttonBneg) gui.sendLineToRobot("D00 R-400");
+      if (subject == buttonApos) robot.sendLineToRobot("D00 L400");
+      if (subject == buttonAneg) robot.sendLineToRobot("D00 L-400");
+      if (subject == buttonBpos) robot.sendLineToRobot("D00 R400");
+      if (subject == buttonBneg) robot.sendLineToRobot("D00 R-400");
     
       if (subject == m1i || subject == m2i) {
         robot.settings.setMotor1Backwards( m1i.isSelected() );

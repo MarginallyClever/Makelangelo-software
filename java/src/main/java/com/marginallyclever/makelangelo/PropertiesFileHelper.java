@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Created on 5/10/15.
  *
@@ -14,11 +11,6 @@ import org.slf4j.LoggerFactory;
  * @since v7.1.2
  */
 public final class PropertiesFileHelper {
-
-  /**
-   *
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesFileHelper.class);
 
   /**
    *
@@ -43,10 +35,10 @@ public final class PropertiesFileHelper {
 
       //get the property value and print it out
       makelangeloVersionPropertyValue = prop.getProperty("makelangelo.version");
-      LOGGER.info("makelangelo.version={}", makelangeloVersionPropertyValue);
+      Log.message("makelangelo.version="+ makelangeloVersionPropertyValue);
 
     } catch (IllegalStateException | IOException ex) {
-      LOGGER.error("{}", ex);
+      Log.error( ex.getMessage() );
     }
     return makelangeloVersionPropertyValue;
   }

@@ -42,20 +42,20 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 	private JButton commandLineSend;
 
 	protected Translator translator;
-	protected MakelangeloRobotSettings machineConfiguration;
-	protected Makelangelo gui;
+	protected MakelangeloRobot robot;
+	
 
 	public void finalize() throws Throwable  {
 		super.finalize();
 		Log.removeListener(this);
 	}
 
-	public PanelLog(Makelangelo _gui, Translator _translator, MakelangeloRobotSettings _machineConfiguration) {
+	
+	public PanelLog(Translator _translator, MakelangeloRobot robot) {
 		Log.addListener(this);
 		
 		translator = _translator;
-		gui = _gui;
-		machineConfiguration = _machineConfiguration;
+		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder());
 
@@ -125,7 +125,7 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 		Object subject = e.getSource();
 
 		if (subject == commandLineSend) {
-			gui.sendLineToRobot(commandLineText.getText());
+			robot.sendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
 	}
@@ -147,7 +147,7 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			gui.sendLineToRobot(commandLineText.getText());
+			robot.sendLineToRobot(commandLineText.getText());
 			commandLineText.setText("");
 		}
 	}

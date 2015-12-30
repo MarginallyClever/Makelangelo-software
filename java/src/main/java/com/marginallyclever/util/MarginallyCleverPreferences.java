@@ -19,8 +19,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.marginallyclever.makelangelo.Log;
 
 /**
  * Created on 6/7/15.
@@ -31,11 +31,6 @@ import org.slf4j.LoggerFactory;
  * @since v7.1.4
  */
 public class MarginallyCleverPreferences extends AbstractPreferences implements Ancestryable {
-
-  /**
-   *
-   */
-  private final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferences.class);
 
   /**
    *
@@ -71,13 +66,13 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    */
   public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);
-    logger.info("Instantiating node {}", name);
+    Log.message("Instantiating node "+ name);
     root = new TreeMap<>();
     children = new TreeMap<>();
     try {
       sync();
     } catch (BackingStoreException e) {
-      logger.error("Unable to sync on creation of node {}. {}", name, e);
+      Log.error("Unable to sync on creation of node "+name+". "+e);
     }
   }
 
@@ -87,7 +82,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
     try {
       flush();
     } catch (BackingStoreException e) {
-      logger.error("Unable to flush after putting {}. {}", key, e);
+    	Log.error("Unable to flush after putting "+key+". "+e);
     }
   }
 
@@ -102,7 +97,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
     try {
       flush();
     } catch (BackingStoreException e) {
-      logger.error("Unable to flush after removing {}. {}", key, e);
+    	Log.error("Unable to flush after removing "+key+". "+e);
     }
   }
 
@@ -141,7 +136,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
       try {
         isChildRemoved = getIsRemoved(childPreferenceNode);
       } catch (ReflectiveOperationException e) {
-        logger.error("{}", e.getMessage());
+        Log.error( e.getMessage() );
       }
     }
     if (childPreferenceNode == null || isChildRemoved) {
@@ -160,7 +155,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    * @throws ReflectiveOperationException
    */
   private boolean getIsRemoved(AbstractPreferences abstractPreference) throws ReflectiveOperationException {
-    logger.info("{}", abstractPreference);
+    Log.message( abstractPreference.toString() );
     final Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
     declaredMethod.setAccessible(true);
     Object isRemoved = declaredMethod.invoke(abstractPreference, new Object[]{null});

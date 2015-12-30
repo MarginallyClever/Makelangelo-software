@@ -54,7 +54,6 @@ import javax.swing.WindowConstants;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
-import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ? edge tracing ?
@@ -83,18 +82,21 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private MakelangeloRobot robot;
 	public GCodeFile gCode;
 	
-	private Translator translator = new Translator();
-	public SoundSystem soundSystem = new SoundSystem();
+	private Translator translator;
+	public SoundSystem soundSystem;
 	
 	// GUI elements
 	private JFrame mainframe = null;
 	// Top of window
 	private JMenuBar menuBar;
-	private JMenuItem buttonExit;
+	// menubar > Makelangelo > preferences
 	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
+	// menubar > Makelangelo
+	private JMenuItem buttonAbout, buttonCheckForUpdate, buttonExit;
+	// menubar > connect
 	private JMenuItem buttonRescan, buttonDisconnect;
+	// menubar > view
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
-	private JMenuItem buttonAbout, buttonCheckForUpdate;
 
 	/**
 	 * buttons that represent connections to real robots attached to the computer.
@@ -128,21 +130,26 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	public Makelangelo() {
 		Log.clear();
-		startTranslator();
-		gCode = new GCodeFile();
-		robot = new MakelangeloRobot(translator);
-		robot.addListener(this);
-		robot.settings.addListener(this);
-		connectionManager = new SerialConnectionManager(prefs);
-		createAndShowGUI();
-	}
 
-	
-	public void startTranslator() {
+		translator = new Translator();
 		if (translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 			chooseLanguage();
 		}
+
+		soundSystem = new SoundSystem();
+		
+		// create a robot and listen to it for important news
+		robot = new MakelangeloRobot(translator);
+		robot.addListener(this);
+		robot.settings.addListener(this);
+		
+		gCode = new GCodeFile();
+		
+		connectionManager = new SerialConnectionManager(prefs);
+		
+		createAndShowGUI();
 	}
+
 
 	// display a dialog box of available languages and let the user select their preference.
 	public void chooseLanguage() {
@@ -152,14 +159,14 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
 		int currentIndex = translator.getCurrentLanguageIndex();
 		languageOptions.setSelectedIndex(currentIndex);
-
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 2;
 		c.gridx = 0;
 		c.gridy = 0;
 		panel.add(languageOptions, c);
-
+		
 		int result;
 		do {
 			result = JOptionPane.showConfirmDialog(this.mainframe, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -168,33 +175,21 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
 		translator.saveConfig();
 	}
-
 	
 	
-
-	public void raisePen() {
-		sendLineToRobot("G00 Z" + robot.settings.getPenUpString());
-		prepareImage.raisePen();
-	}
-
-	public void lowerPen() {
-		sendLineToRobot("G00 Z" + robot.settings.getPenDownString());
-		prepareImage.lowerPen();
-	}
-
 	public void updateMachineConfig() {
 		if (drawPanel != null) {
 			drawPanel.updateMachineConfig();
 			drawPanel.zoomToFitPaper();
 		}
 	}
-
-
+	
+	
 	public String getTempDestinationFile() {
 		return System.getProperty("user.dir") + "/temp.ngc";
 	}
-
-
+	
+	
 	/**
 	 * Adjust graphics preferences
 	 */
@@ -291,15 +286,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			int lineNumber = gCode.getLinesProcessed();
 			line = gCode.nextLine();
 
-			// catch pen up/down status here
-			if (line.contains("Z" + robot.settings.getPenUpString())) {
-				prepareImage.raisePen();
-			}
-			if (line.contains("Z" + robot.settings.getPenDownString())) {
-				prepareImage.lowerPen();
-			}
-
-
 			if (line.length() > 3) {
 				line = "N" + lineNumber + " " + line;
 				line += robot.generateChecksum(line);
@@ -374,41 +360,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 
 		// send relevant part of line to the robot
-		sendLineToRobot(line);
+		robot.sendLineToRobot(line);
 
 		return false;
-	}
-
-
-	/**
-	 * Sends a single command the robot.  Could be anything.
-	 *
-	 * @param line command to send.
-	 * @return <code>true</code> if command was sent to the robot; <code>false</code> otherwise.
-	 */
-	public boolean sendLineToRobot(String line) {
-		if (robot.getConnection() == null || !robot.isPortConfirmed()) return false;
-
-		if (line.trim().equals("")) return false;
-		String reportedline = line;
-		// does it have a checksum?  hide it in the log
-		if (reportedline.contains(";")) {
-			String[] lines = line.split(";");
-			reportedline = lines[0];
-		}
-		if(reportedline.trim().equals("")) return false;
-				
-		Log.write("white", reportedline );
-		line += "\n";
-
-		// send unmodified line
-		try {
-			robot.getConnection().sendMessage(line);
-		} catch (Exception e) {
-			Log.error( e.getMessage() );
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -425,7 +379,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	public void startAt(long lineNumber) {
 		gCode.setLinesProcessed(0);
-		sendLineToRobot("M110 N" + gCode.getLinesProcessed());
+		robot.sendLineToRobot("M110 N" + gCode.getLinesProcessed());
 		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();
 	}
@@ -629,17 +583,12 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		ButtonGroup group;
 		int i;
 
-		boolean isConfirmed = robot.getConnection() != null 
-				&& robot.getConnection().isOpen()
-				&& robot.isPortConfirmed();
-
 		if (prepareImage != null) {
-			prepareImage.updateButtonAccess(isConfirmed, robot.isRunning());
+			prepareImage.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
 		}
 		if (driveControls != null) {
-			driveControls.updateButtonAccess(isConfirmed, robot.isRunning());
+			driveControls.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
 		}
-
 
 		menuBar.removeAll();
 
@@ -750,18 +699,16 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		logPanel = new PanelLog(this, translator, robot.settings);
+		logPanel = new PanelLog(translator, robot);
 		logPanel.clearLog();
 
 		drawPanel = new DrawPanel(robot.settings);
 		drawPanel.setGCode(gCode);
 
-		prepareImage = new PanelPrepareImage();
-		prepareImage.createPanel(this, translator, robot);
+		prepareImage = new PanelPrepareImage(this, translator, robot);
 		prepareImage.updateButtonAccess(false, false);
 
-		driveControls = new MakelangeloDriveControls();
-		driveControls.createPanel(this, translator, robot.settings);
+		driveControls = new MakelangeloDriveControls(translator, robot);
 		driveControls.updateButtonAccess(false, false);
 
 		statusBar = new StatusBar(translator);
@@ -831,8 +778,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	/**
 	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
-	public void updatedriveControls() {
-		driveControls.createPanel(this, translator, robot.settings);
+	public void updateDriveControls() {
+		driveControls = new MakelangeloDriveControls(translator, robot);
+		driveControls.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
 	}
 
 	/**
@@ -846,13 +794,16 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	 * Notice received from MakelangeloRobot when serial connection is confirmed to point at something that speaks Makelangelo-firmware. 
 	 */
 	public void portConfirmed(MakelangeloRobot r) {
-		if(r.settings.getLimitBottom()==0 
+		// we shouldn't need to open the dialog if the default settings are correct.
+		// the default settings must always match the values in the Marginally Clever tutorials.
+		// the default settings must always match the Marginally Clever kit.
+		/* if(r.settings.getLimitBottom()==0 
 				&& r.settings.getLimitTop()==0
 				&& r.settings.getLimitLeft()==0
 				&& r.settings.getLimitRight()==0) {
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,r);
 			m.run();
-		}
+		}*/
 		
 	    getMainframe().setTitle(translator.get("TitlePrefix")
 	        + Long.toString(this.robot.settings.getUID())
@@ -868,11 +819,11 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	    updateMenuBar();
 
 	    // rebuild the drive pane so that the feed rates are correct.
-	    updatedriveControls();
+	    updateDriveControls();
 	}
 	
 	public void dataAvailable(MakelangeloRobot r,String data) {
-		Log.write( "#ffa500",data );
+		Log.write( "#ffa500",data );  // #ffa500 = orange
 	}
 	
 	public void connectionReady(MakelangeloRobot r) {
@@ -884,7 +835,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
         sendFileCommand();
 	}
 	
-	public void settingsChanged(MakelangeloRobotSettings settings) {
+	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
 		getDrawPanel().repaint();
 	}
 }

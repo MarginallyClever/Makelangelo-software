@@ -64,10 +64,10 @@ implements ActionListener {
     panes = new JTabbedPane();
     
     panelAdjustMachineSize = new PanelAdjustMachineSize(translator,robot);
-    panelJogMotors = new PanelJogMotors(gui,translator,robot);
+    panelJogMotors = new PanelJogMotors(translator,robot);
     panelAdjustPen = robot.settings.getTool(0);
-    //panelAdjustTools = new PanelAdjustTools(gui,translator,robot);
-    //panelSelectTool = new PanelSelectTool(gui,translator,robot);
+    //panelAdjustTools = new PanelAdjustTools(translator,robot);
+    //panelSelectTool = new PanelSelectTool(translator,robot);
     
     panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachineSize);
     panes.addTab(translator.get("JogMotors"),panelJogMotors);
@@ -78,7 +78,7 @@ implements ActionListener {
 	this.setLayout(new GridBagLayout());
     GridBagConstraints d = new GridBagConstraints();
 
-    	// choice of machine configuration, save, save as, delete.
+    	// TODO: choice of machine configuration, save, save as, delete.
 
     	// the panes for the selected machine configuration
     	d.fill=GridBagConstraints.BOTH;

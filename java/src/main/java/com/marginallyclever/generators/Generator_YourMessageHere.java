@@ -20,9 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -54,8 +51,6 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 	protected static String lastMessage = "";
 
-	private final Logger logger = LoggerFactory.getLogger(Generator_YourMessageHere.class);
-
 	public Generator_YourMessageHere(Makelangelo gui,
 			MakelangeloRobotSettings mc, Translator ms) {
 		super(gui, mc, ms);
@@ -65,9 +60,9 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	private void logFonts() {
 		final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final Font[] fonts = ge.getAllFonts();
-		logger.info("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
+		Log.message("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
 		for (Font font : fonts) {
-			logger.info("{} : {}", font.getFontName(), font.getFamily());
+			Log.message( font.getFontName() + " : " + font.getFamily());
 		}
 	}
 
@@ -272,7 +267,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
 			textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
 		} catch (IOException e) {
-			logger.error("{}", e);
+			Log.error( e.getMessage() );
 		}
 	}
 	public void textSetPosition(float x, float y) {
@@ -452,7 +447,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	protected void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = ALPHABET_FOLDER;
 
-		logger.info("{} ({})", a1, a1.length());
+		Log.message( a1 +"("+ a1.length() +")" );
 
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {

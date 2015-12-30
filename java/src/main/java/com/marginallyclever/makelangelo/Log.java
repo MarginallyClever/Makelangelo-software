@@ -87,7 +87,7 @@ public class Log {
 	 * Appends a message to the log file.  Color will be red.
 	 * @param message
 	 */
-	static void error(String message) {
+	public static void error(String message) {
 		write("red",message);
 	}
 
@@ -95,7 +95,7 @@ public class Log {
 	 * Appends a message to the log file.  Color will be green.
 	 * @param message
 	 */
-	static void message(String message) {
+	public static void message(String message) {
 		write("green",message);		
 	}
 }

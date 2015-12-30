@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -58,8 +57,6 @@ import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.converters.Converter_Boxes;
@@ -82,7 +79,6 @@ import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 
-
 /**
  * Controls related to converting an image to gcode
  *
@@ -90,9 +86,7 @@ import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PanelPrepareImage
-extends JScrollPane
-implements ActionListener, ChangeListener {
+public class PanelPrepareImage extends JScrollPane implements ActionListener, ChangeListener {
 	/**
 	 *
 	 */
@@ -126,16 +120,8 @@ implements ActionListener, ChangeListener {
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-
-	// to make sure pen isn't on the paper while the machine is paused
-	private boolean penIsUp;
-	private boolean penIsUpBeforePause;
-
-	/**
-	 * @see org.slf4j.Logger
-	 */
-	private final Logger logger = LoggerFactory.getLogger(PanelPrepareImage.class);
+	private Preferences prefs = PreferencesHelper
+			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	/**
 	 * Image processing
@@ -143,78 +129,59 @@ implements ActionListener, ChangeListener {
 	private List<ImageConverter> imageConverters;
 	private List<ImageGenerator> imageGenerators;
 
-	public void raisePen() {
-		penIsUp = true;
-	}
-
-	public void lowerPen() {
-		penIsUp = false;
-	}
-
 	// TODO use a ServiceLoader and find plugins in nearby folders
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
-		imageConverters.add(new Converter_ZigZag(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Spiral(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Crosshatch(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Scanline(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Pulse(gui, robot.settings, translator));
 		imageConverters.add(new Converter_Boxes(gui, robot.settings, translator));
-		//imageConverters.add(new Converter_ColorBoxes(gui, robot.settings, translator));
+		// imageConverters.add(new Converter_ColorBoxes(gui, robot.settings,
+		// translator));
+		imageConverters.add(new Converter_Crosshatch(gui, robot.settings, translator));
+		// imageConverters.add(new Filter_GeneratorColorFloodFill(gui,
+		// robot.settings, translator)); // not ready for public consumption
+		imageConverters.add(new Converter_Pulse(gui, robot.settings, translator));
+		imageConverters.add(new Converter_Sandy(gui, robot.settings, translator));
+		imageConverters.add(new Converter_Scanline(gui, robot.settings, translator));
+		imageConverters.add(new Converter_Spiral(gui, robot.settings, translator));
 		imageConverters.add(new Converter_VoronoiStippling(gui, robot.settings, translator));
-		imageConverters.add(new Converter_VoronoiZigZag(gui,robot.settings,translator));
-		imageConverters.add(new Converter_Sandy(gui,robot.settings,translator));
-		//imageConverters.add(new Filter_GeneratorColorFloodFill(gui, robot.settings, translator));  // not ready for public consumption
+		imageConverters.add(new Converter_VoronoiZigZag(gui, robot.settings, translator));
+		imageConverters.add(new Converter_ZigZag(gui, robot.settings, translator));
 	}
 
 	// TODO use a ServiceLoader and find plugins in nearby folders
 	protected void loadImageGenerators() {
 		imageGenerators = new ArrayList<ImageGenerator>();
-		imageGenerators.add(new Generator_Maze(gui,robot.settings,translator));
-		imageGenerators.add(new Generator_YourMessageHere(gui,robot.settings,translator));
-		imageGenerators.add(new Generator_HilbertCurve(gui,robot.settings,translator));
-		imageGenerators.add(new Generator_LSystemTree(gui,robot.settings,translator));
-		imageGenerators.add(new Generator_KochCurve(gui,robot.settings,translator));
-		imageGenerators.add(new Generator_Dragon(gui,robot.settings,translator));
+		imageGenerators.add(new Generator_Dragon(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_HilbertCurve(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_KochCurve(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_LSystemTree(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_Maze(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_YourMessageHere(gui, robot.settings, translator));
 	}
 
-	/**
-	 * @return
-	 */
-	private String[] getAnyMachineConfigurations() {
-		String[] machineNames = robot.settings.getKnownMachineNames();
-		if (machineNames.length == 0) {
-			machineNames = robot.settings.getAvailableConfigurations();
-		}
-		return machineNames;
-	}
-
-
-	public void createPanel(Makelangelo _gui, Translator translator, MakelangeloRobot robot) {
+	public PanelPrepareImage(Makelangelo _gui, Translator translator, MakelangeloRobot robot) {
 		this.translator = translator;
 		gui = _gui;
 		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder());
 
-		JPanel panel = new JPanel(new GridBagLayout());  
+		JPanel panel = new JPanel(new GridBagLayout());
 		this.setViewportView(panel);
 		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=0;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTHWEST;
+		con1.gridx = 0;
+		con1.gridy = 0;
+		con1.weightx = 1;
+		con1.weighty = 0;
+		con1.fill = GridBagConstraints.HORIZONTAL;
+		con1.anchor = GridBagConstraints.NORTHWEST;
 
-
-		machineNumberPanel = new JPanel(new GridLayout(1,0));
+		machineNumberPanel = new JPanel(new GridLayout(1, 0));
 		updateMachineNumberPanel();
-		panel.add(machineNumberPanel,con1);
+		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		JPanel marginPanel = new JPanel(new GridLayout(1,0));
-		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.settings.paperMargin * 100));
+		JPanel marginPanel = new JPanel(new GridLayout(1, 0));
+		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.settings.getPaperMargin() * 100));
 		paperMargin.setMajorTickSpacing(10);
 		paperMargin.setMinorTickSpacing(5);
 		paperMargin.setPaintTicks(false);
@@ -222,38 +189,38 @@ implements ActionListener, ChangeListener {
 		paperMargin.addChangeListener(this);
 		marginPanel.add(new JLabel(translator.get("PaperMargin")));
 		marginPanel.add(paperMargin);
-		panel.add(marginPanel,con1);
+		panel.add(marginPanel, con1);
 		con1.gridy++;
 
-		panel.add(new JSeparator(),con1);
+		panel.add(new JSeparator(), con1);
 		con1.gridy++;
 
 		// File conversion
 		buttonNewFile = new JButton(translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener(this);
-		panel.add(buttonNewFile,con1);
+		panel.add(buttonNewFile, con1);
 		con1.gridy++;
 
 		buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener(this);
-		panel.add(buttonOpenFile,con1);
+		panel.add(buttonOpenFile, con1);
 		con1.gridy++;
 
 		buttonGenerate = new JButton(translator.get("MenuGenerate"));
 		buttonGenerate.addActionListener(this);
-		panel.add(buttonGenerate,con1);
+		panel.add(buttonGenerate, con1);
 		con1.gridy++;
 
 		buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
 		buttonSaveFile.addActionListener(this);
-		panel.add(buttonSaveFile,con1);
+		panel.add(buttonSaveFile, con1);
 		con1.gridy++;
 
-		panel.add(new JSeparator(),con1);
+		panel.add(new JSeparator(), con1);
 		con1.gridy++;
 
 		// drive menu
-		JPanel drivePanel = new JPanel(new GridLayout(2,2));
+		JPanel drivePanel = new JPanel(new GridLayout(2, 2));
 		buttonStart = new JButton(translator.get("Start"));
 		buttonStartAt = new JButton(translator.get("StartAtLine"));
 		buttonPause = new JButton(translator.get("Pause"));
@@ -266,59 +233,58 @@ implements ActionListener, ChangeListener {
 		buttonStartAt.addActionListener(this);
 		buttonPause.addActionListener(this);
 		buttonHalt.addActionListener(this);
-		panel.add(drivePanel,con1);
+		panel.add(drivePanel, con1);
 		con1.gridy++;
 
-		con1.weighty=1;
-		panel.add(new JLabel(),con1);
+		con1.weighty = 1;
+		panel.add(new JLabel(), con1);
 	}
 
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
-		machineConfigurations = getAnyMachineConfigurations();
-		machineChoices = new JComboBox<>(machineConfigurations);
-		try {
-			int index = robot.settings.getCurrentMachineIndex();
+		machineConfigurations = robot.settings.getKnownMachineNames();
+		int index = robot.settings.getKnownMachineIndex();
+		if( machineConfigurations.length>0 && index>=0 ) {
+			machineChoices = new JComboBox<>(machineConfigurations);
 			machineChoices.setSelectedIndex(index);
-		} catch (IllegalArgumentException e) {
-			// TODO FIXME Do RCA and patch this at the source so that an illegal argument never occurs at this state.
-			logger.info("This only happens for the times Makelangelo GUI runs and there is no known machine configuration. {}", e.getMessage());
-		}
 
+			machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+			machineNumberPanel.add(machineChoices);
+		}
+		
 		openConfig = new JButton(translator.get("configureMachine"));
 		openConfig.addActionListener(this);
 		openConfig.setPreferredSize(openConfig.getPreferredSize());
-
-		machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
-		machineNumberPanel.add(machineChoices);
 		machineNumberPanel.add(openConfig);
 	}
 
 	public void stateChanged(ChangeEvent e) {
 		e.getSource();
 		double pm = (100 - paperMargin.getValue()) * 0.01;
-		if ( Double.compare(robot.settings.paperMargin , pm) != 0) {
-			robot.settings.paperMargin = pm;
+		if (Double.compare(robot.settings.getPaperMargin(), pm) != 0) {
+			robot.settings.setPaperMargin(pm);
 			robot.settings.saveConfig();
 		}
 	}
 
-
-	// The user has done something.  respond to it.
+	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		int selectedIndex = machineChoices.getSelectedIndex();
-		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-		robot.settings.loadConfig(newUID);
+		if( machineChoices != null ) {
+			// TODO: maybe only run this when the machineChoices comboBox changes to a new value
+			int selectedIndex = machineChoices.getSelectedIndex();
+			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
+			robot.settings.loadConfig(newUID);
+		}
 
-		if( subject == openConfig ) {
+		if (subject == openConfig) {
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, robot);
 			m.run();
 			return;
 		}
 
-		if (subject == buttonNewFile ) {
+		if (subject == buttonNewFile) {
 			newFile();
 			return;
 		}
@@ -326,7 +292,7 @@ implements ActionListener, ChangeListener {
 			openFileDialog();
 			return;
 		}
-		if(subject == buttonGenerate) {
+		if (subject == buttonGenerate) {
 			generateImage();
 			return;
 		}
@@ -335,9 +301,8 @@ implements ActionListener, ChangeListener {
 			return;
 		}
 
-
-		if (gui.gCode.isLoaded() ) {
-			if(!robot.isRunning()) {
+		if (gui.gCode.isLoaded()) {
+			if (!robot.isRunning()) {
 				if (subject == buttonStart) {
 					gui.startAt(0);
 					return;
@@ -351,19 +316,21 @@ implements ActionListener, ChangeListener {
 				}
 			} else {
 				if (subject == buttonPause) {
+					// toggle pause
 					if (robot.isPaused() == true) {
-						if (!penIsUpBeforePause) {
-							gui.lowerPen();
-						}
+						// we were paused.
+						// update button text
 						buttonPause.setText(translator.get("Pause"));
+						// ready
 						robot.unPause();
-						// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
+						// TODO: if the robot is not ready to unpause, this
+						// might fail and the program would appear to hang until
+						// a dis- and re-connect.
 						gui.sendFileCommand();
 					} else {
-						penIsUpBeforePause = penIsUp;
-						gui.raisePen();
-						buttonPause.setText(translator.get("Unpause"));
 						robot.pause();
+						// change button text
+						buttonPause.setText(translator.get("Unpause"));
 					}
 					return;
 				}
@@ -375,11 +342,11 @@ implements ActionListener, ChangeListener {
 		}
 	}
 
-
 	/**
 	 * open a dialog to ask for the line number.
 	 *
-	 * @return <code>lineNumber</code> greater than or equal to zero if user hit ok.
+	 * @return <code>lineNumber</code> greater than or equal to zero if user hit
+	 *         ok.
 	 */
 	private long getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());
@@ -394,7 +361,8 @@ implements ActionListener, ChangeListener {
 		c.gridy = 0;
 		panel.add(starting_line, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			long lineNumber;
 			try {
@@ -408,17 +376,18 @@ implements ActionListener, ChangeListener {
 		return -1;
 	}
 
-	void updateButtonAccess(boolean isConnected,boolean isRunning) {
-		if (buttonGenerate != null) buttonGenerate.setEnabled(!isRunning);
+	void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
+		if (buttonGenerate != null)
+			buttonGenerate.setEnabled(!isRunning);
 
 		openConfig.setEnabled(!isRunning);
 
-		buttonStart.setEnabled(isConnected && !isRunning);
-		buttonStartAt.setEnabled(isConnected && !isRunning);
-		buttonPause.setEnabled(isConnected && isRunning);
-		buttonHalt.setEnabled(isConnected && isRunning);
+		buttonStart.setEnabled(isConfirmed && !isRunning);
+		buttonStartAt.setEnabled(isConfirmed && !isRunning);
+		buttonPause.setEnabled(isConfirmed && isRunning);
+		buttonHalt.setEnabled(isConfirmed && isRunning);
 
-		if(!isConnected) {
+		if (!isConfirmed) {
 			buttonPause.setText(translator.get("Pause"));
 		}
 	}
@@ -437,7 +406,8 @@ implements ActionListener, ChangeListener {
 		String filename = lastFileIn;
 
 		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
-		final FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"), imageFileExtentions.toArray(new String[imageFileExtentions.size()]));
+		final FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"),
+				imageFileExtentions.toArray(new String[imageFileExtentions.size()]));
 		FileFilter filterDXF = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
 
 		JFileChooser fc = new JFileChooser(new File(filename));
@@ -484,7 +454,8 @@ implements ActionListener, ChangeListener {
 		c.gridy = y++;
 		panel.add(options, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			int choice = options.getSelectedIndex();
 
@@ -523,7 +494,7 @@ implements ActionListener, ChangeListener {
 			try {
 				gui.gCode.save(selectedFile);
 			} catch (IOException e) {
-				Log.error( translator.get("Failed") + e.getMessage() );
+				Log.error(translator.get("Failed") + e.getMessage());
 				return;
 			}
 		}
@@ -546,7 +517,7 @@ implements ActionListener, ChangeListener {
 
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
-		Log.message( translator.get("OpeningFile") + filename + "...");
+		Log.message(translator.get("OpeningFile") + filename + "...");
 		boolean success = false;
 
 		if (isFileGcode(filename)) {
@@ -556,7 +527,7 @@ implements ActionListener, ChangeListener {
 		} else if (isFileImage(filename)) {
 			success = loadImage(filename);
 		} else {
-			Log.error( translator.get("UnknownFileType") );
+			Log.error(translator.get("UnknownFileType"));
 		}
 
 		if (success == true) {
@@ -566,7 +537,6 @@ implements ActionListener, ChangeListener {
 
 		gui.statusBar.clear();
 	}
-
 
 	protected boolean chooseImageConversionOptions() {
 		final JPanel panel = new JPanel(new GridBagLayout());
@@ -596,7 +566,8 @@ implements ActionListener, ChangeListener {
 		c.gridy = y++;
 		panel.add(inputDrawStyle, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
 			robot.settings.saveConfig();
@@ -611,18 +582,20 @@ implements ActionListener, ChangeListener {
 	}
 
 	/**
-	 * Opens a file.  If the file can be opened, get a drawing time estimate, update recent files list, and repaint the preview tab.
+	 * Opens a file. If the file can be opened, get a drawing time estimate,
+	 * update recent files list, and repaint the preview tab.
 	 *
-	 * @param filename what file to open
+	 * @param filename
+	 *            what file to open
 	 */
 	public boolean loadGCode(String filename) {
 		try {
 			gui.gCode.load(filename);
-			Log.message( gui.gCode.estimateCount + translator.get("LineSegments")
-			+ "\n" + gui.gCode.estimatedLength + translator.get("Centimeters") + "\n"
-			+ translator.get("EstimatedTime") + gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
+			Log.message(gui.gCode.estimateCount + translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
+					+ translator.get("Centimeters") + "\n" + translator.get("EstimatedTime")
+					+ gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
 		} catch (IOException e) {
-			Log.error( translator.get("FileNotOpened") + e.getLocalizedMessage() );
+			Log.error(translator.get("FileNotOpened") + e.getLocalizedMessage());
 			gui.updateMenuBar();
 			return false;
 		}
@@ -631,7 +604,6 @@ implements ActionListener, ChangeListener {
 		gui.halt();
 		return true;
 	}
-
 
 	protected boolean loadDXF(String filename) {
 		// where to save temp output file?
@@ -648,17 +620,15 @@ implements ActionListener, ChangeListener {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void doInBackground() {
-				Log.message( translator.get("Converting") + " " + destinationFile );
+				Log.message(translator.get("Converting") + " " + destinationFile);
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
 				double dxf_x2 = 0;
 				double dxf_y2 = 0;
 
-				try (
-						FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
-						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-						) {
+				try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 					DrawingTool tool = robot.settings.getCurrentTool();
 					out.write(robot.settings.getConfigLine() + ";\n");
 					out.write(robot.settings.getBobbinLine() + ";\n");
@@ -672,22 +642,25 @@ implements ActionListener, ChangeListener {
 					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
 					double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
 
-					// find the scale to fit the image on the paper without altering the aspect ratio
+					// find the scale to fit the image on the paper without
+					// altering the aspect ratio
 					double imageWidth = (b.getMaximumX() - b.getMinimumX());
 					double imageHeight = (b.getMaximumY() - b.getMinimumY());
-					double paperHeight = robot.settings.getPaperHeight()*10 * robot.settings.paperMargin;
-					double paperWidth = robot.settings.getPaperWidth() *10* robot.settings.paperMargin;
-					//double scale = Math.min( scaleX/imageWidth, scaleY/imageHeight);
-					//double scale = (scaleX / imageWidth);
-					//if (imageHeight * scale > scaleX) scale = scaleY / imageHeight;
+					double paperHeight = robot.settings.getPaperHeight() * 10 * robot.settings.getPaperMargin();
+					double paperWidth = robot.settings.getPaperWidth() * 10 * robot.settings.getPaperMargin();
+					// double scale = Math.min( scaleX/imageWidth,
+					// scaleY/imageHeight);
+					// double scale = (scaleX / imageWidth);
+					// if (imageHeight * scale > scaleX) scale = scaleY /
+					// imageHeight;
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
-					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth) : (paperHeight / imageHeight);
-
-					scale *= (robot.settings.reverseForGlass ? -1 : 1);
-					//double scaleX = imageWidth * scale;
-					//double scaleY = imageHeight * scale;
+					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
+							: (paperHeight / imageHeight);
+					scale *= (robot.settings.isReverseForGlass() ? -1 : 1);
+					// double scaleX = imageWidth * scale;
+					// double scaleY = imageHeight * scale;
 
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
@@ -695,12 +668,12 @@ implements ActionListener, ChangeListener {
 					int entity_count = 0;
 					while (layer_iter.hasNext()) {
 						DXFLayer layer = (DXFLayer) layer_iter.next();
-						Log.message( "Found layer " + layer.getName() );
+						Log.message("Found layer " + layer.getName());
 						Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 						while (entity_iter.hasNext()) {
 							String entity_type = (String) entity_iter.next();
 							List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
-							Log.message( "Found " + entity_list.size() + " of type " + entity_type );
+							Log.message("Found " + entity_list.size() + " of type " + entity_type);
 							entity_total += entity_list.size();
 						}
 					}
@@ -731,29 +704,29 @@ implements ActionListener, ChangeListener {
 									double x2 = (end.getX() - imageCenterX) * scale;
 									double y2 = (end.getY() - imageCenterY) * scale;
 									double dx, dy;
-									//*
+									// *
 									// is it worth drawing this line?
-											dx = x2 - x;
-											dy = y2 - y;
-											if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
-												continue;
-											}
-											//*/
-											dx = dxf_x2 - x;
-											dy = dxf_y2 - y;
+									dx = x2 - x;
+									dy = y2 - y;
+									if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
+										continue;
+									}
+									// */
+									dx = dxf_x2 - x;
+									dy = dxf_y2 - y;
 
-											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-												if (tool.isDrawOn()) {
-													tool.writeOff(out);
-												}
-												tool.writeMoveTo(out, (float) x, (float) y);
-											}
-											if (tool.isDrawOff()) {
-												tool.writeOn(out);
-											}
-											tool.writeMoveTo(out, (float) x2, (float) y2);
-											dxf_x2 = x2;
-											dxf_y2 = y2;
+									if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
+										if (tool.isDrawOn()) {
+											tool.writeOff(out);
+										}
+										tool.writeMoveTo(out, (float) x, (float) y);
+									}
+									if (tool.isDrawOff()) {
+										tool.writeOn(out);
+									}
+									tool.writeMoveTo(out, (float) x2, (float) y2);
+									dxf_x2 = x2;
+									dxf_y2 = y2;
 								}
 							} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 								Iterator<DXFEntity> iter = entity_list.iterator();
@@ -773,18 +746,24 @@ implements ActionListener, ChangeListener {
 										if (first == true) {
 											first = false;
 											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-												// line does not start at last tool location, lift and move.
+												// line does not start at last
+												// tool location, lift and move.
 												if (tool.isDrawOn()) {
 													tool.writeOff(out);
 												}
 												tool.writeMoveTo(out, (float) x, (float) y);
 											}
-											// else line starts right here, do nothing.
+											// else line starts right here, do
+											// nothing.
 										} else {
 											// not the first point, draw.
-											if (tool.isDrawOff()) tool.writeOn(out);
-											if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
-												continue;  // less than 1mm movement?  Skip it.
+											if (tool.isDrawOff())
+												tool.writeOn(out);
+											if (j < polyLine.getVertexCount() - 1
+													&& dx * dx + dy * dy < tool.getDiameter() / 2.0)
+												continue; // less than 1mm
+															// movement? Skip
+															// it.
 											tool.writeMoveTo(out, (float) x, (float) y);
 										}
 										dxf_x2 = x;
@@ -807,18 +786,24 @@ implements ActionListener, ChangeListener {
 										if (first == true) {
 											first = false;
 											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-												// line does not start at last tool location, lift and move.
+												// line does not start at last
+												// tool location, lift and move.
 												if (tool.isDrawOn()) {
 													tool.writeOff(out);
 												}
 												tool.writeMoveTo(out, (float) x, (float) y);
 											}
-											// else line starts right here, do nothing.
+											// else line starts right here, do
+											// nothing.
 										} else {
 											// not the first point, draw.
-											if (tool.isDrawOff()) tool.writeOn(out);
-											if (j < entity.getVertexCount() - 1 && dx * dx + dy * dy < tool.getDiameter() / 2.0)
-												continue;  // less than 1mm movement?  Skip it.
+											if (tool.isDrawOff())
+												tool.writeOn(out);
+											if (j < entity.getVertexCount() - 1
+													&& dx * dx + dy * dy < tool.getDiameter() / 2.0)
+												continue; // less than 1mm
+															// movement? Skip
+															// it.
 											tool.writeMoveTo(out, (float) x, (float) y);
 										}
 										dxf_x2 = x;
@@ -829,7 +814,7 @@ implements ActionListener, ChangeListener {
 						}
 					}
 
-					// entities finished.  Close up file.
+					// entities finished. Close up file.
 					tool.writeOff(out);
 					tool.writeMoveTo(out, 0, 0);
 
@@ -845,7 +830,7 @@ implements ActionListener, ChangeListener {
 			@Override
 			public void done() {
 				pm.close();
-				Log.message( translator.get("Finished") );
+				Log.message(translator.get("Finished"));
 				gui.soundSystem.playConversionFinishedSound();
 				if (ok) {
 					loadGCode(destinationFile);
@@ -863,12 +848,12 @@ implements ActionListener, ChangeListener {
 					String message = String.format("%d%%\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						Log.message( translator.get("Finished") );
+						Log.message(translator.get("Finished"));
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						Log.message( translator.get("Cancelled") );
+						Log.message(translator.get("Cancelled"));
 					}
 				}
 			}
@@ -879,14 +864,14 @@ implements ActionListener, ChangeListener {
 		return true;
 	}
 
-
 	public boolean loadImage(String filename) {
 		// where to save temp output file?
 		final String sourceFile = filename;
 		final String destinationFile = gui.getTempDestinationFile();
 
 		loadImageConverters();
-		if (chooseImageConversionOptions() == false) return false;
+		if (chooseImageConversionOptions() == false)
+			return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -896,9 +881,9 @@ implements ActionListener, ChangeListener {
 			@Override
 			public Void doInBackground() {
 				try (OutputStream fileOutputStream = new FileOutputStream(destinationFile);
-						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)){
+						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 					// read in image
-					Log.message( translator.get("Converting") + " " + destinationFile );
+					Log.message(translator.get("Converting") + " " + destinationFile);
 					// convert with style
 					final BufferedImage img = ImageIO.read(new File(sourceFile));
 
@@ -910,14 +895,14 @@ implements ActionListener, ChangeListener {
 					converter.convert(img, out);
 					gui.getDrawPanel().setDecorator(null);
 
-					if(robot.settings.shouldSignName()) {
+					if (robot.settings.shouldSignName()) {
 						// Sign name
 						Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, robot.settings, translator);
 						ymh.signName(out);
 					}
 					gui.updateMachineConfig();
 				} catch (IOException e) {
-					Log.error( translator.get("Failed") + e.getLocalizedMessage() );
+					Log.error(translator.get("Failed") + e.getLocalizedMessage());
 					gui.updateMenuBar();
 				}
 
@@ -930,7 +915,7 @@ implements ActionListener, ChangeListener {
 			@Override
 			public void done() {
 				pm.close();
-				Log.message( translator.get("Finished") );
+				Log.message(translator.get("Finished"));
 				loadGCode(destinationFile);
 				gui.soundSystem.playConversionFinishedSound();
 			}
@@ -945,12 +930,12 @@ implements ActionListener, ChangeListener {
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						Log.message( translator.get("Finished") );
+						Log.message(translator.get("Finished"));
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						Log.message( translator.get("Cancelled") );
+						Log.message(translator.get("Cancelled"));
 					}
 				}
 			}

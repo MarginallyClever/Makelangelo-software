@@ -168,8 +168,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void zoomToFitPaper() {
 		int drawPanelWidth = this.getWidth();
 		int drawPanelHeight = this.getHeight();
-		double widthOfPaper = machine.paperRight - machine.paperLeft;
-		double heightOfPaper = machine.paperTop - machine.paperBottom;
+		double widthOfPaper = machine.getPaperWidth();
+		double heightOfPaper = machine.getPaperHeight();
 		double drawPanelWidthZoom = drawPanelWidth / widthOfPaper;
 		double drawPanelHeightZoom = drawPanelHeight / heightOfPaper;
 		cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
@@ -359,41 +359,41 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void paintLimits(GL2 gl2) {
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.limitLeft, machine.limitTop);
-		gl2.glVertex2d(machine.limitRight, machine.limitTop);
-		gl2.glVertex2d(machine.limitRight, machine.limitBottom);
-		gl2.glVertex2d(machine.limitLeft, machine.limitBottom);
+		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitBottom());
+		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitBottom());
 		gl2.glEnd();
 		
 		if (!connected) {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.paperLeft, machine.paperTop);
-			gl2.glVertex2d(machine.paperRight, machine.paperTop);
-			gl2.glVertex2d(machine.paperRight, machine.paperBottom);
-			gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
+			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
+			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
+			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
+			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
 			gl2.glEnd();
 		} else {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.paperLeft, machine.paperTop);
-			gl2.glVertex2d(machine.paperRight, machine.paperTop);
-			gl2.glVertex2d(machine.paperRight, machine.paperBottom);
-			gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
+			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
+			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
+			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
+			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
 			gl2.glEnd();
 		}
 		// margin settings
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f,0.9f,0.9f);
 		gl2.glLineWidth(1);
-		gl2.glScaled(machine.paperMargin,machine.paperMargin,1);
+		gl2.glScaled(machine.getPaperMargin(),machine.getPaperMargin(),1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(machine.paperLeft, machine.paperTop);
-		gl2.glVertex2d(machine.paperRight, machine.paperTop);
-		gl2.glVertex2d(machine.paperRight, machine.paperBottom);
-		gl2.glVertex2d(machine.paperLeft, machine.paperBottom);
+		gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
+		gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
+		gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
+		gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}
@@ -425,11 +425,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glPushMatrix();
 		gl2.glTranslatef(-2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.limitLeft-5f, machine.limitTop+5f);
-		gl2.glVertex2d(machine.limitLeft+5f, machine.limitTop+5f);
-		gl2.glVertex2d(machine.limitLeft+5f, machine.limitTop);
-		gl2.glVertex2d(machine.limitLeft   , machine.limitTop-5f);
-		gl2.glVertex2d(machine.limitLeft-5f, machine.limitTop-5f);
+		gl2.glVertex2d(machine.getLimitLeft()-5f, machine.getLimitTop()+5f);
+		gl2.glVertex2d(machine.getLimitLeft()+5f, machine.getLimitTop()+5f);
+		gl2.glVertex2d(machine.getLimitLeft()+5f, machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitLeft()   , machine.getLimitTop()-5f);
+		gl2.glVertex2d(machine.getLimitLeft()-5f, machine.getLimitTop()-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
@@ -437,26 +437,26 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glPushMatrix();
 		gl2.glTranslatef(2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.limitRight+5f, machine.limitTop+5f);
-		gl2.glVertex2d(machine.limitRight-5f, machine.limitTop+5f);
-		gl2.glVertex2d(machine.limitRight-5f, machine.limitTop);
-		gl2.glVertex2d(machine.limitRight   , machine.limitTop-5f);
-		gl2.glVertex2d(machine.limitRight+5f, machine.limitTop-5f);
+		gl2.glVertex2d(machine.getLimitRight()+5f, machine.getLimitTop()+5f);
+		gl2.glVertex2d(machine.getLimitRight()-5f, machine.getLimitTop()+5f);
+		gl2.glVertex2d(machine.getLimitRight()-5f, machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitRight()   , machine.getLimitTop()-5f);
+		gl2.glVertex2d(machine.getLimitRight()+5f, machine.getLimitTop()-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
 		// left motor
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(machine.limitLeft-4.2f, machine.limitTop+4.2f);
-		gl2.glVertex2d(machine.limitLeft     , machine.limitTop+4.2f);
-		gl2.glVertex2d(machine.limitLeft     , machine.limitTop);
-		gl2.glVertex2d(machine.limitLeft-4.2f, machine.limitTop);
+		gl2.glVertex2d(machine.getLimitLeft()-4.2f, machine.getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getLimitLeft()     , machine.getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getLimitLeft()     , machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitLeft()-4.2f, machine.getLimitTop());
 		// right motor
-		gl2.glVertex2d(machine.limitRight     , machine.limitTop+4.2f);
-		gl2.glVertex2d(machine.limitRight+4.2f, machine.limitTop+4.2f);
-		gl2.glVertex2d(machine.limitRight+4.2f, machine.limitTop);
-		gl2.glVertex2d(machine.limitRight     , machine.limitTop);
+		gl2.glVertex2d(machine.getLimitRight()     , machine.getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getLimitRight()+4.2f, machine.getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getLimitRight()+4.2f, machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitRight()     , machine.getLimitTop());
 		gl2.glEnd();
 	}
 
@@ -473,37 +473,37 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 			gy=(-gondolaY/cameraZoom-cameraOffsetY);
 		}
 
-		double mw = machine.limitRight-machine.limitLeft;
-		double mh = machine.limitTop-machine.limitBottom;
+		double mw = machine.getLimitRight()-machine.getLimitLeft();
+		double mh = machine.getLimitTop()-machine.getLimitBottom();
 		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
 
-		dx = gx - machine.limitLeft;
-		dy = gy - machine.limitTop;
+		dx = gx - machine.getLimitLeft();
+		dy = gy - machine.getLimitTop();
 		double left_a = Math.sqrt(dx*dx+dy*dy);
 		double left_b = suggested_length - left_a;
 
-		dx = gx - machine.limitRight;
+		dx = gx - machine.getLimitRight();
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = suggested_length - right_a;
 
-		if(gx<machine.limitLeft) return;
-		if(gx>machine.limitRight) return;
-		if(gy>machine.limitTop) return;
-		if(gy<machine.limitBottom) return;
+		if(gx<machine.getLimitLeft()) return;
+		if(gx>machine.getLimitRight()) return;
+		if(gy>machine.getLimitTop()) return;
+		if(gy<machine.getLimitBottom()) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		// motor to gondola left
-		gl2.glVertex2d(machine.limitLeft, machine.limitTop);
+		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitTop());
 		gl2.glVertex2d(gx,gy);
 		// motor to counterweight left
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75, machine.limitTop);
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75, machine.limitTop-left_b);
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75, machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75, machine.getLimitTop()-left_b);
 		// motor to gondola right
-		gl2.glVertex2d(machine.limitRight, machine.limitTop);
+		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitTop());
 		gl2.glVertex2d(gx,gy);
 		// motor to counterweight right
-		gl2.glVertex2d(machine.limitRight+2.1+0.75, machine.limitTop);
-		gl2.glVertex2d(machine.limitRight+2.1+0.75, machine.limitTop-right_b);
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75, machine.getLimitTop());
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75, machine.getLimitTop()-right_b);
 		gl2.glEnd();
 		// gondola
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -517,18 +517,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75-1.5,machine.limitTop-left_b);
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75+1.5,machine.limitTop-left_b);
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75+1.5,machine.limitTop-left_b-15);
-		gl2.glVertex2d(machine.limitLeft-2.1-0.75-1.5,machine.limitTop-left_b-15);
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75-1.5,machine.getLimitTop()-left_b);
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75+1.5,machine.getLimitTop()-left_b);
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75+1.5,machine.getLimitTop()-left_b-15);
+		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75-1.5,machine.getLimitTop()-left_b-15);
 		gl2.glEnd();
 		// counterweight right
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(machine.limitRight+2.1+0.75-1.5,machine.limitTop-right_b);
-		gl2.glVertex2d(machine.limitRight+2.1+0.75+1.5,machine.limitTop-right_b);
-		gl2.glVertex2d(machine.limitRight+2.1+0.75+1.5,machine.limitTop-right_b-15);
-		gl2.glVertex2d(machine.limitRight+2.1+0.75-1.5,machine.limitTop-right_b-15);
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75-1.5,machine.getLimitTop()-right_b);
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75+1.5,machine.getLimitTop()-right_b);
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75+1.5,machine.getLimitTop()-right_b-15);
+		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75-1.5,machine.getLimitTop()-right_b-15);
 		gl2.glEnd();
 		
 		/*
@@ -536,11 +536,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// right
 		gl2.glColor3d(0.6, 0.6, 0.6);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		double w = machine.limitRight - machine.limitLeft+2.1;
-		double h = machine.limitTop - machine.limitBottom + 2.1;
+		double w = machine.getLimitRight() - machine.getLimitLeft()+2.1;
+		double h = machine.getLimitTop() - machine.getLimitBottom() + 2.1;
 		r=(float)Math.sqrt(h*h + w*w); // circle radius
-		gx = machine.limitLeft - 2.1;
-		gy = machine.limitTop + 2.1;
+		gx = machine.getLimitLeft() - 2.1;
+		gy = machine.getLimitTop() + 2.1;
 		double start = (float)1.5*(float)Math.PI;
 		double end = (2*Math.PI-Math.atan(h/w));
 		double v;
@@ -552,7 +552,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		// left
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		gx = machine.limitRight + 2.1;
+		gx = machine.getLimitRight() + 2.1;
 		start = (float)(1*Math.PI+Math.atan(h/w));
 		end = (float)1.5*(float)Math.PI;
 		for(v=0;v<=1.0;v+=0.1) {

@@ -21,8 +21,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 
@@ -70,11 +68,6 @@ public final class Translator {
 	/**
 	 *
 	 */
-	private final Logger logger = LoggerFactory.getLogger(Translator.class);
-
-	/**
-	 *
-	 */
 	public Translator() {
 		// find the english name of the default language.
 		Locale locale = Locale.getDefault();
@@ -85,7 +78,7 @@ public final class Translator {
 		try {
 			loadLanguages();
 		} catch (IllegalStateException e) {
-			logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), defaultLanguage, WORKING_DIRECTORY);
+			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
 			System.out.println("default path requested: "+path);
@@ -94,7 +87,7 @@ public final class Translator {
 			try (InputStream s = pathFound.openStream()) {
 				languageContainer.loadFromInputStream(s);
 			} catch (IOException ie) {
-				logger.error("{}", ie.getMessage());
+				Log.error(ie.getMessage());
 			}
 			languages.put(languageContainer.getName(), languageContainer);
 		}
@@ -111,7 +104,7 @@ public final class Translator {
 				return false;
 			}
 		} catch (BackingStoreException e) {
-			logger.error("{}", e);
+			Log.error(e.getMessage());
 		}
 		return true;
 	}
