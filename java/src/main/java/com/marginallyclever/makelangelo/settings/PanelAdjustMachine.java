@@ -5,14 +5,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -24,7 +21,7 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class PanelAdjustMachine
 extends JPanel
-implements ActionListener, KeyListener {
+implements ActionListener {
 	/**
 	 * 
 	 */
@@ -32,16 +29,22 @@ implements ActionListener, KeyListener {
 	
 	protected Translator translator;
 	protected MakelangeloRobot robot;
-	
-	protected JComboBox<String> paperSizes;
+
 	protected JTextField mw, mh;
-	protected JTextField pw, ph;
 	
 	protected JTextField acceleration;
 	
 	protected JCheckBox flipForGlass;
+	
 	protected JTextField pulleyDiameterLeft,pulleyDiameterRight;
-   
+
+	protected JButton buttonAneg;
+	protected JButton buttonApos;
+	protected JButton buttonBneg;
+	protected JButton buttonBpos;
+	
+	protected JCheckBox m1i;
+	protected JCheckBox m2i;
 	
 	public PanelAdjustMachine(Translator translator, MakelangeloRobot robot) {
 		this.translator = translator;
@@ -57,37 +60,7 @@ implements ActionListener, KeyListener {
 	    c.ipadx=5;
 	    c.ipady=0;
 
-	    int y = 0;
-	/*
-	    JLabel picLabel = null;
-	    BufferedImage myPicture = null;
-	    final String limit_file = "limits.png";
-	    try (final InputStream s = getClass().getClassLoader().getResourceAsStream(limit_file)) {
-	      myPicture = ImageIO.read(s);
-	    }
-	    catch(IOException e) {
-	      logger.error("{}", e);
-	      myPicture=null;
-	    }
-	    
-	    if (myPicture != null) {
-	      picLabel = new JLabel(new ImageIcon(myPicture));
-	    } else {
-	      logger.error("{}", translator.get("CouldNotFind")+limit_file);
-	    }*/
-
-	/*
-	    if (myPicture != null) {
-	      c.weightx = 0.25;
-	      c.gridx = 0;
-	      c.gridy = y;
-	      c.gridwidth = 4;
-	      c.gridheight = 4;
-	      c.anchor = GridBagConstraints.CENTER;
-	      this.add(picLabel, c);
-	      y += 5;
-	    }
-	*/    
+	    // adjust machine size
 	    JPanel p = new JPanel(new GridBagLayout());
 	    this.add(p);
 	    
@@ -95,7 +68,7 @@ implements ActionListener, KeyListener {
 	    p.add(new JLabel("1\" = 25.4mm",SwingConstants.CENTER),c);
 	    c.gridwidth=1;
 	    
-	    y=1;
+	    int y=1;
 
 	    c.anchor=GridBagConstraints.EAST;
 	    d.anchor=GridBagConstraints.WEST;
@@ -115,41 +88,14 @@ implements ActionListener, KeyListener {
 	    d.gridx=2;  d.gridy=y;  p.add(new JLabel("mm"),d);
 	    y++;
 
+		Dimension s = mh.getPreferredSize();
+		s.width = 80;
+		mw.setPreferredSize(s);
+		mh.setPreferredSize(s);
+		
+	    // adjust pulleys
 	    this.add(new JSeparator(SwingConstants.HORIZONTAL));
-	    p = new JPanel(new GridBagLayout());
-	    this.add(p);
-	    y=0;
-	    paperSizes = new JComboBox<>(robot.settings.commonPaperSizes);
-	    paperSizes.setSelectedIndex(robot.settings.getCurrentPaperSizeChoice( robot.settings.getPaperWidth()*10, robot.settings.getPaperHeight()*10 ));
-	    
-	    pw = new JTextField(Double.toString(robot.settings.getPaperWidth()*10));
-	    ph = new JTextField(Double.toString(robot.settings.getPaperHeight()*10));
-	    
-	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
-	    d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
-	    y=1;
-	    d.gridwidth=1;
 
-	    c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
-	    d.gridx=1;  d.gridy=y;  p.add(pw,d); 
-	    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
-	    y++;
-	    c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
-	    d.gridx=1;  d.gridy=y;  p.add(ph,d);
-	    d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
-	    y++;
-	    
-	    //c.gridx=0; c.gridy=9; c.gridwidth=4; c.gridheight=1;
-	    //this.add(new JLabel("For more info see http://bit.ly/fix-this-link."),c);
-	    //c.gridx=0; c.gridy=11; c.gridwidth=2; c.gridheight=1;  this.add(new JLabel("Pen starts at paper"),c);
-	    //c.anchor=GridBagConstraints.WEST;
-	    //c.gridx=2; c.gridy=11; c.gridwidth=2; c.gridheight=1;  this.add(startPos,c);
-
-	    //final JComboBox<String> startPos = new JComboBox<String>(startingStrings);
-	    //startPos.setSelectedIndex(startingPositionIndex);
-
-	    
-	    this.add(new JSeparator());
 	    p = new JPanel(new GridBagLayout());
 	    this.add(p);
 	    
@@ -178,17 +124,73 @@ implements ActionListener, KeyListener {
 	    d.gridx = 1;    d.gridy = y;    p.add(pulleyDiameterRight, d);
 	    d.gridx = 2;    d.gridy = y;    p.add(new JLabel(translator.get("Millimeters")), d);
 
-	    Dimension s = pulleyDiameterLeft.getPreferredSize();
+	    s = pulleyDiameterLeft.getPreferredSize();
 	    s.width = 80;
 	    pulleyDiameterLeft.setPreferredSize(s);
 	    pulleyDiameterRight.setPreferredSize(s);
 
+
+	    // Jog motors
+	    this.add(new JSeparator());
+	    JPanel panel = new JPanel(new GridBagLayout());
+	    this.add(panel);
+	    
+	    buttonAneg = new JButton(translator.get("JogIn"));
+	    buttonApos = new JButton(translator.get("JogOut"));
+	    m1i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor1Backwards());
+	
+	    buttonBneg = new JButton(translator.get("JogIn"));
+	    buttonBpos = new JButton(translator.get("JogOut"));
+	    m2i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor2Backwards());
+
+	    
+	    c.gridx=0;
+	    c.gridy=0;
+	    panel.add(new JLabel(translator.get("Left")), c);
+	    c.gridx = 0;
+	    c.gridy = 1;
+	    panel.add(new JLabel(translator.get("Right")), c);
+	
+	    c.gridx = 1;
+	    c.gridy = 0;
+	    panel.add(buttonAneg, c);
+	    c.gridx = 1;
+	    c.gridy = 1;
+	    panel.add(buttonBneg, c);
+	
+	    c.gridx = 2;
+	    c.gridy = 0;
+	    panel.add(buttonApos, c);
+	    c.gridx = 2;
+	    c.gridy = 1;
+	    panel.add(buttonBpos, c);
+	
+	    c.gridx = 3;
+	    c.gridy = 0;
+	    panel.add(m1i, c);
+	    c.gridx = 3;
+	    c.gridy = 1;
+	    panel.add(m2i, c);
+
+	    buttonApos.addActionListener(this);
+	    buttonAneg.addActionListener(this);
+
+	    buttonBpos.addActionListener(this);
+	    buttonBneg.addActionListener(this);
+
+	    m1i.addActionListener(this);
+	    m2i.addActionListener(this);
+	    
+	    
+	    // acceleration
 	    this.add(new JSeparator());
 	    p = new JPanel(new GridBagLayout());
 	    this.add(p);
 
 	    acceleration = new JTextField(Double.toString(robot.settings.getAcceleration()));
-
+	    s = acceleration.getPreferredSize();
+	    s.width=80;
+	    acceleration.setPreferredSize(s);
 	    y=0;
 	    c.weightx = 0;
 	    c.anchor=GridBagConstraints.EAST;
@@ -196,71 +198,44 @@ implements ActionListener, KeyListener {
 	    c.gridx = 0;    c.gridy = y;    p.add(new JLabel(translator.get("AdjustAcceleration")), c);
 	    d.gridx = 1;    d.gridy = y;    p.add(acceleration, d);
 	    y++;
-	    
-	    
+
+
+	    // flip for glass
 	    this.add(new JSeparator());
+	    p = new JPanel(new GridBagLayout());
+	    this.add(p);
+	    
 	    c.fill=GridBagConstraints.HORIZONTAL;
 	    c.anchor=GridBagConstraints.CENTER;
 	    c.gridx=0;
 	    c.gridy++;
+	    c.gridwidth=2;
 	    flipForGlass = new JCheckBox(translator.get("FlipForGlass"));
 	    flipForGlass.setSelected(robot.settings.isReverseForGlass());
-	    this.add(flipForGlass,c);
-
-	    s = ph.getPreferredSize();
-	    s.width = 80;
-	    mw.setPreferredSize(s);
-	    mh.setPreferredSize(s);
-	    pw.setPreferredSize(s);
-	    ph.setPreferredSize(s);
-
-	    paperSizes.addActionListener(this);
-	    pw.addKeyListener(this);
-	    ph.addKeyListener(this);
-	    this.setVisible(true);
+	    p.add(flipForGlass,c);
 	}
 
-
-	public void keyPressed(KeyEvent e) {}
-	public void keyReleased(KeyEvent e) { Event(e); }
-	public void keyTyped(KeyEvent e) { Event(e); }
-	
-	private void Event(KeyEvent e) {
-    	double w=0;
-    	double h=0;
-    	try {
-    		w = Double.parseDouble(pw.getText());
-    		h = Double.parseDouble(ph.getText());
-    	} catch(Exception err) {
-    		err.getMessage();
-    	}
-    	paperSizes.setSelectedIndex(robot.settings.getCurrentPaperSizeChoice(w,h));	
-	}
-
-	
     public void actionPerformed(ActionEvent e) {
       Object subject = e.getSource();
-
-      if(subject == paperSizes) {
-          final int selectedIndex = paperSizes.getSelectedIndex();
-          if(selectedIndex!= 0) {
-          	String str = paperSizes.getItemAt(selectedIndex);
-          	String sw = str.substring(str.indexOf('(')+1, str.indexOf('x')).trim();
-          	String sh = str.substring(str.indexOf('x')+1, str.indexOf(')')).trim();
-          	pw.setText(sw);
-          	ph.setText(sh);
-          }
+      
+      // jog motors
+      if (subject == buttonApos) robot.sendLineToRobot("D00 L400");
+      if (subject == buttonAneg) robot.sendLineToRobot("D00 L-400");
+      if (subject == buttonBpos) robot.sendLineToRobot("D00 R400");
+      if (subject == buttonBneg) robot.sendLineToRobot("D00 R-400");
+    
+      if (subject == m1i || subject == m2i) {
+        robot.settings.setMotor1Backwards( m1i.isSelected() );
+        robot.settings.setMotor2Backwards( m2i.isSelected() );
+        robot.settings.saveConfig();
+        robot.sendConfig();
       }
     }
      
     public void save() {
-    	double pwf = Double.valueOf(pw.getText()) / 10.0;
-    	double phf = Double.valueOf(ph.getText()) / 10.0;
     	double mwf = Double.valueOf(mw.getText()) / 10.0;
     	double mhf = Double.valueOf(mh.getText()) / 10.0;
     	boolean data_is_sane=true;
-    	if( pwf<=0 ) data_is_sane=false;
-    	if( phf<=0 ) data_is_sane=false;
     	if( mwf<=0 ) data_is_sane=false;
     	if( mhf<=0 ) data_is_sane=false;
 
@@ -274,11 +249,8 @@ implements ActionListener, KeyListener {
     	if (data_is_sane) {
     		robot.settings.setReverseForGlass(flipForGlass.isSelected());
     		robot.settings.setPulleyDiameter(bld,brd);
-    		robot.settings.setPaperSize(pwf,phf);
     		robot.settings.setMachineSize(mwf,mhf);
     		robot.settings.setAcceleration(accel);
-    		robot.settings.saveConfig();
-    		robot.sendConfig();
     	}
     }
 }

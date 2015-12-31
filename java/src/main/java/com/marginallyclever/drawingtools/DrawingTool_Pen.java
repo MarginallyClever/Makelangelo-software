@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -58,8 +60,13 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	}
 
 	public JPanel getPanel() {
-		panel = new JPanel(new GridBagLayout());
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+	    panel.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 
+	    JPanel p = new JPanel(new GridBagLayout());
+	    panel.add(p);
+	    
 		penDiameter = new JTextField(Float.toString(getDiameter()), 5);
 		penFeedRate = new JTextField(Float.toString(feedRate), 5);
 		penUp = new JTextField(Float.toString(zOff), 5);
@@ -76,8 +83,9 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
 
-		c.ipadx=2;
-		d.ipadx=2;
+		c.ipadx=5;
+	    c.ipady=0;
+
 		c.anchor = GridBagConstraints.EAST;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		d.anchor = GridBagConstraints.WEST;
@@ -87,48 +95,48 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("penToolDiameter")), c);
+		p.add(new JLabel(translator.get("penToolDiameter")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		panel.add(penDiameter, d);
+		p.add(penDiameter, d);
 		++y;
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("penToolMaxFeedRate")), c);
+		p.add(new JLabel(translator.get("penToolMaxFeedRate")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		panel.add(penFeedRate, d);
+		p.add(penFeedRate, d);
 		++y;
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("penToolUp")), c);
+		p.add(new JLabel(translator.get("penToolUp")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		panel.add(penUp, d);
+		p.add(penUp, d);
 		d.gridx = 2;
 		d.gridy = y;
-		panel.add(buttonTestUp, d);
+		p.add(buttonTestUp, d);
 		++y;
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("penToolDown")), c);
+		p.add(new JLabel(translator.get("penToolDown")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		panel.add(penDown, d);
+		p.add(penDown, d);
 		d.gridx = 2;
 		d.gridy = y;
-		panel.add(buttonTestDown, d);
+		p.add(buttonTestDown, d);
 		++y;
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("penToolLiftSpeed")), c);
+		p.add(new JLabel(translator.get("penToolLiftSpeed")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		panel.add(penZRate, d);
+		p.add(penZRate, d);
 		++y;
 
 		c.gridwidth = 2;

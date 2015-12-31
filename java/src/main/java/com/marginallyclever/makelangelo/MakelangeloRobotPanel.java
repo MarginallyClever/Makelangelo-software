@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -473,7 +474,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		if (subject == openConfig) {
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(gui, translator, robot);
+			Frame frame = (Frame)this.getRootPane().getParent();
+			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, translator, robot);
 			m.run();
 			return;
 		}

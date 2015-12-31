@@ -123,8 +123,8 @@ public final class MakelangeloRobotSettings {
 	/**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
 	 *
-	 * @param gui
 	 * @param translator
+	 * @param robot
 	 */
 	protected MakelangeloRobotSettings(Translator translator, MakelangeloRobot robot) {
 		double mh = 835 * 0.1; // mm > cm

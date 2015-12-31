@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.settings;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
@@ -15,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -36,25 +36,21 @@ implements ActionListener {
 
   protected Translator translator;
   protected MakelangeloRobot robot;
-  protected Makelangelo gui;
 
   protected JTabbedPane panes;
   protected JButton save, cancel;
   
-  protected PanelAdjustMachine panelAdjustMachineSize;
-  protected PanelJogMotors panelJogMotors;
+  protected PanelAdjustMachine panelAdjustMachine;
+  protected PanelAdjustPaper panelAdjustPaper;
   protected DrawingTool panelAdjustPen;
-  //protected PanelAdjustTools panelAdjustTools;
-  //protected PanelSelectTool panelSelectTool;
   
   protected int dialogWidth = 450;
   protected int dialogHeight = 500;
   
-  public MakelangeloSettingsDialog(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
-	super(gui.getParentFrame(),translator.get("configureMachine"),true);
+  public MakelangeloSettingsDialog(Frame parent, Translator translator, MakelangeloRobot robot) {
+	super(parent,translator.get("configureMachine"),true);
 
 	this.translator = translator;
-	this.gui = gui;
 	this.robot = robot;
   }
 
@@ -63,14 +59,14 @@ implements ActionListener {
   public void run() {
     panes = new JTabbedPane();
     
-    panelAdjustMachineSize = new PanelAdjustMachine(translator,robot);
-    panelJogMotors = new PanelJogMotors(translator,robot);
+    panelAdjustMachine = new PanelAdjustMachine(translator,robot);
+    panelAdjustPaper = new PanelAdjustPaper(translator,robot);
     panelAdjustPen = robot.settings.getTool(0);
     //panelAdjustTools = new PanelAdjustTools(translator,robot);
     //panelSelectTool = new PanelSelectTool(translator,robot);
     
-    panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachineSize);
-    panes.addTab(translator.get("JogMotors"),panelJogMotors);
+    panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachine);
+    panes.addTab(translator.get("MenuAdjustPaper"),panelAdjustPaper);
     panes.addTab(translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
     //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
     //panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
@@ -123,10 +119,11 @@ implements ActionListener {
 	  Object src = e.getSource();
 	  
 	  if(src == save) {
-		  panelAdjustMachineSize.save();
+		  panelAdjustMachine.save();
+		  panelAdjustPaper.save();
 		  panelAdjustPen.save();
-		  //panelAdjustTools.save();
-		  //panelSelectTool.save();
+		  robot.settings.saveConfig();
+		  robot.sendConfig();
 		  this.dispose();
 	  }
 	  if(src == cancel) {

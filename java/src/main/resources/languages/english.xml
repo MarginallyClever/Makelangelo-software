@@ -494,7 +494,12 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>MenuSettingsMachine</key>
-		<value>Size</value>
+		<value>Machine</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAdjustPaper</key>
+		<value>Paper</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
