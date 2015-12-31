@@ -127,23 +127,30 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 */
 	protected MakelangeloRobotSettings(Translator translator, MakelangeloRobot robot) {
-		limitTop = 18 * INCH_TO_CM;
-		limitBottom = -18 * INCH_TO_CM;
-		limitLeft = -18 * INCH_TO_CM;
-		limitRight = 18 * INCH_TO_CM;
+		double mh = 835 * 0.1; // mm > cm
+		double mw = 835 * 0.1; // mm > cm
+		
+		limitTop = mh/2;
+		limitBottom = -mh/2;
+		limitRight = mw/2;
+		limitLeft = -mw/2;
 
 		// paper area
-		paperTop = 12 * INCH_TO_CM;
-		paperBottom = -12 * INCH_TO_CM;
-		paperLeft = -9 * INCH_TO_CM;
-		paperRight = 9 * INCH_TO_CM;
+		double pw = 420 * 0.1; // mm to cm
+		double ph = 594 * 0.1; // mm to cm
+		
+		paperTop = ph/2;
+		paperBottom = -ph/2;
+		paperLeft = -pw/2;
+		paperRight = pw/2;
 		paperMargin = 0.9;
 
 		maxFeedRate     = 7500;
-		maxAcceleration = 100;
+		maxAcceleration = 20;
 		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
+		
 		invertMotor1       = false;
 		invertMotor2       = true;
 		reverseForGlass    = false;

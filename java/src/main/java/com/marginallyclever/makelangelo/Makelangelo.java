@@ -95,7 +95,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// menubar > connect
 	private JMenuItem buttonRescan, buttonDisconnect;
 	// menubar > view
-	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit, buttonToggleLog;
+	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
 
 	/**
 	 * buttons that represent connections to real robots attached to the computer.
@@ -105,7 +105,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// main window layout
 	private Splitter splitLeftRight;
 	private Splitter splitUpDown;
-	private boolean logViewOn=false;
 	
 	// OpenGL window
 	private DrawPanel cameraViewPanel;
@@ -362,10 +361,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			cameraViewPanel.zoomToFitPaper();
 			return;
 		}
-		if( subject == buttonToggleLog ) {
-			toggleLogView();
-			return;
-		}
 		if (subject == buttonRescan) {
 			connectionManager.listConnections();
 			updateMenuBar();
@@ -476,15 +471,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 				+ translator.get("TitleNotConnected"));
 	}
 	
-	private void toggleLogView() {
-		if( logViewOn == false ) {
-			logViewOn=true;
-			logPanel.setVisible(true);
-		} else {
-			logViewOn=false;
-			logPanel.setVisible(false);
-		}
-	}
 	
 	/**
 	 * If the menu bar exists, empty it.  If it doesn't exist, create it.
@@ -629,12 +615,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
-		menu.add(new JSeparator());
-		
-		buttonToggleLog = new JMenuItem(translator.get("ShowLog"));
-		buttonToggleLog.addActionListener(this);
-		menu.add(buttonToggleLog);
-		
 		menuBar.add(menu);
 
 		// finish
@@ -676,7 +656,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		
 		logPanel = new LogPanel(translator, robot);
 		logPanel.clearLog();
-		logPanel.setVisible(false);
 
 		statusBar = new StatusBar(translator);
 
@@ -690,6 +669,12 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		splitUpDown.add(splitLeftRight);
 		splitUpDown.add(logPanel);
 		splitUpDown.setResizeWeight(0.9);
+		splitUpDown.setOneTouchExpandable(true);
+		splitUpDown.setDividerLocation(800);
+		Dimension minimumSize = new Dimension(100, 100);
+		splitLeftRight.setMinimumSize(minimumSize);
+		logPanel.setMinimumSize(minimumSize);
+		
 		contentPane.add(splitUpDown, BorderLayout.CENTER);
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);

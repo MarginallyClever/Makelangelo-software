@@ -159,9 +159,13 @@ implements ActionListener, KeyListener {
 	    c.gridwidth=3;
 	    p.add(new JLabel(translator.get("AdjustPulleySize"),SwingConstants.CENTER),c);
 	    c.gridwidth=1;
- 
-	    pulleyDiameterLeft = new JTextField(String.valueOf(robot.settings.getPulleyDiameterLeft() * 10));
-	    pulleyDiameterRight = new JTextField(String.valueOf(robot.settings.getPulleyDiameterRight() * 10));
+
+		double left  = Math.floor(robot.settings.getPulleyDiameterLeft()*10.0 *1000.0) / 1000.0;
+		double right = Math.floor(robot.settings.getPulleyDiameterRight()*10.0 *1000.0) / 1000.0;
+		
+	    pulleyDiameterLeft  = new JTextField(Double.toString(left ));
+	    pulleyDiameterRight = new JTextField(Double.toString(right));
+	    
 	    y=2;
 	    c.weightx = 0;
 	    c.anchor=GridBagConstraints.EAST;

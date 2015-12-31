@@ -632,7 +632,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (!isConfirmed) {
 			buttonPause.setText(translator.get("Pause"));
 		}
-		
+
+		disengageMotors.setEnabled(isConfirmed && !isRunning);
+		buttonNewFile.setEnabled(!isRunning);
+		buttonOpenFile.setEnabled(!isRunning);
+		buttonGenerate.setEnabled(!isRunning);
 		
 		down100.setEnabled(isConfirmed && !isRunning);
 		down10.setEnabled(isConfirmed && !isRunning);
