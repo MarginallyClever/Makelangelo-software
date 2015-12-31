@@ -22,7 +22,7 @@ import javax.swing.SwingConstants;
 import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
 
-public class PanelAdjustMachineSize
+public class PanelAdjustMachine
 extends JPanel
 implements ActionListener, KeyListener {
 	/**
@@ -43,7 +43,7 @@ implements ActionListener, KeyListener {
 	protected JTextField pulleyDiameterLeft,pulleyDiameterRight;
    
 	
-	public PanelAdjustMachineSize(Translator translator, MakelangeloRobot robot) {
+	public PanelAdjustMachine(Translator translator, MakelangeloRobot robot) {
 		this.translator = translator;
 		this.robot = robot;
 

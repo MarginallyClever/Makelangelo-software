@@ -9,29 +9,22 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-
-public class PanelLog
-extends JPanel
-implements ActionListener, ChangeListener, KeyListener, LogListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+@SuppressWarnings("serial")
+public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
+	Translator translator;
+	MakelangeloRobot robot;
+	
+	// logging
 	private JTextPane log;
 	private HTMLEditorKit kit;
 	private HTMLDocument doc;
@@ -40,24 +33,14 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
-
-	protected Translator translator;
-	protected MakelangeloRobot robot;
 	
-
-	public void finalize() throws Throwable  {
-		super.finalize();
-		Log.removeListener(this);
-	}
-
 	
-	public PanelLog(Translator _translator, MakelangeloRobot robot) {
-		Log.addListener(this);
-		
-		translator = _translator;
+	public LogPanel(Translator translator,MakelangeloRobot robot) {
+		this.translator = translator;
 		this.robot = robot;
-
-		this.setBorder(BorderFactory.createEmptyBorder());
+		
+		// log panel
+		Log.addListener(this);
 
 		// the log panel
 		log = new JTextPane();
@@ -67,19 +50,22 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 		doc = new HTMLDocument();
 		log.setEditorKit(kit);
 		log.setDocument(doc);
-		DefaultCaret c = (DefaultCaret) log.getCaret();
-		c.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		DefaultCaret caret = (DefaultCaret) log.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+		JScrollPane logPane = new JScrollPane(log);
 
 		// Now put all the parts together
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
+		con1.gridx = 0;
+		con1.gridy = 0;
+		
 		con1.weightx=1;
 		con1.weighty=1;
 		con1.fill=GridBagConstraints.BOTH;
 		con1.anchor=GridBagConstraints.NORTHWEST;
-		this.add(new JScrollPane(log),con1);
+		this.add(logPane,con1);
 		con1.gridy++;
 
 
@@ -87,6 +73,12 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 		con1.weightx=1;
 		con1.weighty=0;
 		this.add(getTextInputField(),con1);
+	}
+
+
+	public void finalize() throws Throwable  {
+		super.finalize();
+		Log.removeListener(this);
 	}
 
 	private JPanel getTextInputField() {
@@ -116,21 +108,6 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 
 		return textInputArea;
 	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
-
-		if (subject == commandLineSend) {
-			robot.sendLineToRobot(commandLineText.getText());
-			commandLineText.setText("");
-		}
-	}
-
-
 	@Override
 	public void keyTyped(KeyEvent e) {}
 
@@ -180,4 +157,16 @@ implements ActionListener, ChangeListener, KeyListener, LogListener {
 
 		}
 	}
+	
+	// The user has done something. respond to it.
+	public void actionPerformed(ActionEvent e) {
+		Object subject = e.getSource();
+		
+		// logging
+		if (subject == commandLineSend) {
+			robot.sendLineToRobot(commandLineText.getText());
+			commandLineText.setText("");
+		}
+	}
+
 }

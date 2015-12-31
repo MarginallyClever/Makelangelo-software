@@ -1,10 +1,16 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -15,6 +21,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +35,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -86,7 +94,7 @@ import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PanelPrepareImage extends JScrollPane implements ActionListener, ChangeListener {
+public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, MouseListener, MouseMotionListener {
 	/**
 	 *
 	 */
@@ -104,10 +112,12 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		imageFileExtentions.add("gif");
 	}
 
+	// god objects ?
 	protected Translator translator;
 	protected MakelangeloRobot robot;
 	protected Makelangelo gui;
 
+	// machine options
 	protected String lastFileIn = "";
 	protected String lastFileOut = "";
 
@@ -119,6 +129,23 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 	private JButton buttonOpenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
+	// driving controls
+	private JButton down100,down10,down1,up1,up10,up100;
+	private JButton left100,left10,left1,right1,right10,right100;
+	private JButton goHome,setHome;
+	private JButton goTop,goBottom,goLeft,goRight,penUp,penDown;
+
+	private JFormattedTextField feedRate;
+	private JButton setFeedRate;
+
+	private JButton disengageMotors;
+	private JPanel dragAndDrive;
+	private JLabel coordinates;
+
+	private boolean mouseInside,mouseOn;
+	double last_x,last_y;
+
+	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
@@ -128,7 +155,7 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 	 */
 	private List<ImageConverter> imageConverters;
 	private List<ImageGenerator> imageGenerators;
-
+	
 	// TODO use a ServiceLoader and find plugins in nearby folders
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
@@ -158,15 +185,24 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		imageGenerators.add(new Generator_YourMessageHere(gui, robot.settings, translator));
 	}
 
-	public PanelPrepareImage(Makelangelo _gui, Translator translator, MakelangeloRobot robot) {
+
+	public JButton tightJButton(String label) {
+		JButton b = new JButton(label);
+		b.setMargin(new Insets(0,0,0,0));
+		b.setPreferredSize(new Dimension(60,20));
+		return b;
+	}
+
+	public MakelangeloRobotPanel(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
 		this.translator = translator;
-		gui = _gui;
+		this.gui = gui;
 		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder());
 
 		JPanel panel = new JPanel(new GridBagLayout());
 		this.setViewportView(panel);
+		
 		GridBagConstraints con1 = new GridBagConstraints();
 		con1.gridx = 0;
 		con1.gridy = 0;
@@ -175,6 +211,9 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
+		
+		
+		// settings
 		machineNumberPanel = new JPanel(new GridLayout(1, 0));
 		updateMachineNumberPanel();
 		panel.add(machineNumberPanel, con1);
@@ -195,6 +234,153 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		panel.add(new JSeparator(), con1);
 		con1.gridy++;
 
+		
+		
+		// Driving controls
+		mouseInside=false;
+		mouseOn=false;
+		last_x=last_y=0;
+
+		GridBagConstraints c = new GridBagConstraints();
+
+		JPanel axisControl = new JPanel(new GridBagLayout());
+		down100 = tightJButton("-100");
+		down10 = tightJButton("-10");
+		down1 = tightJButton("-1");
+		
+		setHome = tightJButton(translator.get("SetHome"));
+		
+		up1 = tightJButton("1");
+		up10 = tightJButton("10");
+		up100 = tightJButton("100");
+
+		left100 = tightJButton("-100");
+		left10 = tightJButton("-10");
+		left1 = tightJButton("-1");
+		right1 = tightJButton("1");
+		right10 = tightJButton("10");
+		right100 = tightJButton("100");
+
+		c.fill=GridBagConstraints.BOTH; 
+		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
+		c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
+		c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
+		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);     setHome.setPreferredSize(new Dimension(100,20)); 
+		c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
+		c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
+		c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
+
+		c.gridx=0;  c.gridy=3;  axisControl.add(left100,c);
+		c.gridx=1;  c.gridy=3;  axisControl.add(left10,c);
+		c.gridx=2;  c.gridy=3;  axisControl.add(left1,c);
+		c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
+		c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
+		c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
+		up1.addActionListener(this);
+		up10.addActionListener(this);
+		up100.addActionListener(this);
+		down1.addActionListener(this);
+		down10.addActionListener(this);
+		down100.addActionListener(this);
+		left1.addActionListener(this);
+		left10.addActionListener(this);
+		left100.addActionListener(this);
+		right1.addActionListener(this);
+		right10.addActionListener(this);
+		right100.addActionListener(this);
+		
+		JPanel corners = new JPanel();
+		corners.setLayout(new GridBagLayout());
+		goTop = new JButton(translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
+		goBottom = new JButton(translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
+		goLeft = new JButton(translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
+		goRight = new JButton(translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
+		penUp = new JButton(translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
+		penDown = new JButton(translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
+		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
+		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20)); 
+		goHome = new JButton(translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20)); 
+		JLabel horizontalFiller = new JLabel(" ");  
+		c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
+		c.gridx=2;  c.gridy=1;  corners.add(goHome,c);
+		c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
+		c.gridx=1;  c.gridy=1;  corners.add(goLeft,c);
+		c.gridx=3;  c.gridy=1;  corners.add(goRight,c);
+		c.weightx=1;
+		c.gridx=4;  c.gridy=0;  corners.add(horizontalFiller,c);
+		c.weightx=0;
+		c.gridx=5;  c.gridy=0;  corners.add(penUp,c);
+		c.gridx=5;  c.gridy=2;  corners.add(penDown,c);
+
+		//c.gridx=0;  c.gridy=0;  corners.add(setHome,c);
+		c.insets = new Insets(0,0,0,0);
+		goTop.addActionListener(this);
+		goBottom.addActionListener(this);
+		goLeft.addActionListener(this);
+		goRight.addActionListener(this);
+		penUp.addActionListener(this); 
+		penDown.addActionListener(this);
+		setHome.addActionListener(this);
+		goHome.addActionListener(this);
+
+
+		JPanel feedRateControl = new JPanel();
+		feedRateControl.setLayout(new GridBagLayout());
+		c = new GridBagConstraints();
+		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
+		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
+		setFeedRate = new JButton(translator.get("Set"));
+		setFeedRate.addActionListener(this);
+		disengageMotors = new JButton(translator.get("DisengageMotors"));
+		disengageMotors.addActionListener(this);
+
+		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
+		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
+		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
+		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+		c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
+
+		dragAndDrive = new JPanel(new GridBagLayout());
+		dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		dragAndDrive.addMouseListener(this);
+		dragAndDrive.addMouseMotionListener(this);
+
+		coordinates = new JLabel(translator.get("ClickAndDrag"));
+		c.anchor = GridBagConstraints.CENTER;
+
+		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
+		Dimension dims = new Dimension();
+		dims.setSize( 150, 150 * (double)robot.settings.getPaperWidth()/(double)robot.settings.getPaperHeight());
+		dragAndDrive.setPreferredSize(dims);
+		dragAndDrive.add(coordinates,c);
+
+		con1.weightx=1;
+		con1.weighty=0;
+		con1.fill=GridBagConstraints.HORIZONTAL;
+		con1.anchor=GridBagConstraints.NORTHWEST;
+
+
+		panel.add(axisControl,con1);
+		con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
+		panel.add(corners,con1);
+		con1.gridy++;
+		//panel.add(new JSeparator(),con1);
+		//con1.gridy++;
+		//con1.weighty=1;
+		//p.add(dragAndDrive,con1);
+		//con1.weighty=0;
+		//con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
+		panel.add(feedRateControl,con1);
+		con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
+
+		
+		
 		// File conversion
 		buttonNewFile = new JButton(translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener(this);
@@ -220,7 +406,7 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		con1.gridy++;
 
 		// drive menu
-		JPanel drivePanel = new JPanel(new GridLayout(2, 2));
+		JPanel drivePanel = new JPanel(new GridLayout(1,4));
 		buttonStart = new JButton(translator.get("Start"));
 		buttonStartAt = new JButton(translator.get("StartAtLine"));
 		buttonPause = new JButton(translator.get("Pause"));
@@ -236,6 +422,14 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		panel.add(drivePanel, con1);
 		con1.gridy++;
 
+		panel.add(new JSeparator(), con1);
+		con1.gridy++;
+		
+		
+
+		
+		
+		// always have one extra empty at the end to push everything up.
 		con1.weighty = 1;
 		panel.add(new JLabel(), con1);
 	}
@@ -305,6 +499,7 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 			if (!robot.isRunning()) {
 				if (subject == buttonStart) {
 					gui.startAt(0);
+					updateButtonAccess(robot.isPortConfirmed(), true);
 					return;
 				}
 				if (subject == buttonStartAt) {
@@ -312,6 +507,7 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 					if (lineNumber != -1) {
 						gui.startAt(lineNumber);
 					}
+					updateButtonAccess(robot.isPortConfirmed(), true);
 					return;
 				}
 			} else {
@@ -336,9 +532,55 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 				}
 				if (subject == buttonHalt) {
 					gui.halt();
+					updateButtonAccess(robot.isPortConfirmed(), false);
 					return;
 				}
 			}
+		}
+
+		if      (subject == goHome  ) robot.sendLineToRobot("G00 X0 Y0");
+		else if (subject == setHome ) robot.sendLineToRobot("G92 X0 Y0");
+		else if (subject == goLeft  ) robot.sendLineToRobot("G00 X" + (robot.settings.getPaperLeft() * 10));
+		else if (subject == goRight ) robot.sendLineToRobot("G00 X" + (robot.settings.getPaperRight() * 10));
+		else if (subject == goTop   ) robot.sendLineToRobot("G00 Y" + (robot.settings.getPaperTop() * 10));
+		else if (subject == goBottom) robot.sendLineToRobot("G00 Y" + (robot.settings.getPaperBottom() * 10));
+//		else if (b == find    ) robot.sendLineToRobot("G28");
+		else if (subject == penUp   ) robot.raisePen();
+		else if (subject == penDown ) robot.lowerPen();
+		else if (subject == setFeedRate) {
+			// get the feedrate value
+			String fr = feedRate.getText();
+			fr = fr.replaceAll("[ ,]", "");
+			// trim it to 3 decimal places
+			double parsedFeedRate = 0;
+			try {
+				parsedFeedRate = Double.parseDouble(fr);
+
+				if (parsedFeedRate < 0.001) parsedFeedRate = 0.001;
+				// update the input field
+				feedRate.setText(Double.toString(parsedFeedRate));
+				robot.setFeedRate(parsedFeedRate);
+			} catch(NumberFormatException e1) {}
+		} else if (subject == disengageMotors) {
+			robot.sendLineToRobot("M18");
+		} else {
+			robot.sendLineToRobot("G91");  // set relative mode
+
+			if (subject == down100) robot.sendLineToRobot("G0 Y-100");
+			if (subject == down10) robot.sendLineToRobot("G0 Y-10");
+			if (subject == down1) robot.sendLineToRobot("G0 Y-1");
+			if (subject == up100) robot.sendLineToRobot("G0 Y100");
+			if (subject == up10) robot.sendLineToRobot("G0 Y10");
+			if (subject == up1) robot.sendLineToRobot("G0 Y1");
+
+			if (subject == left100) robot.sendLineToRobot("G0 X-100");
+			if (subject == left10) robot.sendLineToRobot("G0 X-10");
+			if (subject == left1) robot.sendLineToRobot("G0 X-1");
+			if (subject == right100) robot.sendLineToRobot("G0 X100");
+			if (subject == right10) robot.sendLineToRobot("G0 X10");
+			if (subject == right1) robot.sendLineToRobot("G0 X1");
+
+			robot.sendLineToRobot("G90");  // return to absolute mode
 		}
 	}
 
@@ -390,6 +632,34 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 		if (!isConfirmed) {
 			buttonPause.setText(translator.get("Pause"));
 		}
+		
+		
+		down100.setEnabled(isConfirmed && !isRunning);
+		down10.setEnabled(isConfirmed && !isRunning);
+		down1.setEnabled(isConfirmed && !isRunning);
+		up1.setEnabled(isConfirmed && !isRunning);
+		up10.setEnabled(isConfirmed && !isRunning);
+		up100.setEnabled(isConfirmed && !isRunning);
+		
+		left100.setEnabled(isConfirmed && !isRunning);
+		left10.setEnabled(isConfirmed && !isRunning);
+		left1.setEnabled(isConfirmed && !isRunning);
+		right1.setEnabled(isConfirmed && !isRunning);
+		right10.setEnabled(isConfirmed && !isRunning);
+		right100.setEnabled(isConfirmed && !isRunning);
+
+		goTop.setEnabled(isConfirmed && !isRunning);
+		goBottom.setEnabled(isConfirmed && !isRunning);
+		goLeft.setEnabled(isConfirmed && !isRunning);
+		goRight.setEnabled(isConfirmed && !isRunning);
+		
+		setHome.setEnabled(isConfirmed && !isRunning);
+		goHome.setEnabled(isConfirmed && !isRunning);
+		
+		penUp.setEnabled(isConfirmed && !isRunning);
+		penDown.setEnabled(isConfirmed && !isRunning);
+		
+		setFeedRate.setEnabled(isConfirmed && !isRunning);
 	}
 
 	public void newFile() {
@@ -952,5 +1222,55 @@ public class PanelPrepareImage extends JScrollPane implements ActionListener, Ch
 
 	private int getPreferredDrawStyle() {
 		return prefs.getInt("Draw Style", 0);
+	}
+
+	public void mouseClicked(MouseEvent e) {}
+	public void mouseDragged(MouseEvent e) {
+		mouseAction(e);
+	}
+	public void mouseEntered(MouseEvent e) {
+		mouseInside=true;
+	}
+	public void mouseExited(MouseEvent e) {
+		mouseInside=false;
+		mouseOn=false;
+	}
+	public void mouseMoved(MouseEvent e) {
+		mouseAction(e);
+	}
+	public void mousePressed(MouseEvent e) {
+		mouseOn=true;
+		mouseAction(e);
+	}
+	public void mouseReleased(MouseEvent e) {
+		mouseOn=false;
+	}
+	public void mouseWheelMoved(MouseEvent e) {}
+
+	public void mouseAction(MouseEvent e) {
+		if(mouseInside && mouseOn) {
+			double x = (double)e.getX();
+			double y = (double)e.getY();
+			Dimension d = dragAndDrive.getSize();
+			double w = d.getWidth();
+			double h = d.getHeight();
+			double cx = w/2.0;
+			double cy = h/2.0;
+			x = x - cx;
+			y = cy - y;
+			x *= 10 * robot.settings.getPaperWidth()  / w;
+			y *= 10 * robot.settings.getPaperHeight() / h;
+			double dx = x-last_x;
+			double dy = y-last_y;
+			if(Math.sqrt(dx*dx+dy*dy)>=1) {
+				last_x=x;
+				last_y=y;
+				String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
+				robot.sendLineToRobot("G00 "+text);
+				coordinates.setText(text);
+			} else {
+				coordinates.setText("");
+			}
+		}
 	}
 }

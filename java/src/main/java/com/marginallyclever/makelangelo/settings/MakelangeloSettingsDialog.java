@@ -41,7 +41,7 @@ implements ActionListener {
   protected JTabbedPane panes;
   protected JButton save, cancel;
   
-  protected PanelAdjustMachineSize panelAdjustMachineSize;
+  protected PanelAdjustMachine panelAdjustMachineSize;
   protected PanelJogMotors panelJogMotors;
   protected DrawingTool panelAdjustPen;
   //protected PanelAdjustTools panelAdjustTools;
@@ -63,7 +63,7 @@ implements ActionListener {
   public void run() {
     panes = new JTabbedPane();
     
-    panelAdjustMachineSize = new PanelAdjustMachineSize(translator,robot);
+    panelAdjustMachineSize = new PanelAdjustMachine(translator,robot);
     panelJogMotors = new PanelJogMotors(translator,robot);
     panelAdjustPen = robot.settings.getTool(0);
     //panelAdjustTools = new PanelAdjustTools(translator,robot);

@@ -45,7 +45,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
@@ -85,6 +84,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	// GUI elements
 	private JFrame mainframe = null;
+	private JPanel contentPane;
+	
 	// Top of window
 	private JMenuBar menuBar;
 	// menubar > Makelangelo > preferences
@@ -94,7 +95,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// menubar > connect
 	private JMenuItem buttonRescan, buttonDisconnect;
 	// menubar > view
-	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
+	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit, buttonToggleLog;
 
 	/**
 	 * buttons that represent connections to real robots attached to the computer.
@@ -103,15 +104,15 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	// main window layout
 	private Splitter splitLeftRight;
+	private Splitter splitUpDown;
+	private boolean logViewOn=false;
+	
 	// OpenGL window
-	private DrawPanel drawPanel;
+	private DrawPanel cameraViewPanel;
 	// Context sensitive menu
-	private JTabbedPane contextMenu;
-	// Menu tabs
-	private PanelPrepareImage prepareImage;
-	private MakelangeloDriveControls driveControls;
-	private PanelLog logPanel;
+	private MakelangeloRobotPanel robotControlPanel;
 	// Bottom of window
+	public LogPanel logPanel;
 	public StatusBar statusBar;
 
 	
@@ -176,9 +177,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	
 	public void updateMachineConfig() {
-		if (drawPanel != null) {
-			drawPanel.updateMachineConfig();
-			drawPanel.zoomToFitPaper();
+		if (cameraViewPanel != null) {
+			cameraViewPanel.updateMachineConfig();
+			cameraViewPanel.zoomToFitPaper();
 		}
 	}
 	
@@ -261,7 +262,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
 			graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
 
-			drawPanel.setShowPenUp(show_pen_up.isSelected());
+			cameraViewPanel.setShowPenUp(show_pen_up.isSelected());
 		}
 	}
 
@@ -289,7 +290,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 				line += robot.generateChecksum(line);
 			}
 
-			drawPanel.setLinesProcessed(lineNumber);
+			cameraViewPanel.setLinesProcessed(lineNumber);
 			statusBar.setProgress(lineNumber, gCode.getLinesTotal());
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
@@ -323,22 +324,22 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	public void halt() {
 		robot.setRunning(false);
 		robot.unPause();
-		drawPanel.setLinesProcessed(0);
-		drawPanel.setRunning(false);
+		cameraViewPanel.setLinesProcessed(0);
+		cameraViewPanel.setRunning(false);
 		updateMenuBar();
 	}
 
 	public void startAt(long lineNumber) {
 		gCode.setLinesProcessed(0);
 		robot.sendLineToRobot("M110 N" + gCode.getLinesProcessed());
-		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
+		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();
 	}
 
 	private void startDrawing() {
 		robot.unPause();
 		robot.setRunning(true);
-		drawPanel.setRunning(true);
+		cameraViewPanel.setRunning(true);
 		updateMenuBar();
 		statusBar.start();
 		sendFileCommand();
@@ -350,15 +351,19 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		Object subject = e.getSource();
 
 		if (subject == buttonZoomIn) {
-			drawPanel.zoomIn();
+			cameraViewPanel.zoomIn();
 			return;
 		}
 		if (subject == buttonZoomOut) {
-			drawPanel.zoomOut();
+			cameraViewPanel.zoomOut();
 			return;
 		}
 		if (subject == buttonZoomToFit) {
-			drawPanel.zoomToFitPaper();
+			cameraViewPanel.zoomToFitPaper();
+			return;
+		}
+		if( subject == buttonToggleLog ) {
+			toggleLogView();
 			return;
 		}
 		if (subject == buttonRescan) {
@@ -461,7 +466,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private void disconnect() {
 		robot.getConnection().closeConnection();
 		robot.setConnection(null);
-		drawPanel.setConnected(false);
+		cameraViewPanel.setConnected(false);
 		updateMenuBar();
 		soundSystem.playDisconnectSound();
 
@@ -469,6 +474,16 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		this.mainframe.setTitle(translator.get("TitlePrefix")
 				+ Long.toString(robot.settings.getUID())
 				+ translator.get("TitleNotConnected"));
+	}
+	
+	private void toggleLogView() {
+		if( logViewOn == false ) {
+			logViewOn=true;
+			logPanel.setVisible(true);
+		} else {
+			logViewOn=false;
+			logPanel.setVisible(false);
+		}
 	}
 	
 	/**
@@ -534,11 +549,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		ButtonGroup group;
 		int i;
 
-		if (prepareImage != null) {
-			prepareImage.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
-		}
-		if (driveControls != null) {
-			driveControls.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
+		if (robotControlPanel != null) {
+			robotControlPanel.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
 		}
 
 		menuBar.removeAll();
@@ -617,6 +629,12 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
+		menu.add(new JSeparator());
+		
+		buttonToggleLog = new JMenuItem(translator.get("ShowLog"));
+		buttonToggleLog.addActionListener(this);
+		menu.add(buttonToggleLog);
+		
 		menuBar.add(menu);
 
 		// finish
@@ -647,36 +665,34 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	public Container createContentPane() {
 		//Create the content-pane-to-be.
-		final JPanel contentPane = new JPanel(new BorderLayout());
+		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		logPanel = new PanelLog(translator, robot);
+		cameraViewPanel = new DrawPanel(robot.settings);
+		cameraViewPanel.setGCode(gCode);
+
+		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);
+		robotControlPanel.updateButtonAccess(false, false);
+		
+		logPanel = new LogPanel(translator, robot);
 		logPanel.clearLog();
-
-		drawPanel = new DrawPanel(robot.settings);
-		drawPanel.setGCode(gCode);
-
-		prepareImage = new PanelPrepareImage(this, translator, robot);
-		prepareImage.updateButtonAccess(false, false);
-
-		driveControls = new MakelangeloDriveControls(translator, robot);
-		driveControls.updateButtonAccess(false, false);
+		logPanel.setVisible(false);
 
 		statusBar = new StatusBar(translator);
 
-		contextMenu = new JTabbedPane();
-		contextMenu.setPreferredSize(new Dimension(450,100));
-		contextMenu.addTab(translator.get("MenuGCODE"), null, prepareImage, null);
-		contextMenu.addTab(translator.get("MenuDraw"), null, driveControls, null);
-		contextMenu.addTab(translator.get("MenuLog"), null, logPanel, null);
-
 		// major layout
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		splitLeftRight.add(drawPanel);
-		splitLeftRight.add(contextMenu);
+		splitLeftRight.add(cameraViewPanel);
+		splitLeftRight.add(robotControlPanel);
+
+		splitUpDown = new Splitter(JSplitPane.VERTICAL_SPLIT);
+		
+		splitUpDown.add(splitLeftRight);
+		splitUpDown.add(logPanel);
+		splitUpDown.setResizeWeight(0.9);
+		contentPane.add(splitUpDown, BorderLayout.CENTER);
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);
-		contentPane.add(splitLeftRight, BorderLayout.CENTER);
 
 		return contentPane;
 	}
@@ -705,7 +721,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		this.mainframe.setSize(width, height);
 		this.mainframe.setVisible(true);
 
-		drawPanel.zoomToFitPaper();
+		cameraViewPanel.zoomToFitPaper();
 
 		// 2015-05-03: option is meaningless, robot.connectionToRobot doesn't exist when software starts.
 		// if(prefs.getBoolean("Reconnect to last port on start", false)) robot.connectionToRobot.reconnect();
@@ -723,15 +739,15 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
 	public DrawPanel getDrawPanel() {
-		return drawPanel;
+		return cameraViewPanel;
 	}
 
 	/**
 	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
 	 */
 	public void updateDriveControls() {
-		driveControls = new MakelangeloDriveControls(translator, robot);
-		driveControls.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
+		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);
+		robotControlPanel.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
 	}
 
 	/**
@@ -765,7 +781,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	    getDrawPanel().updateMachineConfig();
 	    getDrawPanel().setConnected(true);
 
-	    prepareImage.updateMachineNumberPanel();
+	    robotControlPanel.updateMachineNumberPanel();
 	    
 	    updateMenuBar();
 
@@ -774,6 +790,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	}
 	
 	public void dataAvailable(MakelangeloRobot r,String data) {
+		if(data.endsWith("\n")) data = data.substring(0, data.length()-1);
 		Log.write( "#ffa500",data );  // #ffa500 = orange
 	}
 	

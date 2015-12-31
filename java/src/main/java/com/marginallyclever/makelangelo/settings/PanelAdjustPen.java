@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobot;import com.marginallyclever.makelangelo.Translator;
 
-public class PanelAdjustTools
+public class PanelAdjustPen
 extends JPanel {
 
 	/**
@@ -23,7 +23,7 @@ extends JPanel {
 	protected MakelangeloRobot robot;
 	protected ArrayList<JButton> buttons = new ArrayList<JButton>();
 
-	public PanelAdjustTools(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
+	public PanelAdjustPen(Makelangelo _gui, Translator _translator, MakelangeloRobot robot) {
 		gui = _gui;
 		translator = _translator;
 		this.robot = robot;

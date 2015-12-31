@@ -577,6 +577,16 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
+	<key>ShowLog</key>
+	<value>Show Log</value>
+	<hint>menu or dialog title</hint>
+	</string>
+	<string>
+	<key>HideLog</key>
+	<value>Hide Log</value>
+	<hint>menu or dialog title</hint>
+	</string>
+	<string>
 		<key>mmNotice</key>
 		<value>All values in mm.</value>
 		<hint>Machine size</hint>
