@@ -64,6 +64,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	@Override
+	public void finalize() {
+		if( this.connection != null ) {
+			this.connection.removeListener(this);
+		}
+	}
+	
+	@Override
 	public void connectionReady(MarginallyCleverConnection arg0) {
 		notifyConnectionReady();
 	}
