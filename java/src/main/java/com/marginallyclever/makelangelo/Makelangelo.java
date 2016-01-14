@@ -279,7 +279,14 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		String line;
 		do {
 			// are there any more commands?
-			if( gCode.moreLinesAvailable() == false ) break;
+			if( gCode.moreLinesAvailable() == false )  {
+				// end of file
+				// stop robot
+				halt();
+				// bask in the glory
+				sayHooray();
+				return;
+			}
 			
 			int lineNumber = gCode.getLinesProcessed();
 			line = gCode.nextLine();
@@ -294,14 +301,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
 		} while ( robot.tweakAndSendLine( line, translator ) );
-
-		if (gCode.moreLinesAvailable() == false) {
-			// end of file
-			// stop robot
-			halt();
-			// bask in the glory
-			sayHooray();
-		}
 	}
 
 
@@ -326,6 +325,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		cameraViewPanel.setLinesProcessed(0);
 		cameraViewPanel.setRunning(false);
 		updateMenuBar();
+		
 	}
 
 	public void startAt(long lineNumber) {

@@ -500,49 +500,43 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			return;
 		}
 
-		if (gui.gCode.isLoaded()) {
-			if (!robot.isRunning()) {
-				if (subject == buttonStart) {
-					gui.startAt(0);
-					updateButtonAccess(robot.isPortConfirmed(), true);
-					return;
-				}
-				if (subject == buttonStartAt) {
-					Long lineNumber = getStartingLineNumber();
-					if (lineNumber != -1) {
-						gui.startAt(lineNumber);
-					}
-					updateButtonAccess(robot.isPortConfirmed(), true);
-					return;
-				}
-			} else {
-				if (subject == buttonPause) {
-					// toggle pause
-					if (robot.isPaused() == true) {
-						// we were paused.
-						// update button text
-						buttonPause.setText(translator.get("Pause"));
-						// ready
-						robot.unPause();
-						// TODO: if the robot is not ready to unpause, this
-						// might fail and the program would appear to hang until
-						// a dis- and re-connect.
-						gui.sendFileCommand();
-					} else {
-						robot.pause();
-						// change button text
-						buttonPause.setText(translator.get("Unpause"));
-					}
-					return;
-				}
-				if (subject == buttonHalt) {
-					gui.halt();
-					updateButtonAccess(robot.isPortConfirmed(), false);
-					return;
-				}
-			}
+		if (subject == buttonStart) {
+			gui.startAt(0);
+			updateButtonAccess(robot.isPortConfirmed(), true);
+			return;
 		}
-
+		if (subject == buttonStartAt) {
+			Long lineNumber = getStartingLineNumber();
+			if (lineNumber != -1) {
+				gui.startAt(lineNumber);
+			}
+			updateButtonAccess(robot.isPortConfirmed(), true);
+			return;
+		}
+		if (subject == buttonPause) {
+			// toggle pause
+			if (robot.isPaused() == true) {
+				// we were paused.
+				// update button text
+				buttonPause.setText(translator.get("Pause"));
+				// ready
+				robot.unPause();
+				// TODO: if the robot is not ready to unpause, this
+				// might fail and the program would appear to hang until
+				// a dis- and re-connect.
+				gui.sendFileCommand();
+			} else {
+				robot.pause();
+				// change button text
+				buttonPause.setText(translator.get("Unpause"));
+			}
+			return;
+		}
+		if (subject == buttonHalt) {
+			gui.halt();
+			return;
+		}
+		
 		if      (subject == goHome  ) robot.sendLineToRobot("G00 X0 Y0");
 		else if (subject == setHome ) robot.sendLineToRobot("G92 X0 Y0");
 		else if (subject == goLeft  ) robot.sendLineToRobot("G00 X" + (robot.settings.getPaperLeft() * 10));
@@ -569,23 +563,27 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		} else if (subject == disengageMotors) {
 			robot.sendLineToRobot("M18");
 		} else {
-			robot.sendLineToRobot("G91");  // set relative mode
+			String command="";
 
-			if (subject == down100) robot.sendLineToRobot("G0 Y-100");
-			if (subject == down10) robot.sendLineToRobot("G0 Y-10");
-			if (subject == down1) robot.sendLineToRobot("G0 Y-1");
-			if (subject == up100) robot.sendLineToRobot("G0 Y100");
-			if (subject == up10) robot.sendLineToRobot("G0 Y10");
-			if (subject == up1) robot.sendLineToRobot("G0 Y1");
+			if (subject == down100) command = "G0 Y-100";
+			if (subject == down10) command = "G0 Y-10";
+			if (subject == down1) command = "G0 Y-1";
+			if (subject == up100) command = "G0 Y100";
+			if (subject == up10) command = "G0 Y10";
+			if (subject == up1) command = "G0 Y1";
 
-			if (subject == left100) robot.sendLineToRobot("G0 X-100");
-			if (subject == left10) robot.sendLineToRobot("G0 X-10");
-			if (subject == left1) robot.sendLineToRobot("G0 X-1");
-			if (subject == right100) robot.sendLineToRobot("G0 X100");
-			if (subject == right10) robot.sendLineToRobot("G0 X10");
-			if (subject == right1) robot.sendLineToRobot("G0 X1");
+			if (subject == left100) command = "G0 X-100";
+			if (subject == left10) command = "G0 X-10";
+			if (subject == left1) command = "G0 X-1";
+			if (subject == right100) command = "G0 X100";
+			if (subject == right10) command = "G0 X10";
+			if (subject == right1) command = "G0 X1";
 
-			robot.sendLineToRobot("G90");  // return to absolute mode
+			if(command != "") {
+				robot.sendLineToRobot("G91");  // set relative mode
+				robot.sendLineToRobot(command);
+				robot.sendLineToRobot("G90");  // return to absolute mode
+			}
 		}
 	}
 
@@ -888,7 +886,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		gui.gCode.changed = true;
-		gui.halt();
+		//gui.halt();
 		return true;
 	}
 
