@@ -728,14 +728,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	}
 
 	/**
-	 * driveControls the <code>javax.swing.JPanel</code> representing the preview pane of this GUI.
-	 */
-	public void updateDriveControls() {
-		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);
-		robotControlPanel.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
-	}
-
-	/**
 	 * @return the <code>GCodeFile</code> representing the G-Code file used by this GUI.
 	 */
 	public GCodeFile getGcodeFile() {
@@ -769,9 +761,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	    robotControlPanel.updateMachineNumberPanel();
 	    
 	    updateMenuBar();
-
-	    // rebuild the drive pane so that the feed rates are correct.
-	    updateDriveControls();
 	}
 	
 	public void dataAvailable(MakelangeloRobot r,String data) {
