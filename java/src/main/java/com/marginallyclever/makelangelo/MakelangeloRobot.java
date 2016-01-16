@@ -88,8 +88,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (data.lastIndexOf(hello) < 0) return;
 
 		portConfirmed = true;
+		// which machine is this?
 		String after_hello = data.substring(data.lastIndexOf(hello) + hello.length());
 		parseRobotUID(after_hello);
+		// send whatever config settings I have for this machine.
+		sendConfig();
+		// tell everyone I've confirmed connection.
 		notifyPortConfirmed();
 	}
 	

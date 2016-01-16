@@ -449,6 +449,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			int index = robot.settings.getKnownMachineIndex();
 			if( index<0 ) index=0;
 			machineChoices.setSelectedIndex(index);
+
+			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
+			machineChoices.setEnabled( !robot.isPortConfirmed() );
 		}
 
 		openConfig = new JButton(translator.get("configureMachine"));

@@ -750,11 +750,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			m.run();
 		}*/
 		
-	    getMainframe().setTitle(translator.get("TitlePrefix")
-	        + " #" + Long.toString(robot.settings.getUID())
-	        + translator.get("TitlePostfix"));
-
-	    robot.sendConfig();
+	    getMainframe().setTitle(translator.get("TitlePrefix") + " #" + Long.toString(robot.settings.getUID()));
 	    
 	    getDrawPanel().updateMachineConfig();
 	    getDrawPanel().setConnected(true);
