@@ -160,7 +160,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private List<ImageConverter> imageConverters;
 	private List<ImageGenerator> imageGenerators;
 
-	// TODO use a ServiceLoader and find plugins in nearby folders
+	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
 		imageConverters.add(new Converter_Boxes(gui, robot.settings, translator));
@@ -178,7 +178,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		imageConverters.add(new Converter_ZigZag(gui, robot.settings, translator));
 	}
 
-	// TODO use a ServiceLoader and find plugins in nearby folders
+	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageGenerators() {
 		imageGenerators = new ArrayList<ImageGenerator>();
 		imageGenerators.add(new Generator_Dragon(gui, robot.settings, translator));
@@ -441,13 +441,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
 		machineConfigurations = robot.settings.getKnownMachineNames();
-		int index = robot.settings.getKnownMachineIndex();
-		if( machineConfigurations.length>0 && index>=0 ) {
+		if( machineConfigurations.length>0 ) {
 			machineChoices = new JComboBox<>(machineConfigurations);
-			machineChoices.setSelectedIndex(index);
-
 			machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
 			machineNumberPanel.add(machineChoices);
+
+			int index = robot.settings.getKnownMachineIndex();
+			if( index<0 ) index=0;
+			machineChoices.setSelectedIndex(index);
 		}
 
 		openConfig = new JButton(translator.get("configureMachine"));

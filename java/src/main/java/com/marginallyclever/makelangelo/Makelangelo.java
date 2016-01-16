@@ -438,6 +438,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 
+		// Connecting to a machine
 		String[] connections = connectionManager.listConnections();
 		for (int i = 0; i < connections.length; ++i) {
 			if (subject == buttonConnections[i]) {
@@ -466,7 +467,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		soundSystem.playDisconnectSound();
 
 		// update window title
-		this.mainframe.setTitle(translator.get("TitlePrefix")
+		mainframe.setTitle(translator.get("TitlePrefix")
 				+ Long.toString(robot.settings.getUID())
 				+ translator.get("TitleNotConnected"));
 	}
@@ -691,7 +692,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
 	private void createAndShowGUI() {
 		// Create and set up the window.
-		this.mainframe = new JFrame("Makelangelo");
+		this.mainframe = new JFrame(translator.get("TitlePrefix"));
 		this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		// Create and set up the content pane.
