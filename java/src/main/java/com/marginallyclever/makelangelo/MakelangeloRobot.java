@@ -56,6 +56,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if( this.connection != null ) {
 			this.connection.removeListener(this);
 		}
+		
+		if( this.connection != c ) {
+			portConfirmed = false;
+		}
+		
 		this.connection = c;
 		
 		if( this.connection != null ) {

@@ -466,10 +466,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		updateMenuBar();
 		soundSystem.playDisconnectSound();
 
-		// update window title
-		mainframe.setTitle(translator.get("TitlePrefix")
-				+ Long.toString(robot.settings.getUID())
-				+ translator.get("TitleNotConnected"));
+		// remove machine name from title
+		mainframe.setTitle(translator.get("TitlePrefix"));
 	}
 	
 	
@@ -702,9 +700,11 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		// Display the window.
 		int width = prefs.getInt("Default window width", (int) (1200.0));
 		int height = prefs.getInt("Default window height", (int) (1020.0));
+		this.mainframe.setSize(width, height);
+		// center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
-		this.mainframe.setSize(width, height);
+		// show it
 		this.mainframe.setVisible(true);
 
 		cameraViewPanel.zoomToFitPaper();
@@ -751,7 +751,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		}*/
 		
 	    getMainframe().setTitle(translator.get("TitlePrefix")
-	        + Long.toString(this.robot.settings.getUID())
+	        + " #" + Long.toString(robot.settings.getUID())
 	        + translator.get("TitlePostfix"));
 
 	    robot.sendConfig();
