@@ -5,6 +5,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
@@ -203,22 +204,24 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		FontRenderContext frc = new FontRenderContext(null,true,true);
 		TextLayout textLayout = new TextLayout(text,font,frc);
 		Shape s = textLayout.getOutline(null);
+		Rectangle bounds = s.getBounds();
+		float dx = (float)(bounds.getWidth()/2.0);
+		float dy = (float)(bounds.getHeight()/2.0);
+		
 		PathIterator pi = s.getPathIterator(null);
 		float [] coords = new float[6];
 		float [] coords2 = new float[6];
 		float [] start = new float[6];
-
-		tool = machine.getCurrentTool();
 		
 		while(pi.isDone() == false ) {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				tool.writeMoveTo(output, start[0], -start[1]);
+				tool.writeMoveTo(output, start[0]-dx, -start[1]-dy);
 				tool.writeOff(output);
 				break;
 			case PathIterator.SEG_LINETO:
-				tool.writeMoveTo(output, coords[0], -coords[1]);
+				tool.writeMoveTo(output, coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
@@ -226,7 +229,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
-				tool.writeMoveTo(output, start[0], -start[1]);
+				tool.writeMoveTo(output, start[0]-dx, -start[1]-dy);
 				tool.writeOn(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
@@ -237,9 +240,9 @@ public class Generator_YourMessageHere extends ImageGenerator {
 					float ttt=tt*t;
 					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
 					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
-					tool.writeMoveTo(output, x,-y);
+					tool.writeMoveTo(output, x-dx,-y-dy);
 				}
-				tool.writeMoveTo(output, coords[4],-coords[5]);
+				tool.writeMoveTo(output, coords[4]-dx,-coords[5]-dy);
 				coords2[0] = coords[4];
 				coords2[1] = coords[5];
 				break;
@@ -253,9 +256,9 @@ public class Generator_YourMessageHere extends ImageGenerator {
 					float tttt=t*t;
 					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
 					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					tool.writeMoveTo(output, x,-y);
+					tool.writeMoveTo(output, x-dx,-y-dy);
 				}
-				tool.writeMoveTo(output, coords[2],-coords[3]);
+				tool.writeMoveTo(output, coords[2]-dx,-coords[3]-dy);
 				coords2[0] = coords[2];
 				coords2[1] = coords[3];
 				break;
