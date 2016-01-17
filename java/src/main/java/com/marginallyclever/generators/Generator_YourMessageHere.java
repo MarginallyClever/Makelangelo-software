@@ -2,7 +2,13 @@ package com.marginallyclever.generators;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -13,12 +19,16 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
@@ -28,14 +38,14 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_YourMessageHere extends ImageGenerator {
 	// text properties
-	protected float kerning = 5.0f;
-	protected float letterWidth = 10.0f;
-	protected float letterHeight = 20.0f;
-	protected float lineSpacing = 5.0f;
-	protected float padding = 5.0f;
+	private float kerning = 5.0f;
+	private float letterWidth = 10.0f;
+	private float letterHeight = 20.0f;
+	private float lineSpacing = 5.0f;
+	private float padding = 5.0f;
 	static final String ALPHABET_FOLDER = "ALPHABET/";
-	protected int charsPerLine = 25;
-	protected boolean draw_bounding_box = false;
+	private int charsPerLine = 25;
+	private boolean draw_bounding_box = false;
 
 	// text position and alignment
 	public enum VAlign {
@@ -44,25 +54,30 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 	public enum Align {LEFT, CENTER, RIGHT}
 
-	protected VAlign align_vertical = VAlign.MIDDLE;
-	protected Align align_horizontal = Align.CENTER;
-	protected float posx = 0;
-	protected float posy = 0;
+	private VAlign align_vertical = VAlign.MIDDLE;
+	private Align align_horizontal = Align.CENTER;
+	private float posx = 0;
+	private float posy = 0;
 
-	protected static String lastMessage = "";
+	private static String lastMessage = "";
+	private static int lastFont = 0;
+	private static int lastSize = 20;
+	private static Font [] fontList;
+	private static String [] fontNames;
 
 	public Generator_YourMessageHere(Makelangelo gui,
 			MakelangeloRobotSettings mc, Translator ms) {
 		super(gui, mc, ms);
-		logFonts();
-	}
-
-	private void logFonts() {
-		final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		final Font[] fonts = ge.getAllFonts();
-		Log.message("Now printing all fonts from java.awt.GraphicsEnvironment#getAllFonts in the form of java.awt.Font#getFontName : java.awt.Font#getFamily");
-		for (Font font : fonts) {
-			Log.message( font.getFontName() + " : " + font.getFamily());
+		
+		// build list of fonts
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		fontList = ge.getAllFonts();
+		fontNames = new String[fontList.length];
+		
+		Locale locale = Locale.getDefault();
+		int i=0;
+		for(Font f : fontList) {
+			fontNames[i++] = f.getFontName(locale);
 		}
 	}
 
@@ -143,16 +158,36 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	@Override
 	public boolean generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage, 6, 60);
+		final JTextField size = new JTextField(Integer.toString(lastSize));
+		final JComboBox<String> fontChoices = new JComboBox<String>(fontNames);
+		fontChoices.setSelectedIndex(lastFont);
+		
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.NORTHWEST;
 
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JScrollPane(text));
+		c.gridx=0;
+		panel.add(size,c);
+		c.gridx=1;
+		panel.add(fontChoices,c);
+		c.gridx=0;
+		c.gridy++;
+		c.gridwidth=2;
+		panel.add(new JScrollPane(text),c);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			lastMessage = text.getText();
-			createMessage(lastMessage, dest);
+			lastSize = Integer.parseInt(size.getText());
+			lastFont = fontChoices.getSelectedIndex();
+			createMessage(fontNames[lastFont],lastSize,lastMessage, dest);
 
-			//renderFont(gl2,"TimesRoman","مرحبا بالعالم",18);
+			//renderFont(gl2,"TimesRoman","مرحبا بالعالم",18");
 			//renderFont(gl2,"TimesRoman","Makelangelo",36);
 
 			// TODO Move to GUI?
@@ -163,78 +198,73 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		return false;
 	}
 
-	/*
-    void renderFont(GL2 gl2, String font_name,String text,int size) {
-      gl2.glPushMatrix();
-        gl2.glScalef(0.1f, -0.1f, 1);
-        gl2.glLineWidth(3);
-        gl2.glPointSize(4);
+	void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
+		Font font = new Font(fontName, Font.PLAIN, fontSize);
+		FontRenderContext frc = new FontRenderContext(null,true,true);
+		TextLayout textLayout = new TextLayout(text,font,frc);
+		Shape s = textLayout.getOutline(null);
+		PathIterator pi = s.getPathIterator(null);
+		float [] coords = new float[6];
+		float [] coords2 = new float[6];
+		float [] start = new float[6];
 
-    Font font = new Font(font_name, Font.PLAIN, size);
-    FontRenderContext frc = new FontRenderContext(null,true,true);
-    TextLayout textLayout = new TextLayout(text,font,frc);
-    Shape s = textLayout.getOutline(null);
-      PathIterator pi = s.getPathIterator(null);
-      float [] coords = new float[6];
-      float [] coords2 = new float[6];
-      float [] start = new float[6];
-      while(pi.isDone() == false ) {
-        int type = pi.currentSegment(coords);
-        switch(type) {
-        case PathIterator.SEG_CLOSE:
-            gl2.glVertex2f(start[0], start[1]);
-            gl2.glEnd();
-          break;
-        case PathIterator.SEG_LINETO:
-            gl2.glVertex2f(coords[0], coords[1]);
-          coords2[0] = coords[0];
-          coords2[1] = coords[1];
-          break;
-        case PathIterator.SEG_MOVETO:
-          // move without drawing
-          start[0] = coords2[0] = coords[0];
-          start[1] = coords2[1] = coords[1];
-            gl2.glBegin(GL2.GL_LINE_STRIP);
-            gl2.glVertex2f(start[0], start[1]);
-          break;
-        case PathIterator.SEG_CUBICTO:
-          for(int i=0;i<10;++i) {
-            float t = (float)i/10.0f;
-          // p = a0 + a1*t + a2 * tt + a3*ttt;
-          float tt=t*t;
-          float ttt=tt*t;
-          float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
-          float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
-          gl2.glVertex2f(x,y);
-          }
-        gl2.glVertex2f(coords[4],coords[5]);
-          coords2[0] = coords[4];
-          coords2[1] = coords[5];
-          break;
-        case PathIterator.SEG_QUADTO:
-          for(int i=0;i<10;++i) {
-            float t = (float)i/10.0f;
-            //(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
-            float u = (1.0f-t);
-          float tt=u*u;
-          float ttt=2.0f*t*u;
-          float tttt=t*t;
-          float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
-          float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-          gl2.glVertex2f(x,y);
-          }
-        gl2.glVertex2f(coords[2],coords[3]);
-          coords2[0] = coords[2];
-          coords2[1] = coords[3];
-          break;
-        }
-        pi.next();
-      }
-      gl2.glPopMatrix();
-    }
-	 */
+		tool = machine.getCurrentTool();
+		
+		while(pi.isDone() == false ) {
+			int type = pi.currentSegment(coords);
+			switch(type) {
+			case PathIterator.SEG_CLOSE:
+				tool.writeMoveTo(output, start[0], -start[1]);
+				tool.writeOff(output);
+				break;
+			case PathIterator.SEG_LINETO:
+				tool.writeMoveTo(output, coords[0], -coords[1]);
+				coords2[0] = coords[0];
+				coords2[1] = coords[1];
+				break;
+			case PathIterator.SEG_MOVETO:
+				// move without drawing
+				start[0] = coords2[0] = coords[0];
+				start[1] = coords2[1] = coords[1];
+				tool.writeMoveTo(output, start[0], -start[1]);
+				tool.writeOn(output);
+				break;
+			case PathIterator.SEG_CUBICTO:
+				for(int i=0;i<10;++i) {
+					float t = (float)i/10.0f;
+					// p = a0 + a1*t + a2 * tt + a3*ttt;
+					float tt=t*t;
+					float ttt=tt*t;
+					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
+					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
+					tool.writeMoveTo(output, x,-y);
+				}
+				tool.writeMoveTo(output, coords[4],-coords[5]);
+				coords2[0] = coords[4];
+				coords2[1] = coords[5];
+				break;
+			case PathIterator.SEG_QUADTO:
+				for(int i=0;i<10;++i) {
+					float t = (float)i/10.0f;
+					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
+					float u = (1.0f-t);
+					float tt=u*u;
+					float ttt=2.0f*t*u;
+					float tttt=t*t;
+					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
+					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
+					tool.writeMoveTo(output, x,-y);
+				}
+				tool.writeMoveTo(output, coords[2],-coords[3]);
+				coords2[0] = coords[2];
+				coords2[1] = coords[3];
+				break;
+			}
+			pi.next();
+		}
+	}
 
-	protected void createMessage(String str, String dest) {
+	private void createMessage(String fontName, int fontSize, String str, String dest) {
 		try (final OutputStream fileOutputStream = new FileOutputStream(dest);
 				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
@@ -254,7 +284,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 			textSetAlign(Align.CENTER);
 			textSetVAlign(VAlign.MIDDLE);
-			textCreateMessageNow(lastMessage, output);
+			//textCreateMessageNow(lastMessage, output);
+			writeBeautifulMessage(fontName,fontSize,lastMessage,output);
 
 			w2=0;
 			h2=0;
@@ -265,7 +296,6 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			textSetVAlign(VAlign.TOP);
 			textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
 					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
-			textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), output);
 		} catch (IOException e) {
 			Log.error( e.getMessage() );
 		}
@@ -301,7 +331,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	 * @param text the message to fit around
 	 * @return a Rectangle2D that describes the minimum fit
 	 */
-	protected Rectangle2D textCalculateBounds(String text) {
+	private Rectangle2D textCalculateBounds(String text) {
 		String[] lines = textWrapToLength(text);
 		int len = textLongestLine(lines);
 
@@ -352,7 +382,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	}
 
 
-	protected void textCreateMessageNow(String text, Writer output) throws IOException {
+	private void textCreateMessageNow(String text, Writer output) throws IOException {
 		if (charsPerLine <= 0) return;
 
 		tool = machine.getCurrentTool();
@@ -405,7 +435,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 
 	// break the text into an array of strings.  each string is one line of text made to fit into the chars_per_line limit.
-	protected String[] textWrapToLength(String src) {
+	private String[] textWrapToLength(String src) {
 		String[] test_lines = src.split("\n");
 		int i, j;
 
@@ -435,7 +465,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		return lines;
 	}
 
-	protected int textLongestLine(String[] lines) {
+	private int textLongestLine(String[] lines) {
 		int len = 0;
 		for (String line : lines) {
 			if (len < line.length()) len = line.length();
@@ -444,7 +474,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		return len;
 	}
 
-	protected void textDrawLine(String a1, Writer output) throws IOException {
+	private void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = ALPHABET_FOLDER;
 
 		Log.message( a1 +"("+ a1.length() +")" );

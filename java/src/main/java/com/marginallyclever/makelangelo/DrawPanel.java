@@ -216,7 +216,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		instructions = gcode;
 		emptyNodeBuffer();
 		// process the image into a buffer once rather than re-reading the gcode over and over again?
-				repaint();
+		repaint();
 	}
 
 	public void emptyNodeBuffer() {
@@ -465,7 +465,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		double dx,dy;
 		double gx,gy;
 		if(running) {
-			// TODO test me!
 			gx=gondolaX;
 			gy=gondolaY;
 		} else {
@@ -564,6 +563,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 
+	// TODO move all robot drawing to a class?
 	public void render(GL2 gl2) {
 		paintBackground(gl2);
 		paintCamera(gl2);
@@ -586,7 +586,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	private void paintGcode( GL2 gl2 ) {
-		// TODO move all robot drawing to a class
 		optimizeNodes();
 
 		DrawingTool tool = machine.getTool(0);
