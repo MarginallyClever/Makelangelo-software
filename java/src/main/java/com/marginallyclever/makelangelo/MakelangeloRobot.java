@@ -294,10 +294,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		String[] toolNames = settings.getToolNames();
 
 		if (i < 0 || i > toolNames.length) {
-			Log.error( translator.get("InvalidTool") + i );
+			Log.error( Translator.get("InvalidTool") + i );
 			i = 0;
 		}
-		JOptionPane.showMessageDialog(null, translator.get("ChangeToolPrefix") + toolNames[i] + translator.get("ChangeToolPostfix"));
+		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + toolNames[i] + Translator.get("ChangeToolPostfix"));
 	}
 
 

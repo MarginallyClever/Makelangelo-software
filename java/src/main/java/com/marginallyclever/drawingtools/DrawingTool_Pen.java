@@ -77,8 +77,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		penUp = new JFormattedTextField(nFloat);
 		penDown = new JFormattedTextField(nFloat);
 		penZRate = new JFormattedTextField(nFloat);
-		buttonTestUp = new JButton(translator.get("penToolTest"));
-		buttonTestDown = new JButton(translator.get("penToolTest"));
+		buttonTestUp = new JButton(Translator.get("penToolTest"));
+		buttonTestDown = new JButton(Translator.get("penToolTest"));
 
 		penDiameter.setValue(getDiameter());
 		penFeedRate.setValue(feedRate);
@@ -106,7 +106,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("penToolDiameter")), c);
+		p.add(new JLabel(Translator.get("penToolDiameter")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(penDiameter, d);
@@ -114,7 +114,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("penToolMaxFeedRate")), c);
+		p.add(new JLabel(Translator.get("penToolMaxFeedRate")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(penFeedRate, d);
@@ -122,7 +122,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("penToolUp")), c);
+		p.add(new JLabel(Translator.get("penToolUp")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(penUp, d);
@@ -133,7 +133,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("penToolDown")), c);
+		p.add(new JLabel(Translator.get("penToolDown")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(penDown, d);
@@ -144,7 +144,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("penToolLiftSpeed")), c);
+		p.add(new JLabel(Translator.get("penToolLiftSpeed")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(penZRate, d);

@@ -81,7 +81,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		mh.setValue(h);
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("MachineWidth")), c);
+		p.add(new JLabel(Translator.get("MachineWidth")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(mw, d);
@@ -91,7 +91,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		y++;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("MachineHeight")), c);
+		p.add(new JLabel(Translator.get("MachineHeight")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(mh, d);
@@ -115,7 +115,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.ipadx = 5;
 		c.ipady = 0;
 		c.gridwidth = 3;
-		p.add(new JLabel(translator.get("AdjustPulleySize"), SwingConstants.CENTER), c);
+		p.add(new JLabel(Translator.get("AdjustPulleySize"), SwingConstants.CENTER), c);
 		c.gridwidth = 1;
 
 		double left = Math.floor(robot.settings.getPulleyDiameterLeft() * 10.0 * 1000.0) / 1000.0;
@@ -136,23 +136,23 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		d.anchor = GridBagConstraints.WEST;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("Left")), c);
+		p.add(new JLabel(Translator.get("Left")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(pulleyDiameterLeft, d);
 		d.gridx = 2;
 		d.gridy = y;
-		p.add(new JLabel(translator.get("Millimeters")), d);
+		p.add(new JLabel(Translator.get("Millimeters")), d);
 		y++;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("Right")), c);
+		p.add(new JLabel(Translator.get("Right")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(pulleyDiameterRight, d);
 		d.gridx = 2;
 		d.gridy = y;
-		p.add(new JLabel(translator.get("Millimeters")), d);
+		p.add(new JLabel(Translator.get("Millimeters")), d);
 
 		s = pulleyDiameterLeft.getPreferredSize();
 		s.width = 80;
@@ -164,20 +164,20 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		JPanel panel = new JPanel(new GridBagLayout());
 		this.add(panel);
 
-		buttonAneg = new JButton(translator.get("JogIn"));
-		buttonApos = new JButton(translator.get("JogOut"));
-		m1i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor1Backwards());
+		buttonAneg = new JButton(Translator.get("JogIn"));
+		buttonApos = new JButton(Translator.get("JogOut"));
+		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor1Backwards());
 
-		buttonBneg = new JButton(translator.get("JogIn"));
-		buttonBpos = new JButton(translator.get("JogOut"));
-		m2i = new JCheckBox(translator.get("Invert"), robot.settings.isMotor2Backwards());
+		buttonBneg = new JButton(Translator.get("JogIn"));
+		buttonBpos = new JButton(Translator.get("JogOut"));
+		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor2Backwards());
 
 		c.gridx = 0;
 		c.gridy = 0;
-		panel.add(new JLabel(translator.get("Left")), c);
+		panel.add(new JLabel(Translator.get("Left")), c);
 		c.gridx = 0;
 		c.gridy = 1;
-		panel.add(new JLabel(translator.get("Right")), c);
+		panel.add(new JLabel(Translator.get("Right")), c);
 
 		c.gridx = 1;
 		c.gridy = 0;
@@ -225,7 +225,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		d.anchor = GridBagConstraints.WEST;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(translator.get("AdjustAcceleration")), c);
+		p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		p.add(acceleration, d);
@@ -241,7 +241,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 2;
-		flipForGlass = new JCheckBox(translator.get("FlipForGlass"));
+		flipForGlass = new JCheckBox(Translator.get("FlipForGlass"));
 		flipForGlass.setSelected(robot.settings.isReverseForGlass());
 		p.add(flipForGlass, c);
 	}

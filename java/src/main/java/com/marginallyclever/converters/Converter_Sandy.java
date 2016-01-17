@@ -22,14 +22,13 @@ public class Converter_Sandy extends ImageConverter {
 	private float blockScale=50.0f;
 	private int direction=0;
 
-	public Converter_Sandy(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Converter_Sandy(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("Sandy Noble Style");
+		return Translator.get("Sandy Noble Style");
 	}
 
 	/**
@@ -53,7 +52,7 @@ public class Converter_Sandy extends ImageConverter {
 		final JTextField field_size = new JTextField(Float.toString(blockScale));
 
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(translator.get("HilbertCurveSize")));
+		panel.add(new JLabel(Translator.get("HilbertCurveSize")));
 		panel.add(field_size);
 
 		String [] directions = { "top right", "top left", "bottom left", "bottom right", "center" };
@@ -78,7 +77,7 @@ public class Converter_Sandy extends ImageConverter {
 	 */
 	private void convertNow(BufferedImage img,Writer out) throws IOException {
 		// make black & white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

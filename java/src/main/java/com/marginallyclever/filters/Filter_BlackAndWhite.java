@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.Translator;
 
 
 /**
@@ -16,9 +15,8 @@ public class Filter_BlackAndWhite extends ImageFilter {
   double levels = 2;
 
 
-  public Filter_BlackAndWhite(Makelangelo gui,
-                              MakelangeloRobotSettings mc, Translator ms, int _levels) {
-    super(gui, mc, ms);
+  public Filter_BlackAndWhite(Makelangelo gui, MakelangeloRobotSettings mc, int _levels) {
+    super(gui, mc);
     levels = (double) _levels;
   }
 

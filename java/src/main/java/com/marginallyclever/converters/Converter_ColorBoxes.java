@@ -27,9 +27,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 	private int direction = 1;
 
 
-	public Converter_ColorBoxes(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Converter_ColorBoxes(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 
 		palette = new ColorPalette();
 		palette.addColor(new C3(0, 0, 0));
@@ -40,7 +39,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 
 
 	public String getName() {
-		return translator.get("RGBName");
+		return Translator.get("RGBName");
 	}
 
 	/**

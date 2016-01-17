@@ -48,7 +48,7 @@ implements ActionListener {
   protected int dialogHeight = 500;
   
   public MakelangeloSettingsDialog(Frame parent, Translator translator, MakelangeloRobot robot) {
-	super(parent,translator.get("configureMachine"),true);
+	super(parent,Translator.get("configureMachine"),true);
 
 	this.translator = translator;
 	this.robot = robot;
@@ -65,9 +65,9 @@ implements ActionListener {
     //panelAdjustTools = new PanelAdjustTools(translator,robot);
     //panelSelectTool = new PanelSelectTool(translator,robot);
     
-    panes.addTab(translator.get("MenuSettingsMachine"),panelAdjustMachine);
-    panes.addTab(translator.get("MenuAdjustPaper"),panelAdjustPaper);
-    panes.addTab(translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
+    panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine);
+    panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper);
+    panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
     //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
     //panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
     
@@ -86,8 +86,8 @@ implements ActionListener {
     	this.add(panes,d);
 	
         // save and cancel buttons
-    	cancel = new JButton(translator.get("Cancel"));
-        save = new JButton(translator.get("Save"));
+    	cancel = new JButton(Translator.get("Cancel"));
+        save = new JButton(Translator.get("Save"));
 
 	    JPanel p = new JPanel(new GridBagLayout());
 	    GridBagConstraints c = new GridBagConstraints();

@@ -29,7 +29,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   private ReentrantLock lock = new ReentrantLock();
 
   public String getName() {
-    return translator.get("ZigZagName");
+    return Translator.get("ZigZagName");
   }
 
   // processing tools
@@ -44,8 +44,8 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   int scount;
 
 
-  public Converter_ZigZag(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
-    super(gui, mc, ms);
+  public Converter_ZigZag(Makelangelo gui, MakelangeloRobotSettings mc) {
+    super(gui, mc);
   }
 
 
@@ -343,15 +343,15 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
   public boolean convert(BufferedImage img,Writer out) throws IOException {
     // resize & flip as needed
     // Note that changing 250/250 here changes the number of dots a lot.
-    Filter_Resize rs = new Filter_Resize(mainGUI, machine, translator, 250, 250);
+    Filter_Resize rs = new Filter_Resize(mainGUI, machine, 250, 250);
     img = rs.filter(img);
 
     // make black & white
-    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+    Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
     img = bw.filter(img);
     
     // Dither
-    Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI, machine, translator);
+    Filter_DitherFloydSteinberg dither = new Filter_DitherFloydSteinberg(mainGUI, machine);
     img = dither.filter(img);
     
     // connect the dots

@@ -22,12 +22,12 @@ public class Converter_Spiral extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return translator.get("SpiralName");
+		return Translator.get("SpiralName");
 	}
 
 
-	public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
-		super(gui, mc, ms);
+	public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 
@@ -53,7 +53,7 @@ public class Converter_Spiral extends ImageConverter {
 	@Override
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

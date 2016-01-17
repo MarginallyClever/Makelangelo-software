@@ -29,9 +29,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private BufferedImage imgMask;
 
 
-	public Converter_ColorFloodFill(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Converter_ColorFloodFill(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 
 		palette = new ColorPalette();
 		palette.addColor(new C3(0, 0, 0));
@@ -43,7 +42,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return translator.get("RGBFloodFillName");
+		return Translator.get("RGBFloodFillName");
 	}
 
 
@@ -247,7 +246,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
 		//img = bw.process(img);
 
-		Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI, machine, translator, 1);
+		Filter_GaussianBlur blur = new Filter_GaussianBlur(mainGUI, machine, 1);
 		img = blur.filter(img);
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);

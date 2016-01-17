@@ -88,7 +88,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 
 		commandLineText = new JTextField(0);
 		//commandLineText.setPreferredSize(new Dimension(10, 10));
-		commandLineSend = new JButton(translator.get("Send"));
+		commandLineSend = new JButton(Translator.get("Send"));
 		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
 		c.gridwidth=4;
 		c.weightx=1;

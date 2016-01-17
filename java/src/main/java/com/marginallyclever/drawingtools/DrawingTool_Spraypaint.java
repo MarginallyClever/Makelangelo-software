@@ -116,7 +116,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolDiameter")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolDiameter")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(spraypaintDiameter, d);
@@ -124,7 +124,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolMaxFeedRate")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolMaxFeedRate")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(spraypaintFeedRate, d);
@@ -132,7 +132,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolUp")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolUp")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(spraypaintUp, d);
@@ -140,7 +140,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolDown")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolDown")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(spraypaintDown, d);
@@ -148,7 +148,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolLiftSpeed")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolLiftSpeed")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(spraypaintZRate, d);
@@ -156,7 +156,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("spraypaintToolTest")), c);
+		panel.add(new JLabel(Translator.get("spraypaintToolTest")), c);
 		d.gridx = 1;
 		d.gridy = y;
 		panel.add(buttonTestDot, d);

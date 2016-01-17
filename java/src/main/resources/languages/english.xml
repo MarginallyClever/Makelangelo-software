@@ -896,7 +896,7 @@ to check yourself.</value>
 	</string>
 
 	<string>
-		<key>KochCurveName</key>
+		<key>KochTreeName</key>
 		<value>Koch Curve Fractal</value>
 		<hint></hint>
 	</string>

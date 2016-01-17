@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -19,6 +21,10 @@ import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
+
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -47,28 +53,28 @@ public final class Translator {
 	/**
 	 *
 	 */
-	private final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
+	private static final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
 
 
 	/**
 	 * The default choice when nothing has been selected.
 	 */
-	private String defaultLanguage = "English";
+	private static String defaultLanguage = "English";
 
 	/**
 	 * The current choice
 	 */
-	private String currentLanguage;
+	private static String currentLanguage;
 
 	/**
 	 * a list of all languages and their translations strings
 	 */
-	private final Map<String, TranslatorLanguage> languages = new HashMap<>();
+	private static final Map<String, TranslatorLanguage> languages = new HashMap<>();
 
 	/**
 	 *
 	 */
-	public Translator() {
+	static public void start() {
 		// find the english name of the default language.
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
@@ -82,7 +88,7 @@ public final class Translator {
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
 			System.out.println("default path requested: "+path);
-			URL pathFound = getClass().getClassLoader().getResource(path);
+			URL pathFound = Translator.class.getClassLoader().getResource(path);
 			System.out.println("path found: "+pathFound);
 			try (InputStream s = pathFound.openStream()) {
 				languageContainer.loadFromInputStream(s);
@@ -92,12 +98,43 @@ public final class Translator {
 			languages.put(languageContainer.getName(), languageContainer);
 		}
 		loadConfig();
+
+		if (isThisTheFirstTimeLoadingLanguageFiles()) {
+			chooseLanguage();
+		}
 	}
+
+
+	// display a dialog box of available languages and let the user select their preference.
+	static public void chooseLanguage() {
+		JPanel panel = new JPanel(new GridBagLayout());
+
+		final String[] languageList = getLanguageList();
+		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
+		int currentIndex = getCurrentLanguageIndex();
+		languageOptions.setSelectedIndex(currentIndex);
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.WEST;
+		c.gridwidth = 2;
+		c.gridx = 0;
+		c.gridy = 0;
+		panel.add(languageOptions, c);
+		
+		int result;
+		do {
+			result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+		} while(result != JOptionPane.OK_OPTION);
+		
+		setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
+		saveConfig();
+	}
+	
 
 	/**
 	 * @return true if this is the first time loading language files (probably on install)
 	 */
-	public boolean isThisTheFirstTimeLoadingLanguageFiles() {
+	static private boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
 		try {
 			if (doesLanguagePreferenceExist()) {
@@ -113,7 +150,7 @@ public final class Translator {
 	 * @return true if a preferences node exists
 	 * @throws BackingStoreException
 	 */
-	private boolean doesLanguagePreferenceExist() throws BackingStoreException {
+	static private boolean doesLanguagePreferenceExist() throws BackingStoreException {
 		if (Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
 			return true;
 		}
@@ -123,14 +160,14 @@ public final class Translator {
 	/**
 	 * save the user's current langauge choice
 	 */
-	public void saveConfig() {
+	static public void saveConfig() {
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 * load the user's language choice
 	 */
-	public void loadConfig() {
+	static public void loadConfig() {
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
 
@@ -140,11 +177,11 @@ public final class Translator {
 	 * @see http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
 	 * @throws IllegalStateException No language files found
 	 */
-	public void loadLanguages() throws IllegalStateException {
+	static public void loadLanguages() throws IllegalStateException {
 		// iterate and find all language files
 		URI uri = null;
 		try {
-			uri = getClass().getClassLoader().getResource(WORKING_DIRECTORY).toURI();
+			uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -184,7 +221,7 @@ public final class Translator {
 			name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
 			//System.out.println("found: "+name);
 
-			InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
+			InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
 			//if( stream != null ) 
 			{
 				TranslatorLanguage lang = new TranslatorLanguage();
@@ -203,7 +240,7 @@ public final class Translator {
 	 * @param key
 	 * @return the translated value for key
 	 */
-	public String get(String key) {
+	static public String get(String key) {
 		String value = null;
 		try {
 			value = languages.get(currentLanguage).get(key);
@@ -216,7 +253,7 @@ public final class Translator {
 	/**
 	 * @return the list of language names
 	 */
-	protected String[] getLanguageList() {
+	static protected String[] getLanguageList() {
 		final String[] choices = new String[languages.keySet().size()];
 		final Object[] lang_keys = languages.keySet().toArray();
 
@@ -230,19 +267,19 @@ public final class Translator {
 	/**
 	 * @param currentLanguage the name of the language to make active.
 	 */
-	public void setCurrentLanguage(String currentLanguage) {
-		this.currentLanguage = currentLanguage;
+	static public void setCurrentLanguage(String currentLanguage) {
+		Translator.currentLanguage = currentLanguage;
 	}
 
-	public int getCurrentLanguageIndex() {
+	static public int getCurrentLanguageIndex() {
 		String [] set = getLanguageList();
 		// find the current language
 		for( int i=0;i<set.length; ++i) {
-			if( set[i].equals(this.currentLanguage)) return i;
+			if( set[i].equals(Translator.currentLanguage)) return i;
 		}
 		// now try the default
 		for( int i=0;i<set.length; ++i) {
-			if( set[i].equals(this.defaultLanguage)) return i;
+			if( set[i].equals(Translator.defaultLanguage)) return i;
 		}
 		// failed both, return 0 for the first option.
 		return 0;

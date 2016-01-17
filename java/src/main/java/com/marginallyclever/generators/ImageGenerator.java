@@ -5,7 +5,6 @@ import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Generates gcode from user input.  Fractals might be one example.
@@ -13,9 +12,8 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public abstract class ImageGenerator extends ImageManipulator implements DrawPanelDecorator {
-	public ImageGenerator(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public ImageGenerator(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	/**

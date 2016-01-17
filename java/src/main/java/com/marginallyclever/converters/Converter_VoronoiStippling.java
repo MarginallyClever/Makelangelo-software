@@ -55,13 +55,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	private double[] yValuesIn = null;
 
 
-	public Converter_VoronoiStippling(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
-		super(gui, mc, ms);
+	public Converter_VoronoiStippling(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("voronoiStipplingName");
+		return Translator.get("voronoiStipplingName");
 	}
 
 	@Override
@@ -72,13 +72,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 		JTextField text_dot_min = new JTextField(Float.toString(MIN_DOT_SIZE), 8);
 
 		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(translator.get("voronoiStipplingCellCount")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
 		panel.add(text_cells);
-		panel.add(new JLabel(translator.get("voronoiStipplingGenCount")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
 		panel.add(text_gens);
-		panel.add(new JLabel(translator.get("voronoiStipplingDotMax")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingDotMax")));
 		panel.add(text_dot_max);
-		panel.add(new JLabel(translator.get("voronoiStipplingDotMin")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingDotMin")));
 		panel.add(text_dot_min);
 
 

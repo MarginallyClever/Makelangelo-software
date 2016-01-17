@@ -64,13 +64,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	private long time_limit=10*60*1000;  // 10 minutes
 
 
-	public Converter_VoronoiZigZag(Makelangelo gui,
-			MakelangeloRobotSettings mc, Translator ms) {
-		super(gui, mc, ms);
+	public Converter_VoronoiZigZag(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
-	public String getName() { return translator.get("ZigZagName")+" 2"; }
+	public String getName() { return Translator.get("ZigZagName")+" 2"; }
 
 	@Override
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
@@ -78,9 +77,9 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
 
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(translator.get("voronoiStipplingCellCount")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
 		panel.add(text_cells);
-		panel.add(new JLabel(translator.get("voronoiStipplingGenCount")));
+		panel.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
 		panel.add(text_gens);
 
 
@@ -90,7 +89,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 			MAX_CELLS = Integer.parseInt(text_cells.getText());
 
 			// make black & white
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,translator,255);
+			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,255);
 			img = bw.filter(img);
 
 			src_img = img;
@@ -137,6 +136,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 
 			for(i=0;i<cells.length;++i) {
 				VoronoiCell c = cells[i];
+				if(c==null) continue;
 				float v = 1.0f - (float)sample1x1(src_img,(int)c.centroid.x,(int)c.centroid.y) / 255.0f;
 				if(v*5 <= CUTOFF) {
 					gl2.glColor3f(0.8f,0.8f,0.8f);	 

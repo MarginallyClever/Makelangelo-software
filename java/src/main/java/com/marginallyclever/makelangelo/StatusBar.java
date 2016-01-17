@@ -63,7 +63,7 @@ public class StatusBar extends JPanel {
     this.add(message,c);
     c.gridy++;
     c.ipady=20;
-    this.add(new JLabel("\n"+translator.get("SharePromo")), c);
+    this.add(new JLabel("\n"+Translator.get("SharePromo")), c);
     
     Font f = getFont();
     setFont(f.deriveFont(Font.BOLD, 15));
@@ -96,8 +96,8 @@ public class StatusBar extends JPanel {
       long t_draw_now = (sofar > 0) ? System.currentTimeMillis() - t_start : 0;
       long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
       long remaining = total_time - t_draw_now;
-      sElapsed = translator.get("StatusSoFar") + formatTime(t_draw_now) +
-          translator.get("StatusRemaining") + formatTime(remaining);
+      sElapsed = Translator.get("StatusSoFar") + formatTime(t_draw_now) +
+          Translator.get("StatusRemaining") + formatTime(remaining);
     }
 
     setMessage("% (" + sofar + "/" + total + ") " + sElapsed);

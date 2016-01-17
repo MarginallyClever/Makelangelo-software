@@ -91,7 +91,7 @@ import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 /**
  * Controls related to converting an image to gcode
  *
- * @author danroyer
+ * @author dan royer
  * @author Peter Colapietro
  * @since 7.1.4
  */
@@ -167,30 +167,30 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
-		imageConverters.add(new Converter_Boxes(gui, robot.settings, translator));
+		imageConverters.add(new Converter_Boxes(gui, robot.settings));
 		// imageConverters.add(new Converter_ColorBoxes(gui, robot.settings,
 		// translator));
-		imageConverters.add(new Converter_Crosshatch(gui, robot.settings, translator));
+		imageConverters.add(new Converter_Crosshatch(gui, robot.settings));
 		// imageConverters.add(new Filter_GeneratorColorFloodFill(gui,
-		// robot.settings, translator)); // not ready for public consumption
-		imageConverters.add(new Converter_Pulse(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Sandy(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Scanline(gui, robot.settings, translator));
-		imageConverters.add(new Converter_Spiral(gui, robot.settings, translator));
-		imageConverters.add(new Converter_VoronoiStippling(gui, robot.settings, translator));
-		imageConverters.add(new Converter_VoronoiZigZag(gui, robot.settings, translator));
-		imageConverters.add(new Converter_ZigZag(gui, robot.settings, translator));
+		// robot.settings)); // not ready for public consumption
+		imageConverters.add(new Converter_Pulse(gui, robot.settings));
+		imageConverters.add(new Converter_Sandy(gui, robot.settings));
+		imageConverters.add(new Converter_Scanline(gui, robot.settings));
+		imageConverters.add(new Converter_Spiral(gui, robot.settings));
+		imageConverters.add(new Converter_VoronoiStippling(gui, robot.settings));
+		imageConverters.add(new Converter_VoronoiZigZag(gui, robot.settings));
+		imageConverters.add(new Converter_ZigZag(gui, robot.settings));
 	}
 
 	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageGenerators() {
 		imageGenerators = new ArrayList<ImageGenerator>();
-		imageGenerators.add(new Generator_Dragon(gui, robot.settings, translator));
-		imageGenerators.add(new Generator_HilbertCurve(gui, robot.settings, translator));
-		imageGenerators.add(new Generator_KochCurve(gui, robot.settings, translator));
-		imageGenerators.add(new Generator_LSystemTree(gui, robot.settings, translator));
-		imageGenerators.add(new Generator_Maze(gui, robot.settings, translator));
-		imageGenerators.add(new Generator_YourMessageHere(gui, robot.settings, translator));
+		imageGenerators.add(new Generator_Dragon(gui, robot.settings));
+		imageGenerators.add(new Generator_HilbertCurve(gui, robot.settings));
+		imageGenerators.add(new Generator_KochCurve(gui, robot.settings));
+		imageGenerators.add(new Generator_LSystemTree(gui, robot.settings));
+		imageGenerators.add(new Generator_Maze(gui, robot.settings));
+		imageGenerators.add(new Generator_YourMessageHere(gui, robot.settings));
 	}
 
 
@@ -234,7 +234,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		paperMargin.setPaintTicks(false);
 		paperMargin.setPaintLabels(true);
 		paperMargin.addChangeListener(this);
-		marginPanel.add(new JLabel(translator.get("PaperMargin")));
+		marginPanel.add(new JLabel(Translator.get("PaperMargin")));
 		marginPanel.add(paperMargin);
 		panel.add(marginPanel, con1);
 		con1.gridy++;
@@ -256,7 +256,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		down10 = tightJButton("-10");
 		down1 = tightJButton("-1");
 
-		setHome = tightJButton(translator.get("SetHome"));
+		setHome = tightJButton(Translator.get("SetHome"));
 
 		up1 = tightJButton("1");
 		up10 = tightJButton("10");
@@ -299,15 +299,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		JPanel corners = new JPanel();
 		corners.setLayout(new GridBagLayout());
-		goTop = new JButton(translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
-		goBottom = new JButton(translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
-		goLeft = new JButton(translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
-		goRight = new JButton(translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
-		penUp = new JButton(translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
-		penDown = new JButton(translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
+		goTop = new JButton(Translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
+		goBottom = new JButton(Translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
+		goLeft = new JButton(Translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
+		goRight = new JButton(Translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
+		penUp = new JButton(Translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
+		penDown = new JButton(Translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
 		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
 		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20));
-		goHome = new JButton(translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
+		goHome = new JButton(Translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
 		JLabel horizontalFiller = new JLabel(" ");
 		c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
 		c.gridx=2;  c.gridy=1;  corners.add(goHome,c);
@@ -337,14 +337,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c = new GridBagConstraints();
 		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
-		setFeedRate = new JButton(translator.get("Set"));
+		setFeedRate = new JButton(Translator.get("Set"));
 		setFeedRate.addActionListener(this);
-		disengageMotors = new JButton(translator.get("DisengageMotors"));
+		disengageMotors = new JButton(Translator.get("DisengageMotors"));
 		disengageMotors.addActionListener(this);
 
-		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Speed")),c);
+		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
 		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(translator.get("Rate")),c);
+		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
 		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
 
@@ -353,7 +353,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		dragAndDrive.addMouseListener(this);
 		dragAndDrive.addMouseMotionListener(this);
 
-		coordinates = new JLabel(translator.get("ClickAndDrag"));
+		coordinates = new JLabel(Translator.get("ClickAndDrag"));
 		c.anchor = GridBagConstraints.CENTER;
 
 		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
@@ -390,22 +390,22 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 
 		// File conversion
-		buttonNewFile = new JButton(translator.get("MenuNewFile"));
+		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener(this);
 		panel.add(buttonNewFile, con1);
 		con1.gridy++;
 
-		buttonOpenFile = new JButton(translator.get("MenuOpenFile"));
+		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener(this);
 		panel.add(buttonOpenFile, con1);
 		con1.gridy++;
 
-		buttonGenerate = new JButton(translator.get("MenuGenerate"));
+		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
 		buttonGenerate.addActionListener(this);
 		panel.add(buttonGenerate, con1);
 		con1.gridy++;
 
-		buttonSaveFile = new JButton(translator.get("MenuSaveGCODEAs"));
+		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
 		buttonSaveFile.addActionListener(this);
 		panel.add(buttonSaveFile, con1);
 		con1.gridy++;
@@ -415,10 +415,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		// drive menu
 		JPanel drivePanel = new JPanel(new GridLayout(1,4));
-		buttonStart = new JButton(translator.get("Start"));
-		buttonStartAt = new JButton(translator.get("StartAtLine"));
-		buttonPause = new JButton(translator.get("Pause"));
-		buttonHalt = new JButton(translator.get("Halt"));
+		buttonStart = new JButton(Translator.get("Start"));
+		buttonStartAt = new JButton(Translator.get("StartAtLine"));
+		buttonPause = new JButton(Translator.get("Pause"));
+		buttonHalt = new JButton(Translator.get("Halt"));
 		drivePanel.add(buttonStart);
 		drivePanel.add(buttonStartAt);
 		drivePanel.add(buttonPause);
@@ -450,7 +450,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineConfigurations = robot.settings.getKnownMachineNames();
 		if( machineConfigurations.length>0 ) {
 			machineChoices = new JComboBox<>(machineConfigurations);
-			machineNumberPanel.add(new JLabel(translator.get("MachineNumber")));
+			machineNumberPanel.add(new JLabel(Translator.get("MachineNumber")));
 			machineNumberPanel.add(machineChoices);
 
 			int index = robot.settings.getKnownMachineIndex();
@@ -461,7 +461,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			machineChoices.setEnabled( !robot.isPortConfirmed() );
 		}
 
-		openConfig = new JButton(translator.get("configureMachine"));
+		openConfig = new JButton(Translator.get("configureMachine"));
 		openConfig.addActionListener(this);
 		openConfig.setPreferredSize(openConfig.getPreferredSize());
 		machineNumberPanel.add(openConfig);
@@ -529,7 +529,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if (robot.isPaused() == true) {
 				// we were paused.
 				// update button text
-				buttonPause.setText(translator.get("Pause"));
+				buttonPause.setText(Translator.get("Pause"));
 				// ready
 				robot.unPause();
 				// TODO: if the robot is not ready to unpause, this
@@ -539,7 +539,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			} else {
 				robot.pause();
 				// change button text
-				buttonPause.setText(translator.get("Unpause"));
+				buttonPause.setText(Translator.get("Unpause"));
 			}
 			return;
 		}
@@ -611,13 +611,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridwidth = 2;
 		c.gridx = 0;
 		c.gridy = 0;
-		panel.add(new JLabel(translator.get("StartAtLine")), c);
+		panel.add(new JLabel(Translator.get("StartAtLine")), c);
 		c.gridwidth = 2;
 		c.gridx = 2;
 		c.gridy = 0;
 		panel.add(starting_line, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
+		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			long lineNumber;
@@ -644,7 +644,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		buttonHalt.setEnabled(isConfirmed && isRunning);
 
 		if (!isConfirmed) {
-			buttonPause.setText(translator.get("Pause"));
+			buttonPause.setText(Translator.get("Pause"));
 		}
 
 		disengageMotors.setEnabled(isConfirmed && !isRunning);
@@ -693,10 +693,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		String filename = lastFileIn;
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
-		final FileFilter filterImage = new FileNameExtensionFilter(translator.get("FileTypeImage"),
+		FileFilter filterGCODE = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+		final FileFilter filterImage = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 		IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
-		FileFilter filterDXF = new FileNameExtensionFilter(translator.get("FileTypeDXF"), "dxf");
+		FileFilter filterDXF = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterImage);
@@ -707,7 +707,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 			// if machine is not yet calibrated
 			if (robot.settings.isPaperConfigured() == false) {
-				JOptionPane.showMessageDialog(null, translator.get("SetPaperSize"));
+				JOptionPane.showMessageDialog(null, Translator.get("SetPaperSize"));
 				return;
 			}
 			openFileOnDemand(selectedFile);
@@ -735,14 +735,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("ConversionStyle")), c);
+		panel.add(new JLabel(Translator.get("ConversionStyle")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
 		c.gridy = y++;
 		panel.add(options, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"),
+		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			int choice = options.getSelectedIndex();
@@ -768,7 +768,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 		String filename = lastFileOut;
 
-		FileFilter filterGCODE = new FileNameExtensionFilter(translator.get("FileTypeGCode"), "ngc");
+		FileFilter filterGCODE = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
 
 		JFileChooser fc = new JFileChooser(new File(filename));
 		fc.addChoosableFileFilter(filterGCODE);
@@ -782,7 +782,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			try {
 				gui.gCode.save(selectedFile);
 			} catch (IOException e) {
-				Log.error(translator.get("Failed") + e.getMessage());
+				Log.error(Translator.get("Failed") + e.getMessage());
 				return;
 			}
 		}
@@ -813,7 +813,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	// User has asked that a file be opened.
 	public void openFileOnDemand(String filename) {
-		Log.message(translator.get("OpeningFile") + filename + "...");
+		Log.message(Translator.get("OpeningFile") + filename + "...");
 		boolean success = false;
 
 		if (isFileGcode(filename)) {
@@ -823,7 +823,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		} else if (isFileImage(filename)) {
 			success = loadImage(filename);
 		} else {
-			Log.error(translator.get("UnknownFileType"));
+			Log.error(Translator.get("UnknownFileType"));
 		}
 
 		if (success == true) {
@@ -855,14 +855,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(translator.get("ConversionStyle")), c);
+		panel.add(new JLabel(Translator.get("ConversionStyle")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
 		c.gridy = y++;
 		panel.add(inputDrawStyle, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, translator.get("ConversionOptions"),
+		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
@@ -887,11 +887,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public boolean loadGCode(String filename) {
 		try {
 			gui.gCode.load(filename);
-			Log.message(gui.gCode.estimateCount + translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
-					+ translator.get("Centimeters") + "\n" + translator.get("EstimatedTime")
+			Log.message(gui.gCode.estimateCount + Translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
+					+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
 					+ statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
 		} catch (IOException e) {
-			Log.error(translator.get("FileNotOpened") + e.getLocalizedMessage());
+			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());
 			gui.updateMenuBar();
 			return false;
 		}
@@ -906,7 +906,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		final String destinationFile = gui.getTempDestinationFile();
 		final String srcFile = filename;
 
-		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 
@@ -916,7 +916,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			@SuppressWarnings("unchecked")
 			@Override
 			public Void doInBackground() {
-				Log.message(translator.get("Converting") + " " + destinationFile);
+				Log.message(Translator.get("Converting") + " " + destinationFile);
 
 				Parser parser = ParserBuilder.createDefaultParser();
 
@@ -1126,7 +1126,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			@Override
 			public void done() {
 				pm.close();
-				Log.message(translator.get("Finished"));
+				Log.message(Translator.get("Finished"));
 				gui.soundSystem.playConversionFinishedSound();
 				if (ok) {
 					loadGCode(destinationFile);
@@ -1144,12 +1144,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					String message = String.format("%d%%\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						Log.message(translator.get("Finished"));
+						Log.message(Translator.get("Finished"));
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						Log.message(translator.get("Cancelled"));
+						Log.message(Translator.get("Cancelled"));
 					}
 				}
 			}
@@ -1169,7 +1169,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (chooseImageConversionOptions() == false)
 			return false;
 
-		final ProgressMonitor pm = new ProgressMonitor(null, translator.get("Converting"), "", 0, 100);
+		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 
@@ -1179,7 +1179,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				try (OutputStream fileOutputStream = new FileOutputStream(destinationFile);
 						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 					// read in image
-					Log.message(translator.get("Converting") + " " + destinationFile);
+					Log.message(Translator.get("Converting") + " " + destinationFile);
 					// convert with style
 					final BufferedImage img = ImageIO.read(new File(sourceFile));
 
@@ -1193,12 +1193,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 					if (robot.settings.shouldSignName()) {
 						// Sign name
-						Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, robot.settings, translator);
+						Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, robot.settings);
 						ymh.signName(out);
 					}
 					gui.updateMachineConfig();
 				} catch (IOException e) {
-					Log.error(translator.get("Failed") + e.getLocalizedMessage());
+					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
 					gui.updateMenuBar();
 				}
 
@@ -1211,7 +1211,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			@Override
 			public void done() {
 				pm.close();
-				Log.message(translator.get("Finished"));
+				Log.message(Translator.get("Finished"));
 				loadGCode(destinationFile);
 				gui.soundSystem.playConversionFinishedSound();
 			}
@@ -1226,12 +1226,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (s.isDone()) {
-						Log.message(translator.get("Finished"));
+						Log.message(Translator.get("Finished"));
 					} else if (s.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							s.cancel(true);
 						}
-						Log.message(translator.get("Cancelled"));
+						Log.message(Translator.get("Cancelled"));
 					}
 				}
 			}

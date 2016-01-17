@@ -41,7 +41,7 @@ public class SoundSystem {
 	 * Adjust sound preferences
 	 */
 	protected void adjust(final Frame owner, Translator translator) {
-		final JDialog driver = new JDialog(owner, translator.get("MenuSoundsTitle"), true);
+		final JDialog driver = new JDialog(owner, Translator.get("MenuSoundsTitle"), true);
 		driver.setLayout(new GridBagLayout());
 		
 		final JTextField sound_connect = new JTextField(prefs.get("sound_connect", ""), 32);
@@ -49,16 +49,16 @@ public class SoundSystem {
 		final JTextField sound_conversion_finished = new JTextField(prefs.get("sound_conversion_finished", ""), 32);
 		final JTextField sound_drawing_finished = new JTextField(prefs.get("sound_drawing_finished", ""), 32);
 
-		final JButton change_sound_connect = new JButton(translator.get("MenuSoundsConnect"));
-		final JButton change_sound_disconnect = new JButton(translator.get("MenuSoundsDisconnect"));
-		final JButton change_sound_conversion_finished = new JButton(translator.get("MenuSoundsFinishConvert"));
-		final JButton change_sound_drawing_finished = new JButton(translator.get("MenuSoundsFinishDraw"));
+		final JButton change_sound_connect = new JButton(Translator.get("MenuSoundsConnect"));
+		final JButton change_sound_disconnect = new JButton(Translator.get("MenuSoundsDisconnect"));
+		final JButton change_sound_conversion_finished = new JButton(Translator.get("MenuSoundsFinishConvert"));
+		final JButton change_sound_drawing_finished = new JButton(Translator.get("MenuSoundsFinishDraw"));
 
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton save = new JButton(translator.get("Save"));
+		final JButton cancel = new JButton(Translator.get("Cancel"));
+		final JButton save = new JButton(Translator.get("Save"));
 
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);

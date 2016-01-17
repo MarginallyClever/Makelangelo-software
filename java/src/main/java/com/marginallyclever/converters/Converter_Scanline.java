@@ -12,14 +12,13 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Scanline extends ImageConverter {
-	public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("ScanlineName");
+		return Translator.get("ScanlineName");
 	}
 
 	/**
@@ -30,7 +29,7 @@ public class Converter_Scanline extends ImageConverter {
 	@Override
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
 		img = bw.filter(img);
 
 

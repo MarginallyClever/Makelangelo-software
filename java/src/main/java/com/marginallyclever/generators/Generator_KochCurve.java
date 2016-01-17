@@ -33,14 +33,13 @@ public class Generator_KochCurve extends ImageGenerator {
 
 	float maxSize;
 
-	public Generator_KochCurve(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Generator_KochCurve(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("KochTreeName");
+		return Translator.get("KochTreeName");
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class Generator_KochCurve extends ImageGenerator {
 			final JTextField field_order = new JTextField(Integer.toString(order));
 
 			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(translator.get("HilbertCurveOrder")));
+			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
 			panel.add(field_order);
 
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

@@ -57,18 +57,18 @@ implements ActionListener, KeyListener {
 		c.ipadx=5;
 		c.ipady=2;
 
-		c.gridx=0;  c.gridy=y;  p.add(new JLabel(translator.get("PaperSize")),c);
+		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
 		d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
 		y=1;
 		d.gridwidth=1;
 
 		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
 		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
-		d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
+		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
 		d.gridx=1;  d.gridy=y;  p.add(ph,d);
-		d.gridx=2;  d.gridy=y;  p.add(new JLabel(translator.get("Millimeters")),d);
+		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
 
 

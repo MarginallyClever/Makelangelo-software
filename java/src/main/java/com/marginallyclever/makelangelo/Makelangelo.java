@@ -34,7 +34,6 @@ import java.util.prefs.Preferences;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -128,10 +127,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	public Makelangelo() {
 		Log.clear();
 
-		translator = new Translator();
-		if (translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			chooseLanguage();
-		}
+		Translator.start();
 
 		soundSystem = new SoundSystem();
 		
@@ -145,32 +141,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		connectionManager = new SerialConnectionManager(prefs);
 		
 		createAndShowGUI();
-	}
-
-
-	// display a dialog box of available languages and let the user select their preference.
-	public void chooseLanguage() {
-		JPanel panel = new JPanel(new GridBagLayout());
-
-		final String[] languageList = translator.getLanguageList();
-		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
-		int currentIndex = translator.getCurrentLanguageIndex();
-		languageOptions.setSelectedIndex(currentIndex);
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		c.gridx = 0;
-		c.gridy = 0;
-		panel.add(languageOptions, c);
-		
-		int result;
-		do {
-			result = JOptionPane.showConfirmDialog(this.mainframe, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
-		} while(result != JOptionPane.OK_OPTION);
-		
-		translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
-		translator.saveConfig();
 	}
 	
 	
@@ -198,18 +168,18 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
 
-		final JCheckBox show_pen_up = new JCheckBox(translator.get("MenuGraphicsPenUp"));
-		final JCheckBox antialias_on = new JCheckBox(translator.get("MenuGraphicsAntialias"));
-		final JCheckBox speed_over_quality = new JCheckBox(translator.get("MenuGraphicsSpeedVSQuality"));
-		final JCheckBox draw_all_while_running = new JCheckBox(translator.get("MenuGraphicsDrawWhileRunning"));
+		final JCheckBox show_pen_up = new JCheckBox(Translator.get("MenuGraphicsPenUp"));
+		final JCheckBox antialias_on = new JCheckBox(Translator.get("MenuGraphicsAntialias"));
+		final JCheckBox speed_over_quality = new JCheckBox(Translator.get("MenuGraphicsSpeedVSQuality"));
+		final JCheckBox draw_all_while_running = new JCheckBox(Translator.get("MenuGraphicsDrawWhileRunning"));
 
 		show_pen_up.setSelected(graphics_prefs.getBoolean("show pen up", false));
 		antialias_on.setSelected(graphics_prefs.getBoolean("antialias", true));
 		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
 		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
 
-		final JButton cancel = new JButton(translator.get("Cancel"));
-		final JButton save = new JButton(translator.get("Save"));
+		final JButton cancel = new JButton(Translator.get("Cancel"));
+		final JButton save = new JButton(Translator.get("Save"));
 
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
@@ -252,7 +222,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		c.gridy = y;
 		driver.add(cancel, c);
 		
-		int result = JOptionPane.showConfirmDialog(null, this.mainframe, translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, this.mainframe, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			//allowMetrics = allow_metrics.isSelected();
 			graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
@@ -372,7 +342,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonAdjustLanguage) {
-			chooseLanguage();
+			Translator.chooseLanguage();
 			updateMenuBar();
 			return;
 		}
@@ -405,7 +375,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonResetMachinePreferences) {
-			int dialogResult = JOptionPane.showConfirmDialog(this.mainframe, translator.get("MenuResetMachinePreferencesWarning"), translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
+			int dialogResult = JOptionPane.showConfirmDialog(this.mainframe, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
 			if(dialogResult == JOptionPane.YES_OPTION){
 				try {
 					prefs.removeNode();
@@ -436,14 +406,14 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		for (int i = 0; i < connections.length; ++i) {
 			if (subject == buttonConnections[i]) {
 				logPanel.clearLog();
-				Log.message(translator.get("ConnectingTo") + connections[i] + "...");
+				Log.message(Translator.get("ConnectingTo") + connections[i] + "...");
 
 				MarginallyCleverConnection c = connectionManager.openConnection(connections[i]); 
 				if (c == null) {
-					Log.error(translator.get("PortOpenFailed"));
+					Log.error(Translator.get("PortOpenFailed"));
 				} else {
 					robot.setConnection(c);
-					Log.message( translator.get("PortOpened") );
+					Log.message( Translator.get("PortOpened") );
 					updateMenuBar();
 					soundSystem.playConnectSound();
 				}
@@ -460,7 +430,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		soundSystem.playDisconnectSound();
 
 		// remove machine name from title
-		mainframe.setTitle(translator.get("TitlePrefix"));
+		mainframe.setTitle(Translator.get("TitlePrefix"));
 	}
 	
 	
@@ -505,9 +475,9 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 					//System.out.println(inputLine.compareTo(VERSION));
 
 					if (inputLine.compareTo(VERSION) > 0) {
-						JOptionPane.showMessageDialog(null, translator.get("UpdateNotice"));
+						JOptionPane.showMessageDialog(null, Translator.get("UpdateNotice"));
 					} else {
-						JOptionPane.showMessageDialog(null, translator.get("UpToDate"));
+						JOptionPane.showMessageDialog(null, Translator.get("UpToDate"));
 					}
 				}
 			} else {
@@ -515,7 +485,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			}
 			in.close();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, translator.get("UpdateCheckFailed"));
+			JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed"));
 		}
 	}
 
@@ -534,7 +504,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		menuBar.removeAll();
 
 		// File menu
-		menu = new JMenu(translator.get("MenuMakelangelo"));
+		menu = new JMenu(Translator.get("MenuMakelangelo"));
 		menu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menu);
 
@@ -542,24 +512,24 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 		menu.add(preferencesSubMenu);
 
-		buttonCheckForUpdate = new JMenuItem(translator.get("MenuUpdate"), KeyEvent.VK_U);
+		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"), KeyEvent.VK_U);
 		buttonCheckForUpdate.addActionListener(this);
 		buttonCheckForUpdate.setEnabled(true);
 		menu.add(buttonCheckForUpdate);
 
-		buttonAbout = new JMenuItem(translator.get("MenuAbout"), KeyEvent.VK_A);
+		buttonAbout = new JMenuItem(Translator.get("MenuAbout"), KeyEvent.VK_A);
 		buttonAbout.addActionListener(this);
 		menu.add(buttonAbout);
 
 		menu.addSeparator();
 
-		buttonExit = new JMenuItem(translator.get("MenuQuit"), KeyEvent.VK_Q);
+		buttonExit = new JMenuItem(Translator.get("MenuQuit"), KeyEvent.VK_Q);
 		buttonExit.addActionListener(this);
 		menu.add(buttonExit);
 
 
 		// Connect menu
-		preferencesSubMenu = new JMenu(translator.get("MenuConnect"));
+		preferencesSubMenu = new JMenu(Translator.get("MenuConnect"));
 		preferencesSubMenu.setEnabled(!robot.isRunning());
 		group = new ButtonGroup();
 
@@ -579,11 +549,11 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 		preferencesSubMenu.addSeparator();
 
-		buttonRescan = new JMenuItem(translator.get("MenuRescan"), KeyEvent.VK_N);
+		buttonRescan = new JMenuItem(Translator.get("MenuRescan"), KeyEvent.VK_N);
 		buttonRescan.addActionListener(this);
 		preferencesSubMenu.add(buttonRescan);
 
-		buttonDisconnect = new JMenuItem(translator.get("MenuDisconnect"), KeyEvent.VK_D);
+		buttonDisconnect = new JMenuItem(Translator.get("MenuDisconnect"), KeyEvent.VK_D);
 		buttonDisconnect.addActionListener(this);
 		buttonDisconnect.setEnabled(robot.getConnection() != null && robot.getConnection().isOpen());
 		preferencesSubMenu.add(buttonDisconnect);
@@ -591,18 +561,18 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		menuBar.add(preferencesSubMenu);
 
 		// view menu
-		menu = new JMenu(translator.get("MenuPreview"));
-		buttonZoomOut = new JMenuItem(translator.get("ZoomOut"));
+		menu = new JMenu(Translator.get("MenuPreview"));
+		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
 		buttonZoomOut.addActionListener(this);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.ALT_MASK));
 		menu.add(buttonZoomOut);
 
-		buttonZoomIn = new JMenuItem(translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.addActionListener(this);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.ALT_MASK));
 		menu.add(buttonZoomIn);
 
-		buttonZoomToFit = new JMenuItem(translator.get("ZoomFit"));
+		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"));
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
@@ -614,7 +584,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	private JMenu getPreferencesSubMenu() {
 		final JMenu preferencesSubMenu;
-		preferencesSubMenu = new JMenu(translator.get("MenuPreferences"));
+		preferencesSubMenu = new JMenu(Translator.get("MenuPreferences"));
 
 		buttonAdjustSounds = initializeSubMenuButton(preferencesSubMenu, "MenuSoundsTitle");
 		buttonAdjustGraphics = initializeSubMenuButton(preferencesSubMenu, "MenuGraphicsTitle");
@@ -628,7 +598,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	}
 
 	private JMenuItem initializeSubMenuButton(JMenu preferencesSubMenu, String translationKey) {
-		final JMenuItem jMenuItem = new JMenuItem(translator.get(translationKey));
+		final JMenuItem jMenuItem = new JMenuItem(Translator.get(translationKey));
 		jMenuItem.addActionListener(this);
 		preferencesSubMenu.add(jMenuItem);
 		return jMenuItem;
@@ -678,7 +648,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	// Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
 	private void createAndShowGUI() {
 		// Create and set up the window.
-		this.mainframe = new JFrame(translator.get("TitlePrefix"));
+		this.mainframe = new JFrame(Translator.get("TitlePrefix"));
 		this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		// Create and set up the content pane.
@@ -738,7 +708,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			m.run();
 		}*/
 		
-	    getMainframe().setTitle(translator.get("TitlePrefix") + " #" + Long.toString(robot.settings.getUID()));
+	    getMainframe().setTitle(Translator.get("TitlePrefix") + " #" + Long.toString(robot.settings.getUID()));
 	    
 	    getDrawPanel().updateMachineConfig();
 	    getDrawPanel().setConnected(true);

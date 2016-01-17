@@ -65,9 +65,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	private static Font [] fontList;
 	private static String [] fontNames;
 
-	public Generator_YourMessageHere(Makelangelo gui,
-			MakelangeloRobotSettings mc, Translator ms) {
-		super(gui, mc, ms);
+	public Generator_YourMessageHere(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -83,7 +82,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 	@Override
 	public String getName() {
-		return translator.get("YourMsgHereName");
+		return Translator.get("YourMsgHereName");
 	}
 
 	protected void setupTransform() {

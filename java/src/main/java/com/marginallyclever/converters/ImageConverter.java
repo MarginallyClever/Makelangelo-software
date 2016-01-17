@@ -10,7 +10,6 @@ import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Converts a BufferedImage to gcode
@@ -32,9 +31,8 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 	protected int colorChannel = 0;
 
 
-	public ImageConverter(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public ImageConverter(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	/**

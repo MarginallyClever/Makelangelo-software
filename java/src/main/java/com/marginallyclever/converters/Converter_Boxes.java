@@ -12,14 +12,13 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Boxes extends ImageConverter {
-	public Converter_Boxes(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Converter_Boxes(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("BoxGeneratorName");
+		return Translator.get("BoxGeneratorName");
 	}
 
 	/**
@@ -64,7 +63,7 @@ public class Converter_Boxes extends ImageConverter {
 	 */
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
 		img = bw.filter(img);
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.

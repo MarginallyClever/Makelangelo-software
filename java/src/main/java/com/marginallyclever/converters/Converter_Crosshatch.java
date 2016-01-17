@@ -24,11 +24,11 @@ public class Converter_Crosshatch extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return translator.get("Crosshatch");
+		return Translator.get("Crosshatch");
 	}
 
-	public Converter_Crosshatch(Makelangelo gui, MakelangeloRobotSettings mc, Translator ms) {
-		super(gui, mc, ms);
+	public Converter_Crosshatch(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 
@@ -38,7 +38,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, translator, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

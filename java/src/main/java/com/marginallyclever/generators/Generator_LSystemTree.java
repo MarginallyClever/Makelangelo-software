@@ -38,14 +38,13 @@ public class Generator_LSystemTree extends ImageGenerator {
 	float orderScale = 0.76f;
 
 
-	public Generator_LSystemTree(Makelangelo gui, MakelangeloRobotSettings mc,
-			Translator ms) {
-		super(gui, mc, ms);
+	public Generator_LSystemTree(Makelangelo gui, MakelangeloRobotSettings mc) {
+		super(gui, mc);
 	}
 
 	@Override
 	public String getName() {
-		return translator.get("LSystemTreeName");
+		return Translator.get("LSystemTreeName");
 	}
 
 	/**
@@ -72,16 +71,16 @@ public class Generator_LSystemTree extends ImageGenerator {
 			final JTextField field_branches = new JTextField(Integer.toString(numBranches));
 
 			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(translator.get("HilbertCurveOrder")));
+			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
 			panel.add(field_order);
 
-			panel.add(new JLabel(translator.get("HilbertCurveOrderScale")));
+			panel.add(new JLabel(Translator.get("HilbertCurveOrderScale")));
 			panel.add(field_orderScale);
 			
-			panel.add(new JLabel(translator.get("HilbertCurveAngle")));
+			panel.add(new JLabel(Translator.get("HilbertCurveAngle")));
 			panel.add(field_angle);
 
-			panel.add(new JLabel(translator.get("HilbertCurveBranches")));
+			panel.add(new JLabel(Translator.get("HilbertCurveBranches")));
 			panel.add(field_branches);
 
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

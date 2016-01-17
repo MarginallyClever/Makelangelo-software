@@ -44,8 +44,8 @@ public class DialogAbout {
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString(Translator translator, String version) {
-		final String aboutHtmlBeforeVersionNumber = translator.get("AboutHTMLBeforeVersionNumber");
-		final String aboutHmlAfterVersionNumber = translator.get("AboutHTMLAfterVersionNumber");
+		final String aboutHtmlBeforeVersionNumber = Translator.get("AboutHTMLBeforeVersionNumber");
+		final String aboutHmlAfterVersionNumber = Translator.get("AboutHTMLAfterVersionNumber");
 		final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
 		final int versionNumberStringLength = version.length();
 		final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
@@ -94,7 +94,7 @@ public class DialogAbout {
 		final String aboutHtml = getAboutHtmlFromMultilingualString(translator,version);
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
-		final String menuAboutValue = translator.get("MenuAbout");
+		final String menuAboutValue = Translator.get("MenuAbout");
 		if (icon == null) {
 			icon = getImageIcon("resources/logo.png");
 		}
