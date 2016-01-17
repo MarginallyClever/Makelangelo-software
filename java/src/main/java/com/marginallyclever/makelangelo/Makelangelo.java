@@ -112,7 +112,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private MakelangeloRobotPanel robotControlPanel;
 	// Bottom of window
 	public LogPanel logPanel;
-	public StatusBar statusBar;
 
 	
 	public static void main(String[] argv) {
@@ -277,43 +276,37 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 
 		String line;
-		do {
-			// are there any more commands?
-			if( gCode.moreLinesAvailable() == false )  {
-				// end of file
-				// stop robot
-				halt();
-				// bask in the glory
-				sayHooray();
-				return;
-			}
+
+		// are there any more commands?
+		if( gCode.moreLinesAvailable() == false )  {
+			// end of file
+			// stop robot
+			halt();
+			// bask in the glory
+			int x = gCode.getLinesTotal();
+			if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(x, x);
+			cameraViewPanel.setLinesProcessed(x);
 			
-			int lineNumber = gCode.getLinesProcessed();
-			line = gCode.nextLine();
+			soundSystem.playDrawingFinishedSound();
+			
+			return;
+		}
+		
+		int lineNumber = gCode.getLinesProcessed();
+		line = gCode.nextLine();
 
-			if (line.length() > 3) {
-				line = "N" + lineNumber + " " + line;
-				line += robot.generateChecksum(line);
-			}
+		if (line.length() > 3) {
+			line = "N" + lineNumber + " " + line;
+			line += robot.generateChecksum(line);
+		}
+		robot.tweakAndSendLine( line, translator );
 
-			cameraViewPanel.setLinesProcessed(lineNumber);
-			statusBar.setProgress(lineNumber, gCode.getLinesTotal());
-			// loop until we find a line that gets sent to the robot, at which point we'll
-			// pause for the robot to respond.  Also stop at end of file.
-		} while ( robot.tweakAndSendLine( line, translator ) );
+		cameraViewPanel.setLinesProcessed(lineNumber);
+		if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+		// loop until we find a line that gets sent to the robot, at which point we'll
+		// pause for the robot to respond.  Also stop at end of file.
 	}
 
-
-	private void sayHooray() {
-		JOptionPane.showMessageDialog(null,
-				translator.get("Finished") + " " +
-						gCode.getLinesProcessed() +
-						translator.get("LineSegments") + "\n" +
-						statusBar.getElapsed() + "\n" +
-						translator.get("SharePromo")
-				);
-		soundSystem.playDrawingFinishedSound();
-	}
 
 	/**
 	 * stop sending file commands to the robot.
@@ -340,7 +333,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		robot.setRunning(true);
 		cameraViewPanel.setRunning(true);
 		updateMenuBar();
-		statusBar.start();
+		if(robotControlPanel!=null) robotControlPanel.statusBar.start();
 		sendFileCommand();
 	}
 
@@ -540,7 +533,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 		menuBar.removeAll();
 
-
 		// File menu
 		menu = new JMenu(translator.get("MenuMakelangelo"));
 		menu.setMnemonic(KeyEvent.VK_F);
@@ -656,8 +648,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		logPanel = new LogPanel(translator, robot);
 		logPanel.clearLog();
 
-		statusBar = new StatusBar(translator);
-
 		// major layout
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
 		splitLeftRight.add(cameraViewPanel);
@@ -675,8 +665,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		logPanel.setMinimumSize(minimumSize);
 		
 		contentPane.add(splitUpDown, BorderLayout.CENTER);
-
-		contentPane.add(statusBar, BorderLayout.SOUTH);
 
 		return contentPane;
 	}
@@ -756,7 +744,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	    getDrawPanel().setConnected(true);
 
 	    robotControlPanel.updateMachineNumberPanel();
-	    
+		
 	    updateMenuBar();
 	}
 	

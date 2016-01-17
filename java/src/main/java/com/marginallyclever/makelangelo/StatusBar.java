@@ -47,20 +47,24 @@ public class StatusBar extends JPanel {
 
     translator = ms;
 
-    GridBagConstraints c = new GridBagConstraints();
     message = new JLabel();
     bar = new JProgressBar();
-    c.fill = GridBagConstraints.BOTH;
-    c.weightx = 1;
-    //c.anchor=GridBagConstraints.WEST;
-    gridbag.setConstraints(bar, c);
-    this.add(bar);
-    //c.anchor=GridBagConstraints.EAST;
-    c.weightx = 10;
-    c.gridwidth = GridBagConstraints.REMAINDER;
-    gridbag.setConstraints(message, c);
-    this.add(message);
 
+    GridBagConstraints c = new GridBagConstraints();
+	c.gridx = 0;
+	c.gridy = 0;
+	c.weightx = 1;
+	c.weighty = 0;
+	c.fill = GridBagConstraints.HORIZONTAL;
+	c.anchor = GridBagConstraints.NORTHWEST;
+
+	this.add(bar,c);
+    c.gridy++;
+    this.add(message,c);
+    c.gridy++;
+    c.ipady=20;
+    this.add(new JLabel("\n"+translator.get("SharePromo")), c);
+    
     Font f = getFont();
     setFont(f.deriveFont(Font.BOLD, 15));
 
@@ -68,7 +72,7 @@ public class StatusBar extends JPanel {
   }
 
   public void setMessage(String text) {
-    message.setText(" " + text);
+    message.setText(text);
   }
 
   public String getElapsed() {
@@ -76,7 +80,7 @@ public class StatusBar extends JPanel {
   }
 
   public void clear() {
-    setMessage("Ready");
+    setMessage("");
   }
 
   public void start() {

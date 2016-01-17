@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -139,15 +140,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goHome,setHome;
 	private JButton goTop,goBottom,goLeft,goRight,penUp,penDown;
 
+	// speed
 	private JFormattedTextField feedRate;
 	private JButton setFeedRate;
-
 	private JButton disengageMotors;
-	private JPanel dragAndDrive;
-	private JLabel coordinates;
 
+	// etch-a-sketch test
+	private JLabel coordinates;
+	private JPanel dragAndDrive;
 	private boolean mouseInside,mouseOn;
 	double last_x,last_y;
+
+	// status bar
+	public StatusBar statusBar;
 
 
 	@SuppressWarnings("deprecation")
@@ -431,6 +436,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 
 
+		statusBar = new StatusBar(translator);
+		panel.add(statusBar, con1);
+		con1.gridy++;
 
 
 		// always have one extra empty at the end to push everything up.
@@ -824,7 +832,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			gui.updateMenuBar();
 		}
 
-		gui.statusBar.clear();
+		statusBar.clear();
 	}
 
 	protected boolean chooseImageConversionOptions() {
@@ -882,7 +890,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			gui.gCode.load(filename);
 			Log.message(gui.gCode.estimateCount + translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
 					+ translator.get("Centimeters") + "\n" + translator.get("EstimatedTime")
-					+ gui.statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
+					+ statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
 		} catch (IOException e) {
 			Log.error(translator.get("FileNotOpened") + e.getLocalizedMessage());
 			gui.updateMenuBar();

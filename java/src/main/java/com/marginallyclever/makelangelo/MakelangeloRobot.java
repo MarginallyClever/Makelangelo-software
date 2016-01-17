@@ -267,10 +267,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 * removes comments, processes commands drawbot shouldn't have to handle.
 	 *
 	 * @param line command to send
-	 * @return true if the robot is ready for another command to be sent.
 	 */
-	public boolean tweakAndSendLine(String line,Translator translator) {
-		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return false;
+	public void tweakAndSendLine(String line,Translator translator) {
+		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return;
 
 		// tool change request?
 		String[] tokens = line.split("(\\s|;)");
@@ -286,8 +285,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// send relevant part of line to the robot
 		sendLineToRobot(line);
-
-		return false;
 	}
 
 
