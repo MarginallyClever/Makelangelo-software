@@ -20,10 +20,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -159,7 +161,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	@Override
 	public boolean generate(String dest) {
 		final JTextArea text = new JTextArea(lastMessage, 6, 60);
-		final JTextField size = new JTextField(Integer.toString(lastSize));
+		final JFormattedTextField size = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		size.setValue(lastSize);
 		final JComboBox<String> fontChoices = new JComboBox<String>(fontNames);
 		fontChoices.setSelectedIndex(lastFont);
 		
@@ -187,12 +190,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			lastSize = Integer.parseInt(size.getText());
 			lastFont = fontChoices.getSelectedIndex();
 			createMessage(fontNames[lastFont],lastSize,lastMessage, dest);
-
-			//renderFont(gl2,"TimesRoman","مرحبا بالعالم",18");
-			//renderFont(gl2,"TimesRoman","Makelangelo",36);
-
-			// TODO Move to GUI?
-			Log.write("green","Completed.");
+			//createMessage("TimesRoman",مرحبا بالعالم",18");
+			//createMessage("TimesRoman",36,"Makelangelo");
 
 			return true;
 		}
