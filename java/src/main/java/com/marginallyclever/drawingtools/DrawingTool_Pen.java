@@ -7,11 +7,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,12 +25,13 @@ import com.marginallyclever.makelangelo.Translator;
 public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JDialog dialog;
 	protected JPanel panel;
-	protected JTextField penDiameter;
-	protected JTextField penFeedRate;
+	
+	protected JFormattedTextField penDiameter;
+	protected JFormattedTextField penFeedRate;
+	protected JFormattedTextField penUp;
+	protected JFormattedTextField penDown;
+	protected JFormattedTextField penZRate;
 
-	protected JTextField penUp;
-	protected JTextField penDown;
-	protected JTextField penZRate;
 	protected JButton buttonTestUp;
 	protected JButton buttonTestDown;
 	protected JButton buttonSave;
@@ -67,13 +70,22 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	    JPanel p = new JPanel(new GridBagLayout());
 	    panel.add(p);
 	    
-		penDiameter = new JTextField(Float.toString(getDiameter()), 5);
-		penFeedRate = new JTextField(Float.toString(feedRate), 5);
-		penUp = new JTextField(Float.toString(zOff), 5);
-		penDown = new JTextField(Float.toString(zOn), 5);
-		penZRate = new JTextField(Float.toString(zRate), 5);
+	    NumberFormat nFloat = NumberFormat.getNumberInstance();
+	    nFloat.setMaximumFractionDigits(1);
+	    
+		penDiameter = new JFormattedTextField(nFloat);
+		penFeedRate = new JFormattedTextField(nFloat);
+		penUp = new JFormattedTextField(nFloat);
+		penDown = new JFormattedTextField(nFloat);
+		penZRate = new JFormattedTextField(nFloat);
 		buttonTestUp = new JButton(translator.get("penToolTest"));
 		buttonTestDown = new JButton(translator.get("penToolTest"));
+
+		penDiameter.setValue(getDiameter());
+		penFeedRate.setValue(feedRate);
+		penUp.setValue(zOff);
+		penDown.setValue(zOn);
+		penZRate.setValue(zRate);
 
 	    Dimension s = buttonTestUp.getPreferredSize();
 	    s.width = 80;
@@ -170,11 +182,11 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	}
 	
 	public void save() {
-		setDiameter(Float.valueOf(penDiameter.getText()));
-		feedRate = Float.valueOf(penFeedRate.getText());
-		zRate = Float.valueOf(penZRate.getText());
-		zOff = Float.valueOf(penUp.getText());
-		zOn = Float.valueOf(penDown.getText());
+		setDiameter(((Number)penDiameter.getValue()).floatValue());
+		feedRate = ((Number)penFeedRate.getValue()).floatValue();
+		zRate = ((Number)penZRate.getValue()).floatValue();
+		zOff = ((Number)penUp.getValue()).floatValue();
+		zOn = ((Number)penDown.getValue()).floatValue();
 		robot.settings.saveConfig();
 	}
 

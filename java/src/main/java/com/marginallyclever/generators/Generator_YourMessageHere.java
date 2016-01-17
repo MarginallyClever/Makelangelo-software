@@ -4,7 +4,6 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
@@ -26,12 +25,10 @@ import java.util.StringTokenizer;
 
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
@@ -232,7 +229,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 				tool.writeOn(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
-				for(int i=0;i<10;++i) {
+				for(int i=0;i<8;++i) {
 					float t = (float)i/10.0f;
 					// p = a0 + a1*t + a2 * tt + a3*ttt;
 					float tt=t*t;
@@ -246,7 +243,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 				coords2[1] = coords[5];
 				break;
 			case PathIterator.SEG_QUADTO:
-				for(int i=0;i<10;++i) {
+				for(int i=0;i<8;++i) {
 					float t = (float)i/10.0f;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
 					float u = (1.0f-t);

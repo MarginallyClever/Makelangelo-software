@@ -7,11 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -28,7 +30,7 @@ implements ActionListener, KeyListener {
 	private static final long serialVersionUID = 519519372661103125L;
 
 	protected JComboBox<String> paperSizes;
-	protected JTextField pw, ph;
+	protected JFormattedTextField pw, ph;
 
 	MakelangeloRobot robot;
 
@@ -45,8 +47,11 @@ implements ActionListener, KeyListener {
 		paperSizes = new JComboBox<>(robot.settings.commonPaperSizes);
 		paperSizes.setSelectedIndex(robot.settings.getCurrentPaperSizeChoice( robot.settings.getPaperWidth()*10, robot.settings.getPaperHeight()*10 ));
 
-		pw = new JTextField(Double.toString(robot.settings.getPaperWidth()*10));
-		ph = new JTextField(Double.toString(robot.settings.getPaperHeight()*10));
+		NumberFormat nFloat = NumberFormat.getIntegerInstance();
+		pw = new JFormattedTextField(nFloat);
+		pw.setValue(robot.settings.getPaperWidth()*10);
+		ph = new JFormattedTextField(nFloat);
+		ph.setValue(robot.settings.getPaperHeight()*10);
 
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
@@ -86,8 +91,8 @@ implements ActionListener, KeyListener {
 		double w=0;
 		double h=0;
 		try {
-			w = Double.parseDouble(pw.getText());
-			h = Double.parseDouble(ph.getText());
+			w = ((Number)pw.getValue()).doubleValue();
+			h = ((Number)ph.getValue()).doubleValue();
 		} catch(Exception err) {
 			err.getMessage();
 		}
