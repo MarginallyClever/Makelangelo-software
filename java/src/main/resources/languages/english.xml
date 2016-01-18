@@ -546,7 +546,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value>Save results as...</value>
+		<value>Save as...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 

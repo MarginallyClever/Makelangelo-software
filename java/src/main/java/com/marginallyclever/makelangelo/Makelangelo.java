@@ -163,7 +163,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	protected void adjustGraphics() {
 		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
-		final JPanel driver = new JPanel(new GridBagLayout());
+		final JPanel panel = new JPanel(new GridBagLayout());
 
 		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
 		//allow_metrics.setSelected(allowMetrics);
@@ -178,9 +178,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
 		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
 
-		final JButton cancel = new JButton(Translator.get("Cancel"));
-		final JButton save = new JButton(Translator.get("Save"));
-
 		GridBagConstraints c = new GridBagConstraints();
 		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 
@@ -190,39 +187,28 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		c.gridwidth = 1;
 		c.gridx = 1;
 		c.gridy = y;
-		driver.add(show_pen_up, c);
+		panel.add(show_pen_up, c);
 		y++;
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 1;
 		c.gridx = 1;
 		c.gridy = y;
-		driver.add(draw_all_while_running, c);
+		panel.add(draw_all_while_running, c);
 		y++;
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 1;
 		c.gridx = 1;
 		c.gridy = y;
-		driver.add(antialias_on, c);
+		panel.add(antialias_on, c);
 		y++;
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 1;
 		c.gridx = 1;
 		c.gridy = y;
-		driver.add(speed_over_quality, c);
+		panel.add(speed_over_quality, c);
 		y++;
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 2;
-		c.gridy = y;
-		driver.add(save, c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 3;
-		c.gridy = y;
-		driver.add(cancel, c);
 		
-		int result = JOptionPane.showConfirmDialog(null, this.mainframe, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(this.mainframe, panel, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			//allowMetrics = allow_metrics.isSelected();
 			graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());

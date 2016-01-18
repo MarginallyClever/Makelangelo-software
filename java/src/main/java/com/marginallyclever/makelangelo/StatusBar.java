@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -65,6 +66,9 @@ public class StatusBar extends JPanel {
     c.ipady=20;
     this.add(new JLabel("\n"+Translator.get("SharePromo")), c);
     
+    Dimension preferredSize = bar.getPreferredSize();
+    preferredSize.setSize(preferredSize.getWidth(), preferredSize.getHeight()*2);
+    bar.setPreferredSize(preferredSize);
     Font f = getFont();
     setFont(f.deriveFont(Font.BOLD, 15));
 
