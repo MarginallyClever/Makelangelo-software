@@ -32,7 +32,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -412,6 +411,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		robot.getConnection().closeConnection();
 		robot.setConnection(null);
 		cameraViewPanel.setConnected(false);
+		robotControlPanel.updateMachineNumberPanel();
 		updateMenuBar();
 		soundSystem.playDisconnectSound();
 

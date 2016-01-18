@@ -10,102 +10,113 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {
-  static final long serialVersionUID = 1;
+	static final long serialVersionUID = 1;
 
-  long t_start;
-  protected DecimalFormat fmt = new DecimalFormat("#0.00");
-  protected String sSoFar = "so far: ";
-  protected String sRemaining = " remaining: ";
-  protected String sElapsed = "";
-  protected Translator translator;
-  protected JLabel message;
-  protected JProgressBar bar;
+	long t_start;
+	protected DecimalFormat fmt = new DecimalFormat("#0.00");
+	protected String sSoFar = "so far: ";
+	protected String sRemaining = " remaining: ";
+	protected String sElapsed = "";
+	protected Translator translator;
+	protected JLabel mFinished;
+	protected JLabel mExactly;
+	protected JLabel mRemaining;
+	protected JProgressBar bar;
 
-  public String formatTime(long millis) {
-    long s = millis / 1000;
-    long m = s / 60;
-    long h = m / 60;
-    m %= 60;
-    s %= 60;
+	public String formatTime(long millis) {
+		long s = millis / 1000;
+		long m = s / 60;
+		long h = m / 60;
+		m %= 60;
+		s %= 60;
 
-    String elapsed = "";
-    if (h > 0) elapsed += h + "h";
-    if (h > 0 || m > 0) elapsed += m + "m";
-    elapsed += s + "s ";
+		String elapsed = "";
+		if (h > 0) elapsed += h + "h";
+		if (h > 0 || m > 0) elapsed += m + "m";
+		elapsed += s + "s ";
 
-    return elapsed;
-  }
+		return elapsed;
+	}
 
 
-  public StatusBar(Translator ms) {
-    super();
-    this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-    GridBagLayout gridbag = new GridBagLayout();
-    setLayout(gridbag);
+	public StatusBar(Translator ms) {
+		super();
+		this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+		GridBagLayout gridbag = new GridBagLayout();
+		setLayout(gridbag);
 
-    translator = ms;
+		translator = ms;
 
-    message = new JLabel();
-    bar = new JProgressBar();
+		mFinished = new JLabel("", SwingConstants.LEFT);
+		mExactly = new JLabel("", SwingConstants.CENTER);
+		mRemaining = new JLabel("", SwingConstants.RIGHT);
 
-    GridBagConstraints c = new GridBagConstraints();
-	c.gridx = 0;
-	c.gridy = 0;
-	c.weightx = 1;
-	c.weighty = 0;
-	c.fill = GridBagConstraints.HORIZONTAL;
-	c.anchor = GridBagConstraints.NORTHWEST;
+		bar = new JProgressBar();
 
-	this.add(bar,c);
-    c.gridy++;
-    this.add(message,c);
-    c.gridy++;
-    c.ipady=20;
-    this.add(new JLabel("\n"+Translator.get("SharePromo")), c);
-    
-    Dimension preferredSize = bar.getPreferredSize();
-    preferredSize.setSize(preferredSize.getWidth(), preferredSize.getHeight()*2);
-    bar.setPreferredSize(preferredSize);
-    Font f = getFont();
-    setFont(f.deriveFont(Font.BOLD, 15));
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.NORTHWEST;
 
-    clear();
-  }
+		c.gridwidth=3;
+		this.add(bar,c);
+		c.gridwidth=1;
+		c.gridy++;
+		this.add(mFinished,c);
+		c.gridx++;
+		this.add(mExactly,c);
+		c.gridx++;
+		this.add(mRemaining,c);
+		c.gridx=0;
+		c.gridy++;
+		c.ipady=20;
+		c.gridwidth=3;
+		this.add(new JLabel("\n"+Translator.get("SharePromo")), c);
 
-  public void setMessage(String text) {
-    message.setText(text);
-  }
+		Dimension preferredSize = bar.getPreferredSize();
+		preferredSize.setSize(preferredSize.getWidth(), preferredSize.getHeight()*2);
+		bar.setPreferredSize(preferredSize);
+		Font f = getFont();
+		setFont(f.deriveFont(Font.BOLD, 15));
 
-  public String getElapsed() {
-    return sElapsed;
-  }
+		clear();
+	}
 
-  public void clear() {
-    setMessage("");
-  }
+	public String getElapsed() {
+		return sElapsed;
+	}
 
-  public void start() {
-    t_start = System.currentTimeMillis();
-  }
+	public void clear() {
+		mFinished.setText("");
+		mExactly.setText("");
+		mRemaining.setText("");
+	}
 
-  public void setProgress(long sofar, long total) {
-    sElapsed = "";
-    if (total > 0) {
-      bar.setMaximum((int) total);
-      bar.setValue((int) sofar);
+	public void start() {
+		t_start = System.currentTimeMillis();
+	}
 
-      long t_draw_now = (sofar > 0) ? System.currentTimeMillis() - t_start : 0;
-      long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
-      long remaining = total_time - t_draw_now;
-      sElapsed = Translator.get("StatusSoFar") + formatTime(t_draw_now) +
-          Translator.get("StatusRemaining") + formatTime(remaining);
-    }
+	public void setProgress(long sofar, long total) {
+		if (total <= 0) return;
+		
+		bar.setMaximum((int) total);
+		bar.setValue((int) sofar);
 
-    setMessage("% (" + sofar + "/" + total + ") " + sElapsed);
-  }
+		long t_draw_now = (sofar > 0) ? System.currentTimeMillis() - t_start : 0;
+		long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
+		long remaining = total_time - t_draw_now;
+
+		mFinished.setText(formatTime(t_draw_now));
+		mExactly.setText(sofar + "/" + total);
+		mRemaining.setText(formatTime(remaining));
+	}
 }
 
 /**
