@@ -32,7 +32,6 @@ import javax.swing.JTextArea;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -65,8 +64,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	private static Font [] fontList;
 	private static String [] fontNames;
 
-	public Generator_YourMessageHere(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Generator_YourMessageHere(MakelangeloRobotSettings mc) {
+		super(mc);
 		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();

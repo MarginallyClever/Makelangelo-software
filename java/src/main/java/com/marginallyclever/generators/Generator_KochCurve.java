@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_KochCurve extends ImageGenerator {
@@ -33,8 +32,8 @@ public class Generator_KochCurve extends ImageGenerator {
 
 	float maxSize;
 
-	public Generator_KochCurve(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Generator_KochCurve(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -22,8 +21,8 @@ public class Converter_Pulse extends ImageConverter {
 	private float blockScale = 6.0f;
 	private int direction = 0;
 
-	public Converter_Pulse(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Pulse(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -78,7 +77,7 @@ public class Converter_Pulse extends ImageConverter {
 	 * @throws IOException couldn't open output file
 	 */
 	private void convertNow(BufferedImage img,Writer out) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

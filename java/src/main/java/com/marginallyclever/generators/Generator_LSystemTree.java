@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_LSystemTree extends ImageGenerator {
@@ -38,8 +37,8 @@ public class Generator_LSystemTree extends ImageGenerator {
 	float orderScale = 0.76f;
 
 
-	public Generator_LSystemTree(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Generator_LSystemTree(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override

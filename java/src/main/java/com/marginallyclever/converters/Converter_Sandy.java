@@ -14,7 +14,6 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -22,8 +21,8 @@ public class Converter_Sandy extends ImageConverter {
 	private float blockScale=50.0f;
 	private int direction=0;
 
-	public Converter_Sandy(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Sandy(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -77,7 +76,7 @@ public class Converter_Sandy extends ImageConverter {
 	 */
 	private void convertNow(BufferedImage img,Writer out) throws IOException {
 		// make black & white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

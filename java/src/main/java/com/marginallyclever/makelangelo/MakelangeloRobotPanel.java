@@ -167,30 +167,30 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageConverters() {
 		imageConverters = new ArrayList<ImageConverter>();
-		imageConverters.add(new Converter_Boxes(gui, robot.settings));
-		// imageConverters.add(new Converter_ColorBoxes(gui, robot.settings,
+		imageConverters.add(new Converter_Boxes(robot.settings));
+		// imageConverters.add(new Converter_ColorBoxes(robot.settings,
 		// translator));
-		imageConverters.add(new Converter_Crosshatch(gui, robot.settings));
+		imageConverters.add(new Converter_Crosshatch(robot.settings));
 		// imageConverters.add(new Filter_GeneratorColorFloodFill(gui,
 		// robot.settings)); // not ready for public consumption
-		imageConverters.add(new Converter_Pulse(gui, robot.settings));
-		imageConverters.add(new Converter_Sandy(gui, robot.settings));
-		imageConverters.add(new Converter_Scanline(gui, robot.settings));
-		imageConverters.add(new Converter_Spiral(gui, robot.settings));
-		imageConverters.add(new Converter_VoronoiStippling(gui, robot.settings));
-		imageConverters.add(new Converter_VoronoiZigZag(gui, robot.settings));
-		imageConverters.add(new Converter_ZigZag(gui, robot.settings));
+		imageConverters.add(new Converter_Pulse(robot.settings));
+		imageConverters.add(new Converter_Sandy(robot.settings));
+		imageConverters.add(new Converter_Scanline(robot.settings));
+		imageConverters.add(new Converter_Spiral(robot.settings));
+		imageConverters.add(new Converter_VoronoiStippling(robot.settings));
+		imageConverters.add(new Converter_VoronoiZigZag(robot.settings));
+		imageConverters.add(new Converter_ZigZag(robot.settings));
 	}
 
 	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
 	protected void loadImageGenerators() {
 		imageGenerators = new ArrayList<ImageGenerator>();
-		imageGenerators.add(new Generator_Dragon(gui, robot.settings));
-		imageGenerators.add(new Generator_HilbertCurve(gui, robot.settings));
-		imageGenerators.add(new Generator_KochCurve(gui, robot.settings));
-		imageGenerators.add(new Generator_LSystemTree(gui, robot.settings));
-		imageGenerators.add(new Generator_Maze(gui, robot.settings));
-		imageGenerators.add(new Generator_YourMessageHere(gui, robot.settings));
+		imageGenerators.add(new Generator_Dragon(robot.settings));
+		imageGenerators.add(new Generator_HilbertCurve(robot.settings));
+		imageGenerators.add(new Generator_KochCurve(robot.settings));
+		imageGenerators.add(new Generator_LSystemTree(robot.settings));
+		imageGenerators.add(new Generator_Maze(robot.settings));
+		imageGenerators.add(new Generator_YourMessageHere(robot.settings));
 	}
 
 
@@ -751,8 +751,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.settings.saveConfig();
 
 			String destinationFile = gui.getTempDestinationFile();
+			chosenGenerator.setDrawPanel(gui.getDrawPanel());
 			gui.getDrawPanel().setDecorator(chosenGenerator);
 			chosenGenerator.generate(destinationFile);
+			chosenGenerator.setDrawPanel(null);
 			gui.getDrawPanel().setDecorator(null);
 
 			loadGCode(destinationFile);
@@ -760,6 +762,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 			// Force update of graphics layout.
 			gui.updateMachineConfig();
+			gui.getDrawPanel().repaintNow();
 		}
 	}
 
@@ -1187,13 +1190,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					converter.setParent(this);
 					converter.setProgressMonitor(pm);
 
+					converter.setDrawPanel(gui.getDrawPanel());
 					gui.getDrawPanel().setDecorator(converter);
 					converter.convert(img, out);
+					converter.setDrawPanel(null);
 					gui.getDrawPanel().setDecorator(null);
 
 					if (robot.settings.shouldSignName()) {
 						// Sign name
-						Generator_YourMessageHere ymh = new Generator_YourMessageHere(gui, robot.settings);
+						Generator_YourMessageHere ymh = new Generator_YourMessageHere(robot.settings);
 						ymh.signName(out);
 					}
 					gui.updateMachineConfig();
@@ -1214,6 +1219,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				Log.message(Translator.get("Finished"));
 				loadGCode(destinationFile);
 				gui.soundSystem.playConversionFinishedSound();
+				gui.getDrawPanel().repaintNow();
 			}
 		};
 

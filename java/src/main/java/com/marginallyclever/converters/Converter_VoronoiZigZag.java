@@ -21,7 +21,6 @@ import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
@@ -64,8 +63,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	private long time_limit=10*60*1000;  // 10 minutes
 
 
-	public Converter_VoronoiZigZag(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_VoronoiZigZag(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -89,7 +88,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 			MAX_CELLS = Integer.parseInt(text_cells.getText());
 
 			// make black & white
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI,machine,255);
+			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 			img = bw.filter(img);
 
 			src_img = img;
@@ -182,7 +181,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 			//once|=transposeBackwardTest();
 
 			once|=flipTests();
-			mainGUI.getDrawPanel().repaintNow();
+			if( drawPanel != null ) drawPanel.repaintNow();
 			gen++;
 			Log.write("green","Generation "+gen);
 		}
@@ -439,8 +438,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 				tessellateVoronoiDiagram();
 				lock.unlock();
 				adjustCentroids();
-
-				mainGUI.getDrawPanel().repaintNow();
+				
+				if( drawPanel != null ) drawPanel.repaintNow();
 
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while(generation<MAX_GENERATIONS);

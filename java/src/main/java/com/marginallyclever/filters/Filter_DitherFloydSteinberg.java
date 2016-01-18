@@ -2,9 +2,6 @@ package com.marginallyclever.filters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
-
 /**
  * Floyd/Steinberg dithering
  *
@@ -13,11 +10,6 @@ import com.marginallyclever.makelangelo.Makelangelo;
  */
 public class Filter_DitherFloydSteinberg extends ImageFilter {
   private long tone;
-
-
-  public Filter_DitherFloydSteinberg(Makelangelo gui, MakelangeloRobotSettings mc) {
-    super(gui, mc);
-  }
 
 
   private int quantizeColor(int original) {
@@ -48,7 +40,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = quantizeColor(oldPixel);
       // pixel[x][y] := newpixel
-      img.setRGB(x, y, encode(newPixel));
+      img.setRGB(x, y, ImageFilter.encode(newPixel));
       // quant_error := oldpixel - newpixel
       quant_error = oldPixel - newPixel;
       // pixel[x+1][y  ] += 7/16 * quant_error

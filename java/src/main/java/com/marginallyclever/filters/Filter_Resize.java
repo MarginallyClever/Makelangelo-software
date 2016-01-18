@@ -1,14 +1,9 @@
 package com.marginallyclever.filters;
 
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
-
 
 /**
  * Resize and flip horizontally if needed.
@@ -17,20 +12,21 @@ import com.marginallyclever.makelangelo.Makelangelo;
  */
 public class Filter_Resize extends ImageFilter {
 	protected int maxWidth, maxHeight;
+	public boolean flipHorizontally;
+	public double targetWidth;
+	public double targetHeight;
 
-
-	public Filter_Resize(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Filter_Resize() {
 		maxWidth = 1000;
 		maxHeight = 1000;
+		flipHorizontally = false;
 	}
 
-	public Filter_Resize(Makelangelo gui, MakelangeloRobotSettings mc, int max_width, int max_height) {
-		super(gui, mc);
+	public Filter_Resize(int max_width, int max_height) {
 		maxWidth = max_width;
 		maxHeight = max_height;
-		//maxWidth=1000;
-		//maxHeight=1000;
+		targetWidth=1000;
+		targetHeight=1000;
 	}
 
 
@@ -42,7 +38,7 @@ public class Filter_Resize extends ImageFilter {
 					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			g.setBackground(Color.WHITE);
 			g.clearRect(0, 0, width, height);
-			if (machine.isReverseForGlass()) {
+			if (flipHorizontally) {
 				g.drawImage(img, width, 0, 0, height, 0, 0, img.getWidth(), img.getHeight(), null);
 			} else {
 				g.drawImage(img, 0, 0, width, height, null);
@@ -59,15 +55,12 @@ public class Filter_Resize extends ImageFilter {
 		int h = img.getHeight();
 
 		// cap the max_w and max_h so that enormous drawbot images don't break the software.
-		double paper_w = machine.getPaperWidth();
-		double paper_h = machine.getPaperHeight();
-
 		int max_w = maxWidth;
 		int max_h = maxHeight;
-		if (paper_w > paper_h) {
-			max_h *= paper_h / paper_w;
+		if (targetWidth > targetHeight) {
+			max_h *= targetHeight / targetWidth;
 		} else {
-			max_w *= paper_w / paper_h;
+			max_w *= targetWidth / targetHeight;
 		}
 
 		// adjust up

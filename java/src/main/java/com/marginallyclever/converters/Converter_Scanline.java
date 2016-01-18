@@ -7,13 +7,12 @@ import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Scanline extends ImageConverter {
-	public Converter_Scanline(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Scanline(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -29,7 +28,7 @@ public class Converter_Scanline extends ImageConverter {
 	@Override
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 

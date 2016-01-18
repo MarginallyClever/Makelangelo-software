@@ -7,7 +7,6 @@ import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -27,8 +26,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
-	public Converter_Crosshatch(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Crosshatch(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 
@@ -38,7 +37,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

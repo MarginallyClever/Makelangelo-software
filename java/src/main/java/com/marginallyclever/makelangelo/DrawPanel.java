@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import javax.swing.event.MouseInputListener;
@@ -61,6 +62,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	protected MakelangeloRobotSettings machine;
 
+	private ReentrantLock lock = new ReentrantLock();
+	
 	// optimization - turn gcode into vectors once on load, draw vectors after that.
 	private enum NodeType {
 		COLOR, POS, TOOL
@@ -74,7 +77,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		NodeType type;
 	}
 
-	ArrayList<DrawPanelNode> fast_nodes = new ArrayList<DrawPanelNode>();
+	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
 
 
 	public DrawPanel(MakelangeloRobotSettings mc) {
@@ -219,9 +222,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		repaint();
 	}
 
-	public void emptyNodeBuffer() {
-		fast_nodes.clear();
-		optimizeNodes();
+	private void emptyNodeBuffer() {
+		while(lock.isLocked());
+		lock.lock();
+		fastNodes.clear();
+		lock.unlock();
 	}
 
 
@@ -584,52 +589,59 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 
-
 	private void paintGcode( GL2 gl2 ) {
-		optimizeNodes();
-
-		DrawingTool tool = machine.getTool(0);
-		gl2.glColor3f(0, 0, 0);
-
-		// draw image
-		if (fast_nodes.size() > 0) {
-			// draw the nodes
-			Iterator<DrawPanelNode> nodes = fast_nodes.iterator();
-			while (nodes.hasNext()) {
-				DrawPanelNode n = nodes.next();
-
-				if (running) {
-					if (n.line_number < linesProcessed) {
-						gl2.glColor3f(1, 0, 0);
-						//g2d.setColor(Color.RED);
-						if(n.type==NodeType.POS) {
-							gondolaX=n.x1;
-							gondolaY=n.y1;
+		if(lock.isLocked()) return;
+		
+		lock.lock();
+		try {
+			optimizeNodes();
+	
+			DrawingTool tool = machine.getTool(0);
+			gl2.glColor3f(0, 0, 0);
+	
+			// draw image
+			if (fastNodes.size() > 0) {
+				// draw the nodes
+				Iterator<DrawPanelNode> nodes = fastNodes.iterator();
+				while (nodes.hasNext()) {
+					DrawPanelNode n = nodes.next();
+	
+					if (running) {
+						if (n.line_number < linesProcessed) {
+							gl2.glColor3f(1, 0, 0);
+							//g2d.setColor(Color.RED);
+							if(n.type==NodeType.POS) {
+								gondolaX=n.x1;
+								gondolaY=n.y1;
+							}
+						} else if (n.line_number <= linesProcessed + lookAhead) {
+							gl2.glColor3f(0, 1, 0);
+							//g2d.setColor(Color.GREEN);
+						} else if (prefs.getBoolean("Draw all while running", true) == false) {
+							break;
 						}
-					} else if (n.line_number <= linesProcessed + lookAhead) {
-						gl2.glColor3f(0, 1, 0);
-						//g2d.setColor(Color.GREEN);
-					} else if (prefs.getBoolean("Draw all while running", true) == false) {
+					}
+	
+					switch (n.type) {
+					case TOOL:
+						tool = machine.getTool(n.tool_id);
+						gl2.glLineWidth(tool.getDiameter() * (float) this.cameraZoom / 10.0f);
+						break;
+					case COLOR:
+						if (!running || n.line_number > linesProcessed + lookAhead) {
+							//g2d.setColor(n.c);
+							gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
+						}
+						break;
+					default:
+						tool.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
 						break;
 					}
 				}
-
-				switch (n.type) {
-				case TOOL:
-					tool = machine.getTool(n.tool_id);
-					gl2.glLineWidth(tool.getDiameter() * (float) this.cameraZoom / 10.0f);
-					break;
-				case COLOR:
-					if (!running || n.line_number > linesProcessed + lookAhead) {
-						//g2d.setColor(n.c);
-						gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
-					}
-					break;
-				default:
-					tool.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
-					break;
-				}
 			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -641,7 +653,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		n.y1 = y1;
 		n.y2 = y2;
 		n.type = NodeType.POS;
-		fast_nodes.add(n);
+
+		fastNodes.add(n);
 	}
 
 	private void addNodeColor(int i, Color c) {
@@ -649,7 +662,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		n.line_number = i;
 		n.c = c;
 		n.type = NodeType.COLOR;
-		fast_nodes.add(n);
+
+		fastNodes.add(n);
 	}
 
 	private void addNodeTool(int i, int tool_id) {
@@ -657,16 +671,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		n.line_number = i;
 		n.tool_id = tool_id;
 		n.type = NodeType.TOOL;
-		fast_nodes.add(n);
 
+		fastNodes.add(n);
 	}
 
 	private void optimizeNodes() {
 		if (instructions == null) return;
 		if (instructions.changed == false) return;
 		instructions.changed = false;
-
-		emptyNodeBuffer();
 
 		DrawingTool tool = machine.getTool(0);
 

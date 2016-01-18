@@ -8,7 +8,6 @@ import java.io.Writer;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -26,8 +25,8 @@ public class Converter_Spiral extends ImageConverter {
 	}
 
 
-	public Converter_Spiral(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Spiral(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 
@@ -53,7 +52,7 @@ public class Converter_Spiral extends ImageConverter {
 	@Override
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		imageStart(img, out);

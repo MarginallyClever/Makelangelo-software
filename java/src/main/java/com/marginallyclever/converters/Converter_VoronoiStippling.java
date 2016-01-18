@@ -19,7 +19,6 @@ import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiCellEdge;
@@ -55,8 +54,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	private double[] yValuesIn = null;
 
 
-	public Converter_VoronoiStippling(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_VoronoiStippling(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -217,7 +216,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				//}
 				adjustCentroids();
 
-				mainGUI.getDrawPanel().repaintNow();
+				if(drawPanel != null) drawPanel.repaintNow();
 
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while (generation < MAX_GENERATIONS);

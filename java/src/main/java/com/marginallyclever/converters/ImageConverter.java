@@ -7,8 +7,8 @@ import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.filters.ImageFilter;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 
 /**
@@ -31,8 +31,8 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 	protected int colorChannel = 0;
 
 
-	public ImageConverter(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public ImageConverter(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 		case 3:
 			return c.getBlue();
 		default:
-			return decode(c);
+			return ImageFilter.decode(c);
 		}
 	}
 

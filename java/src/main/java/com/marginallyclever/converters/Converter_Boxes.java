@@ -7,13 +7,12 @@ import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Boxes extends ImageConverter {
-	public Converter_Boxes(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public Converter_Boxes(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class Converter_Boxes extends ImageConverter {
 	 */
 	public boolean convert(BufferedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(mainGUI, machine, 255);
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.

@@ -3,7 +3,6 @@ package com.marginallyclever.generators;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 
 /**
@@ -12,8 +11,8 @@ import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
  *
  */
 public abstract class ImageGenerator extends ImageManipulator implements DrawPanelDecorator {
-	public ImageGenerator(Makelangelo gui, MakelangeloRobotSettings mc) {
-		super(gui, mc);
+	public ImageGenerator(MakelangeloRobotSettings mc) {
+		super(mc);
 	}
 
 	/**
