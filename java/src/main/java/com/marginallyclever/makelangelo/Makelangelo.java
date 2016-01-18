@@ -609,7 +609,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		cameraViewPanel = new DrawPanel(robot.settings);
+		cameraViewPanel = new DrawPanel();
+		cameraViewPanel.setMachine(robot.settings);
 		cameraViewPanel.setGCode(gCode);
 
 		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);

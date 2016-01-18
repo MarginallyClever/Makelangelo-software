@@ -80,12 +80,16 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
 
 
-	public DrawPanel(MakelangeloRobotSettings mc) {
+	public DrawPanel() {
 		super();
-		machine = mc;
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addGLEventListener(this);
+	}
+	
+	
+	void setMachine(MakelangeloRobotSettings mc) {
+		machine = mc;
 	}
 
 
@@ -570,6 +574,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	// TODO move all robot drawing to a class?
 	public void render(GL2 gl2) {
+		if(machine==null) return;
+		
 		paintBackground(gl2);
 		paintCamera(gl2);
 
