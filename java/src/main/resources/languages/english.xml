@@ -409,7 +409,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="http://makelangelo.com/#productDescription">http://makelangelo.com/</a> to get the new hotness.</html></body>]]></value>
+		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://github.com/MarginallyClever/Makelangelo/releases">https://github.com/MarginallyClever/Makelangelo/releases</a> to get the new hotness.</html></body>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
@@ -809,25 +809,15 @@ to check yourself.</value>
 	<string>
 		<key>AboutHTMLAfterVersionNumber</key>
 		<value><![CDATA[
-</h1>
+	</h1>
       <h3>
-        <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
+        <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
-        <p>
-          Created by Dan Royer (<a href="mailto:dan@marginallyclever.com">dan@marginallyclever.com</a>).<br>
-          Additional contributions by Joseph Cottam,
-           <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>,
-            and Mark Raynsford.
-        </p>
-        <br>
-        <p>
-          To get the latest version please visit<br>
-          <a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a>
-        </p>
-        <br>
-        <p>
-          This program is open source and free.  As it should be!
-        </p>
+        <p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.<br>
+        Additional contributions by Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, and Mark Raynsford.</p>
+        <p>To get the latest version please visit<br>
+          <a href='https://github.com/MarginallyClever/Makelangelo/releases'>https://github.com/MarginallyClever/Makelangelo/releases</a></p>
+        <p>This program is open source and free, as it should be!<br>Show your support at <a href='https://www.patreon.com/imakerobots'>https://www.patreon.com/imakerobots</a></p>
       </body>
     </html>
     ]]>

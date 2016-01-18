@@ -455,7 +455,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	// write cell centroids to gcode.
 	protected void writeOutCells(Writer out) throws IOException {
 		if(graphEdges != null ) {
-			Log.write("green","Writing gcode to "+dest);
+			Log.write("green","Writing gcode.");
 			imageStart(src_img, out);
 
 			// set absolute coordinates
