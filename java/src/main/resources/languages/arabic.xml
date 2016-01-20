@@ -1,0 +1,899 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+  <language>
+    <meta>
+      <name>العربية</name>
+      <author>Adeeb Haddad (adeeb.ak.haddad@gmail.com)</author>
+    </meta>
+
+    <string>
+      <key>Cancel</key>
+      <value>إلغاء</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>Save</key>
+      <value>حفظ</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>Load</key>
+      <value>تحميل</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>CouldNotFind</key>
+      <value> لم يتم العثور على الملف</value>
+      <hint>as in, "could not find FILEX".  keep the space at the end.</hint>
+    </string>
+    <string>
+      <key>MachineWidth</key>
+      <value>عرض الآلة</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>MachineHeight</key>
+      <value>طول الآلة</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>PaperWidth</key>
+      <value>عرض الورق</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>PaperHeight</key>
+      <value>طول الورق</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>InvertLeft</key>
+      <value>القلب يساراً</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>InvertRight</key>
+      <value>القلب يميناً</value>
+      <hint>adjust machine settings</hint>
+    </string>
+    <string>
+      <key>ToolType</key>
+      <value>نوع الأداة</value>
+      <hint>tool settings</hint>
+    </string>
+    <string>
+      <key>AdjustPulleySize</key>
+      <value>ضبط حجم البكرة</value>
+      <hint>Adjust pulleys</hint>
+    </string>
+    <string>
+      <key>Left</key>
+      <value>اليسار</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>Right</key>
+      <value>اليمين</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>AdjustPulleySize</key>
+      <value>القطر</value>
+      <hint>Adjust pulleys</hint>
+    </string>
+    <string>
+      <key>Millimeters</key>
+      <value>مم</value>
+      <hint></hint>
+    </string>
+
+    <string>
+      <key>ConnectingTo</key>
+      <value> الاتصال ب</value>
+      <hint>status message.  keep the space at the end.</hint>
+    </string>
+    <string>
+      <key>PortNotConfigured</key>
+      <value> :لم يتم التمكن من ضبط المنفذ</value>
+      <hint>status message.  keep the space at the end.</hint>
+    </string>
+    <string>
+      <key>PortOpened</key>
+      <value>المنفذ مفتوح.</value>
+      <hint>status message</hint>
+    </string>
+    <string>
+      <key>TitlePrefix</key>
+      <value># ميكيلانجيلو</value>
+      <hint>window title</hint>
+    </string>
+    <string>
+      <key>TitlePostfix</key>
+      <value>تم الاتصال</value>
+      <hint>window title</hint>
+    </string>
+
+    <string>
+      <key>LineSegments</key>
+      <value>.شرائح الخط</value>
+      <hint>status message</hint>
+    </string>
+    <string>
+      <key>Centimeters</key>
+      <value>سم</value>
+      <hint></hint>
+    </string>
+
+    <string>
+      <key>EstimatedTime</key>
+      <value> :الوقت التقديري المتوقع للرسم</value>
+      <hint>status message.  keep the space at the end.</hint>
+    </string>
+
+    <string>
+      <key>FileNotOpened</key>
+      <value> :لم يتم التمكن من فتح الملف</value>
+      <hint>status message.  keep the space at the end.</hint>
+    </string>
+
+    <string>
+      <key>ConversionOptions</key>
+      <value>خيارات التحويل</value>
+      <hint>dialog title</hint>
+    </string>
+    <string>
+      <key>FlipForGlass</key>
+      <value>القلب للزجاج</value>
+      <hint>conversion options</hint>
+    </string>
+
+    <string>
+      <key>Cancel</key>
+      <value>إلغاء</value>
+      <hint>used in many places</hint>
+    </string>
+    <string>
+      <key>Start</key>
+      <value>البدء</value>
+      <hint>As in "start drawing"</hint>
+    </string>
+    <string>
+      <key>Save</key>
+      <value>حفظ</value>
+      <hint>used in many places</hint>
+    </string>
+
+    <string>
+      <key>PaperMargin</key>
+      <value> )٪( الهامش على حافة الورقة </value>
+      <hint>conversion options</hint>
+    </string>
+    <string>
+      <key>Converting</key>
+      <value>يجري التحويل</value>
+      <hint>status update</hint>
+    </string>
+    <string>
+      <key>Finished</key>
+      <value>تمت العملية</value>
+      <hint>status update</hint>
+    </string>
+    <string>
+      <key>Cancelled</key>
+      <value>تم الإلغاء</value>
+      <hint>status update</hint>
+    </string>
+    <string>
+      <key>Failed</key>
+      <value> :فشلت العلية</value>
+      <hint>status update.  keep the space at the end.</hint>
+    </string>
+
+    <string>
+      <key>ConversionStyle</key>
+      <value>أسلوب التحويل</value>
+      <hint>conversion options</hint>
+    </string>
+
+    <string>
+      <key>OpeningFile</key>
+      <value> يجري الفتح</value>
+      <hint>status update.  keep the space at the end.</hint>
+    </string>
+    <string>
+      <key>UnknownFileType</key>
+      <value>نوع ملف غير معروف</value>
+      <hint>status update</hint>
+    </string>
+    <string>
+      <key>SetPaperSize</key>
+      <value>.يرجى تحديد حجم الورق قبل استيراد صورة</value>
+      <hint>warning message</hint>
+    </string>
+
+    <string>
+      <key>FileTypeGCode</key>
+      <value>GCODE (ngc)</value>
+      <hint>file open dialog</hint>
+    </string>
+    <string>
+      <key>FileTypeImage</key>
+      <value> (jpg/bmp/png/gif)</value>
+      <hint>file open dialog</hint>
+    </string>
+    <string>
+      <key>FileTypeDXF</key>
+      <value>DXF R12 (dxf)</value>
+      <hint>file open dialog</hint>
+    </string>
+
+    <string>
+      <key>MenuSoundsTitle</key>
+      <value>الأصوات</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuSoundsConnect</key>
+      <value>إجراء الاتصال</value>
+      <hint>sound settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuSoundsDisconnect</key>
+      <value>قطع الاتصال</value>
+      <hint>sound settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuSoundsFinishConvert</key>
+      <value>تم الانتهاء من التحويل</value>
+      <hint>sound settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuSoundsFinishDraw</key>
+      <value>تم الانتهاء من الرسم</value>
+      <hint>sound settings dialog</hint>
+    </string>
+
+    <string>
+      <key>MenuGraphicsTitle</key>
+      <value>الرسومات</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuGraphicsPenUp</key>
+      <value>إظهار حركات التثبيت</value>
+      <hint>graphics settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuGraphicsAntialias</key>
+      <value>خطوط الحواف</value>
+      <hint>graphics settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuGraphicsSpeedVSQuality</key>
+      <value>تفضيل السرعة على الجودة</value>
+      <hint>graphics settings dialog</hint>
+    </string>
+    <string>
+      <key>MenuGraphicsDrawWhileRunning</key>
+      <value>إظهار الصورة كاملة عند الرسم</value>
+      <hint>graphics settings dialog</hint>
+    </string>
+
+    <string>
+      <key>MenuLanguageTitle</key>
+      <value>اللغة</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>InvalidTool</key>
+      <value># طلب أداة غير صالحة</value>
+      <hint>warning message</hint>
+    </string>
+    <string>
+      <key>ChangeToolPrefix</key>
+      <value> الرجاء تحضير</value>
+      <hint>tool change prompt.  keep the space at the end.</hint>
+    </string>
+    <string>
+      <key>ChangeToolPostfix</key>
+      <value>.وانقر على أي زر للمتابعة </value>
+      <hint>tool change prompt.  keep the space at the start.</hint>
+    </string>
+
+    <string>
+      <key>StartAt</key>
+      <value>البدء عند</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>StartAtLine</key>
+      <value># البدء عند الخط</value>
+      <hint>start at dialog</hint>
+    </string>
+
+    <string>
+      <key>Pause</key>
+      <value>التوقف</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>Unpause</key>
+      <value>التراجع عن التوقف</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>SetHome</key>
+      <value>الإعداد كصفحة رئيسية</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>GoHome</key>
+      <value>الذهاب إلى الصفحة الرئيسية</value>
+      <hint>manual driving dialog</hint>
+    </string>
+
+    <string>
+      <key>Top</key>
+      <value>العليا</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>Bottom</key>
+      <value>السفلى</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>Left</key>
+      <value>يسار</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>Right</key>
+      <value>يمين</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>PenUp</key>
+      <value>رفع القلم </value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>PenDown</key>
+      <value>إنزال القلم </value>
+      <hint>manual driving dialog</hint>
+    </string>
+
+    <string>
+      <key>Set</key>
+      <value>الضبط</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>Speed</key>
+      <value>:السرعة</value>
+      <hint>manual driving dialog</hint>
+    </string>
+    <string>
+      <key>Rate</key>
+      <value>خطوة/دقيقة</value>
+      <hint>manual driving dialog</hint>
+    </string>
+
+    <string>
+      <key>JogMotors</key>
+      <value>محرك الدفع</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>JogIn</key>
+      <value>إلى الداخل</value>
+      <hint>jog motors dialog</hint>
+    </string>
+    <string>
+      <key>JogOut</key>
+      <value>إلى الخارج</value>
+      <hint>jog motors dialog</hint>
+    </string>
+    <string>
+      <key>Invert</key>
+      <value>العكس</value>
+      <hint>jog motors dialog</hint>
+    </string>
+
+    <string>
+      <key>UpdateNotice</key>
+      <value><![CDATA[<html><body>.نسخة جديدة من هذا البرنامج متاحة حالياً<br/>الرجاء زيارة <a href="http://makelangelo.com/#productDescription">http://makelangelo.com/</a> to get the new hotness.</html></body>]]></value>
+      <hint>check for update dialog</hint>
+    </string>
+    <string>
+      <key>UpToDate</key>
+      <value>.هذا البرنامج يستخدم أحدث إصدار</value>
+      <hint>check for update dialog</hint>
+    </string>
+    <string>
+      <key>UpdateCheckFailed</key>
+      <value>عذراً، لقد فشلت المحاولة. الرجاء زيارة http://www.marginallyclever.com/ to check yourself.</value>
+      <hint>check for update dialog</hint>
+    </string>
+
+    <string>
+      <key>Send</key>
+      <value>إرسال</value>
+      <hint>drive manually dialog</hint>
+    </string>
+    <string>
+      <key>TitleNotConnected</key>
+      <value>غير متصل</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuMakelangelo</key>
+      <value>ميكيلانجيلو</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuPreferences</key>
+      <value>التفضيلات</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuUpdate</key>
+      <value>التحقق من وجود تحديثات</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuAbout</key>
+      <value>نبذة عن</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuQuit</key>
+      <value>إغلاق</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuConnect</key>
+      <value>الاتصال</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuRescan</key>
+      <value>إعادة المسح</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuDisconnect</key>
+      <value>قطع الاتصال</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuLoadMachineConfig</key>
+      <value>...تحميل الإعدادات ل</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuSettings</key>
+      <value>الإعدادات</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuSettingsMachine</key>
+      <value>تعديل الآلة &amp; حجم الورق</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuAdjustPulleys</key>
+      <value>ضبط حجم البكرة</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuJogMotors</key>
+      <value>محرك الدفع</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuSelectTool</key>
+      <value>اختيار الأداة النشطة</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuAdjustTool</key>
+      <value>ضبط الأداة النشطة</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuGCODE</key>
+      <value>GCODE</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>HilbertCurveName</key>
+      <value>إنحناء هلبرت</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuTextToGCODE</key>
+      <value>GCODE من نص إلى </value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuConvertImage</key>
+      <value>..الملفات المستخدمة حديثاً</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuOpenFile</key>
+      <value>...فتح ملف</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>MenuSaveGCODEAs</key>
+      <value>باسم GCODEحفظ ال</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuDraw</key>
+      <value>رسم</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>Halt</key>
+      <value>توقف</value>
+      <hint>menu or dialog title</hint>
+    </string>
+
+    <string>
+      <key>MenuPreview</key>
+      <value>استعراض</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>ZoomIn</key>
+      <value>+تكبير</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>ZoomOut</key>
+      <value>-تصغير</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>ZoomFit</key>
+      <value>تكبير للإحتواء</value>
+      <hint>menu or dialog title</hint>
+    </string>
+    <string>
+      <key>mmNotice</key>
+      <value>جميع القيم بال(مم).</value>
+      <hint>Adjust machine size</hint>
+    </string>
+
+    <string>
+      <key>penToolAdjust</key>
+      <value>ضبط القلم</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolDiameter</key>
+      <value>القطر</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolMaxFeedRate</key>
+      <value>معدل التغذية القصوى</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolUp</key>
+      <value>أعلى</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolDown</key>
+      <value>أسفل</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolLiftSpeed</key>
+      <value>رفع السرعة</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+    <string>
+      <key>penToolTest</key>
+      <value>اختبار</value>
+      <hint>Adjust pen tool</hint>
+    </string>
+
+
+    <string>
+      <key>spraypaintToolTest</key>
+      <value>ضبط علبة الطلاء</value>
+      <hint>Adjust Spraypaint tool</hint>
+    </string>
+    <string>
+      <key>spraypaintToolDiameter</key>
+      <value>Dot size</value>
+      <hint>ضبط أداة علبة الطلاء</hint>
+    </string>
+    <string>
+      <key>spraypaintToolMaxFeedRate</key>
+      <value>معدل التغذية القصوى</value>
+      <hint>Adjust spraypaint tool</hint>
+    </string>
+    <string>
+      <key>spraypaintToolUp</key>
+      <value>إيقاف</value>
+      <hint>Adjust spraypaint tool</hint>
+    </string>
+    <string>
+      <key>spraypaintToolDown</key>
+      <value>تشغيل</value>
+      <hint>Adjust spraypaint tool</hint>
+    </string>
+    <string>
+      <key>spraypaintToolLiftSpeed</key>
+      <value>تشغيل/إطفاء السرعة</value>
+      <hint>Adjust spraypaint tool</hint>
+    </string>
+    <string>
+      <key>spraypaintToolTest</key>
+      <value>إنشاء نقطة</value>
+      <hint>Adjust spraypaint tool</hint>
+    </string>
+
+    <string>
+      <key>voronoiStipplingName</key>
+      <value>تنقيط فوروني</value>
+      <hint>voronoi stippling generator</hint>
+    </string>
+    <string>
+      <key>voronoiStipplingCellCount</key>
+      <value>عدد الخلايا</value>
+      <hint>voronoi stippling generator</hint>
+    </string>
+    <string>
+      <key>voronoiStipplingGenCount</key>
+      <value>عدد التكاثرات</value>
+      <hint>voronoi stippling generator</hint>
+    </string>
+    <string>
+      <key>voronoiStipplingDotMax</key>
+      <value>حجم النقطة الأقصى</value>
+      <hint>voronoi stippling generator</hint>
+    </string>
+    <string>
+      <key>voronoiStipplingDotMin</key>
+      <value>حجم النقطى الأدنى</value>
+      <hint>voronoi stippling generator</hint>
+    </string>
+
+    <string>
+      <key>BoxGeneratorName</key>
+      <value>صندوقي</value>
+      <hint>Boxxy generator</hint>
+    </string>
+    <string>
+      <key>CrosshatchName</key>
+      <value>الخطوط المتقاطعة</value>
+      <hint>Crosshatch generator</hint>
+    </string>
+    <string>
+      <key>HilbertCurveName</key>
+      <value>إنحناء هلبرت</value>
+      <hint>Hilbert Curve generator</hint>
+    </string>
+    <string>
+      <key>HilbertCurveSize</key>
+      <value>الحجم</value>
+      <hint>Hilbert Curve generator</hint>
+    </string>
+    <string>
+      <key>HilbertCurveOrder</key>
+      <value>الترتيب</value>
+      <hint>Hilbert Curve generator</hint>
+    </string>
+
+    <string>
+      <key>PulseLineName</key>
+      <value>سطر النبض</value>
+      <hint>Pulse Line generator</hint>
+    </string>
+    <string>
+      <key>ZigZagName</key>
+      <value>شكل متعرج جداً</value>
+      <hint>Zig Zag generator</hint>
+    </string>
+    <string>
+      <key>YourMsgHereName</key>
+      <value>أدخل رسالتك هنا</value>
+      <hint>Your message here generator</hint>
+    </string>
+    <string>
+      <key>SpiralName</key>
+      <value>حلزوني</value>
+      <hint>Spiral generator</hint>
+    </string>
+    <string>
+      <key>ScanlineName</key>
+      <value>سطر المسح</value>
+      <hint>Scanline generator</hint>
+    </string>
+    <string>
+      <key>RGBName</key>
+      <value>أحمر أخضر أزرق</value>
+      <hint>RGB generator</hint>
+    </string>
+
+    <string>
+      <key>SharePromo</key>
+      <value>لمشاهدة ما قام به الآخرون أيضا  @MarginallyC شاركها على تويتر إلى</value>
+      <hint>Your drawing is finished.  Share it</hint>
+    </string>
+
+    <string>
+      <key>StatusSoFar</key>
+      <value>:زمن التشغيل</value>
+      <hint>time machine has been drawing</hint>
+    </string>
+
+    <string>
+      <key>StatusRemaining</key>
+      <value>:الوقت المتوقع المتبقي</value>
+      <hint>time machine will be drawing</hint>
+    </string>
+
+    <!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber and AboutHTMLAfterVersionNumber are
+    used to dynamically build the HTML for the about message dialog using the version string. This is why there is not
+    one big CDATA html blob. -->
+    <string>
+      <key>AboutHTMLBeforeVersionNumber</key>
+      <value><![CDATA[
+      <html>
+        <body>
+          <h1>ميكيلانجيلو ]]>
+      </value>
+      <hint>HTML for About Dialog</hint>
+    </string>
+
+    <string>
+      <key>AboutHTMLAfterVersionNumber</key>
+      <value><![CDATA[
+  </h1>
+        <h3>
+          <a href='http://www.marginallyclever.com/'>http://www.marginallyclever.com/</a>
+        </h3>
+          <p>
+            .تم تصميمه من قبل دان روير (<a href="mailto:dan@marginallyclever.com">dan@marginallyclever.com</a>)<br>
+            بمساهمات إضافية من جوزيف كوتام و <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>
+          </p>
+          <br>
+          <p>
+            للحصول على آخر إصدار الرجاء زيارة<br>
+            <a href='https://github.com/MarginallyClever/Makelangelo'>https://github.com/MarginallyClever/Makelangelo</a>
+          </p>
+          <br>
+          <p>
+            !هذا البرنامج ذو مصدر مفتوح ومجاني. كما ينبغي أن يكون
+          </p>
+        </body>
+      </html>
+      ]]>
+      </value>
+      <hint>HTML for About Dialog</hint>
+    </string>
+
+
+	<string>
+		<key>MenuSettingsRegister</key>
+		<value>Register</value>
+		<hint>Machine Configuration > Register tab title</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegister</key>
+		<value><![CDATA[<p>Register your robot with your Marginally Clever user account to Unlock features and show your support.</p>]]></value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterCreateAccountButton</key>
+		<value>Create an account</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterUsername</key>
+		<value>User name</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>PleaseRegisterPassword</key>
+		<value>Password</value>
+		<hint>Machine Configuration > Register robot</hint>
+	</string>
+
+	<string>
+		<key>MachineNumber</key>
+		<value>Machine #</value>
+		<hint>Prepare image panel</hint>
+	</string>
+
+	<string>
+		<key>MenuResetMachinePreferencesWarning</key>
+		<value>Are you sure you want to erase all your preferences?</value>
+		<hint>Makelangelo > preferences > reset preferences</hint>
+	</string>
+
+	<string>
+		<key>MenuGenerate</key>
+		<value>Generate art</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>MenuNewFile</key>
+		<value>New</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>LSystemTreeName</key>
+		<value>L System Tree Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>KochCurveName</key>
+		<value>Koch Curve Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>DragonName</key>
+		<value>Dragon Fractal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ClickAndDrag</key>
+		<value>Click &amp; Drag</value>
+		<hint>live drawing panel</hint>
+	</string>
+	<string>
+		<key>configureMachine</key>
+		<value>Settings</value>
+		<hint>open machine settings dialog</hint>
+	</string>
+	<string>
+		<key>MenuResetMachinePreferences</key>
+		<value>Reset Preferences</value>
+		<hint>Preferences menu</hint>
+	</string>
+	<string>
+		<key>MenuLog</key>
+		<value>Log</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	
+	<string>
+		<key>PaperSize</key>
+		<value>Paper Size</value>
+		<hint>machine size control panel</hint>
+	</string>
+	<string>
+		<key>DisengageMotors</key>
+		<value>Disengage</value>
+		<hint>Disengage Button on manual driving dialog</hint>
+	</string>
+
+  </language>
+

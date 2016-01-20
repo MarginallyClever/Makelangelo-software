@@ -1,0 +1,104 @@
+<assembly
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+  <id>with-dependencies</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <formats>
+    <format>jar</format>
+  </formats>
+
+  <dependencySets>
+    <!-- Unpack everything that isn't a JOGL or GlueGen library -->
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>libgluegen-rt*</exclude>
+          <exclude>libjogl_desktop.*</exclude>
+          <exclude>libjogl_mobile.*</exclude>
+          <exclude>libnativewindow_awt.*</exclude>
+          <exclude>libnativewindow_macosx.*</exclude>
+          <exclude>libnativewindow_x11.*</exclude>
+          <exclude>libnewt.*</exclude>
+        </excludes>
+      </unpackOptions>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/natives/linux-amd64/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.jogamp.gluegen:gluegen-rt:jar:natives-linux-amd64</include>
+        <include>org.jogamp.jogl:jogl-all:jar:natives-linux-amd64</include>
+      </includes>
+      <unpackOptions>
+        <includes><include>*.so</include></includes>
+      </unpackOptions>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/natives/linux-i586/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.jogamp.gluegen:gluegen-rt:jar:natives-linux-i586</include>
+        <include>org.jogamp.jogl:jogl-all:jar:natives-linux-i586</include>
+      </includes>
+      <unpackOptions>
+        <includes><include>*.so</include></includes>
+      </unpackOptions>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/natives/windows-amd64/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.jogamp.gluegen:gluegen-rt:jar:natives-windows-amd64</include>
+        <include>org.jogamp.jogl:jogl-all:jar:natives-windows-amd64</include>
+      </includes>
+      <unpackOptions>
+        <includes><include>*.dll</include></includes>
+      </unpackOptions>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/natives/windows-i586/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.jogamp.gluegen:gluegen-rt:jar:natives-windows-i586</include>
+        <include>org.jogamp.jogl:jogl-all:jar:natives-windows-i586</include>
+      </includes>
+      <unpackOptions>
+        <includes><include>*.dll</include></includes>
+      </unpackOptions>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/natives/macosx-universal/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>org.jogamp.gluegen:gluegen-rt:jar:natives-macosx-universal</include>
+        <include>org.jogamp.jogl:jogl-all:jar:natives-macosx-universal</include>
+      </includes>
+      <unpackOptions>
+        <includes><include>*.jnilib</include></includes>
+      </unpackOptions>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>

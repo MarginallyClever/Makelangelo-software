@@ -13,11 +13,16 @@
 *.pde           text
 *.prefs         text
 *.textile       text
+*.md            text
 .gitattributes  text
 .gitignore      text
+LICENSE         text
+script\bootstrap  text
+script\test       text
 
 # Declare files that will always have CRLF line endings (Windows) on checkout.
 *.bat           text eol=crlf
+*.reg           text eol=crlf
 
 # Declare files that will always have LF line endings (*nix) on checkout.
 *.command       text eol=lf

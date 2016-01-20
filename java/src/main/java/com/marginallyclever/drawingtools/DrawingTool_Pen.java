@@ -1,143 +1,192 @@
 package com.marginallyclever.drawingtools;
 
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.Translator;
 
 
-public class DrawingTool_Pen extends DrawingTool {
+public class DrawingTool_Pen extends DrawingTool implements ActionListener {
+	protected JDialog dialog;
+	protected JPanel panel;
 	
-	public DrawingTool_Pen(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
-		super(gui,ms,mc);
-		
-		diameter=1.5f;
-		z_rate=120;
-		z_on=90;
-		z_off=50;
-		tool_number=0;
-		feed_rate=3500;
-		name="Pen";
+	protected JFormattedTextField penDiameter;
+	protected JFormattedTextField penFeedRate;
+	protected JFormattedTextField penUp;
+	protected JFormattedTextField penDown;
+	protected JFormattedTextField penZRate;
+
+	protected JButton buttonTestUp;
+	protected JButton buttonTestDown;
+	protected JButton buttonSave;
+	protected JButton buttonCancel;
+
+	
+	public DrawingTool_Pen(Translator ms, MakelangeloRobot robot) {
+		super(ms, robot);
+
+		diameter = 1.5f;
+		zRate = 50;
+		zOn = 90;
+		zOff = 50;
+		toolNumber = 0;
+		feedRate = 3500;
+		name = "Pen";
 	}
-	
-	public DrawingTool_Pen(String name2,int tool_id,MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
-		super(gui,ms,mc);
-		
-		diameter=1.5f;
-		z_rate=120;
-		z_on=90;
-		z_off=50;
-		tool_number=tool_id;
-		feed_rate=3500;
-		name=name2;
-	}
-	
-	public void Adjust() {
-		final JDialog driver = new JDialog(mainGUI.getParentFrame(),translator.get("penToolAdjust"),true);
-		driver.setLayout(new GridBagLayout());
 
-		final JTextField penDiameter   = new JTextField(Float.toString(GetDiameter()),5);
-		final JTextField penFeedRate   = new JTextField(Float.toString(feed_rate),5);
-		
-		final JTextField penUp   = new JTextField(Float.toString(z_off),5);
-		final JTextField penDown = new JTextField(Float.toString(z_on),5);
-		final JTextField penZRate = new JTextField(Float.toString(z_rate),5);
-		final JButton buttonTestUp = new JButton(translator.get("penToolTest"));
-		final JButton buttonTestDown = new JButton(translator.get("penToolTest"));
-		final JButton buttonSave = new JButton(translator.get("Save"));
-		final JButton buttonCancel = new JButton(translator.get("Cancel"));
-	
+	public DrawingTool_Pen(String name2, int tool_id, Translator ms, MakelangeloRobot robot) {
+		super(ms, robot);
+
+		diameter = 1.5f;
+		zRate = 120;
+		zOn = 90;
+		zOff = 50;
+		toolNumber = tool_id;
+		feedRate = 3500;
+		name = name2;
+	}
+
+	public JPanel getPanel() {
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+	    panel.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
+
+	    JPanel p = new JPanel(new GridBagLayout());
+	    panel.add(p);
+	    
+	    NumberFormat nFloat = NumberFormat.getNumberInstance();
+	    nFloat.setMaximumFractionDigits(1);
+	    
+		penDiameter = new JFormattedTextField(nFloat);
+		penFeedRate = new JFormattedTextField(nFloat);
+		penUp = new JFormattedTextField(nFloat);
+		penDown = new JFormattedTextField(nFloat);
+		penZRate = new JFormattedTextField(nFloat);
+		buttonTestUp = new JButton(Translator.get("penToolTest"));
+		buttonTestDown = new JButton(Translator.get("penToolTest"));
+
+		penDiameter.setValue(getDiameter());
+		penFeedRate.setValue(feedRate);
+		penUp.setValue(zOff);
+		penDown.setValue(zOn);
+		penZRate.setValue(zRate);
+
+	    Dimension s = buttonTestUp.getPreferredSize();
+	    s.width = 80;
+	    buttonTestUp.setPreferredSize(s);
+	    buttonTestDown.setPreferredSize(s);
+
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
 
-		c.anchor=GridBagConstraints.EAST;
-		c.fill=GridBagConstraints.HORIZONTAL;
-		d.anchor=GridBagConstraints.WEST;
-		d.fill=GridBagConstraints.HORIZONTAL;
-		d.weightx=50;
-		int y=0;
+		c.ipadx=5;
+	    c.ipady=0;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("penToolDiameter")),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penDiameter,d);
+		c.anchor = GridBagConstraints.EAST;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		d.anchor = GridBagConstraints.WEST;
+		d.fill = GridBagConstraints.HORIZONTAL;
+		d.weightx = 50;
+		int y = 0;
+
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("penToolDiameter")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(penDiameter, d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("penToolMaxFeedRate")),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penFeedRate,d);
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("penToolMaxFeedRate")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(penFeedRate, d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("penToolUp")),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penUp,d);
-		d.gridx=2;	d.gridy=y;	driver.add(buttonTestUp,d);
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("penToolUp")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(penUp, d);
+		d.gridx = 2;
+		d.gridy = y;
+		p.add(buttonTestUp, d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("penToolDown")),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penDown,d);
-		d.gridx=2;	d.gridy=y;	driver.add(buttonTestDown,d);
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("penToolDown")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(penDown, d);
+		d.gridx = 2;
+		d.gridy = y;
+		p.add(buttonTestDown, d);
 		++y;
 
-		c.gridx=0;	c.gridy=y;	driver.add(new JLabel(translator.get("penToolLiftSpeed")),c);
-		d.gridx=1;	d.gridy=y;	driver.add(penZRate,d);
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("penToolLiftSpeed")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(penZRate, d);
 		++y;
+
+		c.gridwidth = 2;
+		c.insets = new Insets(0, 5, 5, 5);
+		c.anchor = GridBagConstraints.WEST;
+		
+		buttonTestUp.addActionListener(this);
+		buttonTestDown.addActionListener(this);
+		
+		return panel;
+	}
 	
-		c.gridx=1;	c.gridy=y;	driver.add(buttonSave,c);
-		c.gridx=2;	c.gridy=y;	driver.add(buttonCancel,c);
-		++y;
 	
-		c.gridwidth=2;
-		c.insets=new Insets(0,5,5,5);
-		c.anchor=GridBagConstraints.WEST;
-		/*
-		c.gridheight=4;
-		c.gridx=0;  c.gridy=y;
-		driver.add(new JTextArea("Adjust the values sent to the servo to\n" +
-								 "raise and lower the pen."),c);
-		*/
-		ActionListener driveButtons = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object subject = e.getSource();
-				
-				if(subject == buttonTestUp) {
-					mainGUI.sendLineToRobot("G00 Z"+penUp.getText());
-				}
-				if(subject == buttonTestDown) {
-					mainGUI.sendLineToRobot("G00 Z"+penDown.getText());
-				}
-				if(subject == buttonSave) {
-					SetDiameter(Float.valueOf(penDiameter.getText()));
-					feed_rate = Float.valueOf(penFeedRate.getText());
-					z_rate = Float.valueOf(penZRate.getText());
-					z_off = Float.valueOf(penUp.getText());
-					z_on = Float.valueOf(penDown.getText());
-					machine.SaveConfig();
-					driver.dispose();
-				}
-				if(subject == buttonCancel) {
-					driver.dispose();
-				}
+	public void actionPerformed(ActionEvent event) {
+		Object subject = event.getSource();
+
+		if (subject == buttonTestUp) {
+			if(robot.isPortConfirmed()) {
+				try {
+				robot.getConnection().sendMessage("G00 Z" + penUp.getText());
+				} catch(Exception e) {}
 			}
-		};
-		
-		buttonTestUp.addActionListener(driveButtons);
-		buttonTestDown.addActionListener(driveButtons);
-		
-		buttonSave.addActionListener(driveButtons);
-		buttonCancel.addActionListener(driveButtons);
-		driver.getRootPane().setDefaultButton(buttonSave);
+		}
+		if (subject == buttonTestDown) {
+			if(robot.isPortConfirmed()) {
+				try {
+					robot.getConnection().sendMessage("G00 Z" + penDown.getText());
+				} catch(Exception e) {}
+			}
+		}
+	}
 	
-		mainGUI.sendLineToRobot("M114");
-		driver.pack();
-		driver.setVisible(true);
+	public void save() {
+		setDiameter(((Number)penDiameter.getValue()).floatValue());
+		feedRate = ((Number)penFeedRate.getValue()).floatValue();
+		zRate = ((Number)penZRate.getValue()).floatValue();
+		zOff = ((Number)penUp.getValue()).floatValue();
+		zOn = ((Number)penDown.getValue()).floatValue();
+		robot.settings.saveConfig();
 	}
 
 }

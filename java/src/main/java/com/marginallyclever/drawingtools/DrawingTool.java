@@ -1,116 +1,136 @@
 package com.marginallyclever.drawingtools;
 
-import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
-
-import java.awt.*;
+import java.awt.BasicStroke;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.prefs.Preferences;
 
+import javax.swing.JPanel;
+
+import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.Translator;
 
 
-public class DrawingTool {
-	// every tool must have a unique number.
-	protected int tool_number;
-	
-	protected float diameter=1; // mm
-	protected float feed_rate;
-	protected float z_on;
-	protected float z_off;
-	protected float z_rate;
-	protected String name;
+public abstract class DrawingTool {
+  // Every tool must have a unique number.
+  protected int toolNumber;
 
-	// used while drawing to the GUI
-	protected float draw_z=0;
+  protected float diameter; // mm
+  protected float feedRate;
+  protected float zOn;
+  protected float zOff;
+  protected float zRate;
+  protected String name;
 
-	protected MainGUI mainGUI;
-	protected MultilingualSupport translator;
-	protected MachineConfiguration machine;
-	
+  // used while drawing to the GUI
+  protected float draw_z = 0;
 
-	public DrawingTool(MainGUI gui,MultilingualSupport ms,MachineConfiguration mc) {
-		mainGUI = gui;
-		translator = ms;
-		machine = mc;
-	}
-	
-	public float GetZOn() { return z_on; }
-	public float GetZOff() { return z_off; }
-	
-	// Load a configure menu and let people adjust the tool settings
-	public void Adjust() {
-		//final JDialog driver = new JDialog(DrawbotGUI.getSingleton().getParentFrame(),"Adjust pulley size",true);		
-	}
-	
-	public void SetDiameter(float d) {
-		diameter = d;
-	}
-	
-	public float GetDiameter() {
-		return diameter;
-	}
+  protected Translator translator;
+  protected MakelangeloRobot robot;
 
-	public String GetName() { return name; }
-	public float GetFeedRate() { return feed_rate; }
-	
-	public void WriteChangeTo(OutputStreamWriter out) throws IOException {
-		out.write("M06 T"+tool_number+";\n");
-	}
 
-	public void WriteOn(OutputStreamWriter out) throws IOException {
-		out.write("G00 Z"+z_on+" F"+z_rate+";\n");  // lower the pen.
-		out.write("G04 P50;\n");
-		out.write("G00 F"+GetFeedRate()+";\n");
-		DrawZ(z_on);
-	}
+  public DrawingTool(Translator ms, MakelangeloRobot robot) {
+    translator = ms;
+    this.robot = robot;
+    diameter = 1;
+  }
 
-	public void WriteOff(OutputStreamWriter out) throws IOException {
-		out.write("G00 Z"+z_off+" F"+z_rate+";\n");  // lift the pen.
-		out.write("G04 P50;\n");
-		out.write("G00 F"+GetFeedRate()+";\n");
-		DrawZ(z_off);
-	}
-	
-	public void WriteMoveTo(OutputStreamWriter out,float x,float y) throws IOException {
-		out.write("G00 X"+x+" Y"+y+";\n");
-	}
-	
-	public BasicStroke getStroke() {
-		return new BasicStroke(diameter*10,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
-	}
-	
-	public void DrawZ(float z) { draw_z=z; }
-	public boolean DrawIsOn() { return z_on==draw_z; }
-	public boolean DrawIsOff() { return z_off==draw_z; }
+  public float getZOn() {
+    return zOn;
+  }
 
-	public void DrawLine(GL2 gl2,double x1,double y1,double x2,double y2) {
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2d(x1,y1);
-		gl2.glVertex2d(x2, y2);
-		gl2.glEnd();
-	}
-	
+  public float getZOff() {
+    return zOff;
+  }
 
-	public void LoadConfig(Preferences prefs) {
-		prefs = prefs.node(name);
-		SetDiameter(Float.parseFloat(prefs.get("diameter",Float.toString(diameter))));
-		z_rate = Float.parseFloat(prefs.get("z_rate",Float.toString(z_rate)));
-		z_on = Float.parseFloat(prefs.get("z_on",Float.toString(z_on)));
-		z_off = Float.parseFloat(prefs.get("z_off",Float.toString(z_off)));
-		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feed_rate = Float.parseFloat(prefs.get("feed_rate",Float.toString(feed_rate)));		
-	}
+  // load a configure menu and return it to the caller for embedding.
+  public JPanel getPanel() {
+	  return null;
+  }
 
-	public void SaveConfig(Preferences prefs) {
-		prefs = prefs.node(name);
-		prefs.put("diameter", Float.toString(GetDiameter()));
-		prefs.put("z_rate", Float.toString(z_rate));
-		prefs.put("z_on", Float.toString(z_on));
-		prefs.put("z_off", Float.toString(z_off));
-		prefs.put("tool_number", Integer.toString(tool_number));
-		prefs.put("feed_rate", Float.toString(feed_rate));
-	}
+  public void setDiameter(float d) {
+    diameter = d;
+  }
+
+  public float getDiameter() {
+    return diameter;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public float getFeedRate() {
+    return feedRate;
+  }
+
+  public void writeChangeTo(Writer out) throws IOException {
+    out.write("M06 T" + toolNumber + ";\n");
+    out.write("G00 F" + getFeedRate() + " A"+ robot.settings.getAcceleration() + ";\n");
+  }
+
+  // lower the pen.
+  public void writeOn(Writer out) throws IOException {
+    out.write("G00 Z" + zOn + ";\n");
+    out.write("G04 P" + zRate + ";\n");
+    drawZ(zOn);
+  }
+
+  // lift the pen.
+  public void writeOff(Writer out) throws IOException {
+    out.write("G00 Z" + zOff + ";\n");
+    out.write("G04 P" + zRate + ";\n");
+    drawZ(zOff);
+  }
+
+  public void writeMoveTo(Writer out, float x, float y) throws IOException {
+    out.write("G00 X" + x + " Y" + y + ";\n");
+  }
+
+  public BasicStroke getStroke() {
+    return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+  }
+
+  public void drawZ(float z) {
+    draw_z = z;
+  }
+
+  public boolean isDrawOn() {
+    return zOn == draw_z;
+  }
+
+  public boolean isDrawOff() {
+    return zOff == draw_z;
+  }
+
+  public void drawLine(GL2 gl2, double x1, double y1, double x2, double y2) {
+    gl2.glBegin(GL2.GL_LINES);
+    gl2.glVertex2d(x1, y1);
+    gl2.glVertex2d(x2, y2);
+    gl2.glEnd();
+  }
+
+
+  public void loadConfig(Preferences prefs) {
+    prefs = prefs.node(name);
+    setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
+    zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
+    zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
+    zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
+    //tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
+    feedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRate)));
+  }
+
+  public void saveConfig(Preferences prefs) {
+    prefs = prefs.node(name);
+    prefs.put("diameter", Float.toString(getDiameter()));
+    prefs.put("z_rate", Float.toString(zRate));
+    prefs.put("z_on", Float.toString(zOn));
+    prefs.put("z_off", Float.toString(zOff));
+    prefs.put("tool_number", Integer.toString(toolNumber));
+    prefs.put("feed_rate", Float.toString(feedRate));
+  }
+  
+  public void save() {}
 }

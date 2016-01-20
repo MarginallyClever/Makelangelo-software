@@ -1,242 +1,268 @@
 package com.marginallyclever.communications;
 
-import jssc.*;
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 
-import com.marginallyclever.makelangelo.MachineConfiguration;
-import com.marginallyclever.makelangelo.MainGUI;
-import com.marginallyclever.makelangelo.MultilingualSupport;
+import java.util.ArrayList;
+
+import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 
 
 /**
- * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation 
+ * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation
  *
  * @author Peter Colapietro
  * @since v7
  */
 public final class SerialConnection implements SerialPortEventListener, MarginallyCleverConnection {
-    private SerialPort serialPort;
-    private static final int BAUD_RATE = 57600;
-    
-    private String connectionName = new String();
-    private boolean portOpened=false;
-    private boolean portConfirmed=false;
-    
-    private String robot_type_name = "DRAWBOT";  // FIXME doesn't belong in connection, should be a higher class
-    private String hello = "HELLO WORLD! I AM " + robot_type_name +" #";  // FIXME doesn't belong in connection, should be a higher class
-    
-    static private String CUE = "> ";
-    static private String NOCHECKSUM = "NOCHECKSUM ";
-    static private String BADCHECKSUM = "BADCHECKSUM ";
-    static private String BADLINENUM = "BADLINENUM ";
-    
-    // parsing input from Makelangelo
-    private String serial_recv_buffer="";
-    // prevent repeating pings from appearing in console
-    boolean lastLineWasCue=false;
-    
-    private final MainGUI mainGUI;
-    private final MultilingualSupport translator;
-    private final MachineConfiguration machine;
+	private SerialPort serialPort;
+	private static final int BAUD_RATE = 57600;
 
-    
-    public SerialConnection(MainGUI mainGUI, MultilingualSupport translator, MachineConfiguration machine) {
-        this.mainGUI = mainGUI;
-        this.translator = translator;
-        this.machine = machine;
-    }
+	private String connectionName = "";
+	private boolean portOpened = false;
+	private boolean waitingForCue = false;
 
-    @Override
-    public void sendMessage(String msg) throws Exception {
-		try {
-			serialPort.writeBytes(msg.getBytes());
+
+	static final String CUE = "> ";
+	static final String NOCHECKSUM = "NOCHECKSUM ";
+	static final String BADCHECKSUM = "BADCHECKSUM ";
+	static final String BADLINENUM = "BADLINENUM ";
+	static final String NEWLINE = "\n";
+	static final String COMMENT_START = ";";
+
+	// parsing input from Makelangelo
+	private String inputBuffer = "";
+    ArrayList<String> commandQueue = new ArrayList<String>();
+
+    // Listeners which should be notified of a change to the percentage.
+    private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
+
+
+	public SerialConnection() {}
+
+	@Override
+	public void sendMessage(String msg) throws Exception {
+		commandQueue.add(msg);
+		sendQueuedCommand();
+	}
+
+
+	@Override
+	public void closeConnection() {
+		if (portOpened) {
+			if (serialPort != null) {
+				try {
+					serialPort.removeEventListener();
+					serialPort.closePort();
+				} catch (SerialPortException e) {
+				}
+			}
+			portOpened = false;
 		}
-		catch(SerialPortException e) {
-			throw new Exception(e.getMessage());
+	}
+
+	// open a serial connection to a device.  We won't know it's the robot until
+	@Override
+	public void openConnection(String portName) throws Exception {
+		if (portOpened) return;
+
+		closeConnection();
+
+		// open the port
+		serialPort = new SerialPort(portName);
+		serialPort.openPort();// Open serial port
+		serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		serialPort.addEventListener(this);
+
+		connectionName = portName;
+		portOpened = true;
+		waitingForCue = true;
+		
+	}
+
+
+	/**
+	 * Check if the robot reports an error and if so what line number.
+	 *
+	 * @return -1 if there was no error, otherwise the line number containing the error.
+	 */
+	protected int errorReported(String line) {
+		if (line.lastIndexOf(NOCHECKSUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
+			String x = getNumberPortion(after_error);
+			int err = 0;
+			try {
+				err = Integer.decode(x);
+			} catch (Exception e) {
+			}
+
+			return err;
 		}
-    }
-    
-    
-    @Override
-    public void closeConnection() {
-        if(portOpened) {
-            if (serialPort != null) {
-                try {
-                    serialPort.removeEventListener();
-                    serialPort.closePort();
-                } catch (SerialPortException e) {}
-            }
-            portOpened=false;
-            portConfirmed=false;
-        }
-    }
+		if (line.lastIndexOf(BADCHECKSUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
+			String x = getNumberPortion(after_error);
+			int err = 0;
+			try {
+				err = Integer.decode(x);
+			} catch (Exception e) {
+			}
 
-    // open a serial connection to a device.  We won't know it's the robot until
-    @Override
-    public void openConnection(String portName) throws Exception {
-        if(portOpened) return;
+			return err;
+		}
+		if (line.lastIndexOf(BADLINENUM) != -1) {
+			String after_error = line.substring(line.lastIndexOf(BADLINENUM) + BADLINENUM.length());
+			String x = getNumberPortion(after_error);
+			int err = 0;
+			try {
+				err = Integer.decode(x);
+			} catch (Exception e) {
+			}
 
-        closeConnection();
+			return err;
+		}
 
-        // open the port
-        serialPort = new SerialPort(portName);
-        serialPort.openPort();// Open serial port
-        serialPort.setParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-        serialPort.addEventListener(this);
-
-        connectionName = portName;
-        portOpened=true;
-        lastLineWasCue=false;
-    }
+		return -1;
+	}
 
 
-    /**
-     * Check if the robot reports an error and if so what line number.
-     * @return -1 if there was no error, otherwise the line number containing the error.
-     */
-    protected int ErrorReported() {
-        if(portConfirmed==false) return -1;
-
-        if( serial_recv_buffer.lastIndexOf(NOCHECKSUM) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(NOCHECKSUM) + NOCHECKSUM.length());
-            String x=GetNumberPortion(after_error);
-            return Integer.decode(x);
-        }
-        if( serial_recv_buffer.lastIndexOf(BADCHECKSUM) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADCHECKSUM) + BADCHECKSUM.length());
-            String x=GetNumberPortion(after_error);
-            return Integer.decode(x);
-        }
-        if( serial_recv_buffer.lastIndexOf(BADLINENUM) != -1 ) {
-            String after_error = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(BADLINENUM) + BADLINENUM.length());
-            String x=GetNumberPortion(after_error);
-            return Integer.decode(x);
-        }
-
-        return -1;
-    }
-
-
-    /**
-     * Complete the handshake, load robot-specific configuration, update the menu, repaint the preview with the limits.
-     * @return true if handshake succeeds.
-     */
-    public boolean ConfirmPort() {
-        if(portConfirmed==true) return true;
-        if(serial_recv_buffer.lastIndexOf(hello) < 0) return false;
-
-        portConfirmed=true;
-
-        String after_hello = serial_recv_buffer.substring(serial_recv_buffer.lastIndexOf(hello) + hello.length());
-        machine.ParseRobotUID(after_hello);
-
-        mainGUI.getMainframe().setTitle(translator.get("TitlePrefix")
-                + Long.toString(machine.GetUID())
-                + translator.get("TitlePostfix"));
-
-        mainGUI.SendConfig();
-        mainGUI.getPreviewPane().updateMachineConfig();
-
-        mainGUI.updateMenuBar();
-        mainGUI.getPreviewPane().setConnected(true);
-
-        // rebuild the drive pane so that the feed rates are correct.
-        mainGUI.updatedriveControls();
-
-        return true;
-    }
-    
-
-    // Deal with something robot has sent.
-    @Override
-    public void serialEvent(SerialPortEvent events) {
+	// Deal with something robot has sent.
+	@Override
+	public void serialEvent(SerialPortEvent events) {
+		String rawInput, oneLine;
+		int x;
+		
         if(events.isRXCHAR()) {
+        	if(!portOpened) return;
             try {
-                int len = events.getEventValue();
-                byte[] buffer = serialPort.readBytes(len);
-                String line2 = new String(buffer,0,len);
-
-                serial_recv_buffer+=line2;
-                // wait for the cue ("> ") to send another command
-                if(serial_recv_buffer.lastIndexOf(CUE)!=-1) {
-                    String line2_mod = serial_recv_buffer;
-                    //line2_mod = line2.mod.replace("\n", "");
-                    //line2_mod = line2_mod.replace(">", "");
-                    line2_mod = line2_mod.trim();
-                    if(line2_mod.length()>0) {
-                        if(line2_mod.equals(CUE.trim())) {
-                            if(lastLineWasCue==true) {
-                                // don't repeat the ping
-                                //Log("<span style='color:#FF00A5'>"+line2_mod+"</span>");
-                            } else {
-                                mainGUI.Log("<span style='color:#FFA500'>" + line2_mod + "</span>");
-                            }
-                            lastLineWasCue=true;
-                        } else {
-                            lastLineWasCue=false;
-                            mainGUI.Log("<span style='color:#FFA500'>" + line2_mod + "</span>");
-                        }
-                    }
-
-                    int error_line = ErrorReported();
-                    if(error_line != -1) {
-                        mainGUI.getGcodeFile().linesProcessed = error_line;
-                        serial_recv_buffer="";
-                        mainGUI.SendFileCommand();
-                    } else if(ConfirmPort()) {
-                        serial_recv_buffer="";
-                        mainGUI.SendFileCommand();
-                    }
-                }
+            	int len = events.getEventValue();
+				byte [] buffer = serialPort.readBytes(len);
+				if( len>0 ) {
+					rawInput = new String(buffer,0,len);
+					inputBuffer+=rawInput;
+					// each line ends with a \n.
+					for( x=inputBuffer.indexOf("\n"); x!=-1; x=inputBuffer.indexOf("\n") ) {
+						x=x+1;
+						oneLine = inputBuffer.substring(0,x);
+						inputBuffer = inputBuffer.substring(x);
+						// wait for the cue to send another command
+						if(oneLine.indexOf(CUE)==0) {
+							if(waitingForCue) {
+								notifyDataAvailable(oneLine);
+							}
+							waitingForCue=false;
+						} else {
+							int error_line = errorReported(oneLine);
+		                    if(error_line != -1) {
+		                    	notifyLineError(error_line);
+		                    }
+		                    notifyDataAvailable(oneLine);
+						}
+					}
+					if(waitingForCue==false) {
+						sendQueuedCommand();
+					}
+				}
             } catch (SerialPortException e) {}
         }
-    }
-
-    
-    // connect to the last port
-    @Override
-    public void reconnect() throws Exception {
-        openConnection(connectionName);
-    }
-
-    /**
-     * Java string to int is very picky.  this method is slightly less picky.  Only works with positive whole numbers.
-     * @param src
-     * @return the portion of the string that is actually a number
-     */
-    private String GetNumberPortion(String src) {
-    	src = src.trim();
-        int length = src.length();
-        String result = "";
-        for (int i = 0; i < length; i++) {
-            Character character = src.charAt(i);
-            if (Character.isDigit(character)) {
-                result += character;
-            }
-        }
-        return result;
-    }
+	}
 
 
-    /**
-     *
-     * @return <code>true</code> if the serial port has been confirmed; <code>false</code> otherwise
-     */
-    @Override
-    public boolean isRobotConfirmed() {
-        return portConfirmed;
-    }
+	protected void sendQueuedCommand() {
+		if(!portOpened || waitingForCue) return;
+		
+		if(commandQueue.size()==0) {
+		      notifyConnectionReady();
+		      return;
+		}
+		
+		String command;
+		try {
+			command=commandQueue.remove(0);
+			String line = command;
+			if(line.contains(COMMENT_START)) {
+				String [] lines = line.split(COMMENT_START);
+				command = lines[0];
+			}
+			if(line.endsWith("\n") == false) {
+				line+=NEWLINE;
+			}
+			serialPort.writeBytes(line.getBytes());
+			waitingForCue=true;
+		}
+		catch(IndexOutOfBoundsException e1) {}
+		catch(SerialPortException e2) {}
+	}
+	
+	public void deleteAllQueuedCommands() {
+		commandQueue.clear();
+	}
+	
+	// connect to the last port
+	@Override
+	public void reconnect() throws Exception {
+		openConnection(connectionName);
+	}
 
-    /**
-     *
-     * @return the port open for this serial connection.
-     */
-    @Override
-    public boolean isConnectionOpen() {
-        return portOpened;
+	/**
+	 * Java string to int is very picky.  this method is slightly less picky.  Only works with positive whole numbers.
+	 *
+	 * @param src
+	 * @return the portion of the string that is actually a number
+	 */
+	private String getNumberPortion(String src) {
+		src = src.trim();
+		int length = src.length();
+		String result = "";
+		for (int i = 0; i < length; i++) {
+			Character character = src.charAt(i);
+			if (Character.isDigit(character)) {
+				result += character;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * @return the port open for this serial connection.
+	 */
+	@Override
+	public boolean isOpen() {
+		return portOpened;
+	}
+
+	@Override
+	public String getRecentConnection() {
+		return connectionName;
+	}
+
+	@Override
+	public void addListener(MarginallyCleverConnectionReadyListener listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(MarginallyCleverConnectionReadyListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void notifyLineError(int lineNumber) {
+	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
+	          listener.lineError(this,lineNumber);
+	        }
+	}
+	
+    private void notifyConnectionReady() {
+      for (MarginallyCleverConnectionReadyListener listener : listeners) {
+        listener.connectionReady(this);
+      }
     }
-    
-    @Override
-    public String getRecentConnection() {
-    	return connectionName;
-    }
+	
+	// tell all listeners data has arrived
+	private void notifyDataAvailable(String line) {
+	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
+	        listener.dataAvailable(this,line);
+	      }
+	}
 }

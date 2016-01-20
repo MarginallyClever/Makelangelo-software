@@ -1,7 +1,0 @@
-DOWN
-
-G0 Y1
-G0 X1
-G0 Y-1
-
-UP
