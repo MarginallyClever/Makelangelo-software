@@ -155,7 +155,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	public void addListener(MakelangeloRobotListener listener) {
 		listeners.add(listener);
-		
 	}
 
 	public void removeListener(MakelangeloRobotListener listener) {
