@@ -182,7 +182,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
-		repaint();
+		repaintNow();
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -247,7 +247,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void setShowPenUp(boolean state) {
 		showPenUpMoves = state;
 		instructions.changed = true;
-		repaint();
+		emptyNodeBuffer();
+		repaintNow();
 	}
 
 	/**

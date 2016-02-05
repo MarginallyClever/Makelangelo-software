@@ -63,6 +63,41 @@ public class Converter_Crosshatch extends ImageConverter {
 				);
 	}
 
+	protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
+		if(lastUp != up) {
+			tool.writeMoveTo(out, (float) x, (float) y);
+			if (up) liftPen(out);
+			else lowerPen(out);
+			lastUp = up;
+		}
+	}
+
+	protected void convertAlongLine(BufferedImage img, Writer out,double x1,double y1,double x2,double y2,double stepSize, double level) throws IOException {
+		double dx = x2-x1;
+		double dy = y2-y1;
+		
+		double len = Math.sqrt(dx*dx+dy*dy);
+		double steps;
+		
+		if(len>0) steps = Math.ceil(len/stepSize);
+		else steps=1;
+		
+		double halfStep = stepSize/2.0;
+		double px,py;
+		int v;
+		
+		for(double i=0;i<=steps;++i) {
+			px = x1 + dx * (i/steps);
+			py = y1 + dy * (i/steps);
+			if( px>=xStart && px <xEnd && py>=yStart && py<yEnd ) {
+				v = sampleScale(img, px - halfStep, py - halfStep, px + halfStep, py + halfStep);
+			} else {
+				v=255;
+			}
+			moveToPaper(out, px, py, v >= level);
+		}
+	}
+	
 	protected void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
 		double leveladd = 255.0 / 6.0;
 		double level = leveladd;
@@ -90,73 +125,109 @@ public class Converter_Crosshatch extends ImageConverter {
 		previousY = 0;
 
 		double stepSize = tool.getDiameter() * 3.0;
-		double halfStep = stepSize / 2.0;
 		double x, y;
+		boolean flip=true;
 
 		// vertical
-		for (y = yStart; y < yEnd; y += stepSize) {
-			moveToPaper(out, xStart, y, true);
-			for (x = xStart; x < xEnd; x += stepSize) {
-				int v = sampleScale(img, x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-				moveToPaper(out, x, y, v >= level);
+		for (y = yStart; y <= yEnd; y += stepSize) {
+			if(flip) {
+				moveToPaper(out, xStart, y, true);
+				convertAlongLine(img,out,xStart,y,xEnd,y,stepSize,level);
+				moveToPaper(out, xEnd, y, true);
+			} else {
+				moveToPaper(out, xEnd, y, true);
+				convertAlongLine(img,out,xEnd,y,xStart,y,stepSize,level);
+				moveToPaper(out, xStart, y, true);
 			}
-			moveToPaper(out, xEnd, y, true);
+			flip = !flip;
 		}
+
+		level += leveladd;
+		
 		// horizontal
-		level += leveladd;
-		for (x = xStart; x < xEnd; x += stepSize) {
-			moveToPaper(out, x, yStart, true);
-			for (y = yStart; y < yEnd; y += stepSize) {
-				int v = sampleScale(img, x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-				moveToPaper(out, x, y, v >= level);
+		for (x = xStart; x <= xEnd; x += stepSize) {
+			if(flip) {
+				moveToPaper(out, x, yStart, true);
+				convertAlongLine(img,out,x,yStart,x,yEnd,stepSize,level);
+				moveToPaper(out, x, yEnd, true);
+			} else {
+				moveToPaper(out, x, yEnd, true);
+				convertAlongLine(img,out,x,yEnd,x,yStart,stepSize,level);
+				moveToPaper(out, x, yStart, true);
 			}
-			moveToPaper(out, x, yEnd, true);
+			flip = !flip;
 		}
 
-
-		double x2;
-
-		// diagonal 1
 		level += leveladd;
-		x = xStart;
-		do {
-			x2 = x;
-			moveToPaper(out, x2, yStart, true);
-			for (y = yStart; y < yEnd; y += stepSize, x2 -= stepSize) {
-				if (x2 < xStart) {
-					moveToPaper(out, xStart, y - stepSize, true);
-					break;
-				}
-				if (x2 > xEnd) continue;
-				int v = sampleScale(img, x2 - halfStep, y - halfStep, x2 + halfStep, y + halfStep);
-				moveToPaper(out, x2, y, v >= level);
-			}
-			//if(x2>=xStart && x2 <xEnd)
-			moveToPaper(out, x2, yEnd, true);
+		
+		// diagonal 1
+		double dy = yEnd-yStart;
+		double dx = xEnd-xStart;
+		double len = dx > dy? dx:dy;
 
-			x += stepSize;
-		} while (x2 < xEnd);
+		double x1 = -len;
+		double y1 = -len;
+		
+		double x2 = +len;
+		double y2 = +len;
+
+		double len2 = Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+		double steps;
+		if(len2>0) steps = len2/stepSize;
+		else steps=1;
+		double i;
+		
+		for(i=0;i<steps;++i) {
+			double px = x1+(x2-x1)*(i/steps);
+			double py = y1+(y2-y1)*(i/steps);
+			
+			double x3 = px-len;
+			double y3 = py+len;
+			double x4 = px+len;
+			double y4 = py-len;
+
+			if(flip) {
+				moveToPaper(out, x3, y3, true);
+				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
+				moveToPaper(out, x4, y4, true);
+			} else {
+				moveToPaper(out, x4, y4, true);
+				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
+				moveToPaper(out, x3, y3, true);
+			}
+			flip = !flip;
+		}
+		
+		level += leveladd;
 
 		// diagonal 2
-		level += leveladd;
-		x = xEnd;
-		do {
-			x2 = x;
-			moveToPaper(out, x2, yStart, true);
-			for (y = yStart; y < yEnd; y += stepSize, x2 += stepSize) {
-				if (x2 < xStart) continue;
-				if (x2 > xEnd) {
-					moveToPaper(out, xEnd, y -= stepSize, true);
-					break;
-				}
-				int v = sampleScale(img, x2 - halfStep, y - halfStep, x2 + halfStep, y + halfStep);
-				moveToPaper(out, x2, y, v >= level);
-			}
-			//if(x2>=xStart && x2 <xEnd)
-			moveToPaper(out, x2, yEnd, true);
 
-			x -= stepSize;
-		} while (x2 > xStart);
+		x1 = +len;
+		y1 = -len;
+		
+		x2 = -len;
+		y2 = +len;
+
+		for(i=0;i<steps;++i) {
+			double px = x1+(x2-x1)*(i/steps);
+			double py = y1+(y2-y1)*(i/steps);
+			
+			double x3 = px+len;
+			double y3 = py+len;
+			double x4 = px-len;
+			double y4 = py-len;
+
+			if(flip) {
+				moveToPaper(out, x3, y3, true);
+				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
+				moveToPaper(out, x4, y4, true);
+			} else {
+				moveToPaper(out, x4, y4, true);
+				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
+				moveToPaper(out, x3, y3, true);
+			}
+			flip = !flip;
+		}
 	}
 }
 

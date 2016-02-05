@@ -234,6 +234,8 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 			sample1x1Safe(img, right, (int) y1, xweightend * yweightend);
 		}
 
+		if(sampleSum==0) return 0;
+		
 		return (int) (sampleValue / sampleSum);
 	}
 

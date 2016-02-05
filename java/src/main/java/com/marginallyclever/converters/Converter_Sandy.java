@@ -143,7 +143,6 @@ public class Converter_Sandy extends ImageConverter {
 		boolean wasDrawing=true;
 		double flipSum;
 		pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
-		boolean isDown = pulseSize < PULSE_MINIMUM;
 
 		// make concentric circles that get bigger and bigger.
 		for(r=rMin;r<rMax;r+=rStep) {
@@ -168,7 +167,7 @@ public class Converter_Sandy extends ImageConverter {
 				last_x=x;
 				last_y=y;
 				// read a block of the image and find the average intensity in this block
-				z = sampleScale( img, x-rStep/4.0, y-rStep/4.0,x+rStep/4.0,y + rStep/4.0 );
+				z = sampleScale( img, x-pulseSize/2, y-pulseSize/2,x+pulseSize/2,y +pulseSize/2 );
 				// scale the intensity value
 				if(z<0) z=0;
 				if(z>255) z=255;
@@ -176,20 +175,25 @@ public class Converter_Sandy extends ImageConverter {
 
 
 				if(wasDrawing == false) {
-					moveToPaper(out,last_x,last_y,isDown);
+					moveToPaper(out,last_x,last_y,false);
 					wasDrawing=true;
 				}
 
 				flipSum+=scaleZ;
 				if(flipSum >= 1) {
 					flipSum-=1;
+
 					x2 = x + dx * pulseSize*pulseFlip;
 					y2 = y + dy * pulseSize*pulseFlip;
-					moveToPaper(out,x2,y2,isDown);
+					moveToPaper(out,x2,y2,false);
 					pulseFlip = -pulseFlip;
 					x2 = x + dx * pulseSize*pulseFlip;
 					y2 = y + dy * pulseSize*pulseFlip;
-					moveToPaper(out,x2,y2,isDown);
+					moveToPaper(out,x2,y2,false);
+				} else {
+					x2 = x + dx * pulseSize*pulseFlip;
+					y2 = y + dy * pulseSize*pulseFlip;
+					moveToPaper(out,x2,y2,false);
 				}
 			}
 			t_dir=-t_dir;

@@ -151,14 +151,16 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 						int error_line = errorReported(oneLine);
 	                    if(error_line != -1) {
 	                    	notifyLineError(error_line);
-	                    	break;
+	                    } else {
+	                    	// no error
+	                    	//if(oneLine.indexOf(CUE)!=0 || waitingForCue==false) 
+	                    	{
+	                    		notifyDataAvailable(oneLine);
+	                    	}
 	                    }
-
+	                    
 	                    // wait for the cue to send another command
 						if(oneLine.indexOf(CUE)==0) {
-							if(waitingForCue) {
-								notifyDataAvailable(oneLine);
-							}
 							waitingForCue=false;
 						}
 					}
