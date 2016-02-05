@@ -235,6 +235,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	public void updateMachineConfig() {
+		emptyNodeBuffer();
 		repaint();
 	}
 
@@ -247,7 +248,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void setShowPenUp(boolean state) {
 		showPenUpMoves = state;
-		instructions.changed = true;
+		if(instructions!=null) instructions.changed = true;
 		emptyNodeBuffer();
 		repaintNow();
 	}
@@ -653,6 +654,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		}
 	}
 
+	
 	private void addNodePos(int i, double x1, double y1, double x2, double y2) {
 		DrawPanelNode n = new DrawPanelNode();
 		n.line_number = i;
