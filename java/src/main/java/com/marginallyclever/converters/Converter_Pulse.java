@@ -18,8 +18,8 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Pulse extends ImageConverter {
-	private float blockScale = 6.0f;
-	private int direction = 0;
+	private static float blockScale = 6.0f;
+	private static int direction = 0;
 
 	public Converter_Pulse(MakelangeloRobotSettings mc) {
 		super(mc);

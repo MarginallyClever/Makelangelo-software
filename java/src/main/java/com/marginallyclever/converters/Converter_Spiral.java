@@ -17,7 +17,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan
  */
 public class Converter_Spiral extends ImageConverter {
-	private boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
+	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
 	@Override
 	public String getName() {

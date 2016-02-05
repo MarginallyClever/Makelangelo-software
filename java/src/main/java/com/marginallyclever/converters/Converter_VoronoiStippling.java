@@ -42,10 +42,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	private int w, h;
 	private BufferedImage src_img;
 	private List<VoronoiGraphEdge> graphEdges = null;
-	private int MAX_GENERATIONS = 40;
-	private int MAX_CELLS = 5000;
-	private float MAX_DOT_SIZE = 5.0f;
-	private float MIN_DOT_SIZE = 1.0f;
+	private static int MAX_GENERATIONS = 400;
+	private static int MAX_CELLS = 1000;
+	private static float MAX_DOT_SIZE = 5.0f;
+	private static float MIN_DOT_SIZE = 1.0f;
 	private Point2D bound_min = new Point2D();
 	private Point2D bound_max = new Point2D();
 	private int numEdgesInCell;

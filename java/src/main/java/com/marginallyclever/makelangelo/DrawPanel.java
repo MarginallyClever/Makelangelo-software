@@ -243,6 +243,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * toggle pen up moves.
 	 *
 	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
+ 	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
 	 */
 	public void setShowPenUp(boolean state) {
 		showPenUpMoves = state;

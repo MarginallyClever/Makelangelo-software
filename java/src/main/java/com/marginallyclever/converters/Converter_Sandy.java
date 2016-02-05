@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Sandy extends ImageConverter {
-	private float blockScale=50.0f;
+	private static float blockScale=150.0f;
 	private int direction=0;
 
 	public Converter_Sandy(MakelangeloRobotSettings mc) {
@@ -98,8 +98,6 @@ public class Converter_Sandy extends ImageConverter {
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 		setupPaperImageTransform();
 
-		double PULSE_MINIMUM=0.5;
-
 		// from top to bottom of the image...
 		double x, y, z, scaleZ, pulseSize;
 
@@ -173,7 +171,6 @@ public class Converter_Sandy extends ImageConverter {
 				if(z>255) z=255;
 				scaleZ = (255.0 -  z) / 255.0;
 
-
 				if(wasDrawing == false) {
 					moveToPaper(out,last_x,last_y,false);
 					wasDrawing=true;
@@ -182,7 +179,6 @@ public class Converter_Sandy extends ImageConverter {
 				flipSum+=scaleZ;
 				if(flipSum >= 1) {
 					flipSum-=1;
-
 					x2 = x + dx * pulseSize*pulseFlip;
 					y2 = y + dy * pulseSize*pulseFlip;
 					moveToPaper(out,x2,y2,false);

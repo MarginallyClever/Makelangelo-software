@@ -43,9 +43,9 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	private int w, h;
 	private BufferedImage src_img;
 	private List<VoronoiGraphEdge> graphEdges = null;
-	private int MAX_GENERATIONS=200;
-	private int MAX_CELLS=3000;
-	private float CUTOFF=1.0f;
+	private static int MAX_GENERATIONS=200;
+	private static int MAX_CELLS=3000;
+	private static float CUTOFF=1.0f;
 	private Point2D bound_min = new Point2D();
 	private Point2D bound_max = new Point2D();
 	private int numEdgesInCell;
