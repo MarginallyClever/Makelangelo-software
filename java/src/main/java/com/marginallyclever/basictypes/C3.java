@@ -10,9 +10,9 @@ import java.awt.Color;
  *
  */
 public class C3 {
-  int red = 0;
-  int green = 0;
-  int blue = 0;
+  public int red = 0;
+  public int green = 0;
+  public int blue = 0;
 
   public C3(int r, int g, int b) {
     red = r;
