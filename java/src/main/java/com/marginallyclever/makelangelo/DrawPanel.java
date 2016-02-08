@@ -687,7 +687,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	private void optimizeNodes() {
 		if (instructions == null) return;
-		if (instructions.changed == false) return;
+		if (!fastNodes.isEmpty() && instructions.changed == false) return;
 		instructions.changed = false;
 
 		DrawingTool tool = machine.getTool(0);

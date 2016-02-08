@@ -894,8 +894,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	public boolean loadGCode(String filename) {
 		try {
-			// TODO FIXME flip for glass should happen here.
-			gui.gCode.load(filename);
+			if(robot.settings.isReverseForGlass()) {
+				Log.message("Flipping for glass...");
+			}
+			gui.gCode.load(filename,robot.settings.isReverseForGlass());
 			Log.message(gui.gCode.estimateCount + Translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
 					+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
 					+ statusBar.formatTime((long) (gui.gCode.estimatedTime)) + "s.");
@@ -906,6 +908,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		gui.gCode.changed = true;
+		gui.getDrawPanel().setGCode(gui.gCode);
+		gui.getDrawPanel().repaintNow();
+		
 		//gui.halt();
 		return true;
 	}
@@ -1217,7 +1222,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				Log.message(Translator.get("Finished"));
 				loadGCode(destinationFile);
 				gui.soundSystem.playConversionFinishedSound();
-				gui.getDrawPanel().repaintNow();
 			}
 		};
 
