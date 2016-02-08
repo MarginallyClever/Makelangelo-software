@@ -234,6 +234,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void pause() {
+		if(isPaused) return;
+		
 		isPaused = true;
 		// remember for later if the pen is down
 		penIsUpBeforePause = penIsUp;
@@ -242,6 +244,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void unPause() {
+		if(!isPaused) return;
+		
 		// if pen was down before pause, lower it
 		if (!penIsUpBeforePause) {
 			lowerPen();
