@@ -347,8 +347,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		rs.flipHorizontally = machine.isReverseForGlass();
 		rs.targetWidth = machine.getPaperWidth();
 		rs.targetHeight = machine.getPaperHeight();
-
-
 		img = rs.filter(img);
 
 		// make black & white

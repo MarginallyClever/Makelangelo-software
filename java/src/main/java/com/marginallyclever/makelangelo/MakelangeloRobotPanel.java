@@ -962,7 +962,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					double outerAspectRatio = paperWidth / paperHeight;
 					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
 							: (paperHeight / imageHeight);
-					scale *= (robot.settings.isReverseForGlass() ? -1 : 1);
+					double flip = (robot.settings.isReverseForGlass() ? -1 : 1);
 					// double scaleX = imageWidth * scale;
 					// double scaleY = imageHeight * scale;
 
@@ -1003,9 +1003,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
-									double x = (start.getX() - imageCenterX) * scale;
+									double x = (start.getX() - imageCenterX) * scale * flip;
 									double y = (start.getY() - imageCenterY) * scale;
-									double x2 = (end.getX() - imageCenterX) * scale;
+									double x2 = (end.getX() - imageCenterX) * scale * flip;
 									double y2 = (end.getY() - imageCenterY) * scale;
 									double dx, dy;
 									// *
@@ -1042,7 +1042,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									boolean first = true;
 									for (int j = 0; j < polyLine.getVertexCount(); ++j) {
 										DXFVertex v = polyLine.getVertex(j);
-										double x = (v.getX() - imageCenterX) * scale;
+										double x = (v.getX() - imageCenterX) * scale * flip;
 										double y = (v.getY() - imageCenterY) * scale;
 										double dx = dxf_x2 - x;
 										double dy = dxf_y2 - y;
@@ -1082,7 +1082,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									boolean first = true;
 									for (int j = 0; j < entity.getVertexCount(); ++j) {
 										DXFVertex v = entity.getVertex(j);
-										double x = (v.getX() - imageCenterX) * scale;
+										double x = (v.getX() - imageCenterX) * scale * flip;
 										double y = (v.getY() - imageCenterY) * scale;
 										double dx = dxf_x2 - x;
 										double dy = dxf_y2 - y;
