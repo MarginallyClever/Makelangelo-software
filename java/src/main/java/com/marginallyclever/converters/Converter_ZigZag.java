@@ -344,7 +344,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		// resize & flip as needed
 		// Note that changing 250/250 here changes the number of dots a lot.
 		Filter_Resize rs = new Filter_Resize(250, 250);
-		rs.flipHorizontally = machine.isReverseForGlass();
 		rs.targetWidth = machine.getPaperWidth();
 		rs.targetHeight = machine.getPaperHeight();
 		img = rs.filter(img);

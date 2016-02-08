@@ -894,6 +894,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	public boolean loadGCode(String filename) {
 		try {
+			// TODO FIXME flip for glass should happen here.
 			gui.gCode.load(filename);
 			Log.message(gui.gCode.estimateCount + Translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
 					+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
@@ -910,9 +911,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	protected boolean loadDXF(String filename) {
-		// where to save temp output file?
 		final String destinationFile = gui.getTempDestinationFile();
-		final String srcFile = filename;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -940,7 +939,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					tool.writeChangeTo(out);
 					tool.writeOff(out);
 
-					parser.parse(srcFile, DXFParser.DEFAULT_ENCODING);
+					parser.parse(filename, DXFParser.DEFAULT_ENCODING);
 					DXFDocument doc = parser.getDocument();
 					Bounds b = doc.getBounds();
 					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
@@ -952,19 +951,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					double imageHeight = (b.getMaximumY() - b.getMinimumY());
 					double paperHeight = robot.settings.getPaperHeight() * 10 * robot.settings.getPaperMargin();
 					double paperWidth = robot.settings.getPaperWidth() * 10 * robot.settings.getPaperMargin();
-					// double scale = Math.min( scaleX/imageWidth,
-					// scaleY/imageHeight);
-					// double scale = (scaleX / imageWidth);
-					// if (imageHeight * scale > scaleX) scale = scaleY /
-					// imageHeight;
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
 					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
 							: (paperHeight / imageHeight);
-					double flip = (robot.settings.isReverseForGlass() ? -1 : 1);
-					// double scaleX = imageWidth * scale;
-					// double scaleY = imageHeight * scale;
 
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
@@ -1003,9 +994,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									Point start = entity.getStartPoint();
 									Point end = entity.getEndPoint();
 
-									double x = (start.getX() - imageCenterX) * scale * flip;
+									double x = (start.getX() - imageCenterX) * scale;
 									double y = (start.getY() - imageCenterY) * scale;
-									double x2 = (end.getX() - imageCenterX) * scale * flip;
+									double x2 = (end.getX() - imageCenterX) * scale;
 									double y2 = (end.getY() - imageCenterY) * scale;
 									double dx, dy;
 									// *
@@ -1040,9 +1031,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									entity.setLineWeight(30);
 									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
 									boolean first = true;
-									for (int j = 0; j < polyLine.getVertexCount(); ++j) {
-										DXFVertex v = polyLine.getVertex(j);
-										double x = (v.getX() - imageCenterX) * scale * flip;
+									int count = polyLine.getVertexCount() + (polyLine.isClosed()?1:0);
+									for (int j = 0; j < count; ++j) {
+										DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
+										double x = (v.getX() - imageCenterX) * scale;
 										double y = (v.getY() - imageCenterY) * scale;
 										double dx = dxf_x2 - x;
 										double dy = dxf_y2 - y;
@@ -1080,9 +1072,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 									pm.setProgress(entity_count++);
 									DXFPolyline entity = (DXFPolyline) iter.next();
 									boolean first = true;
-									for (int j = 0; j < entity.getVertexCount(); ++j) {
-										DXFVertex v = entity.getVertex(j);
-										double x = (v.getX() - imageCenterX) * scale * flip;
+									int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+									for (int j = 0; j < count; ++j) {
+										DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+										double x = (v.getX() - imageCenterX) * scale;
 										double y = (v.getY() - imageCenterY) * scale;
 										double dx = dxf_x2 - x;
 										double dy = dxf_y2 - y;
