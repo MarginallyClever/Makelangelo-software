@@ -13,6 +13,7 @@ import javax.swing.event.MouseInputListener;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
@@ -80,8 +81,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
 
 
-	public DrawPanel() {
-		super();
+	public DrawPanel(GLCapabilities caps) {        
+		super(caps);
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addGLEventListener(this);
@@ -165,6 +166,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 		GL2 gl2 = glautodrawable.getGL().getGL2();
 
+    	gl2.glEnable(GL2.GL_LINE_SMOOTH);      
+        gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
+        gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+        
 		// draw the world
 		render(gl2);
 	}

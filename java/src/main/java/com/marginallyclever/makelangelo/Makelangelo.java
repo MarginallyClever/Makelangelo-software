@@ -46,6 +46,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import com.jogamp.opengl.GLCapabilities;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
@@ -595,7 +596,12 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		cameraViewPanel = new DrawPanel();
+        GLCapabilities caps = new GLCapabilities(null);
+        caps.setSampleBuffers(true);
+        caps.setHardwareAccelerated(true);
+        caps.setNumSamples(4);
+        
+		cameraViewPanel = new DrawPanel(caps);
 		cameraViewPanel.setMachine(robot.settings);
 		cameraViewPanel.setGCode(gCode);
 

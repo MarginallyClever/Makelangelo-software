@@ -911,7 +911,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		gui.getDrawPanel().setGCode(gui.gCode);
 		gui.getDrawPanel().repaintNow();
 		
-		//gui.halt();
 		return true;
 	}
 
@@ -1087,7 +1086,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 										if (first == true) {
 											first = false;
-											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
+											if (dx * dx + dy * dy > tool.getDiameter()) {
 												// line does not start at last
 												// tool location, lift and move.
 												if (tool.isDrawOn()) {
@@ -1095,14 +1094,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 												}
 												tool.writeMoveTo(out, (float) x, (float) y);
 											}
-											// else line starts right here, do
-											// nothing.
+											// else line starts right here, do nothing.
 										} else {
 											// not the first point, draw.
 											if (tool.isDrawOff())
 												tool.writeOn(out);
 											if (j < entity.getVertexCount() - 1
-													&& dx * dx + dy * dy < tool.getDiameter() / 2.0)
+													&& dx * dx + dy * dy < tool.getDiameter()*3)
 												continue; // less than 1mm
 															// movement? Skip
 															// it.
