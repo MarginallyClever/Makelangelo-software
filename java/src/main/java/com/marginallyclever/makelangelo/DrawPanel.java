@@ -165,10 +165,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		//System.out.println(dt);
 
 		GL2 gl2 = glautodrawable.getGL().getGL2();
-
-    	gl2.glEnable(GL2.GL_LINE_SMOOTH);      
-        gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
-        gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+		
+    	//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
+        //gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
+        //gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
         
 		// draw the world
 		render(gl2);

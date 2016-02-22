@@ -595,12 +595,14 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		//Create the content-pane-to-be.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
-
+//*/
         GLCapabilities caps = new GLCapabilities(null);
         caps.setSampleBuffers(true);
         caps.setHardwareAccelerated(true);
         caps.setNumSamples(4);
-        
+        /*/
+		GLCapabilities caps = new GLCapabilities(null);
+		//*/
 		cameraViewPanel = new DrawPanel(caps);
 		cameraViewPanel.setMachine(robot.settings);
 		cameraViewPanel.setGCode(gCode);
