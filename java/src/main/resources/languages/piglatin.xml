@@ -8,217 +8,217 @@
 
 	<string>
 		<key>Cancel</key>
-		<value> ancelCay </value>
+		<value>ancelCay</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Save</key>
-		<value> aveSay </value>
+		<value>aveSay</value>
 		<hint>used in many places</hint>
 	</string>
 	
 	<string>
 		<key>Load</key>
-		<value> oadLay </value>
+		<value>oadLay</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>CouldNotFind</key>
-		<value> ouldcay otnay indfay </value>
+		<value>ouldcay otnay indfay</value>
 		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
 	</string>
 	
 	<string>
 		<key>MachineWidth</key>
-		<value> achineMay idthway </value>
+		<value>achineMay idthway</value>
 		<hint>Machine settings</hint>
 	</string>
 	<string>
 		<key>MachineHeight</key>
-		<value> achineMay eighthay </value>
+		<value>achineMay eighthay</value>
 		<hint>Machine settings</hint>
 	</string>
 	
 	<string>
 		<key>PaperWidth</key>
-		<value> aperPay idthway </value>
+		<value>aperPay idthway</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>PaperHeight</key>
-		<value> aperPay eighthay </value>
+		<value>aperPay eighthay</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>InvertLeft</key>
-		<value> Invertyay eftlay </value>
+		<value>Invertyay eftlay</value>
 		<hint>jog motor control panel</hint>
 	</string>
 	<string>
 		<key>InvertRight</key>
-		<value> Invertyay ightray </value>
+		<value>Invertyay ightray</value>
 		<hint>jog motor control panel</hint>
 	</string>
 	<string>
 		<key>ToolType</key>
-		<value> oolTay ypetay </value>
+		<value>oolTay ypetay</value>
 		<hint>tool settings</hint>
 	</string>
 	
 	<string>
 		<key>PaperSize</key>
-		<value> aperPay izeSay </value>
+		<value>aperPay izeSay</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>AdjustPulleySize</key>
-		<value> ulleyPay iameterday </value>
+		<value>ulleyPay iameterday</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>AdjustAcceleration</key>
-		<value> Accelerationyay </value>
+		<value>Accelerationyay</value>
 		<hint>machine size control panel</hint>
 	</string>
 	
 	<string>
 		<key>Left</key>
-		<value> eftLay </value>
+		<value>eftLay</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Right</key>
-		<value> ightRay </value>
+		<value>ightRay</value>
 		<hint>used in many places</hint>
 	</string>
 	<string>
 		<key>Millimeters</key>
-		<value> mmay </value>
+		<value>mmay</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>ConnectingTo</key>
-		<value> onnectingCay otay </value>
+		<value>onnectingCay otay</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortNotConfigured</key>
-		<value> ortPay ouldcay otnay ebay onfiguredcay:</value>
+		<value>ortPay ouldcay otnay ebay onfiguredcay:</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>PortOpened</key>
-		<value> ortPay openedyay.</value>
+		<value>ortPay openedyay.</value>
 		<hint>status message</hint>
 	</string>
 	<string>
 		<key>TitlePrefix</key>
-		<value> akelangeloMay </value>
+		<value>akelangeloMay</value>
 		<hint>window title</hint>
 	</string>
 	<string>
 		<key>TitlePostfix</key>
-		<value> onnectedcay </value>
+		<value>onnectedcay</value>
 		<hint>window title</hint>
 	</string>
 
 	<string>
 		<key>LineSegments</key>
-		<value> inelay egmentssay.</value>
+		<value>inelay egmentssay.</value>
 		<hint>status message</hint>
 	</string>
 	<string>
 		<key>Centimeters</key>
-		<value> cmay </value>
+		<value>cmay</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>EstimatedTime</key>
-		<value> Estimatedyay awdray imetay: </value>
+		<value>Estimatedyay awdray imetay:</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
 
 	<string>
 		<key>FileNotOpened</key>
-		<value> ileFay ouldcay otnay ebay openedyay: </value>
+		<value>ileFay ouldcay otnay ebay openedyay:</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
 
 	<string>
 		<key>ConversionOptions</key>
-		<value> onversionCay optionsyay </value>
+		<value>onversionCay optionsyay</value>
 		<hint>dialog title</hint>
 	</string>
 	<string>
 		<key>FlipForGlass</key>
-		<value> ipFlay orfay assglay </value>
+		<value>ipFlay orfay assglay</value>
 		<hint>conversion options</hint>
 	</string>
 
 	<string>
 		<key>Start</key>
-		<value> artStay </value>
+		<value>artStay</value>
 		<hint>As in "start drawing"</hint>
 	</string>
 
 	<string>
 		<key>PaperMargin</key>
-		<value> arginMay atyay aperpay edgeyay (%)</value>
+		<value>arginMay atyay aperpay edgeyay (%)</value>
 		<hint>conversion options</hint>
 	</string>
 	<string>
 		<key>Converting</key>
-		<value> onvertingCay </value>
+		<value>onvertingCay</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Finished</key>
-		<value> ompletedCay </value>
+		<value>ompletedCay</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Cancelled</key>
-		<value> ancelledCay </value>
+		<value>ancelledCay</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>Failed</key>
-		<value> ailedFay: </value>
+		<value>ailedFay:</value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
 
 	<string>
 		<key>ConversionStyle</key>
-		<value> onversionCay ylestay </value>
+		<value>onversionCay ylestay</value>
 		<hint>conversion options</hint>
 	</string>
 
 	<string>
 		<key>OpeningFile</key>
-		<value> Openingyay </value>
+		<value>Openingyay</value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>UnknownFileType</key>
-		<value> Unknownyay ilefay ypetay </value>
+		<value>Unknownyay ilefay ypetay</value>
 		<hint>status update</hint>
 	</string>
 	<string>
 		<key>SetPaperSize</key>
-		<value> easePlay etsay ayay aperpay izesay eforebay importingyay anyay imageyay.</value>
+		<value>easePlay etsay ayay aperpay izesay eforebay importingyay anyay imageyay.</value>
 		<hint>warning message</hint>
 	</string>
 
 	<string>
 		<key>FileTypeGCode</key>
-		<value> ODEGCay (ngc)</value>
+		<value>ODEGCay (ngc)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string>
 		<key>FileTypeImage</key>
-		<value> Imageyay (jpg/bmp/png/gif)</value>
+		<value>Imageyay (jpg/bmp/png/gif)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string>
@@ -229,171 +229,171 @@
 
 	<string>
 		<key>MenuSoundsTitle</key>
-		<value> oundsSay </value>
+		<value>oundsSay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSoundsConnect</key>
-		<value> onnectCay </value>
+		<value>onnectCay</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsDisconnect</key>
-		<value> isconnectDay </value>
+		<value>isconnectDay</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsFinishConvert</key>
-		<value> inishFay onvertingcay </value>
+		<value>inishFay onvertingcay</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuSoundsFinishDraw</key>
-		<value> inishFay awingdray </value>
+		<value>inishFay awingdray</value>
 		<hint>sound settings dialog</hint>
 	</string>
 
 	<string>
 		<key>MenuGraphicsTitle</key>
-		<value> aphicsGray </value>
+		<value>aphicsGray</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsPenUp</key>
-		<value> owShay enpay upyay ovesmay </value>
+		<value>owShay enpay upyay ovesmay</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsAntialias</key>
-		<value> Antialiasyay ineslay </value>
+		<value>Antialiasyay ineslay</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsSpeedVSQuality</key>
-		<value> eedSpay overyay ualityqay </value>
+		<value>eedSpay overyay ualityqay</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuGraphicsDrawWhileRunning</key>
-		<value> owShay entireyay imageyay ilewhay awingdray </value>
+		<value>owShay entireyay imageyay ilewhay awingdray</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 
 	<string>
 		<key>MenuResetMachinePreferences</key>
-		<value> esetRay eferencesPray </value>
+		<value>esetRay eferencesPray</value>
 		<hint>Preferences menu</hint>
 	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
-		<value> anguageLay </value>
+		<value>anguageLay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>InvalidTool</key>
-		<value> equestedRay invalidyay ooltay #</value>
+		<value>equestedRay invalidyay ooltay #</value>
 		<hint>warning message</hint>
 	</string>
 	<string>
 		<key>ChangeToolPrefix</key>
-		<value> easePlay eparepray </value>
+		<value>easePlay eparepray</value>
 		<hint>tool change prompt. keep the space at the end.</hint>
 	</string>
 	<string>
 		<key>ChangeToolPostfix</key>
-		<value> andyay ickclay anyyay uttonbay otay ontinuecay.</value>
+		<value>andyay ickclay anyyay uttonbay otay ontinuecay.</value>
 		<hint>tool change prompt. keep the space at the start.</hint>
 	</string>
 
 	<string>
 		<key>StartAt</key>
-		<value> artStay atyay </value>
+		<value>artStay atyay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>StartAtLine</key>
-		<value> artStay atyay inelay #</value>
+		<value>artStay atyay inelay #</value>
 		<hint>start at dialog</hint>
 	</string>
 
 	<string>
 		<key>Pause</key>
-		<value> ausePay </value>
+		<value>ausePay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>Unpause</key>
-		<value> Unpauseyay </value>
+		<value>Unpauseyay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>SetHome</key>
-		<value> etSay omehay </value>
+		<value>etSay omehay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>GoHome</key>
-		<value> oGay omehay </value>
+		<value>oGay omehay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
 		<key>Top</key>
-		<value> opTay </value>
+		<value>opTay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Bottom</key>
-		<value> ottomBay </value>
+		<value>ottomBay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Left</key>
-		<value> eftLay </value>
+		<value>eftLay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
-		<value> ightRay </value>
+		<value>ightRay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenUp</key>
-		<value> enPay upyay </value>
+		<value>enPay upyay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PenDown</key>
-		<value> enPay ownday </value>
+		<value>enPay ownday</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
 		<key>Set</key>
-		<value> etSay </value>
+		<value>etSay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Speed</key>
-		<value> eedSpay:</value>
+		<value>eedSpay:</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Rate</key>
-		<value> epsstay/inmay </value>
+		<value>epsstay/inmay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
 		<key>JogMotors</key>
-		<value> otorsMay </value>
+		<value>otorsMay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>JogIn</key>
-		<value> INYAY</value>
+		<value>INYAY</value>
 		<hint>jog motors dialog</hint>
 	</string>
 	<string>
@@ -403,7 +403,7 @@
 	</string>
 	<string>
 		<key>Invert</key>
-		<value> Invertyay </value>
+		<value>Invertyay</value>
 		<hint>jog motors dialog</hint>
 	</string>
 
@@ -414,381 +414,381 @@
 	</string>
 	<string>
 		<key>UpToDate</key>
-		<value> isthay oftwaresay isyay upyay otay ateday  This software is up to date.</value>
+		<value>isthay oftwaresay isyay upyay otay ateday  This software is up to date.</value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
 		<key>UpdateCheckFailed</key>
-		<value> orrysay, Iyay ailedfay. Please visit http://www.marginallyclever.com/ 
+		<value>orrysay, Iyay ailedfay. Please visit http://www.marginallyclever.com/ 
 to check yourself.</value>
 		<hint>check for update dialog</hint>
 	</string>
 
 	<string>
 		<key>Send</key>
-		<value> endsay </value>
+		<value>endsay</value>
 		<hint>drive manually dialog</hint>
 	</string>
 	<string>
 		<key>TitleNotConnected</key>
-		<value> otnay onnectedcay </value>
+		<value>otnay onnectedcay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuMakelangelo</key>
-		<value> akelangelomay </value>
+		<value>akelangelomay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuPreferences</key>
-		<value> eferencesPray </value>
+		<value>eferencesPray</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuLog</key>
-		<value> ogLay </value>
+		<value>ogLay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuUpdate</key>
-		<value> eckChay orfay updatesyay </value>
+		<value>eckChay orfay updatesyay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAbout</key>
-		<value> Aboutyay </value>
+		<value>Aboutyay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuQuit</key>
-		<value> uitQay </value>
+		<value>uitQay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuConnect</key>
-		<value> onnectCay </value>
+		<value>onnectCay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuRescan</key>
-		<value> escanRay </value>
+		<value>escanRay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuDisconnect</key>
-		<value> isconnectDay </value>
+		<value>isconnectDay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuLoadMachineConfig</key>
-		<value> oadLay ettingssay orfay...</value>
+		<value>oadLay ettingssay orfay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuSettings</key>
-		<value> ettingsSay </value>
+		<value>ettingsSay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSettingsMachine</key>
-		<value> achineMay </value>
+		<value>achineMay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAdjustPaper</key>
-		<value> aperPay </value>
+		<value>aperPay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAdjustPulleys</key>
-		<value> ulleyPay izesay </value>
+		<value>ulleyPay izesay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuJogMotors</key>
-		<value> ogJay otorsMay </value>
+		<value>ogJay otorsMay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuSelectTool</key>
-		<value> electSay activeyay ooltay </value>
+		<value>electSay activeyay ooltay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuAdjustTool</key>
-		<value> enPay </value>
+		<value>enPay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuGCODE</key>
-		<value> onvertCay </value>
+		<value>onvertCay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuTextToGCODE</key>
-		<value> Youryay essagemay erehay </value>
+		<value>Youryay essagemay erehay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuConvertImage</key>
-		<value> Openyay ecentRay...</value>
+		<value>Openyay ecentRay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuOpenFile</key>
-		<value> Openyay ileFay...</value>
+		<value>Openyay ileFay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value> aveSay asyay...</value>
+		<value>aveSay asyay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuDraw</key>
-		<value> awDray </value>
+		<value>awDray</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>Halt</key>
-		<value> altHay </value>
+		<value>altHay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuPreview</key>
-		<value> iewVay </value>
+		<value>iewVay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>ZoomIn</key>
-		<value> oomZay +</value>
+		<value>oomZay +</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>ZoomOut</key>
-		<value> oomZay -</value>
+		<value>oomZay -</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>ZoomFit</key>
-		<value> oomZay otay itfay </value>
+		<value>oomZay otay itfay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 	<key>ShowLog</key>
-	<value> owShay ogLay </value>
+	<value>owShay ogLay</value>
 	<hint>menu or dialog title</hint>
 	</string>
 	<string>
 	<key>HideLog</key>
-	<value> ideHay ogLay </value>
+	<value>ideHay ogLay</value>
 	<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>mmNotice</key>
-		<value> Allyay aluesvay inyay mmay.</value>
+		<value>Allyay aluesvay inyay mmay.</value>
 		<hint>Machine size</hint>
 	</string>
 
 	<string>
 		<key>penToolAdjust</key>
-		<value> enPay </value>
+		<value>enPay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolDiameter</key>
-		<value> iameterDay </value>
+		<value>iameterDay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value> axMay eedfay ateray </value>
+		<value>axMay eedfay ateray</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolUp</key>
-		<value> Upyay </value>
+		<value>Upyay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolDown</key>
-		<value> ownDay </value>
+		<value>ownDay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value> iftLay elayday </value>
+		<value>iftLay elayday</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolTest</key>
-		<value> estTay </value>
+		<value>estTay</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 
 
 	<string>
 		<key>spraypaintToolTest</key>
-		<value> aypaintSpray </value>
+		<value>aypaintSpray</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDiameter</key>
-		<value> otDay izesay </value>
+		<value>otDay izesay</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolMaxFeedRate</key>
-		<value> axMay eedfay ateray </value>
+		<value>axMay eedfay ateray</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolUp</key>
-		<value> Offyay </value>
+		<value>Offyay</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDown</key>
-		<value> Onyay </value>
+		<value>Onyay</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolLiftSpeed</key>
-		<value> Onyay/offyay eedspay </value>
+		<value>Onyay/offyay eedspay</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
 		<key>spraypaintToolTest</key>
-		<value> akeMay ayay otday </value>
+		<value>akeMay ayay otday</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 
 	<string>
 		<key>voronoiStipplingName</key>
-		<value> oronoiVay ipplesstay </value>
+		<value>oronoiVay ipplesstay</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingCellCount</key>
-		<value> umberNay ofyay ellsCay </value>
+		<value>umberNay ofyay ellsCay</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingGenCount</key>
-		<value> umberNay ofyay enerationsGay </value>
+		<value>umberNay ofyay enerationsGay</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingDotMax</key>
-		<value> axMay otday izesay </value>
+		<value>axMay otday izesay</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
 		<key>voronoiStipplingDotMin</key>
-		<value> inMay otday izesay </value>
+		<value>inMay otday izesay</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 
 	<string>
 		<key>BoxGeneratorName</key>
-		<value> oxxyBay </value>
+		<value>oxxyBay</value>
 		<hint>Boxxy generator</hint>
 	</string>
 	<string>
 		<key>CrosshatchName</key>
-		<value> osshatchCray </value>
+		<value>osshatchCray</value>
 		<hint>Crosshatch generator</hint>
 	</string>
 	<string>
 		<key>HilbertCurveName</key>
-		<value> ilbertHay urveCay </value>
+		<value>ilbertHay urveCay</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
 		<key>HilbertCurveSize</key>
-		<value> izeSay </value>
+		<value>izeSay</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
 		<key>HilbertCurveOrder</key>
-		<value> Orderyay </value>
+		<value>Orderyay</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
 		<key>MazeName</key>
-		<value> azeMay </value>
+		<value>azeMay</value>
 		<hint>Maze generator</hint>
 	</string>
 	<string>
 		<key>MazeRows</key>
-		<value> owsRay </value>
+		<value>owsRay</value>
 		<hint>Maze generator</hint>
 	</string>
 	<string>
 		<key>MazeColumns</key>
-		<value> olumnsCay </value>
+		<value>olumnsCay</value>
 		<hint>Maze generator</hint>
 	</string>
 
 	<string>
 		<key>PulseLineName</key>
-		<value> ulsePay ineLay </value>
+		<value>ulsePay ineLay</value>
 		<hint>Pulse Line generator</hint>
 	</string>
 	<string>
 		<key>ZigZagName</key>
-		<value> igBay igzay agzay </value>
+		<value>igBay igzay agzay</value>
 		<hint>Zig Zag generator</hint>
 	</string>
 	<string>
 		<key>YourMsgHereName</key>
-		<value> Youryay essagemay erehay </value>
+		<value>Youryay essagemay erehay</value>
 		<hint>Your message here generator</hint>
 	</string>
 	<string>
 		<key>SpiralName</key>
-		<value> iralSpay </value>
+		<value>iralSpay</value>
 		<hint>Spiral generator</hint>
 	</string>
 	<string>
 		<key>ScanlineName</key>
-		<value> anlineScay </value>
+		<value>anlineScay</value>
 		<hint>Scanline generator</hint>
 	</string>
 	<string>
 		<key>RGBName</key>
-		<value> edRay eenGray ueBlay </value>
+		<value>edRay eenGray ueBlay</value>
 		<hint>RGB generator</hint>
 	</string>
 
 	<string>
 		<key>SharePromo</key>
-		<value> Useyay itterTway areshay youryay artyay.   Use Twitter tag #makelangelo to share your art and see what others have made.</value>
+		<value>Useyay itterTway areshay youryay artyay.   Use Twitter tag #makelangelo to share your art and see what others have made.</value>
 		<hint>Your drawing is finished. Share it</hint>
 	</string>
 
 	<string>
 		<key>StatusSoFar</key>
-		<value> imeTay unningray: </value>
+		<value>imeTay unningray:</value>
 		<hint>time machine has been drawing</hint>
 	</string>
 
 	<string>
 		<key>StatusRemaining</key>
-		<value> Estimatedyay imetay eftlay: </value>
+		<value>Estimatedyay imetay eftlay:</value>
 		<hint>time machine will be drawing</hint>
 	</string>
 
 	<string>
 		<key>DisengageMotors</key>
-		<value> isengageDay </value>
+		<value>isengageDay</value>
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 
@@ -821,13 +821,13 @@ to check yourself.</value>
       </body>
     </html>
     ]]>
-        </value>
+       </value>
         <hint>HTML for About Dialog</hint>
     </string>
 
 	<string>
 		<key>MenuSettingsRegister</key>
-		<value> egisterRay </value>
+		<value>egisterRay</value>
 		<hint>Machine Configuration > Register tab title</hint>
 	</string>
 
@@ -839,93 +839,93 @@ to check yourself.</value>
 
 	<string>
 		<key>PleaseRegisterCreateAccountButton</key>
-		<value> eateCray anyay accountyay </value>
+		<value>eateCray anyay accountyay</value>
 		<hint>Machine Configuration > Register robot</hint>
 	</string>
 
 	<string>
 		<key>PleaseRegisterUsername</key>
-		<value> Useryay amenay </value>
+		<value>Useryay amenay</value>
 		<hint>Machine Configuration > Register robot</hint>
 	</string>
 
 	<string>
 		<key>PleaseRegisterPassword</key>
-		<value> asswordPay </value>
+		<value>asswordPay</value>
 		<hint>Machine Configuration > Register robot</hint>
 	</string>
 
 	<string>
 		<key>MachineNumber</key>
-		<value> achineMay #</value>
+		<value>achineMay #</value>
 		<hint>Prepare image panel</hint>
 	</string>
 
 	<string>
 		<key>MenuResetMachinePreferencesWarning</key>
-		<value> eraseyay allyay youryay eferencespray   Are you sure you want to erase all your preferences?</value>
+		<value>eraseyay allyay youryay eferencespray   Are you sure you want to erase all your preferences?</value>
 		<hint>Makelangelo > preferences > reset preferences</hint>
 	</string>
 
 	<string>
 		<key>MenuGenerate</key>
-		<value> enerateGay artyay </value>
+		<value>enerateGay artyay</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>MenuNewFile</key>
-		<value> ewNay </value>
+		<value>ewNay</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>LSystemTreeName</key>
-		<value> Lay ystemSay eeTray actalFray </value>
+		<value>Lay ystemSay eeTray actalFray</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>KochTreeName</key>
-		<value> ochKay urveCay actalFray </value>
+		<value>ochKay urveCay actalFray</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>DragonName</key>
-		<value> agonDray actalFray </value>
+		<value>agonDray actalFray</value>
 		<hint></hint>
 	</string>
 
 	<string>
 		<key>ClickAndDrag</key>
-		<value> ickClay andyay agDray </value>
+		<value>ickClay andyay agDray</value>
 		<hint>live drawing panel</hint>
 	</string>
 	<string>
 		<key>configureMachine</key>
-		<value> ettingsSay </value>
+		<value>ettingsSay</value>
 		<hint>open machine settings dialog</hint>
 	</string>
 	<string>
 		<key>MenuResetMachinePreferences</key>
-		<value> esetRay eferencesPray </value>
+		<value>esetRay eferencesPray</value>
 		<hint>Preferences menu</hint>
 	</string>
 	<string>
 		<key>MenuLog</key>
-		<value> ogLay </value>
+		<value>ogLay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	
 	<string>
 		<key>PaperSize</key>
-		<value> aperPay izeSay </value>
+		<value>aperPay izeSay</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
 		<key>DisengageMotors</key>
-		<value> isengageDay </value>
+		<value>isengageDay</value>
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 	
