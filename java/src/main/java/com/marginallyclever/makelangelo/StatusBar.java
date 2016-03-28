@@ -27,21 +27,6 @@ public class StatusBar extends JPanel {
 	protected JLabel mRemaining;
 	protected JProgressBar bar;
 
-	public String formatTime(long millis) {
-		long s = millis / 1000;
-		long m = s / 60;
-		long h = m / 60;
-		m %= 60;
-		s %= 60;
-
-		String elapsed = "";
-		if (h > 0) elapsed += h + "h";
-		if (h > 0 || m > 0) elapsed += m + "m";
-		elapsed += s + "s ";
-
-		return elapsed;
-	}
-
 
 	public StatusBar(Translator ms) {
 		super();
@@ -113,9 +98,9 @@ public class StatusBar extends JPanel {
 		long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
 		long remaining = total_time - t_draw_now;
 
-		mFinished.setText(formatTime(t_draw_now));
+		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
 		mExactly.setText(sofar + "/" + total);
-		mRemaining.setText(formatTime(remaining));
+		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }
 

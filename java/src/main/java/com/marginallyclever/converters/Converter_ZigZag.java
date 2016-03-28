@@ -26,12 +26,6 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan
  */
 public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorator {
-	private ReentrantLock lock = new ReentrantLock();
-
-	public String getName() {
-		return Translator.get("ZigZagName");
-	}
-
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;
@@ -43,9 +37,12 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	int[] solution = null;
 	int scount;
 
+	
+	private ReentrantLock lock = new ReentrantLock();
 
-	public Converter_ZigZag(MakelangeloRobotSettings mc) {
-		super(mc);
+	
+	public String getName() {
+		return Translator.get("ZigZagName");
 	}
 
 

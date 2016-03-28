@@ -6,15 +6,10 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Boxes extends ImageConverter {
-	public Converter_Boxes(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	@Override
 	public String getName() {
 		return Translator.get("BoxGeneratorName");

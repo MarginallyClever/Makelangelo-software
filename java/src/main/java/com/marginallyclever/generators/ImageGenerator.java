@@ -11,10 +11,6 @@ import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
  *
  */
 public abstract class ImageGenerator extends ImageManipulator implements DrawPanelDecorator {
-	public ImageGenerator(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	/**
 	 * @return true if generate succeeded.
 	 * @param dest the file where the results will be saved.

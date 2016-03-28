@@ -7,7 +7,6 @@ import java.io.Writer;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -26,9 +25,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	private int direction = 1;
 
 
-	public Converter_ColorBoxes(MakelangeloRobotSettings mc) {
-		super(mc);
-
+	public Converter_ColorBoxes() {
 		palette = new ColorPalette();
 		palette.addColor(new C3(0, 0, 0));
 		palette.addColor(new C3(255, 0, 0));

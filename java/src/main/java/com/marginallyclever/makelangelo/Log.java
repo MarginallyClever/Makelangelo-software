@@ -75,6 +75,27 @@ public class Log {
 
 
 	/**
+	 * turns milliseconds into h:m:s
+	 * @param millis
+	 * @return
+	 */
+	public static String millisecondsToHumanReadable(long millis) {
+		long s = millis / 1000;
+		long m = s / 60;
+		long h = m / 60;
+		m %= 60;
+		s %= 60;
+
+		String elapsed = "";
+		if (h > 0) elapsed += h + "h";
+		if (h > 0 || m > 0) elapsed += m + "m";
+		elapsed += s + "s ";
+
+		return elapsed;
+	}
+	
+
+	/**
 	 * Appends a message to the log file
 	 * @param color the hex code or HTML name of the color for this message
 	 * @param msg the text

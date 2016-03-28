@@ -7,15 +7,10 @@ import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_Invert;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_CannyEdge extends ImageConverter {
-	public Converter_CannyEdge(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	@Override
 	public String getName() {
 		return Translator.get("CannyEdgeConverterName");

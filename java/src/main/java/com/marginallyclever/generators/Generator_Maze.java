@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Maze extends ImageGenerator {
@@ -37,11 +36,6 @@ public class Generator_Maze extends ImageGenerator {
 	protected MazeCell [] cells;
 	protected MazeWall [] walls;
 	
-
-	
-	public Generator_Maze(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
 
 	@Override
 	public String getName() {

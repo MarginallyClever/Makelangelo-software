@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -24,10 +23,6 @@ public class Converter_Crosshatch extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("Crosshatch");
-	}
-
-	public Converter_Crosshatch(MakelangeloRobotSettings mc) {
-		super(mc);
 	}
 
 

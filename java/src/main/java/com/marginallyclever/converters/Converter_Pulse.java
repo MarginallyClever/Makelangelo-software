@@ -13,17 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 
 public class Converter_Pulse extends ImageConverter {
 	private static float blockScale = 6.0f;
 	private static int direction = 0;
-
-	public Converter_Pulse(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
 
 	@Override
 	public String getName() {

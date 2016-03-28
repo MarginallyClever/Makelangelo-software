@@ -54,10 +54,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	private double[] yValuesIn = null;
 
 
-	public Converter_VoronoiStippling(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	@Override
 	public String getName() {
 		return Translator.get("voronoiStipplingName");

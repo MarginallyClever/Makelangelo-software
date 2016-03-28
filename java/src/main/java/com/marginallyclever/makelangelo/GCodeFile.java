@@ -21,7 +21,15 @@ public class GCodeFile {
 	private int linesProcessed = 0;
 	private boolean fileOpened = false;
 	private ArrayList<String> lines = new ArrayList<String>();
+	
+	/**
+	 * Milliseconds to draw gcode.
+	 */
 	public float estimatedTime = 0;
+	
+	/**
+	 * Distance tool must travel to draw gcode.
+	 */
 	public float estimatedLength = 0;
 	public int estimateCount = 0;
 	public float scale = 1.0f;

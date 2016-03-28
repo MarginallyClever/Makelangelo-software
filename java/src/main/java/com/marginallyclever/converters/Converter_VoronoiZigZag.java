@@ -63,10 +63,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	private long time_limit=10*60*1000;  // 10 minutes
 
 
-	public Converter_VoronoiZigZag(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	@Override
 	public String getName() { return Translator.get("ZigZagName")+" 2"; }
 

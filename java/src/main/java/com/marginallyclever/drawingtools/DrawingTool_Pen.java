@@ -165,18 +165,10 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		Object subject = event.getSource();
 
 		if (subject == buttonTestUp) {
-			if(robot.isPortConfirmed()) {
-				try {
-				robot.getConnection().sendMessage("G00 Z" + penUp.getText());
-				} catch(Exception e) {}
-			}
+			robot.sendLineToRobot("G00 Z" + penUp.getText());
 		}
 		if (subject == buttonTestDown) {
-			if(robot.isPortConfirmed()) {
-				try {
-					robot.getConnection().sendMessage("G00 Z" + penDown.getText());
-				} catch(Exception e) {}
-			}
+			robot.sendLineToRobot("G00 Z" + penDown.getText());
 		}
 	}
 	

@@ -31,10 +31,6 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 	protected int colorChannel = 0;
 
 
-	public ImageConverter(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
-
 	/**
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
 	 * @return true if conversion succeeded.

@@ -13,7 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_HilbertCurve extends ImageGenerator {
@@ -30,10 +29,6 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	int order = 4; // controls complexity of curve
 	float x, y;
 
-
-	public Generator_HilbertCurve(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
 
 	@Override
 	public String getName() {

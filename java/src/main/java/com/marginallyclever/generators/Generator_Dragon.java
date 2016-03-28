@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Dragon extends ImageGenerator {
@@ -30,10 +29,6 @@ public class Generator_Dragon extends ImageGenerator {
 
 	private List<Integer> sequence;
 
-	
-	public Generator_Dragon(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
 
 	@Override
 	public String getName() {

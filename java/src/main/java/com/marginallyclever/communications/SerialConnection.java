@@ -176,7 +176,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	protected void sendQueuedCommand() {
 		if(!portOpened || waitingForCue) return;
 		
-		if(commandQueue.size()==0) {
+		if(commandQueue.isEmpty()==true) {
 		      notifyConnectionReady();
 		      return;
 		}

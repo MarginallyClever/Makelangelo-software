@@ -9,6 +9,7 @@ import javax.swing.SwingWorker;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.DrawPanel;
+import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 
 
@@ -39,16 +40,16 @@ public abstract class ImageManipulator {
 	protected DrawPanel drawPanel;
 
 
-	public ImageManipulator(MakelangeloRobotSettings mc) {
-		machine = mc;
-	}
-
 	public void setParent(SwingWorker<Void, Void> p) {
 		parent = p;
 	}
 
 	public void setProgressMonitor(ProgressMonitor p) {
 		pm = p;
+	}
+	
+	public void setMachine(MakelangeloRobot robot) {
+		machine = robot.settings;
 	}
 
 	public void setDrawPanel(DrawPanel drawPanel) {

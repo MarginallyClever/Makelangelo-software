@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -22,11 +21,6 @@ public class Converter_Spiral extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("SpiralName");
-	}
-
-
-	public Converter_Spiral(MakelangeloRobotSettings mc) {
-		super(mc);
 	}
 
 

@@ -53,7 +53,6 @@ import com.marginallyclever.communications.SerialConnectionManager;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ? edge tracing ?
-// TODO filters -> vectors, vector <-> gcode,dxf,etc.
 
 /**
  * @author danroyer
