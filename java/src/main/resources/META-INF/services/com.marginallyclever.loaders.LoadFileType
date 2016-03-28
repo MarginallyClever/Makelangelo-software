@@ -1,0 +1,3 @@
+com.marginallyclever.loaders.LoadGCode
+com.marginallyclever.loaders.LoadDXF
+com.marginallyclever.loaders.LoadImage

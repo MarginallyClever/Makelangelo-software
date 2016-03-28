@@ -18,6 +18,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,12 +45,13 @@ import com.marginallyclever.generators.Generator_LSystemTree;
 import com.marginallyclever.generators.Generator_Maze;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.generators.ImageGenerator;
-import com.marginallyclever.loaders.LoadDXF;
 import com.marginallyclever.loaders.LoadFileType;
 import com.marginallyclever.loaders.LoadGCode;
-import com.marginallyclever.loaders.LoadImage;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.savers.SaveFileType;
+
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 
 /**
  * Controls related to converting an image to gcode
@@ -101,16 +104,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public StatusBar statusBar;
 
 
-	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
-	protected List<LoadFileType> loadFileLoaders() {
-		List<LoadFileType> imageLoaders = new ArrayList<LoadFileType>();
-		imageLoaders.add(new LoadGCode());
-		imageLoaders.add(new LoadDXF());
-		imageLoaders.add(new LoadImage());
-		
-		return imageLoaders;
-	}
-	
 	protected List<SaveFileType> loadFileSavers() {
 		return new ArrayList<SaveFileType>();
 	}
@@ -639,7 +632,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
 
-		List<LoadFileType> imageLoaders = loadFileLoaders();
+		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
 		Iterator<LoadFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
 			LoadFileType lft = i.next();
@@ -657,10 +650,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void generateImage() {
 		final JPanel panel = new JPanel(new GridBagLayout());
 
-		List<ImageGenerator> imageGenerators = loadImageGenerators();
-		String[] imageGeneratorNames = new String[imageGenerators.size()];
+		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
 		Iterator<ImageGenerator> ici = imageGenerators.iterator();
-		int i = 0;
+		int i=0;
+		while(ici.hasNext()) {
+			ici.next();
+			i++;
+		}
+		
+		String[] imageGeneratorNames = new String[i];
+		
+		i=0;
+		ici = imageGenerators.iterator();
 		while (ici.hasNext()) {
 			ImageManipulator f = ici.next();
 			imageGeneratorNames[i++] = f.getName();
@@ -687,7 +688,17 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (result == JOptionPane.OK_OPTION) {
 			int choice = options.getSelectedIndex();
 
-			ImageGenerator chosenGenerator = imageGenerators.get(choice);
+			ImageGenerator chosenGenerator = null; 
+			ici = imageGenerators.iterator();
+			i=0;
+			while(ici.hasNext()) {
+				chosenGenerator = ici.next();
+				if(i==choice) {
+					break;
+				}
+				i++;
+			}
+			
 			robot.settings.saveConfig();
 
 			String destinationFile = gui.getTempDestinationFile();
@@ -746,8 +757,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Log.message(Translator.get("OpeningFile") + filename + "...");
 		boolean success=false;
 		boolean attempted=false;
-		
-		List<LoadFileType> imageLoaders = loadFileLoaders();
+
+		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
 		Iterator<LoadFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
 			LoadFileType lft = i.next();
