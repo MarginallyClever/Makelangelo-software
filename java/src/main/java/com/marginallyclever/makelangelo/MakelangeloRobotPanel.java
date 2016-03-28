@@ -50,9 +50,6 @@ import com.marginallyclever.loaders.LoadGCode;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.savers.SaveFileType;
 
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
-
 /**
  * Controls related to converting an image to gcode
  *
