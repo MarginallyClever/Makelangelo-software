@@ -38,12 +38,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.generators.Generator_Dragon;
-import com.marginallyclever.generators.Generator_HilbertCurve;
-import com.marginallyclever.generators.Generator_KochCurve;
-import com.marginallyclever.generators.Generator_LSystemTree;
-import com.marginallyclever.generators.Generator_Maze;
-import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.loaders.LoadFileType;
 import com.marginallyclever.loaders.LoadGCode;
@@ -103,18 +97,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	protected List<SaveFileType> loadFileSavers() {
 		return new ArrayList<SaveFileType>();
-	}
-
-	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
-	protected List<ImageGenerator> loadImageGenerators() {
-		List<ImageGenerator> imageGenerators = new ArrayList<ImageGenerator>();
-		imageGenerators.add(new Generator_Dragon());
-		imageGenerators.add(new Generator_HilbertCurve());
-		imageGenerators.add(new Generator_KochCurve());
-		imageGenerators.add(new Generator_LSystemTree());
-		imageGenerators.add(new Generator_Maze());
-		imageGenerators.add(new Generator_YourMessageHere());
-		return imageGenerators;
 	}
 
 

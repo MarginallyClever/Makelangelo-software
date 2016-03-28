@@ -12,11 +12,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
@@ -30,15 +29,6 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.converters.Converter_Boxes;
-import com.marginallyclever.converters.Converter_Crosshatch;
-import com.marginallyclever.converters.Converter_Pulse;
-import com.marginallyclever.converters.Converter_Sandy;
-import com.marginallyclever.converters.Converter_Scanline;
-import com.marginallyclever.converters.Converter_Spiral;
-import com.marginallyclever.converters.Converter_VoronoiStippling;
-import com.marginallyclever.converters.Converter_VoronoiZigZag;
-import com.marginallyclever.converters.Converter_ZigZag;
 import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.Log;
@@ -53,8 +43,7 @@ public class LoadImage implements LoadFileType {
 	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	
-	private List<ImageConverter> imageConverters;
+	private ServiceLoader<ImageConverter> converters;
 	
 	/**
 	 * Set of image file extensions.
@@ -71,6 +60,7 @@ public class LoadImage implements LoadFileType {
 		IMAGE_FILE_EXTENSIONS.add("gif");
 	}
 
+	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return new FileNameExtensionFilter(Translator.get("FileTypeImage"),
@@ -84,28 +74,20 @@ public class LoadImage implements LoadFileType {
 	}
 
 
-	// TODO see https://github.com/MarginallyClever/Makelangelo/issues/139
-	protected void loadImageConverters() {
-		imageConverters = new ArrayList<ImageConverter>();
-		imageConverters.add(new Converter_Boxes());
-		// imageConverters.add(new Converter_ColorBoxes());
-		imageConverters.add(new Converter_Crosshatch());
-		// imageConverters.add(new Filter_GeneratorColorFloodFill()); // not ready for public consumption
-		imageConverters.add(new Converter_Pulse());
-		imageConverters.add(new Converter_Sandy());
-		imageConverters.add(new Converter_Scanline());
-		imageConverters.add(new Converter_Spiral());
-		imageConverters.add(new Converter_VoronoiStippling());
-		imageConverters.add(new Converter_VoronoiZigZag());
-		imageConverters.add(new Converter_ZigZag());
-	}
-
 	protected boolean chooseImageConversionOptions(MakelangeloRobot robot,Makelangelo gui) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 
-		String[] imageConverterNames = new String[imageConverters.size()];
-		Iterator<ImageConverter> ici = imageConverters.iterator();
-		int i = 0;
+		Iterator<ImageConverter> ici = converters.iterator();
+		int i=0;
+		while(ici.hasNext()) {
+			ici.next();
+			i++;
+		}
+				
+		String[] imageConverterNames = new String[i];
+
+		i=0;
+		ici = converters.iterator();
 		while (ici.hasNext()) {
 			ImageManipulator f = ici.next();
 			imageConverterNames[i++] = f.getName();
@@ -148,10 +130,9 @@ public class LoadImage implements LoadFileType {
 
 	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
 		// where to save temp output file?
-		final String sourceFile = filename;
 		final String destinationFile = gui.getTempDestinationFile();
 
-		loadImageConverters();
+		converters = ServiceLoader.load(ImageConverter.class);
 		if (chooseImageConversionOptions(robot,gui) == false)
 			return false;
 
@@ -167,9 +148,17 @@ public class LoadImage implements LoadFileType {
 					// read in image
 					Log.message(Translator.get("Converting") + " " + destinationFile);
 					// convert with style
-					final BufferedImage img = ImageIO.read(new File(sourceFile));
+					final BufferedImage img = ImageIO.read(new File(filename));
 
-					ImageConverter converter = imageConverters.get(getPreferredDrawStyle());
+					ImageConverter converter = null;
+					int preferredIndex = getPreferredDrawStyle();
+					int i=0;
+					Iterator<ImageConverter> ici = converters.iterator();
+					while(ici.hasNext()) {
+						converter = ici.next();
+						if(i==preferredIndex) break;
+						++i;
+					}
 					converter.setParent(this);
 					converter.setProgressMonitor(pm);
 

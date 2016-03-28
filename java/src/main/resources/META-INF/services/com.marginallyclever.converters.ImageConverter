@@ -1,0 +1,9 @@
+com.marginallyclever.converters.Converter_Boxes
+com.marginallyclever.converters.Converter_Crosshatch
+com.marginallyclever.converters.Converter_Pulse
+com.marginallyclever.converters.Converter_Sandy
+com.marginallyclever.converters.Converter_Scanline
+com.marginallyclever.converters.Converter_Spiral
+com.marginallyclever.converters.Converter_VoronoiStippling
+com.marginallyclever.converters.Converter_VoronoiZigZag
+com.marginallyclever.converters.Converter_ZigZag
