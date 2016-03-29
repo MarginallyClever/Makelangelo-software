@@ -65,7 +65,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// machine options
 	protected String lastFileIn = "";
 	protected String lastFileOut = "";
-
+	protected int generatorChoice=0;
+	
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
 	private JButton openConfig;
@@ -647,6 +648,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
+		options.setSelectedIndex(generatorChoice);
 
 		GridBagConstraints c = new GridBagConstraints();
 
@@ -665,14 +667,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			int choice = options.getSelectedIndex();
+			generatorChoice = options.getSelectedIndex();
 
 			ImageGenerator chosenGenerator = null; 
 			ici = imageGenerators.iterator();
 			i=0;
 			while(ici.hasNext()) {
 				chosenGenerator = ici.next();
-				if(i==choice) {
+				if(i==generatorChoice) {
 					break;
 				}
 				i++;

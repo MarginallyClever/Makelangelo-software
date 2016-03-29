@@ -190,16 +190,59 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		return false;
 	}
 
-	void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
+	
+	private void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
+		String[] pieces=text.split("\n");
+		System.out.println("lines="+pieces.length);
+		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
+
+		float yTotal=0;
+		float yFirstStep = 0;
+		float xMax=0;
+		int p;
+		for(p=0;p<pieces.length;++p) {
+			TextLayout textLayout = new TextLayout(pieces[p],font,frc);
+			Shape s = textLayout.getOutline(null);
+			Rectangle bounds = s.getBounds();
+			yTotal += bounds.getHeight();
+			if(yFirstStep==0) yFirstStep = (float)bounds.getHeight();
+			if(xMax < bounds.getWidth()) xMax = (float)bounds.getWidth();
+		}
+		/*
+		// display bounding box
+		float dx = xMax/2.0f;
+		float dy = -(yTotal+yFirstStep/2.0f)/2.0f;
+
+		tool.writeOff(output);
+		tool.writeMoveTo(output,-dx, dy);
+		tool.writeOn(output);
+		tool.writeMoveTo(output, dx, dy);
+		tool.writeMoveTo(output, dx,-dy);
+		tool.writeMoveTo(output,-dx,-dy);
+		tool.writeMoveTo(output,-dx, dy);
+		tool.writeOff(output);
+		 */
+		float dx = xMax / 2.0f;
+		float dy = -yTotal/2.0f+yFirstStep/2.0f;
+
+		for(p=0;p<pieces.length;++p) {
+			TextLayout textLayout = new TextLayout(text,font,frc);
+			Shape s = textLayout.getOutline(null);
+			Rectangle bounds = s.getBounds();
+
+			writeBeautifulString(font,frc,pieces[p],output, dx, dy);
+			
+			dy += bounds.getHeight();
+		}
+	}
+	
+	private void writeBeautifulString(Font font, FontRenderContext frc,String text, Writer output,float dx, float dy) throws IOException { 
 		TextLayout textLayout = new TextLayout(text,font,frc);
-		Shape s = textLayout.getOutline(null);
-		Rectangle bounds = s.getBounds();
-		float dx = (float)(bounds.getWidth()/2.0);
-		float dy = (float)(bounds.getHeight()/2.0);
-		
+		Shape s = textLayout.getOutline(null);		
 		PathIterator pi = s.getPathIterator(null);
+		
 		float [] coords = new float[6];
 		float [] coords2 = new float[6];
 		float [] start = new float[6];
