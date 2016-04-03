@@ -6,8 +6,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class LoadGCode implements LoadFileType {
 

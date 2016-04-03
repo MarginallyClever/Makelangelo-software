@@ -55,7 +55,8 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
     //if(connectionName.equals(recentPort)) return null;
 
     SerialConnection serialConnection = new SerialConnection();
-
+    serialConnection.setManager(this);
+    
     try {
       serialConnection.openConnection(connectionName);
     } catch (Exception e) {

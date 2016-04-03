@@ -34,8 +34,9 @@ import org.kabeja.parser.ParserBuilder;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class LoadDXF implements LoadFileType {
 
@@ -267,7 +268,7 @@ public class LoadDXF implements LoadFileType {
 			public void done() {
 				pm.close();
 				Log.message(Translator.get("Finished"));
-				gui.soundSystem.playConversionFinishedSound();
+				SoundSystem.playConversionFinishedSound();
 				if (ok) {
 					LoadGCode loader = new LoadGCode();
 					loader.load(destinationFile, robot, gui);

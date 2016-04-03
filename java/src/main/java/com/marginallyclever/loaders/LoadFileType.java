@@ -3,7 +3,7 @@ package com.marginallyclever.loaders;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public interface LoadFileType {
 	/**

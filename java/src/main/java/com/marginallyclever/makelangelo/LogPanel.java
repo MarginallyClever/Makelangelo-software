@@ -19,6 +19,8 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+
 @SuppressWarnings("serial")
 public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
 	Translator translator;

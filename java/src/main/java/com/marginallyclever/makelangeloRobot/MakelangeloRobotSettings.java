@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,9 @@ import java.util.prefs.Preferences;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.PreferencesHelper;
+import com.marginallyclever.makelangelo.Translator;
 
 
 /**

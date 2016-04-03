@@ -19,13 +19,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 
 public class SoundSystem {
+	static private Preferences prefs;
+
+
 	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-
-
-
-
-	private String selectFile(Frame owner) {
+	static void start() {
+		prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+	}
+	
+	
+	static private String selectFile(Frame owner) {
 		JFileChooser choose = new JFileChooser();
 		int returnVal = choose.showOpenDialog(owner);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -36,11 +39,12 @@ public class SoundSystem {
 			return "";
 		}
 	}
+	
 
 	/**
 	 * Adjust sound preferences
 	 */
-	protected void adjust(final Frame owner, Translator translator) {
+	static protected void adjust(final Frame owner, Translator translator) {
 		final JDialog driver = new JDialog(owner, Translator.get("MenuSoundsTitle"), true);
 		driver.setLayout(new GridBagLayout());
 		
@@ -149,7 +153,7 @@ public class SoundSystem {
 	}
 	
 	
-	private void playSound(String url) {
+	static private void playSound(String url) {
 		if (url.isEmpty()) return;
 
 		try {
@@ -164,19 +168,19 @@ public class SoundSystem {
 		}
 	}
 
-	public void playConnectSound() {
+	static public void playConnectSound() {
 		playSound(prefs.get("sound_connect", ""));
 	}
 
-	public void playDisconnectSound() {
+	static public void playDisconnectSound() {
 		playSound(prefs.get("sound_disconnect", ""));
 	}
 
-	public void playConversionFinishedSound() {
+	static public void playConversionFinishedSound() {
 		playSound(prefs.get("sound_conversion_finished", ""));
 	}
 
-	public void playDrawingFinishedSound() {
+	static public void playDrawingFinishedSound() {
 		playSound(prefs.get("sound_drawing_finished", ""));
 	}
 }

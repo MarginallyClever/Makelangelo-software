@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * @author Admin
@@ -54,6 +56,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	public void setConnection(MarginallyCleverConnection c) {
 		if( this.connection != null ) {
+			this.connection.closeConnection();
 			this.connection.removeListener(this);
 		}
 		
@@ -166,24 +169,26 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 */
 	private long getNewRobotUID() {
 		long newUID = 0;
-
-		try {
-			// Send data
-			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
-			URLConnection conn = url.openConnection();
-			try (
-					final InputStream connectionInputStream = conn.getInputStream();
-					final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-					final BufferedReader rd = new BufferedReader(inputStreamReader)
-					) {
-				String line = rd.readLine();
-				newUID = Long.parseLong(line);
+	
+		boolean please_dont_get_a_guid=false;  // set to true when I'm building robots @ marginallyclever.com.
+		if(please_dont_get_a_guid) {
+			try {
+				// Send data
+				URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
+				URLConnection conn = url.openConnection();
+				try (
+						final InputStream connectionInputStream = conn.getInputStream();
+						final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+						final BufferedReader rd = new BufferedReader(inputStreamReader)
+						) {
+					String line = rd.readLine();
+					newUID = Long.parseLong(line);
+				}
+			} catch (Exception e) {
+				Log.error( e.getMessage() );
+				return 0;
 			}
-		} catch (Exception e) {
-			Log.error( e.getMessage() );
-			return 0;
 		}
-
 		// did read go ok?
 		if (newUID != 0) {
 			settings.createNewUID(newUID);
@@ -199,7 +204,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
-	protected String generateChecksum(String line) {
+	public String generateChecksum(String line) {
 		byte checksum = 0;
 
 		for (int i = 0; i < line.length(); ++i) {

@@ -8,8 +8,8 @@ import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
 public abstract class DrawingTool {

@@ -23,4 +23,7 @@ public interface MarginallyCleverConnection {
 	public void addListener(MarginallyCleverConnectionReadyListener listener);
 
 	public void removeListener(MarginallyCleverConnectionReadyListener listener);
+	
+	public void setManager(MarginallyCleverConnectionManager manager);
+	public MarginallyCleverConnectionManager getManager();
 }

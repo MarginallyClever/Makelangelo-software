@@ -15,8 +15,8 @@ import com.marginallyclever.filters.Filter_Resize;
 import com.marginallyclever.filters.ImageFilter;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 
 /**

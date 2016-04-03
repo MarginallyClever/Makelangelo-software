@@ -31,7 +31,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -40,16 +39,19 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import com.jogamp.opengl.GLCapabilities;
-import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
 
 
 // TODO while not drawing, in-app gcode editing with immediate visual feedback ? edge tracing ?
@@ -78,7 +80,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	public GCodeFile gCode;
 	
 	private Translator translator;
-	public SoundSystem soundSystem;
 	
 	// GUI elements
 	private JFrame mainframe = null;
@@ -94,11 +95,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private JMenuItem buttonRescan, buttonDisconnect;
 	// menubar > view
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
-
-	/**
-	 * buttons that represent connections to real robots attached to the computer.
-	 */
-	private JMenuItem[] buttonConnections;
 	
 	// main window layout
 	private Splitter splitLeftRight;
@@ -127,8 +123,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		Log.clear();
 
 		Translator.start();
-
-		soundSystem = new SoundSystem();
+		SoundSystem.start();
 		
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot(translator);
@@ -242,7 +237,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(x, x);
 			cameraViewPanel.setLinesProcessed(x);
 			
-			soundSystem.playDrawingFinishedSound();
+			SoundSystem.playDrawingFinishedSound();
 			
 			return;
 		}
@@ -319,7 +314,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			return;
 		}
 		if (subject == buttonAdjustSounds) {
-			soundSystem.adjust(this.mainframe,translator);
+			SoundSystem.adjust(this.mainframe,translator);
 			return;
 		}
 		if (subject == buttonAdjustGraphics) {
@@ -385,26 +380,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 			System.exit(0);
 			return;
 		}
-
-		// Connecting to a machine
-		String[] connections = connectionManager.listConnections();
-		for (int i = 0; i < connections.length; ++i) {
-			if (subject == buttonConnections[i]) {
-				logPanel.clearLog();
-				Log.message(Translator.get("ConnectingTo") + connections[i] + "...");
-
-				MarginallyCleverConnection c = connectionManager.openConnection(connections[i]); 
-				if (c == null) {
-					Log.error(Translator.get("PortOpenFailed"));
-				} else {
-					robot.setConnection(c);
-					Log.message( Translator.get("PortOpened") );
-					updateMenuBar();
-					soundSystem.playConnectSound();
-				}
-				return;
-			}
-		}
 	}
 	
 	private void disconnect() {
@@ -413,7 +388,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		cameraViewPanel.setConnected(false);
 		robotControlPanel.updateMachineNumberPanel();
 		updateMenuBar();
-		soundSystem.playDisconnectSound();
+		SoundSystem.playDisconnectSound();
 
 		// remove machine name from title
 		mainframe.setTitle(Translator.get("TitlePrefix"));
@@ -480,8 +455,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	 */
 	public void updateMenuBar() {
 		JMenu menu, preferencesSubMenu;
-		ButtonGroup group;
-		int i;
 
 		if (robotControlPanel != null) {
 			robotControlPanel.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
@@ -512,37 +485,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		buttonExit = new JMenuItem(Translator.get("MenuQuit"), KeyEvent.VK_Q);
 		buttonExit.addActionListener(this);
 		menu.add(buttonExit);
-
-
-		// Connect menu
-		preferencesSubMenu = new JMenu(Translator.get("MenuConnect"));
-		preferencesSubMenu.setEnabled(!robot.isRunning());
-		group = new ButtonGroup();
-
-		String[] connections = connectionManager.listConnections();
-		buttonConnections = new JRadioButtonMenuItem[connections.length];
-		for (i = 0; i < connections.length; ++i) {
-			buttonConnections[i] = new JRadioButtonMenuItem(connections[i]);
-			if (robot.getConnection() != null 
-					&& robot.getConnection().isOpen() 
-					&& robot.getConnection().getRecentConnection().equals(connections[i]) ) {
-				buttonConnections[i].setSelected(true);
-			}
-			buttonConnections[i].addActionListener(this);
-			group.add(buttonConnections[i]);
-			preferencesSubMenu.add(buttonConnections[i]);
-		}
-
-		preferencesSubMenu.addSeparator();
-
-		buttonRescan = new JMenuItem(Translator.get("MenuRescan"), KeyEvent.VK_N);
-		buttonRescan.addActionListener(this);
-		preferencesSubMenu.add(buttonRescan);
-
-		buttonDisconnect = new JMenuItem(Translator.get("MenuDisconnect"), KeyEvent.VK_D);
-		buttonDisconnect.addActionListener(this);
-		buttonDisconnect.setEnabled(robot.getConnection() != null && robot.getConnection().isOpen());
-		preferencesSubMenu.add(buttonDisconnect);
 
 		menuBar.add(preferencesSubMenu);
 
@@ -732,6 +674,10 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	public void fileFinished(MakelangeloRobot r) {
 		
+	}
+	
+	public MarginallyCleverConnectionManager getConnectionManager() {
+		return connectionManager;
 	}
 }
 

@@ -9,8 +9,8 @@ import javax.swing.SwingWorker;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.DrawPanel;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 
 /**

@@ -33,9 +33,10 @@ import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.PreferencesHelper;
+import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class LoadImage implements LoadFileType {
 	
@@ -193,7 +194,7 @@ public class LoadImage implements LoadFileType {
 				Log.message(Translator.get("Finished"));
 				LoadGCode loader = new LoadGCode();
 				loader.load(destinationFile, robot, gui);
-				gui.soundSystem.playConversionFinishedSound();
+				SoundSystem.playConversionFinishedSound();
 			}
 		};
 

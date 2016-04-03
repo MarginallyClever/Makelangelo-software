@@ -19,6 +19,7 @@ import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
