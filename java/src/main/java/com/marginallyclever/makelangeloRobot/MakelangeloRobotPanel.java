@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -28,6 +30,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
@@ -38,10 +41,17 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.loaders.LoadFileType;
 import com.marginallyclever.loaders.LoadGCode;
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.SoundSystem;
+import com.marginallyclever.makelangelo.StatusBar;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
+import com.marginallyclever.basictypes.CollapsiblePanel;
 import com.marginallyclever.savers.SaveFileType;
 
 /**
@@ -51,7 +61,7 @@ import com.marginallyclever.savers.SaveFileType;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, MouseListener, MouseMotionListener {
+public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, MouseListener, MouseMotionListener, ItemListener {
 	/**
 	 *
 	 */
@@ -62,6 +72,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	protected MakelangeloRobot robot;
 	protected Makelangelo gui;
 
+	// connect menu
+	private CollapsiblePanel connectionPanel;
+	private JPanel connectionList;
+	private JRadioButtonMenuItem[] buttonConnections;
+	private JComboBox<String> connectionComboBox;
+	private boolean ignoreSelectionEvents=false;
+	private JButton buttonRescan;
+	
 	// machine options
 	protected String lastFileIn = "";
 	protected String lastFileOut = "";
@@ -76,6 +94,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
+	private JPanel driveControlPanel;
 	private JButton down100,down10,down1,up1,up10,up100;
 	private JButton left100,left10,left1,right1,right10,right100;
 	private JButton goHome,setHome;
@@ -108,7 +127,86 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return b;
 	}
 
+
+	protected JPanel getConnectMenu() {
+		connectionPanel = new CollapsiblePanel(Translator.get("MenuConnect"));
+		JPanel contents =connectionPanel.getContentPane();
+		
+		GridBagConstraints con1 = new GridBagConstraints();
+		con1.gridx=0;
+		con1.gridy=0;
+		con1.weightx=1;
+		con1.weighty=1;
+		con1.fill=GridBagConstraints.HORIZONTAL;
+		con1.anchor=GridBagConstraints.NORTH;
+		
+		connectionList = new JPanel(new GridLayout(0,1));
+		rescanConnections();
+		
+        buttonRescan = new JButton(Translator.get("MenuRescan"));
+        buttonRescan.addActionListener(this);
+
+        contents.add(connectionList,con1);
+		con1.gridy++;
+		contents.add(buttonRescan,con1);
+		con1.gridy++;
+
+	    return connectionPanel;
+	}
+	
+	
+	protected void rescanConnections() {
+		ignoreSelectionEvents=true;
+	    connectionComboBox = new JComboBox<String>();
+        connectionComboBox.addItemListener(this);
+        connectionList.removeAll();
+        connectionList.add(connectionComboBox);
+	    
+        connectionComboBox.addItem("No connection"); // index 0
+	    connectionComboBox.setSelectedIndex(0);
+	    
+	    String recentConnection = "";
+	    if(robot.getConnection()!=null) {
+	    	recentConnection = robot.getConnection().getRecentConnection();
+	    }
+
+	    if(gui.getConnectionManager()!=null) {
+			String [] portsDetected = gui.getConnectionManager().listConnections();
+			int i;
+		    for(i=0;i<portsDetected.length;++i) {
+		    	connectionComboBox.addItem(portsDetected[i]);
+		    	if(recentConnection.equals(portsDetected[i])) {
+		    		connectionComboBox.setSelectedIndex(i+1);
+		    	}
+		    }
+	    }
+        ignoreSelectionEvents=false;
+	}
+	
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		Object subject = e.getSource();
+		
+		if(subject == connectionComboBox) {
+			if(ignoreSelectionEvents==false && e.getStateChange()==ItemEvent.SELECTED) {
+				if(connectionComboBox.getSelectedIndex()==0) {
+					// disconnect
+					robot.setConnection(null);
+				} else {
+					String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+					robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
+				}
+				rescanConnections();
+				return;
+			}
+		}
+	}
+	
+	
 	public MakelangeloRobotPanel(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
+		GridBagConstraints c;
+		
 		this.translator = translator;
 		this.gui = gui;
 		this.robot = robot;
@@ -126,14 +224,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
+		JPanel connectPanel = getConnectMenu();
+		panel.add(connectPanel, con1);
+		con1.gridy++;
 
-
+		
 		// settings
 		machineNumberPanel = new JPanel(new GridLayout(1, 0));
 		updateMachineNumberPanel();
 		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
 
+		// margins
 		JPanel marginPanel = new JPanel(new GridLayout(1, 0));
 		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.settings.getPaperMargin() * 100));
 		paperMargin.setMajorTickSpacing(10);
@@ -145,8 +247,27 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		marginPanel.add(paperMargin);
 		panel.add(marginPanel, con1);
 		con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
 
-		panel.add(new JSeparator(), con1);
+		// feed rate
+		JPanel feedRateControl = new JPanel();
+		feedRateControl.setLayout(new GridBagLayout());
+		c = new GridBagConstraints();
+		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
+		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
+		setFeedRate = new JButton(Translator.get("Set"));
+		setFeedRate.addActionListener(this);
+		disengageMotors = new JButton(Translator.get("DisengageMotors"));
+		disengageMotors.addActionListener(this);
+
+		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
+		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
+		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
+		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+		c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
+
+		panel.add(feedRateControl,con1);
 		con1.gridy++;
 
 
@@ -156,9 +277,142 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		mouseOn=false;
 		last_x=last_y=0;
 
+		makeDriveControls();
+		panel.add(driveControlPanel,con1);
+		con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
+
+
+
+		// drive to corners
+		
+		JPanel corners = new JPanel();
+		corners.setLayout(new GridBagLayout());
+		goTop = new JButton(Translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
+		goBottom = new JButton(Translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
+		goLeft = new JButton(Translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
+		goRight = new JButton(Translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
+		penUp = new JButton(Translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
+		penDown = new JButton(Translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
+		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
+		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20));
+		goHome = new JButton(Translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
+		JLabel horizontalFiller = new JLabel(" ");
+		c = new GridBagConstraints();
+		c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
+		c.gridx=2;  c.gridy=1;  corners.add(goHome,c);
+		c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
+		c.gridx=1;  c.gridy=1;  corners.add(goLeft,c);
+		c.gridx=3;  c.gridy=1;  corners.add(goRight,c);
+		c.weightx=1;
+		c.gridx=4;  c.gridy=0;  corners.add(horizontalFiller,c);
+		c.weightx=0;
+		c.gridx=5;  c.gridy=0;  corners.add(penUp,c);
+		c.gridx=5;  c.gridy=2;  corners.add(penDown,c);
+
+		//c.gridx=0;  c.gridy=0;  corners.add(setHome,c);
+		c.insets = new Insets(0,0,0,0);
+		goTop.addActionListener(this);
+		goBottom.addActionListener(this);
+		goLeft.addActionListener(this);
+		goRight.addActionListener(this);
+		penUp.addActionListener(this);
+		penDown.addActionListener(this);
+		setHome.addActionListener(this);
+		goHome.addActionListener(this);
+
+		dragAndDrive = new JPanel(new GridBagLayout());
+		dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		dragAndDrive.addMouseListener(this);
+		dragAndDrive.addMouseMotionListener(this);
+
+		coordinates = new JLabel(Translator.get("ClickAndDrag"));
+		c.anchor = GridBagConstraints.CENTER;
+
+		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
+		Dimension dims = new Dimension();
+		dims.setSize( 150, 150 * (double)robot.settings.getPaperWidth()/(double)robot.settings.getPaperHeight());
+		dragAndDrive.setPreferredSize(dims);
+		dragAndDrive.add(coordinates,c);
+
+		con1.weightx=1;
+		con1.weighty=0;
+		con1.fill=GridBagConstraints.HORIZONTAL;
+		con1.anchor=GridBagConstraints.NORTHWEST;
+
+
+		panel.add(corners,con1);
+		con1.gridy++;
+		panel.add(new JSeparator(),con1);
+		con1.gridy++;
+		//con1.weighty=1;
+		//p.add(dragAndDrive,con1);
+		//con1.weighty=0;
+		//con1.gridy++;
+
+
+
+		// File conversion
+		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
+		buttonNewFile.addActionListener(this);
+		panel.add(buttonNewFile, con1);
+		con1.gridy++;
+
+		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
+		buttonOpenFile.addActionListener(this);
+		panel.add(buttonOpenFile, con1);
+		con1.gridy++;
+
+		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
+		buttonGenerate.addActionListener(this);
+		panel.add(buttonGenerate, con1);
+		con1.gridy++;
+
+		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
+		buttonSaveFile.addActionListener(this);
+		panel.add(buttonSaveFile, con1);
+		con1.gridy++;
+
+
+		// drive menu
+		JPanel drivePanel = new JPanel(new GridLayout(1,4));
+		buttonStart = new JButton(Translator.get("Start"));
+		buttonStartAt = new JButton(Translator.get("StartAtLine"));
+		buttonPause = new JButton(Translator.get("Pause"));
+		buttonHalt = new JButton(Translator.get("Halt"));
+		drivePanel.add(buttonStart);
+		drivePanel.add(buttonStartAt);
+		drivePanel.add(buttonPause);
+		drivePanel.add(buttonHalt);
+		buttonStart.addActionListener(this);
+		buttonStartAt.addActionListener(this);
+		buttonPause.addActionListener(this);
+		buttonHalt.addActionListener(this);
+		panel.add(drivePanel, con1);
+		con1.gridy++;
+
+		panel.add(new JSeparator(), con1);
+		con1.gridy++;
+
+
+
+		statusBar = new StatusBar(translator);
+		panel.add(statusBar, con1);
+		con1.gridy++;
+
+
+		// always have one extra empty at the end to push everything up.
+		con1.weighty = 1;
+		panel.add(new JLabel(), con1);
+	}
+
+	private void makeDriveControls() {
+		driveControlPanel = new JPanel();
+		JPanel axisControl = new JPanel();
+		axisControl.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		JPanel axisControl = new JPanel(new GridBagLayout());
 		down100 = tightJButton("-100");
 		down10 = tightJButton("-10");
 		down1 = tightJButton("-1");
@@ -203,155 +457,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right1.addActionListener(this);
 		right10.addActionListener(this);
 		right100.addActionListener(this);
-
-		JPanel corners = new JPanel();
-		corners.setLayout(new GridBagLayout());
-		goTop = new JButton(Translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
-		goBottom = new JButton(Translator.get("Bottom")); goBottom.setPreferredSize(new Dimension(80,20));
-		goLeft = new JButton(Translator.get("Left"));     goLeft.setPreferredSize(new Dimension(80,20));
-		goRight = new JButton(Translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
-		penUp = new JButton(Translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
-		penDown = new JButton(Translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
-		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
-		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20));
-		goHome = new JButton(Translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
-		JLabel horizontalFiller = new JLabel(" ");
-		c.gridx=2;  c.gridy=0;  corners.add(goTop,c);
-		c.gridx=2;  c.gridy=1;  corners.add(goHome,c);
-		c.gridx=2;  c.gridy=2;  corners.add(goBottom,c);
-		c.gridx=1;  c.gridy=1;  corners.add(goLeft,c);
-		c.gridx=3;  c.gridy=1;  corners.add(goRight,c);
-		c.weightx=1;
-		c.gridx=4;  c.gridy=0;  corners.add(horizontalFiller,c);
-		c.weightx=0;
-		c.gridx=5;  c.gridy=0;  corners.add(penUp,c);
-		c.gridx=5;  c.gridy=2;  corners.add(penDown,c);
-
-		//c.gridx=0;  c.gridy=0;  corners.add(setHome,c);
-		c.insets = new Insets(0,0,0,0);
-		goTop.addActionListener(this);
-		goBottom.addActionListener(this);
-		goLeft.addActionListener(this);
-		goRight.addActionListener(this);
-		penUp.addActionListener(this);
-		penDown.addActionListener(this);
-		setHome.addActionListener(this);
-		goHome.addActionListener(this);
-
-
-		JPanel feedRateControl = new JPanel();
-		feedRateControl.setLayout(new GridBagLayout());
-		c = new GridBagConstraints();
-		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
-		setFeedRate = new JButton(Translator.get("Set"));
-		setFeedRate.addActionListener(this);
-		disengageMotors = new JButton(Translator.get("DisengageMotors"));
-		disengageMotors.addActionListener(this);
-
-		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
-		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-		c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
-
-		dragAndDrive = new JPanel(new GridBagLayout());
-		dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		dragAndDrive.addMouseListener(this);
-		dragAndDrive.addMouseMotionListener(this);
-
-		coordinates = new JLabel(Translator.get("ClickAndDrag"));
-		c.anchor = GridBagConstraints.CENTER;
-
-		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
-		Dimension dims = new Dimension();
-		dims.setSize( 150, 150 * (double)robot.settings.getPaperWidth()/(double)robot.settings.getPaperHeight());
-		dragAndDrive.setPreferredSize(dims);
-		dragAndDrive.add(coordinates,c);
-
-		con1.weightx=1;
-		con1.weighty=0;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTHWEST;
-
-
-		panel.add(axisControl,con1);
-		con1.gridy++;
-		panel.add(new JSeparator(),con1);
-		con1.gridy++;
-		panel.add(corners,con1);
-		con1.gridy++;
-		//panel.add(new JSeparator(),con1);
-		//con1.gridy++;
-		//con1.weighty=1;
-		//p.add(dragAndDrive,con1);
-		//con1.weighty=0;
-		//con1.gridy++;
-		panel.add(new JSeparator(),con1);
-		con1.gridy++;
-		panel.add(feedRateControl,con1);
-		con1.gridy++;
-		panel.add(new JSeparator(),con1);
-		con1.gridy++;
-
-
-
-		// File conversion
-		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
-		buttonNewFile.addActionListener(this);
-		panel.add(buttonNewFile, con1);
-		con1.gridy++;
-
-		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener(this);
-		panel.add(buttonOpenFile, con1);
-		con1.gridy++;
-
-		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
-		buttonGenerate.addActionListener(this);
-		panel.add(buttonGenerate, con1);
-		con1.gridy++;
-
-		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
-		buttonSaveFile.addActionListener(this);
-		panel.add(buttonSaveFile, con1);
-		con1.gridy++;
-
-		panel.add(new JSeparator(), con1);
-		con1.gridy++;
-
-		// drive menu
-		JPanel drivePanel = new JPanel(new GridLayout(1,4));
-		buttonStart = new JButton(Translator.get("Start"));
-		buttonStartAt = new JButton(Translator.get("StartAtLine"));
-		buttonPause = new JButton(Translator.get("Pause"));
-		buttonHalt = new JButton(Translator.get("Halt"));
-		drivePanel.add(buttonStart);
-		drivePanel.add(buttonStartAt);
-		drivePanel.add(buttonPause);
-		drivePanel.add(buttonHalt);
-		buttonStart.addActionListener(this);
-		buttonStartAt.addActionListener(this);
-		buttonPause.addActionListener(this);
-		buttonHalt.addActionListener(this);
-		panel.add(drivePanel, con1);
-		con1.gridy++;
-
-		panel.add(new JSeparator(), con1);
-		con1.gridy++;
-
-
-
-		statusBar = new StatusBar(translator);
-		panel.add(statusBar, con1);
-		con1.gridy++;
-
-
-		// always have one extra empty at the end to push everything up.
-		con1.weighty = 1;
-		panel.add(new JLabel(), con1);
+		
+		driveControlPanel.add(axisControl);
 	}
 
+	
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
 		machineConfigurations = robot.settings.getKnownMachineNames();
@@ -379,6 +489,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineNumberPanel.add(openConfig);
 	}
 
+	
 	public void stateChanged(ChangeEvent e) {
 		e.getSource();
 		double pm = (100 - paperMargin.getValue()) * 0.01;
@@ -397,6 +508,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			int selectedIndex = machineChoices.getSelectedIndex();
 			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
 			robot.settings.loadConfig(newUID);
+		}
+		
+		if( subject == buttonRescan ) {
+			rescanConnections();
+			return;
 		}
 
 		if (subject == openConfig) {
@@ -508,6 +624,26 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				robot.sendLineToRobot("G90");  // return to absolute mode
 			}
 		}
+
+		// Connecting to a machine
+		String[] connections = gui.getConnectionManager().listConnections();
+		for (int i = 0; i < connections.length; ++i) {
+			if (subject == buttonConnections[i]) {
+				Log.clear();
+				Log.message(Translator.get("ConnectingTo") + connections[i] + "...");
+
+				MarginallyCleverConnection c = robot.getConnection().getManager().openConnection(connections[i]); 
+				if (c == null) {
+					Log.error(Translator.get("PortOpenFailed"));
+				} else {
+					robot.setConnection(c);
+					Log.message( Translator.get("PortOpened") );
+					gui.updateMenuBar();
+					SoundSystem.playConnectSound();
+				}
+				return;
+			}
+		}
 	}
 
 	/**
@@ -544,7 +680,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return -1;
 	}
 
-	void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
+	public void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
 		if (buttonGenerate != null)
 			buttonGenerate.setEnabled(!isRunning);
 
@@ -696,7 +832,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			LoadGCode loader = new LoadGCode();
 			loader.load(destinationFile,robot,gui);
 			
-			gui.soundSystem.playConversionFinishedSound();
+			SoundSystem.playConversionFinishedSound();
 
 			// Force update of graphics layout.
 			gui.updateMachineConfig();
