@@ -26,26 +26,33 @@ public class Point3D {
 	}
 
 	public void normalize() {
-		double d = Math.sqrt(x*x+y*y+z*z);
+		float d = lengthSquared();
 		x/=d;
 		y/=d;
 		z/=d;
 	}
+
+	public float lengthSquared() {
+		return x*x+y*y+z*z;
+	}
+
+	public float length() {
+		return (float)Math.sqrt(lengthSquared());
+	}
 }
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Makelangelo is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Makelangelo is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p>
- * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Makelangelo. If not, see <http://www.gnu.org/licenses/>.
  */
