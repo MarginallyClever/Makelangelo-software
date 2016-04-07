@@ -2,13 +2,13 @@ package com.marginallyclever.converters;
 
 
 import java.awt.image.BufferedImage;
+import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.filters.Filter_Resize;
@@ -33,7 +33,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	long time_limit = 10 * 60 * 1000;  // 10 minutes
 
 	int numPoints;
-	Point2D[] points = null;
+	Point[] points = null;
 	int[] solution = null;
 	int scount;
 
@@ -317,7 +317,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		}
 
 		Log.write("green", numPoints + " points.");
-		points = new Point2D[numPoints + 1];
+		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 
 		// collect the point data
@@ -326,7 +326,9 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 			for (x = 0; x < imageWidth; ++x) {
 				i = ImageFilter.decode(img.getRGB(x, y));
 				if (i == 0) {
-					points[numPoints++] = new Point2D(TX(x), TY(y));
+					Point p = new Point();
+					p.setLocation( TX(x), TY(y) );
+					points[numPoints++] = p;
 				}
 			}
 		}

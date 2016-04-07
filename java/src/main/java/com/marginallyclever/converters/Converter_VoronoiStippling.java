@@ -1,6 +1,7 @@
 package com.marginallyclever.converters;
 
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
@@ -15,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -46,8 +46,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	private static int MAX_CELLS = 1000;
 	private static float MAX_DOT_SIZE = 5.0f;
 	private static float MIN_DOT_SIZE = 1.0f;
-	private Point2D bound_min = new Point2D();
-	private Point2D bound_max = new Point2D();
+	private Point bound_min = new Point();
+	private Point bound_max = new Point();
 	private int numEdgesInCell;
 	private List<VoronoiCellEdge> cellBorder = null;
 	private double[] xValuesIn = null;
@@ -125,8 +125,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 		gl2.glPointSize(3);
 		gl2.glColor3f(0, 0, 0);
 		for (VoronoiCell c : cells) {
-			float x = c.centroid.x;
-			float y = c.centroid.y;
+			float x = (float)c.centroid.getX();
+			float y = (float)c.centroid.getY();
 			float val = 1.0f - (sample1x1(src_img, (int) x, (int) y) / 255.0f);
 			float r = (val * MAX_DOT_SIZE) / scale;
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -161,7 +161,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 					for (x = 0; x < w; x += length) {
 						cells[used] = new VoronoiCell();
 						//cells[used].centroid.set(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
-						cells[used].centroid.set(x, y);
+						cells[used].centroid.setLocation(x, y);
 						++used;
 						if (used == MAX_CELLS) break;
 					}
@@ -171,7 +171,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 						cells[used] = new VoronoiCell();
 						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
 						//cells[used].centroid.set(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
-						cells[used].centroid.set(x, y);
+						cells[used].centroid.setLocation(x, y);
 						++used;
 						if (used == MAX_CELLS) break;
 					}
@@ -318,29 +318,29 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 			if (e.site1 != cellIndex && e.site2 != cellIndex) continue;
 			if (numEdgesInCell == 0) {
 				if (e.x1 < e.x2) {
-					bound_min.x = (float) e.x1;
-					bound_max.x = (float) e.x2;
+					bound_min.setLocation( e.x1, bound_min.getY() );
+					bound_max.setLocation( e.x2, bound_max.getY() );
 				} else {
-					bound_min.x = (float) e.x2;
-					bound_max.x = (float) e.x1;
+					bound_min.setLocation( e.x2, bound_min.getY() );
+					bound_max.setLocation( e.x1, bound_max.getY() );
 				}
 				if (e.y1 < e.y2) {
-					bound_min.y = (float) e.y1;
-					bound_max.y = (float) e.y2;
+					bound_min.setLocation( bound_min.getX(), (float) e.y1 );
+					bound_max.setLocation( bound_max.getX(), (float) e.y2 );
 				} else {
-					bound_min.y = (float) e.y2;
-					bound_max.y = (float) e.y1;
+					bound_min.setLocation( bound_min.getX(), (float) e.y2 );
+					bound_max.setLocation( bound_max.getX(), (float) e.y1 );
 				}
 			} else {
-				if (bound_min.x > e.x1) bound_min.x = (float) e.x1;
-				if (bound_min.x > e.x2) bound_min.x = (float) e.x2;
-				if (bound_max.x < e.x1) bound_max.x = (float) e.x1;
-				if (bound_max.y < e.y2) bound_max.y = (float) e.y2;
+				if (bound_min.x > e.x1) bound_min.setLocation( e.x1, bound_min.getY() );
+				if (bound_min.x > e.x2) bound_min.setLocation( e.x2, bound_min.getY() );
+				if (bound_max.x < e.x1) bound_max.setLocation( e.x1, bound_max.getY() );
+				if (bound_max.x < e.x2) bound_max.setLocation( e.x2, bound_max.getY() );
 
-				if (bound_min.y > e.y1) bound_min.y = (float) e.y1;
-				if (bound_min.y > e.y2) bound_min.y = (float) e.y2;
-				if (bound_max.y < e.y1) bound_max.y = (float) e.y1;
-				if (bound_max.y < e.y2) bound_max.y = (float) e.y2;
+				if (bound_min.y > e.y1) bound_min.setLocation( bound_min.getX(), e.y1 );
+				if (bound_min.y > e.y2) bound_min.setLocation( bound_min.getX(), e.y2 );
+				if (bound_max.y < e.y1) bound_max.setLocation( bound_max.getX(), e.y1 );
+				if (bound_max.y < e.y2) bound_max.setLocation( bound_max.getX(), e.y2 );
 			}
 
 			// make a unnormalized vector along the edge of e
@@ -441,7 +441,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 			if (wy >= h) wy = h - 1;
 
 			// use the new center
-			cells[i].centroid.set((float)wx, (float)wy);
+			cells[i].centroid.setLocation(wx, wy);
 		}
 	}
 }

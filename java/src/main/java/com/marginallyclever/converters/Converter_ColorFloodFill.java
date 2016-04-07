@@ -3,6 +3,7 @@ package com.marginallyclever.converters;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,7 +11,6 @@ import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.Point2D;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -146,10 +146,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * @throws IOException
 	 */
 	protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
-		LinkedList<Point2D> points_to_visit = new LinkedList<>();
-		points_to_visit.add(new Point2D(x, y));
+		LinkedList<Point> points_to_visit = new LinkedList<>();
+		points_to_visit.add(new Point(x, y));
 
-		Point2D a;
+		Point a;
 
 		while (!points_to_visit.isEmpty()) {
 			a = points_to_visit.removeLast();
@@ -176,13 +176,13 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			last_y = (int) a.y;
 
 			//      if( !getMaskTouched((int)(a.x+diameter),(int)a.y           ) )
-			points_to_visit.add(new Point2D(a.x + diameter, a.y));
+			points_to_visit.add(new Point(a.x + diameter, a.y));
 			//      if( !getMaskTouched((int)(a.x-diameter),(int)a.y           ) )
-			points_to_visit.add(new Point2D(a.x - diameter, a.y));
+			points_to_visit.add(new Point(a.x - diameter, a.y));
 			//      if( !getMaskTouched((int)a.x           ,(int)(a.y+diameter)) )
-			points_to_visit.add(new Point2D(a.x, a.y + diameter));
+			points_to_visit.add(new Point(a.x, a.y + diameter));
 			//      if( !getMaskTouched((int)a.x           ,(int)(a.y-diameter)) )
-			points_to_visit.add(new Point2D(a.x, a.y - diameter));
+			points_to_visit.add(new Point(a.x, a.y - diameter));
 		}
 	}
 
