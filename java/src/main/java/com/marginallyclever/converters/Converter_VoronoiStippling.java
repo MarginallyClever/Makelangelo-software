@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -84,6 +85,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 			MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
 			MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
 
+			// make black & white
+			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+			img = bw.filter(img);
+
 			src_img = img;
 			h = img.getHeight();
 			w = img.getWidth();
@@ -93,7 +98,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 			cellBorder = new ArrayList<>();
 
-			initializeCells(MIN_DOT_SIZE);
+			initializeCells(0.001);
 			evolveCells();
 			writeOutCells(out);
 
@@ -160,8 +165,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				if (dir == 1) {
 					for (x = 0; x < w; x += length) {
 						cells[used] = new VoronoiCell();
-						//cells[used].centroid.set(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
-						cells[used].centroid.setLocation(x, y);
+						cells[used].centroid.setLocation(x+((float)Math.random()*length/2),y+((float)Math.random()*length/2));
+						//cells[used].centroid.setLocation(x, y);
 						++used;
 						if (used == MAX_CELLS) break;
 					}
@@ -169,9 +174,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				} else {
 					for (x = w - 1; x >= 0; x -= length) {
 						cells[used] = new VoronoiCell();
-						//cells[used].centroid.set((float)Math.random()*(float)w,(float)Math.random()*(float)h);
-						//cells[used].centroid.set(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
-						cells[used].centroid.setLocation(x, y);
+						cells[used].centroid.setLocation((float)Math.random()*(float)w,(float)Math.random()*(float)h);
+						//cells[used].centroid.setLocation(x-((float)Math.random()*length/2),y-((float)Math.random()*length/2));
+						//cells[used].centroid.setLocation(x, y);
 						++used;
 						if (used == MAX_CELLS) break;
 					}
