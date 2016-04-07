@@ -25,9 +25,12 @@ public class Point2D {
 	}
 
 	public void normalize() {
-		float d = lengthSquared();
-		x/=d;
-		y/=d;
+		scale(1.0f/lengthSquared());
+	}
+	
+	public void scale(float s) {
+		x*=s;
+		y*=s;
 	}
 
 

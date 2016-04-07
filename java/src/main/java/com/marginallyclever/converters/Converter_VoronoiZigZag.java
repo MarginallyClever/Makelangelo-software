@@ -264,7 +264,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 				while(lock.isLocked());
 
 				lock.lock();  
-				//DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin));
+				//Makelangelo.getSingleton().Log("<font color='red'>flipping "+(finish-begin));
 				for(j=0;j<half;++j) {
 					temp = solution[ti(begin+j)];
 					solution[ti(begin+j)]=solution[ti(finish-1-j)];
@@ -659,18 +659,18 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  *
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */
