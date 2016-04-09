@@ -492,12 +492,12 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		menu = new JMenu(Translator.get("MenuPreview"));
 		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
 		buttonZoomOut.addActionListener(this);
-		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.ALT_MASK));
+		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(buttonZoomOut);
 
 		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.addActionListener(this);
-		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.ALT_MASK));
+		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(buttonZoomIn);
 
 		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"));
