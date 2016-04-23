@@ -36,11 +36,11 @@ public abstract class DrawingTool {
     diameter = 1;
   }
 
-  public float getZOn() {
+  public float getPenDownAngle() {
     return zOn;
   }
 
-  public float getZOff() {
+  public float getPenUpAngle() {
     return zOff;
   }
 

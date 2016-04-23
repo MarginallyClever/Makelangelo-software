@@ -108,8 +108,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// etch-a-sketch test
 	private JLabel coordinates;
 	private JPanel dragAndDrive;
-	private boolean mouseInside,mouseOn;
-	double last_x,last_y;
+	private boolean mouseInside, mouseOn;
+	private double mouseLastX, mouseLastY;
 
 	// status bar
 	public StatusBar statusBar;
@@ -211,7 +211,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		this.translator = translator;
 		this.gui = gui;
 		this.robot = robot;
-
+		
 		this.setBorder(BorderFactory.createEmptyBorder());
 
 		JPanel panel = new JPanel(new GridBagLayout());
@@ -276,7 +276,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// Driving controls
 		mouseInside=false;
 		mouseOn=false;
-		last_x=last_y=0;
+		mouseLastX=mouseLastY=0;
 
 		makeDriveControls();
 		panel.add(driveControlPanel,con1);
@@ -411,12 +411,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		axisControl.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
+		setHome = tightJButton(Translator.get("SetHome"));
+	    setHome.setPreferredSize(new Dimension(100,20));
+
 		down100 = tightJButton("-100");
 		down10 = tightJButton("-10");
 		down1 = tightJButton("-1");
-
-		setHome = tightJButton(Translator.get("SetHome"));
-	    setHome.setPreferredSize(new Dimension(100,20));
 
 		up1 = tightJButton("1");
 		up10 = tightJButton("10");
@@ -564,12 +564,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			return;
 		}
 		
-		if      (subject == goHome  ) robot.sendLineToRobot("G00 X0 Y0");
-		else if (subject == setHome ) robot.sendLineToRobot("G92 X0 Y0");
-		else if (subject == goLeft  ) robot.sendLineToRobot("G00 X" + (robot.settings.getPaperLeft() * 10));
-		else if (subject == goRight ) robot.sendLineToRobot("G00 X" + (robot.settings.getPaperRight() * 10));
-		else if (subject == goTop   ) robot.sendLineToRobot("G00 Y" + (robot.settings.getPaperTop() * 10));
-		else if (subject == goBottom) robot.sendLineToRobot("G00 Y" + (robot.settings.getPaperBottom() * 10));
+		if      (subject == goHome  ) robot.goHome();
+		else if (subject == setHome ) robot.setHome();
+		else if (subject == goLeft  ) robot.movePenAbsolute((float)robot.settings.getPaperLeft() * 10, robot.getToolPositionY());
+		else if (subject == goRight ) robot.movePenAbsolute((float)robot.settings.getPaperRight() * 10, robot.getToolPositionY());
+		else if (subject == goTop   ) robot.movePenAbsolute(robot.getToolPositionX(), (float)robot.settings.getPaperTop() * 10);
+		else if (subject == goBottom) robot.movePenAbsolute(robot.getToolPositionX(), (float)robot.settings.getPaperBottom() * 10);
 //		else if (b == find    ) robot.sendLineToRobot("G28");
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
@@ -588,27 +588,28 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				robot.setFeedRate(parsedFeedRate);
 			} catch(NumberFormatException e1) {}
 		} else if (subject == disengageMotors) {
-			robot.sendLineToRobot("M18");
+			robot.disengageMotors();
 		} else {
-			String command="";
+			float dx=0;
+			float dy=0;
+			
+			if (subject == down100) dy=-100;
+			if (subject == down10) dy = -10;
+			if (subject == down1) dy = -1;
+			if (subject == up100) dy = 100;
+			if (subject == up10) dy = 10;
+			if (subject == up1) dy = 1;
 
-			if (subject == down100) command = "G0 Y-100";
-			if (subject == down10) command = "G0 Y-10";
-			if (subject == down1) command = "G0 Y-1";
-			if (subject == up100) command = "G0 Y100";
-			if (subject == up10) command = "G0 Y10";
-			if (subject == up1) command = "G0 Y1";
+			if (subject == left100) dx = -100;
+			if (subject == left10) dx = -10;
+			if (subject == left1) dx = -1;
+			if (subject == right100) dx = 100;
+			if (subject == right10) dx = 10;
+			if (subject == right1) dx = 1;
 
-			if (subject == left100) command = "G0 X-100";
-			if (subject == left10) command = "G0 X-10";
-			if (subject == left1) command = "G0 X-1";
-			if (subject == right100) command = "G0 X100";
-			if (subject == right10) command = "G0 X10";
-			if (subject == right1) command = "G0 X1";
-
-			if(command != "") {
+			if(dx!=0 || dy!=0) {
 				robot.sendLineToRobot("G91");  // set relative mode
-				robot.sendLineToRobot(command);
+				robot.movePenRelative(dx,dy);
 				robot.sendLineToRobot("G90");  // return to absolute mode
 			}
 		}
@@ -923,11 +924,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			y = cy - y;
 			x *= 10 * robot.settings.getPaperWidth()  / w;
 			y *= 10 * robot.settings.getPaperHeight() / h;
-			double dx = x-last_x;
-			double dy = y-last_y;
+			double dx = x-mouseLastX;
+			double dy = y-mouseLastY;
 			if(Math.sqrt(dx*dx+dy*dy)>=1) {
-				last_x=x;
-				last_y=y;
+				mouseLastX=x;
+				mouseLastY=y;
 				String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
 				robot.sendLineToRobot("G00 "+text);
 				coordinates.setText(text);

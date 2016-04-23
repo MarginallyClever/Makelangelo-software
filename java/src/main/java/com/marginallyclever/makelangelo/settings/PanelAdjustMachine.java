@@ -166,11 +166,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 
 		buttonAneg = new JButton(Translator.get("JogIn"));
 		buttonApos = new JButton(Translator.get("JogOut"));
-		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor1Backwards());
+		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isLeftMotorInverted());
 
 		buttonBneg = new JButton(Translator.get("JogIn"));
 		buttonBpos = new JButton(Translator.get("JogOut"));
-		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor2Backwards());
+		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isRightMotorInverted());
 
 		c.gridx = 0;
 		c.gridy = 0;
@@ -250,18 +250,14 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		Object subject = e.getSource();
 
 		// jog motors
-		if (subject == buttonApos)
-			robot.sendLineToRobot("D00 L400");
-		if (subject == buttonAneg)
-			robot.sendLineToRobot("D00 L-400");
-		if (subject == buttonBpos)
-			robot.sendLineToRobot("D00 R400");
-		if (subject == buttonBneg)
-			robot.sendLineToRobot("D00 R-400");
+		if (subject == buttonApos) robot.jogLeftMotorOut();
+		if (subject == buttonAneg) robot.jogLeftMotorIn();
+		if (subject == buttonBpos) robot.jogRightMotorOut();
+		if (subject == buttonBneg) robot.jogRightMotorIn();
 
 		if (subject == m1i || subject == m2i) {
-			robot.settings.setMotor1Backwards(m1i.isSelected());
-			robot.settings.setMotor2Backwards(m2i.isSelected());
+			robot.settings.invertLeftMotor(m1i.isSelected());
+			robot.settings.invertRightMotor(m2i.isSelected());
 			robot.settings.saveConfig();
 			robot.sendConfig();
 		}

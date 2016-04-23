@@ -59,8 +59,8 @@ public final class MakelangeloRobotSettings {
 	private double paperMargin;
 
 	// pulleys turning backwards?
-	private boolean invertMotor1;
-	private boolean invertMotor2;
+	private boolean isLeftMotorInverted;
+	private boolean isRightMotorInverted;
 
 	// pulley diameter
 	private double pulleyDiameterLeft;
@@ -154,8 +154,8 @@ public final class MakelangeloRobotSettings {
 		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
 		
-		invertMotor1       = false;
-		invertMotor2       = true;
+		isLeftMotorInverted       = false;
+		isRightMotorInverted       = true;
 		reverseForGlass    = false;
 
 		startingPositionIndex = 4;
@@ -255,8 +255,8 @@ public final class MakelangeloRobotSettings {
 		paperTop=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 
-		invertMotor1=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(invertMotor1)));
-		invertMotor2=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(invertMotor2)));
+		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
+		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
 
 		pulleyDiameterLeft=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameterLeft)));
 		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));
@@ -331,8 +331,8 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(invertMotor1));
-		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(invertMotor2));
+		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
+		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameterLeft));
 		uniqueMachinePreferencesNode.put("bobbin_right_diameter", Double.toString(pulleyDiameterRight));
 		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
@@ -369,17 +369,17 @@ public final class MakelangeloRobotSettings {
 				+ " B" + limitBottom
 				+ " L" + limitLeft
 				+ " R" + limitRight
-				+ " I" + (invertMotor1 ? "-1" : "1")
-				+ " J" + (invertMotor2 ? "-1" : "1");
+				+ " I" + (isLeftMotorInverted ? "-1" : "1")
+				+ " J" + (isRightMotorInverted ? "-1" : "1");
 	}
 
 
 	public String getPenUpString() {
-		return Float.toString(getCurrentTool().getZOff());
+		return Float.toString(getCurrentTool().getPenUpAngle());
 	}
 
 	public String getPenDownString() {
-		return Float.toString(getCurrentTool().getZOn());
+		return Float.toString(getCurrentTool().getPenDownAngle());
 	}
 
 	public boolean isPaperConfigured() {
@@ -608,17 +608,17 @@ public final class MakelangeloRobotSettings {
 	public double getPulleyDiameterRight() {
 		return pulleyDiameterRight;
 	}
-	public boolean isMotor1Backwards() {
-		return invertMotor1;
+	public boolean isLeftMotorInverted() {
+		return isLeftMotorInverted;
 	}
-	public boolean isMotor2Backwards() {
-		return invertMotor2;
+	public boolean isRightMotorInverted() {
+		return isRightMotorInverted;
 	}
-	public void setMotor1Backwards(boolean backwards) {
-		invertMotor1 = backwards;
+	public void invertLeftMotor(boolean backwards) {
+		isLeftMotorInverted = backwards;
 	}
-	public void setMotor2Backwards(boolean backwards) {
-		invertMotor2 = backwards;
+	public void invertRightMotor(boolean backwards) {
+		isRightMotorInverted = backwards;
 	}
 	
 	public boolean isRegistered() {

@@ -45,9 +45,18 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean penIsUp = false;
 	private boolean penIsUpBeforePause = false;
 	
+	// current location
+	private boolean hasSetHome;
+	private float px,py;
+	private int lineNumber;
+	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
+		px=0;
+		py=0;
+		hasSetHome=false;
+		lineNumber=0;
 	}
 	
 	public MarginallyCleverConnection getConnection() {
@@ -269,6 +278,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void lowerPen() {
 		sendLineToRobot("G00 Z" + settings.getPenDownString());
 	}
+	public void testPenAngle(String testAngle) {
+		sendLineToRobot("G00 Z" + testAngle);
+	}
 
 
 	/**
@@ -291,6 +303,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			}
 		}
 
+		if (line.length() > 3) {
+			line = "N" + lineNumber + " " + line;
+			line += generateChecksum(line);
+		}
+		
 		// send relevant part of line to the robot
 		sendLineToRobot(line);
 	}
@@ -353,5 +370,73 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		settings.setFeedRate(parsedFeedRate);
 		// tell the robot
 		sendLineToRobot("G00 F" + parsedFeedRate);
+	}
+	
+	
+	public void goHome() {
+		sendLineToRobot("G00 X0 Y0");
+		px=0;
+		py=0;
+	}
+	
+	
+	public void setHome() {
+		sendLineToRobot("G92 X0 Y0");
+		px=0;
+		py=0;
+	}
+	
+	
+	public boolean hasSetHome() {
+		return hasSetHome;
+	}
+	
+	
+	public void movePenAbsolute(float x,float y) {
+		sendLineToRobot("G00"+
+						" X" + x +
+						" Y" + y);
+		px=x;
+		py=y;
+	}
+	
+	public void movePenRelative(float dx,float dy) {
+		sendLineToRobot("G91");  // set relative mode
+		sendLineToRobot("G00"+
+				" X" + dx +
+				" Y" + dy);
+		sendLineToRobot("G90");  // return to absolute mode
+		px+=dx;
+		py+=dy;
+	}
+	
+	public float getToolPositionX() {
+		return px;
+	}
+	
+	public float getToolPositionY() {
+		return py;
+	}
+	
+	public void disengageMotors() {
+		sendLineToRobot("M18");
+	}
+	
+	public void engageMotors() {
+		sendLineToRobot("M17");
+	}
+	
+	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
+	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}
+	public void jogRightMotorOut() {		sendLineToRobot("D00 R400");	}
+	public void jogRightMotorIn()  {		sendLineToRobot("D00 R-400");	}
+	
+	public void setLineNumber(int newLineNumber) {
+		lineNumber = newLineNumber;
+		sendLineToRobot("M110 N" + lineNumber);
+	}
+	
+	public int getLineNumber() {
+		return lineNumber;
 	}
 }

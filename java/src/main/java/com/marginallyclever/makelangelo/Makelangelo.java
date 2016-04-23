@@ -244,11 +244,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		
 		int lineNumber = gCode.getLinesProcessed();
 		line = gCode.nextLine();
-
-		if (line.length() > 3) {
-			line = "N" + lineNumber + " " + line;
-			line += robot.generateChecksum(line);
-		}
+		
 		robot.tweakAndSendLine( line, translator );
 
 		cameraViewPanel.setLinesProcessed(lineNumber);
@@ -273,7 +269,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 
 	public void startAt(int lineNumber) {
 		gCode.setLinesProcessed(lineNumber);
-		robot.sendLineToRobot("M110 N" + gCode.getLinesProcessed());
+		robot.setLineNumber(gCode.getLinesProcessed());
 		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();
 	}
