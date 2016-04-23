@@ -453,7 +453,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		JMenu menu, preferencesSubMenu;
 
 		if (robotControlPanel != null) {
-			robotControlPanel.updateButtonAccess(robot.isPortConfirmed(), robot.isRunning());
+			robotControlPanel.updateButtonAccess();
 		}
 
 		menuBar.removeAll();
@@ -545,7 +545,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		cameraViewPanel.setGCode(gCode);
 
 		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);
-		robotControlPanel.updateButtonAccess(false, false);
+		robotControlPanel.updateButtonAccess();
 		
 		logPanel = new LogPanel(translator, robot);
 		logPanel.clearLog();

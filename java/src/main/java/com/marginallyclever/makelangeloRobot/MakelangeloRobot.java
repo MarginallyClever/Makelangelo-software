@@ -47,14 +47,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	// current location
 	private boolean hasSetHome;
-	private float px,py;
 	private int lineNumber;
 	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
-		px=0;
-		py=0;
 		hasSetHome=false;
 		lineNumber=0;
 	}
@@ -375,15 +372,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void goHome() {
 		sendLineToRobot("G00 X0 Y0");
-		px=0;
-		py=0;
 	}
 	
 	
 	public void setHome() {
 		sendLineToRobot("G92 X0 Y0");
-		px=0;
-		py=0;
 	}
 	
 	
@@ -396,8 +389,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot("G00"+
 						" X" + x +
 						" Y" + y);
-		px=x;
-		py=y;
 	}
 	
 	public void movePenRelative(float dx,float dy) {
@@ -406,17 +397,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				" X" + dx +
 				" Y" + dy);
 		sendLineToRobot("G90");  // return to absolute mode
-		px+=dx;
-		py+=dy;
 	}
 	
-	public float getToolPositionX() {
-		return px;
-	}
-	
-	public float getToolPositionY() {
-		return py;
-	}
+	public void movePenToEdgeLeft()   {		sendLineToRobot("G00 X" + settings.getPaperLeft()   * 10);	}
+	public void movePenToEdgeRight()  {		sendLineToRobot("G00 X" + settings.getPaperRight()  * 10);	}
+	public void movePenToEdgeTop()    {		sendLineToRobot("G00 Y" + settings.getPaperTop()    * 10);	}
+	public void movePenToEdgeBottom() {		sendLineToRobot("G00 Y" + settings.getPaperBottom() * 10);	}
 	
 	public void disengageMotors() {
 		sendLineToRobot("M18");

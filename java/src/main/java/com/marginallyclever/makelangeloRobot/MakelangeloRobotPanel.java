@@ -529,7 +529,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		if (subject == buttonStart) {
 			gui.startAt(0);
-			updateButtonAccess(robot.isPortConfirmed(), true);
 			return;
 		}
 		if (subject == buttonStartAt) {
@@ -537,7 +536,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if (lineNumber != -1) {
 				gui.startAt(lineNumber);
 			}
-			updateButtonAccess(robot.isPortConfirmed(), true);
 			return;
 		}
 		if (subject == buttonPause) {
@@ -565,11 +563,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		
 		if      (subject == goHome  ) robot.goHome();
-		else if (subject == setHome ) robot.setHome();
-		else if (subject == goLeft  ) robot.movePenAbsolute((float)robot.settings.getPaperLeft() * 10, robot.getToolPositionY());
-		else if (subject == goRight ) robot.movePenAbsolute((float)robot.settings.getPaperRight() * 10, robot.getToolPositionY());
-		else if (subject == goTop   ) robot.movePenAbsolute(robot.getToolPositionX(), (float)robot.settings.getPaperTop() * 10);
-		else if (subject == goBottom) robot.movePenAbsolute(robot.getToolPositionX(), (float)robot.settings.getPaperBottom() * 10);
+		else if (subject == setHome ) {
+			robot.setHome();
+			updateButtonAccess();
+		}
+		else if (subject == goLeft  ) robot.movePenToEdgeLeft();
+		else if (subject == goRight ) robot.movePenToEdgeRight();
+		else if (subject == goTop   ) robot.movePenToEdgeTop();
+		else if (subject == goBottom) robot.movePenToEdgeBottom();
 //		else if (b == find    ) robot.sendLineToRobot("G28");
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
@@ -593,13 +594,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			float dx=0;
 			float dy=0;
 			
-			if (subject == down100) dy=-100;
+			if (subject == down100) dy = -100;
 			if (subject == down10) dy = -10;
 			if (subject == down1) dy = -1;
 			if (subject == up100) dy = 100;
 			if (subject == up10) dy = 10;
 			if (subject == up1) dy = 1;
-
+			
 			if (subject == left100) dx = -100;
 			if (subject == left10) dx = -10;
 			if (subject == left1) dx = -1;
@@ -607,11 +608,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if (subject == right10) dx = 10;
 			if (subject == right1) dx = 1;
 
-			if(dx!=0 || dy!=0) {
-				robot.sendLineToRobot("G91");  // set relative mode
-				robot.movePenRelative(dx,dy);
-				robot.sendLineToRobot("G90");  // return to absolute mode
-			}
+			if(dx!=0 || dy!=0) robot.movePenRelative(dx,dy);
 		}
 
 		// Connecting to a machine
@@ -669,14 +666,24 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return -1;
 	}
 
-	public void updateButtonAccess(boolean isConfirmed, boolean isRunning) {
+	public void updateButtonAccess() {
+		boolean isConfirmed=false;
+		boolean isRunning=false;
+		boolean hasSetHome=false;
+		
+		if(robot!=null) {
+			isConfirmed = robot.isPortConfirmed();
+			isRunning = robot.isRunning();
+			hasSetHome = robot.hasSetHome();
+		}
+		
 		if (buttonGenerate != null)
 			buttonGenerate.setEnabled(!isRunning);
 
 		openConfig.setEnabled(!isRunning);
 
-		buttonStart.setEnabled(isConfirmed && !isRunning);
-		buttonStartAt.setEnabled(isConfirmed && !isRunning);
+		buttonStart.setEnabled(isConfirmed && hasSetHome && !isRunning);
+		buttonStartAt.setEnabled(isConfirmed && hasSetHome && !isRunning);
 		buttonPause.setEnabled(isConfirmed && isRunning);
 		buttonHalt.setEnabled(isConfirmed && isRunning);
 
@@ -712,7 +719,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goHome.setEnabled(isConfirmed && !isRunning);
 
 		penUp.setEnabled(isConfirmed && !isRunning);
-		penDown.setEnabled(isConfirmed && !isRunning);
+		penDown.setEnabled(isConfirmed && hasSetHome && !isRunning);
 
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
 	}
