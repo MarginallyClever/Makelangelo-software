@@ -431,11 +431,17 @@ public final class MakelangeloRobotSettings {
 	}
 
 
+	/**
+	 * @return paper width, in centimeters.
+	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}
 
 
+	/**
+	 * @return paper height, in centimeters.
+	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}

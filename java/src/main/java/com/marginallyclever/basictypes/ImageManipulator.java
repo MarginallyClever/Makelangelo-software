@@ -83,13 +83,16 @@ public abstract class ImageManipulator {
 		out.write("G91;\n");
 	}
 
+	/**
+	 * set up the transform between image space and paper space
+	 */
 	protected void setupTransform() {
 		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
 		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
 		h2 = (float)imageHeight / 2.0f;
 		w2 = (float)imageWidth / 2.0f;
 
-		scale = 1;  // 10mm = 1cm
+		scale = 1;  // 1mm
 
 		double newHeight = imageHeight;
 
@@ -129,7 +132,7 @@ public abstract class ImageManipulator {
 	}
 
 	/**
-	 * Create the gcode that will move the robot to a new position.
+	 * Create the gcode that will move the robot to a new position.  It will translate from image space to paper space.
 	 * @param out where to write the gcode
 	 * @param x new coordinate
 	 * @param y new coordinate
@@ -159,12 +162,35 @@ public abstract class ImageManipulator {
 		}
 	}
 
+
+	/**
+	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
+	 * @param out where to write the gcode
+	 * @param x new coordinate
+	 * @param y new coordinate
+	 * @param up new pen state
+	 * @throws IOException on write failure
+	 */
 	protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
 		tool.writeMoveTo(out, (float) x, (float) y);
 		if(lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
 			lastUp = up;
+		}
+	}
+
+	/**
+	 * This is a special case of moveToPaper() that only works when every line on the paper is a straight line.
+	 * @param out where to write the gcode
+	 * @param x new coordinate
+	 * @param y new coordinate
+	 * @param up new pen state
+	 * @throws IOException on write failure
+	 */
+	protected void lineToPaper(Writer out, double x, double y, boolean up) throws IOException {
+		if(lastUp != up) {
+			moveToPaper(out,x,y,up);
 		}
 	}
 }
