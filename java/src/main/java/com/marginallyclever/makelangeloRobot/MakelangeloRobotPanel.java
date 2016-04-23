@@ -194,6 +194,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				if(connectionComboBox.getSelectedIndex()==0) {
 					// disconnect
 					robot.setConnection(null);
+					updateButtonAccess();
 				} else {
 					String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
 					robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
@@ -571,7 +572,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		else if (subject == goRight ) robot.movePenToEdgeRight();
 		else if (subject == goTop   ) robot.movePenToEdgeTop();
 		else if (subject == goBottom) robot.movePenToEdgeBottom();
-//		else if (b == find    ) robot.sendLineToRobot("G28");
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
 		else if (subject == setFeedRate) {
@@ -716,10 +716,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goRight.setEnabled(isConfirmed && !isRunning);
 
 		setHome.setEnabled(isConfirmed && !isRunning);
-		goHome.setEnabled(isConfirmed && !isRunning);
+		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
 
 		penUp.setEnabled(isConfirmed && !isRunning);
-		penDown.setEnabled(isConfirmed && hasSetHome && !isRunning);
+		penDown.setEnabled(isConfirmed && !isRunning);
 
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
 	}
