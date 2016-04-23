@@ -124,6 +124,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		JButton b = new JButton(label);
 		b.setMargin(new Insets(0,0,0,0));
 		b.setPreferredSize(new Dimension(60,20));
+		b.addActionListener(this);
 		return b;
 	}
 
@@ -295,8 +296,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goRight = new JButton(Translator.get("Right"));   goRight.setPreferredSize(new Dimension(80,20));
 		penUp = new JButton(Translator.get("PenUp"));      penUp.setPreferredSize(new Dimension(100,20));
 		penDown = new JButton(Translator.get("PenDown"));  penDown.setPreferredSize(new Dimension(100,20));
-		//final JButton find = new JButton("FIND HOME");    find.setPreferredSize(new Dimension(100,20));
-		//setHome = new JButton(translator.get("SetHome"));     setHome.setPreferredSize(new Dimension(100,20));
 		goHome = new JButton(Translator.get("GoHome"));     goHome.setPreferredSize(new Dimension(100,20));
 		JLabel horizontalFiller = new JLabel(" ");
 		c = new GridBagConstraints();
@@ -319,7 +318,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		goRight.addActionListener(this);
 		penUp.addActionListener(this);
 		penDown.addActionListener(this);
-		setHome.addActionListener(this);
 		goHome.addActionListener(this);
 
 		dragAndDrive = new JPanel(new GridBagLayout());
@@ -418,6 +416,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		down1 = tightJButton("-1");
 
 		setHome = tightJButton(Translator.get("SetHome"));
+	    setHome.setPreferredSize(new Dimension(100,20));
 
 		up1 = tightJButton("1");
 		up10 = tightJButton("10");
@@ -426,6 +425,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		left100 = tightJButton("-100");
 		left10 = tightJButton("-10");
 		left1 = tightJButton("-1");
+		
 		right1 = tightJButton("1");
 		right10 = tightJButton("10");
 		right100 = tightJButton("100");
@@ -434,7 +434,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
 		c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
 		c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
-		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);     setHome.setPreferredSize(new Dimension(100,20));
+		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
 		c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
 		c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
 		c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
@@ -445,18 +445,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
 		c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
 		c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
-		up1.addActionListener(this);
-		up10.addActionListener(this);
-		up100.addActionListener(this);
-		down1.addActionListener(this);
-		down10.addActionListener(this);
-		down100.addActionListener(this);
-		left1.addActionListener(this);
-		left10.addActionListener(this);
-		left100.addActionListener(this);
-		right1.addActionListener(this);
-		right10.addActionListener(this);
-		right100.addActionListener(this);
 		
 		driveControlPanel.add(axisControl);
 	}
