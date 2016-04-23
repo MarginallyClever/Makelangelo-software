@@ -545,7 +545,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			return;
 		}
 		if (subject == buttonStartAt) {
-			Long lineNumber = getStartingLineNumber();
+			int lineNumber = getStartingLineNumber();
 			if (lineNumber != -1) {
 				gui.startAt(lineNumber);
 			}
@@ -652,7 +652,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * @return <code>lineNumber</code> greater than or equal to zero if user hit
 	 *         ok.
 	 */
-	private long getStartingLineNumber() {
+	private int getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		final JTextField starting_line = new JTextField("0", 8);
 		GridBagConstraints c = new GridBagConstraints();
@@ -668,9 +668,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			long lineNumber;
+			int lineNumber;
 			try {
-				lineNumber = Long.decode(starting_line.getText());
+				lineNumber = Integer.decode(starting_line.getText());
 			} catch (Exception e) {
 				lineNumber = -1;
 			}

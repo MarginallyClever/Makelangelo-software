@@ -271,8 +271,8 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		
 	}
 
-	public void startAt(long lineNumber) {
-		gCode.setLinesProcessed(0);
+	public void startAt(int lineNumber) {
+		gCode.setLinesProcessed(lineNumber);
 		robot.sendLineToRobot("M110 N" + gCode.getLinesProcessed());
 		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();
