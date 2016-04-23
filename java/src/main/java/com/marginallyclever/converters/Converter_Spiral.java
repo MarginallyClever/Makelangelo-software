@@ -25,20 +25,6 @@ public class Converter_Spiral extends ImageConverter {
 
 
 	/**
-	 * Overrides teh basic MoveTo() because optimizing for spirals is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		tool.writeMoveTo(out, TX(x), TY(y));
-		if (lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-	}
-
-
-	/**
 	 * The main entry point
 	 *
 	 * @param img the image to convert.

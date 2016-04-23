@@ -49,22 +49,22 @@ public class Converter_Scanline extends ImageConverter {
 			if ((i % 2) == 0) {
 				// every even line move left to right
 
-				//MoveTo(file,x,y,pen up?)
-				moveTo(out, (float) 0, (float) y, true);
+				//lineTo(file,x,y,pen up?)
+				lineTo(out, (float) 0, (float) y, true);
 				for (x = 0; x < imageWidth; ++x) {
 					// read the image at x,y
 					z = sample3x3(img, x, y);
-					moveTo(out, (float) x, (float) y, (z > level));
+					lineTo(out, (float) x, (float) y, (z > level));
 				}
-				moveTo(out, (float) imageWidth, (float) y, true);
+				lineTo(out, (float) imageWidth, (float) y, true);
 			} else {
 				// every odd line move right to left
-				moveTo(out, (float) imageWidth, (float) y, true);
+				lineTo(out, (float) imageWidth, (float) y, true);
 				for (x = imageWidth - 1; x >= 0; --x) {
 					z = sample3x3(img, x, y);
-					moveTo(out, (float) x, (float) y, (z > level));
+					lineTo(out, (float) x, (float) y, (z > level));
 				}
-				moveTo(out, (float) 0, (float) y, true);
+				lineTo(out, (float) 0, (float) y, true);
 			}
 		}
 

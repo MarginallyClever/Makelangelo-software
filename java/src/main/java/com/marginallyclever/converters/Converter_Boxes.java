@@ -15,18 +15,6 @@ public class Converter_Boxes extends ImageConverter {
 		return Translator.get("BoxGeneratorName");
 	}
 
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		if (lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
 
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
 	protected int takeImageSampleBlock(BufferedImage img, int x0, int y0, int x1, int y1) {
@@ -84,7 +72,7 @@ public class Converter_Boxes extends ImageConverter {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
-				//MoveTo(file,x,y,pen up?)]
+				//lineTo(file,x,y,pen up?)]
 				for (x = 0; x < imageWidth - blockSize; x += blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z = takeImageSampleBlock(img, (int) x, (int) (y - halfstep), (int) (x + blockSize), (int) (y + halfstep));
@@ -93,17 +81,17 @@ public class Converter_Boxes extends ImageConverter {
 					float pulse_size = (halfstep - 1.0f) * scale_z;
 					if (pulse_size > 0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
-						moveTo(out, x + halfstep + pulse_size, y + halfstep - pulse_size, false);
-						moveTo(out, x + halfstep + pulse_size, y + halfstep + pulse_size, false);
-						moveTo(out, x + halfstep - pulse_size, y + halfstep + pulse_size, false);
-						moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, false);
-						moveTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
+						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
+						lineTo(out, x + halfstep + pulse_size, y + halfstep - pulse_size, false);
+						lineTo(out, x + halfstep + pulse_size, y + halfstep + pulse_size, false);
+						lineTo(out, x + halfstep - pulse_size, y + halfstep + pulse_size, false);
+						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, false);
+						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
 					}
 				}
 			} else {
 				// every odd line move right to left
-				//MoveTo(file,x,y,pen up?)]
+				//lineTo(file,x,y,pen up?)]
 				for (x = imageWidth - blockSize; x >= 0; x -= blockSize) {
 					// read a block of the image and find the average intensity in this block
 					z = takeImageSampleBlock(img, (int) (x - blockSize), (int) (y - halfstep), (int) x, (int) (y + halfstep));
@@ -112,12 +100,12 @@ public class Converter_Boxes extends ImageConverter {
 					float pulse_size = (halfstep - 1.0f) * scale_z;
 					if (pulse_size > 0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
-						moveTo(out, x - halfstep + pulse_size, y + halfstep - pulse_size, false);
-						moveTo(out, x - halfstep + pulse_size, y + halfstep + pulse_size, false);
-						moveTo(out, x - halfstep - pulse_size, y + halfstep + pulse_size, false);
-						moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, false);
-						moveTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
+						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
+						lineTo(out, x - halfstep + pulse_size, y + halfstep - pulse_size, false);
+						lineTo(out, x - halfstep + pulse_size, y + halfstep + pulse_size, false);
+						lineTo(out, x - halfstep - pulse_size, y + halfstep + pulse_size, false);
+						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, false);
+						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
 					}
 				}
 			}

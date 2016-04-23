@@ -488,20 +488,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	}
 
 
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-		if(lastUp!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastUp=up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
-
-
 	// I have a set of points.  I want a list of cell borders.
 	// cell borders are halfway between any point and it's nearest neighbors.
 	protected void tessellateVoronoiDiagram() {

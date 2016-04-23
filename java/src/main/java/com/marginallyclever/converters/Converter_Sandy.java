@@ -27,19 +27,6 @@ public class Converter_Sandy extends ImageConverter {
 	}
 
 	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out,float x,float y,boolean up) throws IOException {
-		if(lastUp!=up) {
-			if(up) liftPen(out);
-			else   lowerPen(out);
-			lastUp=up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
-
-	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */

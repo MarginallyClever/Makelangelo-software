@@ -128,19 +128,34 @@ public abstract class ImageManipulator {
 		return SY(PY(y));
 	}
 
-
+	/**
+	 * Create the gcode that will move the robot to a new position.
+	 * @param out where to write the gcode
+	 * @param x new coordinate
+	 * @param y new coordinate
+	 * @param up new pen state
+	 * @throws IOException on write failure
+	 */
 	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		float x2 = TX(x);
-		float y2 = TY(y);
-
-		if (up == lastUp) {
-			previousX = x2;
-			previousY = y2;
-		} else {
-			tool.writeMoveTo(out, previousX, previousY);
-			tool.writeMoveTo(out, x2, y2);
+		tool.writeMoveTo(out, TX(x), TY(y));
+		if (lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
+			lastUp = up;
+		}
+	}
+
+	/**
+	 * This is a special case of moveTo() that only works when every line on the paper is a straight line.
+	 * @param out where to write the gcode
+	 * @param x new coordinate
+	 * @param y new coordinate
+	 * @param up new pen state
+	 * @throws IOException on write failure
+	 */
+	protected void lineTo(Writer out, float x, float y, boolean up) throws IOException {
+		if (up != lastUp) {
+			moveTo(out,x,y,up);
 		}
 	}
 

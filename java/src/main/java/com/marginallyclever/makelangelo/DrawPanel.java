@@ -614,6 +614,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 			DrawingTool tool = machine.getTool(0);
 			gl2.glColor3f(0, 0, 0);
 	
+			boolean drawAllWhileRunning = false;
+			if (running) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
+				
 			// draw image
 			if (fastNodes.size() > 0) {
 				// draw the nodes
@@ -632,7 +635,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 						} else if (n.line_number <= linesProcessed + lookAhead) {
 							gl2.glColor3f(0, 1, 0);
 							//g2d.setColor(Color.GREEN);
-						} else if (prefs.getBoolean("Draw all while running", true) == false) {
+						} else if (drawAllWhileRunning == false) {
 							break;
 						}
 					}

@@ -35,19 +35,6 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		return Translator.get("HilbertCurveName");
 	}
 
-	/**
-	 * Overrides the basic MoveTo() because optimizing for spirals is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		tool.writeMoveTo(out, TX(x), TY(y));
-		if (lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-	}
-
 
 	@Override
 	public boolean generate(final String dest) {

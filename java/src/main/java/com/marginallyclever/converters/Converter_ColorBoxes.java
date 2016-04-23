@@ -38,19 +38,6 @@ public class Converter_ColorBoxes extends ImageConverter {
 		return Translator.get("RGBName");
 	}
 
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out1, float x, float y, boolean up) throws IOException {
-		if (lastUp != up) {
-			if (up) liftPen(out1);
-			else lowerPen(out1);
-			lastUp = up;
-		}
-		tool.writeMoveTo(out1, TX(x), TY(y));
-	}
-
 
 	private void ditherDirection(BufferedImage img, int y, C3[] error, C3[] nexterror, int direction, Writer out) throws IOException {
 		float w = stepw;

@@ -132,14 +132,16 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 		for (VoronoiCell c : cells) {
 			float x = (float)c.centroid.getX();
 			float y = (float)c.centroid.getY();
-			float val = 1.0f - (sample1x1(src_img, (int) x, (int) y) / 255.0f);
-			float r = (val * MAX_DOT_SIZE) / scale;
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
-				gl2.glVertex2d(TX((float) (x + Math.cos(j) * r)),
-						TY((float) (y + Math.sin(j) * r)));
+			if(x>=0 && x< src_img.getWidth() && y>=0 && y < src_img.getHeight() ) {
+				float val = 1.0f - (sample1x1(src_img, (int) x, (int) y) / 255.0f);
+				float r = (val * MAX_DOT_SIZE) / scale;
+				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+				for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
+					gl2.glVertex2d(TX((float) (x + Math.cos(j) * r)),
+							TY((float) (y + Math.sin(j) * r)));
+				}
+				gl2.glEnd();
 			}
-			gl2.glEnd();
 		}
 
 		lock.unlock();
@@ -279,19 +281,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 		}
 	}
 
-
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		if (lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-		tool.writeMoveTo(out, TX(x), TY(y));
-	}
 
 
 	// I have a set of points.  I want a list of cell borders.

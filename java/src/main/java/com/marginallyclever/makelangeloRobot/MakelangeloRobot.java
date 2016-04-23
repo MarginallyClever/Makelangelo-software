@@ -18,7 +18,10 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * @author Admin
+ * MakelangeloRobot is the Controller for a physical robot, following a Model-View-Controller design pattern.  It also contains non-persistent Model data.  
+ * MakelangeloRobotPanel is one of the Views.
+ * MakelangeloRobotSettings is the persistent Model data (machine configuration).
+ * @author dan
  * @since 7.2.10
  *
  */
