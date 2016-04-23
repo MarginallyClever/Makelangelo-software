@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -28,6 +29,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		
 	// Settings go here
 	public MakelangeloRobotSettings settings = null;
+	
+	// control panel
+	private MakelangeloRobotPanel myPanel = null;
 	
 	// Current state goes here
 	private MarginallyCleverConnection connection = null;
@@ -424,5 +428,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public int getLineNumber() {
 		return lineNumber;
+	}
+	
+
+	public MakelangeloRobotPanel getControlPanel(Makelangelo gui) {
+		myPanel = new MakelangeloRobotPanel(gui, this);
+		
+		return myPanel;
 	}
 }

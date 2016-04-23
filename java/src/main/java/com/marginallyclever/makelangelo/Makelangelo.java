@@ -544,7 +544,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		cameraViewPanel.setMachine(robot.settings);
 		cameraViewPanel.setGCode(gCode);
 
-		robotControlPanel = new MakelangeloRobotPanel(this, translator, robot);
+		robotControlPanel = robot.getControlPanel(this);
 		robotControlPanel.updateButtonAccess();
 		
 		logPanel = new LogPanel(translator, robot);

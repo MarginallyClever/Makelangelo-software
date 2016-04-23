@@ -33,7 +33,7 @@ implements ActionListener, PropertyChangeListener {
 
 	MakelangeloRobot robot;
 
-	public PanelAdjustPaper(Translator translator,MakelangeloRobot robot) {
+	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
 
 	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));

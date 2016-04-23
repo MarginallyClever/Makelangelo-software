@@ -28,13 +28,11 @@ public class StatusBar extends JPanel {
 	protected JProgressBar bar;
 
 
-	public StatusBar(Translator ms) {
+	public StatusBar() {
 		super();
 		this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 		GridBagLayout gridbag = new GridBagLayout();
 		setLayout(gridbag);
-
-		translator = ms;
 
 		mFinished = new JLabel("", SwingConstants.LEFT);
 		mExactly = new JLabel("", SwingConstants.CENTER);

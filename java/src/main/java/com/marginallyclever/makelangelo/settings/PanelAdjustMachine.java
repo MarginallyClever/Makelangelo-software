@@ -25,7 +25,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = -84665452555208524L;
 
-	protected Translator translator;
 	protected MakelangeloRobot robot;
 
 	protected JFormattedTextField mw, mh;
@@ -42,8 +41,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 	protected JCheckBox m1i;
 	protected JCheckBox m2i;
 
-	public PanelAdjustMachine(Translator translator, MakelangeloRobot robot) {
-		this.translator = translator;
+	public PanelAdjustMachine( MakelangeloRobot robot) {
 		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));

@@ -68,7 +68,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private static final long serialVersionUID = -4703402918904039337L;
 
 	// god objects ?
-	protected Translator translator;
 	protected MakelangeloRobot robot;
 	protected Makelangelo gui;
 
@@ -192,7 +191,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if(subject == connectionComboBox) {
 			if(ignoreSelectionEvents==false && e.getStateChange()==ItemEvent.SELECTED) {
 				if(connectionComboBox.getSelectedIndex()==0) {
-					// disconnect
+					// Disconnect
 					robot.setConnection(null);
 					updateButtonAccess();
 				} else {
@@ -206,10 +205,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 	
-	public MakelangeloRobotPanel(Makelangelo gui, Translator translator, MakelangeloRobot robot) {
+	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
 		GridBagConstraints c;
 		
-		this.translator = translator;
 		this.gui = gui;
 		this.robot = robot;
 		
@@ -396,7 +394,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 
 
-		statusBar = new StatusBar(translator);
+		statusBar = new StatusBar();
 		panel.add(statusBar, con1);
 		con1.gridy++;
 
@@ -506,7 +504,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		if (subject == openConfig) {
 			Frame frame = (Frame)this.getRootPane().getParent();
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, translator, robot);
+			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
 			m.run();
 			return;
 		}
