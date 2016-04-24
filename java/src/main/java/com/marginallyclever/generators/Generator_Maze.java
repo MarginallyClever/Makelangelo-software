@@ -171,31 +171,28 @@ public class Generator_Maze extends ImageGenerator {
 		output.write(machine.getBobbinLine() + ";\n");
 		tool.writeChangeTo(output);
 
-		w2 = 0;
-		h2 = 0;
-		scale = 10.0f;
-
-		xmax = (float) (machine.getPaperWidth() * machine.getPaperMargin()) * 10.0f / 2.0f;
-		ymax = (float) (machine.getPaperHeight() * machine.getPaperMargin()) * 10.0f / 2.0f;
-		xmin = -xmax;
-		ymin = -ymax;
+		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xmin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xmax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
 		float w = (xmax - xmin) / columns;
 		float h = (ymax - ymin) / rows;
 
 		// Draw outside edge
 		liftPen(output);
-		moveToPaper(output, xmin, ymax, true);
-		moveToPaper(output, xmin, ymax, false);
-		moveToPaper(output, xmax, ymax, false);
-		moveToPaper(output, xmax, ymin + h, false);
-		moveToPaper(output, xmax, ymin + h, true);
+		moveTo(output, xmin, ymax, true);
+		moveTo(output, xmin, ymax, false);
+		moveTo(output, xmax, ymax, false);
+		moveTo(output, xmax, ymin + h, false);
+		moveTo(output, xmax, ymin + h, true);
 		// bottom right gap for exit is here
-		moveToPaper(output, xmax, ymin, true);
-		moveToPaper(output, xmax, ymin, false);
-		moveToPaper(output, xmin, ymin, false);
+		moveTo(output, xmax, ymin, true);
+		moveTo(output, xmax, ymin, false);
+		moveTo(output, xmin, ymin, false);
 		// top-left gap for entrance is left here
-		moveToPaper(output, xmin, ymax - h, false);
-		moveToPaper(output, xmin, ymax - h, true);
+		moveTo(output, xmin, ymax - h, false);
+		moveTo(output, xmin, ymax - h, true);
 
 		int i;
 		for (i = 0; i < walls.length; ++i) {
@@ -209,16 +206,16 @@ public class Generator_Maze extends ImageGenerator {
 			int by = cells[b].y;
 			if (ay == by) {
 				// vertical wall
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, true);
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, false);
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, true);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, false);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
 			} else if (ax == bx) {
 				// horizontal wall
-				moveToPaper(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, true);
-				moveToPaper(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, false);
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
-				moveToPaper(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
+				moveTo(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, true);
+				moveTo(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, false);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
+				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
 			}
 		}
 	}

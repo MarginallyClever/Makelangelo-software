@@ -2,7 +2,6 @@ package com.marginallyclever.converters;
 
 
 import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -12,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -31,7 +31,7 @@ public class Converter_Pulse extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		final JTextField field_size = new JTextField(Float.toString(blockScale));
 
 		JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -59,11 +59,11 @@ public class Converter_Pulse extends ImageConverter {
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
-	private void convertNow(BufferedImage img,Writer out) throws IOException {
+	private void convertNow(TransformedImage img,Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
-		imageStart(img, out);
+		imageStart(out);
 
 		// set absolute coordinates
 		out.write("G00 G90;\n");
@@ -76,100 +76,103 @@ public class Converter_Pulse extends ImageConverter {
 	}
 
 
-	private void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
-		setupPaperImageTransform();
-
+	private void convertPaperSpace(TransformedImage img, Writer out) throws IOException {
 		double PULSE_MINIMUM = 0.5;
 
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
 		// figure out how many lines we're going to have on this image.
-		double stepSize = tool.getDiameter() * blockScale;
-		double halfStep = stepSize / 2.0;
-		double zigZagSpacing = tool.getDiameter();
+		float stepSize = tool.getDiameter() * blockScale;
+		float halfStep = stepSize / 2.0f;
+		float zigZagSpacing = tool.getDiameter();
 
 		// from top to bottom of the image...
-		double x, y, z, scale_z, pulse_size, i = 0;
+		float x, y, z, scale_z, pulse_size, i = 0;
 		double n = 1;
 
 		if (direction == 0) {
 			// horizontal
-			for (y = yStart; y < yEnd; y += stepSize) {
+			for (y = yBottom; y < yTop; y += stepSize) {
 				++i;
 
 				if ((i % 2) == 0) {
 					// every even line move left to right
-					//moveToPaper(file,x,y,pen up?)]
-					moveToPaper(out, xStart, y + halfStep, true);
+					//moveTo(file,x,y,pen up?)]
+					moveTo(out, xLeft, y + halfStep, true);
 
-					for (x = xStart; x < xEnd; x += zigZagSpacing) {
+					for (x = xLeft; x < xRight; x += zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
-						z = sampleScale(img, x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
+						z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
 						// scale the intensity value
 						assert (z >= 0);
-						assert (z <= 255.0);
-						scale_z = (255.0 - z) / 255.0;
+						assert (z <= 255.0f);
+						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
 
-						moveToPaper(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
+						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						n = n > 0 ? -1 : 1;
 					}
-					moveToPaper(out, xEnd, y + halfStep, true);
+					moveTo(out, xRight, y + halfStep, true);
 				} else {
 					// every odd line move right to left
-					//moveToPaper(file,x,y,pen up?)]
-					moveToPaper(out, xEnd, y + halfStep, true);
+					//moveTo(file,x,y,pen up?)]
+					moveTo(out, xRight, y + halfStep, true);
 
-					for (x = xEnd; x >= xStart; x -= zigZagSpacing) {
+					for (x = xRight; x >= xLeft; x -= zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
-						z = sampleScale(img, x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
+						z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
 						// scale the intensity value
-						scale_z = (255.0 - z) / 255.0;
+						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						assert (scale_z <= 1.0);
 						pulse_size = halfStep * scale_z;
-						moveToPaper(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
+						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						n = n > 0 ? -1 : 1;
 					}
-					moveToPaper(out, xStart, y + halfStep, true);
+					moveTo(out, xLeft, y + halfStep, true);
 				}
 			}
 		} else {
 			// vertical
-			for (x = xStart; x < xEnd; x += stepSize) {
+			for (x = xLeft; x < xRight; x += stepSize) {
 				++i;
 
 				if ((i % 2) == 0) {
 					// every even line move top to bottom
-					//moveToPaper(file,x,y,pen up?)]
-					moveToPaper(out, x + halfStep, yStart, true);
+					//moveTo(file,x,y,pen up?)]
+					moveTo(out, x + halfStep, yBottom, true);
 
-					for (y = yStart; y < yEnd; y += zigZagSpacing) {
+					for (y = yBottom; y < yTop; y += zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
-						z = sampleScale(img, x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing);
+						z = img.sample( x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing);
 						// scale the intensity value
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						moveToPaper(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
+						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
 						n *= -1;
 					}
-					moveToPaper(out, x + halfStep, yEnd, true);
+					moveTo(out, x + halfStep, yTop, true);
 				} else {
 					// every odd line move bottom to top
-					//moveToPaper(file,x,y,pen up?)]
-					moveToPaper(out, x + halfStep, yEnd, true);
+					//moveTo(file,x,y,pen up?)]
+					moveTo(out, x + halfStep, yTop, true);
 
-					for (y = yEnd; y >= yStart; y -= zigZagSpacing) {
+					for (y = yTop; y >= yBottom; y -= zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
-						z = sampleScale(img, x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing);
+						z = img.sample( x - halfStep, y - zigZagSpacing, x + halfStep, y + zigZagSpacing);
 						// scale the intensity value
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						moveToPaper(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
+						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
 						n *= -1;
 					}
-					moveToPaper(out, x + halfStep, yStart, true);
+					moveTo(out, x + halfStep, yBottom, true);
 				}
 			}
 		}

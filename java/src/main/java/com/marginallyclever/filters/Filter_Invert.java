@@ -1,8 +1,7 @@
 package com.marginallyclever.filters;
 
-import java.awt.image.BufferedImage;
-
 import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.TransformedImage;
 
 
 /**
@@ -11,18 +10,18 @@ import com.marginallyclever.basictypes.C3;
  * @author Dan
  */
 public class Filter_Invert extends ImageFilter {
-  public BufferedImage filter(BufferedImage img) {
-    int h = img.getHeight();
-    int w = img.getWidth();
+  public TransformedImage filter(TransformedImage img) {
+    int h = img.getSourceImage().getHeight();
+    int w = img.getSourceImage().getWidth();
     int x, y;
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        C3 color = new C3(img.getRGB(x, y));
+        C3 color = new C3(img.getSourceImage().getRGB(x, y));
         color.red   = 255 - color.red;
         color.green = 255 - color.green;
         color.blue  = 255 - color.blue;
-        img.setRGB(x, y, color.toInt());
+        img.getSourceImage().setRGB(x, y, color.toInt());
       }
     }
 

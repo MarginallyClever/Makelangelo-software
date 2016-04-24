@@ -7,6 +7,7 @@ import java.io.Writer;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -39,7 +40,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 
 
-	private void ditherDirection(BufferedImage img, int y, C3[] error, C3[] nexterror, int direction, Writer out) throws IOException {
+	private void ditherDirection(TransformedImage img, int y, C3[] error, C3[] nexterror, int direction, Writer out) throws IOException {
 		float w = stepw;
 		C3 oldPixel = new C3(0, 0, 0);
 		C3 newPixel = new C3(0, 0, 0);
@@ -63,7 +64,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 		for (x = start; x != end; x += direction) {
 			// oldpixel := pixel[x][y]
 			//oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
-			oldPixel.set(new C3(takeImageSampleBlock(img, (int) (x * step4), (int) (y * step4), (int) (x * step4 + step4), (int) (y * step4 + step4))).add(error[x]));
+			oldPixel.set(new C3(img.sampleArea((int) (x * step4), (int) (y * step4), (int) (x * step4 + step4), (int) (y * step4 + step4))).add(error[x]));
 			// newpixel := find_closest_palette_color(oldpixel)
 			int newIndex = palette.quantizeIndex(oldPixel);
 			newPixel = palette.getColor(newIndex);
@@ -135,7 +136,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 
 
-	protected void scan(int tool_index, BufferedImage img, Writer out) throws IOException {
+	protected void scan(int tool_index, TransformedImage img, Writer out) throws IOException {
 		palette_mask = tool_index;
 
 		// "please change to tool X and press any key to continue"
@@ -168,9 +169,9 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
+		imageStart(out);
 
 		double pw = machine.getPaperWidth();
 

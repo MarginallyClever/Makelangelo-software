@@ -1,7 +1,8 @@
 package com.marginallyclever.filters;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
+
+import com.marginallyclever.basictypes.TransformedImage;
 
 /**
  * Modifies a BufferedImage
@@ -31,7 +32,7 @@ public class ImageFilter {
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
 	 * @return the altered image
 	 */
-	public BufferedImage filter(BufferedImage img) {
+	public TransformedImage filter(TransformedImage img) {
 		return img;
 	}
 }

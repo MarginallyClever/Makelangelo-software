@@ -2,7 +2,6 @@ package com.marginallyclever.loaders;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -29,6 +28,7 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.Log;
@@ -149,7 +149,7 @@ public class LoadImage implements LoadFileType {
 					// read in image
 					Log.message(Translator.get("Converting") + " " + destinationFile);
 					// convert with style
-					final BufferedImage img = ImageIO.read(new File(filename));
+					final TransformedImage img = new TransformedImage( ImageIO.read(new File(filename)) );
 
 					ImageConverter converter = null;
 					int preferredIndex = getPreferredDrawStyle();

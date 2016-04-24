@@ -1,10 +1,10 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -21,50 +21,67 @@ public class Converter_Scanline extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
+		imageStart(out);
 		// "please change to tool X and press any key to continue"
 		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 
 		// figure out how many lines we're going to have on this image.
-		int steps = (int) Math.ceil(tool.getDiameter() / (1.75 * scale));
+		float steps = tool.getDiameter();
 		if (steps < 1) steps = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
 		double level = 255.0 / 2.0;
 
-		// from top to bottom of the image...
-		int x, y, z, i = 0;
-		for (y = 0; y < imageHeight; y += steps) {
+		// from top to bottom of the margin area...
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
+		liftPen(out);/*
+		moveTo(out,xLeft,yTop,true);
+		lowerPen(out);
+		moveTo(out,xRight,yTop,false);
+		moveTo(out,xRight,yBottom,false);
+		moveTo(out,xLeft,yBottom,false);
+		moveTo(out,xLeft,yTop,false);
+		liftPen(out);
+		moveTo(out,0,0,true);*/
+		
+		
+		float x, y, z;
+		int i = 0;
+		for (y = yBottom; y < yTop; y += steps) {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
 
 				//lineTo(file,x,y,pen up?)
 				lineTo(out, (float) 0, (float) y, true);
-				for (x = 0; x < imageWidth; ++x) {
+				for (x = xLeft; x < xRight; ++x) {
 					// read the image at x,y
-					z = sample3x3(img, x, y);
-					lineTo(out, (float) x, (float) y, (z > level));
+					z = img.sample3x3(x, y);
+					lineTo(out, x, y, (z > level));
 				}
-				lineTo(out, (float) imageWidth, (float) y, true);
+				lineTo(out, xRight, y, true);
 			} else {
 				// every odd line move right to left
-				lineTo(out, (float) imageWidth, (float) y, true);
-				for (x = imageWidth - 1; x >= 0; --x) {
-					z = sample3x3(img, x, y);
-					lineTo(out, (float) x, (float) y, (z > level));
+				lineTo(out, xRight, y, true);
+				for (x = xRight; x >= xLeft; --x) {
+					z = img.sample3x3(x, y);
+					lineTo(out, x, y, (z > level));
 				}
-				lineTo(out, (float) 0, (float) y, true);
+				lineTo(out, xLeft, y, true);
 			}
 		}
 

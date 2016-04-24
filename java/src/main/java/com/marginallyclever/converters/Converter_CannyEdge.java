@@ -1,10 +1,10 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_Invert;
 import com.marginallyclever.makelangelo.Translator;
@@ -16,34 +16,12 @@ public class Converter_CannyEdge extends ImageConverter {
 		return Translator.get("CannyEdgeConverterName");
 	}
 
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int takeImageSampleBlock(BufferedImage img, int x0, int y0, int x1, int y1) {
-		// point sampling
-		int value = 0;
-		int sum = 0;
-
-		if (x0 < 0) x0 = 0;
-		if (x1 > imageWidth - 1) x1 = imageWidth - 1;
-		if (y0 < 0) y0 = 0;
-		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
-
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				value += sample1x1(img, x, y);
-				++sum;
-			}
-		}
-
-		if (sum == 0) return 255;
-
-		return value / sum;
-	}
 
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
@@ -56,10 +34,11 @@ public class Converter_CannyEdge extends ImageConverter {
 		detector.setHighThreshold(1f);
 
 		//apply it to an image
-		detector.setSourceImage(img);
+		detector.setSourceImage(img.getSourceImage());
 		detector.process();
-		BufferedImage edges = detector.getEdgesImage();
-
+		TransformedImage edges = new TransformedImage(detector.getEdgesImage());
+		edges.copySettingsFrom(img);
+		
 		Filter_Invert inv = new Filter_Invert();
 		edges = inv.filter(edges);
 		

@@ -1,6 +1,6 @@
 package com.marginallyclever.filters;
 
-import java.awt.image.BufferedImage;
+import com.marginallyclever.basictypes.TransformedImage;
 
 /**
  * Floyd/Steinberg dithering
@@ -18,8 +18,8 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
   }
 
 
-  private void ditherDirection(BufferedImage img, int y, int[] error, int[] nexterror, int direction) {
-    int w = img.getWidth();
+  private void ditherDirection(TransformedImage img, int y, int[] error, int[] nexterror, int direction) {
+    int w = img.getSourceImage().getWidth();
     int oldPixel, newPixel, quant_error;
     int start, end, x;
 
@@ -36,11 +36,11 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     // for each x from left to right
     for (x = start; x != end; x += direction) {
       // oldpixel := pixel[x][y]
-      oldPixel = decode(img.getRGB(x, y)) + error[x];
+      oldPixel = decode(img.getSourceImage().getRGB(x, y)) + error[x];
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = quantizeColor(oldPixel);
       // pixel[x][y] := newpixel
-      img.setRGB(x, y, ImageFilter.encode(newPixel));
+      img.getSourceImage().setRGB(x, y, ImageFilter.encode(newPixel));
       // quant_error := oldpixel - newpixel
       quant_error = oldPixel - newPixel;
       // pixel[x+1][y  ] += 7/16 * quant_error
@@ -59,10 +59,10 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
   }
 
   
-  public BufferedImage filter(BufferedImage img) {
+  public TransformedImage filter(TransformedImage img) {
     int y, x;
-    int h = img.getHeight();
-    int w = img.getWidth();
+    int h = img.getSourceImage().getHeight();
+    int w = img.getSourceImage().getWidth();
     int direction = 1;
     int[] error = new int[w];
     int[] nexterror = new int[w];
@@ -74,7 +74,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     // find the average color of the system
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        tone += decode(img.getRGB(x, y));
+        tone += decode(img.getSourceImage().getRGB(x, y));
       }
     }
 

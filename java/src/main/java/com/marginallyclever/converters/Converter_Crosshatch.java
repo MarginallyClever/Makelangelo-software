@@ -1,10 +1,10 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -16,9 +16,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan
  */
 public class Converter_Crosshatch extends ImageConverter {
-	private double xStart, yStart;
-	private double xEnd, yEnd;
-	private double paperWidth, paperHeight;
+	private double xStart, yStart, xEnd, yEnd;
 
 	@Override
 	public String getName() {
@@ -31,43 +29,21 @@ public class Converter_Crosshatch extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
-		imageStart(img, out);
+		imageStart(out);
 
-		// set absolute coordinates
-		out.write("G00 G90;\n");
-		tool.writeChangeTo(out);
 		liftPen(out);
-
 		convertPaperSpace(img, out);
-
 		liftPen(out);
 
 		return true;
 	}
 
-	protected int sampleScale(BufferedImage img, double x0, double y0, double x1, double y1) {
-		return sample(img,
-				(x0 - xStart) / (xEnd - xStart) * (double) imageWidth,
-				(double) imageHeight - (y1 - yStart) / (yEnd - yStart) * (double) imageHeight,
-				(x1 - xStart) / (xEnd - xStart) * (double) imageWidth,
-				(double) imageHeight - (y0 - yStart) / (yEnd - yStart) * (double) imageHeight
-				);
-	}
 
-	protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
-		if(lastUp != up) {
-			tool.writeMoveTo(out, (float) x, (float) y);
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-	}
-
-	protected void convertAlongLine(BufferedImage img, Writer out,double x1,double y1,double x2,double y2,double stepSize, double level) throws IOException {
+	protected void convertAlongLine(TransformedImage img, Writer out,double x1,double y1,double x2,double y2,double stepSize, double level) throws IOException {
 		double dx = x2-x1;
 		double dy = y2-y1;
 		
@@ -78,44 +54,32 @@ public class Converter_Crosshatch extends ImageConverter {
 		else steps=1;
 		
 		double halfStep = stepSize/2.0;
-		double px,py;
+		float px,py;
 		int v;
 		
-		for(double i=0;i<=steps;++i) {
-			px = x1 + dx * (i/steps);
-			py = y1 + dy * (i/steps);
-			if( px>=xStart && px <xEnd && py>=yStart && py<yEnd ) {
-				v = sampleScale(img, px - halfStep, py - halfStep, px + halfStep, py + halfStep);
+		for(float i=0;i<=steps;++i) {
+			px = (float)(x1 + dx * (i/steps));
+			py = (float)(y1 + dy * (i/steps));
+			if( isInsidePaperMargins(px, py)) {
+				v = img.sample( px - halfStep, py - halfStep, px + halfStep, py + halfStep);
 			} else {
 				v=255;
 			}
-			moveToPaper(out, px, py, v >= level);
+			moveTo(out, px, py, v >= level);
 		}
 	}
 	
-	protected void convertPaperSpace(BufferedImage img, Writer out) throws IOException {
+	protected void convertPaperSpace(TransformedImage img, Writer out) throws IOException {
 		double leveladd = 255.0 / 6.0;
 		double level = leveladd;
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		paperWidth = machine.getPaperWidth();
-		paperHeight = machine.getPaperHeight();
-
-		xStart = -paperWidth / 2.0;
-		yStart = xStart * (double) imageHeight / (double) imageWidth;
-
-		if (yStart < -(paperHeight / 2.0)) {
-			xStart *= (-(paperHeight / 2.0)) / yStart;
-			yStart = -(paperHeight / 2.0);
-		}
-
-		xStart *= 10.0 * machine.getPaperMargin();
-		yStart *= 10.0 * machine.getPaperMargin();
-		xEnd = -xStart;
-		yEnd = -yStart;
-
+		yStart = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		yEnd   = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xStart = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xEnd   = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		previousX = 0;
 		previousY = 0;
 
@@ -126,13 +90,13 @@ public class Converter_Crosshatch extends ImageConverter {
 		// vertical
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if(flip) {
-				moveToPaper(out, xStart, y, true);
+				moveTo(out, xStart, y, true);
 				convertAlongLine(img,out,xStart,y,xEnd,y,stepSize,level);
-				moveToPaper(out, xEnd, y, true);
+				moveTo(out, xEnd, y, true);
 			} else {
-				moveToPaper(out, xEnd, y, true);
+				moveTo(out, xEnd, y, true);
 				convertAlongLine(img,out,xEnd,y,xStart,y,stepSize,level);
-				moveToPaper(out, xStart, y, true);
+				moveTo(out, xStart, y, true);
 			}
 			flip = !flip;
 		}
@@ -142,13 +106,13 @@ public class Converter_Crosshatch extends ImageConverter {
 		// horizontal
 		for (x = xStart; x <= xEnd; x += stepSize) {
 			if(flip) {
-				moveToPaper(out, x, yStart, true);
+				moveTo(out, x, yStart, true);
 				convertAlongLine(img,out,x,yStart,x,yEnd,stepSize,level);
-				moveToPaper(out, x, yEnd, true);
+				moveTo(out, x, yEnd, true);
 			} else {
-				moveToPaper(out, x, yEnd, true);
+				moveTo(out, x, yEnd, true);
 				convertAlongLine(img,out,x,yEnd,x,yStart,stepSize,level);
-				moveToPaper(out, x, yStart, true);
+				moveTo(out, x, yStart, true);
 			}
 			flip = !flip;
 		}
@@ -182,13 +146,13 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py-len;
 
 			if(flip) {
-				moveToPaper(out, x3, y3, true);
+				moveTo(out, x3, y3, true);
 				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
-				moveToPaper(out, x4, y4, true);
+				moveTo(out, x4, y4, true);
 			} else {
-				moveToPaper(out, x4, y4, true);
+				moveTo(out, x4, y4, true);
 				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
-				moveToPaper(out, x3, y3, true);
+				moveTo(out, x3, y3, true);
 			}
 			flip = !flip;
 		}
@@ -213,13 +177,13 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py-len;
 
 			if(flip) {
-				moveToPaper(out, x3, y3, true);
+				moveTo(out, x3, y3, true);
 				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
-				moveToPaper(out, x4, y4, true);
+				moveTo(out, x4, y4, true);
 			} else {
-				moveToPaper(out, x4, y4, true);
+				moveTo(out, x4, y4, true);
 				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
-				moveToPaper(out, x3, y3, true);
+				moveTo(out, x3, y3, true);
 			}
 			flip = !flip;
 		}

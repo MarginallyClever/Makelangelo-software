@@ -93,10 +93,6 @@ public class Generator_LSystemTree extends ImageGenerator {
 			output.write(machine.getBobbinLine() + ";\n");
 			tool.writeChangeTo(output);
 
-			w2=0;
-			h2=0;
-			scale=10.0f;
-
 			float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 					(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f / 2.0f;
 			xmax = v;
@@ -117,17 +113,17 @@ public class Generator_LSystemTree extends ImageGenerator {
 			// Draw bounding box
 			//SetAbsoluteMode(output);
 			liftPen(output);
-			moveToPaper(output, xmax, ymax, false);
-			moveToPaper(output, xmax, ymin, false);
-			moveToPaper(output, xmin, ymin, false);
-			moveToPaper(output, xmin, ymax, false);
-			moveToPaper(output, xmax, ymax, false);
+			moveTo(output, xmax, ymax, false);
+			moveTo(output, xmax, ymin, false);
+			moveTo(output, xmin, ymin, false);
+			moveTo(output, xmin, ymax, false);
+			moveTo(output, xmax, ymax, false);
 			 
 		      liftPen(output);
 			// move to starting position
 			x = 0;//(xmax - turtleStep / 2);
 			y = (ymax - turtleStep / 2);
-			moveToPaper(output, x, y, true);
+			moveTo(output, x, y, true);
 			lowerPen(output);
 			// do the curve
 			lSystemTree(output, order, maxSize/4);
@@ -176,6 +172,6 @@ public class Generator_LSystemTree extends ImageGenerator {
 		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
 		x += (turtleDx * (float)stepSize );
 		y += (turtleDy * (float)stepSize );
-		moveToPaper(output, x, y, false);
+		moveTo(output, x, y, false);
 	}
 }

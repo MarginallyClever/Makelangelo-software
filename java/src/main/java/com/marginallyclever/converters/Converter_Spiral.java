@@ -1,10 +1,10 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -25,28 +25,22 @@ public class Converter_Spiral extends ImageConverter {
 
 
 	/**
-	 * The main entry point
+	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 *
 	 * @param img the image to convert.
 	 */
 	@Override
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
-		imageStart(img, out);
-
-		double toolDiameter = tool.getDiameter() / scale;
-		tool.writeChangeTo(out);
+		imageStart(out);
 		liftPen(out);
 
-		//*
-		// create a spiral across the image
-		// raise and lower the pen to darken the appropriate areas
+		double toolDiameter = tool.getDiameter();
 
-		// spiralize
-		int x, y, i, j;
+		int i, j;
 		final int steps = 4;
 		double leveladd = 255.0 / 5.0f;
 		double level;
@@ -56,14 +50,18 @@ public class Converter_Spiral extends ImageConverter {
 		convertToCorners=false;
 		if (convertToCorners) {
 			// go right to the corners
+			float h2 = (float)machine.getPaperHeight() * 10;
+			float w2 = (float)machine.getPaperWidth() * 10;
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
-			maxr = (h2 > w2) ? w2 : h2;
+			float w = (float)machine.getPaperWidth()/2.0f;
+			float h = (float)machine.getPaperHeight()/2.0f;
+			maxr = (float)( h < w ? h : w );
+			maxr *= machine.getPaperMargin() * 10.0f;
 		}
-		maxr /= 2;
-
-		float r = maxr, d, f;
+		
+		float r = maxr, f;
 		float fx, fy;
 		int numRings = 0;
 		double[] each_level = new double[steps];
@@ -73,28 +71,30 @@ public class Converter_Spiral extends ImageConverter {
 		each_level[3] = leveladd * 4;
 		j = 0;
 		while (r > toolDiameter) {
-			d = r * 2.0f;
 			++j;
 			level = each_level[j % steps];
 			// find circumference of current circle
-			float circumference = (float) Math.floor((2.0f * d - toolDiameter) * Math.PI);
+			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI);
 			if (circumference > 360.0f) circumference = 360.0f;
 
 			for (i = 0; i <= circumference; ++i) {
-				f = (float) Math.PI * 2.0f * (i / circumference);
-				fx = w2 + (float) (Math.cos(f) * d);
-				fy = h2 + (float) (Math.sin(f) * d);
-				x = (int) fx;
-				y = (int) fy;
-				// clip to image boundaries
-				if (x >= 0 && x < imageWidth && y >= 0 && y < imageHeight) {
-					z = sample3x3(img, x, y);
+				f = (float) Math.PI * 2.0f * (float)i / (float)circumference;
+				fx = (float) (Math.cos(f) * r);
+				fy = (float) (Math.sin(f) * r);
+				// clip to paper boundaries
+				if( isInsidePaperMargins(fx, fy) )
+				{
+					try {
+						z = img.sample3x3(fx, fy);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
 					moveTo(out, fx, fy, (z >= level));
 				} else {
 					moveTo(out, fx, fy, true);
 				}
 			}
-			r -= toolDiameter * 0.5;
+			r -= toolDiameter;
 			++numRings;
 		}
 

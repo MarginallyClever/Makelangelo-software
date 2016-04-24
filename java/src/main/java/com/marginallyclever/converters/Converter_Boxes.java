@@ -1,10 +1,10 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -15,67 +15,43 @@ public class Converter_Boxes extends ImageConverter {
 		return Translator.get("BoxGeneratorName");
 	}
 
-
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	protected int takeImageSampleBlock(BufferedImage img, int x0, int y0, int x1, int y1) {
-		// point sampling
-		int value = 0;
-		int sum = 0;
-
-		if (x0 < 0) x0 = 0;
-		if (x1 > imageWidth - 1) x1 = imageWidth - 1;
-		if (y0 < 0) y0 = 0;
-		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
-
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				value += sample1x1(img, x, y);
-				++sum;
-			}
-		}
-
-		if (sum == 0) return 255;
-
-		return value / sum;
-	}
-
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
+		imageStart(out);
 		// "please change to tool X and press any key to continue"
 		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 
-		double pw = machine.getPaperWidth();
-		//double ph = machine.GetPaperHeight();
+		float pw = (float)machine.getPaperWidth();
+		float ph = (float)machine.getPaperHeight();
 
 		// figure out how many lines we're going to have on this image.
 		float steps = (float) (pw / tool.getDiameter());
 		if (steps < 1) steps = 1;
 
-		float blockSize = (int) (imageWidth / steps);
+		float blockSize = (int) (pw / steps);
 		float halfstep = (float) blockSize / 2.0f;
 
 		// from top to bottom of the image...
 		float x, y, z;
 		int i = 0;
-		for (y = 0; y < imageHeight; y += blockSize) {
+		for (y = 0; y < ph; y += blockSize) {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
 				//lineTo(file,x,y,pen up?)]
-				for (x = 0; x < imageWidth - blockSize; x += blockSize) {
+				for (x = 0; x < pw - blockSize; x += blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z = takeImageSampleBlock(img, (int) x, (int) (y - halfstep), (int) (x + blockSize), (int) (y + halfstep));
+					z = img.sample( x, y - halfstep, x + blockSize, y + halfstep );
 					// scale the intensity value
 					float scale_z = (255.0f - (float) z) / 255.0f;
 					float pulse_size = (halfstep - 1.0f) * scale_z;
@@ -92,9 +68,9 @@ public class Converter_Boxes extends ImageConverter {
 			} else {
 				// every odd line move right to left
 				//lineTo(file,x,y,pen up?)]
-				for (x = imageWidth - blockSize; x >= 0; x -= blockSize) {
+				for (x = pw - blockSize; x >= 0; x -= blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z = takeImageSampleBlock(img, (int) (x - blockSize), (int) (y - halfstep), (int) x, (int) (y + halfstep));
+					z = img.sample(x - blockSize, y - halfstep, x, y + halfstep );
 					// scale the intensity value
 					float scale_z = (255.0f - (float) z) / 255.0f;
 					float pulse_size = (halfstep - 1.0f) * scale_z;

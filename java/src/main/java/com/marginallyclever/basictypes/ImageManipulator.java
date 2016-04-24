@@ -18,10 +18,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
  * @author Dan
  */
 public abstract class ImageManipulator {
-	// helpers
-	protected float w2, h2, scale;
-	protected DrawingTool tool;
-
 	// file properties
 	protected String dest;
 	// pen position optimizing
@@ -32,11 +28,9 @@ public abstract class ImageManipulator {
 	protected ProgressMonitor pm;
 	protected SwingWorker<Void, Void> parent;
 
+	// helpers
 	protected MakelangeloRobotSettings machine;
-
-	protected float sampleValue;
-	protected float sampleSum;
-
+	protected DrawingTool tool;
 	protected DrawPanel drawPanel;
 
 
@@ -83,65 +77,18 @@ public abstract class ImageManipulator {
 		out.write("G91;\n");
 	}
 
-	/**
-	 * set up the transform between image space and paper space
-	 */
-	protected void setupTransform() {
-		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
-		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
-		h2 = (float)imageHeight / 2.0f;
-		w2 = (float)imageWidth / 2.0f;
-
-		scale = 1;  // 1mm
-
-		double newHeight = imageHeight;
-
-		if (imageWidth > machine.getPaperWidth()) {
-			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
-			scale *= resize;
-			newHeight *= resize;
-		}
-		if (newHeight > machine.getPaperHeight()) {
-			float resize = (float) machine.getPaperHeight() / (float) newHeight;
-			scale *= resize;
-		}
-	}
-
-	protected float SX(float x) {
-		return x * scale;
-	}
-
-	protected float SY(float y) {
-		return y * scale;
-	}
-
-	protected float PX(float x) {
-		return x - w2;
-	}
-
-	protected float PY(float y) {
-		return h2 - y;
-	}
-
-	protected float TX(float x) {
-		return SX(PX(x));
-	}
-
-	protected float TY(float y) {
-		return SY(PY(y));
-	}
 
 	/**
-	 * Create the gcode that will move the robot to a new position.  It will translate from image space to paper space.
+	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
 	 * @param out where to write the gcode
 	 * @param x new coordinate
 	 * @param y new coordinate
 	 * @param up new pen state
 	 * @throws IOException on write failure
 	 */
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		tool.writeMoveTo(out, TX(x), TY(y));
-		if (lastUp != up) {
+	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
+		tool.writeMoveTo(out, (float) x, (float) y);
+		if(lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
 			lastUp = up;
@@ -156,41 +103,9 @@ public abstract class ImageManipulator {
 	 * @param up new pen state
 	 * @throws IOException on write failure
 	 */
-	protected void lineTo(Writer out, float x, float y, boolean up) throws IOException {
-		if (up != lastUp) {
+	protected void lineTo(Writer out, double x, double y, boolean up) throws IOException {
+		if(lastUp != up) {
 			moveTo(out,x,y,up);
-		}
-	}
-
-
-	/**
-	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
-	 * @param out where to write the gcode
-	 * @param x new coordinate
-	 * @param y new coordinate
-	 * @param up new pen state
-	 * @throws IOException on write failure
-	 */
-	protected void moveToPaper(Writer out, double x, double y, boolean up) throws IOException {
-		tool.writeMoveTo(out, (float) x, (float) y);
-		if(lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
-	}
-
-	/**
-	 * This is a special case of moveToPaper() that only works when every line on the paper is a straight line.
-	 * @param out where to write the gcode
-	 * @param x new coordinate
-	 * @param y new coordinate
-	 * @param up new pen state
-	 * @throws IOException on write failure
-	 */
-	protected void lineToPaper(Writer out, double x, double y, boolean up) throws IOException {
-		if(lastUp != up) {
-			moveToPaper(out,x,y,up);
 		}
 	}
 }

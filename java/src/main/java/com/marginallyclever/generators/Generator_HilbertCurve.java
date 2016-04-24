@@ -64,12 +64,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 			output.write(machine.getBobbinLine() + ";\n");
 			tool.writeChangeTo(output);
 
-			w2=0;
-			h2=0;
-			scale=10.0f;
-
-			float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin())/2.0f,
-					(float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f);
+			float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
+					           (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
 			xmax = v;
 			ymax = v;
 			xmin = -v;

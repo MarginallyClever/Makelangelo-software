@@ -82,27 +82,19 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	}
 
 	protected void setupTransform() {
-		super.setupTransform();
-
 		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
 		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
-		h2 = (float)imageHeight / 2.0f;
-		w2 = (float)imageWidth / 2.0f;
-
-		scale = 1;  // 10mm = 1cm
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
 		if (imageWidth > machine.getPaperWidth()) {
 			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
-			scale *= resize;
 			newHeight *= resize;
 			newWidth = machine.getPaperWidth();
 		}
 		if (newHeight > machine.getPaperHeight()) {
 			float resize = (float) machine.getPaperHeight() / (float) newHeight;
-			scale *= resize;
 			newWidth *= resize;
 			newHeight = machine.getPaperHeight();
 		}
@@ -111,42 +103,35 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 		textFindCharsPerLine(newWidth);
 
-		posx = w2;
-		posy = h2;
+		posx = 0;
+		posy = 0;
 	}
 
 
 	protected void setupTransform(int width, int height) {
 		int imageHeight = height;
 		int imageWidth = width;
-		h2 = imageHeight / 2;
-		w2 = imageWidth / 2;
-
-		scale = 10f;  // 10mm = 1cm
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
 		if (imageWidth > machine.getPaperWidth()) {
 			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
-			scale *= resize;
 			newHeight *= resize;
 			newWidth = machine.getPaperWidth();
 		}
 		if (newHeight > machine.getPaperHeight()) {
 			float resize = (float) machine.getPaperHeight() / (float) newHeight;
-			scale *= resize;
 			newWidth *= resize;
 			newHeight = machine.getPaperHeight();
 		}
-		scale *= machine.getPaperMargin();
 		newWidth *= machine.getPaperMargin();
 		newHeight *= machine.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
-		posx = w2;
-		posy = h2;
+		posx = 0;
+		posy = 0;
 	}
 
 
@@ -307,12 +292,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 			tool = machine.getCurrentTool();
 
-			w2=0;
-			h2=0;
 			posx=0;
 			posy=0;
-			scale=1;
-
 			textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
 
 			output.write(machine.getConfigLine() + ";\n");
@@ -324,11 +305,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			//textCreateMessageNow(lastMessage, output);
 			writeBeautifulMessage(fontName,fontSize,lastMessage,output);
 
-			w2=0;
-			h2=0;
 			posx=0;
 			posy=0;
-			scale=1;
 			textSetAlign(Align.RIGHT);
 			textSetVAlign(VAlign.TOP);
 			textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
@@ -432,20 +410,20 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 		if (draw_bounding_box) {
 			// draw bounding box
-			output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
+			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMaxY() + ";\n");
 			lowerPen(output);
-			output.write("G0 X" + TX((float) r.getMaxX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
-			output.write("G0 X" + TX((float) r.getMaxX()) + " Y" + TY((float) r.getMinY()) + ";\n");
-			output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMinY()) + ";\n");
-			output.write("G0 X" + TX((float) r.getMinX()) + " Y" + TY((float) r.getMaxY()) + ";\n");
+			output.write("G0 X" + (float) r.getMaxX() + " Y" + (float) r.getMaxY() + ";\n");
+			output.write("G0 X" + (float) r.getMaxX() + " Y" + (float) r.getMinY() + ";\n");
+			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMinY() + ";\n");
+			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMaxY() + ";\n");
 			liftPen(output);
 		}
 
 		// move to first line height
 		// assumes we are still G90
-		float message_start = TX((float) r.getMinX()) + SX(padding);
-		float firstline = TY((float) r.getMinY()) - SY(padding + letterHeight);
-		float interline = -SY(letterHeight + lineSpacing);
+		float message_start = (float) r.getMinX() + padding;
+		float firstline = (float) r.getMinY() - (padding + letterHeight);
+		float interline = -(letterHeight + lineSpacing);
 
 		output.write("G0 X" + message_start + " Y" + firstline + ";\n");
 		output.write("G91;\n");
@@ -640,7 +618,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
 			if (inputStream != null) {
 				if (i > 0 && kerning != 0) {
-					output.write("G0 X" + SX(kerning) + ";\n");
+					output.write("G0 X" + (kerning) + ";\n");
 				}
 				try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 						final BufferedReader in = new BufferedReader(inputStreamReader)) {
@@ -670,11 +648,11 @@ public class Generator_YourMessageHere extends ImageGenerator {
 								} else if (c.startsWith("X")) {
 									// translate coordinates
 									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "X" + SX(x));
+									output.write(gap + "X" + (x));
 								} else if (c.startsWith("Y")) {
 									// translate coordinates
 									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "Y" + SY(y));
+									output.write(gap + "Y" + (y));
 								} else {
 									output.write(gap + c);
 								}
@@ -697,26 +675,14 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	public void signName(Writer out) throws IOException {
 		setupTransform();
 
-		float desired_scale = 0.5f;  // changes the size of the font.  large number = larger font
-
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition((float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
 				(float)(machine.getPaperHeight()*10.0f*machine.getPaperMargin()));
 
-		float xx = w2;
-		float yy = h2;
-		float old_scale = scale;
-		h2 = 0;
-		w2 = 0;
-		scale = desired_scale;
-
 		textSetCharsPerLine(25);
 
 		textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), out);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
-		h2 = yy;
-		w2 = xx;
-		scale = old_scale;
 	}
 }

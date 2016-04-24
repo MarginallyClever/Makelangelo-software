@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.TransformedImage;
 
 
 /**
@@ -24,12 +25,12 @@ public class Filter_GaussianBlur extends ImageFilter {
 	}
 
 
-	public BufferedImage filter(BufferedImage img) {
-		int h = img.getHeight();
-		int w = img.getWidth();
+	public TransformedImage filter(TransformedImage img) {
+		int h = img.getSourceImage().getHeight();
+		int w = img.getSourceImage().getWidth();
 		int x, y;
 
-		BufferedImage dest = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+		BufferedImage dest = new BufferedImage(img.getSourceImage().getWidth(), img.getSourceImage().getHeight(), img.getSourceImage().getType());
 
 		// scales could be filled with a gaussian curve: float[] scales = new float[radius];
 		float[] scales = new float[3];
@@ -47,19 +48,19 @@ public class Filter_GaussianBlur extends ImageFilter {
 				pixel.set(0, 0, 0);
 				sum = 0;
 				if (x - 1 >= 0) {
-					p = new C3(img.getRGB(x - 1, y));
+					p = new C3(img.getSourceImage().getRGB(x - 1, y));
 					p.mul(scales[0]);
 					pixel.add(p);
 					sum += scales[0];
 				}
 
-				p = new C3(img.getRGB(x, y));
+				p = new C3(img.getSourceImage().getRGB(x, y));
 				p.mul(scales[1]);
 				pixel.add(p);
 				sum += scales[1];
 
 				if (x + 1 < w) {
-					p = new C3(img.getRGB(x + 1, y));
+					p = new C3(img.getSourceImage().getRGB(x + 1, y));
 					p.mul(scales[2]);
 					pixel.add(p);
 					sum += scales[2];
@@ -97,14 +98,14 @@ public class Filter_GaussianBlur extends ImageFilter {
 
 				pixel.mul(1.0 / sum);
 				//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
-				img.setRGB(x, y, pixel.toInt());
+				img.getSourceImage().setRGB(x, y, pixel.toInt());
 			}
 		}
 
 		try {
 			// save image
 			File outputfile = new File("saved.png");
-			ImageIO.write(img, "png", outputfile);
+			ImageIO.write(img.getSourceImage(), "png", outputfile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

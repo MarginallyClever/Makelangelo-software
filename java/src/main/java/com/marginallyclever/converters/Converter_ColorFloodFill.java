@@ -11,6 +11,7 @@ import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -23,7 +24,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private ColorPalette palette;
 	private int diameter = 0;
 	private int last_x, last_y;
-	private BufferedImage imgChanged;
+	private TransformedImage imgChanged;
 	private BufferedImage imgMask;
 
 
@@ -41,18 +42,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		return Translator.get("RGBFloodFillName");
 	}
 
-
-	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	protected void moveTo(float x, float y, boolean up, Writer osw) throws IOException {
-		if (lastUp != up) {
-			if (up) liftPen(osw);
-			else lowerPen(osw);
-			lastUp = up;
-		}
-		tool.writeMoveTo(osw, TX(x), TY(y));
-	}
 
 	/**
 	 * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
@@ -164,12 +153,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			float dy = (float) (a.y - last_y);
 			if ((dx * dx + dy * dy) > diameter * diameter * 2.0f) {
 				//System.out.print("Jump at "+x+", "+y+"\n");
-				moveTo(last_x, last_y, true, osw);
-				moveTo(a.x, a.y, true, osw);
-				moveTo(a.x, a.y, false, osw);
+				moveTo(osw, last_x, last_y, true);
+				moveTo(osw, a.x, a.y, true);
+				moveTo(osw, a.x, a.y, false);
 			} else {
 				//System.out.print("Move to "+x+", "+y+"\n");
-				moveTo(a.x, a.y, false, osw);
+				moveTo(osw, a.x, a.y, false);
 			}
 			// update the last position.
 			last_x = (int) a.x;
@@ -237,11 +226,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
-		//img = bw.process(img);
-
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
 		img = blur.filter(img);
 		//    Histogram h = new Histogram();
@@ -254,10 +239,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, imgMask.getWidth(), imgMask.getHeight());
 
-
-
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
+		imageStart(out);
 
 
 		float pw = (float) machine.getPaperWidth();
