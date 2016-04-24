@@ -108,10 +108,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		if (y0 < 0) y0 = 0;
 		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
 
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				value.add(new C3(imgChanged.getRGB(x, y)));
-				++sum;
+		for (float y = y0; y < y1; ++y) {
+			for (float x = x0; x < x1; ++x) {
+				if(isInsidePaperMargins(x, y)) {
+					value.add(new C3(imgChanged.getRGB(x, y)));
+					++sum;
+				}
 			}
 		}
 

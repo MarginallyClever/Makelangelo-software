@@ -24,64 +24,63 @@ public class Converter_Boxes extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
-		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
-		// "please change to tool X and press any key to continue"
-		tool.writeChangeTo(out);
-		// Make sure the pen is up for the first move
 		liftPen(out);
 
-		float pw = (float)machine.getPaperWidth();
-		float ph = (float)machine.getPaperHeight();
-
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float pw = xRight - xLeft;
+		
 		// figure out how many lines we're going to have on this image.
-		float steps = (float) (pw / tool.getDiameter());
+		float blockSize = tool.getDiameter()*10.0f;
+		float halfStep = blockSize / 2.0f;
+		
+		float steps = pw / blockSize;
 		if (steps < 1) steps = 1;
-
-		float blockSize = (int) (pw / steps);
-		float halfstep = (float) blockSize / 2.0f;
 
 		// from top to bottom of the image...
 		float x, y, z;
 		int i = 0;
-		for (y = 0; y < ph; y += blockSize) {
+		for (y = yBottom + halfStep; y < yTop - halfStep; y += blockSize) {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
-				//lineTo(file,x,y,pen up?)]
-				for (x = 0; x < pw - blockSize; x += blockSize) {
+				for (x = xLeft; x < xRight; x += blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z = img.sample( x, y - halfstep, x + blockSize, y + halfstep );
+					z = img.sample( x, y - halfStep, x + blockSize, y + halfStep );
 					// scale the intensity value
-					float scale_z = (255.0f - (float) z) / 255.0f;
-					float pulse_size = (halfstep - 1.0f) * scale_z;
-					if (pulse_size > 0.1f) {
+					float scaleZ =  (255.0f - z) / 255.0f;
+					float pulseSize = (halfStep - 1.0f) * scaleZ;
+					if (pulseSize > 0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
-						lineTo(out, x + halfstep + pulse_size, y + halfstep - pulse_size, false);
-						lineTo(out, x + halfstep + pulse_size, y + halfstep + pulse_size, false);
-						lineTo(out, x + halfstep - pulse_size, y + halfstep + pulse_size, false);
-						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, false);
-						lineTo(out, x + halfstep - pulse_size, y + halfstep - pulse_size, true);
+						moveTo(out, x + halfStep - pulseSize, y + halfStep - pulseSize, true);
+						lowerPen(out);
+						moveTo(out, x + halfStep + pulseSize, y + halfStep - pulseSize, false);
+						moveTo(out, x + halfStep + pulseSize, y + halfStep + pulseSize, false);
+						moveTo(out, x + halfStep - pulseSize, y + halfStep + pulseSize, false);
+						moveTo(out, x + halfStep - pulseSize, y + halfStep - pulseSize, false);
+						liftPen(out);
 					}
 				}
 			} else {
 				// every odd line move right to left
-				//lineTo(file,x,y,pen up?)]
-				for (x = pw - blockSize; x >= 0; x -= blockSize) {
+				for (x = xRight; x > xLeft; x -= blockSize) {
 					// read a block of the image and find the average intensity in this block
-					z = img.sample(x - blockSize, y - halfstep, x, y + halfstep );
+					z = img.sample(x - blockSize, y - halfStep, x, y + halfStep );
 					// scale the intensity value
-					float scale_z = (255.0f - (float) z) / 255.0f;
-					float pulse_size = (halfstep - 1.0f) * scale_z;
-					if (pulse_size > 0.1f) {
+					float scaleZ = 1;//(255.0f - z) / 255.0f;
+					float pulseSize = (halfStep - 1.0f) * scaleZ;
+					if (pulseSize > 0.1f) {
 						// draw a square.  the diameter is relative to the intensity.
-						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
-						lineTo(out, x - halfstep + pulse_size, y + halfstep - pulse_size, false);
-						lineTo(out, x - halfstep + pulse_size, y + halfstep + pulse_size, false);
-						lineTo(out, x - halfstep - pulse_size, y + halfstep + pulse_size, false);
-						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, false);
-						lineTo(out, x - halfstep - pulse_size, y + halfstep - pulse_size, true);
+						moveTo(out, x - halfStep - pulseSize, y + halfStep - pulseSize, true);
+						lowerPen(out);
+						moveTo(out, x - halfStep + pulseSize, y + halfStep - pulseSize, false);
+						moveTo(out, x - halfStep + pulseSize, y + halfStep + pulseSize, false);
+						moveTo(out, x - halfStep - pulseSize, y + halfStep + pulseSize, false);
+						moveTo(out, x - halfStep - pulseSize, y + halfStep - pulseSize, false);
+						liftPen(out);
 					}
 				}
 			}
