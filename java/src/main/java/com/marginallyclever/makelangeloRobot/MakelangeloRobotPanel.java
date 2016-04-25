@@ -708,10 +708,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right10.setEnabled(isConfirmed && !isRunning);
 		right100.setEnabled(isConfirmed && !isRunning);
 
-		goTop.setEnabled(isConfirmed && !isRunning);
-		goBottom.setEnabled(isConfirmed && !isRunning);
-		goLeft.setEnabled(isConfirmed && !isRunning);
-		goRight.setEnabled(isConfirmed && !isRunning);
+		goTop.setEnabled(isConfirmed && !isRunning && hasSetHome);
+		goBottom.setEnabled(isConfirmed && !isRunning && hasSetHome);
+		goLeft.setEnabled(isConfirmed && !isRunning && hasSetHome);
+		goRight.setEnabled(isConfirmed && !isRunning && hasSetHome);
 
 		setHome.setEnabled(isConfirmed && !isRunning);
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);

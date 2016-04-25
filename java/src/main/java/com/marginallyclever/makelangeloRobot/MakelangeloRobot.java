@@ -75,6 +75,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		
 		if( this.connection != c ) {
 			portConfirmed = false;
+			hasSetHome = false;
 		}
 		
 		this.connection = c;
@@ -384,6 +385,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void setHome() {
 		sendLineToRobot("G92 X0 Y0");
+		hasSetHome=true;
 	}
 	
 	

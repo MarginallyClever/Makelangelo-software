@@ -71,14 +71,14 @@ public class TransformedImage {
 		return sourceImage;
 	}
 
-	private int getTransformedX(float x) {
+	public int getTransformedX(float x) {
 		return (int) ((x * scaleX) + translateX);
 	}
 
-	private int getTransformedY(float y) {
+	public int getTransformedY(float y) {
 		return (int) ((y * scaleY) + translateY);
 	}
-
+	
 	public void rotateAbsolute(float degrees) {
 		rotationDegrees = degrees;
 	}
