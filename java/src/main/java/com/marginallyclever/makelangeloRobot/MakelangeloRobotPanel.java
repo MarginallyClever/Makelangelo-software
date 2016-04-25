@@ -74,7 +74,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// connect menu
 	private CollapsiblePanel connectionPanel;
 	private JPanel connectionList;
-	private JRadioButtonMenuItem[] buttonConnections;
 	private JComboBox<String> connectionComboBox;
 	private boolean ignoreSelectionEvents=false;
 	private JButton buttonRescan;
@@ -607,26 +606,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if (subject == right1) dx = 1;
 
 			if(dx!=0 || dy!=0) robot.movePenRelative(dx,dy);
-		}
-
-		// Connecting to a machine
-		String[] connections = gui.getConnectionManager().listConnections();
-		for (int i = 0; i < connections.length; ++i) {
-			if (subject == buttonConnections[i]) {
-				Log.clear();
-				Log.message(Translator.get("ConnectingTo") + connections[i] + "...");
-
-				MarginallyCleverConnection c = robot.getConnection().getManager().openConnection(connections[i]); 
-				if (c == null) {
-					Log.error(Translator.get("PortOpenFailed"));
-				} else {
-					robot.setConnection(c);
-					Log.message( Translator.get("PortOpened") );
-					gui.updateMenuBar();
-					SoundSystem.playConnectSound();
-				}
-				return;
-			}
 		}
 	}
 
