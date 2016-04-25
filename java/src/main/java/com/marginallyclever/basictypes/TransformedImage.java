@@ -55,7 +55,7 @@ public class TransformedImage {
 		colorChannel = other.colorChannel;
 	}
 
-	public float getRotation() {
+	public float getRotationDegrees() {
 		return rotationDegrees;
 	}
 

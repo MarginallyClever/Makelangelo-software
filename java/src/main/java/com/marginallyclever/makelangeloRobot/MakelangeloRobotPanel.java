@@ -30,7 +30,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
@@ -41,7 +40,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.loaders.LoadFileType;
 import com.marginallyclever.loaders.LoadGCode;
