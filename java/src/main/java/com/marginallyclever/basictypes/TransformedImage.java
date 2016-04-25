@@ -26,7 +26,7 @@ public class TransformedImage {
 		translateX = src.getWidth() / 2.0f;
 		translateY = src.getHeight() / 2.0f;
 		scaleX = 1;
-		scaleY = 1;
+		scaleY = -1;
 		rotationDegrees = 0;
 		colorChannel = 0;
 	}

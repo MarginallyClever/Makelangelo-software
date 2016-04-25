@@ -54,13 +54,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	// current location
 	private boolean hasSetHome;
-	private int lineNumber;
 	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
 		hasSetHome=false;
-		lineNumber=0;
 	}
 	
 	public MarginallyCleverConnection getConnection() {
@@ -289,11 +287,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 
 	/**
-	 * removes comments, processes commands drawbot shouldn't have to handle.
+	 * removes comments, processes commands robot doesn't handle, add checksum information.
 	 *
 	 * @param line command to send
 	 */
-	public void tweakAndSendLine(String line,Translator translator) {
+	public void tweakAndSendLine(String line, int lineNumber, Translator translator) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return;
 
 		// tool change request?
@@ -311,7 +309,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
 			line += generateChecksum(line);
-			++lineNumber;
 		}
 		
 		// send relevant part of line to the robot
@@ -414,27 +411,15 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void movePenToEdgeTop()    {		sendLineToRobot("G00 Y" + settings.getPaperTop()    * 10);	}
 	public void movePenToEdgeBottom() {		sendLineToRobot("G00 Y" + settings.getPaperBottom() * 10);	}
 	
-	public void disengageMotors() {
-		sendLineToRobot("M18");
-	}
-	
-	public void engageMotors() {
-		sendLineToRobot("M17");
-	}
+	public void disengageMotors() {		sendLineToRobot("M18");	}
+	public void engageMotors()    {		sendLineToRobot("M17");	}
 	
 	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
 	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}
 	public void jogRightMotorOut() {		sendLineToRobot("D00 R400");	}
 	public void jogRightMotorIn()  {		sendLineToRobot("D00 R-400");	}
-	
-	public void setLineNumber(int newLineNumber) {
-		lineNumber = newLineNumber;
-		sendLineToRobot("M110 N" + lineNumber);
-	}
-	
-	public int getLineNumber() {
-		return lineNumber;
-	}
+		
+	public void setLineNumber(int newLineNumber) {		sendLineToRobot("M110 N" + newLineNumber);	}
 	
 
 	public MakelangeloRobotPanel getControlPanel(Makelangelo gui) {

@@ -243,7 +243,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		int lineNumber = gCode.getLinesProcessed();
 		String line = gCode.nextLine();
 		
-		robot.tweakAndSendLine( line, translator );
+		robot.tweakAndSendLine( line, lineNumber, translator );
 
 		cameraViewPanel.setLinesProcessed(lineNumber);
 		if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
@@ -630,13 +630,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		// we shouldn't need to open the dialog if the default settings are correct.
 		// the default settings must always match the values in the Marginally Clever tutorials.
 		// the default settings must always match the Marginally Clever kit.
-		/* if(r.settings.getLimitBottom()==0 
-				&& r.settings.getLimitTop()==0
-				&& r.settings.getLimitLeft()==0
-				&& r.settings.getLimitRight()==0) {
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(this,translator,r);
-			m.run();
-		}*/
 		
 	    getMainframe().setTitle(Translator.get("TitlePrefix") + " #" + Long.toString(robot.settings.getUID()));
 	    
