@@ -39,6 +39,7 @@ public class Converter_Sandy extends ImageConverter {
 
 		String [] directions = { "top right", "top left", "bottom left", "bottom right", "center" };
 		final JComboBox<String> direction_choices = new JComboBox<>(directions);
+		direction_choices.setSelectedIndex(direction);
 		panel.add(direction_choices);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
