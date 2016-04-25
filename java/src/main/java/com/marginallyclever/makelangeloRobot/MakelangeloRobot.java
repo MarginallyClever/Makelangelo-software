@@ -311,6 +311,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
 			line += generateChecksum(line);
+			++lineNumber;
 		}
 		
 		// send relevant part of line to the robot

@@ -225,8 +225,6 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
 			return;
 
-		String line;
-
 		// are there any more commands?
 		if( gCode.moreLinesAvailable() == false )  {
 			// end of file
@@ -243,7 +241,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		}
 		
 		int lineNumber = gCode.getLinesProcessed();
-		line = gCode.nextLine();
+		String line = gCode.nextLine();
 		
 		robot.tweakAndSendLine( line, translator );
 
