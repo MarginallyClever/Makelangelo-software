@@ -45,18 +45,18 @@ public final class MakelangeloRobotSettings {
 	 */
 	private long robotUID = 0;
 
-	// machine physical limits
+	// machine physical limits, in cm
 	private double limitTop;
 	private double limitBottom;
 	private double limitLeft;
 	private double limitRight;
 
-	// paper area
+	// paper area, in cm
 	private double paperTop;
 	private double paperBottom;
 	private double paperLeft;
 	private double paperRight;
-	private double paperMargin;
+	private double paperMargin;  // % from edge of paper.
 
 	// pulleys turning backwards?
 	private boolean isLeftMotorInverted;
@@ -139,8 +139,8 @@ public final class MakelangeloRobotSettings {
 		limitLeft = -mw/2;
 
 		// paper area
-		double pw = 420 * 0.1; // mm to cm
-		double ph = 594 * 0.1; // mm to cm
+		double pw = 420 * 0.1; // cm
+		double ph = 594 * 0.1; // cm
 		
 		paperTop = ph/2;
 		paperBottom = -ph/2;
@@ -148,15 +148,15 @@ public final class MakelangeloRobotSettings {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate     = 7500;
+		maxFeedRate = 7500;
 		maxAcceleration = 20;
 		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
 		
-		isLeftMotorInverted       = false;
-		isRightMotorInverted       = true;
-		reverseForGlass    = false;
+		isLeftMotorInverted = false;
+		isRightMotorInverted = true;
+		reverseForGlass = false;
 
 		startingPositionIndex = 4;
 		
@@ -245,15 +245,15 @@ public final class MakelangeloRobotSettings {
 
 	protected void loadConfigFromLocal() {
 		final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
-		limitTop = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
+		limitTop    = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
 		limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
-		limitLeft = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
-		limitRight = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
+		limitLeft   = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
+		limitRight  = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
 
-		paperLeft=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paperLeft)));
-		paperRight=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
-		paperTop=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
-		paperBottom=Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
+		paperLeft   = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paperLeft)));
+		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
+		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
+		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 
 		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
 		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
@@ -432,7 +432,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper width, in centimeters.
+	 * @return paper width, in cm.
 	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
@@ -440,23 +440,12 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper height, in centimeters.
+	 * @return paper height, in cm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
 
-
-	public double getPaperScale() {
-		double paper_w = getPaperWidth();
-		double paper_h = getPaperHeight();
-
-		if (paper_w > paper_h) {
-			return paper_h / paper_w;
-		} else {
-			return paper_w / paper_h;
-		}
-	}
 
 	public double getFeedRate() {
 		return maxFeedRate;
@@ -584,9 +573,9 @@ public final class MakelangeloRobotSettings {
         switch (this.startingPositionIndex / 3) {
           case 0:
           	this.paperTop = 0;
-	            this.paperBottom = -phf;
-	            this.setLimitTop( (mhf - phf) / 2.0f );
-	            this.setLimitBottom( -phf - (mhf - phf) / 2.0f );
+            this.paperBottom = -phf;
+            this.setLimitTop( (mhf - phf) / 2.0f );
+            this.setLimitBottom( -phf - (mhf - phf) / 2.0f );
             break;
           case 1:
           	this.paperTop = phf / 2.0f;

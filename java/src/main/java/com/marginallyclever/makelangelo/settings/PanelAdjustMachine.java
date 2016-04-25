@@ -66,9 +66,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.anchor = GridBagConstraints.EAST;
 		d.anchor = GridBagConstraints.WEST;
 
-		double r = robot.settings.getLimitRight();
-		double l = robot.settings.getLimitLeft();
-		double w = (r - l) * 10;
+		double r = robot.settings.getLimitRight() * 10;
+		double l = robot.settings.getLimitLeft() * 10;
+		double w = (r - l);
 		double h = (robot.settings.getLimitTop() - robot.settings.getLimitBottom()) * 10;
 		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);

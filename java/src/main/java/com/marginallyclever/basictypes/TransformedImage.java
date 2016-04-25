@@ -23,8 +23,8 @@ public class TransformedImage {
 
 	public TransformedImage(BufferedImage src) {
 		sourceImage = src;
-		translateX = src.getWidth() / 2.0f;
-		translateY = src.getHeight() / 2.0f;
+		translateX = -src.getWidth() / 2.0f;
+		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
 		scaleY = -1;
 		rotationDegrees = 0;
@@ -67,16 +67,24 @@ public class TransformedImage {
 		return scaleY;
 	}
 
+	public float getTranslateX() {
+		return translateX;
+	}
+
+	public float getTranslateY() {
+		return translateY;
+	}
+	
 	public BufferedImage getSourceImage() {
 		return sourceImage;
 	}
 
 	public int getTransformedX(float x) {
-		return (int) ((x * scaleX) + translateX);
+		return (int) ((x / scaleX) - translateX);
 	}
 
 	public int getTransformedY(float y) {
-		return (int) ((y * scaleY) + translateY);
+		return (int) ((y / scaleY) - translateY);
 	}
 	
 	public void rotateAbsolute(float degrees) {
@@ -186,7 +194,7 @@ public class TransformedImage {
 		}
 
 		if (sampleSum == 0)
-			return 0;
+			return 255;
 
 		return (int) (sampleValue / sampleSum);
 	}

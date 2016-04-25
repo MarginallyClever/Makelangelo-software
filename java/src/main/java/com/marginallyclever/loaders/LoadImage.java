@@ -128,8 +128,33 @@ public class LoadImage implements LoadFileType {
 	
 
 
-
+	/**
+	 * Load and convert the image in the chosen style
+	 * @return false if loading cancelled or failed.
+	 */
 	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
+		TransformedImage img;
+		try {
+			img = new TransformedImage( ImageIO.read(new File(filename)) );
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		
+		// scale image to fit paper, same behaviour as before.
+		if(robot.settings.getPaperWidth() < img.getSourceImage().getWidth()) {
+			float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
+			img.scaleRelative(f, f);
+		}
+
+		if(robot.settings.getPaperHeight() < img.getSourceImage().getHeight()) {
+			float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
+			img.scaleRelative(f, f);
+		}
+		
+		
+		
+		
 		// where to save temp output file?
 		final String destinationFile = gui.getTempDestinationFile();
 
@@ -149,7 +174,6 @@ public class LoadImage implements LoadFileType {
 					// read in image
 					Log.message(Translator.get("Converting") + " " + destinationFile);
 					// convert with style
-					final TransformedImage img = new TransformedImage( ImageIO.read(new File(filename)) );
 
 					ImageConverter converter = null;
 					int preferredIndex = getPreferredDrawStyle();
