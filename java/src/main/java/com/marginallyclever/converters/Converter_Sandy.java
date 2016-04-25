@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Converter_Sandy extends ImageConverter {
 	private static float blockScale=150.0f;
-	private int direction=0;
+	private static int direction=0;
 
 
 	@Override
@@ -81,14 +81,6 @@ public class Converter_Sandy extends ImageConverter {
 		xLeft   = (float)machine.getLimitLeft()   * 10;
 		xRight  = (float)machine.getLimitRight()  * 10;
 		
-		// from top to bottom of the image...
-		double x, y, z, scaleZ, pulseSize;
-
-		double dx = xRight - xLeft; 
-		double dy = yTop - yBottom;
-		double rMax = Math.sqrt(dx*dx+dy*dy);
-		double rMin = 0;
-
 		double cx,cy;
 
 		switch(direction) {
@@ -114,6 +106,13 @@ public class Converter_Sandy extends ImageConverter {
 			break;
 		}
 
+		double x, y, z, scaleZ;
+
+		double dx = xRight - xLeft; 
+		double dy = yTop - yBottom;
+		double rMax = Math.sqrt(dx*dx+dy*dy);
+		double rMin = 0;
+
 		double rStep = (rMax-rMin)/blockScale;
 		double r;
 		double t_dir=1;
@@ -122,7 +121,7 @@ public class Converter_Sandy extends ImageConverter {
 		double last_x=0,last_y=0;
 		boolean wasDrawing=true;
 		double flipSum;
-		pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
+		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
 
 		// make concentric circles that get bigger and bigger.
 		for(r=rMin;r<rMax;r+=rStep) {
