@@ -65,7 +65,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			} else {
 				v=255;
 			}
-			moveTo(out, px, py, v >= level);
+			lineTo(out, px, py, v >= level);
 		}
 	}
 	

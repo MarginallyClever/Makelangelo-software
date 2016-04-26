@@ -142,14 +142,16 @@ public class LoadImage implements LoadFileType {
 		}
 		
 		// scale image to fit paper, same behaviour as before.
-		if(robot.settings.getPaperWidth() < img.getSourceImage().getWidth()) {
-			float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
-			img.scaleRelative(f, f);
-		}
-
-		if(robot.settings.getPaperHeight() < img.getSourceImage().getHeight()) {
-			float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
-			img.scaleRelative(f, f);
+		if( robot.settings.getPaperWidth() > robot.settings.getPaperHeight() ) {
+			if(robot.settings.getPaperWidth()*10 < img.getSourceImage().getWidth()) {
+				float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
+				img.scaleRelative(f, f);
+			}
+		} else {
+			if(robot.settings.getPaperHeight()*10 < img.getSourceImage().getHeight()) {
+				float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
+				img.scaleRelative(f, f);
+			}
 		}
 		
 		
