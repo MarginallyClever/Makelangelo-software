@@ -29,6 +29,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// Constants
 	final String robotTypeName = "DRAWBOT";
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+
+	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.
 		
 	// Settings go here
 	public MakelangeloRobotSettings settings = null;
@@ -181,22 +183,25 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 */
 	private long getNewRobotUID() {
 		long newUID = 0;
-	
-		Log.message("obtaining UID");
-		
-		boolean please_dont_get_a_guid=false;  // set to true when I'm building robots @ marginallyclever.com.
-		if(please_dont_get_a_guid) {
+
+		if(please_get_a_guid==false) {
+			Log.error("Developers have made a stupid mistake.");
+		} else {
+			Log.message("obtaining UID from server.");
 			try {
 				// Send data
-				URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
+				URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
 				URLConnection conn = url.openConnection();
-				try (
-						final InputStream connectionInputStream = conn.getInputStream();
+				try (	final InputStream connectionInputStream = conn.getInputStream();
 						final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
 						final BufferedReader rd = new BufferedReader(inputStreamReader)
 						) {
 					String line = rd.readLine();
+					Log.message("Server says: '"+line+"'");
 					newUID = Long.parseLong(line);
+				} catch (Exception e) {
+					Log.error( "UID from server: "+e.getMessage() );
+					return 0;
 				}
 			} catch (Exception e) {
 				Log.error( "UID from server: "+e.getMessage() );

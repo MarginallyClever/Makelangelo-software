@@ -101,7 +101,7 @@ public class Log {
 	 * @param msg the text
 	 */
 	public static void write(String color, String msg) {
-		write("<font color='"+color+"'>"+msg+"</font>\n");
+		write("<div color='"+color+"'>"+msg+"</div>\n");
 	}
 
 	/**
