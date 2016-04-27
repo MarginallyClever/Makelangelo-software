@@ -143,19 +143,18 @@ public class LoadImage implements LoadFileType {
 		
 		// scale image to fit paper, same behaviour as before.
 		if( robot.settings.getPaperWidth() > robot.settings.getPaperHeight() ) {
-			if(robot.settings.getPaperWidth()*10 < img.getSourceImage().getWidth()) {
+			if(robot.settings.getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
 				float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
-				img.scaleRelative(f, f);
+				img.setScaleX(img.getScaleX() * f);
+				img.setScaleY(img.getScaleY() * f);
 			}
 		} else {
-			if(robot.settings.getPaperHeight()*10 < img.getSourceImage().getHeight()) {
+			if(robot.settings.getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
 				float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
-				img.scaleRelative(f, f);
+				img.setScaleX(img.getScaleX() * f);
+				img.setScaleY(img.getScaleY() * f);
 			}
 		}
-		
-		
-		
 		
 		// where to save temp output file?
 		final String destinationFile = gui.getTempDestinationFile();

@@ -273,29 +273,25 @@ public class TransformedImage {
 			return 255;
 
 		return value / sum;
-	}
+	}	
 
-	public void scaleAbsolute(float x, float y) {
-		scaleX = x;
-		scaleY = y;
-	}
-
-	public void scaleRelative(float x, float y) {
-		scaleX *= x;
-		scaleY *= y;
-	}
-	
 	public void setColorChannel(int channel) {
 		colorChannel = channel;
 	}
 
-	public void translateAbsolute(float x, float y) {
-		translateX = x;
-		translateY = y;
+	public void setScaleX(float x) {
+		scaleX = x;
+	}
+	
+	public void setScaleY(float y) {
+		scaleY = y;
 	}
 
-	public void translateRelative(float x, float y) {
-		translateX += x;
+	public void translateX(float x) {
+		translateX = x;
+	}
+
+	public void translateY(float y) {
 		translateY += y;
 	}
 }

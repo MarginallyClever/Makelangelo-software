@@ -121,22 +121,22 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
-		long new_uid = 0;
+		long newUID = 0;
 		if (lines.length > 0) {
 			try {
-				new_uid = Long.parseLong(lines[0]);
+				newUID = Long.parseLong(lines[0]);
 			} catch (NumberFormatException e) {
-				Log.error( e.getMessage() );
+				Log.error( "UID parsing: "+e.getMessage() );
 			}
 		}
 
 		// new robots have UID=0
-		if (new_uid == 0) {
-			new_uid = getNewRobotUID();
+		if (newUID == 0) {
+			newUID = getNewRobotUID();
 		}
 		
 		// load machine specific config
-		settings.loadConfig(new_uid);
+		settings.loadConfig(newUID);
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
@@ -182,6 +182,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private long getNewRobotUID() {
 		long newUID = 0;
 	
+		Log.message("obtaining UID");
+		
 		boolean please_dont_get_a_guid=false;  // set to true when I'm building robots @ marginallyclever.com.
 		if(please_dont_get_a_guid) {
 			try {
@@ -197,7 +199,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 					newUID = Long.parseLong(line);
 				}
 			} catch (Exception e) {
-				Log.error( e.getMessage() );
+				Log.error( "UID from server: "+e.getMessage() );
 				return 0;
 			}
 		}
@@ -210,6 +212,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				connection.sendMessage("UID " + newUID);
 			} catch(Exception e) {
 				//FIXME deal with this rare and smelly problem.
+				Log.error( "UID to robot: "+e.getMessage() );
 			}
 		}
 		return newUID;
