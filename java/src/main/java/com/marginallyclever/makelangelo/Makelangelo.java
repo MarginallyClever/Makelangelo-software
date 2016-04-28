@@ -266,7 +266,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	}
 
 	public void startAt(int lineNumber) {
-		gCode.setLinesProcessed(lineNumber);
+		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.settings.getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
 		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
 		startDrawing();

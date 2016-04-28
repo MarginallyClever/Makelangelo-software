@@ -228,6 +228,22 @@ public class GCodeFile {
 		out.close();
 	}
 
+	public int findLastPenUpBefore(int startAtLine,String toMatch) {
+		int x = startAtLine;
+		if( linesTotal==0 ) return 0;
+		if(x > linesTotal) x = linesTotal;
+		do {
+			String line = lines.get(x).trim();
+			if(line.equals(toMatch)) {
+				return x;
+			}
+			--x;
+		} while(x>0);
+		
+		return x;
+	}
+	
+	
 	public int getLinesProcessed() {
 		return linesProcessed;
 	}
