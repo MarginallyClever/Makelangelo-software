@@ -89,7 +89,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private Translator translator;
 	
 	// GUI elements
-	private JFrame mainframe = null;
+	private JFrame mainFrame = null;
 	private JPanel contentPane;
 	
 	// Top of window
@@ -209,7 +209,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		panel.add(speed_over_quality, c);
 		y++;
 		
-		int result = JOptionPane.showConfirmDialog(this.mainframe, panel, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(this.mainFrame, panel, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			//allowMetrics = allow_metrics.isSelected();
 			graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
@@ -315,7 +315,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			return;
 		}
 		if (subject == buttonAdjustSounds) {
-			SoundSystem.adjust(this.mainframe,translator);
+			SoundSystem.adjust(this.mainFrame,translator);
 			return;
 		}
 		if (subject == buttonAdjustGraphics) {
@@ -329,7 +329,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		}
 		if (subject == buttonExportMachinePreferences) {
 			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showSaveDialog(this.mainframe);
+			int returnVal = fc.showSaveDialog(this.mainFrame);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				final File file = fc.getSelectedFile();
 				try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
@@ -342,7 +342,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		}
 		if (subject == buttonImportMachinePreferences) {
 			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showOpenDialog(this.mainframe);
+			int returnVal = fc.showOpenDialog(this.mainFrame);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				final File file = fc.getSelectedFile();
 				try (final InputStream fileInputStream = new FileInputStream(file)) {
@@ -356,7 +356,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			return;
 		}
 		if (subject == buttonResetMachinePreferences) {
-			int dialogResult = JOptionPane.showConfirmDialog(this.mainframe, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
+			int dialogResult = JOptionPane.showConfirmDialog(this.mainFrame, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
 			if(dialogResult == JOptionPane.YES_OPTION){
 				try {
 					prefs.removeNode();
@@ -392,7 +392,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		SoundSystem.playDisconnectSound();
 
 		// remove machine name from title
-		mainframe.setTitle(Translator.get("TitlePrefix"));
+		mainFrame.setTitle(Translator.get("TitlePrefix"));
 	}
 	
 	
@@ -578,19 +578,20 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	public JFrame getParentFrame() {
-		return this.mainframe;
+		return this.mainFrame;
 	}
 
 
 	// Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
 	private void createAndShowGUI() {
 		// Create and set up the window.
-		this.mainframe = new JFrame(Translator.get("TitlePrefix"));
-		this.mainframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.mainFrame = new JFrame(Translator.get("TitlePrefix"));
+		this.mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.mainFrame.addWindowListener(this);
 
 		// Create and set up the content pane.
-		this.mainframe.setJMenuBar(createMenuBar());
-		this.mainframe.setContentPane(createContentPane());
+		this.mainFrame.setJMenuBar(createMenuBar());
+		this.mainFrame.setContentPane(createContentPane());
 
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -605,7 +606,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			maxHeight = screenSize.height;
 		}
 			
-		// Display the window.
+		// set window size
 		int width = prefs.getInt("Default window width", maxWidth );
 		int height = prefs.getInt("Default window height", maxHeight );
 		if(width > maxWidth || height > maxHeight ) {
@@ -615,16 +616,18 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			prefs.putInt("Default window height", maxHeight );
 		}
 		
-		this.mainframe.setSize(width, height);
+		this.mainFrame.setSize(width, height);
+		
+		// set window location
 		// by default center the window.  Later use preferences.
 		int defaultLocationX = (screenSize.width - width) / 2;
 		int defaultLocationY = (screenSize.height - height) / 2;
 		int locationX = prefs.getInt("Default window location x", defaultLocationX);
 		int locationY = prefs.getInt("Default window location y", defaultLocationY);
-		this.mainframe.setLocation(locationX,locationY);
+		this.mainFrame.setLocation(locationX,locationY);
 		
-		// show it
-		this.mainframe.setVisible(true);
+		// make window visible
+		this.mainFrame.setVisible(true);
 
 		cameraViewPanel.zoomToFitPaper();
 
@@ -637,7 +640,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
 	 */
 	public JFrame getMainframe() {
-		return this.mainframe;
+		return this.mainFrame;
 	}
 
 	/**
@@ -702,43 +705,39 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	
 	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowActivated(WindowEvent e) {}
 
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowClosed(WindowEvent e) {}
 
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
 		onClose();
 	}
 
 	
 	private void onClose() {
         int result = JOptionPane.showConfirmDialog(
-            this.mainframe,
+            this.mainFrame,
             Translator.get("ConfirmQuitQuestion"),
             Translator.get("ConfirmQuitTitle"),
             JOptionPane.YES_NO_OPTION);
  
         if (result == JOptionPane.YES_OPTION) {
-        	this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        	this.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         	savePreferences();
+        	System.exit(0);
         }
 	}
 	
 	private void savePreferences() {
-		Dimension size = this.mainframe.getSize();
+		Dimension size = this.mainFrame.getSize();
 		prefs.putInt("Default window width", size.width );
 		prefs.putInt("Default window height", size.height );
 		
-		Point location = this.mainframe.getLocation();
+		Point location = this.mainFrame.getLocation();
 		prefs.putInt("Default window location x", location.x);
 		prefs.putInt("Default window location y", location.y);
 	}
@@ -746,27 +745,19 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowDeactivated(WindowEvent e) {}
 
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowDeiconified(WindowEvent e) {}
 
 
 	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowIconified(WindowEvent e) {}
 
 
 	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
+	public void windowOpened(WindowEvent e) {}
 }
 
 
