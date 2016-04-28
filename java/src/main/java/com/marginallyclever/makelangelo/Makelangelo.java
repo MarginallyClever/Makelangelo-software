@@ -13,6 +13,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -615,8 +616,13 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		}
 		
 		this.mainframe.setSize(width, height);
-		// center the window
-		this.mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
+		// by default center the window.  Later use preferences.
+		int defaultLocationX = (screenSize.width - width) / 2;
+		int defaultLocationY = (screenSize.height - height) / 2;
+		int locationX = prefs.getInt("Default window location x", defaultLocationX);
+		int locationY = prefs.getInt("Default window location y", defaultLocationY);
+		this.mainframe.setLocation(locationX,locationY);
+		
 		// show it
 		this.mainframe.setVisible(true);
 
@@ -714,18 +720,27 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 	
-	public void onClose() {
+	private void onClose() {
         int result = JOptionPane.showConfirmDialog(
-            frame,
+            this.mainframe,
             Translator.get("ConfirmQuitQuestion"),
-            ,
-            "Exit Application",
+            Translator.get("ConfirmQuitTitle"),
             JOptionPane.YES_NO_OPTION);
  
         if (result == JOptionPane.YES_OPTION) {
         	this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        	
+        	savePreferences();
         }
+	}
+	
+	private void savePreferences() {
+		Dimension size = this.mainframe.getSize();
+		prefs.putInt("Default window width", size.width );
+		prefs.putInt("Default window height", size.height );
+		
+		Point location = this.mainframe.getLocation();
+		prefs.putInt("Default window location x", location.x);
+		prefs.putInt("Default window location y", location.y);
 	}
 	
 
