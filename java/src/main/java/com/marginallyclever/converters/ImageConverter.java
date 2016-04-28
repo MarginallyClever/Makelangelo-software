@@ -43,15 +43,6 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 		setAbsoluteMode(out);
 	}
 
-
-	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)) return false;
-		return true;
-	}
-
 	
 	@Override
 	public void render(GL2 gl2,MakelangeloRobotSettings settings) {}

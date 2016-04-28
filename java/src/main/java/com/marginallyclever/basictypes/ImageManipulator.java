@@ -87,13 +87,16 @@ public abstract class ImageManipulator {
 	 * @throws IOException on write failure
 	 */
 	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
-		tool.writeMoveTo(out, (float) x, (float) y);
+		if(isInsidePaperMargins(x,y)) {
+			tool.writeMoveTo(out, (float) x, (float) y);
+		}
 		if(lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
 			lastUp = up;
 		}
 	}
+	
 
 	/**
 	 * This is a special case of moveTo() that only works when every line on the paper is a straight line.
@@ -107,6 +110,15 @@ public abstract class ImageManipulator {
 		if(lastUp != up) {
 			moveTo(out,x,y,up);
 		}
+	}
+
+
+	protected boolean isInsidePaperMargins(double x,double y) {
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)) return false;
+		return true;
 	}
 }
 
