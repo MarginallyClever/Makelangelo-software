@@ -7,6 +7,17 @@
 	</meta>
 
 	<string>
+		<key>ConfirmQuitQuestion</key>
+		<value>Reay ouyay uresay ouyay antway otay uitqay?</value>
+		<hint>confirm quit dialog question</hint>
+	</string>
+	<string>
+		<key>ConfirmQuitTitle</key>
+		<value>Xitey</value>
+		<hint>confirm quit dialog title</hint>
+	</string>
+	
+	<string>
 		<key>Cancel</key>
 		<value>ancelCay</value>
 		<hint>used in many places</hint>
