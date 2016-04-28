@@ -17,6 +17,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +64,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
  * @since 0.0.1?
  */
 public final class Makelangelo
-implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
+implements ActionListener, WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -72,6 +74,10 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	 */
 	public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
+	// only used on first run.
+	private static final int DEFAULT_WINDOW_WIDTH = 1200;
+	private static final int DEFAULT_WINDOW_HEIGHT = 1020;
+	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
@@ -371,7 +377,7 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 		}
 
 		if (subject == buttonExit) {
-			System.exit(0);
+			onClose();
 			return;
 		}
 	}
@@ -579,18 +585,37 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	private void createAndShowGUI() {
 		// Create and set up the window.
 		this.mainframe = new JFrame(Translator.get("TitlePrefix"));
-		this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.mainframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		// Create and set up the content pane.
 		this.mainframe.setJMenuBar(createMenuBar());
 		this.mainframe.setContentPane(createContentPane());
 
+		// Get default screen size
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int maxWidth = DEFAULT_WINDOW_WIDTH;
+		int maxHeight = DEFAULT_WINDOW_HEIGHT;
+		if( screenSize.width < maxWidth ) {
+			maxHeight *= screenSize.width / maxWidth;
+			maxWidth = screenSize.width;
+		}
+		if( screenSize.height < maxHeight ) {
+			maxWidth *= screenSize.height / maxHeight;
+			maxHeight = screenSize.height;
+		}
+			
 		// Display the window.
-		int width = prefs.getInt("Default window width", (int) (1200.0));
-		int height = prefs.getInt("Default window height", (int) (1020.0));
+		int width = prefs.getInt("Default window width", maxWidth );
+		int height = prefs.getInt("Default window height", maxHeight );
+		if(width > maxWidth || height > maxHeight ) {
+			width = maxWidth;
+			height = maxHeight;
+			prefs.putInt("Default window width", maxWidth );
+			prefs.putInt("Default window height", maxHeight );
+		}
+		
 		this.mainframe.setSize(width, height);
 		// center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.mainframe.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
 		// show it
 		this.mainframe.setVisible(true);
@@ -665,6 +690,67 @@ implements ActionListener, MakelangeloRobotListener, MakelangeloRobotSettingsLis
 	
 	public MarginallyCleverConnectionManager getConnectionManager() {
 		return connectionManager;
+	}
+
+
+
+	
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		onClose();
+	}
+
+	
+	public void onClose() {
+        int result = JOptionPane.showConfirmDialog(
+            frame,
+            Translator.get("ConfirmQuitQuestion"),
+            ,
+            "Exit Application",
+            JOptionPane.YES_NO_OPTION);
+ 
+        if (result == JOptionPane.YES_OPTION) {
+        	this.mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        	
+        }
+	}
+	
+
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
 	}
 }
 

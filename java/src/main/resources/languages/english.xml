@@ -7,6 +7,17 @@
 	</meta>
 
 	<string>
+		<key>ConfirmQuitQuestion</key>
+		<value>Are you sure you want to quit?</value>
+		<hint>confirm quit dialog question</hint>
+	</string>
+	<string>
+		<key>ConfirmQuitTitle</key>
+		<value>Exit</value>
+		<hint>confirm quit dialog title</hint>
+	</string>
+	
+	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
 		<hint>used in many places</hint>
