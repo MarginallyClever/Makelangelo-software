@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -11,9 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -59,7 +55,7 @@ import com.marginallyclever.savers.SaveFileType;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, MouseListener, MouseMotionListener, ItemListener {
+public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, ItemListener {
 	/**
 	 *
 	 */
@@ -100,12 +96,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JFormattedTextField feedRate;
 	private JButton setFeedRate;
 	private JButton disengageMotors;
-
-	// etch-a-sketch test
-	private JLabel coordinates;
-	private JPanel dragAndDrive;
-	private boolean mouseInside, mouseOn;
-	private double mouseLastX, mouseLastY;
 
 	// status bar
 	public StatusBar statusBar;
@@ -190,11 +180,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				if(connectionComboBox.getSelectedIndex()==0) {
 					// Disconnect
 					robot.setConnection(null);
-					updateButtonAccess();
 				} else {
 					String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
 					robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
 				}
+				updateMachineNumberPanel();
+				updateButtonAccess();
 				rescanConnections();
 				return;
 			}
@@ -203,8 +194,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	
 	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
-		GridBagConstraints c;
-		
 		this.gui = gui;
 		this.robot = robot;
 		
@@ -250,7 +239,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// feed rate
 		JPanel feedRateControl = new JPanel();
 		feedRateControl.setLayout(new GridBagLayout());
-		c = new GridBagConstraints();
+		GridBagConstraints c = new GridBagConstraints();
 		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
 		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
 		setFeedRate = new JButton(Translator.get("Set"));
@@ -268,20 +257,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.gridy++;
 
 
-
-		// Driving controls
-		mouseInside=false;
-		mouseOn=false;
-		mouseLastX=mouseLastY=0;
-
 		makeDriveControls();
-		panel.add(driveControlPanel,con1);
+		this.add(driveControlPanel,con1);
 		con1.gridy++;
-		panel.add(new JSeparator(),con1);
-		con1.gridy++;
-
-
-
+		
 		// drive to corners
 		
 		JPanel corners = new JPanel();
@@ -315,20 +294,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penUp.addActionListener(this);
 		penDown.addActionListener(this);
 		goHome.addActionListener(this);
-
-		dragAndDrive = new JPanel(new GridBagLayout());
-		dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		dragAndDrive.addMouseListener(this);
-		dragAndDrive.addMouseMotionListener(this);
-
-		coordinates = new JLabel(Translator.get("ClickAndDrag"));
-		c.anchor = GridBagConstraints.CENTER;
-
-		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
-		Dimension dims = new Dimension();
-		dims.setSize( 150, 150 * (double)robot.settings.getPaperWidth()/(double)robot.settings.getPaperHeight());
-		dragAndDrive.setPreferredSize(dims);
-		dragAndDrive.add(coordinates,c);
 
 		con1.weightx=1;
 		con1.weighty=0;
@@ -867,56 +832,5 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		gui.updateMenuBar();
 		statusBar.clear();
-	}
-
-
-	public void mouseClicked(MouseEvent e) {}
-	public void mouseDragged(MouseEvent e) {
-		mouseAction(e);
-	}
-	public void mouseEntered(MouseEvent e) {
-		mouseInside=true;
-	}
-	public void mouseExited(MouseEvent e) {
-		mouseInside=false;
-		mouseOn=false;
-	}
-	public void mouseMoved(MouseEvent e) {
-		mouseAction(e);
-	}
-	public void mousePressed(MouseEvent e) {
-		mouseOn=true;
-		mouseAction(e);
-	}
-	public void mouseReleased(MouseEvent e) {
-		mouseOn=false;
-	}
-	public void mouseWheelMoved(MouseEvent e) {}
-
-	public void mouseAction(MouseEvent e) {
-		if(mouseInside && mouseOn) {
-			double x = (double)e.getX();
-			double y = (double)e.getY();
-			Dimension d = dragAndDrive.getSize();
-			double w = d.getWidth();
-			double h = d.getHeight();
-			double cx = w/2.0;
-			double cy = h/2.0;
-			x = x - cx;
-			y = cy - y;
-			x *= 10 * robot.settings.getPaperWidth()  / w;
-			y *= 10 * robot.settings.getPaperHeight() / h;
-			double dx = x-mouseLastX;
-			double dy = y-mouseLastY;
-			if(Math.sqrt(dx*dx+dy*dy)>=1) {
-				mouseLastX=x;
-				mouseLastY=y;
-				String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
-				robot.sendLineToRobot("G00 "+text);
-				coordinates.setText(text);
-			} else {
-				coordinates.setText("");
-			}
-		}
 	}
 }

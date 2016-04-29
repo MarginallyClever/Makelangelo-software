@@ -352,19 +352,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 	
 	
-	private void disconnect() {
-		robot.getConnection().closeConnection();
-		robot.setConnection(null);
-		drawPanel.setConnected(false);
-		robotPanel.updateMachineNumberPanel();
-		updateMenuBar();
-		SoundSystem.playDisconnectSound();
-
-		// remove machine name from title
-		mainFrame.setTitle(Translator.get("TitlePrefix"));
-	}
-	
-	
 	/**
 	 * If the menu bar exists, empty it.  If it doesn't exist, create it.
 	 * @return the refreshed menu bar
@@ -601,12 +588,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
 	}
 
-	/**
-	 * @return the <code>javax.swing.JFrame</code> representing the main frame of this GUI.
-	 */
-	public JFrame getMainframe() {
-		return this.mainFrame;
-	}
 
 	/**
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
@@ -615,52 +596,53 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		return drawPanel;
 	}
 
-	/**
-	 * @return the <code>GCodeFile</code> representing the G-Code file used by this GUI.
-	 */
-	public GCodeFile getGcodeFile() {
-		return gCode;
-	}
 	
-	/**
-	 * Notice received from MakelangeloRobot when serial connection is confirmed to point at something that speaks Makelangelo-firmware. 
-	 */
+	@Override
 	public void portConfirmed(MakelangeloRobot r) {
 		// we shouldn't need to open the dialog if the default settings are correct.
 		// the default settings must always match the values in the Marginally Clever tutorials.
 		// the default settings must always match the Marginally Clever kit.
 		
-	    getMainframe().setTitle(Translator.get("TitlePrefix") + " #" + Long.toString(robot.settings.getUID()));
-	    
-	    getDrawPanel().updateMachineConfig();
-	    getDrawPanel().setConnected(true);
+		drawPanel.updateMachineConfig();
+		drawPanel.setConnected(true);
 
 	    robotPanel.updateMachineNumberPanel();
 		
 	    updateMenuBar();
 	}
 	
+	@Override
 	public void dataAvailable(MakelangeloRobot r,String data) {
 		if(data.endsWith("\n")) data = data.substring(0, data.length()-1);
 		Log.write( "#ffa500",data );  // #ffa500 = orange
 	}
 	
+
+	@Override
 	public void connectionReady(MakelangeloRobot r) {
 		sendFileCommand();
 	}
 	
+
+	@Override
 	public void lineError(MakelangeloRobot r,int lineNumber) {
-        getGcodeFile().setLinesProcessed(lineNumber);
+        gCode.setLinesProcessed(lineNumber);
         sendFileCommand();
 	}
+
+
+	@Override
+	public void disconnected(MakelangeloRobot r) {
+		drawPanel.setConnected(false);
+	}
+	
+	
+	
 	
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
 		getDrawPanel().repaint();
 	}
 	
-	public void fileFinished(MakelangeloRobot r) {
-		
-	}
 	
 	public MarginallyCleverConnectionManager getConnectionManager() {
 		return connectionManager;
