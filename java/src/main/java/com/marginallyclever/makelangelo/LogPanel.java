@@ -19,6 +19,8 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+
 @SuppressWarnings("serial")
 public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
 	Translator translator;
@@ -143,7 +145,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 			doc.remove(0, over_length);
 			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException | IOException e) {
-			// FIXME: failure here logs new error, causes infinite loop?
+			// FIXME failure here logs new error, causes infinite loop?
 			Log.error(e.getMessage());
 		}
 	}

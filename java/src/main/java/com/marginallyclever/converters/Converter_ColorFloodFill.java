@@ -3,6 +3,7 @@ package com.marginallyclever.converters;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,9 +11,8 @@ import java.util.LinkedList;
 
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_GaussianBlur;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -22,15 +22,15 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_ColorFloodFill extends ImageConverter {
 	private ColorPalette palette;
-	private int diameter = 0;
-	private int last_x, last_y;
-	private BufferedImage imgChanged;
-	private BufferedImage imgMask;
+	private float diameter;
+	private float lastX, lastY;
+	private TransformedImage imgChanged;
+	private TransformedImage imgMask;
+
+	float yBottom , yTop, xLeft, xRight;
 
 
-	public Converter_ColorFloodFill(MakelangeloRobotSettings mc) {
-		super(mc);
-
+	public Converter_ColorFloodFill() {
 		palette = new ColorPalette();
 		palette.addColor(new C3(0, 0, 0));
 		palette.addColor(new C3(255, 0, 0));
@@ -46,40 +46,26 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 
 	/**
-	 * Overrides MoveTo() because optimizing for zigzag is different logic than straight lines.
-	 */
-	protected void moveTo(float x, float y, boolean up, Writer osw) throws IOException {
-		if (lastUp != up) {
-			if (up) liftPen(osw);
-			else lowerPen(osw);
-			lastUp = up;
-		}
-		tool.writeMoveTo(osw, TX(x), TY(y));
-	}
-
-	/**
 	 * test the mask from x0,y0 (top left) to x1,y1 (bottom right) to see if this region has already been visited
 	 *
 	 * @param x0 left
 	 * @param y0 top
 	 * @return true if all the pixels in this region are zero.
 	 */
-	protected boolean getMaskTouched(int x0, int y0) {
-		int x1 = x0 + diameter;
-		int y1 = y0 + diameter;
-		if (x0 < 0) x0 = 0;
-		if (x1 > imageWidth - 1) x1 = imageWidth - 1;
-		if (y0 < 0) y0 = 0;
-		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
+	protected boolean getMaskTouched(float x0, float y0) {
+		float x1 = x0 + diameter;
+		float y1 = y0 + diameter;
 
 		Color value;
 		int sum = 0;
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				++sum;
-				value = new Color(imgMask.getRGB(x, y));
-				if (value.getRed() != 0) {
-					return true;
+		for (float y = y0; y < y1; ++y) {
+			for (float x = x0; x < x1; ++x) {
+				if(imgMask.canSampleAt(x, y)) {
+					++sum;
+					value = new Color(imgMask.sample1x1Unchecked(x, y));
+					if (value.getRed() != 0) {
+						return true;
+					}
 				}
 			}
 		}
@@ -87,16 +73,14 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		return (sum == 0);
 	}
 
-	protected void setMaskTouched(int x0, int y0, int x1, int y1) {
-		if (x0 < 0) x0 = 0;
-		if (x1 > imageWidth - 1) x1 = imageWidth - 1;
-		if (y0 < 0) y0 = 0;
-		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
-
+	protected void setMaskTouched(float x0, float y0, float x1, float y1) {
+		
 		int c = (new C3(255, 255, 255)).toInt();
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				imgMask.setRGB(x, y, c);
+		for (float y = y0; y < y1; ++y) {
+			for (float x = x0; x < x1; ++x) {
+				if(imgMask.canSampleAt(x, y)) {
+					imgMask.getSourceImage().setRGB(imgMask.getTransformedX(x), imgMask.getTransformedY(y), c);
+				}
 			}
 		}
 		//imgMask.flush();
@@ -106,26 +90,23 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	/**
 	 * sample the pixels from x0,y0 (top left) to x1,y1 (bottom right) and average the color.
 	 *
-	 * @param x0
-	 * @param y0
-	 * @param x1
-	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @param f
+	 * @param g
 	 * @return the average color in the region.  if nothing is sampled, return white.
 	 */
-	protected C3 takeImageSampleBlock(int x0, int y0, int x1, int y1) {
+	protected C3 takeImageSampleBlock(float x2, float y2, float f, float g) {
 		// point sampling
 		C3 value = new C3(0, 0, 0);
 		int sum = 0;
 
-		if (x0 < 0) x0 = 0;
-		if (x1 > imageWidth - 1) x1 = imageWidth - 1;
-		if (y0 < 0) y0 = 0;
-		if (y1 > imageHeight - 1) y1 = imageHeight - 1;
-
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				value.add(new C3(imgChanged.getRGB(x, y)));
-				++sum;
+		for (float y = y2; y < g; ++y) {
+			for (float x = x2; x < f; ++x) {
+				if(isInsidePaperMargins(x, y) && imgChanged.canSampleAt(x, y)) {
+					value.add(new C3(imgChanged.sample1x1(x, y)));
+					++sum;
+				}
 			}
 		}
 
@@ -145,47 +126,47 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	/**
 	 * queue-based flood fill
 	 *
-	 * @param color_index
+	 * @param colorIndex
 	 * @throws IOException
 	 */
-	protected void floodFillBlob(int color_index, int x, int y, Writer osw) throws IOException {
-		LinkedList<Point2D> points_to_visit = new LinkedList<>();
-		points_to_visit.add(new Point2D(x, y));
+	protected void floodFillBlob(int colorIndex, float x, float y, Writer osw) throws IOException {
+		LinkedList<Point> pointsToVisit = new LinkedList<>();
+		pointsToVisit.add(new Point((int)x, (int)y));
 
-		Point2D a;
+		Point a;
 
-		while (!points_to_visit.isEmpty()) {
-			a = points_to_visit.removeLast();
+		while (!pointsToVisit.isEmpty()) {
+			a = pointsToVisit.removeLast();
 
-			if (getMaskTouched((int) a.x, (int) a.y)) continue;
-			if (!doesQuantizedBlockMatch(color_index, a.x, a.y)) continue;
+			if (getMaskTouched(a.x,a.y)) continue;
+			if (!doesQuantizedBlockMatch(colorIndex, a.x, a.y)) continue;
 			// mark this spot as visited.
-			setMaskTouched((int) a.x, (int) a.y, (int) (a.x + diameter), (int) (a.y + diameter));
+			setMaskTouched(a.x, a.y, (int)(a.x + diameter), (int)(a.y + diameter));
 
 			// if the difference between the last filled pixel and this one is more than diameter*2, pen up, move, pen down.
-			float dx = (float) (a.x - last_x);
-			float dy = (float) (a.y - last_y);
+			float dx = a.x - lastX;
+			float dy = a.y - lastY;
 			if ((dx * dx + dy * dy) > diameter * diameter * 2.0f) {
 				//System.out.print("Jump at "+x+", "+y+"\n");
-				moveTo(last_x, last_y, true, osw);
-				moveTo(a.x, a.y, true, osw);
-				moveTo(a.x, a.y, false, osw);
+				moveTo(osw, lastX, lastY, true);
+				moveTo(osw, a.x, a.y, true);
+				moveTo(osw, a.x, a.y, false);
 			} else {
 				//System.out.print("Move to "+x+", "+y+"\n");
-				moveTo(a.x, a.y, false, osw);
+				moveTo(osw, a.x, a.y, false);
 			}
 			// update the last position.
-			last_x = (int) a.x;
-			last_y = (int) a.y;
+			lastX = a.x;
+			lastY = a.y;
 
-			//      if( !getMaskTouched((int)(a.x+diameter),(int)a.y           ) )
-			points_to_visit.add(new Point2D(a.x + diameter, a.y));
-			//      if( !getMaskTouched((int)(a.x-diameter),(int)a.y           ) )
-			points_to_visit.add(new Point2D(a.x - diameter, a.y));
-			//      if( !getMaskTouched((int)a.x           ,(int)(a.y+diameter)) )
-			points_to_visit.add(new Point2D(a.x, a.y + diameter));
-			//      if( !getMaskTouched((int)a.x           ,(int)(a.y-diameter)) )
-			points_to_visit.add(new Point2D(a.x, a.y - diameter));
+			//      if( !getMaskTouched((int)(a.x + diameter), (int)a.y            ))
+			pointsToVisit.add(new Point((int)(a.x + diameter), a.y                 ));
+			//      if( !getMaskTouched((int)(a.x - diameter), (int)a.y            ))
+			pointsToVisit.add(new Point((int)(a.x - diameter), a.y                 ));
+			//      if( !getMaskTouched((int)a.x             , (int)(a.y + diameter)))
+			pointsToVisit.add(new Point(     a.x             , (int)(a.y + diameter)));
+			//      if( !getMaskTouched((int)a.x             , (int)(a.y - diameter)))
+			pointsToVisit.add(new Point(     a.x             , (int)(a.y - diameter)));
 		}
 	}
 
@@ -193,27 +174,27 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	/**
 	 * find blobs of color in the original image.  Send that to the flood fill system.
 	 *
-	 * @param color_index index into the list of colors at the top of the class
+	 * @param colorIndex index into the list of colors at the top of the class
 	 * @throws IOException
 	 */
-	void scanForContiguousBlocks(int color_index, Writer osw) throws IOException {
-		C3 original_color;
+	void scanForContiguousBlocks(int colorIndex, Writer osw) throws IOException {
+		C3 originalColor;
 		int quantized_color;
 
-		int x, y;
+		float x, y;
 		int z = 0;
 
-		Log.write("orange", "Palette color " + palette.getColor(color_index).toString() );
+		Log.write("orange", "Palette color " + palette.getColor(colorIndex).toString() );
 
-		for (y = 0; y < imageHeight; y += diameter) {
-			for (x = 0; x < imageWidth; x += diameter) {
+		for (y = yBottom; y < yTop; y += diameter) {
+			for (x = xLeft; x < xRight; x += diameter) {
 				if (getMaskTouched(x, y)) continue;
 
-				original_color = takeImageSampleBlock(x, y, x + diameter, y + diameter);
-				quantized_color = palette.quantizeIndex(original_color);
-				if (quantized_color == color_index) {
+				originalColor = takeImageSampleBlock(x, y, x + diameter, y + diameter);
+				quantized_color = palette.quantizeIndex(originalColor);
+				if (quantized_color == colorIndex) {
 					// found blob
-					floodFillBlob(color_index, x, y, osw);
+					floodFillBlob(colorIndex, x, y, osw);
 					z++;
 					//if(z==20)
 					//            return;
@@ -240,11 +221,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		//Filter_DitherFloydSteinbergRGB bw = new Filter_DitherFloydSteinbergRGB(mainGUI,machine,translator);
-		//img = bw.process(img);
-
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
 		img = blur.filter(img);
 		//    Histogram h = new Histogram();
@@ -252,32 +229,26 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 
 		// create a color mask so we don't repeat any pixels
-		imgMask = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = imgMask.createGraphics();
+		BufferedImage bi = new BufferedImage(img.getSourceImage().getWidth(), img.getSourceImage().getHeight(), BufferedImage.TYPE_INT_RGB);
+		imgMask = new TransformedImage(bi);
+		imgMask.copySettingsFrom(imgChanged);
+		Graphics2D g = bi.createGraphics();
 		g.setPaint(new Color(0, 0, 0));
-		g.fillRect(0, 0, imgMask.getWidth(), imgMask.getHeight());
+		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
-
-
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(img, out);
-
-
-		float pw = (float) machine.getPaperWidth();
-		float df = tool.getDiameter() * (float) img.getWidth() / (4.0f * pw);
-		if (df < 1) df = 1;
-
-		//    float steps = img.getWidth() / df;
-
-		//System.out.println("Diameter = "+df);
-		//System.out.println("Steps = "+steps);
-
-		diameter = (int) df;
+		imageStart(out);
+		
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
+		diameter = (int)( tool.getDiameter() * 10.0f );
 
 		imgChanged = img;
 
-		last_x = img.getWidth() / 2;
-		last_y = img.getHeight() / 2;
+		lastX = 0;
+		lastY = 0;
 
 		scanColor(0, out);  // black
 		scanColor(1, out);  // red
@@ -290,18 +261,18 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */

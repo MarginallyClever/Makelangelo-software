@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 public interface MakelangeloRobotListener {
 	// only called when robot connection is confirmed

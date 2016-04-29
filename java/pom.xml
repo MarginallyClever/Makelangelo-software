@@ -4,7 +4,7 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>v7.3.0-alpha</version>
+  <version>v7.4.5</version>
   <name>Makelangelo</name>
   <description>A mural drawing robot.
 
@@ -32,11 +32,23 @@ If you like this project, please support us by buying Marginally Clever products
   </scm>
 
   <organization>
-    <name>Marginally Clever Robots, Ltd.</name>
+    <name>Marginally Clever Robots, Limited.</name>
     <url>http://www.marginallyclever.com/</url>
   </organization>
 
   <developers>
+    <developer>
+      <id>dr</id>
+      <name>Dan Royer</name>
+      <email>dan@marginallyclever.com</email>
+      <url>https://github.com/i-make-robots</url>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
+    
     <developer>
       <id>pc</id>
       <name>Peter Colapietro</name>
@@ -115,6 +127,7 @@ If you like this project, please support us by buying Marginally Clever products
           </execution>
         </executions>
       </plugin>
+      
       <!-- Beginning of plugins defined originally only in Super POM  -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>

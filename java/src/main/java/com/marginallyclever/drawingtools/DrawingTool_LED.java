@@ -3,8 +3,8 @@ package com.marginallyclever.drawingtools;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
 public class DrawingTool_LED extends DrawingTool {

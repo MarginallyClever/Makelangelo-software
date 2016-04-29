@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Dragon extends ImageGenerator {
@@ -30,27 +29,10 @@ public class Generator_Dragon extends ImageGenerator {
 
 	private List<Integer> sequence;
 
-	
-	public Generator_Dragon(MakelangeloRobotSettings mc) {
-		super(mc);
-	}
 
 	@Override
 	public String getName() {
 		return Translator.get("DragonName");
-	}
-
-	/**
-	 * Overrides the basic MoveTo() because optimizing for spirals is different logic than straight lines.
-	 */
-	@Override
-	protected void moveTo(Writer out, float x, float y, boolean up) throws IOException {
-		tool.writeMoveTo(out, TX(x), TY(y));
-		if (lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-			lastUp = up;
-		}
 	}
 
 
@@ -90,12 +72,8 @@ public class Generator_Dragon extends ImageGenerator {
 			output.write(machine.getBobbinLine() + ";\n");
 			tool.writeChangeTo(output);
 
-			w2=0;
-			h2=0;
-			scale=10.0f;
-
-			float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin())/2.0f,
-					(float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f);
+			float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
+							   (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
 			xmax = v;
 			ymax = v;
 			xmin = -v;
@@ -136,7 +114,7 @@ public class Generator_Dragon extends ImageGenerator {
 			// move to starting position
 
 			liftPen(output);
-	        moveTo(output,x,y,true);
+			moveTo(output,x,y,true);
 			// draw the fractal
 			turtleDx = 0;
 			turtleDy = -1;

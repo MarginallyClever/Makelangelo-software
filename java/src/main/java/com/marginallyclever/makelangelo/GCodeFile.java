@@ -21,7 +21,15 @@ public class GCodeFile {
 	private int linesProcessed = 0;
 	private boolean fileOpened = false;
 	private ArrayList<String> lines = new ArrayList<String>();
+	
+	/**
+	 * Milliseconds to draw gcode.
+	 */
 	public float estimatedTime = 0;
+	
+	/**
+	 * Distance tool must travel to draw gcode.
+	 */
 	public float estimatedLength = 0;
 	public int estimateCount = 0;
 	public float scale = 1.0f;
@@ -64,7 +72,7 @@ public class GCodeFile {
 		estimatedLength = 0;
 		estimateCount = 0;
 
-		Iterator<String> iLine = getLines().iterator();
+		Iterator<String> iLine = lines.iterator();
 		while (iLine.hasNext()) {
 			String line = iLine.next();
 			String[] pieces = line.split(";");  // comments come after a semicolon.
@@ -163,7 +171,7 @@ public class GCodeFile {
 	}
 
 
-	public void load(String filename) throws IOException {
+	public void load(String filename,boolean flipHorizontally) throws IOException {
 		closeFile();
 
 		Scanner scanner = new Scanner(new FileInputStream(filename));
@@ -172,7 +180,27 @@ public class GCodeFile {
 		setLines(new ArrayList<String>());
 		try {
 			while (scanner.hasNextLine()) {
-				getLines().add(scanner.nextLine());
+				String line = scanner.nextLine();
+				if(flipHorizontally) {
+					// find X, change to X-
+					// find X--, change to X-
+					line = line.replace("X","X-");
+					line = line.replace("X--","X");
+					// do it again for I, the X portion of arc centers.
+					if(!line.contains("M101")) {
+						line = line.replace("I","I-");
+						line = line.replace("I--","I");
+					}
+					// reverse the direction of arcs?
+					if(line.contains("G02") || line.contains("G2")) {
+						line = line.replace("G02","G03");
+						line = line.replace("G2","G3");
+					} else if(line.contains("G03") || line.contains("G3")) {
+						line = line.replace("G03","G02");
+						line = line.replace("G3","G2");
+					}
+				}
+				lines.add(line);
 				setLinesTotal(getLinesTotal() + 1);
 			}
 		} finally {
@@ -188,7 +216,7 @@ public class GCodeFile {
 		String temp;
 
 		for (int i = 0; i < getLinesTotal(); ++i) {
-			temp = getLines().get(i);
+			temp = lines.get(i);
 			if (!temp.endsWith(";") && !temp.endsWith(";\n")) {
 				temp += ";";
 			}
@@ -200,6 +228,25 @@ public class GCodeFile {
 		out.close();
 	}
 
+	
+	public int findLastPenUpBefore(int startAtLine,String toMatch) {
+		int x = startAtLine;
+		if( linesTotal==0 ) return 0;
+		if(x > linesTotal) x = linesTotal;
+		
+		toMatch = "G00 Z"+toMatch;
+		while(x>1) {
+			String line = lines.get(x).trim().substring(0, toMatch.length());
+			if(line.equals(toMatch)) {
+				return x;
+			}
+			--x;
+		}
+				
+		return x;
+	}
+	
+	
 	public int getLinesProcessed() {
 		return linesProcessed;
 	}
@@ -234,7 +281,7 @@ public class GCodeFile {
 	public String nextLine() {
 		int lineNumber = getLinesProcessed();
 		setLinesProcessed(lineNumber + 1);
-		String line = getLines().get(lineNumber).trim();
+		String line = lines.get(lineNumber).trim();
 		return line;
 	}
 
@@ -247,24 +294,24 @@ public class GCodeFile {
 	}
 
 	public boolean isLoaded() {
-		return (isFileOpened() && getLines() != null && getLines().size() > 0);
+		return (isFileOpened() && lines != null && lines.size() > 0);
 	}
 }
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */

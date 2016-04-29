@@ -1,12 +1,12 @@
 package com.marginallyclever.voronoi;
 
-import com.marginallyclever.basictypes.Point2D;
+import java.awt.Point;
 
 public class VoronoiSite {
-  public Point2D coord;
+  public Point coord;
   public int sitenbr;
 
   public VoronoiSite() {
-    coord = new Point2D();
+    coord = new Point();
   }
 }

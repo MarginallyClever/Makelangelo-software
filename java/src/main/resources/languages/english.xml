@@ -7,6 +7,17 @@
 	</meta>
 
 	<string>
+		<key>ConfirmQuitQuestion</key>
+		<value>Are you sure you want to quit?</value>
+		<hint>confirm quit dialog question</hint>
+	</string>
+	<string>
+		<key>ConfirmQuitTitle</key>
+		<value>Exit</value>
+		<hint>confirm quit dialog title</hint>
+	</string>
+	
+	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
 		<hint>used in many places</hint>
@@ -816,8 +827,7 @@ to check yourself.</value>
         <p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.<br>
         Additional contributions by Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, and Mark Raynsford.</p>
         <p>To get the latest version please visit<br>
-          <a href='https://github.com/MarginallyClever/Makelangelo/releases'>https://github.com/MarginallyClever/Makelangelo/releases</a></p>
-        <p>This program is open source and free, as it should be!<br>Show your support at <a href='https://www.patreon.com/imakerobots'>https://www.patreon.com/imakerobots</a></p>
+          <a href='https://www.marginallyclever.com/product/makelangelo-software/'>https://www.marginallyclever.com/product/makelangelo-software/</a></p>
       </body>
     </html>
     ]]>

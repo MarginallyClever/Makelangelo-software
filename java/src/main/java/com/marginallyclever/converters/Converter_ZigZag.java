@@ -1,22 +1,20 @@
 package com.marginallyclever.converters;
 
 
-import java.awt.image.BufferedImage;
+import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.Point2D;
+import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.filters.Filter_BlackAndWhite;
 import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
-import com.marginallyclever.filters.Filter_Resize;
-import com.marginallyclever.filters.ImageFilter;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 
 /**
@@ -26,12 +24,6 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan
  */
 public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorator {
-	private ReentrantLock lock = new ReentrantLock();
-
-	public String getName() {
-		return Translator.get("ZigZagName");
-	}
-
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;
@@ -39,13 +31,16 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	long time_limit = 10 * 60 * 1000;  // 10 minutes
 
 	int numPoints;
-	Point2D[] points = null;
+	Point[] points = null;
 	int[] solution = null;
 	int scount;
 
+	
+	private ReentrantLock lock = new ReentrantLock();
 
-	public Converter_ZigZag(MakelangeloRobotSettings mc) {
-		super(mc);
+	
+	public String getName() {
+		return Translator.get("ZigZagName");
 	}
 
 
@@ -129,7 +124,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 				while (lock.isLocked()) ;
 
 				lock.lock();
-				//DrawbotGUI.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
+				//Makelangelo.getSingleton().Log("<font color='red'>flipping "+(finish-begin)+"</font>\n");
 				for (j = 0; j < half; ++j) {
 					temp = solution[begin + j];
 					solution[begin + j] = solution[finish - 1 - j];
@@ -257,7 +252,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	}
 
 
-	private void moveTo(Writer out, int i, boolean up) throws IOException {
+	private void moveToPoint(Writer out, int i, boolean up) throws IOException {
 		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 
@@ -283,36 +278,39 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 			}
 		}
 
-		out.write(machine.getConfigLine() + ";\n");
-		out.write(machine.getBobbinLine() + ";\n");
+		imageStart(out);
 
-		setAbsoluteMode(out);
-		tool.writeChangeTo(out);
 		liftPen(out);
 		// move to the first point
-		moveTo(out, besti, false);
+		moveToPoint(out, besti, false);
 		lowerPen(out);
 
 		for (i = 1; i < numPoints; ++i) {
-			moveTo(out, (besti + i) % numPoints, false);
+			moveToPoint(out, (besti + i) % numPoints, false);
 		}
-		moveTo(out, besti, false);
+		moveToPoint(out, besti, false);
 
 		// lift pen and return to home
 		liftPen(out);
 	}
 
 
-	protected void connectTheDots(BufferedImage img) {
+	protected void connectTheDots(TransformedImage img) {
 		tool = machine.getCurrentTool();
-		imageSetupTransform(img);
 
-		int x, y, i;
+		// from top to bottom of the margin area...
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
+		float x, y;
+		int i;
 		// count the points
 		numPoints = 0;
-		for (y = 0; y < imageHeight; ++y) {
-			for (x = 0; x < imageWidth; ++x) {
-				i = ImageFilter.decode(img.getRGB(x, y));
+		for (y = yBottom; y < yTop; ++y) {
+			for (x = xLeft; x < xRight; ++x) {
+				i = img.sample1x1(x, y);
 				if (i == 0) {
 					++numPoints;
 				}
@@ -320,16 +318,18 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		}
 
 		Log.write("green", numPoints + " points.");
-		points = new Point2D[numPoints + 1];
+		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 
 		// collect the point data
 		numPoints = 0;
-		for (y = 0; y < imageHeight; ++y) {
-			for (x = 0; x < imageWidth; ++x) {
-				i = ImageFilter.decode(img.getRGB(x, y));
+		for (y = yBottom; y < yTop; ++y) {
+			for (x = xLeft; x < xRight; ++x) {
+				i = img.sample1x1(x, y);
 				if (i == 0) {
-					points[numPoints++] = new Point2D(TX(x), TY(y));
+					Point p = new Point();
+					p.setLocation( x, y );
+					points[numPoints++] = p;
 				}
 			}
 		}
@@ -340,17 +340,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(BufferedImage img,Writer out) throws IOException {
-		// resize & flip as needed
-		// Note that changing 250/250 here changes the number of dots a lot.
-		Filter_Resize rs = new Filter_Resize(250, 250);
-		rs.flipHorizontally = machine.isReverseForGlass();
-		rs.targetWidth = machine.getPaperWidth();
-		rs.targetHeight = machine.getPaperHeight();
-
-
-		img = rs.filter(img);
-
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
@@ -370,18 +360,18 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */

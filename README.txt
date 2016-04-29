@@ -21,6 +21,12 @@ For developers, please see https://github.com/MarginallyClever/Makelangelo/wiki/
 Please visit the forums
 https://marginallyclever.com/forum
 
+## Show support ##
+
+Did this program help you?  Like Open Source software?  Want to show support?
+Donate what you can to help speed up development at https://www.marginallyclever.com/product/makelangelo-software/
+Thank you!
+
 ## Special thanks ##
 
 Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.

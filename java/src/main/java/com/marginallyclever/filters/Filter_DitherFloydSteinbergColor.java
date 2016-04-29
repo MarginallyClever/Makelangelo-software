@@ -1,9 +1,8 @@
 package com.marginallyclever.filters;
 
-import java.awt.image.BufferedImage;
-
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
+import com.marginallyclever.basictypes.TransformedImage;
 
 
 /**
@@ -23,8 +22,8 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
   }
 
 
-  private void ditherDirection(BufferedImage img, int y, C3[] error, C3[] nexterror, int direction) {
-    int w = img.getWidth();
+  private void ditherDirection(TransformedImage img, int y, C3[] error, C3[] nexterror, int direction) {
+    int w = img.getSourceImage().getWidth();
     C3 oldPixel = new C3(0, 0, 0);
     C3 newPixel = new C3(0, 0, 0);
     C3 quant_error = new C3(0, 0, 0);
@@ -43,11 +42,11 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
     // for each x from left to right
     for (x = start; x != end; x += direction) {
       // oldpixel := pixel[x][y]
-      oldPixel.set(new C3(img.getRGB(x, y)).add(error[x]));
+      oldPixel.set(new C3(img.getSourceImage().getRGB(x, y)).add(error[x]));
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = palette.quantize(oldPixel);
       // pixel[x][y] := newpixel
-      img.setRGB(x, y, newPixel.toInt());
+      img.getSourceImage().setRGB(x, y, newPixel.toInt());
       // quant_error := oldpixel - newpixel
       quant_error.set(oldPixel.sub(newPixel));
       // pixel[x+1][y  ] += 7/16 * quant_error
@@ -66,10 +65,10 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
   }
 
   
-  public BufferedImage filter(BufferedImage img) {
+  public TransformedImage filter(TransformedImage img) {
     int y;
-    int h = img.getHeight();
-    int w = img.getWidth();
+    int h = img.getSourceImage().getHeight();
+    int w = img.getSourceImage().getWidth();
     int direction = 1;
     C3[] error = new C3[w];
     C3[] nexterror = new C3[w];
@@ -95,18 +94,18 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */

@@ -48,7 +48,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.marginallyclever.basictypes.Point2D;
+import java.awt.Point;
+
 
 public class VoronoiTesselator {
   // ************* Private members ******************
@@ -159,17 +160,17 @@ public class VoronoiTesselator {
     Collections.sort(listSites, new Comparator<VoronoiSite>() {
       @Override
       public final int compare(VoronoiSite p1, VoronoiSite p2) {
-        Point2D s1 = p1.coord, s2 = p2.coord;
+        Point s1 = p1.coord, s2 = p2.coord;
         if (s1.y < s2.y) {
           return (-1);
         }
         if (s1.y > s2.y) {
           return (1);
         }
-        if (s1.x < s2.x) {
+        if (s1.getX() < s2.getX()) {
           return (-1);
         }
-        if (s1.x > s2.x) {
+        if (s1.getX() > s2.getX()) {
           return (1);
         }
         return (0);
@@ -192,7 +193,7 @@ public class VoronoiTesselator {
     ymax = yValues[0];
     for (i = 0; i < nsites; i++) {
       sites[i] = new VoronoiSite();
-      sites[i].coord.set((float) xValues[i], (float) yValues[i]);
+      sites[i].coord.setLocation( xValues[i], yValues[i] );
       sites[i].sitenbr = i;
 
       if (xValues[i] < xmin) {
@@ -239,12 +240,12 @@ public class VoronoiTesselator {
     newedge.ep[1] = null;
 
     // get the difference in x dist between the sites
-    dx = s2.coord.x - s1.coord.x;
+    dx = s2.coord.getX() - s1.coord.getX();
     dy = s2.coord.y - s1.coord.y;
     // make sure that the difference in positive
     adx = dx > 0 ? dx : -dx;
     ady = dy > 0 ? dy : -dy;
-    newedge.c = (double) (s1.coord.x * dx + s1.coord.y * dy + (dx * dx + dy
+    newedge.c = (double) (s1.coord.getX() * dx + s1.coord.y * dy + (dx * dx + dy
         * dy) * 0.5);// get the slope of the line
 
     if (adx > ady) {
@@ -304,7 +305,7 @@ public class VoronoiTesselator {
     he.ystar = (double) (v.coord.y + offset);
     last = PQhash[PQbucket(he)];
     while ((next = last.PQnext) != null
-        && (he.ystar > next.ystar || (he.ystar == next.ystar && v.coord.x > next.vertex.coord.x))) {
+        && (he.ystar > next.ystar || (he.ystar == next.ystar && v.coord.getX() > next.vertex.coord.getX()))) {
       last = next;
     }
     he.PQnext = last.PQnext;
@@ -332,14 +333,14 @@ public class VoronoiTesselator {
     return (PQcount == 0);
   }
 
-  private Point2D PQ_min() {
-    Point2D answer = new Point2D();
+  private Point PQ_min() {
+    Point answer = new Point();
 
     while (PQhash[PQmin].PQnext == null) {
       PQmin += 1;
     }
-    answer.x = (float) PQhash[PQmin].PQnext.vertex.coord.x;
-    answer.y = (float) PQhash[PQmin].PQnext.ystar;
+    answer.setLocation( PQhash[PQmin].PQnext.vertex.coord.x, 
+    					PQhash[PQmin].PQnext.ystar );
     return (answer);
   }
 
@@ -431,14 +432,14 @@ public class VoronoiTesselator {
     return (null);
   }
 
-  private VoronoiHalfEdge ELleftbnd(Point2D p) {
+  private VoronoiHalfEdge ELleftbnd(Point p) {
     int i, bucket;
     VoronoiHalfEdge he;
 
         /* Use hash table to get close to desired halfedge */
     // use the hash function to find the place in the hash map that this
     // HalfEdge should be
-    bucket = (int) ((p.x - xmin) / deltax * ELhashsize);
+    bucket = (int) ((p.getX() - xmin) / deltax * ELhashsize);
 
     // make sure that the bucket position in within the range of the hash
     // array
@@ -504,8 +505,8 @@ public class VoronoiTesselator {
     VoronoiSite s1, s2;
     double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
-    x1 = e.reg[0].coord.x;
-    x2 = e.reg[1].coord.x;
+    x1 = e.reg[0].coord.getX();
+    x2 = e.reg[1].coord.getX();
     y1 = e.reg[0].coord.y;
     y2 = e.reg[1].coord.y;
 
@@ -566,16 +567,16 @@ public class VoronoiTesselator {
       }
     } else {
       x1 = pxmin;
-      if (s1 != null && s1.coord.x > pxmin) {
-        x1 = s1.coord.x;
+      if (s1 != null && s1.coord.getX() > pxmin) {
+        x1 = s1.coord.getX();
       }
       if (x1 > pxmax) {
         x1 = pxmax;
       }
       y1 = e.c - e.a * x1;
       x2 = pxmax;
-      if (s2 != null && s2.coord.x < pxmax) {
-        x2 = s2.coord.x;
+      if (s2 != null && s2.coord.getX() < pxmax) {
+        x2 = s2.coord.getX();
       }
       if (x2 < pxmin) {
         x2 = pxmin;
@@ -614,7 +615,7 @@ public class VoronoiTesselator {
   }
 
   /* returns 1 if p is to right of halfedge e */
-  private boolean right_of(VoronoiHalfEdge el, Point2D p) {
+  private boolean right_of(VoronoiHalfEdge el, Point p) {
     VoronoiEdge e;
     VoronoiSite topsite;
     boolean right_of_site;
@@ -623,7 +624,7 @@ public class VoronoiTesselator {
 
     e = el.ELedge;
     topsite = e.reg[1];
-    if (p.x > topsite.coord.x) {
+    if (p.getX() > topsite.coord.getX()) {
       right_of_site = true;
     } else {
       right_of_site = false;
@@ -637,13 +638,13 @@ public class VoronoiTesselator {
 
     if (e.a == 1.0) {
       dyp = p.y - topsite.coord.y;
-      dxp = p.x - topsite.coord.x;
+      dxp = p.getX() - topsite.coord.getX();
       fast = false;
       if ((!right_of_site & (e.b < 0.0)) | (right_of_site & (e.b >= 0.0))) {
         above = dyp >= e.b * dxp;
         fast = above;
       } else {
-        above = p.x + p.y * e.b > e.c;
+        above = p.getX() + p.y * e.b > e.c;
         if (e.b < 0.0) {
           above = !above;
         }
@@ -652,7 +653,7 @@ public class VoronoiTesselator {
         }
       }
       if (!fast) {
-        dxs = topsite.coord.x - (e.reg[0]).coord.x;
+        dxs = topsite.coord.getX() - (e.reg[0]).coord.getX();
         above = e.b * (dxp * dxp - dyp * dyp) < dxs * dyp
             * (1.0 + 2.0 * dxp / dxs + e.b * e.b);
         if (e.b < 0.0) {
@@ -662,9 +663,9 @@ public class VoronoiTesselator {
     } else /* e.b==1.0 */
 
     {
-      yl = e.c - e.a * p.x;
+      yl = e.c - e.a * p.getX();
       t1 = p.y - yl;
-      t2 = p.x - topsite.coord.x;
+      t2 = p.getX() - topsite.coord.getX();
       t3 = yl - topsite.coord.y;
       above = t1 * t1 > t2 * t2 + t3 * t3;
     }
@@ -686,7 +687,7 @@ public class VoronoiTesselator {
 
   private double dist(VoronoiSite s, VoronoiSite t) {
     double dx, dy;
-    dx = s.coord.x - t.coord.x;
+    dx = s.coord.getX() - t.coord.getX();
     dy = s.coord.y - t.coord.y;
     return (double) (Math.sqrt(dx * dx + dy * dy));
   }
@@ -720,7 +721,7 @@ public class VoronoiTesselator {
     yint = (e2.c * e1.a - e1.c * e2.a) / d;
 
     if ((e1.reg[1].coord.y < e2.reg[1].coord.y)
-        || (e1.reg[1].coord.y == e2.reg[1].coord.y && e1.reg[1].coord.x < e2.reg[1].coord.x)) {
+        || (e1.reg[1].coord.y == e2.reg[1].coord.y && e1.reg[1].coord.getX() < e2.reg[1].coord.getX())) {
       el = el1;
       e = e1;
     } else {
@@ -728,7 +729,7 @@ public class VoronoiTesselator {
       e = e2;
     }
 
-    right_of_site = xint >= e.reg[1].coord.x;
+    right_of_site = xint >= e.reg[1].coord.getX();
     if ((right_of_site && el.ELpm == LE)
         || (!right_of_site && el.ELpm == RE)) {
       return null;
@@ -737,8 +738,7 @@ public class VoronoiTesselator {
     // create a new site at the point of intersection - this is a new vector
     // event waiting to happen
     v = new VoronoiSite();
-    v.coord.x = (float) xint;
-    v.coord.y = (float) yint;
+    v.coord.setLocation( xint, yint );
     return (v);
   }
 
@@ -750,7 +750,7 @@ public class VoronoiTesselator {
   private boolean voronoi_bd() {
     VoronoiSite newsite, bot, top, temp, p;
     VoronoiSite v;
-    Point2D newintstar = null;
+    Point newintstar = null;
     int pm;
     VoronoiHalfEdge lbnd, rbnd, llbnd, rrbnd, bisector;
     VoronoiEdge e;
@@ -769,7 +769,7 @@ public class VoronoiTesselator {
       // process the site otherwise process the vector intersection
 
       if (newsite != null
-          && (PQempty() || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.x < newintstar.x))) {
+          && (PQempty() || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.getX() < newintstar.getX()))) {
                 /* new site is smallest -this is a site event */
         // get the first HalfEdge to the LEFT of the new site
         lbnd = ELleftbnd((newsite.coord));

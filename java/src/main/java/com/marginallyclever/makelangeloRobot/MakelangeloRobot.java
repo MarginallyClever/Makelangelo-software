@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -13,9 +13,15 @@ import javax.swing.JOptionPane;
 
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
- * @author Admin
+ * MakelangeloRobot is the Controller for a physical robot, following a Model-View-Controller design pattern.  It also contains non-persistent Model data.  
+ * MakelangeloRobotPanel is one of the Views.
+ * MakelangeloRobotSettings is the persistent Model data (machine configuration).
+ * @author dan
  * @since 7.2.10
  *
  */
@@ -23,9 +29,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// Constants
 	final String robotTypeName = "DRAWBOT";
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+
+	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.
 		
 	// Settings go here
 	public MakelangeloRobotSettings settings = null;
+	
+	// control panel
+	private MakelangeloRobotPanel myPanel = null;
 	
 	// Current state goes here
 	private MarginallyCleverConnection connection = null;
@@ -43,9 +54,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean penIsUp = false;
 	private boolean penIsUpBeforePause = false;
 	
+	// current location
+	private boolean hasSetHome;
+	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
+		hasSetHome=false;
 	}
 	
 	public MarginallyCleverConnection getConnection() {
@@ -54,11 +69,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	public void setConnection(MarginallyCleverConnection c) {
 		if( this.connection != null ) {
+			this.connection.closeConnection();
 			this.connection.removeListener(this);
 		}
 		
 		if( this.connection != c ) {
 			portConfirmed = false;
+			hasSetHome = false;
 		}
 		
 		this.connection = c;
@@ -106,22 +123,22 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
-		long new_uid = 0;
+		long newUID = 0;
 		if (lines.length > 0) {
 			try {
-				new_uid = Long.parseLong(lines[0]);
+				newUID = Long.parseLong(lines[0]);
 			} catch (NumberFormatException e) {
-				Log.error( e.getMessage() );
+				Log.error( "UID parsing: "+e.getMessage() );
 			}
 		}
 
 		// new robots have UID=0
-		if (new_uid == 0) {
-			new_uid = getNewRobotUID();
+		if (newUID == 0) {
+			newUID = getNewRobotUID();
 		}
 		
 		// load machine specific config
-		settings.loadConfig(new_uid);
+		settings.loadConfig(newUID);
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
@@ -155,7 +172,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	public void addListener(MakelangeloRobotListener listener) {
 		listeners.add(listener);
-		
 	}
 
 	public void removeListener(MakelangeloRobotListener listener) {
@@ -168,23 +184,30 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private long getNewRobotUID() {
 		long newUID = 0;
 
-		try {
-			// Send data
-			URL url = new URL("https://marginallyclever.com/drawbot_getuid.php");
-			URLConnection conn = url.openConnection();
-			try (
-					final InputStream connectionInputStream = conn.getInputStream();
-					final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-					final BufferedReader rd = new BufferedReader(inputStreamReader)
-					) {
-				String line = rd.readLine();
-				newUID = Long.parseLong(line);
+		if(please_get_a_guid==false) {
+			Log.error("Developers have made a stupid mistake.");
+		} else {
+			Log.message("obtaining UID from server.");
+			try {
+				// Send data
+				URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
+				URLConnection conn = url.openConnection();
+				try (	final InputStream connectionInputStream = conn.getInputStream();
+						final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+						final BufferedReader rd = new BufferedReader(inputStreamReader)
+						) {
+					String line = rd.readLine();
+					Log.message("Server says: '"+line+"'");
+					newUID = Long.parseLong(line);
+				} catch (Exception e) {
+					Log.error( "UID from server: "+e.getMessage() );
+					return 0;
+				}
+			} catch (Exception e) {
+				Log.error( "UID from server: "+e.getMessage() );
+				return 0;
 			}
-		} catch (Exception e) {
-			Log.error( e.getMessage() );
-			return 0;
 		}
-
 		// did read go ok?
 		if (newUID != 0) {
 			settings.createNewUID(newUID);
@@ -194,13 +217,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				connection.sendMessage("UID " + newUID);
 			} catch(Exception e) {
 				//FIXME deal with this rare and smelly problem.
+				Log.error( "UID to robot: "+e.getMessage() );
 			}
 		}
 		return newUID;
 	}
 
 
-	protected String generateChecksum(String line) {
+	public String generateChecksum(String line) {
 		byte checksum = 0;
 
 		for (int i = 0; i < line.length(); ++i) {
@@ -235,6 +259,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void pause() {
+		if(isPaused) return;
+		
 		isPaused = true;
 		// remember for later if the pen is down
 		penIsUpBeforePause = penIsUp;
@@ -243,6 +269,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void unPause() {
+		if(!isPaused) return;
+		
 		// if pen was down before pause, lower it
 		if (!penIsUpBeforePause) {
 			lowerPen();
@@ -261,14 +289,17 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void lowerPen() {
 		sendLineToRobot("G00 Z" + settings.getPenDownString());
 	}
+	public void testPenAngle(String testAngle) {
+		sendLineToRobot("G00 Z" + testAngle);
+	}
 
 
 	/**
-	 * removes comments, processes commands drawbot shouldn't have to handle.
+	 * removes comments, processes commands robot doesn't handle, add checksum information.
 	 *
 	 * @param line command to send
 	 */
-	public void tweakAndSendLine(String line,Translator translator) {
+	public void tweakAndSendLine(String line, int lineNumber, Translator translator) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return;
 
 		// tool change request?
@@ -283,6 +314,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			}
 		}
 
+		if (line.length() > 3) {
+			line = "N" + lineNumber + " " + line;
+			line += generateChecksum(line);
+		}
+		
 		// send relevant part of line to the robot
 		sendLineToRobot(line);
 	}
@@ -345,5 +381,58 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		settings.setFeedRate(parsedFeedRate);
 		// tell the robot
 		sendLineToRobot("G00 F" + parsedFeedRate);
+	}
+	
+	
+	public void goHome() {
+		sendLineToRobot("G00 X0 Y0");
+	}
+	
+	
+	public void setHome() {
+		sendLineToRobot("G92 X0 Y0");
+		hasSetHome=true;
+	}
+	
+	
+	public boolean hasSetHome() {
+		return hasSetHome;
+	}
+	
+	
+	public void movePenAbsolute(float x,float y) {
+		sendLineToRobot("G00"+
+						" X" + x +
+						" Y" + y);
+	}
+	
+	public void movePenRelative(float dx,float dy) {
+		sendLineToRobot("G91");  // set relative mode
+		sendLineToRobot("G00"+
+				" X" + dx +
+				" Y" + dy);
+		sendLineToRobot("G90");  // return to absolute mode
+	}
+	
+	public void movePenToEdgeLeft()   {		sendLineToRobot("G00 X" + settings.getPaperLeft()   * 10);	}
+	public void movePenToEdgeRight()  {		sendLineToRobot("G00 X" + settings.getPaperRight()  * 10);	}
+	public void movePenToEdgeTop()    {		sendLineToRobot("G00 Y" + settings.getPaperTop()    * 10);	}
+	public void movePenToEdgeBottom() {		sendLineToRobot("G00 Y" + settings.getPaperBottom() * 10);	}
+	
+	public void disengageMotors() {		sendLineToRobot("M18");	}
+	public void engageMotors()    {		sendLineToRobot("M17");	}
+	
+	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
+	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}
+	public void jogRightMotorOut() {		sendLineToRobot("D00 R400");	}
+	public void jogRightMotorIn()  {		sendLineToRobot("D00 R-400");	}
+		
+	public void setLineNumber(int newLineNumber) {		sendLineToRobot("M110 N" + newLineNumber);	}
+	
+
+	public MakelangeloRobotPanel getControlPanel(Makelangelo gui) {
+		myPanel = new MakelangeloRobotPanel(gui, this);
+		
+		return myPanel;
 	}
 }

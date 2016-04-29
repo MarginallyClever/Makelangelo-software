@@ -1,7 +1,7 @@
 package com.marginallyclever.voronoi;
 
-import com.marginallyclever.basictypes.Point2D;
+import java.awt.Point;
 
 public class VoronoiCell {
-  public Point2D centroid = new Point2D();
+  public Point centroid = new Point();
 }

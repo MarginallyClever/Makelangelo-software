@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 /**
  * DrawDecorator adds features to DrawPanel. An example is the Draw panel shows

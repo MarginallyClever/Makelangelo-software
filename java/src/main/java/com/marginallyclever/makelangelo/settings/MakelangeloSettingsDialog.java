@@ -16,8 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -34,7 +34,6 @@ implements ActionListener {
    */
   private static final long serialVersionUID = 1L;
 
-  protected Translator translator;
   protected MakelangeloRobot robot;
 
   protected JTabbedPane panes;
@@ -47,10 +46,9 @@ implements ActionListener {
   protected int dialogWidth = 450;
   protected int dialogHeight = 500;
   
-  public MakelangeloSettingsDialog(Frame parent, Translator translator, MakelangeloRobot robot) {
+  public MakelangeloSettingsDialog(Frame parent, MakelangeloRobot robot) {
 	super(parent,Translator.get("configureMachine"),true);
 
-	this.translator = translator;
 	this.robot = robot;
   }
 
@@ -59,8 +57,8 @@ implements ActionListener {
   public void run() {
     panes = new JTabbedPane();
     
-    panelAdjustMachine = new PanelAdjustMachine(translator,robot);
-    panelAdjustPaper = new PanelAdjustPaper(translator,robot);
+    panelAdjustMachine = new PanelAdjustMachine(robot);
+    panelAdjustPaper = new PanelAdjustPaper(robot);
     panelAdjustPen = robot.settings.getTool(0);
     //panelAdjustTools = new PanelAdjustTools(translator,robot);
     //panelSelectTool = new PanelSelectTool(translator,robot);

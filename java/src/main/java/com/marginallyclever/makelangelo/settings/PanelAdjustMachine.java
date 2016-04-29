@@ -16,8 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustMachine extends JPanel implements ActionListener {
 	/**
@@ -25,7 +25,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = -84665452555208524L;
 
-	protected Translator translator;
 	protected MakelangeloRobot robot;
 
 	protected JFormattedTextField mw, mh;
@@ -42,8 +41,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 	protected JCheckBox m1i;
 	protected JCheckBox m2i;
 
-	public PanelAdjustMachine(Translator translator, MakelangeloRobot robot) {
-		this.translator = translator;
+	public PanelAdjustMachine( MakelangeloRobot robot) {
 		this.robot = robot;
 
 		this.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
@@ -68,9 +66,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.anchor = GridBagConstraints.EAST;
 		d.anchor = GridBagConstraints.WEST;
 
-		double r = robot.settings.getLimitRight();
-		double l = robot.settings.getLimitLeft();
-		double w = (r - l) * 10;
+		double r = robot.settings.getLimitRight() * 10;
+		double l = robot.settings.getLimitLeft() * 10;
+		double w = (r - l);
 		double h = (robot.settings.getLimitTop() - robot.settings.getLimitBottom()) * 10;
 		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);
@@ -166,11 +164,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 
 		buttonAneg = new JButton(Translator.get("JogIn"));
 		buttonApos = new JButton(Translator.get("JogOut"));
-		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor1Backwards());
+		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isLeftMotorInverted());
 
 		buttonBneg = new JButton(Translator.get("JogIn"));
 		buttonBpos = new JButton(Translator.get("JogOut"));
-		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isMotor2Backwards());
+		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isRightMotorInverted());
 
 		c.gridx = 0;
 		c.gridy = 0;
@@ -250,18 +248,14 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		Object subject = e.getSource();
 
 		// jog motors
-		if (subject == buttonApos)
-			robot.sendLineToRobot("D00 L400");
-		if (subject == buttonAneg)
-			robot.sendLineToRobot("D00 L-400");
-		if (subject == buttonBpos)
-			robot.sendLineToRobot("D00 R400");
-		if (subject == buttonBneg)
-			robot.sendLineToRobot("D00 R-400");
+		if (subject == buttonApos) robot.jogLeftMotorOut();
+		if (subject == buttonAneg) robot.jogLeftMotorIn();
+		if (subject == buttonBpos) robot.jogRightMotorOut();
+		if (subject == buttonBneg) robot.jogRightMotorIn();
 
 		if (subject == m1i || subject == m2i) {
-			robot.settings.setMotor1Backwards(m1i.isSelected());
-			robot.settings.setMotor2Backwards(m2i.isSelected());
+			robot.settings.invertLeftMotor(m1i.isSelected());
+			robot.settings.invertRightMotor(m2i.isSelected());
 			robot.settings.saveConfig();
 			robot.sendConfig();
 		}

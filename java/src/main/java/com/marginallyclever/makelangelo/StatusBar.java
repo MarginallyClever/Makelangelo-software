@@ -27,29 +27,12 @@ public class StatusBar extends JPanel {
 	protected JLabel mRemaining;
 	protected JProgressBar bar;
 
-	public String formatTime(long millis) {
-		long s = millis / 1000;
-		long m = s / 60;
-		long h = m / 60;
-		m %= 60;
-		s %= 60;
 
-		String elapsed = "";
-		if (h > 0) elapsed += h + "h";
-		if (h > 0 || m > 0) elapsed += m + "m";
-		elapsed += s + "s ";
-
-		return elapsed;
-	}
-
-
-	public StatusBar(Translator ms) {
+	public StatusBar() {
 		super();
 		this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 		GridBagLayout gridbag = new GridBagLayout();
 		setLayout(gridbag);
-
-		translator = ms;
 
 		mFinished = new JLabel("", SwingConstants.LEFT);
 		mExactly = new JLabel("", SwingConstants.CENTER);
@@ -113,25 +96,25 @@ public class StatusBar extends JPanel {
 		long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
 		long remaining = total_time - t_draw_now;
 
-		mFinished.setText(formatTime(t_draw_now));
+		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
 		mExactly.setText(sofar + "/" + total);
-		mRemaining.setText(formatTime(remaining));
+		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */

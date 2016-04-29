@@ -5,8 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
@@ -17,12 +17,12 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustPaper
 extends JPanel
-implements ActionListener, KeyListener {
+implements ActionListener, PropertyChangeListener {
 	/**
 	 * 
 	 */
@@ -33,7 +33,7 @@ implements ActionListener, KeyListener {
 
 	MakelangeloRobot robot;
 
-	public PanelAdjustPaper(Translator translator,MakelangeloRobot robot) {
+	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
 
 	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
@@ -78,15 +78,11 @@ implements ActionListener, KeyListener {
 		ph.setPreferredSize(s);
 
 		paperSizes.addActionListener(this);
-		pw.addKeyListener(this);
-		ph.addKeyListener(this);
+		pw.addPropertyChangeListener(this);
+		ph.addPropertyChangeListener(this);
 	}
 
-	public void keyPressed(KeyEvent e) {}
-	public void keyReleased(KeyEvent e) { Event(e); }
-	public void keyTyped(KeyEvent e) { Event(e); }
-
-	private void Event(KeyEvent e) {
+	public void propertyChange(PropertyChangeEvent  e) {
 		double w=0;
 		double h=0;
 		try {
@@ -103,6 +99,7 @@ implements ActionListener, KeyListener {
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
+		// changing the drop box value
 		if(subject == paperSizes) {
 			final int selectedIndex = paperSizes.getSelectedIndex();
 			if(selectedIndex!= 0) {
@@ -115,15 +112,15 @@ implements ActionListener, KeyListener {
 		}
 	}
     
-   public void save() {
-   	double pwf = Double.valueOf(pw.getText()) / 10.0;
-   	double phf = Double.valueOf(ph.getText()) / 10.0;
-   	boolean data_is_sane=true;
-   	if( pwf<=0 ) data_is_sane=false;
-   	if( phf<=0 ) data_is_sane=false;
-   	
-   	if (data_is_sane) {
-   		robot.settings.setPaperSize(pwf,phf);
-   	}
-   }
+	public void save() {
+		double pwf = Double.valueOf(pw.getText()) / 10.0;
+		double phf = Double.valueOf(ph.getText()) / 10.0;
+		boolean data_is_sane=true;
+		if( pwf<=0 ) data_is_sane=false;
+		if( phf<=0 ) data_is_sane=false;
+
+		if (data_is_sane) {
+			robot.settings.setPaperSize(pwf,phf);
+		}
+	}
 }

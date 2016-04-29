@@ -8,8 +8,8 @@ import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.MakelangeloRobot;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
 public abstract class DrawingTool {
@@ -36,11 +36,11 @@ public abstract class DrawingTool {
     diameter = 1;
   }
 
-  public float getZOn() {
+  public float getPenDownAngle() {
     return zOn;
   }
 
-  public float getZOff() {
+  public float getPenUpAngle() {
     return zOff;
   }
 

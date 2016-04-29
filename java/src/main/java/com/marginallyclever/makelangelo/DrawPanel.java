@@ -13,11 +13,13 @@ import javax.swing.event.MouseInputListener;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
@@ -80,8 +82,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
 
 
-	public DrawPanel() {
-		super();
+	public DrawPanel(GLCapabilities caps) {        
+		super(caps);
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addGLEventListener(this);
@@ -164,7 +166,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		//System.out.println(dt);
 
 		GL2 gl2 = glautodrawable.getGL().getGL2();
-
+		
+    	//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
+        //gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
+        //gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+        
 		// draw the world
 		render(gl2);
 	}
@@ -182,7 +188,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
-		repaint();
+		repaintNow();
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -235,6 +241,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	public void updateMachineConfig() {
+		emptyNodeBuffer();
 		repaint();
 	}
 
@@ -243,11 +250,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * toggle pen up moves.
 	 *
 	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
+ 	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
 	 */
 	public void setShowPenUp(boolean state) {
 		showPenUpMoves = state;
-		instructions.changed = true;
-		repaint();
+		if(instructions!=null) instructions.changed = true;
+		emptyNodeBuffer();
+		repaintNow();
 	}
 
 	/**
@@ -605,6 +614,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 			DrawingTool tool = machine.getTool(0);
 			gl2.glColor3f(0, 0, 0);
 	
+			boolean drawAllWhileRunning = false;
+			if (running) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
+				
 			// draw image
 			if (fastNodes.size() > 0) {
 				// draw the nodes
@@ -623,7 +635,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 						} else if (n.line_number <= linesProcessed + lookAhead) {
 							gl2.glColor3f(0, 1, 0);
 							//g2d.setColor(Color.GREEN);
-						} else if (prefs.getBoolean("Draw all while running", true) == false) {
+						} else if (drawAllWhileRunning == false) {
 							break;
 						}
 					}
@@ -651,6 +663,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		}
 	}
 
+	
 	private void addNodePos(int i, double x1, double y1, double x2, double y2) {
 		DrawPanelNode n = new DrawPanelNode();
 		n.line_number = i;
@@ -683,7 +696,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	private void optimizeNodes() {
 		if (instructions == null) return;
-		if (instructions.changed == false) return;
+		if (!fastNodes.isEmpty() && instructions.changed == false) return;
 		instructions.changed = false;
 
 		DrawingTool tool = machine.getTool(0);
@@ -837,18 +850,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 /**
- * This file is part of DrawbotGUI.
+ * This file is part of Makelangelo.
  * <p>
- * DrawbotGUI is free software: you can redistribute it and/or modify
+ * Makelangelo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p>
- * DrawbotGUI is distributed in the hope that it will be useful,
+ * Makelangelo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p>
  * You should have received a copy of the GNU General Public License
- * along with DrawbotGUI.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
  */
