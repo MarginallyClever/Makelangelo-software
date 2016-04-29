@@ -108,9 +108,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private Splitter splitUpDown;
 	
 	// OpenGL window
-	private DrawPanel cameraViewPanel;
+	private DrawPanel drawPanel;
 	// Context sensitive menu
-	private MakelangeloRobotPanel robotControlPanel;
+	private MakelangeloRobotPanel robotPanel;
 	// Bottom of window
 	public LogPanel logPanel;
 
@@ -146,9 +146,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	
 	public void updateMachineConfig() {
-		if (cameraViewPanel != null) {
-			cameraViewPanel.updateMachineConfig();
-			cameraViewPanel.zoomToFitPaper();
+		if (drawPanel != null) {
+			drawPanel.updateMachineConfig();
+			drawPanel.zoomToFitPaper();
 		}
 	}
 	
@@ -217,7 +217,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
 			graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
 
-			cameraViewPanel.setShowPenUp(show_pen_up.isSelected());
+			drawPanel.setShowPenUp(show_pen_up.isSelected());
 		}
 	}
 
@@ -239,8 +239,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			halt();
 			// bask in the glory
 			int x = gCode.getLinesTotal();
-			if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(x, x);
-			cameraViewPanel.setLinesProcessed(x);
+			if(robotPanel!=null) robotPanel.statusBar.setProgress(x, x);
+			drawPanel.setLinesProcessed(x);
 			
 			SoundSystem.playDrawingFinishedSound();
 			
@@ -252,8 +252,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		
 		robot.tweakAndSendLine( line, lineNumber, translator );
 
-		cameraViewPanel.setLinesProcessed(lineNumber);
-		if(robotControlPanel!=null) robotControlPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+		drawPanel.setLinesProcessed(lineNumber);
+		if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
 		// loop until we find a line that gets sent to the robot, at which point we'll
 		// pause for the robot to respond.  Also stop at end of file.
 	}
@@ -266,22 +266,21 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void halt() {
 		robot.setRunning(false);
 		robot.unPause();
-		cameraViewPanel.setLinesProcessed(0);
-		cameraViewPanel.setRunning(false);
+		drawPanel.setLinesProcessed(0);
+		drawPanel.setRunning(false);
 		updateMenuBar();
-		
 	}
 
 	public void startAt(int lineNumber) {
 		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.settings.getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
-		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
+		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
 
 		robot.unPause();
 		robot.setRunning(true);
-		cameraViewPanel.setRunning(true);
+		drawPanel.setRunning(true);
 		updateMenuBar();
-		if(robotControlPanel!=null) robotControlPanel.statusBar.start();
+		if(robotPanel!=null) robotPanel.statusBar.start();
 		sendFileCommand();
 	}
 
@@ -291,15 +290,15 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		Object subject = e.getSource();
 
 		if (subject == buttonZoomIn) {
-			cameraViewPanel.zoomIn();
+			drawPanel.zoomIn();
 			return;
 		}
 		if (subject == buttonZoomOut) {
-			cameraViewPanel.zoomOut();
+			drawPanel.zoomOut();
 			return;
 		}
 		if (subject == buttonZoomToFit) {
-			cameraViewPanel.zoomToFitPaper();
+			drawPanel.zoomToFitPaper();
 			return;
 		}
 		if (subject == buttonRescan) {
@@ -384,8 +383,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private void disconnect() {
 		robot.getConnection().closeConnection();
 		robot.setConnection(null);
-		cameraViewPanel.setConnected(false);
-		robotControlPanel.updateMachineNumberPanel();
+		drawPanel.setConnected(false);
+		robotPanel.updateMachineNumberPanel();
 		updateMenuBar();
 		SoundSystem.playDisconnectSound();
 
@@ -455,8 +454,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void updateMenuBar() {
 		JMenu menu, preferencesSubMenu;
 
-		if (robotControlPanel != null) {
-			robotControlPanel.updateButtonAccess();
+		if (robotPanel != null) {
+			robotPanel.updateButtonAccess();
 		}
 
 		menuBar.removeAll();
@@ -538,6 +537,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		//Create the content-pane-to-be.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
+		
 		/*/
         GLCapabilities caps = new GLCapabilities(null);
         caps.setSampleBuffers(true);
@@ -546,20 +546,20 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
         /*/
 		GLCapabilities caps = new GLCapabilities(null);
 		//*/
-		cameraViewPanel = new DrawPanel(caps);
-		cameraViewPanel.setMachine(robot.settings);
-		cameraViewPanel.setGCode(gCode);
+		drawPanel = new DrawPanel(caps);
+		drawPanel.setMachine(robot.settings);
+		drawPanel.setGCode(gCode);
 
-		robotControlPanel = robot.getControlPanel(this);
-		robotControlPanel.updateButtonAccess();
+		robotPanel = robot.getControlPanel(this);
+		robotPanel.updateButtonAccess();
 		
 		logPanel = new LogPanel(translator, robot);
 		logPanel.clearLog();
 
 		// major layout
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		splitLeftRight.add(cameraViewPanel);
-		splitLeftRight.add(robotControlPanel);
+		splitLeftRight.add(drawPanel);
+		splitLeftRight.add(robotPanel);
 
 		splitUpDown = new Splitter(JSplitPane.VERTICAL_SPLIT);
 		
@@ -630,7 +630,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// make window visible
 		this.mainFrame.setVisible(true);
 
-		cameraViewPanel.zoomToFitPaper();
+		drawPanel.zoomToFitPaper();
 
 		// 2015-05-03: option is meaningless, robot.connectionToRobot doesn't exist when software starts.
 		// if(prefs.getBoolean("Reconnect to last port on start", false)) robot.connectionToRobot.reconnect();
@@ -648,7 +648,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
 	 */
 	public DrawPanel getDrawPanel() {
-		return cameraViewPanel;
+		return drawPanel;
 	}
 
 	/**
@@ -671,7 +671,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	    getDrawPanel().updateMachineConfig();
 	    getDrawPanel().setConnected(true);
 
-	    robotControlPanel.updateMachineNumberPanel();
+	    robotPanel.updateMachineNumberPanel();
 		
 	    updateMenuBar();
 	}
