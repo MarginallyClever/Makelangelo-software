@@ -94,12 +94,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	// Top of window
 	private JMenuBar menuBar;
-	// menubar > Makelangelo > preferences
-	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
-	// menubar > Makelangelo
+	// menubar > file
 	private JMenuItem buttonAbout, buttonCheckForUpdate, buttonExit;
-	// menubar > connect
-	private JMenuItem buttonRescan, buttonDisconnect;
+	// menubar > preferences
+	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
 	// menubar > view
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
 	
@@ -289,93 +287,67 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		if (subject == buttonZoomIn) {
-			drawPanel.zoomIn();
-			return;
-		}
-		if (subject == buttonZoomOut) {
-			drawPanel.zoomOut();
-			return;
-		}
-		if (subject == buttonZoomToFit) {
-			drawPanel.zoomToFitPaper();
-			return;
-		}
-		if (subject == buttonRescan) {
-			connectionManager.listConnections();
-			updateMenuBar();
-			return;
-		}
-		if (subject == buttonDisconnect) {
-			disconnect();
-			return;
-		}
-		if (subject == buttonAdjustSounds) {
-			SoundSystem.adjust(this.mainFrame,translator);
-			return;
-		}
-		if (subject == buttonAdjustGraphics) {
-			adjustGraphics();
-			return;
-		}
-		if (subject == buttonAdjustLanguage) {
-			Translator.chooseLanguage();
-			updateMenuBar();
-			return;
-		}
-		if (subject == buttonExportMachinePreferences) {
-			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showSaveDialog(this.mainFrame);
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
-				final File file = fc.getSelectedFile();
-				try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
-					prefs.exportSubtree(fileOutputStream);
-				} catch (IOException | BackingStoreException pe) {
-					Log.error(pe.getMessage());
-				}
-			}
-			return;
-		}
-		if (subject == buttonImportMachinePreferences) {
-			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showOpenDialog(this.mainFrame);
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
-				final File file = fc.getSelectedFile();
-				try (final InputStream fileInputStream = new FileInputStream(file)) {
-					prefs.flush();
-					Preferences.importPreferences(fileInputStream);
-					prefs.flush();
-				} catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
-					Log.error(pe.getMessage());
-				}
-			}
-			return;
-		}
-		if (subject == buttonResetMachinePreferences) {
-			int dialogResult = JOptionPane.showConfirmDialog(this.mainFrame, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
-			if(dialogResult == JOptionPane.YES_OPTION){
-				try {
-					prefs.removeNode();
-					Preferences.userRoot().flush();
-				} catch (BackingStoreException e1) {
-					Log.error(e1.getMessage());
-				}
-			}
-			return;
-		}
-		if (subject == buttonAbout) {
-			DialogAbout about = new DialogAbout();
-			about.display(translator,Makelangelo.VERSION);
-			return;
-		}
-		if (subject == buttonCheckForUpdate) {
-			checkForUpdate();
-			return;
-		}
+		if (subject == buttonZoomIn) drawPanel.zoomIn();
+		if (subject == buttonZoomOut) drawPanel.zoomOut();
+		if (subject == buttonZoomToFit) drawPanel.zoomToFitPaper();
+		if (subject == buttonAdjustSounds) SoundSystem.adjust(this.mainFrame,translator);
+		if (subject == buttonAdjustGraphics) adjustGraphics();
+		if (subject == buttonAdjustLanguage) adjustLanguage();
+		if (subject == buttonExportMachinePreferences) exportPreferences();
+		if (subject == buttonImportMachinePreferences) importPreferences();
+		if (subject == buttonResetMachinePreferences) resetPreferences();
+		if (subject == buttonAbout) (new DialogAbout()).display(translator,Makelangelo.VERSION,this.mainFrame);
+		if (subject == buttonCheckForUpdate) checkForUpdate();
+		if (subject == buttonExit) onClose();
+	}
 
-		if (subject == buttonExit) {
-			onClose();
-			return;
+	
+	private void adjustLanguage() {
+		Translator.chooseLanguage();
+		// TODO replace all strings with strings from new language.
+		updateMenuBar();
+	}
+
+	
+	private void exportPreferences() {
+		final JFileChooser fc = new JFileChooser();
+		int returnVal = fc.showSaveDialog(this.mainFrame);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			final File file = fc.getSelectedFile();
+			try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
+				prefs.exportSubtree(fileOutputStream);
+			} catch (IOException | BackingStoreException pe) {
+				Log.error(pe.getMessage());
+			}
+		}
+	}
+	
+	
+	private void importPreferences() {
+		final JFileChooser fc = new JFileChooser();
+		int returnVal = fc.showOpenDialog(this.mainFrame);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			final File file = fc.getSelectedFile();
+			try (final InputStream fileInputStream = new FileInputStream(file)) {
+				prefs.flush();
+				Preferences.importPreferences(fileInputStream);
+				prefs.flush();
+			} catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
+				Log.error(pe.getMessage());
+			}
+		}
+	}
+	
+	
+	private void resetPreferences() {
+		int dialogResult = JOptionPane.showConfirmDialog(this.mainFrame, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
+		if(dialogResult == JOptionPane.YES_OPTION){
+			try {
+				prefs.removeNode();
+				Preferences.userRoot().flush();
+			} catch (BackingStoreException e1) {
+				Log.error(e1.getMessage());
+			}
 		}
 	}
 	
@@ -400,7 +372,50 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public JMenuBar createMenuBar() {
 		menuBar = new JMenuBar();
 
-		updateMenuBar();
+		JMenu menu;
+
+		// File menu
+		menu = new JMenu(Translator.get("MenuMakelangelo"));
+		menu.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menu);
+
+
+		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"), KeyEvent.VK_U);
+		buttonCheckForUpdate.addActionListener(this);
+		buttonCheckForUpdate.setEnabled(true);
+		menu.add(buttonCheckForUpdate);
+
+		buttonAbout = new JMenuItem(Translator.get("MenuAbout"), KeyEvent.VK_A);
+		buttonAbout.addActionListener(this);
+		menu.add(buttonAbout);
+
+		menu.addSeparator();
+
+		buttonExit = new JMenuItem(Translator.get("MenuQuit"), KeyEvent.VK_Q);
+		buttonExit.addActionListener(this);
+		menu.add(buttonExit);
+
+		// preferences
+		menuBar.add(createPreferencesSubMenu());
+
+		// view menu
+		menu = new JMenu(Translator.get("MenuPreview"));
+		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
+		buttonZoomOut.addActionListener(this);
+		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menu.add(buttonZoomOut);
+
+		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+		buttonZoomIn.addActionListener(this);
+		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menu.add(buttonZoomIn);
+
+		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"));
+		buttonZoomToFit.addActionListener(this);
+		menu.add(buttonZoomToFit);
+
+		menuBar.add(menu);
+		menuBar.updateUI();
 
 		return menuBar;
 	}
@@ -452,80 +467,29 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 * Rebuild the contents of the menu based on current program state
 	 */
 	public void updateMenuBar() {
-		JMenu menu, preferencesSubMenu;
-
 		if (robotPanel != null) {
 			robotPanel.updateButtonAccess();
 		}
-
-		menuBar.removeAll();
-
-		// File menu
-		menu = new JMenu(Translator.get("MenuMakelangelo"));
-		menu.setMnemonic(KeyEvent.VK_F);
-		menuBar.add(menu);
-
-		preferencesSubMenu = getPreferencesSubMenu();
-
-		menu.add(preferencesSubMenu);
-
-		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"), KeyEvent.VK_U);
-		buttonCheckForUpdate.addActionListener(this);
-		buttonCheckForUpdate.setEnabled(true);
-		menu.add(buttonCheckForUpdate);
-
-		buttonAbout = new JMenuItem(Translator.get("MenuAbout"), KeyEvent.VK_A);
-		buttonAbout.addActionListener(this);
-		menu.add(buttonAbout);
-
-		menu.addSeparator();
-
-		buttonExit = new JMenuItem(Translator.get("MenuQuit"), KeyEvent.VK_Q);
-		buttonExit.addActionListener(this);
-		menu.add(buttonExit);
-
-		menuBar.add(preferencesSubMenu);
-
-		// view menu
-		menu = new JMenu(Translator.get("MenuPreview"));
-		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
-		buttonZoomOut.addActionListener(this);
-		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menu.add(buttonZoomOut);
-
-		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
-		buttonZoomIn.addActionListener(this);
-		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menu.add(buttonZoomIn);
-
-		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"));
-		buttonZoomToFit.addActionListener(this);
-		menu.add(buttonZoomToFit);
-
-		menuBar.add(menu);
-
-		// finish
-		menuBar.updateUI();
 	}
 
 	
-	private JMenu getPreferencesSubMenu() {
+	private JMenu createPreferencesSubMenu() {
 		final JMenu preferencesSubMenu;
 		preferencesSubMenu = new JMenu(Translator.get("MenuPreferences"));
 
-		buttonAdjustSounds = initializeSubMenuButton(preferencesSubMenu, "MenuSoundsTitle");
-		buttonAdjustGraphics = initializeSubMenuButton(preferencesSubMenu, "MenuGraphicsTitle");
-		buttonAdjustLanguage = initializeSubMenuButton(preferencesSubMenu, "MenuLanguageTitle");
+		buttonAdjustSounds = createSubMenuItem(preferencesSubMenu, "MenuSoundsTitle");
+		buttonAdjustGraphics = createSubMenuItem(preferencesSubMenu, "MenuGraphicsTitle");
+		buttonAdjustLanguage = createSubMenuItem(preferencesSubMenu, "MenuLanguageTitle");
 		preferencesSubMenu.add(new JSeparator());
-		buttonExportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "Save");
-		buttonImportMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "Load");
-		buttonResetMachinePreferences = initializeSubMenuButton(preferencesSubMenu, "MenuResetMachinePreferences");
+		buttonExportMachinePreferences = createSubMenuItem(preferencesSubMenu, "Save");
+		buttonImportMachinePreferences = createSubMenuItem(preferencesSubMenu, "Load");
+		buttonResetMachinePreferences = createSubMenuItem(preferencesSubMenu, "MenuResetMachinePreferences");
 
 		return preferencesSubMenu;
 	}
 	
 
-	private JMenuItem initializeSubMenuButton(JMenu preferencesSubMenu, String translationKey) {
+	private JMenuItem createSubMenuItem(JMenu preferencesSubMenu, String translationKey) {
 		final JMenuItem jMenuItem = new JMenuItem(Translator.get(translationKey));
 		jMenuItem.addActionListener(this);
 		preferencesSubMenu.add(jMenuItem);
