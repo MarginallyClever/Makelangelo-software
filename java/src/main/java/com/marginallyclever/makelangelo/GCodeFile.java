@@ -21,20 +21,20 @@ public class GCodeFile {
 	private int linesProcessed = 0;
 	private boolean fileOpened = false;
 	private ArrayList<String> lines = new ArrayList<String>();
-	
-	/**
-	 * Milliseconds to draw gcode.
-	 */
-	public float estimatedTime = 0;
-	
-	/**
-	 * Distance tool must travel to draw gcode.
-	 */
-	public float estimatedLength = 0;
+	public float estimatedTime = 0;  // ms
+	public float estimatedLength = 0;  // cm
 	public int estimateCount = 0;
 	public float scale = 1.0f;
 	public float feedRate = 1.0f;
 	public boolean changed = false;
+
+	
+	public GCodeFile() {}
+	
+	
+	public GCodeFile(String filename,boolean flipHorizontally) throws IOException {
+		load(filename,flipHorizontally);
+	}
 
 
 	public void reset() {
@@ -50,6 +50,7 @@ public class GCodeFile {
 		changed = true;
 	}
 
+	
 	// returns angle of dy/dx as a value from 0...2PI
 	private double atan3(double dy, double dx) {
 		double a = Math.atan2(dy, dx);
@@ -208,6 +209,7 @@ public class GCodeFile {
 		}
 		setFileOpened(true);
 		estimateDrawTime();
+		changed=true;
 	}
 
 

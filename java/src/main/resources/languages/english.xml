@@ -800,8 +800,14 @@ to check yourself.</value>
 	<string>
 		<key>DisengageMotors</key>
 		<value>Disengage</value>
-		<hint>Disengage Button on manual driving dialog</hint>
+		<hint>Manual driving dialog</hint>
 	</string>
+	<string>
+		<key>EngageMotors</key>
+		<value>Engage</value>
+		<hint>Manual driving dialog</hint>
+	</string>
+	
 
 	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
 		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
@@ -933,10 +939,4 @@ to check yourself.</value>
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
-	<string>
-		<key>DisengageMotors</key>
-		<value>Disengage</value>
-		<hint>Disengage Button on manual driving dialog</hint>
-	</string>
-	
 </language>

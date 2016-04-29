@@ -95,7 +95,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// speed
 	private JFormattedTextField feedRate;
 	private JButton setFeedRate;
-	private JButton disengageMotors;
+	private JButton toggleEngagedMotor;
 
 	// status bar
 	public StatusBar statusBar;
@@ -233,9 +233,31 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		marginPanel.add(paperMargin);
 		panel.add(marginPanel, con1);
 		con1.gridy++;
-		panel.add(new JSeparator(),con1);
+
+		
+		// File conversion
+		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
+		buttonNewFile.addActionListener(this);
+		panel.add(buttonNewFile, con1);
 		con1.gridy++;
 
+		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
+		buttonOpenFile.addActionListener(this);
+		panel.add(buttonOpenFile, con1);
+		con1.gridy++;
+
+		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
+		buttonGenerate.addActionListener(this);
+		panel.add(buttonGenerate, con1);
+		con1.gridy++;
+
+		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
+		buttonSaveFile.addActionListener(this);
+		panel.add(buttonSaveFile, con1);
+		con1.gridy++;
+		
+		
+		
 		// feed rate
 		JPanel feedRateControl = new JPanel();
 		feedRateControl.setLayout(new GridBagLayout());
@@ -244,25 +266,23 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
 		setFeedRate = new JButton(Translator.get("Set"));
 		setFeedRate.addActionListener(this);
-		disengageMotors = new JButton(Translator.get("DisengageMotors"));
-		disengageMotors.addActionListener(this);
+		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+		toggleEngagedMotor.addActionListener(this);
 
 		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
 		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
 		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
 		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-		c.gridx=7;  c.gridy=0;  feedRateControl.add(disengageMotors,c);
+		c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
 
 		panel.add(feedRateControl,con1);
 		con1.gridy++;
 
-
 		makeDriveControls();
-		this.add(driveControlPanel,con1);
+		panel.add(driveControlPanel,con1);
 		con1.gridy++;
 		
 		// drive to corners
-		
 		JPanel corners = new JPanel();
 		corners.setLayout(new GridBagLayout());
 		goTop = new JButton(Translator.get("Top"));       goTop.setPreferredSize(new Dimension(80,20));
@@ -300,37 +320,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill=GridBagConstraints.HORIZONTAL;
 		con1.anchor=GridBagConstraints.NORTHWEST;
 
-
 		panel.add(corners,con1);
 		con1.gridy++;
+		
 		panel.add(new JSeparator(),con1);
-		con1.gridy++;
-		//con1.weighty=1;
-		//p.add(dragAndDrive,con1);
-		//con1.weighty=0;
-		//con1.gridy++;
-
-
-
-		// File conversion
-		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
-		buttonNewFile.addActionListener(this);
-		panel.add(buttonNewFile, con1);
-		con1.gridy++;
-
-		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener(this);
-		panel.add(buttonOpenFile, con1);
-		con1.gridy++;
-
-		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
-		buttonGenerate.addActionListener(this);
-		panel.add(buttonGenerate, con1);
-		con1.gridy++;
-
-		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
-		buttonSaveFile.addActionListener(this);
-		panel.add(buttonSaveFile, con1);
 		con1.gridy++;
 
 
@@ -548,8 +541,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				feedRate.setText(Double.toString(parsedFeedRate));
 				robot.setFeedRate(parsedFeedRate);
 			} catch(NumberFormatException e1) {}
-		} else if (subject == disengageMotors) {
-			robot.disengageMotors();
+		} else if (subject == toggleEngagedMotor) {
+			// TODO if someone sends "M17" or "M18" through the advanced panel then these buttons will be displayed wrong.
+			if(robot.areMotorsEngaged() ) {
+				robot.disengageMotors();
+				toggleEngagedMotor.setText(Translator.get("EngageMotors"));
+			} else {
+				robot.engageMotors();
+				toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
+			}
 		} else {
 			float dx=0;
 			float dy=0;
@@ -631,7 +631,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			buttonPause.setText(Translator.get("Pause"));
 		}
 
-		disengageMotors.setEnabled(isConfirmed && !isRunning);
+		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		buttonNewFile.setEnabled(!isRunning);
 		buttonOpenFile.setEnabled(!isRunning);
 		buttonGenerate.setEnabled(!isRunning);
@@ -665,7 +665,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	public void newFile() {
-		gui.gCode.reset();
+		gui.setGCode(null);
 		gui.updateMenuBar();
 		gui.updateMachineConfig();
 	}
@@ -793,7 +793,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			}
 
 			try {
-				gui.gCode.save(selectedFile);
+				gui.getGCode().save(selectedFile);
 			} catch (IOException e) {
 				Log.error(Translator.get("Failed") + e.getMessage());
 				return;

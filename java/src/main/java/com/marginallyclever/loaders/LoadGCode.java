@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,22 +25,26 @@ public class LoadGCode implements LoadFileType {
 
 	@Override
 	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
+		if(robot.settings.isReverseForGlass()) {
+			Log.message("Flipping for glass...");
+		}
+
+		GCodeFile file;
 		try {
-			if(robot.settings.isReverseForGlass()) {
-				Log.message("Flipping for glass...");
-			}
-			gui.gCode.load(filename,robot.settings.isReverseForGlass());
-			Log.message(gui.gCode.estimateCount + Translator.get("LineSegments") + "\n" + gui.gCode.estimatedLength
-					+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
-					+ Log.millisecondsToHumanReadable((long) (gui.gCode.estimatedTime)) + ".");
+			file = new GCodeFile(filename,robot.settings.isReverseForGlass());
+			
 		} catch (IOException e) {
 			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());
 			gui.updateMenuBar();
 			return false;
 		}
 
-		gui.gCode.changed = true;
-		gui.getDrawPanel().setGCode(gui.gCode);
+		Log.message(file.estimateCount + Translator.get("LineSegments") + "\n" + file.estimatedLength
+				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
+				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
+
+		gui.setGCode(file);
+		gui.getDrawPanel().setGCode(file);
 		gui.getDrawPanel().repaintNow();
 		return true;
 	}

@@ -46,7 +46,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
-	// reading file
+    private boolean areMotorsEngaged = true;
 	private boolean isRunning = false;
 	private boolean isPaused = true;
 	
@@ -414,13 +414,15 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot("G90");  // return to absolute mode
 	}
 	
+	public boolean areMotorsEngaged() { return areMotorsEngaged; }
+	
 	public void movePenToEdgeLeft()   {		sendLineToRobot("G00 X" + settings.getPaperLeft()   * 10);	}
 	public void movePenToEdgeRight()  {		sendLineToRobot("G00 X" + settings.getPaperRight()  * 10);	}
 	public void movePenToEdgeTop()    {		sendLineToRobot("G00 Y" + settings.getPaperTop()    * 10);	}
 	public void movePenToEdgeBottom() {		sendLineToRobot("G00 Y" + settings.getPaperBottom() * 10);	}
 	
-	public void disengageMotors() {		sendLineToRobot("M18");	}
-	public void engageMotors()    {		sendLineToRobot("M17");	}
+	public void disengageMotors() {		sendLineToRobot("M17");	areMotorsEngaged=false; }
+	public void engageMotors()    {		sendLineToRobot("M18");	areMotorsEngaged=true; }
 	
 	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
 	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}

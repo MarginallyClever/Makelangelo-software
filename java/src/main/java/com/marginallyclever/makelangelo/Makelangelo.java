@@ -84,7 +84,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	private MarginallyCleverConnectionManager connectionManager;
 	private MakelangeloRobot robot;
-	public GCodeFile gCode;
+	private GCodeFile gCode;
 	
 	private Translator translator;
 	
@@ -134,8 +134,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot = new MakelangeloRobot(translator);
 		robot.addListener(this);
 		robot.settings.addListener(this);
-		
-		gCode = new GCodeFile();
 		
 		connectionManager = new SerialConnectionManager(prefs);
 		
@@ -226,6 +224,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void sendFileCommand() {
 		if (robot.isRunning() == false 
 				|| robot.isPaused() == true 
+				|| gCode==null
 				|| gCode.isFileOpened() == false 
 				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
 			return;
@@ -270,6 +269,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 	public void startAt(int lineNumber) {
+		if(gCode==null) return;
+		
 		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.settings.getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
 		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
@@ -499,7 +500,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		//*/
 		drawPanel = new DrawPanel(caps);
 		drawPanel.setMachine(robot.settings);
-		drawPanel.setGCode(gCode);
 
 		robotPanel = robot.getControlPanel(this);
 		robotPanel.updateButtonAccess();
@@ -526,11 +526,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		contentPane.add(splitUpDown, BorderLayout.CENTER);
 
 		return contentPane;
-	}
-
-
-	public JFrame getParentFrame() {
-		return this.mainFrame;
 	}
 
 
@@ -597,6 +592,14 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 	
+	public GCodeFile getGCode() {
+		return gCode;
+	}
+	public void setGCode(GCodeFile file) {
+		gCode = file;
+	}
+	
+	
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
 		// we shouldn't need to open the dialog if the default settings are correct.
@@ -626,7 +629,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void lineError(MakelangeloRobot r,int lineNumber) {
-        gCode.setLinesProcessed(lineNumber);
+        if(gCode!=null) gCode.setLinesProcessed(lineNumber);
         sendFileCommand();
 	}
 
@@ -640,7 +643,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
-		getDrawPanel().repaint();
+		drawPanel.repaint();
 	}
 	
 	
