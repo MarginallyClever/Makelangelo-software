@@ -71,6 +71,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if( this.connection != null ) {
 			this.connection.closeConnection();
 			this.connection.removeListener(this);
+			notifyDisconnected();
 		}
 		
 		if( this.connection != c ) {
@@ -93,7 +94,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	@Override
-	public void connectionReady(MarginallyCleverConnection arg0) {
+	public void sendBufferEmpty(MarginallyCleverConnection arg0) {
 		notifyConnectionReady();
 	}
 
@@ -156,7 +157,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	private void notifyConnectionReady() {
 		for(MakelangeloRobotListener listener : listeners) {
-			listener.connectionReady(this);
+			listener.sendBufferEmpty(this);
 		}
 	}
 	
@@ -170,6 +171,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		}
 	}
 
+	public void notifyDisconnected() {
+		for(MakelangeloRobotListener listener : listeners) {
+			listener.disconnected(this);
+		}
+	}
+	
 	public void addListener(MakelangeloRobotListener listener) {
 		listeners.add(listener);
 	}

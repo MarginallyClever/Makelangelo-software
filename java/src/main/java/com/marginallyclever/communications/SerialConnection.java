@@ -178,7 +178,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		if(!portOpened || waitingForCue) return;
 		
 		if(commandQueue.isEmpty()==true) {
-		      notifyConnectionReady();
+		      notifySendBufferEmpty();
 		      return;
 		}
 		
@@ -258,9 +258,9 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	        }
 	}
 	
-    private void notifyConnectionReady() {
+    private void notifySendBufferEmpty() {
       for (MarginallyCleverConnectionReadyListener listener : listeners) {
-        listener.connectionReady(this);
+        listener.sendBufferEmpty(this);
       }
     }
 	

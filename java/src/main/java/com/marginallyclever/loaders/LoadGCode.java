@@ -35,7 +35,6 @@ public class LoadGCode implements LoadFileType {
 			
 		} catch (IOException e) {
 			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());
-			gui.updateMenuBar();
 			return false;
 		}
 

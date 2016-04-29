@@ -240,19 +240,17 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			drawPanel.setLinesProcessed(x);
 			
 			SoundSystem.playDrawingFinishedSound();
+		} else {
+			int lineNumber = gCode.getLinesProcessed();
+			String line = gCode.nextLine();
 			
-			return;
+			robot.tweakAndSendLine( line, lineNumber, translator );
+	
+			drawPanel.setLinesProcessed(lineNumber);
+			if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+			// loop until we find a line that gets sent to the robot, at which point we'll
+			// pause for the robot to respond.  Also stop at end of file.
 		}
-		
-		int lineNumber = gCode.getLinesProcessed();
-		String line = gCode.nextLine();
-		
-		robot.tweakAndSendLine( line, lineNumber, translator );
-
-		drawPanel.setLinesProcessed(lineNumber);
-		if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
-		// loop until we find a line that gets sent to the robot, at which point we'll
-		// pause for the robot to respond.  Also stop at end of file.
 	}
 
 
@@ -265,7 +263,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.unPause();
 		drawPanel.setLinesProcessed(0);
 		drawPanel.setRunning(false);
-		updateMenuBar();
+		if (robotPanel != null) robotPanel.updateButtonAccess();
 	}
 
 	public void startAt(int lineNumber) {
@@ -278,8 +276,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.unPause();
 		robot.setRunning(true);
 		drawPanel.setRunning(true);
-		updateMenuBar();
-		if(robotPanel!=null) robotPanel.statusBar.start();
+		if(robotPanel != null) robotPanel.updateButtonAccess();
+		if(robotPanel != null) robotPanel.statusBar.start();
 		sendFileCommand();
 	}
 
@@ -306,7 +304,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private void adjustLanguage() {
 		Translator.chooseLanguage();
 		// TODO replace all strings with strings from new language.
-		updateMenuBar();
+		
+		if (robotPanel != null) robotPanel.updateButtonAccess();
 	}
 
 	
@@ -455,9 +454,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 * Rebuild the contents of the menu based on current program state
 	 */
 	public void updateMenuBar() {
-		if (robotPanel != null) {
-			robotPanel.updateButtonAccess();
-		}
+		if (robotPanel != null) robotPanel.updateButtonAccess();
 	}
 
 	
@@ -608,10 +605,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		
 		drawPanel.updateMachineConfig();
 		drawPanel.setConnected(true);
-
-	    robotPanel.updateMachineNumberPanel();
-		
-	    updateMenuBar();
+		if(robotPanel!=null) robotPanel.updateMachineNumberPanel();
+		if(robotPanel!=null) robotPanel.updateButtonAccess();
 	}
 	
 	@Override
@@ -622,7 +617,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 
 	@Override
-	public void connectionReady(MakelangeloRobot r) {
+	public void sendBufferEmpty(MakelangeloRobot r) {
 		sendFileCommand();
 	}
 	

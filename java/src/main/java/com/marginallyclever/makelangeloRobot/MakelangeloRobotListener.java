@@ -2,7 +2,7 @@ package com.marginallyclever.makelangeloRobot;
 
 public interface MakelangeloRobotListener {
 	// called when live robot is ready to receive more commands.
-	public void connectionReady(MakelangeloRobot r);
+	public void sendBufferEmpty(MakelangeloRobot r);
 	// called whenever data arrives from serial connection, regardless of confirmation.
 	public void dataAvailable(MakelangeloRobot r,String data);
 	// called when robot connection is disconnected

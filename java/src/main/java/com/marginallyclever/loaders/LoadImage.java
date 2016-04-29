@@ -204,7 +204,6 @@ public class LoadImage implements LoadFileType {
 					gui.updateMachineConfig();
 				} catch (IOException e) {
 					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
-					gui.updateMenuBar();
 				}
 
 				// out closed when scope of try() ended.
