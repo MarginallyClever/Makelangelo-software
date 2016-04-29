@@ -260,7 +260,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	/**
-	 * stop sending file commands to the robot.
+	 * Stop sending file commands to the robot.
 	 * TODO add an e-stop command?
 	 */
 	public void halt() {
@@ -276,10 +276,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.settings.getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
 		cameraViewPanel.setLinesProcessed(gCode.getLinesProcessed());
-		startDrawing();
-	}
 
-	private void startDrawing() {
 		robot.unPause();
 		robot.setRunning(true);
 		cameraViewPanel.setRunning(true);
@@ -382,6 +379,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			return;
 		}
 	}
+	
 	
 	private void disconnect() {
 		robot.getConnection().closeConnection();
@@ -511,6 +509,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		menuBar.updateUI();
 	}
 
+	
 	private JMenu getPreferencesSubMenu() {
 		final JMenu preferencesSubMenu;
 		preferencesSubMenu = new JMenu(Translator.get("MenuPreferences"));
@@ -525,6 +524,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 		return preferencesSubMenu;
 	}
+	
 
 	private JMenuItem initializeSubMenuButton(JMenu preferencesSubMenu, String translationKey) {
 		final JMenuItem jMenuItem = new JMenuItem(Translator.get(translationKey));
@@ -533,11 +533,12 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		return jMenuItem;
 	}
 
+	
 	public Container createContentPane() {
 		//Create the content-pane-to-be.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
-//*/
+		/*/
         GLCapabilities caps = new GLCapabilities(null);
         caps.setSampleBuffers(true);
         caps.setHardwareAccelerated(true);

@@ -235,14 +235,14 @@ public class GCodeFile {
 		if(x > linesTotal) x = linesTotal;
 		
 		toMatch = "G00 Z"+toMatch;
-		do {
+		while(x>1) {
 			String line = lines.get(x).trim().substring(0, toMatch.length());
 			if(line.equals(toMatch)) {
 				return x;
 			}
 			--x;
-		} while(x>0);
-		
+		}
+				
 		return x;
 	}
 	

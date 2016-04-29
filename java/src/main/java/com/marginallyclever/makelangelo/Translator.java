@@ -80,23 +80,7 @@ public final class Translator {
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
 		//System.out.println("Default language = "+defaultLanguage);
 		
-		// load the languages
-		try {
-			loadLanguages();
-		} catch (IllegalStateException e) {
-			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
-			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
-			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
-			System.out.println("default path requested: "+path);
-			URL pathFound = Translator.class.getClassLoader().getResource(path);
-			System.out.println("path found: "+pathFound);
-			try (InputStream s = pathFound.openStream()) {
-				languageContainer.loadFromInputStream(s);
-			} catch (IOException ie) {
-				Log.error(ie.getMessage());
-			}
-			languages.put(languageContainer.getName(), languageContainer);
-		}
+		loadLanguages();
 		loadConfig();
 
 		if (isThisTheFirstTimeLoadingLanguageFiles()) {
@@ -177,62 +161,77 @@ public final class Translator {
 	 * @see http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
 	 * @throws IllegalStateException No language files found
 	 */
-	static public void loadLanguages() throws IllegalStateException {
-		// iterate and find all language files
-		URI uri = null;
+	static public void loadLanguages() {
 		try {
-			uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		Path myPath;
-		if (uri.getScheme().equals("jar")) {
-			FileSystem fileSystem = null;
+			// iterate and find all language files
+			URI uri = null;
 			try {
-				fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+				uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			Path myPath;
+			if (uri.getScheme().equals("jar")) {
+				FileSystem fileSystem = null;
+				try {
+					fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				myPath = fileSystem.getPath(WORKING_DIRECTORY);
+			} else {
+				myPath = Paths.get(uri);
+			}
+			Stream<Path> walk = null;
+			try {
+				walk = Files.walk(myPath, 1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			myPath = fileSystem.getPath(WORKING_DIRECTORY);
-		} else {
-			myPath = Paths.get(uri);
-		}
-		Stream<Path> walk = null;
-		try {
-			walk = Files.walk(myPath, 1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		int found=0;
-		Iterator<Path> it = walk.iterator();
-		while( it.hasNext() ) {
-			Path p = it.next();
-			String name = p.toString();
-			//System.out.println("testing "+name);
-			//if( f.isDirectory() || f.isHidden() ) continue;
-			String ext = FilenameUtils.getExtension(name).toLowerCase(); 
-			if( ext.equals("xml") == false ) {
-				continue;
+	
+			int found=0;
+			Iterator<Path> it = walk.iterator();
+			while( it.hasNext() ) {
+				Path p = it.next();
+				String name = p.toString();
+				//System.out.println("testing "+name);
+				//if( f.isDirectory() || f.isHidden() ) continue;
+				String ext = FilenameUtils.getExtension(name).toLowerCase(); 
+				if( ext.equals("xml") == false ) {
+					continue;
+				}
+	
+				// found an XML file in the /languages folder.  Good sign!
+				++found;
+				name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+				//System.out.println("found: "+name);
+	
+				InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
+				//if( stream != null ) 
+				{
+					TranslatorLanguage lang = new TranslatorLanguage();
+					lang.loadFromInputStream(stream);
+					languages.put(lang.getName(), lang);
+				}
 			}
-
-			// found an XML file in the /languages folder.  Good sign!
-			++found;
-			name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-			//System.out.println("found: "+name);
-
-			InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
-			//if( stream != null ) 
-			{
-				TranslatorLanguage lang = new TranslatorLanguage();
-				lang.loadFromInputStream(stream);
-				languages.put(lang.getName(), lang);
+			//System.out.println("total found: "+found);
+	
+			if(found==0) {
+				throw new IllegalStateException("No translations found.");
 			}
-		}
-		//System.out.println("total found: "+found);
-
-		if(found==0) {
-			throw new IllegalStateException();
+		} catch (IllegalStateException e) {
+			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
+			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
+			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
+			System.out.println("default path requested: "+path);
+			URL pathFound = Translator.class.getClassLoader().getResource(path);
+			System.out.println("path found: "+pathFound);
+			try (InputStream s = pathFound.openStream()) {
+				languageContainer.loadFromInputStream(s);
+			} catch (IOException ie) {
+				Log.error(ie.getMessage());
+			}
+			languages.put(languageContainer.getName(), languageContainer);
 		}
 	}
 
