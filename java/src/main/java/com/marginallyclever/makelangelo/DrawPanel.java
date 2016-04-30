@@ -19,7 +19,7 @@ import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener  {
@@ -33,11 +33,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	// arc smoothness - increase to make more smooth and run slower.
 	private static final double STEPS_PER_DEGREE=1;
-
-	// progress
-	private long linesProcessed=0;
-	private boolean connected=false;
-	private boolean running=false;
 
 	// config
 	private boolean showPenUpMoves=false;
@@ -58,11 +53,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 	private final int lookAhead=500;
 
-	private GCodeFile instructions;
+	private GCodeFile gCode;
 
 	private DrawPanelDecorator drawDecorator=null;
 
-	protected MakelangeloRobotSettings machine;
+	protected MakelangeloRobot machine;
 
 	private ReentrantLock lock = new ReentrantLock();
 	
@@ -90,8 +85,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 	
 	
-	void setMachine(MakelangeloRobotSettings mc) {
-		machine = mc;
+	void setRobot(MakelangeloRobot r) {
+		machine = r;
 	}
 
 
@@ -181,8 +176,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void zoomToFitPaper() {
 		int drawPanelWidth = this.getWidth();
 		int drawPanelHeight = this.getHeight();
-		double widthOfPaper = machine.getPaperWidth();
-		double heightOfPaper = machine.getPaperHeight();
+		double widthOfPaper = machine.getSettings().getPaperWidth();
+		double heightOfPaper = machine.getSettings().getPaperHeight();
 		double drawPanelWidthZoom = drawPanelWidth / widthOfPaper;
 		double drawPanelHeightZoom = drawPanelHeight / heightOfPaper;
 		cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
@@ -226,7 +221,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	public void setGCode(GCodeFile gcode) {
-		instructions = gcode;
+		gCode = gcode;
 		emptyNodeBuffer();
 		// process the image into a buffer once rather than re-reading the gcode over and over again?
 		repaint();
@@ -247,14 +242,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	/**
-	 * toggle pen up moves.
-	 *
+	 * Toggle pen up moves.
 	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
  	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
 	 */
 	public void setShowPenUp(boolean state) {
 		showPenUpMoves = state;
-		if(instructions!=null) instructions.changed = true;
+		if(gCode!=null) gCode.changed = true;
 		emptyNodeBuffer();
 		repaintNow();
 	}
@@ -266,23 +260,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		return showPenUpMoves;
 	}
 
-
-	public void setLinesProcessed(long c) {
-		linesProcessed = c;
-		if ((linesProcessed % 10) == 0) repaint();
-	}
-
-	public void setConnected(boolean state) {
-		connected = state;
-		repaint();
-	}
-
-	public void setRunning(boolean state) {
-		running = state;
-		if (running == false) {
-			linesProcessed = 0;
-		}
-	}
 
 	/**
 	 * returns angle of dy/dx as a value from 0...2PI
@@ -377,41 +354,41 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void paintLimits(GL2 gl2) {
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitBottom());
-		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitBottom());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft(), machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight(), machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight(), machine.getSettings().getLimitBottom());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft(), machine.getSettings().getLimitBottom());
 		gl2.glEnd();
 		
-		if (!connected) {
+		if (!machine.isPortConfirmed()) {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
-			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
-			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
-			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
+			gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperTop());
+			gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperTop());
+			gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperBottom());
+			gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperBottom());
 			gl2.glEnd();
 		} else {
 			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
 			gl2.glColor3f(1, 1, 1);
 			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
-			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
-			gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
-			gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
+			gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperTop());
+			gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperTop());
+			gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperBottom());
+			gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperBottom());
 			gl2.glEnd();
 		}
 		// margin settings
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f,0.9f,0.9f);
 		gl2.glLineWidth(1);
-		gl2.glScaled(machine.getPaperMargin(),machine.getPaperMargin(),1);
+		gl2.glScaled(machine.getSettings().getPaperMargin(),machine.getSettings().getPaperMargin(),1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperTop());
-		gl2.glVertex2d(machine.getPaperRight(), machine.getPaperTop());
-		gl2.glVertex2d(machine.getPaperRight(), machine.getPaperBottom());
-		gl2.glVertex2d(machine.getPaperLeft(), machine.getPaperBottom());
+		gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperTop());
+		gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperTop());
+		gl2.glVertex2d(machine.getSettings().getPaperRight(), machine.getSettings().getPaperBottom());
+		gl2.glVertex2d(machine.getSettings().getPaperLeft(), machine.getSettings().getPaperBottom());
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}
@@ -443,11 +420,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glPushMatrix();
 		gl2.glTranslatef(-2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.getLimitLeft()-5f, machine.getLimitTop()+5f);
-		gl2.glVertex2d(machine.getLimitLeft()+5f, machine.getLimitTop()+5f);
-		gl2.glVertex2d(machine.getLimitLeft()+5f, machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitLeft()   , machine.getLimitTop()-5f);
-		gl2.glVertex2d(machine.getLimitLeft()-5f, machine.getLimitTop()-5f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-5f, machine.getSettings().getLimitTop()+5f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()+5f, machine.getSettings().getLimitTop()+5f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()+5f, machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()   , machine.getSettings().getLimitTop()-5f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-5f, machine.getSettings().getLimitTop()-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
@@ -455,26 +432,26 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glPushMatrix();
 		gl2.glTranslatef(2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(machine.getLimitRight()+5f, machine.getLimitTop()+5f);
-		gl2.glVertex2d(machine.getLimitRight()-5f, machine.getLimitTop()+5f);
-		gl2.glVertex2d(machine.getLimitRight()-5f, machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitRight()   , machine.getLimitTop()-5f);
-		gl2.glVertex2d(machine.getLimitRight()+5f, machine.getLimitTop()-5f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+5f, machine.getSettings().getLimitTop()+5f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()-5f, machine.getSettings().getLimitTop()+5f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()-5f, machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight()   , machine.getSettings().getLimitTop()-5f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+5f, machine.getSettings().getLimitTop()-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
 		// left motor
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(machine.getLimitLeft()-4.2f, machine.getLimitTop()+4.2f);
-		gl2.glVertex2d(machine.getLimitLeft()     , machine.getLimitTop()+4.2f);
-		gl2.glVertex2d(machine.getLimitLeft()     , machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitLeft()-4.2f, machine.getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-4.2f, machine.getSettings().getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()     , machine.getSettings().getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()     , machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-4.2f, machine.getSettings().getLimitTop());
 		// right motor
-		gl2.glVertex2d(machine.getLimitRight()     , machine.getLimitTop()+4.2f);
-		gl2.glVertex2d(machine.getLimitRight()+4.2f, machine.getLimitTop()+4.2f);
-		gl2.glVertex2d(machine.getLimitRight()+4.2f, machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitRight()     , machine.getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight()     , machine.getSettings().getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+4.2f, machine.getSettings().getLimitTop()+4.2f);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+4.2f, machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight()     , machine.getSettings().getLimitTop());
 		gl2.glEnd();
 	}
 
@@ -482,7 +459,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void paintGondolaAndCounterweights( GL2 gl2 ) {
 		double dx,dy;
 		double gx,gy;
-		if(running) {
+		if(machine.isRunning()) {
 			gx=gondolaX;
 			gy=gondolaY;
 		} else {
@@ -490,37 +467,37 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 			gy=(-gondolaY/cameraZoom-cameraOffsetY);
 		}
 
-		double mw = machine.getLimitRight()-machine.getLimitLeft();
-		double mh = machine.getLimitTop()-machine.getLimitBottom();
+		double mw = machine.getSettings().getLimitRight()-machine.getSettings().getLimitLeft();
+		double mh = machine.getSettings().getLimitTop()-machine.getSettings().getLimitBottom();
 		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
 
-		dx = gx - machine.getLimitLeft();
-		dy = gy - machine.getLimitTop();
+		dx = gx - machine.getSettings().getLimitLeft();
+		dy = gy - machine.getSettings().getLimitTop();
 		double left_a = Math.sqrt(dx*dx+dy*dy);
 		double left_b = suggested_length - left_a;
 
-		dx = gx - machine.getLimitRight();
+		dx = gx - machine.getSettings().getLimitRight();
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = suggested_length - right_a;
 
-		if(gx<machine.getLimitLeft()) return;
-		if(gx>machine.getLimitRight()) return;
-		if(gy>machine.getLimitTop()) return;
-		if(gy<machine.getLimitBottom()) return;
+		if(gx<machine.getSettings().getLimitLeft()) return;
+		if(gx>machine.getSettings().getLimitRight()) return;
+		if(gy>machine.getSettings().getLimitTop()) return;
+		if(gy<machine.getSettings().getLimitBottom()) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		// motor to gondola left
-		gl2.glVertex2d(machine.getLimitLeft(), machine.getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft(), machine.getSettings().getLimitTop());
 		gl2.glVertex2d(gx,gy);
 		// motor to counterweight left
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75, machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75, machine.getLimitTop()-left_b);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75, machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75, machine.getSettings().getLimitTop()-left_b);
 		// motor to gondola right
-		gl2.glVertex2d(machine.getLimitRight(), machine.getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight(), machine.getSettings().getLimitTop());
 		gl2.glVertex2d(gx,gy);
 		// motor to counterweight right
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75, machine.getLimitTop());
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75, machine.getLimitTop()-right_b);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75, machine.getSettings().getLimitTop());
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75, machine.getSettings().getLimitTop()-right_b);
 		gl2.glEnd();
 		// gondola
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -534,18 +511,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75-1.5,machine.getLimitTop()-left_b);
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75+1.5,machine.getLimitTop()-left_b);
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75+1.5,machine.getLimitTop()-left_b-15);
-		gl2.glVertex2d(machine.getLimitLeft()-2.1-0.75-1.5,machine.getLimitTop()-left_b-15);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75-1.5,machine.getSettings().getLimitTop()-left_b);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75+1.5,machine.getSettings().getLimitTop()-left_b);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75+1.5,machine.getSettings().getLimitTop()-left_b-15);
+		gl2.glVertex2d(machine.getSettings().getLimitLeft()-2.1-0.75-1.5,machine.getSettings().getLimitTop()-left_b-15);
 		gl2.glEnd();
 		// counterweight right
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75-1.5,machine.getLimitTop()-right_b);
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75+1.5,machine.getLimitTop()-right_b);
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75+1.5,machine.getLimitTop()-right_b-15);
-		gl2.glVertex2d(machine.getLimitRight()+2.1+0.75-1.5,machine.getLimitTop()-right_b-15);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75-1.5,machine.getSettings().getLimitTop()-right_b);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75+1.5,machine.getSettings().getLimitTop()-right_b);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75+1.5,machine.getSettings().getLimitTop()-right_b-15);
+		gl2.glVertex2d(machine.getSettings().getLimitRight()+2.1+0.75-1.5,machine.getSettings().getLimitTop()-right_b-15);
 		gl2.glEnd();
 		
 		/*
@@ -553,11 +530,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// right
 		gl2.glColor3d(0.6, 0.6, 0.6);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		double w = machine.getLimitRight() - machine.getLimitLeft()+2.1;
-		double h = machine.getLimitTop() - machine.getLimitBottom() + 2.1;
+		double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft()+2.1;
+		double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
 		r=(float)Math.sqrt(h*h + w*w); // circle radius
-		gx = machine.getLimitLeft() - 2.1;
-		gy = machine.getLimitTop() + 2.1;
+		gx = machine.getSettings().getLimitLeft() - 2.1;
+		gy = machine.getSettings().getLimitTop() + 2.1;
 		double start = (float)1.5*(float)Math.PI;
 		double end = (2*Math.PI-Math.atan(h/w));
 		double v;
@@ -569,7 +546,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		
 		// left
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		gx = machine.getLimitRight() + 2.1;
+		gx = machine.getSettings().getLimitRight() + 2.1;
 		start = (float)(1*Math.PI+Math.atan(h/w));
 		end = (float)1.5*(float)Math.PI;
 		for(v=0;v<=1.0;v+=0.1) {
@@ -596,7 +573,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 		if(drawDecorator!=null) {
 			// filters can also draw WYSIWYG previews while converting.
-			drawDecorator.render(gl2,machine);
+			drawDecorator.render(gl2,machine.getSettings());
 			return;
 		}
 
@@ -605,17 +582,19 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 
 	private void paintGcode( GL2 gl2 ) {
+		if(gCode==null) return;
 		if(lock.isLocked()) return;
 		
 		lock.lock();
 		try {
+			int linesProcessed = gCode.getLinesProcessed();
 			optimizeNodes();
 	
-			DrawingTool tool = machine.getTool(0);
+			DrawingTool tool = machine.getSettings().getTool(0);
 			gl2.glColor3f(0, 0, 0);
 	
 			boolean drawAllWhileRunning = false;
-			if (running) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
+			if (machine.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 				
 			// draw image
 			if (fastNodes.size() > 0) {
@@ -624,7 +603,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 				while (nodes.hasNext()) {
 					DrawPanelNode n = nodes.next();
 	
-					if (running) {
+					if (machine.isRunning()) {
 						if (n.line_number < linesProcessed) {
 							gl2.glColor3f(1, 0, 0);
 							//g2d.setColor(Color.RED);
@@ -642,11 +621,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	
 					switch (n.type) {
 					case TOOL:
-						tool = machine.getTool(n.tool_id);
+						tool = machine.getSettings().getTool(n.tool_id);
 						gl2.glLineWidth(tool.getDiameter() * (float) this.cameraZoom / 10.0f);
 						break;
 					case COLOR:
-						if (!running || n.line_number > linesProcessed + lookAhead) {
+						if (!machine.isRunning() || n.line_number > linesProcessed + lookAhead) {
 							//g2d.setColor(n.c);
 							gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
 						}
@@ -695,11 +674,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 	private void optimizeNodes() {
-		if (instructions == null) return;
-		if (!fastNodes.isEmpty() && instructions.changed == false) return;
-		instructions.changed = false;
+		if (gCode == null) return;
+		if (!fastNodes.isEmpty() && gCode.changed == false) return;
+		gCode.changed = false;
 
-		DrawingTool tool = machine.getTool(0);
+		DrawingTool tool = machine.getSettings().getTool(0);
 
 		drawScale = 0.1f;
 
@@ -711,7 +690,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		String tool_change = "M06 T";
 		Color tool_color = Color.BLACK;
 
-		Iterator<String> commands = instructions.getLines().iterator();
+		Iterator<String> commands = gCode.getLines().iterator();
 		i = 0;
 		while (commands.hasNext()) {
 			String line = commands.next();

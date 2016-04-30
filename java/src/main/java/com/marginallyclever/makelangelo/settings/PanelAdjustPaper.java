@@ -43,14 +43,14 @@ implements ActionListener, PropertyChangeListener {
 		JPanel p = new JPanel(new GridBagLayout());
 		this.add(p);
 		int y=0;
-		paperSizes = new JComboBox<>(robot.settings.commonPaperSizes);
-		paperSizes.setSelectedIndex(robot.settings.getCurrentPaperSizeChoice( robot.settings.getPaperWidth()*10, robot.settings.getPaperHeight()*10 ));
+		paperSizes = new JComboBox<>(robot.getSettings().commonPaperSizes);
+		paperSizes.setSelectedIndex(robot.getSettings().getCurrentPaperSizeChoice( robot.getSettings().getPaperWidth()*10, robot.getSettings().getPaperHeight()*10 ));
 
 		NumberFormat nFloat = NumberFormat.getIntegerInstance();
 		pw = new JFormattedTextField(nFloat);
-		pw.setValue(robot.settings.getPaperWidth()*10);
+		pw.setValue(robot.getSettings().getPaperWidth()*10);
 		ph = new JFormattedTextField(nFloat);
-		ph.setValue(robot.settings.getPaperHeight()*10);
+		ph.setValue(robot.getSettings().getPaperHeight()*10);
 
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
@@ -91,7 +91,7 @@ implements ActionListener, PropertyChangeListener {
 		} catch(Exception err) {
 			err.getMessage();
 		}
-		paperSizes.setSelectedIndex(robot.settings.getCurrentPaperSizeChoice(w,h));	
+		paperSizes.setSelectedIndex(robot.getSettings().getCurrentPaperSizeChoice(w,h));	
 	}
 
 
@@ -120,7 +120,7 @@ implements ActionListener, PropertyChangeListener {
 		if( phf<=0 ) data_is_sane=false;
 
 		if (data_is_sane) {
-			robot.settings.setPaperSize(pwf,phf);
+			robot.getSettings().setPaperSize(pwf,phf);
 		}
 	}
 }

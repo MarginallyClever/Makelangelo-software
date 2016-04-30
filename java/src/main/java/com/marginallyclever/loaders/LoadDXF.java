@@ -34,7 +34,6 @@ import org.kabeja.parser.ParserBuilder;
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -73,9 +72,9 @@ public class LoadDXF implements LoadFileType {
 
 				try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
 						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-					DrawingTool tool = robot.settings.getCurrentTool();
-					out.write(robot.settings.getConfigLine() + ";\n");
-					out.write(robot.settings.getBobbinLine() + ";\n");
+					DrawingTool tool = robot.getSettings().getCurrentTool();
+					out.write(robot.getSettings().getConfigLine() + ";\n");
+					out.write(robot.getSettings().getBobbinLine() + ";\n");
 					out.write("G00 G90;\n");
 					tool.writeChangeTo(out);
 					tool.writeOff(out);
@@ -90,8 +89,8 @@ public class LoadDXF implements LoadFileType {
 					// altering the aspect ratio
 					double imageWidth = (b.getMaximumX() - b.getMinimumX());
 					double imageHeight = (b.getMaximumY() - b.getMinimumY());
-					double paperHeight = robot.settings.getPaperHeight() * 10 * robot.settings.getPaperMargin();
-					double paperWidth = robot.settings.getPaperWidth() * 10 * robot.settings.getPaperMargin();
+					double paperHeight = robot.getSettings().getPaperHeight() * 10 * robot.getSettings().getPaperMargin();
+					double paperWidth = robot.getSettings().getPaperWidth() * 10 * robot.getSettings().getPaperMargin();
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
@@ -267,8 +266,6 @@ public class LoadDXF implements LoadFileType {
 			@Override
 			public void done() {
 				pm.close();
-				Log.message(Translator.get("Finished"));
-				SoundSystem.playConversionFinishedSound();
 				if (ok) {
 					LoadGCode loader = new LoadGCode();
 					loader.load(destinationFile, robot, gui);

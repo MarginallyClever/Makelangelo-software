@@ -34,7 +34,6 @@ import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.PreferencesHelper;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -115,7 +114,7 @@ public class LoadImage implements LoadFileType {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
-			robot.settings.saveConfig();
+			robot.getSettings().saveConfig();
 
 			// Force update of graphics layout.
 			gui.updateMachineConfig();
@@ -142,15 +141,15 @@ public class LoadImage implements LoadFileType {
 		}
 		
 		// scale image to fit paper, same behaviour as before.
-		if( robot.settings.getPaperWidth() > robot.settings.getPaperHeight() ) {
-			if(robot.settings.getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
-				float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
+		if( robot.getSettings().getPaperWidth() > robot.getSettings().getPaperHeight() ) {
+			if(robot.getSettings().getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
+				float f = (float)( robot.getSettings().getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
 				img.setScaleX(img.getScaleX() * f);
 				img.setScaleY(img.getScaleY() * f);
 			}
 		} else {
-			if(robot.settings.getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
-				float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
+			if(robot.getSettings().getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
+				float f = (float)( robot.getSettings().getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
 				img.setScaleX(img.getScaleX() * f);
 				img.setScaleY(img.getScaleY() * f);
 			}
@@ -195,7 +194,7 @@ public class LoadImage implements LoadFileType {
 					converter.setDrawPanel(null);
 					gui.getDrawPanel().setDecorator(null);
 
-					if (robot.settings.shouldSignName()) {
+					if (robot.getSettings().shouldSignName()) {
 						// Sign name
 						Generator_YourMessageHere ymh = new Generator_YourMessageHere();
 						ymh.setMachine(robot);
@@ -215,10 +214,8 @@ public class LoadImage implements LoadFileType {
 			@Override
 			public void done() {
 				pm.close();
-				Log.message(Translator.get("Finished"));
 				LoadGCode loader = new LoadGCode();
 				loader.load(destinationFile, robot, gui);
-				SoundSystem.playConversionFinishedSound();
 			}
 		};
 

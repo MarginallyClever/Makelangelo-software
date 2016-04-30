@@ -133,7 +133,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot(translator);
 		robot.addListener(this);
-		robot.settings.addListener(this);
+		robot.getSettings().addListener(this);
 		
 		connectionManager = new SerialConnectionManager(prefs);
 		
@@ -237,7 +237,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			// bask in the glory
 			int x = gCode.getLinesTotal();
 			if(robotPanel!=null) robotPanel.statusBar.setProgress(x, x);
-			drawPanel.setLinesProcessed(x);
 			
 			SoundSystem.playDrawingFinishedSound();
 		} else {
@@ -246,11 +245,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			
 			robot.tweakAndSendLine( line, lineNumber, translator );
 	
-			drawPanel.setLinesProcessed(lineNumber);
 			if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
 		}
+		drawPanel.repaint();
 	}
 
 
@@ -261,21 +260,18 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void halt() {
 		robot.setRunning(false);
 		robot.unPause();
-		drawPanel.setLinesProcessed(0);
-		drawPanel.setRunning(false);
-		if (robotPanel != null) robotPanel.updateButtonAccess();
+		drawPanel.repaint();
+		if(robotPanel != null) robotPanel.updateButtonAccess();
 	}
 
 	public void startAt(int lineNumber) {
 		if(gCode==null) return;
 		
-		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.settings.getPenUpString()));
+		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
-		drawPanel.setLinesProcessed(gCode.getLinesProcessed());
 
 		robot.unPause();
 		robot.setRunning(true);
-		drawPanel.setRunning(true);
 		if(robotPanel != null) robotPanel.updateButtonAccess();
 		if(robotPanel != null) robotPanel.statusBar.start();
 		sendFileCommand();
@@ -496,7 +492,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		GLCapabilities caps = new GLCapabilities(null);
 		//*/
 		drawPanel = new DrawPanel(caps);
-		drawPanel.setMachine(robot.settings);
+		drawPanel.setRobot(robot);
 
 		robotPanel = robot.getControlPanel(this);
 		robotPanel.updateButtonAccess();
@@ -604,10 +600,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// the default settings must always match the Marginally Clever kit.
 		
 		drawPanel.updateMachineConfig();
-		drawPanel.setConnected(true);
+		drawPanel.repaint();
 		if(robotPanel!=null) robotPanel.updateMachineNumberPanel();
 		if(robotPanel!=null) robotPanel.updateButtonAccess();
 	}
+	
 	
 	@Override
 	public void dataAvailable(MakelangeloRobot r,String data) {
@@ -631,7 +628,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void disconnected(MakelangeloRobot r) {
-		drawPanel.setConnected(false);
+		drawPanel.repaint();
+		SoundSystem.playDisconnectSound();
 	}
 	
 	

@@ -43,7 +43,7 @@ public abstract class ImageManipulator {
 	}
 	
 	public void setMachine(MakelangeloRobot robot) {
-		machine = robot.settings;
+		machine = robot.getSettings();
 	}
 
 	public void setDrawPanel(DrawPanel drawPanel) {

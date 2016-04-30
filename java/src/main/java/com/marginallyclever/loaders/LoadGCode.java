@@ -25,13 +25,13 @@ public class LoadGCode implements LoadFileType {
 
 	@Override
 	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
-		if(robot.settings.isReverseForGlass()) {
+		if(robot.getSettings().isReverseForGlass()) {
 			Log.message("Flipping for glass...");
 		}
 
 		GCodeFile file;
 		try {
-			file = new GCodeFile(filename,robot.settings.isReverseForGlass());
+			file = new GCodeFile(filename,robot.getSettings().isReverseForGlass());
 			
 		} catch (IOException e) {
 			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());

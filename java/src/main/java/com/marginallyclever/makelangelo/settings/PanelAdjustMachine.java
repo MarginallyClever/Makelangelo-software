@@ -66,10 +66,10 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.anchor = GridBagConstraints.EAST;
 		d.anchor = GridBagConstraints.WEST;
 
-		double r = robot.settings.getLimitRight() * 10;
-		double l = robot.settings.getLimitLeft() * 10;
+		double r = robot.getSettings().getLimitRight() * 10;
+		double l = robot.getSettings().getLimitLeft() * 10;
 		double w = (r - l);
-		double h = (robot.settings.getLimitTop() - robot.settings.getLimitBottom()) * 10;
+		double h = (robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom()) * 10;
 		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
@@ -116,8 +116,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		p.add(new JLabel(Translator.get("AdjustPulleySize"), SwingConstants.CENTER), c);
 		c.gridwidth = 1;
 
-		double left = Math.floor(robot.settings.getPulleyDiameterLeft() * 10.0 * 1000.0) / 1000.0;
-		double right = Math.floor(robot.settings.getPulleyDiameterRight() * 10.0 * 1000.0) / 1000.0;
+		double left = Math.floor(robot.getSettings().getPulleyDiameterLeft() * 10.0 * 1000.0) / 1000.0;
+		double right = Math.floor(robot.getSettings().getPulleyDiameterRight() * 10.0 * 1000.0) / 1000.0;
 
 		NumberFormat nDouble = NumberFormat.getNumberInstance();
 		nDouble.setMinimumFractionDigits(1);
@@ -164,11 +164,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 
 		buttonAneg = new JButton(Translator.get("JogIn"));
 		buttonApos = new JButton(Translator.get("JogOut"));
-		m1i = new JCheckBox(Translator.get("Invert"), robot.settings.isLeftMotorInverted());
+		m1i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isLeftMotorInverted());
 
 		buttonBneg = new JButton(Translator.get("JogIn"));
 		buttonBpos = new JButton(Translator.get("JogOut"));
-		m2i = new JCheckBox(Translator.get("Invert"), robot.settings.isRightMotorInverted());
+		m2i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isRightMotorInverted());
 
 		c.gridx = 0;
 		c.gridy = 0;
@@ -213,7 +213,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		this.add(p);
 
 		acceleration = new JFormattedTextField(nDouble);
-		acceleration.setValue(robot.settings.getAcceleration());
+		acceleration.setValue(robot.getSettings().getAcceleration());
 		s = acceleration.getPreferredSize();
 		s.width = 80;
 		acceleration.setPreferredSize(s);
@@ -240,7 +240,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		c.gridy++;
 		c.gridwidth = 2;
 		flipForGlass = new JCheckBox(Translator.get("FlipForGlass"));
-		flipForGlass.setSelected(robot.settings.isReverseForGlass());
+		flipForGlass.setSelected(robot.getSettings().isReverseForGlass());
 		p.add(flipForGlass, c);
 	}
 
@@ -254,9 +254,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		if (subject == buttonBneg) robot.jogRightMotorIn();
 
 		if (subject == m1i || subject == m2i) {
-			robot.settings.invertLeftMotor(m1i.isSelected());
-			robot.settings.invertRightMotor(m2i.isSelected());
-			robot.settings.saveConfig();
+			robot.getSettings().invertLeftMotor(m1i.isSelected());
+			robot.getSettings().invertRightMotor(m2i.isSelected());
+			robot.getSettings().saveConfig();
 			robot.sendConfig();
 		}
 	}
@@ -280,10 +280,10 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 			data_is_sane = false;
 
 		if (data_is_sane) {
-			robot.settings.setReverseForGlass(flipForGlass.isSelected());
-			robot.settings.setPulleyDiameter(bld, brd);
-			robot.settings.setMachineSize(mwf, mhf);
-			robot.settings.setAcceleration(accel);
+			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
+			robot.getSettings().setPulleyDiameter(bld, brd);
+			robot.getSettings().setMachineSize(mwf, mhf);
+			robot.getSettings().setAcceleration(accel);
 		}
 	}
 }

@@ -33,7 +33,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.
 		
 	// Settings go here
-	public MakelangeloRobotSettings settings = null;
+	private MakelangeloRobotSettings settings = null;
 	
 	// control panel
 	private MakelangeloRobotPanel myPanel = null;
@@ -439,6 +439,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void setLineNumber(int newLineNumber) {		sendLineToRobot("M110 N" + newLineNumber);	}
 	
 
+	public MakelangeloRobotSettings getSettings() {
+		return settings;
+	}
+	
 	public MakelangeloRobotPanel getControlPanel(Makelangelo gui) {
 		myPanel = new MakelangeloRobotPanel(gui, this);
 		

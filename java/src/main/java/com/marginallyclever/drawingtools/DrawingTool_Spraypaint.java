@@ -200,6 +200,6 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 		zOff = Float.valueOf(spraypaintUp.getText());
 		zOn = Float.valueOf(spraypaintDown.getText());
 		zRate = Float.valueOf(spraypaintZRate.getText());
-		robot.settings.saveConfig();	  
+		robot.getSettings().saveConfig();	  
 	}
 }

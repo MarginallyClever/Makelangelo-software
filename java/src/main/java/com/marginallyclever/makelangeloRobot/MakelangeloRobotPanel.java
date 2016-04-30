@@ -223,7 +223,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		// margins
 		JPanel marginPanel = new JPanel(new GridLayout(1, 0));
-		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.settings.getPaperMargin() * 100));
+		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.getSettings().getPaperMargin() * 100));
 		paperMargin.setMajorTickSpacing(10);
 		paperMargin.setMinorTickSpacing(5);
 		paperMargin.setPaintTicks(false);
@@ -263,7 +263,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		feedRateControl.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-		feedRate.setText(Double.toString(robot.settings.getFeedRate()));
+		feedRate.setText(Double.toString(robot.getSettings().getFeedRate()));
 		setFeedRate = new JButton(Translator.get("Set"));
 		setFeedRate.addActionListener(this);
 		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
@@ -404,15 +404,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	
+	/**
+	 * Refresh the list of available machine settings.  If we are connected to a machine, select that setting and disable the selection.
+	 */
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
-		machineConfigurations = robot.settings.getKnownMachineNames();
+		machineConfigurations = robot.getSettings().getKnownMachineNames();
 		if( machineConfigurations.length>0 ) {
 			machineChoices = new JComboBox<>(machineConfigurations);
 			machineNumberPanel.add(new JLabel(Translator.get("MachineNumber")));
 			machineNumberPanel.add(machineChoices);
 
-			int index = robot.settings.getKnownMachineIndex();
+			int index = robot.getSettings().getKnownMachineIndex();
 			if( index<0 ) index=0;
 			machineChoices.setSelectedIndex(index);
 			
@@ -435,9 +438,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void stateChanged(ChangeEvent e) {
 		e.getSource();
 		double pm = (100 - paperMargin.getValue()) * 0.01;
-		if (Double.compare(robot.settings.getPaperMargin(), pm) != 0) {
-			robot.settings.setPaperMargin(pm);
-			robot.settings.saveConfig();
+		if (Double.compare(robot.getSettings().getPaperMargin(), pm) != 0) {
+			robot.getSettings().setPaperMargin(pm);
+			robot.getSettings().saveConfig();
 		}
 	}
 
@@ -449,7 +452,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			// TODO: maybe only run this when the machineChoices comboBox changes to a new value
 			int selectedIndex = machineChoices.getSelectedIndex();
 			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-			robot.settings.loadConfig(newUID);
+			robot.getSettings().loadConfig(newUID);
 		}
 		
 		if( subject == buttonRescan ) {
@@ -676,7 +679,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	public void openFileDialog() {
 		// Is you machine not yet calibrated?
-		if (robot.settings.isPaperConfigured() == false) {
+		if (robot.getSettings().isPaperConfigured() == false) {
 			// Hey!  Come back after you calibrate! 
 			JOptionPane.showMessageDialog(null, Translator.get("SetPaperSize"));
 			return;
@@ -752,7 +755,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				i++;
 			}
 			
-			robot.settings.saveConfig();
+			robot.getSettings().saveConfig();
 
 			String destinationFile = gui.getTempDestinationFile();
 
@@ -818,7 +821,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if(lft.canLoad(filename)) {
 				attempted=true;
 				success=lft.load(filename, robot, gui);
-				if(success==true) break;
+				if(success==true) {
+					break;
+				}
 			}
 		}
 		
@@ -827,6 +832,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		if (success == true) {
+			Log.message(Translator.get("Finished"));
+			SoundSystem.playConversionFinishedSound();
 			lastFileIn = filename;
 		}
 

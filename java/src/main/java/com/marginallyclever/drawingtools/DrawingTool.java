@@ -67,7 +67,7 @@ public abstract class DrawingTool {
 
   public void writeChangeTo(Writer out) throws IOException {
     out.write("M06 T" + toolNumber + ";\n");
-    out.write("G00 F" + getFeedRate() + " A"+ robot.settings.getAcceleration() + ";\n");
+    out.write("G00 F" + getFeedRate() + " A"+ robot.getSettings().getAcceleration() + ";\n");
   }
 
   // lower the pen.
