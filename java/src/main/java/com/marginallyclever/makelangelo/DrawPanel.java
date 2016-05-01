@@ -134,7 +134,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
-		repaintNow();
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -158,7 +157,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		}
 		mouseOldX=x;
 		mouseOldY=y;
-		repaint();
 	}
 	public void mouseMoved(MouseEvent e) {}
 
@@ -190,7 +188,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void zoomIn() {
 		cameraZoom *= 3.0d / 4.0d;
-		repaint();
 	}
 
 	/**
@@ -198,7 +195,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void zoomOut() {
 		cameraZoom *= 4.0d / 3.0d;
-		repaint();
 	}
 
 	/**
@@ -231,12 +227,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		} else {
 			gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		}
-	}
-	
-	
-	public void repaintNow() {
-		validate();
-		repaint();
 	}
 	
 	

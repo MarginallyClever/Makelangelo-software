@@ -197,8 +197,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				lock.unlock();
 				adjustCentroids();
 
-				if(drawPanel != null) drawPanel.repaintNow();
-
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while (generation < MAX_GENERATIONS);
 		} catch (Exception e) {

@@ -85,7 +85,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	private MarginallyCleverConnectionManager connectionManager;
 	private MakelangeloRobot robot;
-	private GCodeFile gCode;
 	
 	private Translator translator;
 	
@@ -139,18 +138,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		connectionManager = new SerialConnectionManager(prefs);
 		
 		createAndShowGUI();
-	}
-	
-	
-	public void updateMachineConfig() {
-		if (drawPanel != null) {
-			drawPanel.zoomToFitPaper();
-		}
-	}
-	
-	
-	public String getTempDestinationFile() {
-		return System.getProperty("user.dir") + "/temp.ngc";
 	}
 	
 	
@@ -224,27 +211,27 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	public void sendFileCommand() {
 		if (robot.isRunning() == false 
 				|| robot.isPaused() == true 
-				|| gCode==null
-				|| gCode.isFileOpened() == false 
+				|| robot.gCode==null
+				|| robot.gCode.isFileOpened() == false 
 				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
 			return;
 
 		// are there any more commands?
-		if( gCode.moreLinesAvailable() == false )  {
+		if( robot.gCode.moreLinesAvailable() == false )  {
 			// end of file
 			robot.halt();
 			// bask in the glory
-			int x = gCode.getLinesTotal();
+			int x = robot.gCode.getLinesTotal();
 			if(robotPanel!=null) robotPanel.statusBar.setProgress(x, x);
 			
 			SoundSystem.playDrawingFinishedSound();
 		} else {
-			int lineNumber = gCode.getLinesProcessed();
-			String line = gCode.nextLine();
+			int lineNumber = robot.gCode.getLinesProcessed();
+			String line = robot.gCode.nextLine();
 			
 			robot.tweakAndSendLine( line, lineNumber, translator );
 	
-			if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+			if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, robot.gCode.getLinesTotal());
 			// loop until we find a line that gets sent to the robot, at which point we'll
 			// pause for the robot to respond.  Also stop at end of file.
 		}
@@ -253,10 +240,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	public void startAt(int lineNumber) {
-		if(gCode==null) return;
+		if(robot.gCode==null) return;
 		
-		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString()));
-		robot.setLineNumber(gCode.getLinesProcessed());
+		robot.gCode.setLinesProcessed(robot.gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString()));
+		robot.setLineNumber(robot.gCode.getLinesProcessed());
 		robot.setRunning();
 		sendFileCommand();
 	}
@@ -560,20 +547,22 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// start animation system        
         final Animator animator = new Animator();
         mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent e) {
-              // Run this on another thread than the AWT event queue to
-              // make sure the call to Animator.stop() completes before
-              // exiting
-              new Thread(new Runnable() {
-                  public void run() {
-                    animator.stop();
-                    System.exit(0);
-                  }
-                }).start();
-            }
-          });
+        	public void windowClosing(java.awt.event.WindowEvent e) {
+        		// Run this on another thread than the AWT event queue to
+        		// make sure the call to Animator.stop() completes before
+        		// exiting
+        		new Thread(new Runnable() {
+        			public void run() {
+        				animator.stop();
+        				System.exit(0);
+        			}
+        		}).start();
+        	}
+        });
+        animator.add(drawPanel);
+        animator.start();
+
         
-                
 		// 2015-05-03: option is meaningless, robot.connectionToRobot doesn't exist when software starts.
 		// if(prefs.getBoolean("Reconnect to last port on start", false)) robot.connectionToRobot.reconnect();
 		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
@@ -587,14 +576,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		return drawPanel;
 	}
 
-	
-	public GCodeFile getGCode() {
-		return gCode;
-	}
-	public void setGCode(GCodeFile file) {
-		gCode = file;
-	}
-	
 	
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
@@ -623,7 +604,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void lineError(MakelangeloRobot r,int lineNumber) {
-        if(gCode!=null) gCode.setLinesProcessed(lineNumber);
+        if(robot.gCode!=null) robot.gCode.setLinesProcessed(lineNumber);
         sendFileCommand();
 	}
 

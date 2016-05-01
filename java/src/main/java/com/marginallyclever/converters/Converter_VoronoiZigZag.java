@@ -181,8 +181,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 			// once|=transposeBackwardTest();
 
 			once |= flipTests();
-			if (drawPanel != null)
-				drawPanel.repaintNow();
 			gen++;
 			Log.write("green", "Generation " + gen);
 		}
@@ -412,9 +410,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 				tessellateVoronoiDiagram();
 				lock.unlock();
 				adjustCentroids();
-
-				if (drawPanel != null)
-					drawPanel.repaintNow();
 
 				// Do again if things are still moving a lot. Cap the # of times
 				// so we don't have an infinite loop.

@@ -636,9 +636,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	public void newFile() {
-		gui.setGCode(null);
+		robot.setGCode(null);
 		gui.updateMenuBar();
-		gui.updateMachineConfig();
 	}
 
 	/**
@@ -725,23 +724,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			
 			robot.getSettings().saveConfig();
 
-			String destinationFile = gui.getTempDestinationFile();
+			String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
 
-			chosenGenerator.setDrawPanel(gui.getDrawPanel());
 			robot.setDecorator(chosenGenerator);
-			chosenGenerator.setMachine(robot);
+			chosenGenerator.setRobot(robot);
 			chosenGenerator.generate(destinationFile);
-			chosenGenerator.setDrawPanel(null);
 			robot.setDecorator(null);
 
 			LoadGCode loader = new LoadGCode();
-			loader.load(destinationFile,robot,gui);
-			
-			SoundSystem.playConversionFinishedSound();
+			loader.load(destinationFile,robot);
 
-			// Force update of graphics layout.
-			gui.updateMachineConfig();
-			gui.getDrawPanel().repaintNow();
+			Log.message(Translator.get("Finished"));
+			SoundSystem.playConversionFinishedSound();
 		}
 	}
 
@@ -762,7 +756,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			}
 
 			try {
-				gui.getGCode().save(selectedFile);
+				robot.gCode.save(selectedFile);
 			} catch (IOException e) {
 				Log.error(Translator.get("Failed") + e.getMessage());
 				return;
@@ -786,7 +780,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			LoadFileType lft = i.next();
 			if(lft.canLoad(filename)) {
 				attempted=true;
-				success=lft.load(filename, robot, gui);
+				success=lft.load(filename, robot);
 				if(success==true) {
 					break;
 				}
@@ -798,9 +792,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		if (success == true) {
+			lastFileIn = filename;
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
-			lastFileIn = filename;
 		}
 
 		gui.updateMenuBar();

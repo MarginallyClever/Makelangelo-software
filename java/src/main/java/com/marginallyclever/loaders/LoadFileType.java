@@ -2,7 +2,6 @@ package com.marginallyclever.loaders;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public interface LoadFileType {
@@ -25,5 +24,5 @@ public interface LoadFileType {
 	 * @param filename
 	 * @return true if load successful.
 	 */
-	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui);
+	public boolean load(String filename,MakelangeloRobot robot);
 }

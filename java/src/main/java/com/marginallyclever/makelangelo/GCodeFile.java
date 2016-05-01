@@ -38,6 +38,22 @@ public class GCodeFile {
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 	private ReentrantLock lock = new ReentrantLock();
 
+	// optimization - turn gcode into vectors once on load, draw vectors after that.
+	private enum NodeType {
+		COLOR, POS, TOOL
+	}
+
+	class DrawPanelNode {
+		double x1, y1, x2, y2;
+		Color c;
+		int tool_id;
+		int line_number;
+		NodeType type;
+	}
+
+	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
+
+
 	
 	public GCodeFile() {}
 	
@@ -308,25 +324,6 @@ public class GCodeFile {
 	public boolean isLoaded() {
 		return (isFileOpened() && lines != null && lines.size() > 0);
 	}
-	
-	
-
-	// optimization - turn gcode into vectors once on load, draw vectors after that.
-	private enum NodeType {
-		COLOR, POS, TOOL
-	}
-
-	class DrawPanelNode {
-		double x1, y1, x2, y2;
-		Color c;
-		int tool_id;
-		int line_number;
-		NodeType type;
-	}
-
-	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
-
-
 
 	public void render( GL2 gl2, MakelangeloRobot robot ) {
 		if(lock.isLocked()) return;

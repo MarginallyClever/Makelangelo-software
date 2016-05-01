@@ -58,7 +58,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
-	GCodeFile gCode;
+	public GCodeFile gCode;
 	
 	
 	public MakelangeloRobot(Translator translator) {
@@ -412,6 +412,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void goHome() {
 		sendLineToRobot("G00 X0 Y0");
+		gondolaX=0;
+		gondolaY=0;
 	}
 	
 	

@@ -6,7 +6,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -24,7 +23,7 @@ public class LoadGCode implements LoadFileType {
 	}
 
 	@Override
-	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
+	public boolean load(String filename,MakelangeloRobot robot) {
 		if(robot.getSettings().isReverseForGlass()) {
 			Log.message("Flipping for glass...");
 		}
@@ -42,9 +41,7 @@ public class LoadGCode implements LoadFileType {
 				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
 				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
 
-		gui.setGCode(file);
 		robot.setGCode(file);
-		gui.getDrawPanel().repaintNow();
 		return true;
 	}
 }

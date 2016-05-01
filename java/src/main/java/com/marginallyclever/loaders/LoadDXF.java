@@ -33,7 +33,6 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -50,8 +49,8 @@ public class LoadDXF implements LoadFileType {
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
-		final String destinationFile = gui.getTempDestinationFile();
+	public boolean load(String filename,MakelangeloRobot robot) {
+		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 
 		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -268,7 +267,7 @@ public class LoadDXF implements LoadFileType {
 				pm.close();
 				if (ok) {
 					LoadGCode loader = new LoadGCode();
-					loader.load(destinationFile, robot, gui);
+					loader.load(destinationFile, robot);
 				}
 			}
 		};
