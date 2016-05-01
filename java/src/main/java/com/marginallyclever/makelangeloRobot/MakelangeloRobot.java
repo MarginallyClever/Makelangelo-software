@@ -11,8 +11,11 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -46,10 +49,16 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean penIsUp;
 	private boolean penIsUpBeforePause;
 	private boolean hasSetHome;
+	public float gondolaX,gondolaY;
+
+	// rendering stuff
+	public boolean showPenUpMoves=false;
+	private DrawPanelDecorator drawDecorator=null;
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
+	GCodeFile gCode;
 	
 	
 	public MakelangeloRobot(Translator translator) {
@@ -61,7 +70,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		penIsUp = false;
 		penIsUpBeforePause = false;
 		hasSetHome = false;
-		hasSetHome=false;
+		gondolaX = 0;
+		gondolaY = 0;
 	}
 	
 	public MarginallyCleverConnection getConnection() {
@@ -408,6 +418,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void setHome() {
 		sendLineToRobot("G92 X0 Y0");
 		hasSetHome=true;
+		gondolaX=0;
+		gondolaY=0;
 	}
 	
 	
@@ -420,6 +432,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot("G00"+
 						" X" + x +
 						" Y" + y);
+		gondolaX=x;
+		gondolaY=y;
 	}
 	
 	public void movePenRelative(float dx,float dy) {
@@ -428,14 +442,16 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				" X" + dx +
 				" Y" + dy);
 		sendLineToRobot("G90");  // return to absolute mode
+		gondolaX+=dx;
+		gondolaY+=dy;
 	}
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
 	
-	public void movePenToEdgeLeft()   {		sendLineToRobot("G00 X" + settings.getPaperLeft()   * 10);	}
-	public void movePenToEdgeRight()  {		sendLineToRobot("G00 X" + settings.getPaperRight()  * 10);	}
-	public void movePenToEdgeTop()    {		sendLineToRobot("G00 Y" + settings.getPaperTop()    * 10);	}
-	public void movePenToEdgeBottom() {		sendLineToRobot("G00 Y" + settings.getPaperBottom() * 10);	}
+	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
+	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
+	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX,(float)settings.getPaperTop()   *10);  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX,(float)settings.getPaperBottom()*10);  }
 	
 	public void disengageMotors() {		sendLineToRobot("M17");	areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M18");	areMotorsEngaged=true; }
@@ -457,4 +473,256 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		
 		return myPanel;
 	}
+
+
+	public void setGCode(GCodeFile gcode) {
+		gCode = gcode;
+		if(gCode!=null) gCode.emptyNodeBuffer();
+	}
+
+
+	public void setDecorator(DrawPanelDecorator dd) {
+		drawDecorator = dd;
+		if(gCode!=null) gCode.emptyNodeBuffer();
+	}
+	
+	
+	public void render(GL2 gl2) {
+		paintLimits(gl2);
+		paintCenter(gl2);
+		paintMotors(gl2);
+		paintGondolaAndCounterweights(gl2);
+		// TODO draw control box?
+
+		if(drawDecorator!=null) {
+			// filters can also draw WYSIWYG previews while converting.
+			drawDecorator.render(gl2,settings);
+			return;
+		}
+
+		if(gCode!=null) gCode.render(gl2,this);
+	}
+
+	// draw left motor, right motor
+	private void paintMotors( GL2 gl2 ) {
+		gl2.glColor3f(1,0.8f,0.5f);
+		// left frame
+		gl2.glPushMatrix();
+		gl2.glTranslatef(-2.1f, 2.1f, 0);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(settings.getLimitLeft()-5f, settings.getLimitTop()+5f);
+		gl2.glVertex2d(settings.getLimitLeft()+5f, settings.getLimitTop()+5f);
+		gl2.glVertex2d(settings.getLimitLeft()+5f, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft()   , settings.getLimitTop()-5f);
+		gl2.glVertex2d(settings.getLimitLeft()-5f, settings.getLimitTop()-5f);
+		gl2.glEnd();
+		gl2.glPopMatrix();
+
+		// right frame
+		gl2.glPushMatrix();
+		gl2.glTranslatef(2.1f, 2.1f, 0);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(settings.getLimitRight()+5f, settings.getLimitTop()+5f);
+		gl2.glVertex2d(settings.getLimitRight()-5f, settings.getLimitTop()+5f);
+		gl2.glVertex2d(settings.getLimitRight()-5f, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()   , settings.getLimitTop()-5f);
+		gl2.glVertex2d(settings.getLimitRight()+5f, settings.getLimitTop()-5f);
+		gl2.glEnd();
+		gl2.glPopMatrix();
+
+		// left motor
+		gl2.glColor3f(0,0,0);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(settings.getLimitLeft()-4.2f, settings.getLimitTop()+4.2f);
+		gl2.glVertex2d(settings.getLimitLeft()     , settings.getLimitTop()+4.2f);
+		gl2.glVertex2d(settings.getLimitLeft()     , settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft()-4.2f, settings.getLimitTop());
+		// right motor
+		gl2.glVertex2d(settings.getLimitRight()     , settings.getLimitTop()+4.2f);
+		gl2.glVertex2d(settings.getLimitRight()+4.2f, settings.getLimitTop()+4.2f);
+		gl2.glVertex2d(settings.getLimitRight()+4.2f, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()     , settings.getLimitTop());
+		gl2.glEnd();
+	}
+
+
+	private void paintGondolaAndCounterweights( GL2 gl2 ) {
+		double dx,dy;
+
+		double mw = settings.getLimitRight()-settings.getLimitLeft();
+		double mh = settings.getLimitTop()-settings.getLimitBottom();
+		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
+
+		dx = gondolaX - settings.getLimitLeft();
+		dy = gondolaY - settings.getLimitTop();
+		double left_a = Math.sqrt(dx*dx+dy*dy);
+		double left_b = suggested_length - left_a;
+
+		dx = gondolaX - settings.getLimitRight();
+		double right_a = Math.sqrt(dx*dx+dy*dy);
+		double right_b = suggested_length - right_a;
+
+		if(gondolaX<settings.getLimitLeft()) return;
+		if(gondolaX>settings.getLimitRight()) return;
+		if(gondolaY>settings.getLimitTop()) return;
+		if(gondolaY<settings.getLimitBottom()) return;
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glColor3d(0.2,0.2,0.2);
+		// motor to gondola left
+		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
+		gl2.glVertex2d(gondolaX,gondolaY);
+		// motor to counterweight left
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75, settings.getLimitTop()-left_b);
+		// motor to gondola right
+		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
+		gl2.glVertex2d(gondolaX,gondolaY);
+		// motor to counterweight right
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop()-right_b);
+		gl2.glEnd();
+		// gondola
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		float f;
+		float r=4; // circle radius
+		for(f=0;f<2.0*Math.PI;f+=0.3f) {
+			gl2.glVertex2d(gondolaX+Math.cos(f)*r,gondolaY+Math.sin(f)*r);
+		}
+		gl2.glEnd();
+		// counterweight left
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75-1.5,settings.getLimitTop()-left_b);
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75+1.5,settings.getLimitTop()-left_b);
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75+1.5,settings.getLimitTop()-left_b-15);
+		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75-1.5,settings.getLimitTop()-left_b-15);
+		gl2.glEnd();
+		// counterweight right
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75-1.5,settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75+1.5,settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75+1.5,settings.getLimitTop()-right_b-15);
+		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75-1.5,settings.getLimitTop()-right_b-15);
+		gl2.glEnd();
+		
+		/*
+		// bottom clearance arcs
+		// right
+		gl2.glColor3d(0.6, 0.6, 0.6);
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft()+2.1;
+		double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
+		r=(float)Math.sqrt(h*h + w*w); // circle radius
+		gx = machine.getSettings().getLimitLeft() - 2.1;
+		gy = machine.getSettings().getLimitTop() + 2.1;
+		double start = (float)1.5*(float)Math.PI;
+		double end = (2*Math.PI-Math.atan(h/w));
+		double v;
+		for(v=0;v<=1.0;v+=0.1) {
+			double vi = (end-start)*v + start;
+			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		}
+		gl2.glEnd();
+		
+		// left
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		gx = machine.getSettings().getLimitRight() + 2.1;
+		start = (float)(1*Math.PI+Math.atan(h/w));
+		end = (float)1.5*(float)Math.PI;
+		for(v=0;v<=1.0;v+=0.1) {
+			double vi = (end-start)*v + start;
+			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		}
+		gl2.glEnd();
+		*/
+	}
+
+
+
+	/**
+	 * draw the machine edges and paper edges
+	 *
+	 * @param gl2
+	 */
+	private void paintLimits(GL2 gl2) {
+		gl2.glColor3f(0.7f, 0.7f, 0.7f);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
+		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
+		gl2.glEnd();
+		
+		if (!isPortConfirmed()) {
+			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
+			gl2.glColor3f(1, 1, 1);
+			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
+			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
+			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+			gl2.glEnd();
+		} else {
+			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
+			gl2.glColor3f(1, 1, 1);
+			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
+			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
+			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+			gl2.glEnd();
+		}
+		// margin settings
+		gl2.glPushMatrix();
+		gl2.glColor3f(0.9f,0.9f,0.9f);
+		gl2.glLineWidth(1);
+		gl2.glScaled(settings.getPaperMargin(),settings.getPaperMargin(),1);
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glEnd();
+		gl2.glPopMatrix();
+	}
+
+
+	/**
+	 * draw calibration point
+	 * @param gl2
+	 */
+	private void paintCenter(GL2 gl2) {
+		gl2.glColor3f(1,0,0);
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glVertex2f(-0.25f,0.0f);
+		gl2.glVertex2f( 0.25f,0.0f);
+		gl2.glVertex2f(0.0f,-0.25f);
+		gl2.glVertex2f(0.0f, 0.25f);
+		gl2.glEnd();
+	}
+
+
+	/**
+	 * Toggle pen up moves.
+	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
+ 	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
+	 */
+	public void setShowPenUp(boolean state) {
+		showPenUpMoves = state;
+		if(gCode!=null) {
+			gCode.changed = true;
+			gCode.emptyNodeBuffer();
+		}
+	}
+
+	
+	/**
+	 * @return the "show pen up" flag
+	 */
+	public boolean getShowPenUp() {
+		return showPenUpMoves;
+	}
+
 }

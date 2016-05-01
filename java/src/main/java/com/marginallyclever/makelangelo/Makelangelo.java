@@ -48,6 +48,7 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.util.Animator;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -143,7 +144,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	public void updateMachineConfig() {
 		if (drawPanel != null) {
-			drawPanel.updateMachineConfig();
 			drawPanel.zoomToFitPaper();
 		}
 	}
@@ -213,7 +213,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
 			graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
 
-			drawPanel.setShowPenUp(show_pen_up.isSelected());
+			robot.setShowPenUp(show_pen_up.isSelected());
 		}
 	}
 
@@ -556,6 +556,24 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 		drawPanel.zoomToFitPaper();
 
+
+		// start animation system        
+        final Animator animator = new Animator();
+        mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+              // Run this on another thread than the AWT event queue to
+              // make sure the call to Animator.stop() completes before
+              // exiting
+              new Thread(new Runnable() {
+                  public void run() {
+                    animator.stop();
+                    System.exit(0);
+                  }
+                }).start();
+            }
+          });
+        
+                
 		// 2015-05-03: option is meaningless, robot.connectionToRobot doesn't exist when software starts.
 		// if(prefs.getBoolean("Reconnect to last port on start", false)) robot.connectionToRobot.reconnect();
 		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
@@ -584,7 +602,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// the default settings must always match the values in the Marginally Clever tutorials.
 		// the default settings must always match the Marginally Clever kit.
 		
-		drawPanel.updateMachineConfig();
 		drawPanel.repaint();
 		if(robotPanel!=null) robotPanel.updateMachineNumberPanel();
 		if(robotPanel!=null) robotPanel.updateButtonAccess();

@@ -1,11 +1,18 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.prefs.Preferences;
+
+import com.jogamp.opengl.GL2;
+import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * contains the text for a gcode file.
@@ -27,6 +34,9 @@ public class GCodeFile {
 	public float scale = 1.0f;
 	public float feedRate = 1.0f;
 	public boolean changed = false;
+
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+	private ReentrantLock lock = new ReentrantLock();
 
 	
 	public GCodeFile() {}
@@ -238,8 +248,8 @@ public class GCodeFile {
 		
 		toMatch = "G00 Z"+toMatch;
 		while(x>1) {
-			String line = lines.get(x).trim().substring(0, toMatch.length());
-			if(line.equals(toMatch)) {
+			String line = lines.get(x).trim();
+			if(line.startsWith(toMatch)) {
 				return x;
 			}
 			--x;
@@ -297,6 +307,267 @@ public class GCodeFile {
 
 	public boolean isLoaded() {
 		return (isFileOpened() && lines != null && lines.size() > 0);
+	}
+	
+	
+
+	// optimization - turn gcode into vectors once on load, draw vectors after that.
+	private enum NodeType {
+		COLOR, POS, TOOL
+	}
+
+	class DrawPanelNode {
+		double x1, y1, x2, y2;
+		Color c;
+		int tool_id;
+		int line_number;
+		NodeType type;
+	}
+
+	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
+
+
+
+	public void render( GL2 gl2, MakelangeloRobot robot ) {
+		if(lock.isLocked()) return;
+		lock.lock();
+		try {
+			renderLocked(gl2,robot);
+		}
+		finally {
+			lock.unlock();
+		}
+	}
+	
+	
+	private void renderLocked( GL2 gl2, MakelangeloRobot robot ) {
+		int linesProcessed = getLinesProcessed();
+		optimizeNodes(robot);
+
+		int lookAhead=500;
+
+		DrawingTool tool = robot.getSettings().getTool(0);
+		gl2.glColor3f(0, 0, 0);
+
+		boolean drawAllWhileRunning = false;
+		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
+			
+		// draw image
+		if (fastNodes.size() > 0) {
+			// draw the nodes
+			Iterator<DrawPanelNode> nodes = fastNodes.iterator();
+			while (nodes.hasNext()) {
+				DrawPanelNode n = nodes.next();
+
+				if (robot.isRunning()) {
+					if (n.line_number < linesProcessed) {
+						gl2.glColor3f(1, 0, 0);
+						//g2d.setColor(Color.RED);
+						if(n.type==NodeType.POS) {
+							robot.gondolaX=(float)n.x1;
+							robot.gondolaY=(float)n.y1;
+						}
+					} else if (n.line_number <= linesProcessed + lookAhead) {
+						gl2.glColor3f(0, 1, 0);
+						//g2d.setColor(Color.GREEN);
+					} else if (drawAllWhileRunning == false) {
+						break;
+					}
+				}
+
+				switch (n.type) {
+				case TOOL:
+					tool = robot.getSettings().getTool(n.tool_id);
+					gl2.glLineWidth(tool.getDiameter());
+					break;
+				case COLOR:
+					if (!robot.isRunning() || n.line_number > linesProcessed + lookAhead) {
+						//g2d.setColor(n.c);
+						gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
+					}
+					break;
+				default:
+					tool.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
+					break;
+				}
+			}
+		}
+	}
+
+	
+	private void addNodePos(int i, double x1, double y1, double x2, double y2) {
+		DrawPanelNode n = new DrawPanelNode();
+		n.line_number = i;
+		n.x1 = x1;
+		n.x2 = x2;
+		n.y1 = y1;
+		n.y2 = y2;
+		n.type = NodeType.POS;
+
+		fastNodes.add(n);
+	}
+
+	private void addNodeColor(int i, Color c) {
+		DrawPanelNode n = new DrawPanelNode();
+		n.line_number = i;
+		n.c = c;
+		n.type = NodeType.COLOR;
+
+		fastNodes.add(n);
+	}
+
+	private void addNodeTool(int i, int tool_id) {
+		DrawPanelNode n = new DrawPanelNode();
+		n.line_number = i;
+		n.tool_id = tool_id;
+		n.type = NodeType.TOOL;
+
+		fastNodes.add(n);
+	}
+
+	public void emptyNodeBuffer() {
+		while(lock.isLocked());
+		lock.lock();
+		fastNodes.clear();
+		lock.unlock();
+	}
+
+	private void optimizeNodes( MakelangeloRobot robot ) {
+		if (!fastNodes.isEmpty() && changed == false) return;
+		changed = false;
+
+		DrawingTool tool = robot.getSettings().getTool(0);
+
+		float drawScale = 0.1f;
+		// arc smoothness - increase to make more smooth and run slower.
+		double STEPS_PER_DEGREE=1;
+		
+		
+		float px = 0, py = 0, pz = 90;
+		float x, y, z, ai, aj;
+		int i, j;
+		boolean absMode = true;
+		String tool_change = "M06 T";
+		Color tool_color = Color.BLACK;
+
+		Iterator<String> commands = getLines().iterator();
+		i = 0;
+		while (commands.hasNext()) {
+			String line = commands.next();
+			++i;
+			String[] pieces = line.split(";");
+			if (pieces.length == 0) continue;
+
+			if (line.startsWith(tool_change)) {
+				String numberOnly = line.substring(tool_change.length()).replaceAll("[^0-9]", "");
+				int id = (int) Integer.valueOf(numberOnly, 10);
+				addNodeTool(i, id);
+				switch (id) {
+				case 1:					tool_color = Color.RED;					break;
+				case 2:					tool_color = Color.GREEN;				break;
+				case 3:					tool_color = Color.BLUE;				break;
+				default:				tool_color = Color.BLACK;				break;
+				}
+				continue;
+			}
+
+			String[] tokens = pieces[0].split("\\s");
+			if (tokens.length == 0) continue;
+
+			// have we changed scale?
+			// what are our coordinates?
+			x = px;
+			y = py;
+			z = pz;
+			ai = px;
+			aj = py;
+			for (j = 0; j < tokens.length; ++j) {
+				if (tokens[j].equals("G20")) drawScale = 2.54f; // in->cm
+				else if (tokens[j].equals("G21")) drawScale = 0.10f; // mm->cm
+				else if (tokens[j].equals("G90")) {
+					absMode = true;
+					break;
+				} else if (tokens[j].equals("G91")) {
+					absMode = false;
+					break;
+				} else if (tokens[j].equals("G54")) break;
+				else if (tokens[j].startsWith("X")) {
+					float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
+					x = absMode ? tx : x + tx;
+				} else if (tokens[j].startsWith("Y")) {
+					float ty = Float.valueOf(tokens[j].substring(1)) * drawScale;
+					y = absMode ? ty : y + ty;
+				} else if (tokens[j].startsWith("Z")) {
+					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
+					z = absMode ? tz : z + tz;
+				}
+				if (tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
+				if (tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
+			}
+			if (j < tokens.length) continue;
+
+			tool.drawZ(z);
+			if (tool.isDrawOff()) {
+				if (robot.getShowPenUp() == false) {
+					px = x;
+					py = y;
+					pz = z;
+					continue;
+				}
+				addNodeColor(i, Color.BLUE);
+			} else if (tool.isDrawOn()) {
+				addNodeColor(i, tool_color);  // TODO use actual pen color
+			} else {
+				addNodeColor(i, Color.ORANGE);
+			}
+
+			// what kind of motion are we going to make?
+			if (tokens[0].equals("G00") || tokens[0].equals("G0") ||
+				tokens[0].equals("G01") || tokens[0].equals("G1")) {
+				addNodePos(i, px, py, x, y);
+			} else if (tokens[0].equals("G02") || tokens[0].equals("G2") ||
+					tokens[0].equals("G03") || tokens[0].equals("G3")) {
+				// draw an arc
+
+				// clockwise or counter-clockwise?
+				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
+
+				double dx = px - ai;
+				double dy = py - aj;
+				double radius = Math.sqrt(dx * dx + dy * dy);
+
+				// find angle of arc (sweep)
+				double angle1 = atan3(dy, dx);
+				double angle2 = atan3(y - aj, x - ai);
+				double theta = angle2 - angle1;
+
+				if (dir > 0 && theta < 0) angle2 += Math.PI * 2.0;
+				else if (dir < 0 && theta > 0) angle1 += Math.PI * 2.0;
+
+				theta = angle2 - angle1;
+
+				double len = Math.abs(theta) * radius;
+				double segments = len * STEPS_PER_DEGREE * 2.0;
+				double nx, ny, angle3, scale;
+
+				// Draw the arc from a lot of little line segments.
+				for (int k = 0; k < segments; ++k) {
+					scale = (double) k / segments;
+					angle3 = theta * scale + angle1;
+					nx = ai + Math.cos(angle3) * radius;
+					ny = aj + Math.sin(angle3) * radius;
+
+					addNodePos(i, px, py, nx, ny);
+					px = (float) nx;
+					py = (float) ny;
+				}
+				addNodePos(i, px, py, x, y);
+			}
+
+			px = x;
+			py = y;
+			pz = z;
+		}  // for ( each instruction )
 	}
 }
 

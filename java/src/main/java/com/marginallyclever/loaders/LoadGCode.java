@@ -43,7 +43,7 @@ public class LoadGCode implements LoadFileType {
 				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
 
 		gui.setGCode(file);
-		gui.getDrawPanel().setGCode(file);
+		robot.setGCode(file);
 		gui.getDrawPanel().repaintNow();
 		return true;
 	}

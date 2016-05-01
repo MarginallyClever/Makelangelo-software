@@ -728,13 +728,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			String destinationFile = gui.getTempDestinationFile();
 
 			chosenGenerator.setDrawPanel(gui.getDrawPanel());
-			gui.getDrawPanel().setDecorator(chosenGenerator);
-
+			robot.setDecorator(chosenGenerator);
 			chosenGenerator.setMachine(robot);
 			chosenGenerator.generate(destinationFile);
-
 			chosenGenerator.setDrawPanel(null);
-			gui.getDrawPanel().setDecorator(null);
+			robot.setDecorator(null);
 
 			LoadGCode loader = new LoadGCode();
 			loader.load(destinationFile,robot,gui);

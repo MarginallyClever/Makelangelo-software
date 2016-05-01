@@ -189,10 +189,10 @@ public class LoadImage implements LoadFileType {
 
 					converter.setDrawPanel(gui.getDrawPanel());
 					converter.setMachine(robot);
-					gui.getDrawPanel().setDecorator(converter);
+					robot.setDecorator(converter);
 					converter.convert(img, out);
 					converter.setDrawPanel(null);
-					gui.getDrawPanel().setDecorator(null);
+					robot.setDecorator(null);
 
 					if (robot.getSettings().shouldSignName()) {
 						// Sign name
