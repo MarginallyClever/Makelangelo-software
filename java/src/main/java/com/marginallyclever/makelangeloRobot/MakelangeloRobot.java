@@ -30,36 +30,37 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String robotTypeName = "DRAWBOT";
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
-	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.
+	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
 		
-	// Settings go here
 	private MakelangeloRobotSettings settings = null;
-	
-	// control panel
 	private MakelangeloRobotPanel myPanel = null;
 	
-	// Current state goes here
+	// Connection state
 	private MarginallyCleverConnection connection = null;
-	private boolean portConfirmed = false;
+	private boolean portConfirmed;
 
+	// misc state
+	private boolean areMotorsEngaged;
+	private boolean isRunning;
+	private boolean isPaused;
+	private boolean penIsUp;
+	private boolean penIsUpBeforePause;
+	private boolean hasSetHome;
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
-    private boolean areMotorsEngaged = true;
-	private boolean isRunning = false;
-	private boolean isPaused = true;
-	
-	// current pen state
-	private boolean penIsUp = false;
-	private boolean penIsUpBeforePause = false;
-	
-	// current location
-	private boolean hasSetHome;
 	
 	
 	public MakelangeloRobot(Translator translator) {
 		settings = new MakelangeloRobotSettings(translator, this);
+		portConfirmed = false;
+		areMotorsEngaged = true;
+		isRunning = false;
+		isPaused = false;
+		penIsUp = false;
+		penIsUpBeforePause = false;
+		hasSetHome = false;
 		hasSetHome=false;
 	}
 	
@@ -286,8 +287,16 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		isPaused = false;
 	}
 	
-	public void setRunning(boolean running) {
-		isRunning = running;
+	public void halt() {
+		isRunning = false;
+		if(isPaused) isPaused=false;  // do not lower pen
+		if(myPanel != null) myPanel.updateButtonAccess();
+	}
+	
+	public void setRunning() {
+		isRunning = true;
+		if(myPanel != null) myPanel.statusBar.start();
+		if(myPanel != null) myPanel.updateButtonAccess();
 	}
 	
 	public void raisePen() {

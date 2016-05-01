@@ -84,26 +84,11 @@ public class Converter_Sandy extends ImageConverter {
 		double cx,cy;
 
 		switch(direction) {
-		case 0:
-			cx = machine.getLimitRight()*10;
-			cy = machine.getLimitTop()*10;
-			break;
-		case 1:
-			cx = machine.getLimitLeft()*10;
-			cy = machine.getLimitTop()*10;
-			break;
-		case 2:
-			cx = machine.getLimitLeft()*10;
-			cy = machine.getLimitBottom()*10;
-			break;
-		case 3:
-			cx = machine.getLimitLeft()*10;
-			cy = machine.getLimitBottom()*10;
-			break;
-		default:
-			cx = 0;
-			cy = 0;
-			break;
+		case 0:		cx = xRight;	cy = yTop;		break;
+		case 1:		cx = xLeft;		cy = yTop;		break;
+		case 2:		cx = xLeft;		cy = yBottom;	break;
+		case 3:		cx = xRight;	cy = yBottom;	break;
+		default:	cx = 0;			cy = 0;			break;
 		}
 
 		double x, y, z, scaleZ;

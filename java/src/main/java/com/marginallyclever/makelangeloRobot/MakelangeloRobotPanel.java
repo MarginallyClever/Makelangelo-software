@@ -455,71 +455,39 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.getSettings().loadConfig(newUID);
 		}
 		
-		if( subject == buttonRescan ) {
-			rescanConnections();
-			return;
-		}
-
-		if (subject == openConfig) {
+		if( subject == buttonRescan ) rescanConnections();
+		else if (subject == openConfig) {
 			Frame frame = (Frame)this.getRootPane().getParent();
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
 			m.run();
-			return;
 		}
-
-		if (subject == buttonNewFile) {
-			newFile();
-			return;
-		}
-		if (subject == buttonOpenFile) {
-			openFileDialog();
-			return;
-		}
-		if (subject == buttonGenerate) {
-			generateImage();
-			return;
-		}
-		if (subject == buttonSaveFile) {
-			saveFileDialog();
-			return;
-		}
-
-		if (subject == buttonStart) {
-			gui.startAt(0);
-			return;
-		}
-		if (subject == buttonStartAt) {
+		else if (subject == buttonNewFile) newFile();
+		else if (subject == buttonOpenFile) openFileDialog();
+		else if (subject == buttonGenerate) generateImage();
+		else if (subject == buttonSaveFile) saveFileDialog();
+		else if (subject == buttonStart) gui.startAt(0);
+		else if (subject == buttonStartAt) {
 			int lineNumber = getStartingLineNumber();
 			if (lineNumber != -1) {
 				gui.startAt(lineNumber);
 			}
 			return;
 		}
-		if (subject == buttonPause) {
+		else if (subject == buttonPause) {
 			// toggle pause
 			if (robot.isPaused() == true) {
-				// we were paused.
-				// update button text
 				buttonPause.setText(Translator.get("Pause"));
-				// ready
 				robot.unPause();
-				// TODO: if the robot is not ready to unpause, this
-				// might fail and the program would appear to hang until
-				// a dis- and re-connect.
+				// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
 				gui.sendFileCommand();
 			} else {
 				robot.pause();
-				// change button text
 				buttonPause.setText(Translator.get("Unpause"));
 			}
 			return;
 		}
-		if (subject == buttonHalt) {
-			gui.halt();
-			return;
-		}
-		
-		if      (subject == goHome  ) robot.goHome();
+		else if (subject == buttonHalt) robot.halt();		
+		else if (subject == goHome  ) robot.goHome();
 		else if (subject == setHome ) {
 			robot.setHome();
 			updateButtonAccess();
@@ -531,7 +499,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
 		else if (subject == setFeedRate) {
-			// get the feedrate value
+			// get the feed rate
 			String fr = feedRate.getText();
 			fr = fr.replaceAll("[ ,]", "");
 			// trim it to 3 decimal places

@@ -270,7 +270,6 @@ public class LoadDXF implements LoadFileType {
 					LoadGCode loader = new LoadGCode();
 					loader.load(destinationFile, robot, gui);
 				}
-				gui.halt();
 			}
 		};
 

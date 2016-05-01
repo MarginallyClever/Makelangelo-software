@@ -232,8 +232,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// are there any more commands?
 		if( gCode.moreLinesAvailable() == false )  {
 			// end of file
-			// stop robot
-			halt();
+			robot.halt();
 			// bask in the glory
 			int x = gCode.getLinesTotal();
 			if(robotPanel!=null) robotPanel.statusBar.setProgress(x, x);
@@ -253,30 +252,16 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 
-	/**
-	 * Stop sending file commands to the robot.
-	 * TODO add an e-stop command?
-	 */
-	public void halt() {
-		robot.setRunning(false);
-		robot.unPause();
-		drawPanel.repaint();
-		if(robotPanel != null) robotPanel.updateButtonAccess();
-	}
-
 	public void startAt(int lineNumber) {
 		if(gCode==null) return;
 		
 		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString()));
 		robot.setLineNumber(gCode.getLinesProcessed());
-
-		robot.unPause();
-		robot.setRunning(true);
-		if(robotPanel != null) robotPanel.updateButtonAccess();
-		if(robotPanel != null) robotPanel.statusBar.start();
+		robot.setRunning();
 		sendFileCommand();
 	}
 
+	
 	// The user has done something.  respond to it.
 	@Override
 	public void actionPerformed(ActionEvent e) {
