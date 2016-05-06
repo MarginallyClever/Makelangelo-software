@@ -33,7 +33,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String robotTypeName = "DRAWBOT";
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
-	static boolean please_get_a_guid=true;  // set to true when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
+	static boolean please_get_a_guid=false;  // set to false when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
 		
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
@@ -202,9 +202,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private long getNewRobotUID() {
 		long newUID = 0;
 
-		if(please_get_a_guid==false) {
-			Log.error("Developers have made a stupid mistake.");
-		} else {
+		if(please_get_a_guid) {
 			Log.message("obtaining UID from server.");
 			try {
 				// Send data
@@ -434,18 +432,18 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot("G00"+
 						" X" + x +
 						" Y" + y);
-		gondolaX=x;
-		gondolaY=y;
+		gondolaX = x * 0.1f;
+		gondolaY = y * 0.1f;
 	}
 	
 	public void movePenRelative(float dx,float dy) {
 		sendLineToRobot("G91");  // set relative mode
 		sendLineToRobot("G00"+
-				" X" + dx +
-				" Y" + dy);
+						" X" + dx +
+						" Y" + dy);
 		sendLineToRobot("G90");  // return to absolute mode
-		gondolaX+=dx;
-		gondolaY+=dy;
+		gondolaX += dx * 0.1f;
+		gondolaY += dy * 0.1f;
 	}
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }

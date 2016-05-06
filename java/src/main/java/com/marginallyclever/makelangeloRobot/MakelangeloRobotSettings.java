@@ -22,26 +22,14 @@ public final class MakelangeloRobotSettings {
 	public final static double INCH_TO_CM = 2.54;
 
 
-	public final String commonPaperSizes [] = { "---",
-			"4A0 (1682 x 2378)",
-			"2A0 (1189 x 1682)",
-			"A0 (841 x 1189)",
-			"A1 (594 x 841)",
-			"A2 (420 x 594)",
-			"A3 (297 x 420)",
-			"A4 (210 x 297)",
-			"A5 (148 x 210)",
-			"A6 (105 x 148)",
-			"A7 (74 x 105)",};
-
-	private String[] configsAvailable = null;
-	
+	private boolean isPortrait;
+	private String[] configsAvailable;
 	
 	private int currentToolIndex;
 
 	// pulleys turning backwards?
 	private boolean isLeftMotorInverted;
-	private boolean isRegistered = false;
+	private boolean isRegistered;
 	private boolean isRightMotorInverted;
 	private double limitBottom;
 
@@ -49,7 +37,7 @@ public final class MakelangeloRobotSettings {
 	private double limitRight;
 	// machine physical limits, in cm
 	private double limitTop;
-	private ArrayList<MakelangeloRobotSettingsListener> listeners = new ArrayList<MakelangeloRobotSettingsListener>();
+	private ArrayList<MakelangeloRobotSettingsListener> listeners;
 	private double maxAcceleration;
 
 	// maximum speed
@@ -72,11 +60,11 @@ public final class MakelangeloRobotSettings {
 	/**
 	 * Each robot has a global unique identifier
 	 */
-	private long robotUID = 0;
+	private long robotUID;
 	
 	// TODO leave the origin at the center of the paper and make a G92 (teleport) call when at the starting position
 
-	private boolean shouldSignName = false;
+	private boolean shouldSignName;
 
 	/**
 	 * top left, bottom center, etc...
@@ -117,11 +105,17 @@ public final class MakelangeloRobotSettings {
 		double mh = 835 * 0.1; // mm > cm
 		double mw = 835 * 0.1; // mm > cm
 		
+		robotUID = 0;
+		isPortrait = false;
+		isRegistered = false;
 		limitTop = mh/2;
 		limitBottom = -mh/2;
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
+		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
+		shouldSignName = false;
+		
 		// paper area
 		double pw = 420 * 0.1; // cm
 		double ph = 594 * 0.1; // cm
@@ -206,26 +200,6 @@ public final class MakelangeloRobotSettings {
 				+ " R" + limitRight
 				+ " I" + (isLeftMotorInverted ? "-1" : "1")
 				+ " J" + (isRightMotorInverted ? "-1" : "1");
-	}
-
-
-	/**
-	 * Must match commonPaperSizes
-	 * @return
-	 */
-	public int getCurrentPaperSizeChoice(double pw,double ph) {
-		if( pw == 1682 && ph == 2378 ) return 1;
-		if( pw == 1189 && ph == 1682 ) return 2;
-		if( pw == 841 && ph == 1189 ) return 3;
-		if( pw == 594 && ph == 841 ) return 4;
-		if( pw == 420 && ph == 594 ) return 5;
-		if( pw == 297 && ph == 420 ) return 6;
-		if( pw == 210 && ph == 297 ) return 7;
-		if( pw == 148 && ph == 210 ) return 8;
-		if( pw == 105 && ph == 148 ) return 9;
-		if( pw == 74 && ph == 105 ) return 10;
-
-		return 0;
 	}
 
 
@@ -380,6 +354,13 @@ public final class MakelangeloRobotSettings {
 	public String getPenUpString() {
 		return Float.toString(getCurrentTool().getPenUpAngle());
 	}
+	
+	public void setPortrait(boolean isPortrait) {
+		this.isPortrait = isPortrait;
+	}
+	public boolean isPortrait() {
+		return isPortrait;
+	}
 
 	public double getPulleyDiameterLeft()  {
 		return pulleyDiameterLeft;
@@ -462,6 +443,7 @@ public final class MakelangeloRobotSettings {
 
 		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
 		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
+		isPortrait = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isPortrait", Boolean.toString(isPortrait)));
 
 		pulleyDiameterLeft=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameterLeft)));
 		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));
