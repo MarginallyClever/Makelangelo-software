@@ -131,7 +131,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		double heightOfPaper = robot.getSettings().getPaperHeight();
 		double drawPanelWidthZoom = widthOfPaper;
 		double drawPanelHeightZoom = heightOfPaper;
-		cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+		
+		if( windowWidth < windowHeight ) {
+			cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+		} else {
+			cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+		}
+		
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
 	}

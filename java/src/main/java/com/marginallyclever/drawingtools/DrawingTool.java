@@ -133,4 +133,5 @@ public abstract class DrawingTool {
   }
   
   public void save() {}
+  public void cancel() {}
 }

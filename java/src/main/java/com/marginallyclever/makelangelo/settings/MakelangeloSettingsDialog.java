@@ -125,6 +125,9 @@ implements ActionListener {
 		  this.dispose();
 	  }
 	  if(src == cancel) {
+		  panelAdjustMachine.cancel();
+		  panelAdjustPaper.cancel();
+		  panelAdjustPen.cancel();
 		  this.dispose();
 		  return;
 	  }

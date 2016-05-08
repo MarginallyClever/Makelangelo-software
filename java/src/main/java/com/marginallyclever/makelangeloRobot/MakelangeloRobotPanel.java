@@ -28,10 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -55,7 +52,7 @@ import com.marginallyclever.savers.SaveFileType;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ChangeListener, ItemListener {
+public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ItemListener {
 	/**
 	 *
 	 */
@@ -80,7 +77,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
 	private JButton openConfig;
-	private JSlider paperMargin;
 	private JPanel machineNumberPanel;
 	private JButton buttonOpenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
@@ -219,19 +215,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineNumberPanel = new JPanel(new GridLayout(1, 0));
 		updateMachineNumberPanel();
 		panel.add(machineNumberPanel, con1);
-		con1.gridy++;
-
-		// margins
-		JPanel marginPanel = new JPanel(new GridLayout(1, 0));
-		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.getSettings().getPaperMargin() * 100));
-		paperMargin.setMajorTickSpacing(10);
-		paperMargin.setMinorTickSpacing(5);
-		paperMargin.setPaintTicks(false);
-		paperMargin.setPaintLabels(true);
-		paperMargin.addChangeListener(this);
-		marginPanel.add(new JLabel(Translator.get("PaperMargin")));
-		marginPanel.add(paperMargin);
-		panel.add(marginPanel, con1);
 		con1.gridy++;
 
 		
@@ -434,16 +417,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineNumberPanel.add(openConfig);
 	}
 
-	
-	public void stateChanged(ChangeEvent e) {
-		e.getSource();
-		double pm = (100 - paperMargin.getValue()) * 0.01;
-		if (Double.compare(robot.getSettings().getPaperMargin(), pm) != 0) {
-			robot.getSettings().setPaperMargin(pm);
-			robot.getSettings().saveConfig();
-		}
-	}
-
 	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
@@ -633,6 +606,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penDown.setEnabled(isConfirmed && !isRunning);
 
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
+		
+		this.validate();
 	}
 
 	public void newFile() {

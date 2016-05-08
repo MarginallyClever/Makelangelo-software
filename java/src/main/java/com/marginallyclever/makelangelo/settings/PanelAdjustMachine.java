@@ -286,4 +286,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 			robot.getSettings().setAcceleration(accel);
 		}
 	}
+	
+	public void cancel() {}
 }

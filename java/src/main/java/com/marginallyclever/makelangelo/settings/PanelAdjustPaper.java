@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.settings;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -17,13 +18,17 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 public class PanelAdjustPaper
 extends JPanel
-implements ActionListener, PropertyChangeListener {
+implements ActionListener, PropertyChangeListener, ChangeListener {
 	/**
 	 * 
 	 */
@@ -31,8 +36,9 @@ implements ActionListener, PropertyChangeListener {
 
 	protected JComboBox<String> paperSizes;
 	protected JFormattedTextField pw, ph;
-	protected JCheckBox isPortrait;
-
+	protected JCheckBox isLandscape;
+	protected boolean beingModified;
+	
 	MakelangeloRobot robot;
 
 	private final String commonPaperSizes [] = {
@@ -49,9 +55,23 @@ implements ActionListener, PropertyChangeListener {
 		"A7 (74 x 105)"
 		};
 
+	private JSlider paperMargin;
+	
+	double originalPaperWidth;
+	double originalPaperHeight;
+	double originalPaperMargin;
+	
+
 	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
-
+		
+		beingModified=false;
+		
+		originalPaperWidth = robot.getSettings().getPaperWidth();
+		originalPaperHeight = robot.getSettings().getPaperHeight();
+		originalPaperMargin = robot.getSettings().getPaperMargin();
+		
+		
 	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 	    this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	    
@@ -59,54 +79,72 @@ implements ActionListener, PropertyChangeListener {
 		JPanel p = new JPanel(new GridBagLayout());
 		this.add(p);
 		int y=0;
-		paperSizes = new JComboBox<>(commonPaperSizes);
-		paperSizes.setSelectedIndex(getCurrentPaperSizeChoice( robot.getSettings().getPaperWidth()*10, robot.getSettings().getPaperHeight()*10 ));
-
-		isPortrait = new JCheckBox(Translator.get("isPortrait"), robot.getSettings().isPortrait());
-		
-		NumberFormat nFloat = NumberFormat.getIntegerInstance();
-		pw = new JFormattedTextField(nFloat);
-		pw.setValue(robot.getSettings().getPaperWidth()*10);
-		ph = new JFormattedTextField(nFloat);
-		ph.setValue(robot.getSettings().getPaperHeight()*10);
 
 		GridBagConstraints c = new GridBagConstraints();
 		GridBagConstraints d = new GridBagConstraints();
-
 		d.anchor = GridBagConstraints.WEST;
-		
+		c.anchor = GridBagConstraints.EAST;
 		c.ipadx=5;
 		c.ipady=2;
 
+		// common paper sizes
+		paperSizes = new JComboBox<>(commonPaperSizes);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
 		d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
 		y++;
 
-		d.gridx=1;  d.gridy=y;  d.gridwidth=3;  p.add(isPortrait,d);
+		// landscape checkbox
+		isLandscape = new JCheckBox(Translator.get("isLandscape"), false);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		d.gridx=0;  d.gridy=y;  d.gridwidth=3;  p.add(isLandscape,d);
 		y++;
+		c.fill = GridBagConstraints.NONE;
 
+		// manual paper size settings
+		NumberFormat nFloat = NumberFormat.getIntegerInstance();
 
 		d.gridwidth=1;
+		pw = new JFormattedTextField(nFloat);
 		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
 		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
+		
+		ph = new JFormattedTextField(nFloat);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
 		d.gridx=1;  d.gridy=y;  p.add(ph,d);
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
 
-
 		Dimension s = ph.getPreferredSize();
 		s.width = 80;
 		pw.setPreferredSize(s);
 		ph.setPreferredSize(s);
+		
+		// paper margin
+		JPanel marginPanel = new JPanel(new GridLayout(2, 1));
+		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.getSettings().getPaperMargin() * 100));
+		paperMargin.setMajorTickSpacing(10);
+		paperMargin.setMinorTickSpacing(5);
+		paperMargin.setPaintTicks(false);
+		paperMargin.setPaintLabels(true);
+		marginPanel.add(new JLabel(Translator.get("PaperMargin")));
+		marginPanel.add(paperMargin);
+		c.gridwidth=3;
+		c.gridx=0;  c.gridy=y;  p.add(marginPanel, c);
+		y++;
 
 		paperSizes.addActionListener(this);
+		isLandscape.addActionListener(this);
 		pw.addPropertyChangeListener(this);
 		ph.addPropertyChangeListener(this);
-		isPortrait.addActionListener(this);
+		paperMargin.addChangeListener(this);
+		
+		updateValues();
 	}
+
+	
+	public void stateChanged(ChangeEvent e) {}
 
 
 	/**
@@ -129,39 +167,45 @@ implements ActionListener, PropertyChangeListener {
 	}
 
 	public void propertyChange(PropertyChangeEvent  e) {
-		double w=0;
-		double h=0;
-		try {
-			w = ((Number)pw.getValue()).doubleValue();
-			h = ((Number)ph.getValue()).doubleValue();
-		} catch(Exception err) {
-			err.getMessage();
-		}
+		if(beingModified) return;
 
-		boolean isPortrait = false;
-		int i = getCurrentPaperSizeChoice(w,h);
-		if( i == 0 ) {
-			i = getCurrentPaperSizeChoice(h,w);
-			isPortrait = ( i != 0 );
-		};
-		
-		robot.getSettings().setPortrait(isPortrait);
-		paperSizes.setSelectedIndex(i);	
+		beingModified=true;
+		if( e.getSource() == pw || e.getSource() == ph ) {
+			double w=0;
+			double h=0;
+			try {
+				w = ((Number)pw.getValue()).doubleValue();
+				h = ((Number)ph.getValue()).doubleValue();
+			} catch(Exception err) {
+				err.getMessage();
+			}
+
+			int i = getCurrentPaperSizeChoice( h, w );
+			if(i!=0) {
+				isLandscape.setSelected(true);
+			} else {
+				i = getCurrentPaperSizeChoice( w, h );
+				isLandscape.setSelected(false);
+			}
+			paperSizes.setSelectedIndex(i);
+		}
+		beingModified=false;
 	}
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
-
-		// changing the drop box value
+		if(beingModified) return;
+		beingModified=true;
+		
 		if(subject == paperSizes) {
 			final int selectedIndex = paperSizes.getSelectedIndex();
 			if(selectedIndex!= 0) {
 				String str = paperSizes.getItemAt(selectedIndex);
 				String sw = str.substring(str.indexOf('(')+1, str.indexOf('x')).trim();
 				String sh = str.substring(str.indexOf('x')+1, str.indexOf(')')).trim();
-				if(robot.getSettings().isPortrait()) {
+				if(isLandscape.isSelected()) {
 					String temp = sw;
 					sw = sh;
 					sh = temp;
@@ -170,20 +214,38 @@ implements ActionListener, PropertyChangeListener {
 				ph.setText(sh);
 			}
 		}
-		if( subject == isPortrait ) {
-			boolean wasPortrait = robot.getSettings().isPortrait();
-			boolean isNowPortrait = isPortrait.isSelected();
-			robot.getSettings().setPortrait(isNowPortrait);
-			
-			if(wasPortrait != isNowPortrait) {
-				String sh = pw.getText();
-				String sw = ph.getText();
-				pw.setText(sw);
-				ph.setText(sh);
-			}
+		if( subject == isLandscape ) {
+			String sw = pw.getText();
+			String sh = ph.getText();
+			pw.setText(sh);
+			ph.setText(sw);
 		}
+		
+		beingModified=false;
 	}
-    
+
+	public void updateValues() {
+		if(robot==null) return;
+		
+		double w = robot.getSettings().getPaperWidth()*10;
+		double h = robot.getSettings().getPaperHeight()*10;
+
+		beingModified=true;
+		
+		int i = getCurrentPaperSizeChoice( h, w );
+		if(i!=0) {
+			isLandscape.setSelected(true);
+		} else {
+			i = getCurrentPaperSizeChoice( w, h );
+			isLandscape.setSelected(false);
+		}
+		paperSizes.setSelectedIndex(i);
+		pw.setValue(w);
+		ph.setValue(h);
+
+		beingModified=false;
+	}
+	
 	public void save() {
 		double pwf = Double.valueOf(pw.getText()) / 10.0;
 		double phf = Double.valueOf(ph.getText()) / 10.0;
@@ -192,7 +254,14 @@ implements ActionListener, PropertyChangeListener {
 		if( phf<=0 ) data_is_sane=false;
 
 		if (data_is_sane) {
-			robot.getSettings().setPaperSize(pwf,phf);
+			MakelangeloRobotSettings s = robot.getSettings();
+			s.setPaperSize(pwf,phf);
+
+			double pm = (100 - paperMargin.getValue()) * 0.01;
+			s.setPaperMargin(pm);
 		}
 	}
+	
+	public void cancel() {}
+
 }

@@ -19,10 +19,13 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  */
 public final class MakelangeloRobotSettings {
-	public final static double INCH_TO_CM = 2.54;
-
-
-	private boolean isPortrait;
+	public static final double INCH_TO_CM = 2.54;
+	/**
+	 * measured from "m4 calibration.pdf"
+	 * @since 7.5.0
+	 */
+	public static final float CALIBRATION_CM_FROM_TOP = 21.7f;
+	
 	private String[] configsAvailable;
 	
 	private int currentToolIndex;
@@ -56,6 +59,7 @@ public final class MakelangeloRobotSettings {
 	
 	private double pulleyDiameterRight;
 	private boolean reverseForGlass;
+	
 
 	/**
 	 * Each robot has a global unique identifier
@@ -106,7 +110,6 @@ public final class MakelangeloRobotSettings {
 		double mw = 835 * 0.1; // mm > cm
 		
 		robotUID = 0;
-		isPortrait = false;
 		isRegistered = false;
 		limitTop = mh/2;
 		limitBottom = -mh/2;
@@ -119,7 +122,7 @@ public final class MakelangeloRobotSettings {
 		// paper area
 		double pw = 420 * 0.1; // cm
 		double ph = 594 * 0.1; // cm
-		
+
 		paperTop = ph/2;
 		paperBottom = -ph/2;
 		paperLeft = -pw/2;
@@ -131,7 +134,6 @@ public final class MakelangeloRobotSettings {
 		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
-		
 		isLeftMotorInverted = false;
 		isRightMotorInverted = true;
 		reverseForGlass = false;
@@ -192,6 +194,20 @@ public final class MakelangeloRobotSettings {
 		return "D1 L" + left + " R" + right;
 	}
 
+	
+	public double getHomeX() {
+		return 0;
+	}
+	
+	public double getHomeY() {
+		float limitTop = (float)getLimitTop();
+		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
+		return homeY;
+	}
+	
+	public String getSetStartAtHomeLine() {
+		return "G92 X"+getHomeX()+" Y"+getHomeY();
+	}
 
 	public String getConfigLine() {
 		return "M101 T" + limitTop
@@ -354,13 +370,6 @@ public final class MakelangeloRobotSettings {
 	public String getPenUpString() {
 		return Float.toString(getCurrentTool().getPenUpAngle());
 	}
-	
-	public void setPortrait(boolean isPortrait) {
-		this.isPortrait = isPortrait;
-	}
-	public boolean isPortrait() {
-		return isPortrait;
-	}
 
 	public double getPulleyDiameterLeft()  {
 		return pulleyDiameterLeft;
@@ -443,7 +452,6 @@ public final class MakelangeloRobotSettings {
 
 		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
 		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
-		isPortrait = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isPortrait", Boolean.toString(isPortrait)));
 
 		pulleyDiameterLeft=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameterLeft)));
 		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));

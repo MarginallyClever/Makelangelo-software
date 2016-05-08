@@ -45,7 +45,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.util.Animator;
@@ -110,8 +109,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
 	// Bottom of window
-	public LogPanel logPanel;
-
+	private LogPanel logPanel;
+	
+	private Animator animator;
+	
 	
 	public static void main(String[] argv) {
 		//Schedule a job for the event-dispatching thread:
@@ -497,30 +498,31 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	// Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
 	private void createAndShowGUI() {
 		// Create and set up the window.
-		this.mainFrame = new JFrame(Translator.get("TitlePrefix"));
-		this.mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.mainFrame.addWindowListener(this);
+		mainFrame = new JFrame(Translator.get("TitlePrefix"));
+    	mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		mainFrame.addWindowListener(this);
 
 		// Create and set up the content pane.
-		this.mainFrame.setJMenuBar(createMenuBar());
-		this.mainFrame.setContentPane(createContentPane());
+		mainFrame.setJMenuBar(createMenuBar());
+		mainFrame.setContentPane(createContentPane());
 
-		// Get default screen size
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		int maxWidth = DEFAULT_WINDOW_WIDTH;
 		int maxHeight = DEFAULT_WINDOW_HEIGHT;
-		if( screenSize.width < maxWidth ) {
+		int width = prefs.getInt("Default window width", maxWidth );
+		int height = prefs.getInt("Default window height", maxHeight );
+		
+		// Get default screen size
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if( screenSize.width > 0 && screenSize.width < maxWidth ) {
 			maxHeight *= screenSize.width / maxWidth;
 			maxWidth = screenSize.width;
 		}
-		if( screenSize.height < maxHeight ) {
+		if( screenSize.height > 0 && screenSize.height < maxHeight ) {
 			maxWidth *= screenSize.height / maxHeight;
 			maxHeight = screenSize.height;
 		}
 			
 		// set window size
-		int width = prefs.getInt("Default window width", maxWidth );
-		int height = prefs.getInt("Default window height", maxHeight );
 		if(width > maxWidth || height > maxHeight ) {
 			width = maxWidth;
 			height = maxHeight;
@@ -528,7 +530,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			prefs.putInt("Default window height", maxHeight );
 		}
 		
-		this.mainFrame.setSize(width, height);
+		mainFrame.setSize(width, height);
 		
 		// set window location
 		// by default center the window.  Later use preferences.
@@ -536,29 +538,16 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		int defaultLocationY = (screenSize.height - height) / 2;
 		int locationX = prefs.getInt("Default window location x", defaultLocationX);
 		int locationY = prefs.getInt("Default window location y", defaultLocationY);
-		this.mainFrame.setLocation(locationX,locationY);
+		mainFrame.setLocation(locationX,locationY);
 		
 		// make window visible
-		this.mainFrame.setVisible(true);
+		mainFrame.setVisible(true);
 
 		drawPanel.zoomToFitPaper();
 
 
 		// start animation system        
-        final Animator animator = new Animator();
-        mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-        	public void windowClosing(java.awt.event.WindowEvent e) {
-        		// Run this on another thread than the AWT event queue to
-        		// make sure the call to Animator.stop() completes before
-        		// exiting
-        		new Thread(new Runnable() {
-        			public void run() {
-        				animator.stop();
-        				System.exit(0);
-        			}
-        		}).start();
-        	}
-        });
+        animator = new Animator();
         animator.add(drawPanel);
         animator.start();
 
@@ -584,8 +573,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// the default settings must always match the Marginally Clever kit.
 		
 		drawPanel.repaint();
-		if(robotPanel!=null) robotPanel.updateMachineNumberPanel();
-		if(robotPanel!=null) robotPanel.updateButtonAccess();
+		if(robotPanel!=null) {
+			robotPanel.updateMachineNumberPanel();
+			robotPanel.updateButtonAccess();
+		}
 	}
 	
 	
@@ -616,8 +607,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 	
 	
-	
-	
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
 		drawPanel.repaint();
 	}
@@ -628,35 +617,36 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 
-
-	
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-
-	@Override
-	public void windowClosed(WindowEvent e) {}
-
-
 	@Override
 	public void windowClosing(WindowEvent e) {
+		System.out.println("windowClosing");
 		onClose();
 	}
 
 	
 	private void onClose() {
         int result = JOptionPane.showConfirmDialog(
-            this.mainFrame,
+            mainFrame,
             Translator.get("ConfirmQuitQuestion"),
             Translator.get("ConfirmQuitTitle"),
             JOptionPane.YES_NO_OPTION);
- 
+
         if (result == JOptionPane.YES_OPTION) {
-        	this.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         	savePreferences();
-        	System.exit(0);
+
+    		// Run this on another thread than the AWT event queue to
+    		// make sure the call to Animator.stop() completes before
+    		// exiting
+    		new Thread(new Runnable() {
+    			public void run() {
+    				animator.stop();
+    				System.exit(0);
+    			}
+    		}).start();
         }
 	}
+	
 	
 	private void savePreferences() {
 		Dimension size = this.mainFrame.getSize();
@@ -684,6 +674,16 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void windowOpened(WindowEvent e) {}
+
+	
+	@Override
+	public void windowActivated(WindowEvent e) {}
+
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		System.out.println("windowClosed");
+	}
 }
 
 

@@ -35,6 +35,7 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 
 		out.write(machine.getConfigLine() + ";\n");
 		out.write(machine.getBobbinLine() + ";\n");
+		out.write(machine.getSetStartAtHomeLine() + ";\n");
 		tool.writeChangeTo(out);
 
 		previousX = 0;

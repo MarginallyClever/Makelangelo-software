@@ -53,13 +53,19 @@
 	<string>
 		<key>PaperWidth</key>
 		<value>Paper width</value>
-		<hint>machine size control panel</hint>
+		<hint>Paper settings panel</hint>
 	</string>
 	<string>
 		<key>PaperHeight</key>
 		<value>Paper height</value>
-		<hint>machine size control panel</hint>
+		<hint>Paper settings panel</hint>
 	</string>
+	<string>
+		<key>isLandscape</key>
+		<value>Is landscape?</value>
+		<hint>Paper settings dialog</hint>
+	</string>
+	
 	<string>
 		<key>InvertLeft</key>
 		<value>Invert left</value>
