@@ -260,7 +260,7 @@ public class GCodeFile {
 	public int findLastPenUpBefore(int startAtLine,String toMatch) {
 		int x = startAtLine;
 		if( linesTotal==0 ) return 0;
-		if(x > linesTotal) x = linesTotal;
+		if(x >= linesTotal) x = linesTotal-1;
 		
 		toMatch = "G00 Z"+toMatch;
 		while(x>1) {

@@ -260,9 +260,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// Send  new configuration values to the robot.
 		try {
-			connection.sendMessage(settings.getConfigLine() + "\n");
-			connection.sendMessage(settings.getBobbinLine() + "\n");
-			connection.sendMessage("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
+			sendLineToRobot(settings.getConfigLine() + "\n");
+			sendLineToRobot(settings.getBobbinLine() + "\n");
+			setHome();
+			sendLineToRobot("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -409,7 +410,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	
 	public void goHome() {
-		sendLineToRobot("G00 X"+settings.getHomeX()+" Y"+settings.getHomeY());
+		sendLineToRobot("G00 X"+settings.getHomeX()+" Y"+(settings.getHomeY()*10));
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
 	}

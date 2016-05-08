@@ -131,6 +131,9 @@ public final class MakelangeloRobotSettings {
 
 		maxFeedRate = 7500;
 		maxAcceleration = 20;
+
+		// diameter = circumference/pi
+		// circumference is 20 teeth @ 2mm/tooth
 		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 

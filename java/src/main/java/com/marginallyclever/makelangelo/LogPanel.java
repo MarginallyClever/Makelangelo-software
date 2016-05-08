@@ -146,7 +146,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
 		} catch (BadLocationException | IOException e) {
 			// FIXME failure here logs new error, causes infinite loop?
-			Log.error(e.getMessage());
+			Log.error("Logging error: "+e.getMessage());
 		}
 	}
 

@@ -74,6 +74,7 @@ public class LoadDXF implements LoadFileType {
 					DrawingTool tool = robot.getSettings().getCurrentTool();
 					out.write(robot.getSettings().getConfigLine() + ";\n");
 					out.write(robot.getSettings().getBobbinLine() + ";\n");
+					out.write(robot.getSettings().getSetStartAtHomeLine()+";\n");
 					out.write("G00 G90;\n");
 					tool.writeChangeTo(out);
 					tool.writeOff(out);
