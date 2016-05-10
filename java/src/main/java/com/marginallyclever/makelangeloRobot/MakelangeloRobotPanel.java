@@ -252,6 +252,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// always have one extra empty at the end to push everything up.
 		con1.weighty = 1;
 		panel.add(new JLabel(), con1);
+		
+		// lastly, set the button states
+		updateButtonAccess();
 	}
 
 	

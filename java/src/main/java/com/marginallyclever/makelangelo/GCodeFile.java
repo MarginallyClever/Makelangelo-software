@@ -140,8 +140,9 @@ public class GCodeFile {
 				assert (!Float.isNaN(estimatedTime));
 			}
 
-			if (tokens[0].equals("G00") || tokens[0].equals("G0") ||
-					tokens[0].equals("G01") || tokens[0].equals("G1")) {
+			String firstToken = tokens[0];
+			if (firstToken.equals("G00") || firstToken.equals("G0") ||
+					firstToken.equals("G01") || firstToken.equals("G1")) {
 				// draw a line
 				double ddx = x - px;
 				double ddy = y - py;
@@ -153,10 +154,10 @@ public class GCodeFile {
 				px = x;
 				py = y;
 				pz = z;
-			} else if (tokens[0].equals("G02") || tokens[0].equals("G2") ||
-					tokens[0].equals("G03") || tokens[0].equals("G3")) {
+			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
+					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
-				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
+				int dir = (firstToken.equals("G02") || firstToken.equals("G2")) ? -1 : 1;
 				double dx = px - ai;
 				double dy = py - aj;
 				double radius = Math.sqrt(dx * dx + dy * dy);
@@ -444,6 +445,7 @@ public class GCodeFile {
 		float x, y, z, ai, aj;
 		int i, j;
 		boolean absMode = true;
+		boolean isLifted=true;
 		String tool_change = "M06 T";
 		Color tool_color = Color.BLACK;
 
@@ -460,10 +462,10 @@ public class GCodeFile {
 				int id = (int) Integer.valueOf(numberOnly, 10);
 				addNodeTool(i, id);
 				switch (id) {
-				case 1:					tool_color = Color.RED;					break;
-				case 2:					tool_color = Color.GREEN;				break;
-				case 3:					tool_color = Color.BLUE;				break;
-				default:				tool_color = Color.BLACK;				break;
+				case 1:		tool_color = Color.RED;		break;
+				case 2:		tool_color = Color.GREEN;	break;
+				case 3:		tool_color = Color.BLUE;	break;
+				default:	tool_color = Color.BLACK;	break;
 				}
 				continue;
 			}
@@ -497,14 +499,15 @@ public class GCodeFile {
 				} else if (tokens[j].startsWith("Z")) {
 					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
 					z = absMode ? tz : z + tz;
+					
+					isLifted = (tool.getPenUpAngle()==z);
 				}
 				if (tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if (tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
 			}
 			if (j < tokens.length) continue;
 
-			tool.drawZ(z);
-			if (tool.isDrawOff()) {
+			if (isLifted) {
 				if (robot.getShowPenUp() == false) {
 					px = x;
 					py = y;
@@ -512,22 +515,21 @@ public class GCodeFile {
 					continue;
 				}
 				addNodeColor(i, Color.BLUE);
-			} else if (tool.isDrawOn()) {
-				addNodeColor(i, tool_color);  // TODO use actual pen color
 			} else {
-				addNodeColor(i, Color.ORANGE);
+				addNodeColor(i, tool_color);  // TODO use actual pen color
 			}
 
 			// what kind of motion are we going to make?
-			if (tokens[0].equals("G00") || tokens[0].equals("G0") ||
-				tokens[0].equals("G01") || tokens[0].equals("G1")) {
+			String firstToken = tokens[0];
+			if (firstToken.equals("G00") || firstToken.equals("G0") ||
+				firstToken.equals("G01") || firstToken.equals("G1")) {
 				addNodePos(i, px, py, x, y);
-			} else if (tokens[0].equals("G02") || tokens[0].equals("G2") ||
-					tokens[0].equals("G03") || tokens[0].equals("G3")) {
+			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
+					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
 
 				// clockwise or counter-clockwise?
-				int dir = (tokens[0].equals("G02") || tokens[0].equals("G2")) ? -1 : 1;
+				int dir = (firstToken.equals("G02") || firstToken.equals("G2")) ? -1 : 1;
 
 				double dx = px - ai;
 				double dy = py - aj;

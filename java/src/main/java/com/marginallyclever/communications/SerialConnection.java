@@ -36,10 +36,10 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
-    ArrayList<String> commandQueue = new ArrayList<String>();
+	ArrayList<String> commandQueue = new ArrayList<String>();
 
-    // Listeners which should be notified of a change to the percentage.
-    private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
+	// Listeners which should be notified of a change to the percentage.
+	private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
 
 
 	public SerialConnection() {}
@@ -81,7 +81,7 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		connectionName = portName;
 		portOpened = true;
 		waitingForCue = true;
-		
+
 	}
 
 
@@ -134,11 +134,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	public void serialEvent(SerialPortEvent events) {
 		String rawInput, oneLine;
 		int x;
-		
-        if(events.isRXCHAR()) {
-        	if(!portOpened) return;
-            try {
-            	int len = events.getEventValue();
+
+		if(events.isRXCHAR()) {
+			if(!portOpened) return;
+			try {
+				int len = events.getEventValue();
 				byte [] buffer = serialPort.readBytes(len);
 				if( len>0 ) {
 					rawInput = new String(buffer,0,len);
@@ -151,17 +151,17 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 
 						// check for error
 						int error_line = errorReported(oneLine);
-	                    if(error_line != -1) {
-	                    	notifyLineError(error_line);
-	                    } else {
-	                    	// no error
-	                    	//if(oneLine.indexOf(CUE)!=0 || waitingForCue==false) 
-	                    	{
-	                    		notifyDataAvailable(oneLine);
-	                    	}
-	                    }
-	                    
-	                    // wait for the cue to send another command
+						if(error_line != -1) {
+							notifyLineError(error_line);
+						} else {
+							// no error
+							//if(oneLine.indexOf(CUE)!=0 || waitingForCue==false) 
+							{
+								notifyDataAvailable(oneLine);
+							}
+						}
+
+						// wait for the cue to send another command
 						if(oneLine.indexOf(CUE)==0) {
 							waitingForCue=false;
 						}
@@ -170,19 +170,19 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 						sendQueuedCommand();
 					}
 				}
-            } catch (SerialPortException e) {}
-        }
+			} catch (SerialPortException e) {}
+		}
 	}
 
 
 	protected void sendQueuedCommand() {
 		if(!portOpened || waitingForCue) return;
-		
+
 		if(commandQueue.isEmpty()==true) {
-		      notifySendBufferEmpty();
-		      return;
+			notifySendBufferEmpty();
+			return;
 		}
-		
+
 		String command;
 		try {
 			command=commandQueue.remove(0);
@@ -200,11 +200,11 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 		catch(IndexOutOfBoundsException e1) {}
 		catch(SerialPortException e2) {}
 	}
-	
+
 	public void deleteAllQueuedCommands() {
 		commandQueue.clear();
 	}
-	
+
 	// connect to the last port
 	@Override
 	public void reconnect() throws Exception {
@@ -254,25 +254,25 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 	}
 
 	private void notifyLineError(int lineNumber) {
-	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
-	          listener.lineError(this,lineNumber);
-	        }
+		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+			listener.lineError(this,lineNumber);
+		}
 	}
-	
-    private void notifySendBufferEmpty() {
-      for (MarginallyCleverConnectionReadyListener listener : listeners) {
-        listener.sendBufferEmpty(this);
-      }
-    }
-	
+
+	private void notifySendBufferEmpty() {
+		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+			listener.sendBufferEmpty(this);
+		}
+	}
+
 	// tell all listeners data has arrived
 	private void notifyDataAvailable(String line) {
-	      for (MarginallyCleverConnectionReadyListener listener : listeners) {
-	        listener.dataAvailable(this,line);
-	      }
+		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+			listener.dataAvailable(this,line);
+		}
 	}
-	
-	
+
+
 	public void setManager(MarginallyCleverConnectionManager manager) {
 		this.connectionManager = manager;
 	}

@@ -75,6 +75,9 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		con1.weightx=1;
 		con1.weighty=0;
 		this.add(getTextInputField(),con1);
+		
+		// lastly, clear the log
+		clearLog();
 	}
 
 

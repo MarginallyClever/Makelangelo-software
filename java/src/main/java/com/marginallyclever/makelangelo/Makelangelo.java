@@ -57,8 +57,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
 
 
-// TODO while not drawing, in-app gcode editing with immediate visual feedback ? edge tracing ?
-
 /**
  * @author danroyer
  * @author Peter Colapietro
@@ -426,10 +424,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		drawPanel.setRobot(robot);
 
 		robotPanel = robot.getControlPanel(this);
-		robotPanel.updateButtonAccess();
 		
 		logPanel = new LogPanel(translator, robot);
-		logPanel.clearLog();
 
 		// major layout
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);

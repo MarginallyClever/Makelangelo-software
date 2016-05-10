@@ -78,25 +78,29 @@ public class LoadDXF implements LoadFileType {
 					out.write("G00 G90;\n");  // absolute mode
 					tool.writeChangeTo(out);
 					tool.writeOff(out);
+					
+					boolean isLifted=true;
 
 					parser.parse(filename, DXFParser.DEFAULT_ENCODING);
 					DXFDocument doc = parser.getDocument();
 					Bounds b = doc.getBounds();
-					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
-					double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
+					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0;
+					double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0;
 
 					// find the scale to fit the image on the paper without
 					// altering the aspect ratio
 					double imageWidth  = (b.getMaximumX() - b.getMinimumX());
 					double imageHeight = (b.getMaximumY() - b.getMinimumY());
-					double paperHeight = robot.getSettings().getPaperHeight() * 10 * robot.getSettings().getPaperMargin();
-					double paperWidth  = robot.getSettings().getPaperWidth () * 10 * robot.getSettings().getPaperMargin();
+					double paperHeight = robot.getSettings().getPaperHeight() * 10.0 * robot.getSettings().getPaperMargin();
+					double paperWidth  = robot.getSettings().getPaperWidth () * 10.0 * robot.getSettings().getPaperMargin();
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
 					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
 							: (paperHeight / imageHeight);
 
+					double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
+					
 					// count all entities in all layers
 					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
 					int entity_total = 0;
@@ -138,26 +142,19 @@ public class LoadDXF implements LoadFileType {
 									double y = (start.getY() - imageCenterY) * scale;
 									double x2 = (end.getX() - imageCenterX) * scale;
 									double y2 = (end.getY() - imageCenterY) * scale;
-									double dx, dy;
-									// *
-									// is it worth drawing this line?
-									dx = x2 - x;
-									dy = y2 - y;
-									if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
-										continue;
-									}
-									// */
-									dx = dxf_x2 - x;
-									dy = dxf_y2 - y;
 
-									if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-										if (tool.isDrawOn()) {
+									double dx = dxf_x2 - x;
+									double dy = dxf_y2 - y;
+									if (dx * dx + dy * dy > toolDiameterSquared) {
+										if (!isLifted) {
 											tool.writeOff(out);
+											isLifted=true;
 										}
 										tool.writeMoveTo(out, (float) x, (float) y);
 									}
-									if (tool.isDrawOff()) {
+									if (isLifted) {
 										tool.writeOn(out);
+										isLifted=false;
 									}
 									tool.writeMoveTo(out, (float) x2, (float) y2);
 									dxf_x2 = x2;
@@ -181,25 +178,23 @@ public class LoadDXF implements LoadFileType {
 
 										if (first == true) {
 											first = false;
-											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-												// line does not start at last
-												// tool location, lift and move.
-												if (tool.isDrawOn()) {
+											if (dx * dx + dy * dy > toolDiameterSquared) {
+												// line does not start at last tool location, lift and move.
+												if (!isLifted) {
 													tool.writeOff(out);
+													isLifted=true;
 												}
 												tool.writeMoveTo(out, (float) x, (float) y);
 											}
-											// else line starts right here, do
-											// nothing.
+											// else line starts right here, pen is down, do nothing extra.
 										} else {
 											// not the first point, draw.
-											if (tool.isDrawOff())
+											if (isLifted) {
 												tool.writeOn(out);
-											if (j < polyLine.getVertexCount() - 1
-													&& dx * dx + dy * dy < tool.getDiameter() / 2.0)
-												continue; // less than 1mm
-															// movement? Skip
-															// it.
+												isLifted=false;
+											}
+											if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy <= toolDiameterSquared)
+												continue; // points too close together
 											tool.writeMoveTo(out, (float) x, (float) y);
 										}
 										dxf_x2 = x;
@@ -222,24 +217,24 @@ public class LoadDXF implements LoadFileType {
 
 										if (first == true) {
 											first = false;
-											if (dx * dx + dy * dy > tool.getDiameter()) {
-												// line does not start at last
-												// tool location, lift and move.
-												if (tool.isDrawOn()) {
+											if (dx * dx + dy * dy > toolDiameterSquared) {
+												// line does not start at last tool location, lift and move.
+												if (!isLifted) {
 													tool.writeOff(out);
+													isLifted=true;
 												}
 												tool.writeMoveTo(out, (float) x, (float) y);
 											}
-											// else line starts right here, do nothing.
+											// else line starts right here, pen is down, do nothing extra.
 										} else {
 											// not the first point, draw.
-											if (tool.isDrawOff())
+											if (isLifted) {
 												tool.writeOn(out);
+												isLifted=false;
+											}
 											if (j < entity.getVertexCount() - 1
-													&& dx * dx + dy * dy < tool.getDiameter()*3)
-												continue; // less than 1mm
-															// movement? Skip
-															// it.
+													&& dx * dx + dy * dy < toolDiameterSquared)
+												continue; // points too close together
 											tool.writeMoveTo(out, (float) x, (float) y);
 										}
 										dxf_x2 = x;
