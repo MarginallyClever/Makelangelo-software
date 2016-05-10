@@ -8,6 +8,7 @@ import jssc.SerialPortException;
 import java.util.ArrayList;
 
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.Log;
 
 
 /**
@@ -96,8 +97,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 			int err = 0;
 			try {
 				err = Integer.decode(x);
-			} catch (Exception e) {
-			}
+				Log.error("NOCHECKSUM "+err);
+			} catch (Exception e) {}
 
 			return err;
 		}
@@ -107,8 +108,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 			int err = 0;
 			try {
 				err = Integer.decode(x);
-			} catch (Exception e) {
-			}
+				Log.error("BADCHECKSUM "+err);
+			} catch (Exception e) {}
 
 			return err;
 		}
@@ -118,8 +119,8 @@ public final class SerialConnection implements SerialPortEventListener, Marginal
 			int err = 0;
 			try {
 				err = Integer.decode(x);
-			} catch (Exception e) {
-			}
+				Log.error("BADLINENUM "+err);
+			} catch (Exception e) {}
 
 			return err;
 		}

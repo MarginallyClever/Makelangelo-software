@@ -93,11 +93,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	// Top of window
 	private JMenuBar menuBar;
-	// menubar > file
+	// file menu
 	private JMenuItem buttonAbout, buttonCheckForUpdate, buttonExit;
-	// menubar > preferences
+	// preferences menu
 	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
-	// menubar > view
+	// view menu
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
 	
 	// main window layout
@@ -139,6 +139,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		connectionManager = new SerialConnectionManager(prefs);
 		
 		createAndShowGUI();
+
+		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
 	}
 	
 	
@@ -203,50 +205,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 			robot.setShowPenUp(show_pen_up.isSelected());
 		}
-	}
-
-
-	/**
-	 * Take the next line from the file and send it to the robot, if permitted.
-	 */
-	public void sendFileCommand() {
-		if (robot.isRunning() == false 
-				|| robot.isPaused() == true 
-				|| robot.gCode==null
-				|| robot.gCode.isFileOpened() == false 
-				|| (robot.getConnection() != null && robot.isPortConfirmed() == false) )
-			return;
-
-		// are there any more commands?
-		if( robot.gCode.moreLinesAvailable() == false )  {
-			// end of file
-			robot.halt();
-			// bask in the glory
-			int x = robot.gCode.getLinesTotal();
-			if(robotPanel!=null) robotPanel.statusBar.setProgress(x, x);
-			
-			SoundSystem.playDrawingFinishedSound();
-		} else {
-			int lineNumber = robot.gCode.getLinesProcessed();
-			String line = robot.gCode.nextLine();
-			
-			robot.tweakAndSendLine( line, lineNumber, translator );
-	
-			if(robotPanel!=null) robotPanel.statusBar.setProgress(lineNumber, robot.gCode.getLinesTotal());
-			// loop until we find a line that gets sent to the robot, at which point we'll
-			// pause for the robot to respond.  Also stop at end of file.
-		}
-		drawPanel.repaint();
-	}
-
-
-	public void startAt(int lineNumber) {
-		if(robot.gCode==null) return;
-		
-		robot.gCode.setLinesProcessed(robot.gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString()));
-		robot.setLineNumber(robot.gCode.getLinesProcessed());
-		robot.setRunning();
-		sendFileCommand();
 	}
 
 	
@@ -401,7 +359,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 					inputLine = inputLine.substring(inputLine.lastIndexOf("/") + 1);
 
 					System.out.println("last release: " + inputLine);
-					System.out.println("your VERSION: " + VERSION);
+					System.out.println("this version: " + VERSION);
 					//System.out.println(inputLine.compareTo(VERSION));
 
 					if (inputLine.compareTo(VERSION) > 0) {
@@ -501,11 +459,23 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		mainFrame = new JFrame(Translator.get("TitlePrefix"));
     	mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
-
 		// Create and set up the content pane.
 		mainFrame.setJMenuBar(createMenuBar());
 		mainFrame.setContentPane(createContentPane());
 
+		setupFrameRealEstate();
+		mainFrame.setVisible(true);
+
+		drawPanel.zoomToFitPaper();
+
+		// start animation system        
+        animator = new Animator();
+        animator.add(drawPanel);
+        animator.start();
+	}
+
+	
+	private void setupFrameRealEstate() {
 		int maxWidth = DEFAULT_WINDOW_WIDTH;
 		int maxHeight = DEFAULT_WINDOW_HEIGHT;
 		int width = prefs.getInt("Default window width", maxWidth );
@@ -539,24 +509,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		int locationX = prefs.getInt("Default window location x", defaultLocationX);
 		int locationY = prefs.getInt("Default window location y", defaultLocationY);
 		mainFrame.setLocation(locationX,locationY);
-		
-		// make window visible
-		mainFrame.setVisible(true);
-
-		drawPanel.zoomToFitPaper();
-
-
-		// start animation system        
-        animator = new Animator();
-        animator.add(drawPanel);
-        animator.start();
-
-        
-		// 2015-05-03: option is meaningless, robot.connectionToRobot doesn't exist when software starts.
-		// if(prefs.getBoolean("Reconnect to last port on start", false)) robot.connectionToRobot.reconnect();
-		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
 	}
-
+	
 
 	/**
 	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
@@ -568,15 +522,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
-		// we shouldn't need to open the dialog if the default settings are correct.
-		// the default settings must always match the values in the Marginally Clever tutorials.
-		// the default settings must always match the Marginally Clever kit.
-		
 		drawPanel.repaint();
-		if(robotPanel!=null) {
-			robotPanel.updateMachineNumberPanel();
-			robotPanel.updateButtonAccess();
-		}
 	}
 	
 	
@@ -588,16 +534,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 
 	@Override
-	public void sendBufferEmpty(MakelangeloRobot r) {
-		sendFileCommand();
-	}
+	public void sendBufferEmpty(MakelangeloRobot r) {}
 	
 
 	@Override
-	public void lineError(MakelangeloRobot r,int lineNumber) {
-        if(robot.gCode!=null) robot.gCode.setLinesProcessed(lineNumber);
-        sendFileCommand();
-	}
+	public void lineError(MakelangeloRobot r,int lineNumber) {}
 
 
 	@Override
@@ -619,7 +560,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		System.out.println("windowClosing");
 		onClose();
 	}
 

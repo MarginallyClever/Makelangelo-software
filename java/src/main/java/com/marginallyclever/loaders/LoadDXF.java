@@ -75,7 +75,7 @@ public class LoadDXF implements LoadFileType {
 					out.write(robot.getSettings().getConfigLine() + ";\n");
 					out.write(robot.getSettings().getBobbinLine() + ";\n");
 					out.write(robot.getSettings().getSetStartAtHomeLine()+";\n");
-					out.write("G00 G90;\n");
+					out.write("G00 G90;\n");  // absolute mode
 					tool.writeChangeTo(out);
 					tool.writeOff(out);
 
@@ -87,10 +87,10 @@ public class LoadDXF implements LoadFileType {
 
 					// find the scale to fit the image on the paper without
 					// altering the aspect ratio
-					double imageWidth = (b.getMaximumX() - b.getMinimumX());
+					double imageWidth  = (b.getMaximumX() - b.getMinimumX());
 					double imageHeight = (b.getMaximumY() - b.getMinimumY());
 					double paperHeight = robot.getSettings().getPaperHeight() * 10 * robot.getSettings().getPaperMargin();
-					double paperWidth = robot.getSettings().getPaperWidth() * 10 * robot.getSettings().getPaperMargin();
+					double paperWidth  = robot.getSettings().getPaperWidth () * 10 * robot.getSettings().getPaperMargin();
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;

@@ -18,6 +18,7 @@ import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -106,6 +107,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	@Override
 	public void sendBufferEmpty(MarginallyCleverConnection arg0) {
+		sendFileCommand();
+		
 		notifyConnectionReady();
 	}
 
@@ -122,6 +125,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		parseRobotUID(after_hello);
 		// send whatever config settings I have for this machine.
 		sendConfig();
+		
+		if(myPanel!=null) {
+			myPanel.updateMachineNumberPanel();
+			myPanel.updateButtonAccess();
+		}
+		
 		// tell everyone I've confirmed connection.
 		notifyPortConfirmed();
 	}
@@ -173,6 +182,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void lineError(MarginallyCleverConnection arg0,int lineNumber) {
+        if(gCode!=null) {
+    		gCode.setLinesProcessed(lineNumber);
+        }
+        
 		notifyLineError(lineNumber);
 	}
 	
@@ -324,7 +337,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 *
 	 * @param line command to send
 	 */
-	public void tweakAndSendLine(String line, int lineNumber, Translator translator) {
+	public void tweakAndSendLine(String line, int lineNumber) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return;
 
 		// tool change request?
@@ -334,7 +347,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
 			for (String token : tokens) {
 				if (token.startsWith("T")) {
-					changeToTool(token.substring(1),translator);
+					changeToTool(token.substring(1));
 				}
 			}
 		}
@@ -349,7 +362,47 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
-	private void changeToTool(String changeToolString,Translator translator) {
+	/**
+	 * Take the next line from the file and send it to the robot, if permitted.
+	 */
+	public void sendFileCommand() {
+		if (isRunning() == false 
+				|| isPaused() == true 
+				|| gCode==null
+				|| gCode.isFileOpened() == false 
+				|| (getConnection() != null && isPortConfirmed() == false) )
+			return;
+
+		// are there any more commands?
+		if( gCode.moreLinesAvailable() == false )  {
+			// end of file
+			halt();
+			// bask in the glory
+			int x = gCode.getLinesTotal();
+			if(myPanel!=null) myPanel.statusBar.setProgress(x, x);
+			
+			SoundSystem.playDrawingFinishedSound();
+		} else {
+			int lineNumber = gCode.getLinesProcessed();
+			String line = gCode.nextLine();
+			tweakAndSendLine( line, lineNumber );
+	
+			if(myPanel!=null) myPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+			// loop until we find a line that gets sent to the robot, at which point we'll
+			// pause for the robot to respond.  Also stop at end of file.
+		}
+	}
+
+	public void startAt(int lineNumber) {
+		if(gCode==null) return;
+		
+		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString()));
+		setLineNumber(gCode.getLinesProcessed());
+		setRunning();
+		sendFileCommand();
+	}
+
+	private void changeToTool(String changeToolString) {
 		int i = Integer.decode(changeToolString);
 
 		String[] toolNames = settings.getToolNames();

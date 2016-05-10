@@ -4,13 +4,8 @@
 package com.marginallyclever.generators;
 
 import java.awt.GridLayout;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -41,7 +36,7 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate(final String dest) {
+	public boolean generate(Writer out) throws IOException {
 		while (true) {
 			final JTextField field_rows = new JTextField(Integer.toString(rows));
 			final JTextField field_columns = new JTextField(Integer.toString(columns));
@@ -65,104 +60,99 @@ public class Generator_Maze extends ImageGenerator {
 				if (columns < 1)
 					continue;
 
-				createMazeNow(dest);
+				createMazeNow(out);
 				return true;
 			}
 		}
 	}
 
-	private void createMazeNow(String dest) {
-		try (final OutputStream fileOutputStream = new FileOutputStream(dest);
-				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-			// build the cells
-			cells = new MazeCell[rows * columns];
+	private void createMazeNow(Writer out) throws IOException {
+		imageStart(out);
+		
+		// build the cells
+		cells = new MazeCell[rows * columns];
 
-			int x, y, i = 0;
-			for (y = 0; y < rows; ++y) {
-				for (x = 0; x < columns; ++x) {
-					cells[i] = new MazeCell();
-					cells[i].visited = false;
-					cells[i].onStack = false;
-					cells[i].x = x;
-					cells[i].y = y;
+		int x, y, i = 0;
+		for (y = 0; y < rows; ++y) {
+			for (x = 0; x < columns; ++x) {
+				cells[i] = new MazeCell();
+				cells[i].visited = false;
+				cells[i].onStack = false;
+				cells[i].x = x;
+				cells[i].y = y;
+				++i;
+			}
+		}
+
+		// build the graph
+		walls = new MazeWall[((rows - 1) * columns) + ((columns - 1) * rows)];
+		i = 0;
+		for (y = 0; y < rows; ++y) {
+			for (x = 0; x < columns; ++x) {
+				if (x < columns - 1) {
+					// vertical wall between horizontal cells
+					walls[i] = new MazeWall();
+					walls[i].removed = false;
+					walls[i].cellA = y * columns + x;
+					walls[i].cellB = y * columns + x + 1;
+					++i;
+				}
+				if (y < rows - 1) {
+					// horizontal wall between vertical cells
+					walls[i] = new MazeWall();
+					walls[i].removed = false;
+					walls[i].cellA = y * columns + x;
+					walls[i].cellB = y * columns + x + columns;
 					++i;
 				}
 			}
-
-			// build the graph
-			walls = new MazeWall[((rows - 1) * columns) + ((columns - 1) * rows)];
-			i = 0;
-			for (y = 0; y < rows; ++y) {
-				for (x = 0; x < columns; ++x) {
-					if (x < columns - 1) {
-						// vertical wall between horizontal cells
-						walls[i] = new MazeWall();
-						walls[i].removed = false;
-						walls[i].cellA = y * columns + x;
-						walls[i].cellB = y * columns + x + 1;
-						++i;
-					}
-					if (y < rows - 1) {
-						// horizontal wall between vertical cells
-						walls[i] = new MazeWall();
-						walls[i].removed = false;
-						walls[i].cellA = y * columns + x;
-						walls[i].cellB = y * columns + x + columns;
-						++i;
-					}
-				}
-			}
-
-			int unvisitedCells = cells.length; // -1 for initial cell.
-			int cellsOnStack = 0;
-
-			// Make the initial cell the current cell and mark it as visited
-			int currentCell = 0;
-			cells[currentCell].visited = true;
-			--unvisitedCells;
-
-			// While there are unvisited cells
-			while (unvisitedCells > 0) {
-				// If the current cell has any neighbours which have not been
-				// visited
-				// Choose randomly one of the unvisited neighbours
-				int nextCell = chooseUnvisitedNeighbor(currentCell);
-				if (nextCell != -1) {
-					// Push the current cell to the stack
-					cells[currentCell].onStack = true;
-					++cellsOnStack;
-					// Remove the wall between the current cell and the chosen
-					// cell
-					int wallIndex = findWallBetween(currentCell, nextCell);
-					assert (wallIndex != -1);
-					walls[wallIndex].removed = true;
-					// Make the chosen cell the current cell and mark it as
-					// visited
-					currentCell = nextCell;
-					cells[currentCell].visited = true;
-					--unvisitedCells;
-				} else if (cellsOnStack > 0) {
-					// Else if stack is not empty
-					// Pop a cell from the stack
-					for (i = 0; i < cells.length; ++i) {
-						if (cells[i].onStack) {
-							// Make it the current cell
-							currentCell = i;
-							cells[i].onStack = false;
-							--cellsOnStack;
-							break;
-						}
-					}
-				}
-			}
-
-			// draw the maze
-			drawMaze(output);
-
-			output.flush();
-			output.close();
-		} catch (IOException ex) {
 		}
+
+		int unvisitedCells = cells.length; // -1 for initial cell.
+		int cellsOnStack = 0;
+
+		// Make the initial cell the current cell and mark it as visited
+		int currentCell = 0;
+		cells[currentCell].visited = true;
+		--unvisitedCells;
+
+		// While there are unvisited cells
+		while (unvisitedCells > 0) {
+			// If the current cell has any neighbours which have not been
+			// visited
+			// Choose randomly one of the unvisited neighbours
+			int nextCell = chooseUnvisitedNeighbor(currentCell);
+			if (nextCell != -1) {
+				// Push the current cell to the stack
+				cells[currentCell].onStack = true;
+				++cellsOnStack;
+				// Remove the wall between the current cell and the chosen
+				// cell
+				int wallIndex = findWallBetween(currentCell, nextCell);
+				assert (wallIndex != -1);
+				walls[wallIndex].removed = true;
+				// Make the chosen cell the current cell and mark it as
+				// visited
+				currentCell = nextCell;
+				cells[currentCell].visited = true;
+				--unvisitedCells;
+			} else if (cellsOnStack > 0) {
+				// Else if stack is not empty
+				// Pop a cell from the stack
+				for (i = 0; i < cells.length; ++i) {
+					if (cells[i].onStack) {
+						// Make it the current cell
+						currentCell = i;
+						cells[i].onStack = false;
+						--cellsOnStack;
+						break;
+					}
+				}
+			}
+		}
+
+		// draw the maze
+		drawMaze(out);
 	}
 
 	private void drawMaze(Writer output) throws IOException {

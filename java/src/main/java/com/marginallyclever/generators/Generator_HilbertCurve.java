@@ -1,13 +1,8 @@
 package com.marginallyclever.generators;
 
 import java.awt.GridLayout;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,7 +32,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 
 
 	@Override
-	public boolean generate(final String dest) {
+	public boolean generate(Writer out) throws IOException {
 		final JTextField field_order = new JTextField(Integer.toString(order));
 
 		JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -47,59 +42,47 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			order = Integer.parseInt(field_order.getText());
-			createCurveNow(dest);
+			createCurveNow(out);
 			return true;
 		}
 		return false;
 	}
 
 
-	private void createCurveNow(String dest) {
-		try (
-				final OutputStream fileOutputStream = new FileOutputStream(dest);
-				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-				) {
-			tool = machine.getCurrentTool();
-			output.write(machine.getConfigLine() + ";\n");
-			output.write(machine.getBobbinLine() + ";\n");
-			tool.writeChangeTo(output);
+	private void createCurveNow(Writer out) throws IOException {
+		imageStart(out);
 
-			float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
-					           (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
-			xmax = v;
-			ymax = v;
-			xmin = -v;
-			ymin = -v;
+		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
+				           (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
+		xmax = v;
+		ymax = v;
+		xmin = -v;
+		ymin = -v;
 
-			turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
-			turtleX = 0;
-			turtleY = 0;
-			turtleDx = 0;
-			turtleDy = -1;
+		turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
+		turtleX = 0;
+		turtleY = 0;
+		turtleDx = 0;
+		turtleDy = -1;
 
-			// Draw bounding box
-			//SetAbsoluteMode(output);
-			liftPen(output);
-			moveTo(output, xmax, ymax, false);
-			moveTo(output, xmax, ymin, false);
-			moveTo(output, xmin, ymin, false);
-			moveTo(output, xmin, ymax, false);
-			moveTo(output, xmax, ymax, false);
-			liftPen(output);
+		// Draw bounding box
+		//SetAbsoluteMode(output);
+		liftPen(out);
+		moveTo(out, xmax, ymax, false);
+		moveTo(out, xmax, ymin, false);
+		moveTo(out, xmin, ymin, false);
+		moveTo(out, xmin, ymax, false);
+		moveTo(out, xmax, ymax, false);
+		liftPen(out);
 
-			// move to starting position
-			x = (xmax - turtleStep / 2);
-			y = (ymax - turtleStep / 2);
-			moveTo(output, x, y, true);
-			lowerPen(output);
-			// do the curve
-			hilbert(output, order);
-			liftPen(output);
-
-			output.flush();
-			output.close();
-		} catch (IOException ex) {
-		}
+		// move to starting position
+		x = (xmax - turtleStep / 2);
+		y = (ymax - turtleStep / 2);
+		moveTo(out, x, y, true);
+		lowerPen(out);
+		// do the curve
+		hilbert(out, order);
+		liftPen(out);
 	}
 
 

@@ -11,7 +11,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -469,11 +474,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		else if (subject == buttonOpenFile) openFileDialog();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
-		else if (subject == buttonStart) gui.startAt(0);
+		else if (subject == buttonStart) robot.startAt(0);
 		else if (subject == buttonStartAt) {
 			int lineNumber = getStartingLineNumber();
 			if (lineNumber != -1) {
-				gui.startAt(lineNumber);
+				robot.startAt(lineNumber);
 			}
 			return;
 		}
@@ -482,11 +487,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if (robot.isPaused() == true) {
 				buttonPause.setText(Translator.get("Pause"));
 				robot.unPause();
-				// TODO: if the robot is not ready to unpause, this might fail and the program would appear to hang until a dis- and re-connect.
-				gui.sendFileCommand();
+				robot.sendFileCommand();
 			} else {
-				robot.pause();
 				buttonPause.setText(Translator.get("Unpause"));
+				robot.pause();
 			}
 			return;
 		}
@@ -729,12 +733,20 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			}
 			
 			robot.getSettings().saveConfig();
-
-			String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
-
 			robot.setDecorator(chosenGenerator);
 			chosenGenerator.setRobot(robot);
-			chosenGenerator.generate(destinationFile);
+
+			String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
+			try (
+					final OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+					final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
+					) {
+				chosenGenerator.generate(out);
+				out.flush();
+				out.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 			robot.setDecorator(null);
 
 			LoadGCode loader = new LoadGCode();
