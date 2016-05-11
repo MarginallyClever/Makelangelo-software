@@ -53,6 +53,27 @@ public abstract class ImageManipulator {
 	}
 
 
+	/**
+	 * insert the machine-specific preamble at the start of the gcode file.
+	 * @param img
+	 * @param out
+	 * @throws IOException
+	 */
+	public void imageStart(Writer out) throws IOException {
+		tool = machine.getCurrentTool();
+
+		out.write(machine.getConfigLine() + ";\n");
+		out.write(machine.getBobbinLine() + ";\n");
+		out.write(machine.getSetStartAtHomeLine() + ";\n");
+		tool.writeChangeTo(out);
+
+		previousX = 0;
+		previousY = 0;
+
+		setAbsoluteMode(out);
+	}
+
+
 	protected void liftPen(Writer out) throws IOException {
 		tool.writeOff(out);
 		lastUp = true;

@@ -23,27 +23,6 @@ public abstract class ImageConverter extends ImageManipulator implements DrawPan
 		return false;
 	}
 
-
-	/**
-	 * insert the machine-specific preamble at the start of the gcode file.
-	 * @param img
-	 * @param out
-	 * @throws IOException
-	 */
-	protected void imageStart(Writer out) throws IOException {
-		tool = machine.getCurrentTool();
-
-		out.write(machine.getConfigLine() + ";\n");
-		out.write(machine.getBobbinLine() + ";\n");
-		out.write(machine.getSetStartAtHomeLine() + ";\n");
-		tool.writeChangeTo(out);
-
-		previousX = 0;
-		previousY = 0;
-
-		setAbsoluteMode(out);
-	}
-
 	
 	@Override
 	public void render(GL2 gl2,MakelangeloRobotSettings settings) {}
