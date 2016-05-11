@@ -4,9 +4,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -127,10 +128,10 @@ public class LoadImage implements LoadFileType {
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
-	public boolean load(String filename,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		TransformedImage img;
 		try {
-			img = new TransformedImage( ImageIO.read(new File(filename)) );
+			img = new TransformedImage( ImageIO.read(in) );
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
@@ -208,7 +209,11 @@ public class LoadImage implements LoadFileType {
 			public void done() {
 				pm.close();
 				LoadGCode loader = new LoadGCode();
-				loader.load(destinationFile, robot);
+				try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
+					loader.load(fileInputStream,robot);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
 		};
 

@@ -1,6 +1,7 @@
 package com.marginallyclever.loaders;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -22,15 +23,16 @@ public class LoadGCode implements LoadFileType {
 		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
 
+	
 	@Override
-	public boolean load(String filename,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		if(robot.getSettings().isReverseForGlass()) {
 			Log.message("Flipping for glass...");
 		}
 
 		GCodeFile file;
 		try {
-			file = new GCodeFile(filename,robot.getSettings().isReverseForGlass());
+			file = new GCodeFile(in,robot.getSettings().isReverseForGlass());
 			
 		} catch (IOException e) {
 			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());

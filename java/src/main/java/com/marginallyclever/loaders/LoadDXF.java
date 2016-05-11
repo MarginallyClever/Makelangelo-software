@@ -2,8 +2,10 @@ package com.marginallyclever.loaders;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +51,8 @@ public class LoadDXF implements LoadFileType {
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	public boolean load(String filename,MakelangeloRobot robot) {
+	@Override
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 
 		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
@@ -81,7 +84,7 @@ public class LoadDXF implements LoadFileType {
 					
 					boolean isLifted=true;
 
-					parser.parse(filename, DXFParser.DEFAULT_ENCODING);
+					parser.parse(in, DXFParser.DEFAULT_ENCODING);
 					DXFDocument doc = parser.getDocument();
 					Bounds b = doc.getBounds();
 					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0;
@@ -96,10 +99,15 @@ public class LoadDXF implements LoadFileType {
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
-					double scale = (innerAspectRatio >= outerAspectRatio) ?
-							(paperWidth / imageWidth) :
-							(paperHeight / imageHeight);
-
+					double scale = 1;
+					
+					boolean scaleToFit = true;
+					if(scaleToFit) {
+						scale = (innerAspectRatio >= outerAspectRatio) ?
+								(paperWidth / imageWidth) :
+								(paperHeight / imageHeight);
+					}
+					
 					double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
 					
 					// count all entities in all layers
@@ -264,7 +272,13 @@ public class LoadDXF implements LoadFileType {
 				pm.close();
 				if (ok) {
 					LoadGCode loader = new LoadGCode();
-					loader.load(destinationFile, robot);
+					try (
+							final InputStream fileInputStream = new FileInputStream(destinationFile);
+							) {
+						loader.load(fileInputStream,robot);
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		};

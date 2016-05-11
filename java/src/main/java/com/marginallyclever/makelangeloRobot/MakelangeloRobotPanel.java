@@ -11,8 +11,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -753,7 +755,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.setDecorator(null);
 
 			LoadGCode loader = new LoadGCode();
-			loader.load(destinationFile,robot);
+			try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
+				loader.load(fileInputStream,robot);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
@@ -801,7 +807,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			LoadFileType lft = i.next();
 			if(lft.canLoad(filename)) {
 				attempted=true;
-				success=lft.load(filename, robot);
+				try (final InputStream fileInputStream = new FileInputStream(filename)) {
+					lft.load(fileInputStream,robot);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 				if(success==true) {
 					break;
 				}

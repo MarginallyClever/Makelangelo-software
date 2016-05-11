@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -60,6 +61,11 @@ public class GCodeFile {
 	
 	public GCodeFile(String filename,boolean flipHorizontally) throws IOException {
 		load(filename,flipHorizontally);
+	}
+	
+	
+	public GCodeFile(InputStream in,boolean flipHorizontally) throws IOException {
+		load(in,flipHorizontally);
 	}
 
 
@@ -198,11 +204,19 @@ public class GCodeFile {
 		}
 	}
 
+	public void load(InputStream in,boolean flipHorizontally) throws IOException {
+		Scanner scanner = new Scanner(in);
+		loadFromScanner(scanner,flipHorizontally);
+	}
 
 	public void load(String filename,boolean flipHorizontally) throws IOException {
+		Scanner scanner = new Scanner(new FileInputStream(filename));	
+		loadFromScanner(scanner,flipHorizontally);
+	}
+	
+	
+	private void loadFromScanner(Scanner scanner,boolean flipHorizontally) {
 		closeFile();
-
-		Scanner scanner = new Scanner(new FileInputStream(filename));
 
 		setLinesTotal(0);
 		setLines(new ArrayList<String>());
