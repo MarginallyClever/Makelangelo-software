@@ -34,8 +34,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String robotTypeName = "DRAWBOT";
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
+	static public final float PEN_HOLDER_RADIUS=6; //cm
+	
 	static boolean please_get_a_guid=false;  // set to false when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
-		
+	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
 	
@@ -543,9 +545,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void render(GL2 gl2) {
 		paintLimits(gl2);
-		paintCenter(gl2);
+		paintCalibrationPoint(gl2);
 		paintMotors(gl2);
-		paintGondolaAndCounterweights(gl2);
+		paintPenHolderAndCounterweights(gl2);
 		// TODO draw control box?
 
 		if(drawDecorator!=null) {
@@ -600,7 +602,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
-	private void paintGondolaAndCounterweights( GL2 gl2 ) {
+	private void paintPenHolderAndCounterweights( GL2 gl2 ) {
 		double dx,dy;
 
 		double mw = settings.getLimitRight()-settings.getLimitLeft();
@@ -639,11 +641,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
 		float f;
-		float r=4; // circle radius
 		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(gondolaX+Math.cos(f)*r,gondolaY+Math.sin(f)*r);
+			gl2.glVertex2d(gondolaX+Math.cos(f)*PEN_HOLDER_RADIUS,gondolaY+Math.sin(f)*PEN_HOLDER_RADIUS);
 		}
 		gl2.glEnd();
+		
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
@@ -652,6 +654,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75+1.5,settings.getLimitTop()-left_b-15);
 		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75-1.5,settings.getLimitTop()-left_b-15);
 		gl2.glEnd();
+		
 		// counterweight right
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
@@ -747,14 +750,29 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 * draw calibration point
 	 * @param gl2
 	 */
-	private void paintCenter(GL2 gl2) {
-		gl2.glColor3f(1,0,0);
+	private void paintCalibrationPoint(GL2 gl2) {
+		gl2.glColor3f(0.8f,0.8f,0.8f);
+		gl2.glPushMatrix();
+		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
+
+		// gondola
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		float f;
+		for(f=0;f<2.0*Math.PI;f+=0.3f) {
+			gl2.glVertex2d(	Math.cos(f)*(PEN_HOLDER_RADIUS+0.1),
+							Math.sin(f)*(PEN_HOLDER_RADIUS+0.1)
+							);
+		}
+		gl2.glEnd();
+
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2f(-0.25f,0.0f);
 		gl2.glVertex2f( 0.25f,0.0f);
 		gl2.glVertex2f(0.0f,-0.25f);
 		gl2.glVertex2f(0.0f, 0.25f);
 		gl2.glEnd();
+		
+		gl2.glPopMatrix();
 	}
 
 
