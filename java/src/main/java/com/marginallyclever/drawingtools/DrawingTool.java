@@ -3,6 +3,7 @@ package com.marginallyclever.drawingtools;
 import java.awt.BasicStroke;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DecimalFormat;
 import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
@@ -15,6 +16,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public abstract class DrawingTool {
 	protected float diameter; // mm
 
+	DecimalFormat df = new DecimalFormat("#.###");
+	
 	// used while drawing to the GUI
 	protected float feedRate;
 	protected String name;
@@ -106,17 +109,17 @@ public abstract class DrawingTool {
 	}
 
 	public void writeMoveTo(Writer out, float x, float y) throws IOException {
-		out.write("G00 X" + x + " Y" + y + ";\n");
+		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 
 	// lift the pen.
 	public void writeOff(Writer out) throws IOException {
-		out.write("G00 Z" + zOff + ";\n");
-		out.write("G04 P" + zRate + ";\n");
+		out.write("G00 Z" + df.format(zOff) + ";\n");
+		out.write("G04 P" + df.format(zRate) + ";\n");
 	}
 	// lower the pen.
 	public void writeOn(Writer out) throws IOException {
-		out.write("G00 Z" + zOn + ";\n");
-		out.write("G04 P" + zRate + ";\n");
+		out.write("G00 Z" + df.format(zOn) + ";\n");
+		out.write("G04 P" + df.format(zRate) + ";\n");
 	}
 }

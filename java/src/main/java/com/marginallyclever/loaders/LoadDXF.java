@@ -96,8 +96,9 @@ public class LoadDXF implements LoadFileType {
 
 					double innerAspectRatio = imageWidth / imageHeight;
 					double outerAspectRatio = paperWidth / paperHeight;
-					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
-							: (paperHeight / imageHeight);
+					double scale = (innerAspectRatio >= outerAspectRatio) ?
+							(paperWidth / imageWidth) :
+							(paperHeight / imageHeight);
 
 					double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
 					
