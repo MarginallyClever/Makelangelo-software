@@ -37,7 +37,7 @@ import com.marginallyclever.makelangelo.PreferencesHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class LoadImage implements LoadFileType {
+public class LoadImage extends ImageManipulator implements LoadFileType {
 	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper

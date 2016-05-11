@@ -45,7 +45,6 @@ import com.marginallyclever.loaders.LoadGCode;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
-import com.marginallyclever.makelangelo.StatusBar;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.basictypes.CollapsiblePanel;
@@ -98,7 +97,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
-	// status bar
 	public StatusBar statusBar;
 
 

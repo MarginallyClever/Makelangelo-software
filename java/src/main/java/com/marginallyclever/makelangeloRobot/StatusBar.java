@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -11,6 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Translator;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {
@@ -97,7 +100,8 @@ public class StatusBar extends JPanel {
 		long remaining = total_time - t_draw_now;
 
 		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
-		mExactly.setText(sofar + "/" + total);
+		DecimalFormat df = new DecimalFormat("#.##");
+		mExactly.setText(sofar + "/" + total + " "+df.format(100*(double)sofar/(double)total)+"%");
 		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }

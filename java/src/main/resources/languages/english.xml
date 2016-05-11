@@ -18,6 +18,12 @@
 	</string>
 	
 	<string>
+		<key>DXFScaleOnLoad</key>
+		<value>Scale image to fit paper?</value>
+		<hint>DXF load option</hint>
+	</string>
+	
+	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
 		<hint>used in many places</hint>
