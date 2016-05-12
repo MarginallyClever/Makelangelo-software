@@ -105,10 +105,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 
-	public JButton tightJButton(String label) {
+	public JButton createTightJButton(String label) {
 		JButton b = new JButton(label);
 		b.setMargin(new Insets(0,0,0,0));
 		b.setPreferredSize(new Dimension(60,20));
+		b.addActionListener(this);
+		return b;
+	}
+
+
+	public JButton createNarrowJButton(String label) {
+		JButton b = new JButton(label);
+		b.setMargin(new Insets(0,0,0,0));
+		b.setPreferredSize(new Dimension(40,20));
 		b.addActionListener(this);
 		return b;
 	}
@@ -385,24 +394,24 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		axisControl.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		setHome = tightJButton(Translator.get("SetHome"));
+		setHome = createTightJButton(Translator.get("SetHome"));
 	    setHome.setPreferredSize(new Dimension(100,20));
 
-		down100 = tightJButton("-100");
-		down10 = tightJButton("-10");
-		down1 = tightJButton("-1");
+		down100 = createTightJButton("-100");
+		down10 = createTightJButton("-10");
+		down1 = createTightJButton("-1");
 
-		up1 = tightJButton("1");
-		up10 = tightJButton("10");
-		up100 = tightJButton("100");
+		up1 = createTightJButton("1");
+		up10 = createTightJButton("10");
+		up100 = createTightJButton("100");
 
-		left100 = tightJButton("-100");
-		left10 = tightJButton("-10");
-		left1 = tightJButton("-1");
+		left100 = createNarrowJButton("-100");
+		left10 = createNarrowJButton("-10");
+		left1 = createNarrowJButton("-1");
 		
-		right1 = tightJButton("1");
-		right10 = tightJButton("10");
-		right100 = tightJButton("100");
+		right1 = createNarrowJButton("1");
+		right10 = createNarrowJButton("10");
+		right100 = createNarrowJButton("100");
 
 		c.fill=GridBagConstraints.BOTH;
 		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);

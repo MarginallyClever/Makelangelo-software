@@ -156,11 +156,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void mouseDragged(MouseEvent e) {
 		int x=e.getX();
 		int y=e.getY();
-		if(buttonPressed==MouseEvent.BUTTON1) {
-			moveCamera(x,y);
-		} else if(buttonPressed==MouseEvent.BUTTON3) {
-			zoomCamera(y);
-		}
+		int dx = x - mouseOldX;
+		int dy = y - mouseOldY;
+		if(buttonPressed==MouseEvent.BUTTON1) moveCamera(-dx,-dy);
+		if(buttonPressed==MouseEvent.BUTTON3) zoomCamera(dy);
 		mouseOldX=x;
 		mouseOldY=y;
 	}
@@ -170,12 +169,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	/**
 	 * position the camera in from of the robot
 	 *
-	 * @param x position horizontally
-	 * @param y position vertically
+	 * @param dx change horizontally
+	 * @param dy change vertically
 	 */
-	private void moveCamera(int x, int y) {
-		cameraOffsetX += (mouseOldX - x) * cameraZoom / windowWidth;
-		cameraOffsetY += (mouseOldY - y) * cameraZoom / windowWidth;
+	private void moveCamera(int dx, int dy) {
+		cameraOffsetX += (float)dx * cameraZoom / windowWidth;
+		cameraOffsetY += (float)dy * cameraZoom / windowWidth;
 	}
 
 	/**
@@ -183,10 +182,10 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 *
 	 * @param y
 	 */
-	private void zoomCamera(int y) {
-		final double zoomAmount = (double) (y - mouseOldY) * 0.01;
+	private void zoomCamera(int dy) {
+		double zoomAmount = (double)dy * 0.25;
 		cameraZoom += zoomAmount;
-		if (Double.compare(cameraZoom, 0.1d) < 0) cameraZoom = 0.1d;
+		if (cameraZoom < 0.1) cameraZoom = 0.1;
 	}
 
 	/**
