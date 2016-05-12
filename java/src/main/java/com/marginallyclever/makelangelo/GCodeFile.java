@@ -40,19 +40,19 @@ public class GCodeFile {
 	private ReentrantLock lock = new ReentrantLock();
 
 	// optimization - turn gcode into vectors once on load, draw vectors after that.
-	private enum NodeType {
+	public enum GCodeNodeType {
 		COLOR, POS, TOOL
 	}
-
-	class DrawPanelNode {
+	
+	class GCodeNode {
 		double x1, y1, x2, y2;
 		Color c;
-		int tool_id;
-		int line_number;
-		NodeType type;
+		int toolID;
+		int lineNumber;
+		GCodeNodeType type;
 	}
 
-	ArrayList<DrawPanelNode> fastNodes = new ArrayList<DrawPanelNode>();
+	ArrayList<GCodeNode> fastNodes = new ArrayList<GCodeNode>();
 
 
 	
@@ -367,19 +367,19 @@ public class GCodeFile {
 		// draw image
 		if (fastNodes.size() > 0) {
 			// draw the nodes
-			Iterator<DrawPanelNode> nodes = fastNodes.iterator();
+			Iterator<GCodeNode> nodes = fastNodes.iterator();
 			while (nodes.hasNext()) {
-				DrawPanelNode n = nodes.next();
+				GCodeNode n = nodes.next();
 
 				if (robot.isRunning()) {
-					if (n.line_number < linesProcessed) {
+					if (n.lineNumber < linesProcessed) {
 						gl2.glColor3f(1, 0, 0);
 						//g2d.setColor(Color.RED);
-						if(n.type==NodeType.POS) {
+						if(n.type==GCodeNodeType.POS) {
 							robot.gondolaX=(float)n.x1;
 							robot.gondolaY=(float)n.y1;
 						}
-					} else if (n.line_number <= linesProcessed + lookAhead) {
+					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						gl2.glColor3f(0, 1, 0);
 						//g2d.setColor(Color.GREEN);
 					} else if (drawAllWhileRunning == false) {
@@ -389,11 +389,11 @@ public class GCodeFile {
 
 				switch (n.type) {
 				case TOOL:
-					tool = robot.getSettings().getTool(n.tool_id);
+					tool = robot.getSettings().getTool(n.toolID);
 					gl2.glLineWidth(tool.getDiameter());
 					break;
 				case COLOR:
-					if (!robot.isRunning() || n.line_number > linesProcessed + lookAhead) {
+					if (!robot.isRunning() || n.lineNumber > linesProcessed + lookAhead) {
 						//g2d.setColor(n.c);
 						gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
 					}
@@ -408,31 +408,31 @@ public class GCodeFile {
 
 	
 	private void addNodePos(int i, double x1, double y1, double x2, double y2) {
-		DrawPanelNode n = new DrawPanelNode();
-		n.line_number = i;
+		GCodeNode n = new GCodeNode();
+		n.lineNumber = i;
 		n.x1 = x1;
 		n.x2 = x2;
 		n.y1 = y1;
 		n.y2 = y2;
-		n.type = NodeType.POS;
+		n.type = GCodeNodeType.POS;
 
 		fastNodes.add(n);
 	}
 
 	private void addNodeColor(int i, Color c) {
-		DrawPanelNode n = new DrawPanelNode();
-		n.line_number = i;
+		GCodeNode n = new GCodeNode();
+		n.lineNumber = i;
 		n.c = c;
-		n.type = NodeType.COLOR;
+		n.type = GCodeNodeType.COLOR;
 
 		fastNodes.add(n);
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		DrawPanelNode n = new DrawPanelNode();
-		n.line_number = i;
-		n.tool_id = tool_id;
-		n.type = NodeType.TOOL;
+		GCodeNode n = new GCodeNode();
+		n.lineNumber = i;
+		n.toolID = tool_id;
+		n.type = GCodeNodeType.TOOL;
 
 		fastNodes.add(n);
 	}
