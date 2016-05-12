@@ -686,7 +686,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-
 			openFileOnDemand(selectedFile);
 		}
 	}
@@ -815,7 +814,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			if(lft.canLoad(filename)) {
 				attempted=true;
 				try (final InputStream fileInputStream = new FileInputStream(filename)) {
-					lft.load(fileInputStream,robot);
+					success=lft.load(fileInputStream,robot);
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
