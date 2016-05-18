@@ -612,11 +612,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		dx = gondolaX - settings.getLimitLeft();
 		dy = gondolaY - settings.getLimitTop();
 		double left_a = Math.sqrt(dx*dx+dy*dy);
-		double left_b = suggested_length - left_a;
+		double left_b = (suggested_length - left_a)/2;
 
 		dx = gondolaX - settings.getLimitRight();
 		double right_a = Math.sqrt(dx*dx+dy*dy);
-		double right_b = suggested_length - right_a;
+		double right_b = (suggested_length - right_a)/2;
 
 		if(gondolaX<settings.getLimitLeft()) return;
 		if(gondolaX>settings.getLimitRight()) return;
@@ -624,19 +624,28 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if(gondolaY<settings.getLimitBottom()) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
+		
 		// motor to gondola left
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
 		gl2.glVertex2d(gondolaX,gondolaY);
-		// motor to counterweight left
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75, settings.getLimitTop()-left_b);
 		// motor to gondola right
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
 		gl2.glVertex2d(gondolaX,gondolaY);
+		
+		float bottleCenter = 2.1f+0.75f;
+		
+		// motor to counterweight left
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-0.1, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-0.1, settings.getLimitTop()-left_b);
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop()-left_b);
 		// motor to counterweight right
 		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+2.1+1, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()+2.1+1, settings.getLimitTop()-right_b);
 		gl2.glEnd();
+		
 		// gondola
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
@@ -649,19 +658,19 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75-1.5,settings.getLimitTop()-left_b);
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75+1.5,settings.getLimitTop()-left_b);
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75+1.5,settings.getLimitTop()-left_b-15);
-		gl2.glVertex2d(settings.getLimitLeft()-2.1-0.75-1.5,settings.getLimitTop()-left_b-15);
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-1.5,settings.getLimitTop()-left_b);
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+1.5,settings.getLimitTop()-left_b);
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+1.5,settings.getLimitTop()-left_b-15);
+		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-1.5,settings.getLimitTop()-left_b-15);
 		gl2.glEnd();
 		
 		// counterweight right
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75-1.5,settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75+1.5,settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75+1.5,settings.getLimitTop()-right_b-15);
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75-1.5,settings.getLimitTop()-right_b-15);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-1.5,settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+1.5,settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+1.5,settings.getLimitTop()-right_b-15);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-1.5,settings.getLimitTop()-right_b-15);
 		gl2.glEnd();
 		
 		/*
