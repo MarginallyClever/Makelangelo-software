@@ -111,6 +111,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	private Animator animator;
 	
+	// Drag & drop support
+	private MakelangeloTransferHandler myTransferHandler;
+	
 	
 	public static void main(String[] argv) {
 		//Schedule a job for the event-dispatching thread:
@@ -133,6 +136,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot = new MakelangeloRobot(translator);
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
+		
+		myTransferHandler = new MakelangeloTransferHandler(robot);
 		
 		connectionManager = new SerialConnectionManager(prefs);
 		
@@ -411,7 +416,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		//Create the content-pane-to-be.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
-		
 		/*/
         GLCapabilities caps = new GLCapabilities(null);
         caps.setSampleBuffers(true);
@@ -423,7 +427,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		drawPanel = new DrawPanel(caps);
 		drawPanel.setRobot(robot);
 
-		robotPanel = robot.getControlPanel(this);
+		robotPanel = robot.createControlPanel(this);
 		
 		logPanel = new LogPanel(translator, robot);
 
@@ -458,7 +462,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// Create and set up the content pane.
 		mainFrame.setJMenuBar(createMenuBar());
 		mainFrame.setContentPane(createContentPane());
-
+		
+		mainFrame.setTransferHandler(myTransferHandler);
+		
 		setupFrameRealEstate();
 		mainFrame.setVisible(true);
 

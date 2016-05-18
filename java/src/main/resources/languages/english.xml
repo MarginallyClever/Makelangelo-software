@@ -251,6 +251,23 @@
 	</string>
 
 	<string>
+		<key>MenuDriveControls</key>
+		<value>Manual Driving</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuCreativeControl</key>
+		<value>Creative control</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuAnimate</key>
+		<value>Animation control</value>
+		<hint>context sensitive menu</hint>
+	</string>
+
+	
+	<string>
 		<key>MenuSoundsTitle</key>
 		<value>Sounds</value>
 		<hint>menu or dialog title</hint>

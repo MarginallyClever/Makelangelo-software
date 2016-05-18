@@ -524,9 +524,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return settings;
 	}
 	
-	public MakelangeloRobotPanel getControlPanel(Makelangelo gui) {
+	public MakelangeloRobotPanel createControlPanel(Makelangelo gui) {
 		myPanel = new MakelangeloRobotPanel(gui, this);
-		
+		return myPanel;
+	}
+	
+	public MakelangeloRobotPanel getControlPanel() {		
 		return myPanel;
 	}
 
@@ -640,10 +643,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop()-left_b);
 		// motor to counterweight right
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()+2.1+0.75, settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+2.1+1, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()+2.1+1, settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-0.1, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-0.1, settings.getLimitTop()-right_b);
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+0.1, settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+0.1, settings.getLimitTop()-right_b);
 		gl2.glEnd();
 		
 		// gondola

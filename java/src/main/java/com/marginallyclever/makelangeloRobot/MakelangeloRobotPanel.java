@@ -249,8 +249,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		panel.add(feedRateControl,con1); 				con1.gridy++;
 		panel.add(createDriveControls(),con1);			con1.gridy++;
-		panel.add(createDriveCornersPanel(), con1);		con1.gridy++;
-		panel.add(createFileAccessPanel(), con1);		con1.gridy++;
+		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
 		panel.add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
@@ -268,7 +267,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	
 	private JPanel createAnimationPanel() {
-		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuFileAccess"));
+		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuAnimate"));
 		JPanel drivePanel = animationPanel.getContentPane();
 		
 		GridBagConstraints con1 = new GridBagConstraints();
@@ -297,9 +296,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 
-	private JPanel createFileAccessPanel() {
-		CollapsiblePanel fileAccessPanel = new CollapsiblePanel(Translator.get("MenuFileAccess"));
-		JPanel panel = fileAccessPanel.getContentPane();
+	private JPanel createCreativeControlPanel() {
+		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
+		JPanel panel = creativeControlPanel.getContentPane();
 		
 		GridBagConstraints con1 = new GridBagConstraints();
 		con1.gridx=0;
@@ -329,108 +328,110 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(buttonSaveFile, con1);
 		con1.gridy++;
 		
-		return fileAccessPanel;
-	}
-	
-	private JPanel createDriveCornersPanel() {
-		CollapsiblePanel cornerPanel = new CollapsiblePanel(Translator.get("MenuDriveCorners"));
-		JPanel contents = cornerPanel.getContentPane();
-		
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=1;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTH;
-		
-		contents.setLayout(new GridBagLayout());
-		goTop    = new JButton(Translator.get("Top"));			goTop   .setPreferredSize(new Dimension(80,20));
-		goBottom = new JButton(Translator.get("Bottom"));		goBottom.setPreferredSize(new Dimension(80,20));
-		goLeft   = new JButton(Translator.get("Left"));			goLeft  .setPreferredSize(new Dimension(80,20));
-		goRight  = new JButton(Translator.get("Right"));		goRight .setPreferredSize(new Dimension(80,20));
-		penUp    = new JButton(Translator.get("PenUp"));		penUp   .setPreferredSize(new Dimension(100,20));
-		penDown  = new JButton(Translator.get("PenDown"));		penDown .setPreferredSize(new Dimension(100,20));
-		goHome   = new JButton(Translator.get("GoHome"));		goHome  .setPreferredSize(new Dimension(100,20));
-		JLabel horizontalFiller = new JLabel(" ");
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx=2;  c.gridy=0;  contents.add(goTop,c);
-		c.gridx=2;  c.gridy=1;  contents.add(goHome,c);
-		c.gridx=2;  c.gridy=2;  contents.add(goBottom,c);
-		c.gridx=1;  c.gridy=1;  contents.add(goLeft,c);
-		c.gridx=3;  c.gridy=1;  contents.add(goRight,c);
-		c.weightx=1;
-		c.gridx=4;  c.gridy=0;  contents.add(horizontalFiller,c);
-		c.weightx=0;
-		c.gridx=5;  c.gridy=0;  contents.add(penUp,c);
-		c.gridx=5;  c.gridy=2;  contents.add(penDown,c);
-
-		//c.gridx=0;  c.gridy=0;  corners.add(setHome,c);
-		c.insets = new Insets(0,0,0,0);
-		goTop.addActionListener(this);
-		goBottom.addActionListener(this);
-		goLeft.addActionListener(this);
-		goRight.addActionListener(this);
-		penUp.addActionListener(this);
-		penDown.addActionListener(this);
-		goHome.addActionListener(this);
-
-		con1.weightx=1;
-		con1.weighty=0;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTHWEST;
-
-		con1.gridy++;
-		
-		return cornerPanel;
+		return creativeControlPanel;
 	}
 	
 	
 	private JPanel createDriveControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuDriveControls"));
-		JPanel axisControl = drivePanel.getContentPane();
-
-		axisControl.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-
-		setHome = createTightJButton(Translator.get("SetHome"));
-	    setHome.setPreferredSize(new Dimension(100,20));
-
-		down100 = createTightJButton("-100");
-		down10 = createTightJButton("-10");
-		down1 = createTightJButton("-1");
-
-		up1 = createTightJButton("1");
-		up10 = createTightJButton("10");
-		up100 = createTightJButton("100");
-
-		left100 = createNarrowJButton("-100");
-		left10 = createNarrowJButton("-10");
-		left1 = createNarrowJButton("-1");
+		JPanel mainPanel = drivePanel.getContentPane();
+		mainPanel.setLayout(new GridBagLayout());
+		GridBagConstraints cMain = new GridBagConstraints();
+		cMain.fill=GridBagConstraints.HORIZONTAL;
+		cMain.anchor=GridBagConstraints.NORTH;
 		
-		right1 = createNarrowJButton("1");
-		right10 = createNarrowJButton("10");
-		right100 = createNarrowJButton("100");
+		{
+			JPanel axisControl = new JPanel(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			cMain.gridx=0;
+			cMain.gridy=0;
+			mainPanel.add(axisControl,cMain);
+	
+			setHome = createTightJButton(Translator.get("SetHome"));
+		    setHome.setPreferredSize(new Dimension(100,20));
+	
+			down100 = createTightJButton("-100");
+			down10 = createTightJButton("-10");
+			down1 = createTightJButton("-1");
+	
+			up1 = createTightJButton("1");
+			up10 = createTightJButton("10");
+			up100 = createTightJButton("100");
+	
+			left100 = createNarrowJButton("-100");
+			left10 = createNarrowJButton("-10");
+			left1 = createNarrowJButton("-1");
+			
+			right1 = createNarrowJButton("1");
+			right10 = createNarrowJButton("10");
+			right100 = createNarrowJButton("100");
+	
+			c.fill=GridBagConstraints.BOTH;
+			c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
+			c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
+			c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
+			c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
+			c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
+			c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
+			c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
+	
+			c.gridx=0;  c.gridy=3;  axisControl.add(left100,c);
+			c.gridx=1;  c.gridy=3;  axisControl.add(left10,c);
+			c.gridx=2;  c.gridy=3;  axisControl.add(left1,c);
+			c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
+			c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
+			c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
+		}
+		{
+			// quick drive to corners
+			JPanel quickDriveOptions = new JPanel(new GridBagLayout());
+			cMain.insets = new Insets(10,0,0,0);
+			cMain.gridx=0;
+			cMain.gridy=1;
+			mainPanel.add(quickDriveOptions,cMain);
+			
+			GridBagConstraints con1 = new GridBagConstraints();
+			con1.gridx=0;
+			con1.gridy=0;
+			con1.weightx=1;
+			con1.weighty=1;
+			con1.fill=GridBagConstraints.HORIZONTAL;
+			con1.anchor=GridBagConstraints.NORTH;
+	
+			goTop    = new JButton(Translator.get("Top"));			goTop   .setPreferredSize(new Dimension(80,20));
+			goBottom = new JButton(Translator.get("Bottom"));		goBottom.setPreferredSize(new Dimension(80,20));
+			goLeft   = new JButton(Translator.get("Left"));			goLeft  .setPreferredSize(new Dimension(80,20));
+			goRight  = new JButton(Translator.get("Right"));		goRight .setPreferredSize(new Dimension(80,20));
+			penUp    = new JButton(Translator.get("PenUp"));		penUp   .setPreferredSize(new Dimension(100,20));
+			penDown  = new JButton(Translator.get("PenDown"));		penDown .setPreferredSize(new Dimension(100,20));
+			goHome   = new JButton(Translator.get("GoHome"));		goHome  .setPreferredSize(new Dimension(100,20));
 
-		c.fill=GridBagConstraints.BOTH;
-		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
-		c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
-		c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
-		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
-		c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
-		c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
-		c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
-
-		c.gridx=0;  c.gridy=3;  axisControl.add(left100,c);
-		c.gridx=1;  c.gridy=3;  axisControl.add(left10,c);
-		c.gridx=2;  c.gridy=3;  axisControl.add(left1,c);
-		c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
-		c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
-		c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
-		
-		drivePanel.add(axisControl);
-		
+			GridBagConstraints c = new GridBagConstraints();
+			c.anchor=GridBagConstraints.WEST;
+			c.fill=GridBagConstraints.BOTH;
+			c.gridx=2;  c.gridy=0;  quickDriveOptions.add(goTop,c);
+			c.gridx=2;  c.gridy=1;  quickDriveOptions.add(goHome,c);
+			c.gridx=2;  c.gridy=2;  quickDriveOptions.add(goBottom,c);
+			c.gridx=1;  c.gridy=1;  quickDriveOptions.add(goLeft,c);
+			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(goRight,c);
+			c.gridx=4;  c.gridy=0;  quickDriveOptions.add(penUp,c);
+			c.gridx=4;  c.gridy=2;  quickDriveOptions.add(penDown,c);
+	
+			goTop.addActionListener(this);
+			goBottom.addActionListener(this);
+			goLeft.addActionListener(this);
+			goRight.addActionListener(this);
+			penUp.addActionListener(this);
+			penDown.addActionListener(this);
+			goHome.addActionListener(this);
+	
+			con1.weightx=1;
+			con1.weighty=0;
+			con1.fill=GridBagConstraints.HORIZONTAL;
+			con1.anchor=GridBagConstraints.NORTHWEST;
+	
+			con1.gridy++;
+		}
 		return drivePanel;
 	}
 
