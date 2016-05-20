@@ -224,7 +224,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		
 		// settings
-		machineNumberPanel = new JPanel(new GridLayout(1, 0));
+		machineNumberPanel = new JPanel(new GridBagLayout());
 		updateMachineNumberPanel();
 		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
@@ -442,10 +442,17 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
 		machineConfigurations = robot.getSettings().getKnownMachineNames();
+		GridBagConstraints cMachine = new GridBagConstraints();
+		cMachine.fill= GridBagConstraints.HORIZONTAL;
+		cMachine.anchor = GridBagConstraints.NORTH;
+		cMachine.gridx=0;
+		cMachine.gridy=0;
 		if( machineConfigurations.length>0 ) {
 			machineChoices = new JComboBox<>(machineConfigurations);
-			machineNumberPanel.add(new JLabel(Translator.get("MachineNumber")));
-			machineNumberPanel.add(machineChoices);
+			machineNumberPanel.add(new JLabel(Translator.get("MachineNumber")),cMachine);
+			cMachine.gridx++;
+			machineNumberPanel.add(machineChoices,cMachine);
+			cMachine.gridx++;
 
 			int index = robot.getSettings().getKnownMachineIndex();
 			if( index<0 ) index=0;
@@ -463,7 +470,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		openConfig = new JButton(Translator.get("configureMachine"));
 		openConfig.addActionListener(this);
 		openConfig.setPreferredSize(openConfig.getPreferredSize());
-		machineNumberPanel.add(openConfig);
+		machineNumberPanel.add(openConfig,cMachine);
+		cMachine.gridx++;
 	}
 
 	// The user has done something. respond to it.

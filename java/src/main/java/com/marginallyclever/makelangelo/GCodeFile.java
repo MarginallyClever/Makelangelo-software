@@ -356,7 +356,7 @@ public class GCodeFile {
 		int linesProcessed = getLinesProcessed();
 		optimizeNodes(robot);
 
-		int lookAhead=500;
+		int lookAhead=320;
 
 		DrawingTool tool = robot.getSettings().getTool(0);
 		gl2.glColor3f(0, 0, 0);

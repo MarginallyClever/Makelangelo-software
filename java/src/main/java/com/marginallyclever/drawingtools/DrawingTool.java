@@ -115,11 +115,11 @@ public abstract class DrawingTool {
 	// lift the pen.
 	public void writeOff(Writer out) throws IOException {
 		out.write("G00 Z" + df.format(zOff) + ";\n");
-		out.write("G04 P" + df.format(zRate) + ";\n");
+		//out.write("G04 P" + df.format(zRate) + ";\n");
 	}
 	// lower the pen.
 	public void writeOn(Writer out) throws IOException {
 		out.write("G00 Z" + df.format(zOn) + ";\n");
-		out.write("G04 P" + df.format(zRate) + ";\n");
+		//out.write("G04 P" + df.format(zRate) + ";\n");
 	}
 }

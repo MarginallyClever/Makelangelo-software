@@ -174,7 +174,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	private void moveCamera(int dx, int dy) {
 		cameraOffsetX += (float)dx * cameraZoom / windowWidth;
-		cameraOffsetY += (float)dy * cameraZoom / windowWidth;
+		cameraOffsetY += (float)dy * cameraZoom / windowHeight;
 	}
 
 	/**

@@ -420,7 +420,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body> Ayay ewnay ersionvay ofyay isthay oftwaresay isyay availableyay  A new version of this software is available.<br/>Please visit <a href="https://github.com/MarginallyClever/Makelangelo/releases">https://github.com/MarginallyClever/Makelangelo/releases</a> to get the new hotness.</html></body>]]></value>
+		<value><![CDATA[<html><body> Ayay ewnay ersionvay ofyay isthay oftwaresay isyay availableyay  A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>

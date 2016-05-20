@@ -361,15 +361,16 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 					// parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
 					inputLine = inputLine.substring(inputLine.lastIndexOf("/") + 1);
 
-					System.out.println("last release: " + inputLine);
-					System.out.println("this version: " + VERSION);
+					System.out.println("latest release: " + inputLine+"; this version: " + VERSION);
 					//System.out.println(inputLine.compareTo(VERSION));
 
-					if (inputLine.compareTo(VERSION) > 0) {
-						JOptionPane.showMessageDialog(null, Translator.get("UpdateNotice"));
-					} else {
-						JOptionPane.showMessageDialog(null, Translator.get("UpToDate"));
-					}
+					int comp = inputLine.compareTo(VERSION);
+					String results;
+					if     (comp>0) results = Translator.get("UpdateNotice");
+					else if(comp<0) results = "This version is from the future?!";
+					else 			results = Translator.get("UpToDate");
+
+					JOptionPane.showMessageDialog(mainFrame, results);
 				}
 			} else {
 				throw new Exception();
