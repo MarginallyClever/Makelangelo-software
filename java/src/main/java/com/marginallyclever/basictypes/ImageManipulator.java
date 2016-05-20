@@ -8,7 +8,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.DrawPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
@@ -31,7 +30,6 @@ public abstract class ImageManipulator {
 	// helpers
 	protected MakelangeloRobotSettings machine;
 	protected DrawingTool tool;
-	protected DrawPanel drawPanel;
 
 
 	public void setParent(SwingWorker<Void, Void> p) {
@@ -42,19 +40,37 @@ public abstract class ImageManipulator {
 		pm = p;
 	}
 	
-	public void setMachine(MakelangeloRobot robot) {
-		machine = robot.settings;
+	public void setRobot(MakelangeloRobot robot) {
+		machine = robot.getSettings();
 	}
 
-	public void setDrawPanel(DrawPanel drawPanel) {
-		this.drawPanel = drawPanel;
-	}
 
 	/**
 	 * @return the translated name of the manipulator.
 	 */
 	public String getName() {
 		return "Unnamed";
+	}
+
+
+	/**
+	 * insert the machine-specific preamble at the start of the gcode file.
+	 * @param img
+	 * @param out
+	 * @throws IOException
+	 */
+	public void imageStart(Writer out) throws IOException {
+		tool = machine.getCurrentTool();
+
+		out.write(machine.getConfigLine() + ";\n");
+		out.write(machine.getBobbinLine() + ";\n");
+		out.write(machine.getSetStartAtHomeLine() + ";\n");
+		tool.writeChangeTo(out);
+
+		previousX = 0;
+		previousY = 0;
+
+		setAbsoluteMode(out);
 	}
 
 

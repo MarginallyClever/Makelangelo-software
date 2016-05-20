@@ -1,18 +1,19 @@
 package com.marginallyclever.loaders;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.GridLayout;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.kabeja.dxf.Bounds;
@@ -31,15 +32,17 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class LoadDXF implements LoadFileType {
-
+public class LoadDXF extends ImageManipulator implements LoadFileType {
+	boolean shouldScaleOnLoad=true;
+	
+	@Override
+	public String getName() { return "DXF"; }
+	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
@@ -51,253 +54,220 @@ public class LoadDXF implements LoadFileType {
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
-		final String destinationFile = gui.getTempDestinationFile();
+	@Override
+	public boolean load(InputStream in,MakelangeloRobot robot) {
+		final JCheckBox checkScale = new JCheckBox(Translator.get("DXFScaleOnLoad"));
 
-		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
-		pm.setProgress(0);
-		pm.setMillisToPopup(0);
+		JPanel panel = new JPanel(new GridLayout(0, 1));
+		panel.add(checkScale);
+		checkScale.setSelected(shouldScaleOnLoad);
 
-		final SwingWorker<Void, Void> s = new SwingWorker<Void, Void>() {
-			public boolean ok = false;
+		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (result == JOptionPane.OK_OPTION) {
+			shouldScaleOnLoad = checkScale.isSelected();
+			
+			return loadNow(in,robot);
+		}
+		return false;
+	}
+	
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public Void doInBackground() {
-				Log.message(Translator.get("Converting") + " " + destinationFile);
+	@SuppressWarnings("unchecked")
+	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
+		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
+		Log.message(Translator.get("Converting") + " " + destinationFile);
 
-				Parser parser = ParserBuilder.createDefaultParser();
+		try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
-				double dxf_x2 = 0;
-				double dxf_y2 = 0;
+			machine = robot.getSettings();
+			tool = robot.getSettings().getCurrentTool();
+			// gcode preamble
+			out.write(robot.getSettings().getConfigLine() + ";\n");
+			out.write(robot.getSettings().getBobbinLine() + ";\n");
+			out.write(robot.getSettings().getSetStartAtHomeLine()+";\n");
+			setAbsoluteMode(out);
+			tool.writeChangeTo(out);
+			liftPen(out);
 
-				try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
-						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-					DrawingTool tool = robot.settings.getCurrentTool();
-					out.write(robot.settings.getConfigLine() + ";\n");
-					out.write(robot.settings.getBobbinLine() + ";\n");
-					out.write("G00 G90;\n");
-					tool.writeChangeTo(out);
-					tool.writeOff(out);
+			// start parser
+			Parser parser = ParserBuilder.createDefaultParser();
+			parser.parse(in, DXFParser.DEFAULT_ENCODING);
+			DXFDocument doc = parser.getDocument();
+			Bounds b = doc.getBounds();
+			double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0;
+			double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0;
 
-					parser.parse(filename, DXFParser.DEFAULT_ENCODING);
-					DXFDocument doc = parser.getDocument();
-					Bounds b = doc.getBounds();
-					double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0f;
-					double imageCenterY = (b.getMaximumY() + b.getMinimumY()) / 2.0f;
+			// find the scale to fit the image on the paper without
+			// altering the aspect ratio
+			double imageWidth  = (b.getMaximumX() - b.getMinimumX());
+			double imageHeight = (b.getMaximumY() - b.getMinimumY());
+			double paperHeight = robot.getSettings().getPaperHeight() * 10.0 * robot.getSettings().getPaperMargin();
+			double paperWidth  = robot.getSettings().getPaperWidth () * 10.0 * robot.getSettings().getPaperMargin();
 
-					// find the scale to fit the image on the paper without
-					// altering the aspect ratio
-					double imageWidth = (b.getMaximumX() - b.getMinimumX());
-					double imageHeight = (b.getMaximumY() - b.getMinimumY());
-					double paperHeight = robot.settings.getPaperHeight() * 10 * robot.settings.getPaperMargin();
-					double paperWidth = robot.settings.getPaperWidth() * 10 * robot.settings.getPaperMargin();
+			double innerAspectRatio = imageWidth / imageHeight;
+			double outerAspectRatio = paperWidth / paperHeight;
+			double scale = 1;
 
-					double innerAspectRatio = imageWidth / imageHeight;
-					double outerAspectRatio = paperWidth / paperHeight;
-					double scale = (innerAspectRatio >= outerAspectRatio) ? (paperWidth / imageWidth)
-							: (paperHeight / imageHeight);
+			if(shouldScaleOnLoad) {
+				scale = (innerAspectRatio >= outerAspectRatio) ?
+						(paperWidth / imageWidth) :
+						(paperHeight / imageHeight);
+			}
+			
+			double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
+			boolean isLifted=true;
+			double dxf_x2 = 0;
+			double dxf_y2 = 0;
 
-					// count all entities in all layers
-					Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
-					int entity_total = 0;
-					int entity_count = 0;
-					while (layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer) layer_iter.next();
-						Log.message("Found layer " + layer.getName());
-						Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-						while (entity_iter.hasNext()) {
-							String entity_type = (String) entity_iter.next();
-							List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
-							Log.message("Found " + entity_list.size() + " of type " + entity_type);
-							entity_total += entity_list.size();
+			// count all entities in all layers
+			Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
+			//int entity_total = 0;
+			while (layer_iter.hasNext()) {
+				DXFLayer layer = (DXFLayer) layer_iter.next();
+				Log.message("Found layer " + layer.getName());
+				Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+				while (entity_iter.hasNext()) {
+					String entity_type = (String) entity_iter.next();
+					List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
+					Log.message("Found " + entity_list.size() + " of type " + entity_type);
+					//entity_total += entity_list.size();
+				}
+			}
+
+			// convert each entity
+			layer_iter = doc.getDXFLayerIterator();
+			while (layer_iter.hasNext()) {
+				DXFLayer layer = (DXFLayer) layer_iter.next();
+
+				Iterator<String> entity_type_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+				while (entity_type_iter.hasNext()) {
+					String entity_type = (String) entity_type_iter.next();
+					List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
+
+					if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
+						Iterator<DXFEntity> iter = entity_list.iterator();
+						while (iter.hasNext()) {
+							DXFLine entity = (DXFLine) iter.next();
+							Point start = entity.getStartPoint();
+							Point end = entity.getEndPoint();
+
+							double x = (start.getX() - imageCenterX) * scale;
+							double y = (start.getY() - imageCenterY) * scale;
+							double x2 = (end.getX() - imageCenterX) * scale;
+							double y2 = (end.getY() - imageCenterY) * scale;
+
+							double dx = dxf_x2 - x;
+							double dy = dxf_y2 - y;
+							if (dx * dx + dy * dy > toolDiameterSquared) {
+								if (!isLifted) {
+									liftPen(out);
+									isLifted=true;
+								}
+								moveTo(out, (float) x, (float) y,true);
+							}
+							if (isLifted) {
+								lowerPen(out);
+								isLifted=false;
+							}
+							moveTo(out, (float) x2, (float) y2,false);
+							dxf_x2 = x2;
+							dxf_y2 = y2;
 						}
-					}
-					// set the progress meter
-					pm.setMinimum(0);
-					pm.setMaximum(entity_total);
+					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+						Iterator<DXFEntity> iter = entity_list.iterator();
+						while (iter.hasNext()) {
+							DXFSpline entity = (DXFSpline) iter.next();
+							entity.setLineWeight(30);
+							DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+							boolean first = true;
+							int count = polyLine.getVertexCount() + (polyLine.isClosed()?1:0);
+							for (int j = 0; j < count; ++j) {
+								DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
+								double x = (v.getX() - imageCenterX) * scale;
+								double y = (v.getY() - imageCenterY) * scale;
+								double dx = dxf_x2 - x;
+								double dy = dxf_y2 - y;
 
-					// convert each entity
-					layer_iter = doc.getDXFLayerIterator();
-					while (layer_iter.hasNext()) {
-						DXFLayer layer = (DXFLayer) layer_iter.next();
-
-						Iterator<String> entity_type_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-						while (entity_type_iter.hasNext()) {
-							String entity_type = (String) entity_type_iter.next();
-							List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
-
-							if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-								Iterator<DXFEntity> iter = entity_list.iterator();
-								while (iter.hasNext()) {
-									pm.setProgress(entity_count++);
-									DXFLine entity = (DXFLine) iter.next();
-									Point start = entity.getStartPoint();
-									Point end = entity.getEndPoint();
-
-									double x = (start.getX() - imageCenterX) * scale;
-									double y = (start.getY() - imageCenterY) * scale;
-									double x2 = (end.getX() - imageCenterX) * scale;
-									double y2 = (end.getY() - imageCenterY) * scale;
-									double dx, dy;
-									// *
-									// is it worth drawing this line?
-									dx = x2 - x;
-									dy = y2 - y;
-									if (dx * dx + dy * dy < tool.getDiameter() / 2.0) {
-										continue;
-									}
-									// */
-									dx = dxf_x2 - x;
-									dy = dxf_y2 - y;
-
-									if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-										if (tool.isDrawOn()) {
-											tool.writeOff(out);
+								if (first == true) {
+									first = false;
+									if (dx * dx + dy * dy > toolDiameterSquared) {
+										// line does not start at last tool location, lift and move.
+										if (!isLifted) {
+											liftPen(out);
+											isLifted=true;
 										}
-										tool.writeMoveTo(out, (float) x, (float) y);
+										moveTo(out, (float) x, (float) y,true);
 									}
-									if (tool.isDrawOff()) {
-										tool.writeOn(out);
+									// else line starts right here, pen is down, do nothing extra.
+								} else {
+									// not the first point, draw.
+									if (isLifted) {
+										lowerPen(out);
+										isLifted=false;
 									}
-									tool.writeMoveTo(out, (float) x2, (float) y2);
-									dxf_x2 = x2;
-									dxf_y2 = y2;
+									if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy <= toolDiameterSquared)
+										continue; // points too close together
+									moveTo(out, (float) x, (float) y,false);
 								}
-							} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-								Iterator<DXFEntity> iter = entity_list.iterator();
-								while (iter.hasNext()) {
-									pm.setProgress(entity_count++);
-									DXFSpline entity = (DXFSpline) iter.next();
-									entity.setLineWeight(30);
-									DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-									boolean first = true;
-									int count = polyLine.getVertexCount() + (polyLine.isClosed()?1:0);
-									for (int j = 0; j < count; ++j) {
-										DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
-										double x = (v.getX() - imageCenterX) * scale;
-										double y = (v.getY() - imageCenterY) * scale;
-										double dx = dxf_x2 - x;
-										double dy = dxf_y2 - y;
+								dxf_x2 = x;
+								dxf_y2 = y;
+							}
+						}
+					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+						Iterator<DXFEntity> iter = entity_list.iterator();
+						while (iter.hasNext()) {
+							DXFPolyline entity = (DXFPolyline) iter.next();
+							boolean first = true;
+							int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+							for (int j = 0; j < count; ++j) {
+								DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+								double x = (v.getX() - imageCenterX) * scale;
+								double y = (v.getY() - imageCenterY) * scale;
+								double dx = dxf_x2 - x;
+								double dy = dxf_y2 - y;
 
-										if (first == true) {
-											first = false;
-											if (dx * dx + dy * dy > tool.getDiameter() / 2.0) {
-												// line does not start at last
-												// tool location, lift and move.
-												if (tool.isDrawOn()) {
-													tool.writeOff(out);
-												}
-												tool.writeMoveTo(out, (float) x, (float) y);
-											}
-											// else line starts right here, do
-											// nothing.
-										} else {
-											// not the first point, draw.
-											if (tool.isDrawOff())
-												tool.writeOn(out);
-											if (j < polyLine.getVertexCount() - 1
-													&& dx * dx + dy * dy < tool.getDiameter() / 2.0)
-												continue; // less than 1mm
-															// movement? Skip
-															// it.
-											tool.writeMoveTo(out, (float) x, (float) y);
+								if (first == true) {
+									first = false;
+									if (dx * dx + dy * dy > toolDiameterSquared) {
+										// line does not start at last tool location, lift and move.
+										if (!isLifted) {
+											liftPen(out);
+											isLifted=true;
 										}
-										dxf_x2 = x;
-										dxf_y2 = y;
+										moveTo(out, (float) x, (float) y,true);
 									}
-								}
-							} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-								Iterator<DXFEntity> iter = entity_list.iterator();
-								while (iter.hasNext()) {
-									pm.setProgress(entity_count++);
-									DXFPolyline entity = (DXFPolyline) iter.next();
-									boolean first = true;
-									int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-									for (int j = 0; j < count; ++j) {
-										DXFVertex v = entity.getVertex(j % entity.getVertexCount());
-										double x = (v.getX() - imageCenterX) * scale;
-										double y = (v.getY() - imageCenterY) * scale;
-										double dx = dxf_x2 - x;
-										double dy = dxf_y2 - y;
-
-										if (first == true) {
-											first = false;
-											if (dx * dx + dy * dy > tool.getDiameter()) {
-												// line does not start at last
-												// tool location, lift and move.
-												if (tool.isDrawOn()) {
-													tool.writeOff(out);
-												}
-												tool.writeMoveTo(out, (float) x, (float) y);
-											}
-											// else line starts right here, do nothing.
-										} else {
-											// not the first point, draw.
-											if (tool.isDrawOff())
-												tool.writeOn(out);
-											if (j < entity.getVertexCount() - 1
-													&& dx * dx + dy * dy < tool.getDiameter()*3)
-												continue; // less than 1mm
-															// movement? Skip
-															// it.
-											tool.writeMoveTo(out, (float) x, (float) y);
-										}
-										dxf_x2 = x;
-										dxf_y2 = y;
+									// else line starts right here, pen is down, do nothing extra.
+								} else {
+									// not the first point, draw.
+									if (isLifted) {
+										lowerPen(out);
+										isLifted=false;
 									}
+									if (j < entity.getVertexCount() - 1
+											&& dx * dx + dy * dy < toolDiameterSquared)
+										continue; // points too close together
+									moveTo(out, (float) x, (float) y,false);
 								}
+								dxf_x2 = x;
+								dxf_y2 = y;
 							}
 						}
 					}
-
-					// entities finished. Close up file.
-					tool.writeOff(out);
-					tool.writeMoveTo(out, 0, 0);
-
-					ok = true;
-				} catch (IOException | ParseException e) {
-					e.printStackTrace();
-				}
-
-				pm.setProgress(100);
-				return null;
-			}
-
-			@Override
-			public void done() {
-				pm.close();
-				Log.message(Translator.get("Finished"));
-				SoundSystem.playConversionFinishedSound();
-				if (ok) {
-					LoadGCode loader = new LoadGCode();
-					loader.load(destinationFile, robot, gui);
-				}
-				gui.halt();
-			}
-		};
-
-		s.addPropertyChangeListener(new PropertyChangeListener() {
-			// Invoked when task's progress property changes.
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (Objects.equals("progress", evt.getPropertyName())) {
-					int progress = (Integer) evt.getNewValue();
-					pm.setProgress(progress);
-					String message = String.format("%d%%\n", progress);
-					pm.setNote(message);
-					if (s.isDone()) {
-						Log.message(Translator.get("Finished"));
-					} else if (s.isCancelled() || pm.isCanceled()) {
-						if (pm.isCanceled()) {
-							s.cancel(true);
-						}
-						Log.message(Translator.get("Cancelled"));
-					}
 				}
 			}
-		});
 
-		s.execute();
+			// entities finished. Close up file.
+			liftPen(out);
+			moveTo(out, 0, 0,true);
+
+			LoadGCode loader = new LoadGCode();
+			InputStream fileInputStream = new FileInputStream(destinationFile);
+			loader.load(fileInputStream,robot);
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+
 		return true;
 	}
 }

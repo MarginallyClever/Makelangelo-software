@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -187,7 +188,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 			int generation = 0;
 			do {
-				generation++;
+				++generation;
 				Log.write("green","Generation " + generation);
 
 				assert !lock.isHeldByCurrentThread();
@@ -195,8 +196,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				tessellateVoronoiDiagram();
 				lock.unlock();
 				adjustCentroids();
-
-				if(drawPanel != null) drawPanel.repaintNow();
 
 				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
 			} while (generation < MAX_GENERATIONS);
@@ -211,45 +210,49 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 
 	// write cell centroids to gcode.
 	protected void writeOutCells(Writer out) throws IOException {
-		if (graphEdges != null) {
-			Log.write("green", "Writing gcode.");
+		if (graphEdges == null) return;
 
-			imageStart(out);
-			liftPen(out);
+		Log.write("green", "Writing gcode.");
 
-			float toolDiameter = tool.getDiameter();
+		imageStart(out);
+		liftPen(out);
 
-			int i;
+		float toolDiameter = tool.getDiameter();
 
-			for (i = 0; i < cells.length; ++i) {
-				float x = cells[i].centroid.x;
-				float y = cells[i].centroid.y;
-				float val = 1.0f - (sourceImage.sample1x1(x,y) / 255.0f);
-				float r = val * MAX_DOT_SIZE;
-				if (r < MIN_DOT_SIZE) continue;
+		Arrays.sort(cells);
+		
+		int i;
+		for (i = 0; i < cells.length; ++i) {
+			float x = cells[i].centroid.x;
+			float y = cells[i].centroid.y;
+			float val = 1.0f - (sourceImage.sample1x1(x,y) / 255.0f);
+			float r = val * MAX_DOT_SIZE;
+			if (r < MIN_DOT_SIZE) continue;
 
-				float lastX=0,lastY=0;
-				boolean first=true;
-				// filled circles
-				while (r > toolDiameter) {
-					float detail = (float)Math.ceil(Math.PI * r / toolDiameter);
-					if (detail < 4) detail = 4;
-					if (detail > 20) detail = 20;
-					for (float j = 0; j <= detail; ++j) {
-						lastX = x + r * (float) Math.cos((float) Math.PI * 2.0f * j / detail);
-						lastY = y + r * (float) Math.sin((float) Math.PI * 2.0f * j / detail);
-						moveTo(out, lastX, lastY, first);
-						first=false;
+			float lastX=0,lastY=0;
+			boolean first=true;
+			// filled circles
+			while (r > 0) {
+				float detail = (float)Math.ceil(Math.PI * r / toolDiameter);
+				if (detail < 4) detail = 4;
+				if (detail > 20) detail = 20;
+				for (float j = 0; j <= detail; ++j) {
+					double v = Math.PI * 2.0f * j / detail;
+					lastX = x + r * (float) Math.cos(v);
+					lastY = y + r * (float) Math.sin(v);
+					if(first) {
+						moveTo(out, lastX, lastY, true);
+						lowerPen(out);
+					} else {
+						moveTo(out, lastX, lastY, false);
 					}
-					r -= toolDiameter;
+					first=false;
 				}
-				if(first == false) {
-					moveTo(out, x, y, false);
-					moveTo(out, x, y, true);
-				}
+				r -= toolDiameter;
 			}
-
-			liftPen(out);
+			if(first==false) {
+				liftPen(out);
+			}
 		}
 	}
 

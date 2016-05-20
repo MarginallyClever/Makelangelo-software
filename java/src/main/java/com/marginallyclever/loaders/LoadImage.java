@@ -4,9 +4,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -32,13 +33,11 @@ import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.generators.Generator_YourMessageHere;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.PreferencesHelper;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class LoadImage implements LoadFileType {
+public class LoadImage extends ImageManipulator implements LoadFileType {
 	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
@@ -75,7 +74,7 @@ public class LoadImage implements LoadFileType {
 	}
 
 
-	protected boolean chooseImageConversionOptions(MakelangeloRobot robot,Makelangelo gui) {
+	protected boolean chooseImageConversionOptions(MakelangeloRobot robot) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 
 		Iterator<ImageConverter> ici = converters.iterator();
@@ -115,10 +114,7 @@ public class LoadImage implements LoadFileType {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
-			robot.settings.saveConfig();
-
-			// Force update of graphics layout.
-			gui.updateMachineConfig();
+			robot.getSettings().saveConfig();
 
 			return true;
 		}
@@ -132,35 +128,35 @@ public class LoadImage implements LoadFileType {
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
-	public boolean load(String filename,MakelangeloRobot robot,Makelangelo gui) {
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		TransformedImage img;
 		try {
-			img = new TransformedImage( ImageIO.read(new File(filename)) );
+			img = new TransformedImage( ImageIO.read(in) );
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
 		}
 		
 		// scale image to fit paper, same behaviour as before.
-		if( robot.settings.getPaperWidth() > robot.settings.getPaperHeight() ) {
-			if(robot.settings.getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
-				float f = (float)( robot.settings.getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
+		if( robot.getSettings().getPaperWidth() > robot.getSettings().getPaperHeight() ) {
+			if(robot.getSettings().getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
+				float f = (float)( robot.getSettings().getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
 				img.setScaleX(img.getScaleX() * f);
 				img.setScaleY(img.getScaleY() * f);
 			}
 		} else {
-			if(robot.settings.getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
-				float f = (float)( robot.settings.getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
+			if(robot.getSettings().getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
+				float f = (float)( robot.getSettings().getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
 				img.setScaleX(img.getScaleX() * f);
 				img.setScaleY(img.getScaleY() * f);
 			}
 		}
 		
 		// where to save temp output file?
-		final String destinationFile = gui.getTempDestinationFile();
+		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
 
 		converters = ServiceLoader.load(ImageConverter.class);
-		if (chooseImageConversionOptions(robot,gui) == false)
+		if (chooseImageConversionOptions(robot) == false)
 			return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
@@ -188,23 +184,19 @@ public class LoadImage implements LoadFileType {
 					converter.setParent(this);
 					converter.setProgressMonitor(pm);
 
-					converter.setDrawPanel(gui.getDrawPanel());
-					converter.setMachine(robot);
-					gui.getDrawPanel().setDecorator(converter);
+					converter.setRobot(robot);
+					robot.setDecorator(converter);
 					converter.convert(img, out);
-					converter.setDrawPanel(null);
-					gui.getDrawPanel().setDecorator(null);
+					robot.setDecorator(null);
 
-					if (robot.settings.shouldSignName()) {
+					if (robot.getSettings().shouldSignName()) {
 						// Sign name
 						Generator_YourMessageHere ymh = new Generator_YourMessageHere();
-						ymh.setMachine(robot);
+						ymh.setRobot(robot);
 						ymh.signName(out);
 					}
-					gui.updateMachineConfig();
 				} catch (IOException e) {
 					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
-					gui.updateMenuBar();
 				}
 
 				// out closed when scope of try() ended.
@@ -216,10 +208,12 @@ public class LoadImage implements LoadFileType {
 			@Override
 			public void done() {
 				pm.close();
-				Log.message(Translator.get("Finished"));
 				LoadGCode loader = new LoadGCode();
-				loader.load(destinationFile, robot, gui);
-				SoundSystem.playConversionFinishedSound();
+				try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
+					loader.load(fileInputStream,robot);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
 		};
 

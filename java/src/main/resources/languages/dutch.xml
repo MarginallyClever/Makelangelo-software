@@ -409,7 +409,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>Een nieuwe versie van deze software is beschikbaar.<br/>\nBezoek <a href="https://github.com/MarginallyClever/Makelangelo/releases">https://github.com/MarginallyClever/Makelangelo/releases</a> om de laatste versie te halen.</html></body>]]></value>
+		<value><![CDATA[<html><body>Een nieuwe versie van deze software is beschikbaar.<br/>\nBezoek <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> om de laatste versie te halen.</html></body>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>

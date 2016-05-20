@@ -131,7 +131,6 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 					solution[finish - 1 - j] = temp;
 				}
 				lock.unlock();
-				if(drawPanel != null) drawPanel.repaintNow();
 				updateProgress(len, 1);
 			}
 		}

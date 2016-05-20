@@ -11,12 +11,9 @@ import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
@@ -136,7 +133,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 
 
 	@Override
-	public boolean generate(String dest) {
+	public boolean generate(Writer out) throws IOException {
 		final JTextArea text = new JTextArea(lastMessage, 6, 60);
 		final JFormattedTextField size = new JFormattedTextField(NumberFormat.getIntegerInstance());
 		size.setValue(lastSize);
@@ -166,7 +163,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 			lastMessage = text.getText();
 			lastSize = Integer.parseInt(size.getText());
 			lastFont = fontChoices.getSelectedIndex();
-			createMessage(fontNames[lastFont],lastSize,lastMessage, dest);
+			createMessage(fontNames[lastFont],lastSize,lastMessage, out);
 			//createMessage("TimesRoman",مرحبا بالعالم",18");
 			//createMessage("TimesRoman",36,"Makelangelo");
 
@@ -286,34 +283,25 @@ public class Generator_YourMessageHere extends ImageGenerator {
 		}
 	}
 
-	private void createMessage(String fontName, int fontSize, String str, String dest) {
-		try (final OutputStream fileOutputStream = new FileOutputStream(dest);
-				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+	private void createMessage(String fontName, int fontSize, String str, Writer out) throws IOException {
+		imageStart(out);
 
-			tool = machine.getCurrentTool();
-
-			posx=0;
-			posy=0;
-			textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
-
-			output.write(machine.getConfigLine() + ";\n");
-			output.write(machine.getBobbinLine() + ";\n");
-			tool.writeChangeTo(output);
-
-			textSetAlign(Align.CENTER);
-			textSetVAlign(VAlign.MIDDLE);
-			//textCreateMessageNow(lastMessage, output);
-			writeBeautifulMessage(fontName,fontSize,lastMessage,output);
-
-			posx=0;
-			posy=0;
-			textSetAlign(Align.RIGHT);
-			textSetVAlign(VAlign.TOP);
-			textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
-					(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
-		} catch (IOException e) {
-			Log.error( e.getMessage() );
-		}
+		posx=0;
+		posy=0;
+		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
+		textSetAlign(Align.CENTER);
+		textSetVAlign(VAlign.MIDDLE);
+		//
+		writeBeautifulMessage(fontName,fontSize,lastMessage,out);
+/*
+		posx=0;
+		posy=0;
+		textSetAlign(Align.RIGHT);
+		textSetVAlign(VAlign.TOP);
+		textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
+						(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
+		textCreateMessageNow(lastMessage, out);
+*/
 	}
 	public void textSetPosition(float x, float y) {
 		posx = x;

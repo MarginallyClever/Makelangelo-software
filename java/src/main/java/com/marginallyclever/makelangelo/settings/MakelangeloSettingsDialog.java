@@ -59,7 +59,7 @@ implements ActionListener {
     
     panelAdjustMachine = new PanelAdjustMachine(robot);
     panelAdjustPaper = new PanelAdjustPaper(robot);
-    panelAdjustPen = robot.settings.getTool(0);
+    panelAdjustPen = robot.getSettings().getTool(0);
     //panelAdjustTools = new PanelAdjustTools(translator,robot);
     //panelSelectTool = new PanelSelectTool(translator,robot);
     
@@ -120,11 +120,14 @@ implements ActionListener {
 		  panelAdjustMachine.save();
 		  panelAdjustPaper.save();
 		  panelAdjustPen.save();
-		  robot.settings.saveConfig();
+		  robot.getSettings().saveConfig();
 		  robot.sendConfig();
 		  this.dispose();
 	  }
 	  if(src == cancel) {
+		  panelAdjustMachine.cancel();
+		  panelAdjustPaper.cancel();
+		  panelAdjustPen.cancel();
 		  this.dispose();
 		  return;
 	  }

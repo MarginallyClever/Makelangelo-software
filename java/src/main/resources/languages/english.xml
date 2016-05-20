@@ -18,6 +18,12 @@
 	</string>
 	
 	<string>
+		<key>DXFScaleOnLoad</key>
+		<value>Scale image to fit paper?</value>
+		<hint>DXF load option</hint>
+	</string>
+	
+	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
 		<hint>used in many places</hint>
@@ -53,13 +59,19 @@
 	<string>
 		<key>PaperWidth</key>
 		<value>Paper width</value>
-		<hint>machine size control panel</hint>
+		<hint>Paper settings panel</hint>
 	</string>
 	<string>
 		<key>PaperHeight</key>
 		<value>Paper height</value>
-		<hint>machine size control panel</hint>
+		<hint>Paper settings panel</hint>
 	</string>
+	<string>
+		<key>isLandscape</key>
+		<value>Is landscape?</value>
+		<hint>Paper settings dialog</hint>
+	</string>
+	
 	<string>
 		<key>InvertLeft</key>
 		<value>Invert left</value>
@@ -238,6 +250,23 @@
 		<hint>file open dialog</hint>
 	</string>
 
+	<string>
+		<key>MenuDriveControls</key>
+		<value>Manual Driving</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuCreativeControl</key>
+		<value>Creative control</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuAnimate</key>
+		<value>Animation control</value>
+		<hint>context sensitive menu</hint>
+	</string>
+
+	
 	<string>
 		<key>MenuSoundsTitle</key>
 		<value>Sounds</value>
@@ -420,7 +449,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://github.com/MarginallyClever/Makelangelo/releases">https://github.com/MarginallyClever/Makelangelo/releases</a> to get the new hotness.</html></body>]]></value>
+		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
@@ -800,8 +829,14 @@ to check yourself.</value>
 	<string>
 		<key>DisengageMotors</key>
 		<value>Disengage</value>
-		<hint>Disengage Button on manual driving dialog</hint>
+		<hint>Manual driving dialog</hint>
 	</string>
+	<string>
+		<key>EngageMotors</key>
+		<value>Engage</value>
+		<hint>Manual driving dialog</hint>
+	</string>
+	
 
 	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
 		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
@@ -933,10 +968,4 @@ to check yourself.</value>
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
-	<string>
-		<key>DisengageMotors</key>
-		<value>Disengage</value>
-		<hint>Disengage Button on manual driving dialog</hint>
-	</string>
-	
 </language>

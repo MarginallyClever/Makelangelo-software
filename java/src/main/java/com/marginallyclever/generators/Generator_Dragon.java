@@ -1,12 +1,8 @@
 package com.marginallyclever.generators;
 
 import java.awt.GridLayout;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +33,7 @@ public class Generator_Dragon extends ImageGenerator {
 
 
 	@Override
-	public boolean generate(final String dest) {
+	public boolean generate(Writer out) throws IOException {
 		boolean tryAgain=false;
 		do {
 			final JTextField field_order = new JTextField(Integer.toString(order));
@@ -52,7 +48,7 @@ public class Generator_Dragon extends ImageGenerator {
 
 				// TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
 
-				createCurveNow(dest);
+				createCurveNow(out);
 				return true;
 			}
 		}
@@ -62,69 +58,57 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 
 
-	private void createCurveNow(String dest) {
-		try (
-				final OutputStream fileOutputStream = new FileOutputStream(dest);
-				final Writer output = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-				) {
-			tool = machine.getCurrentTool();
-			output.write(machine.getConfigLine() + ";\n");
-			output.write(machine.getBobbinLine() + ";\n");
-			tool.writeChangeTo(output);
+	private void createCurveNow(Writer out) throws IOException {
+		imageStart(out);
 
-			float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-							   (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
-			xmax = v;
-			ymax = v;
-			xmin = -v;
-			ymin = -v;
+		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
+						   (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
+		xmax = v;
+		ymax = v;
+		xmin = -v;
+		ymin = -v;
 
-			turtleDx = 0;
-			turtleDy = -1;
+		turtleDx = 0;
+		turtleDy = -1;
 
-			boolean drawBoundingBox=false;
-			if(drawBoundingBox) {
-		      // Draw bounding box
-		      //SetAbsoluteMode(output);
-		      liftPen(output);
-		      moveTo(output, xmax, ymax, false);
-		      moveTo(output, xmax, ymin, false);
-		      moveTo(output, xmin, ymin, false);
-		      moveTo(output, xmin, ymax, false);
-		      moveTo(output, xmax, ymax, false);
-		      liftPen(output);
-			}
-			
-			// create the sequence
-	        sequence = new ArrayList<Integer>();
-	        for (int i = 0; i < order; i++) {
-	            List<Integer> copy = new ArrayList<Integer>(sequence);
-	            Collections.reverse(copy);
-	            sequence.add(1);
-	            for (Integer turn : copy) {
-	                sequence.add(-turn);
-	            }
-	        }
-			
-			// move to starting position
-			x = 0;
-			y = 0;
-			// scale the fractal
-	        float stepSize = findStepSize(output);
-			// move to starting position
-
-			liftPen(output);
-			moveTo(output,x,y,true);
-			// draw the fractal
-			turtleDx = 0;
-			turtleDy = -1;
-			drawDragon(output, stepSize);
-			liftPen(output);
-
-			output.flush();
-			output.close();
-		} catch (IOException ex) {
+		boolean drawBoundingBox=false;
+		if(drawBoundingBox) {
+	      // Draw bounding box
+	      //SetAbsoluteMode(output);
+	      liftPen(out);
+	      moveTo(out, xmax, ymax, false);
+	      moveTo(out, xmax, ymin, false);
+	      moveTo(out, xmin, ymin, false);
+	      moveTo(out, xmin, ymax, false);
+	      moveTo(out, xmax, ymax, false);
+	      liftPen(out);
 		}
+		
+		// create the sequence
+        sequence = new ArrayList<Integer>();
+        for (int i = 0; i < order; i++) {
+            List<Integer> copy = new ArrayList<Integer>(sequence);
+            Collections.reverse(copy);
+            sequence.add(1);
+            for (Integer turn : copy) {
+                sequence.add(-turn);
+            }
+        }
+		
+		// move to starting position
+		x = 0;
+		y = 0;
+		// scale the fractal
+        float stepSize = findStepSize(out);
+		// move to starting position
+
+		liftPen(out);
+		moveTo(out,x,y,true);
+		// draw the fractal
+		turtleDx = 0;
+		turtleDy = -1;
+		drawDragon(out, stepSize);
+		liftPen(out);
 	}
 
 	

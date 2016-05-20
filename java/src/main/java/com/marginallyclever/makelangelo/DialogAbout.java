@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Component;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -90,7 +91,7 @@ public class DialogAbout {
 	/**
 	 * Display the about dialog.
 	 */
-	public void display(Translator translator,String version) {
+	public void display(Translator translator,String version,Component parent) {
 		final String aboutHtml = getAboutHtmlFromMultilingualString(translator,version);
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
@@ -98,6 +99,6 @@ public class DialogAbout {
 		if (icon == null) {
 			icon = getImageIcon("resources/logo.png");
 		}
-		JOptionPane.showMessageDialog(null, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
+		JOptionPane.showMessageDialog(parent, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
 	}
 }
