@@ -15,13 +15,12 @@ import javax.swing.JTextField;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Dragon extends ImageGenerator {
-	private float turtleDx, turtleDy;
+	private Turtle turtle;
 	private float xmax = 7;
 	private float xmin = -7;
 	private float ymax = 7;
 	private float ymin = -7;
 	private int order = 12; // controls complexity of curve
-	private float x, y;
 
 	private List<Integer> sequence;
 
@@ -68,8 +67,7 @@ public class Generator_Dragon extends ImageGenerator {
 		xmin = -v;
 		ymin = -v;
 
-		turtleDx = 0;
-		turtleDy = -1;
+		turtle = new Turtle();;
 
 		boolean drawBoundingBox=false;
 		if(drawBoundingBox) {
@@ -96,17 +94,13 @@ public class Generator_Dragon extends ImageGenerator {
         }
 		
 		// move to starting position
-		x = 0;
-		y = 0;
 		// scale the fractal
         float stepSize = findStepSize(out);
 		// move to starting position
 
 		liftPen(out);
-		moveTo(out,x,y,true);
+		moveTo(out,turtle.getX(),turtle.getY(),true);
 		// draw the fractal
-		turtleDx = 0;
-		turtleDy = -1;
 		drawDragon(out, stepSize);
 		liftPen(out);
 	}
@@ -118,9 +112,12 @@ public class Generator_Dragon extends ImageGenerator {
 		float minX=0;
 		float minY=0;
 		
+		float x = turtle.getX();
+		float y = turtle.getY();
+		
         for (Integer turn : sequence) {
-            turtle_turn(turn * 90);
-            turtle_goForward(output,1,false);
+            turtle.turn(turn * 90);
+            turtleMove(output,1,false);
             
             if(maxX<x) maxX = x;
             if(minX>x) minX = x;
@@ -143,6 +140,9 @@ public class Generator_Dragon extends ImageGenerator {
         
         x*=largest;
         y*=largest;
+
+        turtle.setX(x);
+        turtle.setY(y);
         
         return largest;
 	}
@@ -150,29 +150,16 @@ public class Generator_Dragon extends ImageGenerator {
 	// L System tree
 	private void drawDragon(Writer output, float distance) throws IOException {
         for (Integer turn : sequence) {
-            turtle_turn(turn * 90);
-            turtle_goForward(output,distance,true);
+            turtle.turn(turn * 90);
+            turtleMove(output,distance,true);
         }
 	}
 
 
-	public void turtle_turn(float degrees) {
-		double n = Math.toRadians(degrees);
-		double newx = Math.cos(n) * turtleDx + Math.sin(n) * turtleDy;
-		double newy = -Math.sin(n) * turtleDx + Math.cos(n) * turtleDy;
-		double len = Math.sqrt(newx * newx + newy * newy);
-		assert (len > 0);
-		turtleDx = (float) (newx / len);
-		turtleDy = (float) (newy / len);
-	}
 
 	
-	public void turtle_goForward(Writer output,float stepSize,boolean write) throws IOException {
-		//turtle_x += turtle_dx * distance;
-		//turtle_y += turtle_dy * distance;
-		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		x += (turtleDx * (float)stepSize );
-		y += (turtleDy * (float)stepSize );
-		if(write) moveTo(output, x, y, false);
+	public void turtleMove(Writer output,float stepSize,boolean write) throws IOException {
+		turtle.move(stepSize);
+		if(write) moveTo(output, turtle.getX(),turtle.getY(), false);
 	}
 }

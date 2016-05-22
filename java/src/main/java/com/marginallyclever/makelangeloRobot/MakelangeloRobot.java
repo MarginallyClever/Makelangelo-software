@@ -36,7 +36,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	static public final float PEN_HOLDER_RADIUS=6; //cm
 	
-	static boolean please_get_a_guid=true;  // set to false when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
+	// TODO make please_get_a_guid a runtime parameter
+	// set to false when I'm building robots @ marginallyclever.com.  
+	static boolean please_get_a_guid=false;
 	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;

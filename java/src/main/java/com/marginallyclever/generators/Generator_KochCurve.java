@@ -11,20 +11,14 @@ import javax.swing.JTextField;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_KochCurve extends ImageGenerator {
-	float turtleX, turtleY;
-	float turtleDx, turtleDy;
-	float turtleStep = 10.0f;
-	float xmax = 7;
-	float xmin = -7;
-	float ymax = 7;
-	float ymin = -7;
-	float toolOffsetZ = 1.25f;
-	float zDown = 40;
-	float zUp = 90;
-	int order = 4; // controls complexity of curve
-	float x, y;
+	private Turtle turtle;
+	private float xmax = 7;
+	private float xmin = -7;
+	private float ymax = 7;
+	private float ymin = -7;
+	private int order = 4; // controls complexity of curve
 
-	float maxSize;
+	private float maxSize;
 
 
 	@Override
@@ -69,12 +63,8 @@ public class Generator_KochCurve extends ImageGenerator {
 		xmin = -v;
 		ymin = -v;
 
-		turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
-		turtleX = 0;
-		turtleY = 0;
-		turtleDx = 0;
-		turtleDy = -1;
-
+		turtle = new Turtle();
+		
 		float xx = xmax - xmin;
 		float yy = ymax - ymin;
 		maxSize = xx > yy ? xx : yy;
@@ -90,12 +80,12 @@ public class Generator_KochCurve extends ImageGenerator {
 		 */
 		liftPen(out);
 		// move to starting position
-		x = xmax;//(xmax - turtleStep / 2);
-		y = 0;
-		moveTo(out, x, y, true);
+		turtle.setX(xmax);
+		turtle.setY(0);
+		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
-		turtle_turn(90);
+		turtle.turn(90);
 		kochCurve(out, order, maxSize);
 		liftPen(out);
 	}
@@ -104,40 +94,28 @@ public class Generator_KochCurve extends ImageGenerator {
 	// L System tree
 	private void kochCurve(Writer output, int n, float distance) throws IOException {
 		if (n == 0) {
-			turtle_goForward(output,distance);
+			turtleMove(output,distance);
 			return;
 		}
 		kochCurve(output,n-1,distance/3.0f);
 		if(n>1) {
-			turtle_turn(-60);
+			turtle.turn(-60);
 			kochCurve(output,n-1,distance/3.0f);
-			turtle_turn(120);
+			turtle.turn(120);
 			kochCurve(output,n-1,distance/3.0f);
-			turtle_turn(-60);
+			turtle.turn(-60);
 		} else {
-			turtle_goForward(output,distance/3.0f);
+			turtleMove(output,distance/3.0f);
 		}
 		kochCurve(output,n-1,distance/3.0f);
 	}
 
 
-	public void turtle_turn(float degrees) {
-		double n = degrees * Math.PI / 180.0;
-		double newx = Math.cos(n) * turtleDx + Math.sin(n) * turtleDy;
-		double newy = -Math.sin(n) * turtleDx + Math.cos(n) * turtleDy;
-		double len = Math.sqrt(newx * newx + newy * newy);
-		assert (len > 0);
-		turtleDx = (float) (newx / len);
-		turtleDy = (float) (newy / len);
-	}
-
-
-	public void turtle_goForward(Writer output,float stepSize) throws IOException {
+	public void turtleMove(Writer output,float distance) throws IOException {
 		//turtle_x += turtle_dx * distance;
 		//turtle_y += turtle_dy * distance;
 		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		x += (turtleDx * (float)stepSize );
-		y += (turtleDy * (float)stepSize );
-		moveTo(output, x, y, false);
+		turtle.move(distance);
+		moveTo(output, turtle.getX(), turtle.getY(), false);
 	}
 }

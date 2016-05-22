@@ -228,26 +228,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		updateMachineNumberPanel();
 		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
-		
-		
-		// feed rate
-		JPanel feedRateControl = new JPanel();
-		feedRateControl.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-		feedRate.setText(Double.toString(robot.getSettings().getFeedRate()));
-		setFeedRate = new JButton(Translator.get("Set"));
-		setFeedRate.addActionListener(this);
-		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
-		toggleEngagedMotor.addActionListener(this);
 
-		c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-		c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-		c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
-		c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-		c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
-
-		panel.add(feedRateControl,con1); 				con1.gridy++;
 		panel.add(createDriveControls(),con1);			con1.gridy++;
 		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
 		panel.add(createAnimationPanel(),con1);			con1.gridy++;
@@ -255,7 +236,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		statusBar = new StatusBar();
 		panel.add(statusBar, con1);
 		con1.gridy++;
-
 
 		// always have one extra empty at the end to push everything up.
 		con1.weighty = 1;
@@ -270,27 +250,20 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuAnimate"));
 		JPanel drivePanel = animationPanel.getContentPane();
 		
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=1;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTH;
-		
-		drivePanel.setLayout(new GridLayout(1,4));
+		drivePanel.setLayout(new GridLayout(4,1));
 		buttonStart = new JButton(Translator.get("Start"));
 		buttonStartAt = new JButton(Translator.get("StartAtLine"));
 		buttonPause = new JButton(Translator.get("Pause"));
 		buttonHalt = new JButton(Translator.get("Halt"));
-		drivePanel.add(buttonStart);
-		drivePanel.add(buttonStartAt);
-		drivePanel.add(buttonPause);
-		drivePanel.add(buttonHalt);
 		buttonStart.addActionListener(this);
 		buttonStartAt.addActionListener(this);
 		buttonPause.addActionListener(this);
 		buttonHalt.addActionListener(this);
+
+		drivePanel.add(buttonStart);
+		drivePanel.add(buttonStartAt);
+		drivePanel.add(buttonPause);
+		drivePanel.add(buttonHalt);
 		
 		return animationPanel;
 	}
@@ -336,16 +309,37 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuDriveControls"));
 		JPanel mainPanel = drivePanel.getContentPane();
 		mainPanel.setLayout(new GridBagLayout());
-		GridBagConstraints cMain = new GridBagConstraints();
+		final GridBagConstraints cMain = new GridBagConstraints();
 		cMain.fill=GridBagConstraints.HORIZONTAL;
 		cMain.anchor=GridBagConstraints.NORTH;
-		
+		cMain.gridx=0;
+		cMain.gridy=0;
 		{
+			// feed rate
+			JPanel feedRateControl = new JPanel();
+			mainPanel.add(feedRateControl,cMain);
+			cMain.gridy++;
+			feedRateControl.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
+			feedRate.setText(Double.toString(robot.getSettings().getFeedRate()));
+			setFeedRate = new JButton(Translator.get("Set"));
+			setFeedRate.addActionListener(this);
+			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+			toggleEngagedMotor.addActionListener(this);
+
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
+			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
+			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+			c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
+		}
+		{
+			// axis driving
 			JPanel axisControl = new JPanel(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			cMain.gridx=0;
-			cMain.gridy=0;
 			mainPanel.add(axisControl,cMain);
+			cMain.gridy++;
 	
 			setHome = createTightJButton(Translator.get("SetHome"));
 		    setHome.setPreferredSize(new Dimension(100,20));
@@ -386,8 +380,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			// quick drive to corners
 			JPanel quickDriveOptions = new JPanel(new GridBagLayout());
 			cMain.insets = new Insets(10,0,0,0);
-			cMain.gridx=0;
-			cMain.gridy=1;
 			mainPanel.add(quickDriveOptions,cMain);
 			
 			GridBagConstraints con1 = new GridBagConstraints();
@@ -444,12 +436,17 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineConfigurations = robot.getSettings().getKnownMachineNames();
 		GridBagConstraints cMachine = new GridBagConstraints();
 		cMachine.fill= GridBagConstraints.HORIZONTAL;
-		cMachine.anchor = GridBagConstraints.NORTH;
+		cMachine.anchor = GridBagConstraints.CENTER;
 		cMachine.gridx=0;
 		cMachine.gridy=0;
+		
 		if( machineConfigurations.length>0 ) {
 			machineChoices = new JComboBox<>(machineConfigurations);
-			machineNumberPanel.add(new JLabel(Translator.get("MachineNumber")),cMachine);
+			JLabel label = new JLabel(Translator.get("MachineNumber"));
+			cMachine.insets = new Insets(0,0,0,5);
+			machineNumberPanel.add(label,cMachine);
+			cMachine.insets = new Insets(0,0,0,0);
+
 			cMachine.gridx++;
 			machineNumberPanel.add(machineChoices,cMachine);
 			cMachine.gridx++;
