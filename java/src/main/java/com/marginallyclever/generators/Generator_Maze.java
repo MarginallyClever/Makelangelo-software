@@ -66,6 +66,11 @@ public class Generator_Maze extends ImageGenerator {
 		}
 	}
 
+	/**
+	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
+	 * @param out
+	 * @throws IOException
+	 */
 	private void createMazeNow(Writer out) throws IOException {
 		imageStart(out);
 		
@@ -118,27 +123,23 @@ public class Generator_Maze extends ImageGenerator {
 
 		// While there are unvisited cells
 		while (unvisitedCells > 0) {
-			// If the current cell has any neighbours which have not been
-			// visited
+			// If the current cell has any neighbours which have not been visited
 			// Choose randomly one of the unvisited neighbours
 			int nextCell = chooseUnvisitedNeighbor(currentCell);
 			if (nextCell != -1) {
 				// Push the current cell to the stack
 				cells[currentCell].onStack = true;
 				++cellsOnStack;
-				// Remove the wall between the current cell and the chosen
-				// cell
+				// Remove the wall between the current cell and the chosen cell
 				int wallIndex = findWallBetween(currentCell, nextCell);
 				assert (wallIndex != -1);
 				walls[wallIndex].removed = true;
-				// Make the chosen cell the current cell and mark it as
-				// visited
+				// Make the chosen cell the current cell and mark it as visited
 				currentCell = nextCell;
 				cells[currentCell].visited = true;
 				--unvisitedCells;
 			} else if (cellsOnStack > 0) {
-				// Else if stack is not empty
-				// Pop a cell from the stack
+				// else if stack is not empty pop a cell from the stack
 				for (i = 0; i < cells.length; ++i) {
 					if (cells[i].onStack) {
 						// Make it the current cell
@@ -156,10 +157,7 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	private void drawMaze(Writer output) throws IOException {
-		tool = machine.getCurrentTool();
-		output.write(machine.getConfigLine() + ";\n");
-		output.write(machine.getBobbinLine() + ";\n");
-		tool.writeChangeTo(output);
+		imageStart(output);
 
 		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
 		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
@@ -196,16 +194,23 @@ public class Generator_Maze extends ImageGenerator {
 			int by = cells[b].y;
 			if (ay == by) {
 				// vertical wall
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, true);
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 0) * h, false);
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
+				float x = xmin + (ax + 1) * w;
+				float y0 = ymin + (ay + 0) * h;
+				float y1 = ymin + (ay + 1) * h;
+				
+				moveTo(output, x, y0, true);
+				moveTo(output, x, y0, false);
+				moveTo(output, x, y1, false);
+				moveTo(output, x, y1, true);
 			} else if (ax == bx) {
 				// horizontal wall
-				moveTo(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, true);
-				moveTo(output, xmin + (ax + 0) * w, ymin + (ay + 1) * h, false);
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, false);
-				moveTo(output, xmin + (ax + 1) * w, ymin + (ay + 1) * h, true);
+				float x0 = xmin + (ax + 0) * w;
+				float x1 = xmin + (ax + 1) * w;
+				float y = ymin + (ay + 1) * h;
+				moveTo(output, x0, y, true);
+				moveTo(output, x0, y, false);
+				moveTo(output, x1, y, false);
+				moveTo(output, x1, y, true);
 			}
 		}
 	}

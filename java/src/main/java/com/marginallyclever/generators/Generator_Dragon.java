@@ -60,19 +60,16 @@ public class Generator_Dragon extends ImageGenerator {
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
 
-		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-						   (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
-		xmax = v;
-		ymax = v;
-		xmin = -v;
-		ymin = -v;
+		xmax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;
+		ymax = (float)(machine.getPaperHeight()/2.0f * machine.getPaperMargin()) * 10.0f;
+		xmin = -xmax;
+		ymin = -ymax;
 
-		turtle = new Turtle();;
+		turtle = new Turtle();
 
 		boolean drawBoundingBox=false;
 		if(drawBoundingBox) {
 	      // Draw bounding box
-	      //SetAbsoluteMode(output);
 	      liftPen(out);
 	      moveTo(out, xmax, ymax, false);
 	      moveTo(out, xmax, ymin, false);
@@ -95,9 +92,10 @@ public class Generator_Dragon extends ImageGenerator {
 		
 		// move to starting position
 		// scale the fractal
+        turtle.setX(0);
+        turtle.setY(0);
         float stepSize = findStepSize(out);
 		// move to starting position
-
 		liftPen(out);
 		moveTo(out,turtle.getX(),turtle.getY(),true);
 		// draw the fractal
@@ -112,18 +110,15 @@ public class Generator_Dragon extends ImageGenerator {
 		float minX=0;
 		float minY=0;
 		
-		float x = turtle.getX();
-		float y = turtle.getY();
-		
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtleMove(output,1,false);
             
-            if(maxX<x) maxX = x;
-            if(minX>x) minX = x;
+            if(maxX<turtle.getX()) maxX = turtle.getX();
+            if(minX>turtle.getX()) minX = turtle.getX();
             
-            if(maxY<y) maxY = y;
-            if(minY>y) minY = y;
+            if(maxY<turtle.getY()) maxY = turtle.getY();
+            if(minY>turtle.getY()) minY = turtle.getY();
         }
 
         float dx = maxX - minX;
@@ -135,27 +130,29 @@ public class Generator_Dragon extends ImageGenerator {
 		float largestY = yy/dy;
 		float largest = largestX < largestY ? largestX : largestY;
 
+		float x = turtle.getX();
+		float y = turtle.getY();
+		
         x = -((minX+maxX)/2.0f);
         y = -((minY+maxY)/2.0f);
         
         x*=largest;
         y*=largest;
 
+        turtle.reset();
         turtle.setX(x);
         turtle.setY(y);
         
         return largest;
 	}
 
-	// L System tree
+	
 	private void drawDragon(Writer output, float distance) throws IOException {
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtleMove(output,distance,true);
         }
 	}
-
-
 
 	
 	public void turtleMove(Writer output,float stepSize,boolean write) throws IOException {

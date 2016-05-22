@@ -12,12 +12,15 @@ public class Turtle {
 
 	
 	public Turtle() {
+		reset();
+	}
+	
+	public void reset() {
 		turtleX = 0;
 		turtleY = 0;
 		turtleDx = 0;
 		turtleDy = -1;
 	}
-	
 	
 	public void setX(float arg0) {		turtleX = arg0;	}
 	public void setY(float arg0) {		turtleY = arg0;	}
