@@ -105,8 +105,10 @@ public class GCodeFile {
 		estimatedLength = 0;
 		estimateCount = 0;
 
+		int lineCount=0;
 		Iterator<String> iLine = lines.iterator();
 		while (iLine.hasNext()) {
+			lineCount++;
 			String line = iLine.next();
 			String[] pieces = line.split(";");  // comments come after a semicolon.
 			if (pieces.length == 0) continue;
