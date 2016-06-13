@@ -83,7 +83,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JComboBox<String> machineChoices;
 	private JButton openConfig;
 	private JPanel machineNumberPanel;
-	private JButton buttonOpenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
+	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
@@ -290,6 +290,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		buttonOpenFile.addActionListener(this);
 		panel.add(buttonOpenFile, con1);
 		con1.gridy++;
+		
+		buttonReopenFile = new JButton(Translator.get("MenuReopenFile"));
+		buttonReopenFile.addActionListener(this);
+		panel.add(buttonReopenFile, con1);
+		con1.gridy++;
 
 		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
 		buttonGenerate.addActionListener(this);
@@ -490,6 +495,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		else if (subject == buttonNewFile) newFile();
 		else if (subject == buttonOpenFile) openFileDialog();
+		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
 		else if (subject == buttonStart) robot.startAt(0);
@@ -631,6 +637,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		buttonNewFile.setEnabled(!isRunning);
 		buttonOpenFile.setEnabled(!isRunning);
+		buttonReopenFile.setEnabled(!isRunning && (!lastFileIn.isEmpty()));
 		buttonGenerate.setEnabled(!isRunning);
 
 		down100.setEnabled(isConfirmed && !isRunning);
@@ -681,7 +688,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
-
 		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
 		Iterator<LoadFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
@@ -692,8 +698,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			openFileOnDemand(selectedFile);
+			if(openFileOnDemand(selectedFile)) {
+				lastFileIn = selectedFile;
+				updateButtonAccess();
+			}
 		}
+	}
+	
+	private void reopenFile() {
+		openFileOnDemand(lastFileIn);
 	}
 
 	public void generateImage() {
@@ -807,8 +820,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	/**
 	 * User has asked that a file be opened.
 	 * @param filename the file to be opened.
+	 * @return true if file was loaded successfully.  false if it failed.
 	 */
-	public void openFileOnDemand(String filename) {
+	public boolean openFileOnDemand(String filename) {
 		Log.message(Translator.get("OpeningFile") + filename + "...");
 		boolean success=false;
 		boolean attempted=false;
@@ -835,12 +849,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 
 		if (success == true) {
-			lastFileIn = filename;
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
 		}
 
 		gui.updateMenuBar();
 		statusBar.clear();
+		return success;
 	}
 }

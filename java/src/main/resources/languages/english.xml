@@ -582,7 +582,12 @@ to check yourself.</value>
 	<string>
 		<key>MenuOpenFile</key>
 		<value>Open File...</value>
-		<hint>menu or dialog title</hint>
+		<hint></hint>
+	</string>
+	<string>
+		<key>MenuReopenFile</key>
+		<value>Reopen last file</value>
+		<hint></hint>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
