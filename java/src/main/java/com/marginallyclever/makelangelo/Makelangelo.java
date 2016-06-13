@@ -128,7 +128,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	public Makelangelo() {
 		Log.clear();
-
 		Translator.start();
 		SoundSystem.start();
 		

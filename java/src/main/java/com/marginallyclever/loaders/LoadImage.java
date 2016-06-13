@@ -183,7 +183,6 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 					}
 					converter.setParent(this);
 					converter.setProgressMonitor(pm);
-
 					converter.setRobot(robot);
 					robot.setDecorator(converter);
 					converter.convert(img, out);

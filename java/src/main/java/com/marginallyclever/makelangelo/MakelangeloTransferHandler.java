@@ -9,6 +9,11 @@ import javax.swing.TransferHandler;
 
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
+/**
+ * drag & drop support for files
+ * @author Dan Royer
+ *
+ */
 public class MakelangeloTransferHandler  extends TransferHandler {
 	MakelangeloRobot robot;
 	

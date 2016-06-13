@@ -51,7 +51,7 @@ import com.marginallyclever.basictypes.CollapsiblePanel;
 import com.marginallyclever.savers.SaveFileType;
 
 /**
- * Controls related to converting an image to gcode
+ * Control panel for a Makelangelo robot
  *
  * @author dan royer
  * @author Peter Colapietro
