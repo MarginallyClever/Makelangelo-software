@@ -133,7 +133,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		SoundSystem.start();
 		
 		// create a robot and listen to it for important news
-		robot = new MakelangeloRobot(translator);
+		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 		

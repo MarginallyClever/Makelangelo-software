@@ -66,8 +66,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public GCodeFile gCode;
 	
 	
-	public MakelangeloRobot(Translator translator) {
-		settings = new MakelangeloRobotSettings(translator, this);
+	public MakelangeloRobot() {
+		settings = new MakelangeloRobotSettings(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;

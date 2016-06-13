@@ -9,7 +9,6 @@ import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
@@ -24,15 +23,13 @@ public abstract class DrawingTool {
 	protected MakelangeloRobot robot;
 	// Every tool must have a unique number.
 	protected int toolNumber;
-	protected Translator translator;
 
 	protected float zOff;
 	protected float zOn;
 	protected float zRate;
 
 
-	public DrawingTool(Translator ms, MakelangeloRobot robot) {
-		translator = ms;
+	public DrawingTool(MakelangeloRobot robot) {
 		this.robot = robot;
 		diameter = 1;
 	}

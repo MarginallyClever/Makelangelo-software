@@ -36,8 +36,8 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 
 
-	public DrawingTool_Spraypaint(Translator ms, MakelangeloRobot robot) {
-		super(ms, robot);
+	public DrawingTool_Spraypaint(MakelangeloRobot robot) {
+		super(robot);
 
 		diameter = 40;
 		zRate = 80;

@@ -11,7 +11,6 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
-import com.marginallyclever.makelangelo.Translator;
 
 
 /**
@@ -105,7 +104,7 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	protected MakelangeloRobotSettings(Translator translator, MakelangeloRobot robot) {
+	protected MakelangeloRobotSettings(MakelangeloRobot robot) {
 		double mh = 835 * 0.1; // mm > cm
 		double mw = 835 * 0.1; // mm > cm
 		
@@ -144,7 +143,7 @@ public final class MakelangeloRobotSettings {
 		startingPositionIndex = 4;
 		
 		tools = new ArrayList<>();
-		tools.add(new DrawingTool_Pen(translator, robot));
+		tools.add(new DrawingTool_Pen(robot));
 		currentToolIndex = 0;
 
 		// which configurations are available?
