@@ -260,6 +260,9 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			// entities finished. Close up file.
 			liftPen(out);
 			moveTo(out, 0, 0,true);
+			
+			out.flush();
+			out.close();
 
 			LoadGCode loader = new LoadGCode();
 			InputStream fileInputStream = new FileInputStream(destinationFile);

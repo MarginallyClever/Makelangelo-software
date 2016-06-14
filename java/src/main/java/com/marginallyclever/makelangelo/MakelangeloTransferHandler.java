@@ -55,6 +55,8 @@ public class MakelangeloTransferHandler  extends TransferHandler {
         if(data==null) return false;
         if(data.size()<1) return false;
         
+        //TODO check if we know this file type via LoadFileType.canLoad()
+        
         String filename = data.get(0).getAbsolutePath();
         robot.getControlPanel().openFileOnDemand(filename);
         

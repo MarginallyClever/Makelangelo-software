@@ -32,10 +32,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	public Converter_ColorFloodFill() {
 		palette = new ColorPalette();
-		palette.addColor(new C3(0, 0, 0));
-		palette.addColor(new C3(255, 0, 0));
-		palette.addColor(new C3(0, 255, 0));
-		palette.addColor(new C3(0, 0, 255));
+		palette.addColor(new C3(  0,   0,   0));
+		palette.addColor(new C3(255,   0,   0));
+		palette.addColor(new C3(  0, 255,   0));
+		palette.addColor(new C3(  0,   0, 255));
 		palette.addColor(new C3(255, 255, 255));
 	}
 

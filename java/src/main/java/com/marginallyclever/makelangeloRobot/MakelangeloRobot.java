@@ -400,7 +400,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void startAt(int lineNumber) {
 		if(gCode==null) return;
 		
-		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString()));
+		int lineBefore = gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString());
+		gCode.setLinesProcessed(lineBefore);
 		setLineNumber(gCode.getLinesProcessed());
 		setRunning();
 		sendFileCommand();
