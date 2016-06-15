@@ -99,6 +99,14 @@ public abstract class DrawingTool {
 		diameter = d;
 	}
 
+	public String getPenDownString() {
+		return "G00 Z" + df.format(getPenDownAngle()) + ";\n";
+	}
+	
+	public String getPenUpString() {
+		return "G00 Z" + df.format(getPenUpAngle()) + ";\n";
+	}
+
 
 	public void writeChangeTo(Writer out) throws IOException {
 		out.write("M06 T" + toolNumber + ";\n");
@@ -109,14 +117,13 @@ public abstract class DrawingTool {
 		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 
-	// lift the pen.
+	// lift the pen
 	public void writeOff(Writer out) throws IOException {
-		out.write("G00 Z" + df.format(zOff) + ";\n");
-		//out.write("G04 P" + df.format(zRate) + ";\n");
+		out.write(getPenUpString());
 	}
-	// lower the pen.
+	
+	// lower the pen
 	public void writeOn(Writer out) throws IOException {
-		out.write("G00 Z" + df.format(zOn) + ";\n");
-		//out.write("G04 P" + df.format(zRate) + ";\n");
+		out.write(getPenDownString());
 	}
 }

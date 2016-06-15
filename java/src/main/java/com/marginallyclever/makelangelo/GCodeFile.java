@@ -284,10 +284,10 @@ public class GCodeFile {
 		if( linesTotal==0 ) return 0;
 		if(x >= linesTotal) x = linesTotal-1;
 		
-		toMatch = "G00 Z"+toMatch;
+		toMatch = toMatch.trim();
 		while(x>1) {
 			String line = lines.get(x).trim();
-			if(line.startsWith(toMatch)) {
+			if(line.equals(toMatch)) {
 				return x;
 			}
 			--x;

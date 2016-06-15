@@ -367,11 +367,11 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return Float.toString(getCurrentTool().getPenDownAngle());
+		return getCurrentTool().getPenDownString();
 	}
 	
 	public String getPenUpString() {
-		return Float.toString(getCurrentTool().getPenUpAngle());
+		return getCurrentTool().getPenUpString();
 	}
 
 	public double getPulleyDiameterLeft()  {

@@ -326,11 +326,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void raisePen() {
-		sendLineToRobot("G00 Z" + settings.getPenUpString());
+		sendLineToRobot(settings.getPenUpString());
 	}
+	
 	public void lowerPen() {
-		sendLineToRobot("G00 Z" + settings.getPenDownString());
+		sendLineToRobot(settings.getPenDownString());
 	}
+	
 	public void testPenAngle(String testAngle) {
 		sendLineToRobot("G00 Z" + testAngle);
 	}
@@ -436,13 +438,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			String[] lines = line.split(";");
 			reportedline = lines[0];
 		}
-		if(reportedline.trim().equals("")) return false;
+		if(reportedline.trim().isEmpty()) return false;
 
 		// catch pen up/down status here
-		if (line.contains("Z" + settings.getPenUpString())) {
+		if (line.equals(settings.getPenUpString())) {
 			penIsUp=true;
 		}
-		if (line.contains("Z" + settings.getPenDownString())) {
+		if (line.equals(settings.getPenDownString())) {
 			penIsUp=false;
 		}
 
