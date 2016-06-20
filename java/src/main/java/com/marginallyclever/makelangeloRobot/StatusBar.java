@@ -102,8 +102,7 @@ public class StatusBar extends JPanel {
 		long remaining = total_time - t_draw_now;
 
 		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
-		DecimalFormat df = new DecimalFormat("#.##");
-		mExactly.setText(sofar + "/" + total + " "+df.format(100*(double)sofar/(double)total)+"%");
+		mExactly.setText(sofar + "/" + total + " "+fmt.format(100*(double)sofar/(double)total)+"%");
 		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }

@@ -11,12 +11,11 @@ import javax.swing.JPanel;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-
 public abstract class DrawingTool {
 	protected float diameter; // mm
 
 	DecimalFormat df = new DecimalFormat("#.###");
-	
+
 	// used while drawing to the GUI
 	protected float feedRate;
 	protected String name;
@@ -28,13 +27,13 @@ public abstract class DrawingTool {
 	protected float zOn;
 	protected float zRate;
 
-
 	public DrawingTool(MakelangeloRobot robot) {
 		this.robot = robot;
 		diameter = 1;
 	}
 
-	public void cancel() {}
+	public void cancel() {
+	}
 
 	public void drawLine(GL2 gl2, double x1, double y1, double x2, double y2) {
 		gl2.glBegin(GL2.GL_LINES);
@@ -72,18 +71,19 @@ public abstract class DrawingTool {
 		return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	}
 
-
 	public void loadConfig(Preferences prefs) {
 		prefs = prefs.node(name);
 		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
 		zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
 		zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
 		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
-		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
+		// tool_number =
+		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
 		feedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRate)));
 	}
 
-	public void save() {}
+	public void save() {
+	}
 
 	public void saveConfig(Preferences prefs) {
 		prefs = prefs.node(name);
@@ -102,15 +102,14 @@ public abstract class DrawingTool {
 	public String getPenDownString() {
 		return "G00 Z" + df.format(getPenDownAngle()) + ";\n";
 	}
-	
+
 	public String getPenUpString() {
 		return "G00 Z" + df.format(getPenUpAngle()) + ";\n";
 	}
 
-
 	public void writeChangeTo(Writer out) throws IOException {
 		out.write("M06 T" + toolNumber + ";\n");
-		out.write("G00 F" + getFeedRate() + " A"+ robot.getSettings().getAcceleration() + ";\n");
+		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
 	}
 
 	public void writeMoveTo(Writer out, float x, float y) throws IOException {
@@ -121,7 +120,7 @@ public abstract class DrawingTool {
 	public void writeOff(Writer out) throws IOException {
 		out.write(getPenUpString());
 	}
-	
+
 	// lower the pen
 	public void writeOn(Writer out) throws IOException {
 		out.write(getPenDownString());
