@@ -34,7 +34,7 @@ public abstract class DrawingTool {
 		
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 		otherSymbols.setDecimalSeparator('.');
-		df = new DecimalFormat("#.###");
+		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 	}
 
