@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
@@ -14,7 +15,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public abstract class DrawingTool {
 	protected float diameter; // mm
 
-	DecimalFormat df = new DecimalFormat("#.###");
+	DecimalFormat df;
 
 	// used while drawing to the GUI
 	protected float feedRate;
@@ -30,6 +31,11 @@ public abstract class DrawingTool {
 	public DrawingTool(MakelangeloRobot robot) {
 		this.robot = robot;
 		diameter = 1;
+		
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+		otherSymbols.setDecimalSeparator('.');
+		df = new DecimalFormat("#.###");
+		df.setGroupingUsed(false);
 	}
 
 	public void cancel() {
