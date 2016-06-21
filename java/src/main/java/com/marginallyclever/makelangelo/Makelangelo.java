@@ -58,6 +58,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
 
 
 /**
+ * The root window of the GUI
  * @author danroyer
  * @author Peter Colapietro
  * @since 0.0.1?
@@ -485,32 +486,27 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if( screenSize.width > 0 && screenSize.width < maxWidth ) {
-			maxHeight *= screenSize.width / maxWidth;
-			maxWidth = screenSize.width;
-		}
-		if( screenSize.height > 0 && screenSize.height < maxHeight ) {
-			maxWidth *= screenSize.height / maxHeight;
-			maxHeight = screenSize.height;
-		}
-			
-		// set window size
+		maxWidth = screenSize.width;
+		maxHeight = screenSize.height;
+
+		// Set window size
 		if(width > maxWidth || height > maxHeight ) {
 			width = maxWidth;
 			height = maxHeight;
 			prefs.putInt("Default window width", maxWidth );
 			prefs.putInt("Default window height", maxHeight );
 		}
-		
+
 		mainFrame.setSize(width, height);
 		
-		// set window location
+		// Set window location
 		// by default center the window.  Later use preferences.
 		int defaultLocationX = (screenSize.width - width) / 2;
 		int defaultLocationY = (screenSize.height - height) / 2;
-		int locationX = prefs.getInt("Default window location x", defaultLocationX);
-		int locationY = prefs.getInt("Default window location y", defaultLocationY);
-		mainFrame.setLocation(locationX,locationY);
+		mainFrame.setLocation(defaultLocationX,defaultLocationY);
+		//int locationX = prefs.getInt("Default window location x", defaultLocationX);
+		//int locationY = prefs.getInt("Default window location y", defaultLocationY);
+		//mainFrame.setLocation(locationX,locationY);
 	}
 	
 
@@ -623,9 +619,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		System.out.println("windowClosed");
-	}
+	public void windowClosed(WindowEvent e) {}
 }
 
 
