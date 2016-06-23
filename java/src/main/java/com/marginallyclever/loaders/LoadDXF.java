@@ -83,9 +83,9 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			machine = robot.getSettings();
 			tool = robot.getSettings().getCurrentTool();
 			// gcode preamble
-			out.write(robot.getSettings().getConfigLine() + ";\n");
-			out.write(robot.getSettings().getBobbinLine() + ";\n");
-			out.write(robot.getSettings().getSetStartAtHomeLine()+";\n");
+			out.write(robot.getSettings().getGCodeConfig() + ";\n");
+			out.write(robot.getSettings().getGCodeBobbin() + ";\n");
+			out.write(robot.getSettings().getGCodeSetPositionAtHome()+";\n");
 			setAbsoluteMode(out);
 			tool.writeChangeTo(out);
 			liftPen(out);
@@ -116,9 +116,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			}
 			
 			double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
-			boolean isLifted=true;
-			double dxf_x2 = 0;
-			double dxf_y2 = 0;
+			previousX = machine.getHomeX();
+			previousY = machine.getHomeY();
 
 			// count all entities in all layers
 			Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
@@ -157,22 +156,14 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 							double x2 = (end.getX() - imageCenterX) * scale;
 							double y2 = (end.getY() - imageCenterY) * scale;
 
-							double dx = dxf_x2 - x;
-							double dy = dxf_y2 - y;
+							double dx = previousX - x;
+							double dy = previousY - y;
 							if (dx * dx + dy * dy > toolDiameterSquared) {
-								if (!isLifted) {
-									liftPen(out);
-									isLifted=true;
-								}
+								if (!lastUp) liftPen(out);
 								moveTo(out, (float) x, (float) y,true);
-							}
-							if (isLifted) {
-								lowerPen(out);
-								isLifted=false;
+								if (lastUp) lowerPen(out);
 							}
 							moveTo(out, (float) x2, (float) y2,false);
-							dxf_x2 = x2;
-							dxf_y2 = y2;
 						}
 					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 						Iterator<DXFEntity> iter = entity_list.iterator();
@@ -186,32 +177,24 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 								DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
 								double x = (v.getX() - imageCenterX) * scale;
 								double y = (v.getY() - imageCenterY) * scale;
-								double dx = dxf_x2 - x;
-								double dy = dxf_y2 - y;
+								double dx = previousX - x;
+								double dy = previousY - y;
 
 								if (first == true) {
 									first = false;
 									if (dx * dx + dy * dy > toolDiameterSquared) {
 										// line does not start at last tool location, lift and move.
-										if (!isLifted) {
-											liftPen(out);
-											isLifted=true;
-										}
+										if (!lastUp) liftPen(out);
 										moveTo(out, (float) x, (float) y,true);
+										if (lastUp) lowerPen(out);
 									}
 									// else line starts right here, pen is down, do nothing extra.
 								} else {
 									// not the first point, draw.
-									if (isLifted) {
-										lowerPen(out);
-										isLifted=false;
-									}
-									if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy <= toolDiameterSquared)
+									if (j < count - 1 && dx * dx + dy * dy <= toolDiameterSquared)
 										continue; // points too close together
 									moveTo(out, (float) x, (float) y,false);
 								}
-								dxf_x2 = x;
-								dxf_y2 = y;
 							}
 						}
 					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
@@ -224,33 +207,24 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 								DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 								double x = (v.getX() - imageCenterX) * scale;
 								double y = (v.getY() - imageCenterY) * scale;
-								double dx = dxf_x2 - x;
-								double dy = dxf_y2 - y;
+								double dx = previousX - x;
+								double dy = previousY - y;
 
 								if (first == true) {
 									first = false;
 									if (dx * dx + dy * dy > toolDiameterSquared) {
 										// line does not start at last tool location, lift and move.
-										if (!isLifted) {
-											liftPen(out);
-											isLifted=true;
-										}
+										if (!lastUp) liftPen(out);
 										moveTo(out, (float) x, (float) y,true);
+										if (lastUp) lowerPen(out);
 									}
 									// else line starts right here, pen is down, do nothing extra.
 								} else {
 									// not the first point, draw.
-									if (isLifted) {
-										lowerPen(out);
-										isLifted=false;
-									}
-									if (j < entity.getVertexCount() - 1
-											&& dx * dx + dy * dy < toolDiameterSquared)
+									if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared)
 										continue; // points too close together
 									moveTo(out, (float) x, (float) y,false);
 								}
-								dxf_x2 = x;
-								dxf_y2 = y;
 							}
 						}
 					}

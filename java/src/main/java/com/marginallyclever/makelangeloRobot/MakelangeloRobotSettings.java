@@ -190,7 +190,7 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	
-	public String getBobbinLine() {
+	public String getGCodeBobbin() {
 		String left = String.format("%.4f", pulleyDiameterLeft);
 		String right = String.format("%.4f", pulleyDiameterRight);
 		return "D1 L" + left + " R" + right;
@@ -208,11 +208,11 @@ public final class MakelangeloRobotSettings {
 		return homeY;
 	}
 	
-	public String getSetStartAtHomeLine() {
+	public String getGCodeSetPositionAtHome() {
 		return "G92 X"+getHomeX()+" Y"+getHomeY();
 	}
 
-	public String getConfigLine() {
+	public String getGCodeConfig() {
 		return "M101 T" + limitTop
 				+ " B" + limitBottom
 				+ " L" + limitLeft
