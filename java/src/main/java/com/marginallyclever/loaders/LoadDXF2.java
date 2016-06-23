@@ -72,17 +72,19 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 		return false;
 	}
 
+	
+	protected void sortGroupsByProximity(List<DXFGroup> groups) {
+		
+	}
 
 	/**
-	 * put every non-closed entity into a bucket.  Put closed entities in the groups list (they are a group of one)
+	 * Put every entity into a bucket.
 	 * @param doc
 	 * @param grid
 	 * @param groups
 	 */
 	@SuppressWarnings("unchecked")
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFBucketGrid grid,List<DXFGroup> groups) {
-		int entityCount=0;
-
 		Iterator<DXFLayer> layerIter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
@@ -95,7 +97,6 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 				while(iter.hasNext()) {
 					DXFEntity e = iter.next();
 					DXFBucketEntity be = new DXFBucketEntity(e);
-					++entityCount;
 					
 					if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 						DXFLine line = (DXFLine)e;
@@ -114,10 +115,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 							grid.addEntity(be, polyLine.getVertex(0).getPoint());
 							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
 						} else {
-							// Closed loops are a group of one.  Add directly to groups.
-							DXFGroup g = new DXFGroup();
-							g.addLast(be);
-							groups.add(g);
+							grid.addEntity(be, polyLine.getVertex(0).getPoint());
+							grid.addEntity(be, polyLine.getVertex(0).getPoint());
 						}
 						continue;
 					}
@@ -127,16 +126,12 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			}
 		}
 		
-		Log.message(entityCount + " entities before sort.");
-		
 		grid.countEntitiesInBuckets();
 		
 		// Use the buckets to narrow the search field and find neighboring entities
 		grid.sortEntitiesIntoContinguousGroups(groups);
 	}
 	
-
-
 	
 	/**
 	 * 
@@ -149,18 +144,18 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 		Log.message(Translator.get("Converting") + " " + destinationFile);
 
-		// start parser
+		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
 		try {
 			parser.parse(in, DXFParser.DEFAULT_ENCODING);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return false;
-		}
-		
+		}		
 		DXFDocument doc = parser.getDocument();
 
-		// Sort entities into buckets.  Buckets are arranged in a grid.
+		// Sort the entities into the buckets.  Buckets are arranged in an XY grid.
+		// All non-closed entities would appear in two buckets.  One Entity might be in the same bucket twice.
 		Bounds bounds = doc.getBounds();
 		Point topLeft = new Point();
 		Point bottomRight = new Point();
@@ -168,12 +163,10 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 		topLeft.setY(bounds.getMinimumY());
 		bottomRight.setX(bounds.getMaximumX());
 		bottomRight.setY(bounds.getMaximumY());
-
-		// Sort the entities into the buckets.  All non-closed entity would appear in the list twice.  One Entity might be in the same bucket twice.
-		DXFBucketGrid grid = new DXFBucketGrid(10,10,topLeft,bottomRight);
+		DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
 		List<DXFGroup> groups = new LinkedList<DXFGroup>();
-		
 		sortEntitiesIntoBucketsAndGroups(doc,grid,groups);
+		sortGroupsByProximity(groups);
 
 		// convert each entity
 		Bounds b = doc.getBounds();
@@ -229,7 +222,6 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			previousY = machine.getHomeY();
 			
 			double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
-			int entityCount=0;
 			
 			// output all entities
 			Iterator<DXFGroup> groupIter = groups.iterator();
@@ -237,7 +229,6 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 				DXFGroup g = groupIter.next();
 				Iterator<DXFBucketEntity> iter = g.entities.iterator();
 				while(iter.hasNext()) {
-					++entityCount;
 					DXFEntity e = iter.next().entity;
 					if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 						parseDXFLine(out,(DXFLine)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
@@ -248,8 +239,6 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 					}
 				}
 			}
-
-			Log.message(entityCount + " entities after sort.");
 			
 			// entities finished. Close up file.
 			liftPen(out);

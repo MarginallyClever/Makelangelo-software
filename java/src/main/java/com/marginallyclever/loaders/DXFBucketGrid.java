@@ -22,7 +22,7 @@ public class DXFBucketGrid {
 		int totalCells = cellsWide * cellsHigh;
 		assert(totalCells>0);
 		
-		System.out.println("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
+		//System.out.println("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
 		buckets = new ArrayList<DXFBucket>();
 		double dx = bottomRight.getX() - topLeft.getX(); 
 		double dy = bottomRight.getY() - topLeft.getY();
@@ -36,7 +36,7 @@ public class DXFBucketGrid {
 				b.topLeft    .setY( ( y    / (double)cellsHigh) * dy + topLeft.getY());
 				b.bottomRight.setX( ((x+1) / (double)cellsWide) * dx + topLeft.getX());
 				b.bottomRight.setY( ((y+1) / (double)cellsHigh) * dy + topLeft.getY());
-				System.out.println(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
+				//System.out.println(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
 			}
 		}
 	}
@@ -75,28 +75,27 @@ public class DXFBucketGrid {
 	}
 	
 	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups) {
-		System.out.println(groups.size()+ " groups at start.");
-		int entityCount=0;
 		DXFBucket bucket;
 		Point p=null;
 	
+		double dx = buckets.get(buckets.size()-1).bottomRight.getX() - buckets.get(0).topLeft.getX();
+		double dy = buckets.get(buckets.size()-1).bottomRight.getY() - buckets.get(0).topLeft.getY();
+		double BIG_EPSILON = dx*dx+dy*dy;
+		
 		// as long as there are entities in buckets
 		while((bucket=findNonEmptyBucket(p))!=null) {
 			// start a new group
 			DXFGroup group = new DXFGroup();
-			System.out.print("+group");
 			groups.add(group);
 			// add the first entity found 
-			DXFBucketEntity be = bucket.getFirstEntity();
+			DXFBucketEntity be = bucket.findBestFitToPoint(p,BIG_EPSILON);
 			DXFBucket otherBucket = bucket;
 
 			DXFBucketEntity firstBe = be;
 			DXFBucket firstBucket = otherBucket;
 
-			// loop forward
+			// Loop forward
 			do {
-				++entityCount;
-				System.out.print("+");
 				bucket = otherBucket;
 				bucket.remove(be);
 				group.addLast(be);
@@ -111,15 +110,13 @@ public class DXFBucketGrid {
 				// until there are no more entities in this contiguous group
 			} while(be!=null);
 			
-			// maybe the first line we picked is in the middle of a contiguous group.  Find the real start
-			// loop backward
+			// Maybe the first line we picked is in the middle of a contiguous group.  
+			// Find the start by looping backward.
 			otherBucket = firstBucket;
 			be = firstBe;
 			p = be.getPointInBucket(otherBucket);
 			be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
 			while(be!=null) {
-				++entityCount;
-				System.out.print("~");
 				bucket = otherBucket;
 				bucket.remove(be);
 				group.addFirst(be);
@@ -132,14 +129,19 @@ public class DXFBucketGrid {
 				// find the best fit for an entity that shares this point
 				be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
 				// until there are no more entities in this contiguous group
-			} 
+			}
 			
 			System.out.println();
 		}
-		System.out.println(groups.size()+ " groups at end.");
-		System.out.println(entityCount+ " entities at end.");
+
+		System.out.println(groups.size()+ " groups after sort.");
 	}
 	
+	/**
+	 * Find the non-empty bucket nearest to point p.  If p is null, pick the first non-empty bucket.
+	 * @param p
+	 * @return the selected bucket
+	 */
 	protected DXFBucket findNonEmptyBucket(Point p) {
 		if(p==null) {
 			Iterator<DXFBucket> bucketIter = buckets.iterator();
@@ -156,14 +158,14 @@ public class DXFBucketGrid {
 				if(!bucket.contents.isEmpty()) {
 					if(bestBucket==null) {
 						bestBucket = bucket;
-						double dx = bestBucket.topLeft.getX() + bestBucket.bottomRight.getX();
-						double dy = bestBucket.topLeft.getY() + bestBucket.bottomRight.getY();
-						bestD = dx*dx + dy*dy; 	
+						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX())/2;
+						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY())/2;
+						bestD = Math.sqrt( dx*dx + dy*dy ); 	
 					} else {
-						double dx = bestBucket.topLeft.getX() + bestBucket.bottomRight.getX();
-						double dy = bestBucket.topLeft.getY() + bestBucket.bottomRight.getY();
-						double d = dx*dx + dy*dy; 	
-						if(bestD<d) {
+						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX())/2;
+						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY())/2;
+						double d = Math.sqrt( dx*dx + dy*dy ); 	
+						if(bestD>d) {
 							bestD=d;
 							bestBucket = bucket;
 						}

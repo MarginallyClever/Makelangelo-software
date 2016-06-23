@@ -156,8 +156,7 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
 
 		converters = ServiceLoader.load(ImageConverter.class);
-		if (chooseImageConversionOptions(robot) == false)
-			return false;
+		if (!chooseImageConversionOptions(robot)) return false;
 
 		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);

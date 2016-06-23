@@ -4,6 +4,11 @@ import org.kabeja.dxf.helpers.Point;
 
 import org.kabeja.dxf.DXFEntity;
 
+/**
+ * An entity has two end points.  Each end point is in a bucket.  They may be the same bucket. 
+ * @author Dan Royer
+ *
+ */
 public class DXFBucketEntity {
 	public DXFEntity entity;
 	public DXFBucket bucketA,bucketB;
@@ -28,7 +33,7 @@ public class DXFBucketEntity {
 
 	public DXFBucket getRemainingBucket() {
 		if(bucketA!=null) return bucketA;
-		else if(bucketB!=null) return bucketB;
+		if(bucketB!=null) return bucketB;
 		// should never reach this point
 		assert(false);
 		return null;
@@ -36,7 +41,7 @@ public class DXFBucketEntity {
 	
 	public Point getPointInBucket(DXFBucket match) {
 		if(bucketA==match) return pointA;
-		else if(bucketB==match) return pointB;
+		if(bucketB==match) return pointB;
 		// should never reach this point
 		assert(false);
 		return null;

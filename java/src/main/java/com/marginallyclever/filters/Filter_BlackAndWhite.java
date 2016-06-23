@@ -27,7 +27,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        i = decode(img.getSourceImage().getRGB(x, y));
+        i = decode32bit(img.getSourceImage().getRGB(x, y));
         if (max_intensity < i) max_intensity = i;
         if (min_intensity > i) min_intensity = i;
       }
@@ -46,7 +46,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        pixel = decode(img.getSourceImage().getRGB(x, y));
+        pixel = decode32bit(img.getSourceImage().getRGB(x, y));
 
         double a = (pixel - min_intensity) / intensity_range;
         double c = Math.ceil(a * levels) * ilevels;
@@ -54,7 +54,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
         if (b > 255) b = 255;
         if (b < 0) b = 0;
         //if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
-        img.getSourceImage().setRGB(x, y, ImageFilter.encode(b));
+        img.getSourceImage().setRGB(x, y, ImageFilter.encode32bit(b));
       }
     }
 
@@ -84,7 +84,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        i = decode(img.getSourceImage().getRGB(x, y));
+        i = decode32bit(img.getSourceImage().getRGB(x, y));
         ++histogram[i];
       }
     }
@@ -119,9 +119,9 @@ public class Filter_BlackAndWhite extends ImageFilter {
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        pixel = decode(img.getSourceImage().getRGB(x, y));
+        pixel = decode32bit(img.getSourceImage().getRGB(x, y));
         b = (int) histogram[pixel];
-        img.getSourceImage().setRGB(x, y, ImageFilter.encode(b));
+        img.getSourceImage().setRGB(x, y, ImageFilter.encode32bit(b));
       }
     }
 

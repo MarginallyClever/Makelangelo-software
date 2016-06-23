@@ -36,6 +36,8 @@ public class DXFBucket {
 
 	
 	public DXFBucketEntity findBestFitToPoint(Point p,double epsilon) {
+		if(p==null) return getFirstEntity();
+		
 		double bestD = epsilon;
 		double d;
 		DXFBucketEntity bestEntity=null;
