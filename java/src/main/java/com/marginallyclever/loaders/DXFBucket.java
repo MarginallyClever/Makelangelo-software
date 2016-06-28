@@ -38,7 +38,7 @@ public class DXFBucket {
 	public DXFBucketEntity findBestFitToPoint(Point p,double epsilon) {
 		if(p==null) return getFirstEntity();
 		
-		double bestD = epsilon;
+		double bestD = epsilon*epsilon;
 		double d;
 		DXFBucketEntity bestEntity=null;
 		
@@ -46,14 +46,14 @@ public class DXFBucket {
 		while(i.hasNext()) {
 			DXFBucketEntity be = i.next();
 			d = distanceBetweenPointsSquared(p,be.pointA);
-			if( d < bestD*bestD) {
+			if( d < bestD) {
 				bestEntity = be;
-				bestD = d;
+				bestD = d*d;
 			}
 			d = distanceBetweenPointsSquared(p,be.pointB);
-			if( d < bestD*bestD) {
+			if( d < bestD) {
 				bestEntity = be;
-				bestD = d;
+				bestD = d*d;
 			}
 		}
 		return bestEntity;

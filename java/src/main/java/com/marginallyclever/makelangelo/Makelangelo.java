@@ -117,6 +117,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	
 	public static void main(String[] argv) {
+		Log.clear();
+		CommandLineOptions.setFromMain(argv);
+		
 		//Schedule a job for the event-dispatching thread:
 		//creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -128,7 +131,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	public Makelangelo() {
-		Log.clear();
 		Translator.start();
 		SoundSystem.start();
 		
@@ -464,9 +466,12 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		mainFrame.setJMenuBar(createMenuBar());
 		mainFrame.setContentPane(createContentPane());
 		
+		// add the drag & drop support
 		mainFrame.setTransferHandler(myTransferHandler);
 		
+		// adjust the window size
 		setupFrameRealEstate();
+		
 		mainFrame.setVisible(true);
 
 		drawPanel.zoomToFitPaper();

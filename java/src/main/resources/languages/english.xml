@@ -246,7 +246,12 @@
 	</string>
 	<string>
 		<key>FileTypeDXF</key>
-		<value>DXF R12 (dxf)</value>
+		<value>DXF R12 for map data (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 for images (dxf)</value>
 		<hint>file open dialog</hint>
 	</string>
 

@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
@@ -35,10 +36,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
 	static public final float PEN_HOLDER_RADIUS=6; //cm
-	
-	// TODO make please_get_a_guid a runtime parameter
-	// set to false when I'm building robots @ marginallyclever.com.  
-	static boolean please_get_a_guid=false;
 	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
@@ -219,7 +216,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private long getNewRobotUID() {
 		long newUID = 0;
 
-		if(please_get_a_guid) {
+		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
+		if(pleaseGetAGUID) {
 			Log.message("obtaining UID from server.");
 			try {
 				// Send data

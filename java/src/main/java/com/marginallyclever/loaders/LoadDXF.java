@@ -20,6 +20,7 @@ import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFConstants;
 import org.kabeja.dxf.DXFDocument;
 import org.kabeja.dxf.DXFEntity;
+import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFPolyline;
@@ -201,6 +202,36 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 						Iterator<DXFEntity> iter = entity_list.iterator();
 						while (iter.hasNext()) {
 							DXFPolyline entity = (DXFPolyline) iter.next();
+							boolean first = true;
+							int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+							for (int j = 0; j < count; ++j) {
+								DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+								double x = (v.getX() - imageCenterX) * scale;
+								double y = (v.getY() - imageCenterY) * scale;
+								double dx = previousX - x;
+								double dy = previousY - y;
+
+								if (first == true) {
+									first = false;
+									if (dx * dx + dy * dy > toolDiameterSquared) {
+										// line does not start at last tool location, lift and move.
+										if (!lastUp) liftPen(out);
+										moveTo(out, (float) x, (float) y,true);
+										if (lastUp) lowerPen(out);
+									}
+									// else line starts right here, pen is down, do nothing extra.
+								} else {
+									// not the first point, draw.
+									if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared)
+										continue; // points too close together
+									moveTo(out, (float) x, (float) y,false);
+								}
+							}
+						}
+					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+						Iterator<DXFEntity> iter = entity_list.iterator();
+						while (iter.hasNext()) {
+							DXFLWPolyline entity = (DXFLWPolyline) iter.next();
 							boolean first = true;
 							int count = entity.getVertexCount() + (entity.isClosed()?1:0);
 							for (int j = 0; j < count; ++j) {

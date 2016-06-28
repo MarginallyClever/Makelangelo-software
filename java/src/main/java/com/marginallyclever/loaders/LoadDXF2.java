@@ -21,6 +21,7 @@ import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFConstants;
 import org.kabeja.dxf.DXFDocument;
 import org.kabeja.dxf.DXFEntity;
+import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFPolyline;
@@ -46,7 +47,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
-		return new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
+		return new FileNameExtensionFilter(Translator.get("FileTypeDXF2"), "dxf");
 	}
 
 	@Override
@@ -74,7 +75,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 
 	
 	protected void sortGroupsByProximity(List<DXFGroup> groups) {
-		
+		Log.message("Sorting groups by proximity...");
 	}
 
 	/**
@@ -85,6 +86,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 	 */
 	@SuppressWarnings("unchecked")
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFBucketGrid grid,List<DXFGroup> groups) {
+		Log.message("Sorting into buckets...");
+		
 		Iterator<DXFLayer> layerIter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
@@ -111,6 +114,17 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 					if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
 						DXFPolyline polyLine = (DXFPolyline)e;
 						
+						if(!polyLine.isClosed()) {
+							grid.addEntity(be, polyLine.getVertex(0).getPoint());
+							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+						} else {
+							grid.addEntity(be, polyLine.getVertex(0).getPoint());
+							grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						}
+						continue;
+					}
+					if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+						DXFLWPolyline polyLine = (DXFLWPolyline)e;
 						if(!polyLine.isClosed()) {
 							grid.addEntity(be, polyLine.getVertex(0).getPoint());
 							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
@@ -167,7 +181,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 		List<DXFGroup> groups = new LinkedList<DXFGroup>();
 		sortEntitiesIntoBucketsAndGroups(doc,grid,groups);
 		sortGroupsByProximity(groups);
-
+		
 		// convert each entity
 		Bounds b = doc.getBounds();
 		double imageCenterX = (b.getMaximumX() + b.getMinimumX()) / 2.0;
@@ -204,7 +218,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 				//entityTotal += entityList.size();
 			}
 		}
-		
+
+		Log.message("Exporting...");
 		try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
 				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
@@ -236,6 +251,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 						parseDXFPolyline(out,DXFSplineConverter.toDXFPolyline((DXFSpline)e),scale,imageCenterX,imageCenterY,toolDiameterSquared);
 					} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
 						parseDXFPolyline(out,(DXFPolyline)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+					} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+						parseDXFLWPolyline(out,(DXFLWPolyline)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
 					}
 				}
 			}
@@ -247,6 +264,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			out.flush();
 			out.close();
 
+			Log.message("Done!");
 			LoadGCode loader = new LoadGCode();
 			InputStream fileInputStream = new FileInputStream(destinationFile);
 			loader.load(fileInputStream,robot);
@@ -280,6 +298,89 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			} else {
 				// last point is closer
 				parseDXFPolylineBackward(out,entity,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+			}
+		}
+	}
+	
+	protected void parseDXFLWPolylineForward(Writer out,DXFLWPolyline entity,double scale,double imageCenterX,double imageCenterY,double toolDiameterSquared) throws IOException {
+		boolean first = true;
+		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+		for (int j = 0; j < count; ++j) {
+			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+			double x = (v.getX() - imageCenterX) * scale;
+			double y = (v.getY() - imageCenterY) * scale;
+			double dx = previousX - x;
+			double dy = previousY - y;
+
+			if (first == true) {
+				first = false;
+				if (dx * dx + dy * dy > toolDiameterSquared) {
+					// line does not start at last tool location, lift and move.
+					if (!lastUp) liftPen(out);
+					moveTo(out, (float) x, (float) y,true);
+					if (lastUp) lowerPen(out);
+				}
+				// else line starts right here, pen is down, do nothing extra.
+			} else {
+				// not the first point, draw.
+				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
+					continue; // points too close together
+				moveTo(out, (float) x, (float) y,false);
+			}
+		}
+	}
+	
+	protected void parseDXFLWPolylineBackward(Writer out,DXFLWPolyline entity,double scale,double imageCenterX,double imageCenterY,double toolDiameterSquared) throws IOException {
+		boolean first = true;
+		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+		for (int j = 0; j < count; ++j) {
+			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
+			double x = (v.getX() - imageCenterX) * scale;
+			double y = (v.getY() - imageCenterY) * scale;
+			double dx = previousX - x;
+			double dy = previousY - y;
+
+			if (first == true) {
+				first = false;
+				if (dx * dx + dy * dy > toolDiameterSquared) {
+					// line does not start at last tool location, lift and move.
+					if (!lastUp) liftPen(out);
+					moveTo(out, (float) x, (float) y,true);
+					if (lastUp) lowerPen(out);
+				}
+				// else line starts right here, pen is down, do nothing extra.
+			} else {
+				// not the first point, draw.
+				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
+					continue; // points too close together
+				moveTo(out, (float) x, (float) y,false);
+			}
+		}
+	}
+
+	protected void parseDXFLWPolyline(Writer out,DXFLWPolyline entity,double scale,double imageCenterX,double imageCenterY,double toolDiameterSquared) throws IOException {
+		if(entity.isClosed()) {
+			// only one end to care about
+			parseDXFLWPolylineForward(out,entity,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+		} else {
+			// which end is closest to the previous (x,y)?
+			int n = entity.getVertexCount()-1;
+			double x = (entity.getVertex(0).getX() - imageCenterX) * scale;
+			double y = (entity.getVertex(0).getY() - imageCenterY) * scale;
+			double x2 = (entity.getVertex(n).getX() - imageCenterX) * scale;
+			double y2 = (entity.getVertex(n).getY() - imageCenterY) * scale;
+
+			// which end is closer to the previous (x,y) ?
+			double dx = previousX - x;
+			double dy = previousY - y;
+			double dx2 = previousX - x2;
+			double dy2 = previousY - y2;
+			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
+				// first point is closer
+				parseDXFLWPolylineForward(out,entity,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+			} else {
+				// last point is closer
+				parseDXFLWPolylineBackward(out,entity,scale,imageCenterX,imageCenterY,toolDiameterSquared);
 			}
 		}
 	}
