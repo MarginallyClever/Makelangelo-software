@@ -109,6 +109,7 @@ public final class MakelangeloRobotSettings {
 	 * @param robot
 	 */
 	protected MakelangeloRobotSettings(MakelangeloRobot robot) {
+		// set up number format
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 		otherSymbols.setDecimalSeparator('.');
 		df = new DecimalFormat("#.###",otherSymbols);

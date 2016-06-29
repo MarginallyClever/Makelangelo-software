@@ -4,5 +4,5 @@ import org.junit.Test;
 
 public class MakelangeloRobotTest {
 	@Test
-	static public void test() {}
+	public void test() {}
 }

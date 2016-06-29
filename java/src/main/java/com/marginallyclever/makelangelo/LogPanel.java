@@ -137,8 +137,8 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	// appends a message to the log tab and system out.
 	@Override
 	public void logEvent(String msg) {
-		// remove the
-		if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
+		// remove the 
+		//if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
 
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");

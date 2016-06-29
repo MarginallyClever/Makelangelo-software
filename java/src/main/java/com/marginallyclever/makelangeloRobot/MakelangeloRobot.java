@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -36,6 +38,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
 	static public final float PEN_HOLDER_RADIUS=6; //cm
+
+	private DecimalFormat df;
 	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
@@ -64,6 +68,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	
 	public MakelangeloRobot() {
+		// set up number format
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+		otherSymbols.setDecimalSeparator('.');
+		df = new DecimalFormat("#.###",otherSymbols);
+		df.setGroupingUsed(false);
+		
 		settings = new MakelangeloRobotSettings(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
@@ -262,7 +272,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			checksum ^= line.charAt(i);
 		}
 
-		return "*" + ((int) checksum);
+		return "*" + Integer.toString(checksum);
 	}
 
 
@@ -278,7 +288,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
 			sendLineToRobot(settings.getGCodeBobbin() + "\n");
 			setHome();
-			sendLineToRobot("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
+			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -332,7 +342,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void testPenAngle(String testAngle) {
-		sendLineToRobot("G00 Z" + testAngle);
+		sendLineToRobot("G00 Z" + df.format(testAngle));
 	}
 
 
@@ -358,7 +368,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
-			line += generateChecksum(line);
+			String checksum = generateChecksum(line); 
+			line += checksum; 
 		}
 		
 		// send relevant part of line to the robot
@@ -446,7 +457,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			penIsUp=false;
 		}
 
-		Log.write("white", reportedline );
+		Log.write("white", line );
 		line += "\n";
 
 		// send unmodified line
@@ -463,12 +474,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// remember it
 		settings.setFeedRate(parsedFeedRate);
 		// tell the robot
-		sendLineToRobot("G00 F" + parsedFeedRate);
+		sendLineToRobot("G00 F" + df.format(parsedFeedRate));
 	}
 	
 	
 	public void goHome() {
-		sendLineToRobot("G00 X"+settings.getHomeX()+" Y"+(settings.getHomeY()*10));
+		sendLineToRobot("G00 X"+df.format(settings.getHomeX()*10)+" Y"+df.format(settings.getHomeY()*10));
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
 	}
@@ -488,18 +499,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	
 	public void movePenAbsolute(float x,float y) {
-		sendLineToRobot("G00"+
-						" X" + x +
-						" Y" + y);
+		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
 		gondolaX = x * 0.1f;
 		gondolaY = y * 0.1f;
 	}
 	
 	public void movePenRelative(float dx,float dy) {
 		sendLineToRobot("G91");  // set relative mode
-		sendLineToRobot("G00"+
-						" X" + dx +
-						" Y" + dy);
+		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90");  // return to absolute mode
 		gondolaX += dx * 0.1f;
 		gondolaY += dy * 0.1f;
