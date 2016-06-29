@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangeloRobot;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -24,6 +26,8 @@ public final class MakelangeloRobotSettings {
 	 * @since 7.5.0
 	 */
 	public static final float CALIBRATION_CM_FROM_TOP = 21.7f;
+	
+	private DecimalFormat df;
 	
 	private String[] configsAvailable;
 	
@@ -105,6 +109,11 @@ public final class MakelangeloRobotSettings {
 	 * @param robot
 	 */
 	protected MakelangeloRobotSettings(MakelangeloRobot robot) {
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+		otherSymbols.setDecimalSeparator('.');
+		df = new DecimalFormat("#.###",otherSymbols);
+		df.setGroupingUsed(false);
+				
 		double mh = 835 * 0.1; // mm > cm
 		double mw = 835 * 0.1; // mm > cm
 		
@@ -191,9 +200,7 @@ public final class MakelangeloRobotSettings {
 	
 	
 	public String getGCodeBobbin() {
-		String left = String.format("%.4f", pulleyDiameterLeft);
-		String right = String.format("%.4f", pulleyDiameterRight);
-		return "D1 L" + left + " R" + right;
+		return "D1 L" + df.format(pulleyDiameterLeft) + " R" + df.format(pulleyDiameterRight);
 	}
 
 	
@@ -213,10 +220,10 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getGCodeConfig() {
-		return "M101 T" + limitTop
-				+ " B" + limitBottom
-				+ " L" + limitLeft
-				+ " R" + limitRight
+		return "M101 T" + df.format(limitTop)
+				+ " B" + df.format(limitBottom)
+				+ " L" + df.format(limitLeft)
+				+ " R" + df.format(limitRight)
 				+ " I" + (isLeftMotorInverted ? "-1" : "1")
 				+ " J" + (isRightMotorInverted ? "-1" : "1");
 	}
