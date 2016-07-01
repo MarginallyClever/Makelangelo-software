@@ -89,12 +89,11 @@ public class Converter_Multipass extends ImageConverter {
 			double majorPY = majorY * a;
 			double startPX = majorPX - majorY * radius;
 			double startPY = majorPY + majorX * radius;
-			double endPX = majorPX + majorY * radius;
-			double endPY = majorPY - majorX * radius;
-			double r2 = radius*2;
+			double endPX   = majorPX + majorY * radius;
+			double endPY   = majorPY - majorX * radius;
+			double r2      = radius*2;
 		
 			double l2 = level * (1 + (i % passes));
-			System.out.println(i + " @ " + l2);
 			if ((i % 2) == 0) {
 				convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,l2,img,out);
 			} else {
@@ -106,34 +105,28 @@ public class Converter_Multipass extends ImageConverter {
 		return true;
 	}
 	
-	protected void convertAlongLine(double x0,double y0,double x1,double y1,double steps,double r2,double level,TransformedImage img,Writer out) throws IOException {
+	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double level,TransformedImage img,Writer out) throws IOException {
 		double b;
-		// skip the start of the line outside the margins.
-		for (b = 0; b <= r2; b+=steps) {
-			double n = b / r2;  // reversed
-			double x = (x1 - x0) * n + x0;
-			double y = (y1 - y0) * n + y0;
+		double dx=x1-x0;
+		double dy=y1-y0;
+		
+		double halfStep = stepSize/2;
+		double steps = r2 / stepSize;
+		if(steps<1) steps=1;
+
+		double n,x,y,v;
+		
+		for (b = 0; b <= steps; ++b) {
+			n = b / steps;
+			x = dx * n + x0;
+			y = dy * n + y0;
 			if(isInsidePaperMargins(x, y)) {
-				// move to first point inside margins.
-				lineTo(out, (float)x, (float)y, true);
-				break;
+				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+			} else {
+				v = 255;
 			}
+			lineTo(out, (float)x, (float)y, v>=level);
 		}
-		// scan across area inside margins.
-		for (; b <= r2; b+=steps) {
-			double n = b / r2;  // reversed
-			double x = (x1 - x0) * n + x0;
-			double y = (y1 - y0) * n + y0;
-			if(!isInsidePaperMargins(x, y)) {
-				lineTo(out, (float)x1, (float)y1, true);
-				return;
-			}
-			// read the image at x,y
-			double z = img.sample3x3((float)x, (float)y);
-			lineTo(out, x, y, (z > level));
-		}
-		// reached the end of the line and didn't hit margin edge.
-		moveTo(out, (float)x1, (float)y1, true);
 	}
 }
 
