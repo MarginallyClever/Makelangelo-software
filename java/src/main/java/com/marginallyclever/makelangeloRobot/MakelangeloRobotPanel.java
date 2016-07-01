@@ -183,20 +183,23 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void itemStateChanged(ItemEvent e) {
 		Object subject = e.getSource();
 		
-		if(subject == connectionComboBox) {
-			if(ignoreSelectionEvents==false && e.getStateChange()==ItemEvent.SELECTED) {
-				if(connectionComboBox.getSelectedIndex()==0) {
-					// Disconnect
-					robot.setConnection(null);
-				} else {
-					String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-					robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
-				}
-				updateMachineNumberPanel();
-				updateButtonAccess();
-				rescanConnections();
-				return;
+		if(subject == connectionComboBox && !ignoreSelectionEvents && e.getStateChange()==ItemEvent.SELECTED) {
+			if(connectionComboBox.getSelectedIndex()==0) {
+				// Disconnect
+				robot.setConnection(null);
+			} else {
+				String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+				robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
 			}
+			updateMachineNumberPanel();
+			updateButtonAccess();
+			rescanConnections();
+		}
+		
+		if(subject == machineChoices && e.getStateChange()==ItemEvent.SELECTED) {
+			int selectedIndex = machineChoices.getSelectedIndex();
+			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
+			robot.getSettings().loadConfig(newUID);
 		}
 	}
 	
@@ -467,6 +470,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			else if( robot.isPortConfirmed() == false ) state=true;
 			
 			machineChoices.setEnabled( state );
+			machineChoices.addItemListener(this);
 		}
 
 		openConfig = new JButton(Translator.get("configureMachine"));
@@ -475,18 +479,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		machineNumberPanel.add(openConfig,cMachine);
 		cMachine.gridx++;
 	}
-
+	
+	
 	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		if( machineChoices != null ) {
-			// TODO: maybe only run this when the machineChoices comboBox changes to a new value
-			int selectedIndex = machineChoices.getSelectedIndex();
-			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-			robot.getSettings().loadConfig(newUID);
-		}
-		
 		if( subject == buttonRescan ) rescanConnections();
 		else if (subject == openConfig) {
 			Frame frame = (Frame)this.getRootPane().getParent();
