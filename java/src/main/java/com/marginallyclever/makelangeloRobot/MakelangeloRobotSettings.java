@@ -212,7 +212,7 @@ public final class MakelangeloRobotSettings {
 	public double getHomeY() {
 		float limitTop = (float)getLimitTop();
 		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
-		homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
+		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
 		return homeY;
 	}
 	

@@ -155,6 +155,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
+		Log.message(Translator.get("FileTypeDXF2")+"...");
 		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 		Log.message(Translator.get("Converting") + " " + destinationFile);
 
