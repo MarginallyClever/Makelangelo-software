@@ -154,6 +154,8 @@ public class Generator_Maze extends ImageGenerator {
 
 		// draw the maze
 		drawMaze(out);
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 	private void drawMaze(Writer output) throws IOException {

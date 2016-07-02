@@ -302,6 +302,8 @@ public class Generator_YourMessageHere extends ImageGenerator {
 						(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
 		textCreateMessageNow(lastMessage, out);
 */
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 	public void textSetPosition(float x, float y) {
 		posx = x;

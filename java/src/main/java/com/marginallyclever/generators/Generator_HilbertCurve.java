@@ -75,6 +75,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		// do the curve
 		hilbert(out, order);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 

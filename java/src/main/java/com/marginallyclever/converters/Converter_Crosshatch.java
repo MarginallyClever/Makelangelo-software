@@ -38,6 +38,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		liftPen(out);
 		convertPaperSpace(img, out);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
 		return true;
 	}

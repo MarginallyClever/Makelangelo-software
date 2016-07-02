@@ -260,7 +260,7 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			
 			// entities finished. Close up file.
 			liftPen(out);
-			moveTo(out, 0, 0,true);
+		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 			
 			out.flush();
 			out.close();

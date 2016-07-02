@@ -50,6 +50,8 @@ public class Generator_LimitTest extends ImageGenerator {
 		tool.writeMoveTo(out, (float) xmax, (float) ymin);
 		tool.writeMoveTo(out, (float) xmin, (float) ymin);
 	    liftPen(out);
+
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    
 		return true;
 	}

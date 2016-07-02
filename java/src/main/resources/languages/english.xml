@@ -941,6 +941,12 @@ to check yourself.</value>
 	</string>
 
 	<string>
+		<key>LimitTestName</key>
+		<value>Limit Test</value>
+		<hint></hint>
+	</string>
+
+	<string>
 		<key>KochTreeName</key>
 		<value>Koch Curve Fractal</value>
 		<hint></hint>

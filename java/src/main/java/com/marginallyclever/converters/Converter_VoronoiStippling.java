@@ -254,6 +254,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				liftPen(out);
 			}
 		}
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 

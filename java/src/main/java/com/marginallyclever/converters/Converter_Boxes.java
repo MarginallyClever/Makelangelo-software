@@ -86,8 +86,7 @@ public class Converter_Boxes extends ImageConverter {
 			}
 
 			liftPen(out);
-
-			tool.writeMoveTo(out, 0, 0);
+		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		}
 		return true;
 	}

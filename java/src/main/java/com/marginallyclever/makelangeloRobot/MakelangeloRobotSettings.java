@@ -205,10 +205,12 @@ public final class MakelangeloRobotSettings {
 	}
 
 	
+	// @returns home X coordinate in mm
 	public double getHomeX() {
 		return 0;
 	}
 	
+	// @returns home Y coordinate in mm
 	public double getHomeY() {
 		float limitTop = (float)getLimitTop();
 		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;

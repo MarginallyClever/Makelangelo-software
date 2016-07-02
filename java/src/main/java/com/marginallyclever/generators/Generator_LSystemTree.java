@@ -110,6 +110,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 		// do the curve
 		lSystemTree(out, order, maxSize/4);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 

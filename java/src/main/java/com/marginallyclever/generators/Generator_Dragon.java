@@ -101,6 +101,7 @@ public class Generator_Dragon extends ImageGenerator {
 		// draw the fractal
 		drawDragon(out, stepSize);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 	

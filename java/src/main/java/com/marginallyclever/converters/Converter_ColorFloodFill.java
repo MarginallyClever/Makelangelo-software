@@ -255,6 +255,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		scanColor(2, out);  // green
 		scanColor(3, out);  // blue
 
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		return true;
 	}
 }

@@ -88,6 +88,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		turtle.turn(90);
 		kochCurve(out, order, maxSize);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 
