@@ -479,7 +479,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	
 	public void goHome() {
-		sendLineToRobot("G00 X"+df.format(settings.getHomeX()*10)+" Y"+df.format(settings.getHomeY()*10));
+		sendLineToRobot("G00 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
 	}
