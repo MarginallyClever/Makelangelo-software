@@ -207,11 +207,13 @@ public final class MakelangeloRobotSettings {
 	
 	// @returns home X coordinate in mm
 	public double getHomeX() {
+		//TODO Make home X tweakable for advanced users. relative to edges or center.
 		return 0;
 	}
 	
 	// @returns home Y coordinate in mm
 	public double getHomeY() {
+		//TODO Make home Y tweakable for advanced users. relative to edges or center.
 		float limitTop = (float)getLimitTop();
 		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
 		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
