@@ -310,24 +310,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
-
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-					if (lastUp) lowerPen(out);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
-			}
+			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			first = false;
 		}
 	}
 	
@@ -338,24 +322,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
-
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-					if (lastUp) lowerPen(out);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
-			}
+			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			first = false;
 		}
 	}
 
@@ -393,24 +361,8 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
-
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-					if (lastUp) lowerPen(out);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
-			}
+			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			first = false;
 		}
 	}
 	
@@ -421,24 +373,28 @@ public class LoadDXF2 extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
+			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			first = false;
+		}
+	}
+	
+	protected void parseCurvingLine(Writer out,double x,double y,double limitSquared,boolean first,boolean last) throws IOException {
+		double dx = x - previousX;
+		double dy = y - previousY;
 
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-					if (lastUp) lowerPen(out);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared*4)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
+		if (first == true) {
+			if (dx * dx + dy * dy > limitSquared) {
+				// line does not start at last tool location, lift and move.
+				if (!lastUp) liftPen(out);
+				moveTo(out, (float) x, (float) y,true);
 			}
+			// else line starts right here, pen is down, do nothing extra.
+		} else {
+			if (lastUp) lowerPen(out);
+			// not the first point, draw.
+			if (last && dx * dx + dy * dy < limitSquared)
+				return; // points too close together
+			moveTo(out, (float) x, (float) y,false);
 		}
 	}
 	
