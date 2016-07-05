@@ -202,7 +202,7 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 		double dx2 = previousX - x2;
 		double dy2 = previousY - y2;
 		
-		// start at the end closests to the pen holder
+		// start at the end nearest to the pen holder
 		if( dx * dx + dy * dy > dx2*dx2 + dx2+dx2) {
 			double tx = x;
 			double ty = y;
@@ -239,24 +239,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
-
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				if (lastUp) lowerPen(out);
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy <= toolDiameterSquared)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
-			}
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
 		}
 	}
 
@@ -267,24 +251,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
-	
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				if (lastUp) lowerPen(out);
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
-			}
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
 		}
 	}
 
@@ -295,24 +263,28 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			double dx = previousX - x;
-			double dy = previousY - y;
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
+		}
+	}
 	
-			if (first == true) {
-				first = false;
-				if (dx * dx + dy * dy > toolDiameterSquared) {
-					// line does not start at last tool location, lift and move.
-					if (!lastUp) liftPen(out);
-					moveTo(out, (float) x, (float) y,true);
-				}
-				// else line starts right here, pen is down, do nothing extra.
-			} else {
-				if (lastUp) lowerPen(out);
-				// not the first point, draw.
-				if (j < count - 1 && dx * dx + dy * dy < toolDiameterSquared)
-					continue; // points too close together
-				moveTo(out, (float) x, (float) y,false);
+	protected void moveAction(Writer out,double x,double y,double limitSquared,boolean first,boolean last) throws IOException {
+		double dx = x - previousX;
+		double dy = y - previousY;
+
+		if (first == true) {
+			if (dx * dx + dy * dy > limitSquared) {
+				// line does not start at last tool location, lift and move.
+				if (!lastUp) liftPen(out);
+				moveTo(out, (float) x, (float) y,true);
 			}
+			// else line starts right here, pen is down, do nothing extra.
+		} else {
+			if (lastUp) lowerPen(out);
+			// not the first point, draw.
+			if (last && dx * dx + dy * dy < limitSquared)
+				return; // points too close together
+			moveTo(out, (float) x, (float) y,false);
 		}
 	}
 }
