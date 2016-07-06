@@ -98,6 +98,51 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton toggleEngagedMotor;
 
 	public StatusBar statusBar;
+	
+	
+	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
+		this.gui = gui;
+		this.robot = robot;
+		
+		this.setBorder(BorderFactory.createEmptyBorder());
+
+		JPanel panel = new JPanel(new GridBagLayout());
+		this.setViewportView(panel);
+
+		GridBagConstraints con1 = new GridBagConstraints();
+		con1.gridx = 0;
+		con1.gridy = 0;
+		con1.weightx = 1;
+		con1.weighty = 0;
+		con1.fill = GridBagConstraints.HORIZONTAL;
+		con1.anchor = GridBagConstraints.NORTHWEST;
+
+		JPanel connectPanel = getConnectPanel();
+		panel.add(connectPanel, con1);
+		con1.gridy++;
+
+		
+		// settings
+		machineNumberPanel = new JPanel(new GridBagLayout());
+		updateMachineNumberPanel();
+		panel.add(machineNumberPanel, con1);
+		con1.gridy++;
+
+		panel.add(createDriveControls(),con1);			con1.gridy++;
+		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
+		panel.add(createAnimationPanel(),con1);			con1.gridy++;
+
+		statusBar = new StatusBar();
+		panel.add(statusBar, con1);
+		con1.gridy++;
+
+		// always have one extra empty at the end to push everything up.
+		con1.weighty = 1;
+		panel.add(new JLabel(), con1);
+		
+		// lastly, set the button states
+		updateButtonAccess();
+	}
 
 
 	protected List<SaveFileType> loadFileSavers() {
@@ -201,51 +246,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
 			robot.getSettings().loadConfig(newUID);
 		}
-	}
-	
-	
-	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
-		this.gui = gui;
-		this.robot = robot;
-		
-		this.setBorder(BorderFactory.createEmptyBorder());
-
-		JPanel panel = new JPanel(new GridBagLayout());
-		this.setViewportView(panel);
-
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx = 0;
-		con1.gridy = 0;
-		con1.weightx = 1;
-		con1.weighty = 0;
-		con1.fill = GridBagConstraints.HORIZONTAL;
-		con1.anchor = GridBagConstraints.NORTHWEST;
-
-		JPanel connectPanel = getConnectPanel();
-		panel.add(connectPanel, con1);
-		con1.gridy++;
-
-		
-		// settings
-		machineNumberPanel = new JPanel(new GridBagLayout());
-		updateMachineNumberPanel();
-		panel.add(machineNumberPanel, con1);
-		con1.gridy++;
-
-		panel.add(createDriveControls(),con1);			con1.gridy++;
-		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
-		panel.add(createAnimationPanel(),con1);			con1.gridy++;
-
-		statusBar = new StatusBar();
-		panel.add(statusBar, con1);
-		con1.gridy++;
-
-		// always have one extra empty at the end to push everything up.
-		con1.weighty = 1;
-		panel.add(new JLabel(), con1);
-		
-		// lastly, set the button states
-		updateButtonAccess();
 	}
 
 	
@@ -545,11 +545,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		} else if (subject == toggleEngagedMotor) {
 			// TODO if someone sends "M17" or "M18" through the advanced panel then these buttons will be displayed wrong.
 			if(robot.areMotorsEngaged() ) {
-				robot.disengageMotors();
-				toggleEngagedMotor.setText(Translator.get("EngageMotors"));
+				disengageMotors();
 			} else {
-				robot.engageMotors();
-				toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
+				engageMotors();
 			}
 		} else {
 			float dx=0;
@@ -573,6 +571,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 
+	protected void disengageMotors() {
+		robot.disengageMotors();
+		toggleEngagedMotor.setText(Translator.get("EngageMotors"));
+	}
+
+	protected void engageMotors() {
+		robot.engageMotors();
+		toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
+	}
+	
 	/**
 	 * open a dialog to ask for the line number.
 	 *
@@ -607,6 +615,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		return -1;
 	}
 
+	/**
+	 * the moment a robot is confirmed to have connected 
+	 */
+	public void onConnect() {
+		updateMachineNumberPanel();
+		updateButtonAccess();
+		disengageMotors();
+	}
+	
 	public void updateButtonAccess() {
 		boolean isConfirmed=false;
 		boolean isRunning=false;

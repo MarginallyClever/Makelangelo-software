@@ -138,8 +138,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendConfig();
 		
 		if(myPanel!=null) {
-			myPanel.updateMachineNumberPanel();
-			myPanel.updateButtonAccess();
+			myPanel.onConnect();
 		}
 		
 		// tell everyone I've confirmed connection.
@@ -519,8 +518,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX*10,(float)settings.getPaperTop()   *10);  }
 	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX*10,(float)settings.getPaperBottom()*10);  }
 	
-	public void disengageMotors() {		sendLineToRobot("M17");	areMotorsEngaged=false; }
-	public void engageMotors()    {		sendLineToRobot("M18");	areMotorsEngaged=true; }
+	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
+	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }
 	
 	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
 	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}
