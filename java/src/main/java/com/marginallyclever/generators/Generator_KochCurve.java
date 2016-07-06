@@ -31,10 +31,10 @@ public class Generator_KochCurve extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		boolean tryAgain=false;
 		do {
-			final JTextField field_order = new JTextField(Integer.toString(order));
-
 			JPanel panel = new JPanel(new GridLayout(0, 1));
 			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
+
+			JTextField field_order = new JTextField(Integer.toString(order));
 			panel.add(field_order);
 
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

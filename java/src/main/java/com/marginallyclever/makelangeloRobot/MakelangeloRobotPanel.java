@@ -69,10 +69,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	// connect menu
 	private CollapsiblePanel connectionPanel;
-	private JPanel connectionList;
-	private JComboBox<String> connectionComboBox;
-	private boolean ignoreSelectionEvents=false;
-	private JButton buttonRescan;
+	private JButton buttonConnect;
 	
 	// machine options
 	protected String lastFileIn = "";
@@ -117,7 +114,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		JPanel connectPanel = getConnectPanel();
+		JPanel connectPanel = createConnectPanel();
 		panel.add(connectPanel, con1);
 		con1.gridy++;
 
@@ -168,7 +165,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 
-	protected JPanel getConnectPanel() {
+	protected JPanel createConnectPanel() {
 		connectionPanel = new CollapsiblePanel(Translator.get("MenuConnect"));
 		JPanel contents =connectionPanel.getContentPane();
 		
@@ -180,30 +177,37 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill=GridBagConstraints.HORIZONTAL;
 		con1.anchor=GridBagConstraints.NORTH;
 		
-		connectionList = new JPanel(new GridLayout(0,1));
-		rescanConnections();
-		
-        buttonRescan = new JButton(Translator.get("MenuRescan"));
-        buttonRescan.addActionListener(this);
+        buttonConnect = new JButton(Translator.get("ButtonConnect"));
+        buttonConnect.addActionListener(this);
 
-        contents.add(connectionList,con1);
-		con1.gridy++;
-		contents.add(buttonRescan,con1);
+		contents.add(buttonConnect,con1);
 		con1.gridy++;
 
 	    return connectionPanel;
 	}
+
 	
+	protected void closeConnection() {
+		robot.setConnection(null);
+		buttonConnect.setText(Translator.get("ButtonConnect"));
+	}
 	
-	protected void rescanConnections() {
-		ignoreSelectionEvents=true;
-	    connectionComboBox = new JComboBox<String>();
+	protected void openConnection() {
+		JPanel connectionList = new JPanel(new GridLayout(0, 1));
+		connectionList.add(new JLabel(Translator.get("MenuConnect")));
+		
+		GridBagConstraints con1 = new GridBagConstraints();
+		con1.gridx=0;
+		con1.gridy=0;
+		con1.weightx=1;
+		con1.weighty=1;
+		con1.fill=GridBagConstraints.HORIZONTAL;
+		con1.anchor=GridBagConstraints.NORTH;
+
+		JComboBox<String> connectionComboBox = new JComboBox<String>();
         connectionComboBox.addItemListener(this);
         connectionList.removeAll();
         connectionList.add(connectionComboBox);
-	    
-        connectionComboBox.addItem("No connection"); // index 0
-	    connectionComboBox.setSelectedIndex(0);
 	    
 	    String recentConnection = "";
 	    if(robot.getConnection()!=null) {
@@ -220,27 +224,22 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		    	}
 		    }
 	    }
-        ignoreSelectionEvents=false;
+        
+		int result = JOptionPane.showConfirmDialog(this.getRootPane(), connectionList, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (result == JOptionPane.OK_OPTION) {
+			String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+			robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
+			updateMachineNumberPanel();
+			updateButtonAccess();
+			buttonConnect.setText(Translator.get("ButtonDisconnect"));
+		}
 	}
 	
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
 		Object subject = e.getSource();
-		
-		if(subject == connectionComboBox && !ignoreSelectionEvents && e.getStateChange()==ItemEvent.SELECTED) {
-			if(connectionComboBox.getSelectedIndex()==0) {
-				// Disconnect
-				robot.setConnection(null);
-			} else {
-				String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-				robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
-			}
-			updateMachineNumberPanel();
-			updateButtonAccess();
-			rescanConnections();
-		}
-		
+
 		if(subject == machineChoices && e.getStateChange()==ItemEvent.SELECTED) {
 			int selectedIndex = machineChoices.getSelectedIndex();
 			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
@@ -480,12 +479,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		cMachine.gridx++;
 	}
 	
-	
 	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		if( subject == buttonRescan ) rescanConnections();
+		if( subject == buttonConnect ) {
+			openConnection();
+			if(robot.isPortConfirmed()) {
+				closeConnection();
+			} else {
+				openConnection();
+			}
+		}
 		else if (subject == openConfig) {
 			Frame frame = (Frame)this.getRootPane().getParent();
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
@@ -584,8 +589,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	/**
 	 * open a dialog to ask for the line number.
 	 *
-	 * @return <code>lineNumber</code> greater than or equal to zero if user hit
-	 *         ok.
+	 * @return <code>lineNumber</code> greater than or equal to zero if user hits ok.
 	 */
 	private int getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());

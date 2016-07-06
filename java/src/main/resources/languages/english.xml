@@ -516,6 +516,16 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
+		<key>ButtonConnect</key>
+		<value>Connect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ButtonDisconnect</key>
+		<value>Disconnect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
 		<key>MenuRescan</key>
 		<value>Rescan</value>
 		<hint>menu or dialog title</hint>

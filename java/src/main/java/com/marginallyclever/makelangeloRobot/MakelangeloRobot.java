@@ -90,6 +90,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return connection;
 	}
 
+	/**
+	 * TODO this is not great.  openConnection(id) and closeConnection() would be better.
+	 * @param c the connection.  Use null to close the connection. 
+	 */
 	public void setConnection(MarginallyCleverConnection c) {
 		if( this.connection != null ) {
 			this.connection.closeConnection();
@@ -137,9 +141,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// send whatever config settings I have for this machine.
 		sendConfig();
 		
-		if(myPanel!=null) {
-			myPanel.onConnect();
-		}
+		if(myPanel!=null) myPanel.onConnect();
 		
 		// tell everyone I've confirmed connection.
 		notifyPortConfirmed();
