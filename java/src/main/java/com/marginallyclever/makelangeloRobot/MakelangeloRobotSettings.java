@@ -17,7 +17,7 @@ import com.marginallyclever.makelangelo.PreferencesHelper;
 
 /**
  * All the hardware settings for a single Makelangelo robot.
- * @author dan royer
+ * @author Dan Royer
  */
 public final class MakelangeloRobotSettings {
 	public static final double INCH_TO_CM = 2.54;
@@ -31,46 +31,37 @@ public final class MakelangeloRobotSettings {
 	
 	private String[] configsAvailable;
 	
-	private int currentToolIndex;
 
-	// pulleys turning backwards?
-	private boolean isLeftMotorInverted;
+	private ArrayList<MakelangeloRobotSettingsListener> listeners;
+
+	// Each robot has a global unique identifier
+	private long robotUID;
+	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
-	private boolean isRightMotorInverted;
-	private double limitBottom;
-
+	// machine physical limits, in cm
 	private double limitLeft;
 	private double limitRight;
-	// machine physical limits, in cm
+	private double limitBottom;
 	private double limitTop;
-	private ArrayList<MakelangeloRobotSettingsListener> listeners;
-	private double maxAcceleration;
-
-	// maximum speed
+	// speed control
 	private double maxFeedRate;
-	private double paperBottom;
-
-	private double paperLeft;
-	private double paperMargin;  // % from edge of paper.
-	
-	private double paperRight;
+	private double maxAcceleration;
 	// paper area, in cm
+	private double paperLeft;
+	private double paperRight;
+	private double paperBottom;
 	private double paperTop;
-	
+	// % from edge of paper.
+	private double paperMargin;
 	// pulley diameter
 	private double pulleyDiameterLeft;
-	
 	private double pulleyDiameterRight;
+	// pulleys turning backwards?
+	private boolean isLeftMotorInverted;
+	private boolean isRightMotorInverted;
+	
 	private boolean reverseForGlass;
-	
-
-	/**
-	 * Each robot has a global unique identifier
-	 */
-	private long robotUID;
-	
-	// TODO leave the origin at the center of the paper and make a G92 (teleport) call when at the starting position
-
+	// for a while the robot would sign it's name at the end of a drawing
 	private boolean shouldSignName;
 
 	/**
@@ -94,13 +85,11 @@ public final class MakelangeloRobotSettings {
 
 	// TODO a way for users to create different tools for each machine
 	private List<DrawingTool> tools;
+	// which tool is currently selected.
+	private int currentToolIndex;
 
-	/**
-	 *
-	 */
 	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
-	
 	
 	/**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
@@ -533,7 +522,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered));
-		
 	}
 	
 	public void setAcceleration(double f) {
@@ -549,24 +537,30 @@ public final class MakelangeloRobotSettings {
 		maxFeedRate = f;
 		saveConfig();
 	}
+	
 	public void setLimitBottom(double limitBottom) {
 		this.limitBottom = limitBottom;
 	}
+	
 	public void setLimitLeft(double limitLeft) {
 		this.limitLeft = limitLeft;
 	}
+	
 	public void setLimitRight(double limitRight) {
 		this.limitRight = limitRight;
 	}
+	
 	public void setLimitTop(double limitTop) {
 		this.limitTop = limitTop;
 	}
+	
 	public void setMachineSize(double width, double height) {
 		this.limitLeft = -width/2.0;
 		this.limitRight = width/2.0;
 		this.limitBottom = -height/2.0;
 		this.limitTop = height/2.0;
 	}
+	
 	public void setPaperMargin(double paperMargin) {
 		this.paperMargin = paperMargin;	
 	}
@@ -582,12 +576,15 @@ public final class MakelangeloRobotSettings {
 		pulleyDiameterLeft = left;
 		pulleyDiameterRight = right;
 	}
+	
 	public void setRegistered(boolean isRegistered) {
 		this.isRegistered = isRegistered;
 	}
+	
 	public void setReverseForGlass(boolean reverseForGlass) {
 		this.reverseForGlass = reverseForGlass;
 	}
+	
 	public boolean shouldSignName() {
 		return shouldSignName;
 	}

@@ -34,14 +34,13 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	 */
 	private static final long serialVersionUID = 519519372661103125L;
 
-	protected JComboBox<String> paperSizes;
-	protected JFormattedTextField pw, ph;
-	protected JCheckBox isLandscape;
-	protected boolean beingModified;
-	
-	MakelangeloRobot robot;
+	protected MakelangeloRobot robot;
 
-	private final String commonPaperSizes [] = {
+	private JComboBox<String> paperSizes;
+	private JFormattedTextField pw, ph;
+	private JCheckBox isLandscape;
+	private boolean beingModified;
+	private String commonPaperSizes [] = {
 		"---",
 		"4A0 (1682 x 2378)",
 		"2A0 (1189 x 1682)",
@@ -72,21 +71,11 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		};
 
 	private JSlider paperMargin;
-	
-	double originalPaperWidth;
-	double originalPaperHeight;
-	double originalPaperMargin;
-	
 
 	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
 		
 		beingModified=false;
-		
-		originalPaperWidth = robot.getSettings().getPaperWidth();
-		originalPaperHeight = robot.getSettings().getPaperHeight();
-		originalPaperMargin = robot.getSettings().getPaperMargin();
-		
 		
 	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 	    this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
