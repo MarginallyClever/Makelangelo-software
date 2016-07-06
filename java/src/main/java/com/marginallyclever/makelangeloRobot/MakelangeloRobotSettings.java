@@ -305,11 +305,11 @@ public final class MakelangeloRobotSettings {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		final List<String> thissAvailableArrayAsList = new LinkedList<>(Arrays.asList(configsAvailable));
-		if (thissAvailableArrayAsList.contains("0")) {
-			thissAvailableArrayAsList.remove("0");
+		final List<String> knownMachineList = new LinkedList<>(Arrays.asList(configsAvailable));
+		if (knownMachineList.contains("0")) {
+			knownMachineList.remove("0");
 		}
-		return Arrays.copyOf(thissAvailableArrayAsList.toArray(), thissAvailableArrayAsList.size(), String[].class);
+		return Arrays.copyOf(knownMachineList.toArray(), knownMachineList.size(), String[].class);
 	}
 
 
