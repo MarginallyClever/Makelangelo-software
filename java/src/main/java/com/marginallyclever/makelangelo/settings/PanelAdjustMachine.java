@@ -32,6 +32,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JFormattedTextField machineWidth, machineHeight;
 	protected JLabel totalBeltNeeded;
 	protected JLabel totalServoNeeded;
+	protected JLabel totalStepperNeeded;
 	protected JFormattedTextField acceleration;
 	protected JFormattedTextField pulleyDiameterLeft, pulleyDiameterRight;
 	protected JCheckBox flipForGlass;
@@ -109,11 +110,21 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		machineWidth.addPropertyChangeListener(this);
 		machineHeight.addPropertyChangeListener(this);
 
+		// stepper needed
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
+		d.gridx = 1;
+		d.gridwidth=2;
+		d.gridy = y;
+		p.add(totalStepperNeeded = new JLabel("?"),d);
+		y++;
 		// belt needed
 		c.gridx = 0;
 		c.gridwidth=1;
 		c.gridy = y;
-		p.add(new JLabel(Translator.get("BeltNeeded")),c);
+		p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
 		d.gridx = 1;
 		d.gridwidth=2;
 		d.gridy = y;
@@ -123,11 +134,12 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		c.gridx = 0;
 		c.gridwidth=1;
 		c.gridy = y;
-		p.add(new JLabel(Translator.get("ServoNeeded")),c);
+		p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
 		d.gridx = 1;
 		d.gridwidth=2;
 		d.gridy = y;
 		p.add(totalServoNeeded = new JLabel("?"),d);
+		y++;
 
 		// adjust pulleys
 		this.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -297,13 +309,17 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		double h = ((Number)machineHeight.getValue()).doubleValue();
 		double SAFETY_MARGIN=100;
 		
-		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN)*2.0; // 10cm safety margin
+		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN); // 10cm safety margin
 		double beltNeeded = Math.ceil(mmBeltNeeded*0.001);
 		totalBeltNeeded.setText(Double.toString(beltNeeded)+"m");
 		
 		double mmServoNeeded = (Math.sqrt(w*w+h*h)+SAFETY_MARGIN) + w/2.0; // 10cm safety margin
 		double servoNeeded = Math.ceil(mmServoNeeded*0.001);
 		totalServoNeeded.setText(Double.toString(servoNeeded)+"m");
+
+		double mmStepperNeeded = w/2.0+SAFETY_MARGIN; // 10cm safety margin
+		double stepperNeeded = Math.ceil(mmStepperNeeded*0.001);
+		totalStepperNeeded.setText(Double.toString(stepperNeeded)+"m");
 	}
 
 	public void save() {

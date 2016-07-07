@@ -994,4 +994,21 @@ to check yourself.</value>
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
+	
+	<string>
+		<key>ServoLengthNeeded</key>
+		<value>Servo wire length:</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	<string>
+		<key>StepperLengthNeeded</key>
+		<value>Stepper wire length (each):</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	<string>
+		<key>BeltLengthNeeded</key>
+		<value>Timing belt length (each):</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	
 </language>

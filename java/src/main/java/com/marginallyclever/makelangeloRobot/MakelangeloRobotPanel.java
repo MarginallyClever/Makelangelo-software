@@ -484,7 +484,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Object subject = e.getSource();
 
 		if( subject == buttonConnect ) {
-			openConnection();
 			if(robot.isPortConfirmed()) {
 				closeConnection();
 			} else {
