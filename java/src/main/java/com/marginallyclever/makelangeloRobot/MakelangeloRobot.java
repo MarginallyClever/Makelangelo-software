@@ -360,11 +360,23 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// tool change?
 		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
+			int toolNumber=0;
+			boolean nextTokenIsColorName=false;
+			String colorName ="";
 			for (String token : tokens) {
 				if (token.startsWith("T")) {
-					changeToTool(token.substring(1));
+					toolNumber = Integer.decode(token.substring(1));
+				}
+				if (token.startsWith("//")) {
+					nextTokenIsColorName=true;
+				}
+				if(nextTokenIsColorName) {
+					nextTokenIsColorName=false;
+					colorName = token;
 				}
 			}
+			
+			changeToTool(toolNumber,colorName);
 		}
 
 		if (line.length() > 3) {
@@ -419,16 +431,19 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendFileCommand();
 	}
 
-	private void changeToTool(String changeToolString) {
-		int i = Integer.decode(changeToolString);
-
+	private void changeToTool(int newToolID,String colorName) {
 		String[] toolNames = settings.getToolNames();
 
-		if (i < 0 || i > toolNames.length) {
-			Log.error( Translator.get("InvalidTool") + i );
-			i = 0;
+		if (newToolID < 0 || newToolID > toolNames.length) {
+			Log.error( Translator.get("InvalidTool") + newToolID );
+			newToolID = 0;
 		}
-		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + toolNames[i] + Translator.get("ChangeToolPostfix"));
+		
+		if(!colorName.trim().equals("")) {
+			colorName+=" ";
+		}
+		
+		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + colorName + toolNames[newToolID] + Translator.get("ChangeToolPostfix"));
 	}
 
 

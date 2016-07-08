@@ -94,7 +94,6 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			out.write(robot.getSettings().getGCodeBobbin() + ";\n");
 			out.write(robot.getSettings().getGCodeSetPositionAtHome()+";\n");
 			setAbsoluteMode(out);
-			tool.writeChangeTo(out);
 			liftPen(out);
 
 			// start parser
@@ -127,47 +126,52 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			previousY = machine.getHomeY();
 
 			// count all entities in all layers
-			Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
-			//int entity_total = 0;
-			while (layer_iter.hasNext()) {
-				DXFLayer layer = (DXFLayer) layer_iter.next();
+			Iterator<DXFLayer> layerIter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
+			//int entityTotal = 0;
+			while (layerIter.hasNext()) {
+				DXFLayer layer = (DXFLayer) layerIter.next();
 				Log.message("Found layer " + layer.getName());
-				Iterator<String> entity_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-				while (entity_iter.hasNext()) {
-					String entity_type = (String) entity_iter.next();
-					List<DXFEntity> entity_list = (List<DXFEntity>) layer.getDXFEntities(entity_type);
-					Log.message("Found " + entity_list.size() + " of type " + entity_type);
-					//entity_total += entity_list.size();
+				Iterator<String> entityIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+				while (entityIter.hasNext()) {
+					String entityType = (String) entityIter.next();
+					List<DXFEntity> entityList = (List<DXFEntity>) layer.getDXFEntities(entityType);
+					Log.message("Found " + entityList.size() + " of type " + entityType);
+					//entityTotal += entityList.size();
 				}
 			}
 
 			// convert each entity
-			layer_iter = doc.getDXFLayerIterator();
-			while (layer_iter.hasNext()) {
-				DXFLayer layer = (DXFLayer) layer_iter.next();
+			layerIter = doc.getDXFLayerIterator();
+			while (layerIter.hasNext()) {
+				DXFLayer layer = (DXFLayer) layerIter.next();
+				
+				boolean first=true;
+				
+				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+				while (entityTypeIter.hasNext()) {
+					if(first) {
+						// only write the tool change if there's something on this layer
+						first=false;
+						layer.getColor();
+						tool.writeChangeTo(out,layer.getName());
+					}
+					String entityType = (String) entityTypeIter.next();
+					List<DXFEntity> entityList = layer.getDXFEntities(entityType);
+					Iterator<DXFEntity> iter = entityList.iterator();
 
-				Iterator<String> entity_type_iter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-				while (entity_type_iter.hasNext()) {
-					String entity_type = (String) entity_type_iter.next();
-					List<DXFEntity> entity_list = layer.getDXFEntities(entity_type);
-
-					if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
-						Iterator<DXFEntity> iter = entity_list.iterator();
+					if (entityType.equals(DXFConstants.ENTITY_TYPE_LINE)) {
 						while (iter.hasNext()) {
 							convertDXFLine((DXFLine)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
-					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-						Iterator<DXFEntity> iter = entity_list.iterator();
+					} else if (entityType.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 						while (iter.hasNext()) {
 							convertDXFSpline((DXFSpline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
-					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-						Iterator<DXFEntity> iter = entity_list.iterator();
+					} else if (entityType.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
 						while (iter.hasNext()) {
 							convertDXFPolyline((DXFPolyline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
-					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-						Iterator<DXFEntity> iter = entity_list.iterator();
+					} else if (entityType.equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
 						while (iter.hasNext()) {
 							convertDXFLWPolyline((DXFLWPolyline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
