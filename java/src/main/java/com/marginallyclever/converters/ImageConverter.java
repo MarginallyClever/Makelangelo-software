@@ -11,7 +11,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 /**
  * Converts a BufferedImage to gcode
- * @author danroyer
+ * @author Dan Royer
  *
  */
 public abstract class ImageConverter extends ImageManipulator implements DrawPanelDecorator {
