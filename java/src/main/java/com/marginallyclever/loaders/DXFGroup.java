@@ -2,6 +2,11 @@ package com.marginallyclever.loaders;
 
 import java.util.LinkedList;
 
+/**
+ * Used by LoadDXF2.  A collection of DXFBucketEntities
+ * @author Dan Royer
+ *
+ */
 public class DXFGroup {
 	public LinkedList<DXFBucketEntity> entities;
 	

@@ -31,12 +31,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.converters.ImageConverter;
-import com.marginallyclever.generators.Generator_YourMessageHere;
+import com.marginallyclever.generators.Generator_Text;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
+/**
+ * LoadImage uses an InputStream of data to create gcode. 
+ * @author Dan Royer
+ *
+ */
 public class LoadImage extends ImageManipulator implements LoadFileType {
 	
 	@SuppressWarnings("deprecation")
@@ -189,7 +194,7 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 
 					if (robot.getSettings().shouldSignName()) {
 						// Sign name
-						Generator_YourMessageHere ymh = new Generator_YourMessageHere();
+						Generator_Text ymh = new Generator_Text();
 						ymh.setRobot(robot);
 						ymh.signName(out);
 					}

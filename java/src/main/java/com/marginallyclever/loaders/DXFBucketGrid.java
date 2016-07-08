@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 
 
+/**
+ * Used by LoadDXF2.  A grid of DXFBuckets and convenience methods to access the buckets and their contents.
+ * @author Dan Royer
+ *
+ */
 public class DXFBucketGrid {
 	public static final double DXF_EPSILON = 0.1;
 	

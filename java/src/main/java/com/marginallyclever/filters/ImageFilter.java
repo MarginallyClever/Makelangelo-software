@@ -5,7 +5,7 @@ import java.awt.Color;
 import com.marginallyclever.basictypes.TransformedImage;
 
 /**
- * Modifies a BufferedImage
+ * Filters modify a BufferedImage.
  * @author danroyer
  *
  */

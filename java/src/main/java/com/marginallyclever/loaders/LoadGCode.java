@@ -10,6 +10,11 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
+/**
+ * LoadGCode loads gcode into memory. 
+ * @author Admin
+ *
+ */
 public class LoadGCode implements LoadFileType {
 
 	@Override

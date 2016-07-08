@@ -31,7 +31,7 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
 
-public class Generator_YourMessageHere extends ImageGenerator {
+public class Generator_Text extends ImageGenerator {
 	// text properties
 	private float kerning = 5.0f;
 	private float letterWidth = 10.0f;
@@ -60,7 +60,7 @@ public class Generator_YourMessageHere extends ImageGenerator {
 	private static Font [] fontList;
 	private static String [] fontNames;
 
-	public Generator_YourMessageHere() {		
+	public Generator_Text() {		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		fontList = ge.getAllFonts();

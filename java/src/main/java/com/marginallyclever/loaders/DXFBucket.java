@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Used by LoadDXF2.  A DXFBucket is a collection of DXFBucketEntities, and a limited to a given volume of space.
+ * @author Dan Royer
+ *
+ */
 public class DXFBucket {
 	public Point topLeft;
 	public Point bottomRight;

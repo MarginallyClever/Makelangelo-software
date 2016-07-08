@@ -5,7 +5,7 @@ import org.kabeja.dxf.helpers.Point;
 import org.kabeja.dxf.DXFEntity;
 
 /**
- * An entity has two end points.  Each end point is in a bucket.  They may be the same bucket. 
+ * A DXFBucketEntity has two end points.  Each end point is in a bucket.  They may be the same bucket. 
  * @author Dan Royer
  *
  */

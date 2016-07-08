@@ -6,6 +6,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
+/**
+ * Interface for the service handler
+ * @author Admin
+ *
+ */
 public interface LoadFileType {
 	/**
 	 * Just what it sounds like.
