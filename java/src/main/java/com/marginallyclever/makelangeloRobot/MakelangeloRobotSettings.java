@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangeloRobot;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -11,12 +13,11 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
-import com.marginallyclever.makelangelo.Translator;
 
 
 /**
  * All the hardware settings for a single Makelangelo robot.
- * @author dan royer
+ * @author Dan Royer
  */
 public final class MakelangeloRobotSettings {
 	public static final double INCH_TO_CM = 2.54;
@@ -26,48 +27,41 @@ public final class MakelangeloRobotSettings {
 	 */
 	public static final float CALIBRATION_CM_FROM_TOP = 21.7f;
 	
+	private DecimalFormat df;
+	
 	private String[] configsAvailable;
 	
-	private int currentToolIndex;
 
-	// pulleys turning backwards?
-	private boolean isLeftMotorInverted;
+	private ArrayList<MakelangeloRobotSettingsListener> listeners;
+
+	// Each robot has a global unique identifier
+	private long robotUID;
+	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
-	private boolean isRightMotorInverted;
-	private double limitBottom;
-
+	// machine physical limits, in cm
 	private double limitLeft;
 	private double limitRight;
-	// machine physical limits, in cm
+	private double limitBottom;
 	private double limitTop;
-	private ArrayList<MakelangeloRobotSettingsListener> listeners;
-	private double maxAcceleration;
-
-	// maximum speed
+	// speed control
 	private double maxFeedRate;
-	private double paperBottom;
-
-	private double paperLeft;
-	private double paperMargin;  // % from edge of paper.
-	
-	private double paperRight;
+	private double maxAcceleration;
 	// paper area, in cm
+	private double paperLeft;
+	private double paperRight;
+	private double paperBottom;
 	private double paperTop;
-	
+	// % from edge of paper.
+	private double paperMargin;
 	// pulley diameter
 	private double pulleyDiameterLeft;
-	
 	private double pulleyDiameterRight;
+	// pulleys turning backwards?
+	private boolean isLeftMotorInverted;
+	private boolean isRightMotorInverted;
+	
 	private boolean reverseForGlass;
-	
-
-	/**
-	 * Each robot has a global unique identifier
-	 */
-	private long robotUID;
-	
-	// TODO leave the origin at the center of the paper and make a G92 (teleport) call when at the starting position
-
+	// for a while the robot would sign it's name at the end of a drawing
 	private boolean shouldSignName;
 
 	/**
@@ -91,13 +85,11 @@ public final class MakelangeloRobotSettings {
 
 	// TODO a way for users to create different tools for each machine
 	private List<DrawingTool> tools;
+	// which tool is currently selected.
+	private int currentToolIndex;
 
-	/**
-	 *
-	 */
 	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
-	
 	
 	/**
 	 * TODO move tool names into translations & add a color palette system for quantizing colors
@@ -105,7 +97,13 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	protected MakelangeloRobotSettings(Translator translator, MakelangeloRobot robot) {
+	protected MakelangeloRobotSettings(MakelangeloRobot robot) {
+		// set up number format
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+		otherSymbols.setDecimalSeparator('.');
+		df = new DecimalFormat("#.###",otherSymbols);
+		df.setGroupingUsed(false);
+				
 		double mh = 835 * 0.1; // mm > cm
 		double mw = 835 * 0.1; // mm > cm
 		
@@ -144,7 +142,7 @@ public final class MakelangeloRobotSettings {
 		startingPositionIndex = 4;
 		
 		tools = new ArrayList<>();
-		tools.add(new DrawingTool_Pen(translator, robot));
+		tools.add(new DrawingTool_Pen(robot));
 		currentToolIndex = 0;
 
 		// which configurations are available?
@@ -191,33 +189,35 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	
-	public String getBobbinLine() {
-		String left = String.format("%.4f", pulleyDiameterLeft);
-		String right = String.format("%.4f", pulleyDiameterRight);
-		return "D1 L" + left + " R" + right;
+	public String getGCodeBobbin() {
+		return "D1 L" + df.format(pulleyDiameterLeft) + " R" + df.format(pulleyDiameterRight);
 	}
 
 	
+	// @returns home X coordinate in mm
 	public double getHomeX() {
+		//TODO Make home X tweakable for advanced users. relative to edges or center.
 		return 0;
 	}
 	
+	// @returns home Y coordinate in mm
 	public double getHomeY() {
+		//TODO Make home Y tweakable for advanced users. relative to edges or center.
 		float limitTop = (float)getLimitTop();
 		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
-		homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
+		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
 		return homeY;
 	}
 	
-	public String getSetStartAtHomeLine() {
+	public String getGCodeSetPositionAtHome() {
 		return "G92 X"+getHomeX()+" Y"+getHomeY();
 	}
 
-	public String getConfigLine() {
-		return "M101 T" + limitTop
-				+ " B" + limitBottom
-				+ " L" + limitLeft
-				+ " R" + limitRight
+	public String getGCodeConfig() {
+		return "M101 T" + df.format(limitTop)
+				+ " B" + df.format(limitBottom)
+				+ " L" + df.format(limitLeft)
+				+ " R" + df.format(limitRight)
 				+ " I" + (isLeftMotorInverted ? "-1" : "1")
 				+ " J" + (isRightMotorInverted ? "-1" : "1");
 	}
@@ -294,11 +294,11 @@ public final class MakelangeloRobotSettings {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		final List<String> thissAvailableArrayAsList = new LinkedList<>(Arrays.asList(configsAvailable));
-		if (thissAvailableArrayAsList.contains("0")) {
-			thissAvailableArrayAsList.remove("0");
+		final List<String> knownMachineList = new LinkedList<>(Arrays.asList(configsAvailable));
+		if (knownMachineList.contains("0")) {
+			knownMachineList.remove("0");
 		}
-		return Arrays.copyOf(thissAvailableArrayAsList.toArray(), thissAvailableArrayAsList.size(), String[].class);
+		return Arrays.copyOf(knownMachineList.toArray(), knownMachineList.size(), String[].class);
 	}
 
 
@@ -368,11 +368,11 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return Float.toString(getCurrentTool().getPenDownAngle());
+		return getCurrentTool().getPenDownString();
 	}
 	
 	public String getPenUpString() {
-		return Float.toString(getCurrentTool().getPenUpAngle());
+		return getCurrentTool().getPenUpString();
 	}
 
 	public double getPulleyDiameterLeft()  {
@@ -522,7 +522,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered));
-		
 	}
 	
 	public void setAcceleration(double f) {
@@ -538,24 +537,30 @@ public final class MakelangeloRobotSettings {
 		maxFeedRate = f;
 		saveConfig();
 	}
+	
 	public void setLimitBottom(double limitBottom) {
 		this.limitBottom = limitBottom;
 	}
+	
 	public void setLimitLeft(double limitLeft) {
 		this.limitLeft = limitLeft;
 	}
+	
 	public void setLimitRight(double limitRight) {
 		this.limitRight = limitRight;
 	}
+	
 	public void setLimitTop(double limitTop) {
 		this.limitTop = limitTop;
 	}
+	
 	public void setMachineSize(double width, double height) {
 		this.limitLeft = -width/2.0;
 		this.limitRight = width/2.0;
 		this.limitBottom = -height/2.0;
 		this.limitTop = height/2.0;
 	}
+	
 	public void setPaperMargin(double paperMargin) {
 		this.paperMargin = paperMargin;	
 	}
@@ -571,12 +576,15 @@ public final class MakelangeloRobotSettings {
 		pulleyDiameterLeft = left;
 		pulleyDiameterRight = right;
 	}
+	
 	public void setRegistered(boolean isRegistered) {
 		this.isRegistered = isRegistered;
 	}
+	
 	public void setReverseForGlass(boolean reverseForGlass) {
 		this.reverseForGlass = reverseForGlass;
 	}
+	
 	public boolean shouldSignName() {
 		return shouldSignName;
 	}

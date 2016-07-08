@@ -32,10 +32,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	public Converter_ColorFloodFill() {
 		palette = new ColorPalette();
-		palette.addColor(new C3(0, 0, 0));
-		palette.addColor(new C3(255, 0, 0));
-		palette.addColor(new C3(0, 255, 0));
-		palette.addColor(new C3(0, 0, 255));
+		palette.addColor(new C3(  0,   0,   0));
+		palette.addColor(new C3(255,   0,   0));
+		palette.addColor(new C3(  0, 255,   0));
+		palette.addColor(new C3(  0,   0, 255));
 		palette.addColor(new C3(255, 255, 255));
 	}
 
@@ -255,6 +255,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		scanColor(2, out);  // green
 		scanColor(3, out);  // blue
 
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		return true;
 	}
 }

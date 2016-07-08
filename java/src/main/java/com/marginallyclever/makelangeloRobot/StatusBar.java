@@ -33,7 +33,7 @@ public class StatusBar extends JPanel {
 
 	public StatusBar() {
 		super();
-		this.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+		setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 		GridBagLayout gridbag = new GridBagLayout();
 		setLayout(gridbag);
 
@@ -46,25 +46,27 @@ public class StatusBar extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weightx = 1;
+		c.weightx = 0;
 		c.weighty = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHWEST;
 
 		c.gridwidth=3;
-		this.add(bar,c);
+		add(bar,c);
+		c.gridy++;
+		
 		c.gridwidth=1;
+		add(mFinished,c);
+		c.gridx++;
+		add(mExactly,c);
+		c.gridx++;
+		add(mRemaining,c);
 		c.gridy++;
-		this.add(mFinished,c);
-		c.gridx++;
-		this.add(mExactly,c);
-		c.gridx++;
-		this.add(mRemaining,c);
+		
 		c.gridx=0;
-		c.gridy++;
 		c.ipady=20;
 		c.gridwidth=3;
-		this.add(new JLabel("\n"+Translator.get("SharePromo")), c);
+		add(new JLabel("\n"+Translator.get("SharePromo")), c);
 
 		Dimension preferredSize = bar.getPreferredSize();
 		preferredSize.setSize(preferredSize.getWidth(), preferredSize.getHeight()*2);
@@ -100,8 +102,7 @@ public class StatusBar extends JPanel {
 		long remaining = total_time - t_draw_now;
 
 		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
-		DecimalFormat df = new DecimalFormat("#.##");
-		mExactly.setText(sofar + "/" + total + " "+df.format(100*(double)sofar/(double)total)+"%");
+		mExactly.setText(sofar + "/" + total + " "+fmt.format(100*(double)sofar/(double)total)+"%");
 		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }

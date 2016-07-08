@@ -20,6 +20,7 @@ import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFConstants;
 import org.kabeja.dxf.DXFDocument;
 import org.kabeja.dxf.DXFEntity;
+import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFPolyline;
@@ -37,6 +38,11 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
+/**
+ * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
+ * @author Dan Royer
+ *
+ */
 public class LoadDXF extends ImageManipulator implements LoadFileType {
 	boolean shouldScaleOnLoad=true;
 	
@@ -74,6 +80,7 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
+		Log.message(Translator.get("FileTypeDXF")+"...");
 		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 		Log.message(Translator.get("Converting") + " " + destinationFile);
 
@@ -83,9 +90,9 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			machine = robot.getSettings();
 			tool = robot.getSettings().getCurrentTool();
 			// gcode preamble
-			out.write(robot.getSettings().getConfigLine() + ";\n");
-			out.write(robot.getSettings().getBobbinLine() + ";\n");
-			out.write(robot.getSettings().getSetStartAtHomeLine()+";\n");
+			out.write(robot.getSettings().getGCodeConfig() + ";\n");
+			out.write(robot.getSettings().getGCodeBobbin() + ";\n");
+			out.write(robot.getSettings().getGCodeSetPositionAtHome()+";\n");
 			setAbsoluteMode(out);
 			tool.writeChangeTo(out);
 			liftPen(out);
@@ -116,9 +123,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			}
 			
 			double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
-			boolean isLifted=true;
-			double dxf_x2 = 0;
-			double dxf_y2 = 0;
+			previousX = machine.getHomeX();
+			previousY = machine.getHomeY();
 
 			// count all entities in all layers
 			Iterator<DXFLayer> layer_iter = (Iterator<DXFLayer>) doc.getDXFLayerIterator();
@@ -148,110 +154,22 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 					if (entity_type.equals(DXFConstants.ENTITY_TYPE_LINE)) {
 						Iterator<DXFEntity> iter = entity_list.iterator();
 						while (iter.hasNext()) {
-							DXFLine entity = (DXFLine) iter.next();
-							Point start = entity.getStartPoint();
-							Point end = entity.getEndPoint();
-
-							double x = (start.getX() - imageCenterX) * scale;
-							double y = (start.getY() - imageCenterY) * scale;
-							double x2 = (end.getX() - imageCenterX) * scale;
-							double y2 = (end.getY() - imageCenterY) * scale;
-
-							double dx = dxf_x2 - x;
-							double dy = dxf_y2 - y;
-							if (dx * dx + dy * dy > toolDiameterSquared) {
-								if (!isLifted) {
-									liftPen(out);
-									isLifted=true;
-								}
-								moveTo(out, (float) x, (float) y,true);
-							}
-							if (isLifted) {
-								lowerPen(out);
-								isLifted=false;
-							}
-							moveTo(out, (float) x2, (float) y2,false);
-							dxf_x2 = x2;
-							dxf_y2 = y2;
+							convertDXFLine((DXFLine)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
 					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 						Iterator<DXFEntity> iter = entity_list.iterator();
 						while (iter.hasNext()) {
-							DXFSpline entity = (DXFSpline) iter.next();
-							entity.setLineWeight(30);
-							DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
-							boolean first = true;
-							int count = polyLine.getVertexCount() + (polyLine.isClosed()?1:0);
-							for (int j = 0; j < count; ++j) {
-								DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
-								double x = (v.getX() - imageCenterX) * scale;
-								double y = (v.getY() - imageCenterY) * scale;
-								double dx = dxf_x2 - x;
-								double dy = dxf_y2 - y;
-
-								if (first == true) {
-									first = false;
-									if (dx * dx + dy * dy > toolDiameterSquared) {
-										// line does not start at last tool location, lift and move.
-										if (!isLifted) {
-											liftPen(out);
-											isLifted=true;
-										}
-										moveTo(out, (float) x, (float) y,true);
-									}
-									// else line starts right here, pen is down, do nothing extra.
-								} else {
-									// not the first point, draw.
-									if (isLifted) {
-										lowerPen(out);
-										isLifted=false;
-									}
-									if (j < polyLine.getVertexCount() - 1 && dx * dx + dy * dy <= toolDiameterSquared)
-										continue; // points too close together
-									moveTo(out, (float) x, (float) y,false);
-								}
-								dxf_x2 = x;
-								dxf_y2 = y;
-							}
+							convertDXFSpline((DXFSpline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
 					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
 						Iterator<DXFEntity> iter = entity_list.iterator();
 						while (iter.hasNext()) {
-							DXFPolyline entity = (DXFPolyline) iter.next();
-							boolean first = true;
-							int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-							for (int j = 0; j < count; ++j) {
-								DXFVertex v = entity.getVertex(j % entity.getVertexCount());
-								double x = (v.getX() - imageCenterX) * scale;
-								double y = (v.getY() - imageCenterY) * scale;
-								double dx = dxf_x2 - x;
-								double dy = dxf_y2 - y;
-
-								if (first == true) {
-									first = false;
-									if (dx * dx + dy * dy > toolDiameterSquared) {
-										// line does not start at last tool location, lift and move.
-										if (!isLifted) {
-											liftPen(out);
-											isLifted=true;
-										}
-										moveTo(out, (float) x, (float) y,true);
-									}
-									// else line starts right here, pen is down, do nothing extra.
-								} else {
-									// not the first point, draw.
-									if (isLifted) {
-										lowerPen(out);
-										isLifted=false;
-									}
-									if (j < entity.getVertexCount() - 1
-											&& dx * dx + dy * dy < toolDiameterSquared)
-										continue; // points too close together
-									moveTo(out, (float) x, (float) y,false);
-								}
-								dxf_x2 = x;
-								dxf_y2 = y;
-							}
+							convertDXFPolyline((DXFPolyline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
+						}
+					} else if (entity_type.equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+						Iterator<DXFEntity> iter = entity_list.iterator();
+						while (iter.hasNext()) {
+							convertDXFLWPolyline((DXFLWPolyline)iter.next(),out,imageCenterX,imageCenterY,scale,toolDiameterSquared);
 						}
 					}
 				}
@@ -259,7 +177,10 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 
 			// entities finished. Close up file.
 			liftPen(out);
-			moveTo(out, 0, 0,true);
+		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			
+			out.flush();
+			out.close();
 
 			LoadGCode loader = new LoadGCode();
 			InputStream fileInputStream = new FileInputStream(destinationFile);
@@ -269,5 +190,106 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 		}
 
 		return true;
+	}
+	
+	protected void convertDXFLine(DXFLine entity,Writer out,double imageCenterX,double imageCenterY,double scale,double toolDiameterSquared) throws IOException {
+		Point start = entity.getStartPoint();
+		Point end = entity.getEndPoint();
+
+		double x = (start.getX() - imageCenterX) * scale;
+		double y = (start.getY() - imageCenterY) * scale;
+		double x2 = (end.getX() - imageCenterX) * scale;
+		double y2 = (end.getY() - imageCenterY) * scale;
+
+		double dx = previousX - x;
+		double dy = previousY - y;
+
+		double dx2 = previousX - x2;
+		double dy2 = previousY - y2;
+		
+		// start at the end nearest to the pen holder
+		if( dx * dx + dy * dy > dx2*dx2 + dx2+dx2) {
+			double tx = x;
+			double ty = y;
+			double tdx = dx;
+			double tdy = dy;
+
+			x=x2;
+			y=y2;
+			dx=dx2;
+			dy=dy2;
+			
+			x2=tx;
+			y2=ty;
+			dx2=tdx;
+			dy2=tdy;
+		}
+		
+		// if we're too far, lift the pen.
+		if (dx * dx + dy * dy > toolDiameterSquared) {
+			if (!lastUp) liftPen(out);
+			moveTo(out, (float) x, (float) y,true);
+		}
+		// close enough, lower the pen.
+		if (lastUp) lowerPen(out);
+		moveTo(out, (float) x2, (float) y2,false);
+	}
+
+	protected void convertDXFSpline(DXFSpline entity,Writer out,double imageCenterX,double imageCenterY,double scale,double toolDiameterSquared) throws IOException {
+		entity.setLineWeight(30);
+		DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline(entity);
+		boolean first = true;
+		int count = polyLine.getVertexCount() + (polyLine.isClosed()?1:0);
+		for (int j = 0; j < count; ++j) {
+			DXFVertex v = polyLine.getVertex(j % polyLine.getVertexCount());
+			double x = (v.getX() - imageCenterX) * scale;
+			double y = (v.getY() - imageCenterY) * scale;
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
+		}
+	}
+
+	protected void convertDXFPolyline(DXFPolyline entity,Writer out,double imageCenterX,double imageCenterY,double scale,double toolDiameterSquared) throws IOException {
+		boolean first = true;
+		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+		for (int j = 0; j < count; ++j) {
+			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+			double x = (v.getX() - imageCenterX) * scale;
+			double y = (v.getY() - imageCenterY) * scale;
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
+		}
+	}
+
+	protected void convertDXFLWPolyline(DXFLWPolyline entity,Writer out,double imageCenterX,double imageCenterY,double scale,double toolDiameterSquared) throws IOException {
+		boolean first = true;
+		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
+		for (int j = 0; j < count; ++j) {
+			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
+			double x = (v.getX() - imageCenterX) * scale;
+			double y = (v.getY() - imageCenterY) * scale;
+			moveAction(out,x,y,toolDiameterSquared,first,j < count - 1);
+			first = false;
+		}
+	}
+	
+	protected void moveAction(Writer out,double x,double y,double limitSquared,boolean first,boolean last) throws IOException {
+		double dx = x - previousX;
+		double dy = y - previousY;
+
+		if (first == true) {
+			if (dx * dx + dy * dy > limitSquared) {
+				// line does not start at last tool location, lift and move.
+				if (!lastUp) liftPen(out);
+				moveTo(out, (float) x, (float) y,true);
+			}
+			// else line starts right here, pen is down, do nothing extra.
+		} else {
+			if (lastUp) lowerPen(out);
+			// not the first point, draw.
+			if (last && dx * dx + dy * dy < limitSquared)
+				return; // points too close together
+			moveTo(out, (float) x, (float) y,false);
+		}
 	}
 }

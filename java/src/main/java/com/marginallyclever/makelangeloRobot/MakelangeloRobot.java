@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -14,6 +16,7 @@ import javax.swing.JOptionPane;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
@@ -35,8 +38,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
 	static public final float PEN_HOLDER_RADIUS=6; //cm
-	
-	static boolean please_get_a_guid=true;  // set to false when I'm building robots @ marginallyclever.com.  TODO make this a runtime parameter
+
+	private DecimalFormat df;
 	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
@@ -64,8 +67,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public GCodeFile gCode;
 	
 	
-	public MakelangeloRobot(Translator translator) {
-		settings = new MakelangeloRobotSettings(translator, this);
+	public MakelangeloRobot() {
+		// set up number format
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+		otherSymbols.setDecimalSeparator('.');
+		df = new DecimalFormat("#.###",otherSymbols);
+		df.setGroupingUsed(false);
+		
+		settings = new MakelangeloRobotSettings(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -81,6 +90,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return connection;
 	}
 
+	/**
+	 * TODO this is not great.  openConnection(id) and closeConnection() would be better.
+	 * @param c the connection.  Use null to close the connection. 
+	 */
 	public void setConnection(MarginallyCleverConnection c) {
 		if( this.connection != null ) {
 			this.connection.closeConnection();
@@ -128,10 +141,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// send whatever config settings I have for this machine.
 		sendConfig();
 		
-		if(myPanel!=null) {
-			myPanel.updateMachineNumberPanel();
-			myPanel.updateButtonAccess();
-		}
+		if(myPanel!=null) myPanel.onConnect();
 		
 		// tell everyone I've confirmed connection.
 		notifyPortConfirmed();
@@ -217,7 +227,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private long getNewRobotUID() {
 		long newUID = 0;
 
-		if(please_get_a_guid) {
+		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
+		if(pleaseGetAGUID) {
 			Log.message("obtaining UID from server.");
 			try {
 				// Send data
@@ -262,7 +273,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			checksum ^= line.charAt(i);
 		}
 
-		return "*" + ((int) checksum);
+		return "*" + Integer.toString(checksum);
 	}
 
 
@@ -275,10 +286,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// Send  new configuration values to the robot.
 		try {
-			sendLineToRobot(settings.getConfigLine() + "\n");
-			sendLineToRobot(settings.getBobbinLine() + "\n");
+			sendLineToRobot(settings.getGCodeConfig() + "\n");
+			sendLineToRobot(settings.getGCodeBobbin() + "\n");
 			setHome();
-			sendLineToRobot("G0 F"+ settings.getFeedRate() + " A" + settings.getAcceleration() + "\n");
+			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -324,13 +335,15 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void raisePen() {
-		sendLineToRobot("G00 Z" + settings.getPenUpString());
+		sendLineToRobot(settings.getPenUpString());
 	}
+	
 	public void lowerPen() {
-		sendLineToRobot("G00 Z" + settings.getPenDownString());
+		sendLineToRobot(settings.getPenDownString());
 	}
+	
 	public void testPenAngle(String testAngle) {
-		sendLineToRobot("G00 Z" + testAngle);
+		sendLineToRobot("G00 Z" + df.format(testAngle));
 	}
 
 
@@ -356,7 +369,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
-			line += generateChecksum(line);
+			String checksum = generateChecksum(line); 
+			line += checksum; 
 		}
 		
 		// send relevant part of line to the robot
@@ -398,7 +412,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void startAt(int lineNumber) {
 		if(gCode==null) return;
 		
-		gCode.setLinesProcessed(gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString()));
+		int lineBefore = gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString());
+		gCode.setLinesProcessed(lineBefore);
 		setLineNumber(gCode.getLinesProcessed());
 		setRunning();
 		sendFileCommand();
@@ -433,17 +448,17 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			String[] lines = line.split(";");
 			reportedline = lines[0];
 		}
-		if(reportedline.trim().equals("")) return false;
+		if(reportedline.trim().isEmpty()) return false;
 
 		// catch pen up/down status here
-		if (line.contains("Z" + settings.getPenUpString())) {
+		if (line.equals(settings.getPenUpString())) {
 			penIsUp=true;
 		}
-		if (line.contains("Z" + settings.getPenDownString())) {
+		if (line.equals(settings.getPenDownString())) {
 			penIsUp=false;
 		}
 
-		Log.write("white", reportedline );
+		Log.write("white", line );
 		line += "\n";
 
 		// send unmodified line
@@ -460,19 +475,19 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// remember it
 		settings.setFeedRate(parsedFeedRate);
 		// tell the robot
-		sendLineToRobot("G00 F" + parsedFeedRate);
+		sendLineToRobot("G00 F" + df.format(parsedFeedRate));
 	}
 	
 	
 	public void goHome() {
-		sendLineToRobot("G00 X"+settings.getHomeX()+" Y"+(settings.getHomeY()*10));
+		sendLineToRobot("G00 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
 	}
 	
 	
 	public void setHome() {
-		sendLineToRobot(settings.getSetStartAtHomeLine());
+		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		hasSetHome=true;
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
@@ -485,18 +500,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	
 	public void movePenAbsolute(float x,float y) {
-		sendLineToRobot("G00"+
-						" X" + x +
-						" Y" + y);
+		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
 		gondolaX = x * 0.1f;
 		gondolaY = y * 0.1f;
 	}
 	
 	public void movePenRelative(float dx,float dy) {
 		sendLineToRobot("G91");  // set relative mode
-		sendLineToRobot("G00"+
-						" X" + dx +
-						" Y" + dy);
+		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90");  // return to absolute mode
 		gondolaX += dx * 0.1f;
 		gondolaY += dy * 0.1f;
@@ -509,8 +520,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX*10,(float)settings.getPaperTop()   *10);  }
 	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX*10,(float)settings.getPaperBottom()*10);  }
 	
-	public void disengageMotors() {		sendLineToRobot("M17");	areMotorsEngaged=false; }
-	public void engageMotors()    {		sendLineToRobot("M18");	areMotorsEngaged=true; }
+	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
+	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }
 	
 	public void jogLeftMotorOut()  {		sendLineToRobot("D00 L400");	}
 	public void jogLeftMotorIn()   {		sendLineToRobot("D00 L-400");	}
@@ -550,8 +561,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		paintLimits(gl2);
 		paintCalibrationPoint(gl2);
 		paintMotors(gl2);
+		paintControlBox(gl2);
 		paintPenHolderAndCounterweights(gl2);
-		// TODO draw control box?
 
 		if(drawDecorator!=null) {
 			// filters can also draw WYSIWYG previews while converting.
@@ -564,16 +575,20 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	// draw left motor, right motor
 	private void paintMotors( GL2 gl2 ) {
+		double top = settings.getLimitTop();
+		double right = settings.getLimitRight();
+		double left = settings.getLimitLeft();
+		
 		gl2.glColor3f(1,0.8f,0.5f);
 		// left frame
 		gl2.glPushMatrix();
 		gl2.glTranslatef(-2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getLimitLeft()-5f, settings.getLimitTop()+5f);
-		gl2.glVertex2d(settings.getLimitLeft()+5f, settings.getLimitTop()+5f);
-		gl2.glVertex2d(settings.getLimitLeft()+5f, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitLeft()   , settings.getLimitTop()-5f);
-		gl2.glVertex2d(settings.getLimitLeft()-5f, settings.getLimitTop()-5f);
+		gl2.glVertex2d(left-5f, top+5f);
+		gl2.glVertex2d(left+5f, top+5f);
+		gl2.glVertex2d(left+5f, top);
+		gl2.glVertex2d(left   , top-5f);
+		gl2.glVertex2d(left-5f, top-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
@@ -581,72 +596,121 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glPushMatrix();
 		gl2.glTranslatef(2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getLimitRight()+5f, settings.getLimitTop()+5f);
-		gl2.glVertex2d(settings.getLimitRight()-5f, settings.getLimitTop()+5f);
-		gl2.glVertex2d(settings.getLimitRight()-5f, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()   , settings.getLimitTop()-5f);
-		gl2.glVertex2d(settings.getLimitRight()+5f, settings.getLimitTop()-5f);
+		gl2.glVertex2d(right+5f, top+5f);
+		gl2.glVertex2d(right-5f, top+5f);
+		gl2.glVertex2d(right-5f, top);
+		gl2.glVertex2d(right   , top-5f);
+		gl2.glVertex2d(right+5f, top-5f);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
 		// left motor
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(settings.getLimitLeft()-4.2f, settings.getLimitTop()+4.2f);
-		gl2.glVertex2d(settings.getLimitLeft()     , settings.getLimitTop()+4.2f);
-		gl2.glVertex2d(settings.getLimitLeft()     , settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitLeft()-4.2f, settings.getLimitTop());
+		gl2.glVertex2d(left-4.2f, top+4.2f);
+		gl2.glVertex2d(left     , top+4.2f);
+		gl2.glVertex2d(left     , top);
+		gl2.glVertex2d(left-4.2f, top);
 		// right motor
-		gl2.glVertex2d(settings.getLimitRight()     , settings.getLimitTop()+4.2f);
-		gl2.glVertex2d(settings.getLimitRight()+4.2f, settings.getLimitTop()+4.2f);
-		gl2.glVertex2d(settings.getLimitRight()+4.2f, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()     , settings.getLimitTop());
+		gl2.glVertex2d(right     , top+4.2f);
+		gl2.glVertex2d(right+4.2f, top+4.2f);
+		gl2.glVertex2d(right+4.2f, top);
+		gl2.glVertex2d(right     , top);
 		gl2.glEnd();
 	}
 
+	private void paintControlBox(GL2 gl2) {
+		double cy = settings.getLimitTop();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+		double cx = 0;
 
+		gl2.glPushMatrix();
+		gl2.glTranslated(cx, cy+2.1f, 0);
+		
+		// mounting plate for PCB
+		gl2.glColor3f(1,0.8f,0.5f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-8, 5);
+		gl2.glVertex2d(+8, 5);
+		gl2.glVertex2d(+8, -5);
+		gl2.glVertex2d(-8, -5);
+		gl2.glEnd();
+		
+		// wires to each motor
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(left,-0.3);
+		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(left,-0.1);
+		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(left, 0.1);
+		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(left, 0.3);
+		
+
+		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(right, 0.3);
+		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(right, 0.1);
+		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(right,-0.1);
+		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(right,-0.3);
+		gl2.glEnd();
+		
+		// UNO in v2
+		// @TODO draw correct version based on settings or machine connected
+		gl2.glColor3d(0,0,0.6);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-4, 3);
+		gl2.glVertex2d(+4, 3);
+		gl2.glVertex2d(+4, -3);
+		gl2.glVertex2d(-4, -3);
+		gl2.glEnd();
+
+		gl2.glPopMatrix();
+	}
+	
 	private void paintPenHolderAndCounterweights( GL2 gl2 ) {
 		double dx,dy;
 
-		double mw = settings.getLimitRight()-settings.getLimitLeft();
-		double mh = settings.getLimitTop()-settings.getLimitBottom();
+		double top = settings.getLimitTop();
+		double bottom = settings.getLimitBottom();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+		
+		double mw = right-left;
+		double mh = top-settings.getLimitBottom();
 		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
 
-		dx = gondolaX - settings.getLimitLeft();
-		dy = gondolaY - settings.getLimitTop();
+		dx = gondolaX - left;
+		dy = gondolaY - top;
 		double left_a = Math.sqrt(dx*dx+dy*dy);
 		double left_b = (suggested_length - left_a)/2;
 
-		dx = gondolaX - settings.getLimitRight();
+		dx = gondolaX - right;
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggested_length - right_a)/2;
 
-		if(gondolaX<settings.getLimitLeft()) return;
-		if(gondolaX>settings.getLimitRight()) return;
-		if(gondolaY>settings.getLimitTop()) return;
-		if(gondolaY<settings.getLimitBottom()) return;
+		if(gondolaX<left) return;
+		if(gondolaX>right) return;
+		if(gondolaY>top) return;
+		if(gondolaY<bottom) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		
-		// motor to gondola left
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
+		// belt from motor to gondola left
+		gl2.glVertex2d(left, top);
 		gl2.glVertex2d(gondolaX,gondolaY);
-		// motor to gondola right
-		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
+		// belt from motor to gondola right
+		gl2.glVertex2d(right, top);
 		gl2.glVertex2d(gondolaX,gondolaY);
 		
 		float bottleCenter = 2.1f+0.75f;
 		
-		// motor to counterweight left
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-0.1, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-0.1, settings.getLimitTop()-left_b);
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+0.1, settings.getLimitTop()-left_b);
-		// motor to counterweight right
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-0.1, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-0.1, settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+0.1, settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+0.1, settings.getLimitTop()-right_b);
+		// belt from motor to counterweight left
+		gl2.glVertex2d(left-bottleCenter-0.2, top);
+		gl2.glVertex2d(left-bottleCenter-0.2, top-left_b);
+		gl2.glVertex2d(left-bottleCenter+0.2, top);
+		gl2.glVertex2d(left-bottleCenter+0.2, top-left_b);
+		// belt from motor to counterweight right
+		gl2.glVertex2d(right+bottleCenter-0.2, top);
+		gl2.glVertex2d(right+bottleCenter-0.2, top-right_b);
+		gl2.glVertex2d(right+bottleCenter+0.2, top);
+		gl2.glVertex2d(right+bottleCenter+0.2, top-right_b);
 		gl2.glEnd();
 		
 		// gondola
@@ -661,19 +725,19 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-1.5,settings.getLimitTop()-left_b);
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+1.5,settings.getLimitTop()-left_b);
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter+1.5,settings.getLimitTop()-left_b-15);
-		gl2.glVertex2d(settings.getLimitLeft()-bottleCenter-1.5,settings.getLimitTop()-left_b-15);
+		gl2.glVertex2d(left-bottleCenter-1.5,top-left_b);
+		gl2.glVertex2d(left-bottleCenter+1.5,top-left_b);
+		gl2.glVertex2d(left-bottleCenter+1.5,top-left_b-15);
+		gl2.glVertex2d(left-bottleCenter-1.5,top-left_b-15);
 		gl2.glEnd();
 		
 		// counterweight right
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-1.5,settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+1.5,settings.getLimitTop()-right_b);
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter+1.5,settings.getLimitTop()-right_b-15);
-		gl2.glVertex2d(settings.getLimitRight()+bottleCenter-1.5,settings.getLimitTop()-right_b-15);
+		gl2.glVertex2d(right+bottleCenter-1.5,top-right_b);
+		gl2.glVertex2d(right+bottleCenter+1.5,top-right_b);
+		gl2.glVertex2d(right+bottleCenter+1.5,top-right_b-15);
+		gl2.glVertex2d(right+bottleCenter-1.5,top-right_b-15);
 		gl2.glEnd();
 		
 		/*

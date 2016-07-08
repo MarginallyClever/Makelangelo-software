@@ -183,6 +183,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 		}
 
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
 		return true;
 	}

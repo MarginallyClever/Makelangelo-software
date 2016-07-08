@@ -21,7 +21,7 @@ public abstract class ImageManipulator {
 	protected String dest;
 	// pen position optimizing
 	protected boolean lastUp;
-	protected float previousX, previousY;
+	protected double previousX, previousY;
 	
 	// threading
 	protected ProgressMonitor pm;
@@ -62,9 +62,9 @@ public abstract class ImageManipulator {
 	public void imageStart(Writer out) throws IOException {
 		tool = machine.getCurrentTool();
 
-		out.write(machine.getConfigLine() + ";\n");
-		out.write(machine.getBobbinLine() + ";\n");
-		out.write(machine.getSetStartAtHomeLine() + ";\n");
+		out.write(machine.getGCodeConfig() + ";\n");
+		out.write(machine.getGCodeBobbin() + ";\n");
+		out.write(machine.getGCodeSetPositionAtHome() + ";\n");
 		tool.writeChangeTo(out);
 
 		previousX = 0;
@@ -111,6 +111,8 @@ public abstract class ImageManipulator {
 			else lowerPen(out);
 			lastUp = up;
 		}
+		previousX = x;
+		previousY = y;
 	}
 	
 
@@ -130,10 +132,11 @@ public abstract class ImageManipulator {
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)) return false;
+		final float EPSILON = 0.01f;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f-EPSILON)) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f+EPSILON)) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f-EPSILON)) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f+EPSILON)) return false;
 		return true;
 	}
 }

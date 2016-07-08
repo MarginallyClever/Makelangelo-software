@@ -101,6 +101,7 @@ public class Converter_Spiral extends ImageConverter {
 		Log.write("yellow", numRings + " rings.");
 
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
 		return true;
 	}

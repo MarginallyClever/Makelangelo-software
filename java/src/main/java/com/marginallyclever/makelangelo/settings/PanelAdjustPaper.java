@@ -34,14 +34,13 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	 */
 	private static final long serialVersionUID = 519519372661103125L;
 
-	protected JComboBox<String> paperSizes;
-	protected JFormattedTextField pw, ph;
-	protected JCheckBox isLandscape;
-	protected boolean beingModified;
-	
-	MakelangeloRobot robot;
+	protected MakelangeloRobot robot;
 
-	private final String commonPaperSizes [] = {
+	private JComboBox<String> paperSizes;
+	private JFormattedTextField pw, ph;
+	private JCheckBox isLandscape;
+	private boolean beingModified;
+	private String commonPaperSizes [] = {
 		"---",
 		"4A0 (1682 x 2378)",
 		"2A0 (1189 x 1682)",
@@ -52,25 +51,31 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		"A4 (210 x 297)",
 		"A5 (148 x 210)",
 		"A6 (105 x 148)",
-		"A7 (74 x 105)"
+		"A7 (74 x 105)",
+		"US Half Letter (140 x 216)",
+		"US Letter (216 x 279)",
+		"US Legal (216 x 356)",
+		"US Junior Legal (127 x 203)",
+		"US Ledger / Tabloid (279 x 432)",
+		"ANSI A (216 x 279)",
+		"ANSI B (279 x 432)",
+		"ANSI C (432 x 559)",
+		"ANSI D (559 x 864)",
+		"ANSI E (864 x 1118)",
+		"Arch A (229 x 305)",
+		"Arch B (305 x 457)",
+		"Arch C (457 x 610)",
+		"Arch D (610 x 914)",
+		"Arch E (914 x 1219)",
+		"Arch E1 (762 x 1067)",
 		};
 
 	private JSlider paperMargin;
-	
-	double originalPaperWidth;
-	double originalPaperHeight;
-	double originalPaperMargin;
-	
 
 	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
 		
 		beingModified=false;
-		
-		originalPaperWidth = robot.getSettings().getPaperWidth();
-		originalPaperHeight = robot.getSettings().getPaperHeight();
-		originalPaperMargin = robot.getSettings().getPaperMargin();
-		
 		
 	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 	    this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

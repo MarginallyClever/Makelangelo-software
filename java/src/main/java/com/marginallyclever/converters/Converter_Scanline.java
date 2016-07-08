@@ -85,6 +85,8 @@ public class Converter_Scanline extends ImageConverter {
 			}
 		}
 
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		return true;
 	}
 }

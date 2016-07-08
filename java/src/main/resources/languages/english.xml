@@ -246,7 +246,12 @@
 	</string>
 	<string>
 		<key>FileTypeDXF</key>
-		<value>DXF R12 (dxf)</value>
+		<value>DXF R12 for map data (dxf)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>FileTypeDXF</key>
+		<value>DXF R12 for images (dxf)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -511,6 +516,16 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
+		<key>ButtonConnect</key>
+		<value>Connect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>ButtonDisconnect</key>
+		<value>Disconnect</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
 		<key>MenuRescan</key>
 		<value>Rescan</value>
 		<hint>menu or dialog title</hint>
@@ -582,7 +597,12 @@ to check yourself.</value>
 	<string>
 		<key>MenuOpenFile</key>
 		<value>Open File...</value>
-		<hint>menu or dialog title</hint>
+		<hint></hint>
+	</string>
+	<string>
+		<key>MenuReopenFile</key>
+		<value>Reopen last file</value>
+		<hint></hint>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
@@ -931,6 +951,12 @@ to check yourself.</value>
 	</string>
 
 	<string>
+		<key>LimitTestName</key>
+		<value>Limit Test</value>
+		<hint></hint>
+	</string>
+
+	<string>
 		<key>KochTreeName</key>
 		<value>Koch Curve Fractal</value>
 		<hint></hint>
@@ -968,4 +994,21 @@ to check yourself.</value>
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
+	
+	<string>
+		<key>ServoLengthNeeded</key>
+		<value>Servo wire length:</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	<string>
+		<key>StepperLengthNeeded</key>
+		<value>Stepper wire length (each):</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	<string>
+		<key>BeltLengthNeeded</key>
+		<value>Timing belt length (each):</value>
+		<hint>settings > machine > measurement calculations</hint>
+	</string>
+	
 </language>

@@ -38,6 +38,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		liftPen(out);
 		convertPaperSpace(img, out);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
 		return true;
 	}
@@ -90,13 +91,13 @@ public class Converter_Crosshatch extends ImageConverter {
 		// vertical
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if(flip) {
-				moveTo(out, xStart, y, true);
+				lineTo(out, xStart, y, true);
 				convertAlongLine(img,out,xStart,y,xEnd,y,stepSize,level);
-				moveTo(out, xEnd, y, true);
+				lineTo(out, xEnd, y, true);
 			} else {
-				moveTo(out, xEnd, y, true);
+				lineTo(out, xEnd, y, true);
 				convertAlongLine(img,out,xEnd,y,xStart,y,stepSize,level);
-				moveTo(out, xStart, y, true);
+				lineTo(out, xStart, y, true);
 			}
 			flip = !flip;
 		}
@@ -106,13 +107,13 @@ public class Converter_Crosshatch extends ImageConverter {
 		// horizontal
 		for (x = xStart; x <= xEnd; x += stepSize) {
 			if(flip) {
-				moveTo(out, x, yStart, true);
+				lineTo(out, x, yStart, true);
 				convertAlongLine(img,out,x,yStart,x,yEnd,stepSize,level);
-				moveTo(out, x, yEnd, true);
+				lineTo(out, x, yEnd, true);
 			} else {
-				moveTo(out, x, yEnd, true);
+				lineTo(out, x, yEnd, true);
 				convertAlongLine(img,out,x,yEnd,x,yStart,stepSize,level);
-				moveTo(out, x, yStart, true);
+				lineTo(out, x, yStart, true);
 			}
 			flip = !flip;
 		}
@@ -146,13 +147,13 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py-len;
 
 			if(flip) {
-				moveTo(out, x3, y3, true);
+				lineTo(out, x3, y3, true);
 				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
-				moveTo(out, x4, y4, true);
+				lineTo(out, x4, y4, true);
 			} else {
-				moveTo(out, x4, y4, true);
+				lineTo(out, x4, y4, true);
 				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
-				moveTo(out, x3, y3, true);
+				lineTo(out, x3, y3, true);
 			}
 			flip = !flip;
 		}
@@ -177,13 +178,13 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py-len;
 
 			if(flip) {
-				moveTo(out, x3, y3, true);
+				lineTo(out, x3, y3, true);
 				convertAlongLine(img,out,x3,y3,x4,y4,stepSize,level);
-				moveTo(out, x4, y4, true);
+				lineTo(out, x4, y4, true);
 			} else {
-				moveTo(out, x4, y4, true);
+				lineTo(out, x4, y4, true);
 				convertAlongLine(img,out,x4,y4,x3,y3,stepSize,level);
-				moveTo(out, x3, y3, true);
+				lineTo(out, x3, y3, true);
 			}
 			flip = !flip;
 		}

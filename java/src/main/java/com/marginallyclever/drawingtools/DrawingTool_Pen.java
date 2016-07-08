@@ -37,8 +37,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JButton buttonCancel;
 
 	
-	public DrawingTool_Pen(Translator ms, MakelangeloRobot robot) {
-		super(ms, robot);
+	public DrawingTool_Pen(MakelangeloRobot robot) {
+		super(robot);
 
 		diameter = 1.5f;
 		zRate = 50;
@@ -49,8 +49,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		name = "Pen";
 	}
 
-	public DrawingTool_Pen(String name2, int tool_id, Translator ms, MakelangeloRobot robot) {
-		super(ms, robot);
+	public DrawingTool_Pen(String name2, int tool_id, MakelangeloRobot robot) {
+		super(robot);
 
 		diameter = 1.5f;
 		zRate = 120;

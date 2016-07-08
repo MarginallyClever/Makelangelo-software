@@ -11,18 +11,13 @@ import javax.swing.JTextField;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_HilbertCurve extends ImageGenerator {
-	float turtleX, turtleY;
-	float turtleDx, turtleDy;
-	float turtleStep = 10.0f;
-	float xmax = 7;
-	float xmin = -7;
-	float ymax = 7;
-	float ymin = -7;
-	float toolOffsetZ = 1.25f;
-	float zDown = 40;
-	float zUp = 90;
-	int order = 4; // controls complexity of curve
-	float x, y;
+	private Turtle turtle;
+	private float turtleStep = 10.0f;
+	private float xmax = 7;
+	private float xmin = -7;
+	private float ymax = 7;
+	private float ymin = -7;
+	private int order = 4; // controls complexity of curve
 
 
 	@Override
@@ -59,11 +54,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		xmin = -v;
 		ymin = -v;
 
+		turtle = new Turtle();
 		turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
-		turtleX = 0;
-		turtleY = 0;
-		turtleDx = 0;
-		turtleDy = -1;
 
 		// Draw bounding box
 		//SetAbsoluteMode(output);
@@ -76,58 +68,48 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		liftPen(out);
 
 		// move to starting position
-		x = (xmax - turtleStep / 2);
-		y = (ymax - turtleStep / 2);
-		moveTo(out, x, y, true);
+		turtle.setX(xmax - turtleStep / 2);
+		turtle.setY(ymax - turtleStep / 2);
+		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
 		hilbert(out, order);
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 
 	// Hilbert curve
 	private void hilbert(Writer output, int n) throws IOException {
 		if (n == 0) return;
-		turtle_turn(90);
+		turtle.turn(90);
 		treblih(output, n - 1);
 		turtle_goForward(output);
-		turtle_turn(-90);
+		turtle.turn(-90);
 		hilbert(output, n - 1);
 		turtle_goForward(output);
 		hilbert(output, n - 1);
-		turtle_turn(-90);
+		turtle.turn(-90);
 		turtle_goForward(output);
 		treblih(output, n - 1);
-		turtle_turn(90);
+		turtle.turn(90);
 	}
 
 
 	// evruc trebliH
 	public void treblih(Writer output, int n) throws IOException {
 		if (n == 0) return;
-		turtle_turn(-90);
+		turtle.turn(-90);
 		hilbert(output, n - 1);
 		turtle_goForward(output);
-		turtle_turn(90);
+		turtle.turn(90);
 		treblih(output, n - 1);
 		turtle_goForward(output);
 		treblih(output, n - 1);
-		turtle_turn(90);
+		turtle.turn(90);
 		turtle_goForward(output);
 		hilbert(output, n - 1);
-		turtle_turn(-90);
-	}
-
-
-	public void turtle_turn(float degrees) {
-		double n = degrees * Math.PI / 180.0;
-		double newx = Math.cos(n) * turtleDx + Math.sin(n) * turtleDy;
-		double newy = -Math.sin(n) * turtleDx + Math.cos(n) * turtleDy;
-		double len = Math.sqrt(newx * newx + newy * newy);
-		assert (len > 0);
-		turtleDx = (float) (newx / len);
-		turtleDy = (float) (newy / len);
+		turtle.turn(-90);
 	}
 
 
@@ -135,8 +117,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		//turtle_x += turtle_dx * distance;
 		//turtle_y += turtle_dy * distance;
 		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		x += (turtleDx * turtleStep);
-		y += (turtleDy * turtleStep);
-		moveTo(output, x, y, false);
+		turtle.move(turtleStep);
+		moveTo(output, turtle.getX(), turtle.getY(), false);
 	}
 }

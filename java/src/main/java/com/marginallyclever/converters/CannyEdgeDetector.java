@@ -35,15 +35,11 @@ import java.util.Arrays;
  */
 
 public class CannyEdgeDetector {
-
-	// statics
-	
 	private final static float GAUSSIAN_CUT_OFF = 0.005f;
 	private final static float MAGNITUDE_SCALE = 100F;
 	private final static float MAGNITUDE_LIMIT = 1000F;
 	private final static int MAGNITUDE_MAX = (int) (MAGNITUDE_SCALE * MAGNITUDE_LIMIT);
 
-	// fields
 	
 	private int height;
 	private int width;

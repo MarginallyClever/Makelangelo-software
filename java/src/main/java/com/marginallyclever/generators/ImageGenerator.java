@@ -9,8 +9,8 @@ import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 /**
- * Generates gcode from user input.  Fractals might be one example.
- * @author danroyer
+ * Generators create gcode from user input.  Fractals might be one example.
+ * @author dan royer
  *
  */
 public abstract class ImageGenerator extends ImageManipulator implements DrawPanelDecorator {
@@ -22,6 +22,8 @@ public abstract class ImageGenerator extends ImageManipulator implements DrawPan
 		return false;
 	}
 
-
+	/**
+	 * draw the results as the calculation is being performed.
+	 */
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {}
 }

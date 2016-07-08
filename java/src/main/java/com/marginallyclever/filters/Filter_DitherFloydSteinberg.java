@@ -36,11 +36,11 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     // for each x from left to right
     for (x = start; x != end; x += direction) {
       // oldpixel := pixel[x][y]
-      oldPixel = decode(img.getSourceImage().getRGB(x, y)) + error[x];
+      oldPixel = decode32bit(img.getSourceImage().getRGB(x, y)) + error[x];
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = quantizeColor(oldPixel);
       // pixel[x][y] := newpixel
-      img.getSourceImage().setRGB(x, y, ImageFilter.encode(newPixel));
+      img.getSourceImage().setRGB(x, y, ImageFilter.encode32bit(newPixel));
       // quant_error := oldpixel - newpixel
       quant_error = oldPixel - newPixel;
       // pixel[x+1][y  ] += 7/16 * quant_error
@@ -74,7 +74,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     // find the average color of the system
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        tone += decode(img.getSourceImage().getRGB(x, y));
+        tone += decode32bit(img.getSourceImage().getRGB(x, y));
       }
     }
 

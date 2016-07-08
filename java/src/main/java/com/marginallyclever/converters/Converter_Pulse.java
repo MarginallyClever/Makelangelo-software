@@ -73,6 +73,7 @@ public class Converter_Pulse extends ImageConverter {
 		convertPaperSpace(img, out);
 
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 

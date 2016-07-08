@@ -291,6 +291,7 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 
 		// lift pen and return to home
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 

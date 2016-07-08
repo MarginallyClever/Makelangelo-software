@@ -223,16 +223,18 @@ public class TransformedImage {
 		int sampleY = getTransformedY(y);
 
 		Color c = new Color(sourceImage.getRGB(sampleX, sampleY));
+		int colorToBlend=0;
+		
 		switch (colorChannel) {
-		case 1:
-			return c.getRed();
-		case 2:
-			return c.getGreen();
-		case 3:
-			return c.getBlue();
-		default:
-			return ImageFilter.decode(c);
+		case 1: colorToBlend=c.getRed();  break;
+		case 2: colorToBlend=c.getGreen();  break;
+		case 3: colorToBlend=c.getBlue();  break;
+		default: return ImageFilter.decodeColor(c);
 		}
+		
+		double a = 255-c.getAlpha();
+		int c2 = (int)((255 - colorToBlend) * (a / 255.0) + colorToBlend);
+		return c2;
 	}
 
 	public int sample3x3(float x, float y) {

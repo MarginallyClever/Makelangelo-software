@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,7 +21,7 @@ import javax.swing.SwingConstants;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class PanelAdjustMachine extends JPanel implements ActionListener {
+public class PanelAdjustMachine extends JPanel implements ActionListener, PropertyChangeListener {
 	/**
 	 * 
 	 */
@@ -27,7 +29,10 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 
 	protected MakelangeloRobot robot;
 
-	protected JFormattedTextField mw, mh;
+	protected JFormattedTextField machineWidth, machineHeight;
+	protected JLabel totalBeltNeeded;
+	protected JLabel totalServoNeeded;
+	protected JLabel totalStepperNeeded;
 	protected JFormattedTextField acceleration;
 	protected JFormattedTextField pulleyDiameterLeft, pulleyDiameterRight;
 	protected JCheckBox flipForGlass;
@@ -73,16 +78,16 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
-		mw = new JFormattedTextField(nFloat);
-		mw.setValue(w);
-		mh = new JFormattedTextField(nFloat);
-		mh.setValue(h);
+		machineWidth = new JFormattedTextField(nFloat);
+		machineWidth.setValue(w);
+		machineHeight = new JFormattedTextField(nFloat);
+		machineHeight.setValue(h);
 		c.gridx = 0;
 		c.gridy = y;
 		p.add(new JLabel(Translator.get("MachineWidth")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		p.add(mw, d);
+		p.add(machineWidth, d);
 		d.gridx = 2;
 		d.gridy = y;
 		p.add(new JLabel("mm"), d);
@@ -92,16 +97,49 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		p.add(new JLabel(Translator.get("MachineHeight")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		p.add(mh, d);
+		p.add(machineHeight, d);
 		d.gridx = 2;
 		d.gridy = y;
 		p.add(new JLabel("mm"), d);
 		y++;
-
-		Dimension s = mh.getPreferredSize();
+		
+		Dimension s = machineHeight.getPreferredSize();
 		s.width = 80;
-		mw.setPreferredSize(s);
-		mh.setPreferredSize(s);
+		machineWidth.setPreferredSize(s);
+		machineHeight.setPreferredSize(s);
+		machineWidth.addPropertyChangeListener(this);
+		machineHeight.addPropertyChangeListener(this);
+
+		// stepper needed
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
+		d.gridx = 1;
+		d.gridwidth=2;
+		d.gridy = y;
+		p.add(totalStepperNeeded = new JLabel("?"),d);
+		y++;
+		// belt needed
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
+		d.gridx = 1;
+		d.gridwidth=2;
+		d.gridy = y;
+		p.add(totalBeltNeeded = new JLabel("?"),d);
+		y++;
+		// servo needed
+		c.gridx = 0;
+		c.gridwidth=1;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
+		d.gridx = 1;
+		d.gridwidth=2;
+		d.gridy = y;
+		p.add(totalServoNeeded = new JLabel("?"),d);
+		y++;
 
 		// adjust pulleys
 		this.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -242,6 +280,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 		flipForGlass = new JCheckBox(Translator.get("FlipForGlass"));
 		flipForGlass.setSelected(robot.getSettings().isReverseForGlass());
 		p.add(flipForGlass, c);
+		
+		updateLengthNeeded();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -260,24 +300,41 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 			robot.sendConfig();
 		}
 	}
+	
+	/**
+	 * Calculate length of belt and servo needed based on machine dimensions.
+	 */
+	protected void updateLengthNeeded() {
+		double w = ((Number)machineWidth.getValue()).doubleValue();
+		double h = ((Number)machineHeight.getValue()).doubleValue();
+		double SAFETY_MARGIN=100;
+		
+		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN); // 10cm safety margin
+		double beltNeeded = Math.ceil(mmBeltNeeded*0.001);
+		totalBeltNeeded.setText(Double.toString(beltNeeded)+"m");
+		
+		double mmServoNeeded = (Math.sqrt(w*w+h*h)+SAFETY_MARGIN) + w/2.0; // 10cm safety margin
+		double servoNeeded = Math.ceil(mmServoNeeded*0.001);
+		totalServoNeeded.setText(Double.toString(servoNeeded)+"m");
+
+		double mmStepperNeeded = w/2.0+SAFETY_MARGIN; // 10cm safety margin
+		double stepperNeeded = Math.ceil(mmStepperNeeded*0.001);
+		totalStepperNeeded.setText(Double.toString(stepperNeeded)+"m");
+	}
 
 	public void save() {
-		double mwf = ((Number)mw.getValue()).doubleValue() / 10.0;
-		double mhf = ((Number)mh.getValue()).doubleValue() / 10.0;
+		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
+		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
 		boolean data_is_sane = true;
-		if (mwf <= 0)
-			data_is_sane = false;
-		if (mhf <= 0)
-			data_is_sane = false;
+		if (mwf <= 0) data_is_sane = false;
+		if (mhf <= 0) data_is_sane = false;
 
 		double bld   = ((Number)pulleyDiameterLeft .getValue()).doubleValue() / 10.0;
 		double brd   = ((Number)pulleyDiameterRight.getValue()).doubleValue() / 10.0;
 		double accel = ((Number)acceleration       .getValue()).doubleValue();
 
-		if (bld <= 0)
-			data_is_sane = false;
-		if (brd <= 0)
-			data_is_sane = false;
+		if (bld <= 0) data_is_sane = false;
+		if (brd <= 0) data_is_sane = false;
 
 		if (data_is_sane) {
 			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
@@ -288,4 +345,13 @@ public class PanelAdjustMachine extends JPanel implements ActionListener {
 	}
 	
 	public void cancel() {}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		Object subject = evt.getSource();
+
+		if(subject == machineWidth || subject == machineHeight) {
+			updateLengthNeeded();
+		}
+	}
 }

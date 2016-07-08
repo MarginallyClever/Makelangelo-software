@@ -105,8 +105,10 @@ public class GCodeFile {
 		estimatedLength = 0;
 		estimateCount = 0;
 
+		int lineCount=0;
 		Iterator<String> iLine = lines.iterator();
 		while (iLine.hasNext()) {
+			lineCount++;
 			String line = iLine.next();
 			String[] pieces = line.split(";");  // comments come after a semicolon.
 			if (pieces.length == 0) continue;
@@ -132,12 +134,17 @@ public class GCodeFile {
 			z = pz;
 			ai = px;
 			aj = py;
-			for (j = 1; j < tokens.length; ++j) {
-				if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
-				if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
-				if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
-				if (tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
-				if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
+			try {
+				for (j = 1; j < tokens.length; ++j) {
+					if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
+					if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
+					if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
+					if (tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
+					if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
+				}
+			} catch(Exception e) {
+				System.out.println("Error on line "+lineCount);
+				e.printStackTrace();
 			}
 
 			if (z != pz) {
@@ -277,10 +284,10 @@ public class GCodeFile {
 		if( linesTotal==0 ) return 0;
 		if(x >= linesTotal) x = linesTotal-1;
 		
-		toMatch = "G00 Z"+toMatch;
+		toMatch = toMatch.trim();
 		while(x>1) {
 			String line = lines.get(x).trim();
-			if(line.startsWith(toMatch)) {
+			if(line.equals(toMatch)) {
 				return x;
 			}
 			--x;
