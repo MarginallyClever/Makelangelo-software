@@ -64,11 +64,10 @@ public abstract class ImageManipulator {
 
 		out.write(machine.getGCodeConfig() + ";\n");
 		out.write(machine.getGCodeBobbin() + ";\n");
-		out.write(machine.getGCodeSetPositionAtHome() + ";\n");
 		tool.writeChangeTo(out);
 
-		previousX = 0;
-		previousY = 0;
+		previousX = machine.getHomeX();
+		previousY = machine.getHomeY();
 
 		setAbsoluteMode(out);
 	}

@@ -79,6 +79,22 @@ public class DXFBucketGrid {
 		System.out.println(total+" total entities in buckets (including duplicates).");
 	}
 	
+	protected void dumpEverythingIntoABucket(List<DXFGroup> groups) {
+		DXFGroup group = new DXFGroup();
+		groups.add(group);
+		
+		Iterator<DXFBucket> ib = buckets.iterator();
+		while(ib.hasNext()) {
+			DXFBucket bucket = ib.next();
+			Iterator<DXFBucketEntity> bei = bucket.contents.iterator();
+			while(bei.hasNext()) {
+				group.addLast(bei.next());
+			}
+		}
+		System.out.println(groups.size()+ " groups after dump.");
+		System.out.println(group.entities.size()+ " entities after dump.");
+	}
+	
 	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups) {
 		DXFBucket bucket;
 		Point p=null;

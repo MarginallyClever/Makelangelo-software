@@ -139,7 +139,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	public void logEvent(String msg) {
 		// remove the 
 		//if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
-
+		msg = msg.trim();
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");
 		try {

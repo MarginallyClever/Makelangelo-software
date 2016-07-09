@@ -19,9 +19,16 @@
 	
 	<string>
 		<key>DXFScaleOnLoad</key>
-		<value>Scale image to fit paper?</value>
+		<value>Scale image to fit paper</value>
 		<hint>DXF load option</hint>
 	</string>
+	
+	<string>
+		<key>DXFInfillOnLoad</key>
+		<value>Fill in closed areas</value>
+		<hint>DXF load option</hint>
+	</string>
+	
 	
 	<string>
 		<key>Cancel</key>
