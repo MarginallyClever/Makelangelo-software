@@ -142,11 +142,25 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		msg = msg.trim();
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");
+		if(msg.length()==0) return;
+		
 		try {
+			long docLen = doc.getLength();
+			long caretPosition = log.getCaretPosition();
+			
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
-			int over_length = doc.getLength() - msg.length() - 5000;
+			
+			int over_length = 0;
+			if(docLen>2000) {
+				String startingText = doc.getText(0, 200);
+				over_length = startingText.indexOf("\n");
+			}
+			// don't let the log grow forever
 			doc.remove(0, over_length);
-			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
+			
+			if(docLen==caretPosition) {
+				log.setCaretPosition(doc.getLength());
+			}
 		} catch (BadLocationException | IOException e) {
 			// FIXME failure here logs new error, causes infinite loop?
 			Log.error("Logging error: "+e.getMessage());

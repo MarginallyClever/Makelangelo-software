@@ -262,7 +262,7 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 
 				sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
 
-				DXFGroup infillGroup=null;
+				//DXFGroup infillGroup=null;
 				if(shouldInfillOnLoad) {
 					//infillGroup = infillClosedAreas(layer);
 				}
