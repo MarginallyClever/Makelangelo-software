@@ -225,7 +225,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			// prepare for exporting
 			machine = robot.getSettings();
 			tool = machine.getCurrentTool();
-			double toolDiameterSquared = tool.getDiameter() * tool.getDiameter();
+			double toolDiameterSquared = Math.pow(tool.getDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(tool.getDiameter(), 2);
 
 			// gcode preamble
 			out.write(machine.getGCodeConfig() + ";\n");
@@ -290,13 +291,13 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 					while(iter.hasNext()) {
 						DXFEntity e = iter.next().entity;
 						if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-							parseDXFLine(out,(DXFLine)e,scale,imageCenterX,imageCenterY,0);
+							parseDXFLine(out,(DXFLine)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
 						} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-							parseDXFPolyline(out,DXFSplineConverter.toDXFPolyline((DXFSpline)e),scale,imageCenterX,imageCenterY,toolDiameterSquared);
+							parseDXFPolyline(out,DXFSplineConverter.toDXFPolyline((DXFSpline)e),scale,imageCenterX,imageCenterY,toolMinimumStepSize);
 						} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-							parseDXFPolyline(out,(DXFPolyline)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+							parseDXFPolyline(out,(DXFPolyline)e,scale,imageCenterX,imageCenterY,toolMinimumStepSize);
 						} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-							parseDXFLWPolyline(out,(DXFLWPolyline)e,scale,imageCenterX,imageCenterY,toolDiameterSquared);
+							parseDXFLWPolyline(out,(DXFLWPolyline)e,scale,imageCenterX,imageCenterY,toolMinimumStepSize);
 						}
 					}
 				}
@@ -476,8 +477,8 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 		if (dx * dx + dy * dy > toolDiameterSquared) {
 			if (!lastUp) liftPen(out);
 			moveTo(out, (float) x, (float) y, true);
-			if (lastUp) lowerPen(out);
 		}
+		if (lastUp) lowerPen(out);
 		moveTo(out, (float) x2, (float) y2, false);
 	}
 
