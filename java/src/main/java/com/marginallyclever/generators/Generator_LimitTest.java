@@ -24,8 +24,8 @@ public class Generator_LimitTest extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		ymin = (float)machine.getPaperBottom() * 10;

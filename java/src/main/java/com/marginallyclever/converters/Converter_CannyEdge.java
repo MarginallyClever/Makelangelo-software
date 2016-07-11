@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.filters.Filter_Invert;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_Invert;
 import com.marginallyclever.makelangelo.Translator;
 
 

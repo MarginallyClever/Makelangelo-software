@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -215,8 +215,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 		Log.message("Writing gcode.");
 
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		float toolDiameter = tool.getDiameter();

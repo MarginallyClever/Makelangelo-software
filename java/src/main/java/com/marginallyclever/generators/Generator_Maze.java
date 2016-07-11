@@ -73,8 +73,8 @@ public class Generator_Maze extends ImageGenerator {
 	 */
 	private void createMazeNow(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 		
 		// build the cells

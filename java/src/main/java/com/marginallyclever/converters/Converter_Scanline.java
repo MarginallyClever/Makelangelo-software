@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -29,8 +29,8 @@ public class Converter_Scanline extends ImageConverter {
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		// figure out how many lines we're going to have on this image.

@@ -67,12 +67,20 @@ public abstract class ImageManipulator {
 
 
 	protected void liftPen(Writer out) throws IOException {
+		if(tool==null) {
+			throw new IOException("Order of operations: Can't raise the tool before setting a tool.");
+		}
+		if(lastUp) return;
 		tool.writeOff(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
+		if(tool==null) {
+			throw new IOException("Order of operations: Can't lower the tool before setting a tool.");
+		}
+		if(!lastUp) return;
 		tool.writeOn(out);
 		lastUp = false;
 	}
@@ -106,7 +114,7 @@ public abstract class ImageManipulator {
 		previousX = x;
 		previousY = y;
 	}
-	
+
 
 	/**
 	 * This is a special case of moveTo() that only works when every line on the paper is a straight line.

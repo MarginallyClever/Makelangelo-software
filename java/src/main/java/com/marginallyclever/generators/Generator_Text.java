@@ -285,6 +285,9 @@ public class Generator_Text extends ImageGenerator {
 
 	private void createMessage(String fontName, int fontSize, String str, Writer out) throws IOException {
 		imageStart(out);
+		tool = machine.getCurrentTool();
+		liftPen(out);
+		tool.writeChangeTo(out);
 
 		posx=0;
 		posy=0;

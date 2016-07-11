@@ -46,8 +46,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),

@@ -59,8 +59,8 @@ public class Generator_Dragon extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		xmax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;

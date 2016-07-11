@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -427,8 +427,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 			Log.message("Writing gcode.");
 			
 			imageStart(out);
-			liftPen(out);
 			tool = machine.getCurrentTool();
+			liftPen(out);
 			tool.writeChangeTo(out);
 
 			// find the tsp point closest to the calibration point

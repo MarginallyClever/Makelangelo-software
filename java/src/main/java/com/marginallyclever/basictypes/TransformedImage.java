@@ -3,7 +3,7 @@ package com.marginallyclever.basictypes;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.filters.ImageFilter;
+import com.marginallyclever.imageFilters.ImageFilter;
 
 /**
  * TransformedImage is a BufferedImage, scaled, rotated, and translated

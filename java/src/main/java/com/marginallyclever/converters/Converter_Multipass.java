@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -61,8 +61,8 @@ public class Converter_Multipass extends ImageConverter {
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
-		liftPen(out);
 		tool = machine.getCurrentTool();
+		liftPen(out);
 		tool.writeChangeTo(out);
 
 		// figure out how many lines we're going to have on this image.
@@ -101,8 +101,7 @@ public class Converter_Multipass extends ImageConverter {
 			++i;
 		}
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
 	    
 		return true;
 	}
@@ -111,13 +110,12 @@ public class Converter_Multipass extends ImageConverter {
 		double b;
 		double dx=x1-x0;
 		double dy=y1-y0;
-		
 		double halfStep = stepSize/2;
 		double steps = r2 / stepSize;
 		if(steps<1) steps=1;
 
 		double n,x,y,v;
-		
+
 		for (b = 0; b <= steps; ++b) {
 			n = b / steps;
 			x = dx * n + x0;
@@ -127,7 +125,7 @@ public class Converter_Multipass extends ImageConverter {
 			} else {
 				v = 255;
 			}
-			lineTo(out, (float)x, (float)y, v>=level);
+			lineTo(out, x, y, v>=level);
 		}
 	}
 }
