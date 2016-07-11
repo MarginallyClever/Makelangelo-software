@@ -123,11 +123,9 @@ public class Converter_ColorBoxes extends ImageConverter {
 
 		// "please change to tool X and press any key to continue"
 		// TODO this line only loads the black pen.  Find a way to swap color pens.
-		tool = machine.getCurrentTool();
-		
-		tool.writeChangeTo(out);
-		// Make sure the pen is up for the first move
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		int y;
 

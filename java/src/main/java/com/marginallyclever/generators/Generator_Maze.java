@@ -73,6 +73,9 @@ public class Generator_Maze extends ImageGenerator {
 	 */
 	private void createMazeNow(Writer out) throws IOException {
 		imageStart(out);
+		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 		
 		// build the cells
 		cells = new MazeCell[rows * columns];
@@ -159,8 +162,6 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	private void drawMaze(Writer output) throws IOException {
-		imageStart(output);
-
 		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
 		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
 		xmin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;

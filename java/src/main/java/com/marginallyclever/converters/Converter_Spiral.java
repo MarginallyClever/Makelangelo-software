@@ -37,6 +37,8 @@ public class Converter_Spiral extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		double toolDiameter = tool.getDiameter();
 

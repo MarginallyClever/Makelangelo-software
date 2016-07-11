@@ -26,6 +26,8 @@ public class Converter_Boxes extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
 		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;

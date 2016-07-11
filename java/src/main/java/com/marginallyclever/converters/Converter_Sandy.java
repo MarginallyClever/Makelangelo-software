@@ -65,6 +65,9 @@ public class Converter_Sandy extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
+
 		convertPaperSpace(img,out);
 
 		liftPen(out);

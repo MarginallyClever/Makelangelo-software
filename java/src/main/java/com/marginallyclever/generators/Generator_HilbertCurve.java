@@ -46,6 +46,9 @@ public class Generator_HilbertCurve extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
+		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
 				           (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
@@ -57,15 +60,16 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		turtle = new Turtle();
 		turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
 
-		// Draw bounding box
-		//SetAbsoluteMode(output);
-		liftPen(out);
-		moveTo(out, xmax, ymax, false);
-		moveTo(out, xmax, ymin, false);
-		moveTo(out, xmin, ymin, false);
-		moveTo(out, xmin, ymax, false);
-		moveTo(out, xmax, ymax, false);
-		liftPen(out);
+		boolean drawBoundingBox=false;
+		if(drawBoundingBox) {
+			liftPen(out);
+			moveTo(out, xmax, ymax, false);
+			moveTo(out, xmax, ymin, false);
+			moveTo(out, xmin, ymin, false);
+			moveTo(out, xmin, ymax, false);
+			moveTo(out, xmax, ymax, false);
+			liftPen(out);
+		}
 
 		// move to starting position
 		turtle.setX(xmax - turtleStep / 2);

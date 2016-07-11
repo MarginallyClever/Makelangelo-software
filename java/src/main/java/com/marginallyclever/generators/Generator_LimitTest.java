@@ -8,6 +8,11 @@ import java.io.Writer;
 
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * generate gcode to move the pen from the home position, around the edge of the paper, and back to home.
+ * @author Dan Royer
+ *
+ */
 public class Generator_LimitTest extends ImageGenerator {
 	protected float xmax, xmin, ymax, ymin;
 
@@ -20,6 +25,8 @@ public class Generator_LimitTest extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		ymin = (float)machine.getPaperBottom() * 10;
 		ymax = (float)machine.getPaperTop()    * 10;
@@ -27,30 +34,15 @@ public class Generator_LimitTest extends ImageGenerator {
 		xmax = (float)machine.getPaperRight()  * 10;
 		
 		// Draw outside edge
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
+		moveTo(out, xmin, ymin,true);
 		lowerPen(out);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
+		moveTo(out, xmin, ymin,false);
+		moveTo(out, xmin, ymax,false);
+		moveTo(out, xmax, ymax,false);
+		moveTo(out, xmax, ymin,false);
+		moveTo(out, xmin, ymin,false);
 		liftPen(out);
-/*
-		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xmin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xmax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-		
-		// Draw outside edge
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		lowerPen(out);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-	    liftPen(out);
-*/
+
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    
 		return true;

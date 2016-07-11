@@ -278,8 +278,10 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		}
 
 		imageStart(out);
-
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
+
 		// move to the first point
 		moveToPoint(out, besti, false);
 		lowerPen(out);

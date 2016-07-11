@@ -16,9 +16,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class ImageManipulator {
-	// file properties
-	protected String dest;
+public abstract class ImageManipulator {	
 	// pen position optimizing
 	protected boolean lastUp;
 	protected double previousX, previousY;
@@ -60,15 +58,10 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	public void imageStart(Writer out) throws IOException {
-		tool = machine.getCurrentTool();
-
 		out.write(machine.getGCodeConfig() + ";\n");
 		out.write(machine.getGCodeBobbin() + ";\n");
-		tool.writeChangeTo(out);
-
 		previousX = machine.getHomeX();
 		previousY = machine.getHomeY();
-
 		setAbsoluteMode(out);
 	}
 

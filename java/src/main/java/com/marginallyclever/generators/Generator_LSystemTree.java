@@ -76,6 +76,9 @@ public class Generator_LSystemTree extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
+		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f / 2.0f;
@@ -91,17 +94,18 @@ public class Generator_LSystemTree extends ImageGenerator {
 		float xx = xmax - xmin;
 		float yy = ymax - ymin;
 		maxSize = xx > yy ? xx : yy;
+
+		boolean drawBoundingBox=false;
+		if(drawBoundingBox) {
+			liftPen(out);
+			moveTo(out, xmax, ymax, false);
+			moveTo(out, xmax, ymin, false);
+			moveTo(out, xmin, ymin, false);
+			moveTo(out, xmin, ymax, false);
+			moveTo(out, xmax, ymax, false);
+			liftPen(out);
+		}
 		
-		// Draw bounding box
-		//SetAbsoluteMode(output);
-		liftPen(out);
-		moveTo(out, xmax, ymax, false);
-		moveTo(out, xmax, ymin, false);
-		moveTo(out, xmin, ymin, false);
-		moveTo(out, xmin, ymax, false);
-		moveTo(out, xmax, ymax, false);
-		 
-	      liftPen(out);
 		// move to starting position
 		turtle.setX(0);
 		turtle.setY(ymax - turtleStep / 2);

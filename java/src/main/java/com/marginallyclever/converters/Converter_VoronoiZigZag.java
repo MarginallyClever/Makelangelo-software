@@ -424,13 +424,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements DrawPanel
 	// write cell centroids to gcode.
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges != null) {
-			Log.write("green", "Writing gcode.");
+			Log.message("Writing gcode.");
+			
 			imageStart(out);
-
-			// set absolute coordinates
-			out.write("G00 G90;\n");
-			tool.writeChangeTo(out);
 			liftPen(out);
+			tool = machine.getCurrentTool();
+			tool.writeChangeTo(out);
 
 			// find the tsp point closest to the calibration point
 			int i;

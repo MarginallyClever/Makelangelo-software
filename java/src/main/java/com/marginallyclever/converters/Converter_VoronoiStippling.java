@@ -212,10 +212,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges == null) return;
 
-		Log.write("green", "Writing gcode.");
+		Log.message("Writing gcode.");
 
 		imageStart(out);
 		liftPen(out);
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
 
 		float toolDiameter = tool.getDiameter();
 
@@ -254,6 +256,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				liftPen(out);
 			}
 		}
+		
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}

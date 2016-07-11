@@ -64,12 +64,10 @@ public class Converter_Pulse extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-
-		// set absolute coordinates
-		out.write("G00 G90;\n");
-		tool.writeChangeTo(out);
 		liftPen(out);
-
+		tool = machine.getCurrentTool();
+		tool.writeChangeTo(out);
+		
 		convertPaperSpace(img, out);
 
 		liftPen(out);
