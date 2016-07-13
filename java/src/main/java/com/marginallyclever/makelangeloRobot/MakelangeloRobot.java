@@ -472,6 +472,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if (line.equals(settings.getPenDownString())) {
 			penIsUp=false;
 		}
+		if( line.equals("M17") ) {
+			// engage motors
+			myPanel.motorsHaveBeenEngaged();
+		}
+		if( line.equals("M18")) {
+			// disengage motors
+			myPanel.motorsHaveBeenDisengaged();
+		}
 
 		Log.write("white", line );
 		line += "\n";

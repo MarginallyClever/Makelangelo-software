@@ -44,7 +44,6 @@ public class Log {
 		try {
 			Files.deleteIfExists(p);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		

@@ -68,6 +68,7 @@ public class Converter_Boxes extends ImageConverter {
 						moveTo(out, xmax, ymax, false);
 						moveTo(out, xmin, ymax, false);
 						moveTo(out, xmin, ymin, false);
+						// fill in the square
 						boolean flip = false;
 						for(double yy=ymin;yy<ymax;yy+=d) {
 							moveTo(out,flip?xmin:xmax,yy,false);
@@ -96,6 +97,7 @@ public class Converter_Boxes extends ImageConverter {
 						moveTo(out, xmax, ymax, false);
 						moveTo(out, xmin, ymax, false);
 						moveTo(out, xmin, ymin, false);
+						// fill in the square
 						boolean flip = false;
 						for(double yy=ymin;yy<ymax;yy+=d) {
 							moveTo(out,flip?xmin:xmax,yy,false);
