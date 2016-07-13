@@ -133,8 +133,8 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
-	public boolean load(InputStream in,MakelangeloRobot robot) {
-		TransformedImage img;
+	public boolean load(InputStream in,final MakelangeloRobot robot) {
+		final TransformedImage img;
 		try {
 			img = new TransformedImage( ImageIO.read(in) );
 		} catch (IOException e1) {
@@ -158,7 +158,7 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 		}
 		
 		// where to save temp output file?
-		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
+		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
 
 		converters = ServiceLoader.load(ImageConverter.class);
 		if (!chooseImageConversionOptions(robot)) return false;
