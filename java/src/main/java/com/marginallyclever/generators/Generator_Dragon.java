@@ -45,7 +45,7 @@ public class Generator_Dragon extends ImageGenerator {
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
 
-				// TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
+				// TODO: check order>0
 
 				createCurveNow(out);
 				return true;
