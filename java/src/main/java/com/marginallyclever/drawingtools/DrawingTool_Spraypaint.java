@@ -20,7 +20,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class DrawingTool_Spraypaint extends DrawingTool implements ActionListener {
 	private boolean isUp;
-	private float oldX, oldY;
+	private double oldX, oldY;
 	private float overlap;
 
 	private JPanel panel;
@@ -52,26 +52,29 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 		oldY = 0;
 	}
 
+	  @Override
 	public void writeOn(Writer out) throws IOException {
 		isUp = false;
 	}
 
+	  @Override
 	public void writeOff(Writer out) throws IOException {
 		isUp = true;
 	}
 
-	public void writeMoveTo(Writer out, float x, float y) throws IOException {
+	  @Override
+	public void writeMoveTo(Writer out, double x, double y) throws IOException {
 		if (isUp) {
 			out.write("G00 X" + x + " Y" + y + ";\n");
 		} else {
 			// Make a set of dots in a row, instead of a single continuous line
 			//out.write("G00 X"+x+" Y"+y+";\n");
-			float dx = x - oldX;
-			float dy = y - oldY;
-			float len = (float) Math.sqrt(dx * dx + dy * dy);
-			float step = diameter * (1 - overlap);
-			float r = step / 2;
-			float d, px, py;
+			double dx = x - oldX;
+			double dy = y - oldY;
+			double len = Math.sqrt(dx * dx + dy * dy);
+			double step = diameter * (1 - overlap);
+			double r = step / 2;
+			double d, px, py;
 
 			for (d = r; d < len - r; d += step) {
 				px = oldX + dx * d / len;

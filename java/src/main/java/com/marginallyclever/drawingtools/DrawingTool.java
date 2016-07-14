@@ -123,7 +123,7 @@ public abstract class DrawingTool {
 		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
 	}
 
-	public void writeMoveTo(Writer out, float x, float y) throws IOException {
+	public void writeMoveTo(Writer out, double x, double y) throws IOException {
 		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 

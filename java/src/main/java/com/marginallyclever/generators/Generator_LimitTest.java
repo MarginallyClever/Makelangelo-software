@@ -14,8 +14,6 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_LimitTest extends ImageGenerator {
-	protected float xmax, xmin, ymax, ymin;
-
 	@Override
 	public String getName() {
 		return Translator.get("LimitTestName");
@@ -28,22 +26,21 @@ public class Generator_LimitTest extends ImageGenerator {
 		liftPen(out);
 		tool.writeChangeTo(out);
 
-		ymin = (float)machine.getPaperBottom() * 10;
-		ymax = (float)machine.getPaperTop()    * 10;
-		xmin = (float)machine.getPaperLeft()   * 10;
-		xmax = (float)machine.getPaperRight()  * 10;
+		double ymin = machine.getPaperBottom() * 10;
+		double ymax = machine.getPaperTop()    * 10;
+		double xmin = machine.getPaperLeft()   * 10;
+		double xmax = machine.getPaperRight()  * 10;
 		
 		// Draw outside edge
-		moveTo(out, xmin, ymin,true);
+		tool.writeMoveTo(out, xmin, ymax);
 		lowerPen(out);
-		moveTo(out, xmin, ymin,false);
-		moveTo(out, xmin, ymax,false);
-		moveTo(out, xmax, ymax,false);
-		moveTo(out, xmax, ymin,false);
-		moveTo(out, xmin, ymin,false);
+		tool.writeMoveTo(out, xmax, ymax);
+		tool.writeMoveTo(out, xmax, ymin);
+		tool.writeMoveTo(out, xmin, ymin);
+		tool.writeMoveTo(out, xmin, ymax);
 		liftPen(out);
 
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		tool.writeMoveTo(out, machine.getHomeX(), machine.getHomeY());
 	    
 		return true;
 	}

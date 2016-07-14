@@ -342,7 +342,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot(settings.getPenDownString());
 	}
 	
-	public void testPenAngle(String testAngle) {
+	public void testPenAngle(double testAngle) {
 		sendLineToRobot("G00 Z" + df.format(testAngle));
 	}
 

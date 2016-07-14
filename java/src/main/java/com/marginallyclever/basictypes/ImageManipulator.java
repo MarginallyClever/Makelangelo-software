@@ -60,6 +60,7 @@ public abstract class ImageManipulator {
 	public void imageStart(Writer out) throws IOException {
 		out.write(machine.getGCodeConfig() + ";\n");
 		out.write(machine.getGCodeBobbin() + ";\n");
+		out.write(machine.getGCodeSetPositionAtHome()+";\n");		
 		previousX = machine.getHomeX();
 		previousY = machine.getHomeY();
 		setAbsoluteMode(out);
