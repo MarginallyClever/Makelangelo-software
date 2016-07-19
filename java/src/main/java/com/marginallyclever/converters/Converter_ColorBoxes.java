@@ -121,13 +121,10 @@ public class Converter_ColorBoxes extends ImageConverter {
 	protected void scan(int tool_index, TransformedImage img, Writer out) throws IOException {
 		palette_mask = tool_index;
 
-		// "please change to tool X and press any key to continue"
-		// TODO this line only loads the black pen.  Find a way to swap color pens.
+		// TODO Find a way to swap color pens.
 		tool = machine.getCurrentTool();
-		
-		tool.writeChangeTo(out);
-		// Make sure the pen is up for the first move
 		liftPen(out);
+		tool.writeChangeTo(out);
 
 		int y;
 

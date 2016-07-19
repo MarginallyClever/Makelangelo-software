@@ -9,8 +9,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
-import com.marginallyclever.filters.Filter_DitherFloydSteinberg;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -278,8 +278,10 @@ public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorat
 		}
 
 		imageStart(out);
-
+		tool = machine.getCurrentTool();
 		liftPen(out);
+		tool.writeChangeTo(out);
+
 		// move to the first point
 		moveToPoint(out, besti, false);
 		lowerPen(out);

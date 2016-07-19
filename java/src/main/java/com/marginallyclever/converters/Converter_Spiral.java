@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -36,7 +36,9 @@ public class Converter_Spiral extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
+		tool = machine.getCurrentTool();
 		liftPen(out);
+		tool.writeChangeTo(out);
 
 		double toolDiameter = tool.getDiameter();
 

@@ -72,7 +72,7 @@ implements ActionListener {
 	this.setLayout(new GridBagLayout());
     GridBagConstraints d = new GridBagConstraints();
 
-    	// TODO: choice of machine configuration, save, save as, delete.
+    	// TODO: add choice of machine configuration, save config, save config as, delete config.
 
     	// the panes for the selected machine configuration
     	d.fill=GridBagConstraints.BOTH;

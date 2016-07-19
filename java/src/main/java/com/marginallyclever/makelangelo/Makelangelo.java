@@ -146,6 +146,14 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		createAndShowGUI();
 
 		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
+		
+		loadGraphicsSettings();
+	}
+	
+	// load settings and apply them.
+	protected void loadGraphicsSettings() {
+		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		robot.setShowPenUp(graphics_prefs.getBoolean("show pen up", false));
 	}
 	
 	

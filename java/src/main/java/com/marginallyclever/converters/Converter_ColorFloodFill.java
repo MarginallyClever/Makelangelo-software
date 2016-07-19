@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import com.marginallyclever.basictypes.C3;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_GaussianBlur;
+import com.marginallyclever.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -207,9 +207,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private void scanColor(int i, Writer osw) throws IOException {
 		// "please change to tool X and press any key to continue"
 		tool = machine.getTool(i);
+		liftPen(osw);
 		tool.writeChangeTo(osw);
 		// Make sure the pen is up for the first move
-		liftPen(osw);
 
 		Log.write("green", "Color " + i );
 

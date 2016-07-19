@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -212,10 +212,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges == null) return;
 
-		Log.write("green", "Writing gcode.");
+		Log.message("Writing gcode.");
 
 		imageStart(out);
+		tool = machine.getCurrentTool();
 		liftPen(out);
+		tool.writeChangeTo(out);
 
 		float toolDiameter = tool.getDiameter();
 
@@ -254,6 +256,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements DrawPa
 				liftPen(out);
 			}
 		}
+		
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}

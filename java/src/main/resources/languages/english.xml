@@ -19,9 +19,16 @@
 	
 	<string>
 		<key>DXFScaleOnLoad</key>
-		<value>Scale image to fit paper?</value>
+		<value>Scale image to fit paper</value>
 		<hint>DXF load option</hint>
 	</string>
+	
+	<string>
+		<key>DXFInfillOnLoad</key>
+		<value>Fill in closed areas</value>
+		<hint>DXF load option</hint>
+	</string>
+	
 	
 	<string>
 		<key>Cancel</key>
@@ -1010,5 +1017,17 @@ to check yourself.</value>
 		<value>Timing belt length (each):</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
+	
+	<string>
+		<key>ConverterWanderName</key>
+		<value>Wander</value>
+		<hint>name of Wander converter style</hint>
+	</string>
+	<string>
+		<key>ConverterWanderLineCount</key>
+		<value># Lines</value>
+		<hint>Wander converter style parameter</hint>
+	</string>
+	
 	
 </language>

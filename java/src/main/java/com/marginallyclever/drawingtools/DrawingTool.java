@@ -118,7 +118,12 @@ public abstract class DrawingTool {
 		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
 	}
 
-	public void writeMoveTo(Writer out, float x, float y) throws IOException {
+	public void writeChangeTo(Writer out,String name) throws IOException {
+		out.write("M06 T" + toolNumber + "; //"+name+"\n");
+		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
+	}
+
+	public void writeMoveTo(Writer out, double x, double y) throws IOException {
 		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 

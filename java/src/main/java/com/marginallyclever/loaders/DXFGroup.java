@@ -3,7 +3,7 @@ package com.marginallyclever.loaders;
 import java.util.LinkedList;
 
 /**
- * Used by LoadDXF2.  A collection of DXFBucketEntities
+ * A collection of DXFBucketEntities
  * @author Dan Royer
  *
  */

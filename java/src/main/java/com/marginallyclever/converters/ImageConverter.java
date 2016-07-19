@@ -11,6 +11,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 /**
  * Converts a BufferedImage to gcode
+ * Don't forget http://www.reverb-marketing.com/wiki/index.php/When_a_new_style_has_been_added_to_the_Makelangelo_software
  * @author Dan Royer
  *
  */

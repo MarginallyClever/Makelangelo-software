@@ -15,13 +15,12 @@ import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
 
-public class Converter_Multipass extends ImageConverter {
-	static private float angle=0;
-	static private int passes=4;
+public class Converter_Wander extends ImageConverter {
+	static protected int numLines = 2500;
 	
 	@Override
 	public String getName() {
-		return Translator.get("MultipassName");
+		return Translator.get("ConverterWanderName");
 	}
 
 	/**
@@ -31,20 +30,16 @@ public class Converter_Multipass extends ImageConverter {
 	 */
 	@Override
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField angleField = new JTextField(Float.toString(angle));
-		final JTextField passesField = new JTextField(Integer.toString(passes));
+		final JTextField numLinesField = new JTextField(Integer.toString(numLines));
 
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("Multipass Angle")));
-		panel.add(angleField);
-		panel.add(new JLabel(Translator.get("Multipass Levels")));
-		panel.add(passesField);
+		panel.add(new JLabel(Translator.get("ConverterWanderLineCount")));
+		panel.add(numLinesField);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			angle = Float.parseFloat(angleField.getText());
-			passes = Integer.parseInt(passesField.getText());
-			if(passes<=2) passes=2;
+			numLines = Integer.parseInt(numLinesField.getText());
+			if(numLines<=1) numLines=1;
 			
 			return convertNow(img,out);
 		}
@@ -56,8 +51,6 @@ public class Converter_Multipass extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
-		double majorX = Math.cos(Math.toRadians(angle));
-		double majorY = Math.sin(Math.toRadians(angle));
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
@@ -66,42 +59,43 @@ public class Converter_Multipass extends ImageConverter {
 		tool.writeChangeTo(out);
 
 		// figure out how many lines we're going to have on this image.
-		float steps = tool.getDiameter();
+		float steps = tool.getDiameter()*5;
 		if (steps < 1) steps = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
-		double level = 255.0 / (double)(passes+1);
+		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin() * 10;
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin() * 10;
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin() * 10;
-		double dy = yTop - yBottom;
-		double dx = xRight - xLeft;
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		double dy = yTop - yBottom-1;
+		double dx = xRight - xLeft-1;
 		double radius = Math.sqrt(dx*dx+dy*dy);
-		double r2     = radius*2;
 
-		int i=0;
-		for(double a = -radius;a<radius;a+=steps) {
-			double majorPX = majorX * a;
-			double majorPY = majorY * a;
-			double startPX = majorPX - majorY * radius;
-			double startPY = majorPY + majorX * radius;
-			double endPX   = majorPX + majorY * radius;
-			double endPY   = majorPY - majorX * radius;
-		
-			double l2 = level * (1 + (i % passes));
-			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,l2,img,out);
-			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,steps,r2,l2,img,out);
-			}
-			++i;
+		liftPen(out);
+		moveTo(out,0,yTop,true);
+
+		double startPX = 0; 
+		double startPY = yTop; 
+		double r2 = radius*2;
+
+		int i;
+		for(i=0;i<numLines;++i) {
+			level = 200.0 * (double)i / (double)numLines;
+			double endPX = xLeft   + (Math.random() * dx)+0.5; 
+			double endPY = yBottom + (Math.random() * dy)+0.5; 
+
+			convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,level,img,out);
+			
+			startPX = endPX;
+			startPY = endPY;
 		}
 
-	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    
 		return true;
 	}

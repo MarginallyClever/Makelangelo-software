@@ -1,4 +1,4 @@
-package com.marginallyclever.filters;
+package com.marginallyclever.imageFilters;
 
 import com.marginallyclever.basictypes.TransformedImage;
 

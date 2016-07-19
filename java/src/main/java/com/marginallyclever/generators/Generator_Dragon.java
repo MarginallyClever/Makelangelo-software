@@ -45,7 +45,7 @@ public class Generator_Dragon extends ImageGenerator {
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
 
-				// TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
+				// TODO: check order>0
 
 				createCurveNow(out);
 				return true;
@@ -59,6 +59,9 @@ public class Generator_Dragon extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
+		tool = machine.getCurrentTool();
+		liftPen(out);
+		tool.writeChangeTo(out);
 
 		xmax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;
 		ymax = (float)(machine.getPaperHeight()/2.0f * machine.getPaperMargin()) * 10.0f;

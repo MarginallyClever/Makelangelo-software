@@ -8,9 +8,12 @@ import java.io.Writer;
 
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * generate gcode to move the pen from the home position, around the edge of the paper, and back to home.
+ * @author Dan Royer
+ *
+ */
 public class Generator_LimitTest extends ImageGenerator {
-	protected float xmax, xmin, ymax, ymin;
-
 	@Override
 	public String getName() {
 		return Translator.get("LimitTestName");
@@ -19,39 +22,25 @@ public class Generator_LimitTest extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
+		tool = machine.getCurrentTool();
+		liftPen(out);
+		tool.writeChangeTo(out);
+
+		double ymin = machine.getPaperBottom() * 10;
+		double ymax = machine.getPaperTop()    * 10;
+		double xmin = machine.getPaperLeft()   * 10;
+		double xmax = machine.getPaperRight()  * 10;
+		
+		// Draw outside edge
+		tool.writeMoveTo(out, xmin, ymax);
+		lowerPen(out);
+		tool.writeMoveTo(out, xmax, ymax);
+		tool.writeMoveTo(out, xmax, ymin);
+		tool.writeMoveTo(out, xmin, ymin);
+		tool.writeMoveTo(out, xmin, ymax);
 		liftPen(out);
 
-		ymin = (float)machine.getPaperBottom() * 10;
-		ymax = (float)machine.getPaperTop()    * 10;
-		xmin = (float)machine.getPaperLeft()   * 10;
-		xmax = (float)machine.getPaperRight()  * 10;
-		
-		// Draw outside edge
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		lowerPen(out);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		liftPen(out);
-/*
-		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xmin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xmax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-		
-		// Draw outside edge
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		lowerPen(out);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymax);
-		tool.writeMoveTo(out, (float) xmax, (float) ymin);
-		tool.writeMoveTo(out, (float) xmin, (float) ymin);
-	    liftPen(out);
-*/
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		tool.writeMoveTo(out, machine.getHomeX(), machine.getHomeY());
 	    
 		return true;
 	}

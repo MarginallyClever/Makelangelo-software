@@ -479,7 +479,7 @@ public class GCodeFile {
 			if (pieces.length == 0) continue;
 
 			if (line.startsWith(tool_change)) {
-				String numberOnly = line.substring(tool_change.length()).replaceAll("[^0-9]", "");
+				String numberOnly = pieces[0].substring(tool_change.length()).replaceAll("[^0-9]", "");
 				int id = (int) Integer.valueOf(numberOnly, 10);
 				addNodeTool(i, id);
 				switch (id) {

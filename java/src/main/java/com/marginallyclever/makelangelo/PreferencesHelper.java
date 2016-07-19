@@ -73,7 +73,9 @@ public final class PreferencesHelper {
 	static {
 		final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
 		final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
-		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); //FIXME write unit test/tool to view import/export machine configurations.
+		//FIXME write unit test/tool to view import/export machine configurations.
+		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);
+		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); 
 		final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
 		try {
 			legacyMakelangeloPreferenceNode.sync();

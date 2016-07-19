@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.marginallyclever.basictypes.TransformedImage;
-import com.marginallyclever.filters.Filter_BlackAndWhite;
+import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -64,7 +64,10 @@ public class Converter_Sandy extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
+		tool = machine.getCurrentTool();
 		liftPen(out);
+		tool.writeChangeTo(out);
+
 		convertPaperSpace(img,out);
 
 		liftPen(out);

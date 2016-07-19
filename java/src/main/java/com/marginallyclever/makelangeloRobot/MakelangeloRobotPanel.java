@@ -547,7 +547,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				robot.setFeedRate(parsedFeedRate);
 			} catch(NumberFormatException e1) {}
 		} else if (subject == toggleEngagedMotor) {
-			// TODO if someone sends "M17" or "M18" through the advanced panel then these buttons will be displayed wrong.
 			if(robot.areMotorsEngaged() ) {
 				disengageMotors();
 			} else {
@@ -577,11 +576,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	protected void disengageMotors() {
 		robot.disengageMotors();
-		toggleEngagedMotor.setText(Translator.get("EngageMotors"));
 	}
 
 	protected void engageMotors() {
 		robot.engageMotors();
+	}
+	
+	public void motorsHaveBeenDisengaged() {
+		toggleEngagedMotor.setText(Translator.get("EngageMotors"));
+	}
+	public void motorsHaveBeenEngaged() {
 		toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
 	}
 	

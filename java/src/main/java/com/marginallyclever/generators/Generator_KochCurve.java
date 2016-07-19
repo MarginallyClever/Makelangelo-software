@@ -41,7 +41,7 @@ public class Generator_KochCurve extends ImageGenerator {
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
 
-				// TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
+				// TODO: check order>0
 
 				createCurveNow(out);
 				return true;
@@ -55,6 +55,9 @@ public class Generator_KochCurve extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
+		tool = machine.getCurrentTool();
+		liftPen(out);
+		tool.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
@@ -68,16 +71,18 @@ public class Generator_KochCurve extends ImageGenerator {
 		float xx = xmax - xmin;
 		float yy = ymax - ymin;
 		maxSize = xx > yy ? xx : yy;
-		/*
-  // Draw bounding box
-  //SetAbsoluteMode(output);
-  liftPen(output);
-  moveTo(output, xmax, ymax, false);
-  moveTo(output, xmax, ymin, false);
-  moveTo(output, xmin, ymin, false);
-  moveTo(output, xmin, ymax, false);
-  moveTo(output, xmax, ymax, false);
-		 */
+
+		boolean drawBoundingBox=false;
+		if(drawBoundingBox) {
+			liftPen(out);
+			moveTo(out, xmax, ymax, false);
+			moveTo(out, xmax, ymin, false);
+			moveTo(out, xmin, ymin, false);
+			moveTo(out, xmin, ymax, false);
+			moveTo(out, xmax, ymax, false);
+			liftPen(out);
+		}
+		
 		liftPen(out);
 		// move to starting position
 		turtle.setX(xmax);

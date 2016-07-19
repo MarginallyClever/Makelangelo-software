@@ -9,4 +9,5 @@ com.marginallyclever.converters.Converter_Scanline
 com.marginallyclever.converters.Converter_Spiral
 com.marginallyclever.converters.Converter_VoronoiStippling
 com.marginallyclever.converters.Converter_VoronoiZigZag
+com.marginallyclever.converters.Converter_Wander
 com.marginallyclever.converters.Converter_ZigZag

@@ -16,9 +16,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class ImageManipulator {
-	// file properties
-	protected String dest;
+public abstract class ImageManipulator {	
 	// pen position optimizing
 	protected boolean lastUp;
 	protected double previousX, previousY;
@@ -60,27 +58,30 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	public void imageStart(Writer out) throws IOException {
-		tool = machine.getCurrentTool();
-
 		out.write(machine.getGCodeConfig() + ";\n");
 		out.write(machine.getGCodeBobbin() + ";\n");
-		out.write(machine.getGCodeSetPositionAtHome() + ";\n");
-		tool.writeChangeTo(out);
-
-		previousX = 0;
-		previousY = 0;
-
+		out.write(machine.getGCodeSetPositionAtHome()+";\n");		
+		previousX = machine.getHomeX();
+		previousY = machine.getHomeY();
 		setAbsoluteMode(out);
 	}
 
 
 	protected void liftPen(Writer out) throws IOException {
+		if(tool==null) {
+			throw new IOException("Order of operations: Can't raise the tool before setting a tool.");
+		}
+		if(lastUp) return;
 		tool.writeOff(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
+		if(tool==null) {
+			throw new IOException("Order of operations: Can't lower the tool before setting a tool.");
+		}
+		if(!lastUp) return;
 		tool.writeOn(out);
 		lastUp = false;
 	}
@@ -114,7 +115,7 @@ public abstract class ImageManipulator {
 		previousX = x;
 		previousY = y;
 	}
-	
+
 
 	/**
 	 * This is a special case of moveTo() that only works when every line on the paper is a straight line.
