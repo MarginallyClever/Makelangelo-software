@@ -21,7 +21,7 @@ public class Converter_Multipass extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("MultipassName");
+		return Translator.get("ConverterMultipassName");
 	}
 
 	/**
@@ -35,9 +35,9 @@ public class Converter_Multipass extends ImageConverter {
 		final JTextField passesField = new JTextField(Integer.toString(passes));
 
 		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("Multipass Angle")));
+		panel.add(new JLabel(Translator.get("ConverterMultipassAngle")));
 		panel.add(angleField);
-		panel.add(new JLabel(Translator.get("Multipass Levels")));
+		panel.add(new JLabel(Translator.get("ConverterMultipassLevels")));
 		panel.add(passesField);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
