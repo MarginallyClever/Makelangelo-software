@@ -1018,4 +1018,16 @@ to check yourself.</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	
+	<string>
+		<key>ConverterWanderName</key>
+		<value>Wander</value>
+		<hint>name of Wander converter style</hint>
+	</string>
+	<string>
+		<key>ConverterWanderLineCount</key>
+		<value># Lines</value>
+		<hint>Wander converter style parameter</hint>
+	</string>
+	
+	
 </language>

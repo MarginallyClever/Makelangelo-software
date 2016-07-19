@@ -231,6 +231,7 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			// gcode preamble
 			out.write(machine.getGCodeConfig() + ";\n");
 			out.write(machine.getGCodeBobbin() + ";\n");
+			out.write(machine.getGCodeSetPositionAtHome()+";\n");
 			setAbsoluteMode(out);
 			liftPen(out);
 			previousX = machine.getHomeX();
