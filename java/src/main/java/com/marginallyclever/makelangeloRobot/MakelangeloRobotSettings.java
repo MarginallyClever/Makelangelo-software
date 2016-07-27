@@ -104,8 +104,8 @@ public final class MakelangeloRobotSettings {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 				
-		double mh = 835 * 0.1; // mm > cm
-		double mw = 835 * 0.1; // mm > cm
+		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 650mm.
+		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 900mm.
 		
 		robotUID = 0;
 		isRegistered = false;
@@ -128,7 +128,7 @@ public final class MakelangeloRobotSettings {
 		paperMargin = 0.9;
 
 		maxFeedRate = 7500;
-		maxAcceleration = 300;
+		maxAcceleration = 250;  // matches firmware_rumba/configure.h
 
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
