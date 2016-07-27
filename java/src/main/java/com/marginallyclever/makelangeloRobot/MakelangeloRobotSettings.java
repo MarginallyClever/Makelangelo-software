@@ -128,7 +128,7 @@ public final class MakelangeloRobotSettings {
 		paperMargin = 0.9;
 
 		maxFeedRate = 7500;
-		maxAcceleration = 20;
+		maxAcceleration = 300;
 
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
