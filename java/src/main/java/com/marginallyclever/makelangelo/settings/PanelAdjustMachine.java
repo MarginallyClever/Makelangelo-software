@@ -34,7 +34,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JLabel totalServoNeeded;
 	protected JLabel totalStepperNeeded;
 	protected JFormattedTextField acceleration;
-	protected JFormattedTextField pulleyDiameterLeft, pulleyDiameterRight;
+	protected JFormattedTextField pulleyDiameter;
 	protected JCheckBox flipForGlass;
 
 
@@ -150,21 +150,16 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		c = new GridBagConstraints();
 		c.ipadx = 5;
 		c.ipady = 0;
-		c.gridwidth = 3;
-		p.add(new JLabel(Translator.get("AdjustPulleySize"), SwingConstants.CENTER), c);
 		c.gridwidth = 1;
 
-		double left = Math.floor(robot.getSettings().getPulleyDiameterLeft() * 10.0 * 1000.0) / 1000.0;
-		double right = Math.floor(robot.getSettings().getPulleyDiameterRight() * 10.0 * 1000.0) / 1000.0;
+		double left = Math.floor(robot.getSettings().getPulleyDiameter() * 10.0 * 1000.0) / 1000.0;
 
 		NumberFormat nDouble = NumberFormat.getNumberInstance();
 		nDouble.setMinimumFractionDigits(1);
 		nDouble.setMaximumFractionDigits(3);
 
-		pulleyDiameterLeft = new JFormattedTextField(nDouble);
-		pulleyDiameterLeft.setValue(left);
-		pulleyDiameterRight = new JFormattedTextField(nDouble);
-		pulleyDiameterRight.setValue(right);
+		pulleyDiameter = new JFormattedTextField(nDouble);
+		pulleyDiameter.setValue(left);
 
 		y = 2;
 		c.weightx = 0;
@@ -172,28 +167,33 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		d.anchor = GridBagConstraints.WEST;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(Translator.get("Left")), c);
+		p.add(new JLabel(Translator.get("AdjustPulleySize")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		p.add(pulleyDiameterLeft, d);
+		p.add(pulleyDiameter, d);
 		d.gridx = 2;
 		d.gridy = y;
 		p.add(new JLabel(Translator.get("Millimeters")), d);
 		y++;
+
+		s = pulleyDiameter.getPreferredSize();
+		s.width = 80;
+		pulleyDiameter.setPreferredSize(s);
+
+		// acceleration
+		acceleration = new JFormattedTextField(nDouble);
+		acceleration.setValue(robot.getSettings().getAcceleration());
+		s = acceleration.getPreferredSize();
+		s.width = 80;
+		acceleration.setPreferredSize(s);
+		y = 0;
 		c.gridx = 0;
 		c.gridy = y;
-		p.add(new JLabel(Translator.get("Right")), c);
+		p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		p.add(pulleyDiameterRight, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel(Translator.get("Millimeters")), d);
-
-		s = pulleyDiameterLeft.getPreferredSize();
-		s.width = 80;
-		pulleyDiameterLeft.setPreferredSize(s);
-		pulleyDiameterRight.setPreferredSize(s);
+		p.add(acceleration, d);
+		y++;
 
 		// Jog motors
 		this.add(new JSeparator());
@@ -244,28 +244,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 
 		m1i.addActionListener(this);
 		m2i.addActionListener(this);
-
-		// acceleration
-		this.add(new JSeparator());
-		p = new JPanel(new GridBagLayout());
-		this.add(p);
-
-		acceleration = new JFormattedTextField(nDouble);
-		acceleration.setValue(robot.getSettings().getAcceleration());
-		s = acceleration.getPreferredSize();
-		s.width = 80;
-		acceleration.setPreferredSize(s);
-		y = 0;
-		c.weightx = 0;
-		c.anchor = GridBagConstraints.EAST;
-		d.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(acceleration, d);
-		y++;
 
 		// flip for glass
 		this.add(new JSeparator());
@@ -329,16 +307,14 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		if (mwf <= 0) data_is_sane = false;
 		if (mhf <= 0) data_is_sane = false;
 
-		double bld   = ((Number)pulleyDiameterLeft .getValue()).doubleValue() / 10.0;
-		double brd   = ((Number)pulleyDiameterRight.getValue()).doubleValue() / 10.0;
+		double bld   = ((Number)pulleyDiameter .getValue()).doubleValue() / 10.0;
 		double accel = ((Number)acceleration       .getValue()).doubleValue();
 
 		if (bld <= 0) data_is_sane = false;
-		if (brd <= 0) data_is_sane = false;
 
 		if (data_is_sane) {
 			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
-			robot.getSettings().setPulleyDiameter(bld, brd);
+			robot.getSettings().setPulleyDiameter(bld);
 			robot.getSettings().setMachineSize(mwf, mhf);
 			robot.getSettings().setAcceleration(accel);
 		}

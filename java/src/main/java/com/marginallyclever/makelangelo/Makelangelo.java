@@ -376,8 +376,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 					int comp = inputLine.compareTo(VERSION);
 					String results;
-					if     (comp>0) results = Translator.get("UpdateNotice");
-					else if(comp<0) results = "This version is from the future?!";
+					if     (comp>0) {
+						results = Translator.get("UpdateNotice");
+						//TODO downloadUpdate();
+					} else if(comp<0) results = "This version is from the future?!";
 					else 			results = Translator.get("UpToDate");
 
 					JOptionPane.showMessageDialog(mainFrame, results);
@@ -391,6 +393,21 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		}
 	}
 
+	
+	/**
+	 * See http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-java/
+	 *//*
+	private void downloadUpdate() {
+		String[] run = {"java","-jar","updater/update.jar"};
+        try {
+            Runtime.getRuntime().exec(run);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        System.exit(0);
+	}*/
+	
+	
 	/**
 	 * Rebuild the contents of the menu based on current program state
 	 */

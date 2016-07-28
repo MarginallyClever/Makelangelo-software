@@ -229,9 +229,9 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			double toolMinimumStepSize = Math.pow(tool.getDiameter(), 2);
 
 			// gcode preamble
-			out.write(machine.getGCodeConfig() + ";\n");
-			out.write(machine.getGCodeBobbin() + ";\n");
-			out.write(machine.getGCodeSetPositionAtHome()+";\n");
+			//out.write(machine.getGCodeConfig() + ";\n");
+			//out.write(machine.getGCodeBobbin() + ";\n");
+			//out.write(machine.getGCodeSetPositionAtHome()+";\n");
 			setAbsoluteMode(out);
 			liftPen(out);
 			previousX = machine.getHomeX();

@@ -16,6 +16,7 @@ import com.marginallyclever.makelangelo.PreferencesHelper;
 
 
 /**
+ * TODO move tool names into translations & add a color palette system for quantizing colors
  * All the hardware settings for a single Makelangelo robot.
  * @author Dan Royer
  */
@@ -54,8 +55,7 @@ public final class MakelangeloRobotSettings {
 	// % from edge of paper.
 	private double paperMargin;
 	// pulley diameter
-	private double pulleyDiameterLeft;
-	private double pulleyDiameterRight;
+	private double pulleyDiameter;
 	// pulleys turning backwards?
 	private boolean isLeftMotorInverted;
 	private boolean isRightMotorInverted;
@@ -92,7 +92,7 @@ public final class MakelangeloRobotSettings {
 
 	
 	/**
-	 * TODO move tool names into translations & add a color palette system for quantizing colors
+	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 *
 	 * @param translator
 	 * @param robot
@@ -104,8 +104,8 @@ public final class MakelangeloRobotSettings {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 				
-		double mh = 835 * 0.1; // mm > cm
-		double mw = 835 * 0.1; // mm > cm
+		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 650mm.
+		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 900mm.
 		
 		robotUID = 0;
 		isRegistered = false;
@@ -127,13 +127,12 @@ public final class MakelangeloRobotSettings {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate = 7500;
-		maxAcceleration = 20;
+		maxFeedRate = 6500;
+		maxAcceleration = 250;
 
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
-		pulleyDiameterLeft  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
-		pulleyDiameterRight = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		pulleyDiameter  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
 
 		isLeftMotorInverted = false;
 		isRightMotorInverted = true;
@@ -190,7 +189,7 @@ public final class MakelangeloRobotSettings {
 	
 	
 	public String getGCodeBobbin() {
-		return "D1 L" + df.format(pulleyDiameterLeft) + " R" + df.format(pulleyDiameterRight);
+		return "D1 L" + df.format(pulleyDiameter);
 	}
 
 	
@@ -375,12 +374,8 @@ public final class MakelangeloRobotSettings {
 		return getCurrentTool().getPenUpString();
 	}
 
-	public double getPulleyDiameterLeft()  {
-		return pulleyDiameterLeft;
-	}
-
-	public double getPulleyDiameterRight() {
-		return pulleyDiameterRight;
+	public double getPulleyDiameter()  {
+		return pulleyDiameter;
 	}
 
 	public DrawingTool getTool(int tool_id) {
@@ -457,8 +452,7 @@ public final class MakelangeloRobotSettings {
 		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
 		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
 
-		pulleyDiameterLeft=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameterLeft)));
-		pulleyDiameterRight=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_right_diameter", Double.toString(pulleyDiameterRight)));
+		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
 		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
 		maxAcceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(maxAcceleration)));
@@ -502,8 +496,7 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
 		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
 		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
-		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameterLeft));
-		uniqueMachinePreferencesNode.put("bobbin_right_diameter", Double.toString(pulleyDiameterRight));
+		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
 		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
@@ -572,9 +565,8 @@ public final class MakelangeloRobotSettings {
 		this.paperBottom = -height/2;
 	}
 	
-	public void setPulleyDiameter(double left,double right) {
-		pulleyDiameterLeft = left;
-		pulleyDiameterRight = right;
+	public void setPulleyDiameter(double left) {
+		pulleyDiameter = left;
 	}
 	
 	public void setRegistered(boolean isRegistered) {
