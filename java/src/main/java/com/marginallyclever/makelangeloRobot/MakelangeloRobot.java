@@ -331,7 +331,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void setRunning() {
 		isRunning = true;
 		if(myPanel != null) myPanel.statusBar.start();
-		if(myPanel != null) myPanel.updateButtonAccess();
+		if(myPanel != null) myPanel.updateButtonAccess();  // disables all the manual driving buttons
 	}
 	
 	public void raisePen() {
