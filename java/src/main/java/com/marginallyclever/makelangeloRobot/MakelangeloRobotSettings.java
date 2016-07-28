@@ -16,6 +16,7 @@ import com.marginallyclever.makelangelo.PreferencesHelper;
 
 
 /**
+ * TODO move tool names into translations & add a color palette system for quantizing colors
  * All the hardware settings for a single Makelangelo robot.
  * @author Dan Royer
  */
@@ -92,7 +93,7 @@ public final class MakelangeloRobotSettings {
 
 	
 	/**
-	 * TODO move tool names into translations & add a color palette system for quantizing colors
+	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 *
 	 * @param translator
 	 * @param robot
@@ -128,7 +129,7 @@ public final class MakelangeloRobotSettings {
 		paperMargin = 0.9;
 
 		maxFeedRate = 7500;
-		maxAcceleration = 250;  // matches firmware_rumba/configure.h
+		maxAcceleration = 250;
 
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
