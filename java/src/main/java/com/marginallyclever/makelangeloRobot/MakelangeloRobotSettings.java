@@ -127,7 +127,7 @@ public final class MakelangeloRobotSettings {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate = 7500;
+		maxFeedRate = 6500;
 		maxAcceleration = 250;
 
 		// diameter = circumference/pi
