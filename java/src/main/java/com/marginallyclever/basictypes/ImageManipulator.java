@@ -58,9 +58,9 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	public void imageStart(Writer out) throws IOException {
-		out.write(machine.getGCodeConfig() + ";\n");
-		out.write(machine.getGCodeBobbin() + ";\n");
-		out.write(machine.getGCodeSetPositionAtHome()+";\n");		
+		//out.write(machine.getGCodeConfig() + ";\n");
+		//out.write(machine.getGCodeBobbin() + ";\n");
+		//out.write(machine.getGCodeSetPositionAtHome()+";\n");		
 		previousX = machine.getHomeX();
 		previousY = machine.getHomeY();
 		setAbsoluteMode(out);
