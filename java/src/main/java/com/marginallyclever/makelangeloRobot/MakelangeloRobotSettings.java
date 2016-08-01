@@ -188,7 +188,7 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	
-	public String getGCodeBobbin() {
+	public String getGCodePulleyDiameter() {
 		return "D1 L" + df.format(pulleyDiameter);
 	}
 

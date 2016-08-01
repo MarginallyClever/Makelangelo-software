@@ -34,10 +34,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener {
 	// Constants
-	final String robotTypeName = "DRAWBOT";
-	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+	private final String robotTypeName = "DRAWBOT";
+	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
-	static public final float PEN_HOLDER_RADIUS=6; //cm
+	// Firmware check
+	private final String versionCheck = new String("Firmware v");
+	private final long expectedFirmwareVersion = 5;
+	private boolean firmwareVersionChecked = false;
 
 	private DecimalFormat df;
 	
@@ -60,6 +63,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// rendering stuff
 	public boolean showPenUpMoves=false;
 	private DrawPanelDecorator drawDecorator=null;
+	private final float PEN_HOLDER_RADIUS=6; //cm
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
@@ -104,6 +108,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if( this.connection != c ) {
 			portConfirmed = false;
 			hasSetHome = false;
+			firmwareVersionChecked = false;
 		}
 		
 		this.connection = c;
@@ -131,20 +136,38 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void dataAvailable(MarginallyCleverConnection arg0, String data) {
 		notifyDataAvailable(data);
 		
-		if (portConfirmed == true) return;
-		if (data.lastIndexOf(hello) < 0) return;
-
-		portConfirmed = true;
-		// which machine is this?
-		String after_hello = data.substring(data.lastIndexOf(hello) + hello.length());
-		parseRobotUID(after_hello);
-		// send whatever config settings I have for this machine.
-		sendConfig();
+		boolean justNow = false;
 		
-		if(myPanel!=null) myPanel.onConnect();
+		// is port confirmed?
+		if (!portConfirmed && data.lastIndexOf(hello) >= 0) {
+			portConfirmed = true;
+			// which machine is this?
+			String afterHello = data.substring(data.lastIndexOf(hello) + hello.length());
+			parseRobotUID(afterHello);
+			justNow=true;
+		}
 		
-		// tell everyone I've confirmed connection.
-		notifyPortConfirmed();
+		if( !firmwareVersionChecked && data.lastIndexOf(versionCheck)>=0 ) {
+			String afterV = data.substring(versionCheck.length()).trim();
+			long versionFound = Long.parseLong(afterV);
+			
+			if( versionFound == expectedFirmwareVersion ) {
+				firmwareVersionChecked=true;
+				justNow=true;
+			} else {
+				notifyFirmwareBad(versionFound);
+			}
+		}
+		
+		if(justNow && firmwareVersionChecked && portConfirmed) {
+			// send whatever config settings I have for this machine.
+			sendConfig();
+			
+			if(myPanel!=null) myPanel.onConnect();
+			
+			// tell everyone I've confirmed connection.
+			notifyPortConfirmed();
+		}
 	}
 	
 	public boolean isPortConfirmed() {
@@ -178,6 +201,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private void notifyPortConfirmed() {
 		for (MakelangeloRobotListener listener : listeners) {
 			listener.portConfirmed(this);
+		}
+	}
+
+	// Notify when unknown robot connected so that Makelangelo GUI can respond.
+	private void notifyFirmwareBad(long versionFound) {
+		for (MakelangeloRobotListener listener : listeners) {
+			listener.firmwareBad(this,versionFound);
 		}
 	}
 	
@@ -287,7 +317,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// Send  new configuration values to the robot.
 		try {
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			sendLineToRobot(settings.getGCodeBobbin() + "\n");
+			sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
 			setHome();
 			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
@@ -511,6 +541,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
+		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
 		hasSetHome=true;
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();

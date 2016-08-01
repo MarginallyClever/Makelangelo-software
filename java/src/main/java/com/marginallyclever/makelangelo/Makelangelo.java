@@ -555,6 +555,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	
 	@Override
+	public void firmwareBad(MakelangeloRobot r,long versionFound) {
+        JOptionPane.showMessageDialog(mainFrame, Translator.get("firmwareVersionBadMessage"), Translator.get("firmwareVersionBadTitle"), JOptionPane.ERROR_MESSAGE);
+	}
+	
+	@Override
 	public void dataAvailable(MakelangeloRobot r,String data) {
 		if(data.endsWith("\n")) data = data.substring(0, data.length()-1);
 		Log.write( "#ffa500",data );  // #ffa500 = orange

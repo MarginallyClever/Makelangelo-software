@@ -11,4 +11,6 @@ public interface MakelangeloRobotListener {
 	public void lineError(MakelangeloRobot r,int lineNumber);
 	// called when robot connection is confirmed
 	public void portConfirmed(MakelangeloRobot r);
+	// called when the firmware on the robot is detected as out of date
+	public void firmwareBad(MakelangeloRobot r,long versionFound);
 }

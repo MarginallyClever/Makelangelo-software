@@ -1044,5 +1044,17 @@ to check yourself.</value>
 		<hint>Multipass converter option</hint>
 	</string>
 	
+	<string>
+		<key>firmwareVersionBadTitle</key>
+		<value>Firmware update</value>
+		<hint>Software is too new for firmware</hint>
+	</string>
 	
+	<string>
+		<key>firmwareVersionBadMessage</key>
+		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is out of date.  A new version of this firmware is available.<br/>Please visit 
+		<a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a> to get the new version.</html></body>]]></value>
+		<hint>Software is too new for firmware</hint>
+	</string>
+		
 </language>
