@@ -192,16 +192,20 @@ public final class MakelangeloRobotSettings {
 		return "D1 L" + df.format(pulleyDiameter);
 	}
 
-	
-	// @returns home X coordinate in mm
+
+	/**
+	 * TODO Make home tweakable for advanced users. Relative to edges or center.
+	 * @return home X coordinate in mm
+	 */ 
 	public double getHomeX() {
-		//TODO Make home X tweakable for advanced users. relative to edges or center.
 		return 0;
 	}
 	
-	// @returns home Y coordinate in mm
+	/**
+	 * TODO Make home tweakable for advanced users. Relative to edges or center.
+	 * @return home Y coordinate in mm
+	 */
 	public double getHomeY() {
-		//TODO Make home Y tweakable for advanced users. relative to edges or center.
 		float limitTop = (float)getLimitTop();
 		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
 		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
@@ -301,20 +305,32 @@ public final class MakelangeloRobotSettings {
 	}
 
 
+	/**
+	 * @return bottom limit in cm
+	 */
 	public double getLimitBottom() {
 		return limitBottom;
 	}
 
 
+	/**
+	 * @return left limit in cm
+	 */
 	public double getLimitLeft() {
 		return limitLeft;
 	}
 
 
+	/**
+	 * @return right limit in cm
+	 */
 	public double getLimitRight() {
 		return limitRight;
 	}
 
+	/**
+	 * @return top limit in cm
+	 */
 	public double getLimitTop() {
 		return limitTop;
 	}
@@ -327,40 +343,55 @@ public final class MakelangeloRobotSettings {
 	}
 
 
+	/**
+	 * @return paper bottom edge in cm.
+	 */
 	public double getPaperBottom() {
 		return paperBottom;
 	}
 
 
 	/**
-	 * @return paper height, in cm.
+	 * @return paper height in cm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
 
+	/**
+	 * @return paper left edge in cm.
+	 */
 	public double getPaperLeft() {
 		return paperLeft;
 	}
 
 
+	/**
+	 * @return paper margin %.
+	 */
 	public double getPaperMargin() {
 		return paperMargin;
 	}
 
 
+	/**
+	 * @return paper right edge in cm.
+	 */
 	public double getPaperRight() {
 		return paperRight;
 	}
 
 
+	/**
+	 * @return paper top edge in cm.
+	 */
 	public double getPaperTop() {
 		return paperTop;
 	}
 
 
 	/**
-	 * @return paper width, in cm.
+	 * @return paper width in cm.
 	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;

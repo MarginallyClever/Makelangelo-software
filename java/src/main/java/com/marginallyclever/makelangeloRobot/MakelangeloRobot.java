@@ -552,19 +552,26 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return hasSetHome;
 	}
 	
-	
+	/**
+	 * @param x absolute position in mm
+	 * @param y absolute position in mm
+	 */
 	public void movePenAbsolute(float x,float y) {
 		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
-		gondolaX = x * 0.1f;
-		gondolaY = y * 0.1f;
+		gondolaX = x;
+		gondolaY = y;
 	}
-	
+
+	/**
+	 * @param x relative position in mm
+	 * @param y relative position in mm
+	 */
 	public void movePenRelative(float dx,float dy) {
 		sendLineToRobot("G91");  // set relative mode
 		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90");  // return to absolute mode
-		gondolaX += dx * 0.1f;
-		gondolaY += dy * 0.1f;
+		gondolaX += dx;
+		gondolaY += dy;
 	}
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
@@ -720,7 +727,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	private void paintPenHolderAndCounterweights( GL2 gl2 ) {
 		double dx,dy;
-
+		double gx = gondolaX / 10;
+		double gy = gondolaY / 10;
+		
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
@@ -730,28 +739,28 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		double mh = top-settings.getLimitBottom();
 		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
 
-		dx = gondolaX - left;
-		dy = gondolaY - top;
+		dx = gx - left;
+		dy = gy - top;
 		double left_a = Math.sqrt(dx*dx+dy*dy);
 		double left_b = (suggested_length - left_a)/2;
 
-		dx = gondolaX - right;
+		dx = gx - right;
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggested_length - right_a)/2;
 
-		if(gondolaX<left) return;
-		if(gondolaX>right) return;
-		if(gondolaY>top) return;
-		if(gondolaY<bottom) return;
+		if(gx<left) return;
+		if(gx>right) return;
+		if(gy>top) return;
+		if(gy<bottom) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		
 		// belt from motor to gondola left
 		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(gondolaX,gondolaY);
+		gl2.glVertex2d(gx,gy);
 		// belt from motor to gondola right
 		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(gondolaX,gondolaY);
+		gl2.glVertex2d(gx,gy);
 		
 		float bottleCenter = 2.1f+0.75f;
 		
@@ -772,7 +781,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glColor3f(0, 0, 1);
 		float f;
 		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(gondolaX+Math.cos(f)*PEN_HOLDER_RADIUS,gondolaY+Math.sin(f)*PEN_HOLDER_RADIUS);
+			gl2.glVertex2d(gx+Math.cos(f)*PEN_HOLDER_RADIUS,gy+Math.sin(f)*PEN_HOLDER_RADIUS);
 		}
 		gl2.glEnd();
 		

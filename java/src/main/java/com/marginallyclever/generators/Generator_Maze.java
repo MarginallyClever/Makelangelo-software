@@ -25,7 +25,7 @@ public class Generator_Maze extends ImageGenerator {
 		boolean removed;
 	}
 
-	protected int rows = 5, columns = 5;
+	protected static int rows = 5, columns = 5;
 	protected float xmax, xmin, ymax, ymin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
