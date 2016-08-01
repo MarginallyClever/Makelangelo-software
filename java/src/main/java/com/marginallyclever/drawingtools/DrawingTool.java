@@ -38,9 +38,6 @@ public abstract class DrawingTool {
 		df.setGroupingUsed(false);
 	}
 
-	public void cancel() {
-	}
-
 	public void drawLine(GL2 gl2, double x1, double y1, double x2, double y2) {
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2d(x1, y1);
@@ -86,9 +83,6 @@ public abstract class DrawingTool {
 		// tool_number =
 		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
 		feedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRate)));
-	}
-
-	public void save() {
 	}
 
 	public void saveConfig(Preferences prefs) {
