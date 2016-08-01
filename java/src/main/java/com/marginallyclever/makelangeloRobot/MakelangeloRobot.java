@@ -409,6 +409,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			changeToTool(toolNumber,colorName);
 		}
 
+		// checksums for commands with a line number
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
 			String checksum = generateChecksum(line); 
