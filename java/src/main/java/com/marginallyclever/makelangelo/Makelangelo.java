@@ -353,7 +353,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 */
 	public void checkForUpdate() {
 		try {
-			URL github = new URL("https://github.com/MarginallyClever/Makelangelo/releases/latest");
+			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
 			conn.setInstanceFollowRedirects(false);  //you still need to handle redirect manully.
 			HttpURLConnection.setFollowRedirects(false);
@@ -367,14 +367,14 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 				int start = inputLine.indexOf(matchStart);
 				int end = inputLine.indexOf(matchEnd);
 				if (start != -1 && end != -1) {
-					inputLine = inputLine.substring(start + matchStart.length(), end);
+					String line2 = inputLine.substring(start + matchStart.length(), end);
 					// parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
-					inputLine = inputLine.substring(inputLine.lastIndexOf("/") + 1);
+					line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-					System.out.println("latest release: " + inputLine+"; this version: " + VERSION);
+					System.out.println("latest release: " + line2+"; this version: " + VERSION);
 					//System.out.println(inputLine.compareTo(VERSION));
 
-					int comp = inputLine.compareTo(VERSION);
+					int comp = line2.compareTo(VERSION);
 					String results;
 					if     (comp>0) {
 						results = Translator.get("UpdateNotice");
