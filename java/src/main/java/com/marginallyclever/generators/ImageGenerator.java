@@ -22,8 +22,9 @@ public abstract class ImageGenerator extends ImageManipulator implements DrawPan
 	public boolean generate(Writer out) throws IOException {
 		return false;
 	}
-
+	
 	/**
+	 * live preview as the system is generating.
 	 * draw the results as the calculation is being performed.
 	 */
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {}

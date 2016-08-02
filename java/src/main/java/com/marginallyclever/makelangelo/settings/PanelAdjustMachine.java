@@ -303,13 +303,12 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	public void save() {
 		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
 		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
+		double bld   = ((Number)pulleyDiameter.getValue()).doubleValue() / 10.0;
+		double accel = ((Number)acceleration.getValue()).doubleValue();
+
 		boolean data_is_sane = true;
 		if (mwf <= 0) data_is_sane = false;
 		if (mhf <= 0) data_is_sane = false;
-
-		double bld   = ((Number)pulleyDiameter .getValue()).doubleValue() / 10.0;
-		double accel = ((Number)acceleration       .getValue()).doubleValue();
-
 		if (bld <= 0) data_is_sane = false;
 
 		if (data_is_sane) {
@@ -319,8 +318,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			robot.getSettings().setAcceleration(accel);
 		}
 	}
-	
-	public void cancel() {}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {

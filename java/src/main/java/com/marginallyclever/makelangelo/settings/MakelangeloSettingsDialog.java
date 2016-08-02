@@ -119,17 +119,12 @@ implements ActionListener {
 	  if(src == save) {
 		  panelAdjustMachine.save();
 		  panelAdjustPaper.save();
-		  panelAdjustPen.save();
 		  robot.getSettings().saveConfig();
 		  robot.sendConfig();
 		  this.dispose();
 	  }
 	  if(src == cancel) {
-		  panelAdjustMachine.cancel();
-		  panelAdjustPaper.cancel();
-		  panelAdjustPen.cancel();
 		  this.dispose();
-		  return;
 	  }
   }
 }

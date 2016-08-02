@@ -254,6 +254,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	public void save() {
 		double pwf = Double.valueOf(pw.getText()) / 10.0;
 		double phf = Double.valueOf(ph.getText()) / 10.0;
+		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
 		if( phf<=0 ) data_is_sane=false;
@@ -266,7 +267,4 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 			s.setPaperMargin(pm);
 		}
 	}
-	
-	public void cancel() {}
-
 }

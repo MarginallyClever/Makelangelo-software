@@ -1017,7 +1017,6 @@ to check yourself.</value>
 		<value>Timing belt length (each):</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
-	
 	<string>
 		<key>ConverterWanderName</key>
 		<value>Wander</value>
@@ -1029,5 +1028,33 @@ to check yourself.</value>
 		<hint>Wander converter style parameter</hint>
 	</string>
 	
+	<string>
+		<key>ConverterMultipassName</key>
+		<value>Multipass</value>
+		<hint>name of Multipass converter style</hint>
+	</string>
+	<string>
+		<key>ConverterMultipassAngle</key>
+		<value>Angle (degrees)</value>
+		<hint>Multipass converter option</hint>
+	</string>
+	<string>
+		<key>ConverterMultipassLevels</key>
+		<value>Levels</value>
+		<hint>Multipass converter option</hint>
+	</string>
 	
+	<string>
+		<key>firmwareVersionBadTitle</key>
+		<value>Firmware update</value>
+		<hint>Software is too new for firmware</hint>
+	</string>
+	
+	<string>
+		<key>firmwareVersionBadMessage</key>
+		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is out of date.  A new version of this firmware is available.<br/>Please visit 
+		<a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a> to get the new version.</html></body>]]></value>
+		<hint>Software is too new for firmware</hint>
+	</string>
+		
 </language>

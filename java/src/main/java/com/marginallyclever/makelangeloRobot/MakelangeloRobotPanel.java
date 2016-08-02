@@ -114,10 +114,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		JPanel connectPanel = createConnectPanel();
-		panel.add(connectPanel, con1);
-		con1.gridy++;
-
+		panel.add(createConnectPanel(), con1);		con1.gridy++;
 		
 		// settings
 		machineNumberPanel = new JPanel(new GridBagLayout());

@@ -34,10 +34,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener {
 	// Constants
-	final String robotTypeName = "DRAWBOT";
-	final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+	private final String robotTypeName = "DRAWBOT";
+	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
-	static public final float PEN_HOLDER_RADIUS=6; //cm
+	// Firmware check
+	private final String versionCheck = new String("Firmware v");
+	private final long expectedFirmwareVersion = 5;
+	private boolean firmwareVersionChecked = false;
 
 	private DecimalFormat df;
 	
@@ -60,6 +63,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	// rendering stuff
 	public boolean showPenUpMoves=false;
 	private DrawPanelDecorator drawDecorator=null;
+	private final float PEN_HOLDER_RADIUS=6; //cm
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
@@ -104,6 +108,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		if( this.connection != c ) {
 			portConfirmed = false;
 			hasSetHome = false;
+			firmwareVersionChecked = false;
 		}
 		
 		this.connection = c;
@@ -131,20 +136,38 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void dataAvailable(MarginallyCleverConnection arg0, String data) {
 		notifyDataAvailable(data);
 		
-		if (portConfirmed == true) return;
-		if (data.lastIndexOf(hello) < 0) return;
-
-		portConfirmed = true;
-		// which machine is this?
-		String after_hello = data.substring(data.lastIndexOf(hello) + hello.length());
-		parseRobotUID(after_hello);
-		// send whatever config settings I have for this machine.
-		sendConfig();
+		boolean justNow = false;
 		
-		if(myPanel!=null) myPanel.onConnect();
+		// is port confirmed?
+		if (!portConfirmed && data.lastIndexOf(hello) >= 0) {
+			portConfirmed = true;
+			// which machine is this?
+			String afterHello = data.substring(data.lastIndexOf(hello) + hello.length());
+			parseRobotUID(afterHello);
+			justNow=true;
+		}
 		
-		// tell everyone I've confirmed connection.
-		notifyPortConfirmed();
+		if( !firmwareVersionChecked && data.lastIndexOf(versionCheck)>=0 ) {
+			String afterV = data.substring(versionCheck.length()).trim();
+			long versionFound = Long.parseLong(afterV);
+			
+			if( versionFound == expectedFirmwareVersion ) {
+				firmwareVersionChecked=true;
+				justNow=true;
+			} else {
+				notifyFirmwareBad(versionFound);
+			}
+		}
+		
+		if(justNow && firmwareVersionChecked && portConfirmed) {
+			// send whatever config settings I have for this machine.
+			sendConfig();
+			
+			if(myPanel!=null) myPanel.onConnect();
+			
+			// tell everyone I've confirmed connection.
+			notifyPortConfirmed();
+		}
 	}
 	
 	public boolean isPortConfirmed() {
@@ -178,6 +201,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private void notifyPortConfirmed() {
 		for (MakelangeloRobotListener listener : listeners) {
 			listener.portConfirmed(this);
+		}
+	}
+
+	// Notify when unknown robot connected so that Makelangelo GUI can respond.
+	private void notifyFirmwareBad(long versionFound) {
+		for (MakelangeloRobotListener listener : listeners) {
+			listener.firmwareBad(this,versionFound);
 		}
 	}
 	
@@ -287,7 +317,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// Send  new configuration values to the robot.
 		try {
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			sendLineToRobot(settings.getGCodeBobbin() + "\n");
+			sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
 			setHome();
 			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
@@ -331,7 +361,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	public void setRunning() {
 		isRunning = true;
 		if(myPanel != null) myPanel.statusBar.start();
-		if(myPanel != null) myPanel.updateButtonAccess();
+		if(myPanel != null) myPanel.updateButtonAccess();  // disables all the manual driving buttons
 	}
 	
 	public void raisePen() {
@@ -379,6 +409,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			changeToTool(toolNumber,colorName);
 		}
 
+		// checksums for commands with a line number
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
 			String checksum = generateChecksum(line); 
@@ -511,6 +542,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
+		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
 		hasSetHome=true;
 		gondolaX=(float)settings.getHomeX();
 		gondolaY=(float)settings.getHomeY();
@@ -521,19 +553,26 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return hasSetHome;
 	}
 	
-	
+	/**
+	 * @param x absolute position in mm
+	 * @param y absolute position in mm
+	 */
 	public void movePenAbsolute(float x,float y) {
 		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
-		gondolaX = x * 0.1f;
-		gondolaY = y * 0.1f;
+		gondolaX = x;
+		gondolaY = y;
 	}
-	
+
+	/**
+	 * @param x relative position in mm
+	 * @param y relative position in mm
+	 */
 	public void movePenRelative(float dx,float dy) {
 		sendLineToRobot("G91");  // set relative mode
 		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90");  // return to absolute mode
-		gondolaX += dx * 0.1f;
-		gondolaY += dy * 0.1f;
+		gondolaX += dx;
+		gondolaY += dy;
 	}
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
@@ -689,7 +728,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	private void paintPenHolderAndCounterweights( GL2 gl2 ) {
 		double dx,dy;
-
+		double gx = gondolaX / 10;
+		double gy = gondolaY / 10;
+		
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
@@ -699,28 +740,28 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		double mh = top-settings.getLimitBottom();
 		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
 
-		dx = gondolaX - left;
-		dy = gondolaY - top;
+		dx = gx - left;
+		dy = gy - top;
 		double left_a = Math.sqrt(dx*dx+dy*dy);
 		double left_b = (suggested_length - left_a)/2;
 
-		dx = gondolaX - right;
+		dx = gx - right;
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggested_length - right_a)/2;
 
-		if(gondolaX<left) return;
-		if(gondolaX>right) return;
-		if(gondolaY>top) return;
-		if(gondolaY<bottom) return;
+		if(gx<left) return;
+		if(gx>right) return;
+		if(gy>top) return;
+		if(gy<bottom) return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		
 		// belt from motor to gondola left
 		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(gondolaX,gondolaY);
+		gl2.glVertex2d(gx,gy);
 		// belt from motor to gondola right
 		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(gondolaX,gondolaY);
+		gl2.glVertex2d(gx,gy);
 		
 		float bottleCenter = 2.1f+0.75f;
 		
@@ -741,7 +782,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glColor3f(0, 0, 1);
 		float f;
 		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(gondolaX+Math.cos(f)*PEN_HOLDER_RADIUS,gondolaY+Math.sin(f)*PEN_HOLDER_RADIUS);
+			gl2.glVertex2d(gx+Math.cos(f)*PEN_HOLDER_RADIUS,gy+Math.sin(f)*PEN_HOLDER_RADIUS);
 		}
 		gl2.glEnd();
 		
