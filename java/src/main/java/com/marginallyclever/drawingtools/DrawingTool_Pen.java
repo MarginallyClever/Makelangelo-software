@@ -175,6 +175,5 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		zRate = ((Number)penZRate.getValue()).floatValue();
 		zOff = ((Number)penUp.getValue()).floatValue();
 		zOn = ((Number)penDown.getValue()).floatValue();
-		robot.getSettings().saveConfig();
 	}
 }

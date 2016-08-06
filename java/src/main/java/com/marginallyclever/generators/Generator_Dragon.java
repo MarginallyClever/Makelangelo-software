@@ -20,7 +20,7 @@ public class Generator_Dragon extends ImageGenerator {
 	private float xmin = -7;
 	private float ymax = 7;
 	private float ymin = -7;
-	private int order = 12; // controls complexity of curve
+	private static int order = 12; // controls complexity of curve
 
 	private List<Integer> sequence;
 
