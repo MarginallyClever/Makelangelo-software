@@ -47,7 +47,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
 import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -110,7 +110,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	// Bottom of window
 	private LogPanel logPanel;
 	
-	private Animator animator;
+	private FPSAnimator animator;
 	
 	// Drag & drop support
 	private MakelangeloTransferHandler myTransferHandler;
@@ -502,7 +502,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		drawPanel.zoomToFitPaper();
 
 		// start animation system        
-        animator = new Animator();
+        animator = new FPSAnimator(30);
         animator.add(drawPanel);
         animator.start();
 	}
