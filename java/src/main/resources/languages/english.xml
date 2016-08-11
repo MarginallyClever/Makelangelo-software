@@ -968,6 +968,12 @@ to check yourself.</value>
 		<value>Koch Curve Fractal</value>
 		<hint></hint>
 	</string>
+	
+	<string>
+		<key>FibonacciSpiralName</key>
+		<value>Fibonacci Spiral Fractal</value>
+		<hint></hint>
+	</string>
 
 	<string>
 		<key>DragonName</key>
