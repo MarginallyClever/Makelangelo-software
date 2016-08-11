@@ -12,10 +12,10 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_LSystemTree extends ImageGenerator {
 	private float turtleStep = 10.0f;
-	private float xmax = 7;
-	private float xmin = -7;
-	private float ymax = 7;
-	private float ymin = -7;
+	private float xMax = 7;
+	private float xMin = -7;
+	private float yMax = 7;
+	private float yMin = -7;
 	private int order = 4; // controls complexity of curve
 
 	float maxSize;
@@ -82,33 +82,33 @@ public class Generator_LSystemTree extends ImageGenerator {
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f / 2.0f;
-		xmax = v;
-		ymax = v;
-		xmin = -v;
-		ymin = -v;
+		xMax = v;
+		yMax = v;
+		xMin = -v;
+		yMin = -v;
 
 		turtle = new Turtle();
 		
-		turtleStep = (float) ((xmax - xmin) / (Math.pow(2, order)));
+		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
 
-		float xx = xmax - xmin;
-		float yy = ymax - ymin;
+		float xx = xMax - xMin;
+		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
 
 		boolean drawBoundingBox=false;
 		if(drawBoundingBox) {
 			liftPen(out);
-			moveTo(out, xmax, ymax, false);
-			moveTo(out, xmax, ymin, false);
-			moveTo(out, xmin, ymin, false);
-			moveTo(out, xmin, ymax, false);
-			moveTo(out, xmax, ymax, false);
+			moveTo(out, xMax, yMax, false);
+			moveTo(out, xMax, yMin, false);
+			moveTo(out, xMin, yMin, false);
+			moveTo(out, xMin, yMax, false);
+			moveTo(out, xMax, yMax, false);
 			liftPen(out);
 		}
 		
 		// move to starting position
 		turtle.setX(0);
-		turtle.setY(ymax - turtleStep / 2);
+		turtle.setY(yMax - turtleStep / 2);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve

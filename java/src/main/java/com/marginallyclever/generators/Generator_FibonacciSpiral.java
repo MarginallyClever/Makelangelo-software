@@ -3,7 +3,6 @@ package com.marginallyclever.generators;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.swing.JLabel;
@@ -13,16 +12,20 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * generates a fibonacci spiral
+ * @author danroyer
+ *
+ */
 public class Generator_FibonacciSpiral extends ImageGenerator {
 	private Turtle turtle;
-	private float xmax = 7;
-	private float xmin = -7;
-	private float ymax = 7;
-	private float ymin = -7;
+	private float xMax = 7;
+	private float xMin = -7;
+	private float yMax = 7;
+	private float yMin = -7;
 	private int order = 7; // controls complexity of curve
 
-	private float maxSize;
-	private Stack<Integer> sequence;
+	private Stack<Integer> fibonacciSequence;
 
 
 	@Override
@@ -58,10 +61,10 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 
 
 	private void buildFibonacciSequence(int order) {
-		sequence = new Stack<Integer>();
-		sequence.add(1);
+		fibonacciSequence = new Stack<Integer>();
+		fibonacciSequence.add(1);
 		//System.out.println("add 1");
-		sequence.add(1);
+		fibonacciSequence.add(1);
 		//System.out.println("add 1");
 		int a = 1;
 		int b = 1;
@@ -69,7 +72,7 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		
 		while(order>2) {
 			c = a+b;
-			sequence.add(c);
+			fibonacciSequence.add(c);
 			//System.out.println("add "+c);
 			a=b;
 			b=c;
@@ -83,23 +86,23 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		liftPen(out);
 		tool.writeChangeTo(out);
 
-		xmax = (float)(machine.getPaperWidth () * machine.getPaperMargin()) * 10.0f/2.0f;
-		ymax = (float)(machine.getPaperHeight() * machine.getPaperMargin()) * 10.0f/2.0f;
-		xmin = -xmax;
-		ymin = -ymax;
+		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin()) * 10.0f/2.0f;
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin()) * 10.0f/2.0f;
+		xMin = -xMax;
+		yMin = -yMax;
 
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);
 		
 		// scale the fractal to fit on the page
 		// short side
-		float s1 = sequence.peek();
-		float scale1 = Math.min(xmax, ymax) * 2.0f / s1;
+		float s1 = fibonacciSequence.peek();
+		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
-		float s2 = sequence.get(sequence.size()-2) + s1;
-		float scale2 = Math.max(xmax, ymax) * 2.0f / s2;
+		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
+		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
-		System.out.println("size="+sequence.size());
+		System.out.println("size="+fibonacciSequence.size());
 		if(scale1>scale2) scale1=scale2;
 		
 		turtle = new Turtle();
@@ -107,33 +110,34 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		boolean drawBoundingBox=false;
 		if(drawBoundingBox) {
 			liftPen(out);
-			moveTo(out, xmax, ymax, false);
-			moveTo(out, xmax, ymin, false);
-			moveTo(out, xmin, ymin, false);
-			moveTo(out, xmin, ymax, false);
-			moveTo(out, xmax, ymax, false);
+			moveTo(out, xMax, yMax, false);
+			moveTo(out, xMax, yMin, false);
+			moveTo(out, xMin, yMin, false);
+			moveTo(out, xMin, yMax, false);
+			moveTo(out, xMax, yMax, false);
 			liftPen(out);
 		}
 		
 		liftPen(out);
 		// move to starting position
-		float shortSide = sequence.peek() * scale1 /2.0f; 
-		if( xmax < ymax ) {
+		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
+		if( xMax < yMax ) {
 			// tall thin paper, top left corner
 			turtle.setX(-shortSide);
-			turtle.setY(ymax);
+			turtle.setY(yMax);
 			turtle.turn(-90);
 		} else {
 			// short wide paper, bottom left corner
-			turtle.setX(-xmax);
+			turtle.setX(-xMax);
 			turtle.setY(-shortSide);
 			turtle.turn(180);
 		}
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
-		// do the curve
-		while(!sequence.isEmpty()) {
-			int o = sequence.pop();
+		
+		// do the curve, one square at a time.
+		while(!fibonacciSequence.isEmpty()) {
+			int o = fibonacciSequence.pop();
 			float size = o*scale1;
 			fibonacciCell(out, size);
 		}

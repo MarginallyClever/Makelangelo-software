@@ -26,7 +26,7 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	protected static int rows = 5, columns = 5;
-	protected float xmax, xmin, ymax, ymin;
+	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
 
@@ -162,28 +162,28 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	private void drawMaze(Writer output) throws IOException {
-		ymin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		ymax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xmin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xmax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xMin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
-		float w = (xmax - xmin) / columns;
-		float h = (ymax - ymin) / rows;
+		float w = (xMax - xMin) / columns;
+		float h = (yMax - yMin) / rows;
 
 		// Draw outside edge
 		liftPen(output);
-		moveTo(output, xmin, ymax, true);
-		moveTo(output, xmin, ymax, false);
-		moveTo(output, xmax, ymax, false);
-		moveTo(output, xmax, ymin + h, false);
-		moveTo(output, xmax, ymin + h, true);
+		moveTo(output, xMin, yMax, true);
+		moveTo(output, xMin, yMax, false);
+		moveTo(output, xMax, yMax, false);
+		moveTo(output, xMax, yMin + h, false);
+		moveTo(output, xMax, yMin + h, true);
 		// bottom right gap for exit is here
-		moveTo(output, xmax, ymin, true);
-		moveTo(output, xmax, ymin, false);
-		moveTo(output, xmin, ymin, false);
+		moveTo(output, xMax, yMin, true);
+		moveTo(output, xMax, yMin, false);
+		moveTo(output, xMin, yMin, false);
 		// top-left gap for entrance is left here
-		moveTo(output, xmin, ymax - h, false);
-		moveTo(output, xmin, ymax - h, true);
+		moveTo(output, xMin, yMax - h, false);
+		moveTo(output, xMin, yMax - h, true);
 
 		int i;
 		for (i = 0; i < walls.length; ++i) {
@@ -197,9 +197,9 @@ public class Generator_Maze extends ImageGenerator {
 			int by = cells[b].y;
 			if (ay == by) {
 				// vertical wall
-				float x = xmin + (ax + 1) * w;
-				float y0 = ymin + (ay + 0) * h;
-				float y1 = ymin + (ay + 1) * h;
+				float x = xMin + (ax + 1) * w;
+				float y0 = yMin + (ay + 0) * h;
+				float y1 = yMin + (ay + 1) * h;
 				
 				moveTo(output, x, y0, true);
 				moveTo(output, x, y0, false);
@@ -207,9 +207,9 @@ public class Generator_Maze extends ImageGenerator {
 				moveTo(output, x, y1, true);
 			} else if (ax == bx) {
 				// horizontal wall
-				float x0 = xmin + (ax + 0) * w;
-				float x1 = xmin + (ax + 1) * w;
-				float y = ymin + (ay + 1) * h;
+				float x0 = xMin + (ax + 0) * w;
+				float x1 = xMin + (ax + 1) * w;
+				float y = yMin + (ay + 1) * h;
 				moveTo(output, x0, y, true);
 				moveTo(output, x0, y, false);
 				moveTo(output, x1, y, false);
