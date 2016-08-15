@@ -5,31 +5,13 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
-import org.apache.commons.io.IOUtils;
-
-public class DialogAbout {
-
-	/**
-	 * @return byte array containing data for image icon.
-	 */
-	private ImageIcon getImageIcon(String iconResourceName) {
-		ImageIcon icon = null;
-		try {
-			final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
-			icon = new ImageIcon(imageData);
-		} catch (NullPointerException | IOException e) {
-			Log.error("Error getting image icon: " + e);
-		}
-		return icon;
-	}
-
+public class DialogBadFirmwareVersion {
 	/**
 	 * <p>
 	 * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
@@ -44,19 +26,9 @@ public class DialogAbout {
 	 *
 	 * @return An HTML string used for the About Message Dialog.
 	 */
-	private String getAboutHtmlFromMultilingualString() {
-		String version = Makelangelo.VERSION;
-		final String aboutHtmlBeforeVersionNumber = Translator.get("AboutHTMLBeforeVersionNumber");
-		final String aboutHmlAfterVersionNumber = Translator.get("AboutHTMLAfterVersionNumber");
-		final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
-		final int versionNumberStringLength = version.length();
-		final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
-		final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
-		final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
-		aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
-		aboutHtmlStringBuilder.append(version);
-		aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
-		return aboutHtmlStringBuilder.toString();
+	private String getAboutHtmlFromMultilingualString(String version) {
+		String message = Translator.get("firmwareVersionBadMessage");
+		return message.replace("%VERSION%", version);
 	}
 
 	/**
@@ -92,14 +64,9 @@ public class DialogAbout {
 	/**
 	 * Display the about dialog.
 	 */
-	public void display(Component parent) {
-		final String aboutHtml = getAboutHtmlFromMultilingualString();
+	public void display(Component parent,String version) {
+		final String aboutHtml = getAboutHtmlFromMultilingualString(version);
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
-		ImageIcon icon = getImageIcon("logo.png");
-		final String menuAboutValue = Translator.get("MenuAbout");
-		if (icon == null) {
-			icon = getImageIcon("resources/logo.png");
-		}
-		JOptionPane.showMessageDialog(parent, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
+		JOptionPane.showMessageDialog(parent, bottomText, Translator.get("firmwareVersionBadTitle"), JOptionPane.ERROR_MESSAGE);
 	}
 }

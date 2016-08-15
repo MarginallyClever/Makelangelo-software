@@ -155,7 +155,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				firmwareVersionChecked=true;
 				justNow=true;
 			} else {
-				notifyFirmwareBad(versionFound);
+				notifyFirmwareVersionBad(versionFound);
 			}
 		}
 		
@@ -205,9 +205,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
-	private void notifyFirmwareBad(long versionFound) {
+	private void notifyFirmwareVersionBad(long versionFound) {
 		for (MakelangeloRobotListener listener : listeners) {
-			listener.firmwareBad(this,versionFound);
+			listener.firmwareVersionBad(this,versionFound);
 		}
 	}
 	

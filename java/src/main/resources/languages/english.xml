@@ -864,25 +864,12 @@ to check yourself.</value>
 		<hint>Manual driving dialog</hint>
 	</string>
 	
-
-	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
-		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
-		the about message dialog using the version string. This is why there is not
-		one big CDATA html blob. -->
 	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
+		<key>AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
-	</h1>
+        <h1>Makelangelo %VERSION%</h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
@@ -1058,8 +1045,9 @@ to check yourself.</value>
 	
 	<string>
 		<key>firmwareVersionBadMessage</key>
-		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is out of date.  A new version of this firmware is available.<br/>Please visit 
-		<a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a> to get the new version.</html></body>]]></value>
+		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect.<br>
+		  I found v%VERSION%.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>
+		   to get the latest firmware and  <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value>
 		<hint>Software is too new for firmware</hint>
 	</string>
 		

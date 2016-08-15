@@ -235,7 +235,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		if (subject == buttonExportMachinePreferences) exportPreferences();
 		if (subject == buttonImportMachinePreferences) importPreferences();
 		if (subject == buttonResetMachinePreferences) resetPreferences();
-		if (subject == buttonAbout) (new DialogAbout()).display(translator,Makelangelo.VERSION,this.mainFrame);
+		if (subject == buttonAbout) (new DialogAbout()).display(this.mainFrame);
 		if (subject == buttonCheckForUpdate) checkForUpdate();
 		if (subject == buttonExit) onClose();
 	}
@@ -555,8 +555,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	
 	@Override
-	public void firmwareBad(MakelangeloRobot r,long versionFound) {
-        JOptionPane.showMessageDialog(mainFrame, Translator.get("firmwareVersionBadMessage"), Translator.get("firmwareVersionBadTitle"), JOptionPane.ERROR_MESSAGE);
+	public void firmwareVersionBad(MakelangeloRobot r,long versionFound) {
+		(new DialogBadFirmwareVersion()).display(this.mainFrame,Long.toString(versionFound));
 	}
 	
 	@Override
