@@ -39,7 +39,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	// Firmware check
 	private final String versionCheck = new String("Firmware v");
-	private final long expectedFirmwareVersion = 5;
+	private final long expectedFirmwareVersion = 6;  // must match the version in the the firmware EEPROM
 	private boolean firmwareVersionChecked = false;
 
 	private DecimalFormat df;

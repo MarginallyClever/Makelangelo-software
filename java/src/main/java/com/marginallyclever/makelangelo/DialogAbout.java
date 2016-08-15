@@ -45,18 +45,8 @@ public class DialogAbout {
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString() {
-		String version = Makelangelo.VERSION;
-		final String aboutHtmlBeforeVersionNumber = Translator.get("AboutHTMLBeforeVersionNumber");
-		final String aboutHmlAfterVersionNumber = Translator.get("AboutHTMLAfterVersionNumber");
-		final int aboutHTMLBeforeVersionNumberLength = aboutHtmlBeforeVersionNumber.length();
-		final int versionNumberStringLength = version.length();
-		final int aboutHtmlAfterVersionNumberLength = aboutHmlAfterVersionNumber.length();
-		final int aboutHtmlStringBuilderCapacity = aboutHTMLBeforeVersionNumberLength + versionNumberStringLength + aboutHtmlAfterVersionNumberLength;
-		final StringBuilder aboutHtmlStringBuilder = new StringBuilder(aboutHtmlStringBuilderCapacity);
-		aboutHtmlStringBuilder.append(aboutHtmlBeforeVersionNumber);
-		aboutHtmlStringBuilder.append(version);
-		aboutHtmlStringBuilder.append(aboutHmlAfterVersionNumber);
-		return aboutHtmlStringBuilder.toString();
+		String aboutHTML = Translator.get("AboutHTML");
+		return aboutHTML.replace("%VERSION%",Makelangelo.VERSION);
 	}
 
 	/**
