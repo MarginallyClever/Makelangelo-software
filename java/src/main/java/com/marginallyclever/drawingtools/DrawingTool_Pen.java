@@ -169,6 +169,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	}
 	
 	
+	@Override
 	public void save() {
 		setDiameter(((Number)penDiameter.getValue()).floatValue());
 		feedRate = ((Number)penFeedRate.getValue()).floatValue();

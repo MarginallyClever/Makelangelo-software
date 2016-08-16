@@ -130,4 +130,8 @@ public abstract class DrawingTool {
 	public void writeOn(Writer out) throws IOException {
 		out.write(getPenDownString());
 	}
+	
+	public void save() {}
+	
+	public void cancel() {}
 }

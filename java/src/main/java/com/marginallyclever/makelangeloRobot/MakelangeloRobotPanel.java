@@ -629,7 +629,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void onConnect() {
 		updateMachineNumberPanel();
 		updateButtonAccess();
-		disengageMotors();
+		engageMotors();
 	}
 	
 	public void updateButtonAccess() {
