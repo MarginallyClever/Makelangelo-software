@@ -16,11 +16,19 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Dragon extends ImageGenerator {
 	private Turtle turtle;
+<<<<<<< HEAD
 	private float xmax = 7;
 	private float xmin = -7;
 	private float ymax = 7;
 	private float ymin = -7;
 	private static int order = 12; // controls complexity of curve
+=======
+	private float xMax = 7;
+	private float xMin = -7;
+	private float yMax = 7;
+	private float yMin = -7;
+	private int order = 12; // controls complexity of curve
+>>>>>>> dev
 
 	private List<Integer> sequence;
 
@@ -63,10 +71,10 @@ public class Generator_Dragon extends ImageGenerator {
 		liftPen(out);
 		tool.writeChangeTo(out);
 
-		xmax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;
-		ymax = (float)(machine.getPaperHeight()/2.0f * machine.getPaperMargin()) * 10.0f;
-		xmin = -xmax;
-		ymin = -ymax;
+		xMax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;
+		yMax = (float)(machine.getPaperHeight()/2.0f * machine.getPaperMargin()) * 10.0f;
+		xMin = -xMax;
+		yMin = -yMax;
 
 		turtle = new Turtle();
 
@@ -74,11 +82,11 @@ public class Generator_Dragon extends ImageGenerator {
 		if(drawBoundingBox) {
 	      // Draw bounding box
 	      liftPen(out);
-	      moveTo(out, xmax, ymax, false);
-	      moveTo(out, xmax, ymin, false);
-	      moveTo(out, xmin, ymin, false);
-	      moveTo(out, xmin, ymax, false);
-	      moveTo(out, xmax, ymax, false);
+	      moveTo(out, xMax, yMax, false);
+	      moveTo(out, xMax, yMin, false);
+	      moveTo(out, xMin, yMin, false);
+	      moveTo(out, xMin, yMax, false);
+	      moveTo(out, xMax, yMax, false);
 	      liftPen(out);
 		}
 		
@@ -127,8 +135,8 @@ public class Generator_Dragon extends ImageGenerator {
 
         float dx = maxX - minX;
         float dy = maxY - minY;
-		float xx = xmax - xmin;
-		float yy = ymax - ymin;
+		float xx = xMax - xMin;
+		float yy = yMax - yMin;
 		
 		float largestX = xx/dx;
 		float largestY = yy/dy;

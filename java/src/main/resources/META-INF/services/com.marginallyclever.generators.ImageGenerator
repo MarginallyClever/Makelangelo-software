@@ -4,4 +4,5 @@ com.marginallyclever.generators.Generator_KochCurve
 com.marginallyclever.generators.Generator_LimitTest
 com.marginallyclever.generators.Generator_LSystemTree
 com.marginallyclever.generators.Generator_Maze
+com.marginallyclever.generators.Generator_FibonacciSpiral
 com.marginallyclever.generators.Generator_Text

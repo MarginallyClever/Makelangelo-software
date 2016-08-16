@@ -94,6 +94,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
+	private boolean isConnected;  // has pressed connect button
+	
 	public StatusBar statusBar;
 	
 	
@@ -187,6 +189,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	protected void closeConnection() {
 		robot.setConnection(null);
 		buttonConnect.setText(Translator.get("ButtonConnect"));
+		isConnected=false;
 	}
 	
 	protected void openConnection() {
@@ -230,6 +233,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			updateButtonAccess();
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 		}
+		isConnected=true;
 	}
 	
 
@@ -481,7 +485,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Object subject = e.getSource();
 
 		if( subject == buttonConnect ) {
-			if(robot.isPortConfirmed()) {
+			if(isConnected) {
 				closeConnection();
 			} else {
 				openConnection();
@@ -625,7 +629,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void onConnect() {
 		updateMachineNumberPanel();
 		updateButtonAccess();
-		disengageMotors();
+		engageMotors();
 	}
 	
 	public void updateButtonAccess() {
