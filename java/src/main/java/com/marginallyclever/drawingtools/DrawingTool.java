@@ -132,9 +132,6 @@ public abstract class DrawingTool {
 	}
 	
 	public void save() {}
-<<<<<<< HEAD
-=======
 	
 	public void cancel() {}
->>>>>>> dev
 }
