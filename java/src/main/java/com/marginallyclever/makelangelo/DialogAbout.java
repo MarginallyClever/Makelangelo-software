@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
@@ -64,7 +65,8 @@ public class DialogAbout {
 				if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 					if (Desktop.isDesktopSupported()) {
 						try {
-							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
+							URI u = hyperlinkEvent.getURL().toURI();
+							Desktop.getDesktop().browse(u);
 						} catch (IOException | URISyntaxException exception) {
 							// Auto-generated catch block
 							exception.printStackTrace();

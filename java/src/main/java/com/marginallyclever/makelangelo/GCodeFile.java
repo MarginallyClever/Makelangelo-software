@@ -199,7 +199,7 @@ public class GCodeFile {
 		// processing time for each instruction
 		estimatedTime += estimateCount * 0.007617845117845f;
 		// conversion to ms?
-		estimatedTime *= 10000;
+		estimatedTime *= 10000 * 2;
 	}
 
 
