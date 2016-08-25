@@ -45,7 +45,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		zOn = 90;
 		zOff = 50;
 		toolNumber = 0;
-		feedRate = 3500;
+		feedRateXY = 3500;
 		name = "Pen";
 	}
 
@@ -57,7 +57,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		zOn = 90;
 		zOff = 50;
 		toolNumber = tool_id;
-		feedRate = 3500;
+		feedRateXY = 3500;
 		name = name2;
 	}
 
@@ -81,7 +81,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
 
 		penDiameter.setValue(getDiameter());
-		penFeedRate.setValue(feedRate);
+		penFeedRate.setValue(feedRateXY);
 		penUp.setValue(zOff);
 		penDown.setValue(zOn);
 		penZRate.setValue(zRate);
@@ -172,10 +172,9 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	@Override
 	public void save() {
 		setDiameter(((Number)penDiameter.getValue()).floatValue());
-		feedRate = ((Number)penFeedRate.getValue()).floatValue();
+		feedRateXY = ((Number)penFeedRate.getValue()).floatValue();
 		zRate = ((Number)penZRate.getValue()).floatValue();
 		zOff = ((Number)penUp.getValue()).floatValue();
 		zOn = ((Number)penDown.getValue()).floatValue();
-		robot.getSettings().saveConfig();
 	}
 }

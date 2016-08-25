@@ -199,7 +199,7 @@ public class GCodeFile {
 		// processing time for each instruction
 		estimatedTime += estimateCount * 0.007617845117845f;
 		// conversion to ms?
-		estimatedTime *= 10000;
+		estimatedTime *= 10000 * 2;
 	}
 
 
@@ -383,8 +383,8 @@ public class GCodeFile {
 						gl2.glColor3f(1, 0, 0);
 						//g2d.setColor(Color.RED);
 						if(n.type==GCodeNodeType.POS) {
-							robot.gondolaX=(float)n.x1;
-							robot.gondolaY=(float)n.y1;
+							robot.gondolaX=(float)n.x1*10;
+							robot.gondolaY=(float)n.y1*10;
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						gl2.glColor3f(0, 1, 0);

@@ -40,34 +40,50 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	private JFormattedTextField pw, ph;
 	private JCheckBox isLandscape;
 	private boolean beingModified;
-	private String commonPaperSizes [] = {
-		"---",
-		"4A0 (1682 x 2378)",
-		"2A0 (1189 x 1682)",
-		"A0 (841 x 1189)",
-		"A1 (594 x 841)",
-		"A2 (420 x 594)",
-		"A3 (297 x 420)",
-		"A4 (210 x 297)",
-		"A5 (148 x 210)",
-		"A6 (105 x 148)",
-		"A7 (74 x 105)",
-		"US Half Letter (140 x 216)",
-		"US Letter (216 x 279)",
-		"US Legal (216 x 356)",
-		"US Junior Legal (127 x 203)",
-		"US Ledger / Tabloid (279 x 432)",
-		"ANSI A (216 x 279)",
-		"ANSI B (279 x 432)",
-		"ANSI C (432 x 559)",
-		"ANSI D (559 x 864)",
-		"ANSI E (864 x 1118)",
-		"Arch A (229 x 305)",
-		"Arch B (305 x 457)",
-		"Arch C (457 x 610)",
-		"Arch D (610 x 914)",
-		"Arch E (914 x 1219)",
-		"Arch E1 (762 x 1067)",
+	
+	class PaperSize {
+		public String name;
+		public int width;
+		public int height;
+		
+		PaperSize(String name,int width,int height) {
+			this.name = name;
+			this.width = width;
+			this.height = height;
+		}
+		
+		public String toDescription() {
+			return name+" ("+width+" x "+height+")";
+		}
+	}
+	
+	private PaperSize commonPaperSizes [] = {
+		new PaperSize("4A0",1682,2378),
+		new PaperSize("2A0",1189,1682),
+		new PaperSize("A0",841,1189),
+		new PaperSize("A1",594,841),
+		new PaperSize("A2",420,594),
+		new PaperSize("A3",297,420),
+		new PaperSize("A4",210,297),
+		new PaperSize("A5",148,210),
+		new PaperSize("A6",105,148),
+		new PaperSize("A7",74,105),
+		new PaperSize("US Half Letter",140,216),
+		new PaperSize("US Letter",216,279),
+		new PaperSize("US Legal",216,356),
+		new PaperSize("US Junior Legal",127,203),
+		new PaperSize("US Ledger / Tabloid",279,432),
+		new PaperSize("ANSI A",216,279),
+		new PaperSize("ANSI B",279,432),
+		new PaperSize("ANSI C",432,559),
+		new PaperSize("ANSI D",559,864),
+		new PaperSize("ANSI E",864,1118),
+		new PaperSize("Arch A",229,305),
+		new PaperSize("Arch B",305,457),
+		new PaperSize("Arch C",457,610),
+		new PaperSize("Arch D",610,914),
+		new PaperSize("Arch E",914,1219),
+		new PaperSize("Arch E1",762,1067)
 		};
 
 	private JSlider paperMargin;
@@ -93,7 +109,14 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		c.ipady=2;
 
 		// common paper sizes
-		paperSizes = new JComboBox<>(commonPaperSizes);
+		String[] commonPaperNames = new String[commonPaperSizes.length+1];
+		commonPaperNames[0]="---";
+		int i;
+		for(i=0;i<commonPaperSizes.length;++i) {
+			commonPaperNames[i+1] = new String(commonPaperSizes[i].toDescription());
+		}
+		
+		paperSizes = new JComboBox<>(commonPaperNames);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
 		d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
 		y++;
@@ -157,16 +180,13 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	 * @return
 	 */
 	public int getCurrentPaperSizeChoice(double pw,double ph) {
-		if( pw == 1682 && ph == 2378 ) return 1;
-		if( pw == 1189 && ph == 1682 ) return 2;
-		if( pw == 841 && ph == 1189 ) return 3;
-		if( pw == 594 && ph == 841 ) return 4;
-		if( pw == 420 && ph == 594 ) return 5;
-		if( pw == 297 && ph == 420 ) return 6;
-		if( pw == 210 && ph == 297 ) return 7;
-		if( pw == 148 && ph == 210 ) return 8;
-		if( pw == 105 && ph == 148 ) return 9;
-		if( pw == 74 && ph == 105 ) return 10;
+		int i;
+		for(i=0;i<commonPaperSizes.length;++i) {
+			if(pw == commonPaperSizes[i].width && 
+				ph == commonPaperSizes[i].height)
+				return i+1;
+				
+		}
 
 		return 0;
 	}

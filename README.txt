@@ -19,7 +19,7 @@ For developers, please see https://github.com/MarginallyClever/Makelangelo/wiki/
 ## Get help ##
 
 Please visit the forums
-https://marginallyclever.com/forum
+https://marginallyclever.com/forums
 
 ## Show support ##
 
