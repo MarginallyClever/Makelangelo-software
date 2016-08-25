@@ -140,7 +140,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.getSettings().addListener(this);
 		
 		myTransferHandler = new MakelangeloTransferHandler(robot);
-		
 		connectionManager = new SerialConnectionManager(prefs);
 		
 		createAndShowGUI();
@@ -149,6 +148,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		
 		loadGraphicsSettings();
 	}
+	
 	
 	// load settings and apply them.
 	protected void loadGraphicsSettings() {

@@ -110,11 +110,11 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 
 		// common paper sizes
 		String[] commonPaperNames = new String[commonPaperSizes.length+1];
+		commonPaperNames[0]="---";
 		int i;
 		for(i=0;i<commonPaperSizes.length;++i) {
 			commonPaperNames[i+1] = new String(commonPaperSizes[i].toDescription());
 		}
-		commonPaperNames[0]="---";
 		
 		paperSizes = new JComboBox<>(commonPaperNames);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
