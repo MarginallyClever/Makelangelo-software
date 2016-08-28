@@ -18,7 +18,7 @@ public abstract class DrawingTool {
 	DecimalFormat df;
 
 	// used while drawing to the GUI
-	protected float feedRate;
+	protected float feedRateXY;
 	protected String name;
 	protected MakelangeloRobot robot;
 	// Every tool must have a unique number.
@@ -50,7 +50,7 @@ public abstract class DrawingTool {
 	}
 
 	public float getFeedRate() {
-		return feedRate;
+		return feedRateXY;
 	}
 
 	public String getName() {
@@ -82,7 +82,7 @@ public abstract class DrawingTool {
 		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
 		// tool_number =
 		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRate)));
+		feedRateXY = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateXY)));
 	}
 
 	public void saveConfig(Preferences prefs) {
@@ -92,7 +92,7 @@ public abstract class DrawingTool {
 		prefs.put("z_on", Float.toString(zOn));
 		prefs.put("z_off", Float.toString(zOff));
 		prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Float.toString(feedRate));
+		prefs.put("feed_rate", Float.toString(feedRateXY));
 	}
 
 	public void setDiameter(float d) {
@@ -109,12 +109,12 @@ public abstract class DrawingTool {
 
 	public void writeChangeTo(Writer out) throws IOException {
 		out.write("M06 T" + toolNumber + ";\n");
-		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
+		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(robot.getSettings().getAcceleration()) + ";\n");
 	}
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		out.write("M06 T" + toolNumber + "; //"+name+"\n");
-		out.write("G00 F" + getFeedRate() + " A" + robot.getSettings().getAcceleration() + ";\n");
+		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(robot.getSettings().getAcceleration()) + ";\n");
 	}
 
 	public void writeMoveTo(Writer out, double x, double y) throws IOException {
@@ -123,12 +123,16 @@ public abstract class DrawingTool {
 
 	// lift the pen
 	public void writeOff(Writer out) throws IOException {
+		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenUpString());
+		out.write("G00 F" + df.format(getFeedRate()) + ";\n");
 	}
 
 	// lower the pen
 	public void writeOn(Writer out) throws IOException {
+		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenDownString());
+		out.write("G00 F" + df.format(getFeedRate()) + ";\n");
 	}
 	
 	public void save() {}

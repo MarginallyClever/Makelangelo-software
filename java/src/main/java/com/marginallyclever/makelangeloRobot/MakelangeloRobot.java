@@ -577,10 +577,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
 	
-	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY*10);	}
-	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY*10);	}
-	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX*10,(float)settings.getPaperTop()   *10);  }
-	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX*10,(float)settings.getPaperBottom()*10);  }
+	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
+	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
+	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX,(float)settings.getPaperTop()   *10);  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX,(float)settings.getPaperBottom()*10);  }
 	
 	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }

@@ -3,6 +3,7 @@ com.marginallyclever.converters.Converter_Boxes
 # com.marginallyclever.converters.Converter_ColorFloodFill
 com.marginallyclever.converters.Converter_Crosshatch
 com.marginallyclever.converters.Converter_Multipass
+# com.marginallyclever.converters.Converter_MagicCircle
 com.marginallyclever.converters.Converter_Pulse
 com.marginallyclever.converters.Converter_Sandy
 com.marginallyclever.converters.Converter_Scanline

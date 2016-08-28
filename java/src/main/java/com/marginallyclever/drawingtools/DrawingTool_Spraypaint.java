@@ -45,7 +45,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 		zOff = 90;
 		toolNumber = 2;
 		name = "Spray paint";
-		feedRate = 3000;
+		feedRateXY = 3000;
 		overlap = 0.3f;
 
 		oldX = 0;
@@ -79,14 +79,14 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 			for (d = r; d < len - r; d += step) {
 				px = oldX + dx * d / len;
 				py = oldY + dy * d / len;
-				out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
+				out.write("G00 X" + px + " Y" + py + " F" + feedRateXY + ";\n");
 				super.writeOn(out);
 				super.writeOff(out);
 			}
 			d = len - r;
 			px = oldX + dx * d / len;
 			py = oldY + dy * d / len;
-			out.write("G00 X" + px + " Y" + py + " F" + feedRate + ";\n");
+			out.write("G00 X" + px + " Y" + py + " F" + feedRateXY + ";\n");
 			super.writeOn(out);
 			super.writeOff(out);
 		}
@@ -98,7 +98,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 		panel = new JPanel(new GridBagLayout());
 
 		spraypaintDiameter = new JTextField(Float.toString(diameter), 5);
-		spraypaintFeedRate = new JTextField(Float.toString(feedRate), 5);
+		spraypaintFeedRate = new JTextField(Float.toString(feedRateXY), 5);
 
 		spraypaintUp = new JTextField(Float.toString(zOff), 5);
 		spraypaintDown = new JTextField(Float.toString(zOn), 5);
@@ -199,7 +199,7 @@ public class DrawingTool_Spraypaint extends DrawingTool implements ActionListene
 
 	public void save() {
 		diameter = Float.valueOf(spraypaintDiameter.getText());
-		feedRate = Float.valueOf(spraypaintFeedRate.getText());
+		feedRateXY = Float.valueOf(spraypaintFeedRate.getText());
 		zOff = Float.valueOf(spraypaintUp.getText());
 		zOn = Float.valueOf(spraypaintDown.getText());
 		zRate = Float.valueOf(spraypaintZRate.getText());
