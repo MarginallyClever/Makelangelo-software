@@ -85,4 +85,14 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		Log.message("done.");
 		return true;
 	}
+
+	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return true;
+	}
 }

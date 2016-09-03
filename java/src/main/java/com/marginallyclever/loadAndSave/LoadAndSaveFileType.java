@@ -20,6 +20,16 @@ public interface LoadAndSaveFileType {
 	public FileNameExtensionFilter getFileNameFilter();
 
 	/**
+	 * @return true if this plugin can load data from a stream.
+	 */
+	public boolean canLoad();
+	
+	/**
+	 * @return true if this plugin can save data to a stream.
+	 */
+	public boolean canSave();
+	
+	/**
 	 * Checks a string's filename, which includes the file extension, (e.g. foo.jpg).
 	 *
 	 * @param filename absolute path of file to load.

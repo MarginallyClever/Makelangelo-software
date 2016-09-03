@@ -67,8 +67,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean canSave(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".dxf"));
+		return false;
 	}
 
 	@Override
@@ -493,29 +492,16 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		Log.message("saving...");
-		GCodeFile sourceMaterial = robot.gCode;
-		sourceMaterial.setLinesProcessed(0);
-		
-		DXFDocument doc = new DXFDocument();
+		return false;
+	}
 
-		OutputStreamWriter out = new OutputStreamWriter(outputStream);
-		try {
-			int total=sourceMaterial.getLinesTotal();
-			Log.message(total+" total lines to save.");
-			for(int i=0;i<total;++i) {
-				String str = sourceMaterial.nextLine();
-				if(!str.endsWith(";")) str+=";";
-				if(!str.endsWith("\n")) str+="\n";
-				out.write(str);
-			}
-		}
-		catch(IOException e) {
-			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
-			return false;
-		}
-		
-		Log.message("done.");
+	@Override
+	public boolean canLoad() {
 		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
 	}
 }

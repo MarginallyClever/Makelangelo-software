@@ -260,4 +260,14 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
 		return false;
 	}
+
+	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
+	}
 }

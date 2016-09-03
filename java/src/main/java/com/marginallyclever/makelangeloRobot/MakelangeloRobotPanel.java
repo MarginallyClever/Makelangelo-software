@@ -714,8 +714,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
 			LoadAndSaveFileType lft = i.next();
-			FileFilter filter = lft.getFileNameFilter();
-			fc.addChoosableFileFilter(filter);
+			if(lft.canLoad()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
 		}
 		// no wild card filter, please.
 		fc.setAcceptAllFileFilterUsed(false);
@@ -822,8 +824,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
 		while(i.hasNext()) {
 			LoadAndSaveFileType lft = i.next();
-			FileFilter filter = lft.getFileNameFilter();
-			fc.addChoosableFileFilter(filter);
+			if(lft.canLoad()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
 		}
 		// do not allow wild card (*.*) file extensions
 		fc.setAcceptAllFileFilterUsed(false);
@@ -836,18 +840,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
-				if(lft.canSave(selectedFile)) {
-					boolean success = false;
-					try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-						success=lft.save(fileOutputStream,robot);
-					} catch(IOException e) {
-						e.printStackTrace();
-					}
-					if(success==true) {
-						lastFileOut = selectedFile;
-						updateButtonAccess();
-						break;
-					}
+				if(!lft.canSave()) continue;
+				if(!lft.canSave(selectedFile)) continue;
+				
+				boolean success = false;
+				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
+					success=lft.save(fileOutputStream,robot);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
+				if(success==true) {
+					lastFileOut = selectedFile;
+					updateButtonAccess();
+					break;
 				}					
 			}
 		}
@@ -868,17 +873,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
 			LoadAndSaveFileType lft = i.next();
-			if(lft.canLoad(filename)) {
-				attempted=true;
-				try (final InputStream fileInputStream = new FileInputStream(filename)) {
-					success=lft.load(fileInputStream,robot);
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-				if(success==true) {
-					break;
-				}
+			if(!lft.canLoad()) continue;
+			if(!lft.canLoad(filename)) continue;
+			
+			attempted=true;
+			try (final InputStream fileInputStream = new FileInputStream(filename)) {
+				success=lft.load(fileInputStream,robot);
+			} catch(IOException e) {
+				e.printStackTrace();
 			}
+			if(success==true) break;
 		}
 		
 		if(attempted == false) {
