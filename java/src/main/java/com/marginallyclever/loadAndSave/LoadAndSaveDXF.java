@@ -1,10 +1,11 @@
-package com.marginallyclever.loaders;
+package com.marginallyclever.loadAndSave;
 
 import java.awt.GridLayout;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,7 @@ import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -44,7 +46,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
-public class LoadDXF extends ImageManipulator implements LoadFileType {
+public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
 	static boolean shouldScaleOnLoad=true;
 	static boolean shouldInfillOnLoad=true;
 	static boolean shouldOptimizePathingOnLoad=false;
@@ -59,6 +61,12 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 
 	@Override
 	public boolean canLoad(String filename) {
+		String ext = filename.substring(filename.lastIndexOf('.'));
+		return (ext.equalsIgnoreCase(".dxf"));
+	}
+
+	@Override
+	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
@@ -314,7 +322,7 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 			out.close();
 
 			Log.message("Done!");
-			LoadGCode loader = new LoadGCode();
+			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			InputStream fileInputStream = new FileInputStream(destinationFile);
 			loader.load(fileInputStream,robot);
 		} catch (IOException e) {
@@ -483,4 +491,31 @@ public class LoadDXF extends ImageManipulator implements LoadFileType {
 		moveTo(out, (float) x2, (float) y2, false);
 	}
 
+	@Override
+	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
+		Log.message("saving...");
+		GCodeFile sourceMaterial = robot.gCode;
+		sourceMaterial.setLinesProcessed(0);
+		
+		DXFDocument doc = new DXFDocument();
+
+		OutputStreamWriter out = new OutputStreamWriter(outputStream);
+		try {
+			int total=sourceMaterial.getLinesTotal();
+			Log.message(total+" total lines to save.");
+			for(int i=0;i<total;++i) {
+				String str = sourceMaterial.nextLine();
+				if(!str.endsWith(";")) str+=";";
+				if(!str.endsWith("\n")) str+="\n";
+				out.write(str);
+			}
+		}
+		catch(IOException e) {
+			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
+			return false;
+		}
+		
+		Log.message("done.");
+		return true;
+	}
 }

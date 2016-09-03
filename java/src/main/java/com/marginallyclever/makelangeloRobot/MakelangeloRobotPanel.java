@@ -36,19 +36,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.generators.ImageGenerator;
-import com.marginallyclever.loaders.LoadFileType;
-import com.marginallyclever.loaders.LoadGCode;
+import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.basictypes.CollapsiblePanel;
-import com.marginallyclever.savers.SaveFileType;
 
 /**
  * Control panel for a Makelangelo robot
@@ -141,8 +139,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 
-	protected List<SaveFileType> loadFileSavers() {
-		return new ArrayList<SaveFileType>();
+	protected List<LoadAndSaveFileType> loadFileSavers() {
+		return new ArrayList<LoadAndSaveFileType>();
 	}
 
 
@@ -227,11 +225,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
         
 		int result = JOptionPane.showConfirmDialog(this.getRootPane(), connectionList, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
+			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
 			robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
-			updateMachineNumberPanel();
-			updateButtonAccess();
-			buttonConnect.setText(Translator.get("ButtonDisconnect"));
+			//updateMachineNumberPanel();
+			//updateButtonAccess();
 		}
 		isConnected=true;
 	}
@@ -497,7 +495,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			m.run();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) openFileDialog();
+		else if (subject == buttonOpenFile) loadFileDialog();
 		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
@@ -702,7 +700,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * Creates a file open dialog. If you don't cancel it opens that file.
 	 * Note: source for ExampleFileFilter can be found in FileChooserDemo, under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 	 */
-	public void openFileDialog() {
+	public void loadFileDialog() {
 		// Is you machine not yet calibrated?
 		if (robot.getSettings().isPaperConfigured() == false) {
 			// Hey!  Come back after you calibrate! 
@@ -710,15 +708,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			return;
 		}
 
+		// list available loaders
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
-		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
-		Iterator<LoadFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadFileType lft = i.next();
+			LoadAndSaveFileType lft = i.next();
 			FileFilter filter = lft.getFileNameFilter();
 			fc.addChoosableFileFilter(filter);
 		}
-
+		// no wild card filter, please.
+		fc.setAcceptAllFileFilterUsed(false);
+		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			if(openFileOnDemand(selectedFile)) {
@@ -802,7 +803,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			}
 			robot.setDecorator(null);
 
-			LoadGCode loader = new LoadGCode();
+			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
 				loader.load(fileInputStream,robot);
 			} catch(IOException e) {
@@ -815,26 +816,39 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	public void saveFileDialog() {
-		// Note: source for ExampleFileFilter can be found in FileChooserDemo,
-		// under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = lastFileOut;
-
-		FileFilter filterGCODE = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
-
-		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterGCODE);
+		// list all the known savable file types.
+		JFileChooser fc = new JFileChooser(new File(lastFileOut));
+		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
+		while(i.hasNext()) {
+			LoadAndSaveFileType lft = i.next();
+			FileFilter filter = lft.getFileNameFilter();
+			fc.addChoosableFileFilter(filter);
+		}
+		// do not allow wild card (*.*) file extensions
+		fc.setAcceptAllFileFilterUsed(false);
+		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-
-			if (!selectedFile.toLowerCase().endsWith(".ngc")) {
-				selectedFile += ".ngc";
-			}
-
-			try {
-				robot.gCode.save(selectedFile);
-			} catch (IOException e) {
-				Log.error(Translator.get("Failed") + e.getMessage());
-				return;
+			
+			// figure out which of the savers was requested.
+			// TODO get rid of this stupid guessing game.
+			i = imageSavers.iterator();
+			while(i.hasNext()) {
+				LoadAndSaveFileType lft = i.next();
+				if(lft.canSave(selectedFile)) {
+					boolean success = false;
+					try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
+						success=lft.save(fileOutputStream,robot);
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
+					if(success==true) {
+						lastFileOut = selectedFile;
+						updateButtonAccess();
+						break;
+					}
+				}					
 			}
 		}
 	}
@@ -850,10 +864,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		boolean success=false;
 		boolean attempted=false;
 
-		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
-		Iterator<LoadFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadFileType lft = i.next();
+			LoadAndSaveFileType lft = i.next();
 			if(lft.canLoad(filename)) {
 				attempted=true;
 				try (final InputStream fileInputStream = new FileInputStream(filename)) {

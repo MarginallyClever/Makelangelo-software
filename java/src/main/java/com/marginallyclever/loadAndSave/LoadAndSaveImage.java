@@ -1,4 +1,4 @@
-package com.marginallyclever.loaders;
+package com.marginallyclever.loadAndSave;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,7 +42,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
-public class LoadImage extends ImageManipulator implements LoadFileType {
+public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFileType {
 	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
@@ -211,7 +211,7 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 			@Override
 			public void done() {
 				pm.close();
-				LoadGCode loader = new LoadGCode();
+				LoadAndSaveGCode loader = new LoadAndSaveGCode();
 				try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
 					loader.load(fileInputStream,robot);
 				} catch(IOException e) {
@@ -251,5 +251,13 @@ public class LoadImage extends ImageManipulator implements LoadFileType {
 
 	private int getPreferredDrawStyle() {
 		return prefs.getInt("Draw Style", 0);
+	}
+	
+	public boolean canSave(String filename) {
+		return false;
+	}
+	
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+		return false;
 	}
 }

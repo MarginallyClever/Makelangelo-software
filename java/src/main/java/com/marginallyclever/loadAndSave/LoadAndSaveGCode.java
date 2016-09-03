@@ -1,7 +1,9 @@
-package com.marginallyclever.loaders;
+package com.marginallyclever.loadAndSave;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -15,7 +17,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public class LoadGCode implements LoadFileType {
+public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -24,6 +26,12 @@ public class LoadGCode implements LoadFileType {
 
 	@Override
 	public boolean canLoad(String filename) {
+		String ext = filename.substring(filename.lastIndexOf('.'));
+		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
+	}
+
+	@Override
+	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
@@ -40,7 +48,7 @@ public class LoadGCode implements LoadFileType {
 			file = new GCodeFile(in,robot.getSettings().isReverseForGlass());
 			
 		} catch (IOException e) {
-			Log.error(Translator.get("FileNotOpened") + e.getLocalizedMessage());
+			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
 			return false;
 		}
 
@@ -49,6 +57,32 @@ public class LoadGCode implements LoadFileType {
 				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
 
 		robot.setGCode(file);
+		return true;
+	}
+
+	@Override
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+		Log.message("saving...");
+		GCodeFile sourceMaterial = robot.gCode;
+		sourceMaterial.setLinesProcessed(0);
+		
+		OutputStreamWriter out = new OutputStreamWriter(outputStream);
+		try {
+			int total=sourceMaterial.getLinesTotal();
+			Log.message(total+" total lines to save.");
+			for(int i=0;i<total;++i) {
+				String str = sourceMaterial.nextLine();
+				if(!str.endsWith(";")) str+=";";
+				if(!str.endsWith("\n")) str+="\n";
+				out.write(str);
+			}
+		}
+		catch(IOException e) {
+			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
+			return false;
+		}
+		
+		Log.message("done.");
 		return true;
 	}
 }
