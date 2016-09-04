@@ -540,6 +540,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	
+	public void findHome() {
+		sendLineToRobot("G28");
+		gondolaX=(float)settings.getHomeX();
+		gondolaY=(float)settings.getHomeY();
+	}
+
+	
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position

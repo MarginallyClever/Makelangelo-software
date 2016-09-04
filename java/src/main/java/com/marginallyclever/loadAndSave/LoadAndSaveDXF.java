@@ -36,7 +36,6 @@ import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;

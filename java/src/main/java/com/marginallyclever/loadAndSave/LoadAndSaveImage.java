@@ -36,6 +36,7 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 
@@ -214,6 +215,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				LoadAndSaveGCode loader = new LoadAndSaveGCode();
 				try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
 					loader.load(fileInputStream,robot);
+					MakelangeloRobotPanel panel = robot.getControlPanel();
+					if(panel!=null) panel.updateButtonAccess();
 				} catch(IOException e) {
 					e.printStackTrace();
 				}

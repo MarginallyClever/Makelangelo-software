@@ -84,8 +84,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// driving controls
 	private JButton down100,down10,down1,up1,up10,up100;
 	private JButton left100,left10,left1,right1,right10,right100;
-	private JButton goHome,setHome;
-	private JButton goTop,goBottom,goLeft,goRight,penUp,penDown;
+	private JButton goHome,findHome,setHome;
+	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
 	private JFormattedTextField feedRate;
@@ -396,32 +396,31 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			con1.fill=GridBagConstraints.HORIZONTAL;
 			con1.anchor=GridBagConstraints.NORTH;
 	
-			goTop    = new JButton(Translator.get("Top"));			goTop   .setPreferredSize(new Dimension(80,20));
-			goBottom = new JButton(Translator.get("Bottom"));		goBottom.setPreferredSize(new Dimension(80,20));
-			goLeft   = new JButton(Translator.get("Left"));			goLeft  .setPreferredSize(new Dimension(80,20));
-			goRight  = new JButton(Translator.get("Right"));		goRight .setPreferredSize(new Dimension(80,20));
+			goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
+			goPaperBorder.setPreferredSize(new Dimension(80,20));
+			
 			penUp    = new JButton(Translator.get("PenUp"));		penUp   .setPreferredSize(new Dimension(100,20));
 			penDown  = new JButton(Translator.get("PenDown"));		penDown .setPreferredSize(new Dimension(100,20));
 			goHome   = new JButton(Translator.get("GoHome"));		goHome  .setPreferredSize(new Dimension(100,20));
+			findHome = new JButton(Translator.get("FindHome"));		findHome.setPreferredSize(new Dimension(100,20));
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor=GridBagConstraints.WEST;
 			c.fill=GridBagConstraints.BOTH;
-			c.gridx=2;  c.gridy=0;  quickDriveOptions.add(goTop,c);
-			c.gridx=2;  c.gridy=1;  quickDriveOptions.add(goHome,c);
-			c.gridx=2;  c.gridy=2;  quickDriveOptions.add(goBottom,c);
-			c.gridx=1;  c.gridy=1;  quickDriveOptions.add(goLeft,c);
-			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(goRight,c);
+			
+			c.gridx=0;  c.gridy=0;  quickDriveOptions.add(goPaperBorder,c);
+			
 			c.gridx=4;  c.gridy=0;  quickDriveOptions.add(penUp,c);
-			c.gridx=4;  c.gridy=2;  quickDriveOptions.add(penDown,c);
-	
-			goTop.addActionListener(this);
-			goBottom.addActionListener(this);
-			goLeft.addActionListener(this);
-			goRight.addActionListener(this);
+			c.gridx=4;  c.gridy=1;  quickDriveOptions.add(penDown,c);
+
+			c.gridx=3;  c.gridy=0;  quickDriveOptions.add(goHome,c);
+			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(findHome,c);
+			
+			goPaperBorder.addActionListener(this);
 			penUp.addActionListener(this);
 			penDown.addActionListener(this);
 			goHome.addActionListener(this);
+			findHome.addActionListener(this);
 	
 			con1.weightx=1;
 			con1.weighty=0;
@@ -521,14 +520,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		else if (subject == buttonHalt) robot.halt();		
 		else if (subject == goHome  ) robot.goHome();
+		else if (subject == findHome) robot.findHome();
 		else if (subject == setHome ) {
 			robot.setHome();
 			updateButtonAccess();
 		}
-		else if (subject == goLeft  ) robot.movePenToEdgeLeft();
-		else if (subject == goRight ) robot.movePenToEdgeRight();
-		else if (subject == goTop   ) robot.movePenToEdgeTop();
-		else if (subject == goBottom) robot.movePenToEdgeBottom();
+		else if (subject == goPaperBorder) {
+			robot.movePenToEdgeTop();
+			robot.movePenToEdgeRight();
+			robot.movePenToEdgeBottom();
+			robot.movePenToEdgeLeft();
+			robot.movePenToEdgeTop();
+			robot.goHome();
+		}
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
 		else if (subject == setFeedRate) {
@@ -675,25 +679,24 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right10.setEnabled(isConfirmed && !isRunning);
 		right100.setEnabled(isConfirmed && !isRunning);
 
-		goTop.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goBottom.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goLeft.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goRight.setEnabled(isConfirmed && !isRunning && hasSetHome);
-
+		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
 		setHome.setEnabled(isConfirmed && !isRunning);
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
-
+		findHome.setEnabled(isConfirmed && !isRunning);
+		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
+		
+		buttonSaveFile.setEnabled(robot!=null && robot.gCode != null && robot.gCode.isLoaded());
 		
 		this.validate();
 	}
 
 	public void newFile() {
 		robot.setGCode(null);
-		gui.updateMenuBar();
+		updateButtonAccess();
 	}
 
 	/**
@@ -726,7 +729,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			if(openFileOnDemand(selectedFile)) {
 				lastFileIn = selectedFile;
-				updateButtonAccess();
 			}
 		}
 	}
@@ -814,6 +816,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
+			updateButtonAccess();
 		}
 	}
 
@@ -894,7 +897,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			SoundSystem.playConversionFinishedSound();
 		}
 
-		gui.updateMenuBar();
+		updateButtonAccess();
 		statusBar.clear();
 		return success;
 	}
