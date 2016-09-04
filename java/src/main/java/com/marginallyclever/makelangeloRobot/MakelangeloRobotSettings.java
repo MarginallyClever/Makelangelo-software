@@ -63,6 +63,9 @@ public final class MakelangeloRobotSettings {
 	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
 	private boolean shouldSignName;
+	
+	private int hardwareVersion;
+	private MakelangeloVersionProperties hardwareProperties;
 
 	/**
 	 * top left, bottom center, etc...
@@ -144,6 +147,9 @@ public final class MakelangeloRobotSettings {
 		tools.add(new DrawingTool_Pen(robot));
 		currentToolIndex = 0;
 
+		// default hardware version is 2
+		setHardwareVersion(3);
+		
 		// which configurations are available?
 		try {
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
@@ -610,5 +616,23 @@ public final class MakelangeloRobotSettings {
 	
 	public boolean shouldSignName() {
 		return shouldSignName;
+	}
+
+	public int getHardwareVersion() {
+		return hardwareVersion;
+	}
+
+	public MakelangeloVersionProperties getHardwareProperties() {
+		return hardwareProperties;
+	}
+
+	public void setHardwareVersion(int hardwareVersion) {
+		this.hardwareVersion = hardwareVersion;
+		
+		switch(hardwareVersion) {
+		case 5:  hardwareProperties = new Makelangelo5Properties();  break; 
+		case 3:  hardwareProperties = new Makelangelo3Properties();  break; 
+		default:  hardwareProperties = new Makelangelo2Properties();  break; 
+		}
 	}
 }
