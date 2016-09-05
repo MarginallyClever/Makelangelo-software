@@ -24,7 +24,6 @@ import javax.swing.event.ChangeListener;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
 
 public class PanelAdjustPaper
 extends JPanel

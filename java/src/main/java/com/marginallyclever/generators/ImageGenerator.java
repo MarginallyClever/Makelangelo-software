@@ -6,7 +6,7 @@ import java.io.Writer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettings;
 
 /**
  * Generators create gcode from user input.  Fractals might be one example.

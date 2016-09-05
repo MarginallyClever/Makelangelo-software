@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangelo.settings;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * Properties of each Makelangelo version.  These are non-configurable features unique to each machine.

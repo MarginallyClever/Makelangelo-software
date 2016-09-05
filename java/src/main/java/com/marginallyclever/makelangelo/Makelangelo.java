@@ -50,11 +50,11 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettingsListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
 
 
 /**

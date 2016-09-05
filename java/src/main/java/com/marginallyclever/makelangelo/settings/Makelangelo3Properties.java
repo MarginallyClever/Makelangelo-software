@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangelo.settings;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class Makelangelo3Properties extends Makelangelo2Properties {
 	@Override

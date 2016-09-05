@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangelo.settings;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,6 +13,7 @@ import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
 /**
@@ -100,7 +101,7 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	protected MakelangeloRobotSettings(MakelangeloRobot robot) {
+	public MakelangeloRobotSettings(MakelangeloRobot robot) {
 		// set up number format
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 		otherSymbols.setDecimalSeparator('.');
@@ -467,7 +468,7 @@ public final class MakelangeloRobotSettings {
 	 *
 	 * @param uid the unique id of the robot to be loaded
 	 */
-	protected void loadConfig(long uid) {
+	public void loadConfig(long uid) {
 		robotUID = uid;
 		// once cloud logic is finished.
 		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return;
