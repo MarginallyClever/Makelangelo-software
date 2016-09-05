@@ -58,92 +58,92 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		c.ipadx = 5;
 		c.ipady = 0;
 
+		int y = 1;
+
 		// adjust machine size
 		JPanel p = new JPanel(new GridBagLayout());
 		this.add(p);
-
-		c.gridwidth = 3;
-		p.add(new JLabel("1\" = 25.4mm", SwingConstants.CENTER), c);
-		c.gridwidth = 1;
-
-		int y = 1;
-
-		c.anchor = GridBagConstraints.EAST;
-		d.anchor = GridBagConstraints.WEST;
 
 		double r = robot.getSettings().getLimitRight() * 10;
 		double l = robot.getSettings().getLimitLeft() * 10;
 		double w = (r - l);
 		double h = (robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom()) * 10;
+		
 		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
+		
 		machineWidth = new JFormattedTextField(nFloat);
 		machineWidth.setValue(w);
 		machineHeight = new JFormattedTextField(nFloat);
 		machineHeight.setValue(h);
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("MachineWidth")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(machineWidth, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel("mm"), d);
-		y++;
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("MachineHeight")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(machineHeight, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel("mm"), d);
-		y++;
-		
 		Dimension s = machineHeight.getPreferredSize();
 		s.width = 80;
-		machineWidth.setPreferredSize(s);
-		machineHeight.setPreferredSize(s);
-		machineWidth.addPropertyChangeListener(this);
-		machineHeight.addPropertyChangeListener(this);
-
-		// stepper needed
-		c.gridx = 0;
-		c.gridwidth=1;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
-		d.gridx = 1;
-		d.gridwidth=2;
-		d.gridy = y;
-		p.add(totalStepperNeeded = new JLabel("?"),d);
-		y++;
-		// belt needed
-		c.gridx = 0;
-		c.gridwidth=1;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
-		d.gridx = 1;
-		d.gridwidth=2;
-		d.gridy = y;
-		p.add(totalBeltNeeded = new JLabel("?"),d);
-		y++;
-		// servo needed
-		c.gridx = 0;
-		c.gridwidth=1;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
-		d.gridx = 1;
-		d.gridwidth=2;
-		d.gridy = y;
-		p.add(totalServoNeeded = new JLabel("?"),d);
-		y++;
+		
+		if(robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
+			c.gridwidth = 1;
+			c.anchor = GridBagConstraints.EAST;
+			d.anchor = GridBagConstraints.WEST;
+			c.gridx = 0;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("MachineWidth")), c);
+			d.gridx = 1;
+			d.gridy = y;
+			p.add(machineWidth, d);
+			d.gridx = 2;
+			d.gridy = y;
+			p.add(new JLabel("mm"), d);
+			y++;
+			c.gridx = 0;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("MachineHeight")), c);
+			d.gridx = 1;
+			d.gridy = y;
+			p.add(machineHeight, d);
+			d.gridx = 2;
+			d.gridy = y;
+			p.add(new JLabel("mm"), d);
+			y++;
+		
+			machineWidth.setPreferredSize(s);
+			machineHeight.setPreferredSize(s);
+			machineWidth.addPropertyChangeListener(this);
+			machineHeight.addPropertyChangeListener(this);
+	
+			// stepper needed
+			c.gridx = 0;
+			c.gridwidth=1;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
+			d.gridx = 1;
+			d.gridwidth=2;
+			d.gridy = y;
+			p.add(totalStepperNeeded = new JLabel("?"),d);
+			y++;
+			// belt needed
+			c.gridx = 0;
+			c.gridwidth=1;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
+			d.gridx = 1;
+			d.gridwidth=2;
+			d.gridy = y;
+			p.add(totalBeltNeeded = new JLabel("?"),d);
+			y++;
+			// servo needed
+			c.gridx = 0;
+			c.gridwidth=1;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
+			d.gridx = 1;
+			d.gridwidth=2;
+			d.gridy = y;
+			p.add(totalServoNeeded = new JLabel("?"),d);
+			y++;
+			this.add(new JSeparator(SwingConstants.HORIZONTAL));
+		}
 
 		// adjust pulleys
-		this.add(new JSeparator(SwingConstants.HORIZONTAL));
-
 		p = new JPanel(new GridBagLayout());
 		this.add(p);
 
@@ -158,45 +158,50 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		nDouble.setMinimumFractionDigits(1);
 		nDouble.setMaximumFractionDigits(3);
 
+		// pulley diameter
 		pulleyDiameter = new JFormattedTextField(nDouble);
 		pulleyDiameter.setValue(left);
+		if(robot.getSettings().getHardwareProperties().canChangePulleySize()) {
+			y = 2;
+			c.weightx = 0;
+			c.anchor = GridBagConstraints.EAST;
+			d.anchor = GridBagConstraints.WEST;
+			c.gridx = 0;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("AdjustPulleySize")), c);
+			d.gridx = 1;
+			d.gridy = y;
+			p.add(pulleyDiameter, d);
+			d.gridx = 2;
+			d.gridy = y;
+			p.add(new JLabel(Translator.get("Millimeters")), d);
+			y++;
 
-		y = 2;
-		c.weightx = 0;
-		c.anchor = GridBagConstraints.EAST;
-		d.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("AdjustPulleySize")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(pulleyDiameter, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel(Translator.get("Millimeters")), d);
-		y++;
-
-		s = pulleyDiameter.getPreferredSize();
-		s.width = 80;
-		pulleyDiameter.setPreferredSize(s);
+			s = pulleyDiameter.getPreferredSize();
+			s.width = 80;
+			pulleyDiameter.setPreferredSize(s);
+		}
+		
 
 		// acceleration
 		acceleration = new JFormattedTextField(nDouble);
 		acceleration.setValue(robot.getSettings().getAcceleration());
-		s = acceleration.getPreferredSize();
-		s.width = 80;
-		acceleration.setPreferredSize(s);
-		y = 0;
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(acceleration, d);
-		y++;
+		if(robot.getSettings().getHardwareProperties().canAccelerate()) {
+			s = acceleration.getPreferredSize();
+			s.width = 80;
+			acceleration.setPreferredSize(s);
+			y = 0;
+			c.gridx = 0;
+			c.gridy = y;
+			p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
+			d.gridx = 1;
+			d.gridy = y;
+			p.add(acceleration, d);
+			y++;
+			this.add(new JSeparator());
+		}
 
 		// Jog motors
-		this.add(new JSeparator());
 		JPanel panel = new JPanel(new GridBagLayout());
 		this.add(panel);
 
@@ -258,6 +263,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		flipForGlass = new JCheckBox(Translator.get("FlipForGlass"));
 		flipForGlass.setSelected(robot.getSettings().isReverseForGlass());
 		p.add(flipForGlass, c);
+
+
+		// always have one extra empty at the end to push everything up.
+		c.weighty = 1;
+		p.add(new JLabel(), c);
 		
 		updateLengthNeeded();
 	}
@@ -283,6 +293,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	 * Calculate length of belt and servo needed based on machine dimensions.
 	 */
 	protected void updateLengthNeeded() {
+		if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) return;
+		
 		double w = ((Number)machineWidth.getValue()).doubleValue();
 		double h = ((Number)machineHeight.getValue()).doubleValue();
 		double SAFETY_MARGIN=100;

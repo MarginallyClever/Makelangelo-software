@@ -148,7 +148,7 @@ public final class MakelangeloRobotSettings {
 		currentToolIndex = 0;
 
 		// default hardware version is 2
-		setHardwareVersion(2);
+		setHardwareVersion(5);
 		
 		// which configurations are available?
 		try {

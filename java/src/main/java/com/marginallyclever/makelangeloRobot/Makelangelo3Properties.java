@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 
 public class Makelangelo3Properties extends Makelangelo2Properties {
 	@Override
-	public boolean canChangeMachineWidth() {
+	public boolean canChangeMachineSize() {
 		return true;
 	}
 

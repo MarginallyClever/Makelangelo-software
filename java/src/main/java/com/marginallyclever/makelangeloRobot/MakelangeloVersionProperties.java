@@ -8,8 +8,9 @@ import com.jogamp.opengl.GL2;
  *
  */
 public interface MakelangeloVersionProperties {
-	public boolean canChangeMachineWidth();
+	public boolean canChangeMachineSize();
 	public boolean canAccelerate();
+	public boolean canChangePulleySize();
 	
 	/**
 	 * custom look & feel for each version

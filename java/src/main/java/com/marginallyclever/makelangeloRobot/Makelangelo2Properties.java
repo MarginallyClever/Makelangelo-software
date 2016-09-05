@@ -6,12 +6,17 @@ public class Makelangelo2Properties implements MakelangeloVersionProperties {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 
 	@Override
-	public boolean canChangeMachineWidth() {
+	public boolean canChangeMachineSize() {
 		return true;
 	}
 
 	@Override
 	public boolean canAccelerate() {
+		return false;
+	}
+
+	@Override
+	public boolean canChangePulleySize() {
 		return false;
 	}
 

@@ -63,7 +63,7 @@ implements ActionListener {
     //panelAdjustTools = new PanelAdjustTools(translator,robot);
     //panelSelectTool = new PanelSelectTool(translator,robot);
     
-    panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine);
+   	panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine);
     panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper);
     panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
     //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
@@ -80,7 +80,7 @@ implements ActionListener {
     	d.gridy=0;
     	d.weightx=1;
     	d.weighty=1;
-    	panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
+    	//panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
     	this.add(panes,d);
 	
         // save and cancel buttons
