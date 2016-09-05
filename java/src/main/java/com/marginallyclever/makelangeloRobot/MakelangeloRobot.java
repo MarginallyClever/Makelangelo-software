@@ -39,10 +39,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
 	// Firmware check
-	private final String versionCheck = new String("Firmware v");
-	private final long expectedFirmwareVersion = 6;  // must match the version in the the firmware EEPROM
+	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-
+	private final long expectedFirmwareVersion = 7;  // must match the version in the the firmware EEPROM
+	
+	private boolean hardwareVersionChecked = false;
+	
 	private DecimalFormat df;
 	
 	private MakelangeloRobotSettings settings = null;
@@ -110,6 +112,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			portConfirmed = false;
 			hasSetHome = false;
 			firmwareVersionChecked = false;
+			hardwareVersionChecked = false;
 		}
 		
 		this.connection = c;
@@ -148,15 +151,27 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			justNow=true;
 		}
 		
-		if( !firmwareVersionChecked && data.lastIndexOf(versionCheck)>=0 ) {
-			String afterV = data.substring(versionCheck.length()).trim();
+		if( !firmwareVersionChecked && data.lastIndexOf(versionCheckStart)>=0 ) {
+			String afterV = data.substring(versionCheckStart.length()).trim();
 			long versionFound = Long.parseLong(afterV);
 			
 			if( versionFound == expectedFirmwareVersion ) {
 				firmwareVersionChecked=true;
 				justNow=true;
+				// request the hardware version of this robot
+				sendLineToRobot("D10\n");
 			} else {
 				notifyFirmwareVersionBad(versionFound);
+			}
+		}
+		
+		if( !hardwareVersionChecked && data.lastIndexOf("D10")>=0 ) {
+			String [] pieces = data.split(" ");
+			if(pieces.length==2 && pieces[1].startsWith("V")) {
+				int hardwareVersion = Integer.parseInt(pieces[1].substring(1));
+				this.settings.setHardwareVersion(hardwareVersion);
+				hardwareVersionChecked=true;
+				justNow=true;
 			}
 		}
 		
@@ -317,8 +332,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// Send  new configuration values to the robot.
 		try {
+			// send config
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
+			if(this.settings.getHardwareProperties().canChangePulleySize()) {
+				sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
+			}
 			setHome();
 			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
