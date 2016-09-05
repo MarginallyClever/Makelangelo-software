@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.settings;
+package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.Dimension;
 import java.awt.Frame;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.settings;
+package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -8,7 +8,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
-public interface MakelangeloVersionProperties {
+public interface MakelangeloHardwareProperties {
 	public boolean canChangeMachineSize();
 	public boolean canAccelerate();
 	public boolean canChangePulleySize();

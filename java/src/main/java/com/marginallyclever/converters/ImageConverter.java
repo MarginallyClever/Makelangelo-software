@@ -7,7 +7,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
-import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Converts a BufferedImage to gcode

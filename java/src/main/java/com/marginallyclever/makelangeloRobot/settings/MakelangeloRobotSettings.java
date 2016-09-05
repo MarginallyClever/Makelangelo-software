@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.settings;
+package com.marginallyclever.makelangeloRobot.settings;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -14,6 +14,10 @@ import com.marginallyclever.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.PreferencesHelper;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo3Properties;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5Properties;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 
 
 /**
@@ -66,7 +70,7 @@ public final class MakelangeloRobotSettings {
 	private boolean shouldSignName;
 	
 	private int hardwareVersion;
-	private MakelangeloVersionProperties hardwareProperties;
+	private MakelangeloHardwareProperties hardwareProperties;
 
 	/**
 	 * top left, bottom center, etc...
@@ -108,8 +112,8 @@ public final class MakelangeloRobotSettings {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 				
-		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 650mm.
-		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 900mm.
+		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
+		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
 		
 		robotUID = 0;
 		isRegistered = false;
@@ -149,7 +153,7 @@ public final class MakelangeloRobotSettings {
 		currentToolIndex = 0;
 
 		// default hardware version is 2
-		setHardwareVersion(5);
+		setHardwareVersion(2);
 		
 		// which configurations are available?
 		try {
@@ -552,7 +556,7 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
-		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered));
+		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 	}
 	
 	public void setAcceleration(double f) {
@@ -623,7 +627,7 @@ public final class MakelangeloRobotSettings {
 		return hardwareVersion;
 	}
 
-	public MakelangeloVersionProperties getHardwareProperties() {
+	public MakelangeloHardwareProperties getHardwareProperties() {
 		return hardwareProperties;
 	}
 

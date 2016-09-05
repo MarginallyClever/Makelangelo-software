@@ -8,8 +8,8 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 import com.marginallyclever.drawingtools.DrawingTool;
-import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
 /**
@@ -134,10 +134,10 @@ public abstract class ImageManipulator {
 
 	protected boolean isInsidePaperMargins(double x,double y) {
 		final float EPSILON = 0.01f;
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f-EPSILON)) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f+EPSILON)) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f-EPSILON)) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f+EPSILON)) return false;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-EPSILON) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+EPSILON) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-EPSILON) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+EPSILON) return false;
 		return true;
 	}
 }

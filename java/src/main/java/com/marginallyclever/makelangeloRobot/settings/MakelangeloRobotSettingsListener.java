@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.settings;
+package com.marginallyclever.makelangeloRobot.settings;
 
 public interface MakelangeloRobotSettingsListener {
 	public void settingsChangedEvent(MakelangeloRobotSettings settings);

@@ -46,7 +46,7 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.basictypes.CollapsiblePanel;
 
 /**

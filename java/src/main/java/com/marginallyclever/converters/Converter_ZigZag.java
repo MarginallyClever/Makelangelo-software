@@ -14,7 +14,7 @@ import com.marginallyclever.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
 /**
