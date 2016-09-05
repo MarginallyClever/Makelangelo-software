@@ -36,7 +36,9 @@ import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.basictypes.ImageManipulator;
+import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -66,7 +68,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean canSave(String filename) {
-		return false;
+		String ext = filename.substring(filename.lastIndexOf('.'));
+		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
 	@Override
@@ -490,8 +493,150 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	@Override
+	/**
+	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
+	 * @param outputStream where to write the data
+	 * @param robot the robot from which the data is obtained
+	 * @return true if save succeeded.
+	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		return false;
+		Log.message("saving...");
+		GCodeFile sourceMaterial = robot.gCode;
+		sourceMaterial.setLinesProcessed(0);
+		
+		OutputStreamWriter out = new OutputStreamWriter(outputStream);
+		try {
+			// header
+			out.write("999\nDXF created by Makelangelo software v"+Makelangelo.VERSION+"\n");
+			out.write("0\nSECTION\n");
+			out.write("2\nHEADER\n");
+			out.write("9\n$ACADVER\n1\nAC1006\n");
+			out.write("9\n$INSBASE\n");
+			out.write("10\n0.0\n");
+			out.write("20\n0.0\n");
+			out.write("30\n0.0\n");
+			out.write("9\n$EXTMIN\n");
+			out.write("10\n"+robot.getSettings().getPaperLeft()+"\n");
+			out.write("20\n"+robot.getSettings().getPaperBottom()+"\n");
+			out.write("30\n0.0\n");
+			out.write("9\n$EXTMAX\n");
+			out.write("10\n"+robot.getSettings().getPaperRight()+"\n");
+			out.write("20\n"+robot.getSettings().getPaperTop()+"\n");
+			out.write("30\n0.0\n");
+			out.write("0\nENDSEC\n");
+
+			// tables section
+			out.write("0\nSECTION\n");
+			out.write("2\nTABLES\n");
+			// line type
+			out.write("0\nTABLE\n");
+			out.write("2\nLTYPE\n");
+			out.write("70\n1\n");
+			out.write("0\nLTYPE\n");
+			out.write("2\nCONTINUOUS\n");
+			out.write("70\n64\n");
+			out.write("3\nSolid line\n");
+			out.write("72\n65\n");
+			out.write("73\n0\n");
+			out.write("40\n0.000\n");
+			out.write("0\nENDTAB\n");
+			// layers
+			out.write("0\nTABLE\n");
+			out.write("2\nLAYER\n");
+			out.write("70\n6\n");
+			out.write("0\nLAYER\n");
+			out.write("2\n1\n");
+			out.write("70\n64\n");
+			out.write("62\n7\n");
+			out.write("6\nCONTINUOUS\n");
+			out.write("0\nLAYER\n");
+			out.write("2\n2\n");
+			out.write("70\n64\n");
+			out.write("62\n7\n");
+			out.write("6\nCONTINUOUS\n");
+			out.write("0\nENDTAB\n");
+			out.write("0\nTABLE\n");
+			out.write("2\nSTYLE\n");
+			out.write("70\n0\n");
+			out.write("0\nENDTAB\n");
+			// end tables
+			out.write("0\nENDSEC\n");
+
+			// empty blocks section (good form?)
+			out.write("0\nSECTION\n");
+			out.write("0\nBLOCKS\n");
+			out.write("0\nENDSEC\n");
+			// now the lines
+			out.write("0\nSECTION\n");
+			out.write("2\nENTITIES\n");
+
+			boolean penUp=true;
+			float x0 = (float) robot.getSettings().getHomeX();
+			float y0 = (float) robot.getSettings().getHomeY();
+			float x1;
+			float y1;
+			
+			String matchUp = robot.getSettings().getPenUpString();
+			String matchDown = robot.getSettings().getPenDownString();
+			if(matchUp.contains(";")) {
+				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
+			}
+			if(matchDown.contains(";")) {
+				matchDown = matchDown.substring(0, matchDown.indexOf(";"));
+			}
+			
+			int total=sourceMaterial.getLinesTotal();
+			Log.message(total+" total lines to save.");
+			for(int i=0;i<total;++i) {
+				String str = sourceMaterial.nextLine();
+				// trim comments
+				if(str.contains(";")) {
+					str = str.substring(0, str.indexOf(";"));
+				}
+				if(str.contains(matchUp)) {
+					penUp=true;
+				}
+				if(str.contains(matchDown)) {
+					penUp=false;
+				}
+				if(str.startsWith("G0") || str.startsWith("G1")) {
+					// move command
+					String[] tokens = str.split(" ");
+					x1=x0;
+					y1=y0;
+					int j;
+					for(j=0;j<tokens.length;++j) {
+						String tok = tokens[j];
+						if(tok.startsWith("X")) {
+							x1=Float.parseFloat(tok.substring(1));
+						} else if(tok.startsWith("Y")) {
+							y1=Float.parseFloat(tok.substring(1));
+						}
+					}
+					if(penUp==false && ( x1!=x0 || y1!=y0 ) ) {
+						out.write("0\nLINE\n");
+						out.write("8\n1\n");  // layer 1
+						out.write("10\n"+x0+"\n");
+						out.write("20\n"+y0+"\n");
+						out.write("11\n"+x1+"\n");
+						out.write("21\n"+y1+"\n");
+					}
+					x0=x1;
+					y0=y1;
+				}
+			}
+			// wrap it up
+			out.write("0\nENDSEC\n");
+			out.write("0\nEOF\n");
+			out.flush();
+		}
+		catch(IOException e) {
+			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
+			return false;
+		}
+		
+		Log.message("done.");
+		return true;
 	}
 
 	@Override
@@ -501,6 +646,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean canSave() {
-		return false;
+		return true;
 	}
 }
