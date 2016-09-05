@@ -18,10 +18,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  *
  */
 public class LoadAndSaveGCode implements LoadAndSaveFileType {
-
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
-		return new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+		return filter;
 	}
 
 	@Override

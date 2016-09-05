@@ -65,12 +65,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		IMAGE_FILE_EXTENSIONS.add("bmp");
 		IMAGE_FILE_EXTENSIONS.add("gif");
 	}
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
+			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
-		return new FileNameExtensionFilter(Translator.get("FileTypeImage"),
-				IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
+		return filter;
 	}
 
 	@Override

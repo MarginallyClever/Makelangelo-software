@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.generators.ImageGenerator;
@@ -727,8 +728,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			if(openFileOnDemand(selectedFile)) {
-				lastFileIn = selectedFile;
+			FileFilter chosenFilter = fc.getFileFilter();
+			i = imageLoaders.iterator();
+			while(i.hasNext()) {
+				LoadAndSaveFileType loader = i.next();
+				if( !loader.getFileNameFilter().equals(chosenFilter)) continue;
+				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
+				if(success) {
+					lastFileIn = selectedFile;
+				}
 			}
 		}
 	}
@@ -827,7 +835,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
 		while(i.hasNext()) {
 			LoadAndSaveFileType lft = i.next();
-			if(lft.canLoad()) {
+			if(lft.canSave()) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
 			}
@@ -837,15 +845,31 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
+			FileFilter chosenFilter = fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
 			// TODO get rid of this stupid guessing game.
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
-				if(!lft.canSave()) continue;
-				if(!lft.canSave(selectedFile)) continue;
-				
+				FileFilter filter = lft.getFileNameFilter();
+				if( !chosenFilter.equals(filter) ) continue;
+	
+				// make sure a valid extension is added to the file.
+				String selectedFileLC = selectedFile.toLowerCase();
+				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
+				boolean foundExtension=false;
+				for(String ext : exts) {
+					if (selectedFileLC.endsWith('.'+ext.toLowerCase())) {
+						foundExtension=true;
+						break;
+					}
+				}
+				if(!foundExtension) {
+					selectedFile+='.'+exts[0];
+				}
+
+				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
 					success=lft.save(fileOutputStream,robot);
@@ -863,6 +887,34 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 
 	/**
+	 * Open a file with a given LoadAndSaveFileType plugin.  
+	 * The loader might spawn a new thread and return before the load is actually finished.
+	 * @param filename absolute path of the file to load
+	 * @param loader the plugin to use
+	 * @return true if load is successful.
+	 */
+	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
+		boolean success = false;
+		try (final InputStream fileInputStream = new FileInputStream(filename)) {
+			success=loader.load(fileInputStream,robot);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		// TODO don't rely on this to be true, load may not have finished yet.
+		if (success == true) {
+			Log.message(Translator.get("Finished"));
+			SoundSystem.playConversionFinishedSound();
+		}
+		// TODO don't rely on this to be true, load may not have finished yet.
+		updateButtonAccess();
+		// TODO don't rely on this to be true, load may not have finished yet.
+		statusBar.clear();
+		
+		return success;
+	}
+	
+	/**
 	 * User has asked that a file be opened.
 	 * @param filename the file to be opened.
 	 * @return true if file was loaded successfully.  false if it failed.
@@ -875,30 +927,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
 		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadAndSaveFileType lft = i.next();
-			if(!lft.canLoad()) continue;
-			if(!lft.canLoad(filename)) continue;
+			LoadAndSaveFileType loader = i.next();
+			if(!loader.canLoad()) continue;
+			if(!loader.canLoad(filename)) continue;
 			
 			attempted=true;
-			try (final InputStream fileInputStream = new FileInputStream(filename)) {
-				success=lft.load(fileInputStream,robot);
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+			success=openFileOnDemandWithLoader(filename,loader);
 			if(success==true) break;
 		}
 		
 		if(attempted == false) {
 			Log.error(Translator.get("UnknownFileType"));
 		}
-
-		if (success == true) {
-			Log.message(Translator.get("Finished"));
-			SoundSystem.playConversionFinishedSound();
-		}
-
-		updateButtonAccess();
-		statusBar.clear();
+		
 		return success;
 	}
 }

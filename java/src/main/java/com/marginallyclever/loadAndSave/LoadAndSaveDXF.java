@@ -48,16 +48,17 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  *
  */
 public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
-	static boolean shouldScaleOnLoad=true;
-	static boolean shouldInfillOnLoad=true;
-	static boolean shouldOptimizePathingOnLoad=false;
+	private static boolean shouldScaleOnLoad=true;
+	private static boolean shouldInfillOnLoad=true;
+	private static boolean shouldOptimizePathingOnLoad=false;
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	
 	@Override
 	public String getName() { return "DXF"; }
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
-		return new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
+		return filter;
 	}
 
 	@Override
@@ -512,8 +513,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
 			out.write("9\n$INSBASE\n");
-			out.write("10\n0.0\n");
-			out.write("20\n0.0\n");
+			out.write("10\n"+robot.getSettings().getPaperLeft()+"\n");
+			out.write("20\n"+robot.getSettings().getPaperBottom()+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMIN\n");
 			out.write("10\n"+robot.getSettings().getPaperLeft()+"\n");
