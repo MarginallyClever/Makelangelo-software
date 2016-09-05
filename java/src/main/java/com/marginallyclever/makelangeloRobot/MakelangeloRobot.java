@@ -151,6 +151,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			justNow=true;
 		}
 		
+		// is firmware checked?
 		if( !firmwareVersionChecked && data.lastIndexOf(versionCheckStart)>=0 ) {
 			String afterV = data.substring(versionCheckStart.length()).trim();
 			long versionFound = Long.parseLong(afterV);
@@ -165,6 +166,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			}
 		}
 		
+		// is hardware checked?
 		if( !hardwareVersionChecked && data.lastIndexOf("D10")>=0 ) {
 			String [] pieces = data.split(" ");
 			if(pieces.length==2 && pieces[1].startsWith("V")) {
@@ -175,7 +177,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			}
 		}
 		
-		if(justNow && firmwareVersionChecked && portConfirmed) {
+		if(justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
 			// send whatever config settings I have for this machine.
 			sendConfig();
 			
