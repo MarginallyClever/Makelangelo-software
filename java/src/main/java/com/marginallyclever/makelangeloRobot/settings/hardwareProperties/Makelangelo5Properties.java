@@ -9,6 +9,13 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public boolean canChangeMachineSize() {
 		return false;
 	}
+	public float getWidth() { return 835; }
+	public float getHeight() { return 1200; }
+
+	@Override
+	public boolean canAutoHome() {
+		return true;
+	}
 
 	@Override
 	public void render(GL2 gl2,MakelangeloRobot robot) {

@@ -10,8 +10,15 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 public interface MakelangeloHardwareProperties {
 	public boolean canChangeMachineSize();
+	
 	public boolean canAccelerate();
+	
 	public boolean canChangePulleySize();
+	
+	public boolean canAutoHome();
+	
+	public float getWidth();
+	public float getHeight();
 	
 	/**
 	 * custom look & feel for each version

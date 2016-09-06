@@ -23,6 +23,14 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 
 	@Override
+	public boolean canAutoHome() {
+		return false;
+	}
+
+	public float getWidth() { return 0; }
+	public float getHeight() { return 0; }
+	
+	@Override
 	public void render(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 

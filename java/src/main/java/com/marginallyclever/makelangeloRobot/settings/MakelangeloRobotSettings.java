@@ -639,5 +639,9 @@ public final class MakelangeloRobotSettings {
 		case 3:  hardwareProperties = new Makelangelo3Properties();  break; 
 		default:  hardwareProperties = new Makelangelo2Properties();  break; 
 		}
+		
+		if(!hardwareProperties.canChangeMachineSize()) {
+			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
+		}
 	}
 }

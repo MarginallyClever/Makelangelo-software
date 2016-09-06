@@ -79,7 +79,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		machineHeight.setValue(h);
 		Dimension s = machineHeight.getPreferredSize();
 		s.width = 80;
-		
+
+		if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
+			machineWidth.setValue(robot.getSettings().getHardwareProperties().getWidth());
+			machineHeight.setValue(robot.getSettings().getHardwareProperties().getHeight());
+		}			
 		if(robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.EAST;

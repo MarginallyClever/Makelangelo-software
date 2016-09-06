@@ -169,11 +169,15 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// is hardware checked?
 		if( !hardwareVersionChecked && data.lastIndexOf("D10")>=0 ) {
 			String [] pieces = data.split(" ");
-			if(pieces.length==2 && pieces[1].startsWith("V")) {
-				int hardwareVersion = Integer.parseInt(pieces[1].substring(1));
-				this.settings.setHardwareVersion(hardwareVersion);
-				hardwareVersionChecked=true;
-				justNow=true;
+			if(pieces.length>1) {
+				String last=pieces[pieces.length-1];
+				last = last.replace("\r\n", "");
+				if(last.startsWith("V")) {
+					int hardwareVersion = Integer.parseInt(last.substring(1));
+					this.settings.setHardwareVersion(hardwareVersion);
+					hardwareVersionChecked=true;
+					justNow=true;
+				}
 			}
 		}
 		
