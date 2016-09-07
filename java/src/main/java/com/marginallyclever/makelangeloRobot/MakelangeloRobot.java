@@ -551,15 +551,17 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	public void setCurrentFeedRate(double feedRate) {
-		if(feedRate> settings.getMaxFeedRate()) {
-			feedRate = settings.getMaxFeedRate();
-		}
 		// remember it
-		settings.setMaxFeedRate(feedRate);
+		settings.setCurrentFeedRate(feedRate);
+		// get it again in case it was capped.
+		feedRate = settings.getCurrentFeedRate();
 		// tell the robot
 		sendLineToRobot("G00 F" + df.format(feedRate));
 	}
 	
+	public double getCurrentFeedRate() {
+		return settings.getCurrentFeedRate();
+	}
 	
 	public void goHome() {
 		sendLineToRobot("G00 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));

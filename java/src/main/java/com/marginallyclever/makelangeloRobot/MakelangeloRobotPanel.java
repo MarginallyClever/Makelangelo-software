@@ -551,13 +551,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			double feedRate = 0;
 			try {
 				feedRate = Double.parseDouble(fr);
-				if (feedRate < 0.001) feedRate = 0.001;
-				if( feedRate > robot.getSettings().getMaxFeedRate()) {
-					feedRate = robot.getSettings().getMaxFeedRate();
-				}
-				// update the input field
-				feedRateTxt.setText(Double.toString(feedRate));
+				// update the input field				
 				robot.setCurrentFeedRate(feedRate);
+				feedRateTxt.setText(Double.toString(robot.getCurrentFeedRate()));
+				
 			} catch(NumberFormatException e1) {}
 		} else if (subject == toggleEngagedMotor) {
 			if(robot.areMotorsEngaged() ) {

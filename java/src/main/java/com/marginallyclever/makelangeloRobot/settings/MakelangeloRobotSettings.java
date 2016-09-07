@@ -51,6 +51,7 @@ public final class MakelangeloRobotSettings {
 	private double limitTop;
 	// speed control
 	private double maxFeedRate;
+	private double currentFeedRate;
 	private double maxAcceleration;
 	// paper area, in cm
 	private double paperLeft;
@@ -136,6 +137,7 @@ public final class MakelangeloRobotSettings {
 		paperMargin = 0.9;
 
 		maxFeedRate = 6500;
+		currentFeedRate = 6500;
 		maxAcceleration = 250;
 
 		// diameter = circumference/pi
@@ -244,10 +246,6 @@ public final class MakelangeloRobotSettings {
 
 	public int getCurrentToolNumber() {
 		return currentToolIndex;
-	}
-
-	public double getMaxFeedRate() {
-		return maxFeedRate;
 	}
 
 	public int getKnownMachineIndex() {
@@ -496,6 +494,7 @@ public final class MakelangeloRobotSettings {
 		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
 		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
+		currentFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate_current",Double.toString(currentFeedRate)));
 		maxAcceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(maxAcceleration)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
@@ -541,6 +540,7 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
 		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
+		uniqueMachinePreferencesNode.put("feed_rate_current", Double.toString(currentFeedRate));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
@@ -573,6 +573,24 @@ public final class MakelangeloRobotSettings {
 	public void setMaxFeedRate(double f) {
 		maxFeedRate = f;
 	}
+	
+	public double getMaxFeedRate() {
+		return maxFeedRate;
+	}
+	
+	public void setCurrentFeedRate(double f) {
+		if (f < 0.001) f = 0.001;
+		if( f > maxFeedRate) {
+			f = maxFeedRate;
+		}
+		currentFeedRate = f;
+	}
+	
+	public double getCurrentFeedRate() {
+		return currentFeedRate;
+	}
+	
+	
 	
 	public void setLimitBottom(double limitBottom) {
 		this.limitBottom = limitBottom;
