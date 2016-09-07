@@ -607,6 +607,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
         if (result == JOptionPane.YES_OPTION) {
         	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         	savePreferences();
+        	robot.getSettings().saveConfig();
 
     		// Run this on another thread than the AWT event queue to
     		// make sure the call to Animator.stop() completes before

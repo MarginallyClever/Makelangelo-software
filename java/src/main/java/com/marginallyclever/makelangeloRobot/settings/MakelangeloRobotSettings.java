@@ -246,10 +246,9 @@ public final class MakelangeloRobotSettings {
 		return currentToolIndex;
 	}
 
-	public double getFeedRate() {
+	public double getMaxFeedRate() {
 		return maxFeedRate;
 	}
-
 
 	public int getKnownMachineIndex() {
 		String [] list = getKnownMachineNames();
@@ -565,16 +564,14 @@ public final class MakelangeloRobotSettings {
 	
 	public void setAcceleration(double f) {
 		maxAcceleration = f;
-		saveConfig();
 	}
 	
 	public void setCurrentToolNumber(int current_tool) {
 		this.currentToolIndex = current_tool;
 	}
 	
-	public void setFeedRate(double f) {
+	public void setMaxFeedRate(double f) {
 		maxFeedRate = f;
-		saveConfig();
 	}
 	
 	public void setLimitBottom(double limitBottom) {

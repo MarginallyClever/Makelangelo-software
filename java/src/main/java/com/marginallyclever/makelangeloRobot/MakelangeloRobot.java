@@ -344,7 +344,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
 			}
 			setHome();
-			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
+			sendLineToRobot("G0 F"+ df.format(settings.getMaxFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -550,11 +550,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return true;
 	}
 
-	public void setCurrentFeedRate(double parsedFeedRate) {
+	public void setCurrentFeedRate(double feedRate) {
+		if(feedRate> settings.getMaxFeedRate()) {
+			feedRate = settings.getMaxFeedRate();
+		}
 		// remember it
-		settings.setFeedRate(parsedFeedRate);
+		settings.setMaxFeedRate(feedRate);
 		// tell the robot
-		sendLineToRobot("G00 F" + df.format(parsedFeedRate));
+		sendLineToRobot("G00 F" + df.format(feedRate));
 	}
 	
 	

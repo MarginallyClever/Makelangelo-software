@@ -89,7 +89,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
-	private JFormattedTextField feedRate;
+	private JFormattedTextField feedRateTxt;
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
@@ -332,15 +332,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMain.gridy++;
 			feedRateControl.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-			feedRate.setText(Double.toString(robot.getSettings().getFeedRate()));
+			feedRateTxt = new JFormattedTextField(NumberFormat.getInstance());  feedRateTxt.setPreferredSize(new Dimension(100,20));
+			feedRateTxt.setText(Double.toString(robot.getSettings().getMaxFeedRate()));
 			setFeedRate = new JButton(Translator.get("Set"));
 			setFeedRate.addActionListener(this);
 			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
 			toggleEngagedMotor.addActionListener(this);
 
 			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
+			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRateTxt,c);
 			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
 			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 			c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
@@ -545,17 +545,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		else if (subject == penDown ) robot.lowerPen();
 		else if (subject == setFeedRate) {
 			// get the feed rate
-			String fr = feedRate.getText();
+			String fr = feedRateTxt.getText();
 			fr = fr.replaceAll("[ ,]", "");
 			// trim it to 3 decimal places
-			double parsedFeedRate = 0;
+			double feedRate = 0;
 			try {
-				parsedFeedRate = Double.parseDouble(fr);
-
-				if (parsedFeedRate < 0.001) parsedFeedRate = 0.001;
+				feedRate = Double.parseDouble(fr);
+				if (feedRate < 0.001) feedRate = 0.001;
+				if( feedRate > robot.getSettings().getMaxFeedRate()) {
+					feedRate = robot.getSettings().getMaxFeedRate();
+				}
 				// update the input field
-				feedRate.setText(Double.toString(parsedFeedRate));
-				robot.setCurrentFeedRate(parsedFeedRate);
+				feedRateTxt.setText(Double.toString(feedRate));
+				robot.setCurrentFeedRate(feedRate);
 			} catch(NumberFormatException e1) {}
 		} else if (subject == toggleEngagedMotor) {
 			if(robot.areMotorsEngaged() ) {
