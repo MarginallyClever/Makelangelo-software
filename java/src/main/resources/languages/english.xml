@@ -682,7 +682,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>Max speed</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -719,7 +719,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>spraypaintToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>max speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
