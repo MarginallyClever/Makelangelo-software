@@ -1050,6 +1050,12 @@ to check yourself.</value>
 		<value>Firmware update</value>
 		<hint>Software is too new for firmware</hint>
 	</string>
+
+	<string>
+		<key>HardwareVersion</key>
+		<value>Model: </value>
+		<hint>What is the hardware model of this robot?</hint>
+	</string>
 	
 	<string>
 		<key>firmwareVersionBadMessage</key>
