@@ -8,6 +8,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -17,10 +21,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.filechooser.FileFilter;
 
 import com.marginallyclever.drawingtools.DrawingTool;
+import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -43,9 +50,9 @@ implements ActionListener {
   protected JButton save, cancel;
 
   // TODO pull these from the class listings in the package?
-  private int [] availableHardwareVersions={2,3,5};
   private JComboBox<String> hardwareVersionChoices;
-  private String[] hardwareVersionNames={"2+","3+","5+"};
+  private ArrayList<Integer> availableHardwareVersions;
+  private String[] hardwareVersionNames;
   private int originalHardwareVersion;
   
   private JPanel modelPanel;
@@ -124,18 +131,15 @@ implements ActionListener {
 	  modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 	  modelPanel.add(modelLabel, d);
 	  
+	  findAvailableHardwareVersions();
+	  
 	  d.gridx=1;
 	  d.gridwidth=2;
-	  hardwareVersionNames = new String[availableHardwareVersions.length];
-	  for(int i=0;i<hardwareVersionNames.length;++i) {
-		  hardwareVersionNames[i] = "Makelangelo "+Integer.toString(availableHardwareVersions[i])+"+";
-	  }	  
 	  hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
 	  // set the default
 	  int hv = robot.getSettings().getHardwareVersion();
-	  String hvn = Integer.toString(hv);
-	  for(int i=0;i<hardwareVersionNames.length;++i) {
-		  if(hardwareVersionNames[i].startsWith("Makelangelo "+hvn)) {
+	  for(int i=0;i<availableHardwareVersions.size();++i) {
+		  if(availableHardwareVersions.get(i) == hv) {
 			  hardwareVersionChoices.setSelectedIndex(i);
 			  break;
 		  }
@@ -144,6 +148,28 @@ implements ActionListener {
 	  hardwareVersionChoices.addActionListener(this);
   }
 
+  private void findAvailableHardwareVersions() {
+	  availableHardwareVersions = new ArrayList<Integer>();
+	  
+	  // get version numbers
+	  ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
+	  Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
+	  while(i.hasNext()) {
+		  MakelangeloHardwareProperties hw = i.next();
+		  availableHardwareVersions.add(new Integer(hw.getVersion()));
+	  }
+
+	  // get names
+	  hardwareVersionNames = new String[availableHardwareVersions.size()];
+	  i = knownHardware.iterator();
+	  int j=0;
+	  while(i.hasNext()) {
+		  MakelangeloHardwareProperties hw = i.next();
+		  hardwareVersionNames[j] = hw.getName();
+		  ++j;
+	  }	  
+  }
+  
   // save and cancel buttons
   private void buildSaveAndCancel() {
 	  cancel = new JButton(Translator.get("Cancel"));
@@ -190,7 +216,7 @@ implements ActionListener {
 	  Object src = e.getSource();
 	  
 	  if(src == hardwareVersionChoices) {
-		  int newChoice=availableHardwareVersions[hardwareVersionChoices.getSelectedIndex()];
+		  int newChoice=availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
 		  robot.getSettings().setHardwareVersion(newChoice);
 		  rebuildTabbedPanes();
 	  }

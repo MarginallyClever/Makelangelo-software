@@ -6,6 +6,16 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo5Properties extends Makelangelo3Properties {
 	@Override
+	public int getVersion() {
+		return 5;
+	}
+	
+	@Override
+	public String getName() {
+		return "Makelangelo 5+";
+	}
+	
+	@Override
 	public boolean canChangeMachineSize() {
 		return false;
 	}

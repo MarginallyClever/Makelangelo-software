@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.drawingtools.DrawingTool;
@@ -651,12 +652,28 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public void setHardwareVersion(int hardwareVersion) {
-		this.hardwareVersion = hardwareVersion;
-		
-		switch(hardwareVersion) {
-		case 5:  hardwareProperties = new Makelangelo5Properties();  break; 
-		case 3:  hardwareProperties = new Makelangelo3Properties();  break; 
-		default:  hardwareProperties = new Makelangelo2Properties();  break; 
+		int newVersion = -1;
+
+		try {
+			// get version numbers
+			ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
+			Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
+			while(i.hasNext()) {
+				MakelangeloHardwareProperties hw = i.next();
+				if(hw.getVersion()==hardwareVersion) {
+					hardwareProperties = hw.getClass().newInstance();
+					newVersion = hardwareVersion;
+				};
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.error("Hardware version instance failed. Defaulting to v2");
+			hardwareProperties = new Makelangelo2Properties();
+			newVersion=2;
+		}
+		if(newVersion == -1) {
+			Log.error("Unknown hardware version requested. Defaulting to v2");
+			hardwareProperties = new Makelangelo2Properties();
 		}
 		
 		if(!hardwareProperties.canChangeMachineSize()) {

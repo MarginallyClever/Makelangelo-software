@@ -8,6 +8,16 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 
 	@Override
+	public int getVersion() {
+		return 2;
+	}
+
+	@Override
+	public String getName() {
+		return "Makelangelo 2+";
+	}
+	
+	@Override
 	public boolean canChangeMachineSize() {
 		return true;
 	}
