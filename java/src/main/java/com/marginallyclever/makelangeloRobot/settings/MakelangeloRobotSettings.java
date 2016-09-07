@@ -510,6 +510,8 @@ public final class MakelangeloRobotSettings {
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
 		setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
+
+		setHardwareVersion(Integer.parseInt(uniqueMachinePreferencesNode.get("hardwareVersion", Integer.toString(hardwareVersion))));
 	}
 
 	public void notifySettingsChanged() {
@@ -557,6 +559,8 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
+		
+		uniqueMachinePreferencesNode.put("hardwareVersion", Integer.toString(hardwareVersion));
 	}
 	
 	public void setAcceleration(double f) {
