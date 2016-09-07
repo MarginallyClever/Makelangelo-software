@@ -241,10 +241,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Object subject = e.getSource();
 
 		if(subject == machineChoices && e.getStateChange()==ItemEvent.SELECTED) {
-			int selectedIndex = machineChoices.getSelectedIndex();
-			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-			robot.getSettings().loadConfig(newUID);
+			updateMachineChoice();
 		}
+	}
+	
+	protected void updateMachineChoice() {
+		int selectedIndex = machineChoices.getSelectedIndex();
+		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
+		robot.getSettings().loadConfig(newUID);
 	}
 
 	
@@ -456,10 +460,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMachine.gridx++;
 			machineNumberPanel.add(machineChoices,cMachine);
 			cMachine.gridx++;
-
-			int index = robot.getSettings().getKnownMachineIndex();
-			if( index<0 ) index=0;
-			machineChoices.setSelectedIndex(index);
 			
 			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
 			boolean state=false;
@@ -469,6 +469,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener(this);
+
+			int index = robot.getSettings().getKnownMachineIndex();
+			if( index<0 ) index=0;
+			machineChoices.setSelectedIndex(index);
+
+			// force the GUI to load the correct initial choice.
+			updateMachineChoice();
 		}
 
 		openConfig = new JButton(Translator.get("configureMachine"));
@@ -548,7 +555,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				if (parsedFeedRate < 0.001) parsedFeedRate = 0.001;
 				// update the input field
 				feedRate.setText(Double.toString(parsedFeedRate));
-				robot.setFeedRate(parsedFeedRate);
+				robot.setCurrentFeedRate(parsedFeedRate);
 			} catch(NumberFormatException e1) {}
 		} else if (subject == toggleEngagedMotor) {
 			if(robot.areMotorsEngaged() ) {

@@ -46,6 +46,7 @@ implements ActionListener {
   private int [] availableHardwareVersions={2,3,5};
   private JComboBox<String> hardwareVersionChoices;
   private String[] hardwareVersionNames={"2+","3+","5+"};
+  private int originalHardwareVersion;
   
   private JPanel modelPanel;
   protected PanelAdjustMachine panelAdjustMachine;
@@ -65,6 +66,8 @@ implements ActionListener {
   
   // display settings menu
   public void run() {
+	  originalHardwareVersion = robot.getSettings().getHardwareVersion();
+	  
 	  this.setLayout(new GridBagLayout());
 	  GridBagConstraints d = new GridBagConstraints();
 
@@ -200,6 +203,7 @@ implements ActionListener {
 		  this.dispose();
 	  }
 	  if(src == cancel) {
+		  robot.getSettings().setHardwareVersion(originalHardwareVersion);
 		  this.dispose();
 	  }
   }
