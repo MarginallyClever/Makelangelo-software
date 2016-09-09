@@ -6,8 +6,9 @@ import java.awt.image.BufferedImage;
 /**
  * Histogram of an image with 8 bits red, 8 bits green, and 8 bits blue.
  *
- * @author danroyer
+ * @author Dan Royer
  * @since 7.1.4-SNAPSHOT?
+ * @deprecated nobody uses this class.
  */
 public class Histogram {
   public char[] red = new char[256];

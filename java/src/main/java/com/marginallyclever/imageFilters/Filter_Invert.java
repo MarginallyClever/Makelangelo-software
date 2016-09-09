@@ -1,6 +1,6 @@
 package com.marginallyclever.imageFilters;
 
-import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorRGB;
 import com.marginallyclever.basictypes.TransformedImage;
 
 
@@ -17,7 +17,7 @@ public class Filter_Invert extends ImageFilter {
 
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        C3 color = new C3(img.getSourceImage().getRGB(x, y));
+        ColorRGB color = new ColorRGB(img.getSourceImage().getRGB(x, y));
         color.red   = 255 - color.red;
         color.green = 255 - color.green;
         color.blue  = 255 - color.blue;

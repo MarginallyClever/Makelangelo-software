@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorRGB;
 import com.marginallyclever.basictypes.TransformedImage;
 
 
@@ -38,8 +38,8 @@ public class Filter_GaussianBlur extends ImageFilter {
 		scales[1] = 1.0f / 2.0f;
 		scales[2] = 1.0f / 4.0f;
 
-		C3 pixel = new C3(0, 0, 0);
-		C3 p;
+		ColorRGB pixel = new ColorRGB(0, 0, 0);
+		ColorRGB p;
 		double sum;
 
 		// horizontal blur
@@ -48,19 +48,19 @@ public class Filter_GaussianBlur extends ImageFilter {
 				pixel.set(0, 0, 0);
 				sum = 0;
 				if (x - 1 >= 0) {
-					p = new C3(img.getSourceImage().getRGB(x - 1, y));
+					p = new ColorRGB(img.getSourceImage().getRGB(x - 1, y));
 					p.mul(scales[0]);
 					pixel.add(p);
 					sum += scales[0];
 				}
 
-				p = new C3(img.getSourceImage().getRGB(x, y));
+				p = new ColorRGB(img.getSourceImage().getRGB(x, y));
 				p.mul(scales[1]);
 				pixel.add(p);
 				sum += scales[1];
 
 				if (x + 1 < w) {
-					p = new C3(img.getSourceImage().getRGB(x + 1, y));
+					p = new ColorRGB(img.getSourceImage().getRGB(x + 1, y));
 					p.mul(scales[2]);
 					pixel.add(p);
 					sum += scales[2];
@@ -78,19 +78,19 @@ public class Filter_GaussianBlur extends ImageFilter {
 				pixel.set(0, 0, 0);
 				sum = 0;
 				if (y - 1 >= 0) {
-					p = new C3(dest.getRGB(x, y - 1));
+					p = new ColorRGB(dest.getRGB(x, y - 1));
 					p.mul(scales[0]);
 					pixel.add(p);
 					sum += scales[0];
 				}
 
-				p = new C3(dest.getRGB(x, y));
+				p = new ColorRGB(dest.getRGB(x, y));
 				p.mul(scales[1]);
 				pixel.add(p);
 				sum += scales[1];
 
 				if (y + 1 < h) {
-					p = new C3(dest.getRGB(x, y + 1));
+					p = new ColorRGB(dest.getRGB(x, y + 1));
 					p.mul(scales[2]);
 					pixel.add(p);
 					sum += scales[2];

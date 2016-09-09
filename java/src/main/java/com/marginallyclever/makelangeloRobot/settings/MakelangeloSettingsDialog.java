@@ -23,10 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileFilter;
 
-import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 
 /**

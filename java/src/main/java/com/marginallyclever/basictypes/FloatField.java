@@ -9,7 +9,7 @@ import javax.swing.text.NumberFormatter;
 /**
  * A JFormattedTextField that sets itself up to format floating point numbers. 
  * @author Dan Royer
- *
+ * @since 7.8.0
  */
 public class FloatField extends JFormattedTextField {
 	/**

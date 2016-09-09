@@ -1,6 +1,6 @@
 package com.marginallyclever.imageFilters;
 
-import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorRGB;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.TransformedImage;
 
@@ -16,17 +16,17 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
 
   public Filter_DitherFloydSteinbergColor() {
     palette = new ColorPalette();
-    palette.addColor(new C3(255, 0, 0));
-    palette.addColor(new C3(0, 255, 0));
-    palette.addColor(new C3(0, 0, 255));
+    palette.addColor(new ColorRGB(255, 0, 0));
+    palette.addColor(new ColorRGB(0, 255, 0));
+    palette.addColor(new ColorRGB(0, 0, 255));
   }
 
 
-  private void ditherDirection(TransformedImage img, int y, C3[] error, C3[] nexterror, int direction) {
+  private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction) {
     int w = img.getSourceImage().getWidth();
-    C3 oldPixel = new C3(0, 0, 0);
-    C3 newPixel = new C3(0, 0, 0);
-    C3 quant_error = new C3(0, 0, 0);
+    ColorRGB oldPixel = new ColorRGB(0, 0, 0);
+    ColorRGB newPixel = new ColorRGB(0, 0, 0);
+    ColorRGB quant_error = new ColorRGB(0, 0, 0);
     int start, end, x;
 
     for (x = 0; x < w; ++x) nexterror[x].set(0, 0, 0);
@@ -42,7 +42,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
     // for each x from left to right
     for (x = start; x != end; x += direction) {
       // oldpixel := pixel[x][y]
-      oldPixel.set(new C3(img.getSourceImage().getRGB(x, y)).add(error[x]));
+      oldPixel.set(new ColorRGB(img.getSourceImage().getRGB(x, y)).add(error[x]));
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = palette.quantize(oldPixel);
       // pixel[x][y] := newpixel
@@ -70,12 +70,12 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
     int h = img.getSourceImage().getHeight();
     int w = img.getSourceImage().getWidth();
     int direction = 1;
-    C3[] error = new C3[w];
-    C3[] nexterror = new C3[w];
+    ColorRGB[] error = new ColorRGB[w];
+    ColorRGB[] nexterror = new ColorRGB[w];
 
     for (y = 0; y < w; ++y) {
-      error[y] = new C3(0, 0, 0);
-      nexterror[y] = new C3(0, 0, 0);
+      error[y] = new ColorRGB(0, 0, 0);
+      nexterror[y] = new ColorRGB(0, 0, 0);
     }
 
     // for each y from top to bottom
@@ -83,7 +83,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
       ditherDirection(img, y, error, nexterror, direction);
 
       direction = -direction;
-      C3[] tmp = error;
+      ColorRGB[] tmp = error;
       error = nexterror;
       nexterror = tmp;
     }

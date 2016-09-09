@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 
 /**
  * contains the text for a gcode file.

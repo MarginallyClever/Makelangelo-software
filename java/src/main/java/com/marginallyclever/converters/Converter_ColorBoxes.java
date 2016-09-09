@@ -4,7 +4,7 @@ package com.marginallyclever.converters;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorRGB;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,18 +19,18 @@ public class Converter_ColorBoxes extends ImageConverter {
 	private float step2;
 	private float step4;
 	private int palette_mask;
-	private C3[] error = null;
-	private C3[] nexterror = null;
+	private ColorRGB[] error = null;
+	private ColorRGB[] nexterror = null;
 	private float stepsTotal = 0;
 	private int direction = 1;
 
 
 	public Converter_ColorBoxes() {
 		palette = new ColorPalette();
-		palette.addColor(new C3(0, 0, 0));
-		palette.addColor(new C3(255, 0, 0));
-		palette.addColor(new C3(0, 255, 0));
-		palette.addColor(new C3(0, 0, 255));
+		palette.addColor(new ColorRGB(0, 0, 0));
+		palette.addColor(new ColorRGB(255, 0, 0));
+		palette.addColor(new ColorRGB(0, 255, 0));
+		palette.addColor(new ColorRGB(0, 0, 255));
 	}
 
 
@@ -39,10 +39,10 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 
 
-	private void ditherDirection(TransformedImage img, int y, C3[] error, C3[] nexterror, int direction, Writer out) throws IOException {
-		C3 oldPixel = new C3(0, 0, 0);
-		C3 newPixel = new C3(0, 0, 0);
-		C3 quant_error = new C3(0, 0, 0);
+	private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction, Writer out) throws IOException {
+		ColorRGB oldPixel = new ColorRGB(0, 0, 0);
+		ColorRGB newPixel = new ColorRGB(0, 0, 0);
+		ColorRGB quant_error = new ColorRGB(0, 0, 0);
 		float start, x;
 
 		int xi;
@@ -66,7 +66,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 		for(xi=0;xi<error.length;++xi) {
 			// oldpixel := pixel[x][y]
 			//oldPixel.set( new C3(img.getRGB(x, y)).add(error[x]) );
-			oldPixel.set(new C3(img.sample(x-step2, y-step2, x + step2, y + step2)).add(error[xi]));
+			oldPixel.set(new ColorRGB(img.sample(x-step2, y-step2, x + step2, y + step2)).add(error[xi]));
 			// newpixel := find_closest_palette_color(oldpixel)
 			int newIndex = palette.quantizeIndex(oldPixel);
 			newPixel = palette.getColor(newIndex);
@@ -129,8 +129,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 		int y;
 
 		for (y = 0; y < error.length; ++y) {
-			error[y] = new C3(0, 0, 0);
-			nexterror[y] = new C3(0, 0, 0);
+			error[y] = new ColorRGB(0, 0, 0);
+			nexterror[y] = new ColorRGB(0, 0, 0);
 		}
 
 		int yBottom = (int)( machine.getPaperBottom() * machine.getPaperMargin() * 10.0f );
@@ -141,7 +141,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 			ditherDirection(img, y, error, nexterror, direction, out);
 
 			direction = -direction;
-			C3[] tmp = error;
+			ColorRGB[] tmp = error;
 			error = nexterror;
 			nexterror = tmp;
 		}
@@ -167,8 +167,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 		if (stepsTotal < 1) stepsTotal = 1;
 
 		// set up the error buffers for floyd/steinberg dithering
-		error = new C3[(int) Math.ceil(stepsTotal)];
-		nexterror = new C3[(int) Math.ceil(stepsTotal)];
+		error = new ColorRGB[(int) Math.ceil(stepsTotal)];
+		nexterror = new ColorRGB[(int) Math.ceil(stepsTotal)];
 
 		try {
 			scan(0, img, out);  // black

@@ -15,9 +15,9 @@ public class ColorPalette {
   /**
    * List of colors in the form of red, green, and blue data values.
    *
-   * @see C3
+   * @see ColorRGB
    */
-  protected List<C3> colors;
+  protected List<ColorRGB> colors;
   
 
   public ColorPalette() {
@@ -28,7 +28,7 @@ public class ColorPalette {
    * add a color to the palette.  Does not check for duplicates.
    * @param c
    */
-  public void addColor(C3 c) {
+  public void addColor(ColorRGB c) {
     colors.add(c);
   }
 
@@ -38,9 +38,9 @@ public class ColorPalette {
    * @param c color to remove.
    * @see <a href="http://stackoverflow.com/a/223929">Iterating through a list, avoiding ConcurrentModificationException when removing in loop</a>
    */
-  public void removeColor(C3 c) {
-    for (final Iterator<C3> colorsIterator = colors.iterator(); colorsIterator.hasNext(); ) {
-      final C3 nextColor = colorsIterator.next();
+  public void removeColor(ColorRGB c) {
+    for (final Iterator<ColorRGB> colorsIterator = colors.iterator(); colorsIterator.hasNext(); ) {
+      final ColorRGB nextColor = colorsIterator.next();
       if (nextColor.equals(c)) {
         colorsIterator.remove();
       }
@@ -62,7 +62,7 @@ public class ColorPalette {
    * @param index
    * @return
    */
-  public C3 getColor(int index) throws IndexOutOfBoundsException {
+  public ColorRGB getColor(int index) throws IndexOutOfBoundsException {
     return colors.get(index);
   }
 
@@ -72,7 +72,7 @@ public class ColorPalette {
    * @param c the color to match
    * @return the closest match
    */
-  public C3 quantize(C3 c) {
+  public ColorRGB quantize(ColorRGB c) {
     int i = quantizeIndex(c);
 
     return this.getColor(i);
@@ -84,11 +84,11 @@ public class ColorPalette {
    * @param c the color to match
    * @return the index into the color palette of the closest match 
    */
-  public int quantizeIndex(C3 c) {
-    Iterator<C3> i = colors.iterator();
+  public int quantizeIndex(ColorRGB c) {
+    Iterator<ColorRGB> i = colors.iterator();
     assert (i.hasNext());
 
-    C3 color, nearestColor = i.next();
+    ColorRGB color, nearestColor = i.next();
     int index = 0;
     int nearestIndex = 0;
 

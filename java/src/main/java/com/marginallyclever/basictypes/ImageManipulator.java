@@ -7,8 +7,8 @@ import java.io.Writer;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 

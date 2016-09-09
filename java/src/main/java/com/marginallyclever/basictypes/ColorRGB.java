@@ -6,32 +6,32 @@ import java.awt.Color;
 
 /**
  * RGB color class
- * @author danroyer
+ * @author Dan Royer
  *
  */
-public class C3 {
+public class ColorRGB {
   public int red = 0;
   public int green = 0;
   public int blue = 0;
 
-  public C3(int r, int g, int b) {
+  public ColorRGB(int r, int g, int b) {
     red = r;
     green = g;
     blue = b;
   }
 
-  public C3(C3 x) {
+  public ColorRGB(ColorRGB x) {
     set(x);
   }
 
-  public C3(int pixel) {
+  public ColorRGB(int pixel) {
     int r = ((pixel >> 16) & 0xff);
     int g = ((pixel >> 8) & 0xff);
     int b = ((pixel) & 0xff);
     set(r, g, b);
   }
 
-  public C3(Color c) {
+  public ColorRGB(Color c) {
     red = c.getRed();
     green = c.getGreen();
     blue = c.getBlue();
@@ -41,7 +41,7 @@ public class C3 {
     return ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff);
   }
 
-  public C3 set(C3 x) {
+  public ColorRGB set(ColorRGB x) {
     red = x.red;
     green = x.green;
     blue = x.blue;
@@ -54,28 +54,28 @@ public class C3 {
     blue = b;
   }
 
-  public C3 sub(C3 x) {
+  public ColorRGB sub(ColorRGB x) {
     red -= x.red;
     green -= x.green;
     blue -= x.blue;
     return this;
   }
 
-  public C3 add(C3 x) {
+  public ColorRGB add(ColorRGB x) {
     red += x.red;
     green += x.green;
     blue += x.blue;
     return this;
   }
 
-  public C3 mul(double f) {
+  public ColorRGB mul(double f) {
     red *= f;
     green *= f;
     blue *= f;
     return this;
   }
 
-  public float diff(C3 o) {
+  public float diff(ColorRGB o) {
     int rDiff = o.red - this.red;
     int gDiff = o.green - this.green;
     int bDiff = o.blue - this.blue;

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import com.marginallyclever.basictypes.C3;
+import com.marginallyclever.basictypes.ColorRGB;
 import com.marginallyclever.basictypes.ColorPalette;
 import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.imageFilters.Filter_GaussianBlur;
@@ -32,11 +32,11 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	public Converter_ColorFloodFill() {
 		palette = new ColorPalette();
-		palette.addColor(new C3(  0,   0,   0));
-		palette.addColor(new C3(255,   0,   0));
-		palette.addColor(new C3(  0, 255,   0));
-		palette.addColor(new C3(  0,   0, 255));
-		palette.addColor(new C3(255, 255, 255));
+		palette.addColor(new ColorRGB(  0,   0,   0));
+		palette.addColor(new ColorRGB(255,   0,   0));
+		palette.addColor(new ColorRGB(  0, 255,   0));
+		palette.addColor(new ColorRGB(  0,   0, 255));
+		palette.addColor(new ColorRGB(255, 255, 255));
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	protected void setMaskTouched(float x0, float y0, float x1, float y1) {
 		
-		int c = (new C3(255, 255, 255)).toInt();
+		int c = (new ColorRGB(255, 255, 255)).toInt();
 		for (float y = y0; y < y1; ++y) {
 			for (float x = x0; x < x1; ++x) {
 				if(imgMask.canSampleAt(x, y)) {
@@ -96,28 +96,28 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * @param g
 	 * @return the average color in the region.  if nothing is sampled, return white.
 	 */
-	protected C3 takeImageSampleBlock(float x2, float y2, float f, float g) {
+	protected ColorRGB takeImageSampleBlock(float x2, float y2, float f, float g) {
 		// point sampling
-		C3 value = new C3(0, 0, 0);
+		ColorRGB value = new ColorRGB(0, 0, 0);
 		int sum = 0;
 
 		for (float y = y2; y < g; ++y) {
 			for (float x = x2; x < f; ++x) {
 				if(isInsidePaperMargins(x, y) && imgChanged.canSampleAt(x, y)) {
-					value.add(new C3(imgChanged.sample1x1(x, y)));
+					value.add(new ColorRGB(imgChanged.sample1x1(x, y)));
 					++sum;
 				}
 			}
 		}
 
-		if (sum == 0) return new C3(255, 255, 255);
+		if (sum == 0) return new ColorRGB(255, 255, 255);
 
 		return value.mul(1.0f / sum);
 	}
 
 
 	protected boolean doesQuantizedBlockMatch(int color_index, float x, float y) {
-		C3 original_color = takeImageSampleBlock((int) x, (int) y, (int) (x + diameter), (int) (y + diameter));
+		ColorRGB original_color = takeImageSampleBlock((int) x, (int) y, (int) (x + diameter), (int) (y + diameter));
 		int quantized_color = palette.quantizeIndex(original_color);
 		return (quantized_color == color_index);
 	}
@@ -178,7 +178,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * @throws IOException
 	 */
 	void scanForContiguousBlocks(int colorIndex, Writer osw) throws IOException {
-		C3 originalColor;
+		ColorRGB originalColor;
 		int quantized_color;
 
 		float x, y;
