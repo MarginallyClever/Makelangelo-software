@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.marginallyclever.util.MarginallyCleverPreferences;
+import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.UnitTestHelper;
 
 /**

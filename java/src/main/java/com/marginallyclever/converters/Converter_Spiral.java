@@ -4,9 +4,9 @@ package com.marginallyclever.converters;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

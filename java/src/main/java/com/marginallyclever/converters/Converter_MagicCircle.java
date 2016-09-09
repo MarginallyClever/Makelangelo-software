@@ -6,8 +6,8 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

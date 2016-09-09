@@ -8,12 +8,12 @@ import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.imageFilters.Filter_DitherFloydSteinberg;
-import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
@@ -23,7 +23,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  *
  * @author Dan
  */
-public class Converter_ZigZag extends ImageConverter implements DrawPanelDecorator {
+public class Converter_ZigZag extends ImageConverter implements MakelangeloRobotDecorator {
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;

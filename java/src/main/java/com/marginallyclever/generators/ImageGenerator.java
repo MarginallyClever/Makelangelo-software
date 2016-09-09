@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.makelangelo.DrawPanelDecorator;
+import com.marginallyclever.makelangelo.ImageManipulator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -14,7 +14,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan royer
  *
  */
-public abstract class ImageGenerator extends ImageManipulator implements DrawPanelDecorator {
+public abstract class ImageGenerator extends ImageManipulator implements MakelangeloRobotDecorator {
 	/**
 	 * @return true if generate succeeded.
 	 * @param dest the file where the results will be saved.

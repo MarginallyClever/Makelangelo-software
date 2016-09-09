@@ -1,16 +1,12 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,11 +16,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.marginallyclever.basictypes.FloatField;
+import com.marginallyclever.makelangelo.FloatField;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -158,14 +153,14 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		paperMargin.setPaintTicks(false);
 		paperMargin.setPaintLabels(true);
 		
-		pm.anchor = pm.WEST;
+		pm.anchor = GridBagConstraints.WEST;
 		JLabel marginLabel = new JLabel(Translator.get("PaperMargin"));
 		marginLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		//marginLabel.setBorder(BorderFactory.createLineBorder(new Color(0,0,0), 1));
 		marginPanel.add(marginLabel,pm);
 		pm.gridy=0;
 		pm.gridwidth=2;
-		pm.anchor = pm.EAST;
+		pm.anchor = GridBagConstraints.EAST;
 		//paperMargin.setBorder(BorderFactory.createLineBorder(new Color(0,0,0), 1));
 		marginPanel.add(paperMargin,pm);
 

@@ -17,7 +17,6 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 import com.marginallyclever.makelangelo.CommandLineOptions;
-import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -66,7 +65,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 	// rendering stuff
 	public boolean showPenUpMoves=false;
-	private DrawPanelDecorator drawDecorator=null;
+	private MakelangeloRobotDecorator decorator=null;
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
@@ -650,8 +649,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
-	public void setDecorator(DrawPanelDecorator dd) {
-		drawDecorator = dd;
+	public void setDecorator(MakelangeloRobotDecorator arg0) {
+		decorator = arg0;
 		if(gCode!=null) gCode.emptyNodeBuffer();
 	}
 	
@@ -661,9 +660,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		
 		settings.getHardwareProperties().render(gl2, this);
 
-		if(drawDecorator!=null) {
+		if(decorator!=null) {
 			// filters can also draw WYSIWYG previews while converting.
-			drawDecorator.render(gl2,settings);
+			decorator.render(gl2,settings);
 		} else if(gCode!=null) {
 			gCode.render(gl2,this);
 		}

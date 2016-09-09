@@ -28,15 +28,15 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.converters.ImageConverter;
 import com.marginallyclever.generators.Generator_Text;
+import com.marginallyclever.makelangelo.ImageManipulator;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.PreferencesHelper;
+import com.marginallyclever.makelangelo.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 

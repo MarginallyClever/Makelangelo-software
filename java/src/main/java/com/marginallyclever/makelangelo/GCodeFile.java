@@ -13,6 +13,7 @@ import java.util.prefs.Preferences;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * contains the text for a gcode file.

@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,17 +36,17 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.basictypes.ImageManipulator;
 import com.marginallyclever.generators.ImageGenerator;
 import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.loadAndSave.LoadAndSaveGCode;
+import com.marginallyclever.makelangelo.CollapsiblePanel;
+import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.ImageManipulator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
-import com.marginallyclever.basictypes.CollapsiblePanel;
-import com.marginallyclever.basictypes.FloatField;
 
 /**
  * Control panel for a Makelangelo robot

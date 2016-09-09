@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import com.marginallyclever.basictypes.ColorRGB;
-import com.marginallyclever.basictypes.ColorPalette;
-import com.marginallyclever.basictypes.TransformedImage;
 import com.marginallyclever.imageFilters.Filter_GaussianBlur;
+import com.marginallyclever.makelangelo.ColorPalette;
+import com.marginallyclever.makelangelo.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

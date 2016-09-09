@@ -34,7 +34,7 @@
  * Description: The user-triggered collapsable panel containing the component (trigger) in the titled border
  * URL: http://chianti.ucsd.edu/svn/csplugins/trunk/soc/jgao/NetworkMerge/src/csplugins/network/merge/ui/CollapsiblePanel.java
  */
-package com.marginallyclever.basictypes;
+package com.marginallyclever.makelangelo;
 
 import javax.swing.*;
 import javax.swing.border.Border;

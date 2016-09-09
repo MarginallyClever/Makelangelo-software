@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
@@ -21,9 +20,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.filechooser.FileFilter;
-
-import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;

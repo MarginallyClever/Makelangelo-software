@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -11,6 +11,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author danroyer
  * @since 7.1.4
  */
-public abstract interface DrawPanelDecorator {
+public abstract interface MakelangeloRobotDecorator {
 	void render(GL2 gl2, MakelangeloRobotSettings machine);
 }

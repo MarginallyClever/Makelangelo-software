@@ -1,6 +1,6 @@
 package com.marginallyclever.imageFilters;
 
-import com.marginallyclever.basictypes.TransformedImage;
+import com.marginallyclever.makelangelo.TransformedImage;
 
 
 /**

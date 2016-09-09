@@ -1,7 +1,7 @@
 package com.marginallyclever.imageFilters;
 
-import com.marginallyclever.basictypes.ColorRGB;
-import com.marginallyclever.basictypes.TransformedImage;
+import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.makelangelo.TransformedImage;
 
 
 /**

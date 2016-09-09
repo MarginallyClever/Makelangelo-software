@@ -11,14 +11,12 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.PreferencesHelper;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
-import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo3Properties;
-import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
+import com.marginallyclever.util.PreferencesHelper;
 
 
 /**

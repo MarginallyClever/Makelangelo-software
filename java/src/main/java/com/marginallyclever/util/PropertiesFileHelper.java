@@ -1,8 +1,11 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
 
 /**
  * Created on 5/10/15.

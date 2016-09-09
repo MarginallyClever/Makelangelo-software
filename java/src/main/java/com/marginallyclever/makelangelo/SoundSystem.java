@@ -18,6 +18,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 
+import com.marginallyclever.util.PreferencesHelper;
+
 public class SoundSystem {
 	static private Preferences prefs;
 
