@@ -201,7 +201,7 @@
 
 	<string>
 		<key>PaperMargin</key>
-		<value>Margin at paper edge (%)</value>
+		<value>Margin (%)</value>
 		<hint>conversion options</hint>
 	</string>
 	<string>

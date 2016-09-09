@@ -16,6 +16,11 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public String getName() {
 		return "Makelangelo 2+";
 	}
+
+	@Override
+	public boolean canInvertMotors() {
+		return true;
+	}
 	
 	@Override
 	public boolean canChangeMachineSize() {

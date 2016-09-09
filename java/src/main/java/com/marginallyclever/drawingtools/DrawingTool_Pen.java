@@ -17,6 +17,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.marginallyclever.basictypes.FloatField;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -69,14 +70,11 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	    JPanel p = new JPanel(new GridBagLayout());
 	    panel.add(p);
 	    
-	    NumberFormat nFloat = NumberFormat.getNumberInstance();
-	    nFloat.setMaximumFractionDigits(1);
-	    
-		penDiameter = new JFormattedTextField(nFloat);
-		penFeedRate = new JFormattedTextField(nFloat);
-		penUp = new JFormattedTextField(nFloat);
-		penDown = new JFormattedTextField(nFloat);
-		penZRate = new JFormattedTextField(nFloat);
+		penDiameter = new FloatField();
+		penFeedRate = new FloatField();
+		penUp = new FloatField();
+		penDown = new FloatField();
+		penZRate = new FloatField();
 		buttonTestUp = new JButton(Translator.get("penToolTest"));
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
 

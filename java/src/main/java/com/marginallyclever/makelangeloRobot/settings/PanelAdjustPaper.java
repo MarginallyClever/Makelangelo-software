@@ -22,6 +22,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.marginallyclever.basictypes.FloatField;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -128,16 +129,14 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		c.fill = GridBagConstraints.NONE;
 
 		// manual paper size settings
-		NumberFormat nFloat = NumberFormat.getIntegerInstance();
-
 		d.gridwidth=1;
-		pw = new JFormattedTextField(nFloat);
+		pw = new FloatField();
 		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
 		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
 		
-		ph = new JFormattedTextField(nFloat);
+		ph = new FloatField();
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
 		d.gridx=1;  d.gridy=y;  p.add(ph,d);
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);

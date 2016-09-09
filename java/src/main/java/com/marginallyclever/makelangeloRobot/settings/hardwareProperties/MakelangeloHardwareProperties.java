@@ -17,6 +17,8 @@ public interface MakelangeloHardwareProperties {
 	public boolean canAccelerate();
 	
 	public boolean canChangePulleySize();
+
+	public boolean canInvertMotors();
 	
 	public boolean canAutoHome();
 	

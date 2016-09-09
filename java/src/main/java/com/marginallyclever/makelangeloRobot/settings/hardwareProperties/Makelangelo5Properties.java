@@ -16,6 +16,11 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	}
 	
 	@Override
+	public boolean canInvertMotors() {
+		return false;
+	}
+
+	@Override
 	public boolean canChangeMachineSize() {
 		return false;
 	}

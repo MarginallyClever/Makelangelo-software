@@ -48,6 +48,7 @@ import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.basictypes.CollapsiblePanel;
+import com.marginallyclever.basictypes.FloatField;
 
 /**
  * Control panel for a Makelangelo robot
@@ -89,7 +90,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
-	private JFormattedTextField feedRateTxt;
+	private FloatField feedRateTxt;
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
@@ -332,8 +333,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMain.gridy++;
 			feedRateControl.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			feedRateTxt = new JFormattedTextField(NumberFormat.getInstance());  feedRateTxt.setPreferredSize(new Dimension(100,20));
-			feedRateTxt.setText(Double.toString(robot.getSettings().getMaxFeedRate()));
+			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
+			feedRateTxt.setPreferredSize(new Dimension(100,20));
 			setFeedRate = new JButton(Translator.get("Set"));
 			setFeedRate.addActionListener(this);
 			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
