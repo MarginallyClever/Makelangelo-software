@@ -30,7 +30,7 @@ public class FloatField extends JFormattedTextField {
 	}
 	
 	protected void createAndAttachFormatter() {
-		NumberFormat nFloat = NumberFormat.getIntegerInstance();
+		NumberFormat nFloat = NumberFormat.getNumberInstance();
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
 		nFloat.setGroupingUsed(false);

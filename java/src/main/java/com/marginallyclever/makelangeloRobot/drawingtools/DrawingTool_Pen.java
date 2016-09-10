@@ -24,11 +24,11 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JDialog dialog;
 	protected JPanel panel;
 	
-	protected JFormattedTextField penDiameter;
-	protected JFormattedTextField penFeedRate;
-	protected JFormattedTextField penUp;
-	protected JFormattedTextField penDown;
-	protected JFormattedTextField penZRate;
+	protected FloatField penDiameter;
+	protected FloatField penFeedRate;
+	protected FloatField penUp;
+	protected FloatField penDown;
+	protected FloatField penZRate;
 
 	protected JButton buttonTestUp;
 	protected JButton buttonTestDown;
@@ -51,12 +51,12 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	public DrawingTool_Pen(String name2, int tool_id, MakelangeloRobot robot) {
 		super(robot);
 
-		diameter = 1.5f;
-		zRate = 120;
+		diameter = 0.8f;
+		zRate = 50;
 		zOn = 90;
 		zOff = 50;
 		toolNumber = tool_id;
-		feedRateXY = 3500;
+		feedRateXY = 6500;
 		name = name2;
 	}
 
@@ -68,19 +68,13 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	    JPanel p = new JPanel(new GridBagLayout());
 	    panel.add(p);
 	    
-		penDiameter = new FloatField();
-		penFeedRate = new FloatField();
-		penUp = new FloatField();
-		penDown = new FloatField();
-		penZRate = new FloatField();
+		penDiameter = new FloatField(getDiameter());
+		penFeedRate = new FloatField(feedRateXY);
+		penUp = new FloatField(zOff);
+		penDown = new FloatField(zOn);
+		penZRate = new FloatField(zRate);
 		buttonTestUp = new JButton(Translator.get("penToolTest"));
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
-
-		penDiameter.setValue(getDiameter());
-		penFeedRate.setValue(feedRateXY);
-		penUp.setValue(zOff);
-		penDown.setValue(zOn);
-		penZRate.setValue(zRate);
 
 	    Dimension s = buttonTestUp.getPreferredSize();
 	    s.width = 80;

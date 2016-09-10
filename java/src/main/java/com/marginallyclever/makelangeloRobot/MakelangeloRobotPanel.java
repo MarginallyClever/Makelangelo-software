@@ -36,16 +36,15 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.generators.ImageGenerator;
-import com.marginallyclever.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.FloatField;
-import com.marginallyclever.makelangelo.ImageManipulator;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 /**
