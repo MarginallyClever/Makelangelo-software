@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,17 +36,16 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.basictypes.ImageManipulator;
-import com.marginallyclever.generators.ImageGenerator;
-import com.marginallyclever.loaders.LoadFileType;
-import com.marginallyclever.loaders.LoadGCode;
+import com.marginallyclever.makelangelo.CollapsiblePanel;
+import com.marginallyclever.makelangelo.FloatField;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.settings.MakelangeloSettingsDialog;
-import com.marginallyclever.basictypes.CollapsiblePanel;
-import com.marginallyclever.savers.SaveFileType;
+import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 /**
  * Control panel for a Makelangelo robot
@@ -86,11 +83,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	// driving controls
 	private JButton down100,down10,down1,up1,up10,up100;
 	private JButton left100,left10,left1,right1,right10,right100;
-	private JButton goHome,setHome;
-	private JButton goTop,goBottom,goLeft,goRight,penUp,penDown;
+	private JButton goHome,findHome,setHome;
+	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
-	private JFormattedTextField feedRate;
+	private FloatField feedRateTxt;
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
@@ -141,8 +138,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 
-	protected List<SaveFileType> loadFileSavers() {
-		return new ArrayList<SaveFileType>();
+	protected List<LoadAndSaveFileType> loadFileSavers() {
+		return new ArrayList<LoadAndSaveFileType>();
 	}
 
 
@@ -227,11 +224,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
         
 		int result = JOptionPane.showConfirmDialog(this.getRootPane(), connectionList, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
+			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
 			robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
-			updateMachineNumberPanel();
-			updateButtonAccess();
-			buttonConnect.setText(Translator.get("ButtonDisconnect"));
+			//updateMachineNumberPanel();
+			//updateButtonAccess();
 		}
 		isConnected=true;
 	}
@@ -242,10 +239,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		Object subject = e.getSource();
 
 		if(subject == machineChoices && e.getStateChange()==ItemEvent.SELECTED) {
-			int selectedIndex = machineChoices.getSelectedIndex();
-			long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-			robot.getSettings().loadConfig(newUID);
+			updateMachineChoice();
 		}
+	}
+	
+	protected void updateMachineChoice() {
+		int selectedIndex = machineChoices.getSelectedIndex();
+		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
+		robot.getSettings().loadConfig(newUID);
 	}
 
 	
@@ -323,26 +324,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		cMain.gridx=0;
 		cMain.gridy=0;
 		{
-			// feed rate
-			JPanel feedRateControl = new JPanel();
-			mainPanel.add(feedRateControl,cMain);
-			cMain.gridy++;
-			feedRateControl.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			feedRate = new JFormattedTextField(NumberFormat.getInstance());  feedRate.setPreferredSize(new Dimension(100,20));
-			feedRate.setText(Double.toString(robot.getSettings().getFeedRate()));
-			setFeedRate = new JButton(Translator.get("Set"));
-			setFeedRate.addActionListener(this);
-			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
-			toggleEngagedMotor.addActionListener(this);
-
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRate,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
-			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-			c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
-		}
-		{
 			// axis driving
 			JPanel axisControl = new JPanel(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
@@ -385,6 +366,23 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
 		}
 		{
+			// feed rate
+			JPanel feedRateControl = new JPanel();
+			mainPanel.add(feedRateControl,cMain);
+			cMain.gridy++;
+			feedRateControl.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
+			feedRateTxt.setPreferredSize(new Dimension(100,20));
+			setFeedRate = new JButton(Translator.get("Set"));
+			setFeedRate.addActionListener(this);
+
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
+			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRateTxt,c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
+			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+		}
+		{
 			// quick drive to corners
 			JPanel quickDriveOptions = new JPanel(new GridBagLayout());
 			cMain.insets = new Insets(10,0,0,0);
@@ -398,32 +396,40 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			con1.fill=GridBagConstraints.HORIZONTAL;
 			con1.anchor=GridBagConstraints.NORTH;
 	
-			goTop    = new JButton(Translator.get("Top"));			goTop   .setPreferredSize(new Dimension(80,20));
-			goBottom = new JButton(Translator.get("Bottom"));		goBottom.setPreferredSize(new Dimension(80,20));
-			goLeft   = new JButton(Translator.get("Left"));			goLeft  .setPreferredSize(new Dimension(80,20));
-			goRight  = new JButton(Translator.get("Right"));		goRight .setPreferredSize(new Dimension(80,20));
-			penUp    = new JButton(Translator.get("PenUp"));		penUp   .setPreferredSize(new Dimension(100,20));
-			penDown  = new JButton(Translator.get("PenDown"));		penDown .setPreferredSize(new Dimension(100,20));
-			goHome   = new JButton(Translator.get("GoHome"));		goHome  .setPreferredSize(new Dimension(100,20));
+			goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
+			goPaperBorder.setPreferredSize(new Dimension(80,20));
+			
+			penUp    = new JButton(Translator.get("PenUp"));
+			penDown  = new JButton(Translator.get("PenDown"));
+			goHome   = new JButton(Translator.get("GoHome"));
+			findHome = new JButton(Translator.get("FindHome"));
+			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+
+			penUp   .setPreferredSize(new Dimension(100,20));
+			penDown .setPreferredSize(new Dimension(100,20));
+			goHome  .setPreferredSize(new Dimension(100,20));
+			findHome.setPreferredSize(new Dimension(100,20));
+			toggleEngagedMotor.setPreferredSize(new Dimension(100,20));
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor=GridBagConstraints.WEST;
 			c.fill=GridBagConstraints.BOTH;
-			c.gridx=2;  c.gridy=0;  quickDriveOptions.add(goTop,c);
-			c.gridx=2;  c.gridy=1;  quickDriveOptions.add(goHome,c);
-			c.gridx=2;  c.gridy=2;  quickDriveOptions.add(goBottom,c);
-			c.gridx=1;  c.gridy=1;  quickDriveOptions.add(goLeft,c);
-			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(goRight,c);
+			
+			c.gridx=0;  c.gridy=0;  quickDriveOptions.add(goPaperBorder,c);
+			c.gridx=0;  c.gridy=1;  quickDriveOptions.add(toggleEngagedMotor,c);
+			
 			c.gridx=4;  c.gridy=0;  quickDriveOptions.add(penUp,c);
-			c.gridx=4;  c.gridy=2;  quickDriveOptions.add(penDown,c);
-	
-			goTop.addActionListener(this);
-			goBottom.addActionListener(this);
-			goLeft.addActionListener(this);
-			goRight.addActionListener(this);
+			c.gridx=4;  c.gridy=1;  quickDriveOptions.add(penDown,c);
+
+			c.gridx=3;  c.gridy=0;  quickDriveOptions.add(goHome,c);
+			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(findHome,c);
+			
+			goPaperBorder.addActionListener(this);
+			toggleEngagedMotor.addActionListener(this);
 			penUp.addActionListener(this);
 			penDown.addActionListener(this);
 			goHome.addActionListener(this);
+			findHome.addActionListener(this);
 	
 			con1.weightx=1;
 			con1.weighty=0;
@@ -458,10 +464,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMachine.gridx++;
 			machineNumberPanel.add(machineChoices,cMachine);
 			cMachine.gridx++;
-
-			int index = robot.getSettings().getKnownMachineIndex();
-			if( index<0 ) index=0;
-			machineChoices.setSelectedIndex(index);
 			
 			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
 			boolean state=false;
@@ -471,6 +473,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener(this);
+
+			int index = robot.getSettings().getKnownMachineIndex();
+			if( index<0 ) index=0;
+			machineChoices.setSelectedIndex(index);
+
+			// force the GUI to load the correct initial choice.
+			updateMachineChoice();
 		}
 
 		openConfig = new JButton(Translator.get("configureMachine"));
@@ -497,7 +506,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			m.run();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) openFileDialog();
+		else if (subject == buttonOpenFile) loadFileDialog();
 		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
@@ -523,29 +532,33 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		else if (subject == buttonHalt) robot.halt();		
 		else if (subject == goHome  ) robot.goHome();
+		else if (subject == findHome) robot.findHome();
 		else if (subject == setHome ) {
 			robot.setHome();
 			updateButtonAccess();
 		}
-		else if (subject == goLeft  ) robot.movePenToEdgeLeft();
-		else if (subject == goRight ) robot.movePenToEdgeRight();
-		else if (subject == goTop   ) robot.movePenToEdgeTop();
-		else if (subject == goBottom) robot.movePenToEdgeBottom();
+		else if (subject == goPaperBorder) {
+			robot.movePenToEdgeTop();
+			robot.movePenToEdgeRight();
+			robot.movePenToEdgeBottom();
+			robot.movePenToEdgeLeft();
+			robot.movePenToEdgeTop();
+			robot.goHome();
+		}
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
 		else if (subject == setFeedRate) {
 			// get the feed rate
-			String fr = feedRate.getText();
+			String fr = feedRateTxt.getText();
 			fr = fr.replaceAll("[ ,]", "");
 			// trim it to 3 decimal places
-			double parsedFeedRate = 0;
+			double feedRate = 0;
 			try {
-				parsedFeedRate = Double.parseDouble(fr);
-
-				if (parsedFeedRate < 0.001) parsedFeedRate = 0.001;
-				// update the input field
-				feedRate.setText(Double.toString(parsedFeedRate));
-				robot.setFeedRate(parsedFeedRate);
+				feedRate = Double.parseDouble(fr);
+				// update the input field				
+				robot.setCurrentFeedRate(feedRate);
+				feedRateTxt.setText(Double.toString(robot.getCurrentFeedRate()));
+				
 			} catch(NumberFormatException e1) {}
 		} else if (subject == toggleEngagedMotor) {
 			if(robot.areMotorsEngaged() ) {
@@ -677,32 +690,31 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right10.setEnabled(isConfirmed && !isRunning);
 		right100.setEnabled(isConfirmed && !isRunning);
 
-		goTop.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goBottom.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goLeft.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		goRight.setEnabled(isConfirmed && !isRunning && hasSetHome);
-
+		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
 		setHome.setEnabled(isConfirmed && !isRunning);
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
-
+		findHome.setEnabled(isConfirmed && !isRunning && robot.getSettings().getHardwareProperties().canAutoHome());
+		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
 		setFeedRate.setEnabled(isConfirmed && !isRunning);
+		
+		buttonSaveFile.setEnabled(robot!=null && robot.gCode != null && robot.gCode.isLoaded());
 		
 		this.validate();
 	}
 
 	public void newFile() {
 		robot.setGCode(null);
-		gui.updateMenuBar();
+		updateButtonAccess();
 	}
 
 	/**
 	 * Creates a file open dialog. If you don't cancel it opens that file.
 	 * Note: source for ExampleFileFilter can be found in FileChooserDemo, under the demo/jfc directory in the Java 2 SDK, Standard Edition.
 	 */
-	public void openFileDialog() {
+	public void loadFileDialog() {
 		// Is you machine not yet calibrated?
 		if (robot.getSettings().isPaperConfigured() == false) {
 			// Hey!  Come back after you calibrate! 
@@ -710,20 +722,31 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			return;
 		}
 
+		// list available loaders
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
-		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
-		Iterator<LoadFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadFileType lft = i.next();
-			FileFilter filter = lft.getFileNameFilter();
-			fc.addChoosableFileFilter(filter);
+			LoadAndSaveFileType lft = i.next();
+			if(lft.canLoad()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
 		}
-
+		// no wild card filter, please.
+		fc.setAcceptAllFileFilterUsed(false);
+		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			if(openFileOnDemand(selectedFile)) {
-				lastFileIn = selectedFile;
-				updateButtonAccess();
+			FileFilter chosenFilter = fc.getFileFilter();
+			i = imageLoaders.iterator();
+			while(i.hasNext()) {
+				LoadAndSaveFileType loader = i.next();
+				if( !loader.getFileNameFilter().equals(chosenFilter)) continue;
+				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
+				if(success) {
+					lastFileIn = selectedFile;
+				}
 			}
 		}
 	}
@@ -802,7 +825,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			}
 			robot.setDecorator(null);
 
-			LoadGCode loader = new LoadGCode();
+			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
 				loader.load(fileInputStream,robot);
 			} catch(IOException e) {
@@ -811,35 +834,96 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
+			updateButtonAccess();
 		}
 	}
 
 	public void saveFileDialog() {
-		// Note: source for ExampleFileFilter can be found in FileChooserDemo,
-		// under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-		String filename = lastFileOut;
-
-		FileFilter filterGCODE = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
-
-		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.addChoosableFileFilter(filterGCODE);
+		// list all the known savable file types.
+		JFileChooser fc = new JFileChooser(new File(lastFileOut));
+		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
+		while(i.hasNext()) {
+			LoadAndSaveFileType lft = i.next();
+			if(lft.canSave()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
+		}
+		// do not allow wild card (*.*) file extensions
+		fc.setAcceptAllFileFilterUsed(false);
+		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
+			FileFilter chosenFilter = fc.getFileFilter();
+			
+			// figure out which of the savers was requested.
+			// TODO get rid of this stupid guessing game.
+			i = imageSavers.iterator();
+			while(i.hasNext()) {
+				LoadAndSaveFileType lft = i.next();
+				FileFilter filter = lft.getFileNameFilter();
+				if( !chosenFilter.equals(filter) ) continue;
+	
+				// make sure a valid extension is added to the file.
+				String selectedFileLC = selectedFile.toLowerCase();
+				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
+				boolean foundExtension=false;
+				for(String ext : exts) {
+					if (selectedFileLC.endsWith('.'+ext.toLowerCase())) {
+						foundExtension=true;
+						break;
+					}
+				}
+				if(!foundExtension) {
+					selectedFile+='.'+exts[0];
+				}
 
-			if (!selectedFile.toLowerCase().endsWith(".ngc")) {
-				selectedFile += ".ngc";
-			}
-
-			try {
-				robot.gCode.save(selectedFile);
-			} catch (IOException e) {
-				Log.error(Translator.get("Failed") + e.getMessage());
-				return;
+				// try to save now.
+				boolean success = false;
+				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
+					success=lft.save(fileOutputStream,robot);
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
+				if(success==true) {
+					lastFileOut = selectedFile;
+					updateButtonAccess();
+					break;
+				}					
 			}
 		}
 	}
 
 
+	/**
+	 * Open a file with a given LoadAndSaveFileType plugin.  
+	 * The loader might spawn a new thread and return before the load is actually finished.
+	 * @param filename absolute path of the file to load
+	 * @param loader the plugin to use
+	 * @return true if load is successful.
+	 */
+	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
+		boolean success = false;
+		try (final InputStream fileInputStream = new FileInputStream(filename)) {
+			success=loader.load(fileInputStream,robot);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		// TODO don't rely on this to be true, load may not have finished yet.
+		if (success == true) {
+			Log.message(Translator.get("Finished"));
+			SoundSystem.playConversionFinishedSound();
+		}
+		// TODO don't rely on this to be true, load may not have finished yet.
+		updateButtonAccess();
+		// TODO don't rely on this to be true, load may not have finished yet.
+		statusBar.clear();
+		
+		return success;
+	}
+	
 	/**
 	 * User has asked that a file be opened.
 	 * @param filename the file to be opened.
@@ -850,34 +934,22 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		boolean success=false;
 		boolean attempted=false;
 
-		ServiceLoader<LoadFileType> imageLoaders = ServiceLoader.load(LoadFileType.class);
-		Iterator<LoadFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadFileType lft = i.next();
-			if(lft.canLoad(filename)) {
-				attempted=true;
-				try (final InputStream fileInputStream = new FileInputStream(filename)) {
-					success=lft.load(fileInputStream,robot);
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-				if(success==true) {
-					break;
-				}
-			}
+			LoadAndSaveFileType loader = i.next();
+			if(!loader.canLoad()) continue;
+			if(!loader.canLoad(filename)) continue;
+			
+			attempted=true;
+			success=openFileOnDemandWithLoader(filename,loader);
+			if(success==true) break;
 		}
 		
 		if(attempted == false) {
 			Log.error(Translator.get("UnknownFileType"));
 		}
-
-		if (success == true) {
-			Log.message(Translator.get("Finished"));
-			SoundSystem.playConversionFinishedSound();
-		}
-
-		gui.updateMenuBar();
-		statusBar.clear();
+		
 		return success;
 	}
 }

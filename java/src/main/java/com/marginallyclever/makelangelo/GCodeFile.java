@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,8 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * contains the text for a gcode file.
@@ -69,6 +69,9 @@ public class GCodeFile {
 	}
 
 
+	/**
+	 * rewind the internal pointer to the start of the file.
+	 */
 	public void reset() {
 		setLinesTotal(0);
 		setLinesProcessed(0);
@@ -261,24 +264,6 @@ public class GCodeFile {
 	}
 
 
-	public void save(String filename) throws IOException {
-		FileOutputStream out = new FileOutputStream(filename);
-		String temp;
-
-		for (int i = 0; i < getLinesTotal(); ++i) {
-			temp = lines.get(i);
-			if (!temp.endsWith(";") && !temp.endsWith(";\n")) {
-				temp += ";";
-			}
-			if (!temp.endsWith("\n")) temp += "\n";
-			out.write(temp.getBytes());
-		}
-
-		out.flush();
-		out.close();
-	}
-
-	
 	public int findLastPenUpBefore(int startAtLine,String toMatch) {
 		int x = startAtLine;
 		if( linesTotal==0 ) return 0;
@@ -328,10 +313,14 @@ public class GCodeFile {
 		return true;
 	}
 	
+	/**
+	 * advance the internal line number counter. 
+	 * @return the next line of text.
+	 */
 	public String nextLine() {
 		int lineNumber = getLinesProcessed();
 		setLinesProcessed(lineNumber + 1);
-		String line = lines.get(lineNumber).trim();
+		String line = lines.get(lineNumber).trim();  // TODO use an iterator, faster.
 		return line;
 	}
 
@@ -383,8 +372,8 @@ public class GCodeFile {
 						gl2.glColor3f(1, 0, 0);
 						//g2d.setColor(Color.RED);
 						if(n.type==GCodeNodeType.POS) {
-							robot.gondolaX=(float)n.x1*10;
-							robot.gondolaY=(float)n.y1*10;
+							robot.setGondolaX((float)n.x1*10);
+							robot.setGondolaY((float)n.y1*10);
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						gl2.glColor3f(0, 1, 0);

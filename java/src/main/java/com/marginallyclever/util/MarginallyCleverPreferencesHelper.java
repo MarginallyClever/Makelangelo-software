@@ -11,7 +11,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.PreferencesHelper;
 
 /**
  * @author Peter Colapietro

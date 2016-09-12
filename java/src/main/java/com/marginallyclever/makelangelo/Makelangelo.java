@@ -53,8 +53,10 @@ import com.marginallyclever.communications.SerialConnectionManager;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettings;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotSettingsListener;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettingsListener;
+import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyclever.util.PropertiesFileHelper;
 
 
 /**
@@ -607,6 +609,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
         if (result == JOptionPane.YES_OPTION) {
         	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         	savePreferences();
+        	robot.getSettings().saveConfig();
 
     		// Run this on another thread than the AWT event queue to
     		// make sure the call to Animator.stop() completes before
