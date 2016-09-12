@@ -324,26 +324,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		cMain.gridx=0;
 		cMain.gridy=0;
 		{
-			// feed rate
-			JPanel feedRateControl = new JPanel();
-			mainPanel.add(feedRateControl,cMain);
-			cMain.gridy++;
-			feedRateControl.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
-			feedRateTxt.setPreferredSize(new Dimension(100,20));
-			setFeedRate = new JButton(Translator.get("Set"));
-			setFeedRate.addActionListener(this);
-			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
-			toggleEngagedMotor.addActionListener(this);
-
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRateTxt,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
-			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
-			c.gridx=7;  c.gridy=0;  feedRateControl.add(toggleEngagedMotor,c);
-		}
-		{
 			// axis driving
 			JPanel axisControl = new JPanel(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
@@ -386,6 +366,23 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
 		}
 		{
+			// feed rate
+			JPanel feedRateControl = new JPanel();
+			mainPanel.add(feedRateControl,cMain);
+			cMain.gridy++;
+			feedRateControl.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
+			feedRateTxt.setPreferredSize(new Dimension(100,20));
+			setFeedRate = new JButton(Translator.get("Set"));
+			setFeedRate.addActionListener(this);
+
+			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
+			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRateTxt,c);
+			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
+			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
+		}
+		{
 			// quick drive to corners
 			JPanel quickDriveOptions = new JPanel(new GridBagLayout());
 			cMain.insets = new Insets(10,0,0,0);
@@ -402,16 +399,24 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
 			goPaperBorder.setPreferredSize(new Dimension(80,20));
 			
-			penUp    = new JButton(Translator.get("PenUp"));		penUp   .setPreferredSize(new Dimension(100,20));
-			penDown  = new JButton(Translator.get("PenDown"));		penDown .setPreferredSize(new Dimension(100,20));
-			goHome   = new JButton(Translator.get("GoHome"));		goHome  .setPreferredSize(new Dimension(100,20));
-			findHome = new JButton(Translator.get("FindHome"));		findHome.setPreferredSize(new Dimension(100,20));
+			penUp    = new JButton(Translator.get("PenUp"));
+			penDown  = new JButton(Translator.get("PenDown"));
+			goHome   = new JButton(Translator.get("GoHome"));
+			findHome = new JButton(Translator.get("FindHome"));
+			toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+
+			penUp   .setPreferredSize(new Dimension(100,20));
+			penDown .setPreferredSize(new Dimension(100,20));
+			goHome  .setPreferredSize(new Dimension(100,20));
+			findHome.setPreferredSize(new Dimension(100,20));
+			toggleEngagedMotor.setPreferredSize(new Dimension(100,20));
 
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor=GridBagConstraints.WEST;
 			c.fill=GridBagConstraints.BOTH;
 			
 			c.gridx=0;  c.gridy=0;  quickDriveOptions.add(goPaperBorder,c);
+			c.gridx=0;  c.gridy=1;  quickDriveOptions.add(toggleEngagedMotor,c);
 			
 			c.gridx=4;  c.gridy=0;  quickDriveOptions.add(penUp,c);
 			c.gridx=4;  c.gridy=1;  quickDriveOptions.add(penDown,c);
@@ -420,6 +425,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=3;  c.gridy=1;  quickDriveOptions.add(findHome,c);
 			
 			goPaperBorder.addActionListener(this);
+			toggleEngagedMotor.addActionListener(this);
 			penUp.addActionListener(this);
 			penDown.addActionListener(this);
 			goHome.addActionListener(this);
