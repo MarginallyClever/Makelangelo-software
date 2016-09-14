@@ -42,8 +42,8 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		return false;
 	}
 
-	public float getWidth() { return 0; }
-	public float getHeight() { return 0; }
+	public float getWidth() { return 3*12*25.4f; }
+	public float getHeight() { return 4*12*25.4f; }
 	
 	@Override
 	public void render(GL2 gl2,MakelangeloRobot robot) {
