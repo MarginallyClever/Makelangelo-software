@@ -100,11 +100,11 @@ public abstract class DrawingTool {
 	}
 
 	public String getPenDownString() {
-		return "G00 Z" + df.format(getPenDownAngle()) + ";\n";
+		return "G00 Z" + df.format(getPenDownAngle()) + "; down\n";
 	}
 
 	public String getPenUpString() {
-		return "G00 Z" + df.format(getPenUpAngle()) + ";\n";
+		return "G00 Z" + df.format(getPenUpAngle()) + "; up\n";
 	}
 
 	public void writeChangeTo(Writer out) throws IOException {

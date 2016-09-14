@@ -87,8 +87,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		yEnd   = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
 		xStart = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xEnd   = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-		previousX = 0;
-		previousY = 0;
 
 		double stepSize = tool.getDiameter() * 3.0;
 		double x, y;

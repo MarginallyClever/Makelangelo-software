@@ -18,7 +18,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 public abstract class ImageManipulator {	
 	// pen position optimizing
 	protected boolean lastUp;
-	protected double previousX, previousY;
 	
 	// threading
 	protected ProgressMonitor pm;
@@ -60,8 +59,6 @@ public abstract class ImageManipulator {
 		//out.write(machine.getGCodeConfig() + ";\n");
 		//out.write(machine.getGCodeBobbin() + ";\n");
 		//out.write(machine.getGCodeSetPositionAtHome()+";\n");		
-		previousX = machine.getHomeX();
-		previousY = machine.getHomeY();
 		setAbsoluteMode(out);
 	}
 
@@ -70,7 +67,9 @@ public abstract class ImageManipulator {
 		if(tool==null) {
 			throw new IOException("Order of operations: Can't raise the tool before setting a tool.");
 		}
-		if(lastUp) return;
+		if(lastUp) {
+			return;
+		}
 		tool.writeOff(out);
 		lastUp = true;
 	}
@@ -80,7 +79,9 @@ public abstract class ImageManipulator {
 		if(tool==null) {
 			throw new IOException("Order of operations: Can't lower the tool before setting a tool.");
 		}
-		if(!lastUp) return;
+		if(!lastUp) {
+			return;
+		}
 		tool.writeOn(out);
 		lastUp = false;
 	}
@@ -109,10 +110,7 @@ public abstract class ImageManipulator {
 		if(lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
-			lastUp = up;
 		}
-		previousX = x;
-		previousY = y;
 	}
 
 

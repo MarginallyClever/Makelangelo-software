@@ -382,6 +382,9 @@ public class GCodeFile {
 						break;
 					}
 				}
+				
+				//if(n.lineNumber<4800) continue;
+				//if(n.lineNumber>4825) break;
 
 				switch (n.type) {
 				case TOOL:
@@ -441,7 +444,7 @@ public class GCodeFile {
 	}
 
 	private void optimizeNodes( MakelangeloRobot robot ) {
-		if (!fastNodes.isEmpty() && changed == false) return;
+		if (!fastNodes.isEmpty() && !changed) return;
 		changed = false;
 
 		DrawingTool tool = robot.getSettings().getTool(0);
@@ -467,7 +470,9 @@ public class GCodeFile {
 			String[] pieces = line.split(";");
 			if (pieces.length == 0) continue;
 
+			// tool change
 			if (line.startsWith(tool_change)) {
+				// color of tool
 				String numberOnly = pieces[0].substring(tool_change.length()).replaceAll("[^0-9]", "");
 				int id = (int) Integer.valueOf(numberOnly, 10);
 				addNodeTool(i, id);
@@ -495,12 +500,13 @@ public class GCodeFile {
 				else if (tokens[j].equals("G21")) drawScale = 0.10f; // mm->cm
 				else if (tokens[j].equals("G90")) {
 					absMode = true;
-					break;
+					//break;
 				} else if (tokens[j].equals("G91")) {
 					absMode = false;
-					break;
-				} else if (tokens[j].equals("G54")) break;
-				else if (tokens[j].startsWith("X")) {
+					//break;
+				} else if (tokens[j].equals("G54")) {
+					//break;
+				} else if (tokens[j].startsWith("X")) {
 					float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					x = absMode ? tx : x + tx;
 				} else if (tokens[j].startsWith("Y")) {
@@ -510,7 +516,7 @@ public class GCodeFile {
 					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
 					z = absMode ? tz : z + tz;
 					
-					isLifted = (tool.getPenUpAngle()==z);
+					isLifted = (Math.abs(tool.getPenUpAngle()-z)<0.1);
 				}
 				if (tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if (tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;

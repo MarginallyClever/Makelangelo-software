@@ -52,6 +52,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	private static boolean shouldInfillOnLoad=true;
 	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
+	private double previousX,previousY;
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -470,7 +471,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			if (dx * dx + dy * dy > limitSquared) {
 				// line does not start at last tool location, lift and move.
 				if (!lastUp) liftPen(out);
-				moveTo(out, (float) x, (float) y,true);
+				moveTo(out, (float) x, (float) y, true);
+				previousX = x;
+				previousY = y;
 			}
 			// else line starts right here, pen is down, do nothing extra.
 		} else {
@@ -478,7 +481,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			// not the first point, draw.
 			if (notLast && dx * dx + dy * dy < limitSquared)
 				return; // points too close together
-			moveTo(out, (float) x, (float) y,false);
+			moveTo(out, (float) x, (float) y, false);
+			previousX = x;
+			previousY = y;
 		}
 	}
 	
@@ -488,9 +493,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		if (dx * dx + dy * dy > toolDiameterSquared) {
 			if (!lastUp) liftPen(out);
 			moveTo(out, (float) x, (float) y, true);
+			previousX = x;
+			previousY = y;
 		}
 		if (lastUp) lowerPen(out);
 		moveTo(out, (float) x2, (float) y2, false);
+		previousX = x2;
+		previousY = y2;
 	}
 
 	@Override

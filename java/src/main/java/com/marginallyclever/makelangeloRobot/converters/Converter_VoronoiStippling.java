@@ -243,9 +243,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					newX = x + r * (float) Math.cos(v);
 					newY = y + r * (float) Math.sin(v);
 					if(first) {
-						moveTo(out, newX, newY, true);
-						lowerPen(out);
-						first=false;
+						if(isInsidePaperMargins(newX,newY)) {
+							liftPen(out);
+							moveTo(out, newX, newY, true);
+							lowerPen(out);
+							first=false;
+						}
 					} else {
 						moveTo(out, newX, newY, false);
 					}
