@@ -1,10 +1,5 @@
 package com.marginallyclever.util;
 
-import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS;
-import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE;
-import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT;
-import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.MACHINES;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,6 +57,14 @@ public final class PreferencesHelper {
 	 *
 	 */
 	private static final String LANGUAGE_PATH_NAME = "Language";
+	/**
+	 *
+	 */
+	private static final String SOUND_PATH_NAME = "Sound";
+	/**
+	 *
+	 */
+	private static final String FILE_PATH_NAME = "File";
 
 	/**
 	 * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
@@ -81,10 +84,12 @@ public final class PreferencesHelper {
 			Log.error(e.getMessage());
 		}
 		//initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
-		initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
-		initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
-		initialMap.put(MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
-		initialMap.put(LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
+		initialMap.put(MakelangeloPreferenceKey.GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
 		@SuppressWarnings("unchecked")
 		final Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
 		CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
@@ -116,6 +121,8 @@ public final class PreferencesHelper {
 		GRAPHICS,
 		MACHINES,
 		LANGUAGE,
+		SOUND,
+		FILE,
 		@Deprecated
 		LEGACY_MAKELANGELO_ROOT,
 		//MAKELANGELO_ROOT

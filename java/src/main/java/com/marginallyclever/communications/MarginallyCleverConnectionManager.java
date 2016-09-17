@@ -19,8 +19,4 @@ public interface MarginallyCleverConnectionManager {
    */
   public MarginallyCleverConnection openConnection(String connectionName);
 
-  /**
-   * @return the name of the most recently opened connection.
-   */
-  public String getRecentConnection();
 }

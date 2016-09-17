@@ -42,6 +42,7 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
@@ -94,7 +95,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private boolean isConnected;  // has pressed connect button
 	
 	public StatusBar statusBar;
-	
+
 	
 	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
 		this.gui = gui;
@@ -812,7 +813,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.setDecorator(chosenGenerator);
 			chosenGenerator.setRobot(robot);
 
-			String destinationFile = System.getProperty("user.dir") + "/temp.ngc";;
+			FilePreferences fp = new FilePreferences(null);
+			final String destinationFile = fp.getTempFolder() + "/temp.ngc";
 			try (
 					final OutputStream fileOutputStream = new FileOutputStream(destinationFile);
 					final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)

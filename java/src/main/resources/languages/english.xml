@@ -284,6 +284,11 @@
 		<hint>context sensitive menu</hint>
 	</string>
 
+	<string>
+		<key>MenuFileTitle</key>
+		<value>File</value>
+		<hint>menu or dialog title</hint>
+	</string>
 	
 	<string>
 		<key>MenuSoundsTitle</key>
@@ -339,7 +344,7 @@
 
 	<string>
 		<key>MenuResetMachinePreferences</key>
-		<value>Reset Preferences</value>
+		<value>Reset</value>
 		<hint>Preferences menu</hint>
 	</string>
 	<string>

@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
-
 public class MakelangeloCustomProperties extends Makelangelo2Properties {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 

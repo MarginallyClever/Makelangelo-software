@@ -39,6 +39,7 @@ import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -53,6 +54,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
+
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -194,7 +196,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
+		FilePreferences fp = new FilePreferences(null);
+		final String destinationFile = fp.getTempFolder() + "/temp.ngc";
 		Log.message(Translator.get("Converting") + " " + destinationFile);
 
 		// Read in the DXF file

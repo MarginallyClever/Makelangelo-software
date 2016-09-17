@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -160,7 +161,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 		
 		// where to save temp output file?
-		final String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
+		FilePreferences fp = new FilePreferences(null);
+		final String destinationFile = fp.getTempFolder() + "/temp.ngc";
 
 		converters = ServiceLoader.load(ImageConverter.class);
 		if (!chooseImageConversionOptions(robot)) return false;

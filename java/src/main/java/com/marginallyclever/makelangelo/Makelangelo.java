@@ -11,8 +11,6 @@ package com.marginallyclever.makelangelo;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,28 +19,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
@@ -50,6 +37,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.MarginallyCleverConnectionManager;
 import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -83,6 +71,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
+	private MakelangeloAppPreferences appPreferences;
 	private MarginallyCleverConnectionManager connectionManager;
 	private MakelangeloRobot robot;
 	
@@ -95,9 +84,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	// Top of window
 	private JMenuBar menuBar;
 	// file menu
-	private JMenuItem buttonAbout, buttonCheckForUpdate, buttonExit;
-	// preferences menu
-	private JMenuItem buttonAdjustSounds, buttonAdjustGraphics, buttonAdjustLanguage, buttonExportMachinePreferences, buttonImportMachinePreferences, buttonResetMachinePreferences;
+	private JMenuItem buttonAbout, buttonAdjustPreferences, buttonCheckForUpdate, buttonExit;
 	// view menu
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
 	
@@ -133,8 +120,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 
 	public Makelangelo() {
+		appPreferences = new MakelangeloAppPreferences(this);
+		
 		Translator.start();
-		SoundSystem.start();
 		
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
@@ -142,11 +130,11 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.getSettings().addListener(this);
 		
 		myTransferHandler = new MakelangeloTransferHandler(robot);
-		connectionManager = new SerialConnectionManager(prefs);
+		connectionManager = new SerialConnectionManager();
 		
 		createAndShowGUI();
 
-		if (prefs.getBoolean("Check for updates", false)) checkForUpdate();
+		if (prefs.getBoolean("Check for updates", false)) checkForUpdate(true);
 		
 		loadGraphicsSettings();
 	}
@@ -154,71 +142,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	// load settings and apply them.
 	protected void loadGraphicsSettings() {
-		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		robot.setShowPenUp(graphics_prefs.getBoolean("show pen up", false));
-	}
-	
-	
-	/**
-	 * Adjust graphics preferences
-	 */
-	protected void adjustGraphics() {
-		final Preferences graphics_prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
-		final JPanel panel = new JPanel(new GridBagLayout());
-
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
-
-		final JCheckBox show_pen_up = new JCheckBox(Translator.get("MenuGraphicsPenUp"));
-		final JCheckBox antialias_on = new JCheckBox(Translator.get("MenuGraphicsAntialias"));
-		final JCheckBox speed_over_quality = new JCheckBox(Translator.get("MenuGraphicsSpeedVSQuality"));
-		final JCheckBox draw_all_while_running = new JCheckBox(Translator.get("MenuGraphicsDrawWhileRunning"));
-
-		show_pen_up.setSelected(graphics_prefs.getBoolean("show pen up", false));
-		antialias_on.setSelected(graphics_prefs.getBoolean("antialias", true));
-		speed_over_quality.setSelected(graphics_prefs.getBoolean("speed over quality", true));
-		draw_all_while_running.setSelected(graphics_prefs.getBoolean("Draw all while running", true));
-
-		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
-
-		int y = 0;
-
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(show_pen_up, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(draw_all_while_running, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(antialias_on, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(speed_over_quality, c);
-		y++;
-		
-		int result = JOptionPane.showConfirmDialog(this.mainFrame, panel, Translator.get("MenuGraphicsTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			//allowMetrics = allow_metrics.isSelected();
-			graphics_prefs.putBoolean("show pen up", show_pen_up.isSelected());
-			graphics_prefs.putBoolean("antialias", antialias_on.isSelected());
-			graphics_prefs.putBoolean("speed over quality", speed_over_quality.isSelected());
-			graphics_prefs.putBoolean("Draw all while running", draw_all_while_running.isSelected());
-
-			robot.setShowPenUp(show_pen_up.isSelected());
+		if(robot !=null && appPreferences != null) {
+			robot.setShowPenUp(appPreferences.getGraphics().getShowPenUp());
 		}
 	}
 
@@ -231,66 +156,13 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		if (subject == buttonZoomIn) drawPanel.zoomIn();
 		if (subject == buttonZoomOut) drawPanel.zoomOut();
 		if (subject == buttonZoomToFit) drawPanel.zoomToFitPaper();
-		if (subject == buttonAdjustSounds) SoundSystem.adjust(this.mainFrame,translator);
-		if (subject == buttonAdjustGraphics) adjustGraphics();
-		if (subject == buttonAdjustLanguage) adjustLanguage();
-		if (subject == buttonExportMachinePreferences) exportPreferences();
-		if (subject == buttonImportMachinePreferences) importPreferences();
-		if (subject == buttonResetMachinePreferences) resetPreferences();
 		if (subject == buttonAbout) (new DialogAbout()).display(this.mainFrame);
-		if (subject == buttonCheckForUpdate) checkForUpdate();
+		if (subject == buttonAdjustPreferences) {
+			MakelangeloAppPreferences ap = new MakelangeloAppPreferences(this);
+			ap.run();
+		}
+		if (subject == buttonCheckForUpdate) checkForUpdate(false);
 		if (subject == buttonExit) onClose();
-	}
-
-	
-	private void adjustLanguage() {
-		Translator.chooseLanguage();
-		// TODO replace all strings with strings from new language.
-		
-		if (robotPanel != null) robotPanel.updateButtonAccess();
-	}
-
-	
-	private void exportPreferences() {
-		final JFileChooser fc = new JFileChooser();
-		int returnVal = fc.showSaveDialog(this.mainFrame);
-		if(returnVal == JFileChooser.APPROVE_OPTION) {
-			final File file = fc.getSelectedFile();
-			try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
-				prefs.exportSubtree(fileOutputStream);
-			} catch (IOException | BackingStoreException pe) {
-				Log.error(pe.getMessage());
-			}
-		}
-	}
-	
-	
-	private void importPreferences() {
-		final JFileChooser fc = new JFileChooser();
-		int returnVal = fc.showOpenDialog(this.mainFrame);
-		if(returnVal == JFileChooser.APPROVE_OPTION) {
-			final File file = fc.getSelectedFile();
-			try (final InputStream fileInputStream = new FileInputStream(file)) {
-				prefs.flush();
-				Preferences.importPreferences(fileInputStream);
-				prefs.flush();
-			} catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
-				Log.error(pe.getMessage());
-			}
-		}
-	}
-	
-	
-	private void resetPreferences() {
-		int dialogResult = JOptionPane.showConfirmDialog(this.mainFrame, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
-		if(dialogResult == JOptionPane.YES_OPTION){
-			try {
-				prefs.removeNode();
-				Preferences.userRoot().flush();
-			} catch (BackingStoreException e1) {
-				Log.error(e1.getMessage());
-			}
-		}
 	}
 	
 	
@@ -305,27 +177,27 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 		// File menu
 		menu = new JMenu(Translator.get("MenuMakelangelo"));
-		menu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menu);
 
+		buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
+		buttonAdjustPreferences.addActionListener(this);
+		menu.add(buttonAdjustPreferences);
 
-		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"), KeyEvent.VK_U);
+		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
 		buttonCheckForUpdate.addActionListener(this);
-		buttonCheckForUpdate.setEnabled(true);
 		menu.add(buttonCheckForUpdate);
 
-		buttonAbout = new JMenuItem(Translator.get("MenuAbout"), KeyEvent.VK_A);
+		buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
 		buttonAbout.addActionListener(this);
 		menu.add(buttonAbout);
 
 		menu.addSeparator();
 
-		buttonExit = new JMenuItem(Translator.get("MenuQuit"), KeyEvent.VK_Q);
+		buttonExit = new JMenuItem(Translator.get("MenuQuit"));
 		buttonExit.addActionListener(this);
 		menu.add(buttonExit);
 
 		// preferences
-		menuBar.add(createPreferencesSubMenu());
 
 		// view menu
 		menu = new JMenu(Translator.get("MenuPreview"));
@@ -353,7 +225,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest redirect notice
 	 * to find the latest release tag.
 	 */
-	public void checkForUpdate() {
+	public void checkForUpdate(boolean announceIfFailure) {
 		try {
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
@@ -361,37 +233,40 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 			HttpURLConnection.setFollowRedirects(false);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-			String inputLine;
-			if ((inputLine = in.readLine()) != null) {
-				// parse the URL in the text-only redirect
-				String matchStart = "<a href=\"";
-				String matchEnd = "\">";
-				int start = inputLine.indexOf(matchStart);
-				int end = inputLine.indexOf(matchEnd);
-				if (start != -1 && end != -1) {
-					String line2 = inputLine.substring(start + matchStart.length(), end);
-					// parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
-					line2 = line2.substring(line2.lastIndexOf("/") + 1);
+			String inputLine = in.readLine();
+			if(inputLine == null) {
+				throw new Exception("Could not read from update server.");
+			}
+			
+			// parse the URL in the text-only redirect
+			String matchStart = "<a href=\"";
+			String matchEnd = "\">";
+			int start = inputLine.indexOf(matchStart);
+			int end = inputLine.indexOf(matchEnd);
+			if (start != -1 && end != -1) {
+				String line2 = inputLine.substring(start + matchStart.length(), end);
+				// parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
+				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-					System.out.println("latest release: " + line2+"; this version: " + VERSION);
-					//System.out.println(inputLine.compareTo(VERSION));
+				System.out.println("latest release: " + line2+"; this version: " + VERSION);
+				//System.out.println(inputLine.compareTo(VERSION));
 
-					int comp = line2.compareTo(VERSION);
-					String results;
-					if     (comp>0) {
-						results = Translator.get("UpdateNotice");
-						//TODO downloadUpdate();
-					} else if(comp<0) results = "This version is from the future?!";
-					else 			results = Translator.get("UpToDate");
+				int comp = line2.compareTo(VERSION);
+				String results;
+				if     (comp>0) {
+					results = Translator.get("UpdateNotice");
+					//TODO downloadUpdate();
+				} else if(comp<0) results = "This version is from the future?!";
+				else 			results = Translator.get("UpToDate");
 
-					JOptionPane.showMessageDialog(mainFrame, results);
-				}
-			} else {
-				throw new Exception();
+				JOptionPane.showMessageDialog(mainFrame, results);
 			}
 			in.close();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed"));
+			if(announceIfFailure) {
+				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed"));
+			}
+			e.printStackTrace();
 		}
 	}
 
@@ -415,30 +290,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	 */
 	public void updateMenuBar() {
 		if (robotPanel != null) robotPanel.updateButtonAccess();
-	}
-
-	
-	private JMenu createPreferencesSubMenu() {
-		final JMenu preferencesSubMenu;
-		preferencesSubMenu = new JMenu(Translator.get("MenuPreferences"));
-
-		buttonAdjustSounds = createSubMenuItem(preferencesSubMenu, "MenuSoundsTitle");
-		buttonAdjustGraphics = createSubMenuItem(preferencesSubMenu, "MenuGraphicsTitle");
-		buttonAdjustLanguage = createSubMenuItem(preferencesSubMenu, "MenuLanguageTitle");
-		preferencesSubMenu.add(new JSeparator());
-		buttonExportMachinePreferences = createSubMenuItem(preferencesSubMenu, "Save");
-		buttonImportMachinePreferences = createSubMenuItem(preferencesSubMenu, "Load");
-		buttonResetMachinePreferences = createSubMenuItem(preferencesSubMenu, "MenuResetMachinePreferences");
-
-		return preferencesSubMenu;
-	}
-	
-
-	private JMenuItem createSubMenuItem(JMenu preferencesSubMenu, String translationKey) {
-		final JMenuItem jMenuItem = new JMenuItem(Translator.get(translationKey));
-		jMenuItem.addActionListener(this);
-		preferencesSubMenu.add(jMenuItem);
-		return jMenuItem;
 	}
 
 	
@@ -608,7 +459,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
         if (result == JOptionPane.YES_OPTION) {
         	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        	savePreferences();
+        	saveWindowRealEstate();
         	robot.getSettings().saveConfig();
 
     		// Run this on another thread than the AWT event queue to
@@ -624,7 +475,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 	
 	
-	private void savePreferences() {
+	/**
+	 * save window position and size
+	 */
+	private void saveWindowRealEstate() {
 		Dimension size = this.mainFrame.getSize();
 		prefs.putInt("Default window width", size.width );
 		prefs.putInt("Default window height", size.height );
@@ -658,6 +512,13 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void windowClosed(WindowEvent e) {}
+	
+	public JFrame getMainFrame() {
+		return mainFrame;
+	}
+	public MakelangeloRobot getRobot() {
+		return robot;
+	}
 }
 
 

@@ -462,9 +462,9 @@ public class Generator_Text extends ImageGenerator {
 			if (test_lines[i].length() <= charsPerLine) {
 				lines[j++] = test_lines[i];
 			} else {
-				String[] temp = test_lines[i].split("(?<=\\G.{" + charsPerLine + "})");
-				for (String aTemp : temp) {
-					lines[j++] = aTemp;
+				String[] lineSegments = test_lines[i].split("(?<=\\G.{" + charsPerLine + "})");
+				for (String aLine : lineSegments) {
+					lines[j++] = aLine;
 				}
 			}
 		}
