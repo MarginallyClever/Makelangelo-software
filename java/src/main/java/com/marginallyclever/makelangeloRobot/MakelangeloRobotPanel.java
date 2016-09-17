@@ -42,7 +42,6 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
@@ -813,10 +812,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.setDecorator(chosenGenerator);
 			chosenGenerator.setRobot(robot);
 
-			FilePreferences fp = new FilePreferences(null);
-			final String destinationFile = fp.getTempFolder() + "/temp.ngc";
+			// where to save temp output file?
+			File tempFile;
+			try {
+				tempFile = File.createTempFile("gcode", ".ngc");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
+			tempFile.deleteOnExit();
+
 			try (
-					final OutputStream fileOutputStream = new FileOutputStream(destinationFile);
+					final OutputStream fileOutputStream = new FileOutputStream(tempFile);
 					final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
 					) {
 				chosenGenerator.generate(out);
@@ -828,7 +836,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.setDecorator(null);
 
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
+			try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
 				loader.load(fileInputStream,robot);
 			} catch(IOException e) {
 				e.printStackTrace();

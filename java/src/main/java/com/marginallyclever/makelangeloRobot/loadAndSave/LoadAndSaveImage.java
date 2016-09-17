@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,7 +32,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -161,9 +161,16 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 		
 		// where to save temp output file?
-		FilePreferences fp = new FilePreferences(null);
-		final String destinationFile = fp.getTempFolder() + "/temp.ngc";
-
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("gcode", ".ngc");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		tempFile.deleteOnExit();
+        
 		converters = ServiceLoader.load(ImageConverter.class);
 		if (!chooseImageConversionOptions(robot)) return false;
 
@@ -174,10 +181,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		final SwingWorker<Void, Void> s = new SwingWorker<Void, Void>() {
 			@Override
 			public Void doInBackground() {
-				try (OutputStream fileOutputStream = new FileOutputStream(destinationFile);
-						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+				
+				try (OutputStream fileOutputStream = new FileOutputStream(tempFile);
+					Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+					
+					tempFile.deleteOnExit();
 					// read in image
-					Log.message(Translator.get("Converting") + " " + destinationFile);
+					Log.message(Translator.get("Converting") + " " + tempFile.getName());
 					// convert with style
 
 					ImageConverter converter = null;
@@ -217,13 +227,14 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			public void done() {
 				pm.close();
 				LoadAndSaveGCode loader = new LoadAndSaveGCode();
-				try (final InputStream fileInputStream = new FileInputStream(destinationFile)) {
+				try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
 					loader.load(fileInputStream,robot);
 					MakelangeloRobotPanel panel = robot.getControlPanel();
 					if(panel!=null) panel.updateButtonAccess();
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
+				tempFile.delete();
 			}
 		};
 

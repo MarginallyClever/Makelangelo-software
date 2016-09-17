@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
 import java.awt.GridLayout;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,7 +40,6 @@ import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.preferences.FilePreferences;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -196,9 +196,17 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-		FilePreferences fp = new FilePreferences(null);
-		final String destinationFile = fp.getTempFolder() + "/temp.ngc";
-		Log.message(Translator.get("Converting") + " " + destinationFile);
+
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("temp", ".ngc");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		}
+		tempFile.deleteOnExit();
+		Log.message(Translator.get("Converting") + " " + tempFile.getName());
 
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -233,7 +241,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 		//countAllEntities(doc);
 
-		try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
 				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
 			// prepare for exporting
@@ -329,11 +337,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			Log.message("Done!");
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(destinationFile);
+			InputStream fileInputStream = new FileInputStream(tempFile);
 			loader.load(fileInputStream,robot);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		tempFile.delete();
 
 		return true;
 	}

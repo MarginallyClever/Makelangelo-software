@@ -29,7 +29,12 @@
 		<hint>DXF load option</hint>
 	</string>
 	
-	
+	<string>
+		<key>TempFolderLabel</key>
+		<value>Temporary files location:</value>
+		<hint>Where to save temporary files used in gcode management.</hint>
+	</string>
+		
 	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>

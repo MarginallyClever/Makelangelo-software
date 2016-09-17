@@ -30,7 +30,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 	transient private Makelangelo app;
 	transient private SoundPreferences sound;
 	transient private GFXPreferences gfx;
-	transient private FilePreferences file;
 	transient private LanguagePreferences language;
 	
 	transient private JPanel panel; 
@@ -44,7 +43,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 		sound = new SoundPreferences(app.getMainFrame());
 		gfx = new GFXPreferences(app.getMainFrame());
 		language = new LanguagePreferences(app.getMainFrame());
-		file = new FilePreferences(app.getMainFrame());
 	}
 	
 	public void run() {
@@ -74,7 +72,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 		sound.buildPanel();
 		gfx.buildPanel();
 		language.buildPanel();
-		file.buildPanel();
 		
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
@@ -82,7 +79,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 		pane.add(Translator.get("MenuSoundsTitle"), sound);
 		pane.add(Translator.get("MenuGraphicsTitle"), gfx);
 		pane.add(Translator.get("MenuLanguageTitle"), language);
-		pane.add(Translator.get("MenuFileTitle"), file);
 
 		
 		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -90,7 +86,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 			sound.save();
 			gfx.save();
 			language.save();
-			file.save();
 			
 			app.getRobot().setShowPenUp(gfx.getShowPenUp());
 			app.getRobot().getControlPanel().updateButtonAccess();
@@ -98,7 +93,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 			sound.cancel();
 			gfx.cancel();
 			language.cancel();
-			file.cancel();
 		}
 	}
 
