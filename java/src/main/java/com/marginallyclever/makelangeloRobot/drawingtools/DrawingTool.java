@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.drawingtools;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
@@ -27,6 +28,7 @@ public abstract class DrawingTool {
 	protected float zOff;
 	protected float zOn;
 	protected float zRate;
+	protected Color toolColor;
 
 	public DrawingTool(MakelangeloRobot robot) {
 		this.robot = robot;
@@ -83,6 +85,12 @@ public abstract class DrawingTool {
 		// tool_number =
 		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
 		feedRateXY = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateXY)));
+		
+		int r,g,b;
+		r = prefs.getInt("penColorR", toolColor.getRed());
+		g = prefs.getInt("penColorG", toolColor.getGreen());
+		b = prefs.getInt("penColorB", toolColor.getBlue());
+		toolColor = new Color(r,g,b);
 	}
 
 	public void saveConfig(Preferences prefs) {
@@ -93,6 +101,9 @@ public abstract class DrawingTool {
 		prefs.put("z_off", Float.toString(zOff));
 		prefs.put("tool_number", Integer.toString(toolNumber));
 		prefs.put("feed_rate", Float.toString(feedRateXY));
+		prefs.putInt("penColorR", toolColor.getRed());
+		prefs.putInt("penColorG", toolColor.getGreen());
+		prefs.putInt("penColorB", toolColor.getBlue());
 	}
 
 	public void setDiameter(float d) {
@@ -138,4 +149,12 @@ public abstract class DrawingTool {
 	public void save() {}
 	
 	public void cancel() {}
+	
+	public Color getColor() {
+		return toolColor;
+	}
+	
+	public void setColor(Color arg0) {
+		toolColor=arg0;
+	}
 }

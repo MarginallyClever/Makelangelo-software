@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.drawingtools;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +18,7 @@ import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.FloatField;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.SelectColor;
 
 
 public class DrawingTool_Pen extends DrawingTool implements ActionListener {
@@ -33,6 +35,8 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JButton buttonTestDown;
 	protected JButton buttonSave;
 	protected JButton buttonCancel;
+	
+	protected SelectColor selectColor;
 
 	
 	public DrawingTool_Pen(MakelangeloRobot robot) {
@@ -45,6 +49,7 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		toolNumber = 0;
 		feedRateXY = 3500;
 		name = "Pen";
+		toolColor = Color.BLACK;
 	}
 
 	public DrawingTool_Pen(String name2, int tool_id, MakelangeloRobot robot) {
@@ -146,6 +151,16 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		buttonTestUp.addActionListener(this);
 		buttonTestDown.addActionListener(this);
 		
+		JPanel colorPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints cm = new GridBagConstraints();
+		cm.gridx=0;
+		cm.gridy=0;
+		cm.fill=GridBagConstraints.HORIZONTAL;
+		selectColor = new SelectColor(panel,"pen color",robot.getSettings().getPenColor());
+		colorPanel.add(selectColor,cm);
+		c.gridy++;
+		panel.add(colorPanel,c);
+		
 		return panel;
 	}
 	
@@ -165,5 +180,6 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		zRate = ((Number)penZRate.getValue()).floatValue();
 		zOff = ((Number)penUp.getValue()).floatValue();
 		zOn = ((Number)penDown.getValue()).floatValue();
+		robot.getSettings().setPenColor(selectColor.getColor());
 	}
 }

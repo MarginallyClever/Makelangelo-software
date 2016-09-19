@@ -4,29 +4,19 @@ import java.awt.GridBagConstraints;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Translator;
 
-public class LanguagePreferences extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8814104322237127526L;
-
-	private JFrame rootFrame;
+public class LanguagePreferences {
+	static private String[] languageList;
+	static private JComboBox<String> languageOptions;
 	
-	private String[] languageList;
-	private JComboBox<String> languageOptions;
 	
-	public LanguagePreferences(JFrame arg0) {
-		this.rootFrame=arg0;
-	}
-	
-	public void buildPanel() {
-		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	static public JPanel buildPanel() {
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 		languageList = Translator.getLanguageList();
 		languageOptions = new JComboBox<>(languageList);
@@ -38,28 +28,26 @@ public class LanguagePreferences extends JPanel {
 		c.gridwidth = 2;
 		c.gridx = 0;
 		c.gridy = 0;
-		this.add(languageOptions, c);
+		panel.add(languageOptions, c);
+		
+		return panel;
 	}
 	
-	public void save() {
-		
-	}
+	static public void save() {}
 	
-	public void cancel() {
-		
-	}
+	static public void cancel() {}
 
 
 	/**
 	 * Display a dialog box of available languages and let the user select their preference.
 	 * TODO replace all strings with strings from new language.
 	 */
-	public void chooseLanguage() {
-		this.buildPanel();
+	static public void chooseLanguage() {
+		JPanel panel = buildPanel();
 
 		int result;
 		do {
-			result = JOptionPane.showConfirmDialog(rootFrame, this, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+			result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
 		} while(result != JOptionPane.OK_OPTION);
 		
 		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);

@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.util.PreferencesHelper;
@@ -357,6 +358,10 @@ public class GCodeFile {
 		DrawingTool tool = robot.getSettings().getTool(0);
 		gl2.glColor3f(0, 0, 0);
 
+		float penR = robot.getSettings().getPenColor().getRed() / 255.0f;
+		float penG = robot.getSettings().getPenColor().getGreen() / 255.0f;
+		float penB = robot.getSettings().getPenColor().getBlue() / 255.0f;
+		
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 			
@@ -369,7 +374,7 @@ public class GCodeFile {
 
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {
-						gl2.glColor3f(1, 0, 0);
+						gl2.glColor3f(penR,penG,penB);
 						//g2d.setColor(Color.RED);
 						if(n.type==GCodeNodeType.POS) {
 							robot.setGondolaX((float)n.x1*10);
@@ -449,6 +454,8 @@ public class GCodeFile {
 
 		DrawingTool tool = robot.getSettings().getTool(0);
 
+		boolean showPenUp = GFXPreferences.getShowPenUp();
+		
 		float drawScale = 0.1f;
 		// arc smoothness - increase to make more smooth and run slower.
 		double STEPS_PER_DEGREE=1;
@@ -524,7 +531,7 @@ public class GCodeFile {
 			if (j < tokens.length) continue;
 
 			if (isLifted) {
-				if (robot.getShowPenUp() == false) {
+				if (!showPenUp) {
 					px = x;
 					py = y;
 					pz = z;

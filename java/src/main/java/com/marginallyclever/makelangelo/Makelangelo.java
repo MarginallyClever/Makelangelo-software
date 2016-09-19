@@ -135,19 +135,9 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		createAndShowGUI();
 
 		if (prefs.getBoolean("Check for updates", false)) checkForUpdate(true);
+	}
+	
 		
-		loadGraphicsSettings();
-	}
-	
-	
-	// load settings and apply them.
-	protected void loadGraphicsSettings() {
-		if(robot !=null && appPreferences != null) {
-			robot.setShowPenUp(appPreferences.getGraphics().getShowPenUp());
-		}
-	}
-
-	
 	// The user has done something.  respond to it.
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -158,8 +148,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		if (subject == buttonZoomToFit) drawPanel.zoomToFitPaper();
 		if (subject == buttonAbout) (new DialogAbout()).display(this.mainFrame);
 		if (subject == buttonAdjustPreferences) {
-			MakelangeloAppPreferences ap = new MakelangeloAppPreferences(this);
-			ap.run();
+			appPreferences.run();
 		}
 		if (subject == buttonCheckForUpdate) checkForUpdate(false);
 		if (subject == buttonExit) onClose();

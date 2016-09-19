@@ -80,8 +80,7 @@ public final class Translator {
 		loadConfig();
 
 		if (isThisTheFirstTimeLoadingLanguageFiles()) {
-			LanguagePreferences p = new LanguagePreferences(null);
-			p.chooseLanguage();
+			LanguagePreferences.chooseLanguage();
 		}
 	}
 	

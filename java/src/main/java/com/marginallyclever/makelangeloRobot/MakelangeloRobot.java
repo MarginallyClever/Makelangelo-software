@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -64,7 +65,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private float gondolaY;
 
 	// rendering stuff
-	public boolean showPenUpMoves=false;
 	private MakelangeloRobotDecorator decorator=null;
 
 	// Listeners which should be notified of a change to the percentage.
@@ -649,6 +649,11 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
+	public GCodeFile getGCode() {
+		return gCode;
+	}
+
+
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 		if(gCode!=null) gCode.emptyNodeBuffer();
@@ -682,26 +687,16 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
 		gl2.glEnd();
+
+		Color c = settings.getPaperColor();
+		gl2.glColor3f(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glEnd();
 		
-		if (!isPortConfirmed()) {
-			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
-			gl2.glColor3f(1, 1, 1);
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
-			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
-			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
-			gl2.glEnd();
-		} else {
-			gl2.glColor3f(194.0f / 255.0f, 133.0f / 255.0f, 71.0f / 255.0f);
-			gl2.glColor3f(1, 1, 1);
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
-			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
-			gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-			gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
-			gl2.glEnd();
-		}
 		// margin settings
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f,0.9f,0.9f);
@@ -715,29 +710,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}
-
-
-	/**
-	 * Toggle pen up moves.
-	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
- 	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
-	 */
-	public void setShowPenUp(boolean state) {
-		showPenUpMoves = state;
-		if(gCode!=null) {
-			gCode.changed = true;
-			gCode.emptyNodeBuffer();
-		}
-	}
-
 	
-	/**
-	 * @return the "show pen up" flag
-	 */
-	public boolean getShowPenUp() {
-		return showPenUpMoves;
-	}
-
 	// in mm
 	public float getGondolaX() {
 		return gondolaX;

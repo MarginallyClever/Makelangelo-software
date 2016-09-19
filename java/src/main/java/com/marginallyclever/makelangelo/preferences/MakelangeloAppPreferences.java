@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -28,9 +29,6 @@ import com.marginallyclever.util.PreferencesHelper;
 
 public class MakelangeloAppPreferences implements ActionListener {
 	transient private Makelangelo app;
-	transient private SoundPreferences sound;
-	transient private GFXPreferences gfx;
-	transient private LanguagePreferences language;
 	
 	transient private JPanel panel; 
 	transient private JButton buttonExport;
@@ -39,10 +37,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 	
 	public MakelangeloAppPreferences(Makelangelo arg0) {
 		app=arg0;
-		
-		sound = new SoundPreferences(app.getMainFrame());
-		gfx = new GFXPreferences(app.getMainFrame());
-		language = new LanguagePreferences(app.getMainFrame());
 	}
 	
 	public void run() {
@@ -69,30 +63,27 @@ public class MakelangeloAppPreferences implements ActionListener {
 		c.gridx=0;
 		c.gridwidth=3;
 		
-		sound.buildPanel();
-		gfx.buildPanel();
-		language.buildPanel();
-		
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
 		panel.add(pane,c);
-		pane.add(Translator.get("MenuSoundsTitle"), sound);
-		pane.add(Translator.get("MenuGraphicsTitle"), gfx);
-		pane.add(Translator.get("MenuLanguageTitle"), language);
+		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
+		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
+		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			sound.save();
-			gfx.save();
-			language.save();
-			
-			app.getRobot().setShowPenUp(gfx.getShowPenUp());
+			SoundPreferences.save();
+			GFXPreferences.save();
+			LanguagePreferences.save();
 			app.getRobot().getControlPanel().updateButtonAccess();
+			// refresh look & feel
+			GCodeFile f = app.getRobot().getGCode();
+			if( f != null ) f.emptyNodeBuffer();
 		} else {
-			sound.cancel();
-			gfx.cancel();
-			language.cancel();
+			SoundPreferences.cancel();
+			GFXPreferences.cancel();
+			LanguagePreferences.cancel();
 		}
 	}
 
@@ -105,6 +96,7 @@ public class MakelangeloAppPreferences implements ActionListener {
 		if (subject == buttonReset) resetPreferences();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void exportPreferences() {
 		final JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showSaveDialog(app.getMainFrame());
@@ -119,7 +111,8 @@ public class MakelangeloAppPreferences implements ActionListener {
 		}
 	}
 	
-	
+
+	@SuppressWarnings("deprecation")
 	private void importPreferences() {
 		final JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showOpenDialog(app.getMainFrame());
@@ -136,7 +129,8 @@ public class MakelangeloAppPreferences implements ActionListener {
 		}
 	}
 	
-	
+
+	@SuppressWarnings("deprecation")
 	private void resetPreferences() {
 		int dialogResult = JOptionPane.showConfirmDialog(app.getMainFrame(), Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
 		if(dialogResult == JOptionPane.YES_OPTION){
@@ -148,9 +142,5 @@ public class MakelangeloAppPreferences implements ActionListener {
 				Log.error(e1.getMessage());
 			}
 		}
-	}
-	
-	public GFXPreferences getGraphics() {
-		return gfx;
 	}
 }

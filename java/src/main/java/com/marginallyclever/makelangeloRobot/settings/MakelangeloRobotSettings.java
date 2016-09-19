@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -72,6 +73,8 @@ public final class MakelangeloRobotSettings {
 	private int hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
+	private Color paperColor;
+	
 	/**
 	 * top left, bottom center, etc...
 	 *
@@ -122,6 +125,8 @@ public final class MakelangeloRobotSettings {
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
+		paperColor = Color.WHITE;
+		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 		shouldSignName = false;
 		
@@ -141,7 +146,7 @@ public final class MakelangeloRobotSettings {
 
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
-		pulleyDiameter  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		pulleyDiameter  = 20.0 * 0.2 / Math.PI;
 
 		isLeftMotorInverted = false;
 		isRightMotorInverted = true;
@@ -498,6 +503,12 @@ public final class MakelangeloRobotSettings {
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
+		int r,g,b;
+		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
+		g = uniqueMachinePreferencesNode.getInt("paperColorG", paperColor.getGreen());
+		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
+		paperColor = new Color(r,g,b);
+
 		// load each tool's settings
 		for (DrawingTool tool : tools) {
 			tool.loadConfig(uniqueMachinePreferencesNode);
@@ -547,6 +558,10 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
 		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
+		
+		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
+		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
+		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
 
 		// save each tool's settings
 		for (DrawingTool tool : tools) {
@@ -681,5 +696,21 @@ public final class MakelangeloRobotSettings {
 		}
 		
 		saveConfigToLocal();
+	}
+	
+	public Color getPaperColor() {
+		return paperColor;
+	}
+	
+	public void setPaperColor(Color arg0) {
+		paperColor = arg0;
+	}
+	
+	public void setPenColor(Color arg0) {
+		tools.get(currentToolIndex).setColor(arg0);
+	}
+	
+	public Color getPenColor() {
+		return tools.get(currentToolIndex).getColor();
 	}
 }
