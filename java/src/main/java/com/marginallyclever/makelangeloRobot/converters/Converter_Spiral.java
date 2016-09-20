@@ -36,11 +36,10 @@ public class Converter_Spiral extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
-		double toolDiameter = tool.getDiameter();
+		double toolDiameter = machine.getDiameter();
 
 		int i, j;
 		final int steps = 4;

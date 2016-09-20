@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 
 /**
@@ -54,7 +53,7 @@ implements ActionListener {
   private JPanel modelPanel;
   protected PanelAdjustMachine panelAdjustMachine;
   protected PanelAdjustPaper panelAdjustPaper;
-  protected DrawingTool panelAdjustPen;
+  protected PanelAdjustPen panelAdjustPen;
   private JPanel saveAndCancelPanel;
   
   protected int dialogWidth = 450;
@@ -198,8 +197,8 @@ implements ActionListener {
 	  panelAdjustPaper = new PanelAdjustPaper(robot);
 	  panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper);
 
-	  panelAdjustPen = robot.getSettings().getTool(0);
-	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
+	  panelAdjustPen = new PanelAdjustPen(robot);
+	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen);
 
 	  //panelAdjustTools = new PanelAdjustTools(translator,robot);
 	  //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);

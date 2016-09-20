@@ -34,9 +34,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 		
 		convertPaperSpace(img, out);
 		liftPen(out);
@@ -88,7 +87,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		xStart = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xEnd   = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 
-		double stepSize = tool.getDiameter() * 3.0;
+		double stepSize = machine.getDiameter() * 3.0;
 		double x, y;
 		boolean flip=true;
 

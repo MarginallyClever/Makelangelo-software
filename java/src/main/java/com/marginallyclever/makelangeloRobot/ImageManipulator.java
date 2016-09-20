@@ -7,7 +7,6 @@ import java.io.Writer;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
@@ -25,7 +24,6 @@ public abstract class ImageManipulator {
 
 	// helpers
 	protected MakelangeloRobotSettings machine;
-	protected DrawingTool tool;
 
 
 	public void setParent(SwingWorker<Void, Void> p) {
@@ -64,25 +62,19 @@ public abstract class ImageManipulator {
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(tool==null) {
-			throw new IOException("Order of operations: Can't raise the tool before setting a tool.");
-		}
 		if(lastUp) {
 			return;
 		}
-		tool.writeOff(out);
+		machine.writeOff(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(tool==null) {
-			throw new IOException("Order of operations: Can't lower the tool before setting a tool.");
-		}
 		if(!lastUp) {
 			return;
 		}
-		tool.writeOn(out);
+		machine.writeOn(out);
 		lastUp = false;
 	}
 
@@ -105,7 +97,7 @@ public abstract class ImageManipulator {
 	 */
 	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
 		if(isInsidePaperMargins(x,y)) {
-			tool.writeMoveTo(out, (float) x, (float) y);
+			machine.writeMoveTo(out, (float) x, (float) y);
 		}
 		if(lastUp != up) {
 			if (up) liftPen(out);

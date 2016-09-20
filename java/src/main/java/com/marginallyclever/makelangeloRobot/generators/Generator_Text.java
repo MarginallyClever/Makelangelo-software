@@ -196,14 +196,14 @@ public class Generator_Text extends ImageGenerator {
 		float dx = xMax/2.0f;
 		float dy = -(yTotal+yFirstStep/2.0f)/2.0f;
 
-		tool.writeOff(output);
-		tool.writeMoveTo(output,-dx, dy);
-		tool.writeOn(output);
-		tool.writeMoveTo(output, dx, dy);
-		tool.writeMoveTo(output, dx,-dy);
-		tool.writeMoveTo(output,-dx,-dy);
-		tool.writeMoveTo(output,-dx, dy);
-		tool.writeOff(output);
+		machine.writeOff(output);
+		machine.writeMoveTo(output,-dx, dy);
+		machine.writeOn(output);
+		machine.writeMoveTo(output, dx, dy);
+		machine.writeMoveTo(output, dx,-dy);
+		machine.writeMoveTo(output,-dx,-dy);
+		machine.writeMoveTo(output,-dx, dy);
+		machine.writeOff(output);
 		 */
 		float dx = xMax / 2.0f;
 		float dy = -yTotal/2.0f+yFirstStep/2.0f;
@@ -232,11 +232,11 @@ public class Generator_Text extends ImageGenerator {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				tool.writeMoveTo(output, start[0]-dx, -start[1]-dy);
-				tool.writeOff(output);
+				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy);
+				machine.writeOff(output);
 				break;
 			case PathIterator.SEG_LINETO:
-				tool.writeMoveTo(output, coords[0]-dx, -coords[1]-dy);
+				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
@@ -244,8 +244,8 @@ public class Generator_Text extends ImageGenerator {
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
-				tool.writeMoveTo(output, start[0]-dx, -start[1]-dy);
-				tool.writeOn(output);
+				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy);
+				machine.writeOn(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
 				for(int i=0;i<8;++i) {
@@ -255,9 +255,9 @@ public class Generator_Text extends ImageGenerator {
 					float ttt=tt*t;
 					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
 					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
-					tool.writeMoveTo(output, x-dx,-y-dy);
+					machine.writeMoveTo(output, x-dx,-y-dy);
 				}
-				tool.writeMoveTo(output, coords[4]-dx,-coords[5]-dy);
+				machine.writeMoveTo(output, coords[4]-dx,-coords[5]-dy);
 				coords2[0] = coords[4];
 				coords2[1] = coords[5];
 				break;
@@ -271,9 +271,9 @@ public class Generator_Text extends ImageGenerator {
 					float tttt=t*t;
 					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
 					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					tool.writeMoveTo(output, x-dx,-y-dy);
+					machine.writeMoveTo(output, x-dx,-y-dy);
 				}
-				tool.writeMoveTo(output, coords[2]-dx,-coords[3]-dy);
+				machine.writeMoveTo(output, coords[2]-dx,-coords[3]-dy);
 				coords2[0] = coords[2];
 				coords2[1] = coords[3];
 				break;
@@ -284,9 +284,8 @@ public class Generator_Text extends ImageGenerator {
 
 	private void createMessage(String fontName, int fontSize, String str, Writer out) throws IOException {
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		posx=0;
 		posy=0;
@@ -391,8 +390,6 @@ public class Generator_Text extends ImageGenerator {
 
 	private void textCreateMessageNow(String text, Writer output) throws IOException {
 		if (charsPerLine <= 0) return;
-
-		tool = machine.getCurrentTool();
 
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);

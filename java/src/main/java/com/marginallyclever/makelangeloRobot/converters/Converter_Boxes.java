@@ -25,9 +25,8 @@ public class Converter_Boxes extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
 		double yTop    = machine.getPaperTop()    * machine.getPaperMargin() * 10;
@@ -36,7 +35,7 @@ public class Converter_Boxes extends ImageConverter {
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = tool.getDiameter();
+		double d = machine.getDiameter();
 		double fullStep = d*10.0f;
 		double halfStep = fullStep / 2.0f;
 		

@@ -54,12 +54,11 @@ public class Converter_Wander extends ImageConverter {
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		// figure out how many lines we're going to have on this image.
-		float steps = tool.getDiameter()*5;
+		float steps = machine.getDiameter()*5;
 		if (steps < 1) steps = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

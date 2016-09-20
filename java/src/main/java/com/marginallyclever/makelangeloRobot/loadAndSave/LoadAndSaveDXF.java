@@ -246,9 +246,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			tool = machine.getCurrentTool();
-			double toolDiameterSquared = Math.pow(tool.getDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(tool.getDiameter(), 2);
+			double toolDiameterSquared = Math.pow(machine.getDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(machine.getDiameter(), 2);
 
 			// gcode preamble
 			//out.write(machine.getGCodeConfig() + ";\n");
@@ -268,7 +267,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 				if (entityTypeIter.hasNext()) {
 					layer.getColor();
-					tool.writeChangeTo(out,layer.getName());
+					machine.writeChangeTo(out,layer.getName());
 				}
 				
 				// Sort the entities on this layer into the buckets.

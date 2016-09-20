@@ -22,9 +22,8 @@ public class Generator_LimitTest extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		double ymin = machine.getPaperBottom() * 10;
 		double ymax = machine.getPaperTop()    * 10;
@@ -32,15 +31,15 @@ public class Generator_LimitTest extends ImageGenerator {
 		double xmax = machine.getPaperRight()  * 10;
 		
 		// Draw outside edge
-		tool.writeMoveTo(out, xmin, ymax);
+		machine.writeMoveTo(out, xmin, ymax);
 		lowerPen(out);
-		tool.writeMoveTo(out, xmax, ymax);
-		tool.writeMoveTo(out, xmax, ymin);
-		tool.writeMoveTo(out, xmin, ymin);
-		tool.writeMoveTo(out, xmin, ymax);
+		machine.writeMoveTo(out, xmax, ymax);
+		machine.writeMoveTo(out, xmax, ymin);
+		machine.writeMoveTo(out, xmin, ymin);
+		machine.writeMoveTo(out, xmin, ymax);
 		liftPen(out);
 
-		tool.writeMoveTo(out, machine.getHomeX(), machine.getHomeY());
+		machine.writeMoveTo(out, machine.getHomeX(), machine.getHomeY());
 	    
 		return true;
 	}

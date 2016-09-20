@@ -63,7 +63,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean hasSetHome;
 	private float gondolaX;
 	private float gondolaY;
-
+	
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator=null;
 
@@ -486,19 +486,9 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendFileCommand();
 	}
 
-	private void changeToTool(int newToolID,String colorName) {
-		String[] toolNames = settings.getToolNames();
-
-		if (newToolID < 0 || newToolID > toolNames.length) {
-			Log.error( Translator.get("InvalidTool") + newToolID );
-			newToolID = 0;
-		}
-		
-		if(!colorName.trim().equals("")) {
-			colorName+=" ";
-		}
-		
-		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + colorName + toolNames[newToolID] + Translator.get("ChangeToolPostfix"));
+	// TODO tie tool number to color somehow?  24-bit cool number = color?
+	private void changeToTool(int toolNumber, String colorName) {
+		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + colorName + Translator.get("ChangeToolPostfix"));
 	}
 
 

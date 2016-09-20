@@ -1,7 +1,6 @@
-package com.marginallyclever.makelangeloRobot.drawingtools;
+package com.marginallyclever.makelangeloRobot.settings;
 
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,19 +10,21 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.FloatField;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.SelectColor;
 
 
-public class DrawingTool_Pen extends DrawingTool implements ActionListener {
-	protected JDialog dialog;
-	protected JPanel panel;
+public class PanelAdjustPen extends JPanel implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8304907375185637987L;
+
+	protected MakelangeloRobot robot;
 	
 	protected FloatField penDiameter;
 	protected FloatField penFeedRate;
@@ -39,44 +40,21 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected SelectColor selectColor;
 
 	
-	public DrawingTool_Pen(MakelangeloRobot robot) {
-		super(robot);
+	public PanelAdjustPen(MakelangeloRobot robot) {
+		this.robot = robot;
 
-		diameter = 1.5f;
-		zRate = 50;
-		zOn = 90;
-		zOff = 50;
-		toolNumber = 0;
-		feedRateXY = 3500;
-		name = "Pen";
-		toolColor = Color.BLACK;
-	}
-
-	public DrawingTool_Pen(String name2, int tool_id, MakelangeloRobot robot) {
-		super(robot);
-
-		diameter = 0.8f;
-		zRate = 50;
-		zOn = 90;
-		zOff = 50;
-		toolNumber = tool_id;
-		feedRateXY = 6500;
-		name = name2;
-	}
-
-	public JPanel getPanel() {
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-	    panel.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
+		this.setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+		this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 
 	    JPanel p = new JPanel(new GridBagLayout());
-	    panel.add(p);
+	    this.add(p);
 	    
-		penDiameter = new FloatField(getDiameter());
-		penFeedRate = new FloatField(feedRateXY);
-		penUp = new FloatField(zOff);
-		penDown = new FloatField(zOn);
-		penZRate = new FloatField(zRate);
+	    MakelangeloRobotSettings settings = robot.getSettings();
+		penDiameter = new FloatField(settings.getDiameter());
+		penFeedRate = new FloatField(settings.getFeedRate());
+		penUp = new FloatField(settings.getPenUpAngle());
+		penDown = new FloatField(settings.getPenDownAngle());
+		penZRate = new FloatField(settings.getZRate());
 		buttonTestUp = new JButton(Translator.get("penToolTest"));
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
 
@@ -156,12 +134,10 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		cm.gridx=0;
 		cm.gridy=0;
 		cm.fill=GridBagConstraints.HORIZONTAL;
-		selectColor = new SelectColor(panel,"pen color",robot.getSettings().getPenColor());
+		selectColor = new SelectColor(this,"pen color",robot.getSettings().getPenColor());
 		colorPanel.add(selectColor,cm);
 		c.gridy++;
-		panel.add(colorPanel,c);
-		
-		return panel;
+		this.add(colorPanel,c);
 	}
 	
 	
@@ -173,13 +149,13 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	}
 	
 	
-	@Override
 	public void save() {
-		setDiameter(((Number)penDiameter.getValue()).floatValue());
-		feedRateXY = ((Number)penFeedRate.getValue()).floatValue();
-		zRate = ((Number)penZRate.getValue()).floatValue();
-		zOff = ((Number)penUp.getValue()).floatValue();
-		zOn = ((Number)penDown.getValue()).floatValue();
-		robot.getSettings().setPenColor(selectColor.getColor());
+	    MakelangeloRobotSettings settings = robot.getSettings();
+		settings.setDiameter(((Number)penDiameter.getValue()).floatValue());
+		settings.setMaxFeedRate(((Number)penFeedRate.getValue()).floatValue());
+		settings.setZRate(((Number)penZRate.getValue()).floatValue());
+		settings.setPenUpAngle(((Number)penUp.getValue()).floatValue());
+		settings.setPenDownAngle(((Number)penDown.getValue()).floatValue());
+		settings.setPenColor(selectColor.getColor());
 	}
 }

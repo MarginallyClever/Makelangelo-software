@@ -38,7 +38,6 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	private JCheckBox isLandscape;
 	private boolean beingModified;
 	private SelectColor paperColor;
-	private SelectColor penColor;
 	
 	class PaperSize {
 		public String name;
@@ -178,11 +177,9 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		cm.gridx=0;
 		cm.gridy=0;
 		cm.fill=GridBagConstraints.HORIZONTAL;
-		penColor = new SelectColor(this,"pen color",robot.getSettings().getPenColor());
-		colorPanel.add(penColor,cm);
-		cm.gridy++;
 		paperColor = new SelectColor(this,"paper color",robot.getSettings().getPaperColor());
 		colorPanel.add(paperColor,cm);
+		cm.gridy++;
 		
 		c.gridy++;
 		this.add(colorPanel,c);
@@ -301,7 +298,6 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		if (data_is_sane) {
 			MakelangeloRobotSettings s = robot.getSettings();
 			s.setPaperSize(pwf,phf);
-			s.setPenColor(penColor.getColor());
 			s.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;

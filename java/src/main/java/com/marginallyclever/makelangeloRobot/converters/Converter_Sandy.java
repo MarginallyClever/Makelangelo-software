@@ -64,9 +64,8 @@ public class Converter_Sandy extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		convertPaperSpace(img,out);
 
@@ -117,7 +116,7 @@ public class Converter_Sandy extends ImageConverter {
 		for(r=rMin;r<rMax;r+=rStep) {
 			// go around in a circle
 			t=0;
-			t_step = tool.getDiameter()/r;
+			t_step = machine.getDiameter()/r;
 			flipSum=0;
 			// go around the circle
 			for(t=0;t<Math.PI*2;t+=t_step) {
