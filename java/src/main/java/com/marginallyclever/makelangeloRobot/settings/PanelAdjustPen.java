@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -37,7 +38,8 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	protected JButton buttonSave;
 	protected JButton buttonCancel;
 	
-	protected SelectColor selectColor;
+	protected SelectColor selectPenDownColor;
+	protected SelectColor selectPenUpColor;
 
 	
 	public PanelAdjustPen(MakelangeloRobot robot) {
@@ -125,19 +127,18 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		c.gridwidth = 2;
 		c.insets = new Insets(0, 5, 5, 5);
 		c.anchor = GridBagConstraints.WEST;
+		c.gridy++;
 		
 		buttonTestUp.addActionListener(this);
 		buttonTestDown.addActionListener(this);
 		
-		JPanel colorPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints cm = new GridBagConstraints();
-		cm.gridx=0;
-		cm.gridy=0;
-		cm.fill=GridBagConstraints.HORIZONTAL;
-		selectColor = new SelectColor(this,"pen color",robot.getSettings().getPenColor());
-		colorPanel.add(selectColor,cm);
+		selectPenDownColor = new SelectColor(this,"pen down color",robot.getSettings().getPenDownColor());
+		this.add(selectPenDownColor,cm);
 		c.gridy++;
-		this.add(colorPanel,c);
+		selectPenUpColor = new SelectColor(this,"pen up color",robot.getSettings().getPenUpColor());
+		this.add(selectPenUpColor,cm);
+		c.gridy++;
 	}
 	
 	
@@ -156,6 +157,7 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		settings.setZRate(((Number)penZRate.getValue()).floatValue());
 		settings.setPenUpAngle(((Number)penUp.getValue()).floatValue());
 		settings.setPenDownAngle(((Number)penDown.getValue()).floatValue());
-		settings.setPenColor(selectColor.getColor());
+		settings.setPenDownColor(selectPenDownColor.getColor());
+		settings.setPenUpColor(selectPenUpColor.getColor());
 	}
 }

@@ -274,6 +274,17 @@
 	</string>
 
 	<string>
+		<key>pen up color</key>
+		<value>Up color</value>
+		<hint>Pen settings</hint>
+	</string>
+	<string>
+		<key>pen down color</key>
+		<value>Down color</value>
+		<hint>Pen settings</hint>
+	</string>
+
+	<string>
 		<key>MenuDriveControls</key>
 		<value>Manual Driving</value>
 		<hint>context sensitive menu</hint>

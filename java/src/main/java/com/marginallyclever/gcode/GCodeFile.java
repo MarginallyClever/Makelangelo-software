@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.gcode;
 
 import java.awt.Color;
 import java.io.FileInputStream;
@@ -41,19 +41,8 @@ public class GCodeFile {
 	private ReentrantLock lock = new ReentrantLock();
 
 	// optimization - turn gcode into vectors once on load, draw vectors after that.
-	public enum GCodeNodeType {
-		POS, TOOL
-	}
-	
-	class GCodeNode {
-		double x1, y1, z1, x2, y2, z2;
-		Color c;
-		int lineNumber;
-		GCodeNodeType type;
-	}
 
 	ArrayList<GCodeNode> fastNodes = new ArrayList<GCodeNode>();
-
 
 	
 	public GCodeFile() {}
@@ -356,9 +345,9 @@ public class GCodeFile {
 		
 		int lookAhead=320;
 
-		float penR = robot.getSettings().getPenColor().getRed() / 255.0f;
-		float penG = robot.getSettings().getPenColor().getGreen() / 255.0f;
-		float penB = robot.getSettings().getPenColor().getBlue() / 255.0f;
+		float penR = robot.getSettings().getPenUpColor().getRed() / 255.0f;
+		float penG = robot.getSettings().getPenUpColor().getGreen() / 255.0f;
+		float penB = robot.getSettings().getPenUpColor().getBlue() / 255.0f;
 
 		gl2.glColor3f(penR, penG, penB);
 	
@@ -367,41 +356,31 @@ public class GCodeFile {
 			
 		// draw image
 		if (fastNodes.size() > 0) {
+			gl2.glLineWidth(machine.getDiameter());
+
 			// draw the nodes
 			Iterator<GCodeNode> nodes = fastNodes.iterator();
 			while (nodes.hasNext()) {
 				GCodeNode n = nodes.next();
 
+				gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
+				
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {
-						gl2.glColor3f(penR,penG,penB);
-						//g2d.setColor(Color.RED);
-						if(n.type==GCodeNodeType.POS) {
+						// move the virtual pen holder to the current command start position.
+						if(n.type==GCodeNode.GCodeNodeType.POS) {
 							robot.setGondolaX((float)n.x1*10);
 							robot.setGondolaY((float)n.y1*10);
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						gl2.glColor3f(0, 1, 0);
-						//g2d.setColor(Color.GREEN);
 					} else if (drawAllWhileRunning == false) {
 						break;
 					}
-				}
-				
-				//if(n.lineNumber<4800) continue;
-				//if(n.lineNumber>4825) break;
-
-				switch (n.type) {
-				case TOOL:
-					gl2.glLineWidth(machine.getDiameter());
-					if (!robot.isRunning() || n.lineNumber > linesProcessed + lookAhead) {
-						//g2d.setColor(n.c);
-						gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
+				} else {
+					if(n.type==GCodeNode.GCodeNodeType.POS) {
+						machine.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
 					}
-					break;
-				default:
-					machine.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
-					break;
 				}
 			}
 		}
@@ -409,26 +388,15 @@ public class GCodeFile {
 
 	
 	private void addNodePos(int i, double x1, double y1, double x2, double y2, Color c) {
-		GCodeNode n = new GCodeNode();
-		n.lineNumber = i;
-		n.x1 = x1;
-		n.y1 = y1;
-		n.c=c;
-		n.x2 = x2;
-		n.y2 = y2;
-		n.type = GCodeNodeType.POS;
-
+		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.POS,x1,y1,x2,y2,c);
 		fastNodes.add(n);
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		GCodeNode n = new GCodeNode();
-		n.lineNumber = i;
-		n.c = new Color((tool_id>>16)&0xFF,
-						(tool_id>> 8)&0xFF,
-						(tool_id    )&0xFF);
-		n.type = GCodeNodeType.TOOL;
-
+		Color c = new Color((tool_id>>16)&0xFF,
+							(tool_id>> 8)&0xFF,
+							(tool_id    )&0xFF);
+		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.TOOL,0,0,0,0,c);
 		fastNodes.add(n);
 	}
 
@@ -443,16 +411,16 @@ public class GCodeFile {
 		if (!fastNodes.isEmpty() && !changed) return;
 		changed = false;
 
+		MakelangeloRobotSettings machine = robot.getSettings();
 		boolean showPenUp = GFXPreferences.getShowPenUp();
-		Color penDownColor = Color.BLACK;
-		Color penUpColor = Color.BLUE;
+		Color penDownColor = machine.getPenDownColor();
+		Color penUpColor = machine.getPenUpColor();
 		Color currentColor = penUpColor;
 
 		float drawScale = 0.1f;
 		// arc smoothness - increase to make more smooth and run slower.
 		double STEPS_PER_DEGREE=1;
 		
-		MakelangeloRobotSettings machine = robot.getSettings();
 		
 		float px = 0, py = 0, pz = 90;
 		float x, y, z, ai, aj;

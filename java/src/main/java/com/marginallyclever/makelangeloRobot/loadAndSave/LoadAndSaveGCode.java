@@ -7,7 +7,7 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.makelangelo.GCodeFile;
+import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;

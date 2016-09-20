@@ -82,7 +82,8 @@ public final class MakelangeloRobotSettings {
 	protected float zOff;
 	protected float zOn;
 	protected float zRate;
-	protected Color penColor;
+	protected Color penDownColor;
+	protected Color penUpColor;
 	protected float feedRateXY;
 	
 	/**
@@ -155,7 +156,8 @@ public final class MakelangeloRobotSettings {
 		zOn = 90;
 		zOff = 50;
 		feedRateXY = 6500;
-		penColor = Color.BLACK;
+		penDownColor = Color.BLACK;
+		penUpColor = Color.BLUE;
 		
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
@@ -496,7 +498,7 @@ public final class MakelangeloRobotSettings {
 		setHardwareVersion(Integer.parseInt(uniqueMachinePreferencesNode.get("hardwareVersion", Integer.toString(hardwareVersion))));
 	}
 
-	public void loadPenConfig(Preferences prefs) {
+	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
 		zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
@@ -506,13 +508,17 @@ public final class MakelangeloRobotSettings {
 		feedRateXY = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateXY)));
 		
 		int r,g,b;
-		r = prefs.getInt("penColorR", penColor.getRed());
-		g = prefs.getInt("penColorG", penColor.getGreen());
-		b = prefs.getInt("penColorB", penColor.getBlue());
-		penColor = new Color(r,g,b);
+		r = prefs.getInt("penDownColorR", penDownColor.getRed());
+		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
+		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
+		penDownColor = new Color(r,g,b);
+		r = prefs.getInt("penUpColorR", penUpColor.getRed());
+		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
+		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
+		penUpColor = new Color(r,g,b);
 	}
 
-	public void savePenConfig(Preferences prefs) {
+	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		prefs.put("diameter", Float.toString(getDiameter()));
 		prefs.put("z_rate", Float.toString(zRate));
@@ -520,9 +526,12 @@ public final class MakelangeloRobotSettings {
 		prefs.put("z_off", Float.toString(zOff));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
 		prefs.put("feed_rate", Float.toString(feedRateXY));
-		prefs.putInt("penColorR", penColor.getRed());
-		prefs.putInt("penColorG", penColor.getGreen());
-		prefs.putInt("penColorB", penColor.getBlue());
+		prefs.putInt("penDownColorR", penDownColor.getRed());
+		prefs.putInt("penDownColorG", penDownColor.getGreen());
+		prefs.putInt("penDownColorB", penDownColor.getBlue());
+		prefs.putInt("penUpColorR", penUpColor.getRed());
+		prefs.putInt("penUpColorG", penUpColor.getGreen());
+		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
 
 	public void notifySettingsChanged() {
@@ -702,13 +711,20 @@ public final class MakelangeloRobotSettings {
 		paperColor = arg0;
 	}
 	
-	
-	public Color getPenColor() {
-		return penColor;
+	public Color getPenDownColor() {
+		return penDownColor;
 	}
 	
-	public void setPenColor(Color arg0) {
-		penColor=arg0;
+	public void setPenDownColor(Color arg0) {
+		penDownColor=arg0;
+	}
+	
+	public void setPenUpColor(Color arg0) {
+		penUpColor=arg0;
+	}
+	
+	public Color getPenUpColor() {
+		return penUpColor;
 	}
 
 	public float getZRate() {
@@ -760,13 +776,13 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public void writeChangeTo(Writer out) throws IOException {
-		int toolNumber = penColor.getRGB();
+		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
 		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
-		int toolNumber = penColor.getRGB();
+		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + "; //"+name+"\n");
 		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
