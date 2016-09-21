@@ -81,9 +81,4 @@ public class SelectColor extends JPanel implements ActionListener {
 	public Color getColor() {
 		return fieldValue.getBackground();
 	}
-	
-	@Override
-	public Dimension getPreferredSize() {
-		return this.getParent().getSize();
-	}
 }

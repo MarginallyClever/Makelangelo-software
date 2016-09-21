@@ -89,7 +89,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		penIsUpBeforePause = false;
 		hasSetHome = false;
 		setGondolaX(0);
-		gondolaY = 0;
+		setGondolaY(0);
 	}
 	
 	public MarginallyCleverConnection getConnection() {

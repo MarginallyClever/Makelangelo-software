@@ -353,37 +353,49 @@ public class GCodeFile {
 	
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
-			
+
+		gl2.glBegin(GL2.GL_LINES);
+		
 		// draw image
 		if (fastNodes.size() > 0) {
 			gl2.glLineWidth(machine.getDiameter());
 
 			// draw the nodes
 			Iterator<GCodeNode> nodes = fastNodes.iterator();
+			
 			while (nodes.hasNext()) {
 				GCodeNode n = nodes.next();
 
-				gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
+				gl2.glColor3f(
+						n.c.getRed() / 255.0f, 
+						n.c.getGreen() / 255.0f,
+						n.c.getBlue() / 255.0f);
 				
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {
-						// move the virtual pen holder to the current command start position.
+						// Move the virtual pen holder to the current command start position.
 						if(n.type==GCodeNode.GCodeNodeType.POS) {
 							robot.setGondolaX((float)n.x1*10);
 							robot.setGondolaY((float)n.y1*10);
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
+						// Set the look ahead color
+						// TODO add pen "look ahead" color control?
 						gl2.glColor3f(0, 1, 0);
 					} else if (drawAllWhileRunning == false) {
+						// Stop drawing now!
 						break;
 					}
-				} else {
-					if(n.type==GCodeNode.GCodeNodeType.POS) {
-						machine.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
-					}
+				}
+
+				if(n.type==GCodeNode.GCodeNodeType.POS) {
+					gl2.glVertex2d(n.x1, n.y1);
+					gl2.glVertex2d(n.x2, n.y2);
 				}
 			}
 		}
+		
+		gl2.glEnd();
 	}
 
 	

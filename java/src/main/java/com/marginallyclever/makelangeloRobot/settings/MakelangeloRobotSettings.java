@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
@@ -803,12 +802,5 @@ public final class MakelangeloRobotSettings {
 		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenDownString());
 		out.write("G00 F" + df.format(getFeedRate()) + ";\n");
-	}
-
-	public void drawLine(GL2 gl2, double x1, double y1, double x2, double y2) {
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2d(x1, y1);
-		gl2.glVertex2d(x2, y2);
-		gl2.glEnd();
 	}
 }
