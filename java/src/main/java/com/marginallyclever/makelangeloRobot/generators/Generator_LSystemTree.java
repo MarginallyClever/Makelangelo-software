@@ -32,6 +32,12 @@ public class Generator_LSystemTree extends ImageGenerator {
 		return Translator.get("LSystemTreeName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/l-system.JPG";
+	}
+
+
 
 	@Override
 	public boolean generate(Writer out) throws IOException {

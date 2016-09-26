@@ -15,6 +15,12 @@ public class Converter_Boxes extends ImageConverter {
 		return Translator.get("BoxGeneratorName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/boxxy.JPG";
+	}
+
+
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.

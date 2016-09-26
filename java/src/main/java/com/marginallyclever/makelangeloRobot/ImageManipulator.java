@@ -37,6 +37,13 @@ public abstract class ImageManipulator {
 	public void setRobot(MakelangeloRobot robot) {
 		machine = robot.getSettings();
 	}
+	
+	/**
+	 * @return the filename of the preview image, or null if no filename known.
+	 */
+	public String getPreviewImage() {
+		return null;
+	}
 
 
 	/**

@@ -23,6 +23,11 @@ public class Converter_Spiral extends ImageConverter {
 		return Translator.get("SpiralName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/spiral.JPG";
+	}
+
 
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas

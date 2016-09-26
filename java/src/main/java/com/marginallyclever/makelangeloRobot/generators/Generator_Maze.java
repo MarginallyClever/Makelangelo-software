@@ -36,6 +36,12 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	@Override
+	public String getPreviewImage() {
+		return "/images/generators/maze.JPG";
+	}
+
+
+	@Override
 	public boolean generate(Writer out) throws IOException {
 		while (true) {
 			final JTextField field_rows = new JTextField(Integer.toString(rows));

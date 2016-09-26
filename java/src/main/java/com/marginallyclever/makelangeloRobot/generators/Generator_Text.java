@@ -77,6 +77,12 @@ public class Generator_Text extends ImageGenerator {
 		return Translator.get("YourMsgHereName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/text.JPG";
+	}
+
+
 	protected void setupTransform() {
 		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
 		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();

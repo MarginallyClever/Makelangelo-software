@@ -30,6 +30,10 @@ public class Generator_Dragon extends ImageGenerator {
 		return Translator.get("DragonName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/dragon.JPG";
+	}
 
 	@Override
 	public boolean generate(Writer out) throws IOException {

@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -33,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -779,6 +782,26 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		options.setSelectedIndex(generatorChoice);
 
 		GridBagConstraints c = new GridBagConstraints();
+		JLabel previewPane = new JLabel();
+		
+		options.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+		    {
+				previewPane.setIcon(null);
+				previewPane.setText("No preview availble.");
+				ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
+				String imageFilename = chosenGenerator.getPreviewImage();
+				if(imageFilename!=null) {
+					System.out.println("Found '"+imageFilename+"'.");
+					URL iconURL = chosenGenerator.getClass().getResource(imageFilename);
+			        if (iconURL != null) {
+				        ImageIcon icon = new ImageIcon(iconURL);
+				        previewPane.setIcon(icon);
+						previewPane.setText(null);
+			        }
+				}
+		    }
+		});
 
 		int y = 0;
 		c.anchor = GridBagConstraints.EAST;
@@ -791,23 +814,35 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		c.gridx = 1;
 		c.gridy = y++;
 		panel.add(options, c);
+		c.anchor=GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth=4;
+		c.gridx=0;
+		c.gridy=y++;
+		c.insets = new Insets(10, 0, 0, 0);
+		previewPane.setPreferredSize(new Dimension(449,325));
+		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
+		panel.add(previewPane,c);
+		previewPane.setHorizontalAlignment(SwingConstants.CENTER);
+		previewPane.setVerticalAlignment(SwingConstants.CENTER);
+
+		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
+		String imageFilename = chosenGenerator.getPreviewImage();
+		if(imageFilename!=null) {
+			System.out.println("Found '"+imageFilename+"'.");
+			URL iconURL = chosenGenerator.getClass().getResource(imageFilename);
+	        if (iconURL != null) {
+		        ImageIcon icon = new ImageIcon(iconURL);
+		        previewPane.setIcon(icon);
+	        }
+		}
+
 
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			generatorChoice = options.getSelectedIndex();
-
-			ImageGenerator chosenGenerator = null; 
-			ici = imageGenerators.iterator();
-			i=0;
-			while(ici.hasNext()) {
-				chosenGenerator = ici.next();
-				if(i==generatorChoice) {
-					break;
-				}
-				i++;
-			}
-			
+			chosenGenerator = getGenerator(generatorChoice);
 			robot.getSettings().saveConfig();
 			robot.setDecorator(chosenGenerator);
 			chosenGenerator.setRobot(robot);
@@ -848,6 +883,22 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 
+	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
+		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+		Iterator<ImageGenerator> ici = imageGenerators.iterator();
+		ici = imageGenerators.iterator();
+		int i=0;
+		while(ici.hasNext()) {
+			ImageGenerator chosenGenerator = ici.next();
+			if(i==arg0) {
+				return chosenGenerator;
+			}
+			i++;
+		}
+		
+		throw new IndexOutOfBoundsException();
+	}
+	
 	public void saveFileDialog() {
 		// list all the known savable file types.
 		JFileChooser fc = new JFileChooser(new File(lastFileOut));

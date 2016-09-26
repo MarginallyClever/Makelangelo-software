@@ -26,6 +26,12 @@ public class Generator_KochCurve extends ImageGenerator {
 		return Translator.get("KochTreeName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/koch-curve.JPG";
+	}
+
+
 	
 	@Override
 	public boolean generate(Writer out) throws IOException {

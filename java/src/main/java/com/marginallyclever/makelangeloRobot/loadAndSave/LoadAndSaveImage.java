@@ -1,7 +1,11 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -12,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,11 +26,13 @@ import java.util.Set;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -101,8 +108,31 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			imageConverterNames[i++] = f.getName();
 		}
 
-		final JComboBox<String> inputDrawStyle = new JComboBox<String>(imageConverterNames);
-		inputDrawStyle.setSelectedIndex(getPreferredDrawStyle());
+		final JComboBox<String> options = new JComboBox<String>(imageConverterNames);
+		JLabel previewPane = new JLabel();
+		previewPane.setHorizontalAlignment(SwingConstants.CENTER);
+		previewPane.setVerticalAlignment(SwingConstants.CENTER);
+		
+		options.setSelectedIndex(getPreferredDrawStyle());
+		
+		options.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+		    {
+				previewPane.setIcon(null);
+				previewPane.setText("No preview available.");
+				ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
+				String imageFilename = chosenConverter.getPreviewImage();
+				if(imageFilename!=null) {
+					//System.out.println("Found '"+imageFilename+"'.");
+					URL iconURL = chosenConverter.getClass().getResource(imageFilename);
+			        if (iconURL != null) {
+				        ImageIcon icon = new ImageIcon(iconURL);
+				        previewPane.setIcon(icon);
+						previewPane.setText(null);
+			        }
+				}
+		    }
+		});
 
 		GridBagConstraints c = new GridBagConstraints();
 
@@ -116,18 +146,57 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		c.gridwidth = 3;
 		c.gridx = 1;
 		c.gridy = y++;
-		panel.add(inputDrawStyle, c);
+		panel.add(options, c);
+		c.anchor=GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth=4;
+		c.gridx=0;
+		c.gridy=y++;
+		c.insets = new Insets(10, 0, 0, 0);
+		previewPane.setPreferredSize(new Dimension(449,325));
+		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
+		panel.add(previewPane,c);
+		
+		previewPane.setIcon(null);
+		previewPane.setText("No preview available.");
+		ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
+		String imageFilename = chosenConverter.getPreviewImage();
+		if(imageFilename!=null) {
+			//System.out.println("Found '"+imageFilename+"'.");
+			URL iconURL = chosenConverter.getClass().getResource(imageFilename);
+	        if (iconURL != null) {
+		        ImageIcon icon = new ImageIcon(iconURL);
+		        previewPane.setIcon(icon);
+				previewPane.setText(null);
+	        }
+		}
 
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			setPreferredDrawStyle(inputDrawStyle.getSelectedIndex());
+			setPreferredDrawStyle(options.getSelectedIndex());
 			robot.getSettings().saveConfig();
 
 			return true;
 		}
 
 		return false;
+	}
+
+	private ImageConverter getConverter(int arg0) throws IndexOutOfBoundsException {
+		ServiceLoader<ImageConverter> imageConverters = ServiceLoader.load(ImageConverter.class);
+		Iterator<ImageConverter> ici = imageConverters.iterator();
+		ici = imageConverters.iterator();
+		int i=0;
+		while(ici.hasNext()) {
+			ImageConverter chosenConverter = ici.next();
+			if(i==arg0) {
+				return chosenConverter;
+			}
+			i++;
+		}
+		
+		throw new IndexOutOfBoundsException();
 	}
 	
 

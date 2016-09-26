@@ -24,6 +24,11 @@ public class Converter_Multipass extends ImageConverter {
 		return Translator.get("ConverterMultipassName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/multipass.JPG";
+	}
+
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *

@@ -23,6 +23,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/crosshatch.JPG";
+	}
+
 
 	/**
 	 * The main entry point

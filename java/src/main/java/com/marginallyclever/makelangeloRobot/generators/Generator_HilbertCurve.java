@@ -25,6 +25,12 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		return Translator.get("HilbertCurveName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/hilbert-curve.JPG";
+	}
+
+
 
 	@Override
 	public boolean generate(Writer out) throws IOException {

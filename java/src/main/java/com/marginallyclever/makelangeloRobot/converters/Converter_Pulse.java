@@ -25,6 +25,11 @@ public class Converter_Pulse extends ImageConverter {
 		return Translator.get("PulseLineName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/pulse.JPG";
+	}
+
 
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas

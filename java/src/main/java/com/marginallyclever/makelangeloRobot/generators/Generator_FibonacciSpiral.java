@@ -33,6 +33,12 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		return Translator.get("FibonacciSpiralName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/fibonacci.JPG";
+	}
+
+
 	
 	@Override
 	public boolean generate(Writer out) throws IOException {
