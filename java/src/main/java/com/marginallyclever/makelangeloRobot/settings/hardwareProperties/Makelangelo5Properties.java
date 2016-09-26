@@ -73,4 +73,70 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glVertex2d(right-2.1f, top-2.1f);
 		gl2.glEnd();
 	}
+	
+	protected void renderLCD(GL2 gl2) {
+		// position
+		gl2.glPushMatrix();
+		gl2.glTranslated(-18, 0, 0);
+		/*
+		// mounting plate for LCD
+		gl2.glColor3f(1,0.8f,0.5f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-8, 5);
+		gl2.glVertex2d(+8, 5);
+		gl2.glVertex2d(+8, -5);
+		gl2.glVertex2d(-8, -5);
+		gl2.glEnd();*/
+
+		// LCD red
+		float w = 15.0f/2;
+		float h = 5.6f/2;
+		gl2.glColor3f(0.8f,0.0f,0.0f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+
+		// LCD green
+		gl2.glPushMatrix();
+		gl2.glTranslated(-(2.6)/2, -0.771, 0);
+		
+		w = 9.8f/2;
+		h = 6.0f/2;
+		gl2.glColor3f(0,0.6f,0.0f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+
+		// LCD black
+		h = 4.0f/2;
+		gl2.glColor3f(0,0,0);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+
+		// LCD blue
+		h = 2.5f/2;
+		w = 7.5f/2;
+		gl2.glColor3f(0,0,0.7f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+		
+		gl2.glPopMatrix();
+
+		// clean up
+		gl2.glPopMatrix();
+	}
 }
