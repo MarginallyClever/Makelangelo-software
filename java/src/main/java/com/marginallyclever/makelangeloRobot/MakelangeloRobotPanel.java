@@ -829,7 +829,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
 		String imageFilename = chosenGenerator.getPreviewImage();
 		if(imageFilename!=null) {
-			System.out.println("Found '"+imageFilename+"'.");
+			//System.out.println("Found '"+imageFilename+"'.");
 			URL iconURL = chosenGenerator.getClass().getResource(imageFilename);
 	        if (iconURL != null) {
 		        ImageIcon icon = new ImageIcon(iconURL);
