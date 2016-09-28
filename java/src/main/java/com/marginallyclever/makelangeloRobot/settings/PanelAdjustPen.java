@@ -51,7 +51,7 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	    
 	    MakelangeloRobotSettings settings = robot.getSettings();
 		penDiameter = new FloatField(settings.getDiameter());
-		penFeedRate = new FloatField(settings.getFeedRate());
+		penFeedRate = new FloatField(settings.getMaxFeedRate());
 		penUp = new FloatField(settings.getPenUpAngle());
 		penDown = new FloatField(settings.getPenDownAngle());
 		penZRate = new FloatField(settings.getZRate());
@@ -143,8 +143,20 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		Object subject = event.getSource();
 
-		if (subject == buttonTestUp  ) robot.testPenAngle(((Number)penUp.getValue()).floatValue());
-		if (subject == buttonTestDown) robot.testPenAngle(((Number)penDown.getValue()).floatValue());
+		if (subject == buttonTestUp  ) {
+			// must match MakelangeloRobotSettings.getPenUpString()
+			robot.sendLineToRobot(
+				"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penUp.getValue()).floatValue() + ";\n"+
+				"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+				);
+		}
+		if (subject == buttonTestDown) {
+			// must match MakelangeloRobotSettings.getPenDownString()
+			robot.sendLineToRobot(
+					"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penDown.getValue()).floatValue() + ";\n"+
+					"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+					);
+		}
 	}
 	
 	

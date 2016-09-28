@@ -50,10 +50,6 @@ public final class MakelangeloRobotSettings {
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
-	// speed control
-	private double maxFeedRate;
-	private double currentFeedRate;
-	private double maxAcceleration;
 	// paper area, in cm
 	private double paperLeft;
 	private double paperRight;
@@ -83,7 +79,10 @@ public final class MakelangeloRobotSettings {
 	protected float zRate;
 	protected Color penDownColor;
 	protected Color penUpColor;
-	protected float feedRateXY;
+	// speed control
+	private float maxFeedRate;
+	private float currentFeedRate;
+	private float maxAcceleration;
 	
 	/**
 	 * top left, bottom center, etc...
@@ -154,7 +153,6 @@ public final class MakelangeloRobotSettings {
 		zRate = 50;
 		zOn = 90;
 		zOff = 50;
-		feedRateXY = 6500;
 		penDownColor = Color.BLACK;
 		penUpColor = Color.BLUE;
 		
@@ -475,9 +473,7 @@ public final class MakelangeloRobotSettings {
 
 		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
-		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
-		currentFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate_current",Double.toString(currentFeedRate)));
-		maxAcceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(maxAcceleration)));
+		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
@@ -504,7 +500,8 @@ public final class MakelangeloRobotSettings {
 		zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
 		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feedRateXY = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateXY)));
+		maxFeedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(maxFeedRate)));
+		currentFeedRate=Float.valueOf(prefs.get("feed_rate_current",Float.toString(currentFeedRate)));
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -524,7 +521,8 @@ public final class MakelangeloRobotSettings {
 		prefs.put("z_on", Float.toString(zOn));
 		prefs.put("z_off", Float.toString(zOff));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Float.toString(feedRateXY));
+		prefs.put("feed_rate", Float.toString(maxFeedRate));
+		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
 		prefs.putInt("penDownColorR", penDownColor.getRed());
 		prefs.putInt("penDownColorG", penDownColor.getGreen());
 		prefs.putInt("penDownColorB", penDownColor.getBlue());
@@ -560,8 +558,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
 		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
-		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
-		uniqueMachinePreferencesNode.put("feed_rate_current", Double.toString(currentFeedRate));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
@@ -584,27 +580,30 @@ public final class MakelangeloRobotSettings {
 		savePenConfig(uniqueMachinePreferencesNode);
 	}
 	
-	public void setAcceleration(double f) {
+	public void setAcceleration(float f) {
 		maxAcceleration = f;
 	}
 	
-	public void setMaxFeedRate(double f) {
+	public void setMaxFeedRate(float f) {
 		maxFeedRate = f;
+		if(currentFeedRate > maxFeedRate) {
+			currentFeedRate = maxFeedRate;
+		}
 	}
 	
-	public double getMaxFeedRate() {
+	public float getMaxFeedRate() {
 		return maxFeedRate;
 	}
 	
-	public void setCurrentFeedRate(double f) {
-		if (f < 0.001) f = 0.001;
+	public void setCurrentFeedRate(float f) {
+		if (f < 0.001) f = 0.001f;
 		if( f > maxFeedRate) {
 			f = maxFeedRate;
 		}
 		currentFeedRate = f;
 	}
 	
-	public double getCurrentFeedRate() {
+	public float getCurrentFeedRate() {
 		return currentFeedRate;
 	}
 	
@@ -738,10 +737,6 @@ public final class MakelangeloRobotSettings {
 		return diameter;
 	}
 
-	public float getFeedRate() {
-		return feedRateXY;
-	}
-
 	public float getPenDownAngle() {
 		return zOn;
 	}
@@ -767,23 +762,25 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G00 Z" + df.format(getPenDownAngle()) + "; down\n";
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
+				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
 	public String getPenUpString() {
-		return "G00 Z" + df.format(getPenUpAngle()) + "; up\n";
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + ";\n"+
+				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
 	public void writeChangeTo(Writer out) throws IOException {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
-		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + "; //"+name+"\n");
-		out.write("G00 F" + df.format(getFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
 	public void writeMoveTo(Writer out, double x, double y) throws IOException {
@@ -792,15 +789,13 @@ public final class MakelangeloRobotSettings {
 
 	// lift the pen
 	public void writeOff(Writer out) throws IOException {
-		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenUpString());
-		out.write("G00 F" + df.format(getFeedRate()) + ";\n");
 	}
 
 	// lower the pen
 	public void writeOn(Writer out) throws IOException {
 		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenDownString());
-		out.write("G00 F" + df.format(getFeedRate()) + ";\n");
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + ";\n");
 	}
 }

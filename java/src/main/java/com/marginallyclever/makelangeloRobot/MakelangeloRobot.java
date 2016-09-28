@@ -539,7 +539,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return true;
 	}
 
-	public void setCurrentFeedRate(double feedRate) {
+	public void setCurrentFeedRate(float feedRate) {
 		// remember it
 		settings.setCurrentFeedRate(feedRate);
 		// get it again in case it was capped.

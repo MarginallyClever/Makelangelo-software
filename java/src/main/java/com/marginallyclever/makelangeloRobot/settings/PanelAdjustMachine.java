@@ -189,21 +189,24 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		}
 
 		// acceleration
-		acceleration = new FloatField();
-		acceleration.setValue(robot.getSettings().getAcceleration());
-		s = acceleration.getPreferredSize();
-		s.width = 80;
-		acceleration.setPreferredSize(s);
-		y = 0;
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(acceleration, d);
-		y++;
-		if(!robot.getSettings().getHardwareProperties().canAccelerate()) {
-			p.setVisible(false);
+		{
+			p = new JPanel(new GridBagLayout());
+			this.add(p);
+			
+			acceleration = new FloatField();
+			acceleration.setValue(robot.getSettings().getAcceleration());
+			s = acceleration.getPreferredSize();
+			s.width = 80;
+			acceleration.setPreferredSize(s);
+			c.gridx = 0;
+			c.gridy = 0;
+			p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
+			d.gridx = 1;
+			d.gridy = 0;
+			p.add(acceleration, d);
+			if(!robot.getSettings().getHardwareProperties().canAccelerate()) {
+				p.setVisible(false);
+			}
 		}
 
 		// Jog motors
@@ -329,7 +332,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
 		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
 		double bld   = ((Number)pulleyDiameter.getValue()).doubleValue() / 10.0;
-		double accel = ((Number)acceleration.getValue()).doubleValue();
+		float accel = ((Number)acceleration.getValue()).floatValue();
 
 		boolean data_is_sane = true;
 		if (mwf <= 0) data_is_sane = false;

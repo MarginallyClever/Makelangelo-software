@@ -24,8 +24,19 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public boolean canChangeMachineSize() {
 		return false;
 	}
-	public float getWidth() { return 835; }
-	public float getHeight() { return 1200; }
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangePulleySize() {
+		return false;
+	}
+	
+	public float getWidth() { return 650; }
+	public float getHeight() { return 1100; }
 
 	@Override
 	public boolean canAutoHome() {
