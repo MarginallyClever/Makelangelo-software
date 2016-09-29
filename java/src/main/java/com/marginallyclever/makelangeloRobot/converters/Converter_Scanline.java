@@ -64,7 +64,7 @@ public class Converter_Scanline extends ImageConverter {
 		
 		float x, y, z;
 		int i = 0;
-		for (y = yBottom; y < yTop; y += steps) {
+		for (y = yTop; y > yBottom; y -= steps) {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
