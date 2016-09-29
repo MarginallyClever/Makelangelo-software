@@ -780,7 +780,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		options.setSelectedIndex(generatorChoice);
 
 		GridBagConstraints c = new GridBagConstraints();
-		JLabel previewPane = new JLabel();
+		final JLabel previewPane = new JLabel();
 		
 		options.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)

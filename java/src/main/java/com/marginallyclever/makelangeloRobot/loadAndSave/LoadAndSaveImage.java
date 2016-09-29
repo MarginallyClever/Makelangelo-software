@@ -109,7 +109,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 
 		final JComboBox<String> options = new JComboBox<String>(imageConverterNames);
-		JLabel previewPane = new JLabel();
+		final JLabel previewPane = new JLabel();
 		previewPane.setHorizontalAlignment(SwingConstants.CENTER);
 		previewPane.setVerticalAlignment(SwingConstants.CENTER);
 		
@@ -230,7 +230,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 		
 		// where to save temp output file?
-		File tempFile;
+		final File tempFile;
 		try {
 			tempFile = File.createTempFile("gcode", ".ngc");
 		} catch (Exception e) {

@@ -375,13 +375,13 @@
 		<hint>warning message</hint>
 	</string>
 	<string>
-		<key>ChangeToolPrefix</key>
-		<value>Please prepare </value>
+		<key>ChangeToolTitle</key>
+		<value>Change Pen</value>
 		<hint>tool change prompt. keep the space at the end.</hint>
 	</string>
 	<string>
-		<key>ChangeToolPostfix</key>
-		<value> and click any button to continue.</value>
+		<key>ChangeToolMessage</key>
+		<value>Please change the pen to match this color.</value>
 		<hint>tool change prompt. keep the space at the start.</hint>
 	</string>
 

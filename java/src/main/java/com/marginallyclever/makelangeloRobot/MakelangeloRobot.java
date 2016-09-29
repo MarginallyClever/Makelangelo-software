@@ -1,6 +1,11 @@
 package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +17,10 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
@@ -415,22 +423,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		// tool change?
 		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
 			int toolNumber=0;
-			boolean nextTokenIsColorName=false;
-			String colorName ="";
 			for (String token : tokens) {
 				if (token.startsWith("T")) {
 					toolNumber = Integer.decode(token.substring(1));
 				}
-				if (token.startsWith("//")) {
-					nextTokenIsColorName=true;
-				}
-				if(nextTokenIsColorName) {
-					nextTokenIsColorName=false;
-					colorName = token;
-				}
 			}
 			
-			changeToTool(toolNumber,colorName);
+			changeToTool(toolNumber);
 		}
 
 		// checksums for commands with a line number
@@ -487,8 +486,42 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	// TODO tie tool number to color somehow?  24-bit cool number = color?
-	private void changeToTool(int toolNumber, String colorName) {
-		JOptionPane.showMessageDialog(null, Translator.get("ChangeToolPrefix") + colorName + Translator.get("ChangeToolPostfix"));
+	public void changeToTool(int toolNumber) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+
+		c.anchor = GridBagConstraints.EAST;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.gridx=0;
+		c.gridy=0;
+		c.insets = new Insets(10,10,10,10);
+		
+		int r = ( toolNumber >> 16 ) & 0xff;
+		int g = ( toolNumber >>  8 ) & 0xff;
+		int b = ( toolNumber >>  0 ) & 0xff;
+		
+		JLabel fieldValue = new JLabel("");
+		fieldValue.setOpaque(true);
+		fieldValue.setMinimumSize(new Dimension(80,20));
+		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
+		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
+		fieldValue.setSize(fieldValue.getMinimumSize());
+		fieldValue.setBackground(new Color(r,g,b));
+		fieldValue.setBorder(new LineBorder(Color.BLACK));
+		panel.add(fieldValue, c);
+		
+		
+		JLabel message = new JLabel( Translator.get("ChangeToolMessage") );
+		c.gridx=1;
+		c.gridwidth=3;
+		panel.add(message,c);
+		
+		Component root=null;
+		MakelangeloRobotPanel p = this.getControlPanel();
+		if(p!=null) root = p.getRootPane();
+		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 
 
