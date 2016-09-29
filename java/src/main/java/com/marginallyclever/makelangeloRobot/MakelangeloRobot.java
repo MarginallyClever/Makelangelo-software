@@ -485,7 +485,10 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendFileCommand();
 	}
 
-	// TODO tie tool number to color somehow?  24-bit cool number = color?
+	/**
+	 * display a dialog asking the user to change the pen
+	 * @param toolNumber a 24 bit RGB color of the new pen.
+	 */
 	public void changeToTool(int toolNumber) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -498,17 +501,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		c.gridy=0;
 		c.insets = new Insets(10,10,10,10);
 		
-		int r = ( toolNumber >> 16 ) & 0xff;
-		int g = ( toolNumber >>  8 ) & 0xff;
-		int b = ( toolNumber >>  0 ) & 0xff;
-		
 		JLabel fieldValue = new JLabel("");
 		fieldValue.setOpaque(true);
 		fieldValue.setMinimumSize(new Dimension(80,20));
 		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
 		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
 		fieldValue.setSize(fieldValue.getMinimumSize());
-		fieldValue.setBackground(new Color(r,g,b));
+		fieldValue.setBackground(new Color(toolNumber));
 		fieldValue.setBorder(new LineBorder(Color.BLACK));
 		panel.add(fieldValue, c);
 		
