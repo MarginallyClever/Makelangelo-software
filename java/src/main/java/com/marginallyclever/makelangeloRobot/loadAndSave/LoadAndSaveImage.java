@@ -234,7 +234,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		try {
 			tempFile = File.createTempFile("gcode", ".ngc");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

@@ -201,7 +201,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		try {
 			tempFile = File.createTempFile("temp", ".ngc");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return false;
 		}

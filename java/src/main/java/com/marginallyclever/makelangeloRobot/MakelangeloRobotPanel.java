@@ -850,7 +850,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			try {
 				tempFile = File.createTempFile("gcode", ".ngc");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
 			}

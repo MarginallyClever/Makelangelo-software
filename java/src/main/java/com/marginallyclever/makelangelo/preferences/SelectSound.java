@@ -58,7 +58,6 @@ public class SelectSound extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		fieldValue.setText(selectFile(fieldValue.getText()));
 	}
 	
