@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.gcode;
 
 import java.awt.Color;
 import java.io.FileInputStream;
@@ -11,8 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -40,20 +41,8 @@ public class GCodeFile {
 	private ReentrantLock lock = new ReentrantLock();
 
 	// optimization - turn gcode into vectors once on load, draw vectors after that.
-	public enum GCodeNodeType {
-		COLOR, POS, TOOL
-	}
-	
-	class GCodeNode {
-		double x1, y1, x2, y2;
-		Color c;
-		int toolID;
-		int lineNumber;
-		GCodeNodeType type;
-	}
 
 	ArrayList<GCodeNode> fastNodes = new ArrayList<GCodeNode>();
-
 
 	
 	public GCodeFile() {}
@@ -352,84 +341,74 @@ public class GCodeFile {
 		int linesProcessed = getLinesProcessed();
 		optimizeNodes(robot);
 
+		MakelangeloRobotSettings machine = robot.getSettings();
+		
 		int lookAhead=320;
 
-		DrawingTool tool = robot.getSettings().getTool(0);
-		gl2.glColor3f(0, 0, 0);
+		float penR = robot.getSettings().getPenUpColor().getRed() / 255.0f;
+		float penG = robot.getSettings().getPenUpColor().getGreen() / 255.0f;
+		float penB = robot.getSettings().getPenUpColor().getBlue() / 255.0f;
 
+		gl2.glColor3f(penR, penG, penB);
+	
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
-			
+
+		gl2.glBegin(GL2.GL_LINES);
+		
 		// draw image
 		if (fastNodes.size() > 0) {
+			gl2.glLineWidth(machine.getDiameter());
+
 			// draw the nodes
 			Iterator<GCodeNode> nodes = fastNodes.iterator();
+			
 			while (nodes.hasNext()) {
 				GCodeNode n = nodes.next();
 
+				gl2.glColor3f(
+						n.c.getRed() / 255.0f, 
+						n.c.getGreen() / 255.0f,
+						n.c.getBlue() / 255.0f);
+				
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {
-						gl2.glColor3f(1, 0, 0);
-						//g2d.setColor(Color.RED);
-						if(n.type==GCodeNodeType.POS) {
+						// Move the virtual pen holder to the current command start position.
+						if(n.type==GCodeNode.GCodeNodeType.POS) {
 							robot.setGondolaX((float)n.x1*10);
 							robot.setGondolaY((float)n.y1*10);
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
+						// Set the look ahead color
+						// TODO add pen "look ahead" color control?
 						gl2.glColor3f(0, 1, 0);
-						//g2d.setColor(Color.GREEN);
 					} else if (drawAllWhileRunning == false) {
+						// Stop drawing now!
 						break;
 					}
 				}
 
-				switch (n.type) {
-				case TOOL:
-					tool = robot.getSettings().getTool(n.toolID);
-					gl2.glLineWidth(tool.getDiameter());
-					break;
-				case COLOR:
-					if (!robot.isRunning() || n.lineNumber > linesProcessed + lookAhead) {
-						//g2d.setColor(n.c);
-						gl2.glColor3f(n.c.getRed() / 255.0f, n.c.getGreen() / 255.0f, n.c.getBlue() / 255.0f);
-					}
-					break;
-				default:
-					tool.drawLine(gl2, n.x1, n.y1, n.x2, n.y2);
-					break;
+				if(n.type==GCodeNode.GCodeNodeType.POS) {
+					gl2.glVertex2d(n.x1, n.y1);
+					gl2.glVertex2d(n.x2, n.y2);
 				}
 			}
 		}
+		
+		gl2.glEnd();
 	}
 
 	
-	private void addNodePos(int i, double x1, double y1, double x2, double y2) {
-		GCodeNode n = new GCodeNode();
-		n.lineNumber = i;
-		n.x1 = x1;
-		n.x2 = x2;
-		n.y1 = y1;
-		n.y2 = y2;
-		n.type = GCodeNodeType.POS;
-
-		fastNodes.add(n);
-	}
-
-	private void addNodeColor(int i, Color c) {
-		GCodeNode n = new GCodeNode();
-		n.lineNumber = i;
-		n.c = c;
-		n.type = GCodeNodeType.COLOR;
-
+	private void addNodePos(int i, double x1, double y1, double x2, double y2, Color c) {
+		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.POS,x1,y1,x2,y2,c);
 		fastNodes.add(n);
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		GCodeNode n = new GCodeNode();
-		n.lineNumber = i;
-		n.toolID = tool_id;
-		n.type = GCodeNodeType.TOOL;
-
+		Color c = new Color((tool_id>>16)&0xFF,
+							(tool_id>> 8)&0xFF,
+							(tool_id    )&0xFF);
+		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.TOOL,0,0,0,0,c);
 		fastNodes.add(n);
 	}
 
@@ -441,10 +420,14 @@ public class GCodeFile {
 	}
 
 	private void optimizeNodes( MakelangeloRobot robot ) {
-		if (!fastNodes.isEmpty() && changed == false) return;
+		if (!fastNodes.isEmpty() && !changed) return;
 		changed = false;
 
-		DrawingTool tool = robot.getSettings().getTool(0);
+		MakelangeloRobotSettings machine = robot.getSettings();
+		boolean showPenUp = GFXPreferences.getShowPenUp();
+		Color penDownColor = machine.getPenDownColor();
+		Color penUpColor = machine.getPenUpColor();
+		Color currentColor = penUpColor;
 
 		float drawScale = 0.1f;
 		// arc smoothness - increase to make more smooth and run slower.
@@ -456,8 +439,7 @@ public class GCodeFile {
 		int i, j;
 		boolean absMode = true;
 		boolean isLifted=true;
-		String tool_change = "M06 T";
-		Color tool_color = Color.BLACK;
+		String toolChangeCommand = "M06 T";
 
 		Iterator<String> commands = getLines().iterator();
 		i = 0;
@@ -467,16 +449,13 @@ public class GCodeFile {
 			String[] pieces = line.split(";");
 			if (pieces.length == 0) continue;
 
-			if (line.startsWith(tool_change)) {
-				String numberOnly = pieces[0].substring(tool_change.length()).replaceAll("[^0-9]", "");
-				int id = (int) Integer.valueOf(numberOnly, 10);
+			// tool change
+			if (line.startsWith(toolChangeCommand)) {
+				// color of tool
+				String numberOnly = pieces[0].substring(toolChangeCommand.length());//.replaceAll("[^0-9]", "");
+				int id = (int)Integer.valueOf(numberOnly, 10);
 				addNodeTool(i, id);
-				switch (id) {
-				case 1:		tool_color = Color.RED;		break;
-				case 2:		tool_color = Color.GREEN;	break;
-				case 3:		tool_color = Color.BLUE;	break;
-				default:	tool_color = Color.BLACK;	break;
-				}
+				penDownColor = new Color(id);
 				continue;
 			}
 
@@ -495,12 +474,13 @@ public class GCodeFile {
 				else if (tokens[j].equals("G21")) drawScale = 0.10f; // mm->cm
 				else if (tokens[j].equals("G90")) {
 					absMode = true;
-					break;
+					//break;
 				} else if (tokens[j].equals("G91")) {
 					absMode = false;
-					break;
-				} else if (tokens[j].equals("G54")) break;
-				else if (tokens[j].startsWith("X")) {
+					//break;
+				} else if (tokens[j].equals("G54")) {
+					//break;
+				} else if (tokens[j].startsWith("X")) {
 					float tx = Float.valueOf(tokens[j].substring(1)) * drawScale;
 					x = absMode ? tx : x + tx;
 				} else if (tokens[j].startsWith("Y")) {
@@ -510,30 +490,27 @@ public class GCodeFile {
 					float tz = z = Float.valueOf(tokens[j].substring(1));// * drawScale;
 					z = absMode ? tz : z + tz;
 					
-					isLifted = (tool.getPenUpAngle()==z);
+					isLifted = (Math.abs(machine.getPenUpAngle()-z)<0.1);
+					currentColor = isLifted?penUpColor:penDownColor;
 				}
 				if (tokens[j].startsWith("I")) ai = Float.valueOf(tokens[j].substring(1)) * drawScale;
 				if (tokens[j].startsWith("J")) aj = Float.valueOf(tokens[j].substring(1)) * drawScale;
 			}
 			if (j < tokens.length) continue;
 
-			if (isLifted) {
-				if (robot.getShowPenUp() == false) {
-					px = x;
-					py = y;
-					pz = z;
-					continue;
-				}
-				addNodeColor(i, Color.BLUE);
-			} else {
-				addNodeColor(i, tool_color);  // TODO use actual pen color
+			if (isLifted && !showPenUp) {
+				px = x;
+				py = y;
+				pz = z;
+				continue;
 			}
 
+			
 			// what kind of motion are we going to make?
 			String firstToken = tokens[0];
 			if (firstToken.equals("G00") || firstToken.equals("G0") ||
 				firstToken.equals("G01") || firstToken.equals("G1")) {
-				addNodePos(i, px, py, x, y);
+				addNodePos(i, px, py, x, y, currentColor);
 			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
 					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
@@ -566,11 +543,11 @@ public class GCodeFile {
 					nx = ai + Math.cos(angle3) * radius;
 					ny = aj + Math.sin(angle3) * radius;
 
-					addNodePos(i, px, py, nx, ny);
+					addNodePos(i, px, py, nx, ny,currentColor);
 					px = (float) nx;
 					py = (float) ny;
 				}
-				addNodePos(i, px, py, x, y);
+				addNodePos(i, px, py, x, y,currentColor);
 			}
 
 			px = x;

@@ -37,6 +37,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	private JFormattedTextField pw, ph;
 	private JCheckBox isLandscape;
 	private boolean beingModified;
+	private SelectColor paperColor;
 	
 	class PaperSize {
 		public String name;
@@ -114,12 +115,14 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		}
 		
 		paperSizes = new JComboBox<>(commonPaperNames);
+		paperSizes.addActionListener(this);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
 		d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
 		y++;
 
 		// landscape checkbox
 		isLandscape = new JCheckBox(Translator.get("isLandscape"), false);
+		isLandscape.addActionListener(this);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		d.gridx=0;  d.gridy=y;  d.gridwidth=3;  p.add(isLandscape,d);
 		y++;
@@ -128,21 +131,23 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		// manual paper size settings
 		d.gridwidth=1;
 		pw = new FloatField();
+		Dimension s = pw.getPreferredSize();
+		s.width = 80;
 		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
 		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
+		pw.setPreferredSize(s);
+		pw.addPropertyChangeListener(this);
 		
 		ph = new FloatField();
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
 		d.gridx=1;  d.gridy=y;  p.add(ph,d);
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
 		y++;
-
-		Dimension s = ph.getPreferredSize();
-		s.width = 80;
-		pw.setPreferredSize(s);
+		ph.addPropertyChangeListener(this);
 		ph.setPreferredSize(s);
+
 		
 		// paper margin
 		JPanel marginPanel = new JPanel(new GridBagLayout());
@@ -152,6 +157,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		paperMargin.setMinorTickSpacing(5);
 		paperMargin.setPaintTicks(false);
 		paperMargin.setPaintLabels(true);
+		paperMargin.addChangeListener(this);
 		
 		pm.anchor = GridBagConstraints.WEST;
 		JLabel marginLabel = new JLabel(Translator.get("PaperMargin"));
@@ -165,12 +171,18 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		marginPanel.add(paperMargin,pm);
 
 		this.add(marginPanel, c);
-
-		paperSizes.addActionListener(this);
-		isLandscape.addActionListener(this);
-		pw.addPropertyChangeListener(this);
-		ph.addPropertyChangeListener(this);
-		paperMargin.addChangeListener(this);
+		
+		JPanel colorPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints cm = new GridBagConstraints();
+		cm.gridx=0;
+		cm.gridy=0;
+		cm.fill=GridBagConstraints.HORIZONTAL;
+		paperColor = new SelectColor(this,"paper color",robot.getSettings().getPaperColor());
+		colorPanel.add(paperColor,cm);
+		cm.gridy++;
+		
+		c.gridy++;
+		this.add(colorPanel,c);
 		
 		updateValues();
 	}
@@ -286,6 +298,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		if (data_is_sane) {
 			MakelangeloRobotSettings s = robot.getSettings();
 			s.setPaperSize(pwf,phf);
+			s.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
 			s.setPaperMargin(pm);

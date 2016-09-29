@@ -26,6 +26,11 @@ public class Converter_Sandy extends ImageConverter {
 		return Translator.get("Sandy Noble Style");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/sandy.JPG";
+	}
+
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
@@ -64,9 +69,8 @@ public class Converter_Sandy extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		convertPaperSpace(img,out);
 
@@ -117,7 +121,7 @@ public class Converter_Sandy extends ImageConverter {
 		for(r=rMin;r<rMax;r+=rStep) {
 			// go around in a circle
 			t=0;
-			t_step = tool.getDiameter()/r;
+			t_step = machine.getDiameter()/r;
 			flipSum=0;
 			// go around the circle
 			for(t=0;t<Math.PI*2;t+=t_step) {

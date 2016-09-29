@@ -63,6 +63,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
+	public String getPreviewImage() {
+		return "/images/converters/voronoi-stipples.JPG";
+	}
+
+	@Override
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
@@ -98,8 +103,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 			xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 			
-			tool = machine.getCurrentTool();
-
 			cellBorder = new ArrayList<>();
 
 			initializeCells(0.001);
@@ -215,11 +218,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Log.message("Writing gcode.");
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
-		float toolDiameter = tool.getDiameter();
+		float toolDiameter = machine.getDiameter();
 
 		Arrays.sort(cells);
 		
@@ -243,9 +245,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					newX = x + r * (float) Math.cos(v);
 					newY = y + r * (float) Math.sin(v);
 					if(first) {
-						moveTo(out, newX, newY, true);
-						lowerPen(out);
-						first=false;
+						if(isInsidePaperMargins(newX,newY)) {
+							moveTo(out, newX, newY, true);
+							lowerPen(out);
+							first=false;
+						}
 					} else {
 						moveTo(out, newX, newY, false);
 					}
@@ -374,7 +378,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void adjustCentroids() {
 		int i;
 		double weight, wx, wy, x, y;
-		//int step = (int) Math.ceil(tool.getDiameter() / (1.0 * scale));
+		//int step = (int) Math.ceil(machine.getDiameter() / (1.0 * scale));
 		double stepSize = 2.0;
 
 		for (i = 0; i < cells.length; ++i) {

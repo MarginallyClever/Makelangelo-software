@@ -1,5 +1,9 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.IOException;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -12,8 +16,6 @@ import java.util.prefs.Preferences;
 
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool_Pen;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
@@ -48,10 +50,6 @@ public final class MakelangeloRobotSettings {
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
-	// speed control
-	private double maxFeedRate;
-	private double currentFeedRate;
-	private double maxAcceleration;
 	// paper area, in cm
 	private double paperLeft;
 	private double paperRight;
@@ -64,7 +62,7 @@ public final class MakelangeloRobotSettings {
 	// pulleys turning backwards?
 	private boolean isLeftMotorInverted;
 	private boolean isRightMotorInverted;
-	
+
 	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
 	private boolean shouldSignName;
@@ -72,6 +70,20 @@ public final class MakelangeloRobotSettings {
 	private int hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
+	private Color paperColor;
+
+	// pen
+	protected float diameter; // mm
+	protected float zOff;
+	protected float zOn;
+	protected float zRate;
+	protected Color penDownColor;
+	protected Color penUpColor;
+	// speed control
+	private float maxFeedRate;
+	private float currentFeedRate;
+	private float maxAcceleration;
+	
 	/**
 	 * top left, bottom center, etc...
 	 *
@@ -90,11 +102,6 @@ public final class MakelangeloRobotSettings {
 	 * </pre>
 	 */
 	private int startingPositionIndex;
-
-	// TODO a way for users to create different tools for each machine
-	private List<DrawingTool> tools;
-	// which tool is currently selected.
-	private int currentToolIndex;
 
 	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
@@ -122,6 +129,8 @@ public final class MakelangeloRobotSettings {
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
+		paperColor = Color.WHITE;
+		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 		shouldSignName = false;
 		
@@ -139,19 +148,23 @@ public final class MakelangeloRobotSettings {
 		currentFeedRate = 6500;
 		maxAcceleration = 250;
 
+		// pen
+		diameter = 0.8f;
+		zRate = 50;
+		zOn = 90;
+		zOff = 50;
+		penDownColor = Color.BLACK;
+		penUpColor = Color.BLUE;
+		
 		// diameter = circumference/pi
 		// circumference is 20 teeth @ 2mm/tooth
-		pulleyDiameter  = 20.0 * 0.2 / Math.PI;  // 20 teeth on the pulley, 2mm per tooth.
+		pulleyDiameter  = 20.0 * 0.2 / Math.PI;
 
 		isLeftMotorInverted = false;
 		isRightMotorInverted = true;
 		reverseForGlass = false;
 
 		startingPositionIndex = 4;
-		
-		tools = new ArrayList<>();
-		tools.add(new DrawingTool_Pen(robot));
-		currentToolIndex = 0;
 
 		// default hardware version is 2
 		setHardwareVersion(2);
@@ -237,15 +250,6 @@ public final class MakelangeloRobotSettings {
 				+ " J" + (isRightMotorInverted ? "-1" : "1");
 	}
 
-
-	public DrawingTool getCurrentTool() {
-		return getTool(currentToolIndex);
-	}
-
-
-	public int getCurrentToolNumber() {
-		return currentToolIndex;
-	}
 
 	public int getKnownMachineIndex() {
 		String [] list = getKnownMachineNames();
@@ -404,33 +408,10 @@ public final class MakelangeloRobotSettings {
 		return paperRight - paperLeft;
 	}
 
-	public String getPenDownString() {
-		return getCurrentTool().getPenDownString();
-	}
-	
-	public String getPenUpString() {
-		return getCurrentTool().getPenUpString();
-	}
-
 	public double getPulleyDiameter()  {
 		return pulleyDiameter;
 	}
-
-	public DrawingTool getTool(int tool_id) {
-		return tools.get(tool_id);
-	}
 	
-	public String[] getToolNames() {
-		String[] toolNames = new String[tools.size()];
-		Iterator<DrawingTool> i = tools.iterator();
-		int c = 0;
-		while (i.hasNext()) {
-			DrawingTool t = i.next();
-			toolNames[c++] = t.getName();
-		}
-		return toolNames;
-	}
-
 	public long getUID() {
 		return robotUID;
 	}
@@ -492,23 +473,62 @@ public final class MakelangeloRobotSettings {
 
 		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
-		maxFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate",Double.toString(maxFeedRate)));
-		currentFeedRate=Double.valueOf(uniqueMachinePreferencesNode.get("feed_rate_current",Double.toString(currentFeedRate)));
-		maxAcceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(maxAcceleration)));
+		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
-		// load each tool's settings
-		for (DrawingTool tool : tools) {
-			tool.loadConfig(uniqueMachinePreferencesNode);
-		}
+		int r,g,b;
+		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
+		g = uniqueMachinePreferencesNode.getInt("paperColorG", paperColor.getGreen());
+		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
+		paperColor = new Color(r,g,b);
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
-		setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
+		//setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
 
+		loadPenConfig(uniqueMachinePreferencesNode);
+
 		setHardwareVersion(Integer.parseInt(uniqueMachinePreferencesNode.get("hardwareVersion", Integer.toString(hardwareVersion))));
+	}
+
+	protected void loadPenConfig(Preferences prefs) {
+		prefs = prefs.node("Pen");
+		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
+		zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
+		zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
+		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
+		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
+		maxFeedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(maxFeedRate)));
+		currentFeedRate=Float.valueOf(prefs.get("feed_rate_current",Float.toString(currentFeedRate)));
+		
+		int r,g,b;
+		r = prefs.getInt("penDownColorR", penDownColor.getRed());
+		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
+		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
+		penDownColor = new Color(r,g,b);
+		r = prefs.getInt("penUpColorR", penUpColor.getRed());
+		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
+		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
+		penUpColor = new Color(r,g,b);
+	}
+
+	protected void savePenConfig(Preferences prefs) {
+		prefs = prefs.node("Pen");
+		prefs.put("diameter", Float.toString(getDiameter()));
+		prefs.put("z_rate", Float.toString(zRate));
+		prefs.put("z_on", Float.toString(zOn));
+		prefs.put("z_off", Float.toString(zOff));
+		//prefs.put("tool_number", Integer.toString(toolNumber));
+		prefs.put("feed_rate", Float.toString(maxFeedRate));
+		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
+		prefs.putInt("penDownColorR", penDownColor.getRed());
+		prefs.putInt("penDownColorG", penDownColor.getGreen());
+		prefs.putInt("penDownColorB", penDownColor.getBlue());
+		prefs.putInt("penUpColorR", penUpColor.getRed());
+		prefs.putInt("penUpColorG", penUpColor.getGreen());
+		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
 
 	public void notifySettingsChanged() {
@@ -538,8 +558,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
 		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
-		uniqueMachinePreferencesNode.put("feed_rate", Double.toString(maxFeedRate));
-		uniqueMachinePreferencesNode.put("feed_rate_current", Double.toString(currentFeedRate));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
@@ -547,45 +565,45 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
 		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
-
-		// save each tool's settings
-		for (DrawingTool tool : tools) {
-			tool.saveConfig(uniqueMachinePreferencesNode);
-		}
+		
+		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
+		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
+		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
 
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
-		uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
+		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 		
 		uniqueMachinePreferencesNode.put("hardwareVersion", Integer.toString(hardwareVersion));
+
+		savePenConfig(uniqueMachinePreferencesNode);
 	}
 	
-	public void setAcceleration(double f) {
+	public void setAcceleration(float f) {
 		maxAcceleration = f;
 	}
 	
-	public void setCurrentToolNumber(int current_tool) {
-		this.currentToolIndex = current_tool;
-	}
-	
-	public void setMaxFeedRate(double f) {
+	public void setMaxFeedRate(float f) {
 		maxFeedRate = f;
+		if(currentFeedRate > maxFeedRate) {
+			currentFeedRate = maxFeedRate;
+		}
 	}
 	
-	public double getMaxFeedRate() {
+	public float getMaxFeedRate() {
 		return maxFeedRate;
 	}
 	
-	public void setCurrentFeedRate(double f) {
-		if (f < 0.001) f = 0.001;
+	public void setCurrentFeedRate(float f) {
+		if (f < 0.001) f = 0.001f;
 		if( f > maxFeedRate) {
 			f = maxFeedRate;
 		}
 		currentFeedRate = f;
 	}
 	
-	public double getCurrentFeedRate() {
+	public float getCurrentFeedRate() {
 		return currentFeedRate;
 	}
 	
@@ -681,5 +699,103 @@ public final class MakelangeloRobotSettings {
 		}
 		
 		saveConfigToLocal();
+	}
+	
+	public Color getPaperColor() {
+		return paperColor;
+	}
+	
+	public void setPaperColor(Color arg0) {
+		paperColor = arg0;
+	}
+	
+	public Color getPenDownColor() {
+		return penDownColor;
+	}
+	
+	public void setPenDownColor(Color arg0) {
+		penDownColor=arg0;
+	}
+	
+	public void setPenUpColor(Color arg0) {
+		penUpColor=arg0;
+	}
+	
+	public Color getPenUpColor() {
+		return penUpColor;
+	}
+
+	public float getZRate() {
+		return zRate;
+	}
+	
+	public void setZRate(float arg0) {
+		zRate = arg0;
+	}
+	
+	public float getDiameter() {
+		return diameter;
+	}
+
+	public float getPenDownAngle() {
+		return zOn;
+	}
+
+	public float getPenUpAngle() {
+		return zOff;
+	}
+
+	public void setPenDownAngle(float arg0) {
+		zOn=arg0;
+	}
+
+	public void setPenUpAngle(float arg0) {
+		zOff=arg0;
+	}
+
+	public BasicStroke getStroke() {
+		return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	}
+
+	public void setDiameter(float d) {
+		diameter = d;
+	}
+
+	public String getPenDownString() {
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
+				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+	}
+
+	public String getPenUpString() {
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + ";\n"+
+				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+	}
+
+	public void writeChangeTo(Writer out) throws IOException {
+		int toolNumber = penDownColor.getRGB();
+		out.write("M06 T" + toolNumber + ";\n");
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+	}
+
+	public void writeChangeTo(Writer out,String name) throws IOException {
+		int toolNumber = penDownColor.getRGB();
+		out.write("M06 T" + toolNumber + "; //"+name+"\n");
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+	}
+
+	public void writeMoveTo(Writer out, double x, double y) throws IOException {
+		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
+	}
+
+	// lift the pen
+	public void writeOff(Writer out) throws IOException {
+		out.write(getPenUpString());
+	}
+
+	// lower the pen
+	public void writeOn(Writer out) throws IOException {
+		out.write("G00 F" + df.format(zRate) + ";\n");
+		out.write(getPenDownString());
+		out.write("G00 F" + df.format(getCurrentFeedRate()) + ";\n");
 	}
 }

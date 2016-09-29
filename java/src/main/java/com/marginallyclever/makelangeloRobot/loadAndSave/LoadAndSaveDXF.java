@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
 import java.awt.GridLayout;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,7 +36,7 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.makelangelo.GCodeFile;
+import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
@@ -52,6 +53,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	private static boolean shouldInfillOnLoad=true;
 	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
+	private double previousX,previousY;
+
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -193,8 +196,17 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-		String destinationFile = System.getProperty("user.dir") + "/temp.ngc";
-		Log.message(Translator.get("Converting") + " " + destinationFile);
+
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("temp", ".ngc");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		}
+		tempFile.deleteOnExit();
+		Log.message(Translator.get("Converting") + " " + tempFile.getName());
 
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -229,14 +241,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 		//countAllEntities(doc);
 
-		try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
+		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
 				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			tool = machine.getCurrentTool();
-			double toolDiameterSquared = Math.pow(tool.getDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(tool.getDiameter(), 2);
+			double toolDiameterSquared = Math.pow(machine.getDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(machine.getDiameter(), 2);
 
 			// gcode preamble
 			//out.write(machine.getGCodeConfig() + ";\n");
@@ -256,7 +267,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 				if (entityTypeIter.hasNext()) {
 					layer.getColor();
-					tool.writeChangeTo(out,layer.getName());
+					machine.writeChangeTo(out,layer.getName());
 				}
 				
 				// Sort the entities on this layer into the buckets.
@@ -325,11 +336,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			Log.message("Done!");
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(destinationFile);
+			InputStream fileInputStream = new FileInputStream(tempFile);
 			loader.load(fileInputStream,robot);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		tempFile.delete();
 
 		return true;
 	}
@@ -470,7 +483,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			if (dx * dx + dy * dy > limitSquared) {
 				// line does not start at last tool location, lift and move.
 				if (!lastUp) liftPen(out);
-				moveTo(out, (float) x, (float) y,true);
+				moveTo(out, (float) x, (float) y, true);
+				previousX = x;
+				previousY = y;
 			}
 			// else line starts right here, pen is down, do nothing extra.
 		} else {
@@ -478,7 +493,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			// not the first point, draw.
 			if (notLast && dx * dx + dy * dy < limitSquared)
 				return; // points too close together
-			moveTo(out, (float) x, (float) y,false);
+			moveTo(out, (float) x, (float) y, false);
+			previousX = x;
+			previousY = y;
 		}
 	}
 	
@@ -488,9 +505,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		if (dx * dx + dy * dy > toolDiameterSquared) {
 			if (!lastUp) liftPen(out);
 			moveTo(out, (float) x, (float) y, true);
+			previousX = x;
+			previousY = y;
 		}
 		if (lastUp) lowerPen(out);
 		moveTo(out, (float) x2, (float) y2, false);
+		previousX = x2;
+		previousY = y2;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 /**
- * store command line options for use in the app
+ * Store command line options for use in the app
  * @author Admin
  *
  */

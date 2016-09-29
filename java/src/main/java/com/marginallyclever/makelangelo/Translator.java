@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -22,12 +20,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import org.apache.commons.io.FilenameUtils;
 
+import com.marginallyclever.makelangelo.preferences.LanguagePreferences;
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -85,34 +80,8 @@ public final class Translator {
 		loadConfig();
 
 		if (isThisTheFirstTimeLoadingLanguageFiles()) {
-			chooseLanguage();
+			LanguagePreferences.chooseLanguage();
 		}
-	}
-
-
-	// display a dialog box of available languages and let the user select their preference.
-	static public void chooseLanguage() {
-		JPanel panel = new JPanel(new GridBagLayout());
-
-		final String[] languageList = getLanguageList();
-		final JComboBox<String> languageOptions = new JComboBox<>(languageList);
-		int currentIndex = getCurrentLanguageIndex();
-		languageOptions.setSelectedIndex(currentIndex);
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		c.gridx = 0;
-		c.gridy = 0;
-		panel.add(languageOptions, c);
-		
-		int result;
-		do {
-			result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
-		} while(result != JOptionPane.OK_OPTION);
-		
-		setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
-		saveConfig();
 	}
 	
 
@@ -253,7 +222,7 @@ public final class Translator {
 	/**
 	 * @return the list of language names
 	 */
-	static protected String[] getLanguageList() {
+	static public String[] getLanguageList() {
 		final String[] choices = new String[languages.keySet().size()];
 		final Object[] lang_keys = languages.keySet().toArray();
 

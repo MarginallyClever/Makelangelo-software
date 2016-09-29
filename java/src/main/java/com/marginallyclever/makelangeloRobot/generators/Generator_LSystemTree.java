@@ -32,6 +32,12 @@ public class Generator_LSystemTree extends ImageGenerator {
 		return Translator.get("LSystemTreeName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/l-system.JPG";
+	}
+
+
 
 	@Override
 	public boolean generate(Writer out) throws IOException {
@@ -76,9 +82,8 @@ public class Generator_LSystemTree extends ImageGenerator {
 
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f / 2.0f;

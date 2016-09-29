@@ -23,6 +23,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/crosshatch.JPG";
+	}
+
 
 	/**
 	 * The main entry point
@@ -34,11 +39,10 @@ public class Converter_Crosshatch extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
-		
+		machine.writeChangeTo(out);
 		convertPaperSpace(img, out);
+		
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
@@ -87,10 +91,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		yEnd   = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
 		xStart = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xEnd   = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-		previousX = 0;
-		previousY = 0;
 
-		double stepSize = tool.getDiameter() * 3.0;
+		double stepSize = machine.getDiameter() * 3.0;
 		double x, y;
 		boolean flip=true;
 

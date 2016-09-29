@@ -25,6 +25,11 @@ public class Converter_Pulse extends ImageConverter {
 		return Translator.get("PulseLineName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/converters/pulse.JPG";
+	}
+
 
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
@@ -64,9 +69,8 @@ public class Converter_Pulse extends ImageConverter {
 		img = bw.filter(img);
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 		
 		convertPaperSpace(img, out);
 
@@ -84,9 +88,9 @@ public class Converter_Pulse extends ImageConverter {
 		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = tool.getDiameter() * blockScale;
+		float stepSize = machine.getDiameter() * blockScale;
 		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = tool.getDiameter();
+		float zigZagSpacing = machine.getDiameter();
 
 		// from top to bottom of the image...
 		float x, y, z, scale_z, pulse_size, i = 0;

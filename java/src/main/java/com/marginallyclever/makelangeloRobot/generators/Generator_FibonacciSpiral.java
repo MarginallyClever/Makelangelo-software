@@ -33,6 +33,12 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		return Translator.get("FibonacciSpiralName");
 	}
 
+	@Override
+	public String getPreviewImage() {
+		return "/images/generators/fibonacci.JPG";
+	}
+
+
 	
 	@Override
 	public boolean generate(Writer out) throws IOException {
@@ -82,9 +88,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	
 	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin()) * 10.0f/2.0f;
 		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin()) * 10.0f/2.0f;

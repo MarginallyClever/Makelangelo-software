@@ -252,7 +252,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 
 	private void moveToPoint(Writer out, int i, boolean up) throws IOException {
-		tool.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
+		machine.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
 	}
 
 
@@ -278,9 +278,8 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		}
 
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 
 		// move to the first point
 		moveToPoint(out, besti, false);
@@ -298,8 +297,6 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 
 	protected void connectTheDots(TransformedImage img) {
-		tool = machine.getCurrentTool();
-
 		// from top to bottom of the margin area...
 		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
 		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;

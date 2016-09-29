@@ -29,7 +29,12 @@
 		<hint>DXF load option</hint>
 	</string>
 	
-	
+	<string>
+		<key>TempFolderLabel</key>
+		<value>Temporary files location:</value>
+		<hint>Where to save temporary files used in gcode management.</hint>
+	</string>
+		
 	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
@@ -269,6 +274,17 @@
 	</string>
 
 	<string>
+		<key>pen up color</key>
+		<value>Up color</value>
+		<hint>Pen settings</hint>
+	</string>
+	<string>
+		<key>pen down color</key>
+		<value>Down color</value>
+		<hint>Pen settings</hint>
+	</string>
+
+	<string>
 		<key>MenuDriveControls</key>
 		<value>Manual Driving</value>
 		<hint>context sensitive menu</hint>
@@ -284,6 +300,11 @@
 		<hint>context sensitive menu</hint>
 	</string>
 
+	<string>
+		<key>MenuFileTitle</key>
+		<value>File</value>
+		<hint>menu or dialog title</hint>
+	</string>
 	
 	<string>
 		<key>MenuSoundsTitle</key>
@@ -339,7 +360,7 @@
 
 	<string>
 		<key>MenuResetMachinePreferences</key>
-		<value>Reset Preferences</value>
+		<value>Reset</value>
 		<hint>Preferences menu</hint>
 	</string>
 	<string>

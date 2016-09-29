@@ -36,6 +36,12 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	@Override
+	public String getPreviewImage() {
+		return "/images/generators/maze.JPG";
+	}
+
+
+	@Override
 	public boolean generate(Writer out) throws IOException {
 		while (true) {
 			final JTextField field_rows = new JTextField(Integer.toString(rows));
@@ -73,9 +79,8 @@ public class Generator_Maze extends ImageGenerator {
 	 */
 	private void createMazeNow(Writer out) throws IOException {
 		imageStart(out);
-		tool = machine.getCurrentTool();
 		liftPen(out);
-		tool.writeChangeTo(out);
+		machine.writeChangeTo(out);
 		
 		// build the cells
 		cells = new MazeCell[rows * columns];

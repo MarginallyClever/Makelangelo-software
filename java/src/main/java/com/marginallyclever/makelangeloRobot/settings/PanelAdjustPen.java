@@ -1,5 +1,4 @@
-package com.marginallyclever.makelangeloRobot.drawingtools;
-
+package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -10,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -19,9 +17,13 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
-public class DrawingTool_Pen extends DrawingTool implements ActionListener {
-	protected JDialog dialog;
-	protected JPanel panel;
+public class PanelAdjustPen extends JPanel implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8304907375185637987L;
+
+	protected MakelangeloRobot robot;
 	
 	protected FloatField penDiameter;
 	protected FloatField penFeedRate;
@@ -33,45 +35,26 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 	protected JButton buttonTestDown;
 	protected JButton buttonSave;
 	protected JButton buttonCancel;
+	
+	protected SelectColor selectPenDownColor;
+	protected SelectColor selectPenUpColor;
 
 	
-	public DrawingTool_Pen(MakelangeloRobot robot) {
-		super(robot);
+	public PanelAdjustPen(MakelangeloRobot robot) {
+		this.robot = robot;
 
-		diameter = 1.5f;
-		zRate = 50;
-		zOn = 90;
-		zOff = 50;
-		toolNumber = 0;
-		feedRateXY = 3500;
-		name = "Pen";
-	}
-
-	public DrawingTool_Pen(String name2, int tool_id, MakelangeloRobot robot) {
-		super(robot);
-
-		diameter = 0.8f;
-		zRate = 50;
-		zOn = 90;
-		zOff = 50;
-		toolNumber = tool_id;
-		feedRateXY = 6500;
-		name = name2;
-	}
-
-	public JPanel getPanel() {
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-	    panel.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
+		this.setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+		this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
 
 	    JPanel p = new JPanel(new GridBagLayout());
-	    panel.add(p);
+	    this.add(p);
 	    
-		penDiameter = new FloatField(getDiameter());
-		penFeedRate = new FloatField(feedRateXY);
-		penUp = new FloatField(zOff);
-		penDown = new FloatField(zOn);
-		penZRate = new FloatField(zRate);
+	    MakelangeloRobotSettings settings = robot.getSettings();
+		penDiameter = new FloatField(settings.getDiameter());
+		penFeedRate = new FloatField(settings.getMaxFeedRate());
+		penUp = new FloatField(settings.getPenUpAngle());
+		penDown = new FloatField(settings.getPenDownAngle());
+		penZRate = new FloatField(settings.getZRate());
 		buttonTestUp = new JButton(Translator.get("penToolTest"));
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
 
@@ -142,28 +125,49 @@ public class DrawingTool_Pen extends DrawingTool implements ActionListener {
 		c.gridwidth = 2;
 		c.insets = new Insets(0, 5, 5, 5);
 		c.anchor = GridBagConstraints.WEST;
+		c.gridy++;
 		
 		buttonTestUp.addActionListener(this);
 		buttonTestDown.addActionListener(this);
 		
-		return panel;
+		GridBagConstraints cm = new GridBagConstraints();
+		selectPenDownColor = new SelectColor(this,"pen down color",robot.getSettings().getPenDownColor());
+		this.add(selectPenDownColor,cm);
+		c.gridy++;
+		selectPenUpColor = new SelectColor(this,"pen up color",robot.getSettings().getPenUpColor());
+		this.add(selectPenUpColor,cm);
+		c.gridy++;
 	}
 	
 	
 	public void actionPerformed(ActionEvent event) {
 		Object subject = event.getSource();
 
-		if (subject == buttonTestUp  ) robot.testPenAngle(((Number)penUp.getValue()).floatValue());
-		if (subject == buttonTestDown) robot.testPenAngle(((Number)penDown.getValue()).floatValue());
+		if (subject == buttonTestUp  ) {
+			// must match MakelangeloRobotSettings.getPenUpString()
+			robot.sendLineToRobot(
+				"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penUp.getValue()).floatValue() + ";\n"+
+				"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+				);
+		}
+		if (subject == buttonTestDown) {
+			// must match MakelangeloRobotSettings.getPenDownString()
+			robot.sendLineToRobot(
+					"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penDown.getValue()).floatValue() + ";\n"+
+					"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+					);
+		}
 	}
 	
 	
-	@Override
 	public void save() {
-		setDiameter(((Number)penDiameter.getValue()).floatValue());
-		feedRateXY = ((Number)penFeedRate.getValue()).floatValue();
-		zRate = ((Number)penZRate.getValue()).floatValue();
-		zOff = ((Number)penUp.getValue()).floatValue();
-		zOn = ((Number)penDown.getValue()).floatValue();
+	    MakelangeloRobotSettings settings = robot.getSettings();
+		settings.setDiameter(((Number)penDiameter.getValue()).floatValue());
+		settings.setMaxFeedRate(((Number)penFeedRate.getValue()).floatValue());
+		settings.setZRate(((Number)penZRate.getValue()).floatValue());
+		settings.setPenUpAngle(((Number)penUp.getValue()).floatValue());
+		settings.setPenDownAngle(((Number)penDown.getValue()).floatValue());
+		settings.setPenDownColor(selectPenDownColor.getColor());
+		settings.setPenUpColor(selectPenUpColor.getColor());
 	}
 }

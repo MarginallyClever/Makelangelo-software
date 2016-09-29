@@ -96,8 +96,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 			xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 			
-			tool = machine.getCurrentTool();
-
 			cellBorder = new ArrayList<>();
 
 			initializeCells(0.001);
@@ -427,9 +425,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			Log.message("Writing gcode.");
 			
 			imageStart(out);
-			tool = machine.getCurrentTool();
 			liftPen(out);
-			tool.writeChangeTo(out);
+			machine.writeChangeTo(out);
 
 			// find the tsp point closest to the calibration point
 			int i;

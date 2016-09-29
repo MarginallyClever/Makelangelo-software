@@ -7,7 +7,6 @@ import java.io.Writer;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.makelangeloRobot.drawingtools.DrawingTool;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
@@ -18,7 +17,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 public abstract class ImageManipulator {	
 	// pen position optimizing
 	protected boolean lastUp;
-	protected double previousX, previousY;
 	
 	// threading
 	protected ProgressMonitor pm;
@@ -26,7 +24,6 @@ public abstract class ImageManipulator {
 
 	// helpers
 	protected MakelangeloRobotSettings machine;
-	protected DrawingTool tool;
 
 
 	public void setParent(SwingWorker<Void, Void> p) {
@@ -39,6 +36,13 @@ public abstract class ImageManipulator {
 	
 	public void setRobot(MakelangeloRobot robot) {
 		machine = robot.getSettings();
+	}
+	
+	/**
+	 * @return the filename of the preview image, or null if no filename known.
+	 */
+	public String getPreviewImage() {
+		return null;
 	}
 
 
@@ -60,28 +64,24 @@ public abstract class ImageManipulator {
 		//out.write(machine.getGCodeConfig() + ";\n");
 		//out.write(machine.getGCodeBobbin() + ";\n");
 		//out.write(machine.getGCodeSetPositionAtHome()+";\n");		
-		previousX = machine.getHomeX();
-		previousY = machine.getHomeY();
 		setAbsoluteMode(out);
 	}
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(tool==null) {
-			throw new IOException("Order of operations: Can't raise the tool before setting a tool.");
+		if(lastUp) {
+			return;
 		}
-		if(lastUp) return;
-		tool.writeOff(out);
+		machine.writeOff(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(tool==null) {
-			throw new IOException("Order of operations: Can't lower the tool before setting a tool.");
+		if(!lastUp) {
+			return;
 		}
-		if(!lastUp) return;
-		tool.writeOn(out);
+		machine.writeOn(out);
 		lastUp = false;
 	}
 
@@ -104,15 +104,12 @@ public abstract class ImageManipulator {
 	 */
 	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
 		if(isInsidePaperMargins(x,y)) {
-			tool.writeMoveTo(out, (float) x, (float) y);
+			machine.writeMoveTo(out, (float) x, (float) y);
 		}
 		if(lastUp != up) {
 			if (up) liftPen(out);
 			else lowerPen(out);
-			lastUp = up;
 		}
-		previousX = x;
-		previousY = y;
 	}
 
 
