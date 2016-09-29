@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo;
 
 import java.util.prefs.Preferences;
 
+import com.marginallyclever.util.PreferencesHelper;
+
 public final class RecentFiles<P extends Preferences> {
   @SuppressWarnings("deprecation")
   private P prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);

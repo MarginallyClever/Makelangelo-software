@@ -171,9 +171,15 @@
 	</string>
 
 	<string>
-		<key>FileNotOpened</key>
-		<value>File could not be opened: </value>
-		<hint>status message. keep the space at the end.</hint>
+		<key>LoadError</key>
+		<value>File could not be loaded:</value>
+		<hint>status message.</hint>
+	</string>
+
+	<string>
+		<key>SaveError</key>
+		<value>File could not be saved:</value>
+		<hint>status message.</hint>
 	</string>
 
 	<string>
@@ -195,7 +201,7 @@
 
 	<string>
 		<key>PaperMargin</key>
-		<value>Margin at paper edge (%)</value>
+		<value>Margin (%)</value>
 		<hint>conversion options</hint>
 	</string>
 	<string>
@@ -388,6 +394,16 @@
 	<string>
 		<key>GoHome</key>
 		<value>Go home</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>FindHome</key>
+		<value>Find home</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>GoPaperBorder</key>
+		<value>Border</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
@@ -676,7 +692,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>Max speed</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -713,7 +729,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>spraypaintToolMaxFeedRate</key>
-		<value>Max feed rate</value>
+		<value>max speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
@@ -1043,6 +1059,12 @@ to check yourself.</value>
 		<key>firmwareVersionBadTitle</key>
 		<value>Firmware update</value>
 		<hint>Software is too new for firmware</hint>
+	</string>
+
+	<string>
+		<key>HardwareVersion</key>
+		<value>Model: </value>
+		<hint>What is the hardware model of this robot?</hint>
 	</string>
 	
 	<string>

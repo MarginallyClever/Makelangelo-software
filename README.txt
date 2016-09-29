@@ -10,16 +10,11 @@ This project specifically deals with the GUI: the computer program that makes ru
 
 ## Instructions ##
 
-For installation instructions, see http://learn.marginallyclever.com/index.php/Makelangelo_2_Software
-
-Please visit the Makelangelo wiki for everything else http://learn.marginallyclever.com/index.php/Makelangelo_3.2
+For installation instructions, see https://www.marginallyclever.com/product/makelangelo-software/
 
 For developers, please see https://github.com/MarginallyClever/Makelangelo/wiki/Home/
 
-## Get help ##
-
-Please visit the forums
-https://marginallyclever.com/forums
+Please visit the forums at https://marginallyclever.com/forums
 
 ## Show support ##
 
@@ -30,7 +25,3 @@ Thank you!
 ## Special thanks ##
 
 Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
-
-
-
-This file was downloaded from https://github.com/MarginallyClever/Makelangelo/

@@ -17,12 +17,12 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.MarginallyCleverConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 import com.marginallyclever.makelangelo.CommandLineOptions;
-import com.marginallyclever.makelangelo.DrawPanelDecorator;
 import com.marginallyclever.makelangelo.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a Model-View-Controller design pattern.  It also contains non-persistent Model data.  
@@ -38,10 +38,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 
 	// Firmware check
-	private final String versionCheck = new String("Firmware v");
-	private final long expectedFirmwareVersion = 6;  // must match the version in the the firmware EEPROM
+	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-
+	private final long expectedFirmwareVersion = 7;  // must match the version in the the firmware EEPROM
+	
+	private boolean hardwareVersionChecked = false;
+	
 	private DecimalFormat df;
 	
 	private MakelangeloRobotSettings settings = null;
@@ -58,12 +60,12 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private boolean penIsUp;
 	private boolean penIsUpBeforePause;
 	private boolean hasSetHome;
-	public float gondolaX,gondolaY;
+	private float gondolaX;
+	private float gondolaY;
 
 	// rendering stuff
 	public boolean showPenUpMoves=false;
-	private DrawPanelDecorator drawDecorator=null;
-	private final float PEN_HOLDER_RADIUS=6; //cm
+	private MakelangeloRobotDecorator decorator=null;
 
 	// Listeners which should be notified of a change to the percentage.
     private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
@@ -86,7 +88,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		penIsUp = false;
 		penIsUpBeforePause = false;
 		hasSetHome = false;
-		gondolaX = 0;
+		setGondolaX(0);
 		gondolaY = 0;
 	}
 	
@@ -109,6 +111,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			portConfirmed = false;
 			hasSetHome = false;
 			firmwareVersionChecked = false;
+			hardwareVersionChecked = false;
 		}
 		
 		this.connection = c;
@@ -147,19 +150,37 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 			justNow=true;
 		}
 		
-		if( !firmwareVersionChecked && data.lastIndexOf(versionCheck)>=0 ) {
-			String afterV = data.substring(versionCheck.length()).trim();
+		// is firmware checked?
+		if( !firmwareVersionChecked && data.lastIndexOf(versionCheckStart)>=0 ) {
+			String afterV = data.substring(versionCheckStart.length()).trim();
 			long versionFound = Long.parseLong(afterV);
 			
 			if( versionFound == expectedFirmwareVersion ) {
 				firmwareVersionChecked=true;
 				justNow=true;
+				// request the hardware version of this robot
+				sendLineToRobot("D10\n");
 			} else {
 				notifyFirmwareVersionBad(versionFound);
 			}
 		}
 		
-		if(justNow && firmwareVersionChecked && portConfirmed) {
+		// is hardware checked?
+		if( !hardwareVersionChecked && data.lastIndexOf("D10")>=0 ) {
+			String [] pieces = data.split(" ");
+			if(pieces.length>1) {
+				String last=pieces[pieces.length-1];
+				last = last.replace("\r\n", "");
+				if(last.startsWith("V")) {
+					int hardwareVersion = Integer.parseInt(last.substring(1));
+					this.settings.setHardwareVersion(hardwareVersion);
+					hardwareVersionChecked=true;
+					justNow=true;
+				}
+			}
+		}
+		
+		if(justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
 			// send whatever config settings I have for this machine.
 			sendConfig();
 			
@@ -316,10 +337,13 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 		// Send  new configuration values to the robot.
 		try {
+			// send config
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
+			if(this.settings.getHardwareProperties().canChangePulleySize()) {
+				sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
+			}
 			setHome();
-			sendLineToRobot("G0 F"+ df.format(settings.getFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
+			sendLineToRobot("G0 F"+ df.format(settings.getMaxFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -525,26 +549,38 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return true;
 	}
 
-	public void setFeedRate(double parsedFeedRate) {
+	public void setCurrentFeedRate(double feedRate) {
 		// remember it
-		settings.setFeedRate(parsedFeedRate);
+		settings.setCurrentFeedRate(feedRate);
+		// get it again in case it was capped.
+		feedRate = settings.getCurrentFeedRate();
 		// tell the robot
-		sendLineToRobot("G00 F" + df.format(parsedFeedRate));
+		sendLineToRobot("G00 F" + df.format(feedRate));
 	}
 	
+	public double getCurrentFeedRate() {
+		return settings.getCurrentFeedRate();
+	}
 	
 	public void goHome() {
 		sendLineToRobot("G00 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));
-		gondolaX=(float)settings.getHomeX();
+		setGondolaX((float)settings.getHomeX());
 		gondolaY=(float)settings.getHomeY();
 	}
 	
+	
+	public void findHome() {
+		sendLineToRobot("G28");
+		setGondolaX((float)settings.getHomeX());
+		gondolaY=(float)settings.getHomeY();
+	}
+
 	
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
 		hasSetHome=true;
-		gondolaX=(float)settings.getHomeX();
+		setGondolaX((float)settings.getHomeX());
 		gondolaY=(float)settings.getHomeY();
 	}
 	
@@ -559,7 +595,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	 */
 	public void movePenAbsolute(float x,float y) {
 		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
-		gondolaX = x;
+		setGondolaX(x);
 		gondolaY = y;
 	}
 
@@ -571,7 +607,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		sendLineToRobot("G91");  // set relative mode
 		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90");  // return to absolute mode
-		gondolaX += dx;
+		setGondolaX(getGondolaX() + dx);
 		gondolaY += dy;
 	}
 	
@@ -579,8 +615,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	
 	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
 	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
-	public void movePenToEdgeTop()    {		movePenAbsolute(gondolaX,(float)settings.getPaperTop()   *10);  }
-	public void movePenToEdgeBottom() {		movePenAbsolute(gondolaX,(float)settings.getPaperBottom()*10);  }
+	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   *10);  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom()*10);  }
 	
 	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }
@@ -613,229 +649,24 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 
-	public void setDecorator(DrawPanelDecorator dd) {
-		drawDecorator = dd;
+	public void setDecorator(MakelangeloRobotDecorator arg0) {
+		decorator = arg0;
 		if(gCode!=null) gCode.emptyNodeBuffer();
 	}
 	
 	
 	public void render(GL2 gl2) {
 		paintLimits(gl2);
-		paintCalibrationPoint(gl2);
-		paintMotors(gl2);
-		paintControlBox(gl2);
-		paintPenHolderAndCounterweights(gl2);
+		
+		settings.getHardwareProperties().render(gl2, this);
 
-		if(drawDecorator!=null) {
+		if(decorator!=null) {
 			// filters can also draw WYSIWYG previews while converting.
-			drawDecorator.render(gl2,settings);
-			return;
+			decorator.render(gl2,settings);
+		} else if(gCode!=null) {
+			gCode.render(gl2,this);
 		}
-
-		if(gCode!=null) gCode.render(gl2,this);
 	}
-
-	// draw left motor, right motor
-	private void paintMotors( GL2 gl2 ) {
-		double top = settings.getLimitTop();
-		double right = settings.getLimitRight();
-		double left = settings.getLimitLeft();
-		
-		gl2.glColor3f(1,0.8f,0.5f);
-		// left frame
-		gl2.glPushMatrix();
-		gl2.glTranslatef(-2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(left-5f, top+5f);
-		gl2.glVertex2d(left+5f, top+5f);
-		gl2.glVertex2d(left+5f, top);
-		gl2.glVertex2d(left   , top-5f);
-		gl2.glVertex2d(left-5f, top-5f);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// right frame
-		gl2.glPushMatrix();
-		gl2.glTranslatef(2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(right+5f, top+5f);
-		gl2.glVertex2d(right-5f, top+5f);
-		gl2.glVertex2d(right-5f, top);
-		gl2.glVertex2d(right   , top-5f);
-		gl2.glVertex2d(right+5f, top-5f);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// left motor
-		gl2.glColor3f(0,0,0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left-4.2f, top+4.2f);
-		gl2.glVertex2d(left     , top+4.2f);
-		gl2.glVertex2d(left     , top);
-		gl2.glVertex2d(left-4.2f, top);
-		// right motor
-		gl2.glVertex2d(right     , top+4.2f);
-		gl2.glVertex2d(right+4.2f, top+4.2f);
-		gl2.glVertex2d(right+4.2f, top);
-		gl2.glVertex2d(right     , top);
-		gl2.glEnd();
-	}
-
-	private void paintControlBox(GL2 gl2) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		double cx = 0;
-
-		gl2.glPushMatrix();
-		gl2.glTranslated(cx, cy+2.1f, 0);
-		
-		// mounting plate for PCB
-		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
-		gl2.glEnd();
-		
-		// wires to each motor
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(left,-0.3);
-		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(left,-0.1);
-		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(left, 0.1);
-		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(left, 0.3);
-		
-
-		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(right, 0.3);
-		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(right, 0.1);
-		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(right,-0.1);
-		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(right,-0.3);
-		gl2.glEnd();
-		
-		// UNO in v2
-		// @TODO draw correct version based on settings or machine connected
-		gl2.glColor3d(0,0,0.6);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-4, 3);
-		gl2.glVertex2d(+4, 3);
-		gl2.glVertex2d(+4, -3);
-		gl2.glVertex2d(-4, -3);
-		gl2.glEnd();
-
-		gl2.glPopMatrix();
-	}
-	
-	private void paintPenHolderAndCounterweights( GL2 gl2 ) {
-		double dx,dy;
-		double gx = gondolaX / 10;
-		double gy = gondolaY / 10;
-		
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		
-		double mw = right-left;
-		double mh = top-settings.getLimitBottom();
-		double suggested_length = Math.sqrt(mw*mw+mh*mh)+5;
-
-		dx = gx - left;
-		dy = gy - top;
-		double left_a = Math.sqrt(dx*dx+dy*dy);
-		double left_b = (suggested_length - left_a)/2;
-
-		dx = gx - right;
-		double right_a = Math.sqrt(dx*dx+dy*dy);
-		double right_b = (suggested_length - right_a)/2;
-
-		if(gx<left) return;
-		if(gx>right) return;
-		if(gy>top) return;
-		if(gy<bottom) return;
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3d(0.2,0.2,0.2);
-		
-		// belt from motor to gondola left
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(gx,gy);
-		// belt from motor to gondola right
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(gx,gy);
-		
-		float bottleCenter = 2.1f+0.75f;
-		
-		// belt from motor to counterweight left
-		gl2.glVertex2d(left-bottleCenter-0.2, top);
-		gl2.glVertex2d(left-bottleCenter-0.2, top-left_b);
-		gl2.glVertex2d(left-bottleCenter+0.2, top);
-		gl2.glVertex2d(left-bottleCenter+0.2, top-left_b);
-		// belt from motor to counterweight right
-		gl2.glVertex2d(right+bottleCenter-0.2, top);
-		gl2.glVertex2d(right+bottleCenter-0.2, top-right_b);
-		gl2.glVertex2d(right+bottleCenter+0.2, top);
-		gl2.glVertex2d(right+bottleCenter+0.2, top-right_b);
-		gl2.glEnd();
-		
-		// gondola
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		float f;
-		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(gx+Math.cos(f)*PEN_HOLDER_RADIUS,gy+Math.sin(f)*PEN_HOLDER_RADIUS);
-		}
-		gl2.glEnd();
-		
-		// counterweight left
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(left-bottleCenter-1.5,top-left_b);
-		gl2.glVertex2d(left-bottleCenter+1.5,top-left_b);
-		gl2.glVertex2d(left-bottleCenter+1.5,top-left_b-15);
-		gl2.glVertex2d(left-bottleCenter-1.5,top-left_b-15);
-		gl2.glEnd();
-		
-		// counterweight right
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(right+bottleCenter-1.5,top-right_b);
-		gl2.glVertex2d(right+bottleCenter+1.5,top-right_b);
-		gl2.glVertex2d(right+bottleCenter+1.5,top-right_b-15);
-		gl2.glVertex2d(right+bottleCenter-1.5,top-right_b-15);
-		gl2.glEnd();
-		
-		/*
-		// bottom clearance arcs
-		// right
-		gl2.glColor3d(0.6, 0.6, 0.6);
-		gl2.glBegin(GL2.GL_LINE_STRIP);
-		double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft()+2.1;
-		double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
-		r=(float)Math.sqrt(h*h + w*w); // circle radius
-		gx = machine.getSettings().getLimitLeft() - 2.1;
-		gy = machine.getSettings().getLimitTop() + 2.1;
-		double start = (float)1.5*(float)Math.PI;
-		double end = (2*Math.PI-Math.atan(h/w));
-		double v;
-		for(v=0;v<=1.0;v+=0.1) {
-			double vi = (end-start)*v + start;
-			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
-		}
-		gl2.glEnd();
-		
-		// left
-		gl2.glBegin(GL2.GL_LINE_STRIP);
-		gx = machine.getSettings().getLimitRight() + 2.1;
-		start = (float)(1*Math.PI+Math.atan(h/w));
-		end = (float)1.5*(float)Math.PI;
-		for(v=0;v<=1.0;v+=0.1) {
-			double vi = (end-start)*v + start;
-			gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
-		}
-		gl2.glEnd();
-		*/
-	}
-
 
 
 	/**
@@ -887,36 +718,6 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 
 
 	/**
-	 * draw calibration point
-	 * @param gl2
-	 */
-	private void paintCalibrationPoint(GL2 gl2) {
-		gl2.glColor3f(0.8f,0.8f,0.8f);
-		gl2.glPushMatrix();
-		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
-
-		// gondola
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		float f;
-		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(	Math.cos(f)*(PEN_HOLDER_RADIUS+0.1),
-							Math.sin(f)*(PEN_HOLDER_RADIUS+0.1)
-							);
-		}
-		gl2.glEnd();
-
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2f(-0.25f,0.0f);
-		gl2.glVertex2f( 0.25f,0.0f);
-		gl2.glVertex2f(0.0f,-0.25f);
-		gl2.glVertex2f(0.0f, 0.25f);
-		gl2.glEnd();
-		
-		gl2.glPopMatrix();
-	}
-
-
-	/**
 	 * Toggle pen up moves.
 	 * @param state if <strong>true</strong> the pen up moves will be drawn.  if <strong>false</strong> they will be hidden.
  	 * FIXME setShowPenUp(false) does not refresh the WYSIWYG preview.  It should. 
@@ -937,4 +738,23 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		return showPenUpMoves;
 	}
 
+	// in mm
+	public float getGondolaX() {
+		return gondolaX;
+	}
+
+	// in mm
+	public void setGondolaX(float gondolaX) {
+		this.gondolaX = gondolaX;
+	}
+
+	// in mm
+	public float getGondolaY() {
+		return gondolaY;
+	}
+
+	// in mm
+	public void setGondolaY(float gondolaY) {
+		this.gondolaY = gondolaY;
+	}
 }
