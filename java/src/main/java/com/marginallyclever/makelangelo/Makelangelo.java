@@ -244,7 +244,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 				String results;
 				if     (comp>0) {
 					results = Translator.get("UpdateNotice");
-					//TODO downloadUpdate();
+					//TODO downloadUpdate(), flashNewFirmwareToRobot();
 				} else if(comp<0) results = "This version is from the future?!";
 				else 			results = Translator.get("UpToDate");
 

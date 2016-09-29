@@ -40,7 +40,7 @@ public class LanguagePreferences {
 
 	/**
 	 * Display a dialog box of available languages and let the user select their preference.
-	 * TODO replace all strings with strings from new language.
+	 * TODO when language changes, restart app OR replace all strings with new language.
 	 */
 	static public void chooseLanguage() {
 		JPanel panel = buildPanel();

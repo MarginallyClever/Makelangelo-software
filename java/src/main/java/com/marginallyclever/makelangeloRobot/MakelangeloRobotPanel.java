@@ -916,7 +916,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			FileFilter chosenFilter = fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			// TODO get rid of this stupid guessing game.
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
@@ -950,6 +949,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					break;
 				}					
 			}
+			// No file filter was found.  Wait, what?!
 		}
 	}
 
@@ -969,14 +969,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			e.printStackTrace();
 		}
 
-		// TODO don't rely on this to be true, load may not have finished yet.
+		// TODO don't rely on success to be true, load may not have finished yet.
+
 		if (success == true) {
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
 		}
-		// TODO don't rely on this to be true, load may not have finished yet.
 		updateButtonAccess();
-		// TODO don't rely on this to be true, load may not have finished yet.
 		statusBar.clear();
 		
 		return success;
@@ -1009,5 +1008,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		
 		return success;
+	}
+	
+	public boolean canLoad(String filename) {
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
+		while(i.hasNext()) {
+			LoadAndSaveFileType loader = i.next();
+			if(!loader.canLoad()) continue;
+			if(!loader.canLoad(filename)) continue;
+			// potentially yes, we can load this type.
+			return true;
+		}
+		// nothing can load this type
+		return false;
 	}
 }

@@ -51,16 +51,7 @@ public class Converter_Scanline extends ImageConverter {
 		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
-		liftPen(out);/*
-		moveTo(out,xLeft,yTop,true);
-		lowerPen(out);
-		moveTo(out,xRight,yTop,false);
-		moveTo(out,xRight,yBottom,false);
-		moveTo(out,xLeft,yBottom,false);
-		moveTo(out,xLeft,yTop,false);
 		liftPen(out);
-		moveTo(out,0,0,true);*/
-		
 		
 		float x, y, z;
 		int i = 0;

@@ -44,7 +44,6 @@ implements ActionListener {
   protected JTabbedPane panes;
   protected JButton save, cancel;
 
-  // TODO pull these from the class listings in the package?
   private JComboBox<String> hardwareVersionChoices;
   private ArrayList<Integer> availableHardwareVersions;
   private String[] hardwareVersionNames;
