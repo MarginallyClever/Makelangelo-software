@@ -187,7 +187,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	
 	protected void closeConnection() {
-		robot.setConnection(null);
+		robot.closeConnection();
 		buttonConnect.setText(Translator.get("ButtonConnect"));
 		isConnected=false;
 	}
@@ -229,7 +229,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (result == JOptionPane.OK_OPTION) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
+			robot.openConnection( gui.getConnectionManager().openConnection(connectionName) );
 			//updateMachineNumberPanel();
 			//updateButtonAccess();
 		}

@@ -105,28 +105,28 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 
 	/**
-	 * TODO this is not great.  openConnection(id) and closeConnection() would be better.
 	 * @param c the connection.  Use null to close the connection. 
 	 */
-	public void setConnection(MarginallyCleverConnection c) {
-		if( this.connection != c ) {
-			if( this.connection != null ) {
-				this.connection.closeConnection();
-				this.connection.removeListener(this);
-				notifyDisconnected();
-			}
-		
-			portConfirmed = false;
-			hasSetHome = false;
-			firmwareVersionChecked = false;
-			hardwareVersionChecked = false;
-		}
-		
-		this.connection = c;
+	public void openConnection(MarginallyCleverConnection c) {
+		assert(c!=null);
 		
 		if( this.connection != null ) {
-			this.connection.addListener(this);
+			closeConnection();
 		}
+		
+		portConfirmed = false;
+		hasSetHome = false;
+		firmwareVersionChecked = false;
+		hardwareVersionChecked = false;		
+		this.connection = c;		
+		this.connection.addListener(this);
+	}
+	
+	public void closeConnection() {
+		this.connection.closeConnection();
+		this.connection.removeListener(this);
+		notifyDisconnected();
+		this.connection = null;
 	}
 
 	@Override
