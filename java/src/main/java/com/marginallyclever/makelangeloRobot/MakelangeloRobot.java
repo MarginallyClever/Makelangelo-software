@@ -319,7 +319,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 				// Tell the robot it's new UID.
 				connection.sendMessage("UID " + newUID);
 			} catch(Exception e) {
-				//FIXME deal with this rare and smelly problem.
+				//FIXME has this ever happened?  Deal with it better?
 				Log.error( "UID to robot: "+e.getMessage() );
 			}
 		}
