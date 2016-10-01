@@ -123,6 +123,8 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	public void closeConnection() {
+		if(this.connection==null) return;
+		
 		this.connection.closeConnection();
 		this.connection.removeListener(this);
 		notifyDisconnected();
