@@ -36,7 +36,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	}
 	
 	public float getWidth() { return 650; }
-	public float getHeight() { return 1100; }
+	public float getHeight() { return 1000; }
 
 	@Override
 	public boolean canAutoHome() {
