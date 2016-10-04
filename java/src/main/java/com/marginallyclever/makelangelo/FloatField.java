@@ -39,4 +39,8 @@ public class FloatField extends JFormattedTextField {
 		DefaultFormatterFactory factory = new DefaultFormatterFactory(nff);
 		setFormatterFactory(factory);
 	}
+	
+	public void setReadOnly() {
+		setEditable(false);
+	}
 }

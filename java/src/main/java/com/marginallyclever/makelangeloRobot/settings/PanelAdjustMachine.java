@@ -76,10 +76,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			s = machineHeight.getPreferredSize();
 			s.width = 80;
 	
-			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
-				machineWidth.setValue(robot.getSettings().getHardwareProperties().getWidth());
-				machineHeight.setValue(robot.getSettings().getHardwareProperties().getHeight());
-			}			
+			machineWidth.setValue(robot.getSettings().getHardwareProperties().getWidth());
+			machineHeight.setValue(robot.getSettings().getHardwareProperties().getHeight());
+
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.EAST;
 			d.anchor = GridBagConstraints.WEST;
@@ -139,12 +138,12 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			d.gridy = y;
 			p.add(totalServoNeeded = new JLabel("?"),d);
 			y++;
-	
+
 			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
-				p.setVisible(false);
-			} else {
-				this.add(new JSeparator(SwingConstants.HORIZONTAL));
+				machineWidth.setReadOnly();
+				machineHeight.setReadOnly();
 			}
+			this.add(new JSeparator(SwingConstants.HORIZONTAL));
 		}
 		
 		// adjust pulleys
@@ -309,8 +308,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	 * Calculate length of belt and servo needed based on machine dimensions.
 	 */
 	protected void updateLengthNeeded() {
-		if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) return;
-		
 		double w = ((Number)machineWidth.getValue()).floatValue();
 		double h = ((Number)machineHeight.getValue()).floatValue();
 		double SAFETY_MARGIN=100;
