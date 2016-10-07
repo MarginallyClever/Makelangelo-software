@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.text.DefaultFormatterFactory;
@@ -30,7 +31,7 @@ public class FloatField extends JFormattedTextField {
 	}
 	
 	protected void createAndAttachFormatter() {
-		NumberFormat nFloat = NumberFormat.getNumberInstance();
+		NumberFormat nFloat = NumberFormat.getNumberInstance(Locale.getDefault());
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
 		nFloat.setGroupingUsed(false);
