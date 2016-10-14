@@ -18,20 +18,30 @@ public class FloatField extends JFormattedTextField {
 	 */
 	private static final long serialVersionUID = 2428427667156189335L;
 
+	public FloatField(Locale locale,float defaultValue) {
+		super();
+		createAndAttachFormatter(locale);
+		this.setValue(defaultValue);
+	}
+
+	public FloatField(Locale locale) {
+		super();
+		createAndAttachFormatter(locale);
+	}
+	
 	public FloatField(float defaultValue) {
 		super();
-		createAndAttachFormatter();
+		createAndAttachFormatter(Locale.getDefault());
 		this.setValue(defaultValue);
 	}
 	
-	
 	public FloatField() {
 		super();
-		createAndAttachFormatter();
+		createAndAttachFormatter(Locale.getDefault());
 	}
 	
-	protected void createAndAttachFormatter() {
-		NumberFormat nFloat = NumberFormat.getNumberInstance(Locale.getDefault());
+	protected void createAndAttachFormatter(Locale locale) {
+		NumberFormat nFloat = NumberFormat.getNumberInstance(locale);
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
 		nFloat.setGroupingUsed(false);

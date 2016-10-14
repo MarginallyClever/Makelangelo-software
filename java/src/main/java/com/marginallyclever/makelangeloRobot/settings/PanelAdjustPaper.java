@@ -34,7 +34,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	protected MakelangeloRobot robot;
 
 	private JComboBox<String> paperSizes;
-	private JFormattedTextField pw, ph;
+	private FloatField pw, ph;
 	private JCheckBox isLandscape;
 	private boolean beingModified;
 	private SelectColor paperColor;
@@ -195,11 +195,11 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	 * Must match commonPaperSizes
 	 * @return
 	 */
-	public int getCurrentPaperSizeChoice(double pw,double ph) {
+	public int getCurrentPaperSizeChoice(double paperWidth,double paperHeight) {
 		int i;
 		for(i=0;i<commonPaperSizes.length;++i) {
-			if(pw == commonPaperSizes[i].width && 
-				ph == commonPaperSizes[i].height)
+			if(paperWidth == commonPaperSizes[i].width && 
+				paperHeight == commonPaperSizes[i].height)
 				return i+1;
 				
 		}

@@ -290,6 +290,12 @@ If you like this project, please support us by buying Marginally Clever products
       <artifactId>annotations</artifactId>
       <version>15.0</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
+	<dependency>
+	    <groupId>commons-validator</groupId>
+    	<artifactId>commons-validator</artifactId>
+    	<version>1.4.0</version>
+	</dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
