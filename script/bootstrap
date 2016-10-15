@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # author: Peter Carlo Colapietro
 # see: http://wynnnetherland.com/linked/2013012801/bootstrapping-consistency/
 # see: https://github.com/bdemers/maven-wrapper
