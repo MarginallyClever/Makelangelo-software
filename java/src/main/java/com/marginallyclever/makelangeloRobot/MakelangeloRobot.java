@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.communications.MarginallyCleverConnection;
+import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.CommandLineOptions;
@@ -59,7 +59,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	private MakelangeloRobotPanel myPanel = null;
 	
 	// Connection state
-	private MarginallyCleverConnection connection = null;
+	private NetworkConnection connection = null;
 	private boolean portConfirmed;
 
 	// misc state
@@ -100,14 +100,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		setGondolaY(0);
 	}
 	
-	public MarginallyCleverConnection getConnection() {
+	public NetworkConnection getConnection() {
 		return connection;
 	}
 
 	/**
 	 * @param c the connection.  Use null to close the connection. 
 	 */
-	public void openConnection(MarginallyCleverConnection c) {
+	public void openConnection(NetworkConnection c) {
 		assert(c!=null);
 		
 		if( this.connection != null ) {
@@ -139,14 +139,14 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 	}
 	
 	@Override
-	public void sendBufferEmpty(MarginallyCleverConnection arg0) {
+	public void sendBufferEmpty(NetworkConnection arg0) {
 		sendFileCommand();
 		
 		notifyConnectionReady();
 	}
 
 	@Override
-	public void dataAvailable(MarginallyCleverConnection arg0, String data) {
+	public void dataAvailable(NetworkConnection arg0, String data) {
 		notifyDataAvailable(data);
 		
 		boolean justNow = false;
@@ -254,7 +254,7 @@ public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener
 		}
 	}
 	
-	public void lineError(MarginallyCleverConnection arg0,int lineNumber) {
+	public void lineError(NetworkConnection arg0,int lineNumber) {
         if(gCode!=null) {
     		gCode.setLinesProcessed(lineNumber);
         }

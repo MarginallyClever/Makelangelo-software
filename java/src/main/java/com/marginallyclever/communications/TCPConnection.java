@@ -1,11 +1,11 @@
 package com.marginallyclever.communications;
 
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
-
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
+
 
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
 import com.marginallyclever.makelangelo.Log;
@@ -17,10 +17,8 @@ import com.marginallyclever.makelangelo.Log;
  * @author Peter Colapietro
  * @since v7
  */
-public final class SerialConnection implements SerialPortEventListener, NetworkConnection {
-	private SerialPort serialPort;
-	private static final int BAUD_RATE = 57600;
-
+public final class TCPConnection implements NetworkConnection, TCPConnectionEventListener {
+	private Socket socket;
 	private TransportLayer transportLayer;
 	private String connectionName = "";
 	private boolean portOpened = false;
@@ -34,6 +32,9 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	static final String NEWLINE = "\n";
 	static final String COMMENT_START = ";";
 
+	protected DataOutputStream outToServer;
+	protected TCPConnectionReader inFromServer;
+	
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
 	ArrayList<String> commandQueue = new ArrayList<String>();
@@ -42,7 +43,7 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
 
 
-	public SerialConnection(SerialTransportLayer layer) {
+	public TCPConnection(TransportLayer layer) {
 		transportLayer = layer;
 	}
 
@@ -56,11 +57,24 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	@Override
 	public void closeConnection() {
 		if (portOpened) {
-			if (serialPort != null) {
+			if (socket != null) {
 				try {
-					serialPort.removeEventListener();
-					serialPort.closePort();
-				} catch (SerialPortException e) {
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					outToServer.flush();
+					outToServer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				try {
+					inFromServer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 			portOpened = false;
@@ -69,24 +83,32 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 
 	// open a serial connection to a device.  We won't know it's the robot until
 	@Override
-	public void openConnection(String portName) throws Exception {
+	public void openConnection(String URL) throws Exception {
 		if (portOpened) return;
 
 		closeConnection();
 
-		// open the port
-		serialPort = new SerialPort(portName);
-		serialPort.openPort();// Open serial port
-		serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-		serialPort.addEventListener(this);
+		URL a = new URL(URL);
+		String host = a.getHost();
+		int port = a.getPort();
+		socket = new Socket(host,port);
+		socket.setKeepAlive(true);
+		socket.setTcpNoDelay(true);
+		socket.setSoTimeout(200);  // maybe only use this on closing connection.
 
-		connectionName = portName;
+		outToServer = new DataOutputStream(socket.getOutputStream());
+		inFromServer = new TCPConnectionReader(socket.getInputStream());
+		inFromServer.addListener(this);
+		Thread t = new Thread(inFromServer);
+		
+		connectionName = URL;
 		portOpened = true;
 		waitingForCue = true;
 
+		t.run();
 	}
-
-
+	
+	
 	/**
 	 * Check if the robot reports an error and if so what line number.
 	 *
@@ -133,29 +155,18 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 
 	// Deal with something robot has sent.
 	@Override
-	public void serialEvent(SerialPortEvent events) {
-		String rawInput, oneLine;
-		int x;
-
-		if(!events.isRXCHAR()) return;
+	public void dataAvailable(int len,byte[]message) {
 		if(!portOpened) return;
-		int len =0 ;
-		byte [] buffer;
-		try {
-			len = events.getEventValue();
-			buffer = serialPort.readBytes(len);
-		} catch (SerialPortException e) {
-			// uh oh
-			return;
-		}
+		String rawInput = new String(message).substring(0,len);
+		if( len==0 ) return;
 		
-		if( len<=0 ) return;
-		rawInput = new String(buffer,0,len);
 		inputBuffer+=rawInput;
 		// each line ends with a \n.
+		int x;
+
 		for( x=inputBuffer.indexOf("\n"); x!=-1; x=inputBuffer.indexOf("\n") ) {
 			x=x+1;
-			oneLine = inputBuffer.substring(0,x);
+			String oneLine = inputBuffer.substring(0,x);
 			inputBuffer = inputBuffer.substring(x);
 
 			// check for error
@@ -164,7 +175,8 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 				notifyLineError(error_line);
 			} else {
 				// no error
-				if(!oneLine.trim().equals(CUE.trim())) {
+				if(!oneLine.trim().equals(CUE.trim())) 
+				{
 					notifyDataAvailable(oneLine);
 				}
 			}
@@ -199,11 +211,11 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 			if(line.endsWith("\n") == false) {
 				line+=NEWLINE;
 			}
-			serialPort.writeBytes(line.getBytes());
+			outToServer.writeBytes(line);
 			waitingForCue=true;
 		}
 		catch(IndexOutOfBoundsException e1) {}
-		catch(SerialPortException e2) {}
+		catch(IOException e1) {}
 	}
 
 	public void deleteAllQueuedCommands() {

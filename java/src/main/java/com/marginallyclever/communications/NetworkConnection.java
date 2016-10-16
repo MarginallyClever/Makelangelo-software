@@ -7,7 +7,7 @@ package com.marginallyclever.communications;
  * @author Peter Colapietro
  * @since v7
  */
-public interface MarginallyCleverConnection {
+public interface NetworkConnection {
 	void closeConnection();
 
 	void openConnection(String portName) throws Exception;
@@ -24,6 +24,5 @@ public interface MarginallyCleverConnection {
 
 	public void removeListener(MarginallyCleverConnectionReadyListener listener);
 	
-	public void setManager(MarginallyCleverConnectionManager manager);
-	public MarginallyCleverConnectionManager getManager();
+	public TransportLayer getTransportLayer();
 }

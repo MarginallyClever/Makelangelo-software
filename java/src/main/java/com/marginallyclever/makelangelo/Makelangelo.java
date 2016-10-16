@@ -35,8 +35,8 @@ import javax.swing.KeyStroke;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.communications.MarginallyCleverConnectionManager;
-import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.communications.TransportLayer;
+import com.marginallyclever.communications.SerialTransportLayer;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
@@ -72,7 +72,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	private MakelangeloAppPreferences appPreferences;
-	private MarginallyCleverConnectionManager connectionManager;
+	private TransportLayer connectionManager;
 	private MakelangeloRobot robot;
 	
 	private Translator translator;
@@ -130,7 +130,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.getSettings().addListener(this);
 		
 		myTransferHandler = new MakelangeloTransferHandler(robot);
-		connectionManager = new SerialConnectionManager();
+		connectionManager = new SerialTransportLayer();
 		
 		createAndShowGUI();
 
@@ -428,7 +428,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 	
 	
-	public MarginallyCleverConnectionManager getConnectionManager() {
+	public TransportLayer getConnectionManager() {
 		return connectionManager;
 	}
 
