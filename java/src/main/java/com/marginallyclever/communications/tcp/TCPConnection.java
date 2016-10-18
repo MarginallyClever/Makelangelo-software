@@ -1,13 +1,16 @@
-package com.marginallyclever.communications;
+package com.marginallyclever.communications.tcp;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
 
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.makelangelo.Log;
 
 
@@ -17,12 +20,14 @@ import com.marginallyclever.makelangelo.Log;
  * @author Peter Colapietro
  * @since v7
  */
-public final class TCPConnection implements NetworkConnection, TCPConnectionEventListener {
-	private Socket socket;
+public final class TCPConnection implements Runnable, NetworkConnection {
+	private SocketChannel socket;
 	private TransportLayer transportLayer;
 	private String connectionName = "";
 	private boolean portOpened = false;
 	private boolean waitingForCue = false;
+	private Thread thread;
+	private boolean keepPolling;
 
 
 	static final String CUE = "> ";
@@ -31,9 +36,7 @@ public final class TCPConnection implements NetworkConnection, TCPConnectionEven
 	static final String BADLINENUM = "BADLINENUM ";
 	static final String NEWLINE = "\n";
 	static final String COMMENT_START = ";";
-
-	protected DataOutputStream outToServer;
-	protected TCPConnectionReader inFromServer;
+	private static final int DEFAULT_TCP_PORT = 9999;
 	
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
@@ -58,21 +61,10 @@ public final class TCPConnection implements NetworkConnection, TCPConnectionEven
 	public void closeConnection() {
 		if (portOpened) {
 			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				try {
-					outToServer.flush();
-					outToServer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				keepPolling=false;
 				
 				try {
-					inFromServer.close();
+					socket.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -88,24 +80,36 @@ public final class TCPConnection implements NetworkConnection, TCPConnectionEven
 
 		closeConnection();
 
-		URL a = new URL(URL);
+		URL a = new URL("http://"+URL);
 		String host = a.getHost();
 		int port = a.getPort();
-		socket = new Socket(host,port);
-		socket.setKeepAlive(true);
-		socket.setTcpNoDelay(true);
-		socket.setSoTimeout(200);  // maybe only use this on closing connection.
-
-		outToServer = new DataOutputStream(socket.getOutputStream());
-		inFromServer = new TCPConnectionReader(socket.getInputStream());
-		inFromServer.addListener(this);
-		Thread t = new Thread(inFromServer);
+		if(port==-1) port = DEFAULT_TCP_PORT;
+		socket = SocketChannel.open();
+		socket.connect(new InetSocketAddress(host,port));
+		thread = new Thread(this);
 		
 		connectionName = URL;
 		portOpened = true;
 		waitingForCue = true;
-
-		t.run();
+		keepPolling=true;
+		thread.run();
+	}
+	
+	public void run() {
+		ByteBuffer buf = ByteBuffer.allocate(256);
+		while(keepPolling) {
+			try {
+				int bytesRead = socket.read(buf);
+				if(bytesRead>0) {
+					String line = buf.toString();
+					dataAvailable(bytesRead,line);
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				closeConnection();
+			}
+		}
 	}
 	
 	
@@ -153,11 +157,9 @@ public final class TCPConnection implements NetworkConnection, TCPConnectionEven
 	}
 
 
-	// Deal with something robot has sent.
-	@Override
-	public void dataAvailable(int len,byte[]message) {
+	public void dataAvailable(int len,String message) {
 		if(!portOpened) return;
-		String rawInput = new String(message).substring(0,len);
+		String rawInput = message.substring(0,len);
 		if( len==0 ) return;
 		
 		inputBuffer+=rawInput;
@@ -211,7 +213,11 @@ public final class TCPConnection implements NetworkConnection, TCPConnectionEven
 			if(line.endsWith("\n") == false) {
 				line+=NEWLINE;
 			}
-			outToServer.writeBytes(line);
+			byte[] lineBytes = line.getBytes();
+			ByteBuffer buf = ByteBuffer.allocate(lineBytes.length);
+			buf.clear();
+			buf.put(lineBytes);
+			socket.write(buf);
 			waitingForCue=true;
 		}
 		catch(IndexOutOfBoundsException e1) {}

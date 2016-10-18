@@ -1,7 +1,5 @@
 package com.marginallyclever.communications;
 
-import java.awt.Component;
-
 /**
  * Lists available connections of a type (serial, ethernet, smoke signals, etc) and opens a connection of that type
  *
@@ -17,9 +15,7 @@ public interface TransportLayer {
   public NetworkConnection openConnection(String connectionName);
 
   /**
-   * Create a new connection to a device.  This may include creating a gui to ask questions of the user
-   * @return a connection to the device at address <code>connectionName</code>
+   * @return a panel with the gui options for this transport layer
    */
-  public NetworkConnection requestNewConnection(Component parent);
-
+  public TransportLayerPanel getTransportLayerPanel();
 }

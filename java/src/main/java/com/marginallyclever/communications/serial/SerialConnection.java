@@ -1,4 +1,4 @@
-package com.marginallyclever.communications;
+package com.marginallyclever.communications.serial;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -8,6 +8,8 @@ import jssc.SerialPortException;
 import java.util.ArrayList;
 
 import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.makelangelo.Log;
 
 

@@ -1,8 +1,10 @@
-package com.marginallyclever.communications;
+package com.marginallyclever.communications.tcp;
 
-import java.awt.Component;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
+import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.TransportLayer;
+import com.marginallyclever.communications.TransportLayerPanel;
 import com.marginallyclever.makelangelo.Log;
 
 /**
@@ -24,12 +26,16 @@ public class TCPTransportLayer implements TransportLayer {
 			Log.error("Not a valid IP Address.");
 			return null;
 		}
+		Log.message("Connecting to "+connectionName);
 		//if(connectionName.equals(recentPort)) return null;
 		TCPConnection connection = new TCPConnection(this);
 
 		try {
 			connection.openConnection(connectionName);
+			Log.message("Connect OK");
 		} catch (Exception e) {
+			Log.message("Connect FAILED");
+			e.printStackTrace();
 			return null;
 		}
 
@@ -37,15 +43,7 @@ public class TCPTransportLayer implements TransportLayer {
 	}
 
 	@Override
-	public NetworkConnection requestNewConnection(Component parent) {
-		// TODO Auto-generated method stub
-		//new Socket("192.168.4.1", 9999);
-		String inetAddress=null;
-		
-		// TODO request an address from the user
-
-
-		// connect to it 
-		return openConnection(inetAddress);
+	public TransportLayerPanel getTransportLayerPanel() {
+		return new TCPTransportLayerPanel(this);
 	}
 }
