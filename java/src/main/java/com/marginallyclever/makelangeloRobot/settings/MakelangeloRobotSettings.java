@@ -219,7 +219,6 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * TODO Make home tweakable for advanced users. Relative to edges or center.
 	 * @return home X coordinate in mm
 	 */ 
 	public double getHomeX() {
@@ -227,7 +226,6 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	/**
-	 * TODO Make home tweakable for advanced users. Relative to edges or center.
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {

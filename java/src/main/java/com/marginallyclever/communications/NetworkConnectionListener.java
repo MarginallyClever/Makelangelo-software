@@ -1,7 +1,7 @@
 package com.marginallyclever.communications;
 
 
-public interface MarginallyCleverConnectionReadyListener {
+public interface NetworkConnectionListener {
 	/**
 	 * transmission of message number 'lineNumber' has failed.
 	 * @param arg0

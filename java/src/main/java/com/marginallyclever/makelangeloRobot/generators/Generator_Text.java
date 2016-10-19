@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -140,7 +140,7 @@ public class Generator_Text extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		final JTextArea text = new JTextArea(lastMessage, 6, 60);
-		final FloatField size = new FloatField();
+		final SelectFloat size = new SelectFloat();
 		size.setValue(lastSize);
 		final JComboBox<String> fontChoices = new JComboBox<String>(fontNames);
 		fontChoices.setSelectedIndex(lastFont);

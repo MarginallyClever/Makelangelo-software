@@ -8,7 +8,7 @@ public class FloatFieldTest {
 
 	@Test
 	public void testFloatFieldUS() throws Exception {
-		FloatField field = new FloatField(Locale.US);
+		SelectFloat field = new SelectFloat(Locale.US);
 		field.setText("1000.00");
 		assert(field.isEditValid());
 		field.commitEdit();
@@ -20,7 +20,7 @@ public class FloatFieldTest {
 
 	@Test
 	public void testFloatFieldEU() throws Exception {
-		FloatField field = new FloatField(Locale.FRANCE);
+		SelectFloat field = new SelectFloat(Locale.FRANCE);
 		field.setText("1000,00");
 		assert(field.isEditValid());
 		field.commitEdit();

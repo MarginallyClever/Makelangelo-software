@@ -24,7 +24,7 @@ import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.NetworkConnection;
-import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Log;
@@ -41,7 +41,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.2.10
  *
  */
-public class MakelangeloRobot implements MarginallyCleverConnectionReadyListener {
+public class MakelangeloRobot implements NetworkConnectionListener {
 	// Constants
 	private final String robotTypeName = "DRAWBOT";
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";

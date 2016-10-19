@@ -41,7 +41,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
@@ -91,7 +91,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
-	private FloatField feedRateTxt;
+	private SelectFloat feedRateTxt;
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
@@ -344,7 +344,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMain.gridy++;
 			feedRateControl.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
+			feedRateTxt = new SelectFloat((float)robot.getSettings().getMaxFeedRate());
 			feedRateTxt.setPreferredSize(new Dimension(100,20));
 			setFeedRate = new JButton(Translator.get("Set"));
 			setFeedRate.addActionListener(this);
@@ -716,6 +716,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
+					break;
 				}
 			}
 		}
@@ -943,9 +944,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (success == true) {
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
+			updateButtonAccess();
+			statusBar.clear();
 		}
-		updateButtonAccess();
-		statusBar.clear();
 		
 		return success;
 	}

@@ -14,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
 
 /**
  * handles requests between the UI and the various transport layers 
- * @author Admin
+ * @author dan royer
  *
  */
 public class ConnectionManager {
@@ -36,8 +36,9 @@ public class ConnectionManager {
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();
 		top.add(tabs);
-		// TODO translate these tab names?
+		// TODO translate me?
 		tabs.addTab("USB", serial.getTransportLayerPanel());
+		// TODO translate me?
 		//tabs.addTab("Wifi", tcp.getTransportLayerPanel());
 
 		int result = JOptionPane.showConfirmDialog(parent, top, Translator.get("MenuConnect"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

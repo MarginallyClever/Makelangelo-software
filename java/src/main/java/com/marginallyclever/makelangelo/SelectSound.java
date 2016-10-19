@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.preferences;
+package com.marginallyclever.makelangelo;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,8 +11,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.marginallyclever.makelangelo.Translator;
 
 public class SelectSound extends JPanel implements ActionListener {
 	/**

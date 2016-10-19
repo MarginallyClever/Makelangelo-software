@@ -12,30 +12,30 @@ import javax.swing.text.NumberFormatter;
  * @author Dan Royer
  * @since 7.8.0
  */
-public class FloatField extends JFormattedTextField {
+public class SelectFloat extends JFormattedTextField {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2428427667156189335L;
 
-	public FloatField(Locale locale,float defaultValue) {
+	public SelectFloat(Locale locale,float defaultValue) {
 		super();
 		createAndAttachFormatter(locale);
 		this.setValue(defaultValue);
 	}
 
-	public FloatField(Locale locale) {
+	public SelectFloat(Locale locale) {
 		super();
 		createAndAttachFormatter(locale);
 	}
 	
-	public FloatField(float defaultValue) {
+	public SelectFloat(float defaultValue) {
 		super();
 		createAndAttachFormatter(Locale.getDefault());
 		this.setValue(defaultValue);
 	}
 	
-	public FloatField() {
+	public SelectFloat() {
 		super();
 		createAndAttachFormatter(Locale.getDefault());
 	}

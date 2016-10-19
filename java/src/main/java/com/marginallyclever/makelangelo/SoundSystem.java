@@ -34,7 +34,7 @@ public class SoundSystem {
 	}
 
 	static public void playConversionFinishedSound() {
-		playSound(SoundPreferences.getConnectSoundFilename());
+		playSound(SoundPreferences.getConversionFinishedSoundFilename());
 	}
 
 	static public void playDrawingFinishedSound() {

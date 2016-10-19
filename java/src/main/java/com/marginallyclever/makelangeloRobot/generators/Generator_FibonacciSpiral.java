@@ -53,8 +53,7 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
-
-				// TODO: check order>3
+				if(order<3) order=3;
 
 				createCurveNow(out);
 				return true;

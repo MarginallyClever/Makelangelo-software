@@ -8,7 +8,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
 
-import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.makelangelo.Log;
@@ -43,7 +43,7 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 	ArrayList<String> commandQueue = new ArrayList<String>();
 
 	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
+	private ArrayList<NetworkConnectionListener> listeners = new ArrayList<NetworkConnectionListener>();
 
 
 	public TCPConnection(TransportLayer layer) {
@@ -73,14 +73,21 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 		}
 	}
 
-	// open a serial connection to a device.  We won't know it's the robot until
+	/** 
+	 * Open a connection to a device on the net.
+	 * @param ipAddress the network address of the device
+	 */
 	@Override
-	public void openConnection(String URL) throws Exception {
+	public void openConnection(String ipAddress) throws Exception {
 		if (portOpened) return;
 
 		closeConnection();
+		
+		if(ipAddress.startsWith("http://")) {
+			ipAddress = ipAddress.substring(7);
+		}
 
-		URL a = new URL("http://"+URL);
+		URL a = new URL("http://"+ipAddress);
 		String host = a.getHost();
 		int port = a.getPort();
 		if(port==-1) port = DEFAULT_TCP_PORT;
@@ -88,7 +95,7 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 		socket.connect(new InetSocketAddress(host,port));
 		thread = new Thread(this);
 		
-		connectionName = URL;
+		connectionName = ipAddress;
 		portOpened = true;
 		waitingForCue = true;
 		keepPolling=true;
@@ -267,30 +274,30 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 	}
 
 	@Override
-	public void addListener(MarginallyCleverConnectionReadyListener listener) {
+	public void addListener(NetworkConnectionListener listener) {
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(MarginallyCleverConnectionReadyListener listener) {
+	public void removeListener(NetworkConnectionListener listener) {
 		listeners.remove(listener);
 	}
 
 	private void notifyLineError(int lineNumber) {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.lineError(this,lineNumber);
 		}
 	}
 
 	private void notifySendBufferEmpty() {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.sendBufferEmpty(this);
 		}
 	}
 
 	// tell all listeners data has arrived
 	private void notifyDataAvailable(String line) {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.dataAvailable(this,line);
 		}
 	}

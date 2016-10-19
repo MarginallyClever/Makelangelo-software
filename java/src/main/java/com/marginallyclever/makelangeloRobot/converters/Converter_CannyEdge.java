@@ -42,7 +42,7 @@ public class Converter_CannyEdge extends ImageConverter {
 		Filter_Invert inv = new Filter_Invert();
 		edges = inv.filter(edges);
 		
-		// Well great, now we have a bitmap of the edges.  How to turn that into vectors?
+		// Now we have a bitmap of the edges.  How to turn that into vectors?
 		
 /*
 		// Set up the conversion from image space to paper space, select the current tool, etc.

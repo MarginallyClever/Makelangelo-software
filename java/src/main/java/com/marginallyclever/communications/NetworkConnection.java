@@ -8,21 +8,23 @@ package com.marginallyclever.communications;
  * @since v7
  */
 public interface NetworkConnection {
-	void closeConnection();
+	// close this connection
+	public void closeConnection();
 
-	void openConnection(String portName) throws Exception;
+	// open a connection to a connection
+	public void openConnection(String connectionName) throws Exception;
 
-	void reconnect() throws Exception;
+	public void reconnect() throws Exception;
 
-	boolean isOpen();
+	public boolean isOpen();
 
-	String getRecentConnection();
+	public String getRecentConnection();
 
-	void sendMessage(String msg) throws Exception;
+	public void sendMessage(String msg) throws Exception;
 
-	public void addListener(MarginallyCleverConnectionReadyListener listener);
+	public void addListener(NetworkConnectionListener listener);
 
-	public void removeListener(MarginallyCleverConnectionReadyListener listener);
+	public void removeListener(NetworkConnectionListener listener);
 	
 	public TransportLayer getTransportLayer();
 }

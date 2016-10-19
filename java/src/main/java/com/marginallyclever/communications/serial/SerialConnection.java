@@ -7,7 +7,7 @@ import jssc.SerialPortException;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.communications.MarginallyCleverConnectionReadyListener;
+import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.makelangelo.Log;
@@ -41,7 +41,7 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	ArrayList<String> commandQueue = new ArrayList<String>();
 
 	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<MarginallyCleverConnectionReadyListener> listeners = new ArrayList<MarginallyCleverConnectionReadyListener>();
+	private ArrayList<NetworkConnectionListener> listeners = new ArrayList<NetworkConnectionListener>();
 
 
 	public SerialConnection(SerialTransportLayer layer) {
@@ -251,30 +251,30 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	}
 
 	@Override
-	public void addListener(MarginallyCleverConnectionReadyListener listener) {
+	public void addListener(NetworkConnectionListener listener) {
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(MarginallyCleverConnectionReadyListener listener) {
+	public void removeListener(NetworkConnectionListener listener) {
 		listeners.remove(listener);
 	}
 
 	private void notifyLineError(int lineNumber) {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.lineError(this,lineNumber);
 		}
 	}
 
 	private void notifySendBufferEmpty() {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.sendBufferEmpty(this);
 		}
 	}
 
 	// tell all listeners data has arrived
 	private void notifyDataAvailable(String line) {
-		for (MarginallyCleverConnectionReadyListener listener : listeners) {
+		for (NetworkConnectionListener listener : listeners) {
 			listener.dataAvailable(this,line);
 		}
 	}

@@ -1,7 +1,5 @@
 package com.marginallyclever.communications.tcp;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
-
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
@@ -20,12 +18,15 @@ public class TCPTransportLayer implements TransportLayer {
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
 	public NetworkConnection openConnection(String connectionName) {
+		/*
 		// check it
+		Log.message("Validating "+connectionName);
 		InetAddressValidator validator = new InetAddressValidator();
 		if(!validator.isValid(connectionName)) {
 			Log.error("Not a valid IP Address.");
 			return null;
 		}
+		*/
 		Log.message("Connecting to "+connectionName);
 		//if(connectionName.equals(recentPort)) return null;
 		TCPConnection connection = new TCPConnection(this);

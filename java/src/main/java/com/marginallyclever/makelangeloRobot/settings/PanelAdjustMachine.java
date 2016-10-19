@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -28,12 +28,12 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 
 	protected MakelangeloRobot robot;
 
-	protected FloatField machineWidth, machineHeight;
+	protected SelectFloat machineWidth, machineHeight;
 	protected JLabel totalBeltNeeded;
 	protected JLabel totalServoNeeded;
 	protected JLabel totalStepperNeeded;
-	protected FloatField acceleration;
-	protected FloatField pulleyDiameter;
+	protected SelectFloat acceleration;
+	protected SelectFloat pulleyDiameter;
 	protected JCheckBox flipForGlass;
 
 
@@ -71,8 +71,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			float w = (float)(r - l);
 			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom()) * 10;
 			
-			machineWidth = new FloatField(w);
-			machineHeight = new FloatField(h);
+			machineWidth = new SelectFloat(w);
+			machineHeight = new SelectFloat(h);
 			s = machineHeight.getPreferredSize();
 			s.width = 80;
 	
@@ -159,7 +159,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			double startingDiameter = Math.floor(robot.getSettings().getPulleyDiameter() * 10.0 * 1000.0) / 1000.0;
 	
 			// pulley diameter
-			pulleyDiameter = new FloatField();
+			pulleyDiameter = new SelectFloat();
 			pulleyDiameter.setValue(startingDiameter);
 			y = 2;
 			c.weightx = 0;
@@ -192,7 +192,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			p = new JPanel(new GridBagLayout());
 			this.add(p);
 			
-			acceleration = new FloatField();
+			acceleration = new SelectFloat();
 			acceleration.setValue(robot.getSettings().getAcceleration());
 			s = acceleration.getPreferredSize();
 			s.width = 80;

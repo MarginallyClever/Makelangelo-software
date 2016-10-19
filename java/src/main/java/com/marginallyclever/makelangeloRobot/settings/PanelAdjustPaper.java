@@ -18,7 +18,8 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
+import com.marginallyclever.makelangelo.SelectColor;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -33,7 +34,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	protected MakelangeloRobot robot;
 
 	private JComboBox<String> paperSizes;
-	private FloatField pw, ph;
+	private SelectFloat pw, ph;
 	private JCheckBox isLandscape;
 	private boolean beingModified;
 	private SelectColor paperColor;
@@ -129,7 +130,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 
 		// manual paper size settings
 		d.gridwidth=1;
-		pw = new FloatField();
+		pw = new SelectFloat();
 		Dimension s = pw.getPreferredSize();
 		s.width = 80;
 		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
@@ -139,7 +140,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		pw.setPreferredSize(s);
 		pw.addPropertyChangeListener(this);
 		
-		ph = new FloatField();
+		ph = new SelectFloat();
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
 		d.gridx=1;  d.gridy=y;  p.add(ph,d);
 		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
