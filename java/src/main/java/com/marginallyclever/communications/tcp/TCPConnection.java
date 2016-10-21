@@ -59,18 +59,17 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 
 	@Override
 	public void closeConnection() {
-		if (portOpened) {
-			if (socket != null) {
-				keepPolling=false;
-				
-				try {
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		if (!portOpened) return;
+		if (socket != null) {
+			keepPolling=false;
+			
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			portOpened = false;
 		}
+		portOpened = false;
 	}
 
 	/** 
@@ -99,7 +98,7 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 		portOpened = true;
 		waitingForCue = true;
 		keepPolling=true;
-		thread.run();
+		thread.start();
 	}
 	
 	public void run() {
@@ -108,13 +107,16 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 			try {
 				int bytesRead = socket.read(buf);
 				if(bytesRead>0) {
-					String line = buf.toString();
+					String line = new String(buf.array());
 					dataAvailable(bytesRead,line);
+					buf.rewind();
 				}
 			}
 			catch (IOException e) {
-				e.printStackTrace();
-				closeConnection();
+				if(keepPolling) {
+					e.printStackTrace();
+					closeConnection();
+				}
 			}
 		}
 	}
@@ -224,6 +226,7 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 			ByteBuffer buf = ByteBuffer.allocate(lineBytes.length);
 			buf.clear();
 			buf.put(lineBytes);
+			buf.rewind();
 			socket.write(buf);
 			waitingForCue=true;
 		}
