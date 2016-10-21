@@ -31,15 +31,15 @@ public class Generator_LimitTest extends ImageGenerator {
 		double xmax = machine.getPaperRight()  * 10;
 		
 		// Draw outside edge
-		machine.writeMoveTo(out, xmin, ymax);
+		machine.writeMoveTo(out, xmin, ymax,true);
 		lowerPen(out);
-		machine.writeMoveTo(out, xmax, ymax);
-		machine.writeMoveTo(out, xmax, ymin);
-		machine.writeMoveTo(out, xmin, ymin);
-		machine.writeMoveTo(out, xmin, ymax);
+		machine.writeMoveTo(out, xmax, ymax,false);
+		machine.writeMoveTo(out, xmax, ymin,false);
+		machine.writeMoveTo(out, xmin, ymin,false);
+		machine.writeMoveTo(out, xmin, ymax,false);
 		liftPen(out);
 
-		machine.writeMoveTo(out, machine.getHomeX(), machine.getHomeY());
+		machine.writeMoveTo(out, machine.getHomeX(), machine.getHomeY(),true);
 	    
 		return true;
 	}
