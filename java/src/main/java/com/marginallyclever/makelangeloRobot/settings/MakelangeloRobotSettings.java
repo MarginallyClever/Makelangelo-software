@@ -760,8 +760,8 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
-				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
+				"G01 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
 	public String getPenUpString() {
