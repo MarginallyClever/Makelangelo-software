@@ -781,8 +781,11 @@ public final class MakelangeloRobotSettings {
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
-	public void writeMoveTo(Writer out, double x, double y) throws IOException {
-		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
+	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
+		String command;
+		if(isUp) command="G00";
+		else command="G01";
+		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 
 	// lift the pen

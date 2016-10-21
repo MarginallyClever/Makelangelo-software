@@ -28,5 +28,5 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2,MakelangeloRobotSettings settings) {}
+	public void render(GL2 gl2, MakelangeloRobotSettings settings) {}
 }

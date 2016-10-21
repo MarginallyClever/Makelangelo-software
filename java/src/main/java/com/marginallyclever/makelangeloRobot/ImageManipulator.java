@@ -104,7 +104,7 @@ public abstract class ImageManipulator {
 	 */
 	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
 		if(isInsidePaperMargins(x,y)) {
-			machine.writeMoveTo(out, (float) x, (float) y);
+			machine.writeMoveTo(out, (float) x, (float) y,lastUp);
 		}
 		if(lastUp != up) {
 			if (up) liftPen(out);
