@@ -129,6 +129,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		this.connection.removeListener(this);
 		notifyDisconnected();
 		this.connection = null;
+		this.portConfirmed = false;
 	}
 
 	@Override
