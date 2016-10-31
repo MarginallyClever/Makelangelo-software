@@ -6,6 +6,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+
+import com.marginallyclever.makelangelo.SelectSound;
 import com.marginallyclever.util.PreferencesHelper;
 
 

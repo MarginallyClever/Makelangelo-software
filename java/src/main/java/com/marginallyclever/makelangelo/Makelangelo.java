@@ -35,8 +35,8 @@ import javax.swing.KeyStroke;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.communications.MarginallyCleverConnectionManager;
-import com.marginallyclever.communications.SerialConnectionManager;
+import com.marginallyclever.communications.ConnectionManager;
+import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
@@ -72,7 +72,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	private MakelangeloAppPreferences appPreferences;
-	private MarginallyCleverConnectionManager connectionManager;
+	private ConnectionManager connectionManager;
 	private MakelangeloRobot robot;
 	
 	private Translator translator;
@@ -130,7 +130,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		robot.getSettings().addListener(this);
 		
 		myTransferHandler = new MakelangeloTransferHandler(robot);
-		connectionManager = new SerialConnectionManager();
+		connectionManager = new ConnectionManager();
 		
 		createAndShowGUI();
 
@@ -244,7 +244,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 				String results;
 				if     (comp>0) {
 					results = Translator.get("UpdateNotice");
-					//TODO downloadUpdate();
+					//TODO downloadUpdate(), flashNewFirmwareToRobot();
 				} else if(comp<0) results = "This version is from the future?!";
 				else 			results = Translator.get("UpToDate");
 
@@ -428,8 +428,8 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 	
 	
-	public MarginallyCleverConnectionManager getConnectionManager() {
-		return connectionManager;
+	public NetworkConnection requestNewConnection() {
+		return connectionManager.requestNewConnection(this.mainFrame);
 	}
 
 

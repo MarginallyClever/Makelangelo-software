@@ -6,17 +6,16 @@ package com.marginallyclever.communications;
  * @author Dan
  * @since v7.1.0.0
  */
-public interface MarginallyCleverConnectionManager {
-  /**
-   * @return a list of addresses of a connection type at which robots are likely to exist.
-   */
-  public String[] listConnections();
-
+public interface TransportLayer {
   /**
    * opens a connection
    * @param connectionName where to connect
    * @return a connection to the device at address <code>connectionName</code>
    */
-  public MarginallyCleverConnection openConnection(String connectionName);
+  public NetworkConnection openConnection(String connectionName);
 
+  /**
+   * @return a panel with the gui options for this transport layer
+   */
+  public TransportLayerPanel getTransportLayerPanel();
 }

@@ -219,7 +219,6 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * TODO Make home tweakable for advanced users. Relative to edges or center.
 	 * @return home X coordinate in mm
 	 */ 
 	public double getHomeX() {
@@ -227,7 +226,6 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	/**
-	 * TODO Make home tweakable for advanced users. Relative to edges or center.
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
@@ -762,8 +760,8 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
-				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
+				"G01 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
 	public String getPenUpString() {
@@ -783,8 +781,11 @@ public final class MakelangeloRobotSettings {
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
-	public void writeMoveTo(Writer out, double x, double y) throws IOException {
-		out.write("G00 X" + df.format(x) + " Y" + df.format(y) + ";\n");
+	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
+		String command;
+		if(isUp) command="G00";
+		else command="G01";
+		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + ";\n");
 	}
 
 	// lift the pen

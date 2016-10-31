@@ -39,8 +39,9 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
@@ -90,7 +91,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 
 	// speed
-	private FloatField feedRateTxt;
+	private SelectFloat feedRateTxt;
 	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
@@ -187,53 +188,22 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	
 	protected void closeConnection() {
-		robot.setConnection(null);
+		robot.closeConnection();
 		buttonConnect.setText(Translator.get("ButtonConnect"));
 		isConnected=false;
+		updateButtonAccess();
 	}
 	
 	protected void openConnection() {
-		JPanel connectionList = new JPanel(new GridLayout(0, 1));
-		connectionList.add(new JLabel(Translator.get("MenuConnect")));
-		
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=1;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTH;
+		NetworkConnection s = gui.requestNewConnection();
 
-		JComboBox<String> connectionComboBox = new JComboBox<String>();
-        connectionComboBox.addItemListener(this);
-        connectionList.removeAll();
-        connectionList.add(connectionComboBox);
-	    
-	    String recentConnection = "";
-	    if(robot.getConnection()!=null) {
-	    	recentConnection = robot.getConnection().getRecentConnection();
-	    }
-
-	    if(gui.getConnectionManager()!=null) {
-			String [] portsDetected = gui.getConnectionManager().listConnections();
-			int i;
-		    for(i=0;i<portsDetected.length;++i) {
-		    	connectionComboBox.addItem(portsDetected[i]);
-		    	if(recentConnection.equals(portsDetected[i])) {
-		    		connectionComboBox.setSelectedIndex(i+1);
-		    	}
-		    }
-	    }
-        
-		int result = JOptionPane.showConfirmDialog(this.getRootPane(), connectionList, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
+		if(s!=null) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
-			String connectionName = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			robot.setConnection( gui.getConnectionManager().openConnection(connectionName) );
+			robot.openConnection( s );
 			//updateMachineNumberPanel();
 			//updateButtonAccess();
+			isConnected=true;
 		}
-		isConnected=true;
 	}
 	
 
@@ -375,7 +345,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			cMain.gridy++;
 			feedRateControl.setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			feedRateTxt = new FloatField((float)robot.getSettings().getMaxFeedRate());
+			feedRateTxt = new SelectFloat((float)robot.getSettings().getMaxFeedRate());
 			feedRateTxt.setPreferredSize(new Dimension(100,20));
 			setFeedRate = new JButton(Translator.get("Set"));
 			setFeedRate.addActionListener(this);
@@ -747,6 +717,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
+					break;
 				}
 			}
 		}
@@ -780,7 +751,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		options.setSelectedIndex(generatorChoice);
 
 		GridBagConstraints c = new GridBagConstraints();
-		JLabel previewPane = new JLabel();
+		final JLabel previewPane = new JLabel();
 		
 		options.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
@@ -850,7 +821,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			try {
 				tempFile = File.createTempFile("gcode", ".ngc");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
 			}
@@ -917,7 +887,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			FileFilter chosenFilter = fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			// TODO get rid of this stupid guessing game.
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
@@ -951,6 +920,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					break;
 				}					
 			}
+			// No file filter was found.  Wait, what?!
 		}
 	}
 
@@ -970,15 +940,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			e.printStackTrace();
 		}
 
-		// TODO don't rely on this to be true, load may not have finished yet.
+		// TODO don't rely on success to be true, load may not have finished yet.
+
 		if (success == true) {
 			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
+			updateButtonAccess();
+			statusBar.clear();
 		}
-		// TODO don't rely on this to be true, load may not have finished yet.
-		updateButtonAccess();
-		// TODO don't rely on this to be true, load may not have finished yet.
-		statusBar.clear();
 		
 		return success;
 	}
@@ -1010,5 +979,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		
 		return success;
+	}
+	
+	public boolean canLoad(String filename) {
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
+		while(i.hasNext()) {
+			LoadAndSaveFileType loader = i.next();
+			if(!loader.canLoad()) continue;
+			if(!loader.canLoad(filename)) continue;
+			// potentially yes, we can load this type.
+			return true;
+		}
+		// nothing can load this type
+		return false;
 	}
 }

@@ -251,8 +251,8 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	}
 
 
-	private void moveToPoint(Writer out, int i, boolean up) throws IOException {
-		machine.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y);
+	private void moveToPoint(Writer out, int i, boolean isUp) throws IOException {
+		machine.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y,isUp);
 	}
 
 

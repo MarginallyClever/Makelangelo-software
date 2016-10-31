@@ -1,5 +1,8 @@
-package com.marginallyclever.communications;
+package com.marginallyclever.communications.serial;
 
+import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.TransportLayer;
+import com.marginallyclever.communications.TransportLayerPanel;
 import jssc.SerialPortList;
 
 
@@ -9,17 +12,16 @@ import jssc.SerialPortList;
  * @author Dan
  * @since v7.1.0.0
  */
-public class SerialConnectionManager implements MarginallyCleverConnectionManager {
+public class SerialTransportLayer implements TransportLayer {
 	private String[] portsDetected;
 
-	public SerialConnectionManager() {}
+	public SerialTransportLayer() {}
 
 	/**
 	 * find all available serial ports
 	 *
 	 * @return a list of port names
 	 */
-	@Override
 	public String[] listConnections() {
 		String OS = System.getProperty("os.name").toLowerCase();
 
@@ -42,11 +44,10 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
-	public MarginallyCleverConnection openConnection(String connectionName) {
+	public NetworkConnection openConnection(String connectionName) {
 		//if(connectionName.equals(recentPort)) return null;
 
-		SerialConnection serialConnection = new SerialConnection();
-		serialConnection.setManager(this);
+		SerialConnection serialConnection = new SerialConnection(this);
 
 		try {
 			serialConnection.openConnection(connectionName);
@@ -55,5 +56,12 @@ public class SerialConnectionManager implements MarginallyCleverConnectionManage
 		}
 
 		return serialConnection;
+	}
+
+	/**
+	 * @return a panel with the gui options for this transport layer
+	 */
+	public TransportLayerPanel getTransportLayerPanel() {
+		return new SerialTransportLayerPanel(this);
 	}
 }

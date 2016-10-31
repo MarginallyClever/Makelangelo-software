@@ -48,8 +48,7 @@ public class Generator_Dragon extends ImageGenerator {
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
-
-				// TODO: check order>0
+				if(order<1) order=1;
 
 				createCurveNow(out);
 				return true;
@@ -110,7 +109,12 @@ public class Generator_Dragon extends ImageGenerator {
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
-	
+	/**
+	 * walk through the sequence and find the max/min bounds of the dragon fractal
+	 * @param output
+	 * @return largest dimension of the fractal
+	 * @throws IOException
+	 */
 	private float findStepSize(Writer output) throws IOException {
 		float maxX=0;
 		float maxY=0;

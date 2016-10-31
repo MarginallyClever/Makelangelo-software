@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot.settings;
+package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,8 +13,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
-
-import com.marginallyclever.makelangelo.Translator;
 
 public class SelectColor extends JPanel implements ActionListener {
 	/**

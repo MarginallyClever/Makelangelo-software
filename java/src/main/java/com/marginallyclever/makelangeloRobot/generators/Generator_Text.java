@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -140,7 +140,7 @@ public class Generator_Text extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		final JTextArea text = new JTextArea(lastMessage, 6, 60);
-		final FloatField size = new FloatField();
+		final SelectFloat size = new SelectFloat();
 		size.setValue(lastSize);
 		final JComboBox<String> fontChoices = new JComboBox<String>(fontNames);
 		fontChoices.setSelectedIndex(lastFont);
@@ -238,11 +238,11 @@ public class Generator_Text extends ImageGenerator {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy);
+				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,false);
 				machine.writeOff(output);
 				break;
 			case PathIterator.SEG_LINETO:
-				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy);
+				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy,false);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
@@ -250,7 +250,7 @@ public class Generator_Text extends ImageGenerator {
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
-				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy);
+				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,true);
 				machine.writeOn(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
@@ -261,9 +261,9 @@ public class Generator_Text extends ImageGenerator {
 					float ttt=tt*t;
 					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
 					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
-					machine.writeMoveTo(output, x-dx,-y-dy);
+					machine.writeMoveTo(output, x-dx,-y-dy,false);
 				}
-				machine.writeMoveTo(output, coords[4]-dx,-coords[5]-dy);
+				machine.writeMoveTo(output, coords[4]-dx,-coords[5]-dy,false);
 				coords2[0] = coords[4];
 				coords2[1] = coords[5];
 				break;
@@ -277,9 +277,9 @@ public class Generator_Text extends ImageGenerator {
 					float tttt=t*t;
 					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
 					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					machine.writeMoveTo(output, x-dx,-y-dy);
+					machine.writeMoveTo(output, x-dx,-y-dy,false);
 				}
-				machine.writeMoveTo(output, coords[2]-dx,-coords[3]-dy);
+				machine.writeMoveTo(output, coords[2]-dx,-coords[3]-dy,false);
 				coords2[0] = coords[2];
 				coords2[1] = coords[3];
 				break;

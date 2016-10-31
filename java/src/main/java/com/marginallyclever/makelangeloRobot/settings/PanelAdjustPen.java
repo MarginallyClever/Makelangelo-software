@@ -12,7 +12,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.FloatField;
+import com.marginallyclever.makelangelo.SelectFloat;
+import com.marginallyclever.makelangelo.SelectColor;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -25,11 +26,11 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 
 	protected MakelangeloRobot robot;
 	
-	protected FloatField penDiameter;
-	protected FloatField penFeedRate;
-	protected FloatField penUp;
-	protected FloatField penDown;
-	protected FloatField penZRate;
+	protected SelectFloat penDiameter;
+	protected SelectFloat penFeedRate;
+	protected SelectFloat penUp;
+	protected SelectFloat penDown;
+	protected SelectFloat penZRate;
 
 	protected JButton buttonTestUp;
 	protected JButton buttonTestDown;
@@ -50,11 +51,11 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	    this.add(p);
 	    
 	    MakelangeloRobotSettings settings = robot.getSettings();
-		penDiameter = new FloatField(settings.getDiameter());
-		penFeedRate = new FloatField(settings.getMaxFeedRate());
-		penUp = new FloatField(settings.getPenUpAngle());
-		penDown = new FloatField(settings.getPenDownAngle());
-		penZRate = new FloatField(settings.getZRate());
+		penDiameter = new SelectFloat(settings.getDiameter());
+		penFeedRate = new SelectFloat(settings.getMaxFeedRate());
+		penUp = new SelectFloat(settings.getPenUpAngle());
+		penDown = new SelectFloat(settings.getPenDownAngle());
+		penZRate = new SelectFloat(settings.getZRate());
 		buttonTestUp = new JButton(Translator.get("penToolTest"));
 		buttonTestDown = new JButton(Translator.get("penToolTest"));
 

@@ -46,8 +46,7 @@ public class Generator_KochCurve extends ImageGenerator {
 			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
 				order = Integer.parseInt(field_order.getText());
-
-				// TODO: check order>0
+				if(order<1) order=1;
 
 				createCurveNow(out);
 				return true;

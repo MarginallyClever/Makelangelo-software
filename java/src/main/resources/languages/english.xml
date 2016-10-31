@@ -375,13 +375,13 @@
 		<hint>warning message</hint>
 	</string>
 	<string>
-		<key>ChangeToolPrefix</key>
-		<value>Please prepare </value>
+		<key>ChangeToolTitle</key>
+		<value>Change Pen</value>
 		<hint>tool change prompt. keep the space at the end.</hint>
 	</string>
 	<string>
-		<key>ChangeToolPostfix</key>
-		<value> and click any button to continue.</value>
+		<key>ChangeToolMessage</key>
+		<value>Please change the pen to match this color.</value>
 		<hint>tool change prompt. keep the space at the start.</hint>
 	</string>
 
@@ -914,7 +914,7 @@ to check yourself.</value>
           <a href='https://www.marginallyclever.com/product/makelangelo-software/'>https://www.marginallyclever.com/product/makelangelo-software/</a></p>
         <p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.</p>
         <p>Additional software and hardware contributions by<br>
-        Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>,<br>
+        Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, Miguel Sánchez<br>
         Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p>
       </body>
     </html>

@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.text.DefaultFormatterFactory;
@@ -11,26 +12,36 @@ import javax.swing.text.NumberFormatter;
  * @author Dan Royer
  * @since 7.8.0
  */
-public class FloatField extends JFormattedTextField {
+public class SelectFloat extends JFormattedTextField {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2428427667156189335L;
 
-	public FloatField(float defaultValue) {
+	public SelectFloat(Locale locale,float defaultValue) {
 		super();
-		createAndAttachFormatter();
+		createAndAttachFormatter(locale);
+		this.setValue(defaultValue);
+	}
+
+	public SelectFloat(Locale locale) {
+		super();
+		createAndAttachFormatter(locale);
+	}
+	
+	public SelectFloat(float defaultValue) {
+		super();
+		createAndAttachFormatter(Locale.getDefault());
 		this.setValue(defaultValue);
 	}
 	
-	
-	public FloatField() {
+	public SelectFloat() {
 		super();
-		createAndAttachFormatter();
+		createAndAttachFormatter(Locale.getDefault());
 	}
 	
-	protected void createAndAttachFormatter() {
-		NumberFormat nFloat = NumberFormat.getNumberInstance();
+	protected void createAndAttachFormatter(Locale locale) {
+		NumberFormat nFloat = NumberFormat.getNumberInstance(locale);
 		nFloat.setMinimumFractionDigits(1);
 		nFloat.setMaximumFractionDigits(3);
 		nFloat.setGroupingUsed(false);
@@ -38,5 +49,9 @@ public class FloatField extends JFormattedTextField {
 		NumberFormatter nff = new NumberFormatter(nFloat);
 		DefaultFormatterFactory factory = new DefaultFormatterFactory(nff);
 		setFormatterFactory(factory);
+	}
+	
+	public void setReadOnly() {
+		setEditable(false);
 	}
 }

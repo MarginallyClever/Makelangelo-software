@@ -43,21 +43,18 @@ public class Generator_LSystemTree extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		boolean tryAgain=false;
 		do {
-			final JTextField field_order = new JTextField(Integer.toString(order));
-			final JTextField field_orderScale = new JTextField(Float.toString(orderScale));
-			final JTextField field_angle = new JTextField(Float.toString(angleSpan));
-			final JTextField field_branches = new JTextField(Integer.toString(numBranches));
+			JTextField field_order = new JTextField(Integer.toString(order));
+			JTextField field_orderScale = new JTextField(Float.toString(orderScale));
+			JTextField field_angle = new JTextField(Float.toString(angleSpan));
+			JTextField field_branches = new JTextField(Integer.toString(numBranches));
 
 			JPanel panel = new JPanel(new GridLayout(0, 1));
 			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
 			panel.add(field_order);
-
 			panel.add(new JLabel(Translator.get("HilbertCurveOrderScale")));
 			panel.add(field_orderScale);
-			
 			panel.add(new JLabel(Translator.get("HilbertCurveAngle")));
 			panel.add(field_angle);
-
 			panel.add(new JLabel(Translator.get("HilbertCurveBranches")));
 			panel.add(field_branches);
 
@@ -68,7 +65,10 @@ public class Generator_LSystemTree extends ImageGenerator {
 				numBranches = Integer.parseInt(field_branches.getText());
 				angleSpan = Float.parseFloat(field_angle.getText());
 
-				// TODO: check angleSpan>0, angleSpan<360, numBranches>0, Order>0
+				if(order<1) order=1;
+				if(numBranches<1) numBranches=1;
+				if(angleSpan<1) angleSpan=1;
+				if(angleSpan>359) angleSpan=359;
 
 				createCurveNow(out);
 				return true;

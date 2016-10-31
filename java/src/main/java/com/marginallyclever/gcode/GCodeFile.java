@@ -309,7 +309,10 @@ public class GCodeFile {
 	public String nextLine() {
 		int lineNumber = getLinesProcessed();
 		setLinesProcessed(lineNumber + 1);
-		String line = lines.get(lineNumber).trim();  // TODO use an iterator, faster.
+		// lines.get() is really slow.  
+		// Can't use an iterator because of random seek in lineError().
+		// iterator is one way only.
+		String line = lines.get(lineNumber).trim();
 		return line;
 	}
 
