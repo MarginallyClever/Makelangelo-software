@@ -151,14 +151,16 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		this.repaint();
 	}
 	
-	public void paint(Graphics g2) {
+	public void paintComponent(Graphics g2) {
 		try {
 			long docLen = doc.getLength();
 			long caretPosition = log.getCaretPosition();
 			
-			while(!logMessages.isEmpty()) {
-				String msg = logMessages.poll();
+			String msg;
+			int i=0;
+			while( (msg = logMessages.poll()) != null && i < 100) {
 				kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+				++i;
 			}
 			
 			int overLength = 0;
@@ -177,7 +179,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 			Log.error("Logging error: "+e.getMessage());
 		}
 		
-		super.paint(g2);
+		super.paintComponent(g2);
 	}
 
 	public void clearLog() {
