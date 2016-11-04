@@ -290,40 +290,37 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		long newUID = 0;
 
 		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
-		if(pleaseGetAGUID) {
-			Log.message("obtaining UID from server.");
-			try {
-				// Send data
-				URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
-				URLConnection conn = url.openConnection();
-				try (	final InputStream connectionInputStream = conn.getInputStream();
-						final Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-						final BufferedReader rd = new BufferedReader(inputStreamReader)
-						) {
-					String line = rd.readLine();
-					Log.message("Server says: '"+line+"'");
-					newUID = Long.parseLong(line);
-				} catch (Exception e) {
-					Log.error( "UID from server: "+e.getMessage() );
-					return 0;
+		if(!pleaseGetAGUID) return 0;
+		
+		Log.message("obtaining UID from server.");
+		try {
+			// Send request
+			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
+			URLConnection conn = url.openConnection();
+			// get results
+			InputStream connectionInputStream = conn.getInputStream();
+			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+			BufferedReader rd = new BufferedReader(inputStreamReader);
+			String line = rd.readLine();
+			Log.message("Server says: '"+line+"'");
+			newUID = Long.parseLong(line);
+			// did read go ok?
+			if (newUID != 0) {
+				settings.createNewUID(newUID);
+	
+				try {
+					// Tell the robot it's new UID.
+					connection.sendMessage("UID " + newUID);
+				} catch(Exception e) {
+					//FIXME has this ever happened?  Deal with it better?
+					Log.error( "UID to robot: "+e.getMessage() );
 				}
-			} catch (Exception e) {
-				Log.error( "UID from server: "+e.getMessage() );
-				return 0;
 			}
+		} catch (Exception e) {
+			Log.error( "UID from server: "+e.getMessage() );
+			return 0;
 		}
-		// did read go ok?
-		if (newUID != 0) {
-			settings.createNewUID(newUID);
-
-			try {
-				// Tell the robot it's new UID.
-				connection.sendMessage("UID " + newUID);
-			} catch(Exception e) {
-				//FIXME has this ever happened?  Deal with it better?
-				Log.error( "UID to robot: "+e.getMessage() );
-			}
-		}
+		
 		return newUID;
 	}
 
@@ -389,7 +386,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public void halt() {
 		isRunning = false;
-		if(isPaused) isPaused=false;  // do not lower pen
+		isPaused = false;
+		raisePen();
 		if(myPanel != null) myPanel.updateButtonAccess();
 	}
 	
