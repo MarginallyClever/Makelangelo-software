@@ -466,7 +466,7 @@
 	</string>
 	<string>
 		<key>Speed</key>
-		<value>Speed:</value>
+		<value>Draw speed</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
