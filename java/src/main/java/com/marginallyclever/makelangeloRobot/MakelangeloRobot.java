@@ -401,10 +401,12 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
+		sendLineToRobot(settings.getMaxFeedrateString());
 	}
 	
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
+		sendLineToRobot(settings.getCurrentFeedrateString());
 	}
 	
 	public void testPenAngle(double testAngle) {
