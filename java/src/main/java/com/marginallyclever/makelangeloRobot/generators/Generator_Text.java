@@ -240,20 +240,20 @@ public class Generator_Text extends ImageGenerator {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				System.out.println("CLOSE");
+				//System.out.println("CLOSE");
 				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,false);
 				machine.writeOff(output);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
-				System.out.println("LINE");
+				//System.out.println("LINE");
 				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy,false);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_MOVETO:
-				System.out.println("MOVE");
+				//System.out.println("MOVE");
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
@@ -272,7 +272,7 @@ public class Generator_Text extends ImageGenerator {
 				// B(3,1) = 3 * t * (1 - t)^2
 				// B(3,2) = 3 * t^2 * (1 - t)
 				// B(3,3) = t^3
-				System.out.println("CUBIC");
+				//System.out.println("CUBIC");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					float t1 = (1.0f-t);
@@ -289,7 +289,7 @@ public class Generator_Text extends ImageGenerator {
 				coords2[1] = coords[5];
 				break;
 			case PathIterator.SEG_QUADTO:
-				System.out.println("QUAD");
+				//System.out.println("QUAD");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
