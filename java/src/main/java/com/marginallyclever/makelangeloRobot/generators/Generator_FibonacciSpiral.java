@@ -176,10 +176,11 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		float y1 = turtle.getY();
 		
 		float dx, dy, px, py, len;
+		final int steps = 20;
 		int i;
-		for(i=0;i<10;++i) {
-			px = (x2-x1) * ((float)i/10.0f) + x1;
-			py = (y2-y1) * ((float)i/10.0f) + y1;
+		for(i=0;i<steps;++i) {
+			px = (x2-x1) * ((float)i/steps) + x1;
+			py = (y2-y1) * ((float)i/steps) + y1;
 			dx = px - x0;
 			dy = py - y0;
 			len = (float)Math.sqrt(dx*dx+dy*dy);
