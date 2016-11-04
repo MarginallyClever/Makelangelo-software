@@ -34,8 +34,7 @@ public class StatusBar extends JPanel {
 	public StatusBar() {
 		super();
 		setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-		GridBagLayout gridbag = new GridBagLayout();
-		setLayout(gridbag);
+		setLayout(new GridBagLayout());
 
 		mFinished = new JLabel("", SwingConstants.LEFT);
 		mExactly = new JLabel("", SwingConstants.CENTER);
@@ -46,15 +45,15 @@ public class StatusBar extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weightx = 0;
+		c.weightx = 1;
 		c.weighty = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.NORTHWEST;
-
+		c.anchor = GridBagConstraints.NORTH;
 		c.gridwidth=3;
 		add(bar,c);
 		c.gridy++;
-		
+
+		c.weightx = 0;
 		c.gridwidth=1;
 		add(mFinished,c);
 		c.gridx++;
@@ -64,9 +63,14 @@ public class StatusBar extends JPanel {
 		c.gridy++;
 		
 		c.gridx=0;
-		c.ipady=20;
 		c.gridwidth=3;
-		add(new JLabel("\n"+Translator.get("SharePromo")), c);
+		c.weightx=1;
+		c.weighty=1;
+		JLabel area = new JLabel();
+		// TODO make link to https://twitter.com/search?q=%23makelangelo&lang=en ?
+		area.setText(Translator.get("SharePromo"));
+		area.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		add(area, c);
 
 		Dimension preferredSize = bar.getPreferredSize();
 		preferredSize.setSize(preferredSize.getWidth(), preferredSize.getHeight()*2);
