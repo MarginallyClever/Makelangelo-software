@@ -15,7 +15,6 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
@@ -112,7 +111,7 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	public MakelangeloRobotSettings(MakelangeloRobot robot) {
+	public MakelangeloRobotSettings() {
 		// set up number format
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 		otherSymbols.setDecimalSeparator('.');

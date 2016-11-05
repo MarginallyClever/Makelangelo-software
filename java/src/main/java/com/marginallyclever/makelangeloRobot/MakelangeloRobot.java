@@ -88,7 +88,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 		
-		settings = new MakelangeloRobotSettings(this);
+		settings = new MakelangeloRobotSettings();
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
