@@ -76,9 +76,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			s = machineHeight.getPreferredSize();
 			s.width = 80;
 	
-			machineWidth.setValue(robot.getSettings().getHardwareProperties().getWidth());
-			machineHeight.setValue(robot.getSettings().getHardwareProperties().getHeight());
-
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.EAST;
 			d.anchor = GridBagConstraints.WEST;
@@ -331,12 +328,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		double bld   = ((Number)pulleyDiameter.getValue()).doubleValue() / 10.0;
 		float accel = ((Number)acceleration.getValue()).floatValue();
 
-		boolean data_is_sane = true;
-		if (mwf <= 0) data_is_sane = false;
-		if (mhf <= 0) data_is_sane = false;
-		if (bld <= 0) data_is_sane = false;
-
-		if (data_is_sane) {
+		boolean isDataSane = (mwf > 0 && mhf > 0 && bld > 0);
+		if (isDataSane) {
 			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
 			robot.getSettings().setPulleyDiameter(bld);
 			robot.getSettings().setMachineSize(mwf, mhf);

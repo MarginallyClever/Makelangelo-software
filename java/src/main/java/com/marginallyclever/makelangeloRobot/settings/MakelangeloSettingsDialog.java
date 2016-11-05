@@ -1,10 +1,8 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -13,11 +11,10 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import com.marginallyclever.makelangelo.Translator;
@@ -31,38 +28,36 @@ import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelan
  * @since 7.1.4
  */
 public class MakelangeloSettingsDialog
-extends JDialog
+extends JPanel
 implements ActionListener {
-    
-  /**
-   * @see Serializable
-   */
-  private static final long serialVersionUID = 1L;
+	/**
+	 * @see Serializable
+	 */
+	private static final long serialVersionUID = 1L;
 
-  protected MakelangeloRobot robot;
+	protected MakelangeloRobot robot;
+	protected Frame parentFrame;
+	protected JTabbedPane panes;
+	protected JButton save, cancel;
 
-  protected JTabbedPane panes;
-  protected JButton save, cancel;
+	private JComboBox<String> hardwareVersionChoices;
+	private ArrayList<Integer> availableHardwareVersions;
+	private String[] hardwareVersionNames;
+	private int originalHardwareVersion;
 
-  private JComboBox<String> hardwareVersionChoices;
-  private ArrayList<Integer> availableHardwareVersions;
-  private String[] hardwareVersionNames;
-  private int originalHardwareVersion;
-  
-  private JPanel modelPanel;
-  protected PanelAdjustMachine panelAdjustMachine;
-  protected PanelAdjustPaper panelAdjustPaper;
-  protected PanelAdjustPen panelAdjustPen;
-  private JPanel saveAndCancelPanel;
-  
-  protected int dialogWidth = 450;
-  protected int dialogHeight = 500;
-  
-  public MakelangeloSettingsDialog(Frame parent, MakelangeloRobot robot) {
-	super(parent,Translator.get("configureMachine"),true);
+	private JPanel modelPanel;
+	protected PanelAdjustMachine panelAdjustMachine;
+	protected PanelAdjustPaper panelAdjustPaper;
+	protected PanelAdjustPen panelAdjustPen;
 
-	this.robot = robot;
-  }
+	protected int dialogWidth = 450;
+	protected int dialogHeight = 500;
+
+	public MakelangeloSettingsDialog(Frame parent, MakelangeloRobot robot) {
+		super();
+		this.parentFrame = parent;
+		this.robot = robot;
+	}
 
   
   // display settings menu
@@ -81,8 +76,6 @@ implements ActionListener {
 
 	  rebuildTabbedPanes();
 
-	  buildSaveAndCancel();
-
 	  // now assemble the dialog
 	  d.fill=GridBagConstraints.HORIZONTAL;
 	  d.gridx=0;
@@ -96,16 +89,18 @@ implements ActionListener {
 	  d.weightx=1;
 	  d.weighty=1;
 	  this.add(panes,d);
-	  d.fill=GridBagConstraints.HORIZONTAL;
-	  d.gridy=2;
-	  d.weighty=0;
-	  this.add(saveAndCancelPanel,d);
-	  this.getRootPane().setDefaultButton(save);
-
-	  Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	  this.setLocation((screenSize.width - dialogWidth) / 2, (screenSize.height - dialogHeight) / 2);
-	  this.pack();
-	  this.setVisible(true);
+	  
+	  int result = JOptionPane.showConfirmDialog(parentFrame, this, Translator.get("configureMachine"),
+			  JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	  if (result == JOptionPane.OK_OPTION) {
+		  panelAdjustMachine.save();
+		  panelAdjustPaper.save();
+		  panelAdjustPen.save();
+		  robot.getSettings().saveConfig();
+		  robot.sendConfig();
+	  } else {
+		  robot.getSettings().setHardwareVersion(originalHardwareVersion);
+	  }
   }
 
   // hardware model choice
@@ -164,28 +159,6 @@ implements ActionListener {
 	  }	  
   }
   
-  // save and cancel buttons
-  private void buildSaveAndCancel() {
-	  cancel = new JButton(Translator.get("Cancel"));
-	  save = new JButton(Translator.get("Save"));
-
-	  saveAndCancelPanel = new JPanel(new GridBagLayout());
-	  GridBagConstraints c = new GridBagConstraints();
-	  c.anchor=GridBagConstraints.EAST;
-	  c.gridx=0;
-	  c.gridy=0;
-	  c.weightx=0;
-	  c.weighty=1;
-	  c.gridx=1; c.gridwidth=1; saveAndCancelPanel.add(save,c);
-	  c.gridx=2; c.gridwidth=1; saveAndCancelPanel.add(cancel,c);
-	  c.weightx=1;
-	  c.gridx=0; c.gridwidth=1; saveAndCancelPanel.add(Box.createGlue(),c);
-	  cancel.addActionListener(this);
-	  save.addActionListener(this);
-
-	  saveAndCancelPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-  }
-  
   
   private void rebuildTabbedPanes() {
 	  panes.removeAll();
@@ -213,18 +186,6 @@ implements ActionListener {
 		  int newChoice=availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
 		  robot.getSettings().setHardwareVersion(newChoice);
 		  rebuildTabbedPanes();
-	  }
-	  if(src == save) {
-		  panelAdjustMachine.save();
-		  panelAdjustPaper.save();
-		  panelAdjustPen.save();
-		  robot.getSettings().saveConfig();
-		  robot.sendConfig();
-		  this.dispose();
-	  }
-	  if(src == cancel) {
-		  robot.getSettings().setHardwareVersion(originalHardwareVersion);
-		  this.dispose();
 	  }
   }
 }
