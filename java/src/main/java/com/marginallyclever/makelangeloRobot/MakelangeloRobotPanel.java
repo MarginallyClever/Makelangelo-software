@@ -321,6 +321,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
 			c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
 			c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
+			//TODO: hide the setHome button on Makelangelo 5?
 			c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
 			c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
 			c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);

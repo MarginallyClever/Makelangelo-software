@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.communications.tcp.TCPTransportLayer;
 //import com.marginallyclever.communications.tcp.TCPTransportLayer;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,11 +20,12 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class ConnectionManager {
 	private SerialTransportLayer serial;
-	//private TCPTransportLayer tcp;
+	@SuppressWarnings("unused")
+	private TCPTransportLayer tcp;
 	
 	public ConnectionManager() {
 		serial = new SerialTransportLayer();
-		//tcp = new TCPTransportLayer();
+		tcp = new TCPTransportLayer();
 	}
 
 	/**
@@ -46,11 +48,10 @@ public class ConnectionManager {
 			Component c = tabs.getSelectedComponent();
 			if(c instanceof TransportLayerPanel) {
 				return ((TransportLayerPanel)c).openConnection();
-			} else {
-				Log.error("requestNewConnection impossible panel?!");
 			}
 		}
-		
+
+		Log.error("requestNewConnection impossible panel?!");
 		return null;
 	}
 }
