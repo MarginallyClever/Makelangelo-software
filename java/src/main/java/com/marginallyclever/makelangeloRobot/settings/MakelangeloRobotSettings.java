@@ -695,7 +695,7 @@ public final class MakelangeloRobotSettings {
 			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
 		}
 		
-		saveConfigToLocal();
+		//saveConfigToLocal();
 	}
 	
 	public Color getPaperColor() {
