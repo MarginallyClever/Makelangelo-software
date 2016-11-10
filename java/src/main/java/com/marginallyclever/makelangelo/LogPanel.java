@@ -174,6 +174,9 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 			if(docLen==caretPosition) {
 				log.setCaretPosition(doc.getLength());
 			}
+			if(!logMessages.isEmpty()) {
+				this.repaint();
+			}
 		} catch (Exception e) {
 			// FIXME failure here logs new error, causes infinite loop?
 			Log.error("Logging error: "+e.getMessage());
