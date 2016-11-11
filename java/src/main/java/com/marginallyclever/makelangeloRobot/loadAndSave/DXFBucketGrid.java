@@ -79,6 +79,10 @@ public class DXFBucketGrid {
 		System.out.println(total+" total entities in buckets (including duplicates).");
 	}
 	
+	/**
+	 * dumpes everything into one bucket, probably creating duplicates.
+	 * @param groups
+	 */
 	protected void dumpEverythingIntoABucket(List<DXFGroup> groups) {
 		DXFGroup group = new DXFGroup();
 		groups.add(group);
