@@ -780,6 +780,12 @@ to check yourself.</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
+		<key>VoronoiZigZagName</key>
+		<value>Voronoi zigzag</value>
+		<hint>voronoi zigzag generator</hint>
+	</string>
+	
+	<string>
 		<key>voronoiStipplingCellCount</key>
 		<value>Number of Cells</value>
 		<hint>voronoi stippling generator</hint>
