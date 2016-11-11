@@ -11,8 +11,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -109,7 +111,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		int entityTotal = 0;
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
-			Log.message("Found layer " + layer.getName());
+			int color = layer.getColor();
+			Log.message("Found layer " + layer.getName() + "(RGB="+color+")");
 			Iterator<String> entityIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 			while (entityIter.hasNext()) {
 				String entityType = (String) entityIter.next();
@@ -261,6 +264,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
 			while (layerIter.hasNext()) {
 				DXFLayer layer = (DXFLayer) layerIter.next();
+				int color = layer.getColor();
+				System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
 				
 				// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
@@ -295,6 +300,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				} else {
 					grid.dumpEverythingIntoABucket(groups);
 				}
+				
+				removeDuplicates(groups);
 				
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
@@ -344,6 +351,20 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		tempFile.delete();
 
 		return true;
+	}
+
+	protected void removeDuplicates(List<DXFGroup> groups) {
+		Iterator<DXFGroup> g = groups.iterator();
+		while(g.hasNext()) {
+			DXFGroup group = g.next();
+			int before = group.entities.size();
+			Set<DXFBucketEntity> hs = new LinkedHashSet<>();
+			hs.addAll(group.entities);
+			group.entities.clear();
+			group.entities.addAll(hs);
+			int after = group.entities.size();
+			System.out.println((before-after)+" duplicates removed.");
+		}
 	}
 	
 	protected void parseDXFLine(Writer out,DXFLine entity,double scale,double imageCenterX,double imageCenterY,double toolDiameterSquared) throws IOException {
