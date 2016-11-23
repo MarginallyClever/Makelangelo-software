@@ -10,7 +10,6 @@ import javax.swing.JTabbedPane;
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.communications.tcp.TCPTransportLayer;
 //import com.marginallyclever.communications.tcp.TCPTransportLayer;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -50,8 +49,7 @@ public class ConnectionManager {
 				return ((TransportLayerPanel)c).openConnection();
 			}
 		}
-
-		Log.error("requestNewConnection impossible panel?!");
+		// cancelled connect
 		return null;
 	}
 }
