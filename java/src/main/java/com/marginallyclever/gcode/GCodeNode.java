@@ -10,7 +10,7 @@ public class GCodeNode {
 	public double x2;
 	public double y2;
 	public double z2;
-	public Color c;
+	public Color color;
 	public int lineNumber;
 	public GCodeNodeType type;
 
@@ -20,11 +20,11 @@ public class GCodeNode {
 	
 	public GCodeNode() {}
 	
-	public GCodeNode(int lineNumber, GCodeNodeType type, double x1, double y1, double x2, double y2, Color c) {
+	public GCodeNode(int lineNumber, GCodeNodeType type, double x1, double y1, double x2, double y2, Color color) {
 		this.lineNumber = lineNumber;
 		this.x1 = x1;
 		this.y1 = y1;
-		this.c=c;
+		this.color=color;
 		this.x2 = x2;
 		this.y2 = y2;
 		this.type = type;

@@ -191,7 +191,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	protected void openConnection() {
 		NetworkConnection s = gui.requestNewConnection();
-
 		if(s!=null) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			robot.openConnection( s );
