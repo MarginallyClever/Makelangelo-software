@@ -35,7 +35,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		return false;
 	}
 	
-	public float getWidth() { return 650; }
+	public float getWidth() { return 648; }
 	public float getHeight() { return 1000; }
 
 	@Override
