@@ -67,8 +67,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		GCodeFile sourceMaterial = robot.gCode;
 		sourceMaterial.setLinesProcessed(0);
 		
-		OutputStreamWriter out = new OutputStreamWriter(outputStream);
-		try {
+		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			int total=sourceMaterial.getLinesTotal();
 			Log.message(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
@@ -77,6 +76,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 				if(!str.endsWith("\n")) str+="\n";
 				out.write(str);
 			}
+			out.flush();
 		}
 		catch(IOException e) {
 			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());

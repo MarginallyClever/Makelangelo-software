@@ -79,6 +79,10 @@ public class DXFBucketGrid {
 		System.out.println(total+" total entities in buckets (including duplicates).");
 	}
 	
+	/**
+	 * dumpes everything into one bucket, probably creating duplicates.
+	 * @param groups
+	 */
 	protected void dumpEverythingIntoABucket(List<DXFGroup> groups) {
 		DXFGroup group = new DXFGroup();
 		groups.add(group);
@@ -96,7 +100,7 @@ public class DXFBucketGrid {
 	}
 	
 	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups) {
-		DXFBucket bucket;
+		DXFBucket sourceBucket;
 		Point p=null;
 	
 		double dx = buckets.get(buckets.size()-1).bottomRight.getX() - buckets.get(0).topLeft.getX();
@@ -104,21 +108,20 @@ public class DXFBucketGrid {
 		double BIG_EPSILON = dx*dx+dy*dy;
 		
 		// as long as there are entities in buckets
-		while((bucket=findNonEmptyBucket(p,BIG_EPSILON))!=null) {
+		while((sourceBucket=findNonEmptyBucket(p,BIG_EPSILON))!=null) {
 			do {
 				// start a new group
 				DXFGroup group = new DXFGroup();
 				groups.add(group);
 				// add the first entity found 
-				DXFBucketEntity be = bucket.findBestFitToPoint(p,BIG_EPSILON);
-				DXFBucket otherBucket = bucket;
-				DXFBucketEntity firstBe = be;
-				DXFBucket firstBucket = otherBucket;
+				DXFBucketEntity firstBe = sourceBucket.findBestFitToPoint(p,BIG_EPSILON);
+				DXFBucketEntity be = firstBe;
+				DXFBucket otherBucket = sourceBucket;
+				DXFBucket thisBucket = sourceBucket;
 	
 				// Loop forward
 				while(be!=null) {
-					bucket = otherBucket;
-					bucket.remove(be);
+					thisBucket.remove(be);
 					group.addLast(be);
 					// find the bucket at the far end of this entity
 					otherBucket = be.getRemainingBucket();
@@ -128,20 +131,21 @@ public class DXFBucketGrid {
 					otherBucket.remove(be);
 					// find the best fit for an entity that shares this point
 					be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
+					thisBucket = otherBucket;
 					// until there are no more entities in this contiguous group
 				}
 				
 				// Maybe the first line we picked is in the middle of a contiguous group.  
 				// Find the start by looping backward.
-				otherBucket = firstBucket;
-				be = firstBe;
-				if(be!=null) {
-					p = be.getPointInBucket(otherBucket);
-					be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
+				if(firstBe!=null) {
+					p = firstBe.getPointInBucket(sourceBucket);
+					be = sourceBucket.findBestFitToPoint(p,DXF_EPSILON);
+					thisBucket = sourceBucket;
 					while(be!=null) {
-						bucket = otherBucket;
-						bucket.remove(be);
-						group.addFirst(be);
+						thisBucket.remove(be);
+						if(be!=firstBe) {
+							group.addFirst(be);
+						}
 						// find the bucket at the far end of this entity
 						otherBucket = be.getRemainingBucket();
 						// find the physical end of this entity in the bucket
@@ -151,10 +155,11 @@ public class DXFBucketGrid {
 						// find the best fit for an entity that shares this point
 						be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
 						// until there are no more entities in this contiguous group
+						thisBucket = otherBucket;
 					}
 				}			
 				//System.out.println();
-			} while(!bucket.contents.isEmpty());
+			} while(!sourceBucket.contents.isEmpty());
 		}
 
 		System.out.println(groups.size()+ " groups after sort.");

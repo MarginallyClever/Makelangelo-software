@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -35,7 +37,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
-	
+	private ConcurrentLinkedQueue<String> logMessages;
 	
 	public LogPanel(Translator translator,MakelangeloRobot robot) {
 		this.translator = translator;
@@ -44,6 +46,8 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		// log panel
 		Log.addListener(this);
 
+		logMessages = new ConcurrentLinkedQueue<String>();
+		
 		// the log panel
 		log = new JTextPane();
 		log.setEditable(false);
@@ -139,31 +143,46 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		// remove the 
 		//if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
 		msg = msg.trim();
+		if(msg.length()==0) return;
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");
-		if(msg.length()==0) return;
 		
+		logMessages.add(msg);
+		this.repaint();
+	}
+	
+	public void paintComponent(Graphics g2) {
 		try {
 			long docLen = doc.getLength();
 			long caretPosition = log.getCaretPosition();
 			
-			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+			String msg;
+			int i=0;
+			while( (msg = logMessages.poll()) != null && i < 100) {
+				kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+				++i;
+			}
 			
-			int over_length = 0;
+			int overLength = 0;
 			if(docLen>2000) {
 				String startingText = doc.getText(0, 200);
-				over_length = startingText.indexOf("\n");
+				overLength = startingText.indexOf("\n");
 			}
 			// don't let the log grow forever
-			doc.remove(0, over_length);
+			doc.remove(0, overLength);
 			
 			if(docLen==caretPosition) {
 				log.setCaretPosition(doc.getLength());
 			}
-		} catch (BadLocationException | IOException e) {
+			if(!logMessages.isEmpty()) {
+				this.repaint();
+			}
+		} catch (Exception e) {
 			// FIXME failure here logs new error, causes infinite loop?
 			Log.error("Logging error: "+e.getMessage());
 		}
+		
+		super.paintComponent(g2);
 	}
 
 	public void clearLog() {

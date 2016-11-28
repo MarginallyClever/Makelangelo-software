@@ -370,9 +370,9 @@ public class GCodeFile {
 				GCodeNode n = nodes.next();
 
 				gl2.glColor3f(
-						n.c.getRed() / 255.0f, 
-						n.c.getGreen() / 255.0f,
-						n.c.getBlue() / 255.0f);
+						n.color.getRed() / 255.0f, 
+						n.color.getGreen() / 255.0f,
+						n.color.getBlue() / 255.0f);
 				
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {

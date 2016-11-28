@@ -466,7 +466,7 @@
 	</string>
 	<string>
 		<key>Speed</key>
-		<value>Speed:</value>
+		<value>Draw speed</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
@@ -780,6 +780,12 @@ to check yourself.</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
+		<key>VoronoiZigZagName</key>
+		<value>Voronoi zigzag</value>
+		<hint>voronoi zigzag generator</hint>
+	</string>
+	
+	<string>
 		<key>voronoiStipplingCellCount</key>
 		<value>Number of Cells</value>
 		<hint>voronoi stippling generator</hint>
@@ -874,7 +880,7 @@ to check yourself.</value>
 
 	<string>
 		<key>SharePromo</key>
-		<value>Use Twitter tag #makelangelo to share your art and see what others have made.</value>
+		<value>Use Twitter &amp; Instagram tag #makelangelo</value>
 		<hint>Your drawing is finished. Share it</hint>
 	</string>
 

@@ -15,7 +15,6 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
@@ -112,7 +111,7 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	public MakelangeloRobotSettings(MakelangeloRobot robot) {
+	public MakelangeloRobotSettings() {
 		// set up number format
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 		otherSymbols.setDecimalSeparator('.');
@@ -696,7 +695,7 @@ public final class MakelangeloRobotSettings {
 			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
 		}
 		
-		saveConfigToLocal();
+		//saveConfigToLocal();
 	}
 	
 	public Color getPaperColor() {
@@ -760,13 +759,19 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n"+
-				"G01 F" + df.format(getCurrentFeedRate()) + ";\n";
+		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n";
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + ";\n"+
-				"G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + ";\n";
+	}
+	
+	public String getMaxFeedrateString() {
+		return "G00 F" + df.format(getMaxFeedRate()) + ";\n";
+	}
+	
+	public String getCurrentFeedrateString() {
+		return "G00 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
 	public void writeChangeTo(Writer out) throws IOException {
@@ -791,12 +796,12 @@ public final class MakelangeloRobotSettings {
 	// lift the pen
 	public void writeOff(Writer out) throws IOException {
 		out.write(getPenUpString());
+		out.write("G00 F" + df.format(getMaxFeedRate()) + ";\n");
 	}
 
 	// lower the pen
 	public void writeOn(Writer out) throws IOException {
-		out.write("G00 F" + df.format(zRate) + ";\n");
 		out.write(getPenDownString());
-		out.write("G00 F" + df.format(getCurrentFeedRate()) + ";\n");
+		out.write("G01 F" + df.format(getCurrentFeedRate()) + ";\n");
 	}
 }

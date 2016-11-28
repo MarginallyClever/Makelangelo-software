@@ -15,7 +15,7 @@ public class FloatFieldTest {
 		System.out.println("US text="+field.getText());
 		System.out.println("US value="+field.getValue());
 		float f = ((Number)field.getValue()).floatValue();
-		assert(f==1.0);
+		assert(f==1000.0);
 	}
 
 	@Test
@@ -27,6 +27,6 @@ public class FloatFieldTest {
 		System.out.println("FR text="+field.getText());
 		System.out.println("FR value="+field.getValue());
 		float f = ((Number)field.getValue()).floatValue();
-		assert(f==1.0);
+		assert(f==1000.0);
 	}
 }

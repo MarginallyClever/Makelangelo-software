@@ -166,7 +166,7 @@ public class Generator_Text extends ImageGenerator {
 		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			lastMessage = text.getText();
-			lastSize = Integer.parseInt(size.getText());
+			lastSize = ((Number)size.getValue()).intValue();
 			lastFont = fontChoices.getSelectedIndex();
 			createMessage(fontNames[lastFont],lastSize,lastMessage, out);
 			//createMessage("TimesRoman",مرحبا بالعالم",18");
@@ -180,7 +180,7 @@ public class Generator_Text extends ImageGenerator {
 	
 	private void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
 		String[] pieces=text.split("\n");
-		System.out.println("lines="+pieces.length);
+		System.out.println("lines of text="+pieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
@@ -233,20 +233,27 @@ public class Generator_Text extends ImageGenerator {
 		float [] coords = new float[6];
 		float [] coords2 = new float[6];
 		float [] start = new float[6];
+		float n,i;
+		n = 5;
 		
 		while(pi.isDone() == false ) {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
+				//System.out.println("CLOSE");
 				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,false);
 				machine.writeOff(output);
+				coords2[0] = coords[0];
+				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
+				//System.out.println("LINE");
 				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy,false);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_MOVETO:
+				//System.out.println("MOVE");
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
@@ -254,13 +261,27 @@ public class Generator_Text extends ImageGenerator {
 				machine.writeOn(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
-				for(int i=0;i<8;++i) {
-					float t = (float)i/10.0f;
-					// p = a0 + a1*t + a2 * tt + a3*ttt;
-					float tt=t*t;
-					float ttt=tt*t;
-					float x = coords2[0] + (coords[0]*t) + (coords[2]*tt) + (coords[4]*ttt);
-					float y = coords2[1] + (coords[1]*t) + (coords[3]*tt) + (coords[5]*ttt);
+				//P(t) = B(3,0)*CP + B(3,1)*P1 + B(3,2)*P2 + B(3,3)*P3
+				//0 <= t <= 1
+				//B(n,m) = mth coefficient of nth degree Bernstein polynomial
+	            //   = C(n,m) * t^(m) * (1 - t)^(n-m)
+				//C(n,m) = Combinations of n things, taken m at a time
+	            //   = n! / (m! * (n-m)!)
+				
+				// B(3,0) = (1 - t)^3
+				// B(3,1) = 3 * t * (1 - t)^2
+				// B(3,2) = 3 * t^2 * (1 - t)
+				// B(3,3) = t^3
+				//System.out.println("CUBIC");
+				for(i=0;i<n;++i) {
+					float t = i/n;
+					float t1 = (1.0f-t);
+					float a = t1*t1*t1;
+					float b = 3*t*t1*t1;
+					float c = 3*t*t*t1;
+					float d = t*t*t;
+					float x = coords2[0]*a + coords[0]*b + coords[2]*c + coords[4]*d;
+					float y = coords2[1]*a + coords[1]*b + coords[3]*c + coords[5]*d;
 					machine.writeMoveTo(output, x-dx,-y-dy,false);
 				}
 				machine.writeMoveTo(output, coords[4]-dx,-coords[5]-dy,false);
@@ -268,8 +289,9 @@ public class Generator_Text extends ImageGenerator {
 				coords2[1] = coords[5];
 				break;
 			case PathIterator.SEG_QUADTO:
-				for(int i=0;i<8;++i) {
-					float t = (float)i/10.0f;
+				//System.out.println("QUAD");
+				for(i=0;i<n;++i) {
+					float t = i/n;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
 					float u = (1.0f-t);
 					float tt=u*u;

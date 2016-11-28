@@ -27,7 +27,8 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	protected MakelangeloRobot robot;
 	
 	protected SelectFloat penDiameter;
-	protected SelectFloat penFeedRate;
+	protected SelectFloat maxFeedRate;
+	protected SelectFloat currentFeedRate;
 	protected SelectFloat penUp;
 	protected SelectFloat penDown;
 	protected SelectFloat penZRate;
@@ -52,7 +53,8 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	    
 	    MakelangeloRobotSettings settings = robot.getSettings();
 		penDiameter = new SelectFloat(settings.getDiameter());
-		penFeedRate = new SelectFloat(settings.getMaxFeedRate());
+		maxFeedRate = new SelectFloat(settings.getMaxFeedRate());
+		currentFeedRate = new SelectFloat(settings.getCurrentFeedRate());
 		penUp = new SelectFloat(settings.getPenUpAngle());
 		penDown = new SelectFloat(settings.getPenDownAngle());
 		penZRate = new SelectFloat(settings.getZRate());
@@ -90,7 +92,21 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		p.add(new JLabel(Translator.get("penToolMaxFeedRate")), c);
 		d.gridx = 1;
 		d.gridy = y;
-		p.add(penFeedRate, d);
+		p.add(maxFeedRate, d);
+		d.gridx = 2;
+		d.gridy = y;
+		p.add(new JLabel(Translator.get("Rate")), d);
+		++y;
+
+		c.gridx = 0;
+		c.gridy = y;
+		p.add(new JLabel(Translator.get("Speed")), c);
+		d.gridx = 1;
+		d.gridy = y;
+		p.add(currentFeedRate, d);
+		d.gridx = 2;
+		d.gridy = y;
+		p.add(new JLabel(Translator.get("Rate")), d);
 		++y;
 
 		c.gridx = 0;
@@ -148,14 +164,14 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 			// must match MakelangeloRobotSettings.getPenUpString()
 			robot.sendLineToRobot(
 				"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penUp.getValue()).floatValue() + ";\n"+
-				"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+				"G00 F" + ((Number)maxFeedRate.getValue()).floatValue() + ";\n"
 				);
 		}
 		if (subject == buttonTestDown) {
 			// must match MakelangeloRobotSettings.getPenDownString()
 			robot.sendLineToRobot(
-					"G00 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penDown.getValue()).floatValue() + ";\n"+
-					"G00 F" + ((Number)penFeedRate.getValue()).floatValue() + ";\n"
+					"G01 F" + ((Number)penZRate.getValue()).floatValue() + " Z" + ((Number)penDown.getValue()).floatValue() + ";\n"+
+					"G01 F" + ((Number)currentFeedRate.getValue()).floatValue() + ";\n"
 					);
 		}
 	}
@@ -164,7 +180,8 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	public void save() {
 	    MakelangeloRobotSettings settings = robot.getSettings();
 		settings.setDiameter(((Number)penDiameter.getValue()).floatValue());
-		settings.setMaxFeedRate(((Number)penFeedRate.getValue()).floatValue());
+		settings.setMaxFeedRate(((Number)maxFeedRate.getValue()).floatValue());
+		settings.setCurrentFeedRate(((Number)currentFeedRate.getValue()).floatValue());
 		settings.setZRate(((Number)penZRate.getValue()).floatValue());
 		settings.setPenUpAngle(((Number)penUp.getValue()).floatValue());
 		settings.setPenDownAngle(((Number)penDown.getValue()).floatValue());

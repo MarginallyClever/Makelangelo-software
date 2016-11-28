@@ -41,7 +41,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
@@ -89,10 +88,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton left100,left10,left1,right1,right10,right100;
 	private JButton goHome,findHome,setHome;
 	private JButton goPaperBorder,penUp,penDown;
-
-	// speed
-	private SelectFloat feedRateTxt;
-	private JButton setFeedRate;
 	private JButton toggleEngagedMotor;
 
 	private boolean isConnected;  // has pressed connect button
@@ -196,7 +191,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	protected void openConnection() {
 		NetworkConnection s = gui.requestNewConnection();
-
 		if(s!=null) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			robot.openConnection( s );
@@ -326,6 +320,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
 			c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
 			c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
+			//TODO: hide the setHome button on Makelangelo 5?
 			c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
 			c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
 			c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
@@ -337,23 +332,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
 			c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
 			c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
-		}
-		{
-			// feed rate
-			JPanel feedRateControl = new JPanel();
-			mainPanel.add(feedRateControl,cMain);
-			cMain.gridy++;
-			feedRateControl.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			feedRateTxt = new SelectFloat((float)robot.getSettings().getMaxFeedRate());
-			feedRateTxt.setPreferredSize(new Dimension(100,20));
-			setFeedRate = new JButton(Translator.get("Set"));
-			setFeedRate.addActionListener(this);
-
-			c.gridx=3;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Speed")),c);
-			c.gridx=4;  c.gridy=0;  feedRateControl.add(feedRateTxt,c);
-			c.gridx=5;  c.gridy=0;  feedRateControl.add(new JLabel(Translator.get("Rate")),c);
-			c.gridx=6;  c.gridy=0;  feedRateControl.add(setFeedRate,c);
 		}
 		{
 			// quick drive to corners
@@ -512,26 +490,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		else if (subject == goPaperBorder) {
 			robot.movePenToEdgeTop();
+			robot.lowerPen();
 			robot.movePenToEdgeRight();
 			robot.movePenToEdgeBottom();
 			robot.movePenToEdgeLeft();
 			robot.movePenToEdgeTop();
+			robot.movePenAbsolute(0, robot.getGondolaY());
+			robot.raisePen();
 			robot.goHome();
 		}
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();
-		else if (subject == setFeedRate) {
-			// get the feed rate
-			String fr = feedRateTxt.getText();
-			fr = fr.replaceAll("[ ,]", "");
-			// trim it to 3 decimal places
-			try {
-				float feedRate = Float.parseFloat(fr);
-				// update the input field				
-				robot.setCurrentFeedRate(feedRate);
-				feedRateTxt.setText(Double.toString(robot.getCurrentFeedRate()));
-			} catch(NumberFormatException e1) {}
-		} else if (subject == toggleEngagedMotor) {
+		else if (subject == toggleEngagedMotor) {
 			if(robot.areMotorsEngaged() ) {
 				disengageMotors();
 			} else {
@@ -669,8 +639,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
-		setFeedRate.setEnabled(isConfirmed && !isRunning);
-		
 		buttonSaveFile.setEnabled(robot!=null && robot.gCode != null && robot.gCode.isLoaded());
 		
 		this.validate();
