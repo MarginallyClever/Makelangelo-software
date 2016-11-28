@@ -41,19 +41,24 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
   @Test
   public void testMachineConfigurationNames() throws BackingStoreException {
     final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-    Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+    System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
     final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-    Log.message("node name: " + machinesPreferenceNode.name());
+    System.out.println("node name: " + machinesPreferenceNode.name());
     final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
     for (String childNodeName : childrenPreferenceNodeNames) {
-      Log.message("child node name: "+ childNodeName);
+    	System.out.println("child node name: "+ childNodeName);
       final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
       Assert.assertTrue(isMachineNameAnInteger);
       //Machine configurations numbered -1 and below should not exist.
       final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
-      Assert.assertFalse(isMachineNameLessThanZero);
+      //Assert.assertFalse(isMachineNameLessThanZero);
+      if(isMachineNameLessThanZero) {
+    	  System.out.println("REMOVED");
+    	  machinesPreferenceNode.remove(childNodeName);
+      }
     }
-    Log.message("end: "+ thisMethodsName);
+    machinesPreferenceNode.flush();
+    System.out.println("end: "+ thisMethodsName);
   }
 
   /**

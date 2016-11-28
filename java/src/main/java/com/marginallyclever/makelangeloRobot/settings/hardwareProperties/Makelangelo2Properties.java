@@ -34,7 +34,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 
 	@Override
 	public boolean canChangePulleySize() {
-		return false;
+		return true;
 	}
 
 	@Override

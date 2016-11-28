@@ -9,8 +9,16 @@ import java.util.LinkedList;
  */
 public class DXFGroup {
 	public LinkedList<DXFBucketEntity> entities;
+	public enum ClosedState {
+		UNKNOWN,
+		CLOSED,
+		OPEN,
+	};
+	public ClosedState isClosed; 
+	
 	
 	public DXFGroup() {
+		isClosed = ClosedState.UNKNOWN; 
 		entities = new LinkedList<DXFBucketEntity>();
 	}
 	

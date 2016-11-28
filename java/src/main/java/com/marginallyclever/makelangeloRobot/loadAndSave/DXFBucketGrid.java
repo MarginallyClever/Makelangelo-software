@@ -157,7 +157,7 @@ public class DXFBucketGrid {
 						// until there are no more entities in this contiguous group
 						thisBucket = otherBucket;
 					}
-				}			
+				}
 				//System.out.println();
 			} while(!sourceBucket.contents.isEmpty());
 		}
