@@ -125,15 +125,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		System.out.println(entityTotal + " total entities.");
 	}
 
-
-	/**
-	 * we have Groups of entities that form contiguous lines.  Some of the lines may be flipped.
-	 * @param groups
-	 */
-	protected void sortGroupsByProximity(List<DXFGroup> groups) {
-		//System.out.println("Sorting groups by proximity...");
-	}
-
+	
 	/**
 	 * Put every entity into a bucket.
 	 * @param doc
@@ -301,16 +293,20 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				}
 				
 				removeDuplicates(groups);
+
+				// We have a list of groups. 
+				// Each group is set of lines that make a continuous path.
+				// Maybe even a closed path!
+				// Some of the lines in each group may be flipped. 
+
+				// TODO sort out the flips so the end of line N is the start of line N+1.
+				// TODO detect which groups are closed.
+				// TODO fill in the closed groups if the user says ok.
 				
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
 				//}
 
-				if(shouldOptimizePathingOnLoad) {
-					sortGroupsByProximity(groups);
-				}
-
-				// now we have a list of groups, each group is set of lines that make a continuous path.  Maybe even a closed path!
 				Iterator<DXFGroup> groupIter = groups.iterator();
 				while(groupIter.hasNext()) {
 					DXFGroup g = groupIter.next();

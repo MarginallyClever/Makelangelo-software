@@ -195,7 +195,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			// send whatever config settings I have for this machine.
 			sendConfig();
 			
-			if(myPanel!=null) myPanel.onConnect();
+			if(myPanel!=null) {
+				int hardwareVersion = this.settings.getHardwareVersion(); 
+				myPanel.onConnect();
+				this.settings.setHardwareVersion(hardwareVersion);
+			}
 			
 			// tell everyone I've confirmed connection.
 			notifyPortConfirmed();
