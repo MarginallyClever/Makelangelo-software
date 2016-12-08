@@ -178,6 +178,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 						}
 						continue;
 					}
+					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
+					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
 					// I don't know this entity type.
 					Log.error("Unknown DXF type "+e.getType());
 				}

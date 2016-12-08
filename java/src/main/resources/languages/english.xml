@@ -650,7 +650,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value>Save as...</value>
+		<value>Save GCODE to SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
