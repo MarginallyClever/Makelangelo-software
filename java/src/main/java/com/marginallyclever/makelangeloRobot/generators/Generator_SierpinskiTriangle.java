@@ -10,7 +10,12 @@ import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_KochCurve extends ImageGenerator {
+/**
+ * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
+ * @author Dan Royer 2016-12-12
+ *
+ */
+public class Generator_SierpinskiTriangle extends ImageGenerator {
 	private Turtle turtle;
 	private float xMax = 7;
 	private float xMin = -7;
@@ -23,12 +28,12 @@ public class Generator_KochCurve extends ImageGenerator {
 
 	@Override
 	public String getName() {
-		return Translator.get("KochTreeName");
+		return Translator.get("SierpinskiTriangleName");
 	}
 
 	@Override
 	public String getPreviewImage() {
-		return "/images/generators/koch-curve.JPG";
+		return "/images/generators/SierpinskiTriangle.JPG";
 	}
 
 
@@ -90,34 +95,37 @@ public class Generator_KochCurve extends ImageGenerator {
 		liftPen(out);
 		// move to starting position
 		turtle.setX(xMax);
-		turtle.setY(0);
+		if( (order&1) == 0 ) {
+			turtle.setY(xMax/2);
+		} else{
+			turtle.setY(-xMax/2);
+		}
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
 		turtle.turn(90);
-		drawTriangel(out, order, maxSize);
+		if( (order&1) == 0 ) {
+			drawCurve(out, order, maxSize,60);
+		} else {
+			turtle.turn(60);
+			drawCurve(out, order, maxSize,-60);
+		}
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 
 
-	// L System tree
-	private void drawTriangel(Writer output, int n, float distance) throws IOException {
+	private void drawCurve(Writer output, int n, float distance,float angle) throws IOException {
 		if (n == 0) {
 			turtleMove(output,distance);
 			return;
 		}
-		drawTriangel(output,n-1,distance/3.0f);
-		if(n>1) {
-			turtle.turn(-60);
-			drawTriangel(output,n-1,distance/3.0f);
-			turtle.turn(120);
-			drawTriangel(output,n-1,distance/3.0f);
-			turtle.turn(-60);
-		} else {
-			turtleMove(output,distance/3.0f);
-		}
-		drawTriangel(output,n-1,distance/3.0f);
+		
+		drawCurve(output,n-1,distance/2.0f,-angle);
+		turtle.turn(angle);
+		drawCurve(output,n-1,distance/2.0f,angle);
+		turtle.turn(angle);
+		drawCurve(output,n-1,distance/2.0f,-angle);
 	}
 
 

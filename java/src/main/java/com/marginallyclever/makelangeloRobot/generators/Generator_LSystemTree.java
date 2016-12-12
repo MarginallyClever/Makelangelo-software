@@ -16,7 +16,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 	private float xMin = -7;
 	private float yMax = 7;
 	private float yMin = -7;
-	private int order = 4; // controls complexity of curve
+	private static int order = 4; // controls complexity of curve
 
 	float maxSize;
 

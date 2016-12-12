@@ -5,4 +5,5 @@ com.marginallyclever.makelangeloRobot.generators.Generator_KochCurve
 com.marginallyclever.makelangeloRobot.generators.Generator_LimitTest
 com.marginallyclever.makelangeloRobot.generators.Generator_LSystemTree
 com.marginallyclever.makelangeloRobot.generators.Generator_Maze
+com.marginallyclever.makelangeloRobot.generators.Generator_SierpinskiTriangle
 com.marginallyclever.makelangeloRobot.generators.Generator_Text
