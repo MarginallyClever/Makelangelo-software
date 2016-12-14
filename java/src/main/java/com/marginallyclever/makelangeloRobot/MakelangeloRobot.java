@@ -68,7 +68,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private boolean isPaused;
 	private boolean penIsUp;
 	private boolean penIsUpBeforePause;
-	private boolean hasSetHome;
+	private boolean didSetHome;
 	private float gondolaX;
 	private float gondolaY;
 	
@@ -95,7 +95,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		isPaused = false;
 		penIsUp = false;
 		penIsUpBeforePause = false;
-		hasSetHome = false;
+		didSetHome = false;
 		setGondolaX(0);
 		setGondolaY(0);
 	}
@@ -115,7 +115,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		}
 		
 		portConfirmed = false;
-		hasSetHome = false;
+		didSetHome = false;
 		firmwareVersionChecked = false;
 		hardwareVersionChecked = false;		
 		this.connection = c;		
@@ -609,14 +609,14 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
-		hasSetHome=true;
+		didSetHome=true;
 		setGondolaX((float)settings.getHomeX());
 		setGondolaY((float)settings.getHomeY());
 	}
 	
 	
-	public boolean hasSetHome() {
-		return hasSetHome;
+	public boolean didSetHome() {
+		return didSetHome;
 	}
 	
 	/**

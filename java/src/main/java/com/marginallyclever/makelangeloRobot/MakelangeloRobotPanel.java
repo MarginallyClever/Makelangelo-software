@@ -300,10 +300,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			setHome = createTightJButton(Translator.get("SetHome"));
 		    setHome.setPreferredSize(new Dimension(100,20));
 
-			if(!robot.getSettings().getHardwareProperties().canAutoHome()) {
-				setHome.setEnabled(false);
-			}
-			
 			down100 = createTightJButton("-100");
 			down10 = createTightJButton("-10");
 			down1 = createTightJButton("-1");
@@ -598,7 +594,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if(robot!=null) {
 			isConfirmed = robot.isPortConfirmed();
 			isRunning = robot.isRunning();
-			hasSetHome = robot.hasSetHome();
+			hasSetHome = robot.didSetHome();
 		}
 		
 		if (buttonGenerate != null)
@@ -636,9 +632,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right100.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		setHome.setEnabled(isConfirmed && !isRunning);
+		setHome .setEnabled(isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome());
+		findHome.setEnabled(isConfirmed && !isRunning &&  robot.getSettings().getHardwareProperties().canAutoHome());
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		findHome.setEnabled(isConfirmed && !isRunning && robot.getSettings().getHardwareProperties().canAutoHome());
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
