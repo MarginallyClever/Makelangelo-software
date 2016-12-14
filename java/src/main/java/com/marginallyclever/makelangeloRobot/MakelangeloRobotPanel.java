@@ -299,7 +299,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 			setHome = createTightJButton(Translator.get("SetHome"));
 		    setHome.setPreferredSize(new Dimension(100,20));
-	
+
+			if(!robot.getSettings().getHardwareProperties().canAutoHome()) {
+				setHome.setEnabled(false);
+			}
+			
 			down100 = createTightJButton("-100");
 			down10 = createTightJButton("-10");
 			down1 = createTightJButton("-1");

@@ -775,6 +775,11 @@ to check yourself.</value>
 	</string>
 
 	<string>
+		<key>SierpinskiTriangleName</key>
+		<value>Sierpinski triangle fractal</value>
+		<hint>name of generator</hint>
+	</string>	
+	<string>
 		<key>voronoiStipplingName</key>
 		<value>Voronoi stipples</value>
 		<hint>voronoi stippling generator</hint>

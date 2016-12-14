@@ -17,13 +17,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_SierpinskiTriangle extends ImageGenerator {
 	private Turtle turtle;
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
-	private float yMin = -7;
-	private static int order = 4; // controls complexity of curve
-
+	private float xMax, xMin, yMax, yMin;
 	private float maxSize;
+	private static int order = 4; // controls complexity of curve
 
 
 	@Override
@@ -95,17 +91,13 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		liftPen(out);
 		// move to starting position
 		turtle.setX(xMax);
-		if( (order&1) == 0 ) {
-			turtle.setY(xMax/2);
-		} else{
-			turtle.setY(-xMax/2);
-		}
+		turtle.setY(-xMax/2);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
 		turtle.turn(90);
 		if( (order&1) == 0 ) {
-			drawCurve(out, order, maxSize,60);
+			drawCurve(out, order, maxSize,-60);
 		} else {
 			turtle.turn(60);
 			drawCurve(out, order, maxSize,-60);

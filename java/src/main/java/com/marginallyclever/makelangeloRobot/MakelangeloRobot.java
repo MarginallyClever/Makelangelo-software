@@ -599,9 +599,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	
 	public void findHome() {
+		this.raisePen();
 		sendLineToRobot("G28");
 		setGondolaX((float)settings.getHomeX());
-		gondolaY=(float)settings.getHomeY();
+		setGondolaY((float)settings.getHomeY());
 	}
 
 	
@@ -610,7 +611,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
 		hasSetHome=true;
 		setGondolaX((float)settings.getHomeX());
-		gondolaY=(float)settings.getHomeY();
+		setGondolaY((float)settings.getHomeY());
 	}
 	
 	
