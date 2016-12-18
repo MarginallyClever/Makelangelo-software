@@ -128,7 +128,7 @@ public class Converter_Pulse extends ImageConverter {
 							lifted=false;
 							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						}
-						n = n > 0 ? -1 : 1;
+						n = -n;
 					}
 					if(!lifted) {
 						lifted=true;
@@ -159,7 +159,7 @@ public class Converter_Pulse extends ImageConverter {
 							lifted=false;
 							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						}
-						n = n > 0 ? -1 : 1;
+						n = -n;
 					}
 					
 					if(!lifted) {
@@ -186,7 +186,7 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
 						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
-						n *= -1;
+						n = -n;
 					}
 					moveTo(out, x + halfStep, yTop, true);
 				} else {
@@ -202,7 +202,7 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
 						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
-						n *= -1;
+						n = -n;
 					}
 					moveTo(out, x + halfStep, yBottom, true);
 				}
