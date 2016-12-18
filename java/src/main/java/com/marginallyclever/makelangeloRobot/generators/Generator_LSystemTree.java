@@ -1,28 +1,26 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_LSystemTree extends ImageGenerator {
-	private float turtleStep = 10.0f;
 	private float xMax = 7;
 	private float xMin = -7;
 	private float yMax = 7;
 	private float yMin = -7;
+	private static float turtleStep = 10.0f;
 	private static int order = 4; // controls complexity of curve
+	private static float angleSpan = 120;
+	private static int numBranches = 3;
+	private static float orderScale = 0.76f;
+	
+	private MakelangeloRobotPanel robotPanel;
 
 	float maxSize;
 
-	private float angleSpan = 120;
-	private int numBranches = 3;
-	private float orderScale = 0.76f;
 	
 	private Turtle turtle;
 
@@ -31,56 +29,20 @@ public class Generator_LSystemTree extends ImageGenerator {
 	public String getName() {
 		return Translator.get("LSystemTreeName");
 	}
-
+	
 	@Override
-	public String getPreviewImage() {
-		return "/images/generators/l-system.JPG";
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_LSystemTree_Panel(this);
 	}
-
-
+	
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
 
 	@Override
 	public boolean generate(Writer out) throws IOException {
-		boolean tryAgain=false;
-		do {
-			JTextField field_order = new JTextField(Integer.toString(order));
-			JTextField field_orderScale = new JTextField(Float.toString(orderScale));
-			JTextField field_angle = new JTextField(Float.toString(angleSpan));
-			JTextField field_branches = new JTextField(Integer.toString(numBranches));
-
-			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
-			panel.add(field_order);
-			panel.add(new JLabel(Translator.get("HilbertCurveOrderScale")));
-			panel.add(field_orderScale);
-			panel.add(new JLabel(Translator.get("HilbertCurveAngle")));
-			panel.add(field_angle);
-			panel.add(new JLabel(Translator.get("HilbertCurveBranches")));
-			panel.add(field_branches);
-
-			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (result == JOptionPane.OK_OPTION) {
-				order = Integer.parseInt(field_order.getText());
-				orderScale = Float.parseFloat(field_orderScale.getText());
-				numBranches = Integer.parseInt(field_branches.getText());
-				angleSpan = Float.parseFloat(field_angle.getText());
-
-				if(order<1) order=1;
-				if(numBranches<1) numBranches=1;
-				if(angleSpan<1) angleSpan=1;
-				if(angleSpan>359) angleSpan=359;
-
-				createCurveNow(out);
-				return true;
-			}
-		}
-		while(tryAgain == true);
-
-		return false;
-	}
-
-
-	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -120,6 +82,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 		lSystemTree(out, order, maxSize/4);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		return true;
 	}
 
 
@@ -146,5 +109,33 @@ public class Generator_LSystemTree extends ImageGenerator {
 	public void turtleMove(Writer output,float distance) throws IOException {
 		turtle.move(distance);
 		moveTo(output, turtle.getX(), turtle.getY(), false);
+	}
+
+	public void setOrder(int value) {
+		order=value;	
+	}
+	public int getOrder() {
+		return order;
+	}
+
+	public void setScale(float value) {
+		orderScale = value;
+	}
+	public float getScale() {
+		return orderScale;
+	}
+
+	public void setAngle(float value) {
+		angleSpan = value;
+	}
+	public float getAngle() {
+		return angleSpan;
+	}
+
+	public void setBranches(int value) {
+		numBranches = value;
+	}
+	public int getBranches() {
+		return numBranches;
 	}
 }

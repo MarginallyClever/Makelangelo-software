@@ -1,14 +1,10 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_KochCurve extends ImageGenerator {
 	private Turtle turtle;
@@ -19,6 +15,8 @@ public class Generator_KochCurve extends ImageGenerator {
 	private static int order = 4; // controls complexity of curve
 
 	private float maxSize;
+	
+	private MakelangeloRobotPanel robotPanel;
 
 
 	@Override
@@ -26,39 +24,27 @@ public class Generator_KochCurve extends ImageGenerator {
 		return Translator.get("KochTreeName");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/generators/koch-curve.JPG";
+	static public int getOrder() {
+		return order;
 	}
-
-
+	static public void setOrder(int order) {
+		if(order<1) order=1;
+		Generator_KochCurve.order = order;
+	}
+	
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_KochCurve_Panel(this);
+	}
+	
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
 	
 	@Override
 	public boolean generate(Writer out) throws IOException {
-		boolean tryAgain=false;
-		do {
-			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
-
-			JTextField field_order = new JTextField(Integer.toString(order));
-			panel.add(field_order);
-
-			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (result == JOptionPane.OK_OPTION) {
-				order = Integer.parseInt(field_order.getText());
-				if(order<1) order=1;
-
-				createCurveNow(out);
-				return true;
-			}
-		}
-		while(tryAgain == true);
-
-		return false;
-	}
-
-
-	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -98,6 +84,8 @@ public class Generator_KochCurve extends ImageGenerator {
 		drawTriangel(out, order, maxSize);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    
+	    return true;
 	}
 
 

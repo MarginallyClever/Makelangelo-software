@@ -1,16 +1,13 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Stack;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * generates a fibonacci spiral
@@ -26,6 +23,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	private static int order = 7; // controls complexity of curve
 
 	private Stack<Integer> fibonacciSequence;
+	
+	private MakelangeloRobotPanel robotPanel;
 
 
 	@Override
@@ -34,34 +33,17 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	}
 
 	@Override
-	public String getPreviewImage() {
-		return "/images/generators/fibonacci.JPG";
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_FibonacciSpiral_Panel(this);
 	}
 
-
-	
-	@Override
-	public boolean generate(Writer out) throws IOException {
-		boolean tryAgain=false;
-		do {
-			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
-
-			JTextField field_order = new JTextField(Integer.toString(order));
-			panel.add(field_order);
-
-			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (result == JOptionPane.OK_OPTION) {
-				order = Integer.parseInt(field_order.getText());
-				if(order<3) order=3;
-
-				createCurveNow(out);
-				return true;
-			}
-		}
-		while(tryAgain == true);
-
-		return false;
+	static public int getOrder() {
+		return order;
+	}
+	static public void setOrder(int order) {
+		if(order<3) order=1;
+		Generator_FibonacciSpiral.order = order;
 	}
 
 
@@ -84,8 +66,14 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 			order--;
 		}
 	}
+
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
 	
-	private void createCurveNow(Writer out) throws IOException {
+	@Override
+	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -148,6 +136,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    
+	    return true;
 	}
 
 

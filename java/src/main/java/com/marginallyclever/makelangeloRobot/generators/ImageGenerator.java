@@ -28,6 +28,11 @@ public abstract class ImageGenerator extends ImageManipulator implements Makelan
 	public boolean generate(Writer out) throws IOException {
 		return false;
 	}
+	/**
+	 * @return true if generate succeeded.
+	 * @param dest the file where the results will be saved.
+	 */
+	public void regenerate() throws IOException {}
 	
 	/**
 	 * live preview as the system is generating.

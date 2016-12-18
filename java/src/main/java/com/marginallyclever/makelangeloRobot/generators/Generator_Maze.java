@@ -3,15 +3,12 @@
  */
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_Maze extends ImageGenerator {
 	protected class MazeCell {
@@ -29,55 +26,47 @@ public class Generator_Maze extends ImageGenerator {
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
+	
+	private MakelangeloRobotPanel robotPanel;
 
 	@Override
 	public String getName() {
 		return Translator.get("MazeName");
 	}
 
+	public int getRows() {
+		return rows;
+	}
+	public void setRows(int arg0) {
+		if(arg0<1) arg0=1;
+		rows=arg0;
+	}
+	public int getCols() {
+		return columns;
+	}
+	public void setCols(int arg0) {
+		if(arg0<1) arg0=1;
+		columns=arg0;
+	}
+	
 	@Override
-	public String getPreviewImage() {
-		return "/images/generators/maze.JPG";
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_Maze_Panel(this);
 	}
 
-
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		while (true) {
-			final JTextField field_rows = new JTextField(Integer.toString(rows));
-			final JTextField field_columns = new JTextField(Integer.toString(columns));
-
-			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(Translator.get("MazeRows")));
-			panel.add(field_rows);
-			panel.add(new JLabel(Translator.get("MazeColumns")));
-			panel.add(field_columns);
-
-			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE);
-			if (result != JOptionPane.OK_OPTION)
-				return false;
-			else {
-				rows = Integer.parseInt(field_rows.getText());
-				columns = Integer.parseInt(field_columns.getText());
-
-				if (rows < 1)
-					continue;
-				if (columns < 1)
-					continue;
-
-				createMazeNow(out);
-				return true;
-			}
-		}
+	public void regenerate() {
+		robotPanel.regenerate(this);
 	}
-
+	
 	/**
 	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
 	 * @param out
 	 * @throws IOException
 	 */
-	private void createMazeNow(Writer out) throws IOException {
+	@Override
+	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -164,6 +153,8 @@ public class Generator_Maze extends ImageGenerator {
 		drawMaze(out);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    
+	    return true;
 	}
 
 	private void drawMaze(Writer output) throws IOException {
