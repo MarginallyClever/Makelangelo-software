@@ -70,20 +70,32 @@ public class Converter_SpiralPulse extends ImageConverter {
 		int n=1;
 		float PULSE_MINIMUM = 0.1f;
 		float ringSize = halfStep*2.5f;
+		float zigDesity = 1.2f;  // increase to tighten zigzags
+
+		int i;
+		int z = 0;
 		float r2,scale_z,pulse_size,nx,ny;
 		
 		while (r > toolDiameter) {
-			++j;
 			// find circumference of current circle
+			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDesity;
 			//if (circumference > 360.0f) circumference = 360.0f;
 			
 			for (i = 0; i <= circumference; ++i) {
 				// tweak the diameter to make it look like a spiral
+				r2 = r - ringSize * (float)i / circumference;
 				
+				f = (float)Math.PI * 2.0f * (float)i / circumference;
+				fx = (float)Math.cos(f) * r2;
+				fy = (float)Math.sin(f) * r2;
 				// clip to paper boundaries
 				if( isInsidePaperMargins(fx, fy) )
 				{
 					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
+					scale_z = (255.0f - z) / 255.0f;
+					pulse_size = halfStep * scale_z;
+					nx = (halfStep+pulse_size*n) * fx / r2;
+					ny = (halfStep+pulse_size*n) * fy / r2;
 					moveTo(out, fx+nx, fy + ny, pulse_size < PULSE_MINIMUM);
 					n = -n;
 				} else {
