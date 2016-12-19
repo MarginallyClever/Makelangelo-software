@@ -4,7 +4,10 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -17,10 +20,20 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
  */
 public class Converter_SpiralPulse extends ImageConverter {
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
-
+	private MakelangeloRobotPanel robotPanel;
+	private static float zigDensity = 1.2f;  // increase to tighten zigzags
+	private static float spacing = 2.5f;
+	private static float height = 4.0f;
+	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralPulseName");
+	}
+
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_SpiralPulse_Panel(this);
 	}
 
 
@@ -42,7 +55,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		double toolDiameter = machine.getDiameter();
 
 		float maxr;
-		convertToCorners=false;
+		
 		if (convertToCorners) {
 			// go right to the corners
 			float h2 = (float)machine.getPaperHeight() * 10;
@@ -59,13 +72,12 @@ public class Converter_SpiralPulse extends ImageConverter {
 		float r = maxr-(float)toolDiameter*5.0f, f;
 		float fx, fy;
 		int numRings = 0;
-		float stepSize = machine.getDiameter() * 4;
+		float stepSize = machine.getDiameter() * height;
 		float halfStep = stepSize / 2.0f;
 		float zigZagSpacing = machine.getDiameter();
 		int n=1;
 		float PULSE_MINIMUM = 0.1f;
-		float ringSize = halfStep*2.5f;
-		float zigDesity = 1.2f;  // increase to tighten zigzags
+		float ringSize = halfStep*spacing;
 
 		int i;
 		int z = 0;
@@ -73,7 +85,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		
 		while (r > toolDiameter) {
 			// find circumference of current circle
-			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDesity;
+			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDensity;
 			//if (circumference > 360.0f) circumference = 360.0f;
 			
 			for (i = 0; i <= circumference; ++i) {
@@ -108,6 +120,30 @@ public class Converter_SpiralPulse extends ImageConverter {
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 
 		return true;
+	}
+
+	public void setIntensity(float floatValue) {
+		if(floatValue<0.1) floatValue=0.1;
+		if(floatValue<3.0) floatValue=3.0;
+		zigDensity=floatValue;
+	}
+	public float getIntensity() {
+		return zigDensity;
+	}
+
+	public void setSpacing(float floatValue) {
+		if(floatValue<0.5f) floatValue=0.5f;
+		if(floatValue>10) floatValue=10;
+		spacing=floatValue;
+	}
+	public float getSpacing() {
+		return spacing;
+	}
+
+	public void setHeight(float floatValue) {
+		if(floatValue<0.1) floatValue=1;
+		if(floatValue>10) floatValue=10;
+		height = floatValue;
 	}
 }
 

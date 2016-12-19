@@ -1,65 +1,49 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
 
 public class Converter_Sandy extends ImageConverter {
-	private static float blockScale=150.0f;
+	private static int blockScale=150;
 	private static int direction=0;
-
-
+	private MakelangeloRobotPanel robotPanel;
+	private String [] directions;
+	
+	Converter_Sandy() {
+		directions = new String[]{ 
+				Translator.get("top right"),
+				Translator.get("top left"), 
+				Translator.get("bottom left"), 
+				Translator.get("bottom right"), 
+				Translator.get("center")
+				};		
+	}
+	
+	
 	@Override
 	public String getName() {
 		return Translator.get("Sandy Noble Style");
 	}
 
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_Sandy_Panel(this);
+	}
+
 	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.
 	 */
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField field_size = new JTextField(Float.toString(blockScale));
-
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("HilbertCurveSize")));
-		panel.add(field_size);
-
-		String [] directions = { "top right", "top left", "bottom left", "bottom right", "center" };
-		final JComboBox<String> direction_choices = new JComboBox<>(directions);
-		direction_choices.setSelectedIndex(direction);
-		panel.add(direction_choices);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			blockScale = Float.parseFloat(field_size.getText());
-			direction = direction_choices.getSelectedIndex();
-			convertNow(img,out);
-			return true;
-		}
-		return false;
-	}
-
-
-	/**
-	 * Converts images into zigzags in paper space instead of image space
-	 * @param img the buffered image to convert
-	 * @throws IOException couldn't open output file
-	 */
-	private void convertNow(TransformedImage img,Writer out) throws IOException {
-		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
@@ -71,6 +55,7 @@ public class Converter_Sandy extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    return true;
 	}
 
 
@@ -102,7 +87,7 @@ public class Converter_Sandy extends ImageConverter {
 		double rMax = Math.sqrt(dx*dx+dy*dy);
 		double rMin = 0;
 
-		double rStep = (rMax-rMin)/blockScale;
+		double rStep = (rMax-rMin)/(double)blockScale;
 		double r;
 		double t_dir=1;
 		double pulseFlip=1;
@@ -164,6 +149,24 @@ public class Converter_Sandy extends ImageConverter {
 			}
 			t_dir=-t_dir;
 		}
+	}
+
+	public int getScale() {
+		return blockScale;
+	}
+	public void setScale(int value) {
+		if(value<1) value=1;
+		blockScale=value;
+	}
+	public String [] getDirections() {
+		return directions;
+	}
+	public int getDirectionIndex() {
+		return direction;
+	}
+	public void setDirection(int value) {
+		if(value<0) value=0;
+		if(value>=directions.length) value = directions.length-1;
 	}
 }
 

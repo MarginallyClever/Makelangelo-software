@@ -1,16 +1,12 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -19,39 +15,26 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Pulse extends ImageConverter {
 	private static float blockScale = 6.0f;
 	private static int direction = 0;
-
+	private MakelangeloRobotPanel robotPanel;
+	
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
 	}
 
-
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
-	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField field_size = new JTextField(Float.toString(blockScale));
-
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("HilbertCurveSize")));
-		panel.add(field_size);
-
-		String[] directions = {"horizontal", "vertical"};
-		final JComboBox<String> direction_choices = new JComboBox<>(directions);
-		panel.add(direction_choices);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			blockScale = Float.parseFloat(field_size.getText());
-			direction = direction_choices.getSelectedIndex();
-			convertNow(img,out);
-			return true;
-		}
-		return false;
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_Pulse_Panel(this);
 	}
-
+	
+	public float getScale() {
+		return blockScale;
+	}
+	public void setScale(float value) {
+		if(value<1) value=1;
+		blockScale = value;
+	}
 
 	/**
 	 * Converts images into zigzags in paper space instead of image space
@@ -59,7 +42,7 @@ public class Converter_Pulse extends ImageConverter {
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
-	private void convertNow(TransformedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);
 
@@ -71,6 +54,8 @@ public class Converter_Pulse extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    
+	    return true;
 	}
 
 

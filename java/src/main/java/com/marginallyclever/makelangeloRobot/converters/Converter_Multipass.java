@@ -38,7 +38,7 @@ public class Converter_Multipass extends ImageConverter {
 		return passes;
 	}
 	public void setPasses(int value) {
-		if(passes<=2) passes=2;
+		if(passes<1) passes=1;
 		passes=value;
 	}
 	
