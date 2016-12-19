@@ -650,7 +650,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>MenuSaveGCODEAs</key>
-		<value>Save GCODE to SD</value>
+		<value>Save to file/SD card</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -835,6 +835,21 @@ to check yourself.</value>
 		<key>HilbertCurveOrder</key>
 		<value>Order</value>
 		<hint>Hilbert Curve generator</hint>
+	</string>
+	<string>
+		<key>LSystemBranches</key>
+		<value>Branches</value>
+		<hint>LSystem generator</hint>
+	</string>
+	<string>
+		<key>LSystemOrderScale</key>
+		<value>Scale</value>
+		<hint>LSystem generator</hint>
+	</string>
+	<string>
+		<key>LSystemAngle</key>
+		<value>Angle span</value>
+		<hint>LSystem generator</hint>
 	</string>
 	<string>
 		<key>MazeName</key>
@@ -1110,5 +1125,21 @@ to check yourself.</value>
 		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value>
 		<hint>Software is too new for firmware</hint>
 	</string>
-		
+
+	<string>
+		<key>TextSize</key>
+		<value>Size</value>
+		<hint>Generator_Text_Panel</hint>
+	</string>
+	<string>
+		<key>TextFont</key>
+		<value>Font</value>
+		<hint>Generator_Text_Panel</hint>
+	</string>
+	<string>
+		<key>TextMessage</key>
+		<value>Message</value>
+		<hint>Generator_Text_Panel</hint>
+	</string>
+	
 </language>

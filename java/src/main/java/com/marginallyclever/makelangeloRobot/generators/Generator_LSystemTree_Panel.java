@@ -34,11 +34,11 @@ public class Generator_LSystemTree_Panel extends JPanel implements DocumentListe
 		setLayout(new GridLayout(0, 1));
 		add(new JLabel(Translator.get("HilbertCurveOrder")));
 		add(field_order);
-		add(new JLabel(Translator.get("HilbertCurveBranches")));
+		add(new JLabel(Translator.get("LSystemBranches")));
 		add(field_branches);
-		add(new JLabel(Translator.get("HilbertCurveOrderScale")));
+		add(new JLabel(Translator.get("LSystemOrderScale")));
 		add(field_orderScale);
-		add(new JLabel(Translator.get("HilbertCurveAngle")));
+		add(new JLabel(Translator.get("LSystemAngle")));
 		add(field_angle);
 		
 		field_order.getDocument().addDocumentListener(this);

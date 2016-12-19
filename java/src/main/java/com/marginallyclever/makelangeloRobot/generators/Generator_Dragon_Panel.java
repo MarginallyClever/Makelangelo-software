@@ -32,20 +32,20 @@ public class Generator_Dragon_Panel extends JPanel implements DocumentListener {
 
 	@Override
 	public void changedUpdate(DocumentEvent arg0) {
-		validate();
+		validateInput();
 	}
 
 	@Override
 	public void insertUpdate(DocumentEvent arg0) {
-		validate();
+		validateInput();
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent arg0) {
-		validate();
+		validateInput();
 	}
 	
-	public void validate() {
+	public void validateInput() {
 		int newOrder = ((Number)field_order.getValue()).intValue();
 		if(newOrder<1) newOrder=1;
 		
