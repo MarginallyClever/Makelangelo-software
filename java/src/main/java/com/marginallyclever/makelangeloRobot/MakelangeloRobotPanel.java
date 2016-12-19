@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -455,7 +456,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			m.run();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) loadFileDialog();
+		else if (subject == buttonOpenFile) convertImage();
 		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
@@ -641,24 +642,20 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		this.validate();
 	}
+	
 
 	public void newFile() {
 		robot.setGCode(null);
 		updateButtonAccess();
 	}
 
-	/**
-	 * Creates a file open dialog. If you don't cancel it opens that file.
-	 * Note: source for ExampleFileFilter can be found in FileChooserDemo, under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-	 */
-	public void loadFileDialog() {
-		// Is you machine not yet calibrated?
-		if (robot.getSettings().isPaperConfigured() == false) {
-			// Hey!  Come back after you calibrate! 
-			JOptionPane.showMessageDialog(null, Translator.get("SetPaperSize"));
-			return;
-		}
+	
+	private void reopenFile() {
+		openFileOnDemand(lastFileIn);
+	}
+	
 
+	public void convertImage() {
 		// list available loaders
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
@@ -689,12 +686,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 	
-	private void reopenFile() {
-		openFileOnDemand(lastFileIn);
-	}
-
 	public void generateImage() {
-		final JPanel panel = new JPanel(new GridBagLayout());
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
 		Iterator<ImageGenerator> ici = imageGenerators.iterator();
@@ -718,6 +712,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		GridBagConstraints c = new GridBagConstraints();
 		final JPanel previewPane = new JPanel();
+		previewPane.setPreferredSize(new Dimension(450,300));
 		
 		options.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -725,35 +720,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		    }
 		});
 
-		int y = 0;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = y;
-		panel.add(new JLabel(Translator.get("ConversionStyle")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = y++;
 		panel.add(options, c);
-		c.anchor=GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth=4;
-		c.gridx=0;
-		c.gridy=y++;
-		c.insets = new Insets(10, 0, 0, 0);
-		//previewPane.setPreferredSize(new Dimension(449,325));
-		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
 		panel.add(previewPane,c);
-
+		
 		changeGeneratorPanel(previewPane,options);
 		
-		JDialog dialog = new JDialog(gui.getMainFrame(),"Generator options");
+		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("MenuGenerate"));
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-		// TODO save generator's options?
-		robot.getSettings().saveConfig();
+		// other app buttons are inaccessible until this dialog closes.
 	}
 
 	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
@@ -762,11 +738,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		previewPane.removeAll();
 		if(p!=null) {
 			previewPane.add(p);
-			previewPane.revalidate();
+			previewPane.invalidate();
 			try {
 				chosenGenerator.regenerate();
 			} catch(Exception e){}
 		}
+		previewPane.getParent().validate();
+		previewPane.getParent().repaint();
 	}
 	
 	public void regenerate(ImageGenerator chosenGenerator) {

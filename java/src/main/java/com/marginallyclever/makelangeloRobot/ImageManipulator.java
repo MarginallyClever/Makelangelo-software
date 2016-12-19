@@ -45,13 +45,6 @@ public abstract class ImageManipulator {
 	public JPanel getPanel(MakelangeloRobotPanel arg0) {
 		return null;
 	}
-	
-	/**
-	 * @return the filename of the preview image, or null if no filename known.
-	 */
-	public String getPreviewImage() {
-		return null;
-	}
 
 
 	/**

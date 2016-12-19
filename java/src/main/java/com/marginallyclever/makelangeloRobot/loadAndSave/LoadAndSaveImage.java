@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +25,6 @@ import java.util.Set;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -116,21 +114,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		options.setSelectedIndex(getPreferredDrawStyle());
 		
 		options.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-		    {
-				previewPane.setIcon(null);
-				previewPane.setText("No preview available.");
-				ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
-				String imageFilename = chosenConverter.getPreviewImage();
-				if(imageFilename!=null) {
-					//System.out.println("Found '"+imageFilename+"'.");
-					URL iconURL = chosenConverter.getClass().getResource(imageFilename);
-			        if (iconURL != null) {
-				        ImageIcon icon = new ImageIcon(iconURL);
-				        previewPane.setIcon(icon);
-						previewPane.setText(null);
-			        }
-				}
+			public void actionPerformed(ActionEvent e) {
+				changeConverter(previewPane,options,robot);
 		    }
 		});
 
@@ -157,19 +142,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
 		panel.add(previewPane,c);
 		
-		previewPane.setIcon(null);
-		previewPane.setText("No preview available.");
-		ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
-		String imageFilename = chosenConverter.getPreviewImage();
-		if(imageFilename!=null) {
-			//System.out.println("Found '"+imageFilename+"'.");
-			URL iconURL = chosenConverter.getClass().getResource(imageFilename);
-	        if (iconURL != null) {
-		        ImageIcon icon = new ImageIcon(iconURL);
-		        previewPane.setIcon(icon);
-				previewPane.setText(null);
-	        }
-		}
+		changeConverter(previewPane,options,robot);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -182,7 +155,18 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 		return false;
 	}
-
+	
+	private void changeConverter(JLabel previewPane,JComboBox<String> options,MakelangeloRobot robot) {
+		ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
+		JPanel p = chosenConverter.getPanel(robot.getControlPanel());
+		previewPane.removeAll();
+		if(p!=null) {
+			previewPane.add(p);
+			previewPane.invalidate();
+			previewPane.repaint();
+		}
+	}
+	
 	private ImageConverter getConverter(int arg0) throws IndexOutOfBoundsException {
 		ServiceLoader<ImageConverter> imageConverters = ServiceLoader.load(ImageConverter.class);
 		Iterator<ImageConverter> ici = imageConverters.iterator();

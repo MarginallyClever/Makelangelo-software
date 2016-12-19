@@ -63,11 +63,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public String getPreviewImage() {
-		return "/images/converters/voronoi-stipples.JPG";
-	}
-
-	@Override
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
 		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);

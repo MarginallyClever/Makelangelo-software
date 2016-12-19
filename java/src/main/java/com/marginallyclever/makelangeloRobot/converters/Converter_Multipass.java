@@ -1,15 +1,12 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -18,6 +15,7 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Multipass extends ImageConverter {
 	static private float angle=0;
 	static private int passes=4;
+	MakelangeloRobotPanel robotPanel;
 	
 	@Override
 	public String getName() {
@@ -25,10 +23,25 @@ public class Converter_Multipass extends ImageConverter {
 	}
 
 	@Override
-	public String getPreviewImage() {
-		return "/images/converters/multipass.JPG";
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_Multipass_Panel(this);
 	}
-
+	
+	public float getAngle() {
+		return angle;
+	}
+	public void setAngle(float value) {
+		angle = value;
+	}
+	public int getPasses() {
+		return passes;
+	}
+	public void setPasses(int value) {
+		if(passes<=2) passes=2;
+		passes=value;
+	}
+	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *
@@ -36,27 +49,6 @@ public class Converter_Multipass extends ImageConverter {
 	 */
 	@Override
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField angleField = new JTextField(Float.toString(angle));
-		final JTextField passesField = new JTextField(Integer.toString(passes));
-
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("ConverterMultipassAngle")));
-		panel.add(angleField);
-		panel.add(new JLabel(Translator.get("ConverterMultipassLevels")));
-		panel.add(passesField);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			angle = Float.parseFloat(angleField.getText());
-			passes = Integer.parseInt(passesField.getText());
-			if(passes<=2) passes=2;
-			
-			return convertNow(img,out);
-		}
-		return false;
-	}
-	
-	protected boolean convertNow(TransformedImage img,Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		img = bw.filter(img);

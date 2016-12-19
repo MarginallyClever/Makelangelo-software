@@ -23,11 +23,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 		return Translator.get("SpiralPulseName");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/converters/spiralPulse.JPG";
-	}
-
 
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas

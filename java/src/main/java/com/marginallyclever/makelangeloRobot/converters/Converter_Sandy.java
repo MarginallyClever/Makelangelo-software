@@ -26,11 +26,6 @@ public class Converter_Sandy extends ImageConverter {
 		return Translator.get("Sandy Noble Style");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/converters/sandy.JPG";
-	}
-
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 * @param img the image to convert.

@@ -15,11 +15,6 @@ public class Converter_Scanline extends ImageConverter {
 		return Translator.get("ScanlineName");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/converters/scanline.JPG";
-	}
-
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *
