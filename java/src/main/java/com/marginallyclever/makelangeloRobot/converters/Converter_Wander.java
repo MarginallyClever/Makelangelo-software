@@ -15,6 +15,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
 
+// create random lines across the image.  Raise and lower the pen to darken the appropriate areas
 public class Converter_Wander extends ImageConverter {
 	static protected int numLines = 2500;
 	
@@ -24,8 +25,6 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
 	 * @param img the image to convert.
 	 */
 	@Override
@@ -57,7 +56,6 @@ public class Converter_Wander extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		// figure out how many lines we're going to have on this image.
 		float steps = machine.getDiameter()*5;
 		if (steps < 1) steps = 1;
 
