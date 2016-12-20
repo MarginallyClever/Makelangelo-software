@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,16 +9,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -56,6 +52,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	private float yBottom, yTop, xLeft, xRight;
 	
+	private MakelangeloRobotPanel robotPanel;
 
 	@Override
 	public String getName() {
@@ -63,50 +60,29 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_VoronoiStippling_Panel(this);
+	}
+
+	@Override
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
-		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
-		JTextField text_dot_max = new JTextField(Float.toString(MAX_DOT_SIZE), 8);
-		JTextField text_dot_min = new JTextField(Float.toString(MIN_DOT_SIZE), 8);
+		// make black & white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		sourceImage = bw.filter(img);
+		
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
+		cellBorder = new ArrayList<>();
 
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
-		panel.add(text_cells);
-		panel.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
-		panel.add(text_gens);
-		panel.add(new JLabel(Translator.get("voronoiStipplingDotMax")));
-		panel.add(text_dot_max);
-		panel.add(new JLabel(Translator.get("voronoiStipplingDotMin")));
-		panel.add(text_dot_min);
+		initializeCells(0.001);
+		evolveCells();
+		writeOutCells(out);
 
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-			MAX_CELLS = Integer.parseInt(text_cells.getText());
-			MAX_DOT_SIZE = Float.parseFloat(text_dot_max.getText());
-			MIN_DOT_SIZE = Float.parseFloat(text_dot_min.getText());
-
-			// make black & white
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-			img = bw.filter(img);
-
-			sourceImage = img;
-			
-			yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-			yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-			xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-			xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-			
-			cellBorder = new ArrayList<>();
-
-			initializeCells(0.001);
-			evolveCells();
-			writeOutCells(out);
-
-			return true;
-		}
-		return false;
+		return true;
 	}
 
 
@@ -416,6 +392,35 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			// use the new center
 			cells[i].centroid.setLocation(wx, wy);
 		}
+	}
+
+	public void setGenerations(int value) {
+		if(value<1) value=1;
+		MAX_GENERATIONS = value;
+	}
+	public int getGenerations() {
+		return MAX_GENERATIONS;
+	}
+	public void setNumCells(int value) {
+		if(value<1) value=1;
+		MAX_CELLS = value;
+	}
+	public int getNumCells() {
+		return MAX_CELLS;
+	}
+	public void setMinDotSize(float value) {
+		if(value<0.01) value=0.01f;
+		MIN_DOT_SIZE = value;
+	}
+	public float getMaxDotSize() {
+		return MAX_DOT_SIZE;
+	}
+	public void setMaxDotSize(float value) {
+		if(value<0.01) value=0.01f;
+		MAX_DOT_SIZE = value;
+	}
+	public float getMinDotSize() {
+		return MIN_DOT_SIZE;
 	}
 }
 

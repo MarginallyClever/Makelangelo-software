@@ -28,7 +28,7 @@ public class Converter_SpiralPulse_Panel extends JPanel implements DocumentListe
 
 		this.setLayout(new GridLayout(0,1));
 		this.add(new JLabel(Translator.get("SpiralPulseIntensity")));
-		this.add(intensityField = new SelectFloat(converter.getScale()));
+		this.add(intensityField = new SelectFloat(converter.getIntensity()));
 		this.add(new JLabel(Translator.get("SpiralPulseSpacing")));
 		this.add(spacingField = new SelectFloat(converter.getSpacing()));
 		this.add(new JLabel(Translator.get("SpiralPulseHeight")));

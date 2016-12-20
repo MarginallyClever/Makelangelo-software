@@ -123,8 +123,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 	}
 
 	public void setIntensity(float floatValue) {
-		if(floatValue<0.1) floatValue=0.1;
-		if(floatValue<3.0) floatValue=3.0;
+		if(floatValue<0.1) floatValue=0.1f;
+		if(floatValue<3.0) floatValue=3.0f;
 		zigDensity=floatValue;
 	}
 	public float getIntensity() {
@@ -144,6 +144,9 @@ public class Converter_SpiralPulse extends ImageConverter {
 		if(floatValue<0.1) floatValue=1;
 		if(floatValue>10) floatValue=10;
 		height = floatValue;
+	}
+	public float getHeight() {
+		return height;
 	}
 }
 
