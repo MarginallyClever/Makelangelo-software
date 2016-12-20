@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,16 +9,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -61,7 +57,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private long time_limit = 10 * 60 * 1000; // 10 minutes
 
 	private float yBottom, yTop, xLeft, xRight;
-	
+
+	private MakelangeloRobotPanel robotPanel;
 	
 	@Override
 	public String getName() {
@@ -69,46 +66,39 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Converter_VoronoiZigZag_Panel(this);
+	}
+	
+	@Override
+	public void reconvert() {
+		robotPanel.reconvert(sourceImage,this);
+	}
+
+
+	@Override
 	public boolean convert(TransformedImage img, Writer out) throws IOException {
-		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
-		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
-
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
-		panel.add(text_cells);
-		panel.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
-		panel.add(text_gens);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-			MAX_CELLS = Integer.parseInt(text_cells.getText());
-
-			// make black & white
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-			img = bw.filter(img);
-
-			sourceImage = img;
-
-			yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-			yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-			xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-			xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-			
-			cellBorder = new ArrayList<>();
-
-			initializeCells(0.001);
-
-			renderMode = 0;
-			evolveCells();
-			greedyTour();
-			renderMode = 1;
-			optimizeTour();
-			writeOutCells(out);
-			return true;
-		}
-		return false;
+		// make black & white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		sourceImage = bw.filter(img);
+	
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		
+		cellBorder = new ArrayList<>();
+	
+		initializeCells(0.001);
+	
+		renderMode = 0;
+		evolveCells();
+		greedyTour();
+		renderMode = 1;
+		optimizeTour();
+		writeOutCells(out);
+		return true;
 	}
 
 	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
@@ -621,6 +611,21 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			// use the new center
 			cells[i].centroid.setLocation(wx, wy);
 		}
+	}
+	
+	public void setGenerations(int value) {
+		if(value<1) value=1;
+		MAX_GENERATIONS = value;
+	}
+	public int getGenerations() {
+		return MAX_GENERATIONS;
+	}
+	public void setNumCells(int value) {
+		if(value<1) value=1;
+		MAX_CELLS = value;
+	}
+	public int getNumCells() {
+		return MAX_CELLS;
 	}
 }
 
