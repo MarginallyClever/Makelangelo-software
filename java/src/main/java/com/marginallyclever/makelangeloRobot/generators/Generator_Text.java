@@ -165,13 +165,13 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	
-	private void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
-		if(text.length()<=0) {
+	private void writeBeautifulMessage(String fontName,int fontSize, String message, Writer output) throws IOException {
+		if(message.length()<=0) {
 			return;
 		}
 		
-		String[] pieces=text.split("\n");
-		System.out.println("lines of text="+pieces.length);
+		String[] messagePieces=message.split("\n");
+		System.out.println("lines of text="+messagePieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
@@ -180,8 +180,10 @@ public class Generator_Text extends ImageGenerator {
 		float yFirstStep = 0;
 		float xMax=0;
 		int p;
-		for(p=0;p<pieces.length;++p) {
-			TextLayout textLayout = new TextLayout(pieces[p],font,frc);
+		for(p=0;p<messagePieces.length;++p) {
+			String piece = messagePieces[p];
+			if(piece==null || piece.length()==0) piece="\n";
+			TextLayout textLayout = new TextLayout(piece,font,frc);
 			Shape s = textLayout.getOutline(null);
 			Rectangle bounds = s.getBounds();
 			yTotal += bounds.getHeight();
@@ -205,14 +207,16 @@ public class Generator_Text extends ImageGenerator {
 		float dx = xMax / 2.0f;
 		float dy = -yTotal/2.0f+yFirstStep/2.0f;
 
-		for(p=0;p<pieces.length;++p) {
-			TextLayout textLayout = new TextLayout(text,font,frc);
-			Shape s = textLayout.getOutline(null);
-			Rectangle bounds = s.getBounds();
+		for(p=0;p<messagePieces.length;++p) {
+			String piece = messagePieces[p];
+			if(piece==null || piece.length()==0) piece="\n";
+			//TextLayout textLayout = new TextLayout(piece,font,frc);
+			//Shape s = textLayout.getOutline(null);
+			//Rectangle bounds = s.getBounds();
 
-			writeBeautifulString(font,frc,pieces[p],output, dx, dy);
+			writeBeautifulString(font,frc,piece,output, dx, dy);
 			
-			dy += bounds.getHeight();
+			dy += fontSize;//bounds.getHeight();
 		}
 	}
 	
