@@ -48,7 +48,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private List<VoronoiCellEdge> cellBorder = null;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
-
 	private float yBottom, yTop, xLeft, xRight;
 
 	@Override
@@ -76,11 +75,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 	
 	public boolean iterate() {
+		System.out.println("test");
 		evolveCells();
-		return true;
+		return keepIterating;
 	}
 	
 	public void restart() {
+		keepIterating=true;
 		cellBorder = new ArrayList<>();
 		initializeCells(0.001);
 	}
@@ -162,21 +163,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	 */
 	protected void evolveCells() {
 		try {
-			Log.write("green","Mutating");
-
-			int generation = 0;
-			do {
-				++generation;
-				Log.write("green","Generation " + generation);
-
-				assert !lock.isHeldByCurrentThread();
-				lock.lock();
-				tessellateVoronoiDiagram();
-				lock.unlock();
-				adjustCentroids();
-
-				// Do again if things are still moving a lot.  Cap the # of times so we don't have an infinite loop.
-			} while (generation < MAX_GENERATIONS);
+			assert !lock.isHeldByCurrentThread();
+			lock.lock();
+			tessellateVoronoiDiagram();
+			lock.unlock();
+			adjustCentroids();
 		} catch (Exception e) {
 			e.printStackTrace();
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {

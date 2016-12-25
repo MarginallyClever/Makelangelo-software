@@ -90,7 +90,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	@Override
 	public boolean iterate() {
 		evolveCells();
-		return true;
+		return keepIterating;
 	}
 	
 	public void finish(Writer out) throws IOException {
@@ -169,10 +169,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 			once |= flipTests();
 			gen++;
-			Log.write("green", "Generation " + gen);
+			Log.write("green", "zigzag optimization gen " + gen);
 		}
 
-		Log.write("green", "Finished @ " + gen);
+		Log.write("green", "zigzag optimization finished @ " + gen);
 	}
 
 	public String formatTime(long millis) {
@@ -386,25 +386,15 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	 */
 	protected void evolveCells() {
 		try {
-			Log.write("green", "Mutating");
-
-			int generation = 0;
-			do {
-				generation++;
-				Log.write("green", "Generation " + generation);
-
-				lock.lock();
-				tessellateVoronoiDiagram();
-				lock.unlock();
-				adjustCentroids();
-
-				// Do again if things are still moving a lot. Cap the # of times
-				// so we don't have an infinite loop.
-			} while (generation < MAX_GENERATIONS);
-
-			Log.write("green", "Last " + generation);
+			lock.lock();
+			tessellateVoronoiDiagram();
+			lock.unlock();
+			adjustCentroids();
 		} catch (Exception e) {
 			e.printStackTrace();
+			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
+				lock.unlock();
+			}
 		}
 	}
 
