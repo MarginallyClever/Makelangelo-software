@@ -116,6 +116,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			if( sourceImage.canSampleAt(x,y) ) {
 				float val = 1.0f - (sourceImage.sample1x1( x, y) / 255.0f);
 				float r = (val * MAX_DOT_SIZE);
+				if(r<MIN_DOT_SIZE) continue;
 				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 				for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
 					gl2.glVertex2d(x + Math.cos(j) * r,
@@ -412,7 +413,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		return MAX_CELLS;
 	}
 	public void setMinDotSize(float value) {
-		if(value<0.01) value=0.01f;
+		if(value<0.001) value=0.001f;
 		MIN_DOT_SIZE = value;
 	}
 	public float getMaxDotSize() {

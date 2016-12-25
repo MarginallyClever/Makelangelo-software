@@ -146,9 +146,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		conversionPanel.add(converterOptionsContainer,c);
 		
 		changeConverter(conversionOptions,robot);
-
-		robot.getControlPanel().get
-		int result = JOptionPane.showConfirmDialog(null, conversionPanel, Translator.get("ConversionOptions"),
+		
+		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			setPreferredDrawStyle(conversionOptions.getSelectedIndex());
@@ -232,7 +231,9 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		chosenRobot = robot;
 		
-		return chooseImageConversionOptions(robot);
+		chooseImageConversionOptions(robot);
+		
+		return true;
 	}
 		
 
@@ -254,6 +255,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			@Override
 			public Void doInBackground() {
 				// where to save temp output file?
+				// FIXME going through temp files every time may be thrashing SSDs.
 				File tempFile;
 				try {
 					tempFile = File.createTempFile("gcode", ".ngc");

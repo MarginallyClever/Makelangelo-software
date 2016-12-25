@@ -46,10 +46,16 @@ public class Converter_VoronoiStippling_Panel extends JPanel implements Property
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
+		int oldG = converter.getGenerations();
+		int oldC = converter.getNumCells();
 		converter.setGenerations(((Number)text_gens.getValue()).intValue());
 		converter.setNumCells(((Number)text_cells.getValue()).intValue());
+		int newG = converter.getGenerations();
+		int newC = converter.getNumCells();
 		converter.setMinDotSize(((Number)text_dot_min.getValue()).floatValue());
 		converter.setMaxDotSize(((Number)text_dot_max.getValue()).floatValue());
-		converter.restart();
+		if(newG!=oldG || newC!=oldC) {
+			converter.restart();
+		}
 	}
 }
