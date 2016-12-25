@@ -150,6 +150,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
+			stopSwingWorker();
 			setPreferredDrawStyle(conversionOptions.getSelectedIndex());
 			robot.getSettings().saveConfig();
 
@@ -264,6 +265,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		swingWorker = new SwingWorker<Void, Void>() {
 			@Override
 			public Void doInBackground() {
+				chosenConverter.setSwingWorker(swingWorker);
+				
 				// where to save temp output file?
 				// FIXME going through temp files every time may be thrashing SSDs.
 				File tempFile;
@@ -274,7 +277,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					return null;
 				}
 				tempFile.deleteOnExit();
-				
+
 				// read in image
 				Log.message(Translator.get("Converting") + " " + tempFile.getName());
 				// convert with style
