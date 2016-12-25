@@ -161,6 +161,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	
 	private void changeConverter(JComboBox<String> options,MakelangeloRobot robot) {
 		System.out.println("Changing converter");
+		stopSwingWorker();
+
 		chosenConverter = getConverter(options.getSelectedIndex());
 		chosenConverter.setLoadAndSave(this);
 		JPanel p = chosenConverter.getPanel();
@@ -237,16 +239,24 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 		
 
-	void createSwingWorker() {
+	void stopSwingWorker() {
+		if(chosenConverter!=null) {
+			chosenConverter.stopIterating();
+		}
 		if(swingWorker!=null) {
 			System.out.println("Stopping swingWorker");
-			swingWorker.cancel(true);
+			if(swingWorker.cancel(true)) {
+				System.out.println("stopped OK");
+			} else {
+				System.out.println("stop FAILED");
+			}
 		}
+	}
 
+	void createSwingWorker() {
 		System.out.println("Starting swingWorker");
 
 		chosenConverter.setProgressMonitor(pm);
-
 		chosenConverter.setRobot(chosenRobot);
 		chosenConverter.setImage(img);
 		chosenRobot.setDecorator(chosenConverter);
