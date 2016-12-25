@@ -73,16 +73,17 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10.0f;
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10.0f;
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
 		
 		restart();
 		renderMode = 0;
 	}
 
 	public void restart() {
+		keepIterating=true;
 		cellBorder = new ArrayList<>();
 		initializeCells(0.001);
 	}
@@ -384,18 +385,20 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	/**
 	 * Jiggle the dots until they make a nice picture
 	 */
-	protected void evolveCells() {
+	protected float evolveCells() {
+		float totalWeight=0;
 		try {
 			lock.lock();
 			tessellateVoronoiDiagram();
 			lock.unlock();
-			adjustCentroids();
+			totalWeight = adjustCentroids();
 		} catch (Exception e) {
 			e.printStackTrace();
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
 				lock.unlock();
 			}
 		}
+		return totalWeight;
 	}
 
 	// write cell centroids to gcode.
@@ -480,23 +483,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					bound_max.setLocation(bound_max.getX(), (float) e.y1);
 				}
 			} else {
-				if (bound_min.x > e.x1)
-					bound_min.setLocation(e.x1, bound_min.getY());
-				if (bound_min.x > e.x2)
-					bound_min.setLocation(e.x2, bound_min.getY());
-				if (bound_max.x < e.x1)
-					bound_max.setLocation(e.x1, bound_max.getY());
-				if (bound_max.x < e.x2)
-					bound_max.setLocation(e.x2, bound_max.getY());
-
-				if (bound_min.y > e.y1)
-					bound_min.setLocation(bound_min.getX(), e.y1);
-				if (bound_min.y > e.y2)
-					bound_min.setLocation(bound_min.getX(), e.y2);
-				if (bound_max.y < e.y1)
-					bound_max.setLocation(bound_max.getX(), e.y1);
-				if (bound_max.y < e.y2)
-					bound_max.setLocation(bound_max.getX(), e.y2);
+				if (bound_min.x > e.x1)	bound_min.setLocation(e.x1, bound_min.getY());
+				if (bound_min.x > e.x2) bound_min.setLocation(e.x2, bound_min.getY());
+				if (bound_max.x < e.x1)	bound_max.setLocation(e.x1, bound_max.getY());
+				if (bound_max.x < e.x2)	bound_max.setLocation(e.x2, bound_max.getY());
+				if (bound_min.y > e.y1)	bound_min.setLocation(bound_min.getX(), e.y1);
+				if (bound_min.y > e.y2)	bound_min.setLocation(bound_min.getX(), e.y2);
+				if (bound_max.y < e.y1)	bound_max.setLocation(bound_max.getX(), e.y1);
+				if (bound_max.y < e.y2)	bound_max.setLocation(bound_max.getX(), e.y2);
 			}
 
 			// make a unnormalized vector along the edge of e
@@ -550,13 +544,16 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return true;
 	}
 
-	// find the weighted center of each cell.
-	// weight is based on the intensity of the color of each pixel inside the
-	// cell
-	// the center of the pixel must be inside the cell to be counted.
-	protected void adjustCentroids() {
+	/**
+	 * Adjust the weighted center of each cell.
+	 * weight is based on the intensity of the color of each pixel inside the cell.
+	 * the center of the pixel must be inside the cell to be counted.
+	 * @return
+	 */
+	protected float adjustCentroids() {
 		int i;
 		float weight, wx, wy, x, y;
+		float totalWeight=0;
 		float stepSize = 2;
 
 		for (i = 0; i < cells.length; ++i) {
@@ -589,6 +586,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			if (weight > 0.0f) {
 				wx /= weight;
 				wy /= weight;
+				totalWeight+=weight;
 			}
 
 			// make sure centroid can't leave image bounds
@@ -600,6 +598,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			// use the new center
 			cells[i].centroid.setLocation(wx, wy);
 		}
+		return totalWeight;
 	}
 	
 	public void setGenerations(int value) {
