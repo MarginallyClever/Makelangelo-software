@@ -18,14 +18,12 @@ public class Converter_VoronoiStippling_Panel extends JPanel implements Property
 	private static final long serialVersionUID = 1L;
 	SelectFloat text_dot_max;
 	SelectFloat text_dot_min;
-	SelectInteger text_gens;
 	SelectInteger text_cells;
 	Converter_VoronoiStippling converter;
 	
 	public Converter_VoronoiStippling_Panel(Converter_VoronoiStippling converter_VoronoiStippling) {
 		this.converter = converter_VoronoiStippling;
 		
-		text_gens = new SelectInteger(converter.getGenerations());
 		text_cells = new SelectInteger(converter.getNumCells());
 		text_dot_max = new SelectFloat(converter.getMaxDotSize());
 		text_dot_min = new SelectFloat(converter.getMinDotSize());
@@ -39,22 +37,18 @@ public class Converter_VoronoiStippling_Panel extends JPanel implements Property
 		this.add(text_dot_min);
 		
 		text_cells.addPropertyChangeListener("value",this);
-		text_gens.addPropertyChangeListener("value",this);
 		text_dot_max.addPropertyChangeListener("value",this);
 		text_dot_min.addPropertyChangeListener("value",this);
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		int oldG = converter.getGenerations();
 		int oldC = converter.getNumCells();
-		converter.setGenerations(((Number)text_gens.getValue()).intValue());
 		converter.setNumCells(((Number)text_cells.getValue()).intValue());
-		int newG = converter.getGenerations();
 		int newC = converter.getNumCells();
 		converter.setMinDotSize(((Number)text_dot_min.getValue()).floatValue());
 		converter.setMaxDotSize(((Number)text_dot_max.getValue()).floatValue());
-		if(newG!=oldG || newC!=oldC) {
+		if(newC!=oldC) {
 			converter.restart();
 		}
 	}
