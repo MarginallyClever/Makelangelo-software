@@ -27,6 +27,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 public abstract class ImageConverter extends ImageManipulator implements MakelangeloRobotDecorator {
 	TransformedImage sourceImage;
 	LoadAndSaveImage loadAndSave;
+	boolean keepIterating=false;
 	
 	public void setLoadAndSave(LoadAndSaveImage arg0) {
 		loadAndSave = arg0;
@@ -53,6 +54,10 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 */
 	public boolean iterate() {
 		return false;
+	}
+	
+	public void stopIterating() {
+		keepIterating=false;
 	}
 	
 	/**
