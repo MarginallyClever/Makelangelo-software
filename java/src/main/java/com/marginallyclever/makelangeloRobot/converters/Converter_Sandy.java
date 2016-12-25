@@ -6,7 +6,6 @@ import java.io.Writer;
 
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -15,18 +14,15 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Sandy extends ImageConverter {
 	private static int blockScale=150;
 	private static int direction=0;
-	private MakelangeloRobotPanel robotPanel;
-	private String [] directions;
+	private String [] directionChoices = new String[]{ 
+			Translator.get("top right"),
+			Translator.get("top left"), 
+			Translator.get("bottom left"), 
+			Translator.get("bottom right"), 
+			Translator.get("center")
+			};
 	
-	Converter_Sandy() {
-		directions = new String[]{ 
-				Translator.get("top right"),
-				Translator.get("top left"), 
-				Translator.get("bottom left"), 
-				Translator.get("bottom right"), 
-				Translator.get("center")
-				};		
-	}
+	public Converter_Sandy() {}
 	
 	
 	@Override
@@ -35,17 +31,16 @@ public class Converter_Sandy extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_Sandy_Panel(this);
 	}
-
+	
 	/**
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -55,7 +50,6 @@ public class Converter_Sandy extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-	    return true;
 	}
 
 
@@ -159,14 +153,15 @@ public class Converter_Sandy extends ImageConverter {
 		blockScale=value;
 	}
 	public String [] getDirections() {
-		return directions;
+		return directionChoices;
 	}
 	public int getDirectionIndex() {
 		return direction;
 	}
 	public void setDirection(int value) {
 		if(value<0) value=0;
-		if(value>=directions.length) value = directions.length-1;
+		if(value>=directionChoices.length) value = directionChoices.length-1;
+		direction = value;
 	}
 }
 

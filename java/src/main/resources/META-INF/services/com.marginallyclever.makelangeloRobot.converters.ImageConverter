@@ -11,4 +11,4 @@ com.marginallyclever.makelangeloRobot.converters.Converter_SpiralPulse
 com.marginallyclever.makelangeloRobot.converters.Converter_VoronoiStippling
 com.marginallyclever.makelangeloRobot.converters.Converter_VoronoiZigZag
 com.marginallyclever.makelangeloRobot.converters.Converter_Wander
-com.marginallyclever.makelangeloRobot.converters.Converter_ZigZag
+#com.marginallyclever.makelangeloRobot.converters.Converter_ZigZag

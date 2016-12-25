@@ -3,8 +3,11 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -22,12 +25,48 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  *
  */
 public abstract class ImageConverter extends ImageManipulator implements MakelangeloRobotDecorator {
+	TransformedImage sourceImage;
+	LoadAndSaveImage loadAndSave;
+	
+	public void setLoadAndSave(LoadAndSaveImage arg0) {
+		loadAndSave = arg0;
+	}
+	
 	/**
+	 * set the image to be transformed.
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
-	 * @return true if conversion succeeded.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void setImage(TransformedImage img) {
+		sourceImage=img;
+	}
+	
+	/**
+	 * iterative and non-iterative solvers use this method to restart the conversion process.
+	 */
+	public void reconvert() {
+		loadAndSave.reconvert();
+	}
+	
+	/**
+	 * run one "step" of an iterative image conversion process.
+	 * @return true if conversion should iterate again.
+	 */
+	public boolean iterate() {
 		return false;
+	}
+	
+	/**
+	 * for "run once" converters, return do the entire conversion and write to disk.
+	 * for iterative solvers, the iteration is now done, write to disk.
+	 * @param out the Writer to receive the generated gcode.
+	 */
+	public void finish(Writer out) throws IOException {}
+	
+	/**
+	 * @return the gui panel with options for this manipulator
+	 */
+	public JPanel getPanel() {
+		return null;
 	}
 
 	/**

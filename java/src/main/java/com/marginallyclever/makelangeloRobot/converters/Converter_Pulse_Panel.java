@@ -1,17 +1,19 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_Pulse_Panel extends JPanel implements DocumentListener {
+public class Converter_Pulse_Panel extends JPanel implements PropertyChangeListener, ActionListener {
 	/**
 	 * 
 	 */
@@ -19,7 +21,7 @@ public class Converter_Pulse_Panel extends JPanel implements DocumentListener {
 	Converter_Pulse converter;
 	
 	SelectFloat   sizeField;	
-	JComboBox<String> direction_choices;
+	JComboBox<String> directionChoices;
 	
 	public Converter_Pulse_Panel(Converter_Pulse arg0) {
 		this.converter=arg0;
@@ -28,26 +30,26 @@ public class Converter_Pulse_Panel extends JPanel implements DocumentListener {
 		this.add(new JLabel(Translator.get("HilbertCurveSize")));
 		this.add(sizeField = new SelectFloat(converter.getScale()));
 
-		String[] directions = {Translator.get("horizontal"), Translator.get("vertical") };
-		this.add(direction_choices = new JComboBox<>(directions));
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
+		this.add(directionChoices = new JComboBox<>(converter.getDirections()));
+		directionChoices.setSelectedIndex(converter.getDirectionIndex());
+		
+		sizeField.addPropertyChangeListener("value",this);
+		directionChoices.addActionListener(this);
 	}
 
 	private void validateInput() {
 		converter.setScale(((Number)sizeField.getValue()).floatValue());
+		converter.setDirectionIndex(directionChoices.getSelectedIndex());
+		converter.reconvert();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		validateInput();		
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		validateInput();
 	}
 }

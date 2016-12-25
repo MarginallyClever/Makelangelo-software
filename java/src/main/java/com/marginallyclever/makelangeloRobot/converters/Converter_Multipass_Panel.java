@@ -1,17 +1,17 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_Multipass_Panel extends JPanel implements DocumentListener {
+public class Converter_Multipass_Panel extends JPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */
@@ -27,30 +27,20 @@ public class Converter_Multipass_Panel extends JPanel implements DocumentListene
 		angleField = new SelectFloat(converter.getAngle());
 		passesField = new SelectInteger(converter.getPasses());
 
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("ConverterMultipassAngle")));
-		panel.add(angleField);
-		panel.add(new JLabel(Translator.get("ConverterMultipassLevels")));
-		panel.add(passesField);
+		setLayout(new GridLayout(0,1));
+		this.add(new JLabel(Translator.get("ConverterMultipassAngle")));
+		this.add(angleField);
+		this.add(new JLabel(Translator.get("ConverterMultipassLevels")));
+		this.add(passesField);
+		
+		angleField.addPropertyChangeListener("value",this);
+		passesField.addPropertyChangeListener("value",this);
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	private void validateInput() {
+	public void propertyChange(PropertyChangeEvent arg0) {
 		converter.setAngle(((Number)angleField.getValue()).floatValue());
 		converter.setPasses(((Number)passesField.getValue()).intValue());
+		converter.reconvert();
 	}
 }

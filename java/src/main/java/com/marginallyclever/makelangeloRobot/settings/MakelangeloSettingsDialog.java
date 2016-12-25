@@ -171,12 +171,6 @@ implements ActionListener {
 
 	  panelAdjustPen = new PanelAdjustPen(robot);
 	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen);
-
-	  //panelAdjustTools = new PanelAdjustTools(translator,robot);
-	  //panes.addTab(translator.get("MenuAdjustTool"),panelAdjustTools);
-
-	  //panelSelectTool = new PanelSelectTool(translator,robot);
-	  //panes.addTab(translator.get("MenuSelectTool"),panelSelectTool);
   }
   
   public void actionPerformed(ActionEvent e) {

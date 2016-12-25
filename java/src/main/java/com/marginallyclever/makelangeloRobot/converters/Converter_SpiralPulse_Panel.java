@@ -1,16 +1,16 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_SpiralPulse_Panel extends JPanel implements DocumentListener {
+public class Converter_SpiralPulse_Panel extends JPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */
@@ -33,26 +33,18 @@ public class Converter_SpiralPulse_Panel extends JPanel implements DocumentListe
 		this.add(spacingField = new SelectFloat(converter.getSpacing()));
 		this.add(new JLabel(Translator.get("SpiralPulseHeight")));
 		this.add(heightField = new SelectFloat(converter.getHeight()));
+		
+		intensityField.addPropertyChangeListener("value",this);
+		spacingField.addPropertyChangeListener("value",this);
+		heightField.addPropertyChangeListener("value",this);
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	private void validateInput() {
+	public void propertyChange(PropertyChangeEvent evt) {
 		converter.setIntensity(((Number)intensityField.getValue()).floatValue());
 		converter.setSpacing(((Number)spacingField.getValue()).floatValue());
 		converter.setHeight(((Number)heightField.getValue()).floatValue());
+		converter.reconvert();
+		
 	}
 }

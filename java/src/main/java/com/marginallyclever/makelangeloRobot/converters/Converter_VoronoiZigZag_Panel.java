@@ -1,58 +1,44 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_VoronoiZigZag_Panel extends JPanel implements DocumentListener {
+public class Converter_VoronoiZigZag_Panel extends JPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	SelectFloat text_dot_max;
-	SelectFloat text_dot_min;
-	SelectInteger text_gens;
-	SelectInteger text_cells;
+	SelectInteger numGenerations;
+	SelectInteger numCells;
 	Converter_VoronoiZigZag converter;
 	
 	public Converter_VoronoiZigZag_Panel(Converter_VoronoiZigZag converter_VoronoiZigZag) {
 		this.converter = converter_VoronoiZigZag;
 		
-		text_gens = new SelectInteger(converter.getGenerations());
-		text_cells = new SelectInteger(converter.getNumCells());
+		numGenerations = new SelectInteger(converter.getGenerations());
+		numCells = new SelectInteger(converter.getNumCells());
 
 		this.setLayout(new GridLayout(0, 1));
 		this.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
-		this.add(text_cells);
+		this.add(numCells);
 		this.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
-		this.add(text_gens);
+		this.add(numGenerations);
+		
+		numGenerations.addPropertyChangeListener("value",this);
+		numCells.addPropertyChangeListener("value",this);
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	private void validateInput() {
-		converter.setGenerations(((Number)text_gens.getValue()).intValue());
-		converter.setNumCells(((Number)text_cells.getValue()).intValue());
-		converter.reconvert();
+	public void propertyChange(PropertyChangeEvent evt) {
+		converter.setGenerations(((Number)numGenerations.getValue()).intValue());
+		converter.setNumCells(((Number)numCells.getValue()).intValue());
+		converter.restart();
 	}
 }

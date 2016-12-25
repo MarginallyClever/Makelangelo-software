@@ -7,7 +7,6 @@ import java.io.Writer;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -20,7 +19,6 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
  */
 public class Converter_SpiralPulse extends ImageConverter {
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
-	private MakelangeloRobotPanel robotPanel;
 	private static float zigDensity = 1.2f;  // increase to tighten zigzags
 	private static float spacing = 2.5f;
 	private static float height = 4.0f;
@@ -31,8 +29,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_SpiralPulse_Panel(this);
 	}
 
@@ -43,10 +40,10 @@ public class Converter_SpiralPulse extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -118,8 +115,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-
-		return true;
 	}
 
 	public void setIntensity(float floatValue) {

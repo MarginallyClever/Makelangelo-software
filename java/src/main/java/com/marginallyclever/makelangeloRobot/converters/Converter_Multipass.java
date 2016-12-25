@@ -6,7 +6,6 @@ import java.io.Writer;
 
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -15,7 +14,6 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Multipass extends ImageConverter {
 	static private float angle=0;
 	static private int passes=4;
-	MakelangeloRobotPanel robotPanel;
 	
 	@Override
 	public String getName() {
@@ -23,8 +21,7 @@ public class Converter_Multipass extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_Multipass_Panel(this);
 	}
 	
@@ -48,10 +45,10 @@ public class Converter_Multipass extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
@@ -98,8 +95,6 @@ public class Converter_Multipass extends ImageConverter {
 		}
 
 	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
-	    
-		return true;
 	}
 	
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double level,TransformedImage img,Writer out) throws IOException {

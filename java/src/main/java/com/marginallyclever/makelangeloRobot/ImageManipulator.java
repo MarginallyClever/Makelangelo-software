@@ -4,7 +4,6 @@ package com.marginallyclever.makelangeloRobot;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
@@ -21,14 +20,14 @@ public abstract class ImageManipulator {
 	
 	// threading
 	protected ProgressMonitor pm;
-	protected SwingWorker<Void, Void> parent;
+	protected SwingWorker<Void, Void> swingWorker;
 
 	// helpers
 	protected MakelangeloRobotSettings machine;
 
 
-	public void setParent(SwingWorker<Void, Void> p) {
-		parent = p;
+	public void setSwingWorker(SwingWorker<Void, Void> p) {
+		swingWorker = p;
 	}
 
 	public void setProgressMonitor(ProgressMonitor p) {
@@ -37,13 +36,6 @@ public abstract class ImageManipulator {
 	
 	public void setRobot(MakelangeloRobot robot) {
 		machine = robot.getSettings();
-	}
-
-	/**
-	 * @return the gui panel with options for this manipulator
-	 */
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		return null;
 	}
 
 

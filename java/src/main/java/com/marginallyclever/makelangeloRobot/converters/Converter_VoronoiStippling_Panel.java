@@ -1,17 +1,17 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_VoronoiStippling_Panel extends JPanel implements DocumentListener {
+public class Converter_VoronoiStippling_Panel extends JPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */
@@ -33,33 +33,23 @@ public class Converter_VoronoiStippling_Panel extends JPanel implements Document
 		this.setLayout(new GridLayout(0, 1));
 		this.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
 		this.add(text_cells);
-		this.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
-		this.add(text_gens);
 		this.add(new JLabel(Translator.get("voronoiStipplingDotMax")));
 		this.add(text_dot_max);
 		this.add(new JLabel(Translator.get("voronoiStipplingDotMin")));
 		this.add(text_dot_min);
+		
+		text_cells.addPropertyChangeListener("value",this);
+		text_gens.addPropertyChangeListener("value",this);
+		text_dot_max.addPropertyChangeListener("value",this);
+		text_dot_min.addPropertyChangeListener("value",this);
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	private void validateInput() {
+	public void propertyChange(PropertyChangeEvent evt) {
 		converter.setGenerations(((Number)text_gens.getValue()).intValue());
 		converter.setNumCells(((Number)text_cells.getValue()).intValue());
 		converter.setMinDotSize(((Number)text_dot_min.getValue()).floatValue());
 		converter.setMaxDotSize(((Number)text_dot_max.getValue()).floatValue());
+		converter.restart();
 	}
 }

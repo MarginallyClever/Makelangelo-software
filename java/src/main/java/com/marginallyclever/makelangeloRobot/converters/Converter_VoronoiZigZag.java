@@ -15,7 +15,6 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -57,8 +56,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private long time_limit = 10 * 60 * 1000; // 10 minutes
 
 	private float yBottom, yTop, xLeft, xRight;
-
-	private MakelangeloRobotPanel robotPanel;
 	
 	@Override
 	public String getName() {
@@ -66,39 +63,41 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_VoronoiZigZag_Panel(this);
 	}
 	
 	@Override
-	public void reconvert() {
-		robotPanel.reconvert(sourceImage,this);
-	}
-
-
-	@Override
-	public boolean convert(TransformedImage img, Writer out) throws IOException {
+	public void setImage(TransformedImage img) {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
-	
+		
 		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
 		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
-		cellBorder = new ArrayList<>();
-	
-		initializeCells(0.001);
-	
+		restart();
 		renderMode = 0;
+	}
+
+	public void restart() {
+		cellBorder = new ArrayList<>();
+		initializeCells(0.001);
+	}
+	
+	@Override
+	public boolean iterate() {
 		evolveCells();
+		return true;
+	}
+	
+	public void finish(Writer out) throws IOException {
 		greedyTour();
 		renderMode = 1;
 		optimizeTour();
 		writeOutCells(out);
-		return true;
 	}
 
 	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
@@ -162,7 +161,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 		t_elapsed = 0;
 		t_start = System.currentTimeMillis();
-		while (once == 1 && t_elapsed < time_limit && !parent.isCancelled()) {
+		while (once == 1 && t_elapsed < time_limit && !swingWorker.isCancelled()) {
 			once = 0;
 			// @TODO: make these optional for the very thorough people
 			// once|=transposeForwardTest();
@@ -232,12 +231,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		int start, end, j, once = 0, best_end;
 		float a, b, c, d, temp_diff, best_diff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !parent.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < solutionContains * 2 - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
 			a = calculateWeight(solution[ti(start)], solution[ti(start + 1)]);
 			best_end = -1;
 			best_diff = 0;
 
-			for (end = start + 2; end < start + solutionContains && !parent.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end < start + solutionContains && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
 				// before
 				b = calculateWeight(solution[ti(end)], solution[ti(end - 1)]);
 				// after
@@ -251,7 +250,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				}
 			}
 
-			if (best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
 				once = 1;
 				// do the flip
 				int begin = start + 1;

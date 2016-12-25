@@ -1,17 +1,19 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_Sandy_Panel extends JPanel implements DocumentListener {
+public class Converter_Sandy_Panel extends JPanel implements PropertyChangeListener, ActionListener {
 	/**
 	 * 
 	 */
@@ -19,7 +21,7 @@ public class Converter_Sandy_Panel extends JPanel implements DocumentListener {
 	Converter_Sandy converter;
 	
 	SelectInteger sizeField;	
-	JComboBox<String> direction_choices;
+	JComboBox<String> directionChoices;
 	
 	public Converter_Sandy_Panel(Converter_Sandy arg0) {
 		this.converter=arg0;
@@ -32,27 +34,28 @@ public class Converter_Sandy_Panel extends JPanel implements DocumentListener {
 		this.add(new JLabel(Translator.get("SandyRings")));
 		this.add(sizeField);
 
-		direction_choices = new JComboBox<>(converter.getDirections());
-		direction_choices.setSelectedIndex(converter.getDirectionIndex());
-		this.add(direction_choices);
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validateInput();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validateInput();
+		directionChoices = new JComboBox<>(converter.getDirections());
+		this.add(directionChoices);
+		directionChoices.setSelectedIndex(converter.getDirectionIndex());
+		
+		sizeField.addPropertyChangeListener("value",this);
+		directionChoices.addActionListener(this);
 	}
 
 	private void validateInput() {
 		converter.setScale(((Number)sizeField.getValue()).intValue());
+		converter.setDirection(directionChoices.getSelectedIndex());
+		converter.reconvert();
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		validateInput();
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		validateInput();
 	}
 }

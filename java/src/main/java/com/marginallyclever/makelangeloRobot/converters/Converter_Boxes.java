@@ -20,10 +20,10 @@ public class Converter_Boxes extends ImageConverter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -111,7 +111,6 @@ public class Converter_Boxes extends ImageConverter {
 			liftPen(out);
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		}
-		return true;
 	}
 }
 

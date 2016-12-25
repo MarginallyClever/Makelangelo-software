@@ -15,7 +15,6 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
@@ -51,8 +50,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private double[] yValuesIn = null;
 
 	private float yBottom, yTop, xLeft, xRight;
-	
-	private MakelangeloRobotPanel robotPanel;
 
 	@Override
 	public String getName() {
@@ -60,13 +57,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_VoronoiStippling_Panel(this);
 	}
 
 	@Override
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void setImage(TransformedImage img) {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
@@ -75,16 +71,23 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-		
-		cellBorder = new ArrayList<>();
 
-		initializeCells(0.001);
+		restart();
+	}
+	
+	public boolean iterate() {
 		evolveCells();
-		writeOutCells(out);
-
 		return true;
 	}
+	
+	public void restart() {
+		cellBorder = new ArrayList<>();
+		initializeCells(0.001);
+	}
 
+	public void finish(Writer out) throws IOException {
+		writeOutCells(out);
+	}
 
 	@Override
 	public void render(GL2 gl2, MakelangeloRobotSettings machine) {

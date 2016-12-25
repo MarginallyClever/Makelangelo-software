@@ -6,7 +6,6 @@ import java.io.Writer;
 
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -15,7 +14,7 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Pulse extends ImageConverter {
 	private static float blockScale = 6.0f;
 	private static int direction = 0;
-	private MakelangeloRobotPanel robotPanel;
+	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
 	
 	@Override
 	public String getName() {
@@ -23,8 +22,7 @@ public class Converter_Pulse extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public JPanel getPanel() {
 		return new Converter_Pulse_Panel(this);
 	}
 	
@@ -35,6 +33,17 @@ public class Converter_Pulse extends ImageConverter {
 		if(value<1) value=1;
 		blockScale = value;
 	}
+	public String[] getDirections() {
+		return directionChoices;
+	}
+	public int getDirectionIndex() {
+		return direction;
+	}
+	public void setDirectionIndex(int value) {
+		if(value<0) value=0;
+		if(value>=directionChoices.length) value=directionChoices.length-1;
+		direction = value;
+	}
 
 	/**
 	 * Converts images into zigzags in paper space instead of image space
@@ -42,9 +51,9 @@ public class Converter_Pulse extends ImageConverter {
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -54,8 +63,6 @@ public class Converter_Pulse extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-	    
-	    return true;
 	}
 
 
