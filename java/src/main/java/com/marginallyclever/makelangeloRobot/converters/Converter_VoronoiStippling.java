@@ -71,22 +71,29 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
 
+		keepIterating=true;
 		restart();
 	}
 	
 	public boolean iterate() {
-		float totalMagnitude = evolveCells();
-		System.out.println(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
+		//float totalMagnitude = 
+				evolveCells();
+		//System.out.println(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
 		return keepIterating;
 	}
 	
 	public void restart() {
+		if(!keepIterating) {
+			loadAndSave.reconvert();
+			return;
+		}
 		keepIterating=true;
 		cellBorder = new ArrayList<>();
 		initializeCells(0.001);
 	}
 
 	public void finish(Writer out) throws IOException {
+		keepIterating=false;
 		writeOutCells(out);
 	}
 
