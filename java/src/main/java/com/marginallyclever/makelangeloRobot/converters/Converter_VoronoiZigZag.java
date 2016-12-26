@@ -36,8 +36,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private VoronoiCell[] cells = new VoronoiCell[1];
 	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
-	private static int MAX_GENERATIONS = 200;
-	private static int MAX_CELLS = 3000;
+	private static int numCells = 3000;
 	private static float CUTOFF = 1.0f;
 	private Point bound_min = new Point();
 	private Point bound_max = new Point();
@@ -48,6 +47,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private int[] solution = null;
 	private int solutionContains;
 	private int renderMode;
+	private boolean lowNoise;
 
 	// processing tools
 	private long t_elapsed, t_start;
@@ -78,11 +78,17 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
 		
+		keepIterating=true;
 		restart();
 		renderMode = 0;
 	}
 
 	public void restart() {
+		if(!keepIterating) {
+			loadAndSave.reconvert();
+			return;
+		}
+		lowNoise=false;
 		keepIterating=true;
 		cellBorder = new ArrayList<>();
 		initializeCells(0.001);
@@ -90,14 +96,21 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	
 	@Override
 	public boolean iterate() {
-		evolveCells();
+		if(lowNoise==false) {
+			if(evolveCells()<25*numCells) {
+				lowNoise=true;
+				greedyTour();
+				renderMode = 1;
+				Log.write("green", "Running Lin/Kerighan optimization...");
+			}
+		} else {
+			optimizeTour();			
+		}
 		return keepIterating;
 	}
 	
 	public void finish(Writer out) throws IOException {
-		greedyTour();
-		renderMode = 1;
-		optimizeTour();
+		keepIterating=false;
 		writeOutCells(out);
 	}
 
@@ -150,30 +163,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	private void optimizeTour() {
-		int gen = 0;
-		int once = 1;
-
-		Log.write("green", "Running Lin/Kerighan optimization...");
-
 		old_len = getTourLength(solution);
 		updateProgress(old_len, 2);
 
-		progress = 0;
+		// @TODO: make these optional for the very thorough people
+		// once|=transposeForwardTest();
+		// once|=transposeBackwardTest();
 
-		t_elapsed = 0;
-		t_start = System.currentTimeMillis();
-		while (once == 1 && t_elapsed < time_limit && !swingWorker.isCancelled()) {
-			once = 0;
-			// @TODO: make these optional for the very thorough people
-			// once|=transposeForwardTest();
-			// once|=transposeBackwardTest();
-
-			once |= flipTests();
-			gen++;
-			Log.write("green", "zigzag optimization gen " + gen);
-		}
-
-		Log.write("green", "zigzag optimization finished @ " + gen);
+		keepIterating = flipTests();
 	}
 
 	public String formatTime(long millis) {
@@ -226,10 +223,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return (x + solutionContains) % solutionContains;
 	}
 
-	// we have s1,s2...e-1,e
-	// check if s1,e-1,...s2,e is shorter
-	public int flipTests() {
-		int start, end, j, once = 0, best_end;
+	/**
+	 * we have s1,s2...e-1,e.  check if s1,e-1,...s2,e is shorter
+	 * @return true if something was improved.
+	 */
+	// 
+	public boolean flipTests() {
+		boolean once = false;
+		int start, end, j, best_end;
 		float a, b, c, d, temp_diff, best_diff;
 
 		for (start = 0; start < solutionContains * 2 - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
@@ -252,7 +253,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			}
 
 			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
-				once = 1;
+				once = true;
 				// do the flip
 				int begin = start + 1;
 				int finish = best_end;
@@ -366,9 +367,9 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	protected void initializeCells(double minDistanceBetweenSites) {
 		Log.write("green", "Initializing cells");
 
-		cells = new VoronoiCell[MAX_CELLS];
+		cells = new VoronoiCell[numCells];
 		int used = 0;
-		for (used = 0; used < MAX_CELLS; used++) {
+		for (used = 0; used < numCells; used++) {
 			cells[used] = new VoronoiCell();
 			cells[used].centroid.setLocation(xLeft   + ((float)Math.random()*(xRight-xLeft)),
 											 yBottom + ((float)Math.random()*(yTop-yBottom))
@@ -601,19 +602,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return totalWeight;
 	}
 	
-	public void setGenerations(int value) {
-		if(value<1) value=1;
-		MAX_GENERATIONS = value;
-	}
-	public int getGenerations() {
-		return MAX_GENERATIONS;
-	}
 	public void setNumCells(int value) {
 		if(value<1) value=1;
-		MAX_CELLS = value;
+		numCells = value;
 	}
 	public int getNumCells() {
-		return MAX_CELLS;
+		return numCells;
 	}
 }
 

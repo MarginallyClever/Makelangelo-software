@@ -29,9 +29,9 @@ public class Converter_Crosshatch extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -40,8 +40,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-
-		return true;
 	}
 
 
