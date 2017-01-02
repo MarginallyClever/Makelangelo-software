@@ -3,9 +3,12 @@ package com.marginallyclever.makelangeloRobot.generators;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -28,6 +31,19 @@ public abstract class ImageGenerator extends ImageManipulator implements Makelan
 	public boolean generate(Writer out) throws IOException {
 		return false;
 	}
+	
+	/**
+	 * @return the gui panel with options for this manipulator
+	 */
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		return null;
+	}
+	
+	/**
+	 * @return true if generate succeeded.
+	 * @param dest the file where the results will be saved.
+	 */
+	public void regenerate() throws IOException {}
 	
 	/**
 	 * live preview as the system is generating.

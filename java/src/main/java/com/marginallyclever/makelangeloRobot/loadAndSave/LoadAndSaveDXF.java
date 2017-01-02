@@ -93,7 +93,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		checkInfill.setSelected(shouldInfillOnLoad);
 		checkOptimize.setSelected(shouldOptimizePathingOnLoad);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			shouldScaleOnLoad = checkScale.isSelected();
 			shouldInfillOnLoad = checkInfill.isSelected();
@@ -178,6 +178,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 						}
 						continue;
 					}
+					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
+					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
 					// I don't know this entity type.
 					Log.error("Unknown DXF type "+e.getType());
 				}

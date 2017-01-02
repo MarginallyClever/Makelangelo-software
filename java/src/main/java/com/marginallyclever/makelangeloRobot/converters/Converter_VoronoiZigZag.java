@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,11 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
@@ -41,8 +36,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private VoronoiCell[] cells = new VoronoiCell[1];
 	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
-	private static int MAX_GENERATIONS = 200;
-	private static int MAX_CELLS = 3000;
+	private static int numCells = 3000;
 	private static float CUTOFF = 1.0f;
 	private Point bound_min = new Point();
 	private Point bound_max = new Point();
@@ -53,6 +47,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private int[] solution = null;
 	private int solutionContains;
 	private int renderMode;
+	private boolean lowNoise;
 
 	// processing tools
 	private long t_elapsed, t_start;
@@ -62,53 +57,61 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	private float yBottom, yTop, xLeft, xRight;
 	
-	
 	@Override
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
 	}
 
 	@Override
-	public boolean convert(TransformedImage img, Writer out) throws IOException {
-		JTextField text_gens = new JTextField(Integer.toString(MAX_GENERATIONS), 8);
-		JTextField text_cells = new JTextField(Integer.toString(MAX_CELLS), 8);
+	public JPanel getPanel() {
+		return new Converter_VoronoiZigZag_Panel(this);
+	}
+	
+	@Override
+	public void setImage(TransformedImage img) {
+		// make black & white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		sourceImage = bw.filter(img);
+		
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10.0f;
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10.0f;
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
+		
+		keepIterating=true;
+		restart();
+		renderMode = 0;
+	}
 
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
-		panel.add(text_cells);
-		panel.add(new JLabel(Translator.get("voronoiStipplingGenCount")));
-		panel.add(text_gens);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			MAX_GENERATIONS = Integer.parseInt(text_gens.getText());
-			MAX_CELLS = Integer.parseInt(text_cells.getText());
-
-			// make black & white
-			Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-			img = bw.filter(img);
-
-			sourceImage = img;
-
-			yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-			yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-			xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-			xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
-			
-			cellBorder = new ArrayList<>();
-
-			initializeCells(0.001);
-
-			renderMode = 0;
-			evolveCells();
-			greedyTour();
-			renderMode = 1;
-			optimizeTour();
-			writeOutCells(out);
-			return true;
+	public void restart() {
+		if(!keepIterating) {
+			loadAndSave.reconvert();
+			return;
 		}
-		return false;
+		lowNoise=false;
+		keepIterating=true;
+		cellBorder = new ArrayList<>();
+		initializeCells(0.001);
+	}
+	
+	@Override
+	public boolean iterate() {
+		if(lowNoise==false) {
+			if(evolveCells()<25*numCells) {
+				lowNoise=true;
+				greedyTour();
+				renderMode = 1;
+				Log.write("green", "Running Lin/Kerighan optimization...");
+			}
+		} else {
+			optimizeTour();			
+		}
+		return keepIterating;
+	}
+	
+	public void finish(Writer out) throws IOException {
+		keepIterating=false;
+		writeOutCells(out);
 	}
 
 	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
@@ -160,30 +163,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	private void optimizeTour() {
-		int gen = 0;
-		int once = 1;
-
-		Log.write("green", "Running Lin/Kerighan optimization...");
-
 		old_len = getTourLength(solution);
 		updateProgress(old_len, 2);
 
-		progress = 0;
+		// @TODO: make these optional for the very thorough people
+		// once|=transposeForwardTest();
+		// once|=transposeBackwardTest();
 
-		t_elapsed = 0;
-		t_start = System.currentTimeMillis();
-		while (once == 1 && t_elapsed < time_limit && !parent.isCancelled()) {
-			once = 0;
-			// @TODO: make these optional for the very thorough people
-			// once|=transposeForwardTest();
-			// once|=transposeBackwardTest();
-
-			once |= flipTests();
-			gen++;
-			Log.write("green", "Generation " + gen);
-		}
-
-		Log.write("green", "Finished @ " + gen);
+		keepIterating = flipTests();
 	}
 
 	public String formatTime(long millis) {
@@ -236,18 +223,22 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return (x + solutionContains) % solutionContains;
 	}
 
-	// we have s1,s2...e-1,e
-	// check if s1,e-1,...s2,e is shorter
-	public int flipTests() {
-		int start, end, j, once = 0, best_end;
+	/**
+	 * we have s1,s2...e-1,e.  check if s1,e-1,...s2,e is shorter
+	 * @return true if something was improved.
+	 */
+	// 
+	public boolean flipTests() {
+		boolean once = false;
+		int start, end, j, best_end;
 		float a, b, c, d, temp_diff, best_diff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !parent.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < solutionContains * 2 - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
 			a = calculateWeight(solution[ti(start)], solution[ti(start + 1)]);
 			best_end = -1;
 			best_diff = 0;
 
-			for (end = start + 2; end < start + solutionContains && !parent.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end < start + solutionContains && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
 				// before
 				b = calculateWeight(solution[ti(end)], solution[ti(end - 1)]);
 				// after
@@ -261,8 +252,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				}
 			}
 
-			if (best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
-				once = 1;
+			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
+				once = true;
 				// do the flip
 				int begin = start + 1;
 				int finish = best_end;
@@ -376,9 +367,9 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	protected void initializeCells(double minDistanceBetweenSites) {
 		Log.write("green", "Initializing cells");
 
-		cells = new VoronoiCell[MAX_CELLS];
+		cells = new VoronoiCell[numCells];
 		int used = 0;
-		for (used = 0; used < MAX_CELLS; used++) {
+		for (used = 0; used < numCells; used++) {
 			cells[used] = new VoronoiCell();
 			cells[used].centroid.setLocation(xLeft   + ((float)Math.random()*(xRight-xLeft)),
 											 yBottom + ((float)Math.random()*(yTop-yBottom))
@@ -395,28 +386,20 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	/**
 	 * Jiggle the dots until they make a nice picture
 	 */
-	protected void evolveCells() {
+	protected float evolveCells() {
+		float totalWeight=0;
 		try {
-			Log.write("green", "Mutating");
-
-			int generation = 0;
-			do {
-				generation++;
-				Log.write("green", "Generation " + generation);
-
-				lock.lock();
-				tessellateVoronoiDiagram();
-				lock.unlock();
-				adjustCentroids();
-
-				// Do again if things are still moving a lot. Cap the # of times
-				// so we don't have an infinite loop.
-			} while (generation < MAX_GENERATIONS);
-
-			Log.write("green", "Last " + generation);
+			lock.lock();
+			tessellateVoronoiDiagram();
+			lock.unlock();
+			totalWeight = adjustCentroids();
 		} catch (Exception e) {
 			e.printStackTrace();
+			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
+				lock.unlock();
+			}
 		}
+		return totalWeight;
 	}
 
 	// write cell centroids to gcode.
@@ -501,23 +484,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					bound_max.setLocation(bound_max.getX(), (float) e.y1);
 				}
 			} else {
-				if (bound_min.x > e.x1)
-					bound_min.setLocation(e.x1, bound_min.getY());
-				if (bound_min.x > e.x2)
-					bound_min.setLocation(e.x2, bound_min.getY());
-				if (bound_max.x < e.x1)
-					bound_max.setLocation(e.x1, bound_max.getY());
-				if (bound_max.x < e.x2)
-					bound_max.setLocation(e.x2, bound_max.getY());
-
-				if (bound_min.y > e.y1)
-					bound_min.setLocation(bound_min.getX(), e.y1);
-				if (bound_min.y > e.y2)
-					bound_min.setLocation(bound_min.getX(), e.y2);
-				if (bound_max.y < e.y1)
-					bound_max.setLocation(bound_max.getX(), e.y1);
-				if (bound_max.y < e.y2)
-					bound_max.setLocation(bound_max.getX(), e.y2);
+				if (bound_min.x > e.x1)	bound_min.setLocation(e.x1, bound_min.getY());
+				if (bound_min.x > e.x2) bound_min.setLocation(e.x2, bound_min.getY());
+				if (bound_max.x < e.x1)	bound_max.setLocation(e.x1, bound_max.getY());
+				if (bound_max.x < e.x2)	bound_max.setLocation(e.x2, bound_max.getY());
+				if (bound_min.y > e.y1)	bound_min.setLocation(bound_min.getX(), e.y1);
+				if (bound_min.y > e.y2)	bound_min.setLocation(bound_min.getX(), e.y2);
+				if (bound_max.y < e.y1)	bound_max.setLocation(bound_max.getX(), e.y1);
+				if (bound_max.y < e.y2)	bound_max.setLocation(bound_max.getX(), e.y2);
 			}
 
 			// make a unnormalized vector along the edge of e
@@ -571,13 +545,16 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return true;
 	}
 
-	// find the weighted center of each cell.
-	// weight is based on the intensity of the color of each pixel inside the
-	// cell
-	// the center of the pixel must be inside the cell to be counted.
-	protected void adjustCentroids() {
+	/**
+	 * Adjust the weighted center of each cell.
+	 * weight is based on the intensity of the color of each pixel inside the cell.
+	 * the center of the pixel must be inside the cell to be counted.
+	 * @return
+	 */
+	protected float adjustCentroids() {
 		int i;
 		float weight, wx, wy, x, y;
+		float totalWeight=0;
 		float stepSize = 2;
 
 		for (i = 0; i < cells.length; ++i) {
@@ -610,6 +587,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			if (weight > 0.0f) {
 				wx /= weight;
 				wy /= weight;
+				totalWeight+=weight;
 			}
 
 			// make sure centroid can't leave image bounds
@@ -621,6 +599,15 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			// use the new center
 			cells[i].centroid.setLocation(wx, wy);
 		}
+		return totalWeight;
+	}
+	
+	public void setNumCells(int value) {
+		if(value<1) value=1;
+		numCells = value;
+	}
+	public int getNumCells() {
+		return numCells;
 	}
 }
 

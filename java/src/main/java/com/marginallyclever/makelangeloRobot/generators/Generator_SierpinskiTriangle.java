@@ -6,41 +6,45 @@ import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
-public class Generator_LSystemTree extends ImageGenerator {
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
-	private float yMin = -7;
-	private static float turtleStep = 10.0f;
+/**
+ * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
+ * @author Dan Royer 2016-12-12
+ *
+ */
+public class Generator_SierpinskiTriangle extends ImageGenerator {
+	private Turtle turtle;
+	private float xMax, xMin, yMax, yMin;
+	private float maxSize;
 	private static int order = 4; // controls complexity of curve
-	private static float angleSpan = 120;
-	private static int numBranches = 3;
-	private static float orderScale = 0.76f;
 	
 	private MakelangeloRobotPanel robotPanel;
-
-	float maxSize;
-
-	
-	private Turtle turtle;
 
 
 	@Override
 	public String getName() {
-		return Translator.get("LSystemTreeName");
+		return Translator.get("SierpinskiTriangleName");
+	}
+
+
+	static public int getOrder() {
+		return order;
+	}
+	static public void setOrder(int order) {
+		if(order<1) order=1;
+		Generator_SierpinskiTriangle.order = order;
 	}
 	
 	@Override
 	public JPanel getPanel(MakelangeloRobotPanel arg0) {
 		robotPanel = arg0;
-		return new Generator_LSystemTree_Panel(this);
+		return new Generator_SierpinskiTriangle_Panel(this);
 	}
 	
 	@Override
 	public void regenerate() {
 		robotPanel.regenerate(this);
 	}
-
+	
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
@@ -48,7 +52,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 		machine.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f / 2.0f;
+				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
 		xMax = v;
 		yMax = v;
 		xMin = -v;
@@ -56,8 +60,6 @@ public class Generator_LSystemTree extends ImageGenerator {
 
 		turtle = new Turtle();
 		
-		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
-
 		float xx = xMax - xMin;
 		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
@@ -73,69 +75,45 @@ public class Generator_LSystemTree extends ImageGenerator {
 			liftPen(out);
 		}
 		
+		liftPen(out);
 		// move to starting position
-		turtle.setX(0);
-		turtle.setY(yMax - turtleStep / 2);
+		turtle.setX(xMax);
+		turtle.setY(-xMax/2);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
-		lSystemTree(out, order, maxSize/4);
+		turtle.turn(90);
+		if( (order&1) == 0 ) {
+			drawCurve(out, order, maxSize,-60);
+		} else {
+			turtle.turn(60);
+			drawCurve(out, order, maxSize,-60);
+		}
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		return true;
 	}
 
 
-	// recursive L System tree fractal
-	private void lSystemTree(Writer output, int n, float distance) throws IOException {
-		if (n == 0) return;
-		// 
-		turtleMove(output,distance);
-		if(n>1) {
-			float angleStep = angleSpan / (float)(numBranches-1);
-
-			turtle.turn(-(angleSpan/2.0f));
-			for(int i=0;i<numBranches;++i) {
-				lSystemTree(output,n-1,distance*orderScale);
-				turtle.turn(angleStep);
-			}
-			turtle.turn(-(angleSpan/2.0f)-angleStep);
-
+	private void drawCurve(Writer output, int n, float distance,float angle) throws IOException {
+		if (n == 0) {
+			turtleMove(output,distance);
+			return;
 		}
-		turtleMove(output,-distance);
+		
+		drawCurve(output,n-1,distance/2.0f,-angle);
+		turtle.turn(angle);
+		drawCurve(output,n-1,distance/2.0f,angle);
+		turtle.turn(angle);
+		drawCurve(output,n-1,distance/2.0f,-angle);
 	}
 
 
 	public void turtleMove(Writer output,float distance) throws IOException {
+		//turtle_x += turtle_dx * distance;
+		//turtle_y += turtle_dy * distance;
+		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
 		turtle.move(distance);
 		moveTo(output, turtle.getX(), turtle.getY(), false);
-	}
-
-	public void setOrder(int value) {
-		order=value;	
-	}
-	public int getOrder() {
-		return order;
-	}
-
-	public void setScale(float value) {
-		orderScale = value;
-	}
-	public float getScale() {
-		return orderScale;
-	}
-
-	public void setAngle(float value) {
-		angleSpan = value;
-	}
-	public float getAngle() {
-		return angleSpan;
-	}
-
-	public void setBranches(int value) {
-		numBranches = value;
-	}
-	public int getBranches() {
-		return numBranches;
 	}
 }

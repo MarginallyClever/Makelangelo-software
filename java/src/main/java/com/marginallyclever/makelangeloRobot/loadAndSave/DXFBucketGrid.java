@@ -73,8 +73,10 @@ public class DXFBucketGrid {
 		Iterator<DXFBucket> ib = buckets.iterator();
 		while(ib.hasNext()) {
 			DXFBucket b = ib.next();
-			System.out.println("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
-			total+=b.contents.size();
+			if(b.contents.size()>0) {
+				System.out.println("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
+				total+=b.contents.size();
+			}
 		}
 		System.out.println(total+" total entities in buckets (including duplicates).");
 	}

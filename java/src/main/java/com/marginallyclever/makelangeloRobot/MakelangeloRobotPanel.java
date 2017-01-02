@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,16 +25,16 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -299,7 +298,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 			setHome = createTightJButton(Translator.get("SetHome"));
 		    setHome.setPreferredSize(new Dimension(100,20));
-	
+
 			down100 = createTightJButton("-100");
 			down10 = createTightJButton("-10");
 			down1 = createTightJButton("-1");
@@ -457,7 +456,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			m.run();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) loadFileDialog();
+		else if (subject == buttonOpenFile) convertImage();
 		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
@@ -594,7 +593,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if(robot!=null) {
 			isConfirmed = robot.isPortConfirmed();
 			isRunning = robot.isRunning();
-			hasSetHome = robot.hasSetHome();
+			hasSetHome = robot.didSetHome();
 		}
 		
 		if (buttonGenerate != null)
@@ -632,9 +631,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right100.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		setHome.setEnabled(isConfirmed && !isRunning);
+		setHome .setEnabled(isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome());
+		findHome.setEnabled(isConfirmed && !isRunning &&  robot.getSettings().getHardwareProperties().canAutoHome());
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		findHome.setEnabled(isConfirmed && !isRunning && robot.getSettings().getHardwareProperties().canAutoHome());
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
@@ -643,24 +642,20 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		this.validate();
 	}
+	
 
 	public void newFile() {
 		robot.setGCode(null);
 		updateButtonAccess();
 	}
 
-	/**
-	 * Creates a file open dialog. If you don't cancel it opens that file.
-	 * Note: source for ExampleFileFilter can be found in FileChooserDemo, under the demo/jfc directory in the Java 2 SDK, Standard Edition.
-	 */
-	public void loadFileDialog() {
-		// Is you machine not yet calibrated?
-		if (robot.getSettings().isPaperConfigured() == false) {
-			// Hey!  Come back after you calibrate! 
-			JOptionPane.showMessageDialog(null, Translator.get("SetPaperSize"));
-			return;
-		}
+	
+	private void reopenFile() {
+		openFileOnDemand(lastFileIn);
+	}
+	
 
+	public void convertImage() {
 		// list available loaders
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
@@ -691,12 +686,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 	
-	private void reopenFile() {
-		openFileOnDemand(lastFileIn);
-	}
-
 	public void generateImage() {
-		final JPanel panel = new JPanel(new GridBagLayout());
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
 		Iterator<ImageGenerator> ici = imageGenerators.iterator();
@@ -719,104 +711,79 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		options.setSelectedIndex(generatorChoice);
 
 		GridBagConstraints c = new GridBagConstraints();
-		final JLabel previewPane = new JLabel();
+		final JPanel previewPane = new JPanel();
+		previewPane.setPreferredSize(new Dimension(450,300));
 		
 		options.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-		    {
-				previewPane.setIcon(null);
-				previewPane.setText("No preview availble.");
-				ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
-				String imageFilename = chosenGenerator.getPreviewImage();
-				if(imageFilename!=null) {
-					System.out.println("Found '"+imageFilename+"'.");
-					URL iconURL = chosenGenerator.getClass().getResource(imageFilename);
-			        if (iconURL != null) {
-				        ImageIcon icon = new ImageIcon(iconURL);
-				        previewPane.setIcon(icon);
-						previewPane.setText(null);
-			        }
-				}
+			public void actionPerformed(ActionEvent e) {
+				changeGeneratorPanel(previewPane,options);
 		    }
 		});
 
-		int y = 0;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = y;
-		panel.add(new JLabel(Translator.get("ConversionStyle")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.gridy = y++;
 		panel.add(options, c);
-		c.anchor=GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth=4;
-		c.gridx=0;
-		c.gridy=y++;
-		c.insets = new Insets(10, 0, 0, 0);
-		previewPane.setPreferredSize(new Dimension(449,325));
-		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
 		panel.add(previewPane,c);
-		previewPane.setHorizontalAlignment(SwingConstants.CENTER);
-		previewPane.setVerticalAlignment(SwingConstants.CENTER);
+		
+		changeGeneratorPanel(previewPane,options);
+		
+		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("MenuGenerate"));
+		dialog.add(panel);
+		dialog.pack();
+		dialog.setVisible(true);
+		// other app buttons are inaccessible until this dialog closes.
+	}
 
+	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
 		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
-		String imageFilename = chosenGenerator.getPreviewImage();
-		if(imageFilename!=null) {
-			//System.out.println("Found '"+imageFilename+"'.");
-			URL iconURL = chosenGenerator.getClass().getResource(imageFilename);
-	        if (iconURL != null) {
-		        ImageIcon icon = new ImageIcon(iconURL);
-		        previewPane.setIcon(icon);
-	        }
-		}
-
-
-		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			generatorChoice = options.getSelectedIndex();
-			chosenGenerator = getGenerator(generatorChoice);
-			robot.getSettings().saveConfig();
-			robot.setDecorator(chosenGenerator);
-			chosenGenerator.setRobot(robot);
-
-			// where to save temp output file?
-			File tempFile;
+		JPanel p = chosenGenerator.getPanel(this);
+		previewPane.removeAll();
+		if(p!=null) {
+			previewPane.add(p);
+			previewPane.invalidate();
 			try {
-				tempFile = File.createTempFile("gcode", ".ngc");
-			} catch (Exception e) {
-				e.printStackTrace();
-				return;
-			}
-			tempFile.deleteOnExit();
-
-			try (
-					final OutputStream fileOutputStream = new FileOutputStream(tempFile);
-					final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-					) {
-				chosenGenerator.generate(out);
-				out.flush();
-				out.close();
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-			robot.setDecorator(null);
-
-			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
-				loader.load(fileInputStream,robot);
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-
-			Log.message(Translator.get("Finished"));
-			SoundSystem.playConversionFinishedSound();
-			updateButtonAccess();
+				chosenGenerator.regenerate();
+			} catch(Exception e){}
 		}
+		previewPane.getParent().validate();
+		previewPane.getParent().repaint();
+	}
+	
+	public void regenerate(ImageGenerator chosenGenerator) {
+		robot.setDecorator(chosenGenerator);
+		chosenGenerator.setRobot(robot);
+		
+		// where to save temp output file?
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("gcode", ".ngc");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		tempFile.deleteOnExit();
+
+		try (
+				final OutputStream fileOutputStream = new FileOutputStream(tempFile);
+				final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
+				) {
+			chosenGenerator.generate(out);
+			out.flush();
+			out.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		robot.setDecorator(null);
+
+		LoadAndSaveGCode loader = new LoadAndSaveGCode();
+		try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
+			loader.load(fileInputStream,robot);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		Log.message(Translator.get("Finished"));
+		SoundSystem.playConversionFinishedSound();
+		updateButtonAccess();
 	}
 
 	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {

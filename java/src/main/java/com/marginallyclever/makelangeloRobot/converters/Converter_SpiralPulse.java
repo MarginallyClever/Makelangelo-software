@@ -4,6 +4,8 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -15,12 +17,20 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
  *
  * @author Dan
  */
-public class Converter_Spiral extends ImageConverter {
+public class Converter_SpiralPulse extends ImageConverter {
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
-
+	private static float zigDensity = 1.2f;  // increase to tighten zigzags
+	private static float spacing = 2.5f;
+	private static float height = 4.0f;
+	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralName");
+		return Translator.get("SpiralPulseName");
+	}
+
+	@Override
+	public JPanel getPanel() {
+		return new Converter_SpiralPulse_Panel(this);
 	}
 
 
@@ -41,14 +51,8 @@ public class Converter_Spiral extends ImageConverter {
 
 		double toolDiameter = machine.getDiameter();
 
-		int i, j;
-		final int steps = 4;
-		double leveladd = 255.0 / 5.0f;
-		double level;
-		int z = 0;
-
 		float maxr;
-		convertToCorners=false;
+		
 		if (convertToCorners) {
 			// go right to the corners
 			float h2 = (float)machine.getPaperHeight() * 10;
@@ -62,40 +66,48 @@ public class Converter_Spiral extends ImageConverter {
 			maxr *= machine.getPaperMargin() * 10.0f;
 		}
 		
-		float r = maxr, f;
+		float r = maxr-(float)toolDiameter*5.0f, f;
 		float fx, fy;
 		int numRings = 0;
-		double[] each_level = new double[steps];
-		each_level[0] = leveladd * 1;
-		each_level[1] = leveladd * 3;
-		each_level[2] = leveladd * 2;
-		each_level[3] = leveladd * 4;
-		j = 0;
-		while (r > toolDiameter) {
-			++j;
-			level = each_level[j % steps];
-			// find circumference of current circle
-			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI);
-			if (circumference > 360.0f) circumference = 360.0f;
+		float stepSize = machine.getDiameter() * height;
+		float halfStep = stepSize / 2.0f;
+		float zigZagSpacing = machine.getDiameter();
+		int n=1;
+		float PULSE_MINIMUM = 0.1f;
+		float ringSize = halfStep*spacing;
 
+		int i;
+		int z = 0;
+		float r2,scale_z,pulse_size,nx,ny;
+		
+		while (r > toolDiameter) {
+			// find circumference of current circle
+			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDensity;
+			//if (circumference > 360.0f) circumference = 360.0f;
+			
 			for (i = 0; i <= circumference; ++i) {
-				f = (float) Math.PI * 2.0f * (float)i / (float)circumference;
-				fx = (float) (Math.cos(f) * r);
-				fy = (float) (Math.sin(f) * r);
+				// tweak the diameter to make it look like a spiral
+				r2 = r - ringSize * (float)i / circumference;
+				
+				f = (float)Math.PI * 2.0f * (float)i / circumference;
+				fx = (float)Math.cos(f) * r2;
+				fy = (float)Math.sin(f) * r2;
 				// clip to paper boundaries
 				if( isInsidePaperMargins(fx, fy) )
 				{
-					try {
-						z = img.sample3x3(fx, fy);
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
-					moveTo(out, fx, fy, (z >= level));
+					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
+					scale_z = (255.0f - z) / 255.0f;
+					pulse_size = halfStep * scale_z;
+					nx = (halfStep+pulse_size*n) * fx / r2;
+					ny = (halfStep+pulse_size*n) * fy / r2;
+					moveTo(out, fx+nx, fy + ny, pulse_size < PULSE_MINIMUM);
+					n = -n;
 				} else {
 					moveTo(out, fx, fy, true);
 				}
 			}
-			r -= toolDiameter;
+			n = -n;
+			r -= ringSize;
 			++numRings;
 		}
 
@@ -103,6 +115,33 @@ public class Converter_Spiral extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	}
+
+	public void setIntensity(float floatValue) {
+		if(floatValue<0.1) floatValue=0.1f;
+		if(floatValue>3.0) floatValue=3.0f;
+		zigDensity=floatValue;
+	}
+	public float getIntensity() {
+		return zigDensity;
+	}
+
+	public void setSpacing(float floatValue) {
+		if(floatValue<0.5f) floatValue=0.5f;
+		if(floatValue>10) floatValue=10;
+		spacing=floatValue;
+	}
+	public float getSpacing() {
+		return spacing;
+	}
+
+	public void setHeight(float floatValue) {
+		if(floatValue<0.1) floatValue=1;
+		if(floatValue>10) floatValue=10;
+		height = floatValue;
+	}
+	public float getHeight() {
+		return height;
 	}
 }
 

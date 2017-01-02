@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,13 +25,11 @@ import java.util.Set;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -58,12 +55,17 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	private ServiceLoader<ImageConverter> converters;
+	private ImageConverter chosenConverter;
+	private TransformedImage img;
+	private MakelangeloRobot chosenRobot;
+	JPanel conversionPanel;
+	JComboBox<String> conversionOptions;
+	private JPanel converterOptionsContainer;
 	
 	/**
 	 * Set of image file extensions.
 	 */
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
-
 	static {
 		IMAGE_FILE_EXTENSIONS = new HashSet<>();
 		IMAGE_FILE_EXTENSIONS.add("jpg");
@@ -75,7 +77,26 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
+	private String[] imageConverterNames;
+	
+	public LoadAndSaveImage() {
+		converters = ServiceLoader.load(ImageConverter.class);
+		Iterator<ImageConverter> ici = converters.iterator();
+		int i=0;
+		while(ici.hasNext()) {
+			ici.next();
+			i++;
+		}
+				
+		imageConverterNames = new String[i];
 
+		i=0;
+		ici = converters.iterator();
+		while (ici.hasNext()) {
+			ImageManipulator f = ici.next();
+			imageConverterNames[i++] = f.getName();
+		}
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -88,93 +109,49 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
 
-
 	protected boolean chooseImageConversionOptions(MakelangeloRobot robot) {
-		final JPanel panel = new JPanel(new GridBagLayout());
-
-		Iterator<ImageConverter> ici = converters.iterator();
-		int i=0;
-		while(ici.hasNext()) {
-			ici.next();
-			i++;
-		}
-				
-		String[] imageConverterNames = new String[i];
-
-		i=0;
-		ici = converters.iterator();
-		while (ici.hasNext()) {
-			ImageManipulator f = ici.next();
-			imageConverterNames[i++] = f.getName();
-		}
-
-		final JComboBox<String> options = new JComboBox<String>(imageConverterNames);
-		final JLabel previewPane = new JLabel();
-		previewPane.setHorizontalAlignment(SwingConstants.CENTER);
-		previewPane.setVerticalAlignment(SwingConstants.CENTER);
+		conversionPanel = new JPanel(new GridBagLayout());
+		conversionOptions = new JComboBox<String>(imageConverterNames);
+		converterOptionsContainer = new JPanel();
+		converterOptionsContainer.setPreferredSize(new Dimension(450,300));
 		
-		options.setSelectedIndex(getPreferredDrawStyle());
+		conversionOptions.setSelectedIndex(getPreferredDrawStyle());
 		
-		options.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-		    {
-				previewPane.setIcon(null);
-				previewPane.setText("No preview available.");
-				ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
-				String imageFilename = chosenConverter.getPreviewImage();
-				if(imageFilename!=null) {
-					//System.out.println("Found '"+imageFilename+"'.");
-					URL iconURL = chosenConverter.getClass().getResource(imageFilename);
-			        if (iconURL != null) {
-				        ImageIcon icon = new ImageIcon(iconURL);
-				        previewPane.setIcon(icon);
-						previewPane.setText(null);
-			        }
-				}
+		conversionOptions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				changeConverter(conversionOptions,robot);
 		    }
 		});
 
 		GridBagConstraints c = new GridBagConstraints();
-
 		int y = 0;
 		c.anchor = GridBagConstraints.EAST;
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
-		panel.add(new JLabel(Translator.get("ConversionStyle")), c);
+		conversionPanel.add(new JLabel(Translator.get("ConversionStyle")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
 		c.gridy = y++;
-		panel.add(options, c);
+		conversionPanel.add(conversionOptions, c);
 		c.anchor=GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth=4;
 		c.gridx=0;
 		c.gridy=y++;
 		c.insets = new Insets(10, 0, 0, 0);
-		previewPane.setPreferredSize(new Dimension(449,325));
+		converterOptionsContainer.setPreferredSize(new Dimension(449,325));
 		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
-		panel.add(previewPane,c);
+		conversionPanel.add(converterOptionsContainer,c);
 		
-		previewPane.setIcon(null);
-		previewPane.setText("No preview available.");
-		ImageConverter chosenConverter = getConverter(options.getSelectedIndex());
-		String imageFilename = chosenConverter.getPreviewImage();
-		if(imageFilename!=null) {
-			//System.out.println("Found '"+imageFilename+"'.");
-			URL iconURL = chosenConverter.getClass().getResource(imageFilename);
-	        if (iconURL != null) {
-		        ImageIcon icon = new ImageIcon(iconURL);
-		        previewPane.setIcon(icon);
-				previewPane.setText(null);
-	        }
-		}
-
-		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("ConversionOptions"),
+		changeConverter(conversionOptions,robot);
+		
+		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			setPreferredDrawStyle(options.getSelectedIndex());
+			stopSwingWorker();
+			setPreferredDrawStyle(conversionOptions.getSelectedIndex());
 			robot.getSettings().saveConfig();
 
 			return true;
@@ -182,11 +159,33 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 		return false;
 	}
+	
+	private void changeConverter(JComboBox<String> options,MakelangeloRobot robot) {
+		//System.out.println("Changing converter");
+		stopSwingWorker();
 
+		chosenConverter = getConverter(options.getSelectedIndex());
+		chosenConverter.setLoadAndSave(this);
+		JPanel p = chosenConverter.getPanel();
+		converterOptionsContainer.removeAll();
+		if(p!=null) {
+			//System.out.println("Adding panel");
+			converterOptionsContainer.add(p);
+			converterOptionsContainer.invalidate();
+		}
+		
+		converterOptionsContainer.getParent().validate();
+		converterOptionsContainer.getParent().repaint();
+
+		createSwingWorker();
+	}
+	
+	public void reconvert() {
+		changeConverter(conversionOptions,chosenRobot);
+	}
+	
 	private ImageConverter getConverter(int arg0) throws IndexOutOfBoundsException {
-		ServiceLoader<ImageConverter> imageConverters = ServiceLoader.load(ImageConverter.class);
-		Iterator<ImageConverter> ici = imageConverters.iterator();
-		ici = imageConverters.iterator();
+		Iterator<ImageConverter> ici = converters.iterator();
 		int i=0;
 		while(ici.hasNext()) {
 			ImageConverter chosenConverter = ici.next();
@@ -205,8 +204,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
-	public boolean load(InputStream in,final MakelangeloRobot robot) {
-		final TransformedImage img;
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		try {
 			img = new TransformedImage( ImageIO.read(in) );
 		} catch (IOException e1) {
@@ -228,64 +226,96 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				img.setScaleY(img.getScaleY() * f);
 			}
 		}
-		
-		// where to save temp output file?
-		final File tempFile;
-		try {
-			tempFile = File.createTempFile("gcode", ".ngc");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		tempFile.deleteOnExit();
         
-		converters = ServiceLoader.load(ImageConverter.class);
-		if (!chooseImageConversionOptions(robot)) return false;
-
-		final ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
+		
+		pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
+		
+		chosenRobot = robot;
+		
+		chooseImageConversionOptions(robot);
+		
+		return true;
+	}
+		
 
-		final SwingWorker<Void, Void> s = new SwingWorker<Void, Void>() {
+	void stopSwingWorker() {
+		if(chosenConverter!=null) {
+			chosenConverter.stopIterating();
+		}
+		if(swingWorker!=null) {
+			//System.out.println("Stopping swingWorker");
+			if(swingWorker.cancel(true)) {
+				System.out.println("stopped OK");
+			} else {
+				System.out.println("stop FAILED");
+			}
+		}
+	}
+
+	void createSwingWorker() {
+		//System.out.println("Starting swingWorker");
+
+		chosenConverter.setProgressMonitor(pm);
+		chosenConverter.setRobot(chosenRobot);
+		chosenConverter.setImage(img);
+		chosenRobot.setDecorator(chosenConverter);
+		
+		swingWorker = new SwingWorker<Void, Void>() {
 			@Override
 			public Void doInBackground() {
+				chosenConverter.setSwingWorker(swingWorker);
 				
+				// where to save temp output file?
+				// FIXME going through temp files every time may be thrashing SSDs.
+				File tempFile;
+				try {
+					tempFile = File.createTempFile("gcode", ".ngc");
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+				tempFile.deleteOnExit();
+
+				// read in image
+				Log.message(Translator.get("Converting") + " " + tempFile.getName());
+				// convert with style
+
 				try (OutputStream fileOutputStream = new FileOutputStream(tempFile);
 					Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-					
-					tempFile.deleteOnExit();
-					// read in image
-					Log.message(Translator.get("Converting") + " " + tempFile.getName());
-					// convert with style
 
-					ImageConverter converter = null;
-					int preferredIndex = getPreferredDrawStyle();
-					int i=0;
-					Iterator<ImageConverter> ici = converters.iterator();
-					while(ici.hasNext()) {
-						converter = ici.next();
-						if(i==preferredIndex) break;
-						++i;
+					while(chosenConverter.iterate()) {
+						Thread.sleep(5);
 					}
-					converter.setParent(this);
-					converter.setProgressMonitor(pm);
-					converter.setRobot(robot);
-					robot.setDecorator(converter);
-					converter.convert(img, out);
-					robot.setDecorator(null);
 
-					if (robot.getSettings().shouldSignName()) {
+					chosenConverter.finish(out);
+					
+					chosenRobot.setDecorator(null);
+					
+					if (chosenRobot.getSettings().shouldSignName()) {
 						// Sign name
 						Generator_Text ymh = new Generator_Text();
-						ymh.setRobot(robot);
+						ymh.setRobot(chosenRobot);
 						ymh.signName(out);
 					}
 				} catch (Exception e) {
 					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
-					robot.setDecorator(null);
+					chosenRobot.setDecorator(null);
 				}
 
 				// out closed when scope of try() ended.
+				
+				LoadAndSaveGCode loader = new LoadAndSaveGCode();
+				try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
+					loader.load(fileInputStream,chosenRobot);
+					MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
+					if(panel!=null) panel.updateButtonAccess();
+				} catch(IOException e) {
+					e.printStackTrace();
+				}
+				tempFile.delete();
+
 
 				pm.setProgress(100);
 				return null;
@@ -293,20 +323,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 			@Override
 			public void done() {
-				pm.close();
-				LoadAndSaveGCode loader = new LoadAndSaveGCode();
-				try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
-					loader.load(fileInputStream,robot);
-					MakelangeloRobotPanel panel = robot.getControlPanel();
-					if(panel!=null) panel.updateButtonAccess();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-				tempFile.delete();
+				if(pm!=null) pm.close();
+				//System.out.println("swingWorker ended");
+				swingWorker=null;
 			}
 		};
 
-		s.addPropertyChangeListener(new PropertyChangeListener() {
+		swingWorker.addPropertyChangeListener(new PropertyChangeListener() {
 			// Invoked when task's progress property changes.
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (Objects.equals("progress", evt.getPropertyName())) {
@@ -314,11 +337,11 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					pm.setProgress(progress);
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
-					if (s.isDone()) {
+					if (swingWorker.isDone()) {
 						Log.message(Translator.get("Finished"));
-					} else if (s.isCancelled() || pm.isCanceled()) {
+					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
-							s.cancel(true);
+							swingWorker.cancel(true);
 						}
 						Log.message(Translator.get("Cancelled"));
 					}
@@ -326,9 +349,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			}
 		});
 
-		s.execute();
-
-		return true;
+		swingWorker.execute();
 	}
 	
 	private void setPreferredDrawStyle(int style) {
