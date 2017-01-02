@@ -161,7 +161,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	
 	private void changeConverter(JComboBox<String> options,MakelangeloRobot robot) {
-		System.out.println("Changing converter");
+		//System.out.println("Changing converter");
 		stopSwingWorker();
 
 		chosenConverter = getConverter(options.getSelectedIndex());
@@ -169,7 +169,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		JPanel p = chosenConverter.getPanel();
 		converterOptionsContainer.removeAll();
 		if(p!=null) {
-			System.out.println("Adding panel");
+			//System.out.println("Adding panel");
 			converterOptionsContainer.add(p);
 			converterOptionsContainer.invalidate();
 		}
@@ -245,7 +245,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			chosenConverter.stopIterating();
 		}
 		if(swingWorker!=null) {
-			System.out.println("Stopping swingWorker");
+			//System.out.println("Stopping swingWorker");
 			if(swingWorker.cancel(true)) {
 				System.out.println("stopped OK");
 			} else {
@@ -255,7 +255,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 
 	void createSwingWorker() {
-		System.out.println("Starting swingWorker");
+		//System.out.println("Starting swingWorker");
 
 		chosenConverter.setProgressMonitor(pm);
 		chosenConverter.setRobot(chosenRobot);
@@ -324,6 +324,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			@Override
 			public void done() {
 				if(pm!=null) pm.close();
+				//System.out.println("swingWorker ended");
 				swingWorker=null;
 			}
 		};
