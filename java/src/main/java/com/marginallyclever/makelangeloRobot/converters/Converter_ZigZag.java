@@ -95,12 +95,12 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public int flipTests() {
 		int start, end, j, once = 0;
 
-		for (start = 0; start < numPoints - 2 && !parent.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < numPoints - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
 			float a = calculateWeight(solution[start], solution[start + 1]);
 			int best_end = -1;
 			double best_diff = 0;
 
-			for (end = start + 2; end <= numPoints && !parent.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end <= numPoints && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
 				// before
 				float b = calculateWeight(solution[end], solution[end - 1]);
 				// after
@@ -114,7 +114,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				}
 			}
 
-			if (best_end != -1 && !parent.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
 				once = 1;
 				// do the flip
 				int begin = start + 1;
@@ -179,7 +179,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		updateProgress(len, 2);
 
 		int once = 1;
-		while (once == 1 && t_elapsed < time_limit && !parent.isCancelled()) {
+		while (once == 1 && t_elapsed < time_limit && !swingWorker.isCancelled()) {
 			once = 0;
 			//@TODO: make these optional for the very thorough people
 			//once|=transposeForwardTest();

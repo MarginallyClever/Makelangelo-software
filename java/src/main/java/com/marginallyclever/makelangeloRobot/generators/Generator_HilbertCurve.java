@@ -1,14 +1,10 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_HilbertCurve extends ImageGenerator {
 	private Turtle turtle;
@@ -18,6 +14,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	private float yMax = 7;
 	private float yMin = -7;
 	private static int order = 4; // controls complexity of curve
+	
+	private MakelangeloRobotPanel robotPanel;
 
 
 	@Override
@@ -25,32 +23,27 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		return Translator.get("HilbertCurveName");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/generators/hilbert-curve.JPG";
+	static public int getOrder() {
+		return order;
 	}
-
-
-
+	static public void setOrder(int order) {
+		if(order<1) order=1;
+		Generator_HilbertCurve.order = order;
+	}
+	
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_HilbertCurve_Panel(this);
+	}
+	
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
+	
 	@Override
 	public boolean generate(Writer out) throws IOException {
-		final JTextField field_order = new JTextField(Integer.toString(order));
-
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
-		panel.add(field_order);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			order = Integer.parseInt(field_order.getText());
-			createCurveNow(out);
-			return true;
-		}
-		return false;
-	}
-
-
-	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -85,6 +78,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		hilbert(out, order);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    
+	    return true;
 	}
 
 

@@ -1,15 +1,10 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,44 +14,36 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 public class Converter_Pulse extends ImageConverter {
 	private static float blockScale = 6.0f;
 	private static int direction = 0;
-
+	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
+	
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
 	}
 
 	@Override
-	public String getPreviewImage() {
-		return "/images/converters/pulse.JPG";
+	public JPanel getPanel() {
+		return new Converter_Pulse_Panel(this);
 	}
-
-
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
-	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField field_size = new JTextField(Float.toString(blockScale));
-
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(new JLabel(Translator.get("HilbertCurveSize")));
-		panel.add(field_size);
-
-		String[] directions = {"horizontal", "vertical"};
-		final JComboBox<String> direction_choices = new JComboBox<>(directions);
-		panel.add(direction_choices);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			blockScale = Float.parseFloat(field_size.getText());
-			direction = direction_choices.getSelectedIndex();
-			convertNow(img,out);
-			return true;
-		}
-		return false;
+	
+	public float getScale() {
+		return blockScale;
 	}
-
+	public void setScale(float value) {
+		if(value<1) value=1;
+		blockScale = value;
+	}
+	public String[] getDirections() {
+		return directionChoices;
+	}
+	public int getDirectionIndex() {
+		return direction;
+	}
+	public void setDirectionIndex(int value) {
+		if(value<0) value=0;
+		if(value>=directionChoices.length) value=directionChoices.length-1;
+		direction = value;
+	}
 
 	/**
 	 * Converts images into zigzags in paper space instead of image space
@@ -64,9 +51,9 @@ public class Converter_Pulse extends ImageConverter {
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
-	private void convertNow(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -128,7 +115,7 @@ public class Converter_Pulse extends ImageConverter {
 							lifted=false;
 							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						}
-						n = n > 0 ? -1 : 1;
+						n = -n;
 					}
 					if(!lifted) {
 						lifted=true;
@@ -159,7 +146,7 @@ public class Converter_Pulse extends ImageConverter {
 							lifted=false;
 							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						}
-						n = n > 0 ? -1 : 1;
+						n = -n;
 					}
 					
 					if(!lifted) {
@@ -186,7 +173,7 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
 						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
-						n *= -1;
+						n = -n;
 					}
 					moveTo(out, x + halfStep, yTop, true);
 				} else {
@@ -202,7 +189,7 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
 						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
-						n *= -1;
+						n = -n;
 					}
 					moveTo(out, x + halfStep, yBottom, true);
 				}

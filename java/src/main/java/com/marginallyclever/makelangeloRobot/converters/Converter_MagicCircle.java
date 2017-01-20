@@ -42,7 +42,7 @@ public class Converter_MagicCircle extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		int numLines = numberOfPoints * numberOfPoints / 2;
 		LineIntensity [] intensities = new LineIntensity[numLines*2];
 		double [] px = new double[numberOfPoints];
@@ -50,7 +50,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
 		liftPen(out);
@@ -76,53 +76,46 @@ public class Converter_MagicCircle extends ImageConverter {
 			intensities[i] = new LineIntensity();
 		}
 		
-		try {
-			// go around the circle, calculating intensities
-			for(i=0;i<numberOfPoints;++i) {
-				for(j=i+1;j<numberOfPoints;++j) {
-					int index = i*numberOfPoints + j;
-					double dx = px[j] - px[i];
-					double dy = py[j] - py[i];
-					double len = Math.floor( Math.sqrt(dx*dx+dy*dy) / toolDiameter );
-					
-					// measure how dark is the image under this line.
-					double intensity = 0;
-					for(k=0;k<len;++k) {
-						double s = (double)k/len; 
-						double fx = px[i] + dx * s;
-						double fy = py[i] + dy * s;
-						intensity += img.sample3x3((float)fx, (float)fy);
-					}
-					intensities[index].intensity = (int)( intensity / len );
-					intensities[index].i=i;
-					intensities[index].j=j;
+		// go around the circle, calculating intensities
+		for(i=0;i<numberOfPoints;++i) {
+			for(j=i+1;j<numberOfPoints;++j) {
+				int index = i*numberOfPoints + j;
+				double dx = px[j] - px[i];
+				double dy = py[j] - py[i];
+				double len = Math.floor( Math.sqrt(dx*dx+dy*dy) / toolDiameter );
+				
+				// measure how dark is the image under this line.
+				double intensity = 0;
+				for(k=0;k<len;++k) {
+					double s = (double)k/len; 
+					double fx = px[i] + dx * s;
+					double fy = py[i] + dy * s;
+					intensity += img.sample3x3((float)fx, (float)fy);
 				}
+				intensities[index].intensity = (int)( intensity / len );
+				intensities[index].i=i;
+				intensities[index].j=j;
 			}
-			
-			// sort by intensity, descending.
-			Arrays.sort(intensities, new IntensityComparator());
-
-			// draw darkest lines first.
-			for(k=0;k<numberToDraw;++k) {
-				i = intensities[k].i;
-				j = intensities[k].j;
-				System.out.println(intensities[k].intensity);
-				assert(intensities[k].intensity<255);
-				moveTo(out,px[i],py[i],true);
-				moveTo(out,px[i],py[i],false);
-				//lowerPen(out);
-				moveTo(out,px[j],py[j],false);
-				moveTo(out,px[j],py[j],true);
-				//liftPen(out);
-			}
-	
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
 		}
-		return true;
+		
+		// sort by intensity, descending.
+		Arrays.sort(intensities, new IntensityComparator());
+
+		// draw darkest lines first.
+		for(k=0;k<numberToDraw;++k) {
+			i = intensities[k].i;
+			j = intensities[k].j;
+			System.out.println(intensities[k].intensity);
+			assert(intensities[k].intensity<255);
+			moveTo(out,px[i],py[i],true);
+			moveTo(out,px[i],py[i],false);
+			//lowerPen(out);
+			moveTo(out,px[j],py[j],false);
+			moveTo(out,px[j],py[j],true);
+			//liftPen(out);
+		}
+
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 }
 

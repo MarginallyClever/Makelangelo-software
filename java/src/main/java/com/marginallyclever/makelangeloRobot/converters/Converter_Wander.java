@@ -1,20 +1,15 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
 
+// create random lines across the image.  Raise and lower the pen to darken the appropriate areas
 public class Converter_Wander extends ImageConverter {
 	static protected int numLines = 2500;
 	
@@ -23,33 +18,15 @@ public class Converter_Wander extends ImageConverter {
 		return Translator.get("ConverterWanderName");
 	}
 
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
-	 */
 	@Override
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		final JTextField numLinesField = new JTextField(Integer.toString(numLines));
-
-		JPanel panel = new JPanel(new GridLayout(0,1));
-		panel.add(new JLabel(Translator.get("ConverterWanderLineCount")));
-		panel.add(numLinesField);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			numLines = Integer.parseInt(numLinesField.getText());
-			if(numLines<=1) numLines=1;
-			
-			return convertNow(img,out);
-		}
-		return false;
+	public JPanel getPanel() {
+		return new Converter_Wander_Panel(this);
 	}
 	
-	protected boolean convertNow(TransformedImage img,Writer out) throws IOException {
+	public void finish(Writer out) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
@@ -57,7 +34,6 @@ public class Converter_Wander extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		// figure out how many lines we're going to have on this image.
 		float steps = machine.getDiameter()*5;
 		if (steps < 1) steps = 1;
 
@@ -95,8 +71,6 @@ public class Converter_Wander extends ImageConverter {
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
-	    
-		return true;
 	}
 	
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double level,TransformedImage img,Writer out) throws IOException {
@@ -120,6 +94,14 @@ public class Converter_Wander extends ImageConverter {
 			}
 			lineTo(out, x, y, v>=level);
 		}
+	}
+
+	public int getLineCount() {
+		return numLines;
+	}
+	public void setLineCount(int value) {
+		if(value<1) value=1;
+		numLines = value;
 	}
 }
 

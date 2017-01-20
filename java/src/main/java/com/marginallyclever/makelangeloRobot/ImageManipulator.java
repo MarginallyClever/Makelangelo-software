@@ -20,14 +20,14 @@ public abstract class ImageManipulator {
 	
 	// threading
 	protected ProgressMonitor pm;
-	protected SwingWorker<Void, Void> parent;
+	protected SwingWorker<Void, Void> swingWorker;
 
 	// helpers
 	protected MakelangeloRobotSettings machine;
 
 
-	public void setParent(SwingWorker<Void, Void> p) {
-		parent = p;
+	public void setSwingWorker(SwingWorker<Void, Void> p) {
+		swingWorker = p;
 	}
 
 	public void setProgressMonitor(ProgressMonitor p) {
@@ -36,13 +36,6 @@ public abstract class ImageManipulator {
 	
 	public void setRobot(MakelangeloRobot robot) {
 		machine = robot.getSettings();
-	}
-	
-	/**
-	 * @return the filename of the preview image, or null if no filename known.
-	 */
-	public String getPreviewImage() {
-		return null;
 	}
 
 

@@ -2,8 +2,6 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
@@ -19,15 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 
 public class Generator_Text extends ImageGenerator {
@@ -58,6 +51,8 @@ public class Generator_Text extends ImageGenerator {
 	private static int lastSize = 20;
 	private static Font [] fontList;
 	private static String [] fontNames;
+	
+	private MakelangeloRobotPanel robotPanel;
 
 	public Generator_Text() {		
 		// build list of fonts
@@ -71,17 +66,50 @@ public class Generator_Text extends ImageGenerator {
 			fontNames[i++] = f.getFontName(locale);
 		}
 	}
+	
+	public String [] getFontNames() {
+		return fontNames;
+	}
+	public int getLastFont() {
+		return lastFont;
+	}
+	public void setFont(int arg0) {
+		if(arg0<0) arg0=0;
+		if(arg0>=fontNames.length) arg0 = fontNames.length-1;
+		lastFont = arg0;
+	}
+	
+	
+	public int getLastSize() {
+		return lastSize;
+	}
+	public void setSize(int size) {
+		if(size<1)size=1;
+		lastSize=size;
+	}
+	
+	public String getLastMessage() {
+		return lastMessage;
+	}
+	public void setMessage(String msg) {
+		lastMessage = msg;
+	}
 
 	@Override
 	public String getName() {
 		return Translator.get("YourMsgHereName");
 	}
-
+	
 	@Override
-	public String getPreviewImage() {
-		return "/images/generators/text.JPG";
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_Text_Panel(this);
 	}
-
+	
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
 
 	protected void setupTransform() {
 		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
@@ -136,51 +164,14 @@ public class Generator_Text extends ImageGenerator {
 		posy = 0;
 	}
 
-
-	@Override
-	public boolean generate(Writer out) throws IOException {
-		final JTextArea text = new JTextArea(lastMessage, 6, 60);
-		final SelectFloat size = new SelectFloat();
-		size.setValue(lastSize);
-		final JComboBox<String> fontChoices = new JComboBox<String>(fontNames);
-		fontChoices.setSelectedIndex(lastFont);
-		
-		JPanel panel = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.NORTHWEST;
-
-		c.gridx=0;
-		panel.add(size,c);
-		c.gridx=1;
-		panel.add(fontChoices,c);
-		c.gridx=0;
-		c.gridy++;
-		c.gridwidth=2;
-		panel.add(new JScrollPane(text),c);
-
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			lastMessage = text.getText();
-			lastSize = ((Number)size.getValue()).intValue();
-			lastFont = fontChoices.getSelectedIndex();
-			createMessage(fontNames[lastFont],lastSize,lastMessage, out);
-			//createMessage("TimesRoman",مرحبا بالعالم",18");
-			//createMessage("TimesRoman",36,"Makelangelo");
-
-			return true;
-		}
-		return false;
-	}
-
 	
-	private void writeBeautifulMessage(String fontName,int fontSize, String text, Writer output) throws IOException {
-		String[] pieces=text.split("\n");
-		System.out.println("lines of text="+pieces.length);
+	private void writeBeautifulMessage(String fontName,int fontSize, String message, Writer output) throws IOException {
+		if(message.length()<=0) {
+			return;
+		}
+		
+		String[] messagePieces=message.split("\n");
+		System.out.println("lines of text="+messagePieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
@@ -189,8 +180,10 @@ public class Generator_Text extends ImageGenerator {
 		float yFirstStep = 0;
 		float xMax=0;
 		int p;
-		for(p=0;p<pieces.length;++p) {
-			TextLayout textLayout = new TextLayout(pieces[p],font,frc);
+		for(p=0;p<messagePieces.length;++p) {
+			String piece = messagePieces[p];
+			if(piece==null || piece.length()==0) piece="\n";
+			TextLayout textLayout = new TextLayout(piece,font,frc);
 			Shape s = textLayout.getOutline(null);
 			Rectangle bounds = s.getBounds();
 			yTotal += bounds.getHeight();
@@ -214,14 +207,16 @@ public class Generator_Text extends ImageGenerator {
 		float dx = xMax / 2.0f;
 		float dy = -yTotal/2.0f+yFirstStep/2.0f;
 
-		for(p=0;p<pieces.length;++p) {
-			TextLayout textLayout = new TextLayout(text,font,frc);
-			Shape s = textLayout.getOutline(null);
-			Rectangle bounds = s.getBounds();
+		for(p=0;p<messagePieces.length;++p) {
+			String piece = messagePieces[p];
+			if(piece==null || piece.length()==0) piece="\n";
+			//TextLayout textLayout = new TextLayout(piece,font,frc);
+			//Shape s = textLayout.getOutline(null);
+			//Rectangle bounds = s.getBounds();
 
-			writeBeautifulString(font,frc,pieces[p],output, dx, dy);
+			writeBeautifulString(font,frc,piece,output, dx, dy);
 			
-			dy += bounds.getHeight();
+			dy += fontSize;//bounds.getHeight();
 		}
 	}
 	
@@ -310,7 +305,10 @@ public class Generator_Text extends ImageGenerator {
 		}
 	}
 
-	private void createMessage(String fontName, int fontSize, String str, Writer out) throws IOException {
+	@Override
+	public boolean generate(Writer out) throws IOException {
+		String fontName = fontNames[lastFont];
+
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -320,20 +318,12 @@ public class Generator_Text extends ImageGenerator {
 		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
-		//
-		writeBeautifulMessage(fontName,fontSize,lastMessage,out);
-/*
-		posx=0;
-		posy=0;
-		textSetAlign(Align.RIGHT);
-		textSetVAlign(VAlign.TOP);
-		textSetPosition((float)((machine.getPaperWidth()/2.0f)*10.0f*machine.getPaperMargin()),
-						(float)((machine.getPaperHeight()/2.0f)*10.0f*machine.getPaperMargin()));
-		textCreateMessageNow(lastMessage, out);
-*/
+		writeBeautifulMessage(fontName,lastSize,lastMessage,out);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    return true;
 	}
+	
 	public void textSetPosition(float x, float y) {
 		posx = x;
 		posy = y;

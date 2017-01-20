@@ -1,14 +1,10 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
@@ -17,13 +13,11 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_SierpinskiTriangle extends ImageGenerator {
 	private Turtle turtle;
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
-	private float yMin = -7;
-	private static int order = 4; // controls complexity of curve
-
+	private float xMax, xMin, yMax, yMin;
 	private float maxSize;
+	private static int order = 4; // controls complexity of curve
+	
+	private MakelangeloRobotPanel robotPanel;
 
 
 	@Override
@@ -31,39 +25,28 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		return Translator.get("SierpinskiTriangleName");
 	}
 
-	@Override
-	public String getPreviewImage() {
-		return "/images/generators/SierpinskiTriangle.JPG";
+
+	static public int getOrder() {
+		return order;
 	}
-
-
+	static public void setOrder(int order) {
+		if(order<1) order=1;
+		Generator_SierpinskiTriangle.order = order;
+	}
+	
+	@Override
+	public JPanel getPanel(MakelangeloRobotPanel arg0) {
+		robotPanel = arg0;
+		return new Generator_SierpinskiTriangle_Panel(this);
+	}
+	
+	@Override
+	public void regenerate() {
+		robotPanel.regenerate(this);
+	}
 	
 	@Override
 	public boolean generate(Writer out) throws IOException {
-		boolean tryAgain=false;
-		do {
-			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel(Translator.get("HilbertCurveOrder")));
-
-			JTextField field_order = new JTextField(Integer.toString(order));
-			panel.add(field_order);
-
-			int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-			if (result == JOptionPane.OK_OPTION) {
-				order = Integer.parseInt(field_order.getText());
-				if(order<1) order=1;
-
-				createCurveNow(out);
-				return true;
-			}
-		}
-		while(tryAgain == true);
-
-		return false;
-	}
-
-
-	private void createCurveNow(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
 		machine.writeChangeTo(out);
@@ -95,23 +78,20 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		liftPen(out);
 		// move to starting position
 		turtle.setX(xMax);
-		if( (order&1) == 0 ) {
-			turtle.setY(xMax/2);
-		} else{
-			turtle.setY(-xMax/2);
-		}
+		turtle.setY(-xMax/2);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
 		turtle.turn(90);
 		if( (order&1) == 0 ) {
-			drawCurve(out, order, maxSize,60);
+			drawCurve(out, order, maxSize,-60);
 		} else {
 			turtle.turn(60);
 			drawCurve(out, order, maxSize,-60);
 		}
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		return true;
 	}
 
 

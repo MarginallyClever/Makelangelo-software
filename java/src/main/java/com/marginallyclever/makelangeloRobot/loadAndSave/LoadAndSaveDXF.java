@@ -93,7 +93,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		checkInfill.setSelected(shouldInfillOnLoad);
 		checkOptimize.setSelected(shouldOptimizePathingOnLoad);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			shouldScaleOnLoad = checkScale.isSelected();
 			shouldInfillOnLoad = checkInfill.isSelected();
