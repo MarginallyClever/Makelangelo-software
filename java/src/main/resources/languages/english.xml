@@ -268,8 +268,8 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 for images (dxf)</value>
+		<key>FileTypeSVG</key>
+		<value>Scaleable Vector Graphics 1.1 (svg)</value>
 		<hint>file open dialog</hint>
 	</string>
 
