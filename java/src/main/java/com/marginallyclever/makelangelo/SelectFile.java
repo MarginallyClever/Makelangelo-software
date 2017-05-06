@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SelectSound extends JPanel implements ActionListener {
+public class SelectFile extends JPanel implements ActionListener {
 	/**
 	 * 
 	 */
@@ -21,7 +21,7 @@ public class SelectSound extends JPanel implements ActionListener {
 	private JTextField fieldValue;
 	private JButton chooseButton;
 	
-	public SelectSound(String labelValue,String defaultValue) {
+	public SelectFile(String labelValue,String defaultValue) {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints labelConstraint = new GridBagConstraints();
 		GridBagConstraints fieldConstraint = new GridBagConstraints();
