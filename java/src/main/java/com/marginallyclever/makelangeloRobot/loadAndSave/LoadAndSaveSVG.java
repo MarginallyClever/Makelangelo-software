@@ -1,46 +1,14 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
-import java.awt.GridLayout;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.kabeja.dxf.Bounds;
-import org.kabeja.dxf.DXFConstants;
-import org.kabeja.dxf.DXFDocument;
-import org.kabeja.dxf.DXFEntity;
-import org.kabeja.dxf.DXFLWPolyline;
-import org.kabeja.dxf.DXFLayer;
-import org.kabeja.dxf.DXFLine;
-import org.kabeja.dxf.DXFPolyline;
-import org.kabeja.dxf.DXFSpline;
-import org.kabeja.dxf.DXFVertex;
-import org.kabeja.dxf.helpers.DXFSplineConverter;
-import org.kabeja.dxf.helpers.Point;
-import org.kabeja.parser.DXFParser;
-import org.kabeja.parser.ParseException;
-import org.kabeja.parser.Parser;
-import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -51,13 +19,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  *
  */
 public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
-	private static boolean shouldScaleOnLoad=true;
-	private static boolean shouldInfillOnLoad=true;
-	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
-	private double previousX,previousY;
-	private double scale,imageCenterX,imageCenterY;
-	private boolean writeNow;
 	
 	@Override
 	public String getName() { return "SVG"; }
