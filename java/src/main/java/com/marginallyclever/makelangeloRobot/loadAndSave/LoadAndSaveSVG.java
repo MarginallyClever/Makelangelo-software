@@ -1,11 +1,35 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.anim.dom.SVGOMPathElement;
+import org.apache.batik.anim.dom.SVGOMSVGElement;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgent;
+import org.apache.batik.bridge.UserAgentAdapter;
+import org.apache.batik.dom.svg.SVGItem;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGPathSeg;
+import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
+import org.w3c.dom.svg.SVGPathSegLinetoAbs;
+import org.w3c.dom.svg.SVGPathSegList;
+import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
@@ -21,6 +45,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
+	protected boolean shouldScaleOnLoad = true;
+	
+	protected double maxX,minX,maxY,minY;
+	protected double scale,imageCenterX,imageCenterY;
+	
 	@Override
 	public String getName() { return "SVG"; }
 	
@@ -32,21 +61,243 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	@Override
 	public boolean canLoad() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean canLoad(String filename) {
-		//String ext = filename.substring(filename.lastIndexOf('.'));
-		//return (ext.equalsIgnoreCase(".svg"));
-		return false;
+		String ext = filename.substring(filename.lastIndexOf('.'));
+		return (ext.equalsIgnoreCase(".svg"));
 	}
 
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
-		return false;
+		Log.message("Loading...");
+		// set up a temporary file
+		File tempFile;
+		try {
+			tempFile = File.createTempFile("temp", ".ngc");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		tempFile.deleteOnExit();
+		Log.message(Translator.get("Converting") + " " + tempFile.getName());
+
+		
+		Document document = newDocumentFromInputStream(in);
+		initSVGDOM(document);
+		NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
+
+	    boolean loadOK=true;
+
+		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+
+			// prepare for exporting
+			machine = robot.getSettings();
+			double toolMinimumStepSize = machine.getDiameter() * 2.0;
+			setAbsoluteMode(out);
+			
+			minX = minY =Double.MAX_VALUE;
+			maxX = maxY =-Double.MAX_VALUE;
+			imageCenterX=imageCenterY=0;
+			scale=1;
+			loadOK = parseElements(out,pathNodes,false);
+			if(loadOK) {
+				imageCenterX = ( maxX + minX ) / 2.0;
+				imageCenterY = -( maxY + minY ) / 2.0;
+	
+				double imageWidth  = maxX - minX;
+				double imageHeight = maxY - minY;
+				double paperHeight = robot.getSettings().getPaperHeight() * 10.0 * robot.getSettings().getPaperMargin();
+				double paperWidth  = robot.getSettings().getPaperWidth () * 10.0 * robot.getSettings().getPaperMargin();
+	
+				scale = 1;
+				if(shouldScaleOnLoad) {
+					double innerAspectRatio = imageWidth / imageHeight;
+					double outerAspectRatio = paperWidth / paperHeight;
+					scale = (innerAspectRatio >= outerAspectRatio) ?
+							(paperWidth / imageWidth) :
+							(paperHeight / imageHeight);
+				}
+				
+				loadOK = parseElements(out,pathNodes,true);
+			}		    
+			// entities finished. Close up file.
+			liftPen(out);
+		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			out.flush();
+			out.close();
+
+			Log.message(loadOK?"Loaded OK!":"Failed to load some elements.");
+			if(loadOK) {
+				LoadAndSaveGCode loader = new LoadAndSaveGCode();
+				InputStream fileInputStream = new FileInputStream(tempFile);
+				loader.load(fileInputStream,robot);
+			}			
+		} catch (IOException e) {
+			e.printStackTrace();
+			loadOK=false;
+		}
+
+		return loadOK;
 	}
 
+	/**
+	 * Parse through all the SVG elements and raster them to gcode.
+	 * @param out the writer to send the gcode
+	 * @param pathNodes the source of the elements
+	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
+	 */
+	protected boolean parseElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
+	    boolean loadOK=true;
+
+	    double previousX,previousY,x,y;
+	    x=previousX = machine.getHomeX();
+		y=previousY = machine.getHomeY();
+		
+	    int pathNodeCount = pathNodes.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    	SVGOMPathElement pathElement = ((SVGOMPathElement)pathNodes.item( iPathNode ));
+	    	SVGPathSegList pathList = pathElement.getNormalizedPathSegList();
+	    	int pathObjects = pathList.getNumberOfItems();
+			//System.out.println("New Node has "+pathObjects+" elements.");
+
+			for (int i = 0; i < pathObjects; i++) {
+				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
+				switch( item.getPathSegType() ) {
+				case SVGPathSeg.PATHSEG_CLOSEPATH:
+					{
+						//System.out.println("Close path");
+						if(write) moveTo(out,previousX,previousY,false);
+						x=previousX;
+						y=previousY;
+					}
+					break;
+				case SVGPathSeg.PATHSEG_MOVETO_ABS:
+					{
+						//System.out.println("Move Abs");
+						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
+						if(write) {
+							liftPen(out);
+							moveTo(out,x,y,true);
+						} 
+						x = ( path.getX() - imageCenterX ) * scale;
+						y = ( path.getY() - imageCenterY ) * -scale;
+						if(write) {
+							moveTo(out,x,y,true);
+							lowerPen(out);
+							moveTo(out,x,y,false);
+						} else adjustLimits(x,y);
+						previousX=x;
+						previousY=y;
+					}
+					break;
+				case SVGPathSeg.PATHSEG_LINETO_ABS:
+					{
+						//System.out.println("Line Abs");
+						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
+						x = ( path.getX() - imageCenterX ) * scale;
+						y = ( path.getY() - imageCenterY ) * -scale;
+						if(write) moveTo(out,x,y,false);
+						else adjustLimits(x,y);
+					}
+					break;
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: 
+					{
+						//System.out.println("Curve Cubic Abs");
+						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
+						// x,y is the first point
+						// x0,y0 is the first control point
+						double x0=( path.getX1() - imageCenterX ) * scale;
+						double y0=( path.getY1() - imageCenterY ) * -scale;
+						// x1,y1 is the second control point
+						double x1=( path.getX2() - imageCenterX ) * scale;
+						double y1=( path.getY2() - imageCenterY ) * -scale;
+						// x2,y2 is the third control point
+						double x2=( path.getX() - imageCenterX ) * scale;
+						double y2=( path.getY() - imageCenterY ) * -scale;
+
+						double xabc=x,yabc=y;
+						for(double j=0;j<1;j+=0.1) {
+							double xa = p(x ,x0,j);
+							double ya = p(y ,y0,j);
+							double xb = p(x0,x1,j);
+							double yb = p(y0,y1,j);
+							double xc = p(x1,x2,j);
+							double yc = p(y1,y2,j);
+							
+							double xab = p(xa,xb,j);
+							double yab = p(ya,yb,j);
+							double xbc = p(xb,xc,j);
+							double ybc = p(yb,yc,j);
+							
+							xabc = p(xab,xbc,j);
+							yabc = p(yab,ybc,j);
+							
+							if(write) moveTo(out,xabc,yabc,false);
+							else adjustLimits(xabc,yabc);
+						}
+						x = xabc;
+						y = yabc;
+					}
+					break; 
+				default:
+					System.out.print(item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = ");
+					System.out.println(((SVGItem)item).getValueAsString());
+					loadOK=false;
+				}
+			}
+		}
+	    return loadOK;
+	}
+	
+	protected void adjustLimits(double x,double y) {
+		if(minX>x) minX = x;
+		if(maxX<x) maxX = x;
+		if(minY>y) minY = y;
+		if(maxY<y) maxY = y;
+	}
+
+	protected double p(double a,double b,double fraction) {
+		return ( b - a ) * fraction + a;
+	}
+	
+
+	/**
+	 * Enhance the SVG DOM for the given document to provide CSS- and
+	 * SVG-specific DOM interfaces.
+	 * 
+	 * @param document
+	 *            The document to enhance.
+	 * @link http://wiki.apache.org/xmlgraphics-batik/BootSvgAndCssDom
+	 */
+	private void initSVGDOM(Document document) {
+		UserAgent userAgent = new UserAgentAdapter();
+		DocumentLoader loader = new DocumentLoader(userAgent);
+		BridgeContext bridgeContext = new BridgeContext(userAgent, loader);
+		bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
+
+		// Enable CSS- and SVG-specific enhancements.
+		(new GVTBuilder()).build(bridgeContext, document);
+	}
+
+	public static SVGDocument newDocumentFromInputStream(InputStream in) {
+		SVGDocument ret = null;
+
+		try {
+			String parser = XMLResourceDescriptor.getXMLParserClassName();
+	        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+	        ret = (SVGDocument) factory.createDocument("",in);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return ret;
+	}
+	  
 	@Override
 	public boolean canSave() {
 		return true;

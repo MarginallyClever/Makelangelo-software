@@ -198,7 +198,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-
+		// set up a temporary file
 		File tempFile;
 		try {
 			tempFile = File.createTempFile("temp", ".ngc");
