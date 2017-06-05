@@ -150,8 +150,8 @@ public final class MakelangeloRobotSettings {
 		// pen
 		diameter = 0.8f;
 		zRate = 50;
-		zOn = 90;
-		zOff = 50;
+		zOn = 50;
+		zOff = 90;
 		penDownColor = Color.BLACK;
 		penUpColor = Color.BLUE;
 		
