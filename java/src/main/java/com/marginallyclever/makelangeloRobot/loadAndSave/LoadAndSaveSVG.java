@@ -96,7 +96,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolMinimumStepSize = machine.getDiameter() * 2.0;
 			setAbsoluteMode(out);
 			
 			minX = minY =Double.MAX_VALUE;

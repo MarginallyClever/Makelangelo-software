@@ -18,6 +18,18 @@
 	</string>
 	
 	<string>
+		<key>ConverterCMYKPasses</key>
+		<value>Passes</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKNote</key>
+		<value>Draws Yellow, Cyan, Magenta, and then Black.  Do not run from SD card (yet!)</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
 		<key>DXFScaleOnLoad</key>
 		<value>Scale image to fit paper</value>
 		<hint>DXF load option</hint>

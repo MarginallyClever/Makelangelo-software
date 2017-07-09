@@ -1,4 +1,5 @@
 com.marginallyclever.makelangeloRobot.converters.Converter_Boxes
+com.marginallyclever.makelangeloRobot.converters.Converter_CMYK
 com.marginallyclever.makelangeloRobot.converters.Converter_Crosshatch
 com.marginallyclever.makelangeloRobot.converters.Converter_Multipass
 com.marginallyclever.makelangeloRobot.converters.Converter_Pulse
