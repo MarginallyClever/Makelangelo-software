@@ -18,6 +18,12 @@
 	</string>
 	
 	<string>
+		<key>ConverterCMYKName</key>
+		<value>CMYK</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
 		<key>ConverterCMYKPasses</key>
 		<value>Passes</value>
 		<hint>CMYK converter hint</hint>

@@ -53,20 +53,21 @@ public class Converter_CMYK extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		
-		outputChannel(out,cmyk.getY(),0 ,cutoffY,new Color(255,242,  0));
-		outputChannel(out,cmyk.getC(),15,cutoffC,new Color(  0,174,239));
-		outputChannel(out,cmyk.getM(),75,cutoffM,new Color(236,  0,140));
-		outputChannel(out,cmyk.getK(),45,cutoffK,new Color(  0,  0,  0));
+		outputChannel(out,cmyk.getY(),0 ,new Color(255,242,  0));
+		outputChannel(out,cmyk.getC(),15,new Color(  0,174,239));
+		outputChannel(out,cmyk.getM(),75,new Color(236,  0,140));
+		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 	
-	void outputChannel(Writer out,TransformedImage img,float angle,double channelCutoff,Color newColor) throws IOException {
+	void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
-
+		final double [] channelCutoff = {51,153,102,204};
+		
 		liftPen(out);
 		machine.writeChangeTo(out,newColor);
 
@@ -94,9 +95,9 @@ public class Converter_CMYK extends ImageConverter {
 			endPY   = majorPY - majorX * radius;
 
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff,img,out);
+				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff[i%4],img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff,img,out);
+				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff[i%4],img,out);
 			}
 			++i;
 		}
