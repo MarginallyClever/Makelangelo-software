@@ -32,6 +32,9 @@ public class Filter_GaussianBlur extends ImageFilter {
 
 		BufferedImage dest = new BufferedImage(img.getSourceImage().getWidth(), img.getSourceImage().getHeight(), img.getSourceImage().getType());
 
+	    TransformedImage after = new TransformedImage(img);
+	    BufferedImage afterBI = after.getSourceImage();
+	    
 		// scales could be filled with a gaussian curve: float[] scales = new float[radius];
 		float[] scales = new float[3];
 		scales[0] = 1.0f / 4.0f;
@@ -98,7 +101,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 
 				pixel.mul(1.0 / sum);
 				//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
-				img.getSourceImage().setRGB(x, y, pixel.toInt());
+				afterBI.setRGB(x, y, pixel.toInt());
 			}
 		}
 
@@ -110,7 +113,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 			e.printStackTrace();
 		}
 
-		return img;
+		return after;
 	}
 }
 

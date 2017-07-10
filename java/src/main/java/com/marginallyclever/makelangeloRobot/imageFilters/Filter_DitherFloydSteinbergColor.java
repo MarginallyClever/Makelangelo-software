@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangeloRobot.imageFilters;
 
+import java.awt.image.BufferedImage;
+
 import com.marginallyclever.makelangelo.ColorPalette;
 import com.marginallyclever.makelangelo.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
@@ -22,8 +24,8 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
   }
 
 
-  private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction) {
-    int w = img.getSourceImage().getWidth();
+  private void ditherDirection(TransformedImage img, BufferedImage after, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction) {
+    int w = after.getWidth();
     ColorRGB oldPixel = new ColorRGB(0, 0, 0);
     ColorRGB newPixel = new ColorRGB(0, 0, 0);
     ColorRGB quant_error = new ColorRGB(0, 0, 0);
@@ -46,7 +48,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
       // newpixel := find_closest_palette_color(oldpixel)
       newPixel = palette.quantize(oldPixel);
       // pixel[x][y] := newpixel
-      img.getSourceImage().setRGB(x, y, newPixel.toInt());
+      after.setRGB(x, y, newPixel.toInt());
       // quant_error := oldpixel - newpixel
       quant_error.set(oldPixel.sub(newPixel));
       // pixel[x+1][y  ] += 7/16 * quant_error
@@ -78,9 +80,12 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
       nexterror[y] = new ColorRGB(0, 0, 0);
     }
 
+    TransformedImage after = new TransformedImage(img);
+    BufferedImage afterBI = after.getSourceImage();
+    
     // for each y from top to bottom
     for (y = 0; y < h; ++y) {
-      ditherDirection(img, y, error, nexterror, direction);
+      ditherDirection(img, afterBI, y, error, nexterror, direction);
 
       direction = -direction;
       ColorRGB[] tmp = error;
@@ -88,7 +93,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
       nexterror = tmp;
     }
 
-    return img;
+    return after;
   }
 }
 

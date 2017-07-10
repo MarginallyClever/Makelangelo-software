@@ -47,6 +47,9 @@ public class Filter_BlackAndWhite extends ImageFilter {
 
     double pixel;
 
+    TransformedImage after = new TransformedImage(img);
+    BufferedImage afterBI = after.getSourceImage();
+    
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
         pixel = decode32bit(bi.getRGB(x, y));
@@ -57,11 +60,11 @@ public class Filter_BlackAndWhite extends ImageFilter {
         if (b > 255) b = 255;
         if (b < 0) b = 0;
         //if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
-        bi.setRGB(x, y, ImageFilter.encode32bit(b));
+        afterBI.setRGB(x, y, ImageFilter.encode32bit(b));
       }
     }
 
-    return img;
+    return after;
   }
 
 

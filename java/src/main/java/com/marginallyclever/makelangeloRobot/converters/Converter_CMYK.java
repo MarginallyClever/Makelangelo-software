@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -16,10 +17,10 @@ public class Converter_CMYK extends ImageConverter {
 	static protected int passes=4;
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 	// Lift the pen any time the color value is > cutoff
-	protected double cutoffC=128.0;
-	protected double cutoffY=128.0;
-	protected double cutoffM=128.0;
-	protected double cutoffK=128.0;
+	protected double cutoffC=137.66666666666666666666666666667;  // cyan is (0,174,239), average components to get intensity
+	protected double cutoffY=165.66666666666666666666666666667;  // yellow is (255,242,0), average components to get intensity
+	protected double cutoffM=125.33333333333333333333333333333;  // magenta is (236,0,140), average components to get intensity
+	protected double cutoffK=127;
 	
 	@Override
 	public String getName() {
@@ -52,26 +53,26 @@ public class Converter_CMYK extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		
-		outputChannel(out,cmyk.getY(),0 ,cutoffY);
-		outputChannel(out,cmyk.getC(),15,cutoffC);
-		outputChannel(out,cmyk.getM(),75,cutoffM);
-		outputChannel(out,cmyk.getK(),45,cutoffK);
+		outputChannel(out,cmyk.getY(),0 ,cutoffY,new Color(255,242,  0));
+		outputChannel(out,cmyk.getC(),15,cutoffC,new Color(  0,174,239));
+		outputChannel(out,cmyk.getM(),75,cutoffM,new Color(236,  0,140));
+		outputChannel(out,cmyk.getK(),45,cutoffK,new Color(  0,  0,  0));
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 	
-	void outputChannel(Writer out,TransformedImage img,float angle,double channelCutoff) throws IOException {
+	void outputChannel(Writer out,TransformedImage img,float angle,double channelCutoff,Color newColor) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeTo(out,newColor);
 
 		// figure out how many lines we're going to have on this image.
-		float steps = machine.getDiameter()*passes;
-		if (steps < 1) steps = 1;
+		float stepSize = machine.getDiameter()*passes;
+		if (stepSize < 1) stepSize = 1;
 
 		// from top to bottom of the margin area...
 		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
@@ -81,11 +82,10 @@ public class Converter_CMYK extends ImageConverter {
 		double dy = yTop - yBottom;
 		double dx = xRight - xLeft;
 		double radius = Math.sqrt(dx*dx+dy*dy);
-		double r2     = radius*2;
 
 		double majorPX,majorPY,startPX,startPY,endPX,endPY,a;
 		int i=0;
-		for(a = -radius;a<radius;a+=steps) {
+		for(a = -radius;a<radius;a+=stepSize) {
 			majorPX = majorX * a;
 			majorPY = majorY * a;
 			startPX = majorPX - majorY * radius;
@@ -94,36 +94,13 @@ public class Converter_CMYK extends ImageConverter {
 			endPY   = majorPY - majorX * radius;
 
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,channelCutoff,img,out);
+				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff,img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,steps,r2,channelCutoff,img,out);
+				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff,img,out);
 			}
 			++i;
 		}
 		liftPen(out);
-	}
-	
-	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double channelCutoff,TransformedImage img,Writer out) throws IOException {
-		double b;
-		double dx=x1-x0;
-		double dy=y1-y0;
-		double halfStep = stepSize/2.0;
-		double steps = r2 / stepSize;
-		if(steps<1) steps=1;
-
-		double n,x,y,v;
-
-		for (b = 0; b <= steps; ++b) {
-			n = b / steps;
-			x = dx * n + x0;
-			y = dy * n + y0;
-			if(isInsidePaperMargins(x, y)) {
-				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-			} else {
-				v = 255;
-			}
-			lineTo(out, x, y, v>=channelCutoff);
-		}
 	}
 }
 

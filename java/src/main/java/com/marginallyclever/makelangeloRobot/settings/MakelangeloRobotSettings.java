@@ -76,6 +76,7 @@ public final class MakelangeloRobotSettings {
 	protected float zOff;
 	protected float zOn;
 	protected float zRate;
+	protected Color penDownColorDefault;
 	protected Color penDownColor;
 	protected Color penUpColor;
 	// speed control
@@ -152,7 +153,7 @@ public final class MakelangeloRobotSettings {
 		zRate = 50;
 		zOn = 50;
 		zOff = 90;
-		penDownColor = Color.BLACK;
+		penDownColor = penDownColorDefault = Color.BLACK;
 		penUpColor = Color.BLUE;
 		
 		// diameter = circumference/pi
@@ -504,7 +505,7 @@ public final class MakelangeloRobotSettings {
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
-		penDownColor = new Color(r,g,b);
+		penDownColor = penDownColorDefault = new Color(r,g,b);
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
@@ -520,9 +521,9 @@ public final class MakelangeloRobotSettings {
 		//prefs.put("tool_number", Integer.toString(toolNumber));
 		prefs.put("feed_rate", Float.toString(maxFeedRate));
 		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
-		prefs.putInt("penDownColorR", penDownColor.getRed());
-		prefs.putInt("penDownColorG", penDownColor.getGreen());
-		prefs.putInt("penDownColorB", penDownColor.getBlue());
+		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
+		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
+		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
@@ -706,8 +707,16 @@ public final class MakelangeloRobotSettings {
 		paperColor = arg0;
 	}
 	
+	public Color getPenDownColorDefault() {
+		return penDownColorDefault;
+	}
+	
 	public Color getPenDownColor() {
 		return penDownColor;
+	}
+	
+	public void setPenDownColorDefault(Color arg0) {
+		penDownColorDefault=arg0;
 	}
 	
 	public void setPenDownColor(Color arg0) {
@@ -774,7 +783,17 @@ public final class MakelangeloRobotSettings {
 		return "G00 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
+	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
+		penDownColor = newPenDownColor;
+		writeChangeToInternal(out);
+	}
+
 	public void writeChangeTo(Writer out) throws IOException {
+		penDownColor = penDownColorDefault;
+		writeChangeToInternal(out);
+	}
+	
+	protected void writeChangeToInternal(Writer out) throws IOException {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");

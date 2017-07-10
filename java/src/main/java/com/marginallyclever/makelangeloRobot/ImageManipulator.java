@@ -15,6 +15,8 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author Dan
  */
 public abstract class ImageManipulator {	
+	public static final float MARGIN_EPSILON = 0.01f;
+	
 	// pen position optimizing
 	protected boolean lastUp;
 	
@@ -25,7 +27,7 @@ public abstract class ImageManipulator {
 	// helpers
 	protected MakelangeloRobotSettings machine;
 
-
+	
 	public void setSwingWorker(SwingWorker<Void, Void> p) {
 		swingWorker = p;
 	}
@@ -122,11 +124,10 @@ public abstract class ImageManipulator {
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		final float EPSILON = 0.01f;
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-EPSILON) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+EPSILON) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-EPSILON) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+EPSILON) return false;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-MARGIN_EPSILON) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+MARGIN_EPSILON) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-MARGIN_EPSILON) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+MARGIN_EPSILON) return false;
 		return true;
 	}
 }
