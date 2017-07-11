@@ -58,6 +58,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
 		paintPenHolderAndCounterweights(gl2,robot);		
+		paintSafeArea(gl2,robot);
 	}
 	
 
@@ -66,6 +67,14 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		double top = settings.getLimitTop();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
+		
+		final float SUCTION_CUP_Y=3.5f;
+
+		gl2.glColor3f(1,1f,1f);
+		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,3.25f);
+		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,3.25f);
+		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,3.25f);
+		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,3.25f);
 		
 		gl2.glColor3f(1,0.8f,0.5f);
 		// frame
@@ -208,13 +217,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glEnd();
 		
 		// gondola
-		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		float f;
-		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(gx+Math.cos(f)*PEN_HOLDER_RADIUS_5,gy+Math.sin(f)*PEN_HOLDER_RADIUS_5);
-		}
-		gl2.glEnd();
+		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
 		
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -235,4 +239,29 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glEnd();
 	}
 	
+	protected void drawCircle(GL2 gl2,float x,float y,float r) {
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		float f;
+		for(f=0;f<2.0*Math.PI;f+=0.3f) {
+			gl2.glVertex2d(x+Math.cos(f)*r,y+Math.sin(f)*r);
+		}
+		gl2.glEnd();
+	}
+	
+	protected void paintSafeArea(GL2 gl2,MakelangeloRobot robot) {
+		MakelangeloRobotSettings settings = robot.getSettings();
+		double top = settings.getLimitTop();
+		double bottom = settings.getLimitBottom();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+
+		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
+
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glVertex2d(left-7f, top+7f);
+		gl2.glVertex2d(right+9f, top+7f);
+		gl2.glVertex2d(right+9f, top-100);
+		gl2.glVertex2d(left-7f, top-100);
+		gl2.glEnd();
+	}
 }
