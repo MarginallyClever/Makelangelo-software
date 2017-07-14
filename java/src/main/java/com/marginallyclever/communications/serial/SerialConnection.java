@@ -85,6 +85,7 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 		connectionName = portName;
 		portOpened = true;
 		waitingForCue = true;
+		this.sendMessage("M100\n");
 
 	}
 
