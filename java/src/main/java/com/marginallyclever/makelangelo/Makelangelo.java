@@ -337,8 +337,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		// add the drag & drop support
 		mainFrame.setTransferHandler(myTransferHandler);
 		
-		// adjust the window size
-		setupFrameRealEstate();
+		adjustWindowSize();
 		
 		mainFrame.setVisible(true);
 
@@ -351,7 +350,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	}
 
 	
-	private void setupFrameRealEstate() {
+	private void adjustWindowSize() {
 		int maxWidth = DEFAULT_WINDOW_WIDTH;
 		int maxHeight = DEFAULT_WINDOW_HEIGHT;
 		int width = prefs.getInt("Default window width", maxWidth );
@@ -393,7 +392,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 	
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
-		drawPanel.repaint();
+		if(drawPanel!=null) drawPanel.repaint();
 	}
 	
 	
@@ -419,13 +418,13 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 	@Override
 	public void disconnected(MakelangeloRobot r) {
-		drawPanel.repaint();
+		if(drawPanel!=null) drawPanel.repaint();
 		SoundSystem.playDisconnectSound();
 	}
 	
 	
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
-		drawPanel.repaint();
+		if(drawPanel!=null) drawPanel.repaint();
 	}
 	
 	
@@ -451,6 +450,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
         	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         	saveWindowRealEstate();
         	robot.getSettings().saveConfig();
+        	drawPanel=null;
 
     		// Run this on another thread than the AWT event queue to
     		// make sure the call to Animator.stop() completes before

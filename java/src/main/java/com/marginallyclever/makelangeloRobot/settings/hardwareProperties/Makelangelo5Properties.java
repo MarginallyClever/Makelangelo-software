@@ -251,7 +251,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	protected void paintSafeArea(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
+		//double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
 

@@ -113,7 +113,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		//last_time = now_time;
 		//System.out.println(dt);
 
-		GL2 gl2 = glautodrawable.getGL().getGL2();
+		if( glautodrawable == null ) return;
+		GL gl = glautodrawable.getGL();
+		if( gl == null ) return;
+		GL2 gl2 = gl.getGL2();
+		if( gl2 == null ) return;
 		
     	//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
         //gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
