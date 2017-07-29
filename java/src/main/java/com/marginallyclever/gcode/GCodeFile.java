@@ -361,7 +361,7 @@ public class GCodeFile {
 		
 		// draw image
 		if (fastNodes.size() > 0) {
-			gl2.glLineWidth(machine.getDiameter());
+			gl2.glLineWidth(machine.getPenDiameter());
 
 			// draw the nodes
 			Iterator<GCodeNode> nodes = fastNodes.iterator();

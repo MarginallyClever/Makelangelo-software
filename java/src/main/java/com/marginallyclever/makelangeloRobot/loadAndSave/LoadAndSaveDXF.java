@@ -246,8 +246,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolDiameterSquared = Math.pow(machine.getDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(machine.getDiameter(), 2);
+			double toolDiameterSquared = Math.pow(machine.getPenDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
 
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();

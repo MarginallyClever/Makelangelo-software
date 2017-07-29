@@ -34,7 +34,7 @@ public class Converter_Wander extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		float stepSize = machine.getDiameter()*5;
+		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

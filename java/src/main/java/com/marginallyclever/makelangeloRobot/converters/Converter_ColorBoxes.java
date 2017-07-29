@@ -159,7 +159,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin() * 10.0f);
 
 		// figure out how many boxes we're going to have on this image.
-		step4 = (machine.getDiameter() * 10.0f);
+		step4 = (machine.getPenDiameter() * 10.0f);
 		step2 = (step4 / 2.0f);  // half step
 		step1 = (step4 / 4.0f);  // quarter step
 		stepsTotal = pw / step4;

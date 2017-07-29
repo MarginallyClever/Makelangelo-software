@@ -56,7 +56,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		double toolDiameter = machine.getDiameter();
+		double toolDiameter = machine.getPenDiameter();
 
 		// find the largest circle that still fits in the image.
 		double w = (double)machine.getPaperWidth()/2.0f;

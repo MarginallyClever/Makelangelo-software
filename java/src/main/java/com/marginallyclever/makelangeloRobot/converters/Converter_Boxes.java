@@ -36,7 +36,7 @@ public class Converter_Boxes extends ImageConverter {
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = machine.getDiameter();
+		double d = machine.getPenDiameter();
 		double fullStep = d*10.0f;
 		double halfStep = fullStep / 2.0f;
 		

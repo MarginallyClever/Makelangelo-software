@@ -71,11 +71,23 @@ public final class MakelangeloRobotSettings {
 
 	private Color paperColor;
 
-	// pen
-	protected float diameter; // mm
+	/**
+	 * pen diameter, in mm
+	 */
+	protected float diameter;
+	/**
+	 * pen up servo angle
+	 */
 	protected float zOff;
+	/**
+	 * pen down servo angle
+	 */
 	protected float zOn;
+	/**
+	 * pen servo movement speed
+	 */
 	protected float zRate;
+	
 	protected Color penDownColorDefault;
 	protected Color penDownColor;
 	protected Color penUpColor;
@@ -523,7 +535,7 @@ public final class MakelangeloRobotSettings {
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		prefs.put("diameter", Float.toString(getDiameter()));
+		prefs.put("diameter", Float.toString(getPenDiameter()));
 		prefs.put("z_rate", Float.toString(zRate));
 		prefs.put("z_on", Float.toString(zOn));
 		prefs.put("z_off", Float.toString(zOff));
@@ -748,7 +760,10 @@ public final class MakelangeloRobotSettings {
 		zRate = arg0;
 	}
 	
-	public float getDiameter() {
+	/**
+	 * @return pen diameter, in mm
+	 */
+	public float getPenDiameter() {
 		return diameter;
 	}
 

@@ -75,9 +75,9 @@ public class Converter_Pulse extends ImageConverter {
 		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getDiameter() * blockScale;
+		float stepSize = machine.getPenDiameter() * blockScale;
 		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getDiameter();
+		float zigZagSpacing = machine.getPenDiameter();
 
 		// from top to bottom of the image...
 		float x, y, z, scale_z, pulse_size, i = 0;
