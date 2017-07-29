@@ -112,13 +112,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		//float dt = (now_time - last_time)*0.001f;
 		//last_time = now_time;
 		//System.out.println(dt);
-
-		if( glautodrawable == null ) return;
-		GL gl = glautodrawable.getGL();
-		if( gl == null ) return;
-		GL2 gl2 = gl.getGL2();
-		if( gl2 == null ) return;
-		
+		GL2 gl2 = glautodrawable.getGL().getGL2();
     	//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
         //gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
         //gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
@@ -131,17 +125,18 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * scale the picture of the robot to fake a zoom.
 	 */
 	public void zoomToFitPaper() {
-		double widthOfPaper = robot.getSettings().getPaperWidth();
-		double heightOfPaper = robot.getSettings().getPaperHeight();
-		double drawPanelWidthZoom = widthOfPaper;
-		double drawPanelHeightZoom = heightOfPaper;
-		
-		if( windowWidth < windowHeight ) {
-			cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
-		} else {
-			cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+		if(robot!=null) {
+			double widthOfPaper = robot.getSettings().getPaperWidth();
+			double heightOfPaper = robot.getSettings().getPaperHeight();
+			double drawPanelWidthZoom = widthOfPaper;
+			double drawPanelHeightZoom = heightOfPaper;
+			
+			if( windowWidth < windowHeight ) {
+				cameraZoom = (drawPanelWidthZoom > drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+			} else {
+				cameraZoom = (drawPanelWidthZoom < drawPanelHeightZoom ? drawPanelWidthZoom : drawPanelHeightZoom );
+			}
 		}
-		
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
 	}
@@ -151,12 +146,17 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		mouseOldX=e.getX();
 		mouseOldY=e.getY();
 	}
+	
 	public void mouseReleased(MouseEvent e) {
 		buttonPressed=MouseEvent.NOBUTTON;
 	}
+	
 	public void mouseClicked(MouseEvent e) {}
+	
 	public void mouseEntered(MouseEvent e) {}
+	
 	public void mouseExited(MouseEvent e) {}
+	
 	public void mouseDragged(MouseEvent e) {
 		int x=e.getX();
 		int y=e.getY();
@@ -167,6 +167,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		mouseOldX=x;
 		mouseOldY=y;
 	}
+	
 	public void mouseMoved(MouseEvent e) {}
 
 

@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import com.marginallyclever.makelangelo.ColorPalette;
-import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.internalFormat.ColorPalette;
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;

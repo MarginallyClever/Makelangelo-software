@@ -34,6 +34,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
@@ -287,13 +288,12 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		//Create the content-pane-to-be.
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
-		/*/
-        GLCapabilities caps = new GLCapabilities(null);
-        caps.setSampleBuffers(true);
-        caps.setHardwareAccelerated(true);
-        caps.setNumSamples(4);
-        /*/
-		GLCapabilities caps = new GLCapabilities(null);
+
+		GLProfile glProfile = GLProfile.getDefault();
+        GLCapabilities caps = new GLCapabilities(glProfile);
+        //caps.setSampleBuffers(true);
+        //caps.setHardwareAccelerated(true);
+        //caps.setNumSamples(4);
 		//*/
 		drawPanel = new DrawPanel(caps);
 		drawPanel.setRobot(robot);
@@ -308,40 +308,36 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		splitLeftRight.add(robotPanel);
 
 		splitUpDown = new Splitter(JSplitPane.VERTICAL_SPLIT);
-		
 		splitUpDown.add(splitLeftRight);
 		splitUpDown.add(logPanel);
-		splitUpDown.setResizeWeight(0.9);
-		splitUpDown.setOneTouchExpandable(true);
-		splitUpDown.setDividerLocation(800);
-		Dimension minimumSize = new Dimension(100, 100);
-		splitLeftRight.setMinimumSize(minimumSize);
-		logPanel.setMinimumSize(minimumSize);
 		
 		contentPane.add(splitUpDown, BorderLayout.CENTER);
+
+		//splitUpDown.setResizeWeight(0.9);
+		//splitUpDown.setOneTouchExpandable(true);
+		//splitUpDown.setDividerLocation(800);
+		//Dimension minimumSize = new Dimension(100, 100);
+		//splitLeftRight.setMinimumSize(minimumSize);
+		//logPanel.setMinimumSize(minimumSize);
 
 		return contentPane;
 	}
 
 
-	// Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
+	// For thread safety, this method should be invoked from the event-dispatching thread.
 	private void createAndShowGUI() {
 		// Create and set up the window.
 		mainFrame = new JFrame(Translator.get("TitlePrefix"));
     	mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
-		// Create and set up the content pane.
 		mainFrame.setJMenuBar(createMenuBar());
 		mainFrame.setContentPane(createContentPane());
+		adjustWindowSize();
+		mainFrame.setVisible(true);
+		drawPanel.zoomToFitPaper();
 		
 		// add the drag & drop support
 		mainFrame.setTransferHandler(myTransferHandler);
-		
-		adjustWindowSize();
-		
-		mainFrame.setVisible(true);
-
-		drawPanel.zoomToFitPaper();
 
 		// start animation system        
         animator = new FPSAnimator(30);
@@ -371,7 +367,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 
 		mainFrame.setSize(width, height);
 		
-		// Set window location
 		// by default center the window.  Later use preferences.
 		int defaultLocationX = (screenSize.width - width) / 2;
 		int defaultLocationY = (screenSize.height - height) / 2;
@@ -381,14 +376,6 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
 		//mainFrame.setLocation(locationX,locationY);
 	}
 	
-
-	/**
-	 * @return the <code>com.marginallyclever.makelangelo.DrawPanel</code> representing the preview pane of this GUI.
-	 */
-	public DrawPanel getDrawPanel() {
-		return drawPanel;
-	}
-
 	
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
@@ -447,10 +434,10 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
             JOptionPane.YES_NO_OPTION);
 
         if (result == JOptionPane.YES_OPTION) {
+        	drawPanel.setRobot(null);
         	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         	saveWindowRealEstate();
         	robot.getSettings().saveConfig();
-        	drawPanel=null;
 
     		// Run this on another thread than the AWT event queue to
     		// make sure the call to Animator.stop() completes before

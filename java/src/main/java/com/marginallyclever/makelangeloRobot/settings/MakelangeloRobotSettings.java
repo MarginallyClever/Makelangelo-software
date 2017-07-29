@@ -249,6 +249,15 @@ public final class MakelangeloRobotSettings {
 	}
 
 
+	public String getAbsoluteMode() {
+		return "G90";
+	}
+
+	public String getRelativeMode() {
+		return "G91";
+	}
+
+
 	public int getKnownMachineIndex() {
 		String [] list = getKnownMachineNames();
 		for (int i = 0; i < list.length; i++) {
@@ -801,7 +810,9 @@ public final class MakelangeloRobotSettings {
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		int toolNumber = penDownColor.getRGB();
-		out.write("M06 T" + toolNumber + "; //"+name+"\n");
+		out.write("M06 T" + toolNumber + ";\n");
+		//out.write("M117 Change to "+name+";\n");  // display message
+		//out.write("M226;"); // gcode initiated pause
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
@@ -813,14 +824,22 @@ public final class MakelangeloRobotSettings {
 	}
 
 	// lift the pen
-	public void writeOff(Writer out) throws IOException {
+	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString());
 		out.write("G00 F" + df.format(getMaxFeedRate()) + ";\n");
 	}
 
 	// lower the pen
-	public void writeOn(Writer out) throws IOException {
+	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString());
 		out.write("G01 F" + df.format(getCurrentFeedRate()) + ";\n");
+	}
+	
+	public void writeAbsoluteMode(Writer out) throws IOException {
+		out.write(getAbsoluteMode());
+	}
+
+	public void writeRelativeMode(Writer out) throws IOException {
+		out.write(getRelativeMode());
 	}
 }

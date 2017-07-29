@@ -4,8 +4,8 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.makelangelo.ColorPalette;
-import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.internalFormat.ColorPalette;
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 
 

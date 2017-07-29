@@ -55,37 +55,30 @@ public abstract class ImageManipulator {
 	 * @param out
 	 * @throws IOException
 	 */
-	public void imageStart(Writer out) throws IOException {
-		//out.write(machine.getGCodeConfig() + ";\n");
-		//out.write(machine.getGCodeBobbin() + ";\n");
-		//out.write(machine.getGCodeSetPositionAtHome()+";\n");		
+	public void imageStart(Writer out) throws IOException {	
 		setAbsoluteMode(out);
 	}
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(lastUp) {
-			return;
-		}
-		machine.writeOff(out);
+		if(lastUp) return;
+		machine.writePenUp(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(!lastUp) {
-			return;
-		}
-		machine.writeOn(out);
+		if(!lastUp) return;
+		machine.writePenDown(out);
 		lastUp = false;
 	}
 
 	protected void setAbsoluteMode(Writer out) throws IOException {
-		out.write("G90;\n");
+		machine.writeAbsoluteMode(out);
 	}
 
 	protected void setRelativeMode(Writer out) throws IOException {
-		out.write("G91;\n");
+		machine.writeRelativeMode(out);
 	}
 
 
