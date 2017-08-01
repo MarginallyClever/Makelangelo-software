@@ -35,7 +35,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private double cameraZoom = 1.0d;
 	private int windowWidth=0;
 	private int windowHeight=0;
+	
+	// opengl stuff
+	private GLU glu;
+	private GL  gl;
+	private GL2 gl2;
 
+	
 	protected MakelangeloRobot robot;
 	
 	
@@ -58,7 +64,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	@Override
 	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
 		GL2 gl2 = glautodrawable.getGL().getGL2();
-		gl2.setSwapInterval(1);
+		//gl2.setSwapInterval(1);
 
 		windowWidth = width;
 		windowHeight = height;
@@ -68,7 +74,6 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glLoadIdentity();
 		//gl2.glOrtho(-windowWidth / 2.0d, windowWidth / 2.0d, -windowHeight / 2.0d, windowHeight / 2.0d, 0.01d, 100.0d);
 
-		GLU glu = new GLU();
         glu.gluPerspective(60, (float)windowWidth/(float)windowHeight, 1.0f, 1000.0f);
 	}
 
@@ -76,11 +81,12 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * turn on debug pipeline(s) if needed.
 	 */
 	@Override
-	public void init(GLAutoDrawable drawable) {
+	public void init(GLAutoDrawable glautodrawable) {
+		gl = glautodrawable.getGL();
+		
 		if (DEBUG_GL_ON) {
 			try {
 				// Debug ..
-				GL gl = drawable.getGL();
 				gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -90,12 +96,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		if (TRACE_GL_ON) {
 			try {
 				// Trace ..
-				GL gl = drawable.getGL();
 				gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[]{System.err}));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
+		gl2 = gl.getGL2();
+		glu = GLU.createGLU(gl2);
 	}
 
 
@@ -112,8 +120,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		//float dt = (now_time - last_time)*0.001f;
 		//last_time = now_time;
 		//System.out.println(dt);
-		GL2 gl2 = glautodrawable.getGL().getGL2();
-    	//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
+
+		//gl2.glEnable(GL2.GL_LINE_SMOOTH);      
         //gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
         //gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
         

@@ -445,7 +445,7 @@ implements ActionListener, WindowListener, MakelangeloRobotListener, Makelangelo
     		new Thread(new Runnable() {
     			public void run() {
     				animator.stop();
-    				System.exit(0);
+    				mainFrame.dispose();
     			}
     		}).start();
         }
