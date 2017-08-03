@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -173,6 +174,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
         buttonConnect = new JButton(Translator.get("ButtonConnect"));
         buttonConnect.addActionListener(this);
+        buttonConnect.setForeground(Color.GREEN);
 
 		contents.add(buttonConnect,con1);
 		con1.gridy++;
@@ -184,6 +186,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	protected void closeConnection() {
 		robot.closeConnection();
 		buttonConnect.setText(Translator.get("ButtonConnect"));
+		buttonConnect.setForeground(Color.GREEN);
 		isConnected=false;
 		updateButtonAccess();
 	}
@@ -192,6 +195,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		NetworkConnection s = gui.requestNewConnection();
 		if(s!=null) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
+			buttonConnect.setForeground(Color.RED);
 			robot.openConnection( s );
 			//updateMachineNumberPanel();
 			//updateButtonAccess();
@@ -319,7 +323,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
 			c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
 			c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
-			//TODO: hide the setHome button on Makelangelo 5?
+
 			c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
 			c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
 			c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
@@ -631,8 +635,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right100.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		setHome .setEnabled(isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome());
-		findHome.setEnabled(isConfirmed && !isRunning &&  robot.getSettings().getHardwareProperties().canAutoHome());
+		setHome.setEnabled( isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome() );
+		findHome.setEnabled(isConfirmed && !isRunning && robot.getSettings().getHardwareProperties().canAutoHome());
 		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
 		
 		penUp.setEnabled(isConfirmed && !isRunning);

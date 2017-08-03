@@ -20,9 +20,19 @@ public interface MakelangeloHardwareProperties {
 
 	public boolean canInvertMotors();
 	
+	/**
+	 * @return true if the machine has limit switches and can find home on its own.
+	 */
 	public boolean canAutoHome();
 	
+	/**
+	 * @return machine size, in mm
+	 */
 	public float getWidth();
+
+	/**
+	 * @return machine size, in mm
+	 */
 	public float getHeight();
 	
 	/**
