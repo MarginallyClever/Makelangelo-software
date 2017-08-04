@@ -320,9 +320,9 @@ public final class Makelangelo
 
 		contentPane.add(splitUpDown, BorderLayout.CENTER);
 
-		// splitUpDown.setResizeWeight(0.9);
-		// splitUpDown.setOneTouchExpandable(true);
-		// splitUpDown.setDividerLocation(800);
+		splitUpDown.setResizeWeight(0.9);
+		splitUpDown.setOneTouchExpandable(true);
+		splitUpDown.setDividerLocation(800);
 		// Dimension minimumSize = new Dimension(100, 100);
 		// splitLeftRight.setMinimumSize(minimumSize);
 		// logPanel.setMinimumSize(minimumSize);
