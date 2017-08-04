@@ -408,9 +408,7 @@ public class GCodeFile {
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		Color c = new Color((tool_id>>16)&0xFF,
-							(tool_id>> 8)&0xFF,
-							(tool_id    )&0xFF);
+		Color c = new Color(tool_id);
 		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.TOOL,0,0,0,0,c);
 		fastNodes.add(n);
 	}
