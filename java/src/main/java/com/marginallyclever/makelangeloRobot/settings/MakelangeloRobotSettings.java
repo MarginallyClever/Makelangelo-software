@@ -851,10 +851,10 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
-		out.write(getAbsoluteMode());
+		out.write(getAbsoluteMode() + ";\n");
 	}
 
 	public void writeRelativeMode(Writer out) throws IOException {
-		out.write(getRelativeMode());
+		out.write(getRelativeMode() + ";\n");
 	}
 }
