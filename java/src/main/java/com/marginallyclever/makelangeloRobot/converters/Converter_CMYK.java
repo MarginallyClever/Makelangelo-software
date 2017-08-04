@@ -17,10 +17,6 @@ public class Converter_CMYK extends ImageConverter {
 	static protected int passes=4;
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 	// Lift the pen any time the color value is > cutoff
-	protected double cutoffC=137.66666666666666666666666666667;  // cyan is (0,174,239), average components to get intensity
-	protected double cutoffY=165.66666666666666666666666666667;  // yellow is (255,242,0), average components to get intensity
-	protected double cutoffM=125.33333333333333333333333333333;  // magenta is (236,0,140), average components to get intensity
-	protected double cutoffK=127;
 	
 	@Override
 	public String getName() {
