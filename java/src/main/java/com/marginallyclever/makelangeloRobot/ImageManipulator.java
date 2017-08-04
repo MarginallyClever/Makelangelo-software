@@ -167,13 +167,6 @@ public abstract class ImageManipulator {
 		}
 	}
 
-	class ClippingPoint {
-		double x,y;
-		public ClippingPoint(double thisx, double thisy) { 
-			x=thisx; 
-			y=thisy;
-		}
-	} 
 	
 	boolean CohenSutherland2DClipper(ClippingPoint P0,ClippingPoint P1) {
 		int outCode0,outCode1; 
