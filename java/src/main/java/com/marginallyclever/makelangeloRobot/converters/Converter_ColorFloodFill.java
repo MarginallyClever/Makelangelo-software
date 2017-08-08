@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import com.marginallyclever.makelangelo.ColorPalette;
-import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.internalFormat.ColorPalette;
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -242,7 +242,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		
-		diameter = (int)( machine.getDiameter() * 10.0f );
+		diameter = (int)( machine.getPenDiameter() * 10.0f );
 
 		imgChanged = img;
 

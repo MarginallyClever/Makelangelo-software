@@ -18,6 +18,24 @@
 	</string>
 	
 	<string>
+		<key>ConverterCMYKName</key>
+		<value>CMYK</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKPasses</key>
+		<value>Passes</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKNote</key>
+		<value>Draws Yellow, Cyan, Magenta, and then Black.\r\nDo not run from SD card (yet!)</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
 		<key>DXFScaleOnLoad</key>
 		<value>Scale image to fit paper</value>
 		<hint>DXF load option</hint>
@@ -268,8 +286,8 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 for images (dxf)</value>
+		<key>FileTypeSVG</key>
+		<value>Scaleable Vector Graphics 1.1 (svg)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -285,8 +303,13 @@
 	</string>
 
 	<string>
-		<key>MenuDriveControls</key>
+		<key>MenuAxisDriveControls</key>
 		<value>Manual Driving</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuCommonDriveControls</key>
+		<value>Popular Driving Commands</value>
 		<hint>context sensitive menu</hint>
 	</string>
 	<string>

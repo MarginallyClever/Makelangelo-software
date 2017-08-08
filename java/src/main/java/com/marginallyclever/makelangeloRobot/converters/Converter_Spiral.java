@@ -39,7 +39,7 @@ public class Converter_Spiral extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		double toolDiameter = machine.getDiameter();
+		double toolDiameter = machine.getPenDiameter();
 
 		int i, j;
 		final int steps = 4;

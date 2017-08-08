@@ -34,8 +34,8 @@ public class Converter_Wander extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		float steps = machine.getDiameter()*5;
-		if (steps < 1) steps = 1;
+		float stepSize = machine.getPenDiameter()*5;
+		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
@@ -48,14 +48,12 @@ public class Converter_Wander extends ImageConverter {
 		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
-		double radius = Math.sqrt(dx*dx+dy*dy);
 
 		liftPen(out);
 		moveTo(out,0,yTop,true);
 
 		double startPX = 0; 
-		double startPY = yTop; 
-		double r2 = radius*2;
+		double startPY = yTop;
 
 		int i;
 		for(i=0;i<numLines;++i) {
@@ -63,7 +61,7 @@ public class Converter_Wander extends ImageConverter {
 			double endPX = xLeft   + (Math.random() * dx)+0.5; 
 			double endPY = yBottom + (Math.random() * dy)+0.5; 
 
-			convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,level,img,out);
+			convertAlongLine(startPX,startPY,endPX,endPY,stepSize,level,img,out);
 			
 			startPX = endPX;
 			startPY = endPY;
@@ -73,28 +71,6 @@ public class Converter_Wander extends ImageConverter {
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 	
-	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double level,TransformedImage img,Writer out) throws IOException {
-		double b;
-		double dx=x1-x0;
-		double dy=y1-y0;
-		double halfStep = stepSize/2;
-		double steps = r2 / stepSize;
-		if(steps<1) steps=1;
-
-		double n,x,y,v;
-
-		for (b = 0; b <= steps; ++b) {
-			n = b / steps;
-			x = dx * n + x0;
-			y = dy * n + y0;
-			if(isInsidePaperMargins(x, y)) {
-				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-			} else {
-				v = 255;
-			}
-			lineTo(out, x, y, v>=level);
-		}
-	}
 
 	public int getLineCount() {
 		return numLines;

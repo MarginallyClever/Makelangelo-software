@@ -61,17 +61,6 @@ public class Generator_KochCurve extends ImageGenerator {
 		float xx = xMax - xMin;
 		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
-
-		boolean drawBoundingBox=false;
-		if(drawBoundingBox) {
-			liftPen(out);
-			moveTo(out, xMax, yMax, false);
-			moveTo(out, xMax, yMin, false);
-			moveTo(out, xMin, yMin, false);
-			moveTo(out, xMin, yMax, false);
-			moveTo(out, xMax, yMax, false);
-			liftPen(out);
-		}
 		
 		liftPen(out);
 		// move to starting position

@@ -200,7 +200,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		float toolDiameter = machine.getDiameter();
+		float toolDiameter = machine.getPenDiameter();
 
 		Arrays.sort(cells);
 		

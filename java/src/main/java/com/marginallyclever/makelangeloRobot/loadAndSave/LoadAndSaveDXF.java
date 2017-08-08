@@ -198,7 +198,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-
+		// set up a temporary file
 		File tempFile;
 		try {
 			tempFile = File.createTempFile("temp", ".ngc");
@@ -246,8 +246,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolDiameterSquared = Math.pow(machine.getDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(machine.getDiameter(), 2);
+			double toolDiameterSquared = Math.pow(machine.getPenDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
 
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();

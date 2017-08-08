@@ -609,12 +609,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
-		didSetHome=true;
 		setGondolaX((float)settings.getHomeX());
 		setGondolaY((float)settings.getHomeY());
+		didSetHome=true;
 	}
-	
-	
+		
 	public boolean didSetHome() {
 		return didSetHome;
 	}

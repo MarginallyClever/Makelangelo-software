@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.SelectSound;
+import com.marginallyclever.makelangelo.SelectFile;
 import com.marginallyclever.util.PreferencesHelper;
 
 
@@ -16,10 +16,10 @@ import com.marginallyclever.util.PreferencesHelper;
  */
 public class SoundPreferences {
 	static private JPanel panel;
-	static private SelectSound sound_connect;
-	static private SelectSound sound_disconnect;
-	static private SelectSound sound_conversion_finished;
-	static private SelectSound sound_drawing_finished;
+	static private SelectFile sound_connect;
+	static private SelectFile sound_disconnect;
+	static private SelectFile sound_conversion_finished;
+	static private SelectFile sound_drawing_finished;
 
 	static public JPanel buildPanel() {
 		panel = new JPanel();
@@ -35,16 +35,16 @@ public class SoundPreferences {
 
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.SOUND);
 
-		sound_connect = new SelectSound("MenuSoundsConnect",prefs.get("sound_connect", ""));
+		sound_connect = new SelectFile("MenuSoundsConnect",prefs.get("sound_connect", ""));
 		panel.add(sound_connect,label);  label.gridy++;
 
-		sound_disconnect = new SelectSound("MenuSoundsDisconnect",prefs.get("sound_disconnect", ""));
+		sound_disconnect = new SelectFile("MenuSoundsDisconnect",prefs.get("sound_disconnect", ""));
 		panel.add(sound_disconnect,label);  label.gridy++;
 
-		sound_conversion_finished = new SelectSound("MenuSoundsFinishConvert",prefs.get("sound_conversion_finished", ""));
+		sound_conversion_finished = new SelectFile("MenuSoundsFinishConvert",prefs.get("sound_conversion_finished", ""));
 		panel.add(sound_conversion_finished,label);  label.gridy++;
 
-		sound_drawing_finished = new SelectSound("MenuSoundsFinishDraw",prefs.get("sound_drawing_finished", ""));
+		sound_drawing_finished = new SelectFile("MenuSoundsFinishDraw",prefs.get("sound_drawing_finished", ""));
 		panel.add(sound_drawing_finished,label);  label.gridy++;
 		
 		return panel;

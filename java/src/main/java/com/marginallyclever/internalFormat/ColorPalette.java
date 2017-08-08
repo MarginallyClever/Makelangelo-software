@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.internalFormat;
 
 import java.util.ArrayList;
 import java.util.Iterator;

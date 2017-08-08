@@ -60,19 +60,7 @@ public class Generator_Dragon extends ImageGenerator {
 
 		turtle = new Turtle();
 
-		boolean drawBoundingBox=false;
-		if(drawBoundingBox) {
-	      // Draw bounding box
-	      liftPen(out);
-	      moveTo(out, xMax, yMax, false);
-	      moveTo(out, xMax, yMin, false);
-	      moveTo(out, xMin, yMin, false);
-	      moveTo(out, xMin, yMax, false);
-	      moveTo(out, xMax, yMax, false);
-	      liftPen(out);
-		}
-		
-		// create the sequence
+		// create the sequence of moves
         sequence = new ArrayList<Integer>();
         for (int i = 0; i < order; i++) {
             List<Integer> copy = new ArrayList<Integer>(sequence);
@@ -83,11 +71,9 @@ public class Generator_Dragon extends ImageGenerator {
             }
         }
 		
-		// move to starting position
-		// scale the fractal
-        turtle.setX(0);
-        turtle.setY(0);
+		// scale the step size so the fractal fits on the paper
         float stepSize = findStepSize(out);
+        
 		// move to starting position
 		liftPen(out);
 		moveTo(out,turtle.getX(),turtle.getY(),true);
@@ -100,8 +86,9 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 
 	/**
-	 * walk through the sequence and find the max/min bounds of the dragon fractal
-	 * @param output
+	 * Walk through the sequence and find the max/min bounds of the dragon fractal.
+	 * Moves the turtle to the new starting position.
+	 * @param output where to write the gcode.
 	 * @return largest dimension of the fractal
 	 * @throws IOException
 	 */
@@ -110,7 +97,10 @@ public class Generator_Dragon extends ImageGenerator {
 		float maxY=0;
 		float minX=0;
 		float minY=0;
-		
+
+        turtle.setX(0);
+        turtle.setY(0);
+        
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtleMove(output,1,false);

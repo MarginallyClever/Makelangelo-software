@@ -10,61 +10,69 @@ import com.marginallyclever.makelangeloRobot.TransformedImage;
  *
  * @author Dan
  */
-public class Filter_BlackAndWhite extends ImageFilter {
-  double levels = 2;
+public class Filter_CMYK extends ImageFilter {
+  protected static double levels = 2;
+    
+  protected TransformedImage channel_cyan;
+  protected TransformedImage channel_magenta;
+  protected TransformedImage channel_yellow;
+  protected TransformedImage channel_black;
 
 
-  public Filter_BlackAndWhite(int _levels) {
-    levels = (double) _levels;
-  }
+  public Filter_CMYK() {}
 
 
+  public TransformedImage getC() {  return channel_cyan;  }
+  public TransformedImage getM() {  return channel_magenta;  }
+  public TransformedImage getY() {  return channel_yellow;  }
+  public TransformedImage getK() {  return channel_black;  }
+  
+  
+  // http://www.rapidtables.com/convert/color/rgb-to-cmyk.htm
   public TransformedImage filter(TransformedImage img) {
     int h = img.getSourceImage().getHeight();
     int w = img.getSourceImage().getWidth();
-    int x, y, i;
-
-    double max_intensity = -1000;
-    double min_intensity = 1000;
+    int x, y;
 
     BufferedImage bi = img.getSourceImage();
-    for (y = 0; y < h; ++y) {
-      for (x = 0; x < w; ++x) {
-        i = decode32bit(bi.getRGB(x, y));
-        if (max_intensity < i) max_intensity = i;
-        if (min_intensity > i) min_intensity = i;
-      }
-    }
-    double intensity_range = max_intensity - min_intensity;
-
-    double ilevels = 1;
-    if (levels != 0) ilevels = 1.0 / levels;
-
-    //System.out.println("min_intensity="+min_intensity);
-    //System.out.println("max_intensity="+max_intensity);
-    //System.out.println("levels="+levels);
-    //System.out.println("inverse="+ilevels);
-
-    double pixel;
-
-    TransformedImage after = new TransformedImage(img);
-    BufferedImage afterBI = after.getSourceImage();
+    channel_cyan = new TransformedImage(img);
+    channel_magenta = new TransformedImage(img);
+    channel_yellow = new TransformedImage(img);
+    channel_black = new TransformedImage(img);
+    
+    BufferedImage cc = channel_cyan.getSourceImage();
+    BufferedImage cm = channel_magenta.getSourceImage();
+    BufferedImage cy = channel_yellow.getSourceImage();
+    BufferedImage ck = channel_black.getSourceImage();
+    double r,g,b,k1,ik,c1,m1,y1;
+    int pixel;
     
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
-        pixel = decode32bit(bi.getRGB(x, y));
-
-        double a = (pixel - min_intensity) / intensity_range;
-        double c = Math.ceil(a * levels) * ilevels;
-        int b = (int) (c * 255.0);
-        if (b > 255) b = 255;
-        if (b < 0) b = 0;
-        //if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
-        afterBI.setRGB(x, y, ImageFilter.encode32bit(b));
+    	pixel = bi.getRGB(x,y);
+    	//double a = 255-((pixel>>24) & 0xff);
+		r = (double)((pixel >> 16) & 0xff) / 255.0;
+		g = (double)((pixel >>  8) & 0xff) / 255.0;
+		b = (double)((pixel      ) & 0xff) / 255.0;
+		// now convert to cmyk
+		k1 = 1.0-Math.max(Math.max(r,g),b);   // should be Math.max(Math.max(r,g),b) but colors are inverted.
+		ik = 1.0-k1;
+		
+		if(ik<1.0/255.0) {
+			c1=m1=y1=0;
+		} else {
+			c1 = (ik-r) / ik;
+			m1 = (ik-g) / ik;
+			y1 = (ik-b) / ik;
+		}
+        cc.setRGB(x, y, ImageFilter.encode32bit(255-(int)(c1*255.0)));
+        cm.setRGB(x, y, ImageFilter.encode32bit(255-(int)(m1*255.0)));
+        cy.setRGB(x, y, ImageFilter.encode32bit(255-(int)(y1*255.0)));
+        ck.setRGB(x, y, ImageFilter.encode32bit(255-(int)(k1*255.0)));
       }
     }
 
-    return after;
+    return img;
   }
 
 

@@ -10,7 +10,7 @@ import javax.swing.TransferHandler;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
- * drag & drop support for files
+ * support for drag & drop files into Makelangelo software.
  * @author Dan Royer
  *
  */
