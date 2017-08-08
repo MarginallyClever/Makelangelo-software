@@ -31,7 +31,7 @@
 	
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value>Draws Yellow, Cyan, Magenta, and then Black.  Do not run from SD card (yet!)</value>
+		<value>Draws Yellow, Cyan, Magenta, and then Black.\r\nDo not run from SD card (yet!)</value>
 		<hint>CMYK converter hint</hint>
 	</string>
 	
@@ -303,8 +303,13 @@
 	</string>
 
 	<string>
-		<key>MenuDriveControls</key>
+		<key>MenuAxisDriveControls</key>
 		<value>Manual Driving</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuCommonDriveControls</key>
+		<value>Popular Driving Commands</value>
 		<hint>context sensitive menu</hint>
 	</string>
 	<string>
