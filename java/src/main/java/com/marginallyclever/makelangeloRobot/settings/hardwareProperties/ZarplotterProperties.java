@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
-public class Makelangelo3Properties extends Makelangelo2Properties {
+public class ZarplotterProperties extends Makelangelo2Properties {
 	@Override
 	public int getVersion() {
 		return 3;
@@ -29,10 +29,10 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	public void render(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 
-		paintCalibrationPoint(gl2,settings);
-		paintMotors(gl2,settings);
+		super.paintCalibrationPoint(gl2,settings);
+		super.paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
-		paintPenHolderAndCounterweights(gl2,robot);		
+		super.paintPenHolderAndCounterweights(gl2,robot);		
 	}
 
 	/**

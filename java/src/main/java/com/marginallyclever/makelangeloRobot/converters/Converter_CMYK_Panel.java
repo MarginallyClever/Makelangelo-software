@@ -24,7 +24,7 @@ public class Converter_CMYK_Panel extends JPanel implements PropertyChangeListen
 		
 		passesField = new SelectInteger(converter.getPasses());
 
-		setLayout(new GridLayout(0,1));
+		setLayout(new GridLayout(4,1));
 		this.add(new JLabel(Translator.get("ConverterCMYKPasses")));
 		this.add(passesField);
 		this.add(new JLabel(Translator.get("ConverterCMYKNote")));

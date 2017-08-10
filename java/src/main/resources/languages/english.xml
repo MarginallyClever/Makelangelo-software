@@ -31,7 +31,7 @@
 	
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value>Draws Yellow, Cyan, Magenta, and then Black.\r\nDo not run from SD card (yet!)</value>
+		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.<br>Do not run from SD card (yet!)</html></body>]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 	
