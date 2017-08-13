@@ -241,10 +241,16 @@ public final class MakelangeloRobotSettings {
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
-		float limitTop = (float)getLimitTop();
-		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
-		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
-		return homeY;
+		if(this.hardwareVersion==6) {
+			// Zarplotter
+			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
+			return 0;
+		} else {
+			float limitTop = (float)getLimitTop();
+			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
+			homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
+			return homeY;
+		}
 	}
 	
 	public String getGCodeSetPositionAtHome() {
@@ -252,12 +258,21 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getGCodeConfig() {
-		return "M101 T" + df.format(limitTop)
-				+ " B" + df.format(limitBottom)
-				+ " L" + df.format(limitLeft)
-				+ " R" + df.format(limitRight)
-				+ " I" + (isLeftMotorInverted ? "-1" : "1")
-				+ " J" + (isRightMotorInverted ? "-1" : "1");
+		if(this.hardwareVersion==6) {
+			// Zarplotter
+			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
+			return "M101 T" + df.format(limitTop-7.5)
+					+ " B" + df.format(limitBottom+7.5)
+					+ " L" + df.format(limitLeft+7.5)
+					+ " R" + df.format(limitRight-7.5);
+		} else {
+			return "M101 T" + df.format(limitTop)
+					+ " B" + df.format(limitBottom)
+					+ " L" + df.format(limitLeft)
+					+ " R" + df.format(limitRight)
+					+ " I" + (isLeftMotorInverted ? "-1" : "1")
+					+ " J" + (isRightMotorInverted ? "-1" : "1");
+		}
 	}
 
 
@@ -716,8 +731,6 @@ public final class MakelangeloRobotSettings {
 		if(!hardwareProperties.canChangeMachineSize()) {
 			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
 		}
-		
-		//saveConfigToLocal();
 	}
 	
 	public Color getPaperColor() {

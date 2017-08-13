@@ -26,12 +26,12 @@ public interface MakelangeloHardwareProperties {
 	public boolean canAutoHome();
 	
 	/**
-	 * @return machine size, in mm
+	 * @return default machine size, in mm
 	 */
 	public float getWidth();
 
 	/**
-	 * @return machine size, in mm
+	 * @return default machine size, in mm
 	 */
 	public float getHeight();
 	

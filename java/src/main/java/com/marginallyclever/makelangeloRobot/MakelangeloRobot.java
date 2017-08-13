@@ -45,7 +45,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	// Constants
 	private final String robotTypeName = "DRAWBOT";
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
-
+	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;

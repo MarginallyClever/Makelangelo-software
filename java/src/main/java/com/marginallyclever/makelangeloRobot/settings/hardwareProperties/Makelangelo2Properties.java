@@ -6,6 +6,9 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float PEN_HOLDER_RADIUS_2= 6; // cm
+	public final static float MOTOR_SIZE= 2.1f; // cm
+	public final static float PLOTTER_SIZE= 2.1f; // cm
+	public final static float FRAME_SIZE= 5.0f; // cm
 
 	@Override
 	public int getVersion() {
@@ -71,11 +74,11 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glPushMatrix();
 		// gl2.glTranslatef(-2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(left - 5f, top + 5f);
-		gl2.glVertex2d(left + 5f, top + 5f);
-		gl2.glVertex2d(left + 5f, top);
-		gl2.glVertex2d(left, top - 5f);
-		gl2.glVertex2d(left - 5f, top - 5f);
+		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(left + FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(left + FRAME_SIZE, top             );
+		gl2.glVertex2d(left             , top - FRAME_SIZE);
+		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
@@ -83,26 +86,26 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glPushMatrix();
 		// gl2.glTranslatef(2.1f, 2.1f, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(right + 5f, top + 5f);
-		gl2.glVertex2d(right - 5f, top + 5f);
-		gl2.glVertex2d(right - 5f, top);
-		gl2.glVertex2d(right, top - 5f);
-		gl2.glVertex2d(right + 5f, top - 5f);
+		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right - FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right - FRAME_SIZE, top             );
+		gl2.glVertex2d(right             , top - FRAME_SIZE);
+		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 
 		// left motor
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left - 2.1f, top + 2.1f);
-		gl2.glVertex2d(left + 2.1f, top + 2.1f);
-		gl2.glVertex2d(left + 2.1f, top - 2.1f);
-		gl2.glVertex2d(left - 2.1f, top - 2.1f);
+		gl2.glVertex2d(left - MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(left + MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(left + MOTOR_SIZE, top - MOTOR_SIZE);
+		gl2.glVertex2d(left - MOTOR_SIZE, top - MOTOR_SIZE);
 		// right motor
-		gl2.glVertex2d(right - 2.1f, top + 2.1f);
-		gl2.glVertex2d(right + 2.1f, top + 2.1f);
-		gl2.glVertex2d(right + 2.1f, top - 2.1f);
-		gl2.glVertex2d(right - 2.1f, top - 2.1f);
+		gl2.glVertex2d(right - MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(right + MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(right + MOTOR_SIZE, top - MOTOR_SIZE);
+		gl2.glVertex2d(right - MOTOR_SIZE, top - MOTOR_SIZE);
 		gl2.glEnd();
 	}
 
