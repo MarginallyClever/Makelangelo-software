@@ -261,10 +261,10 @@ public final class MakelangeloRobotSettings {
 		if(this.hardwareVersion==6) {
 			// Zarplotter
 			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
-			return "M101 T" + df.format(limitTop-7.5)
-					+ " B" + df.format(limitBottom+7.5)
-					+ " L" + df.format(limitLeft+7.5)
-					+ " R" + df.format(limitRight-7.5);
+			return "M101 T" + df.format(limitTop)
+					+ " B" + df.format(limitBottom)
+					+ " L" + df.format(limitLeft)
+					+ " R" + df.format(limitRight);
 		} else {
 			return "M101 T" + df.format(limitTop)
 					+ " B" + df.format(limitBottom)

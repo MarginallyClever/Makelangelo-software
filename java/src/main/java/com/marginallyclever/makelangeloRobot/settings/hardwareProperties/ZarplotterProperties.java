@@ -59,7 +59,7 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	@Override
 	protected void paintPenHolderAndCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
-		double dx, dy;
+		//double dx, dy;
 		double gx = robot.getGondolaX() / 10;
 		double gy = robot.getGondolaY() / 10;
 
