@@ -283,8 +283,8 @@ If you like this project, please support us by buying Marginally Clever products
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
-      <artifactId>JSON-java</artifactId>
-      <version>2015-06-04</version>
+      <artifactId>json</artifactId>
+      <version>20150729</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains</groupId>
