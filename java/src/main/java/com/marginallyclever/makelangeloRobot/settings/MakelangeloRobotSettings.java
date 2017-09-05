@@ -258,21 +258,31 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getGCodeConfig() {
+		String result;
 		if(this.hardwareVersion==6) {
 			// Zarplotter
 			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
-			return "M101 T" + df.format(limitTop)
+			result = "M101 T" + df.format(limitTop)
 					+ " B" + df.format(limitBottom)
 					+ " L" + df.format(limitLeft)
 					+ " R" + df.format(limitRight);
+		} else if(this.hardwareVersion==5) {
+			// Makelangelo 5
+			result = "M101 T" + df.format(limitTop)
+					+ " B" + df.format(limitBottom)
+					+ " L" + df.format(limitLeft)
+					+ " R" + df.format(limitRight)
+					+ " I1 J-1"; 
 		} else {
-			return "M101 T" + df.format(limitTop)
+			// all others
+			result = "M101 T" + df.format(limitTop)
 					+ " B" + df.format(limitBottom)
 					+ " L" + df.format(limitLeft)
 					+ " R" + df.format(limitRight)
 					+ " I" + (isLeftMotorInverted ? "-1" : "1")
-					+ " J" + (isRightMotorInverted ? "-1" : "1");
+					+ " J" + (isRightMotorInverted ? "-1" : "1"); 
 		}
+		return result;
 	}
 
 
