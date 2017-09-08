@@ -58,9 +58,6 @@ public final class MakelangeloRobotSettings {
 	private double paperMargin;
 	// pulley diameter
 	private double pulleyDiameter;
-	// pulleys turning backwards?
-	private boolean isLeftMotorInverted;
-	private boolean isRightMotorInverted;
 
 	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
@@ -172,8 +169,6 @@ public final class MakelangeloRobotSettings {
 		// circumference is 20 teeth @ 2mm/tooth
 		pulleyDiameter  = 20.0 * 0.2 / Math.PI;
 
-		isLeftMotorInverted = false;
-		isRightMotorInverted = true;
 		reverseForGlass = false;
 
 		startingPositionIndex = 4;
@@ -278,9 +273,7 @@ public final class MakelangeloRobotSettings {
 			result = "M101 T" + df.format(limitTop)
 					+ " B" + df.format(limitBottom)
 					+ " L" + df.format(limitLeft)
-					+ " R" + df.format(limitRight)
-					+ " I" + (isLeftMotorInverted ? "-1" : "1")
-					+ " J" + (isRightMotorInverted ? "-1" : "1"); 
+					+ " R" + df.format(limitRight); 
 		}
 		return result;
 	}
@@ -460,18 +453,6 @@ public final class MakelangeloRobotSettings {
 		return robotUID;
 	}
 
-	public void invertLeftMotor(boolean backwards)  {
-		isLeftMotorInverted = backwards;
-	}
-
-	public void invertRightMotor(boolean backwards) {
-		isRightMotorInverted = backwards;
-	}
-
-	public boolean isLeftMotorInverted()   {
-		return isLeftMotorInverted;
-	}
-
 	public boolean isPaperConfigured() {
 		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
@@ -482,10 +463,6 @@ public final class MakelangeloRobotSettings {
 
 	public boolean isReverseForGlass() {
 		return reverseForGlass;
-	}
-
-	public boolean isRightMotorInverted() {
-		return isRightMotorInverted;
 	}
 
 	/**
@@ -511,9 +488,6 @@ public final class MakelangeloRobotSettings {
 		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
-
-		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
-		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
 
 		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
@@ -599,8 +573,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
-		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
 		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));

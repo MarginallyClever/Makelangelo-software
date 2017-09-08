@@ -42,8 +42,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JButton buttonBneg;
 	protected JButton buttonBpos;
 
-	protected JCheckBox m1i;
-	protected JCheckBox m2i;
 
 	public PanelAdjustMachine( MakelangeloRobot robot) {
 		this.robot = robot;
@@ -212,11 +210,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	
 			buttonAneg = new JButton(Translator.get("JogIn"));
 			buttonApos = new JButton(Translator.get("JogOut"));
-			m1i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isLeftMotorInverted());
 	
 			buttonBneg = new JButton(Translator.get("JogIn"));
 			buttonBpos = new JButton(Translator.get("JogOut"));
-			m2i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isRightMotorInverted());
 	
 			c.gridx = 0;
 			c.gridy = 0;
@@ -239,21 +235,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			c.gridy = 1;
 			panel.add(buttonBpos, c);
 	
-			c.gridx = 3;
-			c.gridy = 0;
-			panel.add(m1i, c);
-			c.gridx = 3;
-			c.gridy = 1;
-			panel.add(m2i, c);
-	
 			buttonApos.addActionListener(this);
 			buttonAneg.addActionListener(this);
 	
 			buttonBpos.addActionListener(this);
 			buttonBneg.addActionListener(this);
-	
-			m1i.addActionListener(this);
-			m2i.addActionListener(this);
 
 			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
 				panel.setVisible(false);
@@ -292,13 +278,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		if (subject == buttonAneg) robot.jogLeftMotorIn();
 		if (subject == buttonBpos) robot.jogRightMotorOut();
 		if (subject == buttonBneg) robot.jogRightMotorIn();
-
-		if (subject == m1i || subject == m2i) {
-			robot.getSettings().invertLeftMotor(m1i.isSelected());
-			robot.getSettings().invertRightMotor(m2i.isSelected());
-			robot.getSettings().saveConfig();
-			robot.sendConfig();
-		}
 	}
 	
 	/**
