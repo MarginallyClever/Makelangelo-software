@@ -29,11 +29,6 @@ public class MakelangeloCustomProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public boolean canChangePulleySize() {
-		return true;
-	}
-
-	@Override
 	public boolean canAutoHome() {
 		return false;
 	}

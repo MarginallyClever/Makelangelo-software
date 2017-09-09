@@ -351,9 +351,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		try {
 			// send config
 			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			if(this.settings.getHardwareProperties().canChangePulleySize()) {
-				sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
-			}
 			setHome();
 			sendLineToRobot("G0 F"+ df.format(settings.getMaxFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}

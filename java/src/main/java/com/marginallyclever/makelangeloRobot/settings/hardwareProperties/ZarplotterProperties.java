@@ -23,12 +23,6 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	public boolean canInvertMotors() {
 		return false;
 	}
-
-
-	@Override
-	public boolean canChangePulleySize() {
-		return false;
-	}
 	
 	@Override
 	public boolean canAutoHome() {
@@ -52,12 +46,12 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 		paintCalibrationPoint(gl2,settings);
 		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
-		paintPenHolderAndCounterweights(gl2,robot);		
+		paintPenHolderToCounterweights(gl2,robot);		
 	}
 
 	
 	@Override
-	protected void paintPenHolderAndCounterweights(GL2 gl2, MakelangeloRobot robot) {
+	protected void paintPenHolderToCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		//double dx, dy;
 		double gx = robot.getGondolaX() / 10;

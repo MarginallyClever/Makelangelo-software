@@ -32,7 +32,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		paintCalibrationPoint(gl2,settings);
 		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
-		paintPenHolderAndCounterweights(gl2,robot);		
+		paintPenHolderToCounterweights(gl2,robot);		
 	}
 
 	/**

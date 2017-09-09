@@ -36,11 +36,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public boolean canAccelerate() {
 		return true;
 	}
-
-	@Override
-	public boolean canChangePulleySize() {
-		return false;
-	}
 	
 	public float getWidth() { return 650; }
 	public float getHeight() { return 1000; }
@@ -57,7 +52,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		paintCalibrationPoint(gl2,settings);
 		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
-		paintPenHolderAndCounterweights(gl2,robot);		
+		paintPenHolderToCounterweights(gl2,robot);
 		paintSafeArea(gl2,robot);
 	}
 	
@@ -166,8 +161,9 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		// clean up
 		gl2.glPopMatrix();
 	}
+
 	
-	protected void paintPenHolderAndCounterweights( GL2 gl2, MakelangeloRobot robot ) {
+	protected void paintPenHolderToCounterweights( GL2 gl2, MakelangeloRobot robot ) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx,dy;
 		double gx = robot.getGondolaX() / 10;
@@ -177,11 +173,13 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
-
+		
 		if(gx<left  ) return;
 		if(gx>right ) return;
 		if(gy>top   ) return;
 		if(gy<bottom) return;
+		
+		float bottleCenter = 0.8f+0.75f;
 		
 		double mw = right-left;
 		double mh = top-settings.getLimitBottom();
@@ -196,6 +194,11 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggestedLength - right_a)/2;
 
+		// plotter
+		gl2.glColor3f(0, 0, 1);
+		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
+
+		// belts
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2,0.2,0.2);
 		
@@ -206,8 +209,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glVertex2d(right, top);
 		gl2.glVertex2d(gx,gy);
 		
-		float bottleCenter = 0.8f+0.75f;
-		
 		// belt from motor to counterweight left
 		gl2.glVertex2d(left-bottleCenter-PULLEY_RADIUS, top-MOTOR_WIDTH/2);
 		gl2.glVertex2d(left-bottleCenter-PULLEY_RADIUS, top-left_b);
@@ -215,10 +216,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glVertex2d(right+bottleCenter+PULLEY_RADIUS, top-MOTOR_WIDTH/2);
 		gl2.glVertex2d(right+bottleCenter+PULLEY_RADIUS, top-right_b);
 		gl2.glEnd();
-		
-		// gondola
-		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
 		
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);

@@ -34,11 +34,6 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public boolean canAccelerate() {
 		return false;
 	}
-
-	@Override
-	public boolean canChangePulleySize() {
-		return true;
-	}
 	
 	@Override
 	public boolean canAutoHome() {
@@ -60,7 +55,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		paintCalibrationPoint(gl2, settings);
 		paintMotors(gl2, settings);
 		paintControlBox(gl2, settings);
-		paintPenHolderAndCounterweights(gl2, robot);
+		paintPenHolderToCounterweights(gl2, robot);
 	}
 
 	// draw left & right motor
@@ -168,7 +163,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderAndCounterweights(GL2 gl2, MakelangeloRobot robot) {
+	protected void paintPenHolderToCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx, dy;
 		double gx = robot.getGondolaX() / 10;

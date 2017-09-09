@@ -33,7 +33,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JLabel totalServoNeeded;
 	protected JLabel totalStepperNeeded;
 	protected SelectFloat acceleration;
-	protected SelectFloat pulleyDiameter;
 	protected JCheckBox flipForGlass;
 
 
@@ -141,47 +140,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			this.add(new JSeparator(SwingConstants.HORIZONTAL));
 		}
 		
-		// adjust pulleys
-		{
-			p = new JPanel(new GridBagLayout());
-			this.add(p);
-	
-			c = new GridBagConstraints();
-			c.ipadx = 5;
-			c.ipady = 0;
-			c.gridwidth = 1;
-	
-			double startingDiameter = Math.floor(robot.getSettings().getPulleyDiameter() * 10.0 * 1000.0) / 1000.0;
-	
-			// pulley diameter
-			pulleyDiameter = new SelectFloat();
-			pulleyDiameter.setValue(startingDiameter);
-			y = 2;
-			c.weightx = 0;
-			c.anchor = GridBagConstraints.EAST;
-			d.anchor = GridBagConstraints.WEST;
-			c.gridx = 0;
-			c.gridy = y;
-			p.add(new JLabel(Translator.get("AdjustPulleySize")), c);
-			d.gridx = 1;
-			d.gridy = y;
-			p.add(pulleyDiameter, d);
-			d.gridx = 2;
-			d.gridy = y;
-			p.add(new JLabel(Translator.get("Millimeters")), d);
-			y++;
-
-			s = pulleyDiameter.getPreferredSize();
-			s.width = 80;
-			pulleyDiameter.setPreferredSize(s);
-			
-			if(!robot.getSettings().getHardwareProperties().canChangePulleySize()) {
-				p.setVisible(false);
-			} else {
-				this.add(new JSeparator(SwingConstants.HORIZONTAL));
-			}
-		}
-
 		// acceleration
 		{
 			p = new JPanel(new GridBagLayout());
@@ -304,13 +262,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	public void save() {
 		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
 		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
-		double bld   = ((Number)pulleyDiameter.getValue()).doubleValue() / 10.0;
 		float accel = ((Number)acceleration.getValue()).floatValue();
 
-		boolean isDataSane = (mwf > 0 && mhf > 0 && bld > 0);
+		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
 			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
-			robot.getSettings().setPulleyDiameter(bld);
 			robot.getSettings().setMachineSize(mwf, mhf);
 			robot.getSettings().setAcceleration(accel);
 		}

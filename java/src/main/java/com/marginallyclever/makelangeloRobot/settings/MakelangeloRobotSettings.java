@@ -56,8 +56,6 @@ public final class MakelangeloRobotSettings {
 	private double paperTop;
 	// % from edge of paper.
 	private double paperMargin;
-	// pulley diameter
-	private double pulleyDiameter;
 
 	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
@@ -164,13 +162,7 @@ public final class MakelangeloRobotSettings {
 		zOff = 90;
 		penDownColor = penDownColorDefault = Color.BLACK;
 		penUpColor = Color.BLUE;
-		
-		// diameter = circumference/pi
-		// circumference is 20 teeth @ 2mm/tooth
-		pulleyDiameter  = 20.0 * 0.2 / Math.PI;
-
 		reverseForGlass = false;
-
 		startingPositionIndex = 4;
 
 		// default hardware version is 2
@@ -218,12 +210,6 @@ public final class MakelangeloRobotSettings {
 	public String[] getAvailableConfigurations() {
 		return configsAvailable;
 	}
-	
-	
-	public String getGCodePulleyDiameter() {
-		return "D1 L" + df.format(pulleyDiameter);
-	}
-
 
 	/**
 	 * @return home X coordinate in mm
@@ -444,10 +430,6 @@ public final class MakelangeloRobotSettings {
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}
-
-	public double getPulleyDiameter()  {
-		return pulleyDiameter;
-	}
 	
 	public long getUID() {
 		return robotUID;
@@ -488,8 +470,6 @@ public final class MakelangeloRobotSettings {
 		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
-
-		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
 		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
 
@@ -573,7 +553,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
@@ -657,10 +636,6 @@ public final class MakelangeloRobotSettings {
 		this.paperRight = width/2;
 		this.paperTop = height/2;
 		this.paperBottom = -height/2;
-	}
-	
-	public void setPulleyDiameter(double left) {
-		pulleyDiameter = left;
 	}
 	
 	public void setRegistered(boolean isRegistered) {

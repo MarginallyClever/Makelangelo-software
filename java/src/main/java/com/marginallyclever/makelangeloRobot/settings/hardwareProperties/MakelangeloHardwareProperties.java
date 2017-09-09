@@ -15,8 +15,6 @@ public interface MakelangeloHardwareProperties {
 	public boolean canChangeMachineSize();
 	
 	public boolean canAccelerate();
-	
-	public boolean canChangePulleySize();
 
 	public boolean canInvertMotors();
 	
