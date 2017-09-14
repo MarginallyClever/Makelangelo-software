@@ -39,17 +39,16 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * MakelangeloRobotSettings is the persistent Model data (machine configuration).
  * @author dan
  * @since 7.2.10
- *
  */
 public class MakelangeloRobot implements NetworkConnectionListener {
 	// Constants
-	private final String robotTypeName = "DRAWBOT";
+	private final String robotTypeName = "POLARGRAPH";
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
 	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 7;  // must match the version in the the firmware EEPROM
+	private final long expectedFirmwareVersion = 8;  // must match the version in the the firmware EEPROM
 	
 	private boolean hardwareVersionChecked = false;
 	
