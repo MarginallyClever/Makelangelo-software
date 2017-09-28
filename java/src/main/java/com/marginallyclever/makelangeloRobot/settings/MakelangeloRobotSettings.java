@@ -229,7 +229,7 @@ public final class MakelangeloRobotSettings {
 		} else {
 			float limitTop = (float)getLimitTop();
 			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
-			homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
+			homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
 			return homeY;
 		}
 	}
@@ -240,27 +240,9 @@ public final class MakelangeloRobotSettings {
 
 	public String getGCodeConfig() {
 		String result;
-		if(this.hardwareVersion==6) {
-			// Zarplotter
-			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
-			result = "M101 T" + df.format(limitTop)
-					+ " B" + df.format(limitBottom)
-					+ " L" + df.format(limitLeft)
-					+ " R" + df.format(limitRight);
-		} else if(this.hardwareVersion==5) {
-			// Makelangelo 5
-			result = "M101 T" + df.format(limitTop)
-					+ " B" + df.format(limitBottom)
-					+ " L" + df.format(limitLeft)
-					+ " R" + df.format(limitRight)
-					+ " I1 J-1"; 
-		} else {
-			// all others
-			result = "M101 T" + df.format(limitTop)
-					+ " B" + df.format(limitBottom)
-					+ " L" + df.format(limitLeft)
-					+ " R" + df.format(limitRight); 
-		}
+		String xAxis = "M101 A0 T"+df.format(limitRight)+" B"+df.format(limitLeft);
+		String yAxis = "M101 A1 T"+df.format(limitTop)+" B"+df.format(limitBottom);
+		result = xAxis+"\n"+yAxis; 
 		return result;
 	}
 
