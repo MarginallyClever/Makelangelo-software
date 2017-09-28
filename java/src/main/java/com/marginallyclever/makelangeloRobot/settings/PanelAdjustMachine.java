@@ -63,10 +63,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			p = new JPanel(new GridBagLayout());
 			this.add(p);
 	
-			double r = robot.getSettings().getLimitRight() * 10;
-			double l = robot.getSettings().getLimitLeft() * 10;
-			float w = (float)(r - l);
-			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom()) * 10;
+			float w = (float)(robot.getSettings().getLimitRight() - robot.getSettings().getLimitLeft());
+			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom());
 			
 			machineWidth = new SelectFloat(w);
 			machineHeight = new SelectFloat(h);
@@ -260,8 +258,8 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	}
 
 	public void save() {
-		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
-		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
+		double mwf = ((Number)machineWidth.getValue()).doubleValue();
+		double mhf = ((Number)machineHeight.getValue()).doubleValue();
 		float accel = ((Number)acceleration.getValue()).floatValue();
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);

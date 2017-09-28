@@ -641,10 +641,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
 	
-	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft(),gondolaY);	}
-	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight(),gondolaY);	}
-	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   );  }
-	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom());  }
+	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
+	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
+	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   *10);  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom()*10);  }
 	
 	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }

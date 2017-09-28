@@ -31,7 +31,7 @@ public final class MakelangeloRobotSettings {
 	 * measured from "m4 calibration.pdf"
 	 * @since 7.5.0
 	 */
-	public static final float CALIBRATION_CM_FROM_TOP = 21.7f;
+	public static final float CALIBRATION_MM_FROM_TOP = 217f;
 	
 	private DecimalFormat df;
 	
@@ -126,8 +126,8 @@ public final class MakelangeloRobotSettings {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 				
-		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
-		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
+		double mh = 835; // mm
+		double mw = 835; // mm
 		
 		robotUID = 0;
 		isRegistered = false;
@@ -153,7 +153,7 @@ public final class MakelangeloRobotSettings {
 
 		maxFeedRate = 6500;
 		currentFeedRate = 6500;
-		maxAcceleration = 250;
+		maxAcceleration = 2500;
 
 		// pen
 		diameter = 0.8f;
@@ -228,7 +228,7 @@ public final class MakelangeloRobotSettings {
 			return 0;
 		} else {
 			float limitTop = (float)getLimitTop();
-			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
+			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_MM_FROM_TOP;
 			homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
 			return homeY;
 		}
@@ -242,7 +242,8 @@ public final class MakelangeloRobotSettings {
 		String result;
 		String xAxis = "M101 A0 T"+df.format(limitRight)+" B"+df.format(limitLeft);
 		String yAxis = "M101 A1 T"+df.format(limitTop)+" B"+df.format(limitBottom);
-		result = xAxis+"\n"+yAxis; 
+		String zAxis = "M101 A2 T170 B10";
+		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
 	}
 
@@ -668,7 +669,7 @@ public final class MakelangeloRobotSettings {
 		
 		hardwareVersion = newVersion;
 		if(!hardwareProperties.canChangeMachineSize()) {
-			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
+			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
 		}
 	}
 	
