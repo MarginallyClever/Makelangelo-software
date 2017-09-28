@@ -5,11 +5,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo5Properties extends Makelangelo3Properties {
-	public final static float PEN_HOLDER_RADIUS_5 = 3; // cm
-	public final static double COUNTERWEIGHT_W = 3;
-	public final static double COUNTERWEIGHT_H = 6;
-	public final static double PULLEY_RADIUS = 0.127;
-	public final static double MOTOR_WIDTH = 4.2;
+	public final static float PEN_HOLDER_RADIUS_5 = 30; // mm
+	public final static double COUNTERWEIGHT_W = 30;
+	public final static double COUNTERWEIGHT_H = 60;
+	public final static double PULLEY_RADIUS = 1.27;
+	public final static double MOTOR_WIDTH = 42;
 
 	
 	@Override
@@ -50,10 +50,78 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		MakelangeloRobotSettings settings = robot.getSettings();
 
 		paintCalibrationPoint(gl2,settings);
-		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
+		paintMotors(gl2,settings);
 		paintPenHolderToCounterweights(gl2,robot);
 		paintSafeArea(gl2,robot);
+	}
+
+	/**
+	 * paint the controller and the LCD panel
+	 * @param gl2
+	 * @param settings
+	 */
+	protected void paintControlBox(GL2 gl2,MakelangeloRobotSettings settings) {
+		double cy = settings.getLimitTop();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+		double top = settings.getLimitTop();
+		double cx = 0;
+
+		gl2.glPushMatrix();
+		
+		// mounting plate for PCB
+		final float SUCTION_CUP_Y=35f;
+		final float SUCTION_CUP_RADIUS = 32.5f; ///mm
+		final float FRAME_SIZE=50f; //mm
+
+		gl2.glColor3f(1,1f,1f);
+		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
+		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
+		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
+		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
+		
+		gl2.glColor3f(1,0.8f,0.5f);
+		// frame
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left-FRAME_SIZE, top+FRAME_SIZE);
+		gl2.glVertex2d(right+FRAME_SIZE, top+FRAME_SIZE);
+		gl2.glVertex2d(right+FRAME_SIZE, top-FRAME_SIZE);
+		gl2.glVertex2d(left-FRAME_SIZE, top-FRAME_SIZE);
+		gl2.glEnd();
+
+		gl2.glTranslated(cx, cy, 0);
+		
+		// wires to each motor
+		gl2.glBegin(GL2.GL_LINES);
+		final float SPACING=2;
+		float y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+
+		y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glEnd();
+		
+		// RUMBA in v3 (135mm*75mm)
+		float h = 75f/2;
+		float w = 135f/2;
+		gl2.glColor3d(0.9,0.9,0.9);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+
+		renderLCD(gl2);
+
+		gl2.glPopMatrix();
 	}
 	
 
@@ -62,23 +130,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		double top = settings.getLimitTop();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
-		
-		final float SUCTION_CUP_Y=3.5f;
-
-		gl2.glColor3f(1,1f,1f);
-		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,3.25f);
-		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,3.25f);
-		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,3.25f);
-		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,3.25f);
-		
-		gl2.glColor3f(1,0.8f,0.5f);
-		// frame
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left-5f, top+5f);
-		gl2.glVertex2d(right+5f, top+5f);
-		gl2.glVertex2d(right+5f, top-5f);
-		gl2.glVertex2d(left-5f, top-5f);
-		gl2.glEnd();
 
 		// left motor
 		gl2.glColor3f(0,0,0);
@@ -99,7 +150,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	protected void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
-		gl2.glTranslated(-18, 0, 0);
+		gl2.glTranslated(-180, 0, 0);
 		/*
 		// mounting plate for LCD
 		gl2.glColor3f(1,0.8f,0.5f);
@@ -111,8 +162,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glEnd();*/
 
 		// LCD red
-		float w = 15.0f/2;
-		float h = 5.6f/2;
+		float w = 150f/2;
+		float h = 56f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -125,8 +176,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glPushMatrix();
 		gl2.glTranslated(-(2.6)/2, -0.771, 0);
 		
-		w = 9.8f/2;
-		h = 6.0f/2;
+		w = 98f/2;
+		h = 60f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -136,7 +187,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glEnd();
 
 		// LCD black
-		h = 4.0f/2;
+		h = 40f/2;
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -146,8 +197,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glEnd();
 
 		// LCD blue
-		h = 2.5f/2;
-		w = 7.5f/2;
+		h = 25f/2;
+		w = 75f/2;
 		gl2.glColor3f(0,0,0.7f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -166,8 +217,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	protected void paintPenHolderToCounterweights( GL2 gl2, MakelangeloRobot robot ) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx,dy;
-		double gx = robot.getGondolaX() / 10;
-		double gy = robot.getGondolaY() / 10;
+		double gx = robot.getGondolaX();// / 10;
+		double gy = robot.getGondolaY();// / 10;
 		
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -179,11 +230,11 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		if(gy>top   ) return;
 		if(gy<bottom) return;
 		
-		float bottleCenter = 0.8f+0.75f;
+		float bottleCenter = 8f+7.5f;
 		
 		double mw = right-left;
 		double mh = top-settings.getLimitBottom();
-		double suggestedLength = Math.sqrt(mw*mw+mh*mh)+5;
+		double suggestedLength = Math.sqrt(mw*mw+mh*mh)+50;
 
 		dx = gx - left;
 		dy = gy - top;
@@ -255,10 +306,10 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
 
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(left-7f, top+7f);
-		gl2.glVertex2d(right+9f, top+7f);
-		gl2.glVertex2d(right+9f, top-100);
-		gl2.glVertex2d(left-7f, top-100);
+		gl2.glVertex2d(left-70f, top+70f);
+		gl2.glVertex2d(right+90f, top+70f);
+		gl2.glVertex2d(right+90f, top-1000);
+		gl2.glVertex2d(left-70f, top-1000);
 		gl2.glEnd();
 	}
 }

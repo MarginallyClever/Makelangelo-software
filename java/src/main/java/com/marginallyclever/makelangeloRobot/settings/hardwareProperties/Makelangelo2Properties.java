@@ -5,10 +5,10 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo2Properties implements MakelangeloHardwareProperties {
-	public final static float PEN_HOLDER_RADIUS_2= 6; // cm
-	public final static float MOTOR_SIZE= 2.1f; // cm
-	public final static float PLOTTER_SIZE= 2.1f; // cm
-	public final static float FRAME_SIZE= 5.0f; // cm
+	public final static float PEN_HOLDER_RADIUS_2= 60; // cm
+	public final static float MOTOR_SIZE= 21f; // cm
+	public final static float PLOTTER_SIZE= 21f; // cm
+	public final static float FRAME_SIZE= 50f; // cm
 
 	@Override
 	public int getVersion() {
@@ -124,31 +124,18 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 
 		// wires to each motor
 		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3f(1, 0, 0);
-		gl2.glVertex2d(0, -0.3);
-		gl2.glVertex2d(left, -0.3);
-		gl2.glColor3f(0, 1, 0);
-		gl2.glVertex2d(0, -0.1);
-		gl2.glVertex2d(left, -0.1);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(0, 0.1);
-		gl2.glVertex2d(left, 0.1);
-		gl2.glColor3f(1, 1, 0);
-		gl2.glVertex2d(0, 0.3);
-		gl2.glVertex2d(left, 0.3);
+		final float SPACING=20;
+		float y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
 
-		gl2.glColor3f(1, 0, 0);
-		gl2.glVertex2d(0, 0.3);
-		gl2.glVertex2d(right, 0.3);
-		gl2.glColor3f(0, 1, 0);
-		gl2.glVertex2d(0, 0.1);
-		gl2.glVertex2d(right, 0.1);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(0, -0.1);
-		gl2.glVertex2d(right, -0.1);
-		gl2.glColor3f(1, 1, 0);
-		gl2.glVertex2d(0, -0.3);
-		gl2.glVertex2d(right, -0.3);
+		y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
 		gl2.glEnd();
 
 		// UNO

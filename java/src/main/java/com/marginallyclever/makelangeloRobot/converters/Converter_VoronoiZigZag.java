@@ -116,7 +116,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
 		lock.lock();
-		gl2.glScalef(0.1f, 0.1f, 1);
+
 		int i;
 
 		if (graphEdges != null) {

@@ -71,7 +71,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// gl2.glOrtho(-windowWidth / 2.0d, windowWidth / 2.0d, -windowHeight /
 		// 2.0d, windowHeight / 2.0d, 0.01d, 100.0d);
 
-		glu.gluPerspective(60, (float) windowWidth / (float) windowHeight, 1.0f, 1000.0f);
+		glu.gluPerspective(60, (float) windowWidth / (float) windowHeight, 10.0f, 10000.0f);
 	}
 
 	/**

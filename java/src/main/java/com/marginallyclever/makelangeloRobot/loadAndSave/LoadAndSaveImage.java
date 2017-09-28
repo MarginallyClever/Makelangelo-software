@@ -273,8 +273,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 
 		float flip = s.isReverseForGlass() ? -1 : 1;
-		double width  = s.getPaperWidth ()*s.getPaperMargin()*10.0;
-		double height = s.getPaperHeight()*s.getPaperMargin()*10.0;
+		double width  = s.getPaperWidth ()*s.getPaperMargin();
+		double height = s.getPaperHeight()*s.getPaperMargin();
 		
 		if( s.getPaperWidth() > s.getPaperHeight() ) {
 			if(width < img.getSourceImage().getWidth()) {
@@ -296,8 +296,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 		
 		float flip   = s.isReverseForGlass() ? -1 : 1;
-		double width  = s.getPaperWidth ()*s.getPaperMargin()*10.0;
-		double height = s.getPaperHeight()*s.getPaperMargin()*10.0;
+		double width  = s.getPaperWidth ()*s.getPaperMargin();
+		double height = s.getPaperHeight()*s.getPaperMargin();
 		
 		if( s.getPaperWidth() < s.getPaperHeight() ) {
 			if(width < img.getSourceImage().getWidth()) {

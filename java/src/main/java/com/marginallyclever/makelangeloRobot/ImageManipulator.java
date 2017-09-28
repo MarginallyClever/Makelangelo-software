@@ -123,10 +123,10 @@ public abstract class ImageManipulator {
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin())-MARGIN_EPSILON) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin())+MARGIN_EPSILON) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin())-MARGIN_EPSILON) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin())+MARGIN_EPSILON) return false;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
 		return true;
 	}
 

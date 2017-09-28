@@ -104,7 +104,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		while(lock.isLocked());
 		lock.lock();
 
-		gl2.glScalef(0.1f, 0.1f, 1);
+//		gl2.glScalef(1f, 1f, 1);
 
 		// draw cell edges
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);

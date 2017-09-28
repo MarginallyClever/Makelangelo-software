@@ -50,7 +50,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		machine.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
+						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
 		xMax = v;
 		yMax = v;
 		xMin = -v;

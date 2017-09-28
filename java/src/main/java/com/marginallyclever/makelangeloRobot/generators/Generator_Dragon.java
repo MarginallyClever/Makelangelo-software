@@ -53,8 +53,8 @@ public class Generator_Dragon extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		xMax = (float)(machine.getPaperWidth()/2.0f  * machine.getPaperMargin()) * 10.0f;
-		yMax = (float)(machine.getPaperHeight()/2.0f * machine.getPaperMargin()) * 10.0f;
+		xMax = (float)(machine.getPaperWidth()  * machine.getPaperMargin())/2.0f;
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
 		xMin = -xMax;
 		yMin = -yMax;
 

@@ -109,8 +109,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 				double imageWidth  = maxX - minX;
 				double imageHeight = maxY - minY;
-				double paperHeight = robot.getSettings().getPaperHeight() * 10.0 * robot.getSettings().getPaperMargin();
-				double paperWidth  = robot.getSettings().getPaperWidth () * 10.0 * robot.getSettings().getPaperMargin();
+				double paperHeight = robot.getSettings().getPaperHeight() * robot.getSettings().getPaperMargin();
+				double paperWidth  = robot.getSettings().getPaperWidth () * robot.getSettings().getPaperMargin();
 	
 				scale = 1;
 				if(shouldScaleOnLoad) {

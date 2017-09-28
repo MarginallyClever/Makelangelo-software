@@ -16,8 +16,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  */
 public class Generator_FibonacciSpiral extends ImageGenerator {
 	private Turtle turtle;
-	private float xMax = 7;
-	private float yMax = 7;
+	private float xMax = 70;
+	private float yMax = 70;
 	private static int order = 7; // controls complexity of curve
 
 	private Stack<Integer> fibonacciSequence;
@@ -76,8 +76,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin()) * 10.0f/2.0f;
-		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin()) * 10.0f/2.0f;
+		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin())/2.0f;
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
 
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);

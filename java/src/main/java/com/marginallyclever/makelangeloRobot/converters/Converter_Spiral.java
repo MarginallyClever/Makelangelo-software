@@ -64,15 +64,15 @@ public class Converter_Spiral extends ImageConverter {
 		float maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getPaperHeight() * 10;
-			float w2 = (float)machine.getPaperWidth() * 10;
+			float h2 = (float)machine.getPaperHeight();
+			float w2 = (float)machine.getPaperWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
 			float w = (float)machine.getPaperWidth()/2.0f;
 			float h = (float)machine.getPaperHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
-			maxr *= machine.getPaperMargin() * 10.0f;
+			maxr *= machine.getPaperMargin() ;
 		}
 		
 		float r = maxr, f;
