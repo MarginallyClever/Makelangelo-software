@@ -193,15 +193,20 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 		String command;
 		try {
 			command=commandQueue.remove(0);
-			String line = command;
-			if(line.contains(COMMENT_START)) {
-				String [] lines = line.split(COMMENT_START);
-				command = lines[0];
+			if(command==null || command.length()==0) return;
+			/*
+			// remove any comments in the gcode
+			// TODO don't put this in serialConnection, it's the wrong level of abstraction.
+			if(command.contains(COMMENT_START)) {
+				command = command.substring(0,line.indexOf(COMMENT_START));
+			}*/
+			// make sure there is a newline
+			// TODO don't put this in serialConnection, it's the wrong level of abstraction.
+			if(command.endsWith("\n") == false) {
+				command+=NEWLINE;
 			}
-			if(line.endsWith("\n") == false) {
-				line+=NEWLINE;
-			}
-			serialPort.writeBytes(line.getBytes());
+			// send it
+			serialPort.writeBytes(command.getBytes());
 			waitingForCue=true;
 		}
 		catch(IndexOutOfBoundsException e1) {}

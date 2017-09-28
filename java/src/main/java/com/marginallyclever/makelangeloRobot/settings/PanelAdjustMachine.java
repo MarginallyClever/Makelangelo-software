@@ -33,7 +33,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JLabel totalServoNeeded;
 	protected JLabel totalStepperNeeded;
 	protected SelectFloat acceleration;
-	protected SelectFloat pulleyDiameter;
 	protected JCheckBox flipForGlass;
 
 
@@ -42,8 +41,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JButton buttonBneg;
 	protected JButton buttonBpos;
 
-	protected JCheckBox m1i;
-	protected JCheckBox m2i;
 
 	public PanelAdjustMachine( MakelangeloRobot robot) {
 		this.robot = robot;
@@ -143,47 +140,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			this.add(new JSeparator(SwingConstants.HORIZONTAL));
 		}
 		
-		// adjust pulleys
-		{
-			p = new JPanel(new GridBagLayout());
-			this.add(p);
-	
-			c = new GridBagConstraints();
-			c.ipadx = 5;
-			c.ipady = 0;
-			c.gridwidth = 1;
-	
-			double startingDiameter = Math.floor(robot.getSettings().getPulleyDiameter() * 10.0 * 1000.0) / 1000.0;
-	
-			// pulley diameter
-			pulleyDiameter = new SelectFloat();
-			pulleyDiameter.setValue(startingDiameter);
-			y = 2;
-			c.weightx = 0;
-			c.anchor = GridBagConstraints.EAST;
-			d.anchor = GridBagConstraints.WEST;
-			c.gridx = 0;
-			c.gridy = y;
-			p.add(new JLabel(Translator.get("AdjustPulleySize")), c);
-			d.gridx = 1;
-			d.gridy = y;
-			p.add(pulleyDiameter, d);
-			d.gridx = 2;
-			d.gridy = y;
-			p.add(new JLabel(Translator.get("Millimeters")), d);
-			y++;
-
-			s = pulleyDiameter.getPreferredSize();
-			s.width = 80;
-			pulleyDiameter.setPreferredSize(s);
-			
-			if(!robot.getSettings().getHardwareProperties().canChangePulleySize()) {
-				p.setVisible(false);
-			} else {
-				this.add(new JSeparator(SwingConstants.HORIZONTAL));
-			}
-		}
-
 		// acceleration
 		{
 			p = new JPanel(new GridBagLayout());
@@ -212,11 +168,9 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	
 			buttonAneg = new JButton(Translator.get("JogIn"));
 			buttonApos = new JButton(Translator.get("JogOut"));
-			m1i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isLeftMotorInverted());
 	
 			buttonBneg = new JButton(Translator.get("JogIn"));
 			buttonBpos = new JButton(Translator.get("JogOut"));
-			m2i = new JCheckBox(Translator.get("Invert"), robot.getSettings().isRightMotorInverted());
 	
 			c.gridx = 0;
 			c.gridy = 0;
@@ -239,21 +193,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			c.gridy = 1;
 			panel.add(buttonBpos, c);
 	
-			c.gridx = 3;
-			c.gridy = 0;
-			panel.add(m1i, c);
-			c.gridx = 3;
-			c.gridy = 1;
-			panel.add(m2i, c);
-	
 			buttonApos.addActionListener(this);
 			buttonAneg.addActionListener(this);
 	
 			buttonBpos.addActionListener(this);
 			buttonBneg.addActionListener(this);
-	
-			m1i.addActionListener(this);
-			m2i.addActionListener(this);
 
 			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
 				panel.setVisible(false);
@@ -292,13 +236,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 		if (subject == buttonAneg) robot.jogLeftMotorIn();
 		if (subject == buttonBpos) robot.jogRightMotorOut();
 		if (subject == buttonBneg) robot.jogRightMotorIn();
-
-		if (subject == m1i || subject == m2i) {
-			robot.getSettings().invertLeftMotor(m1i.isSelected());
-			robot.getSettings().invertRightMotor(m2i.isSelected());
-			robot.getSettings().saveConfig();
-			robot.sendConfig();
-		}
 	}
 	
 	/**
@@ -325,13 +262,11 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	public void save() {
 		double mwf = ((Number)machineWidth.getValue()).doubleValue() / 10.0;
 		double mhf = ((Number)machineHeight.getValue()).doubleValue() / 10.0;
-		double bld   = ((Number)pulleyDiameter.getValue()).doubleValue() / 10.0;
 		float accel = ((Number)acceleration.getValue()).floatValue();
 
-		boolean isDataSane = (mwf > 0 && mhf > 0 && bld > 0);
+		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
 			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
-			robot.getSettings().setPulleyDiameter(bld);
 			robot.getSettings().setMachineSize(mwf, mhf);
 			robot.getSettings().setAcceleration(accel);
 		}

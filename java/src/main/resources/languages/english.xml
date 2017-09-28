@@ -16,6 +16,17 @@
 		<value>Exit</value>
 		<hint>confirm quit dialog title</hint>
 	</string>
+
+	<string>
+		<key>ConvertImagePaperFill</key>
+		<value>Fill entire paper</value>
+		<hint>Converter hint</hint>
+	</string>
+	<string>
+		<key>ConvertImagePaperFit</key>
+		<value>Fit image on paper</value>
+		<hint>Converter hint</hint>
+	</string>
 	
 	<string>
 		<key>ConverterCMYKName</key>
@@ -31,7 +42,7 @@
 	
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value>Draws Yellow, Cyan, Magenta, and then Black.\r\nDo not run from SD card (yet!)</value>
+		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.<br>Do not run from SD card (yet!)</html></body>]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 	
@@ -250,7 +261,12 @@
 
 	<string>
 		<key>ConversionStyle</key>
-		<value>Conversion style</value>
+		<value>Style</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>ConversionFill</key>
+		<value>Fill</value>
 		<hint>conversion options</hint>
 	</string>
 

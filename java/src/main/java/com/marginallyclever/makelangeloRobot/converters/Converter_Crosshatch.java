@@ -3,6 +3,8 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -16,12 +18,26 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
  */
 public class Converter_Crosshatch extends ImageConverter {
 	private double xStart, yStart, xEnd, yEnd;
-
+	private static float intensity=2.0f;
+	
 	@Override
 	public String getName() {
 		return Translator.get("Crosshatch");
 	}
+	
+	@Override
+	public JPanel getPanel() {
+		return new Converter_Crosshatch_Panel(this);
+	}
 
+	public void setIntensity(float arg0) {
+		intensity=arg0;
+	}
+	
+	public float getIntensity() {
+		return intensity;
+	}
+	
 	/**
 	 * The main entry point
 	 *
@@ -54,7 +70,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		xStart = (float) machine.getPaperLeft() * (float) machine.getPaperMargin() * 10;
 		xEnd = (float) machine.getPaperRight() * (float) machine.getPaperMargin() * 10;
 
-		double stepSize = machine.getPenDiameter() * 3.0;
+		double stepSize = machine.getPenDiameter() * intensity;
 		double x, y;
 		boolean flip = true;
 

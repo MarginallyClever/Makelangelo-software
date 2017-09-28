@@ -4,6 +4,8 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.swing.JPanel;
+
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -23,7 +25,19 @@ public class Converter_Spiral extends ImageConverter {
 		return Translator.get("SpiralName");
 	}
 
+	@Override
+	public JPanel getPanel() {
+		return new Converter_Spiral_Panel(this);
+	}
 
+	public boolean getToCorners() {
+		return convertToCorners;
+	}
+	
+	public void setToCorners(boolean arg0) {
+		convertToCorners=arg0;
+	}
+	
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 *
@@ -48,7 +62,6 @@ public class Converter_Spiral extends ImageConverter {
 		int z = 0;
 
 		float maxr;
-		convertToCorners=false;
 		if (convertToCorners) {
 			// go right to the corners
 			float h2 = (float)machine.getPaperHeight() * 10;

@@ -29,10 +29,10 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	public void render(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 
-		super.paintCalibrationPoint(gl2,settings);
-		super.paintMotors(gl2,settings);
+		paintCalibrationPoint(gl2,settings);
+		paintMotors(gl2,settings);
 		paintControlBox(gl2,settings);
-		super.paintPenHolderAndCounterweights(gl2,robot);		
+		paintPenHolderToCounterweights(gl2,robot);		
 	}
 
 	/**
