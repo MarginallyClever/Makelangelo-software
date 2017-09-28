@@ -73,10 +73,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10.0f;
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10.0f;
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		keepIterating=true;
 		restart();

@@ -48,8 +48,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 		int xi;
 		for (xi = 0; xi < nexterror.length; ++xi) nexterror[xi].set(0, 0, 0);
 
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		
 		if (direction > 0) {
@@ -132,8 +132,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 			nexterror[y] = new ColorRGB(0, 0, 0);
 		}
 
-		int yBottom = (int)( machine.getPaperBottom() * machine.getPaperMargin() * 10.0f );
-		int yTop    = (int)( machine.getPaperTop()    * machine.getPaperMargin() * 10.0f );
+		int yBottom = (int)( machine.getPaperBottom() * machine.getPaperMargin() );
+		int yTop    = (int)( machine.getPaperTop()    * machine.getPaperMargin() );
 		
 		direction = 1;
 		for (y = yBottom; y < yTop; y+= step4) {
@@ -156,10 +156,10 @@ public class Converter_ColorBoxes extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 
-		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin() * 10.0f);
+		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin());
 
 		// figure out how many boxes we're going to have on this image.
-		step4 = (machine.getPenDiameter() * 10.0f);
+		step4 = (machine.getPenDiameter());
 		step2 = (step4 / 2.0f);  // half step
 		step1 = (step4 / 4.0f);  // quarter step
 		stepsTotal = pw / step4;

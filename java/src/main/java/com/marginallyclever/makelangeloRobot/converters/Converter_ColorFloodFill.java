@@ -237,12 +237,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 		imageStart(out);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
-		diameter = (int)( machine.getPenDiameter() * 10.0f );
+		diameter = (int)( machine.getPenDiameter() );
 
 		imgChanged = img;
 

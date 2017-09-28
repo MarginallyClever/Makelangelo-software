@@ -44,12 +44,12 @@ public final class MakelangeloRobotSettings {
 	private long robotUID;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
-	// machine physical limits, in cm
+	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
-	// paper area, in cm
+	// paper area, in mm
 	private double paperLeft;
 	private double paperRight;
 	private double paperBottom;
@@ -323,7 +323,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return bottom limit in cm
+	 * @return bottom limit in mm
 	 */
 	public double getLimitBottom() {
 		return limitBottom;
@@ -331,7 +331,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return left limit in cm
+	 * @return left limit in mm
 	 */
 	public double getLimitLeft() {
 		return limitLeft;
@@ -339,14 +339,14 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return right limit in cm
+	 * @return right limit in mm
 	 */
 	public double getLimitRight() {
 		return limitRight;
 	}
 
 	/**
-	 * @return top limit in cm
+	 * @return top limit in mm
 	 */
 	public double getLimitTop() {
 		return limitTop;
@@ -361,7 +361,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper bottom edge in cm.
+	 * @return paper bottom edge in mm.
 	 */
 	public double getPaperBottom() {
 		return paperBottom;
@@ -369,14 +369,14 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper height in cm.
+	 * @return paper height in mm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
 
 	/**
-	 * @return paper left edge in cm.
+	 * @return paper left edge in mm.
 	 */
 	public double getPaperLeft() {
 		return paperLeft;
@@ -392,7 +392,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper right edge in cm.
+	 * @return paper right edge in mm.
 	 */
 	public double getPaperRight() {
 		return paperRight;
@@ -400,7 +400,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper top edge in cm.
+	 * @return paper top edge in mm.
 	 */
 	public double getPaperTop() {
 		return paperTop;
@@ -408,7 +408,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper width in cm.
+	 * @return paper width in mm.
 	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;

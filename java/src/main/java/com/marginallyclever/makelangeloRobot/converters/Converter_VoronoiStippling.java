@@ -66,10 +66,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10.0f;
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10.0f;
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10.0f;
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10.0f;
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 
 		keepIterating=true;
 		restart();
@@ -144,10 +144,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		cells = new VoronoiCell[numCells];
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		int used;
 		for (used=0;used<numCells;++used) {

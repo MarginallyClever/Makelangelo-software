@@ -59,10 +59,10 @@ public class Converter_Sandy extends ImageConverter {
 
 		float yBottom, yTop, xLeft, xRight;
 
-		yBottom = (float)machine.getLimitBottom() * 10;
-		yTop    = (float)machine.getLimitTop()    * 10;
-		xLeft   = (float)machine.getLimitLeft()   * 10;
-		xRight  = (float)machine.getLimitRight()  * 10;
+		yBottom = (float)machine.getLimitBottom();
+		yTop    = (float)machine.getLimitTop();
+		xLeft   = (float)machine.getLimitLeft();
+		xRight  = (float)machine.getLimitRight();
 		
 		double cx,cy;
 

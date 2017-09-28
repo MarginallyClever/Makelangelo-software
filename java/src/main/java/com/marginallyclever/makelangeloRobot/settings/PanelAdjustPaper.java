@@ -268,8 +268,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	public void updateValues() {
 		if(robot==null) return;
 		
-		double w = robot.getSettings().getPaperWidth()*10;
-		double h = robot.getSettings().getPaperHeight()*10;
+		double w = robot.getSettings().getPaperWidth();
+		double h = robot.getSettings().getPaperHeight();
 
 		beingModified=true;
 		
@@ -288,8 +288,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	}
 	
 	public void save() {
-		double pwf = Double.valueOf(pw.getText()) / 10.0;
-		double phf = Double.valueOf(ph.getText()) / 10.0;
+		double pwf = Double.valueOf(pw.getText());
+		double phf = Double.valueOf(ph.getText());
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;

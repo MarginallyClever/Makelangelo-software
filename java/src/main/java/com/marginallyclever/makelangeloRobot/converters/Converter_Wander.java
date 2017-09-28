@@ -42,10 +42,10 @@ public class Converter_Wander extends ImageConverter {
 		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 

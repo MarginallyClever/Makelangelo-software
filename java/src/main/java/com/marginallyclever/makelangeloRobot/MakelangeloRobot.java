@@ -641,10 +641,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
 	
-	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
-	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
-	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   *10);  }
-	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom()*10);  }
+	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft(),gondolaY);	}
+	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight(),gondolaY);	}
+	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   );  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom());  }
 	
 	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }
@@ -710,19 +710,19 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private void paintLimits(GL2 gl2) {
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft() , settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
+		gl2.glVertex2d(settings.getLimitLeft() , settings.getLimitBottom());
 		gl2.glEnd();
 
 		Color c = settings.getPaperColor();
 		gl2.glColor3f(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperBottom());
 		gl2.glEnd();
 		
 		// margin settings
@@ -731,10 +731,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glLineWidth(1);
 		gl2.glScaled(settings.getPaperMargin(),settings.getPaperMargin(),1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperBottom());
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}

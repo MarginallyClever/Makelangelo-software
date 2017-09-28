@@ -67,10 +67,10 @@ public class Converter_Multipass extends ImageConverter {
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin() * 10;
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin() * 10;
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin() * 10;
+		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
+		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
+		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
+		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
 		double dy = yTop - yBottom;
 		double dx = xRight - xLeft;
 		double radius = Math.sqrt(dx*dx+dy*dy);

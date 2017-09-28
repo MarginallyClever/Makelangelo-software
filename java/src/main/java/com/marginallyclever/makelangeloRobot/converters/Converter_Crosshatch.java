@@ -65,10 +65,10 @@ public class Converter_Crosshatch extends ImageConverter {
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		yStart = (float) machine.getPaperBottom() * (float) machine.getPaperMargin() * 10;
-		yEnd = (float) machine.getPaperTop() * (float) machine.getPaperMargin() * 10;
-		xStart = (float) machine.getPaperLeft() * (float) machine.getPaperMargin() * 10;
-		xEnd = (float) machine.getPaperRight() * (float) machine.getPaperMargin() * 10;
+		yStart = (float) machine.getPaperBottom() * (float) machine.getPaperMargin();
+		yEnd   = (float) machine.getPaperTop()    * (float) machine.getPaperMargin();
+		xStart = (float) machine.getPaperLeft()   * (float) machine.getPaperMargin();
+		xEnd   = (float) machine.getPaperRight()  * (float) machine.getPaperMargin();
 
 		double stepSize = machine.getPenDiameter() * intensity;
 		double x, y;

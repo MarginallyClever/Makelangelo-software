@@ -123,10 +123,10 @@ public abstract class ImageManipulator {
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-MARGIN_EPSILON) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+MARGIN_EPSILON) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-MARGIN_EPSILON) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+MARGIN_EPSILON) return false;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin())-MARGIN_EPSILON) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin())+MARGIN_EPSILON) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin())-MARGIN_EPSILON) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin())+MARGIN_EPSILON) return false;
 		return true;
 	}
 
@@ -143,10 +143,10 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	protected void clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
-		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-ImageManipulator.MARGIN_EPSILON;
-		xRight  = (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+ImageManipulator.MARGIN_EPSILON;
-		yBottom = (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-ImageManipulator.MARGIN_EPSILON;
-		yTop    = (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+ImageManipulator.MARGIN_EPSILON;
+		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		yTop    = (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
 		
 		ClippingPoint P0 = new ClippingPoint(oldX,oldY);
 		ClippingPoint P1 = new ClippingPoint(x,y);
