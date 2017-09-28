@@ -118,6 +118,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 
 	protected boolean chooseImageConversionOptions(MakelangeloRobot robot) {
+		final MakelangeloRobot robot2 = robot;
+		
 		conversionPanel = new JPanel(new GridBagLayout());
 		
 		conversionStyleOptions = new JComboBox<String>(imageConverterNames);
@@ -131,7 +133,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		conversionStyleOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeConverter(conversionStyleOptions,robot);
+				changeConverter(conversionStyleOptions,robot2);
 		    }
 		});
 		conversionFillOptions.addActionListener(new ActionListener() {
@@ -141,7 +143,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					case 1:  scaleToFitPaper();  break;
 					default: break;
 				}
-				changeConverter(conversionStyleOptions,robot);
+				changeConverter(conversionStyleOptions,robot2);
 		    }
 		});
 
