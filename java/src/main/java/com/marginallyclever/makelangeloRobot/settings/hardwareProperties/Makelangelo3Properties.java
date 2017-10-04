@@ -51,16 +51,18 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		
 		// mounting plate for PCB
 		gl2.glColor3f(1,0.8f,0.5f);
+		float w =8;
+		float h = 5;
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-80, 50);
-		gl2.glVertex2d(+80, 50);
-		gl2.glVertex2d(+80, -50);
-		gl2.glVertex2d(-80, -50);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
 		// wires to each motor
 		gl2.glBegin(GL2.GL_LINES);
-		final float SPACING=2;
+		float SPACING=0.2f;
 		float y=SPACING*-1.5f;
 		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
 		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
@@ -75,8 +77,8 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glEnd();
 		
 		// RUMBA in v3 (135mm*75mm)
-		float h = 75f/2;
-		float w = 135f/2;
+		h = 7.5f/2;
+		w = 13.5f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -96,17 +98,19 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glTranslated(-18, 0, 0);
 		
 		// mounting plate for LCD
+		float w = 8.0f;
+		float h = 5.0f;
 		gl2.glColor3f(1,0.8f,0.5f);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-80, 50);
-		gl2.glVertex2d(+80, 50);
-		gl2.glVertex2d(+80, -50);
-		gl2.glVertex2d(-80, -50);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
 		// LCD red
-		float w = 150f/2;
-		float h = 56f/2;
+		w = 15.0f/2;
+		h = 5.6f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -119,8 +123,8 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glPushMatrix();
 		gl2.glTranslated(-(2.6)/2, -0.771, 0);
 		
-		w = 98f/2;
-		h = 60f/2;
+		w = 9.8f/2;
+		h = 6.0f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -130,7 +134,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glEnd();
 
 		// LCD black
-		h = 40f/2;
+		h = 4.0f/2;
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -140,8 +144,8 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glEnd();
 
 		// LCD blue
-		h = 25f/2;
-		w = 75f/2;
+		h = 2.5f/2;
+		w = 7.5f/2;
 		gl2.glColor3f(0,0,0.7f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
