@@ -69,6 +69,7 @@ public class MakelangeloAppPreferences implements ActionListener {
 		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
 		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
 		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

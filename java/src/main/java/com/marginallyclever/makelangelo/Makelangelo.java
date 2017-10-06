@@ -70,7 +70,7 @@ public final class Makelangelo
 	private static final int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper
+	private Preferences preferences = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
 	private MakelangeloAppPreferences appPreferences;
@@ -135,7 +135,7 @@ public final class Makelangelo
 
 		createAndShowGUI();
 
-		if (prefs.getBoolean("Check for updates", false))
+		if (preferences.getBoolean("Check for updates", false))
 			checkForUpdate(true);
 	}
 
@@ -355,8 +355,8 @@ public final class Makelangelo
 	private void adjustWindowSize() {
 		int maxWidth = DEFAULT_WINDOW_WIDTH;
 		int maxHeight = DEFAULT_WINDOW_HEIGHT;
-		int width = prefs.getInt("Default window width", maxWidth);
-		int height = prefs.getInt("Default window height", maxHeight);
+		int width = preferences.getInt("Default window width", maxWidth);
+		int height = preferences.getInt("Default window height", maxHeight);
 
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -367,8 +367,8 @@ public final class Makelangelo
 		if (width > maxWidth || height > maxHeight) {
 			width = maxWidth;
 			height = maxHeight;
-			prefs.putInt("Default window width", maxWidth);
-			prefs.putInt("Default window height", maxHeight);
+			preferences.putInt("Default window width", maxWidth);
+			preferences.putInt("Default window height", maxHeight);
 		}
 
 		mainFrame.setSize(width, height);
@@ -458,12 +458,12 @@ public final class Makelangelo
 	 */
 	private void saveWindowRealEstate() {
 		Dimension size = this.mainFrame.getSize();
-		prefs.putInt("Default window width", size.width);
-		prefs.putInt("Default window height", size.height);
+		preferences.putInt("Default window width", size.width);
+		preferences.putInt("Default window height", size.height);
 
 		Point location = this.mainFrame.getLocation();
-		prefs.putInt("Default window location x", location.x);
-		prefs.putInt("Default window location y", location.y);
+		preferences.putInt("Default window location x", location.x);
+		preferences.putInt("Default window location y", location.y);
 	}
 
 	@Override

@@ -346,6 +346,17 @@
 	</string>
 	
 	<string>
+		<key>MenuMetricsTitle</key>
+		<value>Metrics</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>collectAnonymousMetrics</key>
+		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
 		<key>MenuSoundsTitle</key>
 		<value>Sounds</value>
 		<hint>menu or dialog title</hint>

@@ -64,6 +64,10 @@ public final class PreferencesHelper {
 	/**
 	 *
 	 */
+	private static final String METRICS_PATH_NAME = "Metrics";
+	/**
+	 *
+	 */
 	private static final String FILE_PATH_NAME = "File";
 
 	/**
@@ -89,6 +93,7 @@ public final class PreferencesHelper {
 		initialMap.put(MakelangeloPreferenceKey.MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
 		@SuppressWarnings("unchecked")
 		final Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
@@ -123,6 +128,7 @@ public final class PreferencesHelper {
 		LANGUAGE,
 		SOUND,
 		FILE,
+		METRICS,
 		@Deprecated
 		LEGACY_MAKELANGELO_ROOT,
 		//MAKELANGELO_ROOT
