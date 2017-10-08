@@ -1,7 +1,8 @@
 # Start Makelangelo specific #
 *.class
 *.ngc
-**/log.html
+**/log.html*
+**/log.txt*
 gcode/*
 */temp.png
 java/Makelangelo.jar
