@@ -774,7 +774,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			e.printStackTrace();
 		}
 
-		Log.message(Translator.get("Finished"));
+		Log.info(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
 	}
@@ -871,7 +871,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// TODO don't rely on success to be true, load may not have finished yet.
 
 		if (success == true) {
-			Log.message(Translator.get("Finished"));
+			Log.info(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
 			updateButtonAccess();
 			statusBar.clear();
@@ -886,7 +886,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * @return true if file was loaded successfully.  false if it failed.
 	 */
 	public boolean openFileOnDemand(String filename) {
-		Log.message(Translator.get("OpeningFile") + filename + "...");
+		Log.info(Translator.get("OpeningFile") + filename + "...");
 		boolean success=false;
 		boolean attempted=false;
 

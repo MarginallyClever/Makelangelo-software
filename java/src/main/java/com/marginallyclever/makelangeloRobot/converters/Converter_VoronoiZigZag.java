@@ -101,7 +101,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				lowNoise=true;
 				greedyTour();
 				renderMode = 1;
-				Log.write("green", "Running Lin/Kerighan optimization...");
+				Log.info("green", "Running Lin/Kerighan optimization...");
 			}
 		} else {
 			optimizeTour();			
@@ -212,7 +212,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					c = "white";
 					break;
 				}
-				Log.write(c, formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
+				Log.info(c, formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
 			}
 			progress = new_progress;
 			pm.setProgress((int) progress);
@@ -304,7 +304,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	 * points have been "found".
 	 */
 	private void greedyTour() {
-		Log.write("green", "Finding greedy tour solution...");
+		Log.info("green", "Finding greedy tour solution...");
 
 		int i, j;
 		float w, bestw;
@@ -365,7 +365,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		Log.write("green", "Initializing cells");
+		Log.info("green", "Initializing cells");
 
 		cells = new VoronoiCell[numCells];
 		int used = 0;
@@ -405,7 +405,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	// write cell centroids to gcode.
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges != null) {
-			Log.message("Writing gcode.");
+			Log.info("Writing gcode.");
 			
 			imageStart(out);
 			liftPen(out);

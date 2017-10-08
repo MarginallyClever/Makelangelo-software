@@ -140,7 +140,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			Log.message("node name:"+preferenceNode);
+			Log.info("node name:"+preferenceNode);
 			logKeyValuesForPreferenceNode(preferenceNode);
 			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
 			for (String childNodeName : childrenPreferenceNodeNames) {
@@ -159,7 +159,7 @@ public final class PreferencesHelper {
 	public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
 		final String[] keys = preferenceNode.keys();
 		for (String key : keys) {
-			Log.message("key:"+key+" value:"+ preferenceNode.get(key, null));
+			Log.info("key:"+key+" value:"+ preferenceNode.get(key, null));
 		}
 	}
 
@@ -274,7 +274,7 @@ public final class PreferencesHelper {
 	 */
 	public static void logAncestryable(Ancestryable preferenceNode) {
 		final JSONObject object = new JSONObject(preferenceNode.getChildren());
-		Log.message( object.toString());
+		Log.info( object.toString());
 	}
 
 	/**
@@ -282,7 +282,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Properties> void logPropertiesNode(P properties) {
 		final JSONObject jsonObject = Property.toJSONObject(properties);
-		Log.message( jsonObject.toString());
+		Log.info( jsonObject.toString());
 	}
 
 }

@@ -1,18 +1,13 @@
 package com.marginallyclever.makelangelo;
 
-import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.logging.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 
 /**
  * static log methods available everywhere
@@ -20,58 +15,83 @@ import org.slf4j.LoggerFactory;
  * @since 7.3.0
  */
 public class Log {
-	/**
-	 * logging
-	 * @see org.slf4j.Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
-	private static ArrayList<LogListener> listeners = new ArrayList<LogListener>();
-
+	public static String LOG_FILE_NAME_HTML = "log.html";
+	public static String LOG_FILE_NAME_TXT = "log.txt";
+	public static Logger logger;
+	private static FileHandler fileTXT, fileHTML;
 	
-	public static void addListener(LogListener listener) {
-		listeners.add(listener);
+
+	public static void start() {
+		crashReportCheck();
+		deleteOldLog();
+		
+		logger = Logger.getLogger("");
+		
+		try {
+			fileTXT=new FileHandler(LOG_FILE_NAME_TXT);
+			fileTXT.setFormatter(new SimpleFormatter());
+			logger.addHandler(fileTXT);
+			
+			fileHTML=new FileHandler(LOG_FILE_NAME_HTML);
+			fileHTML.setFormatter(new LogFormatterHTML());
+			logger.addHandler(fileHTML);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		logger.info("START");
 	}
-	public static void removeListener(LogListener listener) {
-		listeners.remove(listener);
+	
+	public static void end() {
+		if(MetricsPreferences.areAllowedToShare()) {
+			logger.info("END");
+			sendLog();
+			// delete the log file
+		}
+	}
+	
+	private static void crashReportCheck() {
+		boolean oldLogExists = false;
+		boolean canShare = MetricsPreferences.areAllowedToShare(); 
+		if( oldLogExists && canShare ) {
+			// Add line "** CRASHED **"
+			// send it!
+			sendLog();
+		}
+	}
+	
+	private static void sendLog() {
+		File f = new File(LOG_FILE_NAME_HTML);
+		if(!f.exists()) return;
 	}
 	
 	/**
 	 * wipe the log file
 	 * @author danroyer
 	 */
-	public static void clear() {
-		Path p = FileSystems.getDefault().getPath("log.html");
+	protected static void deleteOldLog() {
+		Path p = FileSystems.getDefault().getPath(LOG_FILE_NAME_HTML);
 		try {
 			Files.deleteIfExists(p);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		// print starting time
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		write("<h3>" + sdf.format(cal.getTime()) + "</h3>\n");
 	}
-
-
+	
+	
 	/**
 	 * Appends a message to the log file
-	 * @param msg
+	 * @param color the hex code or HTML name of the color for this message
+	 * @param msg the text
 	 */
-	public static void write(String msg) {
-		try (Writer fileWriter = new FileWriter("log.html", true)) {
-			PrintWriter logToFile = new PrintWriter(fileWriter);
-			logToFile.write(msg);
-			logToFile.flush();
-		} catch (IOException e) {
-			logger.error("{}", e);
-		}
-		
-		for( LogListener listener : listeners ) {
-			listener.logEvent(msg);
-		}
+	public static void info(String color, String msg) {
+		assert(logger!=null);
+		logger.log(Level.INFO, msg);
 	}
 
+	public static void info(String msg) {
+		assert(logger!=null);
+		logger.log(Level.INFO, msg);
+	}
 
 	/**
 	 * turns milliseconds into h:m:s
@@ -95,27 +115,20 @@ public class Log {
 	
 
 	/**
-	 * Appends a message to the log file
-	 * @param color the hex code or HTML name of the color for this message
-	 * @param msg the text
+	 * Appends a message to the log file.  Color will be red.
+	 * @param message
 	 */
-	public static void write(String color, String msg) {
-		write("<div color='"+color+"'>"+msg+"</div>\n");
+	public static void warning(String msg) {
+		assert(logger!=null);
+		logger.log(Level.WARNING, msg );
 	}
 
 	/**
 	 * Appends a message to the log file.  Color will be red.
 	 * @param message
 	 */
-	public static void error(String message) {
-		write("red",message);
-	}
-
-	/**
-	 * Appends a message to the log file.  Color will be green.
-	 * @param message
-	 */
-	public static void message(String message) {
-		write("green",message);		
+	public static void error(String msg) {
+		assert(logger!=null);
+		logger.log(Level.SEVERE, msg );
 	}
 }

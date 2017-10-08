@@ -72,7 +72,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
-		Log.message("Loading...");
+		Log.info("Loading...");
 		// set up a temporary file
 		File tempFile;
 		try {
@@ -82,7 +82,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		tempFile.deleteOnExit();
-		Log.message(Translator.get("Converting") + " " + tempFile.getName());
+		Log.info(Translator.get("Converting") + " " + tempFile.getName());
 
 		
 		Document document = newDocumentFromInputStream(in);
@@ -129,7 +129,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			out.flush();
 			out.close();
 
-			Log.message(loadOK?"Loaded OK!":"Failed to load some elements.");
+			Log.info(loadOK?"Loaded OK!":"Failed to load some elements.");
 			if(loadOK) {
 				LoadAndSaveGCode loader = new LoadAndSaveGCode();
 				InputStream fileInputStream = new FileInputStream(tempFile);
@@ -317,7 +317,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @return true if save succeeded.
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		Log.message("saving...");
+		Log.info("saving...");
 		GCodeFile sourceMaterial = robot.gCode;
 		sourceMaterial.setLinesProcessed(0);
 
@@ -350,7 +350,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			}
 			
 			int total=sourceMaterial.getLinesTotal();
-			Log.message(total+" total lines to save.");
+			Log.info(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
 				String str = sourceMaterial.nextLine();
 				// trim comments
@@ -405,7 +405,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		
-		Log.message("done.");
+		Log.info("done.");
 		return true;
 	}
 

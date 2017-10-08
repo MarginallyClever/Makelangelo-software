@@ -34,7 +34,7 @@ final class MarginallyCleverPreferencesHelper {
   @SuppressWarnings("deprecation")
   public static void main(String[] args) throws BackingStoreException {
     final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-    Log.message("node name: "+ machinesPreferenceNode.name());
+    Log.info("node name: "+ machinesPreferenceNode.name());
     final boolean wereThereCommandLineArguments = args.length > 0;
     if (wereThereCommandLineArguments) {
       final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
@@ -83,7 +83,7 @@ final class MarginallyCleverPreferencesHelper {
   private static Set<String> getMachineNamesThatAreLessThanZero(String[] childrenPreferenceNodeNames) {
     final Set<String> lessThanZeroNames = new HashSet<>();
     for (String childNodeName : childrenPreferenceNodeNames) {
-      Log.message("child node name: "+ childNodeName);
+      Log.info("child node name: "+ childNodeName);
       Long parsedMachineName = null;
       try {
         parsedMachineName = Long.parseLong(childNodeName);

@@ -295,7 +295,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
 		if(!pleaseGetAGUID) return 0;
 		
-		Log.message("obtaining UID from server.");
+		Log.info("obtaining UID from server.");
 		try {
 			// Send request
 			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
@@ -305,7 +305,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
 			BufferedReader rd = new BufferedReader(inputStreamReader);
 			String line = rd.readLine();
-			Log.message("Server says: '"+line+"'");
+			Log.info("Server says: '"+line+"'");
 			newUID = Long.parseLong(line);
 			// did read go ok?
 			if (newUID != 0) {
@@ -564,7 +564,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
-		Log.write("white", line );
+		Log.info("white", line );
 		line += "\n";
 
 		// send unmodified line

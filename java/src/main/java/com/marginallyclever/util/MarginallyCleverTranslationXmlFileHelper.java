@@ -98,7 +98,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
           final String languageFileName = languageFile.getName();
           final boolean isDefaultLanguageFile = languageFileName.equals(DEFAULT_LANGUAGE_XML_FILE);
           if (!isDefaultLanguageFile) {
-            Log.message(languageFile.getAbsolutePath());
+            Log.info(languageFile.getAbsolutePath());
             final Document parseXmlLanguageDocument = docBuilder.parse(languageFile);
             final Set<String> thisLanguageFilesKeys = getKeySet(parseXmlLanguageDocument.getDocumentElement());
 
@@ -194,11 +194,11 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private static URL getLanguagesFolderUrl() {
     URL languagesFolderUrl = getLanguagesFolderUrlRelativeToClasspath();
     if( languagesFolderUrl!=null ) {
-    	Log.message("languages relative to classpath: "+languagesFolderUrl.toString());
+    	Log.info("languages relative to classpath: "+languagesFolderUrl.toString());
     }
     URL languageFolderUsingUserDirectory = getLanguagesFolderUrlFromUserDirectory();
     if( languageFolderUsingUserDirectory!=null ) {
-    	Log.message("languages via user directory: "+languageFolderUsingUserDirectory.toString());
+    	Log.info("languages via user directory: "+languageFolderUsingUserDirectory.toString());
     }
     if (languagesFolderUrl == null) {
       languagesFolderUrl = languageFolderUsingUserDirectory;
@@ -257,7 +257,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   private static void logNodeNameAndValue(Node node) {
     final String nodeName = node.getNodeName();
     if (nodeName.equals("key")) {
-      Log.message("node name: "+nodeName+", node value: "+node.getTextContent());
+      Log.info("node name: "+nodeName+", node value: "+node.getTextContent());
     }
   }
 
@@ -310,7 +310,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
     	  }
       }
     } else {
-      Log.message(thisLanguageFilesName+" contains all the default translation keys.");
+      Log.info(thisLanguageFilesName+" contains all the default translation keys.");
     }
     return doesThisLanguageFileContainAllTheDefaultKeys;
   }

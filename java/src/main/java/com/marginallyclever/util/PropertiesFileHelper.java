@@ -38,7 +38,7 @@ public final class PropertiesFileHelper {
 
       //get the property value and print it out
       makelangeloVersionPropertyValue = prop.getProperty("makelangelo.version");
-      Log.message("makelangelo.version="+ makelangeloVersionPropertyValue);
+      Log.info("makelangelo.version="+ makelangeloVersionPropertyValue);
 
     } catch (IllegalStateException | IOException ex) {
       Log.error( ex.getMessage() );

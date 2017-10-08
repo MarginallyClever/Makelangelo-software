@@ -27,15 +27,15 @@ public class TCPTransportLayer implements TransportLayer {
 			return null;
 		}
 		*/
-		Log.message("Connecting to "+connectionName);
+		Log.info("Connecting to "+connectionName);
 		//if(connectionName.equals(recentPort)) return null;
 		TCPConnection connection = new TCPConnection(this);
 
 		try {
 			connection.openConnection(connectionName);
-			Log.message("Connect OK");
+			Log.info("Connect OK");
 		} catch (Exception e) {
-			Log.message("Connect FAILED");
+			Log.info("Connect FAILED");
 			e.printStackTrace();
 			return null;
 		}

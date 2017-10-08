@@ -354,7 +354,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				tempFile.deleteOnExit();
 
 				// read in image
-				Log.message(Translator.get("Converting") + " " + tempFile.getName());
+				Log.info(Translator.get("Converting") + " " + tempFile.getName());
 				// convert with style
 
 				try (OutputStream fileOutputStream = new FileOutputStream(tempFile);
@@ -413,12 +413,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (swingWorker.isDone()) {
-						Log.message(Translator.get("Finished"));
+						Log.info(Translator.get("Finished"));
 					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							swingWorker.cancel(true);
 						}
-						Log.message(Translator.get("Cancelled"));
+						Log.info(Translator.get("Cancelled"));
 					}
 				}
 			}

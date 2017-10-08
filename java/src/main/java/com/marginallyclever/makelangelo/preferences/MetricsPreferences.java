@@ -49,7 +49,7 @@ public class MetricsPreferences {
 		
 	}
 	
-	static public boolean getAllowMetrics() {
+	static public boolean areAllowedToShare() {
 		if(collectAnonymousMetricsCheckbox != null) return collectAnonymousMetricsCheckbox.isSelected();
 		
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);

@@ -47,7 +47,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 	@Override
 	public Preferences userRoot() {
 		if (rootPreferences == null) {
-			Log.message("Instantiating root preferences");
+			Log.info("Instantiating root preferences");
 			@SuppressWarnings("unchecked")
 			final A castedPreferences = (A) new MarginallyCleverPreferences(null, "");
 			rootPreferences = castedPreferences;
@@ -84,13 +84,13 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 			if (!preferencesFile.exists()) {
 				try {
 					if (preferencesFile.createNewFile()) {
-						Log.message("Preferences file was created.");
+						Log.info("Preferences file was created.");
 					}
 				} catch (IOException e) {
 					Log.error( e.getMessage() );
 				}
 			}
-			Log.message("Preferences file is "+ preferencesFile);
+			Log.info("Preferences file is "+ preferencesFile);
 		}
 		return preferencesFile;
 	}

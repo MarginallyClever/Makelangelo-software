@@ -184,7 +184,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		float x, y;
 		int z = 0;
 
-		Log.write("orange", "Palette color " + palette.getColor(colorIndex).toString() );
+		Log.info("orange", "Palette color " + palette.getColor(colorIndex).toString() );
 
 		for (y = yBottom; y < yTop; y += diameter) {
 			for (x = xLeft; x < xRight; x += diameter) {
@@ -210,7 +210,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		machine.writeChangeTo(osw);
 		// Make sure the pen is up for the first move
 
-		Log.write("green", "Color " + i );
+		Log.info("green", "Color " + i );
 
 		scanForContiguousBlocks(i, osw);
 	}

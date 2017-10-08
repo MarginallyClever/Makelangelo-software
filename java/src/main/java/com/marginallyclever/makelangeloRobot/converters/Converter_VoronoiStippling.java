@@ -139,7 +139,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		Log.write("green","Initializing cells");
+		Log.info("green","Initializing cells");
 
 		cells = new VoronoiCell[numCells];
 
@@ -194,7 +194,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void writeOutCells(Writer out) throws IOException {
 		if (graphEdges == null) return;
 
-		Log.message("Writing gcode.");
+		Log.info("Writing gcode.");
 
 		imageStart(out);
 		liftPen(out);

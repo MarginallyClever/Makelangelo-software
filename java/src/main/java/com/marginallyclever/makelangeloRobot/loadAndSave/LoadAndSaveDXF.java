@@ -134,7 +134,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
-		Log.message("Sorting layer "+layer.getName()+" into buckets...");
+		Log.info("Sorting layer "+layer.getName()+" into buckets...");
 
 			Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 			while (entityTypeIter.hasNext()) {
@@ -197,7 +197,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
-		Log.message(Translator.get("FileTypeDXF2")+"...");
+		Log.info(Translator.get("FileTypeDXF2")+"...");
 		// set up a temporary file
 		File tempFile;
 		try {
@@ -207,7 +207,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		tempFile.deleteOnExit();
-		Log.message(Translator.get("Converting") + " " + tempFile.getName());
+		Log.info(Translator.get("Converting") + " " + tempFile.getName());
 
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -343,7 +343,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			out.flush();
 			out.close();
 
-			Log.message("Done!");
+			Log.info("Done!");
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			InputStream fileInputStream = new FileInputStream(tempFile);
 			loader.load(fileInputStream,robot);
@@ -629,7 +629,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * @return true if save succeeded.
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		Log.message("saving...");
+		Log.info("saving...");
 		GCodeFile sourceMaterial = robot.gCode;
 		sourceMaterial.setLinesProcessed(0);
 		
@@ -715,7 +715,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			}
 			
 			int total=sourceMaterial.getLinesTotal();
-			Log.message(total+" total lines to save.");
+			Log.info(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
 				String str = sourceMaterial.nextLine();
 				// trim comments
@@ -764,7 +764,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		
-		Log.message("done.");
+		Log.info("done.");
 		return true;
 	}
 

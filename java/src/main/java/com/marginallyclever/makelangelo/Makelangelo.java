@@ -63,11 +63,11 @@ public final class Makelangelo
 	 * defined in POM.xml. In this way we only define the VERSION once and
 	 * prevent violating DRY.
 	 */
-	public static final String VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
+	public static String VERSION;
 
 	// only used on first run.
-	private static final int DEFAULT_WINDOW_WIDTH = 1200;
-	private static final int DEFAULT_WINDOW_HEIGHT = 1020;
+	private static int DEFAULT_WINDOW_WIDTH = 1200;
+	private static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	@SuppressWarnings("deprecation")
 	private Preferences preferences = PreferencesHelper
@@ -107,8 +107,10 @@ public final class Makelangelo
 	private MakelangeloTransferHandler myTransferHandler;
 
 	public static void main(String[] argv) {
-		Log.clear();
+		Log.start();
 		CommandLineOptions.setFromMain(argv);
+		
+		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
@@ -399,7 +401,7 @@ public final class Makelangelo
 	public void dataAvailable(MakelangeloRobot r, String data) {
 		if (data.endsWith("\n"))
 			data = data.substring(0, data.length() - 1);
-		Log.write("#ffa500", data); // #ffa500 = orange
+		Log.info("#ffa500", data); // #ffa500 = orange
 	}
 
 	@Override
@@ -448,6 +450,7 @@ public final class Makelangelo
 				public void run() {
 					animator.stop();
 					mainFrame.dispose();
+					Log.end();
 				}
 			}).start();
 		}
@@ -467,28 +470,22 @@ public final class Makelangelo
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
+	public void windowDeactivated(WindowEvent e) {}
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
+	public void windowDeiconified(WindowEvent e) {}
 
 	@Override
-	public void windowIconified(WindowEvent e) {
-	}
+	public void windowIconified(WindowEvent e) {}
 
 	@Override
-	public void windowOpened(WindowEvent e) {
-	}
+	public void windowOpened(WindowEvent e) {}
 
 	@Override
-	public void windowActivated(WindowEvent e) {
-	}
+	public void windowActivated(WindowEvent e) {}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-	}
+	public void windowClosed(WindowEvent e) {}
 
 	public JFrame getMainFrame() {
 		return mainFrame;

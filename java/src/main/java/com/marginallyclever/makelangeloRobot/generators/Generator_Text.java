@@ -499,7 +499,7 @@ public class Generator_Text extends ImageGenerator {
 	private void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = ALPHABET_FOLDER;
 
-		Log.message( a1 +"("+ a1.length() +")" );
+		Log.info( a1 +"("+ a1.length() +")" );
 
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {
