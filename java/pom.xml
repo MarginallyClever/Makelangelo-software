@@ -249,6 +249,26 @@ If you like this project, please support us by buying Marginally Clever products
     	<version>2.8.0</version>
 	</dependency>
 
+	<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>4.5.3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpcore</artifactId>
+	    <version>4.4.7</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpmime</artifactId>
+	    <version>4.5.3</version>
+	</dependency>
+	
+
     <dependency>
       <groupId>org.jogamp.gluegen</groupId>
       <artifactId>gluegen-rt-main</artifactId>
@@ -259,22 +279,26 @@ If you like this project, please support us by buying Marginally Clever products
       <artifactId>jogl-all-main</artifactId>
       <version>${jogl.version}</version>
     </dependency>
+    
     <dependency>
       <groupId>org.kabeja</groupId>
       <artifactId>kabeja</artifactId>
       <version>0.4</version>
     </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20150729</version>
     </dependency>
+    
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>

@@ -449,8 +449,9 @@ public final class Makelangelo
 			new Thread(new Runnable() {
 				public void run() {
 					animator.stop();
-					mainFrame.dispose();
+					// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as cloas as I can get.
 					Log.end();
+					mainFrame.dispose();
 				}
 			}).start();
 		}

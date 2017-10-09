@@ -66,6 +66,6 @@ public class LogFormatterHTML extends Formatter {
                 + "</tr>\n";
 	}
 	public String getTail(Handler h) {
-		return "</body>\n</html>";
+		return "</table>\n</body>\n</html>";
 	}
 }

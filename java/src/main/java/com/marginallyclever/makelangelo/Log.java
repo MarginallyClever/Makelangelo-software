@@ -1,11 +1,22 @@
 package com.marginallyclever.makelangelo;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.*;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 
@@ -15,12 +26,13 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
  * @since 7.3.0
  */
 public class Log {
+	public static String LOG_FILE_SHARE_URL = "http://marginallyclever.com/other/shareLog.php";
 	public static String LOG_FILE_NAME_HTML = "log.html";
 	public static String LOG_FILE_NAME_TXT = "log.txt";
 	public static Logger logger;
-	private static FileHandler fileTXT, fileHTML;
+	//private static FileHandler fileTXT;
+	private static FileHandler fileHTML;
 	
-
 	public static void start() {
 		crashReportCheck();
 		deleteOldLog();
@@ -28,9 +40,9 @@ public class Log {
 		logger = Logger.getLogger("");
 		
 		try {
-			fileTXT=new FileHandler(LOG_FILE_NAME_TXT);
-			fileTXT.setFormatter(new SimpleFormatter());
-			logger.addHandler(fileTXT);
+			//fileTXT=new FileHandler(LOG_FILE_NAME_TXT);
+			//fileTXT.setFormatter(new SimpleFormatter());
+			//logger.addHandler(fileTXT);
 			
 			fileHTML=new FileHandler(LOG_FILE_NAME_HTML);
 			fileHTML.setFormatter(new LogFormatterHTML());
@@ -39,29 +51,55 @@ public class Log {
 			e.printStackTrace();
 		}
 		logger.info("START");
+		logger.info(System.getProperty("os.name").toLowerCase());
 	}
 	
 	public static void end() {
-		if(MetricsPreferences.areAllowedToShare()) {
-			logger.info("END");
-			sendLog();
-			// delete the log file
-		}
+		logger.info("END");
+		sendLog();
+		deleteOldLog();
 	}
 	
 	private static void crashReportCheck() {
-		boolean oldLogExists = false;
-		boolean canShare = MetricsPreferences.areAllowedToShare(); 
-		if( oldLogExists && canShare ) {
-			// Add line "** CRASHED **"
-			// send it!
+		File oldLogFile = new File(LOG_FILE_NAME_HTML);
+		if( oldLogFile.exists() ) {
+			// add a crashed message
+			try {
+				OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(oldLogFile));
+				osw.write("</table>\n<h1>**CRASHED**</h1>\n</body>\n</html>");
+				osw.flush();
+				osw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			sendLog();
 		}
 	}
 	
 	private static void sendLog() {
+		boolean canShare = MetricsPreferences.areAllowedToShare();
+		if(!canShare) return;
+		
 		File f = new File(LOG_FILE_NAME_HTML);
 		if(!f.exists()) return;
+		
+		// make an http request with the log file attached
+		MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+	    entityBuilder.addPart("file", new FileBody(f));
+	    
+	    HttpPost request = new HttpPost(LOG_FILE_SHARE_URL);
+	    request.setEntity(entityBuilder.build());
+
+	    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+	    CloseableHttpClient client = clientBuilder.build();
+	    try {
+			//HttpResponse response = client.execute(request); 
+	    	client.execute(request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -77,7 +115,6 @@ public class Log {
 		}
 	}
 	
-	
 	/**
 	 * Appends a message to the log file
 	 * @param color the hex code or HTML name of the color for this message
@@ -92,7 +129,7 @@ public class Log {
 		assert(logger!=null);
 		logger.log(Level.INFO, msg);
 	}
-
+	
 	/**
 	 * turns milliseconds into h:m:s
 	 * @param millis
@@ -113,7 +150,6 @@ public class Log {
 		return elapsed;
 	}
 	
-
 	/**
 	 * Appends a message to the log file.  Color will be red.
 	 * @param message
