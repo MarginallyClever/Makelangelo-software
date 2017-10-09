@@ -14,7 +14,7 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_CMYK;
 
 // http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
 public class Converter_CMYK extends ImageConverter {
-	static protected int passes=4;
+	static protected int passes=1;
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 	// Lift the pen any time the color value is > cutoff
 	
@@ -62,7 +62,7 @@ public class Converter_CMYK extends ImageConverter {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
-		final double [] channelCutoff = {51,153,102,204};
+		double [] channelCutoff = {0,153,51,102,204};
 		
 		liftPen(out);
 		machine.writeChangeTo(out,newColor);
@@ -91,9 +91,9 @@ public class Converter_CMYK extends ImageConverter {
 			endPY   = majorPY - majorX * radius;
 
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff[i%4],img,out);
+				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff[i%channelCutoff.length],img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff[i%4],img,out);
+				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff[i%channelCutoff.length],img,out);
 			}
 			++i;
 		}
