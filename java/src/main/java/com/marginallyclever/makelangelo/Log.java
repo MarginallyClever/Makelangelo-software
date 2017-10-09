@@ -27,7 +27,7 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
  */
 public class Log {
 	public static String LOG_FILE_SHARE_URL = "http://marginallyclever.com/other/shareLog.php";
-	public static String LOG_FILE_NAME_HTML = "log.html";
+	public static String LOG_FILE_NAME_HTML = "%t/log.html";
 	public static String LOG_FILE_NAME_TXT = "log.txt";
 	public static Logger logger;
 	//private static FileHandler fileTXT;
@@ -51,7 +51,7 @@ public class Log {
 			e.printStackTrace();
 		}
 		logger.info("START");
-		logger.info(System.getProperty("os.name").toLowerCase());
+		logger.info("OS="+System.getProperty("os.name").toLowerCase());
 	}
 	
 	public static void end() {

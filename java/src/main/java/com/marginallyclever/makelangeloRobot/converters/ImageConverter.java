@@ -30,7 +30,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	boolean keepIterating=false;
 
 
-	
 	public void setLoadAndSave(LoadAndSaveImage arg0) {
 		loadAndSave = arg0;
 	}
