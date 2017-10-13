@@ -121,12 +121,12 @@ public class Log {
 	 * @param msg the text
 	 */
 	public static void info(String color, String msg) {
-		assert(logger!=null);
+		assert( logger != null );
 		logger.log(Level.INFO, msg);
 	}
 
 	public static void info(String msg) {
-		assert(logger!=null);
+		assert( logger != null );
 		logger.log(Level.INFO, msg);
 	}
 	
@@ -155,7 +155,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void warning(String msg) {
-		assert(logger!=null);
+		assert( logger != null );
 		logger.log(Level.WARNING, msg );
 	}
 
@@ -164,7 +164,7 @@ public class Log {
 	 * @param message
 	 */
 	public static void error(String msg) {
-		assert(logger!=null);
+		assert( logger != null );
 		logger.log(Level.SEVERE, msg );
 	}
 }
