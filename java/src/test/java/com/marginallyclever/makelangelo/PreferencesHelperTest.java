@@ -22,46 +22,13 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 	/**
 	 *
 	 */
-	@SuppressWarnings("deprecation")
-	private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+	private A preferenceNode;
 
 	/**
 	 *
 	 */
-	private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
+	private MarginallyCleverPreferences marginallyCleverJsonPreferenceNode;
 
-	/**
-	 * @throws Exception
-	 */
-	@org.junit.After
-	public void tearDown() throws Exception {
-		marginallyCleverJsonPreferenceNode.removeNode();
-	}
-
-	@Test
-	public void testMachineConfigurationNames() throws BackingStoreException {
-		Log.start();
-		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-		System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
-		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		System.out.println("node name: " + machinesPreferenceNode.name());
-		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
-		for (String childNodeName : childrenPreferenceNodeNames) {
-			System.out.println("child node name: "+ childNodeName);
-			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
-			Assert.assertTrue(isMachineNameAnInteger);
-			//Machine configurations numbered -1 and below should not exist.
-			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
-			//Assert.assertFalse(isMachineNameLessThanZero);
-			if(isMachineNameLessThanZero) {
-				System.out.println("REMOVED");
-				machinesPreferenceNode.remove(childNodeName);
-			}
-		}
-		machinesPreferenceNode.flush();
-		Log.end();
-		System.out.println("end: "+ thisMethodsName);
-	}
 
 	/**
 	 * Over engineered. There are <a href="http://stackoverflow.com/a/442773">pitfalls</a> to this method of getting a
@@ -88,5 +55,42 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 			i++;//My placement of increment via environmental testing.
 		}
 		CLIENT_CODE_STACK_INDEX = i;
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@org.junit.After
+	public void tearDown() throws Exception {
+		marginallyCleverJsonPreferenceNode.removeNode();
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void testMachineConfigurationNames() throws BackingStoreException {
+		Log.start();
+		preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+		marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
+
+		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
+		System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		System.out.println("node name: " + machinesPreferenceNode.name());
+		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
+		for (String childNodeName : childrenPreferenceNodeNames) {
+			System.out.println("child node name: "+ childNodeName);
+			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
+			Assert.assertTrue(isMachineNameAnInteger);
+			//Machine configurations numbered -1 and below should not exist.
+			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
+			//Assert.assertFalse(isMachineNameLessThanZero);
+			if(isMachineNameLessThanZero) {
+				System.out.println("REMOVED");
+				machinesPreferenceNode.remove(childNodeName);
+			}
+		}
+		machinesPreferenceNode.flush();
+		Log.end();
+		System.out.println("end: "+ thisMethodsName);
 	}
 }

@@ -9,13 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.*;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
@@ -37,9 +34,9 @@ public class Log {
 		crashReportCheck();
 		deleteOldLog();
 		
-		logger = Logger.getLogger("");
-		
 		try {
+			logger = Logger.getLogger("");
+			
 			//fileTXT=new FileHandler(LOG_FILE_NAME_TXT);
 			//fileTXT.setFormatter(new SimpleFormatter());
 			//logger.addHandler(fileTXT);
@@ -70,7 +67,6 @@ public class Log {
 				osw.flush();
 				osw.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -95,7 +91,7 @@ public class Log {
 	    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 	    CloseableHttpClient client = clientBuilder.build();
 	    try {
-			//HttpResponse response = client.execute(request); 
+			//HttpResponse response = 
 	    	client.execute(request);
 		} catch (IOException e) {
 			e.printStackTrace();
