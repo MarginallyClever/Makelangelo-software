@@ -19,72 +19,74 @@ import com.marginallyclever.util.UnitTestHelper;
  */
 public class PreferencesHelperTest<A extends AbstractPreferences> {
 
-  /**
-   *
-   */
-  @SuppressWarnings("deprecation")
-  private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+	/**
+	 *
+	 */
+	@SuppressWarnings("deprecation")
+	private final A preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-  /**
-   *
-   */
-  private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
+	/**
+	 *
+	 */
+	private final MarginallyCleverPreferences marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
-  /**
-   * @throws Exception
-   */
-  @org.junit.After
-  public void tearDown() throws Exception {
-    marginallyCleverJsonPreferenceNode.removeNode();
-  }
+	/**
+	 * @throws Exception
+	 */
+	@org.junit.After
+	public void tearDown() throws Exception {
+		marginallyCleverJsonPreferenceNode.removeNode();
+	}
 
-  @Test
-  public void testMachineConfigurationNames() throws BackingStoreException {
-    final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-    System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
-    final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-    System.out.println("node name: " + machinesPreferenceNode.name());
-    final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
-    for (String childNodeName : childrenPreferenceNodeNames) {
-    	System.out.println("child node name: "+ childNodeName);
-      final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
-      Assert.assertTrue(isMachineNameAnInteger);
-      //Machine configurations numbered -1 and below should not exist.
-      final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
-      //Assert.assertFalse(isMachineNameLessThanZero);
-      if(isMachineNameLessThanZero) {
-    	  System.out.println("REMOVED");
-    	  machinesPreferenceNode.remove(childNodeName);
-      }
-    }
-    machinesPreferenceNode.flush();
-    System.out.println("end: "+ thisMethodsName);
-  }
+	@Test
+	public void testMachineConfigurationNames() throws BackingStoreException {
+		Log.start();
+		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
+		System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		System.out.println("node name: " + machinesPreferenceNode.name());
+		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
+		for (String childNodeName : childrenPreferenceNodeNames) {
+			System.out.println("child node name: "+ childNodeName);
+			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
+			Assert.assertTrue(isMachineNameAnInteger);
+			//Machine configurations numbered -1 and below should not exist.
+			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
+			//Assert.assertFalse(isMachineNameLessThanZero);
+			if(isMachineNameLessThanZero) {
+				System.out.println("REMOVED");
+				machinesPreferenceNode.remove(childNodeName);
+			}
+		}
+		machinesPreferenceNode.flush();
+		Log.end();
+		System.out.println("end: "+ thisMethodsName);
+	}
 
-  /**
-   * Over engineered. There are <a href="http://stackoverflow.com/a/442773">pitfalls</a> to this method of getting a
-   * {@code StackTraceElement}'s index which this method does not address. I make a best guess based upon development
-   * environment testing.
-   *
-   * @see <a href="http://stackoverflow.com/a/8592871">Getting the name of the current executing method</a>
-   */
-  private static final int CLIENT_CODE_STACK_INDEX;
+	/**
+	 * Over engineered. There are <a href="http://stackoverflow.com/a/442773">pitfalls</a> to this method of getting a
+	 * {@code StackTraceElement}'s index which this method does not address. I make a best guess based upon development
+	 * environment testing.
+	 *
+	 * @see <a href="http://stackoverflow.com/a/8592871">Getting the name of the current executing method</a>
+	 */
+	private static final int CLIENT_CODE_STACK_INDEX;
 
-  static {
-        /*
+	static {
+		/*
          Finds out the index of "this code" in the returned stack trace - funny but it differs in JDK 1.5, and 1.6.
          In my tests I had to modify to get to work in 1.7 and 1.8.
-        */
-    int i = 0;
-    for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            /* original placement of increment via SO
+		 */
+		int i = 0;
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			/* original placement of increment via SO
             i++;
-             */
-      if (ste.getClassName().equals(PreferencesHelperTest.class.getName())) {
-        break;
-      }
-      i++;//My placement of increment via environmental testing.
-    }
-    CLIENT_CODE_STACK_INDEX = i;
-  }
+			 */
+			if (ste.getClassName().equals(PreferencesHelperTest.class.getName())) {
+				break;
+			}
+			i++;//My placement of increment via environmental testing.
+		}
+		CLIENT_CODE_STACK_INDEX = i;
+	}
 }
