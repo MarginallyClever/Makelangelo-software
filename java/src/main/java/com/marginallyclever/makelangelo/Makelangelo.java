@@ -63,15 +63,13 @@ public final class Makelangelo
 	 * defined in POM.xml. In this way we only define the VERSION once and
 	 * prevent violating DRY.
 	 */
-	public static String VERSION;
+	public String VERSION;
 
 	// only used on first run.
 	private static int DEFAULT_WINDOW_WIDTH = 1200;
 	private static int DEFAULT_WINDOW_HEIGHT = 1020;
 
-	@SuppressWarnings("deprecation")
-	private Preferences preferences = PreferencesHelper
-			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+	private Preferences preferences;
 
 	private MakelangeloAppPreferences appPreferences;
 	private ConnectionManager connectionManager;
@@ -110,8 +108,6 @@ public final class Makelangelo
 		Log.start();
 		CommandLineOptions.setFromMain(argv);
 		
-		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -122,7 +118,10 @@ public final class Makelangelo
 		});
 	}
 
+	@SuppressWarnings("deprecation")
 	public Makelangelo() {
+		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
 		Translator.start();
@@ -153,7 +152,7 @@ public final class Makelangelo
 		if (subject == buttonZoomToFit)
 			drawPanel.zoomToFitPaper();
 		if (subject == buttonAbout)
-			(new DialogAbout()).display(this.mainFrame);
+			(new DialogAbout()).display(this.mainFrame,this.VERSION);
 		if (subject == buttonAdjustPreferences) {
 			appPreferences.run();
 		}
@@ -334,7 +333,7 @@ public final class Makelangelo
 
 	// For thread safety, this method should be invoked from the
 	// event-dispatching thread.
-	private void createAndShowGUI() {
+	public void createAndShowGUI() {
 		// Create and set up the window.
 		mainFrame = new JFrame(Translator.get("TitlePrefix"));
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

@@ -40,7 +40,6 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -636,7 +635,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		try {
 			// header
-			out.write("999\nDXF created by Makelangelo software v"+Makelangelo.VERSION+"\n");
+			out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
 			out.write("0\nSECTION\n");
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
