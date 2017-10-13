@@ -6,7 +6,11 @@ import org.junit.Test;
 public class VersionTest {
 	@Test
 	public void checkVersion() throws IllegalStateException {
-		String [] toks = Makelangelo.VERSION.split("\\.");
+		Log.start();
+		
+		Makelangelo m = new Makelangelo();
+		
+		String [] toks = m.VERSION.split("\\.");
 		if(toks.length!=3) {
 			throw new IllegalStateException("Makelangelo.VERSION must be major.minor.tiny.");
 		}
@@ -15,5 +19,7 @@ public class VersionTest {
 		} catch(NumberFormatException e) {
 			throw new IllegalStateException("Makelangelo.VERSION must start with a number, not a letter.");
 		}
+		
+		Log.end();
 	}
 }
