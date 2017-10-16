@@ -38,6 +38,7 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
+import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -136,10 +137,25 @@ public final class Makelangelo
 
 		createAndShowGUI();
 
+		checkSharingPermission();
+
 		if (preferences.getBoolean("Check for updates", false))
 			checkForUpdate(true);
 	}
 
+	// check if we need to ask about sharing
+	protected void checkSharingPermission() {
+		final String SHARING_CHECK_STRING = "Last version sharing checked";
+				
+		String v = preferences.get(SHARING_CHECK_STRING,"0");
+		int comparison = VERSION.compareTo(v);
+		if(comparison!=0) {
+			preferences.put(SHARING_CHECK_STRING,VERSION);
+			int dialogResult = JOptionPane.showConfirmDialog(mainFrame, Translator.get("collectAnonymousMetricsOnUpdate"),"Sharing Is Caring",JOptionPane.YES_NO_OPTION);
+			MetricsPreferences.setAllowedToShare(dialogResult == JOptionPane.YES_OPTION);
+		}
+	}
+	
 	// The user has done something. respond to it.
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -442,14 +458,15 @@ public final class Makelangelo
 			saveWindowRealEstate();
 			robot.getSettings().saveConfig();
 
+			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as cloas as I can get.
+			Log.end();
+
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
 			// exiting
 			new Thread(new Runnable() {
 				public void run() {
 					animator.stop();
-					// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as cloas as I can get.
-					Log.end();
 					mainFrame.dispose();
 				}
 			}).start();

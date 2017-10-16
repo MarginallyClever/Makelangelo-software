@@ -26,7 +26,7 @@ public class MetricsPreferences {
 
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		collectAnonymousMetricsCheckbox.setSelected(prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, false));
-	
+		
 		GridBagConstraints c = new GridBagConstraints();	
 		int y = 0;
 	
@@ -54,5 +54,10 @@ public class MetricsPreferences {
 		
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		return prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL,false);
+	}
+	
+	static public void setAllowedToShare(boolean newState) {
+		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
+		prefs.putBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, newState);
 	}
 }

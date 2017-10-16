@@ -3,12 +3,16 @@ package com.marginallyclever.makelangelo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.*;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -23,8 +27,9 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
  * @since 7.3.0
  */
 public class Log {
-	public static String LOG_FILE_SHARE_URL = "http://marginallyclever.com/other/shareLog.php";
-	public static String LOG_FILE_NAME_HTML = "%t/log.html";
+	public static String LOG_FILE_SHARE_URL = "https://www.marginallyclever.com/shareLog.php";
+	public static String LOG_FILE_PATH;
+	public static String LOG_FILE_NAME_HTML = "log.html";
 	public static String LOG_FILE_NAME_TXT = "log.txt";
 	public static Logger logger;
 	//private static FileHandler fileTXT;
@@ -34,6 +39,8 @@ public class Log {
 		crashReportCheck();
 		deleteOldLog();
 		
+		LOG_FILE_PATH = System.getProperty("java.io.tmpdir");
+		
 		try {
 			logger = Logger.getLogger("");
 			
@@ -41,7 +48,7 @@ public class Log {
 			//fileTXT.setFormatter(new SimpleFormatter());
 			//logger.addHandler(fileTXT);
 			
-			fileHTML=new FileHandler(LOG_FILE_NAME_HTML);
+			fileHTML=new FileHandler(LOG_FILE_PATH+LOG_FILE_NAME_HTML);
 			fileHTML.setFormatter(new LogFormatterHTML());
 			logger.addHandler(fileHTML);
 		} catch (Exception e) {
@@ -52,13 +59,14 @@ public class Log {
 	}
 	
 	public static void end() {
+		fileHTML.flush();
 		logger.info("END");
 		sendLog();
 		deleteOldLog();
 	}
 	
 	private static void crashReportCheck() {
-		File oldLogFile = new File(LOG_FILE_NAME_HTML);
+		File oldLogFile = new File(LOG_FILE_PATH+LOG_FILE_NAME_HTML);
 		if( oldLogFile.exists() ) {
 			// add a crashed message
 			try {
@@ -78,12 +86,13 @@ public class Log {
 		boolean canShare = MetricsPreferences.areAllowedToShare();
 		if(!canShare) return;
 		
-		File f = new File(LOG_FILE_NAME_HTML);
+		fileHTML.close();
+		File f= new File(LOG_FILE_PATH+LOG_FILE_NAME_HTML);
 		if(!f.exists()) return;
 		
 		// make an http request with the log file attached
 		MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-	    entityBuilder.addPart("file", new FileBody(f));
+	    entityBuilder.addPart("upfile", new FileBody(f));
 	    
 	    HttpPost request = new HttpPost(LOG_FILE_SHARE_URL);
 	    request.setEntity(entityBuilder.build());
@@ -91,8 +100,12 @@ public class Log {
 	    HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 	    CloseableHttpClient client = clientBuilder.build();
 	    try {
-			//HttpResponse response = 
-	    	client.execute(request);
+			HttpResponse response = client.execute(request);
+			System.out.println(response);
+		    StringWriter writer=new StringWriter();
+		    IOUtils.copy(response.getEntity().getContent(),writer);
+            System.out.println(writer.toString());
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

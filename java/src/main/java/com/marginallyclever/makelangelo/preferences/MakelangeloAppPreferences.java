@@ -77,6 +77,7 @@ public class MakelangeloAppPreferences implements ActionListener {
 			SoundPreferences.save();
 			GFXPreferences.save();
 			LanguagePreferences.save();
+			MetricsPreferences.save();
 			app.getRobot().getControlPanel().updateButtonAccess();
 			// refresh look & feel
 			GCodeFile f = app.getRobot().getGCode();
@@ -85,6 +86,7 @@ public class MakelangeloAppPreferences implements ActionListener {
 			SoundPreferences.cancel();
 			GFXPreferences.cancel();
 			LanguagePreferences.cancel();
+			MetricsPreferences.cancel();
 		}
 	}
 
