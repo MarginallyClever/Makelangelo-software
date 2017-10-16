@@ -15,8 +15,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.io.IOUtils;
 
-public class DialogAbout {
-
+public class DialogAbout {	
 	/**
 	 * @return byte array containing data for image icon.
 	 */
@@ -46,8 +45,7 @@ public class DialogAbout {
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString() {
-		String aboutHTML = Translator.get("AboutHTML");
-		return aboutHTML.replace("%VERSION%",Makelangelo.VERSION);
+		return Translator.get("AboutHTML");
 	}
 
 	/**
@@ -84,8 +82,10 @@ public class DialogAbout {
 	/**
 	 * Display the about dialog.
 	 */
-	public void display(Component parent) {
-		final String aboutHtml = getAboutHtmlFromMultilingualString();
+	public void display(Component parent,String versionString) {
+		String aboutHtml = getAboutHtmlFromMultilingualString();
+		aboutHtml = aboutHtml.replace("%VERSION%",versionString);
+		
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
 		final String menuAboutValue = Translator.get("MenuAbout");

@@ -41,7 +41,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		if(robot.getSettings().isReverseForGlass()) {
-			Log.message("Flipping for glass...");
+			Log.info("Flipping for glass...");
 		}
 
 		GCodeFile file;
@@ -53,7 +53,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			return false;
 		}
 
-		Log.message(file.estimateCount + Translator.get("LineSegments") + "\n" + file.estimatedLength
+		Log.info(file.estimateCount + Translator.get("LineSegments") + "\n" + file.estimatedLength
 				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
 				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
 
@@ -63,13 +63,13 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 	@Override
 	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
-		Log.message("saving...");
+		Log.info("saving...");
 		GCodeFile sourceMaterial = robot.gCode;
 		sourceMaterial.setLinesProcessed(0);
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			int total=sourceMaterial.getLinesTotal();
-			Log.message(total+" total lines to save.");
+			Log.info(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
 				String str = sourceMaterial.nextLine();
 				if(!str.endsWith(";")) str+=";";
@@ -83,7 +83,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			return false;
 		}
 		
-		Log.message("done.");
+		Log.info("done.");
 		return true;
 	}
 

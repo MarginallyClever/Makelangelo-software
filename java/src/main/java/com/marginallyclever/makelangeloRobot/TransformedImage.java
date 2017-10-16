@@ -2,6 +2,8 @@ package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import com.marginallyclever.makelangeloRobot.imageFilters.ImageFilter;
 
@@ -29,6 +31,24 @@ public class TransformedImage {
 		scaleY = -1;
 		rotationDegrees = 0;
 		colorChannel = 0;
+	}
+
+	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+	protected BufferedImage deepCopy(BufferedImage bi) {
+		ColorModel cm = bi.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = bi.copyData(null);
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	}
+  
+	public TransformedImage(TransformedImage copy) {
+		sourceImage = deepCopy(copy.sourceImage);
+		translateX = copy.translateX;
+		translateY = copy.translateY;
+		scaleX = copy.scaleX;
+		scaleY = copy.scaleY;
+		rotationDegrees = copy.rotationDegrees;
+		colorChannel = copy.colorChannel;
 	}
 
 	public boolean canSampleAt(float x, float y) {

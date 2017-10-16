@@ -361,7 +361,7 @@ public class GCodeFile {
 		
 		// draw image
 		if (fastNodes.size() > 0) {
-			gl2.glLineWidth(machine.getDiameter());
+			gl2.glLineWidth(machine.getPenDiameter());
 
 			// draw the nodes
 			Iterator<GCodeNode> nodes = fastNodes.iterator();
@@ -378,8 +378,8 @@ public class GCodeFile {
 					if (n.lineNumber < linesProcessed) {
 						// Move the virtual pen holder to the current command start position.
 						if(n.type==GCodeNode.GCodeNodeType.POS) {
-							robot.setGondolaX((float)n.x1*10);
-							robot.setGondolaY((float)n.y1*10);
+							robot.setGondolaX((float)n.x1);
+							robot.setGondolaY((float)n.y1);
 						}
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						// Set the look ahead color
@@ -408,9 +408,7 @@ public class GCodeFile {
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		Color c = new Color((tool_id>>16)&0xFF,
-							(tool_id>> 8)&0xFF,
-							(tool_id    )&0xFF);
+		Color c = new Color(tool_id);
 		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.TOOL,0,0,0,0,c);
 		fastNodes.add(n);
 	}
@@ -432,7 +430,7 @@ public class GCodeFile {
 		Color penUpColor = machine.getPenUpColor();
 		Color currentColor = penUpColor;
 
-		float drawScale = 0.1f;
+		float drawScale = 1f;
 		// arc smoothness - increase to make more smooth and run slower.
 		double STEPS_PER_DEGREE=1;
 		
@@ -473,8 +471,8 @@ public class GCodeFile {
 			ai = px;
 			aj = py;
 			for (j = 0; j < tokens.length; ++j) {
-				if (tokens[j].equals("G20")) drawScale = 2.54f; // in->cm
-				else if (tokens[j].equals("G21")) drawScale = 0.10f; // mm->cm
+				if (tokens[j].equals("G20")) drawScale = 25.4f; // in->mm
+				else if (tokens[j].equals("G21")) drawScale = 1.0f; // mm
 				else if (tokens[j].equals("G90")) {
 					absMode = true;
 					//break;

@@ -69,15 +69,15 @@ public class Converter_Pulse extends ImageConverter {
 	private void convertPaperSpace(TransformedImage img, Writer out) throws IOException {
 		double PULSE_MINIMUM = 0.5;
 
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getDiameter() * blockScale;
+		float stepSize = machine.getPenDiameter() * blockScale;
 		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getDiameter();
+		float zigZagSpacing = machine.getPenDiameter();
 
 		// from top to bottom of the image...
 		float x, y, z, scale_z, pulse_size, i = 0;

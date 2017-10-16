@@ -15,6 +15,8 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author Dan
  */
 public abstract class ImageManipulator {	
+	public static final float MARGIN_EPSILON = 0.01f;
+	
 	// pen position optimizing
 	protected boolean lastUp;
 	
@@ -25,7 +27,13 @@ public abstract class ImageManipulator {
 	// helpers
 	protected MakelangeloRobotSettings machine;
 
-
+	// quickly calculate margin edges for clipping
+	double yTop;
+	double yBottom;
+	double xLeft;
+	double xRight;
+	
+	
 	public void setSwingWorker(SwingWorker<Void, Void> p) {
 		swingWorker = p;
 	}
@@ -53,37 +61,30 @@ public abstract class ImageManipulator {
 	 * @param out
 	 * @throws IOException
 	 */
-	public void imageStart(Writer out) throws IOException {
-		//out.write(machine.getGCodeConfig() + ";\n");
-		//out.write(machine.getGCodeBobbin() + ";\n");
-		//out.write(machine.getGCodeSetPositionAtHome()+";\n");		
+	public void imageStart(Writer out) throws IOException {	
 		setAbsoluteMode(out);
 	}
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(lastUp) {
-			return;
-		}
-		machine.writeOff(out);
+		if(lastUp) return;
+		machine.writePenUp(out);
 		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(!lastUp) {
-			return;
-		}
-		machine.writeOn(out);
+		if(!lastUp) return;
+		machine.writePenDown(out);
 		lastUp = false;
 	}
 
 	protected void setAbsoluteMode(Writer out) throws IOException {
-		out.write("G90;\n");
+		machine.writeAbsoluteMode(out);
 	}
 
 	protected void setRelativeMode(Writer out) throws IOException {
-		out.write("G91;\n");
+		machine.writeRelativeMode(out);
 	}
 
 
@@ -122,12 +123,104 @@ public abstract class ImageManipulator {
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		final float EPSILON = 0.01f;
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin()*10.0f)-EPSILON) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin()*10.0f)+EPSILON) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin()*10.0f)-EPSILON) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin()*10.0f)+EPSILON) return false;
+		if( x < (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
+		if( x > (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
+		if( y < (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
+		if( y > (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
 		return true;
+	}
+
+	
+	/**
+	 * Pen has moved from one side of paper margin to another.  Find the point on the edge that is inside and mark that with a pen up or down (as appropriate)
+	 * https://stackoverflow.com/questions/626812/most-elegant-way-to-clip-a-line
+	 * @param oldX
+	 * @param oldY
+	 * @param x
+	 * @param y
+	 * @param oldPenUp
+	 * @param penUp
+	 * @throws IOException
+	 */
+	protected void clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
+		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		yTop    = (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		
+		ClippingPoint P0 = new ClippingPoint(oldX,oldY);
+		ClippingPoint P1 = new ClippingPoint(x,y);
+		
+		if(CohenSutherland2DClipper(P0, P1)) {
+			// some of the line is inside
+			if(isInside) {
+				// entering the rectangle
+				if(oldPenUp==false) {
+					moveTo(out,P0.x,P0.y,false);
+				}
+			} else {
+				// leaving the rectangle
+				if(oldPenUp==false) {
+					moveTo(out,P1.x,P1.y,false);
+				}
+			}
+		}
+	}
+
+	
+	boolean CohenSutherland2DClipper(ClippingPoint P0,ClippingPoint P1) {
+		int outCode0,outCode1; 
+		while(true) {
+			outCode0 = outCodes(P0);
+			outCode1 = outCodes(P1);
+			if( rejectCheck(outCode0,outCode1) ) return false;  // whatever portion is left is completely out
+			if( acceptCheck(outCode0,outCode1) ) return true;  // whatever portion is left is completely in
+			if(outCode0 == 0) {
+				double tempCoord;
+				int tempCode;
+				tempCoord = P0.x;
+				P0.x= P1.x;
+				P1.x = tempCoord;
+				tempCoord = P0.y;
+				P0.y= P1.y;
+				P1.y = tempCoord;
+				tempCode = outCode0; outCode0 = outCode1; outCode1 = tempCode;
+			} 
+			if( (outCode0 & 1) != 0 ) { 
+				P0.x += (P1.x - P0.x)*(yTop - P0.y)/(P1.y - P0.y);
+				P0.y = yTop;
+			} else if( (outCode0 & 2) != 0 ) { 
+				P0.x += (P1.x - P0.x)*(yBottom - P0.y)/(P1.y - P0.y);
+				P0.y = yBottom;
+			} else if( (outCode0 & 4) != 0 ) { 
+				P0.y += (P1.y - P0.y)*(xRight - P0.x)/(P1.x - P0.x);
+				P0.x = xRight;
+			} else if( (outCode0 & 8) != 0 ) { 
+				P0.y += (P1.y - P0.y)*(xLeft - P0.x)/(P1.x - P0.x);
+				P0.x = xLeft;
+			}
+		} 
+	} 
+	
+	private int outCodes(ClippingPoint P) {
+		int Code = 0;
+		if(P.y > yTop) Code += 1; /* code for above */ 
+		else if(P.y < yBottom) Code += 2; /* code for below */
+
+		if(P.x > xRight) Code += 4; /* code for right */
+		else if(P.x < xLeft) Code += 8; /* code for left */
+		
+		return Code;
+	}
+	
+	
+	private boolean rejectCheck(int outCode1, int outCode2) {
+		return ((outCode1 & outCode2) != 0 );
+	} 
+
+
+	private boolean acceptCheck(int outCode1, int outCode2) {
+		return ( (outCode1 == 0) && (outCode2 == 0) );
 	}
 }
 

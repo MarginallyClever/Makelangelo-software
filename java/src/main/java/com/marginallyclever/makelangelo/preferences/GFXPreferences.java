@@ -24,9 +24,6 @@ public class GFXPreferences {
 		panel.setLayout(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-		//final JCheckBox allow_metrics = new JCheckBox(String.valueOf("I want to add the distance drawn to the // total"));
-		//allow_metrics.setSelected(allowMetrics);
-	
 		showPenUpCheckbox = new JCheckBox(Translator.get("MenuGraphicsPenUp"));
 		antialiasOnCheckbox = new JCheckBox(Translator.get("MenuGraphicsAntialias"));
 		speedOverQualityCheckbox = new JCheckBox(Translator.get("MenuGraphicsSpeedVSQuality"));
@@ -39,7 +36,6 @@ public class GFXPreferences {
 		drawAllWhileRunningCheckbox.setSelected(prefs.getBoolean("Draw all while running", true));
 	
 		GridBagConstraints c = new GridBagConstraints();
-		//c.gridwidth=4;  c.gridx=0;  c.gridy=0;  driver.add(allow_metrics,c);
 	
 		int y = 0;
 	
@@ -73,7 +69,6 @@ public class GFXPreferences {
 	
 	static public void save() {
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		//allowMetrics = allow_metrics.isSelected();
 		prefs.putBoolean("show pen up", showPenUpCheckbox.isSelected());
 		prefs.putBoolean("antialias", antialiasOnCheckbox.isSelected());
 		prefs.putBoolean("speed over quality", speedOverQualityCheckbox.isSelected());

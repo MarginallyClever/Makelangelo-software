@@ -40,7 +40,6 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -134,7 +133,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
-		Log.message("Sorting layer "+layer.getName()+" into buckets...");
+		Log.info("Sorting layer "+layer.getName()+" into buckets...");
 
 			Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 			while (entityTypeIter.hasNext()) {
@@ -197,7 +196,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
-		Log.message(Translator.get("FileTypeDXF2")+"...");
+		Log.info(Translator.get("FileTypeDXF2")+"...");
 		// set up a temporary file
 		File tempFile;
 		try {
@@ -207,7 +206,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		tempFile.deleteOnExit();
-		Log.message(Translator.get("Converting") + " " + tempFile.getName());
+		Log.info(Translator.get("Converting") + " " + tempFile.getName());
 
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -246,8 +245,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolDiameterSquared = Math.pow(machine.getDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(machine.getDiameter(), 2);
+			double toolDiameterSquared = Math.pow(machine.getPenDiameter()/2, 2);
+			double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
 
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();
@@ -343,7 +342,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			out.flush();
 			out.close();
 
-			Log.message("Done!");
+			Log.info("Done!");
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			InputStream fileInputStream = new FileInputStream(tempFile);
 			loader.load(fileInputStream,robot);
@@ -629,14 +628,14 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * @return true if save succeeded.
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		Log.message("saving...");
+		Log.info("saving...");
 		GCodeFile sourceMaterial = robot.gCode;
 		sourceMaterial.setLinesProcessed(0);
 		
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		try {
 			// header
-			out.write("999\nDXF created by Makelangelo software v"+Makelangelo.VERSION+"\n");
+			out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
 			out.write("0\nSECTION\n");
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
@@ -715,7 +714,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			}
 			
 			int total=sourceMaterial.getLinesTotal();
-			Log.message(total+" total lines to save.");
+			Log.info(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
 				String str = sourceMaterial.nextLine();
 				// trim comments
@@ -764,7 +763,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		
-		Log.message("done.");
+		Log.info("done.");
 		return true;
 	}
 

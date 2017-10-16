@@ -190,7 +190,7 @@ public class Generator_Text extends ImageGenerator {
 			if(yFirstStep==0) yFirstStep = (float)bounds.getHeight();
 			if(xMax < bounds.getWidth()) xMax = (float)bounds.getWidth();
 		}
-		/*
+/*
 		// display bounding box
 		float dx = xMax/2.0f;
 		float dy = -(yTotal+yFirstStep/2.0f)/2.0f;
@@ -203,7 +203,7 @@ public class Generator_Text extends ImageGenerator {
 		machine.writeMoveTo(output,-dx,-dy);
 		machine.writeMoveTo(output,-dx, dy);
 		machine.writeOff(output);
-		 */
+*/
 		float dx = xMax / 2.0f;
 		float dy = -yTotal/2.0f+yFirstStep/2.0f;
 
@@ -237,7 +237,7 @@ public class Generator_Text extends ImageGenerator {
 			case PathIterator.SEG_CLOSE:
 				//System.out.println("CLOSE");
 				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,false);
-				machine.writeOff(output);
+				machine.writePenUp(output);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
@@ -253,7 +253,7 @@ public class Generator_Text extends ImageGenerator {
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
 				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,true);
-				machine.writeOn(output);
+				machine.writePenDown(output);
 				break;
 			case PathIterator.SEG_CUBICTO:
 				//P(t) = B(3,0)*CP + B(3,1)*P1 + B(3,2)*P2 + B(3,3)*P3
@@ -499,7 +499,7 @@ public class Generator_Text extends ImageGenerator {
 	private void textDrawLine(String a1, Writer output) throws IOException {
 		String ud = ALPHABET_FOLDER;
 
-		Log.message( a1 +"("+ a1.length() +")" );
+		Log.info( a1 +"("+ a1.length() +")" );
 
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {

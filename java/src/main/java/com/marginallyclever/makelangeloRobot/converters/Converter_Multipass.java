@@ -59,25 +59,24 @@ public class Converter_Multipass extends ImageConverter {
 		machine.writeChangeTo(out);
 
 		// figure out how many lines we're going to have on this image.
-		float steps = machine.getDiameter();
-		if (steps < 1) steps = 1;
+		float stepSize = machine.getPenDiameter();
+		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin() * 10;
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin() * 10;
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin() * 10;
+		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
+		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
+		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
+		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
 		double dy = yTop - yBottom;
 		double dx = xRight - xLeft;
 		double radius = Math.sqrt(dx*dx+dy*dy);
-		double r2     = radius*2;
 
 		int i=0;
-		for(double a = -radius;a<radius;a+=steps) {
+		for(double a = -radius;a<radius;a+=stepSize) {
 			double majorPX = majorX * a;
 			double majorPY = majorY * a;
 			double startPX = majorPX - majorY * radius;
@@ -87,37 +86,14 @@ public class Converter_Multipass extends ImageConverter {
 		
 			double l2 = level * (1 + (i % passes));
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,steps,r2,l2,img,out);
+				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,l2,img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,steps,r2,l2,img,out);
+				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,l2,img,out);
 			}
 			++i;
 		}
 
 	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
-	}
-	
-	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double r2,double level,TransformedImage img,Writer out) throws IOException {
-		double b;
-		double dx=x1-x0;
-		double dy=y1-y0;
-		double halfStep = stepSize/2;
-		double steps = r2 / stepSize;
-		if(steps<1) steps=1;
-
-		double n,x,y,v;
-
-		for (b = 0; b <= steps; ++b) {
-			n = b / steps;
-			x = dx * n + x0;
-			y = dy * n + y0;
-			if(isInsidePaperMargins(x, y)) {
-				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-			} else {
-				v = 255;
-			}
-			lineTo(out, x, y, v>=level);
-		}
 	}
 }
 

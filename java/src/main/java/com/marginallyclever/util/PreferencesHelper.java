@@ -64,6 +64,10 @@ public final class PreferencesHelper {
 	/**
 	 *
 	 */
+	private static final String METRICS_PATH_NAME = "Metrics";
+	/**
+	 *
+	 */
 	private static final String FILE_PATH_NAME = "File";
 
 	/**
@@ -89,6 +93,7 @@ public final class PreferencesHelper {
 		initialMap.put(MakelangeloPreferenceKey.MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
 		@SuppressWarnings("unchecked")
 		final Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
@@ -123,6 +128,7 @@ public final class PreferencesHelper {
 		LANGUAGE,
 		SOUND,
 		FILE,
+		METRICS,
 		@Deprecated
 		LEGACY_MAKELANGELO_ROOT,
 		//MAKELANGELO_ROOT
@@ -134,7 +140,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			Log.message("node name:"+preferenceNode);
+			Log.info("node name:"+preferenceNode);
 			logKeyValuesForPreferenceNode(preferenceNode);
 			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
 			for (String childNodeName : childrenPreferenceNodeNames) {
@@ -153,7 +159,7 @@ public final class PreferencesHelper {
 	public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
 		final String[] keys = preferenceNode.keys();
 		for (String key : keys) {
-			Log.message("key:"+key+" value:"+ preferenceNode.get(key, null));
+			Log.info("key:"+key+" value:"+ preferenceNode.get(key, null));
 		}
 	}
 
@@ -268,7 +274,7 @@ public final class PreferencesHelper {
 	 */
 	public static void logAncestryable(Ancestryable preferenceNode) {
 		final JSONObject object = new JSONObject(preferenceNode.getChildren());
-		Log.message( object.toString());
+		Log.info( object.toString());
 	}
 
 	/**
@@ -276,7 +282,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Properties> void logPropertiesNode(P properties) {
 		final JSONObject jsonObject = Property.toJSONObject(properties);
-		Log.message( jsonObject.toString());
+		Log.info( jsonObject.toString());
 	}
 
 }

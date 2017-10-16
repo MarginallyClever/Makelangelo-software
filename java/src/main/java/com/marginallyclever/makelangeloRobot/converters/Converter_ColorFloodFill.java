@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import com.marginallyclever.makelangelo.ColorPalette;
-import com.marginallyclever.makelangelo.ColorRGB;
+import com.marginallyclever.internalFormat.ColorPalette;
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -184,7 +184,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		float x, y;
 		int z = 0;
 
-		Log.write("orange", "Palette color " + palette.getColor(colorIndex).toString() );
+		Log.info("orange", "Palette color " + palette.getColor(colorIndex).toString() );
 
 		for (y = yBottom; y < yTop; y += diameter) {
 			for (x = xLeft; x < xRight; x += diameter) {
@@ -210,7 +210,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		machine.writeChangeTo(osw);
 		// Make sure the pen is up for the first move
 
-		Log.write("green", "Color " + i );
+		Log.info("green", "Color " + i );
 
 		scanForContiguousBlocks(i, osw);
 	}
@@ -237,12 +237,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 		imageStart(out);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
-		diameter = (int)( machine.getDiameter() * 10.0f );
+		diameter = (int)( machine.getPenDiameter() );
 
 		imgChanged = img;
 

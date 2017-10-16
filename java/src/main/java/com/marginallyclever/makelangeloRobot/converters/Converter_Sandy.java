@@ -59,10 +59,10 @@ public class Converter_Sandy extends ImageConverter {
 
 		float yBottom, yTop, xLeft, xRight;
 
-		yBottom = (float)machine.getLimitBottom() * 10;
-		yTop    = (float)machine.getLimitTop()    * 10;
-		xLeft   = (float)machine.getLimitLeft()   * 10;
-		xRight  = (float)machine.getLimitRight()  * 10;
+		yBottom = (float)machine.getLimitBottom();
+		yTop    = (float)machine.getLimitTop();
+		xLeft   = (float)machine.getLimitLeft();
+		xRight  = (float)machine.getLimitRight();
 		
 		double cx,cy;
 
@@ -95,7 +95,7 @@ public class Converter_Sandy extends ImageConverter {
 		for(r=rMin;r<rMax;r+=rStep) {
 			// go around in a circle
 			t=0;
-			t_step = machine.getDiameter()/r;
+			t_step = machine.getPenDiameter()/r;
 			flipSum=0;
 			// go around the circle
 			for(t=0;t<Math.PI*2;t+=t_step) {

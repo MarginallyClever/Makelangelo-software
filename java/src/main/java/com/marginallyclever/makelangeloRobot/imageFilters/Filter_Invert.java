@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangeloRobot.imageFilters;
 
-import com.marginallyclever.makelangelo.ColorRGB;
+import java.awt.image.BufferedImage;
+
+import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 
 
@@ -15,17 +17,20 @@ public class Filter_Invert extends ImageFilter {
     int w = img.getSourceImage().getWidth();
     int x, y;
 
+    TransformedImage after = new TransformedImage(img);
+    BufferedImage afterBI = after.getSourceImage();
+    
     for (y = 0; y < h; ++y) {
       for (x = 0; x < w; ++x) {
         ColorRGB color = new ColorRGB(img.getSourceImage().getRGB(x, y));
         color.red   = 255 - color.red;
         color.green = 255 - color.green;
         color.blue  = 255 - color.blue;
-        img.getSourceImage().setRGB(x, y, color.toInt());
+        afterBI.setRGB(x, y, color.toInt());
       }
     }
 
-    return img;
+    return after;
   }
 }
 

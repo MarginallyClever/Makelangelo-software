@@ -15,14 +15,22 @@ public interface MakelangeloHardwareProperties {
 	public boolean canChangeMachineSize();
 	
 	public boolean canAccelerate();
-	
-	public boolean canChangePulleySize();
 
 	public boolean canInvertMotors();
 	
+	/**
+	 * @return true if the machine has limit switches and can find home on its own.
+	 */
 	public boolean canAutoHome();
 	
+	/**
+	 * @return default machine size, in mm
+	 */
 	public float getWidth();
+
+	/**
+	 * @return default machine size, in mm
+	 */
 	public float getHeight();
 	
 	/**

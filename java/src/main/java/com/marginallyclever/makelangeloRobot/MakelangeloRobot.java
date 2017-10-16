@@ -39,17 +39,16 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * MakelangeloRobotSettings is the persistent Model data (machine configuration).
  * @author dan
  * @since 7.2.10
- *
  */
 public class MakelangeloRobot implements NetworkConnectionListener {
 	// Constants
-	private final String robotTypeName = "DRAWBOT";
+	private final String robotTypeName = "POLARGRAPH";
 	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
-
+	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 7;  // must match the version in the the firmware EEPROM
+	private final long expectedFirmwareVersion = 8;  // must match the version in the the firmware EEPROM
 	
 	private boolean hardwareVersionChecked = false;
 	
@@ -301,7 +300,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
 		if(!pleaseGetAGUID) return 0;
 		
-		Log.message("obtaining UID from server.");
+		Log.info("obtaining UID from server.");
 		try {
 			// Send request
 			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
@@ -311,7 +310,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
 			BufferedReader rd = new BufferedReader(inputStreamReader);
 			String line = rd.readLine();
-			Log.message("Server says: '"+line+"'");
+			Log.info("Server says: '"+line+"'");
 			newUID = Long.parseLong(line);
 			// did read go ok?
 			if (newUID != 0) {
@@ -352,12 +351,12 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void sendConfig() {
 		if (getConnection() != null && !isPortConfirmed()) return;
 
-		// Send  new configuration values to the robot.
+		String config = settings.getGCodeConfig();
+		String [] lines = config.split("\n");
+
 		try {
-			// send config
-			sendLineToRobot(settings.getGCodeConfig() + "\n");
-			if(this.settings.getHardwareProperties().canChangePulleySize()) {
-				sendLineToRobot(settings.getGCodePulleyDiameter() + "\n");
+			for(int i=0;i<lines.length;++i) {
+				sendLineToRobot( lines[i]+ "\n");
 			}
 			setHome();
 			sendLineToRobot("G0 F"+ df.format(settings.getMaxFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
@@ -570,7 +569,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
-		Log.write("white", line );
+		Log.info("white", line );
 		line += "\n";
 
 		// send unmodified line
@@ -614,12 +613,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		sendLineToRobot("D6 X"+df.format(settings.getHomeX())+" Y"+df.format(settings.getHomeY()));  // save home position
-		didSetHome=true;
 		setGondolaX((float)settings.getHomeX());
 		setGondolaY((float)settings.getHomeY());
+		didSetHome=true;
 	}
-	
-	
+		
 	public boolean didSetHome() {
 		return didSetHome;
 	}
@@ -648,10 +646,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public boolean areMotorsEngaged() { return areMotorsEngaged; }
 	
-	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft()*10,gondolaY);	}
-	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight()*10,gondolaY);	}
-	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   *10);  }
-	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom()*10);  }
+	public void movePenToEdgeLeft()   {		movePenAbsolute((float)settings.getPaperLeft(),gondolaY);	}
+	public void movePenToEdgeRight()  {		movePenAbsolute((float)settings.getPaperRight(),gondolaY);	}
+	public void movePenToEdgeTop()    {		movePenAbsolute(getGondolaX(),(float)settings.getPaperTop()   );  }
+	public void movePenToEdgeBottom() {		movePenAbsolute(getGondolaX(),(float)settings.getPaperBottom());  }
 	
 	public void disengageMotors() {		sendLineToRobot("M18");		areMotorsEngaged=false; }
 	public void engageMotors()    {		sendLineToRobot("M17");		areMotorsEngaged=true; }
@@ -717,19 +715,19 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private void paintLimits(GL2 gl2) {
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
+		gl2.glVertex2d(settings.getLimitLeft() , settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
+		gl2.glVertex2d(settings.getLimitLeft() , settings.getLimitBottom());
 		gl2.glEnd();
 
 		Color c = settings.getPaperColor();
 		gl2.glColor3f(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperBottom());
 		gl2.glEnd();
 		
 		// margin settings
@@ -738,10 +736,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glLineWidth(1);
 		gl2.glScaled(settings.getPaperMargin(),settings.getPaperMargin(),1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getPaperLeft() , settings.getPaperBottom());
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}

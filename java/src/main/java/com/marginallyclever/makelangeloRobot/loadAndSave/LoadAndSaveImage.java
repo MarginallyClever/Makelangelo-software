@@ -41,6 +41,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.converters.ImageConverter;
 import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -59,7 +60,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private TransformedImage img;
 	private MakelangeloRobot chosenRobot;
 	JPanel conversionPanel;
-	JComboBox<String> conversionOptions;
+	JComboBox<String> conversionStyleOptions;
+	JComboBox<String> conversionFillOptions;
 	private JPanel converterOptionsContainer;
 	
 	/**
@@ -78,6 +80,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private String[] imageConverterNames;
+	private String[] imageFillNames;
+	
 	
 	public LoadAndSaveImage() {
 		converters = ServiceLoader.load(ImageConverter.class);
@@ -96,6 +100,10 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			ImageManipulator f = ici.next();
 			imageConverterNames[i++] = f.getName();
 		}
+		
+		imageFillNames = new String[2];
+		imageFillNames[0] = Translator.get("ConvertImagePaperFill");
+		imageFillNames[1] = Translator.get("ConvertImagePaperFit");
 	}
 	
 	@Override
@@ -110,16 +118,32 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 
 	protected boolean chooseImageConversionOptions(MakelangeloRobot robot) {
+		final MakelangeloRobot robot2 = robot;
+		
 		conversionPanel = new JPanel(new GridBagLayout());
-		conversionOptions = new JComboBox<String>(imageConverterNames);
+		
+		conversionStyleOptions = new JComboBox<String>(imageConverterNames);
+		conversionFillOptions = new JComboBox<String>(imageFillNames);
+		
 		converterOptionsContainer = new JPanel();
 		converterOptionsContainer.setPreferredSize(new Dimension(450,300));
 		
-		conversionOptions.setSelectedIndex(getPreferredDrawStyle());
+		conversionStyleOptions.setSelectedIndex(getPreferredDrawStyle());
+		conversionFillOptions.setSelectedIndex(getPreferredFillStyle());
 		
-		conversionOptions.addActionListener(new ActionListener() {
+		conversionStyleOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				changeConverter(conversionOptions,robot);
+				changeConverter(conversionStyleOptions,robot2);
+		    }
+		});
+		conversionFillOptions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switch(conversionFillOptions.getSelectedIndex()) {
+					case 0:  scaleToFillPaper();  break;
+					case 1:  scaleToFitPaper();  break;
+					default: break;
+				}
+				changeConverter(conversionStyleOptions,robot2);
 		    }
 		});
 
@@ -129,29 +153,47 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
+		c.ipadx=5;
 		conversionPanel.add(new JLabel(Translator.get("ConversionStyle")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
-		c.gridy = y++;
-		conversionPanel.add(conversionOptions, c);
+		c.ipadx=0;
+		conversionPanel.add(conversionStyleOptions, c);
+
+		y++;
+		c.anchor = GridBagConstraints.EAST;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = y;
+		c.ipadx=5;
+		conversionPanel.add(new JLabel(Translator.get("ConversionFill")), c);
+		c.anchor = GridBagConstraints.WEST;
+		c.gridwidth = 3;
+		c.gridx = 1;
+		c.ipadx=0;
+		conversionPanel.add(conversionFillOptions, c);
+		c.gridy = y;
+
+		y++;
 		c.anchor=GridBagConstraints.NORTH;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth=4;
 		c.gridx=0;
-		c.gridy=y++;
+		c.gridy=y;
 		c.insets = new Insets(10, 0, 0, 0);
 		converterOptionsContainer.setPreferredSize(new Dimension(449,325));
 		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
 		conversionPanel.add(converterOptionsContainer,c);
 		
-		changeConverter(conversionOptions,robot);
+		changeConverter(conversionStyleOptions,robot);
 		
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			stopSwingWorker();
-			setPreferredDrawStyle(conversionOptions.getSelectedIndex());
+			setPreferredDrawStyle(conversionStyleOptions.getSelectedIndex());
+			setPreferredFillStyle(conversionFillOptions.getSelectedIndex());
 			robot.getSettings().saveConfig();
 
 			return true;
@@ -169,6 +211,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		JPanel p = chosenConverter.getPanel();
 		converterOptionsContainer.removeAll();
 		if(p!=null) {
+			Log.info("Converter="+chosenConverter.getName());
 			//System.out.println("Adding panel");
 			converterOptionsContainer.add(p);
 			converterOptionsContainer.invalidate();
@@ -181,7 +224,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	
 	public void reconvert() {
-		changeConverter(conversionOptions,chosenRobot);
+		changeConverter(conversionStyleOptions,chosenRobot);
 	}
 	
 	private ImageConverter getConverter(int arg0) throws IndexOutOfBoundsException {
@@ -204,6 +247,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
+	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		try {
 			img = new TransformedImage( ImageIO.read(in) );
@@ -212,35 +256,67 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			return false;
 		}
 		
-		// scale image to fit paper, same behaviour as before.
-		if( robot.getSettings().getPaperWidth() > robot.getSettings().getPaperHeight() ) {
-			if(robot.getSettings().getPaperWidth()*10.0f < img.getSourceImage().getWidth()) {
-				float f = (float)( robot.getSettings().getPaperWidth()*10.0f / img.getSourceImage().getWidth() );
-				img.setScaleX(img.getScaleX() * f);
-				img.setScaleY(img.getScaleY() * f);
-			}
-		} else {
-			if(robot.getSettings().getPaperHeight()*10.0f < img.getSourceImage().getHeight()) {
-				float f = (float)( robot.getSettings().getPaperHeight()*10.0f / img.getSourceImage().getHeight() );
-				img.setScaleX(img.getScaleX() * f);
-				img.setScaleY(img.getScaleY() * f);
-			}
-		}
-        
+		chosenRobot = robot;
+		
+		scaleToFillPaper();
 		
 		pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 		
-		chosenRobot = robot;
-		
 		chooseImageConversionOptions(robot);
 		
 		return true;
 	}
-		
 
-	void stopSwingWorker() {
+	
+	public void scaleToFillPaper() {
+		MakelangeloRobotSettings s = chosenRobot.getSettings();
+
+		float flip = s.isReverseForGlass() ? -1 : 1;
+		double width  = s.getPaperWidth ()*s.getPaperMargin();
+		double height = s.getPaperHeight()*s.getPaperMargin();
+		
+		if( s.getPaperWidth() > s.getPaperHeight() ) {
+			if(width < img.getSourceImage().getWidth()) {
+				float f = (float)( width / img.getSourceImage().getWidth() );
+				img.setScaleX(f);
+				img.setScaleY(-f * flip);
+			}
+		} else {
+			if(height < img.getSourceImage().getHeight()) {
+				float f = (float)( height / img.getSourceImage().getHeight() );
+				img.setScaleX(f);
+				img.setScaleY(-f * flip);
+			}
+		}
+	}
+
+	
+	public void scaleToFitPaper() {
+		MakelangeloRobotSettings s = chosenRobot.getSettings();
+		
+		float flip   = s.isReverseForGlass() ? -1 : 1;
+		double width  = s.getPaperWidth ()*s.getPaperMargin();
+		double height = s.getPaperHeight()*s.getPaperMargin();
+		
+		if( s.getPaperWidth() < s.getPaperHeight() ) {
+			if(width < img.getSourceImage().getWidth()) {
+				float f = (float)( width / img.getSourceImage().getWidth() );
+				img.setScaleX(f);
+				img.setScaleY(-f * flip);
+			}
+		} else {
+			if(height < img.getSourceImage().getHeight()) {
+				float f = (float)( height / img.getSourceImage().getHeight() );
+				img.setScaleX(f);
+				img.setScaleY(-f * flip);
+			}
+		}
+	}
+	
+
+	protected void stopSwingWorker() {
 		if(chosenConverter!=null) {
 			chosenConverter.stopIterating();
 		}
@@ -254,7 +330,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 	}
 
-	void createSwingWorker() {
+	protected void createSwingWorker() {
 		//System.out.println("Starting swingWorker");
 
 		chosenConverter.setProgressMonitor(pm);
@@ -279,7 +355,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				tempFile.deleteOnExit();
 
 				// read in image
-				Log.message(Translator.get("Converting") + " " + tempFile.getName());
+				Log.info(Translator.get("Converting") + " " + tempFile.getName());
 				// convert with style
 
 				try (OutputStream fileOutputStream = new FileOutputStream(tempFile);
@@ -338,12 +414,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (swingWorker.isDone()) {
-						Log.message(Translator.get("Finished"));
+						Log.info(Translator.get("Finished"));
 					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							swingWorker.cancel(true);
 						}
-						Log.message(Translator.get("Cancelled"));
+						Log.info(Translator.get("Cancelled"));
 					}
 				}
 			}
@@ -355,9 +431,16 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private void setPreferredDrawStyle(int style) {
 		prefs.putInt("Draw Style", style);
 	}
+	private void setPreferredFillStyle(int style) {
+		prefs.putInt("Fill Style", style);
+	}
 
 	private int getPreferredDrawStyle() {
 		return prefs.getInt("Draw Style", 0);
+	}
+
+	private int getPreferredFillStyle() {
+		return prefs.getInt("Fill Style", 0);
 	}
 	
 	public boolean canSave(String filename) {

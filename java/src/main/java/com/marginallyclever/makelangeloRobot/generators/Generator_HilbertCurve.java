@@ -12,7 +12,6 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	private float xMax = 7;
 	private float xMin = -7;
 	private float yMax = 7;
-	private float yMin = -7;
 	private static int order = 4; // controls complexity of curve
 	
 	private MakelangeloRobotPanel robotPanel;
@@ -49,25 +48,13 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		machine.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
-				           (float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
+				           (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
 		xMax = v;
 		yMax = v;
 		xMin = -v;
-		yMin = -v;
 
 		turtle = new Turtle();
 		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
-
-		boolean drawBoundingBox=false;
-		if(drawBoundingBox) {
-			liftPen(out);
-			moveTo(out, xMax, yMax, false);
-			moveTo(out, xMax, yMin, false);
-			moveTo(out, xMin, yMin, false);
-			moveTo(out, xMin, yMax, false);
-			moveTo(out, xMax, yMax, false);
-			liftPen(out);
-		}
 
 		// move to starting position
 		turtle.setX(xMax - turtleStep / 2);

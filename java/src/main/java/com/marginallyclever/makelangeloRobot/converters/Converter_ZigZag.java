@@ -82,7 +82,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 					c = "white";
 					break;
 				}
-				Log.write( c , formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
+				Log.info( c , formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
 			}
 			progress = new_progress;
 			pm.setProgress((int) progress);
@@ -168,7 +168,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	private void generateTSP(Writer out) throws IOException {
 		greedyTour();
 
-		Log.write("green","Running Lin/Kerighan optimization...");
+		Log.info("green","Running Lin/Kerighan optimization...");
 
 		len = getTourLength(solution);
 		old_len = len;
@@ -216,7 +216,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void greedyTour() {
-		Log.write("green","Finding greedy tour solution...");
+		Log.info("green","Finding greedy tour solution...");
 
 		int i;
 		float w, bestw;
@@ -298,10 +298,10 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 	protected void connectTheDots(TransformedImage img) {
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		float x, y;
 		int i;
@@ -316,7 +316,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			}
 		}
 
-		Log.write("green", numPoints + " points.");
+		Log.info("green", numPoints + " points.");
 		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 

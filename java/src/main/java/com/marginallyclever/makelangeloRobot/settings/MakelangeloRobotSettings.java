@@ -31,7 +31,7 @@ public final class MakelangeloRobotSettings {
 	 * measured from "m4 calibration.pdf"
 	 * @since 7.5.0
 	 */
-	public static final float CALIBRATION_CM_FROM_TOP = 21.7f;
+	public static final float CALIBRATION_MM_FROM_TOP = 217f;
 	
 	private DecimalFormat df;
 	
@@ -44,23 +44,18 @@ public final class MakelangeloRobotSettings {
 	private long robotUID;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
-	// machine physical limits, in cm
+	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
-	// paper area, in cm
+	// paper area, in mm
 	private double paperLeft;
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
 	// % from edge of paper.
 	private double paperMargin;
-	// pulley diameter
-	private double pulleyDiameter;
-	// pulleys turning backwards?
-	private boolean isLeftMotorInverted;
-	private boolean isRightMotorInverted;
 
 	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
@@ -71,11 +66,24 @@ public final class MakelangeloRobotSettings {
 
 	private Color paperColor;
 
-	// pen
-	protected float diameter; // mm
+	/**
+	 * pen diameter, in mm
+	 */
+	protected float diameter;
+	/**
+	 * pen up servo angle
+	 */
 	protected float zOff;
+	/**
+	 * pen down servo angle
+	 */
 	protected float zOn;
+	/**
+	 * pen servo movement speed
+	 */
 	protected float zRate;
+	
+	protected Color penDownColorDefault;
 	protected Color penDownColor;
 	protected Color penUpColor;
 	// speed control
@@ -118,8 +126,8 @@ public final class MakelangeloRobotSettings {
 		df = new DecimalFormat("#.###",otherSymbols);
 		df.setGroupingUsed(false);
 				
-		double mh = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
-		double mw = 835 * 0.1; // mm > cm  // Makelangelo 5 is 835mm.
+		double mh = 835; // mm
+		double mw = 835; // mm
 		
 		robotUID = 0;
 		isRegistered = false;
@@ -145,24 +153,16 @@ public final class MakelangeloRobotSettings {
 
 		maxFeedRate = 6500;
 		currentFeedRate = 6500;
-		maxAcceleration = 250;
+		maxAcceleration = 2500;
 
 		// pen
 		diameter = 0.8f;
 		zRate = 50;
 		zOn = 50;
 		zOff = 90;
-		penDownColor = Color.BLACK;
+		penDownColor = penDownColorDefault = Color.BLACK;
 		penUpColor = Color.BLUE;
-		
-		// diameter = circumference/pi
-		// circumference is 20 teeth @ 2mm/tooth
-		pulleyDiameter  = 20.0 * 0.2 / Math.PI;
-
-		isLeftMotorInverted = false;
-		isRightMotorInverted = true;
 		reverseForGlass = false;
-
 		startingPositionIndex = 4;
 
 		// default hardware version is 2
@@ -210,12 +210,6 @@ public final class MakelangeloRobotSettings {
 	public String[] getAvailableConfigurations() {
 		return configsAvailable;
 	}
-	
-	
-	public String getGCodePulleyDiameter() {
-		return "D1 L" + df.format(pulleyDiameter);
-	}
-
 
 	/**
 	 * @return home X coordinate in mm
@@ -228,10 +222,16 @@ public final class MakelangeloRobotSettings {
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
-		float limitTop = (float)getLimitTop();
-		float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_CM_FROM_TOP;
-		homeY = (float)Math.floor(homeY*10000.0f)/1000.0f;
-		return homeY;
+		if(this.hardwareVersion==6) {
+			// Zarplotter
+			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
+			return 0;
+		} else {
+			float limitTop = (float)getLimitTop();
+			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_MM_FROM_TOP;
+			homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
+			return homeY;
+		}
 	}
 	
 	public String getGCodeSetPositionAtHome() {
@@ -239,12 +239,21 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getGCodeConfig() {
-		return "M101 T" + df.format(limitTop)
-				+ " B" + df.format(limitBottom)
-				+ " L" + df.format(limitLeft)
-				+ " R" + df.format(limitRight)
-				+ " I" + (isLeftMotorInverted ? "-1" : "1")
-				+ " J" + (isRightMotorInverted ? "-1" : "1");
+		String result;
+		String xAxis = "M101 A0 T"+df.format(limitRight)+" B"+df.format(limitLeft);
+		String yAxis = "M101 A1 T"+df.format(limitTop)+" B"+df.format(limitBottom);
+		String zAxis = "M101 A2 T170 B10";
+		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
+		return result;
+	}
+
+
+	public String getAbsoluteMode() {
+		return "G90";
+	}
+
+	public String getRelativeMode() {
+		return "G91";
 	}
 
 
@@ -314,7 +323,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return bottom limit in cm
+	 * @return bottom limit in mm
 	 */
 	public double getLimitBottom() {
 		return limitBottom;
@@ -322,7 +331,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return left limit in cm
+	 * @return left limit in mm
 	 */
 	public double getLimitLeft() {
 		return limitLeft;
@@ -330,14 +339,14 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return right limit in cm
+	 * @return right limit in mm
 	 */
 	public double getLimitRight() {
 		return limitRight;
 	}
 
 	/**
-	 * @return top limit in cm
+	 * @return top limit in mm
 	 */
 	public double getLimitTop() {
 		return limitTop;
@@ -352,7 +361,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper bottom edge in cm.
+	 * @return paper bottom edge in mm.
 	 */
 	public double getPaperBottom() {
 		return paperBottom;
@@ -360,14 +369,14 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper height in cm.
+	 * @return paper height in mm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
 
 	/**
-	 * @return paper left edge in cm.
+	 * @return paper left edge in mm.
 	 */
 	public double getPaperLeft() {
 		return paperLeft;
@@ -383,7 +392,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper right edge in cm.
+	 * @return paper right edge in mm.
 	 */
 	public double getPaperRight() {
 		return paperRight;
@@ -391,7 +400,7 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper top edge in cm.
+	 * @return paper top edge in mm.
 	 */
 	public double getPaperTop() {
 		return paperTop;
@@ -399,30 +408,14 @@ public final class MakelangeloRobotSettings {
 
 
 	/**
-	 * @return paper width in cm.
+	 * @return paper width in mm.
 	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}
-
-	public double getPulleyDiameter()  {
-		return pulleyDiameter;
-	}
 	
 	public long getUID() {
 		return robotUID;
-	}
-
-	public void invertLeftMotor(boolean backwards)  {
-		isLeftMotorInverted = backwards;
-	}
-
-	public void invertRightMotor(boolean backwards) {
-		isRightMotorInverted = backwards;
-	}
-
-	public boolean isLeftMotorInverted()   {
-		return isLeftMotorInverted;
 	}
 
 	public boolean isPaperConfigured() {
@@ -435,10 +428,6 @@ public final class MakelangeloRobotSettings {
 
 	public boolean isReverseForGlass() {
 		return reverseForGlass;
-	}
-
-	public boolean isRightMotorInverted() {
-		return isRightMotorInverted;
 	}
 
 	/**
@@ -464,11 +453,6 @@ public final class MakelangeloRobotSettings {
 		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
-
-		isLeftMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m1invert", Boolean.toString(isLeftMotorInverted)));
-		isRightMotorInverted=Boolean.parseBoolean(uniqueMachinePreferencesNode.get("m2invert", Boolean.toString(isRightMotorInverted)));
-
-		pulleyDiameter=Double.valueOf(uniqueMachinePreferencesNode.get("bobbin_left_diameter", Double.toString(pulleyDiameter)));
 
 		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
 
@@ -504,7 +488,7 @@ public final class MakelangeloRobotSettings {
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
-		penDownColor = new Color(r,g,b);
+		penDownColor = penDownColorDefault = new Color(r,g,b);
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
@@ -513,16 +497,16 @@ public final class MakelangeloRobotSettings {
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		prefs.put("diameter", Float.toString(getDiameter()));
+		prefs.put("diameter", Float.toString(getPenDiameter()));
 		prefs.put("z_rate", Float.toString(zRate));
 		prefs.put("z_on", Float.toString(zOn));
 		prefs.put("z_off", Float.toString(zOff));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
 		prefs.put("feed_rate", Float.toString(maxFeedRate));
 		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
-		prefs.putInt("penDownColorR", penDownColor.getRed());
-		prefs.putInt("penDownColorG", penDownColor.getGreen());
-		prefs.putInt("penDownColorB", penDownColor.getBlue());
+		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
+		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
+		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
@@ -552,9 +536,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("m1invert", Boolean.toString(isLeftMotorInverted));
-		uniqueMachinePreferencesNode.put("m2invert", Boolean.toString(isRightMotorInverted));
-		uniqueMachinePreferencesNode.put("bobbin_left_diameter", Double.toString(pulleyDiameter));
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
@@ -640,10 +621,6 @@ public final class MakelangeloRobotSettings {
 		this.paperBottom = -height/2;
 	}
 	
-	public void setPulleyDiameter(double left) {
-		pulleyDiameter = left;
-	}
-	
 	public void setRegistered(boolean isRegistered) {
 		this.isRegistered = isRegistered;
 	}
@@ -692,10 +669,8 @@ public final class MakelangeloRobotSettings {
 		
 		hardwareVersion = newVersion;
 		if(!hardwareProperties.canChangeMachineSize()) {
-			this.setMachineSize(hardwareProperties.getWidth()*0.1f, hardwareProperties.getHeight()*0.1f);
+			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
 		}
-		
-		//saveConfigToLocal();
 	}
 	
 	public Color getPaperColor() {
@@ -706,8 +681,16 @@ public final class MakelangeloRobotSettings {
 		paperColor = arg0;
 	}
 	
+	public Color getPenDownColorDefault() {
+		return penDownColorDefault;
+	}
+	
 	public Color getPenDownColor() {
 		return penDownColor;
+	}
+	
+	public void setPenDownColorDefault(Color arg0) {
+		penDownColorDefault=arg0;
 	}
 	
 	public void setPenDownColor(Color arg0) {
@@ -730,7 +713,10 @@ public final class MakelangeloRobotSettings {
 		zRate = arg0;
 	}
 	
-	public float getDiameter() {
+	/**
+	 * @return pen diameter, in mm
+	 */
+	public float getPenDiameter() {
 		return diameter;
 	}
 
@@ -774,7 +760,17 @@ public final class MakelangeloRobotSettings {
 		return "G00 F" + df.format(getCurrentFeedRate()) + ";\n";
 	}
 
+	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
+		penDownColor = newPenDownColor;
+		writeChangeToInternal(out);
+	}
+
 	public void writeChangeTo(Writer out) throws IOException {
+		penDownColor = penDownColorDefault;
+		writeChangeToInternal(out);
+	}
+	
+	protected void writeChangeToInternal(Writer out) throws IOException {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
@@ -782,7 +778,9 @@ public final class MakelangeloRobotSettings {
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		int toolNumber = penDownColor.getRGB();
-		out.write("M06 T" + toolNumber + "; //"+name+"\n");
+		out.write("M06 T" + toolNumber + ";\n");
+		//out.write("M117 Change to "+name+";\n");  // display message
+		//out.write("M226;"); // gcode initiated pause
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
@@ -794,14 +792,22 @@ public final class MakelangeloRobotSettings {
 	}
 
 	// lift the pen
-	public void writeOff(Writer out) throws IOException {
+	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString());
 		out.write("G00 F" + df.format(getMaxFeedRate()) + ";\n");
 	}
 
 	// lower the pen
-	public void writeOn(Writer out) throws IOException {
+	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString());
 		out.write("G01 F" + df.format(getCurrentFeedRate()) + ";\n");
+	}
+	
+	public void writeAbsoluteMode(Writer out) throws IOException {
+		out.write(getAbsoluteMode() + ";\n");
+	}
+
+	public void writeRelativeMode(Writer out) throws IOException {
+		out.write(getRelativeMode() + ";\n");
 	}
 }

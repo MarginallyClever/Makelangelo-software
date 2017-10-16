@@ -29,15 +29,15 @@ public class Converter_Boxes extends ImageConverter {
 		liftPen(out);
 		machine.writeChangeTo(out);
 
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin() * 10;
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin() * 10;
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin() * 10;
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin() * 10;
+		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
+		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
+		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
+		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = machine.getDiameter();
-		double fullStep = d*10.0f;
+		double d = machine.getPenDiameter();
+		double fullStep = d;
 		double halfStep = fullStep / 2.0f;
 		
 		double steps = pw / fullStep;

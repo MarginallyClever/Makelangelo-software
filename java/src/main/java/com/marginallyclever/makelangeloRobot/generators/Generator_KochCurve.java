@@ -50,7 +50,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		machine.writeChangeTo(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-				(float)(machine.getPaperHeight() * machine.getPaperMargin())) * 10.0f/2.0f;
+						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
 		xMax = v;
 		yMax = v;
 		xMin = -v;
@@ -61,17 +61,6 @@ public class Generator_KochCurve extends ImageGenerator {
 		float xx = xMax - xMin;
 		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
-
-		boolean drawBoundingBox=false;
-		if(drawBoundingBox) {
-			liftPen(out);
-			moveTo(out, xMax, yMax, false);
-			moveTo(out, xMax, yMin, false);
-			moveTo(out, xMin, yMin, false);
-			moveTo(out, xMin, yMax, false);
-			moveTo(out, xMax, yMax, false);
-			liftPen(out);
-		}
 		
 		liftPen(out);
 		// move to starting position

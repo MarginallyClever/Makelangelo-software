@@ -29,10 +29,10 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	public void render(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 
-		super.paintCalibrationPoint(gl2,settings);
-		super.paintMotors(gl2,settings);
+		paintCalibrationPoint(gl2,settings);
 		paintControlBox(gl2,settings);
-		super.paintPenHolderAndCounterweights(gl2,robot);		
+		paintMotors(gl2,settings);
+		paintPenHolderToCounterweights(gl2,robot);		
 	}
 
 	/**
@@ -51,29 +51,34 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		
 		// mounting plate for PCB
 		gl2.glColor3f(1,0.8f,0.5f);
+		float w =80;
+		float h = 50;
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
 		// wires to each motor
 		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(left+2.1f,-0.3);
-		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(left+2.1f,-0.1);
-		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(left+2.1f, 0.1);
-		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(left+2.1f, 0.3);
+		float SPACING=2f;
+		float y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
 
-		gl2.glColor3f(1,0,0); 	gl2.glVertex2d(0, 0.3);	gl2.glVertex2d(right-2.1f, 0.3);
-		gl2.glColor3f(0,1,0); 	gl2.glVertex2d(0, 0.1);	gl2.glVertex2d(right-2.1f, 0.1);
-		gl2.glColor3f(0,0,1); 	gl2.glVertex2d(0,-0.1);	gl2.glVertex2d(right-2.1f,-0.1);
-		gl2.glColor3f(1,1,0); 	gl2.glVertex2d(0,-0.3);	gl2.glVertex2d(right-2.1f,-0.3);
+		y=SPACING*-1.5f;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
 		gl2.glEnd();
 		
 		// RUMBA in v3 (135mm*75mm)
-		float h = 7.5f/2;
-		float w = 13.5f/2;
+		h = 75f/2;
+		w = 135f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -90,20 +95,22 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	protected void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
-		gl2.glTranslated(-18, 0, 0);
+		gl2.glTranslated(-180, 0, 0);
 		
 		// mounting plate for LCD
+		float w = 80f;
+		float h = 50f;
 		gl2.glColor3f(1,0.8f,0.5f);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
 		// LCD red
-		float w = 15.0f/2;
-		float h = 5.6f/2;
+		w = 150f/2;
+		h = 56f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -116,8 +123,8 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glPushMatrix();
 		gl2.glTranslated(-(2.6)/2, -0.771, 0);
 		
-		w = 9.8f/2;
-		h = 6.0f/2;
+		w = 98f/2;
+		h = 60f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -127,7 +134,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glEnd();
 
 		// LCD black
-		h = 4.0f/2;
+		h = 40f/2;
 		gl2.glColor3f(0,0,0);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
@@ -137,8 +144,8 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 		gl2.glEnd();
 
 		// LCD blue
-		h = 2.5f/2;
-		w = 7.5f/2;
+		h = 25f/2;
+		w = 75f/2;
 		gl2.glColor3f(0,0,0.7f);
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);

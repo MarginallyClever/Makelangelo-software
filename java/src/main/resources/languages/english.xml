@@ -16,6 +16,35 @@
 		<value>Exit</value>
 		<hint>confirm quit dialog title</hint>
 	</string>
+
+	<string>
+		<key>ConvertImagePaperFill</key>
+		<value>Fill entire paper</value>
+		<hint>Converter hint</hint>
+	</string>
+	<string>
+		<key>ConvertImagePaperFit</key>
+		<value>Fit image on paper</value>
+		<hint>Converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKName</key>
+		<value>CMYK</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKPasses</key>
+		<value>Passes</value>
+		<hint>CMYK converter hint</hint>
+	</string>
+	
+	<string>
+		<key>ConverterCMYKNote</key>
+		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.<br>Do not run from SD card (yet!)</html></body>]]></value>
+		<hint>CMYK converter hint</hint>
+	</string>
 	
 	<string>
 		<key>DXFScaleOnLoad</key>
@@ -232,7 +261,12 @@
 
 	<string>
 		<key>ConversionStyle</key>
-		<value>Conversion style</value>
+		<value>Style</value>
+		<hint>conversion options</hint>
+	</string>
+	<string>
+		<key>ConversionFill</key>
+		<value>Fill</value>
 		<hint>conversion options</hint>
 	</string>
 
@@ -285,8 +319,13 @@
 	</string>
 
 	<string>
-		<key>MenuDriveControls</key>
+		<key>MenuAxisDriveControls</key>
 		<value>Manual Driving</value>
+		<hint>context sensitive menu</hint>
+	</string>
+	<string>
+		<key>MenuCommonDriveControls</key>
+		<value>Popular Driving Commands</value>
 		<hint>context sensitive menu</hint>
 	</string>
 	<string>
@@ -306,6 +345,23 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	
+	<string>
+		<key>MenuMetricsTitle</key>
+		<value>Metrics</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>collectAnonymousMetrics</key>
+		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>collectAnonymousMetricsOnUpdate</key>
+		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
+		<hint>menu or dialog title</hint>
+	</string>
+
 	<string>
 		<key>MenuSoundsTitle</key>
 		<value>Sounds</value>

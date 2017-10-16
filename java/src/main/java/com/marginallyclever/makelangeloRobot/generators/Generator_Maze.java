@@ -158,10 +158,10 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	private void drawMaze(Writer output) throws IOException {
-		yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin() * 10;
-		yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin() * 10;
-		xMin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin() * 10;
-		xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin() * 10;
+		yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
+		yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
+		xMin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
+		xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 		
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;
