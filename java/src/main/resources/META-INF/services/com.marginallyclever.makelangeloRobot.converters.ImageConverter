@@ -3,6 +3,7 @@ com.marginallyclever.makelangeloRobot.converters.Converter_CMYK
 com.marginallyclever.makelangeloRobot.converters.Converter_Crosshatch
 com.marginallyclever.makelangeloRobot.converters.Converter_Multipass
 com.marginallyclever.makelangeloRobot.converters.Converter_Pulse
+com.marginallyclever.makelangeloRobot.converters.Converter_RandomLines
 com.marginallyclever.makelangeloRobot.converters.Converter_Sandy
 com.marginallyclever.makelangeloRobot.converters.Converter_Spiral
 com.marginallyclever.makelangeloRobot.converters.Converter_SpiralPulse

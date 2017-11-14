@@ -119,6 +119,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		hardwareVersionChecked = false;		
 		this.connection = c;		
 		this.connection.addListener(this);
+		try {
+			this.connection.sendMessage("M100\n");
+		} catch (Exception e) {
+			Log.error( e.getMessage() );
+		}
 	}
 	
 	public void closeConnection() {
