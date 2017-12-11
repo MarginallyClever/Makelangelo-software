@@ -24,7 +24,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 @SuppressWarnings("serial")
-public class LogPanel extends JPanel implements ActionListener, KeyListener {
+public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
 	Translator translator;
 	MakelangeloRobot robot;
 	
@@ -42,6 +42,9 @@ public class LogPanel extends JPanel implements ActionListener, KeyListener {
 	public LogPanel(Translator translator,MakelangeloRobot robot) {
 		this.translator = translator;
 		this.robot = robot;
+
+		// log panel
+		Log.addListener(this);
 
 		logArea = new JTextPane();
 		logArea.setEditable(false);
@@ -106,6 +109,45 @@ public class LogPanel extends JPanel implements ActionListener, KeyListener {
 	}
 
 
+	public void finalize() throws Throwable  {
+		super.finalize();
+		Log.removeListener(this);
+	}
+
+	// appends a message to the log tab and system out.
+	@Override
+	public void logEvent(String msg) {
+		// remove the 
+		//if (msg.indexOf(';') != -1) msg = msg.substring(0, msg.indexOf(';'));
+		msg = msg.trim();
+		msg = msg.replace("\n", "<br>\n") + "\n";
+		msg = msg.replace("\n\n", "\n");
+		if(msg.length()==0) return;
+		
+		try {
+			long docLen = doc.getLength();
+			long caretPosition = logArea.getCaretPosition();
+			
+			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+			
+			int over_length = 0;
+			if(docLen>2000) {
+				String startingText = doc.getText(0, 1000);
+				over_length = startingText.indexOf("\n");
+			}
+			// don't let the log grow forever
+			doc.remove(0, over_length);
+			
+			if(docLen==caretPosition) {
+				logArea.setCaretPosition(doc.getLength());
+			}
+		} catch (BadLocationException | IOException e) {
+			// FIXME failure here logs new error, causes infinite loop?
+			Log.error("Logging error: "+e.getMessage());
+		}
+	}
+
+
 	private JPanel getTextInputField() {
 		textInputArea = new JPanel();
 		textInputArea.setLayout(new GridBagLayout());
@@ -133,6 +175,7 @@ public class LogPanel extends JPanel implements ActionListener, KeyListener {
 
 		return textInputArea;
 	}
+	
 	@Override
 	public void keyTyped(KeyEvent e) {}
 
