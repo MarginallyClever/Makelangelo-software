@@ -368,8 +368,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Log.info("green", "Initializing cells");
 
 		cells = new VoronoiCell[numCells];
-		int used = 0;
-		for (used = 0; used < numCells; used++) {
+		for (int used = 0; used < cells.length; used++) {
 			cells[used] = new VoronoiCell();
 			cells[used].centroid.setLocation(xLeft   + ((float)Math.random()*(xRight-xLeft)),
 											 yBottom + ((float)Math.random()*(yTop-yBottom))
