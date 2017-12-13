@@ -4,6 +4,7 @@ import java.awt.Point;
 
 public class VoronoiCell implements Comparable<VoronoiCell> {
 	public Point centroid = new Point();
+	public Point oldCentroid = new Point();
 	public double weight;
 	
 	@Override
@@ -12,5 +13,9 @@ public class VoronoiCell implements Comparable<VoronoiCell> {
 		if(y!=0) return y;
 		
 		return centroid.x - arg0.centroid.x;
+	}
+	
+	public String toString() {
+		return centroid.toString()+",w="+weight;
 	}
 }
