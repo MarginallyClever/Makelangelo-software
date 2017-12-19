@@ -200,6 +200,7 @@ public class Log {
 	    }
 	}
 	
+	@SuppressWarnings("unused")
 	private static void sendLog() {
 		boolean canShare = MetricsPreferences.areAllowedToShare();
 		if(!canShare) return;
