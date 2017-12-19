@@ -72,14 +72,14 @@ If you like this project, please support us by buying Marginally Clever products
     -->
     <resources>
         <resource>
-          <directory>src/main/resources</directory>
+          <directory>java/src/main/resources</directory>
           <filtering>true</filtering>
           <includes>
             <include>**/*.properties</include>
           </includes>
         </resource>
         <resource>
-          <directory>src/main/resources</directory>
+          <directory>java/src/main/resources</directory>
           <filtering>false</filtering>
           <excludes>
             <exclude>**/*.properties</exclude>
@@ -112,7 +112,7 @@ If you like this project, please support us by buying Marginally Clever products
             </manifest>
           </archive>
           <descriptors>
-            <descriptor>src/main/assembly/application.xml</descriptor>
+            <descriptor>java/src/main/assembly/application.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
