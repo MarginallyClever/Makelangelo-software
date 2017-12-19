@@ -42,8 +42,9 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  */
 public class MakelangeloRobot implements NetworkConnectionListener {
 	// Constants
-	private final String robotTypeName = "POLARGRAPH";
-	private final String hello = "HELLO WORLD! I AM " + robotTypeName + " #";
+	private static final String HELLO_POLARGRAPH = "HELLO WORLD! I AM POLARGRAPH #";
+	private static final String HELLO_ZARPLOTTER = "HELLO WORLD! I AM ZARPLOTTER #";
+	private static final String HELLO_TRADITIONALXY = "HELLO WORLD! I AM TRADITIONALXY #";
 	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
@@ -157,12 +158,24 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		boolean justNow = false;
 		
 		// is port confirmed?
-		if (!portConfirmed && data.lastIndexOf(hello) >= 0) {
-			portConfirmed = true;
-			// which machine is this?
-			String afterHello = data.substring(data.lastIndexOf(hello) + hello.length());
-			parseRobotUID(afterHello);
-			justNow=true;
+		if (!portConfirmed) {
+			String machineTypeName="";
+			if(data.lastIndexOf(HELLO_POLARGRAPH) >= 0) {
+				portConfirmed = true;
+				machineTypeName = HELLO_POLARGRAPH;
+			} else if(data.lastIndexOf(HELLO_ZARPLOTTER) >= 0) {
+				portConfirmed = true;
+				machineTypeName = HELLO_ZARPLOTTER;
+			} else if(data.lastIndexOf(HELLO_TRADITIONALXY) >= 0) {
+				portConfirmed = true;
+				machineTypeName = HELLO_TRADITIONALXY;
+			}
+			if(portConfirmed) {
+				// which machine GUID is this?
+				String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
+				parseRobotUID(afterHello);
+				justNow=true;
+			}
 		}
 		
 		// is firmware checked?
