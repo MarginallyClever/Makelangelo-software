@@ -25,6 +25,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 @SuppressWarnings("serial")
 public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
+	public static final int LOG_LENGTH = 5000;
+	
 	Translator translator;
 	MakelangeloRobot robot;
 	
@@ -123,6 +125,8 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");
 		if(msg.length()==0) return;
+
+		//System.out.print(msg);
 		
 		try {
 			long docLen = doc.getLength();
@@ -131,9 +135,10 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
 			
 			int over_length = 0;
-			if(docLen>2000) {
-				String startingText = doc.getText(0, 1000);
-				over_length = startingText.indexOf("\n");
+			String startingText ="";
+			if(docLen>LOG_LENGTH) {
+				startingText = doc.getText(0, 1000);
+				over_length = startingText.indexOf("\n")+1;
 			}
 			// don't let the log grow forever
 			doc.remove(0, over_length);
