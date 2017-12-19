@@ -124,7 +124,7 @@ public class Converter_Wander extends ImageConverter {
 		// sort the points by nearest neighbor first.
 		Log.info("Sorting "+actualPoints+" points...");
 		for(int j=0;j<buckets.size();++j) {
-			//Log.info(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
+			Log.info(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
 			a = new Point2D.Double(0,0);
