@@ -59,6 +59,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
 	private MakelangeloRobot chosenRobot;
+	private boolean wasCancelled;
 	JPanel conversionPanel;
 	JComboBox<String> conversionStyleOptions;
 	JComboBox<String> conversionFillOptions;
@@ -186,12 +187,16 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
+			wasCancelled=false;
 			stopSwingWorker();
 			setPreferredDrawStyle(conversionStyleOptions.getSelectedIndex());
 			setPreferredFillStyle(conversionFillOptions.getSelectedIndex());
 			robot.getSettings().saveConfig();
 
 			return true;
+		} else {
+			wasCancelled=true;
+			stopSwingWorker();
 		}
 
 		return false;
@@ -369,16 +374,16 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					while(chosenConverter.iterate()) {
 						Thread.sleep(5);
 					}
-
-					chosenConverter.finish(out);
 					
-					chosenRobot.setDecorator(null);
-					
-					if (chosenRobot.getSettings().shouldSignName()) {
-						// Sign name
-						Generator_Text ymh = new Generator_Text();
-						ymh.setRobot(chosenRobot);
-						ymh.signName(out);
+					if(wasCancelled==false) {
+						chosenConverter.finish(out);
+						
+						if (chosenRobot.getSettings().shouldSignName()) {
+							// Sign name
+							Generator_Text ymh = new Generator_Text();
+							ymh.setRobot(chosenRobot);
+							ymh.signName(out);
+						}
 					}
 				} catch (Exception e) {
 					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
@@ -386,17 +391,21 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				}
 
 				// out closed when scope of try() ended.
-				
-				LoadAndSaveGCode loader = new LoadAndSaveGCode();
-				try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
-					loader.load(fileInputStream,chosenRobot);
-					MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
-					if(panel!=null) panel.updateButtonAccess();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-				tempFile.delete();
 
+				if(wasCancelled==false) {
+					LoadAndSaveGCode loader = new LoadAndSaveGCode();
+					try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
+						loader.load(fileInputStream,chosenRobot);
+						MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
+						if(panel!=null) panel.updateButtonAccess();
+					} catch(IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				chosenRobot.setDecorator(null);
+				
+				tempFile.delete();
 
 				pm.setProgress(100);
 				return null;

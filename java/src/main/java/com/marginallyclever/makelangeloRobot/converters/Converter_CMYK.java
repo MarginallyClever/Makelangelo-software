@@ -49,9 +49,9 @@ public class Converter_CMYK extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		
-		outputChannel(out,cmyk.getY(),0 ,new Color(255,242,  0));
-		outputChannel(out,cmyk.getC(),15,new Color(  0,174,239));
-		outputChannel(out,cmyk.getM(),75,new Color(236,  0,140));
+		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));
+		outputChannel(out,cmyk.getC(),15,new Color(  0,255,255));
+		outputChannel(out,cmyk.getM(),75,new Color(255,  0,255));
 		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
 
 		liftPen(out);
