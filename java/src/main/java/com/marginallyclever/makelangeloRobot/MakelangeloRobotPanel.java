@@ -39,6 +39,8 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.batik.ext.swing.GridBagConstants;
+
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Log;
@@ -545,14 +547,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private int getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		final SelectInteger starting_line = new SelectInteger(0);
+		Dimension d = starting_line.getPreferredSize();
+		d.width = 100;
+		starting_line.setPreferredSize(d);
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth = 2;
+		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 0;
 		panel.add(new JLabel(Translator.get("StartAtLine")), c);
-		c.gridwidth = 2;
+		c.gridwidth = 1;
 		c.gridx = 2;
 		c.gridy = 0;
+		c.insets = new Insets(0,5,0,0);
+		c.fill = GridBagConstants.HORIZONTAL;
 		panel.add(starting_line, c);
 
 		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
