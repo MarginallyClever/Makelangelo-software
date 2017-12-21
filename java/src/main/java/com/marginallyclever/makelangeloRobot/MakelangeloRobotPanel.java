@@ -43,6 +43,7 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
@@ -543,7 +544,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 */
 	private int getStartingLineNumber() {
 		final JPanel panel = new JPanel(new GridBagLayout());
-		final JTextField starting_line = new JTextField("0", 8);
+		final SelectInteger starting_line = new SelectInteger(0);
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridwidth = 2;
 		c.gridx = 0;
@@ -559,7 +560,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (result == JOptionPane.OK_OPTION) {
 			int lineNumber;
 			try {
-				lineNumber = Integer.decode(starting_line.getText());
+				lineNumber = ((Number)starting_line.getValue()).intValue();
 			} catch (Exception e) {
 				lineNumber = -1;
 			}

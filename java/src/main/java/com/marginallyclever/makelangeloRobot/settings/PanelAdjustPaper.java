@@ -288,8 +288,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 	}
 	
 	public void save() {
-		double pwf = Double.valueOf(pw.getText());
-		double phf = Double.valueOf(ph.getText());
+		double pwf = ((Number)pw.getValue()).doubleValue();
+		double phf = ((Number)ph.getValue()).doubleValue();
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
