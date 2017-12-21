@@ -72,7 +72,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			Log.info(total+" total lines to save.");
 			for(int i=0;i<total;++i) {
 				String str = sourceMaterial.nextLine();
-				if(!str.endsWith(";")) str+=";";
+				//if(!str.endsWith(";")) str+=";";
 				if(!str.endsWith("\n")) str+="\n";
 				out.write(str);
 			}
