@@ -15,7 +15,6 @@ import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
