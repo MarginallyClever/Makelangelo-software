@@ -774,13 +774,31 @@ public final class MakelangeloRobotSettings {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+
+		String name="";
+		switch(toolNumber) {
+		case 0xff0000: name="red";		break;
+		case 0x00ff00: name="green";	break;
+		case 0x0000ff: name="blue";		break;
+		case 0x000000: name="black";	break;
+		case 0x00ffff: name="cyan";		break;
+		case 0xff00ff: name="magenta";	break;
+		case 0xffff00: name="yellow";	break;
+		case 0xffffff: name="white";	break;
+		default: name= "0x"+Integer.toHexString(penDownColor.getRGB());  break;  // display unknown RGB value as hex
+		}		
+		
+		out.write("M117 Change to "+name+"\n");
+		out.write("M226\n");  // pause for user input
+		out.write("M117\n"); // clear message
 	}
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		int toolNumber = penDownColor.getRGB();
 		out.write("M06 T" + toolNumber + ";\n");
-		//out.write("M117 Change to "+name+";\n");  // display message
-		//out.write("M226;"); // gcode initiated pause
+		out.write("M117 Change to "+name+"\n");  // display message
+		out.write("M226"); // gcode initiated pause
+		out.write("M117\n");  // clear message
 		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
 	}
 
