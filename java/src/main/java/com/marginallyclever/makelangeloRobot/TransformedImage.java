@@ -55,14 +55,10 @@ public class TransformedImage {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
 
-		if (sampleX < 0)
-			return false;
-		if (sampleX >= sourceImage.getWidth())
-			return false;
-		if (sampleY < 0)
-			return false;
-		if (sampleY >= sourceImage.getHeight())
-			return false;
+		if (sampleX < 0						)			return false;
+		if (sampleX >= sourceImage.getWidth())			return false;
+		if (sampleY < 0						)			return false;
+		if (sampleY >= sourceImage.getHeight())			return false;
 		return true;
 	}
 
@@ -116,12 +112,12 @@ public class TransformedImage {
 	}
 
 	/**
-	 * sample the image, taking into account fractions of pixels.
+	 * sample the image, taking into account fractions of pixels. left < right, bottom < top.
 	 *
-	 * @param x0 top left corner
-	 * @param y0 top left corner
-	 * @param x1 bottom right corner
-	 * @param y1 bottom right corner
+	 * @param x0 left
+	 * @param y0 top
+	 * @param x1 right
+	 * @param y1 bottom
 	 * @return greyscale intensity in this region. range 0...255 inclusive
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
