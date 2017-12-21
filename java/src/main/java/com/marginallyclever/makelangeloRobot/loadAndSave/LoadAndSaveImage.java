@@ -138,11 +138,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		});
 		conversionFillOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				switch(conversionFillOptions.getSelectedIndex()) {
-					case 0:  scaleToFillPaper();  break;
-					case 1:  scaleToFitPaper();  break;
-					default: break;
-				}
 				changeConverter(conversionStyleOptions,robot2);
 		    }
 		});
@@ -220,6 +215,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		converterOptionsContainer.getParent().validate();
 		converterOptionsContainer.getParent().repaint();
 
+		switch(conversionFillOptions.getSelectedIndex()) {
+			case 0:  scaleToFillPaper();  break;
+			case 1:  scaleToFitPaper();  break;
+			default: break;
+		}
+		
 		createSwingWorker();
 	}
 	
@@ -257,8 +258,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 		
 		chosenRobot = robot;
-		
-		scaleToFillPaper();
+
+		switch(getPreferredFillStyle()) {
+			case 0:  scaleToFillPaper();  break;
+			case 1:  scaleToFitPaper();  break;
+			default: break;
+		}
 		
 		pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -279,13 +284,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		if( s.getPaperWidth() > s.getPaperHeight() ) {
 			if(width < img.getSourceImage().getWidth()) {
-				float f = (float)( width / img.getSourceImage().getWidth() );
+				float f = (float)( width / (float)img.getSourceImage().getWidth() );
 				img.setScaleX(f);
 				img.setScaleY(-f * flip);
 			}
 		} else {
 			if(height < img.getSourceImage().getHeight()) {
-				float f = (float)( height / img.getSourceImage().getHeight() );
+				float f = (float)( height / (float)img.getSourceImage().getHeight() );
 				img.setScaleX(f);
 				img.setScaleY(-f * flip);
 			}
