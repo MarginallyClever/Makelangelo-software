@@ -248,8 +248,10 @@ public class TransformedImage {
 		default: return ImageFilter.decodeColor(c);
 		}
 		
-		double a = 255-c.getAlpha();
-		int c2 = (int)((255 - colorToBlend) * (a / 255.0) + colorToBlend);
+		double a = 255.0-c.getAlpha();
+		int c2 = (int)(  (255.0 - (double)colorToBlend) * (a / 255.0) + (double)colorToBlend);
+		if(c2>255) c2=255;
+		if(c2<0) c2=0;
 		return c2;
 	}
 

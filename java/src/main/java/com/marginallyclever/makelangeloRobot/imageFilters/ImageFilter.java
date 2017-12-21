@@ -29,9 +29,10 @@ public class ImageFilter {
 		int b = c.getBlue();
 		double a = 255-c.getAlpha();
 
-		int r2 = (int)((255 - r) * (a / 255.0) + r);
-		int g2 = (int)((255 - g) * (a / 255.0) + g);
-		int b2 = (int)((255 - b) * (a / 255.0) + b);
+		
+		int r2 = (int)((255.0 - (double)r) * (a / 255.0) + r);
+		int g2 = (int)((255.0 - (double)g) * (a / 255.0) + g);
+		int b2 = (int)((255.0 - (double)b) * (a / 255.0) + b);
 		
 		return (r2 + g2 + b2) / 3;
 	}
