@@ -440,11 +440,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public void tweakAndSendLine(String line, int lineNumber) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning()) return;
-
+/*
 		// tool change request?
 		String[] tokens = line.split("(\\s|;)");
-
-		// tool change?
 		if (Arrays.asList(tokens).contains("M06") || Arrays.asList(tokens).contains("M6")) {
 			int toolNumber=0;
 			for (String token : tokens) {
@@ -453,9 +451,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				}
 			}
 			
-			changeToTool(toolNumber);
+			requestUserChangeTool(toolNumber);
 		}
-
+*/
 		// checksums for commands with a line number
 		if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
@@ -513,7 +511,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * display a dialog asking the user to change the pen
 	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
-	public void changeToTool(int toolNumber) {
+	public void requestUserChangeTool(int toolNumber) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
