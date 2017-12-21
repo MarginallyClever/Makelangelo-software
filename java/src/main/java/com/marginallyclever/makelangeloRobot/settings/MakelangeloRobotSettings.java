@@ -569,7 +569,7 @@ public final class MakelangeloRobotSettings {
 		}
 	}
 	
-	public float getMaxFeedRate() {
+	public float getPenUpFeedRate() {
 		return maxFeedRate;
 	}
 	
@@ -581,7 +581,7 @@ public final class MakelangeloRobotSettings {
 		currentFeedRate = f;
 	}
 	
-	public float getCurrentFeedRate() {
+	public float getPenDownFeedRate() {
 		return currentFeedRate;
 	}
 	
@@ -745,19 +745,19 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + ";\n";
+		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + "\n";
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + ";\n";
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + "\n";
 	}
 	
-	public String getMaxFeedrateString() {
-		return "G00 F" + df.format(getMaxFeedRate()) + ";\n";
+	public String getPenUpFeedrateString() {
+		return "G00 F" + df.format(getPenUpFeedRate()) + "\n";
 	}
 	
-	public String getCurrentFeedrateString() {
-		return "G00 F" + df.format(getCurrentFeedRate()) + ";\n";
+	public String getPenDownFeedrateString() {
+		return "G00 F" + df.format(getPenDownFeedRate()) + "\n";
 	}
 
 	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
@@ -771,9 +771,9 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	protected void writeChangeToInternal(Writer out) throws IOException {
-		int toolNumber = penDownColor.getRGB();
-		out.write("M06 T" + toolNumber + ";\n");
-		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+		int toolNumber = penDownColor.getRGB() & 0xffffff;  // ignore alpha channel
+		out.write("M06 T" + toolNumber + "\n");
+		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
 
 		String name="";
 		switch(toolNumber) {
@@ -795,37 +795,37 @@ public final class MakelangeloRobotSettings {
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		int toolNumber = penDownColor.getRGB();
-		out.write("M06 T" + toolNumber + ";\n");
+		out.write("M06 T" + toolNumber + "\n");
 		out.write("M117 Change to "+name+"\n");  // display message
 		out.write("M226"); // gcode initiated pause
 		out.write("M117\n");  // clear message
-		out.write("G00 F" + df.format(getCurrentFeedRate()) + " A" + df.format(getAcceleration()) + ";\n");
+		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
 	}
 
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
 		String command;
 		if(isUp) command="G00";
 		else command="G01";
-		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + ";\n");
+		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + "\n");
 	}
 
 	// lift the pen
 	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString());
-		out.write("G00 F" + df.format(getMaxFeedRate()) + ";\n");
+		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
 	}
 
 	// lower the pen
 	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString());
-		out.write("G01 F" + df.format(getCurrentFeedRate()) + ";\n");
+		out.write("G01 F" + df.format(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
-		out.write(getAbsoluteMode() + ";\n");
+		out.write(getAbsoluteMode() + "\n");
 	}
 
 	public void writeRelativeMode(Writer out) throws IOException {
-		out.write(getRelativeMode() + ";\n");
+		out.write(getRelativeMode() + "\n");
 	}
 }

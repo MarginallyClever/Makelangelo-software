@@ -372,7 +372,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				sendLineToRobot( lines[i]+ "\n");
 			}
 			setHome();
-			sendLineToRobot("G0 F"+ df.format(settings.getMaxFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
+			sendLineToRobot("G0 F"+ df.format(settings.getPenUpFeedRate()) + " A" + df.format(settings.getAcceleration()) + "\n");
 		} catch(Exception e) {}
 	}
 
@@ -420,12 +420,12 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
-		sendLineToRobot(settings.getMaxFeedrateString());
+		sendLineToRobot(settings.getPenUpFeedrateString());
 	}
 	
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
-		sendLineToRobot(settings.getCurrentFeedrateString());
+		sendLineToRobot(settings.getPenDownFeedrateString());
 	}
 	
 	public void testPenAngle(double testAngle) {
@@ -554,8 +554,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public boolean sendLineToRobot(String line) {
 		if (getConnection() == null || !isPortConfirmed()) return false;
-
 		if (line.trim().equals("")) return false;
+
 		String reportedline = line;
 		// does it have a checksum?  hide it in the log
 		if (reportedline.contains(";")) {
@@ -580,7 +580,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
-		Log.info("white", line );
+		Log.info("black", line );
 		line += "\n";
 
 		// send unmodified line
@@ -597,13 +597,13 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		// remember it
 		settings.setCurrentFeedRate(feedRate);
 		// get it again in case it was capped.
-		feedRate = settings.getCurrentFeedRate();
+		feedRate = settings.getPenDownFeedRate();
 		// tell the robot
 		sendLineToRobot("G00 F" + df.format(feedRate));
 	}
 	
 	public double getCurrentFeedRate() {
-		return settings.getCurrentFeedRate();
+		return settings.getPenDownFeedRate();
 	}
 	
 	public void goHome() {
