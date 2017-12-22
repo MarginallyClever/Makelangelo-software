@@ -765,7 +765,7 @@ public final class MakelangeloRobotSettings {
 		writeChangeToInternal(out);
 	}
 
-	public void writeChangeTo(Writer out) throws IOException {
+	public void writeChangeToDefaultColor(Writer out) throws IOException {
 		penDownColor = penDownColorDefault;
 		writeChangeToInternal(out);
 	}

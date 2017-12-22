@@ -32,7 +32,7 @@ public class Converter_RandomLines extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;

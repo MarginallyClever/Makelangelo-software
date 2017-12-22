@@ -27,7 +27,7 @@ public class Converter_Boxes extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
 		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();

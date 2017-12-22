@@ -207,7 +207,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private void scanColor(int i, Writer osw) throws IOException {
 		// "please change to tool X and press any key to continue"
 		liftPen(osw);
-		machine.writeChangeTo(osw);
+		machine.writeChangeToDefaultColor(osw);
 		// Make sure the pen is up for the first move
 
 		Log.info("green", "Color " + i );

@@ -279,7 +279,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		// move to the first point
 		moveToPoint(out, besti, false);

@@ -44,7 +44,7 @@ public class Converter_Sandy extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		convertPaperSpace(img,out);
 

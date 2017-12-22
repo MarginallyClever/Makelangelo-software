@@ -51,7 +51,7 @@ public class Converter_Spiral extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		double toolDiameter = machine.getPenDiameter();
 

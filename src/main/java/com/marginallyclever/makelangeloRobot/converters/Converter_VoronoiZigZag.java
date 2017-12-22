@@ -408,7 +408,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			
 			imageStart(out);
 			liftPen(out);
-			machine.writeChangeTo(out);
+			machine.writeChangeToDefaultColor(out);
 
 			// find the tsp point closest to the calibration point
 			int i;

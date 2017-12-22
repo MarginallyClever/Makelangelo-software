@@ -47,7 +47,7 @@ public class Generator_KochCurve extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;

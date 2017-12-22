@@ -240,13 +240,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	 * @throws IOException
 	 */
 	protected void writeOutCells(Writer out) throws IOException {
-		//if (graphEdges == null) return;
-
 		Log.info("Writing gcode.");
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		float toolDiameter = machine.getPenDiameter();
 

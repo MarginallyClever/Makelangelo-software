@@ -734,11 +734,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
 		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
-		JPanel p = chosenGenerator.getPanel(this);
+		JPanel chosenGeneratorPanel = chosenGenerator.getPanel(this);
 		previewPane.removeAll();
-		if(p!=null) {
+		if(chosenGeneratorPanel!=null) {
 			Log.info("Generator="+chosenGenerator.getName());
-			previewPane.add(p);
+			previewPane.add(chosenGeneratorPanel);
 			previewPane.invalidate();
 			try {
 				chosenGenerator.regenerate();

@@ -50,7 +50,7 @@ public class Converter_Crosshatch extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 		convertPaperSpace(img, out);
 
 		liftPen(out);

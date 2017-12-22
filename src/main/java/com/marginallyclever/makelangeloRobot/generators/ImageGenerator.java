@@ -38,10 +38,10 @@ public abstract class ImageGenerator extends ImageManipulator implements Makelan
 	public JPanel getPanel(MakelangeloRobotPanel arg0) {
 		return null;
 	}
-	
+
 	/**
-	 * @return true if generate succeeded.
-	 * @param dest the file where the results will be saved.
+	 * Force regeneration of the style.  TODO this is a hack and should be redesigned.
+	 * @throws IOException
 	 */
 	public void regenerate() throws IOException {}
 	

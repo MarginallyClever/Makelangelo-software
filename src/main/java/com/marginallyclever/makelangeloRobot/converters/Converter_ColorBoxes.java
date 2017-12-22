@@ -123,7 +123,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 
 		// TODO Find a way to swap color pens.
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		int y;
 

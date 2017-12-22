@@ -311,7 +311,7 @@ public class Generator_Text extends ImageGenerator {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		posx=0;
 		posy=0;

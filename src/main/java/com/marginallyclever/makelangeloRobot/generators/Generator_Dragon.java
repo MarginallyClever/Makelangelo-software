@@ -51,7 +51,7 @@ public class Generator_Dragon extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeTo(out);
+		machine.writeChangeToDefaultColor(out);
 
 		xMax = (float)(machine.getPaperWidth()  * machine.getPaperMargin())/2.0f;
 		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
