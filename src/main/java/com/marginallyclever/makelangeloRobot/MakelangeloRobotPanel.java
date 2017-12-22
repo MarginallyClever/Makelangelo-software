@@ -48,6 +48,7 @@ import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
+import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
@@ -734,14 +735,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
 		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
-		JPanel chosenGeneratorPanel = chosenGenerator.getPanel(this);
+		ImageGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
+		chosenGeneratorPanel.makelangeloRobotPanel = this;
 		previewPane.removeAll();
 		if(chosenGeneratorPanel!=null) {
 			Log.info("Generator="+chosenGenerator.getName());
 			previewPane.add(chosenGeneratorPanel);
 			previewPane.invalidate();
 			try {
-				chosenGenerator.regenerate();
+				regenerate(chosenGenerator);
 			} catch(Exception e){}
 		}
 		previewPane.getParent().validate();
@@ -762,15 +764,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		tempFile.deleteOnExit();
 
-		try (
-				final OutputStream fileOutputStream = new FileOutputStream(tempFile);
-				final Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)
-				) {
+		try {
+			OutputStream fileOutputStream = new FileOutputStream(tempFile);
+			Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
 			chosenGenerator.generate(out);
 			out.flush();
 			out.close();
 		} catch(IOException e) {
 			e.printStackTrace();
+			return;
 		}
 		
 		robot.setDecorator(null);

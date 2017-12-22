@@ -3,14 +3,13 @@ package com.marginallyclever.makelangeloRobot.generators;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_KochCurve_Panel extends JPanel implements DocumentListener {
+public class Generator_KochCurve_Panel extends ImageGeneratorPanel implements DocumentListener {
 	/**
 	 * 
 	 */
@@ -51,7 +50,7 @@ public class Generator_KochCurve_Panel extends JPanel implements DocumentListene
 		
 		if(newOrder != Generator_KochCurve.getOrder()) {
 			Generator_KochCurve.setOrder(newOrder);
-			generator.regenerate();
+			makelangeloRobotPanel.regenerate(generator);
 		}
 	}
 }

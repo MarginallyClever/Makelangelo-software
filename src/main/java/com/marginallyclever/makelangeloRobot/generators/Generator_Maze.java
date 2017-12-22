@@ -5,10 +5,7 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_Maze extends ImageGenerator {
 	protected class MazeCell {
@@ -27,8 +24,6 @@ public class Generator_Maze extends ImageGenerator {
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
 	
-	private MakelangeloRobotPanel robotPanel;
-
 	@Override
 	public String getName() {
 		return Translator.get("MazeName");
@@ -50,16 +45,10 @@ public class Generator_Maze extends ImageGenerator {
 	}
 	
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_Maze_Panel(this);
 	}
 
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
-	}
-	
 	/**
 	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
 	 * @param out

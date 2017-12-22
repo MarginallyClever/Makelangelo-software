@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Stack;
 
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * generates a fibonacci spiral
@@ -22,17 +19,13 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 
 	private Stack<Integer> fibonacciSequence;
 	
-	private MakelangeloRobotPanel robotPanel;
-
-
 	@Override
 	public String getName() {
 		return Translator.get("FibonacciSpiralName");
 	}
 
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_FibonacciSpiral_Panel(this);
 	}
 
@@ -65,11 +58,6 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		}
 	}
 
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
-	}
-	
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);

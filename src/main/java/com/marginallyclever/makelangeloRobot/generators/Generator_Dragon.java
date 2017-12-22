@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_Dragon extends ImageGenerator {
 	private Turtle turtle;
@@ -20,7 +17,6 @@ public class Generator_Dragon extends ImageGenerator {
 	private static int order = 12; // controls complexity of curve
 
 	private List<Integer> sequence;
-	MakelangeloRobotPanel robotPanel;
 
 
 	@Override
@@ -37,16 +33,10 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 	
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_Dragon_Panel(this);
 	}
-	
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
-	}
-	
+		
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);

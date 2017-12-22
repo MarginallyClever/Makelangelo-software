@@ -17,7 +17,7 @@ import javax.swing.event.DocumentListener;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_Text_Panel extends JPanel implements DocumentListener, ActionListener {
+public class Generator_Text_Panel extends ImageGeneratorPanel implements DocumentListener, ActionListener {
 	/**
 	 * 
 	 */
@@ -76,12 +76,12 @@ public class Generator_Text_Panel extends JPanel implements DocumentListener, Ac
 	public void validate() {
 		generator.setMessage(text.getText());
 		generator.setSize(((Number)size.getValue()).intValue());
-		generator.regenerate();
+		makelangeloRobotPanel.regenerate(generator);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		generator.setFont(fontChoices.getSelectedIndex());
-		generator.regenerate();
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

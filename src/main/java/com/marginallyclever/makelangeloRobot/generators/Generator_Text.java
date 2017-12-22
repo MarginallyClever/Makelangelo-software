@@ -17,10 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 
 public class Generator_Text extends ImageGenerator {
@@ -52,8 +50,6 @@ public class Generator_Text extends ImageGenerator {
 	private static Font [] fontList;
 	private static String [] fontNames;
 	
-	private MakelangeloRobotPanel robotPanel;
-
 	public Generator_Text() {		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -101,16 +97,10 @@ public class Generator_Text extends ImageGenerator {
 	}
 	
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_Text_Panel(this);
 	}
 	
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
-	}
-
 	protected void setupTransform() {
 		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
 		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();

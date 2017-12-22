@@ -3,14 +3,13 @@ package com.marginallyclever.makelangeloRobot.generators;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_FillPage_Panel extends JPanel implements DocumentListener {
+public class Generator_FillPage_Panel extends ImageGeneratorPanel implements DocumentListener {
 	/**
 	 * 
 	 */
@@ -50,7 +49,7 @@ public class Generator_FillPage_Panel extends JPanel implements DocumentListener
 		
 		if(newOrder != Generator_FillPage.getAngle()) {
 			Generator_FillPage.setAngle(newOrder);
-			generator.regenerate();
+			makelangeloRobotPanel.regenerate(generator);
 		}
 	}
 }

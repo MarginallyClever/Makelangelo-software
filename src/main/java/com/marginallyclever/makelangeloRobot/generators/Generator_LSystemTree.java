@@ -2,9 +2,7 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 public class Generator_LSystemTree extends ImageGenerator {
 	private float xMax = 7;
@@ -17,8 +15,6 @@ public class Generator_LSystemTree extends ImageGenerator {
 	private static int numBranches = 3;
 	private static float orderScale = 0.76f;
 	
-	private MakelangeloRobotPanel robotPanel;
-
 	float maxSize;
 
 	
@@ -31,16 +27,10 @@ public class Generator_LSystemTree extends ImageGenerator {
 	}
 	
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_LSystemTree_Panel(this);
 	}
 	
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
-	}
-
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);

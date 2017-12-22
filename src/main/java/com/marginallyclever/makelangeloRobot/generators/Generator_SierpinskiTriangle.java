@@ -2,9 +2,7 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
 import java.io.Writer;
-import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
@@ -17,9 +15,6 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	private float maxSize;
 	private static int order = 4; // controls complexity of curve
 	
-	private MakelangeloRobotPanel robotPanel;
-
-
 	@Override
 	public String getName() {
 		return Translator.get("SierpinskiTriangleName");
@@ -35,14 +30,8 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	}
 	
 	@Override
-	public JPanel getPanel(MakelangeloRobotPanel arg0) {
-		robotPanel = arg0;
+	public ImageGeneratorPanel getPanel() {
 		return new Generator_SierpinskiTriangle_Panel(this);
-	}
-	
-	@Override
-	public void regenerate() {
-		robotPanel.regenerate(this);
 	}
 	
 	@Override

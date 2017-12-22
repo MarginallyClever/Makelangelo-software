@@ -2,14 +2,13 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.awt.GridLayout;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_Maze_Panel extends JPanel implements DocumentListener {
+public class Generator_Maze_Panel extends ImageGeneratorPanel implements DocumentListener {
 	/**
 	 * 
 	 */
@@ -56,6 +55,6 @@ public class Generator_Maze_Panel extends JPanel implements DocumentListener {
 	public void validate() {
 		generator.setRows(((Number)field_rows.getValue()).intValue());
 		generator.setCols(((Number)field_columns.getValue()).intValue());
-		generator.regenerate();
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

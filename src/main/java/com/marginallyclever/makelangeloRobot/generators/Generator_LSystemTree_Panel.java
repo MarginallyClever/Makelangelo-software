@@ -2,7 +2,6 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.awt.GridLayout;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -10,7 +9,7 @@ import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Generator_LSystemTree_Panel extends JPanel implements DocumentListener {
+public class Generator_LSystemTree_Panel extends ImageGeneratorPanel implements DocumentListener {
 	/**
 	 * 
 	 */
@@ -68,6 +67,6 @@ public class Generator_LSystemTree_Panel extends JPanel implements DocumentListe
 		generator.setBranches(((Number)field_branches.getValue()).intValue());
 		generator.setScale(((Number)field_orderScale.getValue()).intValue());
 		generator.setAngle(((Number)field_angle.getValue()).intValue());
-		generator.regenerate();
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }
