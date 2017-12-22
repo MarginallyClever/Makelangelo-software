@@ -95,15 +95,16 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	
 	@Override
 	public boolean iterate() {
-		if(lowNoise==false) {
-			if(evolveCells()<25*numCells) {
+		if(lowNoise==true) {
+			optimizeTour();
+		} else {
+			float noiseLevel = evolveCells();
+			if( noiseLevel < 2*numCells ) {
 				lowNoise=true;
 				greedyTour();
 				renderMode = 1;
-				Log.info("green", "Running Lin/Kerighan optimization...");
-			}
-		} else {
-			optimizeTour();			
+				Log.info("Running Lin/Kerighan optimization...");
+			}			
 		}
 		return keepIterating;
 	}
@@ -113,7 +114,9 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		writeOutCells(out);
 	}
 
-	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
+	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
+		super.render(gl2, settings);
+		
 		lock.lock();
 
 		int i;

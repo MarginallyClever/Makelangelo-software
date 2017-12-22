@@ -12,8 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.batik.ext.awt.geom.Polygon2D;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -47,7 +45,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private double[] yValuesIn = null;
 	private float yBottom, yTop, xLeft, xRight;
 
-	Texture texture = null;
 	
 	@Override
 	public String getName() {
@@ -70,7 +67,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
 		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 
-		texture = null;
 		keepIterating=true;
 		restart();
 	}
@@ -101,35 +97,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
+	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
+		super.render(gl2, settings);
+		
 		if (graphEdges == null) return;
 
 		while(lock.isLocked());
 		lock.lock();
-
-		if(texture==null) {
-			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
-		}
-		if(texture!=null) {
-			double w = sourceImage.getSourceImage().getWidth() * sourceImage.getScaleX();
-			double h = sourceImage.getSourceImage().getHeight() * sourceImage.getScaleY();
-			gl2.glEnable(GL2.GL_TEXTURE_2D);
-			gl2.glEnable(GL2.GL_BLEND);
-			gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-			gl2.glDisable(GL2.GL_COLOR);
-			gl2.glColor4f(1, 1, 1,0.5f);
-			gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
-			texture.bind(gl2);
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glTexCoord2d(0, 0);	gl2.glVertex2d(-w/2, -h/2 );
-			gl2.glTexCoord2d(1, 0);	gl2.glVertex2d( w/2, -h/2 );
-			gl2.glTexCoord2d(1, 1);	gl2.glVertex2d( w/2, h/2);
-			gl2.glTexCoord2d(0, 1);	gl2.glVertex2d(-w/2, h/2);
-			gl2.glEnd();
-			gl2.glDisable(GL2.GL_TEXTURE_2D);
-			gl2.glDisable(GL2.GL_BLEND);
-			gl2.glEnable(GL2.GL_COLOR);
-		}	
 		
 		// draw cell edges
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);

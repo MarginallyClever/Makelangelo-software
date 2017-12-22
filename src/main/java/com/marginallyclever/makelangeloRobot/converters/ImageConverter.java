@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
@@ -23,9 +25,10 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  *
  */
 public abstract class ImageConverter extends ImageManipulator implements MakelangeloRobotDecorator {
-	TransformedImage sourceImage;
-	LoadAndSaveImage loadAndSave;
-	boolean keepIterating=false;
+	protected TransformedImage sourceImage;
+	protected LoadAndSaveImage loadAndSave;
+	protected boolean keepIterating=false;
+	protected Texture texture = null;
 
 
 	public void setLoadAndSave(LoadAndSaveImage arg0) {
@@ -38,6 +41,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 */
 	public void setImage(TransformedImage img) {
 		sourceImage=img;
+		texture = null;
 	}
 	
 	/**
@@ -77,7 +81,31 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2, MakelangeloRobotSettings settings) {}
+	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
+		if(texture==null) {
+			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
+		}
+		if(texture!=null) {
+			double w = sourceImage.getSourceImage().getWidth() * sourceImage.getScaleX();
+			double h = sourceImage.getSourceImage().getHeight() * sourceImage.getScaleY();
+			gl2.glEnable(GL2.GL_TEXTURE_2D);
+			gl2.glEnable(GL2.GL_BLEND);
+			gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+			gl2.glDisable(GL2.GL_COLOR);
+			gl2.glColor4f(1, 1, 1,0.5f);
+			gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
+			texture.bind(gl2);
+			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+			gl2.glTexCoord2d(0, 0);	gl2.glVertex2d(-w/2, -h/2 );
+			gl2.glTexCoord2d(1, 0);	gl2.glVertex2d( w/2, -h/2 );
+			gl2.glTexCoord2d(1, 1);	gl2.glVertex2d( w/2, h/2);
+			gl2.glTexCoord2d(0, 1);	gl2.glVertex2d(-w/2, h/2);
+			gl2.glEnd();
+			gl2.glDisable(GL2.GL_TEXTURE_2D);
+			gl2.glDisable(GL2.GL_BLEND);
+			gl2.glEnable(GL2.GL_COLOR);
+		}	
+	}
 	
 
 	
