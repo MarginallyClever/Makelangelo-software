@@ -5,9 +5,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_CMYK;
 
@@ -24,7 +23,7 @@ public class Converter_CMYK extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return new Converter_CMYK_Panel(this);
 	}
 	
@@ -49,16 +48,21 @@ public class Converter_CMYK extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		
+		Log.info("Yellow...");
 		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));
+		Log.info("Cyan...");
 		outputChannel(out,cmyk.getC(),15,new Color(  0,255,255));
+		Log.info("Magenta...");
 		outputChannel(out,cmyk.getM(),75,new Color(255,  0,255));
+		Log.info("Black...");
 		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
+		Log.info("Finishing...");
 
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 	
-	void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
+	protected void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));

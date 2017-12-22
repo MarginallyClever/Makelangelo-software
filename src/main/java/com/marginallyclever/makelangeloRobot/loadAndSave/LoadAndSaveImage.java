@@ -40,6 +40,7 @@ import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.converters.ImageConverter;
+import com.marginallyclever.makelangeloRobot.converters.ImageConverterPanel;
 import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
@@ -208,12 +209,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 		chosenConverter = getConverter(options.getSelectedIndex());
 		chosenConverter.setLoadAndSave(this);
-		JPanel p = chosenConverter.getPanel();
+		ImageConverterPanel imageConverterPanel = chosenConverter.getPanel();
 		converterOptionsContainer.removeAll();
-		if(p!=null) {
+		if(imageConverterPanel!=null) {
 			Log.info("Converter="+chosenConverter.getName());
 			//System.out.println("Adding panel");
-			converterOptionsContainer.add(p);
+			converterOptionsContainer.add(imageConverterPanel);
 			converterOptionsContainer.invalidate();
 		}
 		

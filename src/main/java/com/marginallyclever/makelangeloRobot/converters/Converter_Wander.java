@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
 
-import javax.swing.JPanel;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -39,7 +38,7 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return new Converter_Wander_Panel(this);
 	}
 	

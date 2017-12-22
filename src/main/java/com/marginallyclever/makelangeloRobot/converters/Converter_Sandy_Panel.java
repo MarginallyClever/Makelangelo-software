@@ -8,12 +8,10 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_Sandy_Panel extends JPanel implements PropertyChangeListener, ActionListener {
+public class Converter_Sandy_Panel extends ImageConverterPanel implements PropertyChangeListener, ActionListener {
 	/**
 	 * 
 	 */

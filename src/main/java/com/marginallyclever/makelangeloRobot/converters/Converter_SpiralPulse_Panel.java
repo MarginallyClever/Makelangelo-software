@@ -5,12 +5,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 
-public class Converter_SpiralPulse_Panel extends JPanel implements PropertyChangeListener {
+public class Converter_SpiralPulse_Panel extends ImageConverterPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */

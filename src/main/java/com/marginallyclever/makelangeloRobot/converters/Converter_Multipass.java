@@ -4,8 +4,6 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -21,7 +19,7 @@ public class Converter_Multipass extends ImageConverter {
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return new Converter_Multipass_Panel(this);
 	}
 	

@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JPanel;
-
 import org.apache.batik.ext.awt.geom.Polygon2D;
 
 import com.jogamp.opengl.GL2;
@@ -57,7 +55,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return new Converter_VoronoiStippling_Panel(this);
 	}
 

@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JPanel;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
@@ -63,7 +62,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return new Converter_VoronoiZigZag_Panel(this);
 	}
 	

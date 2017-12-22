@@ -3,8 +3,6 @@ package com.marginallyclever.makelangeloRobot.converters;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.swing.JPanel;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage;
@@ -71,7 +69,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	/**
 	 * @return the gui panel with options for this manipulator
 	 */
-	public JPanel getPanel() {
+	public ImageConverterPanel getPanel() {
 		return null;
 	}
 
