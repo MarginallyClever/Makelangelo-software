@@ -66,20 +66,22 @@ If you like this project, please support us by buying Marginally Clever products
     <maven>${minimum.maven.version}</maven>
   </prerequisites>
   <build>
+    <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+	<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
     <!--
     See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
     and http://stackoverflow.com/a/3697482
     -->
     <resources>
         <resource>
-          <directory>src/main/resources</directory>
+          <directory>${project.basedir}/src/main/resources</directory>
           <filtering>true</filtering>
           <includes>
             <include>**/*.properties</include>
           </includes>
         </resource>
         <resource>
-          <directory>src/main/resources</directory>
+          <directory>${project.basedir}/src/main/resources</directory>
           <filtering>false</filtering>
           <excludes>
             <exclude>**/*.properties</exclude>
@@ -112,7 +114,7 @@ If you like this project, please support us by buying Marginally Clever products
             </manifest>
           </archive>
           <descriptors>
-            <descriptor>src/main/assembly/application.xml</descriptor>
+            <descriptor>${project.basedir}/src/main/assembly/application.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
