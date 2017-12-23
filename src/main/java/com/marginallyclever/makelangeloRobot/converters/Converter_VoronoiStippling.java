@@ -36,7 +36,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private VoronoiCell[] cells = new VoronoiCell[1];
-	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 1000;
 	private static float maxDotSize = 5.0f;
@@ -98,12 +97,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	@Override
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
-		super.render(gl2, settings);
-		
 		if (graphEdges == null) return;
 
 		while(lock.isLocked());
 		lock.lock();
+		
+		super.render(gl2, settings);
 		
 		// draw cell edges
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
@@ -145,7 +144,15 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				gl2.glEnd();
 			}
 		}//*/
-
+		gl2.glBegin(GL2.GL_LINES);
+		for (VoronoiCell c : cells) {
+			gl2.glColor3f(0, 1, 0);
+			gl2.glVertex2d(c.centroid.getX(),c.centroid.getY());
+			gl2.glColor3f(1, 0, 0);
+			gl2.glVertex2d(c.oldCentroid.getX(),c.oldCentroid.getY());
+		}
+		gl2.glEnd();
+		
 		lock.unlock();
 	}
 
@@ -360,9 +367,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					if (c.region.contains(x,y)) {
 						hits++;
 						if(sourceImage.canSampleAt((float)x, (float)y)) {
-							sampleWeight = 255.001f - ( (float)sourceImage.sample1x1Unchecked( (float)x, (float)y ) );
-						} else sampleWeight = 0.001f; 
-					} else sampleWeight = 0.001f;
+							sampleWeight = 255.00f - ( (float)sourceImage.sample1x1Unchecked( (float)x, (float)y ) );
+						} else sampleWeight = 0.00f; 
+					} else sampleWeight = 0.00f;
 					totalCellWeight += sampleWeight;
 					wx += x * sampleWeight;
 					wy += y * sampleWeight;
@@ -384,9 +391,15 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 */
 			// use the new center
 			c.oldCentroid.setLocation(c.centroid);
-			//if(hits>1)
+			if(hits>=1)
 			{
 				c.centroid.setLocation(wx, wy);
+				double dx = wx - c.oldCentroid.getX();
+				double dy = wy - c.oldCentroid.getY();
+				if(dx*dx+dy*dy > 50*50) {
+					Log.info("wow!");
+				}
+				
 				c.weight = totalCellWeight/(double)hits;
 			}
 			i++;

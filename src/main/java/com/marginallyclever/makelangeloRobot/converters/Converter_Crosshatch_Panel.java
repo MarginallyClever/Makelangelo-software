@@ -32,6 +32,6 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel implements P
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
 		converter.setIntensity(((Number)intensityField.getValue()).floatValue());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

@@ -33,6 +33,6 @@ public class Converter_CMYK_Panel extends ImageConverterPanel implements Propert
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
 		converter.setPasses(((Number)passesField.getValue()).intValue());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

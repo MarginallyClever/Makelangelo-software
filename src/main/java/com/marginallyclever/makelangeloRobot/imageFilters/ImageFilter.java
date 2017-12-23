@@ -38,6 +38,7 @@ public class ImageFilter {
 	}
 
 	public static int encode32bit(int i) {
+		i &= 0xff;
 		return (0xff << 24) | (i << 16) | (i << 8) | i;
 	}
 	

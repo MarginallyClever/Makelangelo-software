@@ -30,6 +30,6 @@ public class Converter_Wander_Panel extends ImageConverterPanel implements Prope
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		converter.setLineCount(((Number)sizeField.getValue()).intValue());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

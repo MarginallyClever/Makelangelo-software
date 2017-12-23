@@ -39,6 +39,6 @@ public class Converter_Multipass_Panel extends ImageConverterPanel implements Pr
 	public void propertyChange(PropertyChangeEvent arg0) {
 		converter.setAngle(((Number)angleField.getValue()).floatValue());
 		converter.setPasses(((Number)passesField.getValue()).intValue());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

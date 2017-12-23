@@ -32,7 +32,6 @@ public class Converter_Spiral_Panel extends ImageConverterPanel implements Actio
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		converter.setToCorners(toCornersField.isSelected());
-		converter.reconvert();
-		
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

@@ -38,7 +38,7 @@ public class Converter_Pulse_Panel extends ImageConverterPanel implements Proper
 	private void validateInput() {
 		converter.setScale(((Number)sizeField.getValue()).floatValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 
 	@Override

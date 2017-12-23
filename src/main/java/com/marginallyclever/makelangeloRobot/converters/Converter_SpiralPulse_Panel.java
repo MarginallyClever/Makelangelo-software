@@ -42,7 +42,6 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel implements 
 		converter.setIntensity(((Number)intensityField.getValue()).floatValue());
 		converter.setSpacing(((Number)spacingField.getValue()).floatValue());
 		converter.setHeight(((Number)heightField.getValue()).floatValue());
-		converter.reconvert();
-		
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

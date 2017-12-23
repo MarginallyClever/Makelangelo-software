@@ -30,6 +30,6 @@ public class Converter_RandomLines_Panel extends ImageConverterPanel implements 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		converter.setLineCount(((Number)sizeField.getValue()).intValue());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

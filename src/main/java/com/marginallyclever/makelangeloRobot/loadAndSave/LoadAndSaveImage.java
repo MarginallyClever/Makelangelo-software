@@ -210,6 +210,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		chosenConverter = getConverter(options.getSelectedIndex());
 		chosenConverter.setLoadAndSave(this);
 		ImageConverterPanel imageConverterPanel = chosenConverter.getPanel();
+		imageConverterPanel.loadAndSaveImage = this;
 		converterOptionsContainer.removeAll();
 		if(imageConverterPanel!=null) {
 			Log.info("Converter="+chosenConverter.getName());

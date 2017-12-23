@@ -43,7 +43,7 @@ public class Converter_Sandy_Panel extends ImageConverterPanel implements Proper
 	private void validateInput() {
 		converter.setScale(((Number)sizeField.getValue()).intValue());
 		converter.setDirection(directionChoices.getSelectedIndex());
-		converter.reconvert();
+		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 		
 	}
 

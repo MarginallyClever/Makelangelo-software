@@ -45,13 +45,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	}
 	
 	/**
-	 * iterative and non-iterative solvers use this method to restart the conversion process.
-	 */
-	public void reconvert() {
-		loadAndSave.reconvert();
-	}
-	
-	/**
 	 * run one "step" of an iterative image conversion process.
 	 * @return true if conversion should iterate again.
 	 */
@@ -78,12 +71,14 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	}
 
 	/**
-	 * live preview as the system is converting pictures.
+	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
-		if(texture==null) {
-			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
+		if(texture==null ) {
+			if( sourceImage!=null) {
+				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
+			}
 		}
 		if(texture!=null) {
 			double w = sourceImage.getSourceImage().getWidth() * sourceImage.getScaleX();
@@ -108,7 +103,20 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	}
 	
 
-	
+	/**
+	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
+	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
+	 * This method is used by several converters.
+	 * 
+	 * @param x0 starting position on the paper
+	 * @param y0 starting position on the paper
+	 * @param x1 ending position on the paper
+	 * @param y1 ending position on the paper
+	 * @param stepSize mm level of detail for this line 
+	 * @param channelCutoff only put pen down when color below this amount.
+	 * @param out
+	 * @throws IOException
+	 */
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img,Writer out) throws IOException {
 		double b;
 		double dx=x1-x0;
@@ -125,7 +133,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		boolean penUp,oldPenUp;
 		double oldX=x0,oldY=y0;
 		if(wasInside) {
-			v = img.sample( x0 - halfStep, y0 - halfStep, x0 + halfStep, y0 + halfStep);
+			v = sourceImage.sample( x0 - halfStep, y0 - halfStep, x0 + halfStep, y0 + halfStep);
 			oldPenUp = (v>=channelCutoff);
 		} else {
 			oldPenUp = false;
@@ -139,7 +147,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			y = dy * n + y0;
 			isInside=isInsidePaperMargins(x, y);
 			if(isInside) {
-				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+				v = sourceImage.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
 			} else {
 				v = 255;
 			}
