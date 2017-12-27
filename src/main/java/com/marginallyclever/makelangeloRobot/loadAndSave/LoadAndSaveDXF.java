@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -133,7 +134,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
-		Log.info("Sorting layer "+layer.getName()+" into buckets...");
+		//Log.info("Sorting layer "+layer.getName()+" into buckets...");
 
 			Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 			while (entityTypeIter.hasNext()) {
@@ -251,7 +252,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();
 			previousY = machine.getHomeY();
-
+			
+			Set<Integer> allColors = new HashSet<Integer>();
+			
 			// convert each entity
 			Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
 			while (layerIter.hasNext()) {
@@ -262,6 +265,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 				if (entityTypeIter.hasNext()) {
+					allColors.add(new Integer(layer.getColor()));
 					layer.getColor();
 					machine.writeChangeTo(out,layer.getName());
 				}
@@ -307,17 +311,24 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
 				//}
-
 				Iterator<DXFGroup> groupIter = groups.iterator();
 				while(groupIter.hasNext()) {
 					DXFGroup g = groupIter.next();
-
+					
 					// but each separate line might be forwards or backwards.
 					// scan backward through the group to find the starting of the first line (previousX,previousY).
 					writeNow=false;
 					Iterator<DXFBucketEntity> ents = g.entities.descendingIterator();
 					while(ents.hasNext()) {
 						DXFBucketEntity e = ents.next();
+						byte [] colorNow = e.entity.getColorRGB();
+						int newColor=0;
+						if(colorNow != null && colorNow.length==3) {
+							newColor = 	((int)colorNow[0])<<16 +
+										((int)colorNow[1])<< 8 +
+										((int)colorNow[2]);
+						}
+						allColors.add(new Integer(newColor));
 						parseEntity(e.entity,out,toolDiameterSquared,toolMinimumStepSize);
 					}
 					
@@ -336,6 +347,15 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				}
 			}
 
+			System.out.println("Colors: ");
+			String add="";
+			Iterator<Integer> c = allColors.iterator();
+			while(c.hasNext()) {
+				System.out.print(add+c.next());
+				add=", ";
+			}
+			System.out.println();
+			
 			// entities finished. Close up file.
 			liftPen(out);
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);

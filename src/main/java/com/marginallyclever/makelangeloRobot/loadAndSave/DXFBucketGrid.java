@@ -74,11 +74,11 @@ public class DXFBucketGrid {
 		while(ib.hasNext()) {
 			DXFBucket b = ib.next();
 			if(b.contents.size()>0) {
-				System.out.println("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
+				//System.out.println("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
 				total+=b.contents.size();
 			}
 		}
-		System.out.println(total+" total entities in buckets (including duplicates).");
+		//System.out.println(total+" total entities in buckets (including duplicates).");
 	}
 	
 	/**
@@ -97,8 +97,8 @@ public class DXFBucketGrid {
 				group.addLast(bei.next());
 			}
 		}
-		System.out.println(groups.size()+ " groups after dump.");
-		System.out.println(group.entities.size()+ " entities after dump.");
+		//System.out.println(groups.size()+ " groups after dump.");
+		//System.out.println(group.entities.size()+ " entities after dump.");
 	}
 	
 	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups) {
@@ -164,7 +164,7 @@ public class DXFBucketGrid {
 			} while(!sourceBucket.contents.isEmpty());
 		}
 
-		System.out.println(groups.size()+ " groups after sort.");
+		//System.out.println(groups.size()+ " groups after sort.");
 	}
 	
 	/**
