@@ -158,17 +158,21 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		
 		// is port confirmed?
 		if (!portConfirmed) {
+			// TODO: enumerate all known machine types, make this list more future-proof. 
 			String machineTypeName="";
-			if(data.lastIndexOf(HELLO_POLARGRAPH) >= 0) {
-				portConfirmed = true;
-				machineTypeName = HELLO_POLARGRAPH;
-			} else if(data.lastIndexOf(HELLO_ZARPLOTTER) >= 0) {
-				portConfirmed = true;
-				machineTypeName = HELLO_ZARPLOTTER;
-			} else if(data.lastIndexOf(HELLO_TRADITIONALXY) >= 0) {
-				portConfirmed = true;
-				machineTypeName = HELLO_TRADITIONALXY;
+			String [] knownMachineTypes = {
+					HELLO_POLARGRAPH,
+					HELLO_ZARPLOTTER,
+					HELLO_TRADITIONALXY,
+			};
+			for(int t=0;t<knownMachineTypes.length;++t) {
+				if(data.lastIndexOf(knownMachineTypes[t]) >= 0) {
+					portConfirmed = true;
+					machineTypeName = knownMachineTypes[t];
+					break;
+				}				
 			}
+
 			if(portConfirmed) {
 				// which machine GUID is this?
 				String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
