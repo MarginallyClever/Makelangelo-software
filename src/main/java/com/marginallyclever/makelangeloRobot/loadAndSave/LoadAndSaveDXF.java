@@ -185,7 +185,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				}
 		}
 		
-		grid.countEntitiesInBuckets();
+		//grid.countEntitiesInBuckets();
 	}
 	
 	
