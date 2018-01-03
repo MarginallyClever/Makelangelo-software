@@ -1,7 +1,0 @@
-/bin/
-.project
-.settings
-.settings/
-#Gradle Artifacts
-.gradle/
-build/
