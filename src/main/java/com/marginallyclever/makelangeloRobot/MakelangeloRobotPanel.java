@@ -589,12 +589,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void updateButtonAccess() {
 		boolean isConfirmed=false;
 		boolean isRunning=false;
-		boolean hasSetHome=false;
+		boolean didSetHome=false;
 		
 		if(robot!=null) {
 			isConfirmed = robot.isPortConfirmed();
 			isRunning = robot.isRunning();
-			hasSetHome = robot.didSetHome();
+			didSetHome = robot.didSetHome();
 		}
 		
 		if (buttonGenerate != null)
@@ -602,8 +602,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		openConfig.setEnabled(!isRunning);
 
-		buttonStart.setEnabled(isConfirmed && hasSetHome && !isRunning);
-		buttonStartAt.setEnabled(isConfirmed && hasSetHome && !isRunning);
+		buttonStart.setEnabled(isConfirmed && didSetHome && !isRunning);
+		buttonStartAt.setEnabled(isConfirmed && didSetHome && !isRunning);
 		buttonPause.setEnabled(isConfirmed && isRunning);
 		buttonHalt.setEnabled(isConfirmed && isRunning);
 
@@ -631,10 +631,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		right10.setEnabled(isConfirmed && !isRunning);
 		right100.setEnabled(isConfirmed && !isRunning);
 
-		goPaperBorder.setEnabled(isConfirmed && !isRunning && hasSetHome);
-		setHome.setEnabled( isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome() );
-		findHome.setEnabled(isConfirmed && !isRunning && robot.getSettings().getHardwareProperties().canAutoHome());
-		goHome.setEnabled(isConfirmed && !isRunning && hasSetHome);
+		goPaperBorder.setEnabled(isConfirmed && !isRunning && didSetHome);
+		setHome .setEnabled( isConfirmed && !isRunning && !robot.getSettings().getHardwareProperties().canAutoHome() );
+		findHome.setEnabled( isConfirmed && !isRunning &&  robot.getSettings().getHardwareProperties().canAutoHome() );
+		goHome.setEnabled(isConfirmed && !isRunning && didSetHome);
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
