@@ -24,6 +24,11 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	public boolean canAccelerate() {
 		return true;
 	}
+	
+	@Override
+	public boolean canAutoHome() {
+		return false;
+	}
 
 	@Override
 	public void render(GL2 gl2,MakelangeloRobot robot) {
