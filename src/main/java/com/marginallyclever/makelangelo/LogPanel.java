@@ -40,6 +40,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
+	private JButton clearLog;
 	
 	public LogPanel(Translator translator,MakelangeloRobot robot) {
 		this.translator = translator;
@@ -161,6 +162,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		commandLineText = new JTextField(0);
 		//commandLineText.setPreferredSize(new Dimension(10, 10));
 		commandLineSend = new JButton(Translator.get("Send"));
+		clearLog = new JButton(Translator.get("Clear"));
 		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
 		c.gridwidth=4;
 		c.weightx=1;
@@ -171,9 +173,14 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		c.gridx=4;
 		c.weightx=0;
 		textInputArea.add(commandLineSend,c);
-
+		c.gridwidth=1;
+		c.gridx=5;
+		c.weightx=0;
+		textInputArea.add(clearLog,c);
+		
 		commandLineText.addKeyListener(this);
 		commandLineSend.addActionListener(this);
+		clearLog.addActionListener(this);
 
 		//textInputArea.setMinimumSize(new Dimension(100,50));
 		//textInputArea.setMaximumSize(new Dimension(10000,50));
@@ -248,7 +255,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		
 		super.paintComponent(g2);
 	}
-
+*/
 	public void clearLog() {
 		try {
 			doc.replace(0, doc.getLength(), "", null);
@@ -257,14 +264,17 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		} catch (BadLocationException | IOException e) {
 
 		}
-	}*/
+	}
 	
 	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
-		if (subject == commandLineSend) {
+		if(subject == commandLineSend) {
 			sendCommand();
+		}
+		if(subject == clearLog) {
+			clearLog();
 		}
 	}
 
