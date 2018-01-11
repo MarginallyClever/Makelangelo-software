@@ -126,8 +126,6 @@ public final class Makelangelo
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
-		Translator.start();
-
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
@@ -138,6 +136,8 @@ public final class Makelangelo
 	}
 	
 	public void run() {
+		Translator.start();
+		
 		createAndShowGUI();
 
 		checkSharingPermission();
