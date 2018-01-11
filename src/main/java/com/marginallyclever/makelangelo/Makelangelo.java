@@ -114,7 +114,8 @@ public final class Makelangelo
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new Makelangelo();
+				Makelangelo makelangeloProgram = new Makelangelo();
+				makelangeloProgram.run();
 			}
 		});
 	}
@@ -134,7 +135,9 @@ public final class Makelangelo
 
 		myTransferHandler = new MakelangeloTransferHandler(robot);
 		connectionManager = new ConnectionManager();
-
+	}
+	
+	public void run() {
 		createAndShowGUI();
 
 		checkSharingPermission();
