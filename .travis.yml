@@ -1,3 +1,2 @@
 language: java
-script:
-  java/mvn test -B
+sudo: false # faster builds
