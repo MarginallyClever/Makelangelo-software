@@ -188,6 +188,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	
 	protected void closeConnection() {
+		robot.halt();
 		robot.closeConnection();
 		buttonConnect.setText(Translator.get("ButtonConnect"));
 		buttonConnect.setForeground(Color.GREEN);
