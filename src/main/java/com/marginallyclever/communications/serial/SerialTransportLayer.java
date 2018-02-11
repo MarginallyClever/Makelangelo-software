@@ -1,5 +1,7 @@
 package com.marginallyclever.communications.serial;
 
+import org.junit.Test;
+
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
@@ -63,5 +65,21 @@ public class SerialTransportLayer implements TransportLayer {
 	 */
 	public TransportLayerPanel getTransportLayerPanel() {
 		return new SerialTransportLayerPanel(this);
+	}
+	
+	@Test
+	public void scanConnections() {
+		String [] connectionNames = listConnections();
+		if(connectionNames.length<=0) {
+			System.out.println("No serial connections found.");
+			return;
+		}
+		
+		NetworkConnection [] connections = new NetworkConnection[connectionNames.length];
+		
+		for(int i=0;i<connectionNames.length;++i) {
+			connections[i] = openConnection(connectionNames[i]);
+			
+		}
 	}
 }
