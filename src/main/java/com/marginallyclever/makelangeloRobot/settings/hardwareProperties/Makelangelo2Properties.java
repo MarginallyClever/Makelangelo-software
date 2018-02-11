@@ -40,12 +40,17 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		return false;
 	}
 
+	@Override
+	public boolean canChangeHome() {
+		return false;
+	}
+
 	public float getWidth() {
-		return 3 * 12 * 25.4f;
+		return 3 * 12 * 25.4f;  // 3'
 	}
 
 	public float getHeight() {
-		return 4 * 12 * 25.4f;
+		return 4 * 12 * 25.4f;  // 4'
 	}
 
 	@Override
