@@ -458,11 +458,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		}
 */
 		// checksums for commands with a line number
-		if (line.length() > 3) {
+		//if (line.length() > 3) {
 			line = "N" + lineNumber + " " + line;
 			String checksum = generateChecksum(line); 
 			line += checksum; 
-		}
+		//}
 		
 		// send relevant part of line to the robot
 		sendLineToRobot(line);

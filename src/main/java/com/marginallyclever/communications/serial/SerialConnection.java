@@ -14,7 +14,7 @@ import com.marginallyclever.makelangelo.Log;
 
 
 /**
- * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation
+ * Created on 4/12/15.  Encapsulate all serial receive/transmit implementation and adds checksum calculations
  *
  * @author Peter Colapietro
  * @since v7
@@ -27,7 +27,6 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 	private String connectionName = "";
 	private boolean portOpened = false;
 	private boolean waitingForCue = false;
-
 
 	static final String CUE = "> ";
 	static final String NOCHECKSUM = "NOCHECKSUM ";

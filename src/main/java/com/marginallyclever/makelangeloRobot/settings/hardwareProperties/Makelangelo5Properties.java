@@ -46,6 +46,11 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	}
 
 	@Override
+	public boolean canChangeHome() {
+		return false;
+	}
+
+	@Override
 	public void render(GL2 gl2,MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 

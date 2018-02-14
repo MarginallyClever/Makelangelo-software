@@ -6,8 +6,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
 public class MakelangeloRobotTest {
-	@Test
-	public void test() {}
 	/*
 	@Test
 	public void testChangeToolMessage() {
@@ -35,5 +33,6 @@ public class MakelangeloRobotTest {
 		assert(h/2 == b.getPaperHeight());
 		a.setPaperSize(w,h);
 		a.saveConfig();
+		// TODO: this is a potentially destructive change if the test fails.
 	}
 }

@@ -4,7 +4,7 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>7.15.2</version>
+  <version>7.15.4</version>
   <name>Makelangelo</name>
   <description>A mural drawing robot.
 
@@ -367,10 +367,7 @@ If you like this project, please support us by buying Marginally Clever products
     <maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>my-local-repo</id>
-      <url>file://${basedir}/local-maven-repo</url>
+  <repositories><repository><id>my-local-repo</id><url>file://${project.basedir}/java/local-maven-repo</url>
     </repository>
   </repositories>
 </project>

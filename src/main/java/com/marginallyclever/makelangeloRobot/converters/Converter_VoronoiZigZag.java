@@ -114,6 +114,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		writeOutCells(out);
 	}
 
+	@Override
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
 		super.render(gl2, settings);
 		
@@ -263,8 +264,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					finish += solutionContains;
 				int half = (finish - begin) / 2;
 				int temp;
-				while (lock.isLocked())
-					;
+				while (lock.isLocked());
 
 				lock.lock();
 				// Makelangelo.getSingleton().Log("<font color='red'>flipping

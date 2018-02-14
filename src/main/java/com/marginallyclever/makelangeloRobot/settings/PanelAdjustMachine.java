@@ -35,7 +35,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected SelectFloat acceleration;
 	protected JCheckBox flipForGlass;
 
-
 	protected JButton buttonAneg;
 	protected JButton buttonApos;
 	protected JButton buttonBneg;
@@ -101,34 +100,16 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			machineHeight.addPropertyChangeListener(this);
 	
 			// stepper needed
-			c.gridx = 0;
-			c.gridwidth=1;
-			c.gridy = y;
-			p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
-			d.gridx = 1;
-			d.gridwidth=2;
-			d.gridy = y;
-			p.add(totalStepperNeeded = new JLabel("?"),d);
+			c.gridx = 0;			c.gridwidth=1;			c.gridy = y;			p.add(new JLabel(Translator.get("StepperLengthNeeded")),c);
+			d.gridx = 1;			d.gridwidth=2;			d.gridy = y;			p.add(totalStepperNeeded = new JLabel("?"),d);
 			y++;
 			// belt needed
-			c.gridx = 0;
-			c.gridwidth=1;
-			c.gridy = y;
-			p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
-			d.gridx = 1;
-			d.gridwidth=2;
-			d.gridy = y;
-			p.add(totalBeltNeeded = new JLabel("?"),d);
+			c.gridx = 0;			c.gridwidth=1;			c.gridy = y;			p.add(new JLabel(Translator.get("BeltLengthNeeded")),c);
+			d.gridx = 1;			d.gridwidth=2;			d.gridy = y;			p.add(totalBeltNeeded = new JLabel("?"),d);
 			y++;
 			// servo needed
-			c.gridx = 0;
-			c.gridwidth=1;
-			c.gridy = y;
-			p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
-			d.gridx = 1;
-			d.gridwidth=2;
-			d.gridy = y;
-			p.add(totalServoNeeded = new JLabel("?"),d);
+			c.gridx = 0;			c.gridwidth=1;			c.gridy = y;			p.add(new JLabel(Translator.get("ServoLengthNeeded")),c);
+			d.gridx = 1;			d.gridwidth=2;			d.gridy = y;			p.add(totalServoNeeded = new JLabel("?"),d);
 			y++;
 
 			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
@@ -138,7 +119,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			this.add(new JSeparator(SwingConstants.HORIZONTAL));
 		}
 		
-		// acceleration
+		// Acceleration
 		{
 			p = new JPanel(new GridBagLayout());
 			this.add(p);
@@ -237,7 +218,7 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	}
 	
 	/**
-	 * Calculate length of belt and servo needed based on machine dimensions.
+	 * Calculate length of belt and cables needed based on machine dimensions.
 	 */
 	protected void updateLengthNeeded() {
 		double w = ((Number)machineWidth.getValue()).floatValue();

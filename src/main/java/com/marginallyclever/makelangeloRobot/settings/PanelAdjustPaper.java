@@ -251,8 +251,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 					sw = sh;
 					sh = temp;
 				}
-				pw.setText(sw);
-				ph.setText(sh);
+				pw.setValue(Float.parseFloat(sw));
+				ph.setValue(Float.parseFloat(sh));
 			}
 		}
 		if( subject == isLandscape ) {

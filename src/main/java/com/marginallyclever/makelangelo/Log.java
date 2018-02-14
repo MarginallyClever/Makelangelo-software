@@ -121,7 +121,12 @@ public class Log {
 	
 	public static void start() {
 		LOG_FILE_PATH = System.getProperty("java.io.tmpdir");
+		if(!LOG_FILE_PATH.endsWith(File.separator)) {
+			LOG_FILE_PATH+=File.separator;
+		}
+			
 		System.out.println("java.io.tmpdir="+LOG_FILE_PATH);
+
 		
 		crashReportCheck();
 		deleteOldLog();

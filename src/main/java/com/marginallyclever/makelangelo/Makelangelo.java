@@ -114,7 +114,8 @@ public final class Makelangelo
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new Makelangelo();
+				Makelangelo makelangeloProgram = new Makelangelo();
+				makelangeloProgram.run();
 			}
 		});
 	}
@@ -125,8 +126,6 @@ public final class Makelangelo
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
-		Translator.start();
-
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
@@ -134,7 +133,11 @@ public final class Makelangelo
 
 		myTransferHandler = new MakelangeloTransferHandler(robot);
 		connectionManager = new ConnectionManager();
-
+	}
+	
+	public void run() {
+		Translator.start();
+		
 		createAndShowGUI();
 
 		checkSharingPermission();
