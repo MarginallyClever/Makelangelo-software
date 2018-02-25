@@ -872,6 +872,10 @@ to check yourself.</value>
 		<value>Boxxy</value>
 		<hint>Boxxy generator</hint>
 	</string>
+	<string>		<key>BoxGeneratorMaxSize</key>		<value>Max size</value>		<hint>Boxxy generator</hint>	</string>
+	<string>		<key>BoxGeneratorCutoff</key>		<value>Cutoff</value>		<hint>Boxxy generator</hint>	</string>
+	<string>		<key>BoxGeneratorMaxSizeNote</key>		<value>Max size greater than or equal to 1.  Cutoff 0...1</value>		<hint>Boxxy generator</hint>	</string>
+	
 	<string>
 		<key>CrosshatchName</key>
 		<value>Crosshatch</value>

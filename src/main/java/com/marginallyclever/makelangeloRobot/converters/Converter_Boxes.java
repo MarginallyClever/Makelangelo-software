@@ -10,12 +10,35 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
 
 public class Converter_Boxes extends ImageConverter {
+	public static int boxMaxSize=4; // 0.8*5
+	public static float cutoff=0.5f;
+	
 	@Override
 	public String getName() {
 		return Translator.get("BoxGeneratorName");
 	}
 
 
+	@Override
+	public ImageConverterPanel getPanel() {
+		return new Converter_Boxes_Panel(this);
+	}
+
+	public void setBoxMaxSize(int arg0) {
+		boxMaxSize=arg0;
+	}
+	
+	public int getBoxMasSize() {
+		return boxMaxSize;
+	}
+	
+	public void setCutoff(float arg0) {
+		cutoff = arg0; 
+	}
+	public float getCutoff() {
+		return cutoff;
+	}
+	
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
@@ -36,7 +59,7 @@ public class Converter_Boxes extends ImageConverter {
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = machine.getPenDiameter();
+		double d = machine.getPenDiameter()*boxMaxSize;
 		double fullStep = d;
 		double halfStep = fullStep / 2.0f;
 		
@@ -55,8 +78,8 @@ public class Converter_Boxes extends ImageConverter {
 					z = img.sample( x, y - halfStep, x + fullStep, y + halfStep );
 					// scale the intensity value
 					double scaleZ =  (255.0f - z) / 255.0f;
-					double pulseSize = (halfStep - 0.5f) * scaleZ;
-					if (pulseSize > 0.5f) {
+					double pulseSize = (halfStep) * scaleZ *0.9;
+					if (scaleZ > cutoff) {
 						double xmin = x + halfStep - pulseSize;
 						double xmax = x + halfStep + pulseSize;
 						double ymin = y + halfStep - pulseSize;
@@ -107,10 +130,10 @@ public class Converter_Boxes extends ImageConverter {
 					}
 				}
 			}
-
-			liftPen(out);
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		}
+
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	}
 }
 
