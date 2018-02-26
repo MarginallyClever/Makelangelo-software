@@ -27,7 +27,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
 	public static final int LOG_LENGTH = 5000;
 	
-	Translator translator;
 	MakelangeloRobot robot;
 	
 	// logging
@@ -42,8 +41,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	private JButton commandLineSend;
 	private JButton clearLog;
 	
-	public LogPanel(Translator translator,MakelangeloRobot robot) {
-		this.translator = translator;
+	public LogPanel(MakelangeloRobot robot) {
 		this.robot = robot;
 
 		// log panel
