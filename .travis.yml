@@ -7,5 +7,3 @@ before_script:
   - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render
   #- "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
-script: 
-  - mvn test -B
