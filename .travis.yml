@@ -3,7 +3,7 @@ sudo: false # faster builds
 before_script:
   # start xvfb to run a virtual frame buffer (pretend to have a monitor)
   - "export DISPLAY=:99.0"
-  - sudo apt-get install -qq --force-yes mesa-utils libgl1-mesa-swx11 libgl1-mesa-swx11-dev xvfb  
+  - sudo apt-get install -qq --force-yes mesa-utils libgl1-mesa-glx libgl1-mesa-glx-dev xvfb  
   - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render
   #- "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
