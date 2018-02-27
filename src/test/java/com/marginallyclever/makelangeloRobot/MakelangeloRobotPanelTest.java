@@ -16,6 +16,8 @@ public class MakelangeloRobotPanelTest {
 	public void testNoMissingGeneratorPanels() {
 		System.out.println("testNoMissingGeneratorPanels() begin.");
 		try {
+			System.out.println("Translator.start()...");
+			System.out.flush();
 			Translator.start();
 			System.out.println("loading service...");
 			System.out.flush();
