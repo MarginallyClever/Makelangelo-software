@@ -22,6 +22,7 @@ public class MakelangeloRobotPanelTest {
 			while(ici.hasNext()) {
 				ImageGenerator c = ici.next();
 				System.out.println("Creating panel for "+c.getName());
+				System.out.flush();
 				c.getPanel();
 			}
 		} catch(Exception e) {
