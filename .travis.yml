@@ -6,8 +6,8 @@ addons:
       - xvfb
 
 install:
-  - export DISPLAY=':99.0'
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  #- export DISPLAY=':99.0'
+  #- Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 before_script:
   # start xvfb to run a virtual frame buffer (pretend to have a monitor)
@@ -16,3 +16,5 @@ before_script:
   #- /sbin/start-stop-daemon --start --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render # --quiet
   #- sh -e /etc/init.d/xvfb start
   #- sleep 3 # give xvfb some time to start
+script:
+  xvfb-run -a -- mvn test -B
