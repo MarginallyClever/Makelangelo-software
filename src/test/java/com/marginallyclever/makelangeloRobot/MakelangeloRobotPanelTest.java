@@ -18,9 +18,11 @@ public class MakelangeloRobotPanelTest {
 		try {
 			Translator.start();
 			System.out.println("loading service...");
+			System.out.flush();
 			ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-			Iterator<ImageGenerator> ici = imageGenerators.iterator();
 			System.out.println("iterating...");
+			System.out.flush();
+			Iterator<ImageGenerator> ici = imageGenerators.iterator();
 			while(ici.hasNext()) {
 				ImageGenerator c = ici.next();
 				System.out.println("Creating panel for "+c.getName());
