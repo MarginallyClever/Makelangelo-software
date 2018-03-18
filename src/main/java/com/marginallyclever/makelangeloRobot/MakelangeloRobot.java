@@ -44,6 +44,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private static final String HELLO_POLARGRAPH = "HELLO WORLD! I AM POLARGRAPH #";
 	private static final String HELLO_ZARPLOTTER = "HELLO WORLD! I AM ZARPLOTTER #";
 	private static final String HELLO_TRADITIONALXY = "HELLO WORLD! I AM TRADITIONALXY #";
+	private static final String HELLO_COREXY = "HELLO WORLD! I AM COREXY #";
 	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
@@ -164,6 +165,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 					HELLO_POLARGRAPH,
 					HELLO_ZARPLOTTER,
 					HELLO_TRADITIONALXY,
+					HELLO_COREXY,
 			};
 			for(int t=0;t<knownMachineTypes.length;++t) {
 				if(data.lastIndexOf(knownMachineTypes[t]) >= 0) {
