@@ -883,7 +883,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>HilbertCurveName</key>
-		<value>Hilbert Curve</value>
+		<value>Hilbert Curve Fractal</value>
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
