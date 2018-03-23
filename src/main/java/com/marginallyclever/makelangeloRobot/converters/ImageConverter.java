@@ -108,13 +108,14 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
 	 * This method is used by several converters.
 	 * 
-	 * @param x0 starting position on the paper
-	 * @param y0 starting position on the paper
-	 * @param x1 ending position on the paper
-	 * @param y1 ending position on the paper
-	 * @param stepSize mm level of detail for this line 
+	 * @param x0 starting position on the paper.
+	 * @param y0 starting position on the paper.
+	 * @param x1 ending position on the paper.
+	 * @param y1 ending position on the paper.
+	 * @param stepSize mm level of detail for this line.
 	 * @param channelCutoff only put pen down when color below this amount.
-	 * @param out
+	 * @param img the image to sample while converting along the line.
+	 * @param out the destination for the gcode generated in the conversion process.
 	 * @throws IOException
 	 */
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img,Writer out) throws IOException {
