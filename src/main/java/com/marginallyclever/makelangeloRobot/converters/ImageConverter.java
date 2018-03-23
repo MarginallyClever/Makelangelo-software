@@ -133,7 +133,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		boolean penUp,oldPenUp;
 		double oldX=x0,oldY=y0;
 		if(wasInside) {
-			v = sourceImage.sample( x0 - halfStep, y0 - halfStep, x0 + halfStep, y0 + halfStep);
+			v = img.sample( x0 - halfStep, y0 - halfStep, x0 + halfStep, y0 + halfStep);
 			oldPenUp = (v>=channelCutoff);
 		} else {
 			oldPenUp = false;
@@ -147,7 +147,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			y = dy * n + y0;
 			isInside=isInsidePaperMargins(x, y);
 			if(isInside) {
-				v = sourceImage.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
 			} else {
 				v = 255;
 			}
