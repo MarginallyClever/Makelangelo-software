@@ -76,8 +76,6 @@ public final class Makelangelo
 	private ConnectionManager connectionManager;
 	private MakelangeloRobot robot;
 
-	private Translator translator;
-
 	// GUI elements
 	private JFrame mainFrame = null;
 	private JPanel contentPane;
@@ -327,7 +325,7 @@ public final class Makelangelo
 
 		robotPanel = robot.createControlPanel(this);
 
-		logPanel = new LogPanel(translator, robot);
+		logPanel = new LogPanel(robot);
 
 		// major layout
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
