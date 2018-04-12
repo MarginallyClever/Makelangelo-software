@@ -726,12 +726,16 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			
 			String matchUp = robot.getSettings().getPenUpString();
 			String matchDown = robot.getSettings().getPenDownString();
+			
 			if(matchUp.contains(";")) {
 				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
 			}
+			matchUp = matchUp.replaceAll("\n", "");
+
 			if(matchDown.contains(";")) {
 				matchDown = matchDown.substring(0, matchDown.indexOf(";"));
 			}
+			matchDown = matchDown.replaceAll("\n", "");
 			
 			int total=sourceMaterial.getLinesTotal();
 			Log.info(total+" total lines to save.");
