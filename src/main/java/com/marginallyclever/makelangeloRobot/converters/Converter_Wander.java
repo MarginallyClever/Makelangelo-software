@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,11 +11,13 @@ import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.makelangeloRobot.imageFilters.Filter_CMYK;
 
 
 // create random lines across the image.  Raise and lower the pen to darken the appropriate areas
 public class Converter_Wander extends ImageConverter {
 	static protected int numLines = 9000;
+	static protected boolean isCMYK = false;
 	
 	class Bucket {
 		public Point2D a,b;
@@ -43,13 +46,20 @@ public class Converter_Wander extends ImageConverter {
 	}
 	
 	public void finish(Writer out) throws IOException {
-		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
-
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
+
+		if(isCMYK) {
+			finishCMYK(out);
+		} else {
+			finishBlackAndWhite(out);
+		}
+
 		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	}
+
+	protected int outputChannel(Writer out,TransformedImage img,Color newColor,int numberOfLines,double cutoff) throws IOException {
 		machine.writeChangeToDefaultColor(out);
 
 		float stepSize = machine.getPenDiameter()*5;
@@ -57,8 +67,7 @@ public class Converter_Wander extends ImageConverter {
 		float halfStep = stepSize/2;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
-		// Lift the pen any time the color value is > level (128 or more).
-		double level = 255.0 / 4.0;
+		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
 		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
@@ -71,7 +80,7 @@ public class Converter_Wander extends ImageConverter {
 		double width = xRight - xLeft-1;
 		Point2D a = null;
 		
-		Log.info("Creating buckets in a Z pattern...");
+		//Log.info("Creating buckets in a Z pattern...");
 		buckets = new LinkedList<Bucket>();
 		int actualPoints=0;
 		double wMod = width/5.0;
@@ -93,9 +102,8 @@ public class Converter_Wander extends ImageConverter {
 			}
 		}
 
-		Log.info("Finding points...");
-		for(int i=0;i<numLines;++i) {
-			level = 55 + 50.0 * (double)i / (double)numLines;  // set the cutoff value
+		//Log.info("Finding points...");
+		for(int i=0;i<numberOfLines;++i) {
 			int v, tries=0;
 			double endPX,endPY; 
 			do {
@@ -105,7 +113,7 @@ public class Converter_Wander extends ImageConverter {
 						endPX - halfStep, endPY - halfStep, 
 						endPX + halfStep, endPY + halfStep);
 				++tries;
-			} while(v>level && tries<1000);
+			} while(v>cutoff && tries<1000);
 			if(tries==1000) break;  // ran out of points to try?
 
 			int j;
@@ -123,7 +131,7 @@ public class Converter_Wander extends ImageConverter {
 		// sort the points by nearest neighbor first.
 		Log.info("Sorting "+actualPoints+" points...");
 		for(int j=0;j<buckets.size();++j) {
-			Log.info(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
+			//Log.info(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
 			a = new Point2D.Double(0,0);
@@ -150,6 +158,7 @@ public class Converter_Wander extends ImageConverter {
 		// draw the sorted list of points.
 		Log.info("Drawing points...");
 		liftPen(out);
+		machine.writeChangeTo(out, newColor);
 		boolean isFirst=true;
 
 		for(int j=0;j<buckets.size();++j) {
@@ -160,18 +169,49 @@ public class Converter_Wander extends ImageConverter {
 				isFirst=false;
 			}
 		}
-
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		
+		return actualPoints;
+	}
+	
+	protected void finishCMYK(Writer out) throws IOException {
+		Filter_CMYK cmyk = new Filter_CMYK();
+		cmyk.filter(sourceImage);
+		
+		Log.info("Yellow...");
+		outputChannel(out,cmyk.getY(),new Color(255,255,  0),numLines/4,255.0*3.0/4.0);
+		Log.info("Cyan...");
+		outputChannel(out,cmyk.getC(),new Color(  0,255,255),numLines/4,128.0);
+		Log.info("Magenta...");
+		outputChannel(out,cmyk.getM(),new Color(255,  0,255),numLines/4,128.0);
+		Log.info("Black...");
+		outputChannel(out,cmyk.getK(),new Color(  0,  0,  0),numLines/4,128.0);
+		Log.info("Finishing...");
+	}
+	
+	protected void finishBlackAndWhite(Writer out) throws IOException {
+		// The picture might be in color.  Smash it to 255 shades of grey.
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		TransformedImage img = bw.filter(sourceImage);
+		
+		outputChannel(out,img,new Color(0,0,0),numLines,255.0/4.0);
 	}
 	
 
 	public int getLineCount() {
 		return numLines;
 	}
+
 	public void setLineCount(int value) {
 		if(value<1) value=1;
 		numLines = value;
+	}
+	
+	public boolean isCMYK() {
+		return isCMYK;
+	}
+	
+	public void setCMYK(boolean arg0) {
+		isCMYK = arg0;
 	}
 }
 
