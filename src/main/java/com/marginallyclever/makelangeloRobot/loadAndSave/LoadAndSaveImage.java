@@ -293,9 +293,9 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 		float f;
 		if( s.getPaperWidth() > s.getPaperHeight() ) {
-			f = (float)( width / (float)img.getSourceImage().getWidth() );
+			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
-			f = (float)( height / (float)img.getSourceImage().getHeight() );
+			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
 		img.setScaleX(f);
 		img.setScaleY(-f * flip);
@@ -311,9 +311,9 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		float f;
 		if( s.getPaperWidth() < s.getPaperHeight() ) {
-			f = (float)( width / img.getSourceImage().getWidth() );
+			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
-			f = (float)( height / img.getSourceImage().getHeight() );
+			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
 		img.setScaleX(f);
 		img.setScaleY(-f * flip);
