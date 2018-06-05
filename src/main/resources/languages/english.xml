@@ -7,6 +7,24 @@
 	</meta>
 
 	<string>
+		<key>StartAtLastPenDown</key>
+		<value>Back up to last pen down</value>
+		<hint>Start At option</hint>
+	</string>
+	<string>
+		<key>StartAtAddPenDown</key>
+		<value>Add pen down command here</value>
+		<hint>Start At option</hint>
+	</string>
+	<string>
+		<key>StartAtExactly</key>
+		<value>Do nothing special</value>
+		<hint>Start At option</hint>
+	</string>
+
+
+
+	<string>
 		<key>ConfirmQuitQuestion</key>
 		<value>Are you sure you want to quit?</value>
 		<hint>confirm quit dialog question</hint>

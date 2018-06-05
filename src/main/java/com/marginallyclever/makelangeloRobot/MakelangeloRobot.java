@@ -505,8 +505,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void startAt(int lineNumber) {
 		if(gCode==null) return;
 		
-		int lineBefore = gCode.findLastPenUpBefore(lineNumber,getSettings().getPenUpString());
-		gCode.setLinesProcessed(lineBefore);
+		gCode.setLinesProcessed(lineNumber);
 		setLineNumber(gCode.getLinesProcessed());
 		setRunning();
 		sendFileCommand();

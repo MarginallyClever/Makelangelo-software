@@ -281,27 +281,24 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		return true;
 	}
 
-	
+	/**
+	 * adjust image to fill the paper
+	 */
 	public void scaleToFillPaper() {
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 
 		float flip = s.isReverseForGlass() ? -1 : 1;
 		double width  = s.getPaperWidth ()*s.getPaperMargin();
 		double height = s.getPaperHeight()*s.getPaperMargin();
-		
+
+		float f;
 		if( s.getPaperWidth() > s.getPaperHeight() ) {
-			if(width < img.getSourceImage().getWidth()) {
-				float f = (float)( width / (float)img.getSourceImage().getWidth() );
-				img.setScaleX(f);
-				img.setScaleY(-f * flip);
-			}
+			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
-			if(height < img.getSourceImage().getHeight()) {
-				float f = (float)( height / (float)img.getSourceImage().getHeight() );
-				img.setScaleX(f);
-				img.setScaleY(-f * flip);
-			}
+			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
+		img.setScaleX(f);
+		img.setScaleY(-f * flip);
 	}
 
 	
@@ -312,19 +309,14 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		double width  = s.getPaperWidth ()*s.getPaperMargin();
 		double height = s.getPaperHeight()*s.getPaperMargin();
 		
+		float f;
 		if( s.getPaperWidth() < s.getPaperHeight() ) {
-			if(width < img.getSourceImage().getWidth()) {
-				float f = (float)( width / img.getSourceImage().getWidth() );
-				img.setScaleX(f);
-				img.setScaleY(-f * flip);
-			}
+			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
-			if(height < img.getSourceImage().getHeight()) {
-				float f = (float)( height / img.getSourceImage().getHeight() );
-				img.setScaleX(f);
-				img.setScaleY(-f * flip);
-			}
+			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
+		img.setScaleX(f);
+		img.setScaleY(-f * flip);
 	}
 	
 

@@ -16,4 +16,8 @@ public class SelectBoolean extends JCheckBox {
 	public SelectBoolean(boolean arg0) {
 		this.setSelected(arg0);
 	}
+	
+	public boolean getValue() {
+		return this.isSelected();
+	}
 }
