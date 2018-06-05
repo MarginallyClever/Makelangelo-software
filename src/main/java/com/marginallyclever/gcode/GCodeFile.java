@@ -304,16 +304,22 @@ public class GCodeFile {
 	
 	/**
 	 * advance the internal line number counter. 
-	 * @return the next line of text.
+	 * @return the next line of gcode.
 	 */
 	public String nextLine() {
-		int lineNumber = getLinesProcessed();
-		setLinesProcessed(lineNumber + 1);
-		// lines.get() is really slow.  
+		String thisLine = getThisLine();
+		setLinesProcessed(getLinesProcessed() + 1);
+		return thisLine;
+	}
+	
+	/**
+	 * @return the current line of gcode.
+	 */
+	public String getThisLine() {
+		// lines.get() is really slow.
 		// Can't use an iterator because of random seek in lineError().
 		// iterator is one way only.
-		String line = lines.get(lineNumber).trim();
-		return line;
+		return lines.get(getLinesProcessed()).trim();
 	}
 
 	public boolean isFileOpened() {
