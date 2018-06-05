@@ -8,12 +8,12 @@
 
 	<string>
 		<key>StartAtLastPenDown</key>
-		<value>Start at last pen down</value>
+		<value>Back up to last pen down</value>
 		<hint>Start At option</hint>
 	</string>
 	<string>
 		<key>StartAtAddPenDown</key>
-		<value>Add pen down command</value>
+		<value>Add pen down command here</value>
 		<hint>Start At option</hint>
 	</string>
 	<string>
