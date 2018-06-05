@@ -345,9 +345,12 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			if(matchUp.contains(";")) {
 				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
 			}
+			matchUp = matchUp.replaceAll("\n", "");
+			
 			if(matchDown.contains(";")) {
 				matchDown = matchDown.substring(0, matchDown.indexOf(";"));
 			}
+			matchDown = matchDown.replaceAll("\n", "");
 			
 			int total=sourceMaterial.getLinesTotal();
 			Log.info(total+" total lines to save.");
