@@ -458,13 +458,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
 		else if (subject == buttonStart) robot.startAt(0);
-		else if (subject == buttonStartAt) {
-			int lineNumber = getStartingLineNumber();
-			if (lineNumber != -1) {
-				robot.startAt(lineNumber);
-			}
-			return;
-		}
+		else if (subject == buttonStartAt) startAt();
 		else if (subject == buttonPause) {
 			// toggle pause
 			if (robot.isPaused() == true) {
@@ -539,43 +533,24 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void motorsHaveBeenEngaged() {
 		toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
 	}
-	
-	/**
-	 * open a dialog to ask for the line number.
-	 *
-	 * @return <code>lineNumber</code> greater than or equal to zero if user hits ok.
-	 */
-	private int getStartingLineNumber() {
-		final JPanel panel = new JPanel(new GridBagLayout());
-		final SelectInteger starting_line = new SelectInteger(0);
-		Dimension d = starting_line.getPreferredSize();
-		d.width = 100;
-		starting_line.setPreferredSize(d);
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		panel.add(new JLabel(Translator.get("StartAtLine")), c);
-		c.gridwidth = 1;
-		c.gridx = 2;
-		c.gridy = 0;
-		c.insets = new Insets(0,5,0,0);
-		c.fill = GridBagConstants.HORIZONTAL;
-		panel.add(starting_line, c);
 
-		int result = JOptionPane.showConfirmDialog(null, panel, Translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			int lineNumber;
-			try {
-				lineNumber = ((Number)starting_line.getValue()).intValue();
-			} catch (Exception e) {
-				lineNumber = -1;
+	protected void startAt() {
+		StartAtPanel p = new StartAtPanel();
+		if(p.run(gui.getMainFrame())==false) return;
+
+		int lineNumber = p.lineNumber;
+		if (lineNumber != -1) {
+			if(p.findPreviousPenDown==false) {
+				robot.gCode.setLinesProcessed(lineNumber);
+				if(p.addPenDownCommand==true) {
+					robot.sendLineToRobot(robot.getSettings().getPenDownString());
+				}
+				robot.startAt(lineNumber);
+			} else {
+				int lineBefore = robot.gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString());
+				robot.startAt(lineBefore);
 			}
-
-			return lineNumber;
 		}
-		return -1;
 	}
 
 	/**
