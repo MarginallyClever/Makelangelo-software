@@ -108,10 +108,12 @@ public class Generator_Spirograph extends ImageGenerator {
 		}
 		
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
+		// https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
 		double period = lcm(majorRadius,minorRadius)/majorRadius;
+		double periodRadians = Math.PI*2.0*(double)period/(double)numSamples;
 		
 		for(float t1 = 0; t1<=numSamples;++t1) {
-			t = (float)( t1 * (Math.PI*2.0*period/(double)(numSamples)) );
+			t = (float)( t1 * periodRadians );
 			x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
 			y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
 
