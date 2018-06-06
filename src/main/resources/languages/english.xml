@@ -7,6 +7,37 @@
 	</meta>
 
 	<string>
+		<key>SpirographName</key>
+		<value>Spirograph</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographMajorRadius</key>
+		<value>Major radius (R)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographMinorRadius</key>
+		<value>Minor radius (r)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographPScale</key>
+		<value>Scale (p)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographNumSamples</key>
+		<value>Samples (quality)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographEpitrochoid</key>
+		<value>is epitrochoid</value>
+		<hint>Spirograph generator</hint>
+	</string>
+
+	<string>
 		<key>StartAtLastPenDown</key>
 		<value>Back up to last pen down</value>
 		<hint>Start At option</hint>
