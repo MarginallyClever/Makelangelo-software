@@ -102,13 +102,13 @@ public class Generator_Dragon extends ImageGenerator {
             if(minY>turtle.getY()) minY = turtle.getY();
         }
 
-        float dx = maxX - minX;
-        float dy = maxY - minY;
-		float xx = xMax - xMin;
-		float yy = yMax - yMin;
+        float dragonWidth = maxX - minX;
+        float dragonHeight = maxY - minY;
+		float paperWidth = xMax - xMin;
+		float paperHeight = yMax - yMin;
 		
-		float largestX = xx/dx;
-		float largestY = yy/dy;
+		float largestX = paperWidth/dragonWidth;
+		float largestY = paperHeight/dragonHeight;
 		float largest = largestX < largestY ? largestX : largestY;
 
 		float x = turtle.getX();
