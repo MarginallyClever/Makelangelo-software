@@ -27,20 +27,46 @@ public class Generator_Spirograph extends ImageGenerator {
 		return Translator.get("SpirographName");
 	}
 
-	static public boolean getEpitrochoid()			{		return isEpitrochoid;	}
-	static public void setEpitrochoid(boolean arg0)	{		isEpitrochoid = arg0;	}
-
-	static public int getMajorRadius()			{		return majorRadius;	}
-	static public void setMajorRadius(int arg0)	{		majorRadius = arg0;	}
-
-	static public int getMinorRadius() 			{		return minorRadius;	}
-	static public void setMinorRadius(int arg0) 	{		minorRadius = arg0;	}
+	static public boolean getEpitrochoid() {
+		return isEpitrochoid;
+	}
 	
-	static public float getPScale() 			{		return pScale;	}
-	static public void setPScale(float arg0) 	{		pScale = arg0;	}
+	static public void setEpitrochoid(boolean arg0)	{
+		isEpitrochoid = arg0;
+	}
+
+	static public int getMajorRadius() {
+		return majorRadius;
+	}
 	
-	static public int getNumSamples() 			{		return numSamples;	}
-	static public void setNumSamples(int arg0) 	{		numSamples = arg0;	}
+	static public void setMajorRadius(int arg0)	{
+		majorRadius = arg0;
+	}
+
+	static public int getMinorRadius() {
+		return minorRadius;
+	}
+	
+	static public void setMinorRadius(int arg0) {
+		minorRadius = arg0;
+	}
+	
+	static public float getPScale() {
+		return pScale;
+	}
+	
+	static public void setPScale(float arg0) {
+		pScale = arg0;
+	}
+	
+	static public int getNumSamples() {
+		return numSamples;
+	}
+	
+	static public void setNumSamples(int arg0) {
+		if(numSamples<1) numSamples=1;
+		numSamples = arg0;
+	}
 	
 	@Override
 	public ImageGeneratorPanel getPanel() {
@@ -65,8 +91,10 @@ public class Generator_Spirograph extends ImageGenerator {
 		// scale the step size so the spirograph fits on the paper
 		float paperWidth = (float)(machine.getPaperWidth()  * machine.getPaperMargin());
 		float paperHeight = (float)(machine.getPaperHeight() * machine.getPaperMargin());
-		float drawingWidth = 20+(xMax - xMin);
-		float drawingHeight = 20+(yMax - yMin);
+		// dr 2018-06-06 I don't know why I needed to add a margin to get it drawing ok.
+		final float MARGIN = 20;
+		float drawingWidth = MARGIN+(xMax - xMin);
+		float drawingHeight = MARGIN+(yMax - yMin);
 
 		float largestX = paperWidth/drawingWidth;
 		float largestY = paperHeight/drawingHeight;
@@ -134,17 +162,22 @@ public class Generator_Spirograph extends ImageGenerator {
 	 * @param b
 	 * @return greatest common divider
 	 */
-	private static long gcd(long a, long b)
-	{
-	    while (b > 0)
-	    {
-	        long temp = b;
+	private static long gcd(long a, long b) {
+		long temp;
+	    while (b > 0) {
+	        temp = b;
 	        b = a % b; // % is remainder
 	        a = temp;
 	    }
 	    return a;
 	}
 	
+	/**
+	 * least common multiplier
+	 * @param a
+	 * @param b
+	 * @return least common multiplier
+	 */
 	private static long lcm(long a, long b)
 	{
 	    return a * (b / gcd(a, b));
