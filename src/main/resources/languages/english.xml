@@ -36,6 +36,17 @@
 		<value>is epitrochoid</value>
 		<hint>Spirograph generator</hint>
 	</string>
+	
+	<string>
+		<key>ConverterRandomLinesName</key>
+		<value>Random lines</value>
+		<hint>Random Lines generator</hint>
+	</string>
+	<string>
+		<key>ConverterRandomLinesCount</key>
+		<value>Number of lines</value>
+		<hint>Random Lines generator</hint>
+	</string>
 
 	<string>
 		<key>StartAtLastPenDown</key>
