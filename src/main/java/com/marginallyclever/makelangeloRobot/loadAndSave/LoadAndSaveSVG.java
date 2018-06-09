@@ -322,17 +322,17 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		sourceMaterial.setLinesProcessed(0);
 
 		machine = robot.getSettings();
-		double left = machine.getPaperLeft()*10;
-		double top = machine.getPaperTop()*10;
-		double right = machine.getPaperRight()*10;
-		double bottom = top - machine.getPaperBottom()*10;
+		double left = machine.getPaperLeft();
+		double right = machine.getPaperRight();
+		double top = machine.getPaperTop();
+		double bottom = machine.getPaperBottom();
 		
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		try {
 			// header
 			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
 			out.write("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
-			out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "+right+" "+bottom+"\">\n");
+			out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+left+" "+bottom+" "+(right-left)+" "+(top-bottom)+"\">\n");
 
 			boolean penUp=true;
 			float x0 = (float) robot.getSettings().getHomeX();
@@ -381,10 +381,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						}
 					}
 					if(penUp==false && ( x1!=x0 || y1!=y0 ) ) {
-						double svgX1 = roundOff3(x0 - left);
-						double svgX2 = roundOff3(x1 - left);
-						double svgY1 = roundOff3(top - y0);
-						double svgY2 = roundOff3(top - y1);
+						//double svgX1 = roundOff3(x0 - left);
+						//double svgX2 = roundOff3(x1 - left);
+						//double svgY1 = roundOff3(top - y0);
+						//double svgY2 = roundOff3(top - y1);
+						double svgX1 = roundOff3(x0);
+						double svgX2 = roundOff3(x1);
+						double svgY1 = roundOff3(- y0);
+						double svgY2 = roundOff3(- y1);
 						out.write("  <line");
 						out.write(" x1=\""+svgX1+"\"");
 						out.write(" y1=\""+svgY1+"\"");
