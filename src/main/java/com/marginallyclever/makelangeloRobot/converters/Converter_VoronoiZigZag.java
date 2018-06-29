@@ -36,7 +36,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 3000;
-	private static float CUTOFF = 1.0f;
+	private static float minDotSize = 1.0f;
 	private Point bound_min = new Point();
 	private Point bound_max = new Point();
 	private int numEdgesInCell;
@@ -142,7 +142,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				if (c == null)
 					continue;
 				float v = 1.0f - (float) sourceImage.sample1x1((int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
-				if (v * 5 <= CUTOFF) {
+				if (v * 5 <= minDotSize) {
 					gl2.glColor3f(0.8f, 0.8f, 0.8f);
 				} else {
 					gl2.glColor3f(0, 0, 0);
@@ -316,7 +316,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		for (i = 0; i < cells.length; ++i) {
 			VoronoiCell c = cells[i];
 			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
-			if (v * 5 > CUTOFF)
+			if (v * 5 > minDotSize)
 				solutionContains++;
 		}
 
@@ -328,7 +328,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			for (i = 0; i < cells.length; ++i) {
 				VoronoiCell c = cells[i];
 				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
-				if (v * 5 > CUTOFF) {
+				if (v * 5 > minDotSize) {
 					solution[j++] = i;
 				}
 			}
@@ -609,6 +609,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 	public int getNumCells() {
 		return numCells;
+	}
+	
+	public void setMinDotSize(float value) {
+		if(value<0.001) value=0.001f;
+		minDotSize = value;
+	}
+	public float getMinDotSize() {
+		return minDotSize;
 	}
 }
 
