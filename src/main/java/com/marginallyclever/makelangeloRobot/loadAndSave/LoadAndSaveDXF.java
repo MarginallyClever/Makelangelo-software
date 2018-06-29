@@ -227,8 +227,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		// altering the aspect ratio
 		double imageWidth  = (bounds.getMaximumX() - bounds.getMinimumX());
 		double imageHeight = (bounds.getMaximumY() - bounds.getMinimumY());
-		double paperHeight = robot.getSettings().getPaperHeight() * 10.0 * robot.getSettings().getPaperMargin();
-		double paperWidth  = robot.getSettings().getPaperWidth () * 10.0 * robot.getSettings().getPaperMargin();
+		double paperHeight = robot.getSettings().getPaperHeight() * robot.getSettings().getPaperMargin();
+		double paperWidth  = robot.getSettings().getPaperWidth () * robot.getSettings().getPaperMargin();
 
 		scale = 1;
 		if(shouldScaleOnLoad) {
@@ -238,7 +238,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 					(paperWidth / imageWidth) :
 					(paperHeight / imageHeight);
 		}
-
 		//countAllEntities(doc);
 
 		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
