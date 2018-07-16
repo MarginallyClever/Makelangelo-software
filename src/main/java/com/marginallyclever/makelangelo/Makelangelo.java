@@ -18,8 +18,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.prefs.Preferences;
 
@@ -65,6 +67,8 @@ public final class Makelangelo
 	 * prevent violating DRY.
 	 */
 	public String VERSION;
+	
+	private final String FORUM_URL = "https://www.marginallyclever.com/forums/";
 
 	// only used on first run.
 	private static int DEFAULT_WINDOW_WIDTH = 1200;
@@ -83,9 +87,11 @@ public final class Makelangelo
 	// Top of window
 	private JMenuBar menuBar;
 	// file menu
-	private JMenuItem buttonAbout, buttonAdjustPreferences, buttonCheckForUpdate, buttonExit;
+	private JMenuItem buttonAdjustPreferences, buttonCheckForUpdate, buttonExit;
 	// view menu
 	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
+	// help menu
+	private JMenuItem buttonForums, buttonAbout;
 
 	// main window layout
 	private Splitter splitLeftRight;
@@ -168,6 +174,13 @@ public final class Makelangelo
 			drawPanel.zoomOut();
 		if (subject == buttonZoomToFit)
 			drawPanel.zoomToFitPaper();
+		if( subject == buttonForums) {
+			try {
+				java.awt.Desktop.getDesktop().browse(URI.create(this.FORUM_URL));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 		if (subject == buttonAbout)
 			(new DialogAbout()).display(this.mainFrame,this.VERSION);
 		if (subject == buttonAdjustPreferences) {
@@ -201,10 +214,6 @@ public final class Makelangelo
 		buttonCheckForUpdate.addActionListener(this);
 		menu.add(buttonCheckForUpdate);
 
-		buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener(this);
-		menu.add(buttonAbout);
-
 		menu.addSeparator();
 
 		buttonExit = new JMenuItem(Translator.get("MenuQuit"));
@@ -215,6 +224,8 @@ public final class Makelangelo
 
 		// view menu
 		menu = new JMenu(Translator.get("MenuPreview"));
+		menuBar.add(menu);
+		
 		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
 		buttonZoomOut.addActionListener(this);
 		buttonZoomOut.setAccelerator(
@@ -231,7 +242,20 @@ public final class Makelangelo
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
+		// help menu
+		menu = new JMenu(Translator.get("Help"));
 		menuBar.add(menu);
+
+		buttonForums = new JMenuItem(Translator.get("MenuForums"));
+		buttonForums.addActionListener(this);
+		menu.add(buttonForums);
+		
+		buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
+		buttonAbout.addActionListener(this);
+		menu.add(buttonAbout);
+		
+		
+		// finish
 		menuBar.updateUI();
 
 		return menuBar;
