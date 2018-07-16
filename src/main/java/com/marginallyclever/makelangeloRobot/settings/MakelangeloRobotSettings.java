@@ -65,6 +65,8 @@ public final class MakelangeloRobotSettings {
 	private MakelangeloHardwareProperties hardwareProperties;
 
 	private Color paperColor;
+	
+	private int lookAheadSegments;
 
 	/**
 	 * pen diameter, in mm
@@ -165,6 +167,8 @@ public final class MakelangeloRobotSettings {
 		reverseForGlass = false;
 		startingPositionIndex = 4;
 
+		setLookAheadSegments(32);  // firmware MAX_SEGMENTS
+		
 		// default hardware version is 2
 		setHardwareVersion(2);
 		
@@ -834,5 +838,13 @@ public final class MakelangeloRobotSettings {
 
 	public void writeRelativeMode(Writer out) throws IOException {
 		out.write(getRelativeMode() + "\n");
+	}
+
+	public int getLookAheadSegments() {
+		return lookAheadSegments;
+	}
+
+	public void setLookAheadSegments(int arg0) {
+		this.lookAheadSegments = arg0;
 	}
 }
