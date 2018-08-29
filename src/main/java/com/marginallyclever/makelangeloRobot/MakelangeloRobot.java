@@ -15,6 +15,8 @@ import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,7 +32,9 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a Model-View-Controller design pattern.  It also contains non-persistent Model data.  
@@ -40,12 +44,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.2.10
  */
 public class MakelangeloRobot implements NetworkConnectionListener {
-	// Constants
-	private static final String HELLO_POLARGRAPH = "HELLO WORLD! I AM POLARGRAPH #";
-	private static final String HELLO_ZARPLOTTER = "HELLO WORLD! I AM ZARPLOTTER #";
-	private static final String HELLO_TRADITIONALXY = "HELLO WORLD! I AM TRADITIONALXY #";
-	private static final String HELLO_COREXY = "HELLO WORLD! I AM COREXY #";
-	
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
@@ -159,27 +157,21 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		
 		// is port confirmed?
 		if (!portConfirmed) {
-			// TODO: enumerate all known machine types, make this list more future-proof. 
-			String machineTypeName="";
-			String [] knownMachineTypes = {
-					HELLO_POLARGRAPH,
-					HELLO_ZARPLOTTER,
-					HELLO_TRADITIONALXY,
-					HELLO_COREXY,
-			};
-			for(int t=0;t<knownMachineTypes.length;++t) {
-				if(data.lastIndexOf(knownMachineTypes[t]) >= 0) {
+			// machine names
+			ServiceLoader<MachineStyle> knownHardware = ServiceLoader.load(MachineStyle.class);
+			Iterator<MachineStyle> i = knownHardware.iterator();
+			while(i.hasNext()) {
+				MachineStyle ms = i.next();
+				String machineTypeName=ms.getHello();
+				if(data.lastIndexOf(machineTypeName) >= 0) {
 					portConfirmed = true;
-					machineTypeName = knownMachineTypes[t];
+					// which machine GUID is this?
+					String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
+					parseRobotUID(afterHello);
+					
+					justNow=true;
 					break;
-				}				
-			}
-
-			if(portConfirmed) {
-				// which machine GUID is this?
-				String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
-				parseRobotUID(afterHello);
-				justNow=true;
+				}
 			}
 		}
 		
