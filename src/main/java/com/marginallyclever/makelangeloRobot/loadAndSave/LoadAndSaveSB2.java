@@ -145,13 +145,20 @@ public class LoadAndSaveSB2 extends ImageManipulator implements LoadAndSaveFileT
 			    			//System.out.println("var:"+elem.toString());
 		    				JSONObject elem = (JSONObject)varIter.next();
 		    				String varName = (String)elem.get("name");
-		    				String varValue = (String)elem.get("value");
-		    				try {
-		    					float v = Float.parseFloat(varValue);
-			    				scratchVariables.add(new ScratchVariable(varName,v));
-		    				} catch (Exception e) {
-		    					throw new Exception("Variables must be numbers.");
-		    				}
+		    				Object varValue = (Object)elem.get("value");
+		    				float value;
+		    				if(varValue instanceof Number) {
+		    					Number num = (Number)varValue;
+		    					value = (float)num.doubleValue();
+			    				scratchVariables.add(new ScratchVariable(varName,value));
+		    				} else if(varValue instanceof String) {
+			    				try {
+			    					value = Float.parseFloat((String)varValue);
+				    				scratchVariables.add(new ScratchVariable(varName,value));
+			    				} catch (Exception e) {
+			    					throw new Exception("Variables must be numbers.");
+			    				}
+		    				} else throw new Exception("Variable "+varName+" is "+varValue.toString());
 		    			}
 
 		    			// read the sketch(es)
@@ -245,21 +252,21 @@ public class LoadAndSaveSB2 extends ImageManipulator implements LoadAndSaveFileT
 	    			turtle = new Turtle();
 	    			// make sure machine state is the default.
 	    			setAbsoluteMode(out);
-					//System.out.println("**START**");
+					System.out.println("**START**");
 				} else if(name.compareTo("wait:elapsed:from:")==0) {
 					// dwell - does nothing.
 					Object o2 = (Object)scriptIter.next();
 					@SuppressWarnings("unused")
 					float seconds = resolveValue(o2);
-					//System.out.println("dwell "+seconds+" seconds.");
+					System.out.println("dwell "+seconds+" seconds.");
 				} else if(name.compareTo("putPenUp")==0) {
 					penUp=true;
 					this.liftPen(out);
-					//System.out.println("pen up");
+					System.out.println("pen up");
 				} else if(name.compareTo("putPenDown")==0) {
 					penUp=false;
 					this.lowerPen(out);
-					//System.out.println("pen down");
+					System.out.println("pen down");
 				} else if(name.compareTo("gotoX:y:")==0) {
 					Object o2 = (Object)scriptIter.next();
 					float x = resolveValue(o2);
@@ -269,7 +276,7 @@ public class LoadAndSaveSB2 extends ImageManipulator implements LoadAndSaveFileT
 					turtle.setX(x);
 					turtle.setY(y);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
-					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.compareTo("changeXposBy:")==0) {
 					Object o2 = (Object)scriptIter.next();
 					float v = resolveValue(o2);
@@ -287,23 +294,23 @@ public class LoadAndSaveSB2 extends ImageManipulator implements LoadAndSaveFileT
 					float v = resolveValue(o2);
 					turtle.move(v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
-					//System.out.println("Move forward "+v+" mm");
+					System.out.println("Move forward "+v+" mm");
 				} else if(name.compareTo("turnRight:")==0) {
 					Object o2 = (Object)scriptIter.next();
 					float degrees = resolveValue(o2);
 					turtle.turn(-degrees);
-					//System.out.println("Right "+degrees+" degrees.");
+					System.out.println("Right "+degrees+" degrees.");
 				} else if(name.compareTo("turnLeft:")==0) {
 					Object o2 = (Object)scriptIter.next();
 					float degrees = resolveValue(o2);
 					turtle.turn(degrees);
-					//System.out.println("Left "+degrees+" degrees.");
+					System.out.println("Left "+degrees+" degrees.");
 				} else if(name.compareTo("doRepeat")==0) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					int count = (int)resolveValue(o2);
-					//System.out.println("Repeat "+count+" times:");
-					while(count-->=0) {
+					System.out.println("Repeat "+count+" times:");
+					for(int i=0;i<count;++i) {
 						parseScratchArray((JSONArray)o3,out);
 					}
 				} else if(name.compareTo("xpos:")==0) {
