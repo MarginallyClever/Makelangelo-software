@@ -9,7 +9,7 @@ package com.marginallyclever.makelangeloRobot.generators;
 public class Turtle {
 	private float turtleX, turtleY;
 	private float turtleDx, turtleDy;
-
+	private float angle;
 	
 	public Turtle() {
 		reset();
@@ -18,8 +18,7 @@ public class Turtle {
 	public void reset() {
 		turtleX = 0;
 		turtleY = 0;
-		turtleDx = 0;
-		turtleDy = -1;
+		setAngle(0);
 	}
 	
 	public void setX(float arg0) {		turtleX = arg0;	}
@@ -28,15 +27,21 @@ public class Turtle {
 	public float getY() {		return turtleY;	}
 
 	public void turn(float degrees) {
-		double n = degrees * Math.PI / 180.0;
-		double newx = Math.cos(n) * turtleDx + Math.sin(n) * turtleDy;
-		double newy = -Math.sin(n) * turtleDx + Math.cos(n) * turtleDy;
-		double len = Math.sqrt(newx * newx + newy * newy);
-		assert (len > 0);
-		turtleDx = (float) (newx / len);
-		turtleDy = (float) (newy / len);
+		setAngle(angle+degrees);
 	}
 
+	public float getAngle() {
+		return angle;
+	}
+	
+	/**
+	 * @param degrees degrees
+	 */
+	public void setAngle(float degrees) {
+		angle=degrees;
+		turtleDx = (float)Math.cos(Math.toRadians(angle));
+		turtleDy = (float)Math.sin(Math.toRadians(angle));
+	}
 
 	public void move(float stepSize) {
 		//turtle_x += turtle_dx * distance;
