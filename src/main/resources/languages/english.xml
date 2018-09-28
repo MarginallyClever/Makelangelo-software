@@ -362,6 +362,11 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
+		<key>FileTypeSB2</key>
+		<value>Scratch (SB2)</value>
+		<hint>file open dialog</hint>		
+	</string>
+	<string>
 		<key>FileTypeSVG</key>
 		<value>Scaleable Vector Graphics 1.1 (svg)</value>
 		<hint>file open dialog</hint>
