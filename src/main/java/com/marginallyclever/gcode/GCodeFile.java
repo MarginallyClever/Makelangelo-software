@@ -352,8 +352,7 @@ public class GCodeFile {
 
 		MakelangeloRobotSettings machine = robot.getSettings();
 		
-		int lookAhead=320;
-
+		int lookAhead = machine.getLookAheadSegments();
 		float penR = robot.getSettings().getPenUpColor().getRed() / 255.0f;
 		float penG = robot.getSettings().getPenUpColor().getGreen() / 255.0f;
 		float penB = robot.getSettings().getPenUpColor().getBlue() / 255.0f;
@@ -363,6 +362,9 @@ public class GCodeFile {
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 
+		boolean drawRainbow = false;  // TODO make this a setting
+		int rainbowState = 0;
+		
 		gl2.glBegin(GL2.GL_LINES);
 		
 		// draw image
@@ -375,10 +377,20 @@ public class GCodeFile {
 			while (nodes.hasNext()) {
 				GCodeNode n = nodes.next();
 
-				gl2.glColor3f(
-						n.color.getRed() / 255.0f, 
-						n.color.getGreen() / 255.0f,
-						n.color.getBlue() / 255.0f);
+				if(drawRainbow) {
+					switch(rainbowState) {
+					case 0: gl2.glColor3f(1, 0, 0); break;
+					case 1: gl2.glColor3f(0, 1, 0); break;
+					case 2: gl2.glColor3f(0, 0, 1); break;
+					case 3: gl2.glColor3f(0, 0, 0); break;
+					}
+					rainbowState = (rainbowState+1)%4;
+				} else {
+					gl2.glColor3f(
+							n.color.getRed() / 255.0f, 
+							n.color.getGreen() / 255.0f,
+							n.color.getBlue() / 255.0f);
+				}
 				
 				if (robot.isRunning()) {
 					if (n.lineNumber < linesProcessed) {

@@ -2,7 +2,6 @@ package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -37,9 +36,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private VoronoiCell[] cells = new VoronoiCell[1];
 	private List<VoronoiGraphEdge> graphEdges = null;
+	private static boolean drawBorders = true;
 	private static int numCells = 1000;
 	private static float maxDotSize = 5.0f;
 	private static float minDotSize = 1.0f;
+	private static float cutoff = 0;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
 	private float yBottom, yTop, xLeft, xRight;
@@ -105,14 +106,16 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		super.render(gl2, settings);
 		
 		// draw cell edges
-		gl2.glColor3f(0.9f, 0.9f, 0.9f);
-		gl2.glBegin(GL2.GL_LINES);
-		for (VoronoiGraphEdge e : graphEdges) {
-			gl2.glVertex2d( e.x1, e.y1 );
-			gl2.glVertex2d( e.x2, e.y2 );
+		if(drawBorders) {
+			gl2.glColor3f(0.9f, 0.0f, 0.0f);
+			gl2.glBegin(GL2.GL_LINES);
+			for (VoronoiGraphEdge e : graphEdges) {
+				gl2.glVertex2d( e.x1, e.y1 );
+				gl2.glVertex2d( e.x2, e.y2 );
+			}
+			gl2.glEnd();
 		}
-		gl2.glEnd();
-
+/*
 		// draw bounds
 		gl2.glColor3f(1,0,0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -123,10 +126,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			gl2.glVertex2d( bounds.getMaxX(),bounds.getMaxY() );
 			gl2.glVertex2d( bounds.getMinX(),bounds.getMaxY() );
 		}
-		gl2.glEnd();
+		gl2.glEnd();*/
 
 		// draw cell centers
 		//gl2.glPointSize(3);
+		float scale = maxDotSize - minDotSize;
 		gl2.glColor3f(0, 0, 0);
 		for (VoronoiCell c : cells) {
 			float x = (float)c.centroid.getX();
@@ -134,16 +138,18 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			//if( sourceImage.canSampleAt(x,y) ) 
 			{
 				float val = (float)c.weight/255.0f;//1.0f - (sourceImage.sample1x1( x, y) / 255.0f);
-				float r = (val * maxDotSize);
-				if(r<minDotSize) continue;
-				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-				for (float j = 0; j < Math.PI * 2; j += (Math.PI / 4)) {
-					gl2.glVertex2d(x + Math.cos(j) * r,
-								   y + Math.sin(j) * r);
+				if(val>cutoff) {
+					float r = val * scale;
+					gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+					for (float j = 0; j < Math.PI * 2; j += (Math.PI / 6)) {
+						gl2.glVertex2d(x + Math.cos(j) * r,
+									   y + Math.sin(j) * r);
+					}
+					gl2.glEnd();
 				}
-				gl2.glEnd();
 			}
-		}//*/
+		}
+		
 		gl2.glBegin(GL2.GL_LINES);
 		for (VoronoiCell c : cells) {
 			gl2.glColor3f(0, 1, 0);
@@ -167,12 +173,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 		// from top to bottom of the margin area...
 		int used;
-		for (used=0;used<cells.length;++used) {
+		for (used=0;used<numCells;++used) {
 			cells[used] = new VoronoiCell();
 		}
 		
 		used=0;
-		while(used<cells.length) {
+		while(used<numCells) {
 			Point2D p = new Point2D.Double(
 					xLeft   + Math.random()*(xRight-xLeft),
 					yBottom + Math.random()*(yTop-yBottom)
@@ -230,12 +236,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Arrays.sort(cells);
 		
 		int i;
-		for (i = 0; i < cells.length; ++i) {
+		for (i = 0; i < numCells; ++i) {
 			double x = cells[i].centroid.getX();
 			double y = cells[i].centroid.getY();
 			double val = cells[i].weight/255.0f;
-			double r = val * maxDotSize;
-			if (r < minDotSize) continue;
+			if(val<cutoff) continue;
+
+			double r = val * (maxDotSize-minDotSize);
 
 			double newX=0,newY=0;
 			boolean first=true;
@@ -278,7 +285,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void tessellateVoronoiDiagram() {
 		
 		int i;
-		for (i = 0; i < cells.length; ++i) {
+		for (i = 0; i < numCells; ++i) {
 			xValuesIn[i] = cells[i].centroid.getX();
 			yValuesIn[i] = cells[i].centroid.getY();
 			cells[i].region = new Polygon2D();
@@ -289,8 +296,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		
 		for (VoronoiGraphEdge e : graphEdges) {
 			try {
-				cells[e.site1].region.addPoint((float)e.x1, (float)e.y1);
 				cells[e.site1].region.addPoint((float)e.x2, (float)e.y2);
+				cells[e.site1].region.addPoint((float)e.x1, (float)e.y1);
 				cells[e.site2].region.addPoint((float)e.x1, (float)e.y1);
 				cells[e.site2].region.addPoint((float)e.x2, (float)e.y2);
 			} catch(Exception err) {
@@ -313,9 +320,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		double minX,maxX,minY,maxY;
 		double xDiff, yDiff, maxSize,minSize,scaleFactor;
 		float totalMagnitude=0;
-		double cellBuffer=100;
+		final double cellBuffer=100;
 
-		int i=0;
 		for (VoronoiCell c : cells) {
 			if(c.region.npoints ==0) continue;
 			Rectangle bounds = c.region.getBounds();
@@ -331,14 +337,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			if(minY==maxY) yDiff=1;
 			maxSize = Math.max(xDiff,yDiff);
 			minSize = Math.min(xDiff,yDiff);
-			stepSize=1.0;
 			
 			scaleFactor=1.0;
 			while(maxSize > cellBuffer) {
 				scaleFactor *= 0.5;
 				maxSize *= 0.5;
 			}
-			while(maxSize < (cellBuffer / 2)) {
+			while(maxSize < (cellBuffer/2)) {
 				scaleFactor *= 2;
 				maxSize *= 2;
 			}
@@ -348,13 +353,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				scaleFactor *= 0.5;
 			}
 
-			if(i==0) {
-				System.out.println((maxX-minX)+"\t"+(maxY-minY)+"\t"+stepSize);
-			}
-
-			stepSize = (1.0/scaleFactor);
+			stepSize = 1.0/scaleFactor;
 			//stepSize = maxSize / cellBuffer;
-			assert(stepSize>0 && stepSize<cellBuffer);
+			//assert(stepSize>0 && stepSize<cellBuffer);
+
+			//if(i==0) System.out.println((maxX-minX)+"\t"+(maxY-minY)+"\t"+stepSize);
 
 			int hits = 0;
 			totalCellWeight = 0;
@@ -365,14 +368,15 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			for (y = minY; y <= maxY; y += stepSize) {
 				for (x = minX; x <= maxX; x += stepSize) {
 					if (c.region.contains(x,y)) {
-						hits++;
-						if(sourceImage.canSampleAt((float)x, (float)y)) {
-							sampleWeight = 255.00f - ( (float)sourceImage.sample1x1Unchecked( (float)x, (float)y ) );
-						} else sampleWeight = 0.00f; 
-					} else sampleWeight = 0.00f;
-					totalCellWeight += sampleWeight;
-					wx += x * sampleWeight;
-					wy += y * sampleWeight;
+						//if(sourceImage.canSampleAt((float)x, (float)y)) 
+						{
+							hits++;
+							sampleWeight = 255.001f - (float)sourceImage.sample1x1( (float)x, (float)y );
+							totalCellWeight += sampleWeight;
+							wx += x * sampleWeight;
+							wy += y * sampleWeight;
+						}
+					}
 				}
 			}
 
@@ -381,14 +385,24 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				wy /= totalCellWeight;
 				totalMagnitude+=totalCellWeight;
 			}
-/*
+
 			// make sure centroid can't leave image bounds
-			if (wx <  xLeft ) wx = xLeft;
-			if (wx >= xRight) wx = xRight;
+			if (wx < xLeft || wx >= xRight || wy < yBottom || wy >= yTop ) {
+				// try the geometric centroid
+				for(int j=0;j<c.region.npoints;++j) {
+					wx = c.region.xpoints[j];
+					wy = c.region.ypoints[j];
+				}
+				wx/= c.region.npoints;
+				wy/= c.region.npoints;
+				
+				if (wx <  xLeft ) wx = xLeft+1;
+				if (wx >= xRight) wx = xRight-1;
+				
+				if (wy <  yBottom) wy = yBottom+1;
+				if (wy >= yTop   ) wy = yTop-1;
+			}
 			
-			if (wy <  yBottom) wy = yBottom;
-			if (wy >= yTop   ) wy = yTop;
-*/
 			// use the new center
 			c.oldCentroid.setLocation(c.centroid);
 			if(hits>=1)
@@ -402,7 +416,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				
 				c.weight = totalCellWeight/(double)hits;
 			}
-			i++;
 		}
 		return totalMagnitude;
 	}
@@ -428,12 +441,27 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		return minDotSize;
 	}
 	
+	public void setCutoff(float value) {
+		if(value<0f) value=0f;
+		cutoff = value;
+	}
+	public float getCutoff() {
+		return cutoff;
+	}
+	
 	public float getMaxDotSize() {
 		return maxDotSize;
 	}
 	public void setMaxDotSize(float value) {
-		if(value<0.01) value=0.01f;
+		if(value<=minDotSize) value=minDotSize+1;
 		maxDotSize = value;
+	}
+	
+	public void setDrawBorders(boolean arg0) {
+		drawBorders=arg0;
+	}
+	public boolean getDrawBorders() {
+		return drawBorders;
 	}
 }
 

@@ -7,6 +7,48 @@
 	</meta>
 
 	<string>
+		<key>SpirographName</key>
+		<value>Spirograph</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographMajorRadius</key>
+		<value>Major radius (R)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographMinorRadius</key>
+		<value>Minor radius (r)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographPScale</key>
+		<value>Scale (p)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographNumSamples</key>
+		<value>Samples (quality)</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	<string>
+		<key>SpirographEpitrochoid</key>
+		<value>is epitrochoid</value>
+		<hint>Spirograph generator</hint>
+	</string>
+	
+	<string>
+		<key>ConverterRandomLinesName</key>
+		<value>Random lines</value>
+		<hint>Random Lines generator</hint>
+	</string>
+	<string>
+		<key>ConverterRandomLinesCount</key>
+		<value>Number of lines</value>
+		<hint>Random Lines generator</hint>
+	</string>
+
+	<string>
 		<key>StartAtLastPenDown</key>
 		<value>Back up to last pen down</value>
 		<hint>Start At option</hint>
@@ -320,6 +362,11 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
+		<key>FileTypeSB2</key>
+		<value>Scratch (SB2)</value>
+		<hint>file open dialog</hint>		
+	</string>
+	<string>
 		<key>FileTypeSVG</key>
 		<value>Scaleable Vector Graphics 1.1 (svg)</value>
 		<hint>file open dialog</hint>
@@ -617,11 +664,7 @@ to check yourself.</value>
 		<value>Check for updates</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	<string>
-		<key>MenuAbout</key>
-		<value>About</value>
-		<hint>menu or dialog title</hint>
-	</string>
+	
 	<string>
 		<key>MenuQuit</key>
 		<value>Quit</value>
@@ -633,6 +676,23 @@ to check yourself.</value>
 		<value>Connect</value>
 		<hint>menu or dialog title</hint>
 	</string>
+	
+	<string>
+		<key>MenuHelp</key>
+		<value>Help</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuForums</key>
+		<value>Online help forums</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>MenuAbout</key>
+		<value>About</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	
 	<string>
 		<key>ButtonConnect</key>
 		<value>Connect</value>

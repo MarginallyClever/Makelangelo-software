@@ -94,7 +94,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	public StatusBar statusBar;
 
-	
+	/**
+	 * 
+	 * @param gui
+	 * @param robot
+	 */
 	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
 		this.gui = gui;
 		this.robot = robot;

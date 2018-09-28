@@ -29,6 +29,7 @@ public class LanguagePreferences {
 		c.gridx = 0;
 		c.gridy = 0;
 		panel.add(languageOptions, c);
+		
 		//FIXME changing language preference works inconsistently until reboot!
 		
 		return panel;
