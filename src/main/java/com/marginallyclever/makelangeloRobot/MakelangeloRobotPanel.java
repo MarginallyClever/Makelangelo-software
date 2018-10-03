@@ -20,6 +20,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +75,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	// machine options
 	protected String lastFileIn = "";
+	protected FileFilter lastFilterIn=null;
 	protected String lastFileOut = "";
+	protected FileFilter lastFilterOut=null;
 	protected int generatorChoice=0;
 	
 	private String[] machineConfigurations;
@@ -454,7 +458,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			m.run();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) convertImage();
+		else if (subject == buttonOpenFile) openFile();
 		else if (subject == buttonReopenFile) reopenFile();
 		else if (subject == buttonGenerate) generateImage();
 		else if (subject == buttonSaveFile) saveFileDialog();
@@ -633,7 +637,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 
-	public void convertImage() {
+	public void openFile() {
 		// list available loaders
 		JFileChooser fc = new JFileChooser(new File(lastFileIn));
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
@@ -645,19 +649,29 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				fc.addChoosableFileFilter(filter);
 			}
 		}
+		
 		// no wild card filter, please.
 		fc.setAcceptAllFileFilterUsed(false);
+		// remember the last path & filter used.
+		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
+		if(lastFileIn!=null) {
+			Path p = Paths.get(lastFileIn);
+			String lastDirectoryIn = p.getParent().toString();
+			fc.setCurrentDirectory(new File(lastDirectoryIn));
+		}
+		
 		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileFilter chosenFilter = fc.getFileFilter();
+			FileFilter selectedFilter = fc.getFileFilter();
 			i = imageLoaders.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType loader = i.next();
-				if( !loader.getFileNameFilter().equals(chosenFilter)) continue;
+				if( !loader.getFileNameFilter().equals(lastFilterIn)) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
+					lastFilterIn = selectedFilter;
 					break;
 				}
 			}
@@ -794,19 +808,28 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				fc.addChoosableFileFilter(filter);
 			}
 		}
+		
 		// do not allow wild card (*.*) file extensions
 		fc.setAcceptAllFileFilterUsed(false);
+		// remember the last path & filter used.
+		if(lastFilterOut!=null) fc.setFileFilter(lastFilterOut);
+		if(lastFileOut!=null) {
+			Path p = Paths.get(lastFileOut);
+			String lastDirectoryIn = p.getParent().toString();
+			fc.setCurrentDirectory(new File(lastDirectoryIn));
+		}
+		
 		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileFilter chosenFilter = fc.getFileFilter();
+			FileFilter selectedFilter = fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
 				FileFilter filter = lft.getFileNameFilter();
-				if( !chosenFilter.equals(filter) ) continue;
+				if( !selectedFilter.equals(filter) ) continue;
 	
 				// make sure a valid extension is added to the file.
 				String selectedFileLC = selectedFile.toLowerCase();
@@ -831,6 +854,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				}
 				if(success==true) {
 					lastFileOut = selectedFile;
+					lastFilterOut = selectedFilter;
 					updateButtonAccess();
 					break;
 				}					
