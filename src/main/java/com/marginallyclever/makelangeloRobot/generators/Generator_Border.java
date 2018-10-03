@@ -37,6 +37,7 @@ public class Generator_Border extends ImageGenerator {
 		float xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
 
 		moveTo(out,xMin,yMax,true);
+		moveTo(out,xMin,yMax,false);
 		moveTo(out,xMax,yMax,false);
 		moveTo(out,xMax,yMin,false);
 		moveTo(out,xMin,yMin,false);
