@@ -7,6 +7,12 @@
 	</meta>
 
 	<string>
+		<key>BorderName</key>
+		<value>Outline paper</value>
+		<hint>Border generator</hint>
+	</string>
+
+	<string>
 		<key>SpirographName</key>
 		<value>Spirograph</value>
 		<hint>Spirograph generator</hint>
