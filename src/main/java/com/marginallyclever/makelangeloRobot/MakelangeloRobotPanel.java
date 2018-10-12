@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -74,11 +75,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton buttonConnect;
 	
 	// machine options
-	protected String lastFileIn = "";
-	protected FileFilter lastFilterIn=null;
-	protected String lastFileOut = "";
-	protected FileFilter lastFilterOut=null;
-	protected int generatorChoice=0;
+	protected String lastFileIn = null;
+	protected FileFilter lastFilterIn = null;
+	protected String lastFileOut = null;
+	protected FileFilter lastFilterOut = null;
+	protected int generatorChoice = 0;
 	
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
@@ -595,7 +596,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		buttonNewFile.setEnabled(!isRunning);
 		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && (!lastFileIn.isEmpty()));
+		buttonReopenFile.setEnabled(!isRunning && lastFileIn!=null && !lastFileIn.isEmpty());
 		buttonGenerate.setEnabled(!isRunning);
 
 		down100.setEnabled(isConfirmed && !isRunning);
@@ -639,7 +640,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	public void openFile() {
 		// list available loaders
-		JFileChooser fc = new JFileChooser(new File(lastFileIn));
+		File lastDir = (lastFileIn==null?null : new File(lastFileIn));
+		JFileChooser fc = new JFileChooser(lastDir);
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
 		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
 		while(i.hasNext()) {
@@ -654,11 +656,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		fc.setAcceptAllFileFilterUsed(false);
 		// remember the last path & filter used.
 		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-		if(lastFileIn!=null) {
-			Path p = Paths.get(lastFileIn);
-			String lastDirectoryIn = p.getParent().toString();
-			fc.setCurrentDirectory(new File(lastDirectoryIn));
-		}
 		
 		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -667,7 +664,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			i = imageLoaders.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType loader = i.next();
-				if( !loader.getFileNameFilter().equals(lastFilterIn)) continue;
+				if( loader.getFileNameFilter().getClass() != selectedFilter.getClass() ) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
@@ -798,7 +795,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	public void saveFileDialog() {
 		// list all the known savable file types.
-		JFileChooser fc = new JFileChooser(new File(lastFileOut));
+		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
+		JFileChooser fc = new JFileChooser(lastDir);
 		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
 		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
 		while(i.hasNext()) {
@@ -813,11 +811,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		fc.setAcceptAllFileFilterUsed(false);
 		// remember the last path & filter used.
 		if(lastFilterOut!=null) fc.setFileFilter(lastFilterOut);
-		if(lastFileOut!=null) {
-			Path p = Paths.get(lastFileOut);
-			String lastDirectoryIn = p.getParent().toString();
-			fc.setCurrentDirectory(new File(lastDirectoryIn));
-		}
 		
 		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -829,8 +822,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
 				FileFilter filter = lft.getFileNameFilter();
-				if( !selectedFilter.equals(filter) ) continue;
-	
+				if( filter.getClass() != selectedFilter.getClass() ) continue;
+					
 				// make sure a valid extension is added to the file.
 				String selectedFileLC = selectedFile.toLowerCase();
 				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
