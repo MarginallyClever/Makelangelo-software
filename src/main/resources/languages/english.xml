@@ -13,6 +13,27 @@
 	</string>
 
 	<string>
+		<key>LissajousName</key>
+		<value>Lissajous</value>
+		<hint>Lissajous generator</hint>
+	</string>
+	<string>
+		<key>LissajousA</key>
+		<value>A (&gt;0)</value>
+		<hint>Lissajous generator</hint>
+	</string>
+	<string>
+		<key>LissajousB</key>
+		<value>B (&gt;0)</value>
+		<hint>Lissajous generator</hint>
+	</string>
+	<string>
+		<key>LissajousDelta</key>
+		<value>Delta (0...1)</value>
+		<hint>Lissajous generator</hint>
+	</string>
+	
+	<string>
 		<key>SpirographName</key>
 		<value>Spirograph</value>
 		<hint>Spirograph generator</hint>
@@ -368,7 +389,7 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
-		<key>FileTypeSB2</key>
+		<key>FileTypeScratch</key>
 		<value>Scratch (SB2)</value>
 		<hint>file open dialog</hint>		
 	</string>
