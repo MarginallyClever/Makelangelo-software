@@ -8,7 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marginallyclever.makelangelo.SelectBoolean;
 import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
