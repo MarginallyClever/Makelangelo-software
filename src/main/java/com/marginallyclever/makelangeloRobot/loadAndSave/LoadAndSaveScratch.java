@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
@@ -256,7 +255,6 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 				} else if(name.compareTo("wait:elapsed:from:")==0) {
 					// dwell - does nothing.
 					Object o2 = (Object)scriptIter.next();
-					@SuppressWarnings("unused")
 					float seconds = resolveValue(o2);
 					System.out.println("dwell "+seconds+" seconds.");
 					continue;
@@ -420,23 +418,23 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 			float b = resolveValue(o3);
 			return a < b;
 		}
-		if(name.compareTo("=")==0) {  // guess
+		if(name.compareTo("=")==0) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
 			float a = resolveValue(o2);
 			float b = resolveValue(o3);
 			return a == b; 
 		}
-		if(name.compareTo("!")==0) {  // guess
+		if(name.compareTo("not")==0) {
 			Object o2 = (Object)scriptIter.next();
 			return !resolveBoolean(o2);
 		}
-		if(name.compareTo("&&")==0) {  // guess
+		if(name.compareTo("&")==0) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
 			return resolveBoolean(o2) && resolveBoolean(o3);
 		}
-		if(name.compareTo("||")==0) {  // guess
+		if(name.compareTo("|")==0) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
 			return resolveBoolean(o2) || resolveBoolean(o3);
@@ -549,21 +547,21 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 				
 				float a = (float)resolveValue(o2);
 
-				if(functionName.equals("abs")) return (float)Math.abs(a);  // guess
-				if(functionName.equals("floor")) return (float)Math.floor(a);  // guess
-				if(functionName.equals("ceiling")) return (float)Math.ceil(a);  // guess
-				if(functionName.equals("sqrt")) return (float)Math.sqrt(a);  // guess
+				if(functionName.equals("abs")) return (float)Math.abs(a);
+				if(functionName.equals("floor")) return (float)Math.floor(a);
+				if(functionName.equals("ceiling")) return (float)Math.ceil(a);
+				if(functionName.equals("sqrt")) return (float)Math.sqrt(a);
 				if(functionName.equals("sin")) return (float)Math.sin(Math.toRadians(a));
 				if(functionName.equals("cos")) return (float)Math.cos(Math.toRadians(a));
-				if(functionName.equals("tan")) return (float)Math.tan(Math.toRadians(a));  // guess
+				if(functionName.equals("tan")) return (float)Math.tan(Math.toRadians(a));
 
-				if(functionName.equals("asin")) return (float)Math.asin(Math.toRadians(a));  // guess
-				if(functionName.equals("acos")) return (float)Math.acos(Math.toRadians(a));  // guess
-				if(functionName.equals("atan")) return (float)Math.atan(Math.toRadians(a));  // guess
-				//if(functionName.equals("ln")) return (float)Math.ln(a);  // guess
-				if(functionName.equals("log")) return (float)Math.log(a);  // guess
-				//if(functionName.equals("e^")) return (float)Math.tan(a);  // guess
-				//if(functionName.equals("10^")) return (float)Math.tan(a);  // guess
+				if(functionName.equals("asin")) return (float)Math.asin(Math.toRadians(a));
+				if(functionName.equals("acos")) return (float)Math.acos(Math.toRadians(a));
+				if(functionName.equals("atan")) return (float)Math.atan(Math.toRadians(a));
+				if(functionName.equals("ln")) return (float)Math.log(a);
+				if(functionName.equals("log")) return (float)Math.log10(a);
+				if(functionName.equals("e ^")) return (float)Math.pow(Math.E,a);
+				if(functionName.equals("10 ^")) return (float)Math.pow(10,a);
 				throw new Exception("Parse error (resolveValue computeFunction)");
 			}
 			
