@@ -61,7 +61,7 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
-	private int indent=0;
+	//private int indent=0;
 	private boolean penUp=false;
 	
 	@Override
@@ -151,7 +151,7 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
     			turtle = new Turtle();
     			
     			// make sure machine state is the default.
-    			setAbsoluteMode(out);
+    			imageStart(out);
     			
     			readScratchVariables(tree);
     			readScratchLists(tree);
@@ -188,20 +188,16 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 				return false;
 			}
 			
-
-			System.out.println("Done 1!");
-			
 			// finished. Close up file.
 			liftPen(out);
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 			out.flush();
 			out.close();
-	
-			System.out.println("Done 2!");
+
+			// now load the gcode.
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			InputStream fileInputStream = new FileInputStream(tempGCodeFile);
 			loader.load(fileInputStream,robot);
-			System.out.println("Done 3!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -248,16 +244,17 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 	 */
 	private void readScratchLists(JSONObject tree) throws Exception {
 		scratchLists = new LinkedList<ScratchList>();
-		JSONArray variables = (JSONArray)tree.get("lists");
-		ListIterator<?> varIter = variables.listIterator();
-		while( varIter.hasNext() ) {
+		JSONArray listOfLists = (JSONArray)tree.get("lists");
+		if(listOfLists == null) return;
+		ListIterator<?> listIter = listOfLists.listIterator();
+		while( listIter.hasNext() ) {
 			//System.out.println("var:"+elem.toString());
-			JSONObject elem = (JSONObject)varIter.next();
-			String varName = (String)elem.get("name");
+			JSONObject elem = (JSONObject)listIter.next();
+			String listName = (String)elem.get("name");
 			Object contents = (Object)elem.get("contents");
-			ScratchList list = new ScratchList(varName);
+			ScratchList list = new ScratchList(listName);
 			// fill the list with any given contents
-			if( contents instanceof JSONArray ) {
+			if( contents != null && contents instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)contents;
 
 				ListIterator<?> scriptIter = arr.listIterator();
@@ -275,7 +272,7 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 						} catch (Exception e) {
 							throw new Exception("List variables must be numbers.");
 						}
-					} else throw new Exception("List variable "+varName+"("+list.contents.size()+") is "+varValue.toString());
+					} else throw new Exception("List variable "+listName+"("+list.contents.size()+") is "+varValue.toString());
 				}
 			}
 			// add the list to the list-of-lists.
@@ -296,12 +293,18 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 		throw new Exception("List '"+listName+"' not found.");
 	}
 	
+	/**
+	 * read the elements of a JSON array describing Scratch code and parse it into gcode.
+	 * @param script valid JSONArray of Scratch commands.
+	 * @param out where to put the gcode.
+	 * @throws Exception
+	 */
 	private void parseScratchCode(JSONArray script,Writer out) throws Exception {
 		if(script==null) return;
 		
 		//for(int j=0;j<indent;++j) System.out.print("  ");
 		//System.out.println("size="+script.size());
-		indent++;
+		//indent++;
 		
 		ListIterator<?> scriptIter = script.listIterator();
 		// find the script with the green flag
@@ -327,18 +330,18 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					int count = (int)resolveValue(o2);
-					System.out.println("Repeat "+count+" times:");
+					//System.out.println("Repeat "+count+" times:");
 					for(int i=0;i<count;++i) {
 						parseScratchCode((JSONArray)o3,out);
 					}
 				} else if(name.equals("doUntil")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					System.out.println("Do until {");
+					//System.out.println("Do Until {");
 					while(!resolveBoolean((JSONArray)o2)) {
 						parseScratchCode((JSONArray)o3,out);
 					}
-					System.out.println("}");
+					//System.out.println("}");
 				} else if(name.equals("doIf")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
@@ -501,7 +504,7 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 				}
 			}
 		}
-		indent--;
+		//indent--;
 	}
 	
 	/**
@@ -698,6 +701,13 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 		throw new Exception("Parse error (resolveValue)");
 	}
 	
+	/**
+	 * Find the requested index in a list.
+	 * @param o2 the index value.  could be "random", "last", or an index number
+	 * @param o3 the list name.
+	 * @return the resolved value as an integer.
+	 * @throws Exception
+	 */
 	private int resolveListIndex(Object o2,Object o3) throws Exception {
 		String index = (String)o2;
 		String listName = (String)o3;

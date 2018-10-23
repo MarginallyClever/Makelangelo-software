@@ -96,7 +96,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			setAbsoluteMode(out);
+			imageStart(out);
 			
 			minX = minY =Double.MAX_VALUE;
 			maxX = maxY =-Double.MAX_VALUE;

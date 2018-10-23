@@ -63,6 +63,7 @@ public abstract class ImageManipulator {
 	 */
 	public void imageStart(Writer out) throws IOException {	
 		setAbsoluteMode(out);
+		machine.writeChangeToDefaultColor(out);
 	}
 
 

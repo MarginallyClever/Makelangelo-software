@@ -248,6 +248,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			double toolDiameterSquared = Math.pow(machine.getPenDiameter()/2, 2);
 			double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
 
+			// normally here I use imageStart(), but every layer causes a new writeChangeTo.  This avoids one redundant pen change.
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();
 			previousY = machine.getHomeY();
