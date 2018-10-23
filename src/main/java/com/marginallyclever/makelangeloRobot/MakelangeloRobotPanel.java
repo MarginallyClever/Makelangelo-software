@@ -658,10 +658,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			FileFilter selectedFilter = fc.getFileFilter();
+
+			// figure out which of the loaders was requested.
 			i = imageLoaders.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType loader = i.next();
-				if( loader.getFileNameFilter() != selectedFilter ) continue;
+				if( !isMatchingFileFilter(selectedFilter, loader.getFileNameFilter()) ) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
@@ -819,7 +821,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
 				FileFilter filter = lft.getFileNameFilter();
-				if( filter != selectedFilter ) continue;
+				if( !isMatchingFileFilter(selectedFilter,filter) ) continue;
 					
 				// make sure a valid extension is added to the file.
 				String selectedFileLC = selectedFile.toLowerCase();
@@ -853,6 +855,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 
+	private boolean isMatchingFileFilter(FileFilter a,FileFilter b) {
+		return a.equals(b);
+	}
 
 	/**
 	 * Open a file with a given LoadAndSaveFileType plugin.  
