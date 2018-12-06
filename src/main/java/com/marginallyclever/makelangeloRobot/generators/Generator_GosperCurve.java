@@ -7,9 +7,10 @@ import com.marginallyclever.makelangelo.Translator;
 public class Generator_GosperCurve extends ImageGenerator {
 	private Turtle turtle;
 	private float turtleStep = 10.0f;
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
+	private float xMax = 0;
+	private float xMin = 0;
+	private float yMax = 0;
+	private float yMin = 0;
 	private static int order = 4; // controls complexity of curve
 	
 	@Override
@@ -37,17 +38,46 @@ public class Generator_GosperCurve extends ImageGenerator {
 		machine.writeChangeToDefaultColor(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
-				           (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
-		xMax = v;
-		yMax = v;
-		xMin = -v;
+				           (float)(machine.getPaperHeight() * machine.getPaperMargin()));
 
 		turtle = new Turtle();
-		turtleStep = 10;//(float) ((v/2) / (Math.pow(2, order)));
+		turtleStep = 10;
+		turtle.setX(0);
+		turtle.setY(0);
+		xMax = 0;
+		xMin = 0;
+		yMax = 0;
+		yMin = 0;
+		GosperA(null, order);
 
+		// scale the image to fit on the paper
+		float w = xMax-xMin;
+		float h = yMax-yMin;
+		if(w>h) {
+			float f = v/w;
+			h*=f;
+			turtleStep*=f;
+			xMax*=f;
+			xMin*=f;
+			yMax*=f;
+			yMin*=f;
+		} else {
+			float f = v/h;
+			w*=f;
+			turtleStep*=f;
+			xMax*=f;
+			xMin*=f;
+			yMax*=f;
+			yMin*=f;
+		}
+		// adjust the start position to center the image
+		float x = (xMax+xMin)/-2;
+		float y = (yMax+yMin)/-2;
+		
 		// move to starting position
-		turtle.setX(0);//xMax - turtleStep / 2);
-		turtle.setY(0);//yMax - turtleStep / 2);
+		turtle.setX(x);
+		turtle.setY(y);
+		liftPen(out);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
@@ -112,6 +142,10 @@ public class Generator_GosperCurve extends ImageGenerator {
 		//turtle_y += turtle_dy * distance;
 		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
 		turtle.move(turtleStep);
-		moveTo(output, turtle.getX(), turtle.getY(), false);
+		if(output!=null) moveTo(output, turtle.getX(), turtle.getY(), false);
+		if(xMax<turtle.getX()) xMax=turtle.getX();
+		if(xMin>turtle.getX()) xMin=turtle.getX();
+		if(yMax<turtle.getY()) yMax=turtle.getY();
+		if(yMin>turtle.getY()) yMin=turtle.getY();
 	}
 }
