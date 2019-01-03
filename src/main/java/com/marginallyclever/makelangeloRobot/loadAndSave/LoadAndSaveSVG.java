@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGOMPathElement;
+import org.apache.batik.anim.dom.SVGOMPolylineElement;
 import org.apache.batik.anim.dom.SVGOMSVGElement;
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.bridge.DocumentLoader;
@@ -30,6 +31,8 @@ import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
 import org.w3c.dom.svg.SVGPathSegLinetoAbs;
 import org.w3c.dom.svg.SVGPathSegList;
 import org.w3c.dom.svg.SVGPathSegMovetoAbs;
+import org.w3c.dom.svg.SVGPoint;
+import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
@@ -87,8 +90,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
-		NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-
 	    boolean loadOK=true;
 
 		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
@@ -102,7 +103,12 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			maxX = maxY =-Double.MAX_VALUE;
 			imageCenterX=imageCenterY=0;
 			scale=1;
-			loadOK = parseElements(out,pathNodes,false);
+			NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
+			loadOK = parsePathElements(out,pathNodes,false);
+			if(loadOK) {
+				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
+				loadOK = parsePolylineElements(out,pathNodes,false);
+			}
 			if(loadOK) {
 				imageCenterX = ( maxX + minX ) / 2.0;
 				imageCenterY = -( maxY + minY ) / 2.0;
@@ -121,7 +127,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							(paperHeight / imageHeight);
 				}
 				
-				loadOK = parseElements(out,pathNodes,true);
+				loadOK = parsePathElements(out,pathNodes,true);
+				if(loadOK) {
+					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
+					loadOK = parsePolylineElements(out,pathNodes,true);
+				}
 			}		    
 			// entities finished. Close up file.
 			liftPen(out);
@@ -144,12 +154,12 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	/**
-	 * Parse through all the SVG elements and raster them to gcode.
+	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param out the writer to send the gcode
 	 * @param pathNodes the source of the elements
 	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parseElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
+	protected boolean parsePolylineElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
 	    boolean loadOK=true;
 
 	    double previousX,previousY,x,y;
@@ -158,6 +168,54 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    	SVGOMPolylineElement pathElement = ((SVGOMPolylineElement)pathNodes.item( iPathNode ));
+	    	SVGPointList pointList = pathElement.getAnimatedPoints();
+	    	int numPoints = pointList.getNumberOfItems();
+			//System.out.println("New Node has "+pathObjects+" elements.");
+
+	    	boolean first=true;
+			for (int i = 0; i < numPoints; i++) {
+				SVGPoint  item = (SVGPoint) pointList.getItem(i);
+				x = ( item.getX() - imageCenterX ) * scale;
+				y = ( item.getY() - imageCenterY ) * -scale;
+
+				if(write) {
+					if(first) {
+						//if(previousX!=x && previousY!=y)
+						{
+							liftPen(out);
+							moveTo(out,x,y,true);
+							lowerPen(out);
+						}
+						first=false;
+					} else {
+						moveTo(out,x,y,false);
+					}
+				} else adjustLimits(x,y);
+				previousX=x;
+				previousY=y;
+			}
+		}
+	    return loadOK;
+	}
+	
+	/**
+	 * Parse through all the SVG path elements and raster them to gcode.
+	 * @param out the writer to send the gcode
+	 * @param pathNodes the source of the elements
+	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
+	 */
+	protected boolean parsePathElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
+	    boolean loadOK=true;
+
+	    double previousX,previousY,x,y;
+	    x=previousX = machine.getHomeX();
+		y=previousY = machine.getHomeY();
+		
+	    int pathNodeCount = pathNodes.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) continue;
+	    	
 	    	SVGOMPathElement pathElement = ((SVGOMPathElement)pathNodes.item( iPathNode ));
 	    	SVGPathSegList pathList = pathElement.getNormalizedPathSegList();
 	    	int pathObjects = pathList.getNumberOfItems();
