@@ -165,6 +165,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    double previousX,previousY,x,y;
 	    x=previousX = machine.getHomeX();
 		y=previousY = machine.getHomeY();
+		double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -181,16 +182,16 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 				if(write) {
 					if(first) {
-						//if(previousX!=x && previousY!=y)
-						{
+						double dx=x-previousX;
+						double dy=y-previousY;
+						if(dx*dx+dy*dy > toolMinimumStepSize ) {
 							liftPen(out);
 							moveTo(out,x,y,true);
 							lowerPen(out);
 						}
 						first=false;
-					} else {
-						moveTo(out,x,y,false);
 					}
+					moveTo(out,x,y,false);
 				} else adjustLimits(x,y);
 				previousX=x;
 				previousY=y;
