@@ -38,7 +38,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeToDefaultColor(out);
 
-		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
+		float v = Math.max((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
 		xMax = v;
 		yMax = v;
@@ -53,13 +53,18 @@ public class Generator_KochCurve extends ImageGenerator {
 		
 		liftPen(out);
 		// move to starting position
-		turtle.setX(xMax);
-		turtle.setY(0);
+		if(machine.getPaperWidth() > machine.getPaperHeight()) {
+			turtle.setX(-xMax);
+			turtle.setY(0);
+		} else {
+			turtle.setX(0);
+			turtle.setY(-yMax);
+			turtle.turn(90);
+		}
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
-		turtle.turn(90);
-		drawTriangel(out, order, maxSize);
+		drawTriangle(out, order, maxSize);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    
@@ -68,22 +73,22 @@ public class Generator_KochCurve extends ImageGenerator {
 
 
 	// L System tree
-	private void drawTriangel(Writer output, int n, float distance) throws IOException {
+	private void drawTriangle(Writer output, int n, float distance) throws IOException {
 		if (n == 0) {
 			turtleMove(output,distance);
 			return;
 		}
-		drawTriangel(output,n-1,distance/3.0f);
+		drawTriangle(output,n-1,distance/3.0f);
 		if(n>1) {
 			turtle.turn(-60);
-			drawTriangel(output,n-1,distance/3.0f);
+			drawTriangle(output,n-1,distance/3.0f);
 			turtle.turn(120);
-			drawTriangel(output,n-1,distance/3.0f);
+			drawTriangle(output,n-1,distance/3.0f);
 			turtle.turn(-60);
 		} else {
 			turtleMove(output,distance/3.0f);
 		}
-		drawTriangel(output,n-1,distance/3.0f);
+		drawTriangle(output,n-1,distance/3.0f);
 	}
 
 
