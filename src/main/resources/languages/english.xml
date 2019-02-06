@@ -619,7 +619,12 @@
 	</string>
 	<string>
 		<key>Rate</key>
-		<value>steps/min</value>
+		<value>mm/s</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>RateAccel</key>
+		<value>mm/s/s</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
