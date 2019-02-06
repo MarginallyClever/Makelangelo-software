@@ -40,27 +40,30 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeToDefaultColor(out);
 
-		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-				(float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
-		xMax = v;
-		yMax = v;
-		xMin = -v;
-		yMin = -v;
+		xMax = (float)(machine.getPaperWidth() * machine.getPaperMargin())/2.0f;
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
+		xMin = -xMax;
+		yMin = -yMax;
 
 		turtle = new Turtle();
 		
 		float xx = xMax - xMin;
 		float yy = yMax - yMin;
-		maxSize = xx > yy ? xx : yy;
-		
+		maxSize = (float)Math.tan(Math.toRadians(30))*(xx < yy ? xx : yy)*2;
+		float jj = (float)Math.asin(Math.toRadians(30))*(xx < yy ? xx : yy);
 		liftPen(out);
 		// move to starting position
-		turtle.setX(xMax);
-		turtle.setY(-xMax/2);
+		if(xMax>yMax) {
+			turtle.setX(-jj);
+			turtle.setY(yMin);
+		} else {
+			turtle.setX(xMax);
+			turtle.setY(-jj);
+			turtle.turn(90);
+		}
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
-		turtle.turn(90);
 		if( (order&1) == 0 ) {
 			drawCurve(out, order, maxSize,-60);
 		} else {
