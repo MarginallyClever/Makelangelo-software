@@ -37,28 +37,26 @@ public class Generator_LSystemTree extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeToDefaultColor(out);
 
-		float v = Math.min((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-				(float)(machine.getPaperHeight() * machine.getPaperMargin())) / 2.0f;
-		xMax = v;
-		yMax = v;
-		xMin = -v;
-		yMin = -v;
+		xMax = (float)(machine.getPaperWidth() * machine.getPaperMargin())/ 2.0f;
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/ 2.0f;
+		xMin = -xMax;
+		yMin = -yMax;
 
 		turtle = new Turtle();
 		
-		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
 
 		float xx = xMax - xMin;
 		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
+		turtleStep = (float)(yy / order)*0.99f;
 		
 		// move to starting position
-		turtle.setX(0);
-		turtle.setY(yMax - turtleStep / 2);
+		turtle.setY(-yMax );
+		turtle.turn(90);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
-		lSystemTree(out, order, maxSize/4);
+		lSystemTree(out, order, turtleStep);
 		liftPen(out);
 	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 		return true;
