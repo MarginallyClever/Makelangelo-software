@@ -132,9 +132,12 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			c.gridx = 0;
 			c.gridy = 0;
 			p.add(new JLabel(Translator.get("AdjustAcceleration")), c);
-			d.gridx = 1;
-			d.gridy = 0;
-			p.add(acceleration, d);
+			c.gridx = 1;
+			c.gridy = 0;
+			p.add(acceleration, c);
+			c.gridx = 2;
+			c.gridy = 0;
+			p.add(new JLabel(Translator.get("RateAccel")),c);
 			if(!robot.getSettings().getHardwareProperties().canAccelerate()) {
 				p.setVisible(false);
 			}
