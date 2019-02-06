@@ -258,8 +258,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		if( subject == isLandscape ) {
 			String sw = pw.getText();
 			String sh = ph.getText();
-			pw.setText(sh);
-			ph.setText(sw);
+			pw.setValue(Float.parseFloat(sh));
+			ph.setValue(Float.parseFloat(sw));
 		}
 		
 		beingModified=false;
