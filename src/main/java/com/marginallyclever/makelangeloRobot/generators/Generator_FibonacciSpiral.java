@@ -64,21 +64,24 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		liftPen(out);
 		machine.writeChangeToDefaultColor(out);
 
-		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin())/2.0f;
-		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
-
+		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin() /2.0f);
+		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin() /2.0f);
+		System.out.println("xMax="+xMax);
+		System.out.println("yMax="+yMax);
+		
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);
 		
 		// scale the fractal to fit on the page
 		// short side
 		float s1 = fibonacciSequence.peek();
+		System.out.println("s1="+s1);
 		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
 		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
+		System.out.println("s2="+s2);
 		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
-		System.out.println("size="+fibonacciSequence.size());
 		if(scale1>scale2) scale1=scale2;
 		
 		turtle = new Turtle();
@@ -86,16 +89,19 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		liftPen(out);
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
+		System.out.println("shortSide="+shortSide);
 		if( xMax < yMax ) {
+			System.out.println("tall thin");
 			// tall thin paper, top left corner
-			turtle.setX(-shortSide);
+			turtle.setX(shortSide);
 			turtle.setY(yMax);
-			turtle.turn(-90);
+			turtle.turn(180);
 		} else {
+			System.out.println("short wide");
 			// short wide paper, bottom left corner
 			turtle.setX(-xMax);
-			turtle.setY(-shortSide);
-			turtle.turn(180);
+			turtle.setY(shortSide);
+			turtle.turn(-90);
 		}
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
