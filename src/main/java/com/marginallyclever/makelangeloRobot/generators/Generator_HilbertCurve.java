@@ -46,8 +46,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
 
 		// move to starting position
-		turtle.setX(xMax - turtleStep / 2);
-		turtle.setY(yMax - turtleStep / 2);
+		turtle.setX(-xMax + turtleStep / 2);
+		turtle.setY(-yMax + turtleStep / 2);
 		moveTo(out, turtle.getX(), turtle.getY(), true);
 		lowerPen(out);
 		// do the curve
