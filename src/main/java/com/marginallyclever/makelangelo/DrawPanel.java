@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
 
@@ -17,7 +19,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 // Custom drawing panel written as an inner class to access the instance variables.
-public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, GLEventListener {
+public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, MouseWheelListener, GLEventListener {
 	static final long serialVersionUID = 2;
 
 	// Use debug pipeline?
@@ -47,6 +49,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addGLEventListener(this);
+		addMouseWheelListener(this);
 	}
 
 	void setRobot(MakelangeloRobot r) {
@@ -170,10 +173,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		int y = e.getY();
 		int dx = x - mouseOldX;
 		int dy = y - mouseOldY;
-		if (buttonPressed == MouseEvent.BUTTON1)
-			moveCamera(-dx, -dy);
-		if (buttonPressed == MouseEvent.BUTTON3)
-			zoomCamera(dy);
+		if (buttonPressed == MouseEvent.BUTTON1) moveCamera(-dx, -dy);
+		//if (buttonPressed == MouseEvent.BUTTON3) zoomCamera(dy);
 		mouseOldX = x;
 		mouseOldY = y;
 	}
@@ -199,6 +200,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 *
 	 * @param y
 	 */
+	@SuppressWarnings("unused")
 	private void zoomCamera(int dy) {
 		double zoomAmount = (double) dy * 0.25;
 		cameraZoom += zoomAmount;
@@ -210,14 +212,14 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 * scale the picture of the robot to fake a zoom.
 	 */
 	public void zoomIn() {
-		cameraZoom *= 3.0d / 4.0d;
+		cameraZoom *= 3.5d / 4.0d;
 	}
 
 	/**
 	 * scale the picture of the robot to fake a zoom.
 	 */
 	public void zoomOut() {
-		cameraZoom *= 4.0d / 3.0d;
+		cameraZoom *= 4.0d / 3.5d;
 	}
 
 	/**
@@ -262,6 +264,16 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		}
 
 		gl2.glPopMatrix();
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		int notches = e.getWheelRotation();
+		if (notches < 0) {
+			zoomIn();
+		} else {
+			zoomOut();
+		}
 	}
 }
 
