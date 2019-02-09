@@ -60,7 +60,7 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	protected int outputChannel(Writer out,TransformedImage img,Color newColor,int numberOfLines,double cutoff) throws IOException {
-		machine.writeChangeToDefaultColor(out);
+		machine.writeChangeTo(out,newColor);
 
 		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;

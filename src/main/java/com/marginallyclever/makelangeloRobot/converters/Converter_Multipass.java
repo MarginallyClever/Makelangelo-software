@@ -54,7 +54,6 @@ public class Converter_Multipass extends ImageConverter {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter();

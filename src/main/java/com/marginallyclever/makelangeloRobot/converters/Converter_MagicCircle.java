@@ -54,7 +54,6 @@ public class Converter_MagicCircle extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		double toolDiameter = machine.getPenDiameter();
 

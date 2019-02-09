@@ -45,7 +45,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		double toolDiameter = machine.getPenDiameter();
 

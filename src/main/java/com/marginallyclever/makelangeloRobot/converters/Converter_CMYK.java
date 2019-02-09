@@ -45,8 +45,7 @@ public class Converter_CMYK extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(out);
+		this.setAbsoluteMode(out);
 		
 		Log.info("Yellow...");
 		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));

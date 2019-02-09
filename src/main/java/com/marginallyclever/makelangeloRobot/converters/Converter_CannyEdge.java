@@ -47,8 +47,6 @@ public class Converter_CannyEdge extends ImageConverter {
 /*
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(edges, out);
-		// "please change to tool X and press any key to continue"
-		tool.writeChangeTo(out);
 		// Make sure the pen is up for the first move
 		liftPen(out);
 

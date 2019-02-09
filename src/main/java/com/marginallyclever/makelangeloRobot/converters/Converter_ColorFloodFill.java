@@ -235,7 +235,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
-		imageStart(out);
+		setAbsoluteMode(out);
 		
 		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
 		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();

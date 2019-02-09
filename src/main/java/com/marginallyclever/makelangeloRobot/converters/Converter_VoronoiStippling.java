@@ -229,7 +229,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		float toolDiameter = machine.getPenDiameter();
 
