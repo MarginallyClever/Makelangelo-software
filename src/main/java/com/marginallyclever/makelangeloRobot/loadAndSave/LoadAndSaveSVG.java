@@ -240,9 +240,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	protected boolean parsePathElements(Writer out,NodeList pathNodes,double toolMinimumStepSize,boolean write) throws IOException {
 	    boolean loadOK=true;
 
-	    double x,y,firstX,firstY;
-	    x = firstX = machine.getHomeX();
-		y = firstY = machine.getHomeY();
+	    double x = machine.getHomeX();
+	    double y = machine.getHomeY();
+		//double firstX=x;
+		//double firstY=y;
+		//boolean first=true;
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -259,7 +261,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 			for (int i = 0; i < pathObjects; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
-				switch( item.getPathSegType() ) {
+				switch( item.getPathSegType() ) {/*
 				case SVGPathSeg.PATHSEG_CLOSEPATH:
 					{
 						//System.out.println("Close path");
@@ -267,7 +269,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						x=firstX;
 						y=firstY;
 					}
-					break;
+					break;*/
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:
 					{
 						//System.out.println("Move Abs");
@@ -278,6 +280,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						} 
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
+						//if(first) {
+						//	firstX=x;
+						//	firstY=y;
+						//	first=false;
+						//}
 						if(write) {
 							moveTo(out,x,y,true);
 							lowerPen(out);
@@ -291,6 +298,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
+						//if(first) {
+						//	firstX=x;
+						//	firstY=y;
+						//	first=false;
+						//}
 						if(write) moveTo(out,x,y,false);
 						else adjustLimits(x,y);
 					}
@@ -359,6 +371,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						}
 						x = xabc;
 						y = yabc;
+						//if(first) {
+						//	firstX=x;
+						//	firstY=y;
+						//	first=false;
+						//}
 					}
 					break; 
 				default:
