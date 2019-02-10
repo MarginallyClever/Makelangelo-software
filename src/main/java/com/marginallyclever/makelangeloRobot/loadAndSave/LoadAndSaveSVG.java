@@ -43,7 +43,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 /**
  * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
- *
+ * @see https://www.w3.org/TR/SVG/paths.html
  */
 public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
@@ -242,9 +242,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 	    double x = machine.getHomeX();
 	    double y = machine.getHomeY();
-		//double firstX=x;
-		//double firstY=y;
-		//boolean first=true;
+		double firstX=0;
+		double firstY=0;
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -261,31 +260,23 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 			for (int i = 0; i < pathObjects; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
-				switch( item.getPathSegType() ) {/*
+				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:
 					{
-						//System.out.println("Close path");
-						if(write) moveTo(out,firstX,firstX,false);
-						x=firstX;
-						y=firstY;
+						System.out.println("Close path");
+						if(write) moveTo(out,firstX,firstY,false);
 					}
-					break;*/
+					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:
 					{
-						//System.out.println("Move Abs");
+						System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						if(write) {
-							liftPen(out);
-							moveTo(out,x,y,true);
-						} 
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
-						//if(first) {
-						//	firstX=x;
-						//	firstY=y;
-						//	first=false;
-						//}
+						firstX=x;
+						firstY=y;
 						if(write) {
+							liftPen(out);
 							moveTo(out,x,y,true);
 							lowerPen(out);
 							moveTo(out,x,y,false);
@@ -294,22 +285,17 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:
 					{
-						//System.out.println("Line Abs");
+						System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
-						//if(first) {
-						//	firstX=x;
-						//	firstY=y;
-						//	first=false;
-						//}
 						if(write) moveTo(out,x,y,false);
 						else adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: 
 					{
-						//System.out.println("Curve Cubic Abs");
+						System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 						// x,y is the first point
 						double x0=x;
@@ -341,7 +327,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						}*/
 						
 						double xabc=x,yabc=y;
-						for(double j=0;j<1;j+=0.1) {/*
+						for(double j=0;j<=1;j+=0.1) {/*
+							// old method
 							double xa = p(x0,x1,j);
 							double ya = p(y0,y1,j);
 							double xb = p(x1,x2,j);
@@ -355,27 +342,22 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							double ybc = p(yb,yc,j);
 							
 							xabc = p(xab,xbc,j);
-							yabc = p(yab,ybc,j);*/
+							yabc = p(yab,ybc,j);/*/
 					        double a = Math.pow((1.0 - j), 3.0);
 					        double b = 3.0 * j * Math.pow((1.0 - j), 2.0);
 					        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
 					        double d = Math.pow(j, 3.0);
 					 
 					        xabc = a * x0 + b * x1 + c * x2 + d * x3;
-					        yabc = a * y0 + b * y1 + c * y2 + d * y3;
+					        yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
 							
-							if(distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
+							//if(distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
 								if(write) moveTo(out,xabc,yabc,false);
 								else adjustLimits(xabc,yabc);
-							}
+							//}
 						}
 						x = xabc;
 						y = yabc;
-						//if(first) {
-						//	firstX=x;
-						//	firstY=y;
-						//	first=false;
-						//}
 					}
 					break; 
 				default:
