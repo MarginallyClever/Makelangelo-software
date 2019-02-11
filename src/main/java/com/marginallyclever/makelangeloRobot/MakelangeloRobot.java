@@ -566,17 +566,17 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			return false;
 
 		// catch pen up/down status here
-		if (line.contains(settings.getPenUpString())) {
+		if (reportedline.startsWith(settings.getPenUpString())) {
 			penIsUp = true;
 		}
-		if (line.contains(settings.getPenDownString())) {
+		if (reportedline.startsWith(settings.getPenDownString())) {
 			penIsUp = false;
 		}
-		if (line.equals("M17")) {
+		if (reportedline.startsWith("M17")) {
 			// engage motors
 			myPanel.motorsHaveBeenEngaged();
 		}
-		if (line.equals("M18")) {
+		if (reportedline.startsWith("M18")) {
 			// disengage motors
 			myPanel.motorsHaveBeenDisengaged();
 		}
