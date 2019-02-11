@@ -749,11 +749,11 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public String getPenDownString() {
-		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle()) + "\n";
+		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle()) + "\n";
+		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle());
 	}
 	
 	public String getPenUpFeedrateString() {
@@ -822,13 +822,13 @@ public final class MakelangeloRobotSettings {
 
 	// lift the pen
 	public void writePenUp(Writer out) throws IOException {
-		out.write(getPenUpString());
+		out.write(getPenUpString()+"\n");
 		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
 	}
 
 	// lower the pen
 	public void writePenDown(Writer out) throws IOException {
-		out.write(getPenDownString());
+		out.write(getPenDownString()+"\n");
 		out.write("G01 F" + df.format(getPenDownFeedRate()) + "\n");
 	}
 	

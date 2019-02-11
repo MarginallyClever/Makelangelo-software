@@ -448,24 +448,14 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * @param line
 	 *            command to send
 	 */
-	public void tweakAndSendLine(String line, int lineNumber) {
+	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning())
 			return;
-		/*
-		 * // tool change request? String[] tokens = line.split("(\\s|;)"); if
-		 * (Arrays.asList(tokens).contains("M06") ||
-		 * Arrays.asList(tokens).contains("M6")) { int toolNumber=0; for (String
-		 * token : tokens) { if (token.startsWith("T")) { toolNumber =
-		 * Integer.decode(token.substring(1)); } }
-		 * 
-		 * requestUserChangeTool(toolNumber); }
-		 */
-		// checksums for commands with a line number
-		// if (line.length() > 3) {
+
 		line = "N" + lineNumber + " " + line;
+		if(!line.endsWith(";")) line+=';';
 		String checksum = generateChecksum(line);
 		line += checksum;
-		// }
 
 		// send relevant part of line to the robot
 		sendLineToRobot(line);
@@ -492,7 +482,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		} else {
 			int lineNumber = gCode.getLinesProcessed();
 			String line = gCode.nextLine();
-			tweakAndSendLine(line, lineNumber);
+			sendLineWithNumberAndChecksum(line, lineNumber);
 
 			if (myPanel != null)
 				myPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
@@ -576,10 +566,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			return false;
 
 		// catch pen up/down status here
-		if (line.equals(settings.getPenUpString())) {
+		if (line.contains(settings.getPenUpString())) {
 			penIsUp = true;
 		}
-		if (line.equals(settings.getPenDownString())) {
+		if (line.contains(settings.getPenDownString())) {
 			penIsUp = false;
 		}
 		if (line.equals("M17")) {
