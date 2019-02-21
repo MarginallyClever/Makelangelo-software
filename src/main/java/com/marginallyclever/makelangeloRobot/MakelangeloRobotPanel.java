@@ -657,13 +657,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// run the dialog
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileFilter selectedFilter = fc.getFileFilter();
+			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 
 			// figure out which of the loaders was requested.
 			i = imageLoaders.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType loader = i.next();
-				if( !isMatchingFileFilter(selectedFilter, loader.getFileNameFilter()) ) continue;
+				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFileIn = selectedFile;
@@ -814,14 +814,17 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// run the dialog
 		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileFilter selectedFilter = fc.getFileFilter();
+			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
 			i = imageSavers.iterator();
 			while(i.hasNext()) {
 				LoadAndSaveFileType lft = i.next();
-				FileFilter filter = lft.getFileNameFilter();
-				if( !isMatchingFileFilter(selectedFilter,filter) ) continue;
+				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
+				//if(!filter.accept(new File(selectedFile))) {
+				if( !isMatchingFileFilter(selectedFilter,filter) ) {
+					continue;
+				}
 					
 				// make sure a valid extension is added to the file.
 				String selectedFileLC = selectedFile.toLowerCase();
@@ -855,8 +858,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 	}
 
-	private boolean isMatchingFileFilter(FileFilter a,FileFilter b) {
-		return a.equals(b);
+	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
+		if(!a.getDescription().equals(b.getDescription())) return false;
+		String [] aa = a.getExtensions();
+		String [] bb = b.getExtensions();
+		if(aa.length!=bb.length) return false;
+		for(int i=0;i<aa.length;++i) {
+			if(!aa[i].equals(bb[i])) return false;
+		}
+		return true;
 	}
 
 	/**
