@@ -41,6 +41,8 @@ public final class MakelangeloRobotSettings {
 	static public final float Z_ANGLE_ON = 160;
 	static public final float Z_ANGLE_OFF = 90;
 	
+	static public int FIRMWARE_MAX_SEGMENTS = 32;
+	
 	private DecimalFormat df;
 	
 	private String[] configsAvailable;
@@ -169,13 +171,13 @@ public final class MakelangeloRobotSettings {
 		diameter = 0.8f;
 		zRate = Z_RATE;
 		zOn = Z_ANGLE_ON;
-		zOff = Z_ANGLE_OF;
+		zOff = Z_ANGLE_OFF;
 		penDownColor = penDownColorDefault = Color.BLACK;
 		penUpColor = Color.BLUE;
 		reverseForGlass = false;
 		startingPositionIndex = 4;
 
-		setLookAheadSegments(32);  // firmware MAX_SEGMENTS
+		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
 		
 		// default hardware version is 2
 		setHardwareVersion(2);
