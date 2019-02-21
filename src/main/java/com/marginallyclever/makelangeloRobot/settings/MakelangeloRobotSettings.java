@@ -33,6 +33,14 @@ public final class MakelangeloRobotSettings {
 	 */
 	public static final float CALIBRATION_MM_FROM_TOP = 217f;
 	
+	static public final float FEEDRATE_MAX = 100;
+	static public final float FEEDRATE_DEFAULT = 60;
+	static public final float ACCELERATION_MAX = 300;
+	
+	static public final float Z_RATE = 500;
+	static public final float Z_ANGLE_ON = 160;
+	static public final float Z_ANGLE_OFF = 90;
+	
 	private DecimalFormat df;
 	
 	private String[] configsAvailable;
@@ -153,15 +161,15 @@ public final class MakelangeloRobotSettings {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate = 6500;
-		currentFeedRate = 6500;
-		maxAcceleration = 2500;
+		maxFeedRate = FEEDRATE_MAX;
+		currentFeedRate = FEEDRATE_DEFAULT;
+		maxAcceleration = ACCELERATION_MAX;
 
 		// pen
 		diameter = 0.8f;
-		zRate = 50;
-		zOn = 50;
-		zOff = 90;
+		zRate = Z_RATE;
+		zOn = Z_ANGLE_ON;
+		zOff = Z_ANGLE_OF;
 		penDownColor = penDownColorDefault = Color.BLACK;
 		penUpColor = Color.BLUE;
 		reverseForGlass = false;
