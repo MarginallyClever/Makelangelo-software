@@ -203,11 +203,13 @@ public class GCodeFile {
 		}
 	}
 
+	
 	public void load(InputStream in,boolean flipHorizontally) throws IOException {
 		Scanner scanner = new Scanner(in);
 		loadFromScanner(scanner,flipHorizontally);
 	}
 
+	
 	public void load(String filename,boolean flipHorizontally) throws IOException {
 		Scanner scanner = new Scanner(new FileInputStream(filename));	
 		loadFromScanner(scanner,flipHorizontally);

@@ -2,7 +2,9 @@ package com.marginallyclever.gcode;
 
 import java.awt.Color;
 
-
+/*
+ * GCodeNodes are used to optimize the graphics rendering pipeline.
+ */
 public class GCodeNode {
 	public double x1;
 	public double y1;

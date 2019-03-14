@@ -256,20 +256,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGOMPathElement pathElement = ((SVGOMPathElement)pathNodes.item( iPathNode ));
 	    	SVGPathSegList pathList = pathElement.getNormalizedPathSegList();
 	    	int pathObjects = pathList.getNumberOfItems();
-			System.out.println("Node has "+pathObjects+" elements.");
+			//System.out.println("Node has "+pathObjects+" elements.");
 
 			for (int i = 0; i < pathObjects; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:
 					{
-						System.out.println("Close path");
+						//System.out.println("Close path");
 						if(write) moveTo(out,firstX,firstY,false);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:
 					{
-						System.out.println("Move Abs");
+						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
@@ -285,7 +285,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:
 					{
-						System.out.println("Line Abs");
+						//System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = ( path.getX() - imageCenterX ) * scale;
 						y = ( path.getY() - imageCenterY ) * -scale;
@@ -295,7 +295,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: 
 					{
-						System.out.println("Curve Cubic Abs");
+						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 						// x,y is the first point
 						double x0=x;

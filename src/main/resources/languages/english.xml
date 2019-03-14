@@ -146,6 +146,13 @@
 	</string>
 	
 	<string>
+		<key>DXFOptimizeOnLoad</key>
+		<value>Improve route efficiency</value>
+		<hint>DXF load option</hint>
+	</string>
+	
+	
+	<string>
 		<key>TempFolderLabel</key>
 		<value>Temporary files location:</value>
 		<hint>Where to save temporary files used in gcode management.</hint>
@@ -894,7 +901,7 @@ to check yourself.</value>
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift delay</value>
+		<value>Lift speed</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
