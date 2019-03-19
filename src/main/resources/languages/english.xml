@@ -129,7 +129,7 @@
 	
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.<br>Do not run from SD card (yet!)</html></body>]]></value>
+		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 	
