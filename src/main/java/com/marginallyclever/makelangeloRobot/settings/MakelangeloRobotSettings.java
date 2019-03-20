@@ -833,12 +833,20 @@ public final class MakelangeloRobotSettings {
 	// lift the pen
 	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString()+"\n");
+		// this dwell forces the firmware to stop path-planning through the lift action.
+		// we want to stop is so that it doesn't take off at a crazy speed after a lift.
+		out.write("G04 P1\n");
+		
 		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
 	}
-
+	
 	// lower the pen
 	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString()+"\n");
+		// this dwell forces the firmware to stop path-planning through the lift action.
+		// we want to stop is so that it doesn't take off at a crazy speed after a lift.
+		out.write("G04 P1\n");
+
 		out.write("G01 F" + df.format(getPenDownFeedRate()) + "\n");
 	}
 	
