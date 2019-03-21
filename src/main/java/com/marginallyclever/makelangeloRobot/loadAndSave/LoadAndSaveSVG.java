@@ -175,6 +175,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	int numPoints = pointList.getNumberOfItems();
 			//System.out.println("New Node has "+pathObjects+" elements.");
 
+	    	// which end of the line is closer to our current position?
 	    	double d0 = distanceSquared((SVGPoint)pointList.getItem(0),previousX,previousY);
 	    	double dN = distanceSquared((SVGPoint)pointList.getItem(numPoints-1),previousX,previousY);
 	    	int startI,endI,dirI;

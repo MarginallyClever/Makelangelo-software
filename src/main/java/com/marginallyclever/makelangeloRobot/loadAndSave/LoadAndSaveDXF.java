@@ -304,9 +304,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				// Maybe even a closed path!
 				// Some of the lines in each group may be flipped. 
 
-				// TODO sort out the flips so the end of line N is the start of line N+1.
-				// TODO detect which groups are closed.
-				// TODO fill in the closed groups if the user says ok.
+				// TODO fill in the closed groups if the user says ok. (does not belong in DXF)
 				
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
@@ -379,7 +377,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 			parseDXFLine(out,(DXFLine)e,toolDiameterSquared);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-			parseDXFPolyline(out,DXFSplineConverter.toDXFPolyline((DXFSpline)e),toolMinimumStepSize);
+			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
+			parseDXFPolyline(out,polyLine,toolMinimumStepSize);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
 			parseDXFPolyline(out,(DXFPolyline)e,toolMinimumStepSize);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
@@ -522,7 +521,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
 			first = false;
 		}
 	}
@@ -534,7 +533,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
 			first = false;
 		}
 	}
@@ -573,7 +572,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
 			first = false;
 		}
 	}
@@ -585,12 +584,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parseCurvingLine(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parseCurvingLine(Writer out,double x,double y,double limitSquared,boolean first,boolean notLast) throws IOException {
+	protected void parsePolylineShared(Writer out,double x,double y,double limitSquared,boolean first,boolean notLast) throws IOException {
 		double dx = x - previousX;
 		double dy = y - previousY;
 
