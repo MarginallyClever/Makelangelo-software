@@ -8,9 +8,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,7 +34,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 
 	private JComboBox<String> paperSizes;
 	private SelectFloat pw, ph;
-	private JCheckBox isLandscape;
+	private JButton isLandscape;
 	private boolean beingModified;
 	private SelectColor paperColor;
 	
@@ -117,36 +116,35 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		paperSizes = new JComboBox<>(commonPaperNames);
 		paperSizes.addActionListener(this);
 		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
-		d.gridx=1;  d.gridy=y;  d.gridwidth=2;  p.add(paperSizes,d);
+		d.gridx=1;  d.gridy=y;  d.gridwidth=3;  p.add(paperSizes,d);
 		y++;
 
+		
 		// landscape checkbox
-		isLandscape = new JCheckBox(Translator.get("isLandscape"), false);
+		//isLandscape = new JCheckBox(Translator.get("isLandscape"), false);
+		isLandscape = new JButton("\u21cb");
 		isLandscape.addActionListener(this);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		d.gridx=0;  d.gridy=y;  d.gridwidth=3;  p.add(isLandscape,d);
-		y++;
-		c.fill = GridBagConstraints.NONE;
+		//d.gridx=0;  d.gridy=y;  d.gridwidth=3;  p.add(isLandscape,d);
+		//y++;
+		//c.fill = GridBagConstraints.HORIZONTAL;
+		//c.fill = GridBagConstraints.NONE;
 
 		// manual paper size settings
 		d.gridwidth=1;
 		pw = new SelectFloat();
+		ph = new SelectFloat();
+		//c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
+		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
+		d.gridx=2;  d.gridy=y;  p.add(isLandscape,d);
+		d.gridx=3;  d.gridy=y;  p.add(ph,d);
+		d.gridx=4;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
+		y++;
 		Dimension s = pw.getPreferredSize();
 		s.width = 80;
-		c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
-		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
-		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
-		y++;
 		pw.setPreferredSize(s);
-		pw.addPropertyChangeListener(this);
-		
-		ph = new SelectFloat();
-		c.gridx=0;  c.gridy=y;  p.add(new JLabel(" x "),c);
-		d.gridx=1;  d.gridy=y;  p.add(ph,d);
-		d.gridx=2;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
-		y++;
-		ph.addPropertyChangeListener(this);
 		ph.setPreferredSize(s);
+		pw.addPropertyChangeListener(this);
+		ph.addPropertyChangeListener(this);
 
 		
 		// paper margin
