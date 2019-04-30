@@ -5,7 +5,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo5Properties extends Makelangelo3Properties {
-	public final static float PEN_HOLDER_RADIUS_5 = 30; // mm
+	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
@@ -250,9 +250,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggestedLength - right_a)/2;
 
-		// plotter
-		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
+		paintPlotter(gl2,(float)gx,(float)gy);
 
 		// belts
 		gl2.glBegin(GL2.GL_LINES);
@@ -291,14 +289,25 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glVertex2d(right+PULLEY_RADIUS+bottleCenter-COUNTERWEIGHT_W/2,top-right_b-COUNTERWEIGHT_H);
 		gl2.glEnd();
 	}
+
+	protected void paintPlotter(GL2 gl2,float gx,float gy) {
+		// plotter
+		gl2.glColor3f(0, 0, 1);
+		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
+		
+	}
 	
 	protected void drawCircle(GL2 gl2,float x,float y,float r) {
+		gl2.glTranslatef(x, y, 0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		float f;
 		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(x+Math.cos(f)*r,y+Math.sin(f)*r);
+			gl2.glVertex2d(
+					Math.cos(f)*r,
+					Math.sin(f)*r);
 		}
 		gl2.glEnd();
+		gl2.glTranslatef(-x, -y, 0);
 	}
 	
 	protected void paintSafeArea(GL2 gl2,MakelangeloRobot robot) {
