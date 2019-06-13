@@ -90,7 +90,8 @@ public class Converter_Multipass extends ImageConverter {
 			++i;
 		}
 
-	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
+		liftPen(out);
+	    moveTo(out, machine.getHomeX(), machine.getHomeY());
 	}
 }
 

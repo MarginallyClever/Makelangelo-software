@@ -29,7 +29,6 @@ public class Generator_Border extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		float yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
 		float yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();

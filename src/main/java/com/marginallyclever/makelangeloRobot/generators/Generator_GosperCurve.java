@@ -35,7 +35,6 @@ public class Generator_GosperCurve extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
 				           (float)(machine.getPaperHeight() * machine.getPaperMargin()));

@@ -94,31 +94,27 @@ public abstract class ImageManipulator {
 	 * @param out where to write the gcode
 	 * @param x new coordinate
 	 * @param y new coordinate
-	 * @param up new pen state
+	 * @param penState new pen state
 	 * @throws IOException on write failure
 	 */
-	protected void moveTo(Writer out, double x, double y, boolean up) throws IOException {
-		if(isInsidePaperMargins(x,y)) {
-			machine.writeMoveTo(out, (float) x, (float) y,lastUp);
-		}
-		if(lastUp != up) {
-			if (up) liftPen(out);
-			else lowerPen(out);
-		}
+	protected void moveTo(Writer out, double x, double y, boolean penState) throws IOException {
+		if (penState) liftPen(out);
+		else lowerPen(out);
+		
+		moveTo(out,x,y);
 	}
 
 
 	/**
-	 * This is a special case of moveTo() that only works when every line on the paper is a straight line.
+	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
 	 * @param out where to write the gcode
 	 * @param x new coordinate
 	 * @param y new coordinate
-	 * @param up new pen state
 	 * @throws IOException on write failure
 	 */
-	protected void lineTo(Writer out, double x, double y, boolean up) throws IOException {
-		if(lastUp != up) {
-			moveTo(out,x,y,up);
+	protected void moveTo(Writer out, double x, double y) throws IOException {
+		if(isInsidePaperMargins(x,y)) {
+			machine.writeMoveTo(out, (float) x, (float) y,lastUp);
 		}
 	}
 

@@ -67,7 +67,6 @@ public class Generator_Lissajous extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 		
 		// scale the step size so the curve fits on the paper
 		WIDTH = (machine.getPaperWidth()  * machine.getPaperMargin())/2.0;

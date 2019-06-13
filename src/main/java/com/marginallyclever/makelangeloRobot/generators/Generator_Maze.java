@@ -58,7 +58,6 @@ public class Generator_Maze extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 		
 		// build the cells
 		cells = new MazeCell[rows * columns];

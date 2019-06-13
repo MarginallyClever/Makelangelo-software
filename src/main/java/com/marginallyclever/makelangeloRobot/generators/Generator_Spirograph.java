@@ -77,7 +77,6 @@ public class Generator_Spirograph extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
 
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;

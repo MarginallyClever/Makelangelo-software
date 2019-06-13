@@ -37,8 +37,7 @@ public class Generator_FillPage extends ImageGenerator {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
-
+		
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter();
 		if (stepSize < 1) stepSize = 1;
@@ -71,7 +70,8 @@ public class Generator_FillPage extends ImageGenerator {
 			++i;
 		}
 
-	    lineTo(out, machine.getHomeX(), machine.getHomeY(), true);
+		liftPen(out);
+	    moveTo(out, machine.getHomeX(), machine.getHomeY());
 	    
 	    return true;
 	}
