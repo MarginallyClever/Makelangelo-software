@@ -21,9 +21,9 @@ import com.marginallyclever.util.PreferencesHelper;
 
 
 /**
- * TODO move tool names into translations & add a color palette system for quantizing colors
- * All the hardware settings for a single Makelangelo robot.
+ * All the hardware settings for a single plotter robot.  Does not store state information.  
  * @author Dan Royer
+ * TODO move tool names into translations & add a color palette system for quantizing colors.
  */
 public final class MakelangeloRobotSettings {
 	public static final double INCH_TO_CM = 2.54;
@@ -775,6 +775,8 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
+		if(penDownColor == newPenDownColor) return;
+		
 		penDownColor = newPenDownColor;
 		writeChangeToInternal(out);
 	}
@@ -824,9 +826,7 @@ public final class MakelangeloRobotSettings {
 	}
 
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
-		String command;
-		if(isUp) command="G00";
-		else command="G01";
+		String command=isUp?"G01":"G00";
 		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + "\n");
 	}
 
@@ -835,7 +835,7 @@ public final class MakelangeloRobotSettings {
 		out.write(getPenUpString()+"\n");
 		// this dwell forces the firmware to stop path-planning through the lift action.
 		// we want to stop is so that it doesn't take off at a crazy speed after a lift.
-		out.write("G04 P1\n");
+		out.write("G04 S1\n");
 		
 		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
 	}
