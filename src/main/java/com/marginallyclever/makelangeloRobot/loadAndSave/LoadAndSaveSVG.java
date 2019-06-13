@@ -16,6 +16,7 @@ import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGOMPathElement;
 import org.apache.batik.anim.dom.SVGOMPolylineElement;
 import org.apache.batik.anim.dom.SVGOMSVGElement;
+import org.apache.batik.anim.dom.SVGPointShapeElement;
 import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.bridge.DocumentLoader;
 import org.apache.batik.bridge.GVTBuilder;
@@ -111,6 +112,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,false);
 			}
 			if(loadOK) {
+				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
+				loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,false);
+			}
+			if(loadOK) {
 				imageCenterX = ( maxX + minX ) / 2.0;
 				imageCenterY = -( maxY + minY ) / 2.0;
 	
@@ -132,6 +137,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				loadOK = parsePathElements(out,pathNodes,toolMinimumStepSize,true);
 				if(loadOK) {
 					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
+					loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,true);
+				}
+				if(loadOK) {
+					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
 					loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,true);
 				}
 			}		    
@@ -170,7 +179,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-	    	SVGOMPolylineElement pathElement = ((SVGOMPolylineElement)pathNodes.item( iPathNode ));
+	    	SVGPointShapeElement pathElement = ((SVGPointShapeElement)pathNodes.item( iPathNode ));
 	    	SVGPointList pointList = pathElement.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//System.out.println("New Node has "+pathObjects+" elements.");
@@ -200,9 +209,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						double dx=x-previousX;
 						double dy=y-previousY;
 						if(dx*dx+dy*dy > toolMinimumStepSize*toolMinimumStepSize ) {
-							liftPen(out);
 							moveTo(out,x,y,true);
-							lowerPen(out);
 						}
 						first=false;
 					}
@@ -276,12 +283,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						y = ( path.getY() - imageCenterY ) * -scale;
 						firstX=x;
 						firstY=y;
-						if(write) {
-							liftPen(out);
-							moveTo(out,x,y,true);
-							lowerPen(out);
-							moveTo(out,x,y,false);
-						} else adjustLimits(x,y);
+						if(write) moveTo(out,x,y,true);
+						else adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:
@@ -327,7 +330,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							t = y2; y2=y1; y1=t;
 						}*/
 						
-						double xabc=x,yabc=y;
 						for(double j=0;j<=1;j+=0.1) {/*
 							// old method
 							double xa = p(x0,x1,j);
@@ -349,16 +351,18 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
 					        double d = Math.pow(j, 3.0);
 					 
-					        xabc = a * x0 + b * x1 + c * x2 + d * x3;
-					        yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
+					        double xabc = a * x0 + b * x1 + c * x2 + d * x3;
+					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
 							
-							//if(distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
-								if(write) moveTo(out,xabc,yabc,false);
+							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
+								if(write) {
+									moveTo(out,xabc,yabc,false);
+									x=xabc;
+									y=yabc;
+								}
 								else adjustLimits(xabc,yabc);
 							//}
 						}
-						x = xabc;
-						y = yabc;
 					}
 					break; 
 				default:
