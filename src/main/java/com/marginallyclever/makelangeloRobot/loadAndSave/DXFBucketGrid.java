@@ -12,8 +12,6 @@ import java.util.List;
  *
  */
 public class DXFBucketGrid {
-	public static final double DXF_EPSILON = 0.1;
-	
 	private List<DXFBucket> buckets;
 	
 	/**
@@ -101,7 +99,7 @@ public class DXFBucketGrid {
 		//System.out.println(group.entities.size()+ " entities after dump.");
 	}
 	
-	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups) {
+	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups,double epsilon) {
 		DXFBucket sourceBucket;
 		Point p=null;
 	
@@ -132,7 +130,7 @@ public class DXFBucketGrid {
 					// take this entity out
 					otherBucket.remove(be);
 					// find the best fit for an entity that shares this point
-					be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
+					be = otherBucket.findBestFitToPoint(p,epsilon);
 					thisBucket = otherBucket;
 					// until there are no more entities in this contiguous group
 				}
@@ -141,7 +139,7 @@ public class DXFBucketGrid {
 				// Find the start by looping backward.
 				if(firstBe!=null) {
 					p = firstBe.getPointInBucket(sourceBucket);
-					be = sourceBucket.findBestFitToPoint(p,DXF_EPSILON);
+					be = sourceBucket.findBestFitToPoint(p,epsilon);
 					thisBucket = sourceBucket;
 					while(be!=null) {
 						thisBucket.remove(be);
@@ -155,7 +153,7 @@ public class DXFBucketGrid {
 						// take this entity out
 						otherBucket.remove(be);
 						// find the best fit for an entity that shares this point
-						be = otherBucket.findBestFitToPoint(p,DXF_EPSILON);
+						be = otherBucket.findBestFitToPoint(p,epsilon);
 						// until there are no more entities in this contiguous group
 						thisBucket = otherBucket;
 					}

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -41,6 +42,7 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -58,6 +60,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	private double previousX,previousY;
 	private double scale,imageCenterX,imageCenterY;
 	private boolean writeNow;
+
+	private double toolMinimumPenUpMove=2.0;
+	private double toolMinimumPenDownMove=1.0;
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -84,13 +89,20 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		final JCheckBox checkScale = new JCheckBox(Translator.get("DXFScaleOnLoad"));
 		final JCheckBox checkInfill = new JCheckBox(Translator.get("DXFInfillOnLoad"));
 		final JCheckBox checkOptimize = new JCheckBox(Translator.get("DXFOptimizeOnLoad"));
+		final SelectFloat chooseMinimumPenUpMove = new SelectFloat((float)toolMinimumPenUpMove);
+		final SelectFloat chooseMinimumPenDownMove = new SelectFloat((float)toolMinimumPenDownMove);
 
 		JPanel panel = new JPanel(new GridLayout(0, 1));
 		panel.add(checkScale);
 		//panel.add(checkInfill);
 		panel.add(checkOptimize);
+		panel.add(new JLabel(Translator.get("Minimum pen up move (mm)")));
+		panel.add(chooseMinimumPenUpMove);
+		panel.add(new JLabel(Translator.get("Minimum pen down move (mm)")));
+		panel.add(chooseMinimumPenDownMove);
+
 		checkScale.setSelected(shouldScaleOnLoad);
-		checkInfill.setSelected(shouldInfillOnLoad);
+		//checkInfill.setSelected(shouldInfillOnLoad);
 		checkOptimize.setSelected(shouldOptimizePathingOnLoad);
 
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -98,6 +110,11 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			shouldScaleOnLoad = checkScale.isSelected();
 			shouldInfillOnLoad = checkInfill.isSelected();
 			shouldOptimizePathingOnLoad = checkOptimize.isSelected();
+
+			toolMinimumPenUpMove = ((Number)chooseMinimumPenUpMove.getValue()).doubleValue();
+			toolMinimumPenDownMove = ((Number)chooseMinimumPenDownMove.getValue()).doubleValue();
+			if(toolMinimumPenUpMove<0) toolMinimumPenUpMove=0;
+			if(toolMinimumPenDownMove<0.1) toolMinimumPenUpMove=0.1;
 			
 			return loadNow(in,robot);
 		}
@@ -245,9 +262,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolDiameterSquared = Math.pow(machine.getPenDiameter()/2, 2);
-			double toolMinimumStepSize = Math.pow(machine.getPenDiameter(), 2);
-
 			// normally here I use imageStart(), but every layer causes a new writeChangeTo.  This avoids one redundant pen change.
 			setAbsoluteMode(out);
 			previousX = machine.getHomeX();
@@ -291,8 +305,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				}
 
 				if(shouldOptimizePathingOnLoad) {
+					double DXF_EPSILON = 0.1;
+					
 					// Use the buckets to narrow the search field and find neighboring entities
-					grid.sortEntitiesIntoContinguousGroups(groups);
+					grid.sortEntitiesIntoContinguousGroups(groups,DXF_EPSILON);
 				} else {
 					grid.dumpEverythingIntoABucket(groups);
 				}
@@ -309,11 +325,16 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
 				//}
+				liftPen(out);
+				
 				Iterator<DXFGroup> groupIter = groups.iterator();
 				while(groupIter.hasNext()) {
 					DXFGroup g = groupIter.next();
 					
-					// but each separate line might be forwards or backwards.
+					double px=previousX;
+					double py=previousY;
+					
+					// each separate line might be forwards or backwards.
 					// scan backward through the group to find the starting of the first line (previousX,previousY).
 					writeNow=false;
 					Iterator<DXFBucketEntity> ents = g.entities.descendingIterator();
@@ -327,20 +348,18 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 										((int)colorNow[2]);
 						}
 						allColors.add(new Integer(newColor));
-						parseEntity(e.entity,out,toolDiameterSquared,toolMinimumStepSize);
+						parseEntity(e.entity,out);
 					}
 					
-					// move to the start and put the pen down
-					liftPen(out);
-					moveTo(out,previousX,previousY,true);
-					lowerPen(out);
+					previousX=px;
+					previousY=py;
 
 					// work forward through the loop, writing as you go.
 					writeNow=true;
 					ents = g.entities.iterator();
 					while(ents.hasNext()) {
 						DXFBucketEntity e = ents.next();
-						parseEntity(e.entity,out,toolDiameterSquared,toolMinimumStepSize);
+						parseEntity(e.entity,out);
 					}
 				}
 			}
@@ -355,8 +374,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			System.out.println();
 			
 			// entities finished. Close up file.
-			liftPen(out);
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 			out.flush();
 			out.close();
 
@@ -373,16 +391,16 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return true;
 	}
 	
-	protected void parseEntity(DXFEntity e,Writer out,double toolDiameterSquared,double toolMinimumStepSize) throws IOException {
+	protected void parseEntity(DXFEntity e,Writer out) throws IOException {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-			parseDXFLine(out,(DXFLine)e,toolDiameterSquared);
+			parseDXFLine(out,(DXFLine)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-			parseDXFPolyline(out,polyLine,toolMinimumStepSize);
+			parseDXFPolyline(out,polyLine);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-			parseDXFPolyline(out,(DXFPolyline)e,toolMinimumStepSize);
+			parseDXFPolyline(out,(DXFPolyline)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			parseDXFLWPolyline(out,(DXFLWPolyline)e,toolMinimumStepSize);
+			parseDXFLWPolyline(out,(DXFLWPolyline)e);
 		}
 	}
 	
@@ -461,7 +479,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		if(totalRemoved!=0) System.out.println(totalRemoved+" duplicates removed.");
 	}
 	
-	protected void parseDXFLine(Writer out,DXFLine entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFLine(Writer out,DXFLine entity) throws IOException {
 		Point start = entity.getStartPoint();
 		Point end = entity.getEndPoint();
 
@@ -469,28 +487,23 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		double y = (start.getY() - imageCenterY) * scale;
 		double x2 = (end.getX() - imageCenterX) * scale;
 		double y2 = (end.getY() - imageCenterY) * scale;
-
-		// skip extremely short lines?
-		if( Math.abs(x-x2)<0.001 && Math.abs(y-y2)<0.001) {
-			return;
-		}
 			
-		// which end is closer to the previous (x,y) ?
+		// which end is closer to the previous point?
 		double dx = previousX - x;
 		double dy = previousY - y;
 		double dx2 = previousX - x2;
 		double dy2 = previousY - y2;
 		if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-			parseDXFLineEnds(out,toolDiameterSquared,x,y,x2,y2);
+			parseDXFLineEnds(out,x,y,x2,y2);
 		} else {
-			parseDXFLineEnds(out,toolDiameterSquared,x2,y2,x,y);
+			parseDXFLineEnds(out,x2,y2,x,y);
 		}
 	}
 	
-	protected void parseDXFPolyline(Writer out,DXFPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFPolyline(Writer out,DXFPolyline entity) throws IOException {
 		if(entity.isClosed()) {
 			// only one end to care about
-			parseDXFPolylineForward(out,entity,toolDiameterSquared);
+			parseDXFPolylineForward(out,entity);
 		} else {
 			// which end is closest to the previous (x,y)?
 			int n = entity.getVertexCount()-1;
@@ -506,42 +519,42 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			double dy2 = previousY - y2;
 			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
 				// first point is closer
-				parseDXFPolylineForward(out,entity,toolDiameterSquared);
+				parseDXFPolylineForward(out,entity);
 			} else {
 				// last point is closer
-				parseDXFPolylineBackward(out,entity,toolDiameterSquared);
+				parseDXFPolylineBackward(out,entity);
 			}
 		}
 	}
 	
-	protected void parseDXFLWPolylineForward(Writer out,DXFLWPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFLWPolylineForward(Writer out,DXFLWPolyline entity) throws IOException {
 		boolean first = true;
 		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
 		for (int j = 0; j < count; ++j) {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parseDXFLWPolylineBackward(Writer out,DXFLWPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFLWPolylineBackward(Writer out,DXFLWPolyline entity) throws IOException {
 		boolean first = true;
 		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
 		for (int j = 0; j < count; ++j) {
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 
-	protected void parseDXFLWPolyline(Writer out,DXFLWPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFLWPolyline(Writer out,DXFLWPolyline entity) throws IOException {
 		if(entity.isClosed()) {
 			// only one end to care about
-			parseDXFLWPolylineForward(out,entity,toolDiameterSquared);
+			parseDXFLWPolylineForward(out,entity);
 		} else {
 			// which end is closest to the previous (x,y)?
 			int n = entity.getVertexCount()-1;
@@ -557,86 +570,84 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			double dy2 = previousY - y2;
 			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
 				// first point is closer
-				parseDXFLWPolylineForward(out,entity,toolDiameterSquared);
+				parseDXFLWPolylineForward(out,entity);
 			} else {
 				// last point is closer
-				parseDXFLWPolylineBackward(out,entity,toolDiameterSquared);
+				parseDXFLWPolylineBackward(out,entity);
 			}
 		}
 	}
 	
-	protected void parseDXFPolylineForward(Writer out,DXFPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFPolylineForward(Writer out,DXFPolyline entity) throws IOException {
 		boolean first = true;
 		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
 		for (int j = 0; j < count; ++j) {
 			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parseDXFPolylineBackward(Writer out,DXFPolyline entity,double toolDiameterSquared) throws IOException {
+	protected void parseDXFPolylineBackward(Writer out,DXFPolyline entity) throws IOException {
 		boolean first = true;
 		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
 		for (int j = 0; j < count; ++j) {
 			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
 			double x = (v.getX() - imageCenterX) * scale;
 			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,toolDiameterSquared,first,j<count-1);
+			parsePolylineShared(out,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parsePolylineShared(Writer out,double x,double y,double limitSquared,boolean first,boolean notLast) throws IOException {
+	protected void parsePolylineShared(Writer out,double x,double y,boolean first,boolean notLast) throws IOException {
 		double dx = x - previousX;
 		double dy = y - previousY;
 
 		if (first == true) {
-			if (dx * dx + dy * dy > limitSquared) {
+			boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMove); 
+			if(dx*dx + dy*dy > toolMinimumPenDownMove ) { 
 				// line does not start at last tool location, lift and move.
-				if(writeNow){ 
-					liftPen(out);
-					moveTo(out, (float) x, (float) y, true);
-				}
+				if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
 				previousX = x;
 				previousY = y;
 			}
 			// else line starts right here, pen is down, do nothing extra.
 		} else {
-			if(writeNow) { 
-				lowerPen(out);
-			}
 			// not the first point, draw.
-			if (notLast && dx * dx + dy * dy < limitSquared)
-				return; // points too close together
-			if(writeNow) { 
-				moveTo(out, (float) x, (float) y, false);
+			if (!notLast || dx * dx + dy * dy > toolMinimumPenDownMove) {
+				if(writeNow) moveTo(out, (float) x, (float) y, false);
+				previousX = x;
+				previousY = y;
 			}
-			previousX = x;
-			previousY = y;
 		}
 	}
 	
-	protected void parseDXFLineEnds(Writer out,double limitSquared,double x,double y,double x2,double y2) throws IOException {
+	protected void parseDXFLineEnds(Writer out,double x,double y,double x2,double y2) throws IOException {
 		double dx = x - previousX;
 		double dy = y - previousY;
 		
-		if (dx * dx + dy * dy > limitSquared) {
-			if(writeNow){ 
-				liftPen(out);
-				moveTo(out, (float) x, (float) y, true);
-			}
+		// next line start too far away?
+		boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMove); 
+		//if(dx*dx + dy*dy > toolMinimumStepSize ) 
+		{ 
+			// lift pen and move to that location
+			if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
 			previousX = x;
 			previousY = y;
 		}
-		if(writeNow){ 
-			lowerPen(out);
-			moveTo(out, (float) x2, (float) y2, false);
+
+		dx = x2 - previousX;
+		dy = y2 - previousY;
+		
+		if(dx*dx + dy*dy > toolMinimumPenDownMove ) {
+			// lower pen and draw to end of line
+			if(writeNow) moveTo(out, (float) x2, (float) y2, false);
+			previousX = x2;
+			previousY = y2;
 		}
-		previousX = x2;
-		previousY = y2;
 	}
 
 	@Override
