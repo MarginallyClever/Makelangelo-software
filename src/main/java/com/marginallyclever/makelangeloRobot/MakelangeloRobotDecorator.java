@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
- * DrawDecorator adds features to DrawPanel. An example is the Draw panel shows
+ * MakelangeloRobotDecorator adds features to DrawPanel. An example is the Draw panel shows
  * WYSIWYG progress, while the filters might show conversion while-you-wait
  * updates.
  *
