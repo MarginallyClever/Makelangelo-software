@@ -44,7 +44,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
-		liftPen(out);
 
 		double toolDiameter = machine.getPenDiameter();
 
@@ -109,8 +108,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 		Log.info("yellow", numRings + " rings.");
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 
 	public void setIntensity(float floatValue) {

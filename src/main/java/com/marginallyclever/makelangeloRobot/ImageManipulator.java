@@ -62,8 +62,23 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	public void imageStart(Writer out) throws IOException {	
-		setAbsoluteMode(out);
+		machine.writeProgramStart(out);
 		machine.writeChangeToDefaultColor(out);
+		setAbsoluteMode(out);
+		liftPen(out);
+	}
+
+
+	/**
+	 * insert the machine-specific preamble at the start of the gcode file.
+	 * @param img
+	 * @param out
+	 * @throws IOException
+	 */
+	public void imageEnd(Writer out) throws IOException {
+		liftPen(out);
+	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		machine.writeProgramEnd(out);
 	}
 
 

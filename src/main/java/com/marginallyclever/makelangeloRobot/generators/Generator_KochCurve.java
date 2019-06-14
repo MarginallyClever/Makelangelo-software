@@ -35,7 +35,6 @@ public class Generator_KochCurve extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		float v = Math.max((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
@@ -64,8 +63,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		lowerPen(out);
 		// do the curve
 		drawTriangle(out, order, maxSize);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

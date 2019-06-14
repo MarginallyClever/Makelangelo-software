@@ -263,7 +263,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			// prepare for exporting
 			machine = robot.getSettings();
 			// normally here I use imageStart(), but every layer causes a new writeChangeTo.  This avoids one redundant pen change.
-			setAbsoluteMode(out);
+			imageStart(out);
+			
 			previousX = machine.getHomeX();
 			previousY = machine.getHomeY();
 			
@@ -281,6 +282,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				if (entityTypeIter.hasNext()) {
 					allColors.add(new Integer(layer.getColor()));
 					layer.getColor();
+					liftPen(out);
 					machine.writeChangeTo(out,layer.getName());
 				}
 				
@@ -325,7 +327,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				//if(infillGroup!=null) {
 				//	groups.add(infillGroup);
 				//}
-				liftPen(out);
 				
 				Iterator<DXFGroup> groupIter = groups.iterator();
 				while(groupIter.hasNext()) {
@@ -374,7 +375,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			System.out.println();
 			
 			// entities finished. Close up file.
-			moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			imageEnd(out);
+			
 			out.flush();
 			out.close();
 

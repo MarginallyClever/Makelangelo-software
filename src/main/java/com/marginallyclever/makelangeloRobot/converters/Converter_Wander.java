@@ -55,8 +55,7 @@ public class Converter_Wander extends ImageConverter {
 			finishBlackAndWhite(out);
 		}
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 
 	protected int outputChannel(Writer out,TransformedImage img,Color newColor,int numberOfLines,double cutoff) throws IOException {

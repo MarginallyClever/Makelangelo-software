@@ -1,5 +1,10 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -285,5 +290,19 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glEnd();
 
 		gl2.glPopMatrix();
+	}
+
+	@Override
+	public void writeProgramStart(Writer out) throws IOException {
+		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
+		Date date = new Date(System.currentTimeMillis());  
+		out.write("(Makelangelo 2)\n");
+		out.write("("+formatter.format(date)+")\n");
+		out.write("M203 U500");  // raise top speed of servo (z axis)
+	}
+
+	@Override
+	public void writeProgramEnd(Writer out) throws IOException {
+		out.write("(Program End)\n");
 	}
 }

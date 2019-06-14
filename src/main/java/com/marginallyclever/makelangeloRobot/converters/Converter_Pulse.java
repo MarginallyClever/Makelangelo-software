@@ -54,12 +54,10 @@ public class Converter_Pulse extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
-		liftPen(out);
 		
 		convertPaperSpace(img, out);
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 
 

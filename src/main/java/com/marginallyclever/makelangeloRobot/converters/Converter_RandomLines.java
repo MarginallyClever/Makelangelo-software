@@ -30,7 +30,6 @@ public class Converter_RandomLines extends ImageConverter {
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
-		liftPen(out);
 
 		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
@@ -65,8 +64,7 @@ public class Converter_RandomLines extends ImageConverter {
 			startPY = endPY;
 		}
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 	
 

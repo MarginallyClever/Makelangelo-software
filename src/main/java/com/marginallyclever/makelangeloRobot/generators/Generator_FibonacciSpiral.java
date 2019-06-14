@@ -61,7 +61,6 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin() /2.0f);
 		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin() /2.0f);
@@ -112,8 +111,7 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 			fibonacciCell(out, size);
 		}
 		
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

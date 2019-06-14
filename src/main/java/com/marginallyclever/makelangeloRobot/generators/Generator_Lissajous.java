@@ -66,15 +66,13 @@ public class Generator_Lissajous extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		
 		// scale the step size so the curve fits on the paper
 		WIDTH = (machine.getPaperWidth()  * machine.getPaperMargin())/2.0;
 		HEIGHT = (machine.getPaperHeight() * machine.getPaperMargin())/2.0;
 
 		drawLissajous(out, true);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

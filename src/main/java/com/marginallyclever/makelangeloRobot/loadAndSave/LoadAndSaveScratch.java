@@ -181,6 +181,8 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 	    			parseScratchCode(scripts02,out);
     			}
 
+    			imageEnd(out);
+    			
     			System.out.println("finished scripts");
 			} catch (Exception e) {
 				Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
@@ -189,8 +191,6 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 			}
 			
 			// finished. Close up file.
-			liftPen(out);
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 			out.flush();
 			out.close();
 

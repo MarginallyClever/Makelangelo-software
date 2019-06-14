@@ -28,7 +28,6 @@ public class Generator_Border extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		float yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
 		float yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
@@ -42,8 +41,7 @@ public class Generator_Border extends ImageGenerator {
 		moveTo(out,xMin,yMin,false);
 		moveTo(out,xMin,yMax,false);
 		
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

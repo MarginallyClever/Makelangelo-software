@@ -57,7 +57,6 @@ public class Generator_Maze extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 		
 		// build the cells
 		cells = new MazeCell[rows * columns];
@@ -139,8 +138,7 @@ public class Generator_Maze extends ImageGenerator {
 
 		// draw the maze
 		drawMaze(out);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

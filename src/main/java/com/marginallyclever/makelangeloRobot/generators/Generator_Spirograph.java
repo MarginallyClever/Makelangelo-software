@@ -76,7 +76,6 @@ public class Generator_Spirograph extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;
@@ -101,8 +100,8 @@ public class Generator_Spirograph extends ImageGenerator {
 		
 		// draw the spirograph for real this time
 		drawSpirograph(out, true);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+
+		imageEnd(out);
 	    
 	    return true;
 	}

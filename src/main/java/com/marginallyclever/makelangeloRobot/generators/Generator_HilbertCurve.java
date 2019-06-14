@@ -33,7 +33,6 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
 				           (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
@@ -51,8 +50,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 		lowerPen(out);
 		// do the curve
 		hilbert(out, order);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

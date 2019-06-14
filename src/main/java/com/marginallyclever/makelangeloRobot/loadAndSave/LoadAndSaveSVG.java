@@ -145,8 +145,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				}
 			}		    
 			// entities finished. Close up file.
-			liftPen(out);
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			imageEnd(out);
 			out.flush();
 			out.close();
 

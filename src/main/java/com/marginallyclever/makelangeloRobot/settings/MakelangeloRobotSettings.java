@@ -758,6 +758,14 @@ public final class MakelangeloRobotSettings {
 		diameter = d;
 	}
 
+	public void writeProgramStart(Writer out) throws IOException {	
+		hardwareProperties.writeProgramStart(out);
+	}
+	
+	public void writeProgramEnd(Writer out) throws IOException {	
+		hardwareProperties.writeProgramEnd(out);
+	}
+	
 	public String getPenDownString() {
 		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle());
 	}
@@ -834,7 +842,7 @@ public final class MakelangeloRobotSettings {
 	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString()+"\n");
 		// this dwell forces the firmware to stop path-planning through the lift action.
-		// we want to stop is so that it doesn't take off at a crazy speed after a lift.
+		// we want to stop is so that it doesn't take off at a crazy speed after.
 		// G04 S[milliseconds] P[seconds]
 		out.write("G04 S1\n");
 		
@@ -845,7 +853,7 @@ public final class MakelangeloRobotSettings {
 	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString()+"\n");
 		// this dwell forces the firmware to stop path-planning through the lift action.
-		// we want to stop is so that it doesn't take off at a crazy speed after a lift.
+		// we want to stop is so that it doesn't take off at a crazy speed after.
 		// G04 S[milliseconds] P[seconds]
 		out.write("G04 S1\n");
 

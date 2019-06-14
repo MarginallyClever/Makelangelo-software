@@ -34,7 +34,6 @@ public class Generator_GosperCurve extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
 				           (float)(machine.getPaperHeight() * machine.getPaperMargin()));
@@ -81,8 +80,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 		lowerPen(out);
 		// do the curve
 		GosperA(out, order);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

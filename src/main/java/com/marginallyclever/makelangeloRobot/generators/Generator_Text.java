@@ -300,7 +300,6 @@ public class Generator_Text extends ImageGenerator {
 		String fontName = fontNames[lastFont];
 
 		imageStart(out);
-		liftPen(out);
 
 		posx=0;
 		posy=0;
@@ -308,8 +307,8 @@ public class Generator_Text extends ImageGenerator {
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
 		writeBeautifulMessage(fontName,lastSize,lastMessage,out);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+
+		imageEnd(out);
 	    return true;
 	}
 	

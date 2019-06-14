@@ -49,9 +49,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		imageStart(out);
 		liftPen(out);
 		convertPaperSpace(img, out);
-
-		liftPen(out);
-		moveTo(out, (float) machine.getHomeX(), (float) machine.getHomeY(), true);
+		imageEnd(out);
 	}
 
 	protected void convertPaperSpace(TransformedImage img, Writer out) throws IOException {

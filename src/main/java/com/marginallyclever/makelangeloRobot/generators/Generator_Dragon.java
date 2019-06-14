@@ -40,7 +40,6 @@ public class Generator_Dragon extends ImageGenerator {
 	@Override
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
-		liftPen(out);
 
 		xMax = (float)(machine.getPaperWidth()  * machine.getPaperMargin())/2.0f;
 		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
@@ -68,8 +67,7 @@ public class Generator_Dragon extends ImageGenerator {
 		moveTo(out,turtle.getX(),turtle.getY(),true);
 		// draw the fractal
 		drawDragon(out, stepSize);
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	    
 	    return true;
 	}

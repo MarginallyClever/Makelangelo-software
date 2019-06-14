@@ -45,20 +45,21 @@ public class Converter_CMYK extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 
-		this.setAbsoluteMode(out);
+		// avoids changing to black and then back to yellow.
+		Color defaultColor = machine.getPenDownColorDefault();
+		Color yellow = new Color(255,255,  0);
+		machine.setPenDownColorDefault(yellow);
 		
-		Log.info("Yellow...");
-		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));
-		Log.info("Cyan...");
-		outputChannel(out,cmyk.getC(),15,new Color(  0,255,255));
-		Log.info("Magenta...");
-		outputChannel(out,cmyk.getM(),75,new Color(255,  0,255));
-		Log.info("Black...");
-		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
+		imageStart(out);
+		
+		Log.info("Yellow...");		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));
+		Log.info("Cyan...");		outputChannel(out,cmyk.getC(),15,new Color(  0,255,255));
+		Log.info("Magenta...");		outputChannel(out,cmyk.getM(),75,new Color(255,  0,255));
+		Log.info("Black...");		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
 		Log.info("Finishing...");
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		machine.setPenDownColorDefault(defaultColor);
+		imageEnd(out);
 	}
 	
 	protected void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
@@ -100,7 +101,6 @@ public class Converter_CMYK extends ImageConverter {
 			}
 			++i;
 		}
-		liftPen(out);
 	}
 }
 

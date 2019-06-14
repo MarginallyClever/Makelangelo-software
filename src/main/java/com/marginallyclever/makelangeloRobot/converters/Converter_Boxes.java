@@ -49,7 +49,6 @@ public class Converter_Boxes extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
-		liftPen(out);
 
 		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
 		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
@@ -131,8 +130,7 @@ public class Converter_Boxes extends ImageConverter {
 			}
 		}
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 }
 

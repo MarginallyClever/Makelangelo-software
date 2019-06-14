@@ -53,7 +53,6 @@ public class Converter_MagicCircle extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 		imageStart(out);
-		liftPen(out);
 
 		double toolDiameter = machine.getPenDiameter();
 
@@ -114,7 +113,7 @@ public class Converter_MagicCircle extends ImageConverter {
 			//liftPen(out);
 		}
 
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 }
 

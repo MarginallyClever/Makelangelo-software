@@ -409,7 +409,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			Log.info("Writing gcode.");
 			
 			imageStart(out);
-			liftPen(out);
 
 			// find the tsp point closest to the calibration point
 			int i;
@@ -435,8 +434,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				this.moveTo(out, x, y, false);
 			}
 
-			liftPen(out);
-		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+			imageEnd(out);
 		}
 	}
 

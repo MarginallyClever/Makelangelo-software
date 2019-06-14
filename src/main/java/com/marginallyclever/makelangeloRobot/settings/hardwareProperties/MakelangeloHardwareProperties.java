@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -44,4 +47,17 @@ public interface MakelangeloHardwareProperties {
 	 * @param gl2
 	 */
 	public void render(GL2 gl2,MakelangeloRobot robot);
+	
+	/**
+	 * hardware specific gcode at the start of a program
+	 * @param out
+	 * @throws IOException
+	 */
+	public void writeProgramStart(Writer out) throws IOException;
+	/**
+	 * hardware specific gcode at the end of a program
+	 * @param out
+	 * @throws IOException
+	 */
+	public void writeProgramEnd(Writer out) throws IOException;
 }

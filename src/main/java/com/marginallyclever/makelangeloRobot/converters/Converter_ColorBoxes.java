@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -23,6 +24,9 @@ public class Converter_ColorBoxes extends ImageConverter {
 	private ColorRGB[] nexterror = null;
 	private float stepsTotal = 0;
 	private int direction = 1;
+
+	// TODO make this a parameter
+	public boolean draw_filled = false;
 
 
 	public Converter_ColorBoxes() {
@@ -57,9 +61,6 @@ public class Converter_ColorBoxes extends ImageConverter {
 		} else {
 			start = xRight - step4;
 		}
-
-		// @TODO: make this a parameter
-		boolean draw_filled = false;
 
 		x = start;
 		
@@ -118,12 +119,12 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 	
 
-	protected void scan(int tool_index, TransformedImage img, Writer out) throws IOException {
+	protected void scan(int tool_index, TransformedImage img, Writer out,String colorName,Color newPenColor) throws IOException {
 		palette_mask = tool_index;
 
 		// TODO Find a way to swap color pens.
 		liftPen(out);
-		machine.writeChangeToDefaultColor(out);
+		machine.writeChangeTo(out,newPenColor);
 
 		int y;
 
@@ -154,7 +155,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 */
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
 		// Set up the conversion from image space to paper space, select the current tool, etc.
-		setAbsoluteMode(out);
+		imageStart(out);
 
 		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin());
 
@@ -170,16 +171,15 @@ public class Converter_ColorBoxes extends ImageConverter {
 		nexterror = new ColorRGB[(int) Math.ceil(stepsTotal)];
 
 		try {
-			scan(0, img, out);  // black
-			scan(1, img, out);  // red
-			scan(2, img, out);  // green
-			scan(3, img, out);  // blue
+			scan(0, img, out,"Black",new Color(  0,  0,  0));  // black
+			scan(1, img, out,"Red"  ,new Color(255,  0,  0));  // red
+			scan(2, img, out,"Green",new Color(  0,255,  0));  // green
+			scan(3, img, out,"Blue" ,new Color(  0,  0,255));  // blue
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 
 		return true;
 	}

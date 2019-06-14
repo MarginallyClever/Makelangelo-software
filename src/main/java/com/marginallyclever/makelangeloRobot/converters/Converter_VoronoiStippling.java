@@ -228,7 +228,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Log.info("Writing gcode.");
 
 		imageStart(out);
-		liftPen(out);
 
 		float toolDiameter = machine.getPenDiameter();
 
@@ -271,8 +270,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			}
 		}
 		
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		imageEnd(out);
 	}
 
 
