@@ -135,7 +135,10 @@ public final class Makelangelo
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 
+		// drag & drop support
 		myTransferHandler = new MakelangeloTransferHandler(robot);
+		
+		// network connections
 		connectionManager = new ConnectionManager();
 	}
 	
