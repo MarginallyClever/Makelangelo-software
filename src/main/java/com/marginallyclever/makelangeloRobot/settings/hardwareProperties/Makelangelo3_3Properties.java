@@ -9,7 +9,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
-public class Makelangelo3Properties extends Makelangelo2Properties {
+public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	@Override
 	public int getVersion() {
 		return 3;
@@ -17,7 +17,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 
 	@Override
 	public String getName() {
-		return "Makelangelo 3.0-3.2";
+		return "Makelangelo 3.3";
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	
 	@Override
 	public boolean canAutoHome() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -179,7 +179,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("(Makelangelo 3)\n");
+		out.write("(Makelangelo 3.3)\n");
 		out.write("("+formatter.format(date)+")\n");
 	}
 }
