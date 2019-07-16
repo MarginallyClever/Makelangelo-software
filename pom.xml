@@ -113,6 +113,7 @@ If you like this project, please support us by buying Marginally Clever products
             </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+                  <addClasspath>true</addClasspath>
             </manifest>
           </archive>
           <descriptors>
@@ -155,6 +156,7 @@ If you like this project, please support us by buying Marginally Clever products
             </manifestEntries>
             <manifest>
               <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+                  <addClasspath>true</addClasspath>
             </manifest>
           </archive>
         </configuration>

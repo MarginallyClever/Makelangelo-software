@@ -168,8 +168,6 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	 */
 	protected void paintControlBox(GL2 gl2,MakelangeloRobotSettings settings) {
 		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
 		double cx = 0;
 
 		gl2.glPushMatrix();
