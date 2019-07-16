@@ -2,6 +2,9 @@ package com.marginallyclever.makelangelo;
 
 import org.junit.Test;
 
+import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
+
 
 public class VersionTest {
 	@Test

@@ -4,8 +4,8 @@ public class MakelangeloCustomProperties extends Makelangelo2Properties {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 
 	@Override
-	public int getVersion() {
-		return 0;
+	public String getVersion() {
+		return "0";
 	}
 
 	@Override

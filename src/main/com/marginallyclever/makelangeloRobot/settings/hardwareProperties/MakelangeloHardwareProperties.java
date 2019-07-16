@@ -12,7 +12,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  *
  */
 public interface MakelangeloHardwareProperties {
-	public int getVersion();
+	public String getVersion();
 	public String getName();
 	
 	public boolean canChangeMachineSize();

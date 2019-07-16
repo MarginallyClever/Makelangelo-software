@@ -41,9 +41,9 @@ implements ActionListener {
 	protected JButton save, cancel;
 
 	private JComboBox<String> hardwareVersionChoices;
-	private ArrayList<Integer> availableHardwareVersions;
+	private ArrayList<String> availableHardwareVersions;
 	private String[] hardwareVersionNames;
-	private int originalHardwareVersion;
+	private String originalHardwareVersion;
 
 	private JPanel modelPanel;
 	protected PanelAdjustMachine panelAdjustMachine;
@@ -126,9 +126,9 @@ implements ActionListener {
 	  d.gridwidth=2;
 	  hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
 	  // set the default
-	  int hv = robot.getSettings().getHardwareVersion();
+	  String hv = robot.getSettings().getHardwareVersion();
 	  for(int i=0;i<availableHardwareVersions.size();++i) {
-		  if(availableHardwareVersions.get(i) == hv) {
+		  if(availableHardwareVersions.get(i).equals(hv)) {
 			  hardwareVersionChoices.setSelectedIndex(i);
 			  break;
 		  }
@@ -138,14 +138,14 @@ implements ActionListener {
   }
 
   private void findAvailableHardwareVersions() {
-	  availableHardwareVersions = new ArrayList<Integer>();
+	  availableHardwareVersions = new ArrayList<String>();
 	  
 	  // get version numbers
 	  ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
 	  Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
 	  while(i.hasNext()) {
 		  MakelangeloHardwareProperties hw = i.next();
-		  availableHardwareVersions.add(new Integer(hw.getVersion()));
+		  availableHardwareVersions.add(new String(hw.getVersion()));
 	  }
 
 	  // get names
@@ -177,7 +177,7 @@ implements ActionListener {
 	  Object src = e.getSource();
 	  
 	  if(src == hardwareVersionChoices) {
-		  int newChoice=availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
+		  String newChoice=availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
 		  robot.getSettings().setHardwareVersion(newChoice);
 		  rebuildTabbedPanes();
 	  }

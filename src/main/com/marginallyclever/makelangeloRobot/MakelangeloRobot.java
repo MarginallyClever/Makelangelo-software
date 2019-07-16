@@ -200,7 +200,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				String last = pieces[pieces.length - 1];
 				last = last.replace("\r\n", "");
 				if (last.startsWith("V")) {
-					int hardwareVersion = Integer.parseInt(last.substring(1));
+					String hardwareVersion = last.substring(1);
+					
 					this.settings.setHardwareVersion(hardwareVersion);
 					hardwareVersionChecked = true;
 					justNow = true;
@@ -213,7 +214,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			sendConfig();
 
 			if (myPanel != null) {
-				int hardwareVersion = this.settings.getHardwareVersion();
+				String hardwareVersion = this.settings.getHardwareVersion();
 				myPanel.onConnect();
 				this.settings.setHardwareVersion(hardwareVersion);
 			}

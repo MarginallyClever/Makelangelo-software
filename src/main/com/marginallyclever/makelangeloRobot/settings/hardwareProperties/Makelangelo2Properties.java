@@ -16,8 +16,8 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float FRAME_SIZE= 50f; // cm
 
 	@Override
-	public int getVersion() {
-		return 2;
+	public String getVersion() {
+		return "2";
 	}
 
 	@Override

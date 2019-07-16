@@ -71,7 +71,7 @@ public final class MakelangeloRobotSettings {
 	// for a while the robot would sign it's name at the end of a drawing
 	private boolean shouldSignName;
 	
-	private int hardwareVersion;
+	private String hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
 	private Color paperColor;
@@ -180,7 +180,7 @@ public final class MakelangeloRobotSettings {
 		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
 		
 		// default hardware version is 2
-		setHardwareVersion(2);
+		setHardwareVersion("2");
 		
 		// which configurations are available?
 		try {
@@ -236,7 +236,7 @@ public final class MakelangeloRobotSettings {
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
-		if(this.hardwareVersion==6) {
+		if(this.hardwareVersion.equals("6")) {
 			// Zarplotter
 			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
 			return 0;
@@ -485,7 +485,7 @@ public final class MakelangeloRobotSettings {
 
 		loadPenConfig(uniqueMachinePreferencesNode);
 
-		setHardwareVersion(Integer.parseInt(uniqueMachinePreferencesNode.get("hardwareVersion", Integer.toString(hardwareVersion))));
+		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareVersion));
 	}
 
 	protected void loadPenConfig(Preferences prefs) {
@@ -567,7 +567,7 @@ public final class MakelangeloRobotSettings {
 		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 		
-		uniqueMachinePreferencesNode.put("hardwareVersion", Integer.toString(hardwareVersion));
+		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareVersion);
 
 		savePenConfig(uniqueMachinePreferencesNode);
 	}
@@ -647,7 +647,7 @@ public final class MakelangeloRobotSettings {
 		return shouldSignName;
 	}
 
-	public int getHardwareVersion() {
+	public String getHardwareVersion() {
 		return hardwareVersion;
 	}
 
@@ -655,8 +655,8 @@ public final class MakelangeloRobotSettings {
 		return hardwareProperties;
 	}
 
-	public void setHardwareVersion(int version) {
-		int newVersion = -1;
+	public void setHardwareVersion(String version) {
+		String newVersion = "";
 
 		try {
 			// get version numbers
@@ -664,7 +664,7 @@ public final class MakelangeloRobotSettings {
 			Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
 			while(i.hasNext()) {
 				MakelangeloHardwareProperties hw = i.next();
-				if(hw.getVersion()==version) {
+				if(hw.getVersion().equals(version)) {
 					hardwareProperties = hw.getClass().newInstance();
 					newVersion = version;
 					break;
@@ -674,9 +674,9 @@ public final class MakelangeloRobotSettings {
 			e.printStackTrace();
 			Log.error("Hardware version instance failed. Defaulting to v2");
 			hardwareProperties = new Makelangelo2Properties();
-			newVersion=2;
+			newVersion="2";
 		}
-		if(newVersion == -1) {
+		if(newVersion == "") {
 			Log.error("Unknown hardware version requested. Defaulting to v2");
 			hardwareProperties = new Makelangelo2Properties();
 		}

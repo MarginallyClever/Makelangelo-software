@@ -11,8 +11,8 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	@Override
-	public int getVersion() {
-		return 3;
+	public String getVersion() {
+		return "3_3";
 	}
 
 	@Override

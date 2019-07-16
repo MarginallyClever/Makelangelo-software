@@ -18,8 +18,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 
 	
 	@Override
-	public int getVersion() {
-		return 5;
+	public String getVersion() {
+		return "5";
 	}
 	
 	@Override

@@ -17,8 +17,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public int getVersion() {
-		return 6;
+	public String getVersion() {
+		return "6";
 	}
 
 	@Override
