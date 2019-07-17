@@ -12,7 +12,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	@Override
 	public String getVersion() {
-		return "3_3";
+		return "7";
 	}
 
 	@Override
