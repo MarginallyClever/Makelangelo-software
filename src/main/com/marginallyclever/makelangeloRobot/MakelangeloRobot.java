@@ -623,9 +623,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
-		sendLineToRobot("D6 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY())); // save
-																											// home
-																											// position
+		// save home position
+		sendLineToRobot("D6 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY()));
 		setGondolaX((float) settings.getHomeX());
 		setGondolaY((float) settings.getHomeY());
 		didSetHome = true;
@@ -636,10 +635,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	/**
-	 * @param x
-	 *            absolute position in mm
-	 * @param y
-	 *            absolute position in mm
+	 * @param x absolute position in mm
+	 * @param y absolute position in mm
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
