@@ -34,7 +34,8 @@ public class GCodeFile {
 	public float estimatedLength = 0;  // cm
 	public int estimateCount = 0;
 	public float scale = 1.0f;
-	public float feedRate = 1.0f;
+	public double feedRate = 1.0f;
+	public double acceleration = 1.0f;
 	public boolean changed = false;
 
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
@@ -48,13 +49,13 @@ public class GCodeFile {
 	public GCodeFile() {}
 	
 	
-	public GCodeFile(String filename,boolean flipHorizontally) throws IOException {
-		load(filename,flipHorizontally);
+	public GCodeFile(String filename,MakelangeloRobotSettings settings) throws IOException {
+		load(filename,settings);
 	}
 	
 	
-	public GCodeFile(InputStream in,boolean flipHorizontally) throws IOException {
-		load(in,flipHorizontally);
+	public GCodeFile(InputStream in,MakelangeloRobotSettings settings) throws IOException {
+		load(in,settings);
 	}
 
 
@@ -70,7 +71,8 @@ public class GCodeFile {
 		estimatedLength = 0;
 		estimateCount = 0;
 		scale = 1.0f;
-		feedRate = 1.0f;
+		feedRate = 90.0f;
+		acceleration = 250.0f;
 		changed = true;
 	}
 
@@ -87,15 +89,17 @@ public class GCodeFile {
 	 * Estimate the time required to execute all the gcode commands.
 	 * Requires machine settings, and should probably be moved into MakelangeloRobot
 	 */
-	private void estimateDrawTime() {
+	private void estimateDrawTime(MakelangeloRobotSettings settings) {
 		int j;
 
 		double px = 0, py = 0, pz = 0, length = 0, x, y, z, ai, aj;
-		feedRate = 1.0f;
-		scale = 0.1f;
+		feedRate = settings.getPenDownFeedRate();
+		acceleration = settings.getAcceleration();
+		scale = 1f;
 		estimatedTime = 0;
 		estimatedLength = 0;
 		estimateCount = 0;
+		double startRate = 0;
 
 		int lineCount=0;
 		Iterator<String> iLine = lines.iterator();
@@ -107,27 +111,28 @@ public class GCodeFile {
 
 			String[] tokens = pieces[0].split("\\s");
 
-			for (j = 0; j < tokens.length; ++j) {
-				if (tokens[j].equals("G20")) scale = 2.54f;  // in->cm
-				if (tokens[j].equals("G21")) scale = 0.10f;  // mm->cm
-				if (tokens[j].startsWith("F")) {
-					try {
-						feedRate = Float.valueOf(tokens[j].substring(1)) * scale;
-					}
-					catch(Exception e) {
-						e.printStackTrace(); 
-					}
-					assert (!Float.isNaN(feedRate) && feedRate != 0);
-				}
-			}
-
 			x = px;
 			y = py;
 			z = pz;
 			ai = px;
 			aj = py;
+			
 			try {
-				for (j = 1; j < tokens.length; ++j) {
+				for (j = 0; j < tokens.length; ++j) {
+					if (tokens[j].equals("G20")) scale = 25.4f;  // in->mm
+					if (tokens[j].equals("G21")) scale = 1.0f;  // mm
+					if (tokens[j].startsWith("F")) {
+						float v = Float.valueOf(tokens[j].substring(1)) * scale;
+						if(!Float.isNaN(v) && v>0) {
+							feedRate = v;
+						}
+					}
+					if (tokens[j].startsWith("A")) {
+						float v = Float.valueOf(tokens[j].substring(1)) * scale;
+						if(!Float.isNaN(v) && v>0) {
+							acceleration = v;
+						}
+					}
 					if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
 					if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
 					if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
@@ -152,10 +157,43 @@ public class GCodeFile {
 				double ddx = x - px;
 				double ddy = y - py;
 				length = Math.sqrt(ddx * ddx + ddy * ddy);
-				estimatedTime += length / feedRate;
-				assert (!Float.isNaN(estimatedTime));
-				estimatedLength += length;
-				++estimateCount;
+				if(length>0) {
+					double time;
+					// v1
+					//time = length / feedRate;
+					// v2
+					double endRate = 0; // TODO might not be decelerating to zero if path is heavily optimized.
+					double distanceToAccelerate = ( feedRate*feedRate - startRate*startRate ) / (2.0 *  acceleration);
+					double distanceToDecelerate = ( endRate*endRate   - feedRate*feedRate   ) / (2.0 * -acceleration);
+					if(distanceToAccelerate+distanceToDecelerate > length) {
+						// we never reach feedRate.
+						double intersection = (2.0 * acceleration * length - startRate*startRate + endRate*endRate) / (4.0*acceleration);
+						distanceToAccelerate = intersection;
+						distanceToDecelerate = intersection;
+						length = 0;
+					} else {
+						length-=distanceToAccelerate+distanceToDecelerate;
+					}
+					time = length / feedRate;
+					// 0.5att+vt-d=0
+					// using quadratic to solve for t,
+					// t = -v +/- sqrt(vv+2ad)/a
+					double s,a,b,c,d;
+					s = Math.sqrt(feedRate*feedRate+2*acceleration*distanceToAccelerate);
+					a = (-feedRate + s)/acceleration;
+					b = (-feedRate - s)/acceleration;
+					time += a>b? a:b;
+					
+					s = Math.sqrt(feedRate*feedRate+2*acceleration*distanceToDecelerate);
+					c = (-feedRate + s)/acceleration;
+					d = (-feedRate - s)/acceleration;
+					time += c>d? c:d;
+					
+					estimatedTime += time;
+					assert (!Float.isNaN(estimatedTime));
+					estimatedLength += length;
+					++estimateCount;
+				}
 				px = x;
 				py = y;
 				pz = z;
@@ -188,10 +226,8 @@ public class GCodeFile {
 			}
 		}  // for ( each instruction )
 		assert (!Float.isNaN(estimatedTime));
-		// processing time for each instruction
-		estimatedTime += estimateCount * 0.007617845117845f;
-		// conversion to ms?
-		estimatedTime *= 10000 * 2;
+		// conversion s to ms
+		estimatedTime *= 1000;
 	}
 
 
@@ -204,19 +240,19 @@ public class GCodeFile {
 	}
 
 	
-	public void load(InputStream in,boolean flipHorizontally) throws IOException {
+	public void load(InputStream in,MakelangeloRobotSettings settings) throws IOException {
 		Scanner scanner = new Scanner(in);
-		loadFromScanner(scanner,flipHorizontally);
+		loadFromScanner(scanner,settings);
 	}
 
 	
-	public void load(String filename,boolean flipHorizontally) throws IOException {
+	public void load(String filename,MakelangeloRobotSettings settings) throws IOException {
 		Scanner scanner = new Scanner(new FileInputStream(filename));	
-		loadFromScanner(scanner,flipHorizontally);
+		loadFromScanner(scanner,settings);
 	}
 	
 	
-	private void loadFromScanner(Scanner scanner,boolean flipHorizontally) {
+	private void loadFromScanner(Scanner scanner,MakelangeloRobotSettings settings) {
 		closeFile();
 
 		setLinesTotal(0);
@@ -224,7 +260,7 @@ public class GCodeFile {
 		try {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
-				if(flipHorizontally) {
+				if(settings.isReverseForGlass()) {
 					// find X, change to X-
 					// find X--, change to X-
 					line = line.replace("X","X-");
@@ -250,7 +286,7 @@ public class GCodeFile {
 			scanner.close();
 		}
 		setFileOpened(true);
-		estimateDrawTime();
+		estimateDrawTime(settings);
 		changed=true;
 	}
 

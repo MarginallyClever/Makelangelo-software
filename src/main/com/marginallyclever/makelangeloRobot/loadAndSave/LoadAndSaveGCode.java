@@ -46,7 +46,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 		GCodeFile file;
 		try {
-			file = new GCodeFile(in,robot.getSettings().isReverseForGlass());
+			file = new GCodeFile(in,robot.getSettings());
 			
 		} catch (IOException e) {
 			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
@@ -55,7 +55,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 		Log.info(file.estimateCount + Translator.get("LineSegments") + "\n" + file.estimatedLength
 				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
-				+ Log.millisecondsToHumanReadable((long) (file.estimatedTime)) + ".");
+				+ Log.millisecondsToHumanReadable((long)file.estimatedTime) + ".");
 
 		robot.setGCode(file);
 		return true;
