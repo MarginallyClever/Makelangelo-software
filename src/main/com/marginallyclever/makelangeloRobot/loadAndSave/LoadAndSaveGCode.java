@@ -53,7 +53,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			return false;
 		}
 
-		Log.info(file.estimateCount + Translator.get("LineSegments") + "\n" + file.estimatedLength
+		Log.info(file.estimateCount + Translator.get("LineSegments") + "\n" + (file.estimatedLength*0.1f)
 				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
 				+ Log.millisecondsToHumanReadable((long)file.estimatedTime) + ".");
 

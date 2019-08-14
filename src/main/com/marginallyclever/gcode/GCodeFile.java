@@ -31,7 +31,7 @@ public class GCodeFile {
 	private boolean fileOpened = false;
 	private ArrayList<String> lines = new ArrayList<String>();
 	public float estimatedTime = 0;  // ms
-	public float estimatedLength = 0;  // cm
+	public float estimatedLength = 0;  // mm
 	public int estimateCount = 0;
 	public float scale = 1.0f;
 	public double feedRate = 1.0f;
@@ -92,14 +92,14 @@ public class GCodeFile {
 	private void estimateDrawTime(MakelangeloRobotSettings settings) {
 		int j;
 
-		double px = 0, py = 0, pz = 0, length = 0, x, y, z, ai, aj;
-		feedRate = settings.getPenDownFeedRate();
-		acceleration = settings.getAcceleration();
+		double px = settings.getHomeX(), py = settings.getHomeY(), pz = settings.getPenUpAngle(), length, x, y, z, ai, aj;
+		feedRate = settings.getPenDownFeedRate();  // mm/s
+		double zRate = settings.getZRate();  // mm/s
+		acceleration = settings.getAcceleration();  // mm/s/s
 		scale = 1f;
 		estimatedTime = 0;
 		estimatedLength = 0;
 		estimateCount = 0;
-		double startRate = 0;
 
 		int lineCount=0;
 		Iterator<String> iLine = lines.iterator();
@@ -135,7 +135,9 @@ public class GCodeFile {
 					}
 					if (tokens[j].startsWith("X")) x = Float.valueOf(tokens[j].substring(1)) * scale;
 					if (tokens[j].startsWith("Y")) y = Float.valueOf(tokens[j].substring(1)) * scale;
-					if (tokens[j].startsWith("Z")) z = Float.valueOf(tokens[j].substring(1)) * scale;
+					if (tokens[j].startsWith("Z")) {
+						z = Float.valueOf(tokens[j].substring(1)) * scale;
+					}
 					if (tokens[j].startsWith("I")) ai = px + Float.valueOf(tokens[j].substring(1)) * scale;
 					if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
 				}
@@ -146,51 +148,19 @@ public class GCodeFile {
 
 			if (z != pz) {
 				// pen up/down action
-				estimatedTime += (z - pz) / feedRate;  // seconds?
-				assert (!Float.isNaN(estimatedTime));
+				//estimatedTime += (z - pz) / zRate;
+				estimatedTime += estimateSingleLine(z-pz,0,0,zRate,acceleration);
 			}
 
 			String firstToken = tokens[0];
 			if (firstToken.equals("G00") || firstToken.equals("G0") ||
-					firstToken.equals("G01") || firstToken.equals("G1")) {
+				firstToken.equals("G01") || firstToken.equals("G1")) {
 				// draw a line
 				double ddx = x - px;
 				double ddy = y - py;
-				length = Math.sqrt(ddx * ddx + ddy * ddy);
+				length = Math.sqrt(ddx * ddx + ddy * ddy);  // mm
 				if(length>0) {
-					double time;
-					// v1
-					//time = length / feedRate;
-					// v2
-					double endRate = 0; // TODO might not be decelerating to zero if path is heavily optimized.
-					double distanceToAccelerate = ( feedRate*feedRate - startRate*startRate ) / (2.0 *  acceleration);
-					double distanceToDecelerate = ( endRate*endRate   - feedRate*feedRate   ) / (2.0 * -acceleration);
-					if(distanceToAccelerate+distanceToDecelerate > length) {
-						// we never reach feedRate.
-						double intersection = (2.0 * acceleration * length - startRate*startRate + endRate*endRate) / (4.0*acceleration);
-						distanceToAccelerate = intersection;
-						distanceToDecelerate = intersection;
-						length = 0;
-					} else {
-						length-=distanceToAccelerate+distanceToDecelerate;
-					}
-					time = length / feedRate;
-					// 0.5att+vt-d=0
-					// using quadratic to solve for t,
-					// t = -v +/- sqrt(vv+2ad)/a
-					double s,a,b,c,d;
-					s = Math.sqrt(feedRate*feedRate+2*acceleration*distanceToAccelerate);
-					a = (-feedRate + s)/acceleration;
-					b = (-feedRate - s)/acceleration;
-					time += a>b? a:b;
-					
-					s = Math.sqrt(feedRate*feedRate+2*acceleration*distanceToDecelerate);
-					c = (-feedRate + s)/acceleration;
-					d = (-feedRate - s)/acceleration;
-					time += c>d? c:d;
-					
-					estimatedTime += time;
-					assert (!Float.isNaN(estimatedTime));
+					estimatedTime += estimateSingleLine(length,0,0,feedRate,acceleration);
 					estimatedLength += length;
 					++estimateCount;
 				}
@@ -216,18 +186,71 @@ public class GCodeFile {
 				theta = Math.abs(angle2 - angle1);
 				// length of arc=theta*r (http://math.about.com/od/formulas/ss/surfaceareavol_9.htm)
 				length = theta * radius;
-				estimatedTime += length / feedRate;
-				assert (!Float.isNaN(estimatedTime));
-				estimatedLength += length;
-				++estimateCount;
+				if(length>0) {
+					estimatedTime += estimateSingleLine(length,0,0,feedRate,acceleration);
+					estimatedLength += length;
+					++estimateCount;
+				}
 				px = x;
 				py = y;
 				pz = z;
 			}
-		}  // for ( each instruction )
-		assert (!Float.isNaN(estimatedTime));
+		}
+		
 		// conversion s to ms
 		estimatedTime *= 1000;
+	}
+	
+	/**
+	 * calculate seconds to move a given length.  Also uses globals feedRate and acceleration 
+	 * @param length mm distance to travel.
+	 * @param startRate mm/s at start of move
+	 * @param endRate mm/s at end of move
+	 * @return time to execute move
+	 */
+	protected double estimateSingleLine(double length,double startRate,double endRate,double maxV,double accel) {
+		// v1
+		double originalTime = length / maxV;
+
+		// v2
+		
+		double distanceToAccelerate = ( maxV*maxV - startRate*startRate ) / (2.0 *  accel);
+		double distanceToDecelerate = ( endRate*endRate   - maxV*maxV   ) / (2.0 * -accel);
+		if(distanceToAccelerate+distanceToDecelerate > length) {
+			// we never reach feedRate.
+			double intersection = (2.0 * accel * length - startRate*startRate + endRate*endRate) / (4.0*accel);
+			distanceToAccelerate = intersection;
+			distanceToDecelerate = length-intersection;
+			length = 0;
+		} else {
+			length-=distanceToAccelerate+distanceToDecelerate;
+		}
+		double time = length / maxV;
+		// 0.5att+vt-d=0
+		// using quadratic to solve for t,
+		// t = (-v +/- sqrt(vv+2ad))/a
+		double s;
+		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToAccelerate);
+		double a = (-maxV + s)/accel;
+		double b = (-maxV - s)/accel;
+		double ab = a>b? a:b;
+		if(ab<0) {
+			ab=0;
+		}
+		
+		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToDecelerate);
+		double c = (-maxV + s)/accel;
+		double d = (-maxV - s)/accel;
+		double cd = c>d? c:d;
+		if(cd<0) {
+			cd=0;
+		}
+		
+		double newTime = time+ab+cd;
+		
+		assert( newTime >= originalTime);
+		
+		return newTime;
 	}
 
 
