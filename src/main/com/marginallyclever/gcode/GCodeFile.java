@@ -209,11 +209,6 @@ public class GCodeFile {
 	 * @return time to execute move
 	 */
 	protected double estimateSingleLine(double length,double startRate,double endRate,double maxV,double accel) {
-		// v1
-		double originalTime = length / maxV;
-
-		// v2
-		
 		double distanceToAccelerate = ( maxV*maxV - startRate*startRate ) / (2.0 *  accel);
 		double distanceToDecelerate = ( endRate*endRate   - maxV*maxV   ) / (2.0 * -accel);
 		if(distanceToAccelerate+distanceToDecelerate > length) {
@@ -228,7 +223,7 @@ public class GCodeFile {
 		// time at maxV
 		double time = length / maxV;
 		
-		// time accelerating (ab)
+		// time accelerating
 		// 0.5att+vt-d=0
 		// using quadratic to solve for t,
 		// t = (-v +/- sqrt(vv+2ad))/a
@@ -236,33 +231,22 @@ public class GCodeFile {
 		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToAccelerate);
 		double a = (-maxV + s)/accel;
 		double b = (-maxV - s)/accel;
-		double ab = a>b? a:b;
-		if(ab<0) {
-			ab=0;
+		double accelTime = a>b? a:b;
+		if(accelTime<0) {
+			accelTime=0;
 		}
 		
-		// time decelerating (cd)
+		// time decelerating
 		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToDecelerate);
 		double c = (-maxV + s)/accel;
 		double d = (-maxV - s)/accel;
-		double cd = c>d? c:d;
-		if(cd<0) {
-			cd=0;
+		double decelTime = c>d? c:d;
+		if(decelTime<0) {
+			decelTime=0;
 		}
 		
 		// sum total
-		double newTime = time+ab+cd;
-		
-		if(newTime<0) {
-			System.out.println("newtime<0 ?");
-		}
-		if(Double.isNaN(newTime)) {
-			System.out.println("NaN");
-		}
-		
-		assert( newTime <= originalTime);
-		
-		return newTime;
+		return time+accelTime+decelTime;
 	}
 
 
