@@ -54,7 +54,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
 	private static boolean shouldScaleOnLoad=true;
-	private static boolean shouldInfillOnLoad=true;
 	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
@@ -87,7 +86,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		final JCheckBox checkScale = new JCheckBox(Translator.get("DXFScaleOnLoad"));
-		final JCheckBox checkInfill = new JCheckBox(Translator.get("DXFInfillOnLoad"));
 		final JCheckBox checkOptimize = new JCheckBox(Translator.get("DXFOptimizeOnLoad"));
 		final SelectFloat chooseMinimumPenUpMove = new SelectFloat((float)toolMinimumPenUpMove);
 		final SelectFloat chooseMinimumPenDownMove = new SelectFloat((float)toolMinimumPenDownMove);
@@ -108,7 +106,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			shouldScaleOnLoad = checkScale.isSelected();
-			shouldInfillOnLoad = checkInfill.isSelected();
 			shouldOptimizePathingOnLoad = checkOptimize.isSelected();
 
 			toolMinimumPenUpMove = ((Number)chooseMinimumPenUpMove.getValue()).doubleValue();
@@ -147,59 +144,61 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * Put every entity into a bucket.
 	 * @param doc
 	 * @param grid
-	 * @param groups
 	 */
 	@SuppressWarnings("unchecked")
-	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
+	protected void sortEntitiesIntoBuckets(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid) {
 		//Log.info("Sorting layer "+layer.getName()+" into buckets...");
 
-			Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-			while (entityTypeIter.hasNext()) {
-				String entityType = (String) entityTypeIter.next();
-				List<DXFEntity> entityList = (List<DXFEntity>)layer.getDXFEntities(entityType);
-				Iterator<DXFEntity> iter = entityList.iterator();
-				while(iter.hasNext()) {
-					DXFEntity e = iter.next();
-					DXFBucketEntity be = new DXFBucketEntity(e);
+		Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+		while (entityTypeIter.hasNext()) {
+			String entityType = (String) entityTypeIter.next();
+			List<DXFEntity> entityList = (List<DXFEntity>)layer.getDXFEntities(entityType);
+			Iterator<DXFEntity> iter = entityList.iterator();
+			while(iter.hasNext()) {
+				DXFEntity e = iter.next();
+				DXFBucketEntity be = new DXFBucketEntity(e);
+				
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
+					DXFLine line = (DXFLine)e;
+					grid.addEntity(be, line.getStartPoint());
+					grid.addEntity(be, line.getEndPoint());
+				} else if(e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+					DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
 					
-					if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-						DXFLine line = (DXFLine)e;
-						grid.addEntity(be, line.getStartPoint());
-						grid.addEntity(be, line.getEndPoint());
-						continue;
+					if(!polyLine.isClosed()) {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+					} else {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-						e = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-						// fall through to the next case, polyline.
+				} else if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+					DXFPolyline polyLine = (DXFPolyline)e;
+					
+					if(!polyLine.isClosed()) {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+					} else {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-						DXFPolyline polyLine = (DXFPolyline)e;
-						
-						if(!polyLine.isClosed()) {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
-						} else {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						}
-						continue;
+				} else if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+					DXFLWPolyline polyLine = (DXFLWPolyline)e;
+					if(!polyLine.isClosed()) {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+					} else {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-						DXFLWPolyline polyLine = (DXFLWPolyline)e;
-						if(!polyLine.isClosed()) {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
-						} else {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						}
-						continue;
-					}
+				} else {
 					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
 					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
 					// I don't know this entity type.
 					Log.error("Unknown DXF type "+e.getType());
+					System.out.println("Unknown DXF type "+e.getType());
 				}
+			}
 		}
 		
 		//grid.countEntitiesInBuckets();
@@ -280,14 +279,17 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				int color = layer.getColor();
 				System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
 				
-				// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
+				// Some DXF layers are empty.  
 				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-				if (entityTypeIter.hasNext()) {
-					allColors.add(new Integer(layer.getColor()));
-					layer.getColor();
-					liftPen(out);
-					machine.writeChangeTo(out,layer.getName());
+				if (!entityTypeIter.hasNext()) {
+					continue;
 				}
+				
+				// Only write the tool change command if there's something on this layer.
+				allColors.add(new Integer(layer.getColor()));
+				layer.getColor();
+				liftPen(out);
+				machine.writeChangeTo(out,layer.getName());
 				
 				// Sort the entities on this layer into the buckets.
 				// Buckets are arranged in an XY grid.
@@ -302,34 +304,24 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
 				List<DXFGroup> groups = new LinkedList<DXFGroup>();
 
-				sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
-
-				//DXFGroup infillGroup=null;
-				if(shouldInfillOnLoad) {
-					//infillGroup = infillClosedAreas(layer);
-				}
-
+				sortEntitiesIntoBuckets(doc,layer,grid);
+/*
 				if(shouldOptimizePathingOnLoad) {
 					double DXF_EPSILON = 0.1;
 					
 					// Use the buckets to narrow the search field and find neighboring entities
 					grid.sortEntitiesIntoContinguousGroups(groups,DXF_EPSILON);
-				} else {
-					grid.dumpEverythingIntoABucket(groups);
-				}
+				} else {*/
+					grid.dumpEveryBucketIntoOneGroup(groups);
+				//}
 				
-				removeDuplicates(groups);
+				//removeDuplicates(groups);
 
 				// We have a list of groups. 
 				// Each group is set of lines that make a continuous path.
 				// Maybe even a closed path!
 				// Some of the lines in each group may be flipped. 
 
-				// TODO fill in the closed groups if the user says ok. (does not belong in DXF)
-				
-				//if(infillGroup!=null) {
-				//	groups.add(infillGroup);
-				//}
 				
 				Iterator<DXFGroup> groupIter = groups.iterator();
 				while(groupIter.hasNext()) {
@@ -406,6 +398,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			parseDXFPolyline(out,(DXFPolyline)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
 			parseDXFLWPolyline(out,(DXFLWPolyline)e);
+		} else {
+			System.out.println("entity not parsed.");
 		}
 	}
 	
@@ -431,9 +425,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFLWPolyline line = (DXFLWPolyline)e;
 			DXFVertex v = line.getVertex(0);
 			return new Point(v.getX(),v.getY(),v.getZ());
+		} else {
+			System.out.println("entity not started.");
+			return null;
 		}
-		assert(false);
-		return null;
 	}
 
 	protected Point getEntityEnd(DXFEntity e) {
@@ -458,13 +453,15 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			if(!line.isClosed()) n=line.getVertexCount()-1;
 			DXFVertex v = line.getVertex(n);
 			return new Point(v.getX(),v.getY(),v.getZ());
+		} else {
+			System.out.println("entity not ended.");
+			return null;
 		}
-		assert(false);
-		return null;
 	}
 	
 	/**
 	 * http://stackoverflow.com/questions/203984/how-do-i-remove-repeated-elements-from-arraylist
+	 * may have hash collisions which cause non-duplicates to be dropped.
 	 * @param groups
 	 */
 	protected void removeDuplicates(List<DXFGroup> groups) {
