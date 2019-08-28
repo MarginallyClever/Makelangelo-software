@@ -334,9 +334,9 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 
 	@Override
 	public void writeProgramStart(Writer out) throws IOException {
-		out.write("(Makelangelo 5)\n");
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("("+formatter.format(date)+")\n");
+		out.write("; Makelangelo 5\n");
+		out.write("; "+formatter.format(date)+"\n");
 	}
 }

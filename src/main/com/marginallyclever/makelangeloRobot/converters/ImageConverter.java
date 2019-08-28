@@ -141,7 +141,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		}
 
 		liftPen(out);
-		moveTo(out, x0, y0);
 		
 		for (b = 0; b <= steps; ++b) {
 			n = b / steps;
@@ -157,7 +156,11 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			if(isInside!=wasInside) {
 				clipLine(out,oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
 			}
-			moveTo(out, x, y, penUp);
+			if(penUp!=oldPenUp) {
+				moveTo(out,x,y);
+				if (penUp) liftPen(out);
+				else lowerPen(out);
+			}
 			if( wasInside && !isInside ) break;  // done
 			wasInside=isInside;
 			oldX=x;
@@ -165,6 +168,5 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			oldPenUp=penUp;
 		}
 		liftPen(out);
-		moveTo(out, x1, y1);
 	}
 }

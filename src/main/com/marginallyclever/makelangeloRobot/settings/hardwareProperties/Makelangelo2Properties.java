@@ -296,13 +296,13 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("(Makelangelo 2)\n");
-		out.write("("+formatter.format(date)+")\n");
+		out.write("; Makelangelo 2\n");
+		out.write("; "+formatter.format(date)+"\n");
 		out.write("M203 U500");  // raise top speed of servo (z axis)
 	}
 
 	@Override
 	public void writeProgramEnd(Writer out) throws IOException {
-		out.write("(Program End)\n");
+		out.write("; Program End\n");
 	}
 }

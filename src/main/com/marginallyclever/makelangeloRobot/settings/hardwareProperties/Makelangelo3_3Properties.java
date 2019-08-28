@@ -179,7 +179,7 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("(Makelangelo 3.3)\n");
-		out.write("("+formatter.format(date)+")\n");
+		out.write("; Makelangelo 3.3\n");
+		out.write("; "+formatter.format(date)+"\n");
 	}
 }

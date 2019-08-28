@@ -216,8 +216,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("(Zarplotter)\n");
-		out.write("("+formatter.format(date)+")\n");
+		out.write("; Zarplotter\n");
+		out.write("; "+formatter.format(date)+"\n");
 		out.write("D0 R-500 L-500 U-500 V-500\n");  // tighten belts a little
 		out.write("M203 W500");  // raise top speed of servo (z axis)
 	}

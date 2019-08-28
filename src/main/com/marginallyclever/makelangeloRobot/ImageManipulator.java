@@ -162,17 +162,15 @@ public abstract class ImageManipulator {
 		
 		ClippingPoint P0 = new ClippingPoint(oldX,oldY);
 		ClippingPoint P1 = new ClippingPoint(x,y);
-		
-		if(CohenSutherland2DClipper(P0, P1)) {
-			// some of the line is inside
-			if(isInside) {
-				// entering the rectangle
-				if(oldPenUp==false) {
+
+		if(oldPenUp==false) {
+			if(CohenSutherland2DClipper(P0, P1)) {
+				// some of the line is inside
+				if(isInside) {
+					// entering the rectangle
 					moveTo(out,P0.x,P0.y,false);
-				}
-			} else {
-				// leaving the rectangle
-				if(oldPenUp==false) {
+				} else {
+					// leaving the rectangle
 					moveTo(out,P1.x,P1.y,false);
 				}
 			}

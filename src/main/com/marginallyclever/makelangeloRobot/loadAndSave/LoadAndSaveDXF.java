@@ -263,7 +263,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			// prepare for exporting
 			machine = robot.getSettings();
 			// normally here I use imageStart(), but every layer causes a new writeChangeTo.  This avoids one redundant pen change.
-			imageStart(out);
+			//imageStart(out);
+			machine.writeProgramStart(out);
+			setAbsoluteMode(out);
+			liftPen(out);
 			
 			previousX = machine.getHomeX();
 			previousY = machine.getHomeY();

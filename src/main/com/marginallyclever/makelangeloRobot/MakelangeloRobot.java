@@ -452,7 +452,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning())
 			return;
-
+		
 		line = "N" + lineNumber + " " + line;
 		if(!line.endsWith(";")) line+=';';
 		String checksum = generateChecksum(line);
@@ -553,8 +553,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public boolean sendLineToRobot(String line) {
 		if (getConnection() == null || !isPortConfirmed())
-			return false;
-		if (line.trim().equals(""))
 			return false;
 
 		String reportedline = line;
