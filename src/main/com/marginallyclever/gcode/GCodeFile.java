@@ -149,7 +149,7 @@ public class GCodeFile {
 			if (z != pz) {
 				// pen up/down action
 				//estimatedTime += (z - pz) / zRate;
-				estimatedTime += estimateSingleLine(z-pz,0,0,zRate,acceleration);
+				estimatedTime += estimateSingleLine(Math.abs(z-pz),0,0,zRate,acceleration);
 			}
 
 			String firstToken = tokens[0];
@@ -225,7 +225,10 @@ public class GCodeFile {
 		} else {
 			length-=distanceToAccelerate+distanceToDecelerate;
 		}
+		// time at maxV
 		double time = length / maxV;
+		
+		// time accelerating (ab)
 		// 0.5att+vt-d=0
 		// using quadratic to solve for t,
 		// t = (-v +/- sqrt(vv+2ad))/a
@@ -238,6 +241,7 @@ public class GCodeFile {
 			ab=0;
 		}
 		
+		// time decelerating (cd)
 		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToDecelerate);
 		double c = (-maxV + s)/accel;
 		double d = (-maxV - s)/accel;
@@ -246,9 +250,17 @@ public class GCodeFile {
 			cd=0;
 		}
 		
+		// sum total
 		double newTime = time+ab+cd;
 		
-		assert( newTime >= originalTime);
+		if(newTime<0) {
+			System.out.println("newtime<0 ?");
+		}
+		if(Double.isNaN(newTime)) {
+			System.out.println("NaN");
+		}
+		
+		assert( newTime <= originalTime);
 		
 		return newTime;
 	}
@@ -591,6 +603,8 @@ public class GCodeFile {
 			if (firstToken.equals("G00") || firstToken.equals("G0") ||
 				firstToken.equals("G01") || firstToken.equals("G1")) {
 				addNodePos(i, px, py, x, y, currentColor);
+				// candy cane style
+				//addNodePos(i, px, py, x, y, ((i%2)==0)?Color.red:Color.blue);
 			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
 					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
