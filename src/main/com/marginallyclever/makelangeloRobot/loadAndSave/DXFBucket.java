@@ -36,7 +36,6 @@ public class DXFBucket {
 	}
 	
 	public void remove(DXFBucketEntity o) {
-		o.removeBucket(this);
 		contents.remove(o);
 	}
 
@@ -44,19 +43,19 @@ public class DXFBucket {
 	public DXFBucketEntity findBestFitToPoint(Point p,double epsilon) {
 		if(p==null) return getFirstEntity();
 		
-		double bestD = Double.MAX_VALUE;
+		double bestD = epsilon*epsilon;
 		double d;
 		DXFBucketEntity bestEntity=null;
 		
 		Iterator<DXFBucketEntity> i = contents.iterator();
 		while(i.hasNext()) {
 			DXFBucketEntity be = i.next();
-			d = distanceBetweenPointsSquared(p,be.a.point);
+			d = distanceBetweenPointsSquared(p,be.pointA);
 			if( d < bestD) {
 				bestEntity = be;
 				bestD = d*d;
 			}
-			d = distanceBetweenPointsSquared(p,be.b.point);
+			d = distanceBetweenPointsSquared(p,be.pointB);
 			if( d < bestD) {
 				bestEntity = be;
 				bestD = d*d;
