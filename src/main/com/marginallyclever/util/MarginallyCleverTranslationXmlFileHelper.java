@@ -63,13 +63,13 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * Used when writing a set to disk.
-   * @see #writeSetObjectToFile
+   * See #writeSetObjectToFile
    */
   private static final String SET_OBJECT_FILE_NAME = "keys.txt";
 
   /**
    * @param args command line arguments.
-   * @see <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
+   * See <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
    */
   public static void main(String[] args) {
     areLanguageFilesMissingKeys(DO_NOT_LOG_MISSING_KEYS, CHECK_ALL_LANGUAGE_FILES);
@@ -139,7 +139,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * @param expected set of expected keys
    * @param actual set of actual keys
    * @return
-   * @see <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
+   * See <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
    */
   private static Set<String> getMissingKeys(Set<String> expected, Set<String> actual) {
     final Set<String> keysInA = new HashSet<>(expected);
@@ -159,7 +159,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * Write a set object to disk.
    * @param set Set you want written to disk.
    * @throws IOException
-   * @see #SET_OBJECT_FILE_NAME
+   * See #SET_OBJECT_FILE_NAME
    */
   @SuppressWarnings("unused")
   private static void writeSetObjectToFile(Set<String> set) throws IOException {
@@ -174,7 +174,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * @param languagesFolderUrl language folder.
    * @param languageFiles list of all language files to check for existence of the default
    * @return file object representing the default language file.
-   * @see #DEFAULT_LANGUAGE_XML_FILE
+   * See #DEFAULT_LANGUAGE_XML_FILE
    * @throws AssertionError
    */
   private static File searchForDefaultLanguageInLanguagesFolder(URL languagesFolderUrl, File[] languageFiles) throws AssertionError {
@@ -188,8 +188,8 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * @return url object representing the languages folder
-   * @see #getLanguagesFolderUrlRelativeToClasspath()
-   * @see #getLanguagesFolderUrlFromUserDirectory()
+   * See #getLanguagesFolderUrlRelativeToClasspath()
+   * See #getLanguagesFolderUrlFromUserDirectory()
    */
   private static URL getLanguagesFolderUrl() {
     URL languagesFolderUrl = getLanguagesFolderUrlRelativeToClasspath();
@@ -208,7 +208,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * @return url object representing the language folder in the user's working directory.
-   * @see com.marginallyclever.makelangelo.Translator#WORKING_DIRECTORY
+   * See com.marginallyclever.makelangelo.Translator#WORKING_DIRECTORY
    */
   private static URL getLanguagesFolderUrlFromUserDirectory() {
     URL languageFolderUsingUserDirectoryUrl = null;
@@ -223,8 +223,8 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * @return url object representing languages folder relative to classpath.
-   * @see #LANGUAGES_FOLDER_LOCATION
-   * @see java.lang.ClassLoader#getResource(String)
+   * See #LANGUAGES_FOLDER_LOCATION
+   * See java.lang.ClassLoader#getResource(String)
    */
   public static URL getLanguagesFolderUrlRelativeToClasspath() {
     final ClassLoader thisClassesClassLoader = MarginallyCleverTranslationXmlFileHelper.class.getClassLoader();
@@ -234,8 +234,8 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   /**
    * recursively logs the names and values of a given xml node
    * @param node xml node to recursively log
-   * @see <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
-   * @see #logAllNodesNamesAndValues(org.w3c.dom.Node)
+   * See <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
+   * See #logAllNodesNamesAndValues(org.w3c.dom.Node)
    */
   @SuppressWarnings("unused")
   private static void logAllNodesNamesAndValues(Node node) {
@@ -264,7 +264,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
   /**
    * gets a key set from a given xml node
    * @param node node to get all elements with the name {@code "key"}
-   * @see <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
+   * See <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
    */
   private static Set<String> getKeySet(Node node) {
     final Set<String> keySet = new HashSet<>();

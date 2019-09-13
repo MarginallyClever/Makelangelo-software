@@ -8,7 +8,7 @@ import com.marginallyclever.makelangeloRobot.TransformedImage;
  * Floyd/Steinberg dithering
  *
  * @author Dan
- * @see <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
+ * See <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
 public class Filter_DitherFloydSteinberg extends ImageFilter {
   private long tone;

@@ -15,7 +15,7 @@ public class ColorPalette {
   /**
    * List of colors in the form of red, green, and blue data values.
    *
-   * @see ColorRGB
+   * See ColorRGB
    */
   protected List<ColorRGB> colors;
   
@@ -36,7 +36,7 @@ public class ColorPalette {
    * Removes a given color if it exists in {@link ColorPalette#colors}.
    *
    * @param c color to remove.
-   * @see <a href="http://stackoverflow.com/a/223929">Iterating through a list, avoiding ConcurrentModificationException when removing in loop</a>
+   * See <a href="http://stackoverflow.com/a/223929">Iterating through a list, avoiding ConcurrentModificationException when removing in loop</a>
    */
   public void removeColor(ColorRGB c) {
     for (final Iterator<ColorRGB> colorsIterator = colors.iterator(); colorsIterator.hasNext(); ) {

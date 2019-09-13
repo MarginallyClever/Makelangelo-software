@@ -12,7 +12,7 @@ public final class UnitTestHelper {
    *
    * @param string
    * @return if the string is an integer.
-   * @see <a href="http://stackoverflow.com/a/237204">What's the best way to check to see if a String represents an integer in Java?</a>
+   * See <a href="http://stackoverflow.com/a/237204">What's the best way to check to see if a String represents an integer in Java?</a>
    */
   public static boolean isInteger(String string) {
     if (string == null) {

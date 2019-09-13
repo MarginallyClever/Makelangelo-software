@@ -44,7 +44,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 /**
  * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
- * @see https://www.w3.org/TR/SVG/paths.html
+ * See https://www.w3.org/TR/SVG/paths.html
  */
 public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");

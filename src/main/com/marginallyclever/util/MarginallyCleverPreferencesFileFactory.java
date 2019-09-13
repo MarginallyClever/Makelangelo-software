@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.Log;
 
 /**
  * @author Peter Colapietro
- * @see <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
+ * See <a href="http://www.davidc.net/programming/java/java-preferences-using-file-backing-store">Java Preferences using a file as the backing store</a>
  * @since v7.1.4
  */
 public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPreferences> implements PreferencesFactory {

@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
- * @see https://linuxgazette.net/133/luana.html
+ * See https://linuxgazette.net/133/luana.html
  * @author Admin
  *
  */

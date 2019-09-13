@@ -36,7 +36,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 	 * {@code StackTraceElement}'s index which this method does not address. I make a best guess based upon development
 	 * environment testing.
 	 *
-	 * @see <a href="http://stackoverflow.com/a/8592871">Getting the name of the current executing method</a>
+	 * See <a href="http://stackoverflow.com/a/8592871">Getting the name of the current executing method</a>
 	 */
 	private static final int CLIENT_CODE_STACK_INDEX;
 

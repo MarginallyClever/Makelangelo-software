@@ -31,7 +31,7 @@ import com.marginallyclever.util.PreferencesHelper;
  *
  * @author dan royer
  * @author Peter Colapietro
- * @see <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
+ * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
 public final class Translator {
 
@@ -128,7 +128,7 @@ public final class Translator {
 
 	/**
 	 * Scan folder for language files.
-	 * @see http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
+	 * See http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
 	 * @throws IllegalStateException No language files found
 	 */
 	static public void loadLanguages() {

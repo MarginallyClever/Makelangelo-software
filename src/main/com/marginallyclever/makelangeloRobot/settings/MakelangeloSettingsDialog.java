@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -31,7 +30,7 @@ public class MakelangeloSettingsDialog
 extends JPanel
 implements ActionListener {
 	/**
-	 * @see Serializable
+	 * See Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 
