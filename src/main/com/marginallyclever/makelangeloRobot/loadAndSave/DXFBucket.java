@@ -50,15 +50,19 @@ public class DXFBucket {
 		Iterator<DXFBucketEntity> i = contents.iterator();
 		while(i.hasNext()) {
 			DXFBucketEntity be = i.next();
-			d = distanceBetweenPointsSquared(p,be.pointA);
-			if( d < bestD) {
-				bestEntity = be;
-				bestD = d*d;
+			if(be.pointA!=null) {
+				d = distanceBetweenPointsSquared(p,be.pointA);
+				if( d < bestD) {
+					bestEntity = be;
+					bestD = d;
+				}
 			}
-			d = distanceBetweenPointsSquared(p,be.pointB);
-			if( d < bestD) {
-				bestEntity = be;
-				bestD = d*d;
+			if(be.pointB!=null) {
+				d = distanceBetweenPointsSquared(p,be.pointB);
+				if( d < bestD) {
+					bestEntity = be;
+					bestD = d;
+				}
 			}
 		}
 		return bestEntity;
