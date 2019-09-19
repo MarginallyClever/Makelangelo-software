@@ -35,6 +35,8 @@ import org.kabeja.dxf.DXFSpline;
 import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
+import org.kabeja.dxf.helpers.SplinePoint;
+import org.kabeja.math.NURBSFixedNTELSPointIterator;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
@@ -63,6 +65,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 	private double toolMinimumPenUpMove=2.0;
 	private double toolMinimumPenDownMove=1.0;
+	private double toolMinimumPenUpMoveSq;
+	private double toolMinimumPenDownMoveSq;
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -115,6 +119,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			toolMinimumPenDownMove = ((Number)chooseMinimumPenDownMove.getValue()).doubleValue();
 			if(toolMinimumPenUpMove<0) toolMinimumPenUpMove=0;
 			if(toolMinimumPenDownMove<0.1) toolMinimumPenUpMove=0.1;
+			
+			toolMinimumPenUpMoveSq = toolMinimumPenUpMove*toolMinimumPenUpMove;
+			toolMinimumPenDownMoveSq = toolMinimumPenDownMove*toolMinimumPenDownMove;
 			
 			return loadNow(in,robot);
 		}
@@ -395,17 +402,18 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 		return true;
 	}
-	
+
 	protected void parseEntity(DXFEntity e,Writer out) throws IOException {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 			parseDXFLine(out,(DXFLine)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
+
+		    
 			parseDXFPolyline(out,polyLine);
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
+				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
 			parseDXFPolyline(out,(DXFPolyline)e);
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			parseDXFLWPolyline(out,(DXFLWPolyline)e);
 		}
 	}
 	
@@ -423,12 +431,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			DXFPolyline line = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
 			DXFVertex v = line.getVertex(0);
 			return new Point(v.getX(),v.getY(),v.getZ());
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
+				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
 			DXFPolyline line = (DXFPolyline)e;
-			DXFVertex v = line.getVertex(0);
-			return new Point(v.getX(),v.getY(),v.getZ());
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			DXFLWPolyline line = (DXFLWPolyline)e;
 			DXFVertex v = line.getVertex(0);
 			return new Point(v.getX(),v.getY(),v.getZ());
 		}
@@ -446,14 +451,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			if(!line.isClosed()) n=line.getVertexCount()-1;
 			DXFVertex v = line.getVertex(n);
 			return new Point(v.getX(),v.getY(),v.getZ());
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
+				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
 			DXFPolyline line = (DXFPolyline)e;
-			int n=0;
-			if(!line.isClosed()) n=line.getVertexCount()-1;
-			DXFVertex v = line.getVertex(n);
-			return new Point(v.getX(),v.getY(),v.getZ());
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			DXFLWPolyline line = (DXFLWPolyline)e;
 			int n=0;
 			if(!line.isClosed()) n=line.getVertexCount()-1;
 			DXFVertex v = line.getVertex(n);
@@ -484,14 +484,21 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		if(totalRemoved!=0) System.out.println(totalRemoved+" duplicates removed.");
 	}
 	
+	protected double TX(double x) {
+		return (x-imageCenterX) * scale;
+	}
+	protected double TY(double y) {
+		return (y-imageCenterY) * scale;
+	}
+	
 	protected void parseDXFLine(Writer out,DXFLine entity) throws IOException {
 		Point start = entity.getStartPoint();
 		Point end = entity.getEndPoint();
 
-		double x = (start.getX() - imageCenterX) * scale;
-		double y = (start.getY() - imageCenterY) * scale;
-		double x2 = (end.getX() - imageCenterX) * scale;
-		double y2 = (end.getY() - imageCenterY) * scale;
+		double x = TX(start.getX());
+		double y = TY(start.getY());
+		double x2 = TX(end.getX());
+		double y2 = TY(end.getY());
 			
 		// which end is closer to the previous point?
 		double dx = previousX - x;
@@ -505,137 +512,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		}
 	}
 	
-	protected void parseDXFPolyline(Writer out,DXFPolyline entity) throws IOException {
-		if(entity.isClosed()) {
-			// only one end to care about
-			parseDXFPolylineForward(out,entity);
-		} else {
-			// which end is closest to the previous (x,y)?
-			int n = entity.getVertexCount()-1;
-			double x = (entity.getVertex(0).getX() - imageCenterX) * scale;
-			double y = (entity.getVertex(0).getY() - imageCenterY) * scale;
-			double x2 = (entity.getVertex(n).getX() - imageCenterX) * scale;
-			double y2 = (entity.getVertex(n).getY() - imageCenterY) * scale;
-
-			// which end is closer to the previous (x,y) ?
-			double dx = previousX - x;
-			double dy = previousY - y;
-			double dx2 = previousX - x2;
-			double dy2 = previousY - y2;
-			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-				// first point is closer
-				parseDXFPolylineForward(out,entity);
-			} else {
-				// last point is closer
-				parseDXFPolylineBackward(out,entity);
-			}
-		}
-	}
-	
-	protected void parseDXFLWPolylineForward(Writer out,DXFLWPolyline entity) throws IOException {
-		boolean first = true;
-		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-		for (int j = 0; j < count; ++j) {
-			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
-			double x = (v.getX() - imageCenterX) * scale;
-			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,first,j<count-1);
-			first = false;
-		}
-	}
-	
-	protected void parseDXFLWPolylineBackward(Writer out,DXFLWPolyline entity) throws IOException {
-		boolean first = true;
-		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-		for (int j = 0; j < count; ++j) {
-			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
-			double x = (v.getX() - imageCenterX) * scale;
-			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,first,j<count-1);
-			first = false;
-		}
-	}
-
-	protected void parseDXFLWPolyline(Writer out,DXFLWPolyline entity) throws IOException {
-		if(entity.isClosed()) {
-			// only one end to care about
-			parseDXFLWPolylineForward(out,entity);
-		} else {
-			// which end is closest to the previous (x,y)?
-			int n = entity.getVertexCount()-1;
-			double x = (entity.getVertex(0).getX() - imageCenterX) * scale;
-			double y = (entity.getVertex(0).getY() - imageCenterY) * scale;
-			double x2 = (entity.getVertex(n).getX() - imageCenterX) * scale;
-			double y2 = (entity.getVertex(n).getY() - imageCenterY) * scale;
-
-			// which end is closer to the previous (x,y) ?
-			double dx = previousX - x;
-			double dy = previousY - y;
-			double dx2 = previousX - x2;
-			double dy2 = previousY - y2;
-			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-				// first point is closer
-				parseDXFLWPolylineForward(out,entity);
-			} else {
-				// last point is closer
-				parseDXFLWPolylineBackward(out,entity);
-			}
-		}
-	}
-	
-	protected void parseDXFPolylineForward(Writer out,DXFPolyline entity) throws IOException {
-		boolean first = true;
-		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-		for (int j = 0; j < count; ++j) {
-			DXFVertex v = entity.getVertex(j % entity.getVertexCount());
-			double x = (v.getX() - imageCenterX) * scale;
-			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,first,j<count-1);
-			first = false;
-		}
-	}
-	
-	protected void parseDXFPolylineBackward(Writer out,DXFPolyline entity) throws IOException {
-		boolean first = true;
-		int count = entity.getVertexCount() + (entity.isClosed()?1:0);
-		for (int j = 0; j < count; ++j) {
-			DXFVertex v = entity.getVertex((count+count-1-j) % entity.getVertexCount());
-			double x = (v.getX() - imageCenterX) * scale;
-			double y = (v.getY() - imageCenterY) * scale;
-			parsePolylineShared(out,x,y,first,j<count-1);
-			first = false;
-		}
-	}
-	
-	protected void parsePolylineShared(Writer out,double x,double y,boolean first,boolean notLast) throws IOException {
-		double dx = x - previousX;
-		double dy = y - previousY;
-
-		if (first == true) {
-			boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMove); 
-			if(dx*dx + dy*dy > toolMinimumPenDownMove ) { 
-				// line does not start at last tool location, lift and move.
-				if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
-				previousX = x;
-				previousY = y;
-			}
-			// else line starts right here, pen is down, do nothing extra.
-		} else {
-			// not the first point, draw.
-			if (!notLast || dx * dx + dy * dy > toolMinimumPenDownMove) {
-				if(writeNow) moveTo(out, (float) x, (float) y, false);
-				previousX = x;
-				previousY = y;
-			}
-		}
-	}
-	
 	protected void parseDXFLineEnds(Writer out,double x,double y,double x2,double y2) throws IOException {
 		double dx = x - previousX;
 		double dy = y - previousY;
 		
 		// next line start too far away?
-		boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMove); 
+		boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
 		//if(dx*dx + dy*dy > toolMinimumStepSize ) 
 		{ 
 			// lift pen and move to that location
@@ -647,7 +529,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		dx = x2 - previousX;
 		dy = y2 - previousY;
 		
-		if(dx*dx + dy*dy > toolMinimumPenDownMove ) {
+		if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) {
 			// lower pen and draw to end of line
 			if(writeNow) moveTo(out, (float) x2, (float) y2, false);
 			previousX = x2;
@@ -655,6 +537,87 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		}
 	}
 
+	
+	protected void parseDXFPolyline(Writer out,DXFPolyline entity) throws IOException {
+		if(entity.isClosed()) {
+			// only one end to care about
+			parseDXFPolylineForward(out,entity);
+		} else {
+			// which end is closest to the previous (x,y)?
+			int n = entity.getVertexCount()-1;
+			double x = TX(entity.getVertex(0).getX());
+			double y = TY(entity.getVertex(0).getY());
+			double x2 = TX(entity.getVertex(n).getX());
+			double y2 = TY(entity.getVertex(n).getY());
+
+			// which end is closer to the previous (x,y) ?
+			double dx = x - previousX;
+			double dy = y - previousY;
+			double dx2 = x2 - previousX;
+			double dy2 = y2 - previousY;
+			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
+				// first point is closer
+				parseDXFPolylineForward(out,entity);
+			} else {
+				// last point is closer
+				parseDXFPolylineBackward(out,entity);
+			}
+		}
+	}
+	
+	protected void parseDXFPolylineForward(Writer out,DXFPolyline entity) throws IOException {
+		boolean first = true;
+		int c = entity.getVertexCount();
+		int count = c + (entity.isClosed()?1:0);
+		DXFVertex v;
+		double x,y;
+		for (int j = 0; j < count; ++j) {
+			v = entity.getVertex(j % c);
+			x = TX(v.getX());
+			y = TY(v.getY());
+			parsePolylineShared(out,x,y,first,j<count-1);
+			first = false;
+		}
+	}
+	
+	protected void parseDXFPolylineBackward(Writer out,DXFPolyline entity) throws IOException {
+		boolean first = true;
+		int c = entity.getVertexCount();
+		int count = c + (entity.isClosed()?1:0);
+		DXFVertex v;
+		double x,y;
+		for (int j = 0; j < count; ++j) {
+			v = entity.getVertex((c*2-1-j) % c);
+			x = TX(v.getX());
+			y = TY(v.getY());
+			parsePolylineShared(out,x,y,first,j<count-1);
+			first = false;
+		}
+	}
+	
+	protected void parsePolylineShared(Writer out,double x,double y,boolean first,boolean notLast) throws IOException {
+		double dx = x - previousX;
+		double dy = y - previousY;
+
+		if (first == true) {
+			boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
+			if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) { 
+				// line does not start at last tool location, lift and move.
+				if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
+				previousX = x;
+				previousY = y;
+			}
+			// else line starts right here, pen is down, do nothing extra.
+		} else {
+			// not the first point, draw.
+			if (!notLast || dx * dx + dy * dy > toolMinimumPenDownMoveSq) {
+				if(writeNow) moveTo(out, (float) x, (float) y, false);
+				previousX = x;
+				previousY = y;
+			}
+		}
+	}
+	
 	@Override
 	/**
 	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details

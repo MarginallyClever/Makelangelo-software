@@ -53,6 +53,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	protected double maxX,minX,maxY,minY;
 	protected double scale,imageCenterX,imageCenterY;
+	protected double toolMinimumStepSize = 5; //mm
 	
 	@Override
 	public String getName() { return "SVG"; }
@@ -98,7 +99,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 			// prepare for exporting
 			machine = robot.getSettings();
-			double toolMinimumStepSize = machine.getPenDiameter()* 4;
 			imageStart(out);
 			
 			minX = minY =Double.MAX_VALUE;
@@ -106,14 +106,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			imageCenterX=imageCenterY=0;
 			scale=1;
 			NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-			loadOK = parsePathElements(out,pathNodes,toolMinimumStepSize,false);
+			loadOK = parsePathElements(out,pathNodes,false);
 			if(loadOK) {
 				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-				loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,false);
+				loadOK = parsePolylineElements(out,pathNodes,false);
 			}
 			if(loadOK) {
 				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-				loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,false);
+				loadOK = parsePolylineElements(out,pathNodes,false);
 			}
 			if(loadOK) {
 				imageCenterX = ( maxX + minX ) / 2.0;
@@ -134,14 +134,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				}
 				
 				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-				loadOK = parsePathElements(out,pathNodes,toolMinimumStepSize,true);
+				loadOK = parsePathElements(out,pathNodes,true);
 				if(loadOK) {
 					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-					loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,true);
+					loadOK = parsePolylineElements(out,pathNodes,true);
 				}
 				if(loadOK) {
 					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-					loadOK = parsePolylineElements(out,pathNodes,toolMinimumStepSize,true);
+					loadOK = parsePolylineElements(out,pathNodes,true);
 				}
 			}		    
 			// entities finished. Close up file.
@@ -163,13 +163,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return loadOK;
 	}
 
+	protected double TX(double x) {
+		return ( x - imageCenterX ) * scale;
+	}
+	protected double TY(double y) {
+		return ( y - imageCenterY ) * -scale;
+	}
+	
 	/**
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param out the writer to send the gcode
 	 * @param pathNodes the source of the elements
 	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePolylineElements(Writer out,NodeList pathNodes,double toolMinimumStepSize,boolean write) throws IOException {
+	protected boolean parsePolylineElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
 	    boolean loadOK=true;
 
 	    double previousX,previousY,x,y;
@@ -200,30 +207,37 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	boolean first=true;
 			for (int i=startI; i!=endI; i+=dirI ) {
 				SVGPoint  item = (SVGPoint) pointList.getItem(i);
-				x = ( item.getX() - imageCenterX ) * scale;
-				y = ( item.getY() - imageCenterY ) * -scale;
+				x = TX( item.getX() );
+				y = TY( item.getY() );
 
 				if(write) {
+					double dx=x-previousX;
+					double dy=y-previousY;
+					boolean farEnough = (dx*dx+dy*dy > toolMinimumStepSize*toolMinimumStepSize );
+					
 					if(first) {
-						double dx=x-previousX;
-						double dy=y-previousY;
-						if(dx*dx+dy*dy > toolMinimumStepSize*toolMinimumStepSize ) {
+						if(farEnough) {
 							moveTo(out,x,y,true);
+							previousX=x;
+							previousY=y;
 						}
 						first=false;
+					} else {
+						if(i==endI-dirI || farEnough) {
+							moveTo(out,x,y,false);
+							previousX=x;
+							previousY=y;
+						}
 					}
-					moveTo(out,x,y,false);
 				} else adjustLimits(x,y);
-				previousX=x;
-				previousY=y;
 			}
 		}
 	    return loadOK;
 	}
 	
 	double distanceSquared(SVGPoint item,double previousX,double previousY) {
-		double x = ( item.getX() - imageCenterX ) * scale;
-		double y = ( item.getY() - imageCenterY ) * -scale;
+		double x = TX( item.getX() );
+		double y = TY( item.getY() );
 		
 		double dx=x-previousX;
 		double dy=y-previousY;
@@ -244,7 +258,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param pathNodes the source of the elements
 	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePathElements(Writer out,NodeList pathNodes,double toolMinimumStepSize,boolean write) throws IOException {
+	protected boolean parsePathElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
 	    boolean loadOK=true;
 
 	    double x = machine.getHomeX();
@@ -256,7 +270,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
 	    		System.out.println("Node is a polyline.");
-	    		parsePolylineElements(out,pathNodes,toolMinimumStepSize,write);
+	    		parsePolylineElements(out,pathNodes,write);
 	    		continue;
 	    	}
 	    	
@@ -278,8 +292,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						x = ( path.getX() - imageCenterX ) * scale;
-						y = ( path.getY() - imageCenterY ) * -scale;
+						x = TX( path.getX() );
+						y = TY( path.getY() );
 						firstX=x;
 						firstY=y;
 						if(write) moveTo(out,x,y,true);
@@ -290,8 +304,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						x = ( path.getX() - imageCenterX ) * scale;
-						y = ( path.getY() - imageCenterY ) * -scale;
+						x = TX( path.getX() );
+						y = TY( path.getY() );
 						if(write) moveTo(out,x,y,false);
 						else adjustLimits(x,y);
 					}
@@ -300,19 +314,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
+
 						// x,y is the first point
 						double x0=x;
 						double y0=y;
 						// x0,y0 is the second control point
 						
-						double x1=( path.getX1() - imageCenterX ) * scale;
-						double y1=( path.getY1() - imageCenterY ) * -scale;
+						double x1=TX( path.getX1());
+						double y1=TY( path.getY1());
 						// x1,y1 is the third control point
-						double x2=( path.getX2() - imageCenterX ) * scale;
-						double y2=( path.getY2() - imageCenterY ) * -scale;
+						double x2=TX( path.getX2());
+						double y2=TY( path.getY2());
 						// x2,y2 is the fourth control point
-						double x3=( path.getX() - imageCenterX ) * scale;
-						double y3=( path.getY() - imageCenterY ) * -scale;
+						double x3=TX( path.getX());
+						double y3=TY( path.getY());
 						/*
 						double d0 = distanceSquared(x0,y0,x,y);
 						double dN = distanceSquared(x3,y3,x,y);
@@ -328,8 +343,28 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							t = y3; y3=y0; y0=t;
 							t = y2; y2=y1; y1=t;
 						}*/
+
+						double length=0;
+						double oldx=x;
+						double oldy=y;
+						for(double j=0;j<=1;j+=0.1) {
+					        double a = Math.pow((1.0 - j), 3.0);
+					        double b = 3.0 * j * Math.pow((1.0 - j), 2.0);
+					        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
+					        double d = Math.pow(j, 3.0);
+					 
+					        double xabc = a * x0 + b * x1 + c * x2 + d * x3;
+					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;
+					        
+					        length += Math.sqrt( Math.pow(xabc-oldx, 2) + Math.pow(yabc-oldy,2) );
+					        oldx=xabc;
+					        oldy=yabc;
+						}
 						
-						for(double j=0;j<=1;j+=0.1) {/*
+						double steps = (int)Math.ceil(Math.min(length, 10));
+						if(steps==0) steps=1;
+						
+						for(double j=0;j<=1;j+=1.0/steps) {/*
 							// old method
 							double xa = p(x0,x1,j);
 							double ya = p(y0,y1,j);
