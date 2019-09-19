@@ -242,7 +242,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		if(subject == paperSizes) {
 			final int selectedIndex = paperSizes.getSelectedIndex();
 			if(selectedIndex!= 0) {
-				PaperSize s = commonPaperSizes[selectedIndex];
+				PaperSize s = commonPaperSizes[selectedIndex-1];
 				float sw = s.width;
 				float sh = s.height;
 				if(isLandscape.isSelected()) {
