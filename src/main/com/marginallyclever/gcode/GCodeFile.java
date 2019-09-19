@@ -586,9 +586,9 @@ public class GCodeFile {
 			String firstToken = tokens[0];
 			if (firstToken.equals("G00") || firstToken.equals("G0") ||
 				firstToken.equals("G01") || firstToken.equals("G1")) {
-				addNodePos(i, px, py, x, y, currentColor);
+				//addNodePos(i, px, py, x, y, currentColor);
 				// candy cane style
-				//addNodePos(i, px, py, x, y, ((i%2)==0)?Color.red:Color.blue);
+				addNodePos(i, px, py, x, y, ((i%2)==0)?Color.red:Color.blue);
 			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
 					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
@@ -611,7 +611,7 @@ public class GCodeFile {
 				theta = angle2 - angle1;
 
 				double len = Math.abs(theta) * radius;
-				double segments = len * STEPS_PER_DEGREE * 2.0;
+				double segments = len * STEPS_PER_DEGREE;
 				double nx, ny, angle3, scale;
 
 				// Draw the arc from a lot of little line segments.
