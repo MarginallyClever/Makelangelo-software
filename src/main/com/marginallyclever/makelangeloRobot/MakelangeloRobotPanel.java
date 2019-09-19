@@ -32,7 +32,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
@@ -669,7 +668,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				if(success) {
 					lastFileIn = selectedFile;
 					lastFilterIn = selectedFilter;
-					updateButtonAccess();
 					break;
 				}
 			}
@@ -847,8 +845,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
 					success=lft.save(fileOutputStream,robot);
 				} catch(IOException e) {
-					JOptionPane.showMessageDialog(gui.getMainFrame(), "Save failed: "+e.getMessage());
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 				if(success==true) {
 					lastFileOut = selectedFile;
