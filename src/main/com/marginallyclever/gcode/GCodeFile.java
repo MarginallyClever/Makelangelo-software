@@ -419,7 +419,7 @@ public class GCodeFile {
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 
-		boolean drawRainbow = false;  // TODO make this a setting
+		boolean drawRainbow = true;  // TODO make this a setting
 		int rainbowState = 0;
 		
 		gl2.glBegin(GL2.GL_LINES);
@@ -436,12 +436,10 @@ public class GCodeFile {
 
 				if(drawRainbow) {
 					switch(rainbowState) {
-					case 0: gl2.glColor3f(1, 0, 0); break;
-					case 1: gl2.glColor3f(0, 1, 0); break;
-					case 2: gl2.glColor3f(0, 0, 1); break;
-					case 3: gl2.glColor3f(0, 0, 0); break;
+					case 0: gl2.glColor3f(0.6f, 0.6f, 0.6f); break;
+					case 1: gl2.glColor3f(0 ,0, 0); break;
 					}
-					rainbowState = (rainbowState+1)%4;
+					rainbowState = (rainbowState+1)%2;
 				} else {
 					gl2.glColor3f(
 							n.color.getRed() / 255.0f, 
@@ -459,10 +457,26 @@ public class GCodeFile {
 					} else if (n.lineNumber <= linesProcessed + lookAhead) {
 						// Set the look ahead color
 						// TODO add pen "look ahead" color control?
-						gl2.glColor3f(0, 1, 0);
+						if(drawRainbow) {
+							switch(rainbowState) {
+							case 0: gl2.glColor3f(0, 0.75f, 0); break;
+							case 1: gl2.glColor3f(0, 1.0f, 0); break;
+							}
+						} else {
+							gl2.glColor3f(0, 1, 0);
+						}
 					} else if (drawAllWhileRunning == false) {
 						// Stop drawing now!
 						break;
+					} else {
+						if(drawRainbow) {
+							switch(rainbowState) {
+							case 0: gl2.glColor3f(0, 0, 1); break;
+							case 1: gl2.glColor3f(0,0.8f, 1); break;
+							}
+						} else {
+							gl2.glColor3d(0,0,1);
+						}
 					}
 				}
 
@@ -586,9 +600,7 @@ public class GCodeFile {
 			String firstToken = tokens[0];
 			if (firstToken.equals("G00") || firstToken.equals("G0") ||
 				firstToken.equals("G01") || firstToken.equals("G1")) {
-				//addNodePos(i, px, py, x, y, currentColor);
-				// candy cane style
-				addNodePos(i, px, py, x, y, ((i%2)==0)?Color.red:Color.blue);
+				addNodePos(i, px, py, x, y, currentColor);
 			} else if (firstToken.equals("G02") || firstToken.equals("G2") ||
 					firstToken.equals("G03") || firstToken.equals("G3")) {
 				// draw an arc
