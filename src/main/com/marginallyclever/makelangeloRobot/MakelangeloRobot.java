@@ -48,9 +48,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 9; // must match the version in
-													// the the firmware EEPROM
-
+	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
 	private DecimalFormat df;
