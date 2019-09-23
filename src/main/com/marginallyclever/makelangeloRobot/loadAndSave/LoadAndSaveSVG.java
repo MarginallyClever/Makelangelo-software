@@ -42,7 +42,7 @@ import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
- * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
+ * Reads in SVG file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
@@ -53,7 +53,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	protected double maxX,minX,maxY,minY;
 	protected double scale,imageCenterX,imageCenterY;
-	protected double toolMinimumStepSize = 5; //mm
+	protected double toolMinimumStepSize = 2; //mm
 	
 	@Override
 	public String getName() { return "SVG"; }
