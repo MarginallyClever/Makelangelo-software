@@ -20,7 +20,7 @@ public class CommandLineOptions {
 	
 	static public boolean hasOption(String option) {
 		for(int i=0;i<argv.length;++i) {
-			if(argv.equals(option)) {
+			if(argv[i].equals(option)) {
 				return true;
 			}
 		}
