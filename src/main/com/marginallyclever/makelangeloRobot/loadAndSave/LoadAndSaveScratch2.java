@@ -11,9 +11,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -35,7 +37,7 @@ import com.marginallyclever.makelangeloRobot.generators.Turtle;
  * @author Admin
  *
  */
-public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSaveFileType {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -56,8 +58,15 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 			contents=new ArrayList<Float>();
 		}
 	};
+
+	private static final Set<String> IMAGE_FILE_EXTENSIONS;
+	static {
+		IMAGE_FILE_EXTENSIONS = new HashSet<>();
+		IMAGE_FILE_EXTENSIONS.add("SB2");
+	}
 	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch"), "SB2");
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch2"),
+			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
@@ -71,8 +80,8 @@ public class LoadAndSaveScratch extends ImageManipulator implements LoadAndSaveF
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".sb2"));
+		String filenameExtension = filename.substring(filename.lastIndexOf('.'));
+		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
 
 	@Override
