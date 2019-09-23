@@ -396,8 +396,13 @@
 		<hint>file open dialog</hint>
 	</string>
 	<string>
-		<key>FileTypeScratch</key>
-		<value>Scratch (SB2)</value>
+		<key>FileTypeScratch2</key>
+		<value>Scratch 2 (SB2)</value>
+		<hint>file open dialog</hint>		
+	</string>
+	<string>
+		<key>FileTypeScratch3</key>
+		<value>Scratch 3 (SB3)</value>
 		<hint>file open dialog</hint>		
 	</string>
 	<string>
