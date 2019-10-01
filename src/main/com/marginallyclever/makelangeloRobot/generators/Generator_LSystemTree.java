@@ -2,6 +2,8 @@ package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
 import java.io.Writer;
+
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_LSystemTree extends ImageGenerator {
