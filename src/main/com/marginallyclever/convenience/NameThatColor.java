@@ -222,4 +222,19 @@ public class NameThatColor {
 
 		return find(r0,g0,b0);
 	}
+	
+	
+	/**
+	 * finds the name of the nearest known color.
+	 * 
+	 * @param target the Color to match
+	 * @returns the name of the nearest color.
+	 */
+	public String find(ColorRGB target) {
+		float r0 = target.red;
+		float g0 = target.green;
+		float b0 = target.blue;
+
+		return find(r0,g0,b0);
+	}
 };

@@ -5,9 +5,9 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyclever.internalFormat.ColorPalette;
-import com.marginallyclever.internalFormat.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.ColorPalette;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 
 

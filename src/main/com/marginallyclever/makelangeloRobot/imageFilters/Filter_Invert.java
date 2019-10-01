@@ -2,7 +2,7 @@ package com.marginallyclever.makelangeloRobot.imageFilters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.internalFormat.ColorRGB;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 
 

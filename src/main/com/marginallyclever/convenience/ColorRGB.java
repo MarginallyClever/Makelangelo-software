@@ -1,4 +1,4 @@
-package com.marginallyclever.internalFormat;
+package com.marginallyclever.convenience;
 
 
 import java.awt.Color;
