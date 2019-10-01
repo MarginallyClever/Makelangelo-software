@@ -5,8 +5,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
-import com.marginallyclever.makelangelo.SelectFloat;
+
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class Converter_Crosshatch_Panel extends ImageConverterPanel implements PropertyChangeListener {
 	/**

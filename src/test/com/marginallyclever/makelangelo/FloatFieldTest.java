@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class FloatFieldTest {
 

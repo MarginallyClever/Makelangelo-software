@@ -6,8 +6,8 @@ import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class Generator_FillPage_Panel extends ImageGeneratorPanel implements DocumentListener {
 	/**

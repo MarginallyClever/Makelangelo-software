@@ -13,9 +13,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.SelectFloat;
-import com.marginallyclever.makelangelo.SelectColor;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectColor;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 

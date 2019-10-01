@@ -8,10 +8,10 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
 
-import com.marginallyclever.makelangelo.SelectBoolean;
-import com.marginallyclever.makelangelo.SelectFloat;
-import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_VoronoiStippling_Panel extends ImageConverterPanel implements ActionListener, PropertyChangeListener {
 	/**

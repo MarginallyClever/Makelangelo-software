@@ -8,10 +8,10 @@ import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marginallyclever.makelangelo.SelectBoolean;
-import com.marginallyclever.makelangelo.SelectFloat;
-import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Generator_Spirograph_Panel extends ImageGeneratorPanel implements DocumentListener, ActionListener {
 	/**

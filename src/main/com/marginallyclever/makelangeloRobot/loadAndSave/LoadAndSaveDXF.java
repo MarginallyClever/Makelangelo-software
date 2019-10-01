@@ -44,8 +44,8 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.Log;
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 

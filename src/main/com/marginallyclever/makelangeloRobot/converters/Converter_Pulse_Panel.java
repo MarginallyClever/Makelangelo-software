@@ -8,8 +8,9 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import com.marginallyclever.makelangelo.SelectFloat;
+
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class Converter_Pulse_Panel extends ImageConverterPanel implements PropertyChangeListener, ActionListener {
 	/**

@@ -5,8 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
-import com.marginallyclever.makelangelo.SelectBoolean;
+
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 
 public class Converter_Spiral_Panel extends ImageConverterPanel implements ActionListener {
 	/**

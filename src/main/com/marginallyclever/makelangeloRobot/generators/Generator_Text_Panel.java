@@ -14,8 +14,8 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Generator_Text_Panel extends ImageGeneratorPanel implements DocumentListener, ActionListener {
 	/**

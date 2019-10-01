@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.select;
 
 import java.text.NumberFormat;
 import java.util.Locale;

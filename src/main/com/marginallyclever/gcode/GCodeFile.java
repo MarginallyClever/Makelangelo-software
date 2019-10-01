@@ -142,7 +142,7 @@ public class GCodeFile {
 					if (tokens[j].startsWith("J")) aj = py + Float.valueOf(tokens[j].substring(1)) * scale;
 				}
 			} catch(Exception e) {
-				System.out.println("Error on line "+lineCount);
+				System.out.println("Error on line "+lineCount+": \'"+line+"\'");
 				e.printStackTrace();
 			}
 

@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
@@ -42,11 +43,13 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	
 	private class ScratchVariable {
 		public String name;
+		public String uniqueID;
 		public float value;
 
-		public ScratchVariable(String arg0,float arg1) {
-			name=arg0;
-			value=arg1;
+		public ScratchVariable(String _name,String _id,float _val) {
+			name=_name;
+			uniqueID=_id;
+			value=_val;
 		}
 	};
 	private class ScratchList {
@@ -58,6 +61,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			contents=new ArrayList<Float>();
 		}
 	};
+	
 
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 	static {
@@ -92,7 +96,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
-		Log.info(Translator.get("FileTypeSB2")+"...");
+		Log.info(Translator.get("FileTypeSB3")+"...");
 		// set up a temporary file
 		File tempGCodeFile;
 		try {
@@ -162,36 +166,15 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
     			// make sure machine state is the default.
     			imageStart(out);
     			
-    			confirmVersion3(tree);
+    			if(confirmAtLeastVersion3(tree)==false) {
+    				// TODO add popup dialog warning
+    				return false;
+    			}
     			
     			readScratchVariables(tree);
     			readScratchLists(tree);
-
-    			// read the sketch(es)
-    			JSONArray children = (JSONArray)tree.get("children");
-    			if(children==null) throw new Exception("JSON node 'children' missing.");
-    			//System.out.println("found children");
+    			readScratchInstructions(tree, out);
     			
-    			JSONObject children0 = (JSONObject)children.get(0);
-    			JSONArray scripts = (JSONArray)children0.get("scripts");
-    			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
-    			System.out.println("found  " +scripts.size() + " scripts");
-    			
-    			// extract known elements and convert them to gcode.
-    			ListIterator<?> scriptIter = scripts.listIterator();
-    			// find the script with the green flag
-    			while( scriptIter.hasNext() ) {
-	    			JSONArray scripts0 = (JSONArray)scriptIter.next();
-	    			if( scripts0==null ) continue;
-	    			//System.out.println("scripts0");
-	    			JSONArray scripts02 = (JSONArray)scripts0.get(2);
-	    			if( scripts02==null || scripts02.size()==0 ) continue;
-	    			//System.out.println("scripts02");
-	    			// actual code begins here.
-	    			parseScratchCode(scripts02,out);
-    			}
-
     			imageEnd(out);
     			
     			System.out.println("finished scripts");
@@ -218,19 +201,52 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		return true;
 	}
 
+
+	/**
+	 * parse blocks in scratch
+	 * @param tree the JSONObject tree read from the project.json/zip file.
+	 * @throws Exception
+	 */
+	private void readScratchInstructions(JSONObject tree,Writer out) throws Exception {
+		scratchVariables = new LinkedList<ScratchVariable>();
+		JSONArray targets = (JSONArray)tree.get("targets");
+		ListIterator<?> targetIter = targets.listIterator();
+		while(targetIter.hasNext()) {
+			JSONObject targetN = (JSONObject)targetIter.next();
+			if( (boolean)targetN.get("isStage") == true ) continue;
+			JSONObject blocks = (JSONObject)targetN.get("blocks");
+
+			System.out.println("found  " +blocks.size() + " blocks");
+		}
+		/*
+		// extract known elements and convert them to gcode.
+		ListIterator<?> scriptIter = scripts.listIterator();
+		// find the script with the green flag
+		while( scriptIter.hasNext() ) {
+			JSONArray scripts0 = (JSONArray)scriptIter.next();
+			if( scripts0==null ) continue;
+			//System.out.println("scripts0");
+			JSONArray scripts02 = (JSONArray)scripts0.get(2);
+			if( scripts02==null || scripts02.size()==0 ) continue;
+			//System.out.println("scripts02");
+			// actual code begins here.
+			parseScratchCode(scripts02,out);
+		}*/
+	}
+
 	/**
 	 * confirm this is version 3
 	 * @param tree the JSONObject tree read from the project.json/zip file.
 	 * @throws Exception
 	 */
-	private void confirmVersion3(JSONObject tree) throws Exception {
-		JSONArray variables = (JSONArray)tree.get("meta");
-		ListIterator<JSONObject> varIter = variables.listIterator();
-		while( varIter.hasNext() ) {
-			//System.out.println("var:"+elem.toString());
-			JSONObject elem = varIter.next();
-			
-		}
+	private boolean confirmAtLeastVersion3(JSONObject tree) throws Exception {
+		JSONObject meta = (JSONObject)tree.get("meta");
+		if(meta==null) return false;
+		
+		String semver = (String)meta.get("semver");
+		if(semver==null) return false;
+		
+		return ( semver.compareTo("3.0.0") <= 0 ); 
 	}
 	
 	/**
@@ -240,27 +256,27 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	 */
 	private void readScratchVariables(JSONObject tree) throws Exception {
 		scratchVariables = new LinkedList<ScratchVariable>();
-		JSONArray variables = (JSONArray)tree.get("variables");
-		ListIterator<JSONObject> varIter = variables.listIterator();
-		while( varIter.hasNext() ) {
-			//System.out.println("var:"+elem.toString());
-			JSONObject elem = varIter.next();
-			String varName = (String)elem.get("name");
-			Object varValue = (Object)elem.get("value");
-			float value;
-			if(varValue instanceof Number) {
-				Number num = (Number)varValue;
-				value = (float)num.doubleValue();
-				scratchVariables.add(new ScratchVariable(varName,value));
-			} else if(varValue instanceof String) {
+		JSONArray targets = (JSONArray)tree.get("targets");
+		ListIterator<?> targetIter = targets.listIterator();
+		while(targetIter.hasNext()) {
+			JSONObject targetN = (JSONObject)targetIter.next();
+			if( (boolean)targetN.get("isStage") == false ) continue;
+			
+			JSONObject variables = (JSONObject)targetN.get("variables");
+			Iterator<String> keys = variables.keySet().iterator();
+			while(keys.hasNext()) {
+				String k=keys.next();
+				JSONArray details = (JSONArray)variables.get(k);
+				String name = (String)details.get(0);
+				Number value = (Number)details.get(1);
 				try {
-					value = Float.parseFloat((String)varValue);
-    				scratchVariables.add(new ScratchVariable(varName,value));
+					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
 				} catch (Exception e) {
 					throw new Exception("Variables must be numbers.");
 				}
-			} else throw new Exception("Variable "+varName+" is "+varValue.toString());
+			}
 		}
+		System.out.println(scratchVariables);
 	}
 
 	/**
@@ -270,7 +286,14 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	 */
 	private void readScratchLists(JSONObject tree) throws Exception {
 		scratchLists = new LinkedList<ScratchList>();
-		JSONArray listOfLists = (JSONArray)tree.get("lists");
+		JSONArray targets = (JSONArray)tree.get("targets");
+		ListIterator<?> targetIter = targets.listIterator();
+		while(targetIter.hasNext()) {
+			JSONObject targetN = (JSONObject)targetIter.next();
+			if( (boolean)targetN.get("isStage") == false ) continue;
+			JSONObject listOfLists = (JSONObject)targetN.get("lists");
+		}
+		/*
 		if(listOfLists == null) return;
 		ListIterator<JSONObject> listIter = listOfLists.listIterator();
 		while( listIter.hasNext() ) {
@@ -303,7 +326,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			}
 			// add the list to the list-of-lists.
 			scratchLists.add(list);
-		}
+		}*/
 	}
 	
 	private int getListID(Object obj) throws Exception {

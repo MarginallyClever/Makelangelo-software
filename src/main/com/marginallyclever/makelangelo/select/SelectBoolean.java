@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.select;
 
 import javax.swing.JCheckBox;
 

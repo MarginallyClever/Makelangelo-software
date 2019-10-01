@@ -18,9 +18,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.marginallyclever.makelangelo.SelectFloat;
-import com.marginallyclever.makelangelo.SelectColor;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectColor;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustPaper

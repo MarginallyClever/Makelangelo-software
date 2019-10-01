@@ -5,8 +5,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JLabel;
-import com.marginallyclever.makelangelo.SelectInteger;
+
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_RandomLines_Panel extends ImageConverterPanel implements PropertyChangeListener {
 	/**

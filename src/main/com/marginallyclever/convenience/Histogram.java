@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.convenience;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
