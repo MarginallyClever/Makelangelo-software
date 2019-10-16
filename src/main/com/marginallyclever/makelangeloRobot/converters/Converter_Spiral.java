@@ -53,7 +53,7 @@ public class Converter_Spiral extends ImageConverter {
 
 		int i, j;
 		final int steps = 4;
-		double leveladd = 255.0 / 5.0f;
+		double leveladd = 255.0 / (double)(steps+1);
 		double level;
 		int z = 0;
 
@@ -74,15 +74,10 @@ public class Converter_Spiral extends ImageConverter {
 		float r = maxr, f;
 		float fx, fy;
 		int numRings = 0;
-		double[] each_level = new double[steps];
-		each_level[0] = leveladd * 1;
-		each_level[1] = leveladd * 3;
-		each_level[2] = leveladd * 2;
-		each_level[3] = leveladd * 4;
 		j = 0;
 		while (r > toolDiameter) {
 			++j;
-			level = each_level[j % steps];
+			level = leveladd * (1+(j%steps));
 			// find circumference of current circle
 			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI);
 			if (circumference > 360.0f) circumference = 360.0f;
@@ -91,18 +86,21 @@ public class Converter_Spiral extends ImageConverter {
 				f = (float) Math.PI * 2.0f * (float)i / (float)circumference;
 				fx = (float) (Math.cos(f) * r);
 				fy = (float) (Math.sin(f) * r);
-				// clip to paper boundaries
-				if( isInsidePaperMargins(fx, fy) )
-				{
+				
+				boolean isInside = isInsidePaperMargins(fx, fy);
+				if(isInside) {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-					moveTo(out, fx, fy, (z >= level));
-				} else {
-					moveTo(out, fx, fy, true);
-				}
+	
+	
+					if(z<level) {
+						lowerPen(out);
+					} else liftPen(out);
+				} else liftPen(out);
+				machine.writeMoveTo(out, fx, fy, isPenUp());
 			}
 			r -= toolDiameter;
 			++numRings;
