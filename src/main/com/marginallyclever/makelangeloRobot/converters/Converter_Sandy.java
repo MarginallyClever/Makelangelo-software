@@ -82,10 +82,12 @@ public class Converter_Sandy extends ImageConverter {
 		double pulseFlip=1;
 		double x2,y2,t,t_step;
 		double last_x=0,last_y=0;
-		boolean wasDrawing=true;
+		boolean wasDrawing=false;
 		double flipSum;
 		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
 
+		this.liftPen(out);
+		
 		// make concentric circles that get bigger and bigger.
 		for(r=rMin;r<rMax;r+=rStep) {
 			// go around in a circle
@@ -116,7 +118,7 @@ public class Converter_Sandy extends ImageConverter {
 				scaleZ = (255.0 -  z) / 255.0;
 
 				if(wasDrawing == false) {
-					moveTo(out,last_x,last_y,false);
+					moveTo(out,last_x,last_y,true);
 					wasDrawing=true;
 				}
 
