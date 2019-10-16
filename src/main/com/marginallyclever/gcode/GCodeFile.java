@@ -419,7 +419,7 @@ public class GCodeFile {
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 
-		boolean drawRainbow = true;  // TODO make this a setting
+		boolean drawRainbow = false;  // TODO make this a setting
 		int rainbowState = 0;
 		
 		gl2.glBegin(GL2.GL_LINES);
