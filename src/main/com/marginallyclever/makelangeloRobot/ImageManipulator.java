@@ -94,6 +94,10 @@ public abstract class ImageManipulator {
 		machine.writePenDown(out);
 		lastUp = false;
 	}
+	
+	public boolean isPenUp() {
+		return lastUp;
+	}
 
 	protected void setAbsoluteMode(Writer out) throws IOException {
 		machine.writeAbsoluteMode(out);
@@ -109,11 +113,11 @@ public abstract class ImageManipulator {
 	 * @param out where to write the gcode
 	 * @param x new coordinate
 	 * @param y new coordinate
-	 * @param penState new pen state
+	 * @param liftPenNow new pen state
 	 * @throws IOException on write failure
 	 */
-	protected void moveTo(Writer out, double x, double y, boolean penState) throws IOException {
-		if (penState) liftPen(out);
+	protected void moveTo(Writer out, double x, double y, boolean liftPenNow) throws IOException {
+		if (liftPenNow) liftPen(out);
 		else lowerPen(out);
 		
 		moveTo(out,x,y);
@@ -129,16 +133,21 @@ public abstract class ImageManipulator {
 	 */
 	protected void moveTo(Writer out, double x, double y) throws IOException {
 		if(isInsidePaperMargins(x,y)) {
-			machine.writeMoveTo(out, (float) x, (float) y,lastUp);
+			machine.writeMoveTo(out, x, y, lastUp);
 		}
 	}
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
-		if( x > (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
-		if( y < (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON) return false;
-		if( y > (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON) return false;
+		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
+		yTop    = (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+	
+		if( x < xLeft  ) return false;
+		if( x > xRight ) return false;
+		if( y < yBottom) return false;
+		if( y > yTop   ) return false;
 		return true;
 	}
 
@@ -154,7 +163,7 @@ public abstract class ImageManipulator {
 	 * @param penUp
 	 * @throws IOException
 	 */
-	protected void clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
+	protected boolean clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
 		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
 		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
 		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
@@ -168,13 +177,15 @@ public abstract class ImageManipulator {
 				// some of the line is inside
 				if(isInside) {
 					// entering the rectangle
-					moveTo(out,P0.x,P0.y,false);
+					machine.writeMoveTo(out,P0.x,P0.y,false);
 				} else {
 					// leaving the rectangle
-					moveTo(out,P1.x,P1.y,false);
+					machine.writeMoveTo(out,P1.x,P1.y,false);
 				}
+				return true;
 			}
 		}
+		return false;
 	}
 
 	
