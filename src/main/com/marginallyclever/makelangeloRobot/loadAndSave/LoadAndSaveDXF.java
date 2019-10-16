@@ -35,8 +35,6 @@ import org.kabeja.dxf.DXFSpline;
 import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
-import org.kabeja.dxf.helpers.SplinePoint;
-import org.kabeja.math.NURBSFixedNTELSPointIterator;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;

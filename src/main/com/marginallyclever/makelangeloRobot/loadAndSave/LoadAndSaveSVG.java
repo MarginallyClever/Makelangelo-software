@@ -53,7 +53,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	protected double maxX,minX,maxY,minY;
 	protected double scale,imageCenterX,imageCenterY;
-	protected double toolMinimumStepSize = 2; //mm
+	protected double toolMinimumStepSize = 1; //mm
 	
 	@Override
 	public String getName() { return "SVG"; }
