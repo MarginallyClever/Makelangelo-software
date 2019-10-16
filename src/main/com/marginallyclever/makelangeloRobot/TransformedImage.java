@@ -51,7 +51,7 @@ public class TransformedImage {
 		colorChannel = copy.colorChannel;
 	}
 
-	public boolean canSampleAt(float x, float y) {
+	public boolean canSampleAt(double x, double y) {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
 
@@ -95,11 +95,11 @@ public class TransformedImage {
 		return sourceImage;
 	}
 
-	public int getTransformedX(float x) {
+	public int getTransformedX(double x) {
 		return (int) ((x / scaleX) - translateX);
 	}
 
-	public int getTransformedY(float y) {
+	public int getTransformedY(double y) {
 		return (int) ((y / scaleY) - translateY);
 	}
 	
@@ -234,7 +234,7 @@ public class TransformedImage {
 	 * @param y paper-space coordinates of the image
 	 * @return 255 if the image cannot be sampled.  The intensity of the color channel [0...255].  the color channel is selected with
 	 */
-	public int sample1x1Unchecked(float x, float y) {
+	public int sample1x1Unchecked(double x, double y) {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
 
@@ -255,7 +255,7 @@ public class TransformedImage {
 		return c2;
 	}
 
-	public int sample3x3(float x, float y) {
+	public int sample3x3(double x, double y) {
 		int value = 0, weight = 0;
 
 		if (canSampleAt(x - 1, y - 1)) {			value += sample1x1Unchecked(x - 1, y - 1);			weight += 1;		}
