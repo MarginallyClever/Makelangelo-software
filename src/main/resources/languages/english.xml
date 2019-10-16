@@ -1070,6 +1070,12 @@ to check yourself.</value>
 		<hint>Spiral generator</hint>
 	</string>
 	<string>
+		<key>SpiralCMYKName</key>
+		<value>Spiral CMYK</value>
+		<hint>Spiral generator</hint>
+	</string>
+	
+	<string>
 		<key>SpiralPulseName</key>
 		<value>Pulsing Spiral</value>
 		<hint>Spiral Pulse generator</hint>
