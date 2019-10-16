@@ -77,8 +77,10 @@ public class Converter_Pulse extends ImageConverter {
 		// from top to bottom of the image...
 		float x, y, z, scale_z, pulse_size, i = 0;
 		double n = 1;
+		
 
 		boolean lifted=true;
+		
 		if (direction == 0) {
 			// horizontal
 			for (y = yBottom; y < yTop; y += stepSize) {
@@ -86,11 +88,7 @@ public class Converter_Pulse extends ImageConverter {
 
 				if ((i % 2) == 0) {
 					// every even line move left to right
-					//moveTo(file,x,y,pen up?)]
-					if(!lifted) {
-						lifted=true;
-						moveTo(out, xLeft, y + halfStep, true);
-					}
+					moveTo(out, xLeft, y + halfStep, true);
 
 					for (x = xLeft; x < xRight; x += zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -101,28 +99,14 @@ public class Converter_Pulse extends ImageConverter {
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						if(pulse_size<PULSE_MINIMUM) {
-							if(!lifted) {
-								moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-								lifted=true;
-							}
-						} else {
-							lifted=false;
-							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-						}
+						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						n = -n;
 					}
-					if(!lifted) {
-						lifted=true;
-						moveTo(out, xRight, y + halfStep, true);
-					}
+					moveTo(out, xRight, y + halfStep, true);
 				} else {
 					// every odd line move right to left
 					//moveTo(file,x,y,pen up?)]
-					if(!lifted) {
-						lifted=true;
-						moveTo(out, xRight, y + halfStep, true);
-					}
+					moveTo(out, xRight, y + halfStep, true);
 
 					for (x = xRight; x >= xLeft; x -= zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -132,22 +116,11 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						assert (scale_z <= 1.0);
 						pulse_size = halfStep * scale_z;
-						if(pulse_size<PULSE_MINIMUM) {
-							if(!lifted) {
-								lifted=true;
-								moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-							}
-						} else {
-							lifted=false;
-							moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
-						}
+						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
 						n = -n;
 					}
 					
-					if(!lifted) {
-						lifted=true;
-						moveTo(out, xLeft, y + halfStep, true);
-					}
+					moveTo(out, xLeft, y + halfStep, true);
 				}
 			}
 		} else {
