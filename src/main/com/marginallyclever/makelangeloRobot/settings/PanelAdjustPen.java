@@ -190,6 +190,7 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		settings.setPenUpAngle(((Number)penUp.getValue()).floatValue());
 		settings.setPenDownAngle(((Number)penDown.getValue()).floatValue());
 		settings.setPenDownColor(selectPenDownColor.getColor());
+		settings.setPenDownColorDefault(selectPenDownColor.getColor());
 		settings.setPenUpColor(selectPenUpColor.getColor());
 	}
 }
