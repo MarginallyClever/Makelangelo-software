@@ -373,20 +373,18 @@ public final class MakelangeloRobotSettings {
 		return configsAvailable.length;
 	}
 
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getPaperBottom() {
-		return paperBottom;
-	}
-
-
 	/**
 	 * @return paper height in mm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getPaperWidth() {
+		return paperRight - paperLeft;
 	}
 
 	/**
@@ -396,22 +394,12 @@ public final class MakelangeloRobotSettings {
 		return paperLeft;
 	}
 
-
-	/**
-	 * @return paper margin %.
-	 */
-	public double getPaperMargin() {
-		return paperMargin;
-	}
-
-
 	/**
 	 * @return paper right edge in mm.
 	 */
 	public double getPaperRight() {
 		return paperRight;
 	}
-
 
 	/**
 	 * @return paper top edge in mm.
@@ -420,12 +408,46 @@ public final class MakelangeloRobotSettings {
 		return paperTop;
 	}
 
+	/**
+	 * @return paper bottom edge in mm.
+	 */
+	public double getPaperBottom() {
+		return paperBottom;
+	}
 
 	/**
-	 * @return paper width in mm.
+	 * @return paper left edge in mm.
 	 */
-	public double getPaperWidth() {
-		return paperRight - paperLeft;
+	public double getMarginLeft() {
+		return getPaperLeft() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper right edge in mm.
+	 */
+	public double getMarginRight() {
+		return getPaperRight() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper top edge in mm.
+	 */
+	public double getMarginTop() {
+		return getPaperTop() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper bottom edge in mm.
+	 */
+	public double getMarginBottom() {
+		return getPaperBottom() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper margin %.
+	 */
+	public double getPaperMargin() {
+		return paperMargin;
 	}
 	
 	public long getUID() {
