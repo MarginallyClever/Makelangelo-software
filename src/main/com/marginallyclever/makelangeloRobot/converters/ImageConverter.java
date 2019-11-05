@@ -169,4 +169,71 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		}
 		liftPen(out);
 	}
+	
+
+	/**
+	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
+	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
+	 * This method is used by several converters.
+	 * 
+	 * @param x0 starting position on the paper.
+	 * @param y0 starting position on the paper.
+	 * @param x1 ending position on the paper.
+	 * @param y1 ending position on the paper.
+	 * @param stepSize mm level of detail for this line.
+	 * @param channelCutoff only put pen down when color below this amount.
+	 * @param img the image to sample while converting along the line.
+	 * @param out the destination for the gcode generated in the conversion process.
+	 * @throws IOException
+	 */
+	protected void convertAlongLineErrorTerms(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,double [] error0,double [] error1,TransformedImage img,Writer out) throws IOException {
+		double b;
+		double dx=x1-x0;
+		double dy=y1-y0;
+		double halfStep = stepSize/2.0;
+		double r2 = Math.sqrt(dx*dx+dy*dy);
+		double steps = r2 / stepSize;
+		if(steps<1) steps=1;
+		if(steps>error0.length) steps=error0.length-1;
+
+		double n,x,y,oldPixel,newPixel;
+
+		boolean wasInside = false;
+		boolean isInside;
+		boolean penUp,oldPenUp=true;
+		double oldX=x0,oldY=y0;
+
+		for (b = 0; b <= steps; ++b) {
+			n = b / steps;
+			x = dx * n + x0;
+			y = dy * n + y0;
+			isInside=isInsidePaperMargins(x, y);
+			if(isInside) {
+				oldPixel = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+				int b2 = (int)b;
+				oldPixel += error0[b2];
+				newPixel = oldPixel>=channelCutoff? 255:0;
+				double quantError = oldPixel - newPixel;
+				if(b2+1< steps) error0[b2+1] += quantError * 7.0/16.0;
+				if(b2-1>=0    ) error1[b2-1] += quantError * 3.0/16.0;
+				                error1[b2  ] += quantError * 5.0/16.0;
+				if(b2+1< steps) error1[b2+1] += quantError * 1.0/16.0;
+				
+				penUp = (newPixel==255);
+			} else {
+				penUp=true;
+			}
+			if(isInside!=wasInside) {
+				clipLine(out,oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
+			}
+			moveTo(out,x,y,penUp);
+			
+			if( wasInside && !isInside ) break;  // done
+			wasInside=isInside;
+			oldX=x;
+			oldY=y;
+			oldPenUp=penUp;
+		}
+		liftPen(out);
+	}
 }
