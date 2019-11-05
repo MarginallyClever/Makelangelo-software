@@ -413,15 +413,15 @@ public class GCodeFile {
 		float penR = robot.getSettings().getPenUpColor().getRed() / 255.0f;
 		float penG = robot.getSettings().getPenUpColor().getGreen() / 255.0f;
 		float penB = robot.getSettings().getPenUpColor().getBlue() / 255.0f;
-
-		gl2.glColor3f(penR, penG, penB);
+		float alpha=0.85f;
+		gl2.glColor4f(penR, penG, penB,alpha);
 	
 		boolean drawAllWhileRunning = false;
 		if (robot.isRunning()) drawAllWhileRunning = prefs.getBoolean("Draw all while running", true);
 
 		boolean drawRainbow = false;  // TODO make this a setting
 		int rainbowState = 0;
-		
+
 		gl2.glBegin(GL2.GL_LINES);
 		
 		// draw image
@@ -436,15 +436,16 @@ public class GCodeFile {
 
 				if(drawRainbow) {
 					switch(rainbowState) {
-					case 0: gl2.glColor3f(0.6f, 0.6f, 0.6f); break;
-					case 1: gl2.glColor3f(0 ,0, 0); break;
+					case 0: gl2.glColor4f(0.6f, 0.6f, 0.6f,alpha); break;
+					case 1: gl2.glColor4f(0   ,    0,    0,alpha); break;
 					}
 					rainbowState = (rainbowState+1)%2;
 				} else {
-					gl2.glColor3f(
+					gl2.glColor4f(
 							n.color.getRed() / 255.0f, 
 							n.color.getGreen() / 255.0f,
-							n.color.getBlue() / 255.0f);
+							n.color.getBlue() / 255.0f,
+							alpha);
 				}
 				
 				if (robot.isRunning()) {
@@ -459,11 +460,11 @@ public class GCodeFile {
 						// TODO add pen "look ahead" color control?
 						if(drawRainbow) {
 							switch(rainbowState) {
-							case 0: gl2.glColor3f(0, 0.75f, 0); break;
-							case 1: gl2.glColor3f(0, 1.0f, 0); break;
+							case 0: gl2.glColor4f(0, 0.75f, 0,alpha); break;
+							case 1: gl2.glColor4f(0, 1.00f, 0,alpha); break;
 							}
 						} else {
-							gl2.glColor3f(0, 1, 0);
+							gl2.glColor4f(0, 1, 0,1f);
 						}
 					} else if (drawAllWhileRunning == false) {
 						// Stop drawing now!
@@ -471,11 +472,15 @@ public class GCodeFile {
 					} else {
 						if(drawRainbow) {
 							switch(rainbowState) {
-							case 0: gl2.glColor3f(0, 0, 1); break;
-							case 1: gl2.glColor3f(0,0.8f, 1); break;
+							case 0: gl2.glColor4f(0, 0, 1,alpha); break;
+							case 1: gl2.glColor4f(0,0.8f, 1,alpha); break;
 							}
 						} else {
-							gl2.glColor3d(0,0,1);
+							gl2.glColor4f(
+									(n.color.getRed() / 255.0f), 
+									(n.color.getGreen() / 255.0f),
+									(n.color.getBlue() / 255.0f),
+									alpha/3);
 						}
 					}
 				}
@@ -485,6 +490,7 @@ public class GCodeFile {
 					gl2.glVertex2d(n.x2, n.y2);
 				}
 			}
+			gl2.glLineWidth(1);
 		}
 		
 		gl2.glEnd();
