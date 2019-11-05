@@ -127,30 +127,30 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		turtle.move(size);
 		moveTo(output, turtle.getX(), turtle.getY(), false);
 		turtle.turn(90);
-		float x2 = turtle.getX();
-		float y2 = turtle.getY();
+		double x2 = turtle.getX();
+		double y2 = turtle.getY();
 		turtle.move(size);
 		moveTo(output, turtle.getX(), turtle.getY(), false);
 		turtle.turn(90);
-		float x0 = turtle.getX();
-		float y0 = turtle.getY();
+		double x0 = turtle.getX();
+		double y0 = turtle.getY();
 		turtle.move(size);
 		moveTo(output, turtle.getX(), turtle.getY(), false);
 		turtle.turn(90);
 
 		// make the curve
-		float x1 = turtle.getX();
-		float y1 = turtle.getY();
+		double x1 = turtle.getX();
+		double y1 = turtle.getY();
 		
-		float dx, dy, px, py, len;
+		double dx, dy, px, py, len;
 		final int steps = 20;
 		int i;
 		for(i=0;i<steps;++i) {
-			px = (x2-x1) * ((float)i/steps) + x1;
-			py = (y2-y1) * ((float)i/steps) + y1;
+			px = (x2-x1) * ((double)i/steps) + x1;
+			py = (y2-y1) * ((double)i/steps) + y1;
 			dx = px - x0;
 			dy = py - y0;
-			len = (float)Math.sqrt(dx*dx+dy*dy);
+			len = Math.sqrt(dx*dx+dy*dy);
 			px = dx*size/len + x0;
 			py = dy*size/len + y0;
 			moveTo(output, px, py, false);

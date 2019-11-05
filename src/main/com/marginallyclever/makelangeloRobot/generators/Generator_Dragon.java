@@ -61,7 +61,7 @@ public class Generator_Dragon extends ImageGenerator {
         }
 		
 		// scale the step size so the fractal fits on the paper
-        float stepSize = findStepSize(out);
+        double stepSize = findStepSize(out);
         
 		// move to starting position
 		liftPen(out);
@@ -80,11 +80,11 @@ public class Generator_Dragon extends ImageGenerator {
 	 * @return largest dimension of the fractal
 	 * @throws IOException
 	 */
-	private float findStepSize(Writer output) throws IOException {
-		float maxX=0;
-		float maxY=0;
-		float minX=0;
-		float minY=0;
+	private double findStepSize(Writer output) throws IOException {
+		double maxX=0;
+		double maxY=0;
+		double minX=0;
+		double minY=0;
 
         turtle.setX(0);
         turtle.setY(0);
@@ -100,17 +100,17 @@ public class Generator_Dragon extends ImageGenerator {
             if(minY>turtle.getY()) minY = turtle.getY();
         }
 
-        float dragonWidth = maxX - minX;
-        float dragonHeight = maxY - minY;
-		float paperWidth = xMax - xMin;
-		float paperHeight = yMax - yMin;
+        double dragonWidth = maxX - minX;
+        double dragonHeight = maxY - minY;
+        double paperWidth = xMax - xMin;
+		double paperHeight = yMax - yMin;
 		
-		float largestX = paperWidth/dragonWidth;
-		float largestY = paperHeight/dragonHeight;
-		float largest = largestX < largestY ? largestX : largestY;
+		double largestX = paperWidth/dragonWidth;
+		double largestY = paperHeight/dragonHeight;
+		double largest = largestX < largestY ? largestX : largestY;
 
-		float x = turtle.getX();
-		float y = turtle.getY();
+		double x = turtle.getX();
+		double y = turtle.getY();
 		
         x = -((minX+maxX)/2.0f);
         y = -((minY+maxY)/2.0f);
@@ -126,7 +126,7 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 
 	
-	private void drawDragon(Writer output, float distance) throws IOException {
+	private void drawDragon(Writer output, double distance) throws IOException {
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtleMove(output,distance,true);
@@ -134,7 +134,7 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 
 	
-	public void turtleMove(Writer output,float stepSize,boolean write) throws IOException {
+	public void turtleMove(Writer output,double stepSize,boolean write) throws IOException {
 		turtle.move(stepSize);
 		if(write) moveTo(output, turtle.getX(),turtle.getY(), false);
 	}

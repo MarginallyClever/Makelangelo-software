@@ -8,11 +8,11 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_GosperCurve extends ImageGenerator {
 	private Turtle turtle;
-	private float turtleStep = 10.0f;
-	private float xMax = 0;
-	private float xMin = 0;
-	private float yMax = 0;
-	private float yMin = 0;
+	private double turtleStep = 10.0f;
+	private double xMax = 0;
+	private double xMin = 0;
+	private double yMax = 0;
+	private double yMin = 0;
 	private static int order = 4; // controls complexity of curve
 	
 	@Override
@@ -37,8 +37,8 @@ public class Generator_GosperCurve extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 
-		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
-				           (float)(machine.getPaperHeight() * machine.getPaperMargin()));
+		double v = Math.min((machine.getPaperWidth()  * machine.getPaperMargin()),
+				           (machine.getPaperHeight() * machine.getPaperMargin()));
 
 		turtle = new Turtle();
 		turtleStep = 10;
@@ -51,10 +51,10 @@ public class Generator_GosperCurve extends ImageGenerator {
 		GosperA(null, order);
 
 		// scale the image to fit on the paper
-		float w = xMax-xMin;
-		float h = yMax-yMin;
+		double w = xMax-xMin;
+		double h = yMax-yMin;
 		if(w>h) {
-			float f = v/w;
+			double f = v/w;
 			h*=f;
 			turtleStep*=f;
 			xMax*=f;
@@ -62,7 +62,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 			yMax*=f;
 			yMin*=f;
 		} else {
-			float f = v/h;
+			double f = v/h;
 			w*=f;
 			turtleStep*=f;
 			xMax*=f;
@@ -71,8 +71,8 @@ public class Generator_GosperCurve extends ImageGenerator {
 			yMin*=f;
 		}
 		// adjust the start position to center the image
-		float x = (xMax+xMin)/-2;
-		float y = (yMax+yMin)/-2;
+		double x = (xMax+xMin)/-2;
+		double y = (yMax+yMin)/-2;
 		
 		// move to starting position
 		turtle.setX(x);

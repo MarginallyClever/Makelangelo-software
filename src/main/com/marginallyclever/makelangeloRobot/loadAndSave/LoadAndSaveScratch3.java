@@ -44,7 +44,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private class ScratchVariable {
 		public String name;
 		public String uniqueID;
-		public float value;
+		public double value;
 
 		public ScratchVariable(String _name,String _id,float _val) {
 			name=_name;
@@ -54,11 +54,11 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	};
 	private class ScratchList {
 		public String name;
-		public ArrayList<Float> contents;
+		public ArrayList<Double> contents;
 
 		public ScratchList(String _name) {
 			name=_name;
-			contents=new ArrayList<Float>();
+			contents=new ArrayList<Double>();
 		}
 	};
 	
@@ -410,7 +410,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					// "append:toList:", new value, list name 
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					float value = resolveValue(o2);
+					double value = resolveValue(o2);
 					scratchLists.get(getListID(o3)).contents.add(value);
 				} else if(name.equals("deleteLine:ofList:")) {
 					// "deleteLine:ofList:", index, list name 
@@ -423,7 +423,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					Object o4 = (Object)scriptIter.next();
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					float newValue = resolveValue(o4);
+					double newValue = resolveValue(o4);
 					int listIndex = (int)resolveListIndex(o2,o3);
 					scratchLists.get(getListID(o3)).contents.add(listIndex,newValue);
 				} else if(name.equals("setLine:ofList:to:")) {
@@ -431,13 +431,13 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					Object o4 = (Object)scriptIter.next();
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					float newValue = resolveValue(o4);
+					double newValue = resolveValue(o4);
 					int listIndex = (int)resolveListIndex(o2,o3);
 					scratchLists.get(getListID(o3)).contents.set(listIndex,newValue);
 				} else if(name.equals("wait:elapsed:from:")) {
 					// dwell - does nothing.
 					Object o2 = (Object)scriptIter.next();
-					float seconds = resolveValue(o2);
+					double seconds = resolveValue(o2);
 					System.out.println("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
@@ -451,9 +451,9 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					System.out.println("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
-					float x = resolveValue(o2);
+					double x = resolveValue(o2);
 					Object o3 = (Object)scriptIter.next();
-					float y = resolveValue(o3);
+					double y = resolveValue(o3);
 					
 					turtle.setX(x);
 					turtle.setY(y);
@@ -461,54 +461,54 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
-					float v = resolveValue(o2);
+					double v = resolveValue(o2);
 					turtle.setX(turtle.getX()+v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
-					float v = resolveValue(o2);
+					double v = resolveValue(o2);
 					turtle.setY(turtle.getY()+v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
-					float v = resolveValue(o2);
+					double v = resolveValue(o2);
 					turtle.move(v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					System.out.println("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
-					float degrees = resolveValue(o2);
+					double degrees = resolveValue(o2);
 					turtle.turn(-degrees);
 					System.out.println("Right "+degrees+" degrees.");
 				} else if(name.equals("turnLeft:")) {
 					Object o2 = (Object)scriptIter.next();
-					float degrees = resolveValue(o2);
+					double degrees = resolveValue(o2);
 					turtle.turn(degrees);
 					System.out.println("Left "+degrees+" degrees.");
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
-					float v = resolveValue(o2);
+					double v = resolveValue(o2);
 					turtle.setX(v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
-					float v = resolveValue(o2);
+					double v = resolveValue(o2);
 					turtle.setY(v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();
-					float degrees = resolveValue(o2);
+					double degrees = resolveValue(o2);
 					turtle.setAngle(degrees);
 					//System.out.println("Turn to "+degrees);
 				} else if(name.equals("setVar:to:")) {
 					// set variable
 					String varName = (String)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					float v = (float)resolveValue(o3);
+					double v = (float)resolveValue(o3);
 
 					boolean foundVar=false;
 					ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
@@ -573,22 +573,22 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		if(name.equals(">")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			float a = resolveValue(o2);
-			float b = resolveValue(o3);
+			double a = resolveValue(o2);
+			double b = resolveValue(o3);
 			return a > b;
 		}
 		if(name.equals("<")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			float a = resolveValue(o2);
-			float b = resolveValue(o3);
+			double a = resolveValue(o2);
+			double b = resolveValue(o3);
 			return a < b;
 		}
 		if(name.equals("=")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			float a = resolveValue(o2);
-			float b = resolveValue(o3);
+			double a = resolveValue(o2);
+			double b = resolveValue(o3);
 			return a == b; 
 		}
 		if(name.equals("not")) {
@@ -615,7 +615,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	 * @return the calculated final value.
 	 * @throws Exception
 	 */
-	private float resolveValue(Object obj) throws Exception {
+	private double resolveValue(Object obj) throws Exception {
 		if(obj instanceof String) {
 			// probably a variable
 			String firstName = obj.toString();
