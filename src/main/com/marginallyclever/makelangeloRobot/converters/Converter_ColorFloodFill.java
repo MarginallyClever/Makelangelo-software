@@ -27,7 +27,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private TransformedImage imgChanged;
 	private TransformedImage imgMask;
 
-	float yBottom , yTop, xLeft, xRight;
+	protected double yBottom , yTop, xLeft, xRight;
 
 
 	public Converter_ColorFloodFill() {
@@ -186,8 +186,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 		Log.info("orange", "Palette color " + palette.getColor(colorIndex).toString() );
 
-		for (y = yBottom; y < yTop; y += diameter) {
-			for (x = xLeft; x < xRight; x += diameter) {
+		for (y = (int)yBottom; y < yTop; y += diameter) {
+			for (x = (int)xLeft; x < xRight; x += diameter) {
 				if (getMaskTouched(x, y)) continue;
 
 				originalColor = takeImageSampleBlock(x, y, x + diameter, y + diameter);
@@ -236,11 +236,11 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
 		setAbsoluteMode(out);
-		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+
+		yBottom = machine.getMarginBottom();
+		yTop    = machine.getMarginTop();
+		xLeft   = machine.getMarginLeft();
+		xRight  = machine.getMarginRight();
 		
 		diameter = (int)( machine.getPenDiameter() );
 

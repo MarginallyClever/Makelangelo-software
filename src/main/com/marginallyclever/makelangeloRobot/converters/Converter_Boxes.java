@@ -50,10 +50,10 @@ public class Converter_Boxes extends ImageConverter {
 
 		imageStart(out);
 
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop();
+		double xLeft   = machine.getMarginLeft();
+		double xRight  = machine.getMarginRight();
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.

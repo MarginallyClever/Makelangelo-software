@@ -773,12 +773,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
 		gl2.glLineWidth(1);
-		gl2.glScaled(settings.getPaperMargin(), settings.getPaperMargin(), 1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
-		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
-		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
+		gl2.glVertex2d(settings.getMarginLeft(), settings.getMarginTop());
+		gl2.glVertex2d(settings.getMarginRight(), settings.getMarginTop());
+		gl2.glVertex2d(settings.getMarginRight(), settings.getMarginBottom());
+		gl2.glVertex2d(settings.getMarginLeft(), settings.getMarginBottom());
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}

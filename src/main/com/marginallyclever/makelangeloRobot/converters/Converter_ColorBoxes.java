@@ -47,14 +47,13 @@ public class Converter_ColorBoxes extends ImageConverter {
 		ColorRGB oldPixel = new ColorRGB(0, 0, 0);
 		ColorRGB newPixel = new ColorRGB(0, 0, 0);
 		ColorRGB quant_error = new ColorRGB(0, 0, 0);
-		float start, x;
+		double start, x;
 
 		int xi;
 		for (xi = 0; xi < nexterror.length; ++xi) nexterror[xi].set(0, 0, 0);
 
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
-		
+		double xLeft   = machine.getMarginLeft();
+		double xRight  = machine.getMarginRight();
 		
 		if (direction > 0) {
 			start = xLeft;
@@ -133,11 +132,11 @@ public class Converter_ColorBoxes extends ImageConverter {
 			nexterror[y] = new ColorRGB(0, 0, 0);
 		}
 
-		int yBottom = (int)( machine.getPaperBottom() * machine.getPaperMargin() );
-		int yTop    = (int)( machine.getPaperTop()    * machine.getPaperMargin() );
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop();
 		
 		direction = 1;
-		for (y = yBottom; y < yTop; y+= step4) {
+		for (y = (int)yBottom; y < yTop; y+= step4) {
 			ditherDirection(img, y, error, nexterror, direction, out);
 
 			direction = -direction;
