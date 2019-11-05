@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.prefs.Preferences;
 
 import javax.swing.event.MouseInputListener;
 
@@ -17,6 +18,7 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.util.PreferencesHelper;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, MouseWheelListener, GLEventListener {
@@ -41,7 +43,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private GLU glu;
 	
 	protected MakelangeloRobot robot;
-	
+
+	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 	
 
 	public DrawPanel(GLCapabilities caps) {
@@ -120,12 +123,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// last_time = now_time;
 		// System.out.println(dt);
 
-		GL2 gl2 = glautodrawable.getGL().getGL2();
-		// gl2.glEnable(GL2.GL_LINE_SMOOTH);
-		// gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
-		// gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
-
 		// draw the world
+		GL2 gl2 = glautodrawable.getGL().getGL2();
 		render(gl2);
 	}
 
@@ -254,6 +253,19 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 	public void render(GL2 gl2) {
+		if(prefs.getBoolean("antialias", true)) {
+			gl2.glEnable(GL2.GL_LINE_SMOOTH);
+			gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
+			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+		} else {
+			gl2.glDisable(GL2.GL_LINE_SMOOTH);
+			gl2.glDisable(GL2.GL_POLYGON_SMOOTH);
+			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_FASTEST);
+		}
+		gl2.glEnable(GL2.GL_BLEND);
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);  
+		
+		
 		paintBackground(gl2);
 		paintCamera(gl2);
 
