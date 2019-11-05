@@ -8,14 +8,23 @@ import java.util.List;
  * @author danroyer
  *
  */
-public class Layer2D {
+public class LineCollection {
 	// color for this set of lines
 	public ColorRGB color;
+	
+	public double tx_mm, ty_mm;  // translate
+	public double sx_mm, sy_mm;  // scale
+	public double rot_deg;       // rotate
 	
 	// the lines themselves
 	public List<Line2D> lines;
 	
-	public Layer2D() {
+	public LineCollection() {
 		lines = new ArrayList<Line2D>();
+		tx_mm=0;
+		ty_mm=0;
+		sx_mm=0;
+		sy_mm=0;
+		rot_deg=0;
 	}
 }

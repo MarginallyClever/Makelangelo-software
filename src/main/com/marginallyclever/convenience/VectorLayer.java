@@ -12,5 +12,9 @@ public class VectorLayer {
 	// conversion options
 	
 	// resulting lines
-	Layer2D layer;
+	LineCollection layer;
+	
+	public VectorLayer() {
+		layer = new LineCollection();
+	}
 }

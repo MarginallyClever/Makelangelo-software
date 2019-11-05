@@ -14,9 +14,9 @@ public class BitmapLayer {
 	
 	// conversion options
 	
-	public List<Layer2D> layers;
+	public List<LineCollection> layers;
 	
 	public BitmapLayer() {
-		layers = new ArrayList<Layer2D>();
+		layers = new ArrayList<LineCollection>();
 	}
 }
