@@ -38,7 +38,7 @@ public class Converter_Multipass extends ImageConverter {
 	}
 	
 	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+	 * create parallel lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *
 	 * @param img the image to convert.
 	 */
@@ -48,8 +48,8 @@ public class Converter_Multipass extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double majorX = Math.cos(Math.toRadians(angle));
-		double majorY = Math.sin(Math.toRadians(angle));
+		double dx = Math.cos(Math.toRadians(angle));
+		double dy = Math.sin(Math.toRadians(angle));
 
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(out);
@@ -67,24 +67,30 @@ public class Converter_Multipass extends ImageConverter {
 		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
 		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
 		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
-		double dy = yTop - yBottom;
-		double dx = xRight - xLeft;
-		double radius = Math.sqrt(dx*dx+dy*dy);
+		double height = yTop - yBottom;
+		double width = xRight - xLeft;
+		double maxLen = Math.sqrt(width*width+height*height);
+		double [] error0 = new double[(int)Math.ceil(maxLen)];
+		double [] error1 = new double[(int)Math.ceil(maxLen)];
 
 		int i=0;
-		for(double a = -radius;a<radius;a+=stepSize) {
-			double majorPX = majorX * a;
-			double majorPY = majorY * a;
-			double startPX = majorPX - majorY * radius;
-			double startPY = majorPY + majorX * radius;
-			double endPX   = majorPX + majorY * radius;
-			double endPY   = majorPY - majorX * radius;
+		for(double a = -maxLen;a<maxLen;a+=stepSize) {
+			double px = dx * a;
+			double py = dy * a;
+			double x0 = px - dy * maxLen;
+			double y0 = py + dx * maxLen;
+			double x1 = px + dy * maxLen;
+			double y1 = py - dx * maxLen;
 		
 			double l2 = level * (1 + (i % passes));
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,l2,img,out);
+				convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,l2,img,out);
+				convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img,out);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			++i;
 		}

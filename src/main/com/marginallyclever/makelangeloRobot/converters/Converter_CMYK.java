@@ -64,8 +64,8 @@ public class Converter_CMYK extends ImageConverter {
 	
 	protected void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		double majorX = Math.cos(Math.toRadians(angle));
-		double majorY = Math.sin(Math.toRadians(angle));
+		double dx = Math.cos(Math.toRadians(angle));
+		double dy = Math.sin(Math.toRadians(angle));
 		double [] channelCutoff = {0,153,51,102,204};
 		
 		liftPen(out);
@@ -76,28 +76,34 @@ public class Converter_CMYK extends ImageConverter {
 		if (stepSize < 1) stepSize = 1;
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
-		double dy = yTop - yBottom;
-		double dx = xRight - xLeft;
-		double radius = Math.sqrt(dx*dx+dy*dy);
+		double height  = machine.getMarginTop() - machine.getMarginBottom();
+		double width   = machine.getMarginRight() - machine.getMarginLeft();
+		double maxLen  = Math.sqrt(width*width+height*height);
 
-		double majorPX,majorPY,startPX,startPY,endPX,endPY,a;
+		double [] error0 = new double[(int)Math.ceil(maxLen)];
+		double [] error1 = new double[(int)Math.ceil(maxLen)];
+		
+		double px,py,x0,y0,x1,y1,a;
 		int i=0;
-		for(a = -radius;a<radius;a+=stepSize) {
-			majorPX = majorX * a;
-			majorPY = majorY * a;
-			startPX = majorPX - majorY * radius;
-			startPY = majorPY + majorX * radius;
-			endPX   = majorPX + majorY * radius;
-			endPY   = majorPY - majorX * radius;
+		for(a = -maxLen;a<maxLen;a+=stepSize) {
+			px = dx * a;
+			py = dy * a;
+			// p0-p1 is at a right angle to dx/dy
+			x0 = px - dy * maxLen;
+			y0 = py + dx * maxLen;
+			x1 = px + dy * maxLen;
+			y1 = py - dx * maxLen;
 
+			double cutoff=channelCutoff[i%channelCutoff.length];
 			if ((i % 2) == 0) {
-				convertAlongLine(startPX,startPY,endPX,endPY,stepSize,channelCutoff[i%channelCutoff.length],img,out);
+				convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,cutoff,error0,error1,img,out);
 			} else {
-				convertAlongLine(endPX,endPY,startPX,startPY,stepSize,channelCutoff[i%channelCutoff.length],img,out);
+				convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,cutoff,error0,error1,img,out);
+			}
+			
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			++i;
 		}

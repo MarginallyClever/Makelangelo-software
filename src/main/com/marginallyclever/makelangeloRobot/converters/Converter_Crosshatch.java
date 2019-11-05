@@ -60,38 +60,66 @@ public class Converter_Crosshatch extends ImageConverter {
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		yStart = (float) machine.getPaperBottom() * (float) machine.getPaperMargin();
-		yEnd   = (float) machine.getPaperTop()    * (float) machine.getPaperMargin();
-		xStart = (float) machine.getPaperLeft()   * (float) machine.getPaperMargin();
-		xEnd   = (float) machine.getPaperRight()  * (float) machine.getPaperMargin();
+		yStart = machine.getMarginBottom();
+		yEnd   = machine.getMarginTop();
+		xStart = machine.getMarginLeft();
+		xEnd   = machine.getMarginRight();
 
 		double stepSize = machine.getPenDiameter() * intensity;
 		double x, y;
 		boolean flip = true;
 
+		x = xEnd-xStart;
+		y = yEnd-yStart;
+		
+		int maxLen = (int)Math.sqrt(x*x+y*y);
+		
+		double [] error0 = new double[(int)Math.ceil(maxLen)];
+		double [] error1 = new double[(int)Math.ceil(maxLen)];
+		
+		boolean useError=false;
 		// vertical
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if (flip) {
-				convertAlongLine(xStart, y, xEnd, y, stepSize, level, img, out);
+				if(!useError) convertAlongLine(xStart, y, xEnd, y, stepSize, level,img, out);
+				else convertAlongLineErrorTerms(xStart, y, xEnd, y, stepSize, level,error0,error1, img, out);
 			} else {
-				convertAlongLine(xEnd, y, xStart, y, stepSize, level, img, out);
+				if(!useError) convertAlongLine(xEnd, y, xStart, y, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(xEnd, y, xStart, y, stepSize, level,error0,error1, img, out);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			flip = !flip;
 		}
 
 		level += leveladd;
-
+		for(int j=0;j<error0.length;++j) {
+			error0[j]=error1[j]=0;
+		}
+		
 		// horizontal
 		for (x = xStart; x <= xEnd; x += stepSize) {
 			if (flip) {
-				convertAlongLine(x, yStart, x, yEnd, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x, yStart, x, yEnd, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x, yStart, x, yEnd, stepSize, level,error0,error1, img, out);
 			} else {
-				convertAlongLine(x, yEnd, x, yStart, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x, yEnd, x, yStart, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x, yEnd, x, yStart, stepSize, level,error0,error1, img, out);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			flip = !flip;
 		}
 
 		level += leveladd;
+		for(int j=0;j<error0.length;++j) {
+			error0[j]=error1[j]=0;
+		}
+
 
 		// diagonal 1
 		double dy = yEnd - yStart;
@@ -122,14 +150,23 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img, out);
 			} else {
-				convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img, out);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			flip = !flip;
 		}
 
 		level += leveladd;
+		for(int j=0;j<error0.length;++j) {
+			error0[j]=error1[j]=0;
+		}
 
 		// diagonal 2
 
@@ -149,9 +186,15 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img, out);
 			} else {
-				convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
+				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
+				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img, out);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
 			}
 			flip = !flip;
 		}
