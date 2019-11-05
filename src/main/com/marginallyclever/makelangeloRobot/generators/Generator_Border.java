@@ -29,10 +29,10 @@ public class Generator_Border extends ImageGenerator {
 	public boolean generate(Writer out) throws IOException {
 		imageStart(out);
 
-		float yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		float yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		float xMin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		float xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		float yMin = (float)machine.getMarginBottom();
+		float yMax = (float)machine.getMarginTop();
+		float xMin = (float)machine.getMarginLeft();
+		float xMax = (float)machine.getMarginRight();
 
 		moveTo(out,xMin,yMax,true);
 		moveTo(out,xMin,yMax,false);

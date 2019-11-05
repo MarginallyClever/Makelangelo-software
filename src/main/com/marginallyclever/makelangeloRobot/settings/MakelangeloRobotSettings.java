@@ -383,6 +383,20 @@ public final class MakelangeloRobotSettings {
 	/**
 	 * @return paper width in mm.
 	 */
+	public double getMarginHeight() {
+		return getMarginTop() - getMarginBottom();
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getMarginWidth() {
+		return getMarginRight() - getMarginLeft();
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}

@@ -51,13 +51,13 @@ public class Converter_SpiralPulse extends ImageConverter {
 		
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getPaperHeight();
-			float w2 = (float)machine.getPaperWidth();
+			float h2 = (float)machine.getMarginHeight();
+			float w2 = (float)machine.getMarginWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
-			// do the largest circle that still fits in the image.
-			float w = (float)(machine.getPaperWidth()* machine.getPaperMargin())/2.0f;
-			float h = (float)(machine.getPaperHeight()* machine.getPaperMargin())/2.0f;
+			// do the largest circle that still fits in the margin.
+			float w = (float)(machine.getMarginWidth())/2.0f;
+			float h = (float)(machine.getMarginHeight())/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
 		
