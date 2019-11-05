@@ -1,14 +1,13 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.batik.ext.awt.geom.Polygon2D;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Log;
@@ -34,7 +33,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
-	private VoronoiCell[] cells = new VoronoiCell[1];
+	private ArrayList<VoronoiCell> cells = new ArrayList<VoronoiCell>();
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static boolean drawBorders = true;
 	private static int numCells = 1000;
@@ -43,8 +42,127 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private static float cutoff = 0;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
-	private float yBottom, yTop, xLeft, xRight;
+	private double yMin, yMax;
+	private double xMin, xMax;
+	private int iterations;
 
+	protected class QuadGraph {
+		public Rectangle2D bounds;
+		public ArrayList<VoronoiCell> sites;
+		public QuadGraph[] children;
+		public boolean flag;
+		
+		public QuadGraph(double x,double y,double x2,double y2) {
+			bounds = new Rectangle2D.Double(x,y,0,0);
+			bounds.add(x2,y2);
+			sites = new ArrayList<VoronoiCell>();
+			children=null;
+			flag=false;
+		}
+		
+		public void split(int depth) {
+			if(depth<1) return;
+
+			children = new QuadGraph[4];
+
+		    children[0] = new QuadGraph(bounds.getMinX(), bounds.getMinY(), bounds.getCenterX(),bounds.getCenterY());
+		    children[1] = new QuadGraph(bounds.getMaxX(), bounds.getMinY(), bounds.getCenterX(),bounds.getCenterY());
+		    children[2] = new QuadGraph(bounds.getMaxX(), bounds.getMaxY(), bounds.getCenterX(),bounds.getCenterY());
+		    children[3] = new QuadGraph(bounds.getMinX(), bounds.getMaxY(), bounds.getCenterX(),bounds.getCenterY());
+		    
+			for(int i=0;i<4;++i) {
+				children[i].split(depth-1);
+			}
+		}
+		
+		public boolean insert(VoronoiCell e,int maxDepth) {
+			if(maxDepth>0) {
+				if(children==null) {
+					split(1);
+				}
+				
+				for(int i=0;i<4;++i) {
+					QuadGraph child = children[i]; 
+					if( child.bounds.contains(e.region) ) {
+						// this cell fits entirely within this child
+						if( child.insert(e,maxDepth-1) ) return true;
+					}
+				}
+			}
+			// did not fit in any one child.  add it here.
+			sites.add(e);
+			return true;
+		}
+		
+		public double cellToPointSq(Rectangle2D area,VoronoiCell c) {
+			double x = area.getCenterX();
+			double y = area.getCenterY();
+			return c.centroid.distanceSq(x, y);
+		}
+		
+		// locate the cell under point x,y
+		public VoronoiCell find(Rectangle2D area) {
+			if(area.intersects(bounds)) {
+				VoronoiCell bestFound = null;
+				
+				if(children!=null) {
+					for(int i=0;i<4;++i) {
+						// look into the children
+						VoronoiCell bestChildFound = children[i].find(area);
+						if(bestChildFound!=null) {
+							if( bestFound==null ||
+								cellToPointSq(area,bestFound) > cellToPointSq(area,bestChildFound) )
+							{
+								bestFound = bestChildFound;
+							}
+						}
+					}
+				}
+				// it wasn't in a child, maybe it's in this node.
+				// Is this target point inside the graph edges?
+				if(!sites.isEmpty()) {
+					double bestD = Double.MAX_VALUE;
+					VoronoiCell bestCell = null;
+					Iterator<VoronoiCell> si = sites.iterator();
+					double x = area.getCenterX();
+					double y = area.getCenterY();
+					while(si.hasNext()) {
+						VoronoiCell c = si.next();
+						double d = c.centroid.distanceSq(x, y);
+						if(bestD>d) {
+							bestD = d;
+							bestCell = c;
+						}
+					}
+					if( bestFound==null ||
+							cellToPointSq(area,bestFound) > cellToPointSq(area,bestCell) )
+					bestFound = bestCell;
+				}
+				return bestFound;
+			}
+			// nothing found?!
+			return null;
+		}
+		
+		void render(GL2 gl2) {
+			if(children!=null) {
+				for(int i=0;i<4;++i) {
+					children[i].render(gl2);
+				}
+				return;
+			} else {
+				gl2.glColor3f(1, 0, 1);
+				gl2.glBegin(GL2.GL_LINE_LOOP);
+				gl2.glVertex2d(bounds.getMinX(), bounds.getMinY());
+				gl2.glVertex2d(bounds.getMinX(), bounds.getMaxY());
+				gl2.glVertex2d(bounds.getMaxX(), bounds.getMaxY());
+				gl2.glVertex2d(bounds.getMaxX(), bounds.getMinY());
+				gl2.glEnd();
+			}
+		}
+	}
+	
+	protected QuadGraph tree;
 	
 	@Override
 	public String getName() {
@@ -62,10 +180,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		yMin = machine.getMarginBottom();
+		yMax = machine.getMarginTop();
+		xMin = machine.getMarginLeft();
+		xMax = machine.getMarginRight();
 
 		keepIterating=true;
 		restart();
@@ -86,8 +204,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 		while(lock.isLocked());
 		lock.lock();
+		iterations=0;
 		keepIterating=true;
-		initializeCells(0.01);
+		initializeCells(0.5);
 		lock.unlock();
 	}
 
@@ -98,99 +217,125 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	@Override
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
-		if (graphEdges == null) return;
-
+		super.render(gl2, settings);
+		
 		while(lock.isLocked());
 		lock.lock();
 		
-		super.render(gl2, settings);
-		
 		// draw cell edges
-		if(drawBorders) {
-			gl2.glColor3f(0.9f, 0.0f, 0.0f);
-			gl2.glBegin(GL2.GL_LINES);
-			for (VoronoiGraphEdge e : graphEdges) {
-				gl2.glVertex2d( e.x1, e.y1 );
-				gl2.glVertex2d( e.x2, e.y2 );
-			}
-			gl2.glEnd();
+		if(drawBorders) {/*
+			if(graphEdges != null) {
+				gl2.glColor3f(0.9f, 0.0f, 0.0f);
+				gl2.glBegin(GL2.GL_LINES);
+				for (VoronoiGraphEdge e : graphEdges) {
+					gl2.glVertex2d( e.x1, e.y1 );
+					gl2.glVertex2d( e.x2, e.y2 );
+				}
+				gl2.glEnd();
+			}*/
+			if(tree!=null) tree.render(gl2);
 		}
-/*
-		// draw bounds
+
+		//enderPolygons(gl2);
+		//renderFirstCellBounds(gl2);  // bounds of first cell
+		renderDots(gl2);  // dots sized by darkness
+		//renderPoints(gl2);  // tiny points
+		
+		lock.unlock();
+	}
+
+	protected void renderPolygons(GL2 gl2) {
+		gl2.glColor4d(1,1,0,0.25);
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			if(c.region==null) continue;
+			//gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+			gl2.glBegin(GL2.GL_LINE_LOOP);
+			gl2.glVertex2d( c.region.getMinX(),c.region.getMinY());
+			gl2.glVertex2d( c.region.getMaxX(),c.region.getMinY());
+			gl2.glVertex2d( c.region.getMaxX(),c.region.getMaxY());
+			gl2.glVertex2d( c.region.getMinX(),c.region.getMaxY());
+			//for(int i=0;i<c.region.npoints;++i) {
+			//	gl2.glVertex2d( c.region.xpoints[i],c.region.ypoints[i] );
+			//}
+			gl2.glEnd();
+			return;
+		}
+	}
+	
+	protected void renderFirstCellBounds(GL2 gl2) {
 		gl2.glColor3f(1,0,0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		Rectangle2D bounds = cells[0].region.getBounds2D();
+		Rectangle2D bounds = cells.get(0).region.getBounds2D();
 		if(bounds!=null) {
 			gl2.glVertex2d( bounds.getMinX(),bounds.getMinY() );
 			gl2.glVertex2d( bounds.getMaxX(),bounds.getMinY() );
 			gl2.glVertex2d( bounds.getMaxX(),bounds.getMaxY() );
 			gl2.glVertex2d( bounds.getMinX(),bounds.getMaxY() );
 		}
-		gl2.glEnd();*/
-
-		// draw cell centers
-		//gl2.glPointSize(3);
-		float scale = maxDotSize - minDotSize;
+		gl2.glEnd();
+	}
+	
+	protected void renderPoints(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
-		for (VoronoiCell c : cells) {
-			float x = (float)c.centroid.getX();
-			float y = (float)c.centroid.getY();
-			//if( sourceImage.canSampleAt(x,y) ) 
-			{
-				float val = (float)c.weight/255.0f;//1.0f - (sourceImage.sample1x1( x, y) / 255.0f);
-				if(val>cutoff) {
-					float r = val * scale;
-					gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-					for (float j = 0; j < Math.PI * 2; j += (Math.PI / 6)) {
-						gl2.glVertex2d(x + Math.cos(j) * r,
-									   y + Math.sin(j) * r);
-					}
-					gl2.glEnd();
-				}
-			}
-		}
-		
-		gl2.glBegin(GL2.GL_LINES);
-		for (VoronoiCell c : cells) {
-			gl2.glColor3f(0, 1, 0);
-			gl2.glVertex2d(c.centroid.getX(),c.centroid.getY());
-			gl2.glColor3f(1, 0, 0);
-			gl2.glVertex2d(c.oldCentroid.getX(),c.oldCentroid.getY());
+		gl2.glBegin(GL2.GL_POINTS);
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			Point2D p = c.centroid;
+			gl2.glVertex2d(p.getX(),p.getY());
 		}
 		gl2.glEnd();
-		
-		lock.unlock();
 	}
-
+	
+	protected void renderDots(GL2 gl2) {
+		float scale = maxDotSize - minDotSize;
+		gl2.glColor3f(0, 0, 0);
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			double x = c.centroid.getX();
+			double y = c.centroid.getY();
+			double val = c.weight/255.0;
+			if(val>cutoff) {
+				double r = val * scale;
+				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+				for (float j = 0; j < Math.PI * 2; j += (Math.PI / 6)) {
+					gl2.glVertex2d(x + Math.cos(j) * r,
+								   y + Math.sin(j) * r);
+				}
+				gl2.glEnd();
+			}
+		}
+	}
+	
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		Log.info("green","Initializing cells");
+		Log.info("Initializing cells");
 
-		cells = new VoronoiCell[numCells];
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[numCells];
 		yValuesIn = new double[numCells];
 
 		// from top to bottom of the margin area...
+		cells.clear();
 		int used;
 		for (used=0;used<numCells;++used) {
-			cells[used] = new VoronoiCell();
-		}
-		
-		used=0;
-		while(used<numCells) {
-			Point2D p = new Point2D.Double(
-					xLeft   + Math.random()*(xRight-xLeft),
-					yBottom + Math.random()*(yTop-yBottom)
-					);
-			if(sourceImage.canSampleAt((float)p.getX(), (float)p.getY())) {
-				float v = sourceImage.sample1x1Unchecked((float)p.getX(), (float)p.getY());
-				if(Math.random()*256> v) {
-					cells[used].centroid.setLocation(p);
-					cells[used].oldCentroid.setLocation(cells[used].centroid);
-					++used;
+			VoronoiCell c = new VoronoiCell();
+			
+			double x=0,y=0;
+			for(int i=0;i<30;++i) {
+				x = xMin + Math.random()*(xMax-xMin);
+				y = yMin + Math.random()*(yMax-yMin);
+				if(sourceImage.canSampleAt((float)x, (float)y)) {
+					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+					if(Math.random()*255 >= v) break;
 				}
 			}
+			Point2D p = new Point2D.Double(x,y);
+			c.centroid.setLocation(p);
+			cells.add(c);
 		}
 
 
@@ -231,13 +376,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 		float toolDiameter = machine.getPenDiameter();
 
-		Arrays.sort(cells);
-		
-		int i;
-		for (i = 0; i < numCells; ++i) {
-			double x = cells[i].centroid.getX();
-			double y = cells[i].centroid.getY();
-			double val = cells[i].weight/255.0f;
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			double x = c.centroid.getX();
+			double y = c.centroid.getY();
+			double val = c.weight/255.0f;
 			if(val<cutoff) continue;
 
 			double r = val * (maxDotSize-minDotSize);
@@ -274,36 +418,46 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 
-
 	/**
 	 *  I have a set of points.  I want a list of cell borders.
 	 *  cell borders are halfway between any point and it's nearest neighbors.
 	 */
 	protected void tessellateVoronoiDiagram() {
-		
-		int i;
-		for (i = 0; i < numCells; ++i) {
-			xValuesIn[i] = cells[i].centroid.getX();
-			yValuesIn[i] = cells[i].centroid.getY();
-			cells[i].region = new Polygon2D();
+		iterations++;
+
+		int i=0;
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			xValuesIn[i] = c.centroid.getX();
+			yValuesIn[i] = c.centroid.getY();
+			i++;
+			c.resetRegion();
 		}
 
 		// scan left to right across the image, building the list of borders as we go.
-		graphEdges = voronoiTesselator.generateVoronoi(xValuesIn, yValuesIn, xLeft, xRight, yBottom, yTop);
+		graphEdges = voronoiTesselator.generateVoronoi(xValuesIn, yValuesIn, xMin, xMax, yMin, yMax);
 		
-		for (VoronoiGraphEdge e : graphEdges) {
-			try {
-				cells[e.site1].region.addPoint((float)e.x2, (float)e.y2);
-				cells[e.site1].region.addPoint((float)e.x1, (float)e.y1);
-				cells[e.site2].region.addPoint((float)e.x1, (float)e.y1);
-				cells[e.site2].region.addPoint((float)e.x2, (float)e.y2);
-			} catch(Exception err) {
-				err.printStackTrace();
-			}
+		Iterator<VoronoiGraphEdge> v = graphEdges.iterator();
+		while(v.hasNext()) {
+			VoronoiGraphEdge e = v.next();
+			VoronoiCell a = cells.get(e.site1);
+			a.addPoint(e.x1, e.y1);
+			a.addPoint(e.x2, e.y2);
+			VoronoiCell b = cells.get(e.site1);
+			b.addPoint(e.x1, e.y1);
+			b.addPoint(e.x2, e.y2);
 		}
-		
 	}
 
+
+	protected void adjustCell(VoronoiCell c,double x,double y) {
+		c.hits++;
+		double sampleWeight = 255.0 - sourceImage.sample1x1Unchecked( (float)x, (float)y );
+		c.weight += sampleWeight;
+		c.wx += x * sampleWeight;
+		c.wy += y * sampleWeight;
+	}
 
 	/**
 	 * Find the weighted center of each cell.
@@ -312,107 +466,81 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	 * @return the total magnitude movement of all centers
 	 */
 	protected float adjustCentroids() {
-		double totalCellWeight, wx, wy, x, y;
-		double stepSize;
-		double minX,maxX,minY,maxY;
-		double xDiff, yDiff, maxSize,minSize,scaleFactor;
+		double x, y;
 		float totalMagnitude=0;
-		final double cellBuffer=100;
-
-		for (VoronoiCell c : cells) {
-			if(c.region.npoints ==0) continue;
-			Rectangle bounds = c.region.getBounds();
-			
-			minX = bounds.getMinX();
-			minY = bounds.getMinY();
-			maxX = bounds.getMaxX();
-			maxY = bounds.getMaxY();
-			
-			xDiff = maxX-minX;
-			yDiff = maxY-minY;
-			if(minX==maxX) xDiff=1;
-			if(minY==maxY) yDiff=1;
-			maxSize = Math.max(xDiff,yDiff);
-			minSize = Math.min(xDiff,yDiff);
-			
-			scaleFactor=1.0;
-			while(maxSize > cellBuffer) {
-				scaleFactor *= 0.5;
-				maxSize *= 0.5;
+		
+		tree = new QuadGraph(xMin,yMin,xMax,yMax);
+		tree.split(4);
+		
+		int fails=0;
+		Iterator<VoronoiCell> ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			if(c.region==null) continue;
+			boolean ok = tree.insert(c,8);
+			if(!ok) {
+				fails++;
 			}
-			while(maxSize < (cellBuffer/2)) {
-				scaleFactor *= 2;
-				maxSize *= 2;
-			}
-			if ((minSize * scaleFactor) > (cellBuffer/2)) {
-				// Special correction for objects of near-unity (square-like) aspect ratio,
-				// which have larger area *and* where it is less essential to find the exact centroid:
-				scaleFactor *= 0.5;
-			}
+		}
+		if( fails>0 ) {
+			System.out.println(iterations+" failed "+fails+" times");
+		}
 
-			stepSize = 1.0/scaleFactor;
-			//stepSize = maxSize / cellBuffer;
-			//assert(stepSize>0 && stepSize<cellBuffer);
-
-			//if(i==0) System.out.println((maxX-minX)+"\t"+(maxY-minY)+"\t"+stepSize);
-
-			int hits = 0;
-			totalCellWeight = 0;
-			wx = 0;
-			wy = 0;
-
-			float sampleWeight;
-			for (y = minY; y <= maxY; y += stepSize) {
-				for (x = minX; x <= maxX; x += stepSize) {
-					if (c.region.contains(x,y)) {
-						//if(sourceImage.canSampleAt((float)x, (float)y)) 
-						{
-							hits++;
-							sampleWeight = 255.001f - (float)sourceImage.sample1x1( (float)x, (float)y );
-							totalCellWeight += sampleWeight;
-							wx += x * sampleWeight;
-							wy += y * sampleWeight;
-						}
-					}
+		Rectangle2D test = new Rectangle2D.Double();
+		double v=5;
+		for(y=yMin; y<=yMax; ++y) {			
+			for(x=xMin; x<=xMax; ++x) {
+				if(!sourceImage.canSampleAt((float)x, (float)y)) continue;
+				// binary search over the cells to find the best fit.
+				
+				test.setRect(x-v, y-v, v*2, v*2);
+				VoronoiCell bestCell = tree.find(test);
+				if(bestCell!=null) {
+					adjustCell(bestCell,x,y);
+				} else {
+					// this x,y at an empty quadtree cell.
 				}
 			}
+		}
+		
+		double w = Math.pow(iterations,-0.8);
 
-			if (totalCellWeight > 0) {
-				wx /= totalCellWeight;
-				wy /= totalCellWeight;
-				totalMagnitude+=totalCellWeight;
+
+		ci = cells.iterator();
+		while(ci.hasNext()) {
+			VoronoiCell c = ci.next();
+			
+			if (c.hits>0 && c.weight > 0) {
+				c.wx /= c.weight;
+				c.wy /= c.weight;
+			} else {
+				c.weight=1;
+				c.hits=1;
+				c.wx = c.centroid.getX();
+				c.wy = c.centroid.getY();
 			}
 
 			// make sure centroid can't leave image bounds
-			if (wx < xLeft || wx >= xRight || wy < yBottom || wy >= yTop ) {
-				// try the geometric centroid
-				for(int j=0;j<c.region.npoints;++j) {
-					wx = c.region.xpoints[j];
-					wy = c.region.ypoints[j];
-				}
-				wx/= c.region.npoints;
-				wy/= c.region.npoints;
+			if (c.wx < xMin || c.wx >= xMax || c.wy < yMin || c.wy >= yMax ) {
+				if (c.wx <  xMin ) c.wx = xMin+1;
+				if (c.wx >= xMax) c.wx = xMax-1;
 				
-				if (wx <  xLeft ) wx = xLeft+1;
-				if (wx >= xRight) wx = xRight-1;
-				
-				if (wy <  yBottom) wy = yBottom+1;
-				if (wy >= yTop   ) wy = yTop-1;
+				if (c.wy <  yMin) c.wy = yMin+1;
+				if (c.wy >= yMax   ) c.wy = yMax-1;
 			}
 			
-			// use the new center
-			c.oldCentroid.setLocation(c.centroid);
-			if(hits>=1)
-			{
-				c.centroid.setLocation(wx, wy);
-				double dx = wx - c.oldCentroid.getX();
-				double dy = wy - c.oldCentroid.getY();
-				if(dx*dx+dy*dy > 50*50) {
-					Log.info("wow!");
-				}
-				
-				c.weight = totalCellWeight/(double)hits;
-			}
+			double ox = c.centroid.getX();
+			double oy = c.centroid.getY();
+			double dx2 = (c.wx - ox) * 0.25;
+			double dy2 = (c.wy - oy) * 0.25;
+
+			c.weight /= (double)c.hits;
+			totalMagnitude += Math.abs(dx2) + Math.abs(dy2);
+			
+			double nx = ox + dx2 + (Math.random()-0.5) * w;
+			double ny = oy + dy2 + (Math.random()-0.5) * w;
+			
+			c.centroid.setLocation(nx, ny);
 		}
 		return totalMagnitude;
 	}

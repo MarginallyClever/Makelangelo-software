@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,7 +16,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
-import com.marginallyclever.voronoi.VoronoiCellEdge;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
 
@@ -37,10 +35,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 3000;
 	private static float minDotSize = 1.0f;
-	private Point bound_min = new Point();
-	private Point bound_max = new Point();
-	private int numEdgesInCell;
-	private List<VoronoiCellEdge> cellBorder = null;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
 	private int[] solution = null;
@@ -54,7 +48,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private double old_len, len;
 	private long time_limit = 10 * 60 * 1000; // 10 minutes
 
-	private float yBottom, yTop, xLeft, xRight;
+	private double yBottom, yTop, xLeft, xRight;
 	
 	@Override
 	public String getName() {
@@ -72,10 +66,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		yBottom = machine.getPaperBottom() * machine.getPaperMargin();
+		yTop    = machine.getPaperTop()    * machine.getPaperMargin();
+		xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
+		xRight  = machine.getPaperRight()  * machine.getPaperMargin();
 		
 		keepIterating=true;
 		restart();
@@ -89,8 +83,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		}
 		lowNoise=false;
 		keepIterating=true;
-		cellBorder = new ArrayList<>();
-		initializeCells(0.001);
+		initializeCells(0.5);
 	}
 	
 	@Override
@@ -98,7 +91,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		if(lowNoise==true) {
 			optimizeTour();
 		} else {
-			float noiseLevel = evolveCells();
+			double noiseLevel = evolveCells();
 			if( noiseLevel < 2*numCells ) {
 				lowNoise=true;
 				greedyTour();
@@ -117,7 +110,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	@Override
 	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
 		super.render(gl2, settings);
-		
+
+		while(lock.isLocked());
 		lock.lock();
 
 		int i;
@@ -135,20 +129,11 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		if (renderMode == 0) {
 			// draw cell centers
 			gl2.glPointSize(3);
+			gl2.glColor3f(0, 0, 0);
 			gl2.glBegin(GL2.GL_POINTS);
-
-			for (i = 0; i < cells.length; ++i) {
-				VoronoiCell c = cells[i];
-				if (c == null)
-					continue;
-				float v = 1.0f - (float) sourceImage.sample1x1((int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
-				if (v * 5 <= minDotSize) {
-					gl2.glColor3f(0.8f, 0.8f, 0.8f);
-				} else {
-					gl2.glColor3f(0, 0, 0);
-				}
-
-				gl2.glVertex2d( c.centroid.getX(), c.centroid.getY() );
+			for (VoronoiCell c : cells) {
+				Point2D p = c.centroid;
+				gl2.glVertex2d(p.getX(),p.getY());
 			}
 			gl2.glEnd();
 		}
@@ -367,19 +352,35 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		Log.info("green", "Initializing cells");
+		Log.info("Initializing cells");
 
 		cells = new VoronoiCell[numCells];
-		for (int used = 0; used < cells.length; used++) {
+		// convert the cells to sites used in the Voronoi class.
+		xValuesIn = new double[numCells];
+		yValuesIn = new double[numCells];
+
+		// from top to bottom of the margin area...
+		int used;
+		for (used=0;used<numCells;++used) {
 			cells[used] = new VoronoiCell();
-			cells[used].centroid.setLocation(xLeft   + ((float)Math.random()*(xRight-xLeft)),
-											 yBottom + ((float)Math.random()*(yTop-yBottom))
-											 );
+		}
+		
+		used=0;
+		while(used<numCells) {
+			double x=0,y=0;
+			for(int i=0;i<30;++i) {
+				x = xLeft   + Math.random()*(xRight-xLeft);
+				y = yBottom + Math.random()*(yTop-yBottom);
+				if(sourceImage.canSampleAt((float)x, (float)y)) {
+					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+					if(Math.random()*255 > v) break;
+				}
+			}
+			Point2D p = new Point2D.Double(x,y);
+			cells[used].centroid.setLocation(p);
+			++used;
 		}
 
-		// convert the cells to sites used in the Voronoi class.
-		xValuesIn = new double[cells.length];
-		yValuesIn = new double[cells.length];
 
 		voronoiTesselator.Init(minDistanceBetweenSites);
 	}
@@ -387,9 +388,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	/**
 	 * Jiggle the dots until they make a nice picture
 	 */
-	protected float evolveCells() {
-		float totalWeight=0;
+	protected double evolveCells() {
+		double totalWeight=0;
 		try {
+			while(lock.isLocked());
 			lock.lock();
 			tessellateVoronoiDiagram();
 			lock.unlock();
@@ -443,161 +445,130 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	protected void tessellateVoronoiDiagram() {
 		// convert the cells to sites used in the Voronoi class.
 		int i;
-		for (i = 0; i < cells.length; ++i) {
+		for (i = 0; i < numCells; ++i) {
 			xValuesIn[i] = cells[i].centroid.getX();
 			yValuesIn[i] = cells[i].centroid.getY();
+			cells[i].resetRegion();
 		}
 
-		// scan left to right across the image, building the list of borders as
-		// we go.
+		// scan left to right across the image, building the list of borders as we go.
 		graphEdges = voronoiTesselator.generateVoronoi(xValuesIn, yValuesIn, xLeft, xRight, yBottom, yTop);
-	}
-
-	protected void generateBounds(int cellIndex) {
-		numEdgesInCell = 0;
-
-		double cx = cells[cellIndex].centroid.getX();
-		double cy = cells[cellIndex].centroid.getY();
-
-		double dx, dy, nx, ny, dot1;
-
-		// long ta = System.nanoTime();
-
+		
 		for (VoronoiGraphEdge e : graphEdges) {
-			if (e.site1 != cellIndex && e.site2 != cellIndex)
-				continue;
-			if (numEdgesInCell == 0) {
-				if (e.x1 < e.x2) {
-					bound_min.setLocation(e.x1, bound_min.getY());
-					bound_max.setLocation(e.x2, bound_max.getY());
-				} else {
-					bound_min.setLocation(e.x2, bound_min.getY());
-					bound_max.setLocation(e.x1, bound_max.getY());
-				}
-				if (e.y1 < e.y2) {
-					bound_min.setLocation(bound_min.getX(), (float) e.y1);
-					bound_max.setLocation(bound_max.getX(), (float) e.y2);
-				} else {
-					bound_min.setLocation(bound_min.getX(), (float) e.y2);
-					bound_max.setLocation(bound_max.getX(), (float) e.y1);
-				}
-			} else {
-				if (bound_min.x > e.x1)	bound_min.setLocation(e.x1, bound_min.getY());
-				if (bound_min.x > e.x2) bound_min.setLocation(e.x2, bound_min.getY());
-				if (bound_max.x < e.x1)	bound_max.setLocation(e.x1, bound_max.getY());
-				if (bound_max.x < e.x2)	bound_max.setLocation(e.x2, bound_max.getY());
-				if (bound_min.y > e.y1)	bound_min.setLocation(bound_min.getX(), e.y1);
-				if (bound_min.y > e.y2)	bound_min.setLocation(bound_min.getX(), e.y2);
-				if (bound_max.y < e.y1)	bound_max.setLocation(bound_max.getX(), e.y1);
-				if (bound_max.y < e.y2)	bound_max.setLocation(bound_max.getX(), e.y2);
-			}
-
-			// make a unnormalized vector along the edge of e
-			dx = e.x2 - e.x1;
-			dy = e.y2 - e.y1;
-			// find a line orthogonal to dx/dy
-			nx = dy;
-			ny = -dx;
-			// dot product the centroid and the normal.
-			dx = cx - e.x1;
-			dy = cy - e.y1;
-			dot1 = (dx * nx + dy * ny);
-
-			if (cellBorder.size() == numEdgesInCell) {
-				cellBorder.add(new VoronoiCellEdge());
-			}
-
-			VoronoiCellEdge ce = cellBorder.get(numEdgesInCell++);
-			ce.px = e.x1;
-			ce.py = e.y1;
-			if (dot1 < 0) {
-				ce.nx = -nx;
-				ce.ny = -ny;
-			} else {
-				ce.nx = nx;
-				ce.ny = ny;
+			try {
+				cells[e.site1].addPoint((float)e.x1, (float)e.y1);
+				cells[e.site1].addPoint((float)e.x2, (float)e.y2);
+				
+				cells[e.site2].addPoint((float)e.x1, (float)e.y1);
+				cells[e.site2].addPoint((float)e.x2, (float)e.y2);
+			} catch(Exception err) {
+				err.printStackTrace();
 			}
 		}
-
-		// long tc = System.nanoTime();
-
-		// System.out.println("\t"+((tb-ta)/1e6)+"\t"+((tc-tb)/1e6));
 	}
 
-	protected boolean insideBorder(float x, float y) {
-		double dx, dy;
-		int i;
-		Iterator<VoronoiCellEdge> ice = cellBorder.iterator();
-		for (i = 0; i < numEdgesInCell; ++i) {
-			VoronoiCellEdge ce = ice.next();
-
-			// dot product the test point.
-			dx = x - ce.px;
-			dy = y - ce.py;
-			// If they are opposite signs then the test point is outside the
-			// cell
-			if (dx * ce.nx + dy * ce.ny < 0)
-				return false;
-		}
-		// passed all tests, must be in cell.
-		return true;
-	}
 
 	/**
-	 * Adjust the weighted center of each cell.
-	 * weight is based on the intensity of the color of each pixel inside the cell.
+	 * Find the weighted center of each cell.
+	 * weight is based on the intensity of the color of each pixel inside the cell
 	 * the center of the pixel must be inside the cell to be counted.
-	 * @return
+	 * @return the total magnitude movement of all centers
 	 */
 	protected float adjustCentroids() {
-		int i;
-		float weight, wx, wy, x, y;
-		float totalWeight=0;
-		float stepSize = 2;
+		double totalCellWeight, wx, wy, x, y;
+		double stepSize;
+		double minX,maxX,minY,maxY;
+		float totalMagnitude=0;
 
-		for (i = 0; i < cells.length; ++i) {
-			generateBounds(i);
-			int sx = (int) Math.floor(bound_min.x);
-			int sy = (int) Math.floor(bound_min.y);
-			int ex = (int) Math.floor(bound_max.x);
-			int ey = (int) Math.floor(bound_max.y);
-			// System.out.println("bounding "+i+" from "+sx+", "+sy+" to "+ex+",
-			// "+ey);
-			// System.out.println("centroid "+cells[i].centroid.x+",
-			// "+cells[i].centroid.y);
+		for (VoronoiCell c : cells) {
+			if(c.region==null) { 
+				continue;
+			}
+			Rectangle bounds = c.region.getBounds();
 
-			weight = 0;
+			minX = bounds.getMinX();
+			maxX = bounds.getMaxX();
+			double dx=maxX-minX;
+
+			minY = bounds.getMinY();
+			maxY = bounds.getMaxY();
+			double dy=maxY-minY;
+
+			stepSize=1.0;
+			if(dx<dy) {
+				if(dx<1) {
+					stepSize = dx/3.0;
+				}
+			} else {
+				if(dy<1) {
+					stepSize = dy/3.0;
+				}
+			}
+			
+			int hits = 0;
+			totalCellWeight = 0;
 			wx = 0;
 			wy = 0;
 
-			for (y = sy; y <= ey; y += stepSize) {
-				for (x = sx; x <= ex; x += stepSize) {
-					if (insideBorder(x, y)) {
-						float val = (float) sourceImage.sample1x1((int) x, (int) y) / 255.0f;
-						val = 1.0f - val;
-						weight += val;
-						wx += x * val;
-						wy += y * val;
+			float sampleWeight;
+			for (y = minY; y <= maxY; y +=stepSize) {
+				for (x = minX; x <= maxX; x +=stepSize) {
+					if (c.region.contains(x,y)) {
+						if(sourceImage.canSampleAt((float)x, (float)y)) 
+						{
+							hits++;
+							sampleWeight = 255.0f - (float)sourceImage.sample1x1Unchecked( (float)x, (float)y );
+							totalCellWeight += sampleWeight;
+							wx += (x) * sampleWeight;
+							wy += (y) * sampleWeight;
+						}
 					}
 				}
 			}
 
-			if (weight > 0.0f) {
-				wx /= weight;
-				wy /= weight;
-				totalWeight+=weight;
+			if (totalCellWeight > 0) {
+				wx /= totalCellWeight;
+				wy /= totalCellWeight;
+				totalMagnitude+=totalCellWeight;
+			} else {
+				continue;
 			}
 
 			// make sure centroid can't leave image bounds
-			if (wx < xLeft) wx = xLeft;
-			if (wy < yBottom) wy = yBottom;
-			if (wx >= xRight) wx = xRight;
-			if (wy >= yTop) wy = yTop;
-
+			if (wx < xLeft || wx >= xRight || wy < yBottom || wy >= yTop ) {
+				/*
+				// try the geometric centroid
+				for(int j=0;j<c.region.npoints;++j) {
+					wx = c.region.xpoints[j];
+					wy = c.region.ypoints[j];
+				}
+				wx/= c.region.npoints;
+				wy/= c.region.npoints;
+				*/
+				if (wx <  xLeft ) wx = xLeft+1;
+				if (wx >= xRight) wx = xRight-1;
+				
+				if (wy <  yBottom) wy = yBottom+1;
+				if (wy >= yTop   ) wy = yTop-1;
+			}
+			
 			// use the new center
-			cells[i].centroid.setLocation(wx, wy);
+			if(hits>0)
+			{
+				double ox = c.centroid.getX();
+				double oy = c.centroid.getY();
+				double dx2 = wx - ox;
+				double dy2 = wy - oy;
+
+				c.weight = totalCellWeight/(double)hits;
+				
+				double nx = ox + dx2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
+				double ny = oy + dy2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
+				
+				c.centroid.setLocation(nx, ny);
+			}
 		}
-		return totalWeight;
+		return totalMagnitude;
 	}
 	
 	public void setNumCells(int value) {
