@@ -7,6 +7,7 @@ import java.io.Writer;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
@@ -18,7 +19,7 @@ public abstract class ImageManipulator {
 	public static final float MARGIN_EPSILON = 0.01f;
 	
 	// pen position optimizing
-	protected boolean lastUp;
+	private Turtle turtle = new Turtle();
 	
 	// threading
 	protected ProgressMonitor pm;
@@ -65,6 +66,8 @@ public abstract class ImageManipulator {
 		machine.writeProgramStart(out);
 		machine.writeChangeToDefaultColor(out);
 		setAbsoluteMode(out);
+		turtle.moveTo(machine.getHomeX(),machine.getHomeY());
+		turtle.penDown();
 		liftPen(out);
 	}
 
@@ -77,26 +80,27 @@ public abstract class ImageManipulator {
 	 */
 	public void imageEnd(Writer out) throws IOException {
 		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+	    moveTo(out, machine.getHomeX(), machine.getHomeY(),true);
 		machine.writeProgramEnd(out);
 	}
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(lastUp) return;
+		if(turtle.isUp()) return;
+		turtle.penUp();
 		machine.writePenUp(out);
-		lastUp = true;
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(!lastUp) return;
+		if(!turtle.isUp()) return;
+		turtle.penDown();
+		machine.writeMoveTo(out, turtle.getX(),turtle.getY(),true);
 		machine.writePenDown(out);
-		lastUp = false;
 	}
 	
 	public boolean isPenUp() {
-		return lastUp;
+		return turtle.isUp();
 	}
 
 	protected void setAbsoluteMode(Writer out) throws IOException {
@@ -132,17 +136,18 @@ public abstract class ImageManipulator {
 	 * @throws IOException on write failure
 	 */
 	protected void moveTo(Writer out, double x, double y) throws IOException {
-		if(isInsidePaperMargins(x,y)) {
-			machine.writeMoveTo(out, x, y, lastUp);
+		turtle.moveTo(x,y);
+		if(isInsidePaperMargins(x,y) && !turtle.isUp()) {
+			machine.writeMoveTo(out, x, y, false);
 		}
 	}
 
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
-		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
-		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
-		yTop    = (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
+		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
+		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
+		yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
 	
 		if( x < xLeft  ) return false;
 		if( x > xRight ) return false;
@@ -164,10 +169,10 @@ public abstract class ImageManipulator {
 	 * @throws IOException
 	 */
 	protected boolean clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
-		xLeft   = (machine.getPaperLeft()   * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
-		xRight  = (machine.getPaperRight()  * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
-		yBottom = (machine.getPaperBottom() * machine.getPaperMargin())-ImageManipulator.MARGIN_EPSILON;
-		yTop    = (machine.getPaperTop()    * machine.getPaperMargin())+ImageManipulator.MARGIN_EPSILON;
+		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
+		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
+		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
+		yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
 		
 		ClippingPoint P0 = new ClippingPoint(oldX,oldY);
 		ClippingPoint P1 = new ClippingPoint(x,y);
