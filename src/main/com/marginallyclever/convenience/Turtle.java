@@ -7,9 +7,10 @@ package com.marginallyclever.convenience;
  *
  */
 public class Turtle {
-	private float turtleX, turtleY;
-	private float turtleDx, turtleDy;
-	private float angle;
+	private double turtleX, turtleY;
+	private double turtleDx, turtleDy;
+	private double angle;
+	private boolean isUp;
 	
 	public Turtle() {
 		reset();
@@ -21,33 +22,53 @@ public class Turtle {
 		setAngle(0);
 	}
 	
-	public void setX(float arg0) {		turtleX = arg0;	}
-	public void setY(float arg0) {		turtleY = arg0;	}
-	public float getX() {		return turtleX;	}
-	public float getY() {		return turtleY;	}
+	public void moveTo(double x,double y) {
+		turtleX=x;
+		turtleY=y;
+	}
+	public void setX(double arg0) {		turtleX = arg0;	}
+	public void setY(double arg0) {		turtleY = arg0;	}
+	public double getX() {		return turtleX;	}
+	public double getY() {		return turtleY;	}
+	
+	public void raisePen() {
+		isUp=true;
+	}
+	public void lowerPen() {
+		isUp=false;
+	}
+	public void penUp() {
+		isUp=true;
+	}
+	public void penDown() {
+		isUp=false;
+	}
+	public boolean isUp() {
+		return isUp;
+	}
 
-	public void turn(float degrees) {
+	public void turn(double degrees) {
 		setAngle(angle+degrees);
 	}
 
-	public float getAngle() {
+	public double getAngle() {
 		return angle;
 	}
 	
 	/**
 	 * @param degrees degrees
 	 */
-	public void setAngle(float degrees) {
+	public void setAngle(double degrees) {
 		angle=degrees;
-		turtleDx = (float)Math.cos(Math.toRadians(angle));
-		turtleDy = (float)Math.sin(Math.toRadians(angle));
+		turtleDx = (double)Math.cos(Math.toRadians(angle));
+		turtleDy = (double)Math.sin(Math.toRadians(angle));
 	}
 
-	public void move(float stepSize) {
+	public void move(double stepSize) {
 		//turtle_x += turtle_dx * distance;
 		//turtle_y += turtle_dy * distance;
 		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		turtleX += (turtleDx * (float)stepSize );
-		turtleY += (turtleDy * (float)stepSize );
+		turtleX += (turtleDx * (double)stepSize );
+		turtleY += (turtleDy * (double)stepSize );
 	}
 }
