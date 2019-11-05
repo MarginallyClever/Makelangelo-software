@@ -60,19 +60,18 @@ public class Converter_Spiral extends ImageConverter {
 		float maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getPaperHeight();
-			float w2 = (float)machine.getPaperWidth();
+			float h2 = (float)machine.getMarginHeight();
+			float w2 = (float)machine.getMarginWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
-			float w = (float)machine.getPaperWidth()/2.0f;
-			float h = (float)machine.getPaperHeight()/2.0f;
+			float w = (float)machine.getMarginWidth()/2.0f;
+			float h = (float)machine.getMarginHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
-			maxr *= machine.getPaperMargin() ;
 		}
 		
-		float r = maxr, f;
-		float fx, fy;
+		double r = maxr, f;
+		double fx, fy;
 		int numRings = 0;
 		j = 0;
 		while (r > toolDiameter) {
@@ -83,9 +82,9 @@ public class Converter_Spiral extends ImageConverter {
 			if (circumference > 360.0f) circumference = 360.0f;
 
 			for (i = 0; i <= circumference; ++i) {
-				f = (float) Math.PI * 2.0f * (float)i / (float)circumference;
-				fx = (float) (Math.cos(f) * r);
-				fy = (float) (Math.sin(f) * r);
+				f = Math.PI * 2.0 * (double)i / (double)circumference;
+				fx = Math.cos(f) * r;
+				fy = Math.sin(f) * r;
 				
 				boolean isInside = isInsidePaperMargins(fx, fy);
 				if(isInside) {
@@ -94,13 +93,12 @@ public class Converter_Spiral extends ImageConverter {
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-	
-	
+					
 					if(z<level) {
 						lowerPen(out);
 					} else liftPen(out);
 				} else liftPen(out);
-				machine.writeMoveTo(out, fx, fy, isPenUp());
+				moveTo(out, fx, fy, isPenUp());
 			}
 			r -= toolDiameter;
 			++numRings;
