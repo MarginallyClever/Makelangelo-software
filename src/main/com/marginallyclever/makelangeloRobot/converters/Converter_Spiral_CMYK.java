@@ -100,6 +100,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		
 		double r = maxr, f;
 		double fx, fy;
+		boolean wasInside = false;
 		int numRings = 0;
 		j = 0;
 		while (r > toolDiameter) {
@@ -115,6 +116,11 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 				fy = cy+Math.sin(f) * r;
 				
 				boolean isInside = isInsidePaperMargins(fx, fy);
+				if(isInside != wasInside) {
+					moveTo(out, fx, fy, isPenUp());
+					liftPen(out);
+				}
+				
 				if(isInside) {
 					try {
 						z = img.sample3x3(fx, fy);
@@ -125,8 +131,10 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 					if(z<level) {
 						lowerPen(out);
 					} else liftPen(out);
-				} else liftPen(out);
-				machine.writeMoveTo(out, fx, fy, isPenUp());
+					moveTo(out, fx, fy, isPenUp());
+				}
+
+				wasInside = isInside;
 			}
 			r -= toolDiameter;
 			++numRings;
