@@ -168,7 +168,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	private void generateTSP(Writer out) throws IOException {
 		greedyTour();
 
-		Log.info("green","Running Lin/Kerighan optimization...");
+		Log.info("green","Running Kernighan–Lin optimization...");
 
 		len = getTourLength(solution);
 		old_len = len;
