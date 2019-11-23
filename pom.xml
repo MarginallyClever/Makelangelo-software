@@ -276,17 +276,6 @@ If you like this project, please support us by buying Marginally Clever products
 	
 
     <dependency>
-      <groupId>org.jogamp.gluegen</groupId>
-      <artifactId>gluegen-rt-main</artifactId>
-      <version>${jogl.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.jogl</groupId>
-      <artifactId>jogl-all-main</artifactId>
-      <version>${jogl.version}</version>
-    </dependency>
-    
-    <dependency>
       <groupId>org.kabeja</groupId>
       <artifactId>kabeja</artifactId>
       <version>0.4</version>

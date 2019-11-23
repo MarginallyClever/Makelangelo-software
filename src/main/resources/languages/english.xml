@@ -1191,6 +1191,12 @@ to check yourself.</value>
 	</string>
 
 	<string>
+		<key>MenuCaptureImage</key>
+		<value>Capture From Camera</value>
+		<hint></hint>
+	</string>
+
+	<string>
 		<key>LSystemTreeName</key>
 		<value>L System Tree Fractal</value>
 		<hint></hint>
