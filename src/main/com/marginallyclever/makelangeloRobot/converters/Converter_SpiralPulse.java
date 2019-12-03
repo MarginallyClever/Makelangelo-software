@@ -70,7 +70,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		int n=1;
 		float PULSE_MINIMUM = 0.1f;
 		float ringSize = halfStep*spacing;
-
+		boolean init = false;
 		int i;
 		int z = 0;
 		float r2,scale_z,pulse_size,nx,ny;
@@ -95,9 +95,17 @@ public class Converter_SpiralPulse extends ImageConverter {
 					pulse_size = halfStep * scale_z;
 					nx = (halfStep+pulse_size*n) * fx / r2;
 					ny = (halfStep+pulse_size*n) * fy / r2;
+
+					if (!init) {
+						moveTo(out, fx+nx, fy+ny, true);
+						init = true;
+					}
 					moveTo(out, fx+nx, fy + ny, pulse_size < PULSE_MINIMUM);
 					n = -n;
 				} else {
+					if (!init) {
+						init = true;
+					}
 					moveTo(out, fx, fy, true);
 				}
 			}

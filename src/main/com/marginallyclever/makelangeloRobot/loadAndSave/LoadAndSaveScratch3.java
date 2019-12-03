@@ -172,8 +172,17 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
     			if(children==null) throw new Exception("JSON node 'children' missing.");
     			//System.out.println("found children");
     			
-    			JSONObject children0 = (JSONObject)children.get(0);
-    			JSONArray scripts = (JSONArray)children0.get("scripts");
+    			// look for the first child with a script
+
+    			ListIterator<?> childIter = children.listIterator();
+				JSONArray scripts = null;
+				while( childIter.hasNext() ) {
+    				JSONObject child = (JSONObject)childIter.next();
+    				scripts = (JSONArray)child.get("scripts");
+    				if (scripts != null)
+    					break;
+				}
+    			
     			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
     			System.out.println("found  " +scripts.size() + " scripts");
@@ -241,25 +250,27 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private void readScratchVariables(JSONObject tree) throws Exception {
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray variables = (JSONArray)tree.get("variables");
-		ListIterator<JSONObject> varIter = variables.listIterator();
-		while( varIter.hasNext() ) {
-			//System.out.println("var:"+elem.toString());
-			JSONObject elem = varIter.next();
-			String varName = (String)elem.get("name");
-			Object varValue = (Object)elem.get("value");
-			float value;
-			if(varValue instanceof Number) {
-				Number num = (Number)varValue;
-				value = (float)num.doubleValue();
-				scratchVariables.add(new ScratchVariable(varName,value));
-			} else if(varValue instanceof String) {
-				try {
-					value = Float.parseFloat((String)varValue);
-    				scratchVariables.add(new ScratchVariable(varName,value));
-				} catch (Exception e) {
-					throw new Exception("Variables must be numbers.");
-				}
-			} else throw new Exception("Variable "+varName+" is "+varValue.toString());
+		if (variables != null) {
+			ListIterator<JSONObject> varIter = variables.listIterator();
+			while( varIter.hasNext() ) {
+				//System.out.println("var:"+elem.toString());
+				JSONObject elem = varIter.next();
+				String varName = (String)elem.get("name");
+				Object varValue = (Object)elem.get("value");
+				float value;
+				if(varValue instanceof Number) {
+					Number num = (Number)varValue;
+					value = (float)num.doubleValue();
+					scratchVariables.add(new ScratchVariable(varName,value));
+				} else if(varValue instanceof String) {
+					try {
+						value = Float.parseFloat((String)varValue);
+	    				scratchVariables.add(new ScratchVariable(varName,value));
+					} catch (Exception e) {
+						throw new Exception("Variables must be numbers.");
+					}
+				} else throw new Exception("Variable "+varName+" is "+varValue.toString());
+			}
 		}
 	}
 

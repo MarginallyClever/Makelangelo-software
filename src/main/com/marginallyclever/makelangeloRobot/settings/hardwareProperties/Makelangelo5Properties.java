@@ -343,8 +343,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	@Override
 	public void writeProgramEnd(Writer out) throws IOException {
 		// be sure to lift pen
-		out.write("G0 Z90");
+		out.write("G0 Z90\n");
 		// move out of way for display
-		out.write("G0 X-300 Y300");
+		out.write("G0 X-300 Y300\n");
 	}
 }
