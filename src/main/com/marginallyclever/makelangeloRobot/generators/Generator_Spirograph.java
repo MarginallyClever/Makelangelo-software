@@ -85,19 +85,35 @@ public class Generator_Spirograph extends ImageGenerator {
 
 		// generate the spiral once to find the max/min
 		drawSpirograph(out, false);
-		
+
 		// scale the step size so the spirograph fits on the paper
 		float paperWidth = (float)(machine.getPaperWidth()  * machine.getPaperMargin());
 		float paperHeight = (float)(machine.getPaperHeight() * machine.getPaperMargin());
-		// dr 2018-06-06 I don't know why I needed to add a margin to get it drawing ok.
-		final float MARGIN = 20;
-		float drawingWidth = MARGIN+(xMax - xMin);
-		float drawingHeight = MARGIN+(yMax - yMin);
+
+		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
+		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the
+		// Imagemanipulator.EPSILON_MARGIN
+
+		final float MARGIN = 1;
+		float drawingWidth = MARGIN;
+		float drawingHeight = MARGIN;
+
+		if ( xMax > -xMin) {
+			drawingWidth += 2 * xMax;
+		} else {
+			drawingWidth += 2 * -xMin;
+		}
+
+		if ( yMax > -yMin) {
+			drawingHeight += 2 * yMax;
+		} else {
+			drawingHeight += 2 * -yMin;
+		}
 
 		float largestX = paperWidth/drawingWidth;
 		float largestY = paperHeight/drawingHeight;
 		totalScale =  largestX < largestY ? largestX : largestY;
-		
+
 		// draw the spirograph for real this time
 		drawSpirograph(out, true);
 
@@ -132,7 +148,7 @@ public class Generator_Spirograph extends ImageGenerator {
 			moveTo(output, totalScale*x, totalScale*y, true);
 			lowerPen(output);
 		}
-		
+
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
 		// https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
 		double period = lcm(majorRadius,minorRadius)/majorRadius;

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,18 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -93,7 +84,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton openConfig;
 	private JPanel machineNumberPanel;
 	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonCapture, buttonGenerate, buttonSaveFile;
+	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancel;
+	private BufferedImage buffImg;
+	private boolean useImage;
 	private RPiCamera piCamera;
+	private int awb, drc, exp, contrast, quality, sharpness;
+    private static final int buttonHeight = 25;
 	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
@@ -140,8 +136,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		//create a picamera
 		try {
 			piCamera = new RPiCamera("/home/pi/Pictures");
+			// set the initial parameter settings.
+			awb = 1;  // Auto
+			drc = 1;  // High
+			exp = 11; // VeryLong
+			contrast = 0;
+			quality = 75;
+			sharpness = 0;
 		} catch (FailedToRunRaspistillException e) {
-			e.printStackTrace();
+			System.out.println("Cannot run raspistill");
 		}
 
 		panel.add(createAxisDrivingControls(),con1);	con1.gridy++;
@@ -286,10 +289,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(buttonNewFile, con1);
 		con1.gridy++;
 
-		buttonCapture = new JButton(Translator.get("MenuCaptureImage"));
-		buttonCapture.addActionListener(this);
-		panel.add(buttonCapture, con1);
-		con1.gridy++;
+		if (piCamera != null) {
+            buttonCapture = new JButton(Translator.get("MenuCaptureImage"));
+            buttonCapture.addActionListener(this);
+            panel.add(buttonCapture, con1);
+            con1.gridy++;
+        }
 
 		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener(this);
@@ -616,7 +621,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		buttonNewFile.setEnabled(!isRunning);
-		buttonCapture.setEnabled(!isRunning && (piCamera != null));
+		if (piCamera != null) {
+            buttonCapture.setEnabled(!isRunning);
+        }
 		buttonOpenFile.setEnabled(!isRunning);
 		buttonReopenFile.setEnabled(!isRunning && lastFileIn!=null && !lastFileIn.isEmpty());
 		buttonGenerate.setEnabled(!isRunning);
@@ -660,159 +667,239 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 
 	private void captureFile() {
-		final JPanel panel = new JPanel();
+        // let's make the image the correct width and height for the paper
+		useImage = false;
+        int captureH = 650;
+        int captureW = (int) ((double) captureH * robot.getSettings().getPaperWidth() / robot.getSettings().getPaperHeight());
+
+		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("CaptureImageTitle"), true);
+        dialog.setLocation(gui.getMainFrame().getLocation());
+
+        final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		final GridBagConstraints cMain = new GridBagConstraints();
 		cMain.fill=GridBagConstraints.HORIZONTAL;
 		cMain.anchor=GridBagConstraints.NORTH;
 		cMain.gridx=0;
 		cMain.gridy=0;
+        cMain.gridheight = 1;
+        cMain.gridwidth = 1;
 
 		// create a frame to adjust the image
 
-		panel.setBounds(1024, 100, 700, 615);
-//		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		panel.getContentPane().setLayout(null);
+		panel.setBounds(1024, 100, 700, captureH);
 
-		JLabel imageLabel = new JLabel();
-//		imageLabel.setBounds(3, 11, 575, 565);
-		imageLabel.setPreferredSize(new Dimension(100,20));
-		panel.add(imageLabel, cMain);
+        // if you add more things to the right side, you must increase this.
+        cMain.gridheight = 16;
+        JLabel imageLabel = new JLabel();
+        imageLabel.setPreferredSize(new Dimension(captureW, captureH));
+  		panel.add(imageLabel, cMain);
+        cMain.gridheight = 1;
+
+        // all controls to the right
 		cMain.gridx++;
 
-		String[] encComboBoxChoices = { "jpg", "png", "bmp", "gif" };
-		JComboBox encComboBox = new JComboBox(encComboBoxChoices);
-//		encComboBox.setBounds(584, 91, 90, 20);
-		encComboBox.setPreferredSize(new Dimension(100,20));
-		panel.add(encComboBox, cMain);
-		cMain.gridx = 0;
-		cMain.gridy++;
-
-		JLabel label = new JLabel("AWB:");
-//		label.setFont(new Font("Tahoma", Font.BOLD, 11));
-//		label.setBounds(615, 224, 36, 22);
-		label.setPreferredSize(new Dimension(100,20));
+		JLabel label = new JLabel(Translator.get("AWB"));
+		label.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(label, cMain);
-		cMain.gridx++;
+		cMain.gridy++;
 
-		String[] awbComboBoxChoices = { "Off", "Auto", "Sun", "Cloud", "Shade", "Tungsten",
-				"Fluorescent", "Incandescent", "Flash", "Horizon" };
-		JComboBox awbComboBox = new JComboBox(awbComboBoxChoices);
-//		awbComboBox.setBounds(584, 252, 90, 20);
-		awbComboBox.setPreferredSize(new Dimension(100,20));
+		String[] awbComboBoxChoices = {
+		        Translator.get("Off"),
+                Translator.get("Auto"),
+                Translator.get("Sun"),
+                Translator.get("Cloud"),
+                Translator.get("Shade"),
+                Translator.get("Tungsten"),
+                Translator.get("Fluorescent"),
+                Translator.get("Incandescent"),
+                Translator.get("Flash"),
+                Translator.get("Horizon") };
+		JComboBox<String> awbComboBox = new JComboBox<>(awbComboBoxChoices);
+		awbComboBox.setPreferredSize(new Dimension(100,buttonHeight));
+		awbComboBox.setSelectedIndex(awb);
 		panel.add(awbComboBox, cMain);
-		cMain.gridx = 0;
 		cMain.gridy++;
 
-		JLabel lblNewLabel = new JLabel("DRC:");
-//		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-//		lblNewLabel.setBounds(615, 283, 46, 14);
-		lblNewLabel.setPreferredSize(new Dimension(100,20));
+		JLabel lblNewLabel = new JLabel(Translator.get("DRC"));
+		lblNewLabel.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(lblNewLabel, cMain);
-		cMain.gridx++;
+		cMain.gridy++;
 
-		String[] drcComboBoxChoices = { "Off", "High", "Medium", "Low" };
-		JComboBox drcComboBox = new JComboBox(drcComboBoxChoices);
-//		drcComboBox.setBounds(584, 308, 90, 20);
-		drcComboBox.setPreferredSize(new Dimension(100,20));
+		String[] drcComboBoxChoices = {
+                Translator.get("Off"),
+                Translator.get("High"),
+                Translator.get("Medium"),
+                Translator.get("Low") };
+		JComboBox<String> drcComboBox = new JComboBox<>(drcComboBoxChoices);
+		drcComboBox.setPreferredSize(new Dimension(100,buttonHeight));
+		drcComboBox.setSelectedIndex(drc);
 		panel.add(drcComboBox, cMain);
-		cMain.gridx = 0;
 		cMain.gridy++;
 
-		JLabel label_1 = new JLabel("Exposure:\r\n");
-//		label_1.setFont(new Font("Tahoma", Font.BOLD, 11));
-//		label_1.setBounds(604, 334, 70, 22);
-		label_1.setPreferredSize(new Dimension(100,20));
+		JLabel label_1 = new JLabel(Translator.get("Exposure"));
+		label_1.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(label_1, cMain);
-		cMain.gridx++;
-
-		String[] expComboBoxChoices = { "Antishake", "Auto", "Backlight", "Beach", "Fireworks",
-				"FixedFPS", "Night", "NightPreview", "Snow", "Sports",
-				"Spotlight", "Verylong" };
-		JComboBox expComboBox = new JComboBox(expComboBoxChoices);
-//		expComboBox.setBounds(584, 362, 90, 20);
-		expComboBox.setPreferredSize(new Dimension(100,20));
-		panel.add(expComboBox, cMain);
-		cMain.gridx = 0;
 		cMain.gridy++;
 
-		JLabel lblContrast = new JLabel("Contrast:");
+		String[] expComboBoxChoices = {
+                Translator.get("Antishake"),
+                Translator.get("Auto"),
+                Translator.get("Backlight"),
+                Translator.get("Beach"),
+                Translator.get("Fireworks"),
+                Translator.get("FixedFPS"),
+                Translator.get("Night"),
+                Translator.get("NightPreview"),
+                Translator.get("Snow"),
+                Translator.get("Sports"),
+                Translator.get("Spotlight"),
+                Translator.get("Verylong") };
+		JComboBox<String> expComboBox = new JComboBox<>(expComboBoxChoices);
+//		expComboBox.setBounds(584, 362, 90, 20);
+		expComboBox.setPreferredSize(new Dimension(100,buttonHeight));
+		expComboBox.setSelectedIndex(exp);
+		panel.add(expComboBox, cMain);
+		cMain.gridy++;
+
+		JLabel lblContrast = new JLabel(Translator.get("Contrast"));
 //		lblContrast.setBounds(588, 393, 67, 14);
-		lblContrast.setPreferredSize(new Dimension(100,20));
+		lblContrast.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(lblContrast, cMain);
-		cMain.gridx++;
+		cMain.gridy++;
 
 		JSlider contrastSlider = new JSlider();
 		contrastSlider.setMinimum(-100);
 //		contrastSlider.setBounds(588, 418, 90, 23);
+		contrastSlider.setValue(contrast);
 		panel.add(contrastSlider, cMain);
-		cMain.gridx = 0;
 		cMain.gridy++;
 
-		JLabel lblQuality = new JLabel("Quality:");
+		JLabel lblQuality = new JLabel(Translator.get("Quality"));
 //		lblQuality.setBounds(588, 452, 46, 14);
-		lblQuality.setPreferredSize(new Dimension(100,20));
+		lblQuality.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(lblQuality, cMain);
-		cMain.gridx++;
+		cMain.gridy++;
 
 		JSlider qualitySlider = new JSlider();
-		qualitySlider.setValue(75);
+		qualitySlider.setValue(quality);
 //		qualitySlider.setBounds(584, 477, 90, 29);
 		panel.add(qualitySlider, cMain);
-		cMain.gridx = 0;
 		cMain.gridy++;
 
-		JLabel lblSharpness = new JLabel("Sharpness:");
+		JLabel lblSharpness = new JLabel(Translator.get("Sharpness"));
 //		lblSharpness.setBounds(585, 517, 66, 14);
-		lblSharpness.setPreferredSize(new Dimension(100,20));
+		lblSharpness.setPreferredSize(new Dimension(100,buttonHeight));
 		panel.add(lblSharpness, cMain);
-		cMain.gridx++;
+		cMain.gridy++;
 
 		JSlider sharpnessSlider = new JSlider();
-		sharpnessSlider.setValue(0);
 		sharpnessSlider.setMinimum(-100);
+		sharpnessSlider.setValue(sharpness);
 //		sharpnessSlider.setBounds(588, 542, 90, 23);
 		panel.add(sharpnessSlider, cMain);
+		cMain.gridy++;
 
-		// let's make the image the correct width and height for the paper
+		// I need 3 buttons one for Capture and one for Use if we have captured an image and one to just Cancel
 
-		int captureH = 650;
-		int captureW = (int) ((double) captureH * robot.getSettings().getPaperWidth() / robot.getSettings().getPaperHeight());
+        // a little space between everything else
+        cMain.insets = new Insets(10,0,0,0);  //top padding
 
-		piCamera.setAWB(AWB.AUTO);	    // Change Automatic White Balance setting to automatic
-		piCamera.setDRC(DRC.OFF); 			// Turn off Dynamic Range Compression
-		piCamera.setContrast(100); 			// Set maximum contrast
-		piCamera.setSharpness(100);		    // Set maximum sharpness
-		piCamera.setQuality(100); 		    // Set maximum quality
-		piCamera.setTimeout(10000);		    // Wait 1 second to take the image
-		piCamera.turnOnPreview(200, 200, captureW, captureH);            // Turn on image preview
-		piCamera.setEncoding(Encoding.JPG); // Change encoding of images to PNG
+        buttonCaptureImage = new JButton(Translator.get("CaptureImage"));
+		buttonCaptureImage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					piCamera.turnOnPreview(gui.getMainFrame().getLocationOnScreen().x + 50, gui.getMainFrame().getLocationOnScreen().y + 100, captureW, captureH);
+					piCamera.setAWB(AWB.valueOf(((String) awbComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setDRC(DRC.valueOf(((String) drcComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setExposure(Exposure.valueOf(((String) expComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setEncoding(Encoding.JPG);
+					piCamera.setWidth(captureW);
+					piCamera.setHeight(captureH);
+					piCamera.setContrast(contrastSlider.getValue());
+					piCamera.setQuality(qualitySlider.getValue());
+					piCamera.setSharpness(sharpnessSlider.getValue());
+					piCamera.setTimeout(3000);
+					buffImg = piCamera.takeBufferedStill();
+					System.out.println("Executed this command:\n\t" + piCamera.getPrevCommand());
+					ImageIcon icon = new ImageIcon(buffImg);
+					imageLabel.setIcon(icon);
+					buttonUseCapture.setEnabled(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		buttonCaptureImage.setPreferredSize(new Dimension(89, buttonHeight));
+		panel.add(buttonCaptureImage, cMain);
+		cMain.gridy++;
+        cMain.insets = new Insets(2,0,0,0);  //top padding
+
+		buttonUseCapture = new JButton(Translator.get("UseCapture"));
+		buttonUseCapture.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// we like this image, save off the parameters used.
+				awb = awbComboBox.getSelectedIndex();
+				drc = drcComboBox.getSelectedIndex();
+				exp = expComboBox.getSelectedIndex();
+				contrast = contrastSlider.getValue();
+				quality = qualitySlider.getValue();
+				sharpness = sharpnessSlider.getValue();
+
+				File saveFile = new File("/home/pi/Pictures/capture.jpg");
+				try {
+					ImageIO.write(buffImg, "jpg", saveFile);
+					useImage = true;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				dialog.dispose();
+			};
+		});
+		buttonUseCapture.setPreferredSize(new Dimension(89, buttonHeight));
+		buttonUseCapture.setEnabled(false);
+		panel.add(buttonUseCapture, cMain);
+		cMain.gridy++;
+
+		buttonCancel = new JButton(Translator.get("CancelCapture"));
+		buttonCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dialog.dispose();
+				useImage = false;
+			};
+		});
+		buttonCancel.setPreferredSize(new Dimension(89, buttonHeight));
+		buttonCancel.setEnabled(true);
+		panel.add(buttonCancel, cMain);
+
+//		piCamera.setAWB(AWB.AUTO);	    // Change Automatic White Balance setting to automatic
+//		piCamera.setDRC(DRC.OFF); 			// Turn off Dynamic Range Compression
+//		piCamera.setContrast(100); 			// Set maximum contrast
+//		piCamera.setSharpness(100);		    // Set maximum sharpness
+//		piCamera.setQuality(100); 		    // Set maximum quality
+//		piCamera.setTimeout(10000);		    // Wait 1 second to take the image
+//		piCamera.turnOnPreview(200, 200, captureW, captureH);            // Turn on image preview
+//		piCamera.setEncoding(Encoding.JPG); // Change encoding of images to PNG
 
 		// Take a still image and save it as "/home/pi/Pictures/cameraCapture.jpg"
-		try {
-			System.out.println("We are about to display dialog\n");
-			JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("CaptureImage"), true);
-			dialog.add(panel);
-			dialog.pack();
-			dialog.setVisible(true);
-			System.out.println("We are about to take a still image\n");
-			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
-			System.out.println("New JPG capture saved to:\n\t" + image.getAbsolutePath());
-			piCamera.turnOffPreview();
-			// setup for reopen
-			lastFileIn = image.getAbsolutePath();
+
+		System.out.println("We are about to display dialog\n");
+		dialog.add(panel);
+		dialog.pack();
+		dialog.setVisible(true);
+//			System.out.println("We are about to take a still image\n");
+//			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
+//			System.out.println("New JPG capture saved to:\n\t" + image.getAbsolutePath());
+//			piCamera.turnOffPreview();
+		// setup for reopen
+
+		if (useImage) {
+			lastFileIn = "/home/pi/Pictures/capture.jpg";
 
 			// process the image
 			openFileOnDemand(lastFileIn);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
-
-		// turn off the preview again. It may havebeen turned off if the capture worked.
-
-		piCamera.turnOffPreview();
 	}
 
 	public void openFile() {
