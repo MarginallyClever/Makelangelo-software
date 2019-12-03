@@ -118,12 +118,18 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			if(loadOK) {
 				imageCenterX = ( maxX + minX ) / 2.0;
 				imageCenterY = -( maxY + minY ) / 2.0;
-	
+
 				double imageWidth  = maxX - minX;
 				double imageHeight = maxY - minY;
+
+				// add 2% for margins
+
+				imageWidth += imageWidth * .02;
+				imageHeight += imageHeight * .02;
+
 				double paperHeight = robot.getSettings().getPaperHeight() * robot.getSettings().getPaperMargin();
 				double paperWidth  = robot.getSettings().getPaperWidth () * robot.getSettings().getPaperMargin();
-	
+
 				scale = 1;
 				if(shouldScaleOnLoad) {
 					double innerAspectRatio = imageWidth / imageHeight;

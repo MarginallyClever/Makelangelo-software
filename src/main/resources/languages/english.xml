@@ -1323,5 +1323,174 @@ to check yourself.</value>
 		<value>Message</value>
 		<hint>Generator_Text_Panel</hint>
 	</string>
-	
+	<string>
+		<key>CaptureImageTitle</key>
+		<value>Capture Camera Image</value>
+		<hint>Capture Image from host camera</hint>
+	</string>
+	<string>
+		<key>CaptureImage</key>
+		<value>Capture</value>
+		<hint>Capture Image from host camera</hint>
+	</string>
+	<string>
+		<key>UseCapture</key>
+		<value>Use</value>
+		<hint>Use Image for processing</hint>
+	</string>
+	<string>
+		<key>CancelCapture</key>
+		<value>Cancel</value>
+		<hint>Cancel Capture. Don't process.</hint>
+	</string>
+    <string>
+        <key>AWB</key>
+        <value>Automatic White Balance</value>
+        <hint>Image Automatic White Balance setting</hint>
+    </string>
+    <string>
+        <key>DRC</key>
+        <value>Dynamic Range</value>
+        <hint>Image Dynamic Range Setting</hint>
+    </string>
+    <string>
+        <key>Exposure</key>
+        <value>Exposure</value>
+        <hint>Image Exposure Setting</hint>
+    </string>
+    <string>
+        <key>Contrast</key>
+        <value>Contrast</value>
+        <hint>Image Contrast Setting</hint>
+    </string>
+    <string>
+        <key>Quality</key>
+        <value>Quality</value>
+        <hint>Image Quality Setting</hint>
+    </string>
+    <string>
+        <key>Sharpness</key>
+        <value>Sharpness</value>
+        <hint>Image Sharpness Setting</hint>
+    </string>
+    <string>
+        <key>Off</key>
+        <value>Off</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Auto</key>
+        <value>Auto</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Sun</key>
+        <value>Sun</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Cloud</key>
+        <value>Cloud</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Shade</key>
+        <value>Shade</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Tungsten</key>
+        <value>Tungsten</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Fluorescent</key>
+        <value>Fluorescent</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Incandescent</key>
+        <value>Incandescent</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Flash</key>
+        <value>Flash</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Horizon</key>
+        <value>Horizon</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>High</key>
+        <value>High</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Medium</key>
+        <value>Medium</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Low</key>
+        <value>Low</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Antishake</key>
+        <value>Antishake</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Backlight</key>
+        <value>Backlight</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Beach</key>
+        <value>Beach</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Fireworks</key>
+        <value>Fireworks</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>FixedFPS</key>
+        <value>FixedFPS</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Night</key>
+        <value>Night</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>NightPreview</key>
+        <value>NightPreview</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Snow</key>
+        <value>Snow</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Sports</key>
+        <value>Sports</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Spotlight</key>
+        <value>Spotlight</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>Verylong</key>
+        <value>Verylong</value>
+        <hint></hint>
+    </string>
 </language>

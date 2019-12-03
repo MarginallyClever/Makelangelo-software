@@ -130,6 +130,8 @@ public abstract class ImageManipulator {
 	protected void moveTo(Writer out, double x, double y) throws IOException {
 		if(isInsidePaperMargins(x,y)) {
 			machine.writeMoveTo(out, (float) x, (float) y,lastUp);
+		} else {
+//			System.out.println("out X = " + x + " Y = " + y);
 		}
 	}
 
