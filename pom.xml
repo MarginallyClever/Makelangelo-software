@@ -274,7 +274,19 @@ If you like this project, please support us by buying Marginally Clever products
 	    <version>4.5.3</version>
 	</dependency>
 	
+	<!-- https://mvnrepository.com/artifact/de.sciss/jrpicam -->
+	<dependency>
+	  <groupId>de.sciss</groupId>
+	  <artifactId>jrpicam</artifactId>
+	  <version>0.2.0</version>
+	</dependency>
 
+	<dependency>
+	  <groupId>org.jogamp.fat</groupId>
+	  <artifactId>jogamp-fat</artifactId>
+	  <version>2.4.0</version>
+	</dependency>
+	
     <dependency>
       <groupId>org.kabeja</groupId>
       <artifactId>kabeja</artifactId>
