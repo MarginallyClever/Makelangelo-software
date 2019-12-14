@@ -133,7 +133,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		//create a picamera
+		// Create a piCamera
 		try {
 			piCamera = new RPiCamera("/home/pi/Pictures");
 			// set the initial parameter settings.
