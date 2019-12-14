@@ -871,6 +871,7 @@ public final class MakelangeloRobotSettings {
 
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
 		String command=isUp?"G01":"G00";
+		
 		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + "\n");
 	}
 
