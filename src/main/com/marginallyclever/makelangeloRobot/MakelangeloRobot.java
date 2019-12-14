@@ -740,7 +740,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
-			decorator.render(gl2, settings);
+			decorator.render(gl2);
 		} else if (gCode != null) {
 			gCode.render(gl2, this);
 		}

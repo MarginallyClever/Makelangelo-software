@@ -14,7 +14,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_DitherFloydSteinberg;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
 /**
@@ -138,7 +137,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	}
 
 
-	public void render(GL2 gl2, MakelangeloRobotSettings machine) {
+	public void render(GL2 gl2) {
 		if (points == null || solution == null) return;
 
 		while (lock.isLocked()) ;

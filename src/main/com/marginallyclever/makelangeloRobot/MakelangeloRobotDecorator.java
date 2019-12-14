@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * MakelangeloRobotDecorator adds features to DrawPanel. An example is the Draw panel shows
@@ -12,5 +11,5 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.1.4
  */
 public abstract interface MakelangeloRobotDecorator {
-	void render(GL2 gl2, MakelangeloRobotSettings machine);
+	void render(GL2 gl2);
 }

@@ -6,7 +6,6 @@ import java.io.Writer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Generators create gcode from user input.  Fractals might be one example.
@@ -40,5 +39,5 @@ public abstract class ImageGenerator extends ImageManipulator implements Makelan
 	 * live preview as the system is generating.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2, MakelangeloRobotSettings settings) {}
+	public void render(GL2 gl2) {}
 }

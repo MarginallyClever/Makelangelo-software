@@ -10,7 +10,6 @@ import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Converts a BufferedImage to gcode
@@ -74,7 +73,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
+	public void render(GL2 gl2) {
 		if(texture==null ) {
 			if( sourceImage!=null) {
 				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);

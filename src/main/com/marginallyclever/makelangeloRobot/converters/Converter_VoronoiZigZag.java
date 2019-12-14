@@ -14,7 +14,6 @@ import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
@@ -108,8 +107,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
-	public void render(GL2 gl2, MakelangeloRobotSettings settings) {
-		super.render(gl2, settings);
+	public void render(GL2 gl2) {
+		super.render(gl2);
 
 		while(lock.isLocked());
 		lock.lock();
