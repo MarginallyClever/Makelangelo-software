@@ -78,9 +78,6 @@ public class Converter_Pulse extends ImageConverter {
 		float x, y, z, scale_z, pulse_size, i = 0;
 		double n = 1;
 		
-
-		boolean lifted=true;
-		
 		if (direction == 0) {
 			// horizontal
 			for (y = yBottom; y < yTop; y += stepSize) {
