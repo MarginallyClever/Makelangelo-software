@@ -635,8 +635,13 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
+		<key>RateDeg</key>
+		<value>deg/s</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
 		<key>RateAccel</key>
-		<value>mm/s/s</value>
+		<value>mm/s²</value>
 		<hint>manual driving dialog</hint>
 	</string>
 

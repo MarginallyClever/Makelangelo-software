@@ -140,7 +140,7 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		p.add(penZRate, d);
 		d.gridx = 2;
 		d.gridy = y;
-		p.add(new JLabel(Translator.get("Rate")), d);
+		p.add(new JLabel(Translator.get("RateDeg")), d);
 		++y;
 
 		c.gridwidth = 2;
