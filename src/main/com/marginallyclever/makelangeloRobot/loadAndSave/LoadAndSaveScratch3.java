@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.json.simple.JSONArray;
@@ -35,7 +35,10 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * LoadAndSaveSB3 loads limited set of Scratch commands into memory. 
- * @author Admin
+ * 
+ * We ignore monitors, which are visual displays of variables, booleans, and lists.  They don't contain any real information we need.
+ * 
+ * @author Dan Royer
  *
  */
 public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSaveFileType {
@@ -52,6 +55,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			value=_val;
 		}
 	};
+	
 	private class ScratchList {
 		public String name;
 		public ArrayList<Double> contents;
@@ -74,6 +78,9 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
+	private JSONObject blocks;
+	private Set<?> blockKeys;
+
 	//private int indent=0;
 	private boolean penUp=false;
 	
@@ -167,7 +174,11 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
     			imageStart(out);
     			
     			if(confirmAtLeastVersion3(tree)==false) {
-    				// TODO add popup dialog warning
+    				JOptionPane.showMessageDialog(null, "File must be at least version 3.0.0.");
+    				return false;
+    			}
+    			if(confirmHasPenExtension(tree)==false) {
+    				JOptionPane.showMessageDialog(null, "File must include pen extension.");
     				return false;
     			}
     			
@@ -214,24 +225,120 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
 			if( (boolean)targetN.get("isStage") == true ) continue;
-			JSONObject blocks = (JSONObject)targetN.get("blocks");
-
+			blocks = (JSONObject)targetN.get("blocks");
+			// we found the blocks.
 			System.out.println("found  " +blocks.size() + " blocks");
+			// get the keys, too.
+			blockKeys = blocks.keySet();
+			// find the first block, which should be the only toplevel block.
+			for( Object k : blockKeys ) {
+				JSONObject block = (JSONObject)blocks.get(k);
+				boolean topLevel = (boolean)block.get("topLevel");
+				String opcode = (String)block.get("opcode");
+				if(topLevel && opcode.equals("event_whenflagclicked")) {
+					// found!
+					System.out.println("**START**");
+					parseScratchCode(out,k);
+					System.out.println("**END**");
+				}
+			}
 		}
-		/*
-		// extract known elements and convert them to gcode.
-		ListIterator<?> scriptIter = scripts.listIterator();
-		// find the script with the green flag
-		while( scriptIter.hasNext() ) {
-			JSONArray scripts0 = (JSONArray)scriptIter.next();
-			if( scripts0==null ) continue;
-			//System.out.println("scripts0");
-			JSONArray scripts02 = (JSONArray)scripts0.get(2);
-			if( scripts02==null || scripts02.size()==0 ) continue;
-			//System.out.println("scripts02");
-			// actual code begins here.
-			parseScratchCode(scripts02,out);
-		}*/
+		
+		//parseScratchCode(out,blocks,null,null);
+	}
+	
+	
+	JSONObject findNextBlock(JSONObject previous) {
+		String key = (String)previous.get("next");
+		return (JSONObject)blocks.get(key);
+	}
+	
+	void parseScratchCode(Writer out,Object currentKey) throws Exception {
+		JSONObject currentBlock = (JSONObject)blocks.get(currentKey);
+		JSONObject inputs;
+		JSONArray substack, condition;
+		
+		while(currentBlock!=null) {
+			String opcode = (String)currentBlock.get("opcode");
+			if(opcode==null) throw new Exception("opcode null");
+			
+			switch(opcode) {
+			// START OF SCRIPT
+			case "event_whenflagclicked":
+				// gcode preamble
+				// reset the turtle object
+				turtle = new Turtle();
+				// make sure machine state is the default.
+				setAbsoluteMode(out);
+				break;
+				
+			// C BLOCKS START
+			case "control_repeat":
+				System.out.println("REPEAT");
+				inputs = (JSONObject)currentBlock.get("inputs");
+				condition =(JSONArray)inputs.get("TIMES");
+				substack = (JSONArray)inputs.get("SUBSTACK");
+				break;
+			case "control_repeat_until":
+				System.out.println("REPEAT UNTIL");
+				inputs = (JSONObject)currentBlock.get("inputs");
+				condition =(JSONArray)inputs.get("CONDITION");
+				substack = (JSONArray)inputs.get("SUBSTACK");
+				break;
+			case "control_forever":
+				System.out.println("FOREVER");
+				inputs = (JSONObject)currentBlock.get("inputs");
+				substack = (JSONArray)inputs.get("SUBSTACK");
+				break;
+			case "control_if":
+				System.out.println("IF");
+				inputs = (JSONObject)currentBlock.get("inputs");
+				condition =(JSONArray)inputs.get("CONDITION");
+				substack = (JSONArray)inputs.get("SUBSTACK");
+				break;
+			case "control_if_else":
+				System.out.println("IF");
+				inputs = (JSONObject)currentBlock.get("inputs");
+				condition =(JSONArray)inputs.get("CONDITION");
+				substack = (JSONArray)inputs.get("SUBSTACK");
+				substack = (JSONArray)inputs.get("SUBSTACK2");
+				System.out.println("IF ELSE");
+				break;
+			// C BLOCKS END
+			
+			case "control_stop":
+				throw new Exception("control_stop not supported.");
+/*
+			case "data_variable":			break;
+			case "data_setvariableto":		break;
+			case "data_changevariableby":	break;
+			case "data_hidevariable":		break;
+			case "data_showvariable":		break;
+			case "data_listcontents":		break;
+			case "data_addtolist":			break;
+			case "data_deleteoflist":		break;
+			case "data_deletealloflist":	break;
+			case "data_insertatlist":		break;
+			case "data_replaceitemoflist":	break;
+			case "data_itemoflist":			break;
+			case "data_itemnumoflist":		break;
+			case "data_lengthoflist":		break;
+			case "data_listcontainsitem":	break;
+*/
+			case "motion_gotoxy":
+				break;
+			case "pen_penDown":
+				turtle.penDown();
+				break;
+			case "pen_penUp":
+				turtle.penUp();
+				break;
+			default:
+				System.out.println("Ignored "+opcode);
+			}
+			
+			currentBlock = findNextBlock(currentBlock);
+		}
 	}
 
 	/**
@@ -249,6 +356,13 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		return ( semver.compareTo("3.0.0") <= 0 ); 
 	}
 	
+	private boolean confirmHasPenExtension(JSONObject tree) throws Exception {
+		JSONArray extensions = (JSONArray)tree.get("extensions");
+		if(extensions==null) return false;
+		
+		return extensions.contains("pen");
+	}
+	
 	/**
 	 * read the list of Scratch variables
 	 * @param tree the JSONObject tree read from the project.json/zip file.
@@ -263,13 +377,14 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			if( (boolean)targetN.get("isStage") == false ) continue;
 			
 			JSONObject variables = (JSONObject)targetN.get("variables");
-			Iterator<String> keys = variables.keySet().iterator();
+			Iterator<?> keys = variables.keySet().iterator();
 			while(keys.hasNext()) {
-				String k=keys.next();
+				String k=(String)keys.next();
 				JSONArray details = (JSONArray)variables.get(k);
 				String name = (String)details.get(0);
 				Number value = (Number)details.get(1);
 				try {
+					System.out.println("Variable "+name+" "+k+" "+value.floatValue());
 					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
 				} catch (Exception e) {
 					throw new Exception("Variables must be numbers.");
@@ -292,41 +407,45 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			JSONObject targetN = (JSONObject)targetIter.next();
 			if( (boolean)targetN.get("isStage") == false ) continue;
 			JSONObject listOfLists = (JSONObject)targetN.get("lists");
-		}
-		/*
-		if(listOfLists == null) return;
-		ListIterator<JSONObject> listIter = listOfLists.listIterator();
-		while( listIter.hasNext() ) {
-			//System.out.println("var:"+elem.toString());
-			JSONObject elem = listIter.next();
-			String listName = (String)elem.get("name");
-			Object contents = (Object)elem.get("contents");
-			ScratchList list = new ScratchList(listName);
-			// fill the list with any given contents
-			if( contents != null && contents instanceof JSONArray ) {
-				JSONArray arr = (JSONArray)contents;
+			if(listOfLists == null) return;
+			Set<?> keys = listOfLists.keySet();
+			Iterator<?> keyIter = keys.iterator();
+			while( keyIter.hasNext() ) {
+				String key = (String)keyIter.next();
+				System.out.println("list key:"+key);
+				JSONArray elem = (JSONArray)listOfLists.get(key);
+				String listName = (String)elem.get(0);
+				System.out.println("  list name:"+listName);
+				Object contents = (Object)elem.get(1);
+				ScratchList list = new ScratchList(listName);
+				// fill the list with any given contents
+				if( contents != null && contents instanceof JSONArray ) {
+					JSONArray arr = (JSONArray)contents;
 
-				ListIterator<Object> scriptIter = arr.listIterator();
-				while(scriptIter.hasNext()) {
-					Object varValue = scriptIter.next();
-					float value;
-					if(varValue instanceof Number) {
-						Number num = (Number)varValue;
-						value = (float)num.doubleValue();
-						list.contents.add(value);
-					} else if(varValue instanceof String) {
-						try {
-							value = Float.parseFloat((String)varValue);
+					ListIterator<?> scriptIter = arr.listIterator();
+					while(scriptIter.hasNext()) {
+						Object varValue = scriptIter.next();
+						double value;
+						if(varValue instanceof Number) {
+							Number num = (Number)varValue;
+							value = (float)num.doubleValue();
+							System.out.println("  list float:"+value);
 							list.contents.add(value);
-						} catch (Exception e) {
-							throw new Exception("List variables must be numbers.");
-						}
-					} else throw new Exception("List variable "+listName+"("+list.contents.size()+") is "+varValue.toString());
+						} else if(varValue instanceof String) {
+							try {
+								value = Double.parseDouble((String)varValue);
+								System.out.println("  list string:"+value);
+								list.contents.add(value);
+							} catch (Exception e) {
+								throw new Exception("List variables must be numbers.");
+							}
+						} else throw new Exception("List variable "+listName+"("+list.contents.size()+") is "+varValue.toString());
+					}
 				}
+				// add the list to the list-of-lists.
+				scratchLists.add(list);		
 			}
-			// add the list to the list-of-lists.
-			scratchLists.add(list);
-		}*/
+		}
 	}
 	
 	private int getListID(Object obj) throws Exception {
