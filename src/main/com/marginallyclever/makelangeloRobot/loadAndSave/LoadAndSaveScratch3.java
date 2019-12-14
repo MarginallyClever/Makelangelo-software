@@ -185,6 +185,26 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
     			readScratchVariables(tree);
     			readScratchLists(tree);
     			readScratchInstructions(tree, out);
+
+    			// read the sketch(es)
+    			JSONArray children = (JSONArray)tree.get("children");
+    			if(children==null) throw new Exception("JSON node 'children' missing.");
+    			//System.out.println("found children");
+    			
+    			// look for the first child with a script
+
+    			ListIterator<?> childIter = children.listIterator();
+				JSONArray scripts = null;
+				while( childIter.hasNext() ) {
+    				JSONObject child = (JSONObject)childIter.next();
+    				scripts = (JSONArray)child.get("scripts");
+    				if (scripts != null)
+    					break;
+				}
+    			
+    			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+
+    			System.out.println("found  " +scripts.size() + " scripts");
     			
     			imageEnd(out);
     			

@@ -58,14 +58,22 @@ public class Converter_Sandy extends ImageConverter {
 		yTop    = (float)machine.getLimitTop();
 		xLeft   = (float)machine.getLimitLeft();
 		xRight  = (float)machine.getLimitRight();
-		
+
+		float pBottom, pTop, pLeft, pRight;
+
+		pBottom = ((float) machine.getPaperBottom() + (float) 1.0) * (float) machine.getPaperMargin();
+		pTop = ((float) machine.getPaperTop() - (float) 1.0) * (float) machine.getPaperMargin();
+		pLeft = ((float) machine.getPaperLeft() + (float) 1.0) * (float) machine.getPaperMargin();
+		pRight = ((float) machine.getPaperRight() - (float) 1.0) * (float) machine.getPaperMargin();
+
 		double cx,cy;
+		double last_x=0,last_y=0;
 
 		switch(direction) {
-		case 0:		cx = xRight;	cy = yTop;		break;
-		case 1:		cx = xLeft;		cy = yTop;		break;
-		case 2:		cx = xLeft;		cy = yBottom;	break;
-		case 3:		cx = xRight;	cy = yBottom;	break;
+		case 0:		cx = xRight;	cy = yTop;		last_x = pRight; last_y = pTop;		break;
+		case 1:		cx = xLeft;		cy = yTop;		last_x = pLeft; last_y = pTop;		break;
+		case 2:		cx = xLeft;		cy = yBottom;	last_x = pLeft; last_y = pBottom;	break;
+		case 3:		cx = xRight;	cy = yBottom;	last_x = pRight; last_y = pBottom;	break;
 		default:	cx = 0;			cy = 0;			break;
 		}
 
@@ -81,8 +89,7 @@ public class Converter_Sandy extends ImageConverter {
 		double t_dir=1;
 		double pulseFlip=1;
 		double x2,y2,t,t_step;
-		double last_x=0,last_y=0;
-		boolean wasDrawing=false;
+		boolean wasDrawing=true;
 		double flipSum;
 		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
 
