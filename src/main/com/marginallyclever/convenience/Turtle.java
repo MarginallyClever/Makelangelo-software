@@ -26,6 +26,7 @@ public class Turtle {
 		turtleX=x;
 		turtleY=y;
 	}
+	
 	public void setX(double arg0) {		turtleX = arg0;	}
 	public void setY(double arg0) {		turtleY = arg0;	}
 	public double getX() {		return turtleX;	}
@@ -38,10 +39,10 @@ public class Turtle {
 		isUp=false;
 	}
 	public void penUp() {
-		isUp=true;
+		raisePen();
 	}
 	public void penDown() {
-		isUp=false;
+		lowerPen();
 	}
 	public boolean isUp() {
 		return isUp;
@@ -65,10 +66,8 @@ public class Turtle {
 	}
 
 	public void move(double stepSize) {
-		//turtle_x += turtle_dx * distance;
-		//turtle_y += turtle_dy * distance;
-		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		turtleX += (turtleDx * (double)stepSize );
-		turtleY += (turtleDy * (double)stepSize );
+		moveTo(
+			turtleDx * (double)stepSize,
+			turtleDy * (double)stepSize );
 	}
 }
