@@ -68,7 +68,7 @@ public final class Makelangelo
 	 */
 	public String VERSION;
 	
-	private final String FORUM_URL = "https://www.marginallyclever.com/forums/";
+	private final String FORUM_URL = "https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/";
 
 	// only used on first run.
 	private static int DEFAULT_WINDOW_WIDTH = 1200;
