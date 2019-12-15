@@ -7,6 +7,7 @@ import java.io.Writer;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -156,33 +157,18 @@ public abstract class ImageManipulator {
 	 * @param penUp
 	 * @throws IOException
 	 */
-	protected boolean clipLine(double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) {
+	protected boolean clipLineToPaperMargin(Point2D P0,Point2D P1) {
 		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
 		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
 		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
 		yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
 		
-		ClippingPoint P0 = new ClippingPoint(oldX,oldY);
-		ClippingPoint P1 = new ClippingPoint(x,y);
-
-		if(oldPenUp==false) {
-			if(CohenSutherland2DClipper(P0, P1)) {
-				// some of the line is inside
-				if(isInside) {
-					// entering the rectangle
-					turtle.moveTo(P0.x,P0.y);
-				} else {
-					// leaving the rectangle
-					turtle.moveTo(P1.x,P1.y);
-				}
-				return true;
-			}
-		}
-		return false;
+		return CohenSutherland2DClipper(P0, P1);
 	}
 
 	
-	boolean CohenSutherland2DClipper(ClippingPoint P0,ClippingPoint P1) {
+	// line/box clipping
+	boolean CohenSutherland2DClipper(Point2D P0,Point2D P1) {
 		int outCode0,outCode1; 
 		while(true) {
 			outCode0 = outCodes(P0);
@@ -216,15 +202,15 @@ public abstract class ImageManipulator {
 		} 
 	} 
 	
-	private int outCodes(ClippingPoint P) {
-		int Code = 0;
-		if(P.y > yTop) Code += 1; /* code for above */ 
-		else if(P.y < yBottom) Code += 2; /* code for below */
+	private int outCodes(Point2D P) {
+		int code = 0;
+		if(P.y > yTop) code += 1; /* code for above */ 
+		else if(P.y < yBottom) code += 2; /* code for below */
 
-		if(P.x > xRight) Code += 4; /* code for right */
-		else if(P.x < xLeft) Code += 8; /* code for left */
+		if(P.x > xRight) code += 4; /* code for right */
+		else if(P.x < xLeft) code += 8; /* code for left */
 		
-		return Code;
+		return code;
 	}
 	
 	
