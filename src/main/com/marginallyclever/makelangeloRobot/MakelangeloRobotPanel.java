@@ -1037,10 +1037,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 						machine.writePenUp(out);
 						isUp=true;
 					}
-					machine.writeMoveTo(out,m.x, m.y,isUp);
 					break;
 				case DRAW:
-					if(isUp) { 
+					if(isUp) {
+						machine.writeMoveTo(out,m.x, m.y,isUp); 
 						machine.writePenDown(out);
 						isUp=false;
 					}

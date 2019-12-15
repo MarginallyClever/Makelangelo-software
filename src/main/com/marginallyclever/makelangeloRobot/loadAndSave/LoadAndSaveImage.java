@@ -386,10 +386,10 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 									machine.writePenUp(out);
 									isUp=true;
 								}
-								machine.writeMoveTo(out,m.x, m.y,isUp);
 								break;
 							case DRAW:
 								if(isUp) { 
+									machine.writeMoveTo(out,m.x, m.y,isUp);
 									machine.writePenDown(out);
 									isUp=false;
 								}
