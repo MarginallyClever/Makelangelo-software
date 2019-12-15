@@ -45,6 +45,12 @@ public class Turtle {
 		penUp();
 		history = new ArrayList<Movement>();
 	}
+
+	public void jumpTo(double x,double y) {
+		penUp();
+		moveTo(x,y);
+		penDown();
+	}
 	
 	public void moveTo(double x,double y) {
 		turtleX=x;
@@ -52,17 +58,30 @@ public class Turtle {
 		history.add(new Movement(x,y,isUp ? MoveType.TRAVEL:MoveType.DRAW));
 	}
 	
-	public void setX(double arg0) {		turtleX = arg0;	}
-	public void setY(double arg0) {		turtleY = arg0;	}
-	public double getX() {		return turtleX;	}
-	public double getY() {		return turtleY;	}
+	public void setX(double arg0) {
+		moveTo(arg0,turtleY);
+	}
+	
+	public void setY(double arg0) {
+		moveTo(turtleX,arg0);
+	}
+	
+	public double getX() {
+		return turtleX;
+	}
+	
+	public double getY() {
+		return turtleY;
+	}
 	
 	public void penUp() {
 		isUp=true;
 	}
+	
 	public void penDown() {
 		isUp=false;
 	}
+	
 	public boolean isUp() {
 		return isUp;
 	}
@@ -80,13 +99,15 @@ public class Turtle {
 	 */
 	public void setAngle(double degrees) {
 		angle=degrees;
-		turtleDx = (double)Math.cos(Math.toRadians(angle));
-		turtleDy = (double)Math.sin(Math.toRadians(angle));
+		double radians=Math.toRadians(angle);
+		turtleDx = Math.cos(radians);
+		turtleDy = Math.sin(radians);
 	}
 
 	public void forward(double stepSize) {
 		moveTo(
-			turtleDx * (double)stepSize,
-			turtleDy * (double)stepSize );
+			turtleX + turtleDx * stepSize,
+			turtleY + turtleDy * stepSize
+		);
 	}
 }

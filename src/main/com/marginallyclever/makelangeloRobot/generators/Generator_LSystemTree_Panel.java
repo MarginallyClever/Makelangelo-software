@@ -27,8 +27,8 @@ public class Generator_LSystemTree_Panel extends ImageGeneratorPanel implements 
 
 		field_order = new SelectInteger(generator.getOrder());
 		field_branches = new SelectInteger(generator.getBranches());
-		field_orderScale = new SelectFloat(generator.getScale());
-		field_angle = new SelectFloat(generator.getAngle());
+		field_orderScale = new SelectFloat((float)generator.getScale());
+		field_angle = new SelectFloat((float)generator.getAngle());
 
 		setLayout(new GridLayout(0, 1));
 		add(new JLabel(Translator.get("HilbertCurveOrder")));
@@ -65,8 +65,8 @@ public class Generator_LSystemTree_Panel extends ImageGeneratorPanel implements 
 	public void validate() {
 		generator.setOrder(((Number)field_order.getValue()).intValue());
 		generator.setBranches(((Number)field_branches.getValue()).intValue());
-		generator.setScale(((Number)field_orderScale.getValue()).intValue());
-		generator.setAngle(((Number)field_angle.getValue()).intValue());
+		generator.setScale(((Number)field_orderScale.getValue()).doubleValue());
+		generator.setAngle(((Number)field_angle.getValue()).doubleValue());
 		makelangeloRobotPanel.regenerate(generator);
 	}
 }
