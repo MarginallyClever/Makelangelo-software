@@ -14,8 +14,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 public interface LoadAndSaveFileType {
 	/**
-	 * Just what it sounds like.
-	 * @return
+	 * @return returns a FileNameExtensionFilter with the extensions supported by this filter.
 	 */
 	public FileNameExtensionFilter getFileNameFilter();
 
