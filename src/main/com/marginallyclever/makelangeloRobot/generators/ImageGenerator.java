@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
@@ -24,7 +21,7 @@ public abstract class ImageGenerator extends ImageManipulator implements Makelan
 	 * @return true if generate succeeded.
 	 * @param dest the file where the results will be saved.
 	 */
-	public boolean generate(Writer out) throws IOException {
+	public boolean generate() {
 		return false;
 	}
 	
