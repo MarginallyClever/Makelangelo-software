@@ -10,8 +10,9 @@ import java.util.ArrayList;
  */
 public class Turtle {
 	public enum MoveType {
-		TRAVEL,  // move without drawing 
-		DRAW;  // move while drawing
+		TRAVEL,  // move without drawing
+		DRAW,  // move while drawing
+		TOOL_CHANGE;
 	}
 	
 	public class Movement {
@@ -23,6 +24,10 @@ public class Turtle {
 			y=y0;
 			type=type0;
 		}
+		
+		public ColorRGB getColor() {
+			return new ColorRGB((int)x);
+		}
 	};
 	
 	public ArrayList<Movement> history;
@@ -32,6 +37,7 @@ public class Turtle {
 	private double turtleDx, turtleDy;
 	private double angle;
 	private boolean isUp;
+	private ColorRGB color;
 
 	
 	public Turtle() {
@@ -41,11 +47,17 @@ public class Turtle {
 	public void reset() {
 		turtleX = 0;
 		turtleY = 0;
+		color = new ColorRGB(0,0,0);
 		setAngle(0);
 		penUp();
 		history = new ArrayList<Movement>();
 	}
 
+	public void setColor(ColorRGB c) {
+		color.set(c);
+		history.add(new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE));
+	}
+	
 	public void jumpTo(double x,double y) {
 		penUp();
 		moveTo(x,y);
