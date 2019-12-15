@@ -1,6 +1,10 @@
 com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage
 com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveDXF
 com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode
+
 com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveScratch2
-com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveScratch3
+
+#Scratch3 not supported yet.
+#com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveScratch3
+
 com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveSVG
