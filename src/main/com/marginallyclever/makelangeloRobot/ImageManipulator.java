@@ -19,7 +19,7 @@ public abstract class ImageManipulator {
 	public static final float MARGIN_EPSILON = 0.01f;
 	
 	// pen position optimizing
-	private Turtle turtle = new Turtle();
+	public Turtle turtle = new Turtle();
 	
 	// threading
 	protected ProgressMonitor pm;
@@ -66,8 +66,6 @@ public abstract class ImageManipulator {
 		machine.writeProgramStart(out);
 		machine.writeChangeToDefaultColor(out);
 		setAbsoluteMode(out);
-		turtle.moveTo(machine.getHomeX(),machine.getHomeY());
-		turtle.penDown();
 		liftPen(out);
 	}
 
@@ -86,23 +84,14 @@ public abstract class ImageManipulator {
 
 
 	protected void liftPen(Writer out) throws IOException {
-		if(turtle.isUp()) return;
-		turtle.penUp();
 		machine.writePenUp(out);
 	}
 
 
 	protected void lowerPen(Writer out) throws IOException {
-		if(!turtle.isUp()) return;
-		turtle.penDown();
-		machine.writeMoveTo(out, turtle.getX(),turtle.getY(),true);
 		machine.writePenDown(out);
 	}
 	
-	public boolean isPenUp() {
-		return turtle.isUp();
-	}
-
 	protected void setAbsoluteMode(Writer out) throws IOException {
 		machine.writeAbsoluteMode(out);
 	}
@@ -136,10 +125,9 @@ public abstract class ImageManipulator {
 	 * @throws IOException on write failure
 	 */
 	protected void moveTo(Writer out, double x, double y) throws IOException {
-		turtle.moveTo(x,y);
-		if(isInsidePaperMargins(x,y) && !turtle.isUp()) {
+		//if(isInsidePaperMargins(x,y)) {
 			machine.writeMoveTo(out, x, y, false);
-		}
+		//}
 	}
 
 
