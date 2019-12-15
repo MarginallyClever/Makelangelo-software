@@ -5,6 +5,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
@@ -114,53 +115,31 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * @param out the destination for the gcode generated in the conversion process.
 	 */
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img) {
-		double b;
-		double dx=x1-x0;
-		double dy=y1-y0;
-		double halfStep = stepSize/2.0;
-		double r2 = Math.sqrt(dx*dx+dy*dy);
-		double steps = r2 / stepSize;
-		if(steps<1) steps=1;
-
-		double n,x,y,v;
-
-		boolean wasInside = isInsidePaperMargins(x0, y0);
-		boolean isInside;
-		boolean penUp,oldPenUp;
-		double oldX=x0,oldY=y0;
-		if(wasInside) {
-			v = img.sample( x0 - halfStep, y0 - halfStep, x0 + halfStep, y0 + halfStep);
-			oldPenUp = (v>=channelCutoff);
-		} else {
-			oldPenUp = false;
+		Point2D P0 = new Point2D(x0,y0);
+		Point2D P1 = new Point2D(x1,y1);
+		if(!clipLineToPaperMargin(P0, P1)) {
+			// entire line clipped
+			return;
 		}
 		
-		for (b = 0; b <= steps; ++b) {
-			n = b / steps;
-			x = dx * n + x0;
-			y = dy * n + y0;
-			isInside=isInsidePaperMargins(x, y);
-			if(isInside) {
-				v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-			} else {
-				v = 255;
-			}
-			penUp = (v<channelCutoff);
-			if(isInside!=wasInside) {
-				clipLine(oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
-			}
-			if(penUp!=oldPenUp) {
-				if (penUp) turtle.penUp();
-				else turtle.penDown();
-				turtle.moveTo(x,y);
-			}
-			if( wasInside && !isInside ) break;  // done
-			wasInside=isInside;
-			oldX=x;
-			oldY=y;
-			oldPenUp=penUp;
+		double b;
+		double dx=P1.x-P0.x;
+		double dy=P1.y-P0.y;
+		double halfStep = stepSize/2.0;
+		double distance = Math.sqrt(dx*dx+dy*dy);
+
+		double n,x,y,v;
+		
+		for( b = 0; b <= distance; b+=stepSize ) {
+			n = b / distance;
+			x = dx * n + P0.x;
+			y = dy * n + P0.y;
+			
+			v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+			if(v<channelCutoff) turtle.penDown();
+			else turtle.penUp();
+			turtle.moveTo(x,y);
 		}
-		turtle.penUp();
 	}
 	
 
@@ -183,20 +162,17 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		double dx=x1-x0;
 		double dy=y1-y0;
 		double halfStep = stepSize/2.0;
-		double r2 = Math.sqrt(dx*dx+dy*dy);
-		double steps = r2 / stepSize;
-		if(steps<1) steps=1;
-		if(steps>error0.length) steps=error0.length-1;
+		double distance = Math.sqrt(dx*dx+dy*dy);
 
 		double n,x,y,oldPixel,newPixel;
 
 		boolean wasInside = false;
 		boolean isInside;
-		boolean penUp,oldPenUp=true;
-		double oldX=x0,oldY=y0;
+		boolean penUp;
+		int steps=0;
 
-		for (b = 0; b <= steps; ++b) {
-			n = b / steps;
+		for (b = 0; b <= distance; b+=stepSize) {
+			n = b / distance;
 			x = dx * n + x0;
 			y = dy * n + y0;
 			isInside=isInsidePaperMargins(x, y);
@@ -215,18 +191,13 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			} else {
 				penUp=true;
 			}
-			if(isInside!=wasInside) {
-				clipLine(oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
-			}
 			if(penUp) turtle.penUp();
 			else turtle.penDown();
 			turtle.moveTo(x,y);
+			steps++;
 			
 			if( wasInside && !isInside ) break;  // done
 			wasInside=isInside;
-			oldX=x;
-			oldY=y;
-			oldPenUp=penUp;
 		}
 		turtle.penUp();
 	}
