@@ -39,10 +39,12 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
 import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.RPiCamera;
@@ -1012,42 +1014,52 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		// do the work
 		chosenGenerator.generate();
-
+		
 		try {
-			// where to save temp output file?
 			File tempFile = File.createTempFile("gcode", ".ngc");
 			tempFile.deleteOnExit();
+			
 			OutputStream fileOutputStream = new FileOutputStream(tempFile);
 			Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
 			
-			
-			chosenGenerator.imageStart(out);
-
-			boolean isUp=true;
+			MakelangeloRobotSettings machine = robot.getSettings();
 			Turtle t=chosenGenerator.turtle;
-			
+
+			machine.writeProgramStart(out);
+			machine.writeChangeToDefaultColor(out);
+			machine.writeAbsoluteMode(out);
+			machine.writePenUp(out);
+			boolean isUp=true;
 			for(Turtle.Movement m : t.history ) {
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {
-						chosenGenerator.liftPen(out);
+						machine.writePenUp(out);
 						isUp=true;
 					}
+					machine.writeMoveTo(out,m.x, m.y,isUp);
 					break;
 				case DRAW:
 					if(isUp) { 
-						chosenGenerator.lowerPen(out);
+						machine.writePenDown(out);
 						isUp=false;
 					}
+					machine.writeMoveTo(out,m.x, m.y,isUp);
+					break;
+				case TOOL_CHANGE:
+					machine.writeChangeTo(out, m.getColor());
 					break;
 				}
-				
-				chosenGenerator.moveTo(out, m.x, m.y);
 			}
-			
-			
-			chosenGenerator.imageEnd(out);
-		    
+			if (robot.getSettings().shouldSignName()) {
+				// Sign name
+				Generator_Text ymh = new Generator_Text();
+				ymh.setRobot(robot);
+				ymh.signName();
+			}
+			if(!isUp) machine.writePenUp(out);
+			machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
+			machine.writeProgramEnd(out);
 			
 			out.flush();
 			out.close();
@@ -1055,6 +1067,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			LoadAndSaveGCode loader = new LoadAndSaveGCode();
 			InputStream fileInputStream = new FileInputStream(tempFile);
 			loader.load(fileInputStream,robot);
+			
+			tempFile.delete();
 		} catch(IOException e) {
 			e.printStackTrace();
 			return;

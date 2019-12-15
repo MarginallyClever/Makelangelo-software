@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.LinkedList;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -44,22 +42,18 @@ public class Converter_Wander extends ImageConverter {
 	public ImageConverterPanel getPanel() {
 		return new Converter_Wander_Panel(this);
 	}
-	
-	public void finish(Writer out) throws IOException {
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(out);
 
+	@Override
+	public void finish() {
 		if(isCMYK) {
-			finishCMYK(out);
+			finishCMYK();
 		} else {
-			finishBlackAndWhite(out);
+			finishBlackAndWhite();
 		}
-
-		imageEnd(out);
 	}
 
-	protected int outputChannel(Writer out,TransformedImage img,Color newColor,int numberOfLines,double cutoff) throws IOException {
-		machine.writeChangeTo(out,newColor);
+	protected int outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
+		turtle.setColor(newColor);
 
 		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
@@ -69,10 +63,10 @@ public class Converter_Wander extends ImageConverter {
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop()   ;
+		double xLeft   = machine.getMarginLeft()  ;
+		double xRight  = machine.getMarginRight() ;
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;
@@ -156,43 +150,37 @@ public class Converter_Wander extends ImageConverter {
 		
 		// draw the sorted list of points.
 		Log.info("Drawing points...");
-		liftPen(out);
-		machine.writeChangeTo(out, newColor);
-		boolean isFirst=true;
-
+		turtle.reset();
+		
 		for(int j=0;j<buckets.size();++j) {
 			Bucket b = buckets.get(j);
 			while(!b.sortedPoints.isEmpty()) {
 				a = b.sortedPoints.pop();
-				moveTo(out,a.getX(),a.getY(),isFirst);
-				isFirst=false;
+				turtle.moveTo(a.getX(),a.getY());
+				turtle.penDown();
 			}
 		}
 		
 		return actualPoints;
 	}
 	
-	protected void finishCMYK(Writer out) throws IOException {
+	protected void finishCMYK() {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.info("Yellow...");
-		outputChannel(out,cmyk.getY(),new Color(255,255,  0),numLines/4,255.0*3.0/4.0);
-		Log.info("Cyan...");
-		outputChannel(out,cmyk.getC(),new Color(  0,255,255),numLines/4,128.0);
-		Log.info("Magenta...");
-		outputChannel(out,cmyk.getM(),new Color(255,  0,255),numLines/4,128.0);
-		Log.info("Black...");
-		outputChannel(out,cmyk.getK(),new Color(  0,  0,  0),numLines/4,128.0);
+		Log.info("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
+		Log.info("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
+		Log.info("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
+		Log.info("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
 		Log.info("Finishing...");
 	}
 	
-	protected void finishBlackAndWhite(Writer out) throws IOException {
+	protected void finishBlackAndWhite() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 		
-		outputChannel(out,img,new Color(0,0,0),numLines,255.0/4.0);
+		outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0);
 	}
 	
 

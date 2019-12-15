@@ -1,9 +1,6 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -43,12 +40,11 @@ public class Converter_Boxes extends ImageConverter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
-	public void finish(Writer out) throws IOException {
+	@Override
+	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-
-		imageStart(out);
 
 		double yBottom = machine.getMarginBottom();
 		double yTop    = machine.getMarginTop();
@@ -64,6 +60,8 @@ public class Converter_Boxes extends ImageConverter {
 		double steps = pw / fullStep;
 		if (steps < 1) steps = 1;
 
+		turtle.reset();
+		
 		// from top to bottom of the image...
 		double x, y, z;
 		int i = 0;
@@ -83,19 +81,17 @@ public class Converter_Boxes extends ImageConverter {
 						double ymin = y + halfStep - pulseSize;
 						double ymax = y + halfStep + pulseSize;
 						// Draw a square.  the diameter is relative to the intensity.
-						moveTo(out, xmin, ymin, true);
-						lowerPen(out);
-						moveTo(out, xmax, ymin, false);
-						moveTo(out, xmax, ymax, false);
-						moveTo(out, xmin, ymax, false);
-						moveTo(out, xmin, ymin, false);
+						turtle.jumpTo(xmin, ymin);
+						turtle.moveTo(xmax, ymin);
+						turtle.moveTo(xmax, ymax);
+						turtle.moveTo(xmin, ymax);
+						turtle.moveTo(xmin, ymin);
 						// fill in the square
 						boolean flip = false;
 						for(double yy=ymin;yy<ymax;yy+=d) {
-							moveTo(out,flip?xmin:xmax,yy,false);
+							turtle.moveTo(flip?xmin:xmax,yy);
 							flip = !flip;
 						}
-						liftPen(out);
 					}
 				}
 			} else {
@@ -112,25 +108,21 @@ public class Converter_Boxes extends ImageConverter {
 						double ymin = y + halfStep - pulseSize;
 						double ymax = y + halfStep + pulseSize;
 						// draw a square.  the diameter is relative to the intensity.
-						moveTo(out, xmin, ymin, true);
-						lowerPen(out);
-						moveTo(out, xmax, ymin, false);
-						moveTo(out, xmax, ymax, false);
-						moveTo(out, xmin, ymax, false);
-						moveTo(out, xmin, ymin, false);
+						turtle.jumpTo(xmin, ymin);
+						turtle.moveTo(xmax, ymin);
+						turtle.moveTo(xmax, ymax);
+						turtle.moveTo(xmin, ymax);
+						turtle.moveTo(xmin, ymin);
 						// fill in the square
 						boolean flip = false;
 						for(double yy=ymin;yy<ymax;yy+=d) {
-							moveTo(out,flip?xmin:xmax,yy,false);
+							turtle.moveTo(flip?xmin:xmax,yy);
 							flip = !flip;
 						}
-						liftPen(out);
 					}
 				}
 			}
 		}
-
-		imageEnd(out);
 	}
 }
 

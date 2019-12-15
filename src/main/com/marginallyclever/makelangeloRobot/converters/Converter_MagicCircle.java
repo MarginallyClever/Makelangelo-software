@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -42,25 +40,22 @@ public class Converter_MagicCircle extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public void finish(Writer out) throws IOException {
+	public void finish() {
+		// black and white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		TransformedImage img = bw.filter(sourceImage);
+		
 		int numLines = numberOfPoints * numberOfPoints / 2;
 		LineIntensity [] intensities = new LineIntensity[numLines*2];
 		double [] px = new double[numberOfPoints];
 		double [] py = new double[numberOfPoints];
 		
-		// black and white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
-
-		imageStart(out);
-
 		double toolDiameter = machine.getPenDiameter();
 
 		// find the largest circle that still fits in the image.
-		double w = (double)machine.getPaperWidth()/2.0f;
-		double h = (double)machine.getPaperHeight()/2.0f;
+		double w = machine.getMarginWidth()/2.0f;
+		double h = machine.getMarginHeight()/2.0f;
 		double maxr = ( h < w ? h : w );
-		maxr *= machine.getPaperMargin() * 10.0f;
 
 		
 		int i,j,k;
@@ -100,20 +95,17 @@ public class Converter_MagicCircle extends ImageConverter {
 		Arrays.sort(intensities, new IntensityComparator());
 
 		// draw darkest lines first.
+		turtle.reset();
+		
 		for(k=0;k<numberToDraw;++k) {
 			i = intensities[k].i;
 			j = intensities[k].j;
 			System.out.println(intensities[k].intensity);
 			assert(intensities[k].intensity<255);
-			moveTo(out,px[i],py[i],true);
-			moveTo(out,px[i],py[i],false);
-			//lowerPen(out);
-			moveTo(out,px[j],py[j],false);
-			moveTo(out,px[j],py[j],true);
-			//liftPen(out);
+			turtle.jumpTo(px[i], py[i]);
+			turtle.moveTo(px[j],py[j]);
 		}
-
-		imageEnd(out);
+		turtle.penUp();
 	}
 }
 

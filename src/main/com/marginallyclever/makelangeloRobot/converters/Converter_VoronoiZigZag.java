@@ -2,8 +2,6 @@ package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,10 +63,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = machine.getPaperBottom() * machine.getPaperMargin();
-		yTop    = machine.getPaperTop()    * machine.getPaperMargin();
-		xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
-		xRight  = machine.getPaperRight()  * machine.getPaperMargin();
+		yBottom = machine.getMarginBottom();
+		yTop    = machine.getMarginTop();
+		xLeft   = machine.getMarginLeft();
+		xRight  = machine.getMarginRight();
 		
 		keepIterating=true;
 		restart();
@@ -100,10 +98,11 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		}
 		return keepIterating;
 	}
-	
-	public void finish(Writer out) throws IOException {
+
+	@Override
+	public void finish() {
 		keepIterating=false;
-		writeOutCells(out);
+		writeOutCells();
 	}
 
 	@Override
@@ -405,16 +404,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	// write cell centroids to gcode.
-	protected void writeOutCells(Writer out) throws IOException {
+	protected void writeOutCells() {
+		turtle.reset();
+		
 		if (graphEdges != null) {
-			Log.info("Writing gcode.");
-			
-			imageStart(out);
-
 			// find the tsp point closest to the calibration point
 			int i;
 			int besti = -1;
-			double bestw = 1000000;
+			double bestw = Float.MAX_VALUE;
 			double x, y, w;
 			for (i = 0; i < solutionContains; ++i) {
 				x = cells[solution[i]].centroid.getX();
@@ -431,11 +428,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				int v = (besti + i) % solutionContains;
 				x = cells[solution[v]].centroid.getX();
 				y = cells[solution[v]].centroid.getY();
-
-				this.moveTo(out, x, y, false);
+				turtle.moveTo(x, y);
 			}
-
-			imageEnd(out);
 		}
 	}
 

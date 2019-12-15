@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -15,7 +12,6 @@ import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
  * @author Dan
  */
 public class Converter_Crosshatch extends ImageConverter {
-	private double xStart, yStart, xEnd, yEnd;
 	private static float intensity=2.0f;
 	
 	@Override
@@ -42,17 +38,11 @@ public class Converter_Crosshatch extends ImageConverter {
 	 * @param img
 	 *            the image to convert.
 	 */
-	public void finish(Writer out) throws IOException {
+	@Override
+	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		imageStart(out);
-		liftPen(out);
-		convertPaperSpace(img, out);
-		imageEnd(out);
-	}
-
-	protected void convertPaperSpace(TransformedImage img, Writer out) throws IOException {
 		double leveladd = 255.0 / 6.0;
 		double level = leveladd;
 
@@ -60,10 +50,10 @@ public class Converter_Crosshatch extends ImageConverter {
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		yStart = machine.getMarginBottom();
-		yEnd   = machine.getMarginTop();
-		xStart = machine.getMarginLeft();
-		xEnd   = machine.getMarginRight();
+		double yStart = machine.getMarginBottom();
+		double yEnd   = machine.getMarginTop();
+		double xStart = machine.getMarginLeft();
+		double xEnd   = machine.getMarginRight();
 
 		double stepSize = machine.getPenDiameter() * intensity;
 		double x, y;
@@ -81,11 +71,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		// vertical
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if (flip) {
-				if(!useError) convertAlongLine(xStart, y, xEnd, y, stepSize, level,img, out);
-				else convertAlongLineErrorTerms(xStart, y, xEnd, y, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(xStart, y, xEnd, y, stepSize, level,img);
+				else convertAlongLineErrorTerms(xStart, y, xEnd, y, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(xEnd, y, xStart, y, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(xEnd, y, xStart, y, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(xEnd, y, xStart, y, stepSize, level, img);
+				else convertAlongLineErrorTerms(xEnd, y, xStart, y, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -102,11 +92,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		// horizontal
 		for (x = xStart; x <= xEnd; x += stepSize) {
 			if (flip) {
-				if(!useError) convertAlongLine(x, yStart, x, yEnd, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x, yStart, x, yEnd, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x, yStart, x, yEnd, stepSize, level, img);
+				else convertAlongLineErrorTerms(x, yStart, x, yEnd, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x, yEnd, x, yStart, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x, yEnd, x, yStart, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x, yEnd, x, yStart, stepSize, level, img);
+				else convertAlongLineErrorTerms(x, yEnd, x, yStart, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -150,11 +140,11 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img);
+				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img);
+				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -186,11 +176,11 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img);
+				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img, out);
-				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img, out);
+				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img);
+				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];

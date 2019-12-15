@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -22,14 +19,11 @@ public class Converter_RandomLines extends ImageConverter {
 		return new Converter_RandomLines_Panel(this);
 	}
 	
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(out);
 
 		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
@@ -46,8 +40,8 @@ public class Converter_RandomLines extends ImageConverter {
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 
-		liftPen(out);
-		moveTo(out,0,yTop,true);
+		turtle.reset();
+		turtle.moveTo(0, yTop);
 
 		double startPX = 0; 
 		double startPY = yTop;
@@ -58,13 +52,11 @@ public class Converter_RandomLines extends ImageConverter {
 			double endPX = xLeft   + (Math.random() * dx)+0.5; 
 			double endPY = yBottom + (Math.random() * dy)+0.5; 
 
-			convertAlongLine(startPX,startPY,endPX,endPY,stepSize,level,img,out);
+			convertAlongLine(startPX,startPY,endPX,endPY,stepSize,level,img);
 			
 			startPX = endPX;
 			startPY = endPY;
 		}
-
-		imageEnd(out);
 	}
 	
 

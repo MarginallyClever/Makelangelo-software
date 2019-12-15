@@ -1,6 +1,6 @@
 package com.marginallyclever.gcode;
 
-import java.awt.Color;
+import com.marginallyclever.convenience.ColorRGB;
 
 /*
  * GCodeNodes are used to optimize the graphics rendering pipeline.
@@ -12,7 +12,7 @@ public class GCodeNode {
 	public double x2;
 	public double y2;
 	public double z2;
-	public Color color;
+	public ColorRGB color;
 	public int lineNumber;
 	public GCodeNodeType type;
 
@@ -22,7 +22,7 @@ public class GCodeNode {
 	
 	public GCodeNode() {}
 	
-	public GCodeNode(int lineNumber, GCodeNodeType type, double x1, double y1, double x2, double y2, Color color) {
+	public GCodeNode(int lineNumber, GCodeNodeType type, double x1, double y1, double x2, double y2, ColorRGB color) {
 		this.lineNumber = lineNumber;
 		this.x1 = x1;
 		this.y1 = y1;

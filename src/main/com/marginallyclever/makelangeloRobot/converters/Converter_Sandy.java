@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -36,19 +32,10 @@ public class Converter_Sandy extends ImageConverter {
 	/**
 	 * @param img the image to convert.
 	 */
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		imageStart(out);
-
-		convertPaperSpace(img,out);
-
-		imageEnd(out);
-	}
-
-
-	private void convertPaperSpace(TransformedImage img,Writer out) throws IOException {
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
@@ -69,12 +56,14 @@ public class Converter_Sandy extends ImageConverter {
 		double cx,cy;
 		double last_x=0,last_y=0;
 
+		boolean wasDrawing=false;
+		
 		switch(direction) {
-		case 0:		cx = xRight;	cy = yTop;		last_x = pRight; last_y = pTop;		break;
-		case 1:		cx = xLeft;		cy = yTop;		last_x = pLeft; last_y = pTop;		break;
-		case 2:		cx = xLeft;		cy = yBottom;	last_x = pLeft; last_y = pBottom;	break;
-		case 3:		cx = xRight;	cy = yBottom;	last_x = pRight; last_y = pBottom;	break;
-		default:	cx = 0;			cy = 0;			break;
+		case 0:		cx = xRight;	cy = yTop;		last_x = pRight; 	last_y = pTop;		break;
+		case 1:		cx = xLeft;		cy = yTop;		last_x = pLeft; 	last_y = pTop;		break;
+		case 2:		cx = xLeft;		cy = yBottom;	last_x = pLeft; 	last_y = pBottom;	break;
+		case 3:		cx = xRight;	cy = yBottom;	last_x = pRight; 	last_y = pBottom;	break;
+		default:	cx = 0;			cy = 0;			last_x = 0;      	last_y = 0;			break;
 		}
 
 		double x, y, z, scaleZ;
@@ -88,12 +77,11 @@ public class Converter_Sandy extends ImageConverter {
 		double r;
 		double t_dir=1;
 		double pulseFlip=1;
-		double x2,y2,t,t_step;
-		boolean wasDrawing=true;
+		double t,t_step;
 		double flipSum;
 		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
 
-		this.liftPen(out);
+		turtle.reset();
 		
 		// make concentric circles that get bigger and bigger.
 		for(r=rMin;r<rMax;r+=rStep) {
@@ -109,7 +97,7 @@ public class Converter_Sandy extends ImageConverter {
 				y = cy + dy * r;
 				if(!isInsidePaperMargins(x,y)) {
 					if(wasDrawing) {
-						moveTo(out,last_x,last_y,true);
+						turtle.jumpTo(last_x,last_y);
 						wasDrawing=false;
 					}
 					continue;
@@ -125,24 +113,19 @@ public class Converter_Sandy extends ImageConverter {
 				scaleZ = (255.0 -  z) / 255.0;
 
 				if(wasDrawing == false) {
-					moveTo(out,last_x,last_y,true);
+					turtle.jumpTo(last_x,last_y);
 					wasDrawing=true;
 				}
 
+				turtle.moveTo(	x + dx * pulseSize*pulseFlip,
+								y + dy * pulseSize*pulseFlip);
+				
 				flipSum+=scaleZ;
 				if(flipSum >= 1) {
 					flipSum-=1;
-					x2 = x + dx * pulseSize*pulseFlip;
-					y2 = y + dy * pulseSize*pulseFlip;
-					moveTo(out,x2,y2,false);
 					pulseFlip = -pulseFlip;
-					x2 = x + dx * pulseSize*pulseFlip;
-					y2 = y + dy * pulseSize*pulseFlip;
-					moveTo(out,x2,y2,false);
-				} else {
-					x2 = x + dx * pulseSize*pulseFlip;
-					y2 = y + dy * pulseSize*pulseFlip;
-					moveTo(out,x2,y2,false);
+					turtle.moveTo(	x + dx * pulseSize*pulseFlip,
+									y + dy * pulseSize*pulseFlip);
 				}
 			}
 			t_dir=-t_dir;

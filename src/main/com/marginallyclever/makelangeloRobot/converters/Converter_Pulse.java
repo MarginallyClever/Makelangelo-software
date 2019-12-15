@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -49,20 +45,10 @@ public class Converter_Pulse extends ImageConverter {
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-
-		imageStart(out);
 		
-		convertPaperSpace(img, out);
-
-		imageEnd(out);
-	}
-
-
-	private void convertPaperSpace(TransformedImage img, Writer out) throws IOException {
-		double PULSE_MINIMUM = 0.5;
 
 		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
 		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
@@ -78,6 +64,8 @@ public class Converter_Pulse extends ImageConverter {
 		float x, y, z, scale_z, pulse_size, i = 0;
 		double n = 1;
 		
+		turtle.reset();
+		
 		if (direction == 0) {
 			// horizontal
 			for (y = yBottom; y < yTop; y += stepSize) {
@@ -85,7 +73,7 @@ public class Converter_Pulse extends ImageConverter {
 
 				if ((i % 2) == 0) {
 					// every even line move left to right
-					moveTo(out, xLeft, y + halfStep, true);
+					turtle.jumpTo(xLeft, y + halfStep);
 
 					for (x = xLeft; x < xRight; x += zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -96,14 +84,13 @@ public class Converter_Pulse extends ImageConverter {
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
+						turtle.moveTo( x, (y + halfStep + pulse_size * n));
 						n = -n;
 					}
-					moveTo(out, xRight, y + halfStep, true);
 				} else {
 					// every odd line move right to left
 					//moveTo(file,x,y,pen up?)]
-					moveTo(out, xRight, y + halfStep, true);
+					turtle.jumpTo(xRight, y + halfStep);
 
 					for (x = xRight; x >= xLeft; x -= zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -113,11 +100,9 @@ public class Converter_Pulse extends ImageConverter {
 						//scale_z *= scale_z;  // quadratic curve
 						assert (scale_z <= 1.0);
 						pulse_size = halfStep * scale_z;
-						moveTo(out, x, (y + halfStep + pulse_size * n), pulse_size < PULSE_MINIMUM);
+						turtle.moveTo(x, (y + halfStep + pulse_size * n));
 						n = -n;
 					}
-					
-					moveTo(out, xLeft, y + halfStep, true);
 				}
 			}
 		} else {
@@ -128,7 +113,7 @@ public class Converter_Pulse extends ImageConverter {
 				if ((i % 2) == 0) {
 					// every even line move top to bottom
 					//moveTo(file,x,y,pen up?)]
-					moveTo(out, x + halfStep, yBottom, true);
+					turtle.jumpTo(x + halfStep, yBottom);
 
 					for (y = yBottom; y < yTop; y += zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -137,14 +122,13 @@ public class Converter_Pulse extends ImageConverter {
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
+						turtle.moveTo((x + halfStep + pulse_size * n), y);
 						n = -n;
 					}
-					moveTo(out, x + halfStep, yTop, true);
 				} else {
 					// every odd line move bottom to top
 					//moveTo(file,x,y,pen up?)]
-					moveTo(out, x + halfStep, yTop, true);
+					turtle.jumpTo( x + halfStep, yTop);
 
 					for (y = yTop; y >= yBottom; y -= zigZagSpacing) {
 						// read a block of the image and find the average intensity in this block
@@ -153,10 +137,9 @@ public class Converter_Pulse extends ImageConverter {
 						scale_z = (255.0f - z) / 255.0f;
 						//scale_z *= scale_z;  // quadratic curve
 						pulse_size = halfStep * scale_z;
-						moveTo(out, (x + halfStep + pulse_size * n), y, pulse_size < PULSE_MINIMUM);
+						turtle.moveTo((x + halfStep + pulse_size * n), y);
 						n = -n;
 					}
-					moveTo(out, x + halfStep, yBottom, true);
 				}
 			}
 		}

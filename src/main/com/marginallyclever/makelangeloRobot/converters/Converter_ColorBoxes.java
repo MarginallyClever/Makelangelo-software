@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -118,12 +117,11 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 	
 
-	protected void scan(int tool_index, TransformedImage img, Writer out,String colorName,Color newPenColor) throws IOException {
+	protected void scan(int tool_index, TransformedImage img, Writer out,String colorName,ColorRGB newPenColor) throws IOException {
 		palette_mask = tool_index;
 
-		// TODO Find a way to swap color pens.
-		liftPen(out);
-		machine.writeChangeTo(out,newPenColor);
+		turtle.penUp();
+		turtle.setColor(newPenColor);
 
 		int y;
 
@@ -153,9 +151,6 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(out);
-
 		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin());
 
 		// figure out how many boxes we're going to have on this image.
@@ -170,15 +165,13 @@ public class Converter_ColorBoxes extends ImageConverter {
 		nexterror = new ColorRGB[(int) Math.ceil(stepsTotal)];
 
 		try {
-			scan(0, img, out,"Black",new Color(  0,  0,  0));  // black
-			scan(1, img, out,"Red"  ,new Color(255,  0,  0));  // red
-			scan(2, img, out,"Green",new Color(  0,255,  0));  // green
-			scan(3, img, out,"Blue" ,new Color(  0,  0,255));  // blue
+			scan(0, img, out,"Black",new ColorRGB(  0,  0,  0));  // black
+			scan(1, img, out,"Red"  ,new ColorRGB(255,  0,  0));  // red
+			scan(2, img, out,"Green",new ColorRGB(  0,255,  0));  // green
+			scan(3, img, out,"Blue" ,new ColorRGB(  0,  0,255));  // blue
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		imageEnd(out);
 
 		return true;
 	}

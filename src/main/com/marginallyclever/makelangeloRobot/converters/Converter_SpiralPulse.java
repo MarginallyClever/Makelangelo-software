@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -38,12 +34,10 @@ public class Converter_SpiralPulse extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-
-		imageStart(out);
 
 		double toolDiameter = machine.getPenDiameter();
 
@@ -75,6 +69,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		int z = 0;
 		float r2,scale_z,pulse_size,nx,ny;
 		
+		turtle.reset();
+		
 		while (r > toolDiameter) {
 			// find circumference of current circle
 			float circumference = (float) Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDensity;
@@ -97,16 +93,19 @@ public class Converter_SpiralPulse extends ImageConverter {
 					ny = (halfStep+pulse_size*n) * fy / r2;
 
 					if (!init) {
-						moveTo(out, fx+nx, fy+ny, true);
+						turtle.moveTo(fx+nx, fy+ny);
 						init = true;
 					}
-					moveTo(out, fx+nx, fy + ny, pulse_size < PULSE_MINIMUM);
+					if(pulse_size < PULSE_MINIMUM) turtle.penUp();
+					else turtle.penDown();
+					turtle.moveTo(fx+nx, fy + ny);
 					n = -n;
 				} else {
 					if (!init) {
 						init = true;
 					}
-					moveTo(out, fx, fy, true);
+					turtle.penUp();
+					turtle.moveTo(fx, fy);
 				}
 			}
 			n = -n;
@@ -115,8 +114,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 		}
 
 		Log.info("yellow", numRings + " rings.");
-
-		imageEnd(out);
 	}
 
 	public void setIntensity(float floatValue) {

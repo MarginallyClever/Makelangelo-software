@@ -83,12 +83,12 @@ public abstract class ImageManipulator {
 	}
 
 
-	protected void liftPen(Writer out) throws IOException {
+	public void liftPen(Writer out) throws IOException {
 		machine.writePenUp(out);
 	}
 
 
-	protected void lowerPen(Writer out) throws IOException {
+	public void lowerPen(Writer out) throws IOException {
 		machine.writePenDown(out);
 	}
 	
@@ -124,7 +124,7 @@ public abstract class ImageManipulator {
 	 * @param y new coordinate
 	 * @throws IOException on write failure
 	 */
-	protected void moveTo(Writer out, double x, double y) throws IOException {
+	public void moveTo(Writer out, double x, double y) throws IOException {
 		//if(isInsidePaperMargins(x,y)) {
 			machine.writeMoveTo(out, x, y, false);
 		//}
@@ -156,7 +156,7 @@ public abstract class ImageManipulator {
 	 * @param penUp
 	 * @throws IOException
 	 */
-	protected boolean clipLine(Writer out,double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) throws IOException {
+	protected boolean clipLine(double oldX,double oldY,double x,double y,boolean oldPenUp,boolean penUp,boolean wasInside,boolean isInside) {
 		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
 		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
 		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
@@ -170,10 +170,10 @@ public abstract class ImageManipulator {
 				// some of the line is inside
 				if(isInside) {
 					// entering the rectangle
-					machine.writeMoveTo(out,P0.x,P0.y,false);
+					turtle.moveTo(P0.x,P0.y);
 				} else {
 					// leaving the rectangle
-					machine.writeMoveTo(out,P1.x,P1.y,false);
+					turtle.moveTo(P1.x,P1.y);
 				}
 				return true;
 			}

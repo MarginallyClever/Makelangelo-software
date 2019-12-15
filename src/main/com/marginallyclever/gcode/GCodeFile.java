@@ -1,6 +1,5 @@
 package com.marginallyclever.gcode;
 
-import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -497,13 +497,13 @@ public class GCodeFile {
 	}
 
 	
-	private void addNodePos(int i, double x1, double y1, double x2, double y2, Color c) {
+	private void addNodePos(int i, double x1, double y1, double x2, double y2, ColorRGB c) {
 		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.POS,x1,y1,x2,y2,c);
 		fastNodes.add(n);
 	}
 
 	private void addNodeTool(int i, int tool_id) {
-		Color c = new Color(tool_id);
+		ColorRGB c = new ColorRGB(tool_id);
 		GCodeNode n = new GCodeNode(i,GCodeNode.GCodeNodeType.TOOL,0,0,0,0,c);
 		fastNodes.add(n);
 	}
@@ -521,9 +521,9 @@ public class GCodeFile {
 
 		MakelangeloRobotSettings machine = robot.getSettings();
 		boolean showPenUp = GFXPreferences.getShowPenUp();
-		Color penDownColor = machine.getPenDownColor();
-		Color penUpColor = machine.getPenUpColor();
-		Color currentColor = penUpColor;
+		ColorRGB penDownColor = machine.getPenDownColor();
+		ColorRGB penUpColor = machine.getPenUpColor();
+		ColorRGB currentColor = penUpColor;
 
 		float drawScale = 1f;
 		// arc smoothness - increase to make more smooth and run slower.
@@ -551,7 +551,7 @@ public class GCodeFile {
 				String numberOnly = pieces[0].substring(toolChangeCommand.length());//.replaceAll("[^0-9]", "");
 				int id = (int)Integer.valueOf(numberOnly, 10);
 				addNodeTool(i, id);
-				penDownColor = new Color(id);
+				penDownColor = new ColorRGB(id);
 				continue;
 			}
 

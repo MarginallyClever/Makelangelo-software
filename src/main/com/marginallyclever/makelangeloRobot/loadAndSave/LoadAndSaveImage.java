@@ -33,6 +33,7 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -337,6 +338,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	protected void createSwingWorker() {
 		//System.out.println("Starting swingWorker");
 
+		machine = chosenRobot.getSettings();
+		
 		chosenConverter.setProgressMonitor(pm);
 		chosenConverter.setRobot(chosenRobot);
 		chosenConverter.setImage(img);
@@ -347,69 +350,90 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			public Void doInBackground() {
 				chosenConverter.setSwingWorker(swingWorker);
 				
-				// where to save temp output file?
-				// FIXME going through temp files every time may be thrashing SSDs.
-				File tempFile;
-				try {
-					tempFile = File.createTempFile("gcode", ".ngc");
-				} catch (Exception e) {
-					e.printStackTrace();
-					return null;
-				}
-				tempFile.deleteOnExit();
-
-				// read in image
-				Log.info(Translator.get("Converting") + " " + tempFile.getName());
-				// convert with style
-
-				try (OutputStream fileOutputStream = new FileOutputStream(tempFile);
-					Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-
-					while(chosenConverter.iterate()) {
+				while(chosenConverter.iterate()) {
+					try {
 						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
+				}
+				pm.setProgress(100);
+				
+				chosenRobot.setDecorator(null);
+				if(pm!=null) pm.close();
+				
+				if(wasCancelled==false) {
+					chosenConverter.finish();
+
+					Turtle t=chosenConverter.turtle;
 					
-					if(wasCancelled==false) {
-						chosenConverter.finish(out);
-						
+					try {
+						File tempFile = File.createTempFile("gcode", ".ngc");
+						tempFile.deleteOnExit();
+						OutputStream fileOutputStream = new FileOutputStream(tempFile);
+						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+
+						machine.writeProgramStart(out);
+						machine.writeChangeToDefaultColor(out);
+						machine.writeAbsoluteMode(out);
+						machine.writePenUp(out);
+						boolean isUp=true;
+						for(Turtle.Movement m : t.history ) {
+							switch(m.type) {
+							case TRAVEL:
+								if(!isUp) {
+									machine.writePenUp(out);
+									isUp=true;
+								}
+								machine.writeMoveTo(out,m.x, m.y,isUp);
+								break;
+							case DRAW:
+								if(isUp) { 
+									machine.writePenDown(out);
+									isUp=false;
+								}
+								machine.writeMoveTo(out,m.x, m.y,isUp);
+								break;
+							case TOOL_CHANGE:
+								machine.writeChangeTo(out, m.getColor());
+								break;
+							}
+						}
 						if (chosenRobot.getSettings().shouldSignName()) {
 							// Sign name
 							Generator_Text ymh = new Generator_Text();
 							ymh.setRobot(chosenRobot);
 							ymh.signName();
 						}
-					}
-				} catch (Exception e) {
-					Log.error(Translator.get("Failed") + e.getLocalizedMessage());
-					chosenRobot.setDecorator(null);
-				}
+						if(!isUp) machine.writePenUp(out);
+						machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
+						machine.writeProgramEnd(out);
 
-				// out closed when scope of try() ended.
+						out.flush();
+						out.close();
 
-				if(wasCancelled==false) {
-					LoadAndSaveGCode loader = new LoadAndSaveGCode();
-					try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
+						LoadAndSaveGCode loader = new LoadAndSaveGCode();
+						final InputStream fileInputStream = new FileInputStream(tempFile);
 						loader.load(fileInputStream,chosenRobot);
-						MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
-						if(panel!=null) panel.updateButtonAccess();
-					} catch(IOException e) {
-						e.printStackTrace();
+						
+						tempFile.delete();
+					} catch (IOException e) {
+						Log.error(Translator.get("Failed") + e.getLocalizedMessage());
+						chosenRobot.setDecorator(null);
 					}
 				}
 				
-				chosenRobot.setDecorator(null);
-				
-				tempFile.delete();
 
-				pm.setProgress(100);
 				return null;
 			}
 
 			@Override
 			public void done() {
-				if(pm!=null) pm.close();
 				//System.out.println("swingWorker ended");
 				swingWorker=null;
+				MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
+				if(panel!=null) panel.updateButtonAccess();
 			}
 		};
 

@@ -1,11 +1,8 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_CMYK;
@@ -41,35 +38,24 @@ public class Converter_CMYK extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
-
-		// avoids changing to black and then back to yellow.
-		Color defaultColor = machine.getPenDownColorDefault();
-		Color yellow = new Color(255,255,  0);
-		machine.setPenDownColorDefault(yellow);
 		
-		imageStart(out);
-		
-		Log.info("Yellow...");		outputChannel(out,cmyk.getY(),0 ,new Color(255,255,  0));
-		Log.info("Cyan...");		outputChannel(out,cmyk.getC(),15,new Color(  0,255,255));
-		Log.info("Magenta...");		outputChannel(out,cmyk.getM(),75,new Color(255,  0,255));
-		Log.info("Black...");		outputChannel(out,cmyk.getK(),45,new Color(  0,  0,  0));
+		Log.info("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
+		Log.info("Cyan...");		outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
+		Log.info("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
+		Log.info("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
 		Log.info("Finishing...");
-
-		machine.setPenDownColorDefault(defaultColor);
-		imageEnd(out);
 	}
 	
-	protected void outputChannel(Writer out,TransformedImage img,float angle,Color newColor) throws IOException {
+	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
 		double [] channelCutoff = {0,153,51,102,204};
 		
-		liftPen(out);
-		machine.writeChangeTo(out,newColor);
+		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter()*passes;
@@ -84,6 +70,9 @@ public class Converter_CMYK extends ImageConverter {
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
 		
 		double px,py,x0,y0,x1,y1,a;
+		
+		boolean useError=false;
+		
 		int i=0;
 		for(a = -maxLen;a<maxLen;a+=stepSize) {
 			px = dx * a;
@@ -96,9 +85,11 @@ public class Converter_CMYK extends ImageConverter {
 
 			double cutoff=channelCutoff[i%channelCutoff.length];
 			if ((i % 2) == 0) {
-				convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,cutoff,error0,error1,img,out);
+				if(!useError) convertAlongLine(x0,y0,x1,y1,stepSize,cutoff,img);
+				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,cutoff,error0,error1,img);
 			} else {
-				convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,cutoff,error0,error1,img,out);
+				if(!useError) convertAlongLine(x1,y1,x0,y0,stepSize,cutoff,img);
+				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,cutoff,error0,error1,img);
 			}
 			
 			for(int j=0;j<error0.length;++j) {

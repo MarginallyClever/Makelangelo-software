@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -42,12 +38,10 @@ public class Converter_Spiral extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-
-		imageStart(out);
 
 		double toolDiameter = machine.getPenDiameter();
 
@@ -69,6 +63,8 @@ public class Converter_Spiral extends ImageConverter {
 			float h = (float)machine.getMarginHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
+		
+		turtle.reset();
 		
 		double r = maxr, f;
 		double fx, fy;
@@ -94,19 +90,16 @@ public class Converter_Spiral extends ImageConverter {
 						e.printStackTrace();
 					}
 					
-					if(z<level) {
-						lowerPen(out);
-					} else liftPen(out);
-				} else liftPen(out);
-				moveTo(out, fx, fy, isPenUp());
+					if(z<level) turtle.penDown();
+					else turtle.penUp();
+				} else turtle.penUp();
+				turtle.moveTo(fx, fy);
 			}
 			r -= toolDiameter;
 			++numRings;
 		}
 
 		Log.info("yellow", numRings + " rings.");
-
-		imageEnd(out);
 	}
 }
 

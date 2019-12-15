@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
@@ -74,7 +74,7 @@ public final class MakelangeloRobotSettings {
 	private String hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
-	private Color paperColor;
+	private ColorRGB paperColor;
 	
 	private int lookAheadSegments;
 
@@ -95,9 +95,9 @@ public final class MakelangeloRobotSettings {
 	 */
 	protected float zRate;
 	
-	protected Color penDownColorDefault;
-	protected Color penDownColor;
-	protected Color penUpColor;
+	protected ColorRGB penDownColorDefault;
+	protected ColorRGB penDownColor;
+	protected ColorRGB penUpColor;
 	// speed control
 	private float maxFeedRate;
 	private float currentFeedRate;
@@ -148,7 +148,7 @@ public final class MakelangeloRobotSettings {
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
-		paperColor = Color.WHITE;
+		paperColor = new ColorRGB(255,255,255);
 		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 		shouldSignName = false;
@@ -172,8 +172,8 @@ public final class MakelangeloRobotSettings {
 		zRate = Z_RATE;
 		zOn = Z_ANGLE_ON;
 		zOff = Z_ANGLE_OFF;
-		penDownColor = penDownColorDefault = Color.BLACK;
-		penUpColor = Color.BLUE;
+		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
+		penUpColor = new ColorRGB(0,255,0); // blue
 		reverseForGlass = false;
 		startingPositionIndex = 4;
 
@@ -512,7 +512,7 @@ public final class MakelangeloRobotSettings {
 		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
 		g = uniqueMachinePreferencesNode.getInt("paperColorG", paperColor.getGreen());
 		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
-		paperColor = new Color(r,g,b);
+		paperColor = new ColorRGB(r,g,b);
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
 		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
@@ -538,11 +538,11 @@ public final class MakelangeloRobotSettings {
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
-		penDownColor = penDownColorDefault = new Color(r,g,b);
+		penDownColor = penDownColorDefault = new ColorRGB(r,g,b);
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
-		penUpColor = new Color(r,g,b);
+		penUpColor = new ColorRGB(r,g,b);
 	}
 
 	protected void savePenConfig(Preferences prefs) {
@@ -723,35 +723,35 @@ public final class MakelangeloRobotSettings {
 		}
 	}
 	
-	public Color getPaperColor() {
+	public ColorRGB getPaperColor() {
 		return paperColor;
 	}
 	
-	public void setPaperColor(Color arg0) {
+	public void setPaperColor(ColorRGB arg0) {
 		paperColor = arg0;
 	}
 	
-	public Color getPenDownColorDefault() {
+	public ColorRGB getPenDownColorDefault() {
 		return penDownColorDefault;
 	}
 	
-	public Color getPenDownColor() {
+	public ColorRGB getPenDownColor() {
 		return penDownColor;
 	}
 	
-	public void setPenDownColorDefault(Color arg0) {
+	public void setPenDownColorDefault(ColorRGB arg0) {
 		penDownColorDefault=arg0;
 	}
 	
-	public void setPenDownColor(Color arg0) {
+	public void setPenDownColor(ColorRGB arg0) {
 		penDownColor=arg0;
 	}
 	
-	public void setPenUpColor(Color arg0) {
+	public void setPenUpColor(ColorRGB arg0) {
 		penUpColor=arg0;
 	}
 	
-	public Color getPenUpColor() {
+	public ColorRGB getPenUpColor() {
 		return penUpColor;
 	}
 
@@ -818,7 +818,7 @@ public final class MakelangeloRobotSettings {
 		return "G00 F" + df.format(getPenDownFeedRate()) + "\n";
 	}
 
-	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
+	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
 		if(penDownColor == newPenDownColor) return;
 		
 		penDownColor = newPenDownColor;
@@ -831,7 +831,7 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	protected void writeChangeToInternal(Writer out) throws IOException {
-		int toolNumber = penDownColor.getRGB() & 0xffffff;  // ignore alpha channel
+		int toolNumber = penDownColor.toInt() & 0xffffff;  // ignore alpha channel
 		out.write("M06 T" + toolNumber + "\n");
 		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
 
@@ -845,7 +845,7 @@ public final class MakelangeloRobotSettings {
 		case 0xff00ff: name="magenta";	break;
 		case 0xffff00: name="yellow";	break;
 		case 0xffffff: name="white";	break;
-		default: name= "0x"+Integer.toHexString(penDownColor.getRGB());  break;  // display unknown RGB value as hex
+		default: name= "0x"+Integer.toHexString(penDownColor.toInt());  break;  // display unknown RGB value as hex
 		}		
 		
 		writeChangeToShared(out,name);

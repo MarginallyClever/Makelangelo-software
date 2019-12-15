@@ -26,6 +26,7 @@ import javax.swing.border.LineBorder;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.gcode.GCodeFile;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Log;
@@ -760,7 +761,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
 		gl2.glEnd();
 
-		Color c = settings.getPaperColor();
+		ColorRGB c = settings.getPaperColor();
 		gl2.glColor3f(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());

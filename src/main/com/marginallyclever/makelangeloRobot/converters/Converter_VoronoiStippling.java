@@ -2,8 +2,6 @@ package com.marginallyclever.makelangeloRobot.converters;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -209,9 +207,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		lock.unlock();
 	}
 
-	public void finish(Writer out) throws IOException {
+	@Override
+	public void finish() {
 		keepIterating=false;
-		writeOutCells(out);
+		writeOutCells();
 	}
 
 	@Override
@@ -366,12 +365,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	/**
 	 * write cell centroids to gcode.
 	 * @param out where to write
-	 * @throws IOException
 	 */
-	protected void writeOutCells(Writer out) throws IOException {
-		Log.info("Writing gcode.");
-
-		imageStart(out);
+	protected void writeOutCells() {
+		turtle.reset();
 
 		float toolDiameter = machine.getPenDiameter();
 
@@ -398,22 +394,19 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					newY = y + r * Math.sin(v);
 					if(first) {
 						if(isInsidePaperMargins(newX,newY)) {
-							moveTo(out, newX, newY, true);
-							lowerPen(out);
+							turtle.jumpTo(newX, newY);
 							first=false;
 						}
 					} else {
-						moveTo(out, newX, newY, false);
+						turtle.moveTo(newX, newY);
 					}
 				}
 				r -= toolDiameter;
 			}
 			if(first==false) {
-				liftPen(out);
+				turtle.penUp();
 			}
 		}
-		
-		imageEnd(out);
 	}
 
 

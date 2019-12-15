@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -43,16 +39,13 @@ public class Converter_Multipass extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public void finish(Writer out) throws IOException {
+	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
-
-		// Set up the conversion from image space to paper space, select the current tool, etc.
-		imageStart(out);
 
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter();
@@ -63,16 +56,20 @@ public class Converter_Multipass extends ImageConverter {
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop();
+		double xLeft   = machine.getMarginLeft();
+		double xRight  = machine.getMarginRight();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
 
+		turtle.reset();
+		
+		boolean useError=false;
+		
 		int i=0;
 		for(double a = -maxLen;a<maxLen;a+=stepSize) {
 			double px = dx * a;
@@ -84,9 +81,11 @@ public class Converter_Multipass extends ImageConverter {
 		
 			double l2 = level * (1 + (i % passes));
 			if ((i % 2) == 0) {
-				convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img,out);
+				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
+				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
 			} else {
-				convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img,out);
+				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize, l2, img);
+				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -94,8 +93,6 @@ public class Converter_Multipass extends ImageConverter {
 			}
 			++i;
 		}
-
-		imageEnd(out);
 	}
 }
 

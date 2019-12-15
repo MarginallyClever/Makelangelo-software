@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
@@ -60,7 +57,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * for iterative solvers, the iteration is now done, write to disk.
 	 * @param out the Writer to receive the generated gcode.
 	 */
-	public void finish(Writer out) throws IOException {}
+	public void finish() {}
 	
 	/**
 	 * @return the gui panel with options for this manipulator
@@ -115,9 +112,8 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * @param channelCutoff only put pen down when color below this amount.
 	 * @param img the image to sample while converting along the line.
 	 * @param out the destination for the gcode generated in the conversion process.
-	 * @throws IOException
 	 */
-	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img,Writer out) throws IOException {
+	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img) {
 		double b;
 		double dx=x1-x0;
 		double dy=y1-y0;
@@ -138,8 +134,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		} else {
 			oldPenUp = false;
 		}
-
-		liftPen(out);
 		
 		for (b = 0; b <= steps; ++b) {
 			n = b / steps;
@@ -151,14 +145,14 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			} else {
 				v = 255;
 			}
-			penUp = (v>=channelCutoff);
+			penUp = (v<channelCutoff);
 			if(isInside!=wasInside) {
-				clipLine(out,oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
+				clipLine(oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
 			}
 			if(penUp!=oldPenUp) {
-				moveTo(out,x,y);
-				if (penUp) liftPen(out);
-				else lowerPen(out);
+				if (penUp) turtle.penUp();
+				else turtle.penDown();
+				turtle.moveTo(x,y);
 			}
 			if( wasInside && !isInside ) break;  // done
 			wasInside=isInside;
@@ -166,7 +160,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			oldY=y;
 			oldPenUp=penUp;
 		}
-		liftPen(out);
+		turtle.penUp();
 	}
 	
 
@@ -183,9 +177,8 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * @param channelCutoff only put pen down when color below this amount.
 	 * @param img the image to sample while converting along the line.
 	 * @param out the destination for the gcode generated in the conversion process.
-	 * @throws IOException
 	 */
-	protected void convertAlongLineErrorTerms(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,double [] error0,double [] error1,TransformedImage img,Writer out) throws IOException {
+	protected void convertAlongLineErrorTerms(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,double [] error0,double [] error1,TransformedImage img) {
 		double b;
 		double dx=x1-x0;
 		double dy=y1-y0;
@@ -223,9 +216,11 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 				penUp=true;
 			}
 			if(isInside!=wasInside) {
-				clipLine(out,oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
+				clipLine(oldX,oldY,x,y,oldPenUp,penUp,wasInside,isInside);
 			}
-			moveTo(out,x,y,penUp);
+			if(penUp) turtle.penUp();
+			else turtle.penDown();
+			turtle.moveTo(x,y);
 			
 			if( wasInside && !isInside ) break;  // done
 			wasInside=isInside;
@@ -233,6 +228,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			oldY=y;
 			oldPenUp=penUp;
 		}
-		liftPen(out);
+		turtle.penUp();
 	}
 }

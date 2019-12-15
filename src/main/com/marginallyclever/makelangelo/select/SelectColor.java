@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 
 public class SelectColor extends JPanel implements ActionListener {
@@ -26,7 +27,7 @@ public class SelectColor extends JPanel implements ActionListener {
 	private JButton chooseButton;
 	private JComponent parent;
 	
-	public SelectColor(JComponent parent,String labelValue,Color defaultValue) {
+	public SelectColor(JComponent parent,String labelValue,ColorRGB defaultValue) {
 		this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints labelConstraint = new GridBagConstraints();
@@ -62,7 +63,7 @@ public class SelectColor extends JPanel implements ActionListener {
 		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
 		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
 		fieldValue.setSize(fieldValue.getMinimumSize());
-		fieldValue.setBackground(defaultValue);
+		fieldValue.setBackground(new Color(defaultValue.toInt()));
 
 		fieldValue.setBorder(new LineBorder(Color.BLACK));
 		this.add(fieldValue, fieldConstraint);
@@ -78,7 +79,8 @@ public class SelectColor extends JPanel implements ActionListener {
 		fieldValue.setBackground(c);
 	}
 	
-	public Color getColor() {
-		return fieldValue.getBackground();
+	public ColorRGB getColor() {
+		Color c = fieldValue.getBackground();
+		return new ColorRGB(c.getRed(),c.getGreen(),c.getBlue());
 	}
 }
