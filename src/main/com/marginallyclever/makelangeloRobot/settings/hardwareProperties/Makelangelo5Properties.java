@@ -338,6 +338,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		Date date = new Date(System.currentTimeMillis());  
 		out.write("; Makelangelo 5\n");
 		out.write("; "+formatter.format(date)+"\n");
+		out.write("G28\n");  // force find home
 	}
 	
 	@Override
