@@ -1,13 +1,9 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_GosperCurve extends ImageGenerator {
-	private Turtle turtle;
 	private double turtleStep = 10.0f;
 	private double xMax = 0;
 	private double xMin = 0;
@@ -34,21 +30,22 @@ public class Generator_GosperCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-
+	public boolean generate() {
 		double v = Math.min((machine.getPaperWidth()  * machine.getPaperMargin()),
 				           (machine.getPaperHeight() * machine.getPaperMargin()));
 
 		turtle = new Turtle();
+		
 		turtleStep = 10;
-		turtle.setX(0);
-		turtle.setY(0);
+		
 		xMax = 0;
 		xMin = 0;
 		yMax = 0;
 		yMin = 0;
-		GosperA(null, order);
+		
+		gosperA(order);
+		
+		turtle.reset();
 
 		// scale the image to fit on the paper
 		double w = xMax-xMin;
@@ -75,73 +72,66 @@ public class Generator_GosperCurve extends ImageGenerator {
 		double y = (yMax+yMin)/-2;
 		
 		// move to starting position
-		turtle.setX(x);
-		turtle.setY(y);
-		liftPen(out);
-		moveTo(out, turtle.getX(), turtle.getY(), true);
-		lowerPen(out);
+		turtle.penUp();
+		turtle.moveTo(x,y);
+		turtle.penDown();
 		// do the curve
-		GosperA(out, order);
-		imageEnd(out);
+		gosperA(order);
 	    
 	    return true;
 	}
 
 
 	// Gosper curve A = A-B--B+A++AA+B-
-	private void GosperA(Writer output, int n) throws IOException {
+	private void gosperA(int n) {
 		if (n == 0) {
-			turtle_goForward(output);
+			gosperForward();
 			return;
 		}
-		GosperA(output,n-1);
+		gosperA(n-1);
 		turtle.turn(-60);
-		GosperB(output,n-1);
+		gosperB(n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		GosperB(output,n-1);
+		gosperB(n-1);
 		turtle.turn(60);
-		GosperA(output,n-1);
+		gosperA(n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		GosperA(output,n-1);
-		GosperA(output,n-1);
+		gosperA(n-1);
+		gosperA(n-1);
 		turtle.turn(60);
-		GosperB(output,n-1);
+		gosperB(n-1);
 		turtle.turn(-60);
 	}
 
 
 	// Gosper curve B = +A-BB--B-A++A+B
-	public void GosperB(Writer output, int n) throws IOException {
+	public void gosperB(int n) {
 		if (n == 0) {
-			turtle_goForward(output);
+			gosperForward();
 			return;
 		}
 		turtle.turn(60);
-		GosperA(output,n-1);
+		gosperA(n-1);
 		turtle.turn(-60);
-		GosperB(output,n-1);
-		GosperB(output,n-1);
+		gosperB(n-1);
+		gosperB(n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		GosperB(output,n-1);
+		gosperB(n-1);
 		turtle.turn(-60);
-		GosperA(output,n-1);
+		gosperA(n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		GosperA(output,n-1);
+		gosperA(n-1);
 		turtle.turn(60);
-		GosperB(output,n-1);
+		gosperB(n-1);
 	}
 
 
-	public void turtle_goForward(Writer output) throws IOException {
-		//turtle_x += turtle_dx * distance;
-		//turtle_y += turtle_dy * distance;
-		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		turtle.move(turtleStep);
-		if(output!=null) moveTo(output, turtle.getX(), turtle.getY(), false);
+	public void gosperForward() {
+		turtle.forward(turtleStep);
 		if(xMax<turtle.getX()) xMax=turtle.getX();
 		if(xMin>turtle.getX()) xMin=turtle.getX();
 		if(yMax<turtle.getY()) yMax=turtle.getY();

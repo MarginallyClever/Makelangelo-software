@@ -1,13 +1,9 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_KochCurve extends ImageGenerator {
-	private Turtle turtle;
 	private float xMax = 7;
 	private float xMin = -7;
 	private float yMax = 7;
@@ -35,9 +31,7 @@ public class Generator_KochCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-
+	public boolean generate() {
 		float v = Math.max((float)(machine.getPaperWidth() * machine.getPaperMargin()),
 						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
 		xMax = v;
@@ -51,51 +45,37 @@ public class Generator_KochCurve extends ImageGenerator {
 		float yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
 		
-		liftPen(out);
 		// move to starting position
 		if(machine.getPaperWidth() > machine.getPaperHeight()) {
-			turtle.setX(-xMax);
-			turtle.setY(0);
+			turtle.moveTo(-xMax,0);
 		} else {
-			turtle.setX(0);
-			turtle.setY(-yMax);
+			turtle.moveTo(0,-yMax);
 			turtle.turn(90);
 		}
-		moveTo(out, turtle.getX(), turtle.getY(), true);
-		lowerPen(out);
-		// do the curve
-		drawTriangle(out, order, maxSize);
-		imageEnd(out);
+		
+		turtle.penDown();
+		drawTriangle(order, maxSize);
 	    
 	    return true;
 	}
 
 
 	// L System tree
-	private void drawTriangle(Writer output, int n, float distance) throws IOException {
+	private void drawTriangle(int n, float distance) {
 		if (n == 0) {
-			turtleMove(output,distance);
+			turtle.forward(distance);
 			return;
 		}
-		drawTriangle(output,n-1,distance/3.0f);
+		drawTriangle(n-1,distance/3.0f);
 		if(n>1) {
 			turtle.turn(-60);
-			drawTriangle(output,n-1,distance/3.0f);
+			drawTriangle(n-1,distance/3.0f);
 			turtle.turn(120);
-			drawTriangle(output,n-1,distance/3.0f);
+			drawTriangle(n-1,distance/3.0f);
 			turtle.turn(-60);
 		} else {
-			turtleMove(output,distance/3.0f);
+			turtle.forward(distance/3.0f);
 		}
-		drawTriangle(output,n-1,distance/3.0f);
-	}
-
-
-	public void turtleMove(Writer output,float distance) throws IOException {
-		//turtle_x += turtle_dx * distance;
-		//turtle_y += turtle_dy * distance;
-		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		turtle.move(distance);
-		moveTo(output, turtle.getX(), turtle.getY(), false);
+		drawTriangle(n-1,distance/3.0f);
 	}
 }

@@ -613,7 +613,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.move(v);
+					turtle.forward(v);
 					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					System.out.println("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {

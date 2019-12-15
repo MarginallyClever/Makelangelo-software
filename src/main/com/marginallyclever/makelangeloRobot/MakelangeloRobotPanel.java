@@ -33,6 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -1009,35 +1010,57 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		robot.setDecorator(chosenGenerator);
 		chosenGenerator.setRobot(robot);
 		
-		// where to save temp output file?
-		File tempFile;
-		try {
-			tempFile = File.createTempFile("gcode", ".ngc");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		tempFile.deleteOnExit();
+		// do the work
+		chosenGenerator.generate();
 
 		try {
+			// where to save temp output file?
+			File tempFile = File.createTempFile("gcode", ".ngc");
+			tempFile.deleteOnExit();
 			OutputStream fileOutputStream = new FileOutputStream(tempFile);
 			Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-			chosenGenerator.generate(out);
+			
+			
+			chosenGenerator.imageStart(out);
+
+			boolean isUp=true;
+			Turtle t=chosenGenerator.turtle;
+			
+			for(Turtle.Movement m : t.history ) {
+				switch(m.type) {
+				case TRAVEL:
+					if(!isUp) {
+						chosenGenerator.liftPen(out);
+						isUp=true;
+					}
+					break;
+				case DRAW:
+					if(isUp) { 
+						chosenGenerator.lowerPen(out);
+						isUp=false;
+					}
+					break;
+				}
+				
+				chosenGenerator.moveTo(out, m.x, m.y);
+			}
+			
+			
+			chosenGenerator.imageEnd(out);
+		    
+			
 			out.flush();
 			out.close();
+
+			LoadAndSaveGCode loader = new LoadAndSaveGCode();
+			InputStream fileInputStream = new FileInputStream(tempFile);
+			loader.load(fileInputStream,robot);
 		} catch(IOException e) {
 			e.printStackTrace();
 			return;
 		}
 		
 		robot.setDecorator(null);
-
-		LoadAndSaveGCode loader = new LoadAndSaveGCode();
-		try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
-			loader.load(fileInputStream,robot);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
 
 		Log.info(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();

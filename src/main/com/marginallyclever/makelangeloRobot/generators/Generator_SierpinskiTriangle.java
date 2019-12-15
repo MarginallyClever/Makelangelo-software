@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -12,7 +9,6 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_SierpinskiTriangle extends ImageGenerator {
-	private Turtle turtle;
 	private float xMax, xMin, yMax, yMin;
 	private float maxSize;
 	private static int order = 4; // controls complexity of curve
@@ -37,9 +33,7 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-
+	public boolean generate() {
 		xMax = (float)(machine.getPaperWidth() * machine.getPaperMargin())/2.0f;
 		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin())/2.0f;
 		xMin = -xMax;
@@ -51,51 +45,37 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		float yy = yMax - yMin;
 		maxSize = (float)Math.tan(Math.toRadians(30))*(xx < yy ? xx : yy)*2;
 		float jj = (float)Math.asin(Math.toRadians(30))*(xx < yy ? xx : yy);
-		liftPen(out);
+
 		// move to starting position
 		if(xMax>yMax) {
-			turtle.setX(-jj);
-			turtle.setY(yMin);
+			turtle.moveTo(-jj,yMin);
 		} else {
-			turtle.setX(xMax);
-			turtle.setY(-jj);
+			turtle.moveTo(xMax,-jj);
 			turtle.turn(90);
 		}
-		moveTo(out, turtle.getX(), turtle.getY(), true);
-		lowerPen(out);
+		turtle.penDown();
 		// do the curve
 		if( (order&1) == 0 ) {
-			drawCurve(out, order, maxSize,-60);
+			drawCurve(order, maxSize,-60);
 		} else {
 			turtle.turn(60);
-			drawCurve(out, order, maxSize,-60);
+			drawCurve(order, maxSize,-60);
 		}
 
-		imageEnd(out);
-		
 		return true;
 	}
 
 
-	private void drawCurve(Writer output, int n, float distance,float angle) throws IOException {
+	private void drawCurve(int n, float distance,float angle) {
 		if (n == 0) {
-			turtleMove(output,distance);
+			turtle.forward(distance);
 			return;
 		}
 		
-		drawCurve(output,n-1,distance/2.0f,-angle);
+		drawCurve(n-1,distance/2.0f,-angle);
 		turtle.turn(angle);
-		drawCurve(output,n-1,distance/2.0f,angle);
+		drawCurve(n-1,distance/2.0f,angle);
 		turtle.turn(angle);
-		drawCurve(output,n-1,distance/2.0f,-angle);
-	}
-
-
-	public void turtleMove(Writer output,float distance) throws IOException {
-		//turtle_x += turtle_dx * distance;
-		//turtle_y += turtle_dy * distance;
-		//output.write(new String("G0 X"+(turtle_x)+" Y"+(turtle_y)+"\n").getBytes());
-		turtle.move(distance);
-		moveTo(output, turtle.getX(), turtle.getY(), false);
+		drawCurve(n-1,distance/2.0f,-angle);
 	}
 }

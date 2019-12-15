@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -74,17 +71,16 @@ public class Generator_Spirograph extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-
+	public boolean generate() {
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;
 		xMin = Float.POSITIVE_INFINITY;
 		yMin = Float.POSITIVE_INFINITY;
-		totalScale=1;
-
+		
 		// generate the spiral once to find the max/min
-		drawSpirograph(out, false);
+		totalScale=1;
+		turtle.reset();
+		drawSpirograph(false);
 
 		// scale the step size so the spirograph fits on the paper
 		float paperWidth = (float)(machine.getPaperWidth()  * machine.getPaperMargin());
@@ -115,14 +111,13 @@ public class Generator_Spirograph extends ImageGenerator {
 		totalScale =  largestX < largestY ? largestX : largestY;
 
 		// draw the spirograph for real this time
-		drawSpirograph(out, true);
-
-		imageEnd(out);
+		turtle.reset();
+		drawSpirograph(true);
 	    
 	    return true;
 	}
 	
-	protected void drawSpirograph(Writer output,boolean write) throws IOException {
+	protected void drawSpirograph(boolean write) {
 		float x=0,y=0;
 		
 		float dRadius,pScale1,pScale2;
@@ -139,15 +134,12 @@ public class Generator_Spirograph extends ImageGenerator {
 		}
 		
 		float t = 0;
-		if(write) {
-			// move to starting position
-			x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
-			y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
 
-			liftPen(output);
-			moveTo(output, totalScale*x, totalScale*y, true);
-			lowerPen(output);
-		}
+		// move to starting position
+		x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
+		y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
+		turtle.moveTo(totalScale*x, totalScale*y);
+		turtle.penDown();
 
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
 		// https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
@@ -159,14 +151,12 @@ public class Generator_Spirograph extends ImageGenerator {
 			x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
 			y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
 
-			if(write) moveTo(output, totalScale*x, totalScale*y, false);
-			else {
-				// we are calculating max/min
-				if(xMin>x) xMin=x;
-				if(xMax<x) xMax=x;
-				if(yMin>y) yMin=y;
-				if(yMax<y) yMax=y;
-			}
+			turtle.moveTo(totalScale*x, totalScale*y);
+			// we are calculating max/min
+			if(xMin>x) xMin=x;
+			if(xMax<x) xMax=x;
+			if(yMin>y) yMin=y;
+			if(yMax<y) yMax=y;
 		}
 	}
 	
@@ -192,8 +182,7 @@ public class Generator_Spirograph extends ImageGenerator {
 	 * @param b
 	 * @return least common multiplier
 	 */
-	private static long lcm(long a, long b)
-	{
+	private static long lcm(long a, long b) {
 	    return a * (b / gcd(a, b));
 	}
 }

@@ -3,8 +3,6 @@
  */
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Maze extends ImageGenerator {
@@ -55,9 +53,7 @@ public class Generator_Maze extends ImageGenerator {
 	 * @throws IOException
 	 */
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-		
+	public boolean generate() {
 		// build the cells
 		cells = new MazeCell[rows * columns];
 
@@ -137,35 +133,31 @@ public class Generator_Maze extends ImageGenerator {
 		}
 
 		// draw the maze
-		drawMaze(out);
-		imageEnd(out);
+		drawMaze();
 	    
 	    return true;
 	}
 
-	private void drawMaze(Writer output) throws IOException {
-		yMin = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		yMax = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		xMin = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		xMax = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+	private void drawMaze() {
+		yMin = (float)machine.getMarginBottom();
+		yMax = (float)machine.getMarginTop();
+		xMin = (float)machine.getMarginLeft();
+		xMax = (float)machine.getMarginRight();
 		
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;
 
+		turtle.reset();
+		
 		// Draw outside edge
-		liftPen(output);
-		moveTo(output, xMin, yMax, true);
-		moveTo(output, xMin, yMax, false);
-		moveTo(output, xMax, yMax, false);
-		moveTo(output, xMax, yMin + h, false);
-		moveTo(output, xMax, yMin + h, true);
+		turtle.jumpTo(xMin, yMax);
+		turtle.moveTo(xMax, yMax);
+		turtle.moveTo(xMax, yMin + h);
 		// bottom right gap for exit is here
-		moveTo(output, xMax, yMin, true);
-		moveTo(output, xMax, yMin, false);
-		moveTo(output, xMin, yMin, false);
+		turtle.jumpTo(xMax, yMin);
+		turtle.moveTo(xMin, yMin);
 		// top-left gap for entrance is left here
-		moveTo(output, xMin, yMax - h, false);
-		moveTo(output, xMin, yMax - h, true);
+		turtle.moveTo(xMin, yMax - h);
 
 		int i;
 		for (i = 0; i < walls.length; ++i) {
@@ -182,20 +174,15 @@ public class Generator_Maze extends ImageGenerator {
 				float x = xMin + (ax + 1) * w;
 				float y0 = yMin + (ay + 0) * h;
 				float y1 = yMin + (ay + 1) * h;
-				
-				moveTo(output, x, y0, true);
-				moveTo(output, x, y0, false);
-				moveTo(output, x, y1, false);
-				moveTo(output, x, y1, true);
+				turtle.jumpTo(x, y0);
+				turtle.moveTo(x, y1);
 			} else if (ax == bx) {
 				// horizontal wall
 				float x0 = xMin + (ax + 0) * w;
 				float x1 = xMin + (ax + 1) * w;
 				float y = yMin + (ay + 1) * h;
-				moveTo(output, x0, y, true);
-				moveTo(output, x0, y, false);
-				moveTo(output, x1, y, false);
-				moveTo(output, x1, y, true);
+				turtle.jumpTo(x0, y);
+				turtle.moveTo(x1, y);
 			}
 		}
 	}

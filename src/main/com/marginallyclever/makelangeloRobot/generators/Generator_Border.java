@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
-import java.io.Writer;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -26,23 +25,22 @@ public class Generator_Border extends ImageGenerator {
 	 * @throws IOException
 	 */
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-
+	public boolean generate() {
 		float yMin = (float)machine.getMarginBottom();
 		float yMax = (float)machine.getMarginTop();
 		float xMin = (float)machine.getMarginLeft();
 		float xMax = (float)machine.getMarginRight();
 
-		moveTo(out,xMin,yMax,true);
-		moveTo(out,xMin,yMax,false);
-		moveTo(out,xMax,yMax,false);
-		moveTo(out,xMax,yMin,false);
-		moveTo(out,xMin,yMin,false);
-		moveTo(out,xMin,yMax,false);
+		turtle.reset();
+		turtle.penUp();
+		turtle.moveTo(xMin,yMax);
+		turtle.penDown();
+		turtle.moveTo(xMin,yMax);
+		turtle.moveTo(xMax,yMax);
+		turtle.moveTo(xMax,yMin);
+		turtle.moveTo(xMin,yMin);
+		turtle.moveTo(xMin,yMax);
 		
-		imageEnd(out);
-	    
 	    return true;
 	}
 }

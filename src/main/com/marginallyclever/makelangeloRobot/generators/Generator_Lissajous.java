@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -64,35 +61,33 @@ public class Generator_Lissajous extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate(Writer out) throws IOException {
-		imageStart(out);
-		
+	public boolean generate() {
 		// scale the step size so the curve fits on the paper
 		WIDTH = (machine.getPaperWidth()  * machine.getPaperMargin())/2.0;
 		HEIGHT = (machine.getPaperHeight() * machine.getPaperMargin())/2.0;
 
-		drawLissajous(out, true);
-		imageEnd(out);
+		drawLissajous(true);
 	    
 	    return true;
 	}
 	
 	// see https://www.openprocessing.org/sketch/26608/
 	// based on code by Javier Romero (http://www.fjromero.com/processing/lissajous/)
-	protected void drawLissajous(Writer output,boolean write) throws IOException {
-		double x,y, t1,t;
+	protected void drawLissajous(boolean write) {
+		double x,y,t;
 
 		//x = AX*sin(a*t + delta) + screen_width/2;
 		//y = BX*sin(b*t) + screen_height/2;
+		turtle.reset();
+		turtle.penUp();
 		
-		
-		for(t1=0; t1<=numSamples; ++t1) {
+		for(int t1=0; t1<=numSamples; ++t1) {
 			t = ( Math.PI*2.0 * t1 / (double)numSamples );
 			
 			x = WIDTH * Math.sin(a*t + delta*Math.PI);
 			y = HEIGHT * Math.sin(b*t);
-
-			moveTo(output, x, y, false);
+			turtle.moveTo(x, y);
+			turtle.penDown();
 		}
 	}
 }

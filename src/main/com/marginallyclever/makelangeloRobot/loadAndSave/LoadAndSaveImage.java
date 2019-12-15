@@ -376,7 +376,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 							// Sign name
 							Generator_Text ymh = new Generator_Text();
 							ymh.setRobot(chosenRobot);
-							ymh.signName(out);
+							ymh.signName();
 						}
 					}
 				} catch (Exception e) {

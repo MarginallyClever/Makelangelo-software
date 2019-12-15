@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -155,7 +154,7 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	
-	private void writeBeautifulMessage(String fontName,int fontSize, String message, Writer output) throws IOException {
+	private void writeBeautifulMessage(String fontName,int fontSize, String message) {
 		if(message.length()<=0) {
 			return;
 		}
@@ -184,15 +183,11 @@ public class Generator_Text extends ImageGenerator {
 		// display bounding box
 		float dx = xMax/2.0f;
 		float dy = -(yTotal+yFirstStep/2.0f)/2.0f;
-
-		machine.writeOff(output);
-		machine.writeMoveTo(output,-dx, dy);
-		machine.writeOn(output);
-		machine.writeMoveTo(output, dx, dy);
-		machine.writeMoveTo(output, dx,-dy);
-		machine.writeMoveTo(output,-dx,-dy);
-		machine.writeMoveTo(output,-dx, dy);
-		machine.writeOff(output);
+		turtle.jumpTo(-dx, dy);
+		turtle.moveTo( dx, dy);
+		turtle.moveTo( dx,-dy);
+		turtle.moveTo(-dx,-dy);
+		turtle.moveTo(-dx, dy);
 */
 		float dx = xMax / 2.0f;
 		float dy = -yTotal/2.0f+yFirstStep/2.0f;
@@ -204,13 +199,13 @@ public class Generator_Text extends ImageGenerator {
 			//Shape s = textLayout.getOutline(null);
 			//Rectangle bounds = s.getBounds();
 
-			writeBeautifulString(font,frc,piece,output, dx, dy);
+			writeBeautifulString(font,frc,piece, dx, dy);
 			
 			dy += fontSize;//bounds.getHeight();
 		}
 	}
 	
-	private void writeBeautifulString(Font font, FontRenderContext frc,String text, Writer output,float dx, float dy) throws IOException { 
+	private void writeBeautifulString(Font font, FontRenderContext frc,String text,float dx, float dy) { 
 		TextLayout textLayout = new TextLayout(text,font,frc);
 		Shape s = textLayout.getOutline(null);		
 		PathIterator pi = s.getPathIterator(null);
@@ -226,14 +221,14 @@ public class Generator_Text extends ImageGenerator {
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
 				//System.out.println("CLOSE");
-				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,false);
-				machine.writePenUp(output);
+				turtle.moveTo(start[0]-dx, -start[1]-dy);
+				turtle.penUp();
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
 				//System.out.println("LINE");
-				machine.writeMoveTo(output, coords[0]-dx, -coords[1]-dy,false);
+				turtle.moveTo(coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
@@ -242,8 +237,7 @@ public class Generator_Text extends ImageGenerator {
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
-				machine.writeMoveTo(output, start[0]-dx, -start[1]-dy,true);
-				machine.writePenDown(output);
+				turtle.jumpTo(start[0]-dx, -start[1]-dy);
 				break;
 			case PathIterator.SEG_CUBICTO:
 				//P(t) = B(3,0)*CP + B(3,1)*P1 + B(3,2)*P2 + B(3,3)*P3
@@ -267,9 +261,9 @@ public class Generator_Text extends ImageGenerator {
 					float d = t*t*t;
 					float x = coords2[0]*a + coords[0]*b + coords[2]*c + coords[4]*d;
 					float y = coords2[1]*a + coords[1]*b + coords[3]*c + coords[5]*d;
-					machine.writeMoveTo(output, x-dx,-y-dy,false);
+					turtle.moveTo(x-dx,-y-dy);
 				}
-				machine.writeMoveTo(output, coords[4]-dx,-coords[5]-dy,false);
+				turtle.moveTo(coords[4]-dx,-coords[5]-dy);
 				coords2[0] = coords[4];
 				coords2[1] = coords[5];
 				break;
@@ -284,9 +278,9 @@ public class Generator_Text extends ImageGenerator {
 					float tttt=t*t;
 					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
 					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					machine.writeMoveTo(output, x-dx,-y-dy,false);
+					turtle.moveTo(x-dx,-y-dy);
 				}
-				machine.writeMoveTo(output, coords[2]-dx,-coords[3]-dy,false);
+				turtle.moveTo(coords[2]-dx,-coords[3]-dy);
 				coords2[0] = coords[2];
 				coords2[1] = coords[3];
 				break;
@@ -296,19 +290,17 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate(Writer out) throws IOException {
+	public boolean generate() {
 		String fontName = fontNames[lastFont];
 
-		imageStart(out);
-
+		turtle.reset();
 		posx=0;
 		posy=0;
 		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
-		writeBeautifulMessage(fontName,lastSize,lastMessage,out);
+		writeBeautifulMessage(fontName,lastSize,lastMessage);
 
-		imageEnd(out);
 	    return true;
 	}
 	
@@ -394,24 +386,23 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 
-	private void textCreateMessageNow(String text, Writer output) throws IOException {
+	private void textCreateMessageNow(String text) throws IOException {
 		if (charsPerLine <= 0) return;
 
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);
 
-		output.write("G90;\n");
-		liftPen(output);
+		turtle.reset();
 
 		if (draw_bounding_box) {
 			// draw bounding box
-			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMaxY() + ";\n");
-			lowerPen(output);
-			output.write("G0 X" + (float) r.getMaxX() + " Y" + (float) r.getMaxY() + ";\n");
-			output.write("G0 X" + (float) r.getMaxX() + " Y" + (float) r.getMinY() + ";\n");
-			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMinY() + ";\n");
-			output.write("G0 X" + (float) r.getMinX() + " Y" + (float) r.getMaxY() + ";\n");
-			liftPen(output);
+			turtle.moveTo(r.getMinX(),r.getMinY());
+			turtle.penDown();
+			turtle.moveTo(r.getMinX(),r.getMaxY());
+			turtle.moveTo(r.getMaxX(),r.getMaxY());
+			turtle.moveTo(r.getMaxX(),r.getMinY());
+			turtle.moveTo(r.getMinX(),r.getMinY());
+			turtle.penUp();
 		}
 
 		// move to first line height
@@ -420,27 +411,20 @@ public class Generator_Text extends ImageGenerator {
 		float firstline = (float) r.getMinY() - (padding + letterHeight);
 		float interline = -(letterHeight + lineSpacing);
 
-		output.write("G0 X" + message_start + " Y" + firstline + ";\n");
-		output.write("G91;\n");
+		turtle.moveTo(message_start, firstline);
 
 		// draw line of text
 		String[] lines = textWrapToLength(text);
 		for (int i = 0; i < lines.length; i++) {
 			if (i > 0) {
 				// newline
-				output.write("G0 Y" + interline + ";\n");
-
-				// carriage return
-				output.write("G90;\n");
-				output.write("G0 X" + message_start + ";\n");
-				output.write("G91;\n");
+				turtle.moveTo(message_start, turtle.getY() + interline);
 			}
 
-			textDrawLine(lines[i], output);
+			textDrawLine(lines[i]);
 		}
-
-		output.write("G90;\n");
-		liftPen(output);
+		
+		turtle.penUp();
 	}
 
 
@@ -484,11 +468,11 @@ public class Generator_Text extends ImageGenerator {
 		return len;
 	}
 
-	private void textDrawLine(String a1, Writer output) throws IOException {
+	private void textDrawLine(String a1) throws IOException {
 		String ud = ALPHABET_FOLDER;
 
 		Log.info( a1 +"("+ a1.length() +")" );
-
+		
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {
 			char letter = a1.charAt(i);
@@ -502,108 +486,40 @@ public class Generator_Text extends ImageGenerator {
 				name = "SMALL_" + Character.toUpperCase(letter);
 			} else {
 				switch (letter) {
-				case ' ':
-					name = "SPACE";
-					break;
-				case '!':
-					name = "EXCLAMATION";
-					break;
-				case '"':
-					name = "DOUBLEQ";
-					break;
-				case '$':
-					name = "DOLLAR";
-					break;
-				case '#':
-					name = "POUND";
-					break;
-				case '%':
-					name = "PERCENT";
-					break;
-				case '&':
-					name = "AMPERSAND";
-					break;
-				case '\'':
-					name = "SINGLEQ";
-					break;
-				case '(':
-					name = "B1OPEN";
-					break;
-				case ')':
-					name = "B1CLOSE";
-					break;
-				case '*':
-					name = "ASTERIX";
-					break;
-				case '+':
-					name = "PLUS";
-					break;
-				case ',':
-					name = "COMMA";
-					break;
-				case '-':
-					name = "HYPHEN";
-					break;
-				case '.':
-					name = "PERIOD";
-					break;
-				case '/':
-					name = "FSLASH";
-					break;
-				case ':':
-					name = "COLON";
-					break;
-				case ';':
-					name = "SEMICOLON";
-					break;
-				case '<':
-					name = "GREATERTHAN";
-					break;
-				case '=':
-					name = "EQUAL";
-					break;
-				case '>':
-					name = "LESSTHAN";
-					break;
-				case '?':
-					name = "QUESTION";
-					break;
-				case '@':
-					name = "AT";
-					break;
-				case '[':
-					name = "B2OPEN";
-					break;
-				case ']':
-					name = "B2CLOSE";
-					break;
-				case '^':
-					name = "CARET";
-					break;
-				case '_':
-					name = "UNDERSCORE";
-					break;
-				case '`':
-					name = "GRAVE";
-					break;
-				case '{':
-					name = "B3OPEN";
-					break;
-				case '|':
-					name = "BAR";
-					break;
-				case '}':
-					name = "B3CLOSE";
-					break;
-				case '~':
-					name = "TILDE";
-					break;
-				case '\\':
-					name = "BSLASH";
-					break;
-				case '…':
-					name = "SPACE";
-					break;
+				case ' ':					name = "SPACE";					break;
+				case '!':					name = "EXCLAMATION";			break;
+				case '"':					name = "DOUBLEQ";				break;
+				case '$':					name = "DOLLAR";				break;
+				case '#':					name = "POUND";					break;
+				case '%':					name = "PERCENT";				break;
+				case '&':					name = "AMPERSAND";				break;
+				case '\'':					name = "SINGLEQ";				break;
+				case '(':					name = "B1OPEN";				break;
+				case ')':					name = "B1CLOSE";				break;
+				case '*':					name = "ASTERIX";				break;
+				case '+':					name = "PLUS";					break;
+				case ',':					name = "COMMA";					break;
+				case '-':					name = "HYPHEN";				break;
+				case '.':					name = "PERIOD";				break;
+				case '/':					name = "FSLASH";				break;
+				case ':':					name = "COLON";					break;
+				case ';':					name = "SEMICOLON";				break;
+				case '<':					name = "GREATERTHAN";			break;
+				case '=':					name = "EQUAL";					break;
+				case '>':					name = "LESSTHAN";				break;
+				case '?':					name = "QUESTION";				break;
+				case '@':					name = "AT";					break;
+				case '[':					name = "B2OPEN";				break;
+				case ']':					name = "B2CLOSE";				break;
+				case '^':					name = "CARET";					break;
+				case '_':					name = "UNDERSCORE";			break;
+				case '`':					name = "GRAVE";					break;
+				case '{':					name = "B3OPEN";				break;
+				case '|':					name = "BAR";					break;
+				case '}':					name = "B3CLOSE";				break;
+				case '~':					name = "TILDE";					break;
+				case '\\':					name = "BSLASH";				break;
+				case '…':					name = "SPACE";					break;
 				default:
 					name = Character.toString(letter);
 					break;
@@ -613,7 +529,7 @@ public class Generator_Text extends ImageGenerator {
 			final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
 			if (inputStream != null) {
 				if (i > 0 && kerning != 0) {
-					output.write("G0 X" + (kerning) + ";\n");
+					turtle.moveTo(turtle.getX()+kerning, turtle.getY());
 				}
 				try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 						final BufferedReader in = new BufferedReader(inputStreamReader)) {
@@ -624,36 +540,25 @@ public class Generator_Text extends ImageGenerator {
 							continue;
 						switch (b) {
 						case "UP":
-							output.write("G90;\n");
-							liftPen(output);
-							output.write("G91;\n");
+							turtle.penUp();
 							break;
 						case "DOWN":
-							output.write("G90;\n");
-							lowerPen(output);
-							output.write("G91;\n");
+							turtle.penDown();
 							break;
 						default:
 							StringTokenizer st = new StringTokenizer(b);
-							String gap = "";
 							while (st.hasMoreTokens()) {
 								String c = st.nextToken();
-								if (c.startsWith("G")) {
-									output.write(gap + c);
-								} else if (c.startsWith("X")) {
+								if (c.startsWith("X")) {
 									// translate coordinates
 									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "X" + (x));
+									turtle.moveTo(turtle.getX()+x, turtle.getY());
 								} else if (c.startsWith("Y")) {
 									// translate coordinates
 									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									output.write(gap + "Y" + (y));
-								} else {
-									output.write(gap + c);
+									turtle.moveTo(turtle.getX(), turtle.getY()+y);
 								}
-								gap = " ";
 							}
-							output.write(";\n");
 							break;
 						}
 					}
@@ -667,17 +572,18 @@ public class Generator_Text extends ImageGenerator {
 		}
 	}
 
-	public void signName(Writer out) throws IOException {
+	public void signName() throws IOException {
 		setupTransform();
 
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
-		textSetPosition((float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
+		textSetPosition(
+				(float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
 				(float)(machine.getPaperHeight()*10.0f*machine.getPaperMargin()));
 
 		textSetCharsPerLine(25);
 
-		textCreateMessageNow("Makelangelo #" + Long.toString(machine.getUID()), out);
-		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.",out);
+		textCreateMessageNow( "Makelangelo #" + Long.toString(machine.getUID()) );
+		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.");
 	}
 }
