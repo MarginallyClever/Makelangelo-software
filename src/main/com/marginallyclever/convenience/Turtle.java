@@ -54,8 +54,10 @@ public class Turtle {
 	}
 
 	public void setColor(ColorRGB c) {
+		if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
+		
 		color.set(c);
-		history.add(new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE));
+		history.add( new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE) );
 	}
 	
 	public void jumpTo(double x,double y) {
@@ -67,7 +69,7 @@ public class Turtle {
 	public void moveTo(double x,double y) {
 		turtleX=x;
 		turtleY=y;
-		history.add(new Movement(x,y,isUp ? MoveType.TRAVEL:MoveType.DRAW));
+		history.add( new Movement(x, y, isUp ? MoveType.TRAVEL : MoveType.DRAW) );
 	}
 	
 	public void setX(double arg0) {
