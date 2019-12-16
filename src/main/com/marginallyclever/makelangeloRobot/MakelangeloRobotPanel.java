@@ -43,7 +43,6 @@ import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
 import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
@@ -653,14 +652,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
-		buttonSaveFile.setEnabled(robot!=null && robot.gCode != null && robot.gCode.isLoaded());
+		buttonSaveFile.setEnabled(robot!=null && robot.getTurtle().history.size()>0);
 		
 		this.validate();
 	}
 	
 
 	public void newFile() {
-		robot.setGCode(null);
+		robot.setTurtle(new Turtle());
 		updateButtonAccess();
 	}
 
@@ -1014,68 +1013,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		// do the work
 		chosenGenerator.generate();
-		
-		try {
-			File tempFile = File.createTempFile("gcode", ".ngc");
-			tempFile.deleteOnExit();
-			
-			OutputStream fileOutputStream = new FileOutputStream(tempFile);
-			Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-			
-			MakelangeloRobotSettings machine = robot.getSettings();
-			Turtle t=chosenGenerator.turtle;
+				
+		Turtle t=chosenGenerator.turtle;
 
-			machine.writeProgramStart(out);
-			machine.writeChangeToDefaultColor(out);
-			machine.writeAbsoluteMode(out);
-			machine.writePenUp(out);
-			boolean isUp=true;
-			for(Turtle.Movement m : t.history ) {
-				switch(m.type) {
-				case TRAVEL:
-					if(!isUp) {
-						machine.writePenUp(out);
-						isUp=true;
-					}
-					break;
-				case DRAW:
-					if(isUp) {
-						machine.writeMoveTo(out,m.x, m.y,isUp); 
-						machine.writePenDown(out);
-						isUp=false;
-					}
-					machine.writeMoveTo(out,m.x, m.y,isUp);
-					break;
-				case TOOL_CHANGE:
-					machine.writeChangeTo(out, m.getColor());
-					break;
-				}
-			}
-			if (robot.getSettings().shouldSignName()) {
-				// Sign name
-				Generator_Text ymh = new Generator_Text();
-				ymh.setRobot(robot);
-				ymh.signName();
-			}
-			if(!isUp) machine.writePenUp(out);
-			machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
-			machine.writeProgramEnd(out);
-			
-			out.flush();
-			out.close();
-
-			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(tempFile);
-			loader.load(fileInputStream,robot);
-			
-			tempFile.delete();
-		} catch(IOException e) {
-			e.printStackTrace();
-			return;
+		if (robot.getSettings().shouldSignName()) {
+			// Sign name
+			Generator_Text ymh = new Generator_Text();
+			ymh.setRobot(robot);
+			ymh.signName();
+			t.history.addAll(ymh.turtle.history);
 		}
-		
 		robot.setDecorator(null);
-
+		robot.setTurtle(t);
 		Log.info(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
