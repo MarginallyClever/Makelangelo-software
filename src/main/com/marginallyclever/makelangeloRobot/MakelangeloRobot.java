@@ -17,6 +17,8 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,14 +29,16 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.gcode.GCodeFile;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a
@@ -71,13 +75,15 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private float gondolaX;
 	private float gondolaY;
 
+	protected Turtle turtle;
+	private ReentrantLock turtleLock;
+
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
 
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
-	public GCodeFile gCode;
 
 	public MakelangeloRobot() {
 		// set up number format
@@ -96,6 +102,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		didSetHome = false;
 		setGondolaX(0);
 		setGondolaY(0);
+		turtle = new Turtle();
+		turtleLock = new ReentrantLock();
 	}
 
 	public NetworkConnection getConnection() {
@@ -718,20 +726,15 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		return myPanel;
 	}
 
-	public void setGCode(GCodeFile gcode) {
-		gCode = gcode;
-		if (gCode != null)
-			gCode.emptyNodeBuffer();
+	public void setTurtle(Turtle t) {
+		turtle=t;
 	}
-
-	public GCodeFile getGCode() {
-		return gCode;
+	public Turtle getTurtle() {
+		return turtle;
 	}
 
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
-		if (gCode != null)
-			gCode.emptyNodeBuffer();
 	}
 
 	public void render(GL2 gl2) {
@@ -742,8 +745,77 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
-		} else if (gCode != null) {
-			gCode.render(gl2, this);
+		} else if(turtle != null) {
+
+			if(turtleLock.isLocked()) return;
+			turtleLock.lock();
+			try {
+				boolean showPenUp = GFXPreferences.getShowPenUp();
+				ColorRGB penUpColor = this.settings.getPenUpColor();
+				ColorRGB penDownColor = this.settings.getPenDownColorDefault();
+				
+				Turtle.Movement previousMove=null;
+				
+				boolean isUp=true;
+	
+				gl2.glBegin(GL2.GL_LINE_STRIP);
+				
+				if(showPenUp) {
+					gl2.glColor3d(
+							penUpColor.getRed()/ 255,
+							penUpColor.getGreen()/ 255,
+							penUpColor.getBlue()/ 255);
+					double ox=this.settings.getHomeX();
+					double oy=this.settings.getHomeY();
+					gl2.glVertex2d(ox,oy);
+				}
+				
+				for( Turtle.Movement m : turtle.history ) {
+					switch(m.type) {
+					case TRAVEL:
+						if(!isUp) {
+							isUp=true;
+							gl2.glColor4d(
+									penUpColor.getRed()/ 255,
+									penUpColor.getGreen()/ 255,
+									penUpColor.getBlue()/ 255,
+									showPenUp?1:0);
+							if(previousMove!=null) {
+								gl2.glVertex2d(previousMove.x,previousMove.y);
+							}
+							gl2.glVertex2d(m.x,m.y);
+						}
+						break;
+					case DRAW:
+						if(isUp) {
+							gl2.glVertex2d(m.x,m.y);
+							gl2.glColor4d(
+									penDownColor.getRed()/ 255,
+									penDownColor.getGreen()/ 255,
+									penDownColor.getBlue()/ 255,
+									1);
+							isUp=false;
+						} else {
+							gl2.glVertex2d(m.x,m.y);
+						}
+						previousMove=m;
+						break;
+					case TOOL_CHANGE:
+						penDownColor = m.getColor();
+						gl2.glColor4d(
+								penDownColor.getRed()/ 255,
+								penDownColor.getGreen()/ 255,
+								penDownColor.getBlue()/ 255,
+								1);
+						break;
+					}
+				}
+				
+				gl2.glEnd();
+			}
+			finally {
+				turtleLock.unlock();
+			}
 		}
 	}
 
