@@ -757,18 +757,17 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				Turtle.Movement previousMove=null;
 				
 				boolean isUp=true;
+				double ox=this.settings.getHomeX();
+				double oy=this.settings.getHomeY();
 	
 				gl2.glBegin(GL2.GL_LINE_STRIP);
 				
-				if(showPenUp) {
-					gl2.glColor3d(
-							penUpColor.getRed()/ 255,
-							penUpColor.getGreen()/ 255,
-							penUpColor.getBlue()/ 255);
-					double ox=this.settings.getHomeX();
-					double oy=this.settings.getHomeY();
-					gl2.glVertex2d(ox,oy);
-				}
+				gl2.glColor4d(
+						(double)penUpColor.getRed() / 255.0,
+						(double)penUpColor.getGreen() / 255.0,
+						(double)penUpColor.getBlue() / 255.0,
+						showPenUp?1:0);
+				gl2.glVertex2d(ox,oy);
 				
 				for( Turtle.Movement m : turtle.history ) {
 					switch(m.type) {
@@ -776,37 +775,43 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 						if(!isUp) {
 							isUp=true;
 							gl2.glColor4d(
-									penUpColor.getRed()/ 255,
-									penUpColor.getGreen()/ 255,
-									penUpColor.getBlue()/ 255,
+									(double)penUpColor.getRed() / 255.0,
+									(double)penUpColor.getGreen() / 255.0,
+									(double)penUpColor.getBlue() / 255.0,
 									showPenUp?1:0);
 							if(previousMove!=null) {
 								gl2.glVertex2d(previousMove.x,previousMove.y);
 							}
 							gl2.glVertex2d(m.x,m.y);
 						}
+						previousMove=m;
 						break;
 					case DRAW:
 						if(isUp) {
 							gl2.glVertex2d(m.x,m.y);
 							gl2.glColor4d(
-									penDownColor.getRed()/ 255,
-									penDownColor.getGreen()/ 255,
-									penDownColor.getBlue()/ 255,
+									(double)penDownColor.getRed() / 255.0,
+									(double)penDownColor.getGreen() / 255.0,
+									(double)penDownColor.getBlue() / 255.0,
 									1);
+							if(previousMove!=null) {
+								gl2.glVertex2d(previousMove.x,previousMove.y);
+							}
 							isUp=false;
-						} else {
-							gl2.glVertex2d(m.x,m.y);
 						}
+						gl2.glVertex2d(m.x,m.y);
 						previousMove=m;
 						break;
 					case TOOL_CHANGE:
 						penDownColor = m.getColor();
 						gl2.glColor4d(
-								penDownColor.getRed()/ 255,
-								penDownColor.getGreen()/ 255,
-								penDownColor.getBlue()/ 255,
+								(double)penDownColor.getRed() / 255.0,
+								(double)penDownColor.getGreen() / 255.0,
+								(double)penDownColor.getBlue() / 255.0,
 								1);
+						if(previousMove!=null) {
+							gl2.glVertex2d(previousMove.x,previousMove.y);
+						}
 						break;
 					}
 				}
@@ -834,7 +839,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glEnd();
 
 		ColorRGB c = settings.getPaperColor();
-		gl2.glColor3f(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f);
+		gl2.glColor3d(
+				(double)c.getRed() / 255.0,
+				(double)c.getGreen() / 255.0,
+				(double)c.getBlue() / 255.0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
