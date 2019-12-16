@@ -44,7 +44,7 @@ public class Turtle {
 		reset();
 	}
 	
-	public void reset() {
+	protected void reset() {
 		turtleX = 0;
 		turtleY = 0;
 		color = new ColorRGB(0,0,0);
