@@ -379,7 +379,7 @@ public final class Makelangelo
 	// event-dispatching thread.
 	public void createAndShowGUI() {
 		// Create and set up the window.
-		mainFrame = new JFrame(Translator.get("TitlePrefix"));
+		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
 		mainFrame.setJMenuBar(createMenuBar());
