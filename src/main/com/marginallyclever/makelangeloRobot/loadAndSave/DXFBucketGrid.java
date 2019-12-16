@@ -99,6 +99,7 @@ public class DXFBucketGrid {
 		//System.out.println(group.entities.size()+ " entities after dump.");
 	}
 	
+	@Deprecated
 	protected void sortEntitiesIntoContinguousGroups(List<DXFGroup> groups,double epsilon) {
 		DXFBucket sourceBucket;
 		Point p=null;

@@ -76,7 +76,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
-	    boolean loadOK=true;
 
 		// prepare for exporting
 		machine = robot.getSettings();
@@ -84,58 +83,58 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		maxX = maxY =-Double.MAX_VALUE;
 		imageCenterX=imageCenterY=0;
 		scale=1;
+		
+	    turtle = new Turtle();
+		boolean loadOK = parseAll(document);
+		if(!loadOK) {
+			Log.info("Failed to load some elements (1)");
+			return false;
+		}
+		
+		imageCenterX = ( maxX + minX ) / 2.0;
+		imageCenterY = -( maxY + minY ) / 2.0;
+
+		double imageWidth  = maxX - minX;
+		double imageHeight = maxY - minY;
+
+		// add 2% for margins
+
+		imageWidth += imageWidth * .02;
+		imageHeight += imageHeight * .02;
+
+		double paperHeight = robot.getSettings().getMarginHeight();
+		double paperWidth  = robot.getSettings().getMarginWidth ();
+
+		scale = 1;
+		if(shouldScaleOnLoad) {
+			double innerAspectRatio = imageWidth / imageHeight;
+			double outerAspectRatio = paperWidth / paperHeight;
+			scale = (innerAspectRatio >= outerAspectRatio) ?
+					(paperWidth / imageWidth) :
+					(paperHeight / imageHeight);
+		}
+	    turtle = new Turtle();
+		loadOK = parseAll(document);
+		if(!loadOK) {
+			Log.info("Failed to load some elements (2)");
+			return false;
+		}
+		
+		robot.setTurtle(turtle);
+		return true;
+	}
+	
+	protected boolean parseAll(Document document) {
 		NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-		loadOK = parsePathElements(pathNodes,false);
+		boolean loadOK = parsePathElements(pathNodes);
 		if(loadOK) {
 			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-			loadOK = parsePolylineElements(pathNodes,false);
+			loadOK = parsePolylineElements(pathNodes);
 		}
 		if(loadOK) {
 			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-			loadOK = parsePolylineElements(pathNodes,false);
+			loadOK = parsePolylineElements(pathNodes);
 		}
-		if(loadOK) {
-			imageCenterX = ( maxX + minX ) / 2.0;
-			imageCenterY = -( maxY + minY ) / 2.0;
-
-			double imageWidth  = maxX - minX;
-			double imageHeight = maxY - minY;
-
-			// add 2% for margins
-
-			imageWidth += imageWidth * .02;
-			imageHeight += imageHeight * .02;
-
-			double paperHeight = robot.getSettings().getMarginHeight();
-			double paperWidth  = robot.getSettings().getMarginWidth ();
-
-			scale = 1;
-			if(shouldScaleOnLoad) {
-				double innerAspectRatio = imageWidth / imageHeight;
-				double outerAspectRatio = paperWidth / paperHeight;
-				scale = (innerAspectRatio >= outerAspectRatio) ?
-						(paperWidth / imageWidth) :
-						(paperHeight / imageHeight);
-			}
-			
-			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-			loadOK = parsePathElements(pathNodes,true);
-			if(loadOK) {
-				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-				loadOK = parsePolylineElements(pathNodes,true);
-			}
-			if(loadOK) {
-				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-				loadOK = parsePolylineElements(pathNodes,true);
-			}
-		}		    
-
-		Log.info(loadOK?"Loaded OK!":"Failed to load some elements.");
-		if(loadOK) {
-			robot.setTurtle(turtle);
-		}			
-		
-
 		return loadOK;
 	}
 
@@ -148,16 +147,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	/**
 	 * Parse through all the SVG polyline elements and raster them to gcode.
-	 * @param out the writer to send the gcode
 	 * @param pathNodes the source of the elements
-	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePolylineElements(NodeList pathNodes,boolean write) {
+	protected boolean parsePolylineElements(NodeList pathNodes) {
 	    boolean loadOK=true;
-
-	    double previousX,previousY,x,y;
-	    x=previousX = machine.getHomeX();
-		y=previousY = machine.getHomeY();
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -165,48 +158,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGPointList pointList = pathElement.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//System.out.println("New Node has "+pathObjects+" elements.");
-
-	    	// which end of the line is closer to our current position?
-	    	double d0 = distanceSquared((SVGPoint)pointList.getItem(0),previousX,previousY);
-	    	double dN = distanceSquared((SVGPoint)pointList.getItem(numPoints-1),previousX,previousY);
-	    	int startI,endI,dirI;
-	    	if(d0<dN) {
-	    		startI=0;
-	    		endI=numPoints;
-	    		dirI=1;
-	    	} else {
-	    		startI=numPoints-1;
-	    		endI=-1;
-	    		dirI=-1;
-	    	}
-	    	
+			
 	    	boolean first=true;
-			for (int i=startI; i!=endI; i+=dirI ) {
+			for( int i=0; i<numPoints; ++i ) {
 				SVGPoint  item = (SVGPoint) pointList.getItem(i);
-				x = TX( item.getX() );
-				y = TY( item.getY() );
-
-				if(write) {
-					double dx=x-previousX;
-					double dy=y-previousY;
-					boolean farEnough = (dx*dx+dy*dy > toolMinimumStepSize*toolMinimumStepSize );
-					
-					if(first) {
-						if(farEnough) {
-							turtle.jumpTo(x,y);
-							previousX=x;
-							previousY=y;
-						}
-						first=false;
-					} else {
-						if(i==endI-dirI || farEnough) {
-							turtle.penDown();
-							turtle.moveTo(x,y);
-							previousX=x;
-							previousY=y;
-						}
-					}
-				} else adjustLimits(x,y);
+				double x = TX( item.getX() );
+				double y = TY( item.getY() );
+				
+				adjustLimits(x,y);
+				if(first) {
+					first=false;
+					turtle.jumpTo(x,y);
+				} else {
+					turtle.moveTo(x,y);
+				}
 			}
 		}
 	    return loadOK;
@@ -231,18 +196,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	/**
 	 * Parse through all the SVG path elements and raster them to gcode.
-	 * @param out the writer to send the gcode
 	 * @param pathNodes the source of the elements
-	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePathElements(NodeList pathNodes,boolean write) {
+	protected boolean parsePathElements(NodeList pathNodes) {
 	    boolean loadOK=true;
 
-	    double x = machine.getHomeX();
-	    double y = machine.getHomeY();
-	    turtle = new Turtle();
-	    turtle.setX(x);
-	    turtle.setY(y);
+	    double x=turtle.getX();
+	    double y=turtle.getY();
 		double firstX=0;
 		double firstY=0;
 		
@@ -250,7 +210,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
 	    		System.out.println("Node is a polyline.");
-	    		parsePolylineElements(pathNodes,write);
+	    		parsePolylineElements(pathNodes);
 	    		continue;
 	    	}
 	    	
@@ -265,22 +225,17 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				case SVGPathSeg.PATHSEG_CLOSEPATH:
 					{
 						//System.out.println("Close path");
-						if(write) {
-							turtle.penDown();
-							turtle.moveTo(firstX,firstY);
-						}
+						turtle.moveTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:
 					{
 						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						x = TX( path.getX() );
-						y = TY( path.getY() );
-						firstX=x;
-						firstY=y;
-						if(write) turtle.jumpTo(x,y);
-						else adjustLimits(x,y);
+						x=firstX=TX( path.getX() );
+						y=firstY=TY( path.getY() );
+						turtle.jumpTo(firstX,firstY);
+						adjustLimits(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:
@@ -289,11 +244,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
-						if(write) {
-							turtle.penDown();
-							turtle.moveTo(x,y);
-						}
-						else adjustLimits(x,y);
+						turtle.penDown();
+						turtle.moveTo(x,y);
+						adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: 
@@ -301,17 +254,16 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
-						// x,y is the first point
+						// x0,y0 is the first point
 						double x0=x;
 						double y0=y;
-						// x0,y0 is the second control point
-						
+						// x1,y1 is the second control point
 						double x1=TX( path.getX1());
 						double y1=TY( path.getY1());
-						// x1,y1 is the third control point
+						// x2,y2 is the third control point
 						double x2=TX( path.getX2());
 						double y2=TY( path.getY2());
-						// x2,y2 is the fourth control point
+						// x3,y3 is the fourth control point
 						double x3=TX( path.getX());
 						double y3=TY( path.getY());
 						/*
@@ -349,6 +301,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						
 						double steps = (int)Math.ceil(Math.min(length, 10));
 						if(steps==0) steps=1;
+
 						
 						for(double j=0;j<=1;j+=1.0/steps) {/*
 							// old method
@@ -375,13 +328,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
 							
 							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
-								if(write) {
-									turtle.penDown();
-									turtle.moveTo(xabc,yabc);
-									x=xabc;
-									y=yabc;
-								}
-								else adjustLimits(xabc,yabc);
+								turtle.penDown();
+								turtle.moveTo(xabc,yabc);
+								x=xabc;
+								y=yabc;
+								adjustLimits(xabc,yabc);
 							//}
 						}
 					}

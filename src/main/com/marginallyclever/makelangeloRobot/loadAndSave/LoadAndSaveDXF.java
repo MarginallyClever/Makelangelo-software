@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -39,7 +38,6 @@ import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -51,17 +49,9 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  */
 public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
 	private static boolean shouldScaleOnLoad=true;
-	private static boolean shouldInfillOnLoad=true;
-	private static boolean shouldOptimizePathingOnLoad=false;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double scale,imageCenterX,imageCenterY;
-	private boolean writeNow;
-
-	private double toolMinimumPenUpMove=2.0;
-	private double toolMinimumPenDownMove=1.0;
-	private double toolMinimumPenUpMoveSq;
-	private double toolMinimumPenDownMoveSq;
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -86,30 +76,17 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		final JCheckBox checkScale = new JCheckBox(Translator.get("DXFScaleOnLoad"));
-		final JCheckBox checkInfill = new JCheckBox(Translator.get("DXFInfillOnLoad"));
-		final JCheckBox checkOptimize = new JCheckBox(Translator.get("DXFOptimizeOnLoad"));
-		final SelectFloat chooseMinimumPenUpMove = new SelectFloat((float)toolMinimumPenUpMove);
-		final SelectFloat chooseMinimumPenDownMove = new SelectFloat((float)toolMinimumPenDownMove);
 
 		JPanel panel = new JPanel(new GridLayout(0, 1));
 		panel.add(checkScale);
-		//panel.add(checkInfill);
-		panel.add(checkOptimize);
-		panel.add(new JLabel(Translator.get("Minimum pen up move (mm)")));
-		panel.add(chooseMinimumPenUpMove);
-		panel.add(new JLabel(Translator.get("Minimum pen down move (mm)")));
-		panel.add(chooseMinimumPenDownMove);
 
 		checkScale.setSelected(shouldScaleOnLoad);
 		//checkInfill.setSelected(shouldInfillOnLoad);
-		checkOptimize.setSelected(shouldOptimizePathingOnLoad);
 
 		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			shouldScaleOnLoad = checkScale.isSelected();
-			shouldInfillOnLoad = checkInfill.isSelected();
-			shouldOptimizePathingOnLoad = checkOptimize.isSelected();
-
+/* TODO put this in a middle stage
 			toolMinimumPenUpMove = ((Number)chooseMinimumPenUpMove.getValue()).doubleValue();
 			toolMinimumPenDownMove = ((Number)chooseMinimumPenDownMove.getValue()).doubleValue();
 			if(toolMinimumPenUpMove<0) toolMinimumPenUpMove=0;
@@ -117,7 +94,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			
 			toolMinimumPenUpMoveSq = toolMinimumPenUpMove*toolMinimumPenUpMove;
 			toolMinimumPenDownMoveSq = toolMinimumPenDownMove*toolMinimumPenDownMove;
-			
+*/
 			return loadNow(in,robot);
 		}
 		return false;
@@ -286,59 +263,19 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 
 			sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
 
-			//DXFGroup infillGroup=null;
-			if(shouldInfillOnLoad) {
-				//infillGroup = infillClosedAreas(layer);
-			}
-
-			if(shouldOptimizePathingOnLoad) {
-				double DXF_EPSILON = 0.1;
-				
-				// Use the buckets to narrow the search field and find neighboring entities
-				grid.sortEntitiesIntoContinguousGroups(groups,DXF_EPSILON);
-			} else {
-				grid.dumpEverythingIntoABucket(groups);
-			}
-			
+			// Use the buckets to narrow the search field and find neighboring entities
+			//grid.sortEntitiesIntoContinguousGroups(groups,0.1);
+			grid.dumpEverythingIntoABucket(groups);
 			removeDuplicates(groups);
 
-			// We have a list of groups. 
-			// Each group is set of lines that make a continuous path.
-			// Maybe even a closed path!
-			// Some of the lines in each group may be flipped. 
-
-			// TODO fill in the closed groups if the user says ok. (does not belong in DXF)
-			
-			//if(infillGroup!=null) {
-			//	groups.add(infillGroup);
-			//}
-			
 			Iterator<DXFGroup> groupIter = groups.iterator();
 			while(groupIter.hasNext()) {
 				DXFGroup g = groupIter.next();
-				
-				double px=previousX;
-				double py=previousY;
-				
-				// each separate line might be forwards or backwards.
-				// scan backward through the group to find the starting of the first line (previousX,previousY).
-				writeNow=false;
-				Iterator<DXFBucketEntity> ents = g.entities.descendingIterator();
-				while(ents.hasNext()) {
-					parseEntity(ents.next().entity);
-				}
-				
-				previousX=px;
-				previousY=py;
-
-				// work forward through the loop, writing as you go.
-				writeNow=true;
-				ents = g.entities.iterator();
+				Iterator<DXFBucketEntity> ents = g.entities.iterator();
 				while(ents.hasNext()) {
 					parseEntity(ents.next().entity);
 				}
 			}
-			//turtle.penUp();
 		}
 
 		robot.setTurtle(turtle);
@@ -350,8 +287,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			parseDXFLine((DXFLine)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-
-		    
 			parseDXFPolyline(polyLine);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
 				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
@@ -365,6 +300,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return dx*dx+dy*dy;
 	}
 	
+	@Deprecated
 	protected Point getEntityStart(DXFEntity e) {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 			DXFLine line = (DXFLine)e;
@@ -383,6 +319,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return null;
 	}
 
+	@Deprecated
 	protected Point getEntityEnd(DXFEntity e) {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
 			DXFLine line = (DXFLine)e;
@@ -455,38 +392,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	protected void parseDXFLineEnds(double x,double y,double x2,double y2) {
-		double dx = x - previousX;
-		double dy = y - previousY;
-		
-		// next line start too far away?
-		//if(dx*dx + dy*dy > toolMinimumStepSize ) 
-		{ 
-			// lift pen and move to that location
-			if(writeNow) {
-				boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq);
-				if(liftToStartNextLine) {
-					turtle.jumpTo(x,y);
-				} else {
-					turtle.penDown();
-					turtle.moveTo(x,y);
-				}
-			}
-			previousX = x;
-			previousY = y;
-		}
-
-		dx = x2 - previousX;
-		dy = y2 - previousY;
-		
-		if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) {
-			// lower pen and draw to end of line
-			if(writeNow) {
-				turtle.penDown();
-				turtle.moveTo(x2,y2);
-			}
-			previousX = x2;
-			previousY = y2;
-		}
+		turtle.jumpTo(x,y);
+		turtle.moveTo(x2,y2);
+		previousX = x2;
+		previousY = y2;
 	}
 
 	
@@ -548,36 +457,14 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	protected void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
-		double dx = x - previousX;
-		double dy = y - previousY;
-
 		if (first == true) {
-			if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) { 
-				// line does not start at last tool location, lift and move.
-				if(writeNow) {
-					boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
-					if(liftToStartNextLine) {
-						turtle.jumpTo(x,y);
-					} else {
-						turtle.penDown();
-						turtle.moveTo(x,y);
-					}
-				}
-				previousX = x;
-				previousY = y;
-			}
-			// else line starts right here, pen is down, do nothing extra.
+			turtle.jumpTo(x,y);
 		} else {
-			// not the first point, draw.
-			if (!notLast || dx * dx + dy * dy > toolMinimumPenDownMoveSq) {
-				if(writeNow) {
-					turtle.penDown();
-					turtle.moveTo(x,y);
-				}
-				previousX = x;
-				previousY = y;
-			}
+			turtle.penDown();
+			turtle.moveTo(x,y);
 		}
+		previousX = x;
+		previousY = y;
 	}
 	
 	@Override
