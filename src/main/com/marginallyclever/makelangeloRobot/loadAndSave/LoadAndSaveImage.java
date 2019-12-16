@@ -8,15 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
@@ -42,7 +36,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.converters.ImageConverter;
 import com.marginallyclever.makelangeloRobot.converters.ImageConverterPanel;
-import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -289,8 +282,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 
 		float flip = s.isReverseForGlass() ? -1 : 1;
-		double width  = s.getPaperWidth ()*s.getPaperMargin();
-		double height = s.getPaperHeight()*s.getPaperMargin();
+		double width  = s.getMarginWidth();
+		double height = s.getMarginHeight();
 
 		float f;
 		if( s.getPaperWidth() > s.getPaperHeight() ) {
@@ -307,8 +300,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 		
 		float flip   = s.isReverseForGlass() ? -1 : 1;
-		double width  = s.getPaperWidth ()*s.getPaperMargin();
-		double height = s.getPaperHeight()*s.getPaperMargin();
+		double width  = s.getMarginWidth();
+		double height = s.getMarginHeight();
 		
 		float f;
 		if( s.getPaperWidth() < s.getPaperHeight() ) {
@@ -365,65 +358,9 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				
 				if(wasCancelled==false) {
 					chosenConverter.finish();
-
 					Turtle t=chosenConverter.turtle;
-					
-					try {
-						File tempFile = File.createTempFile("gcode", ".ngc");
-						tempFile.deleteOnExit();
-						OutputStream fileOutputStream = new FileOutputStream(tempFile);
-						Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-
-						machine.writeProgramStart(out);
-						machine.writeChangeToDefaultColor(out);
-						machine.writeAbsoluteMode(out);
-						machine.writePenUp(out);
-						boolean isUp=true;
-						for(Turtle.Movement m : t.history ) {
-							switch(m.type) {
-							case TRAVEL:
-								if(!isUp) {
-									machine.writePenUp(out);
-									isUp=true;
-								}
-								break;
-							case DRAW:
-								if(isUp) { 
-									machine.writeMoveTo(out,m.x, m.y,isUp);
-									machine.writePenDown(out);
-									isUp=false;
-								}
-								machine.writeMoveTo(out,m.x, m.y,isUp);
-								break;
-							case TOOL_CHANGE:
-								machine.writeChangeTo(out, m.getColor());
-								break;
-							}
-						}
-						if (chosenRobot.getSettings().shouldSignName()) {
-							// Sign name
-							Generator_Text ymh = new Generator_Text();
-							ymh.setRobot(chosenRobot);
-							ymh.signName();
-						}
-						if(!isUp) machine.writePenUp(out);
-						machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
-						machine.writeProgramEnd(out);
-
-						out.flush();
-						out.close();
-
-						LoadAndSaveGCode loader = new LoadAndSaveGCode();
-						final InputStream fileInputStream = new FileInputStream(tempFile);
-						loader.load(fileInputStream,chosenRobot);
-						
-						tempFile.delete();
-					} catch (IOException e) {
-						Log.error(Translator.get("Failed") + e.getLocalizedMessage());
-						chosenRobot.setDecorator(null);
-					}
+					chosenRobot.setTurtle(t);
 				}
-				
 
 				return null;
 			}
