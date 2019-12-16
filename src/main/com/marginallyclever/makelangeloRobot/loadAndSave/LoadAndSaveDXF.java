@@ -1,16 +1,10 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
 import java.awt.GridLayout;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -40,12 +34,15 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.gcode.GCodeFile;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
@@ -158,53 +155,53 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	protected void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
 		//Log.info("Sorting layer "+layer.getName()+" into buckets...");
 
-			Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-			while (entityTypeIter.hasNext()) {
-				String entityType = (String) entityTypeIter.next();
-				List<DXFEntity> entityList = (List<DXFEntity>)layer.getDXFEntities(entityType);
-				Iterator<DXFEntity> iter = entityList.iterator();
-				while(iter.hasNext()) {
-					DXFEntity e = iter.next();
-					DXFBucketEntity be = new DXFBucketEntity(e);
-					
-					if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-						DXFLine line = (DXFLine)e;
-						grid.addEntity(be, line.getStartPoint());
-						grid.addEntity(be, line.getEndPoint());
-						continue;
-					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-						e = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-						// fall through to the next case, polyline.
-					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-						DXFPolyline polyLine = (DXFPolyline)e;
-						
-						if(!polyLine.isClosed()) {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
-						} else {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						}
-						continue;
-					}
-					if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-						DXFLWPolyline polyLine = (DXFLWPolyline)e;
-						if(!polyLine.isClosed()) {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
-						} else {
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-							grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						}
-						continue;
-					}
-					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
-					//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
-					// I don't know this entity type.
-					Log.error("Unknown DXF type "+e.getType());
+		Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
+		while (entityTypeIter.hasNext()) {
+			String entityType = (String) entityTypeIter.next();
+			List<DXFEntity> entityList = (List<DXFEntity>)layer.getDXFEntities(entityType);
+			Iterator<DXFEntity> iter = entityList.iterator();
+			while(iter.hasNext()) {
+				DXFEntity e = iter.next();
+				DXFBucketEntity be = new DXFBucketEntity(e);
+				
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
+					DXFLine line = (DXFLine)e;
+					grid.addEntity(be, line.getStartPoint());
+					grid.addEntity(be, line.getEndPoint());
+					continue;
 				}
+				if(e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+					e = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
+					// fall through to the next case, polyline.
+				}
+				if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+					DXFPolyline polyLine = (DXFPolyline)e;
+					
+					if(!polyLine.isClosed()) {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+					} else {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+					}
+					continue;
+				}
+				if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+					DXFLWPolyline polyLine = (DXFLWPolyline)e;
+					if(!polyLine.isClosed()) {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+					} else {
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+						grid.addEntity(be, polyLine.getVertex(0).getPoint());
+					}
+					continue;
+				}
+				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
+				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
+				// I don't know this entity type.
+				Log.error("Unknown DXF type "+e.getType());
+			}
 		}
 		
 		//grid.countEntitiesInBuckets();
@@ -220,16 +217,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	@SuppressWarnings("unchecked")
 	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
 		Log.info(Translator.get("FileTypeDXF2")+"...");
-		// set up a temporary file
-		File tempFile;
-		try {
-			tempFile = File.createTempFile("temp", ".ngc");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-		tempFile.deleteOnExit();
-		Log.info(Translator.get("Converting") + " " + tempFile.getName());
 
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -240,17 +227,15 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		DXFDocument doc = parser.getDocument();
-
 		Bounds bounds = doc.getBounds();
 		imageCenterX = (bounds.getMaximumX() + bounds.getMinimumX()) / 2.0;
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
-
 		// find the scale to fit the image on the paper without
 		// altering the aspect ratio
 		double imageWidth  = (bounds.getMaximumX() - bounds.getMinimumX());
 		double imageHeight = (bounds.getMaximumY() - bounds.getMinimumY());
-		double paperHeight = robot.getSettings().getPaperHeight() * robot.getSettings().getPaperMargin();
-		double paperWidth  = robot.getSettings().getPaperWidth () * robot.getSettings().getPaperMargin();
+		double paperHeight = robot.getSettings().getMarginHeight();
+		double paperWidth  = robot.getSettings().getMarginWidth ();
 
 		scale = 1;
 		if(shouldScaleOnLoad) {
@@ -260,158 +245,117 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 					(paperWidth / imageWidth) :
 					(paperHeight / imageHeight);
 		}
-		//countAllEntities(doc);
 
-		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+		// prepare for exporting
+		machine = robot.getSettings();
+		turtle = new Turtle();
 
-			// prepare for exporting
-			machine = robot.getSettings();
-			// normally here I use imageStart(), but every layer causes a new writeChangeTo.  This avoids one redundant pen change.
-			//imageStart(out);
-			machine.writeProgramStart(out);
-			setAbsoluteMode(out);
-			liftPen(out);
+		previousX = machine.getHomeX();
+		previousY = machine.getHomeY();
+		turtle.setX(previousX);
+		turtle.setY(previousY);
+		
+
+		// convert each entity
+		Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
+		while (layerIter.hasNext()) {
+			DXFLayer layer = (DXFLayer) layerIter.next();
+			int color = layer.getColor();
+			System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
 			
-			previousX = machine.getHomeX();
-			previousY = machine.getHomeY();
-			
-			Set<Integer> allColors = new HashSet<Integer>();
-			
-			// convert each entity
-			Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
-			while (layerIter.hasNext()) {
-				DXFLayer layer = (DXFLayer) layerIter.next();
-				int color = layer.getColor();
-				System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
-				
-				// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
-				Iterator<String> entityTypeIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
-				if (entityTypeIter.hasNext()) {
-					allColors.add(new Integer(layer.getColor()));
-					layer.getColor();
-					liftPen(out);
-					machine.writeChangeTo(out,layer.getName());
-				}
-				
-				// Sort the entities on this layer into the buckets.
-				// Buckets are arranged in an XY grid.
-				// All non-closed entities would appear in two buckets.
-				// One Entity might be in the same bucket twice.
-				Point topLeft = new Point();
-				Point bottomRight = new Point();
-				topLeft.setX(bounds.getMinimumX());
-				topLeft.setY(bounds.getMinimumY());
-				bottomRight.setX(bounds.getMaximumX());
-				bottomRight.setY(bounds.getMaximumY());
-				DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
-				List<DXFGroup> groups = new LinkedList<DXFGroup>();
-
-				sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
-
-				//DXFGroup infillGroup=null;
-				if(shouldInfillOnLoad) {
-					//infillGroup = infillClosedAreas(layer);
-				}
-
-				if(shouldOptimizePathingOnLoad) {
-					double DXF_EPSILON = 0.1;
-					
-					// Use the buckets to narrow the search field and find neighboring entities
-					grid.sortEntitiesIntoContinguousGroups(groups,DXF_EPSILON);
-				} else {
-					grid.dumpEverythingIntoABucket(groups);
-				}
-				
-				removeDuplicates(groups);
-
-				// We have a list of groups. 
-				// Each group is set of lines that make a continuous path.
-				// Maybe even a closed path!
-				// Some of the lines in each group may be flipped. 
-
-				// TODO fill in the closed groups if the user says ok. (does not belong in DXF)
-				
-				//if(infillGroup!=null) {
-				//	groups.add(infillGroup);
-				//}
-				
-				Iterator<DXFGroup> groupIter = groups.iterator();
-				while(groupIter.hasNext()) {
-					DXFGroup g = groupIter.next();
-					
-					double px=previousX;
-					double py=previousY;
-					
-					// each separate line might be forwards or backwards.
-					// scan backward through the group to find the starting of the first line (previousX,previousY).
-					writeNow=false;
-					Iterator<DXFBucketEntity> ents = g.entities.descendingIterator();
-					while(ents.hasNext()) {
-						DXFBucketEntity e = ents.next();
-						byte [] colorNow = e.entity.getColorRGB();
-						int newColor=0;
-						if(colorNow != null && colorNow.length==3) {
-							newColor = 	((int)colorNow[0])<<16 +
-										((int)colorNow[1])<< 8 +
-										((int)colorNow[2]);
-						}
-						allColors.add(new Integer(newColor));
-						parseEntity(e.entity,out);
-					}
-					
-					previousX=px;
-					previousY=py;
-
-					// work forward through the loop, writing as you go.
-					writeNow=true;
-					ents = g.entities.iterator();
-					while(ents.hasNext()) {
-						DXFBucketEntity e = ents.next();
-						parseEntity(e.entity,out);
-					}
-				}
+			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
+			Iterator<String> entityTypeIter = (Iterator<String>)layer.getDXFEntityTypeIterator();
+			if (!entityTypeIter.hasNext()) {
+				continue;
 			}
 
-			System.out.println("Colors: ");
-			String add="";
-			Iterator<Integer> c = allColors.iterator();
-			while(c.hasNext()) {
-				System.out.print(add+c.next());
-				add=", ";
-			}
-			System.out.println();
+			turtle.setColor(new ColorRGB(color));
 			
-			// entities finished. Close up file.
-			imageEnd(out);
-			
-			out.flush();
-			out.close();
+			// Sort the entities on this layer into the buckets.
+			// Buckets are arranged in an XY grid.
+			// All non-closed entities would appear in two buckets.
+			// One Entity might be in the same bucket twice.
+			Point topLeft = new Point();
+			Point bottomRight = new Point();
+			topLeft.setX(bounds.getMinimumX());
+			topLeft.setY(bounds.getMinimumY());
+			bottomRight.setX(bounds.getMaximumX());
+			bottomRight.setY(bounds.getMaximumY());
+			DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
+			List<DXFGroup> groups = new LinkedList<DXFGroup>();
 
-			Log.info("Done!");
-			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(tempFile);
-			loader.load(fileInputStream,robot);
-		} catch (IOException e) {
-			e.printStackTrace();
+			sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
+
+			//DXFGroup infillGroup=null;
+			if(shouldInfillOnLoad) {
+				//infillGroup = infillClosedAreas(layer);
+			}
+
+			if(shouldOptimizePathingOnLoad) {
+				double DXF_EPSILON = 0.1;
+				
+				// Use the buckets to narrow the search field and find neighboring entities
+				grid.sortEntitiesIntoContinguousGroups(groups,DXF_EPSILON);
+			} else {
+				grid.dumpEverythingIntoABucket(groups);
+			}
+			
+			removeDuplicates(groups);
+
+			// We have a list of groups. 
+			// Each group is set of lines that make a continuous path.
+			// Maybe even a closed path!
+			// Some of the lines in each group may be flipped. 
+
+			// TODO fill in the closed groups if the user says ok. (does not belong in DXF)
+			
+			//if(infillGroup!=null) {
+			//	groups.add(infillGroup);
+			//}
+			
+			Iterator<DXFGroup> groupIter = groups.iterator();
+			while(groupIter.hasNext()) {
+				DXFGroup g = groupIter.next();
+				
+				double px=previousX;
+				double py=previousY;
+				
+				// each separate line might be forwards or backwards.
+				// scan backward through the group to find the starting of the first line (previousX,previousY).
+				writeNow=false;
+				Iterator<DXFBucketEntity> ents = g.entities.descendingIterator();
+				while(ents.hasNext()) {
+					parseEntity(ents.next().entity);
+				}
+				
+				previousX=px;
+				previousY=py;
+
+				// work forward through the loop, writing as you go.
+				writeNow=true;
+				ents = g.entities.iterator();
+				while(ents.hasNext()) {
+					parseEntity(ents.next().entity);
+				}
+			}
+			//turtle.penUp();
 		}
 
-		tempFile.delete();
-
+		robot.setTurtle(turtle);
 		return true;
 	}
 
-	protected void parseEntity(DXFEntity e,Writer out) throws IOException {
+	protected void parseEntity(DXFEntity e) {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-			parseDXFLine(out,(DXFLine)e);
+			parseDXFLine((DXFLine)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
 
 		    
-			parseDXFPolyline(out,polyLine);
+			parseDXFPolyline(polyLine);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
 				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			parseDXFPolyline(out,(DXFPolyline)e);
+			parseDXFPolyline((DXFPolyline)e);
 		}
 	}
 	
@@ -489,7 +433,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return (y-imageCenterY) * scale;
 	}
 	
-	protected void parseDXFLine(Writer out,DXFLine entity) throws IOException {
+	protected void parseDXFLine(DXFLine entity) {
 		Point start = entity.getStartPoint();
 		Point end = entity.getEndPoint();
 
@@ -504,22 +448,29 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		double dx2 = previousX - x2;
 		double dy2 = previousY - y2;
 		if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-			parseDXFLineEnds(out,x,y,x2,y2);
+			parseDXFLineEnds(x,y,x2,y2);
 		} else {
-			parseDXFLineEnds(out,x2,y2,x,y);
+			parseDXFLineEnds(x2,y2,x,y);
 		}
 	}
 	
-	protected void parseDXFLineEnds(Writer out,double x,double y,double x2,double y2) throws IOException {
+	protected void parseDXFLineEnds(double x,double y,double x2,double y2) {
 		double dx = x - previousX;
 		double dy = y - previousY;
 		
 		// next line start too far away?
-		boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
 		//if(dx*dx + dy*dy > toolMinimumStepSize ) 
 		{ 
 			// lift pen and move to that location
-			if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
+			if(writeNow) {
+				boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq);
+				if(liftToStartNextLine) {
+					turtle.jumpTo(x,y);
+				} else {
+					turtle.penDown();
+					turtle.moveTo(x,y);
+				}
+			}
 			previousX = x;
 			previousY = y;
 		}
@@ -529,17 +480,20 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		
 		if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) {
 			// lower pen and draw to end of line
-			if(writeNow) moveTo(out, (float) x2, (float) y2, false);
+			if(writeNow) {
+				turtle.penDown();
+				turtle.moveTo(x2,y2);
+			}
 			previousX = x2;
 			previousY = y2;
 		}
 	}
 
 	
-	protected void parseDXFPolyline(Writer out,DXFPolyline entity) throws IOException {
+	protected void parseDXFPolyline(DXFPolyline entity) {
 		if(entity.isClosed()) {
 			// only one end to care about
-			parseDXFPolylineForward(out,entity);
+			parseDXFPolylineForward(entity);
 		} else {
 			// which end is closest to the previous (x,y)?
 			int n = entity.getVertexCount()-1;
@@ -555,15 +509,15 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			double dy2 = y2 - previousY;
 			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
 				// first point is closer
-				parseDXFPolylineForward(out,entity);
+				parseDXFPolylineForward(entity);
 			} else {
 				// last point is closer
-				parseDXFPolylineBackward(out,entity);
+				parseDXFPolylineBackward(entity);
 			}
 		}
 	}
 	
-	protected void parseDXFPolylineForward(Writer out,DXFPolyline entity) throws IOException {
+	protected void parseDXFPolylineForward(DXFPolyline entity) {
 		boolean first = true;
 		int c = entity.getVertexCount();
 		int count = c + (entity.isClosed()?1:0);
@@ -573,12 +527,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			v = entity.getVertex(j % c);
 			x = TX(v.getX());
 			y = TY(v.getY());
-			parsePolylineShared(out,x,y,first,j<count-1);
+			parsePolylineShared(x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parseDXFPolylineBackward(Writer out,DXFPolyline entity) throws IOException {
+	protected void parseDXFPolylineBackward(DXFPolyline entity) {
 		boolean first = true;
 		int c = entity.getVertexCount();
 		int count = c + (entity.isClosed()?1:0);
@@ -588,20 +542,27 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			v = entity.getVertex((c*2-1-j) % c);
 			x = TX(v.getX());
 			y = TY(v.getY());
-			parsePolylineShared(out,x,y,first,j<count-1);
+			parsePolylineShared(x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parsePolylineShared(Writer out,double x,double y,boolean first,boolean notLast) throws IOException {
+	protected void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
 		double dx = x - previousX;
 		double dy = y - previousY;
 
 		if (first == true) {
-			boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
 			if(dx*dx + dy*dy > toolMinimumPenDownMoveSq ) { 
 				// line does not start at last tool location, lift and move.
-				if(writeNow) moveTo(out, (float) x, (float) y, liftToStartNextLine);
+				if(writeNow) {
+					boolean liftToStartNextLine = (dx * dx + dy * dy > toolMinimumPenUpMoveSq); 
+					if(liftToStartNextLine) {
+						turtle.jumpTo(x,y);
+					} else {
+						turtle.penDown();
+						turtle.moveTo(x,y);
+					}
+				}
 				previousX = x;
 				previousY = y;
 			}
@@ -609,7 +570,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		} else {
 			// not the first point, draw.
 			if (!notLast || dx * dx + dy * dy > toolMinimumPenDownMoveSq) {
-				if(writeNow) moveTo(out, (float) x, (float) y, false);
+				if(writeNow) {
+					turtle.penDown();
+					turtle.moveTo(x,y);
+				}
 				previousX = x;
 				previousY = y;
 			}
@@ -625,27 +589,26 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
 		Log.info("saving...");
-		GCodeFile sourceMaterial = robot.gCode;
-		sourceMaterial.setLinesProcessed(0);
+		Turtle turtle = robot.getTurtle();
+		MakelangeloRobotSettings settings = robot.getSettings();
 		
-		OutputStreamWriter out = new OutputStreamWriter(outputStream);
-		try {
+		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			// header
 			out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
 			out.write("0\nSECTION\n");
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
 			out.write("9\n$INSBASE\n");
-			out.write("10\n"+robot.getSettings().getPaperLeft()+"\n");
-			out.write("20\n"+robot.getSettings().getPaperBottom()+"\n");
+			out.write("10\n"+settings.getPaperLeft()+"\n");
+			out.write("20\n"+settings.getPaperBottom()+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMIN\n");
-			out.write("10\n"+robot.getSettings().getPaperLeft()+"\n");
-			out.write("20\n"+robot.getSettings().getPaperBottom()+"\n");
+			out.write("10\n"+settings.getPaperLeft()+"\n");
+			out.write("20\n"+settings.getPaperBottom()+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMAX\n");
-			out.write("10\n"+robot.getSettings().getPaperRight()+"\n");
-			out.write("20\n"+robot.getSettings().getPaperTop()+"\n");
+			out.write("10\n"+settings.getPaperRight()+"\n");
+			out.write("20\n"+settings.getPaperTop()+"\n");
 			out.write("30\n0.0\n");
 			out.write("0\nENDSEC\n");
 
@@ -694,14 +657,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			out.write("0\nSECTION\n");
 			out.write("2\nENTITIES\n");
 
-			boolean penUp=true;
-			float x0 = (float) robot.getSettings().getHomeX();
-			float y0 = (float) robot.getSettings().getHomeY();
-			float x1;
-			float y1;
+			boolean isUp=true;
+			double x0 = settings.getHomeX();
+			double y0 = settings.getHomeY();
 			
-			String matchUp = robot.getSettings().getPenUpString();
-			String matchDown = robot.getSettings().getPenDownString();
+			String matchUp = settings.getPenUpString();
+			String matchDown = settings.getPenDownString();
 			
 			if(matchUp.contains(";")) {
 				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
@@ -713,44 +674,31 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			}
 			matchDown = matchDown.replaceAll("\n", "");
 			
-			int total=sourceMaterial.getLinesTotal();
-			Log.info(total+" total lines to save.");
-			for(int i=0;i<total;++i) {
-				String str = sourceMaterial.nextLine();
-				// trim comments
-				if(str.contains(";")) {
-					str = str.substring(0, str.indexOf(";"));
-				}
-				if(str.contains(matchUp)) {
-					penUp=true;
-				}
-				if(str.contains(matchDown)) {
-					penUp=false;
-				}
-				if(str.startsWith("G0") || str.startsWith("G1")) {
-					// move command
-					String[] tokens = str.split(" ");
-					x1=x0;
-					y1=y0;
-					int j;
-					for(j=0;j<tokens.length;++j) {
-						String tok = tokens[j];
-						if(tok.startsWith("X")) {
-							x1=Float.parseFloat(tok.substring(1));
-						} else if(tok.startsWith("Y")) {
-							y1=Float.parseFloat(tok.substring(1));
-						}
-					}
-					if(penUp==false && ( x1!=x0 || y1!=y0 ) ) {
+			
+			for( Turtle.Movement m : turtle.history ) {
+				switch(m.type) {
+				case TRAVEL:
+					isUp=true;
+					x0=m.x;
+					y0=m.y;
+					break;
+				case DRAW:
+					if(isUp) isUp=false;
+					else {
 						out.write("0\nLINE\n");
 						out.write("8\n1\n");  // layer 1
-						out.write("10\n"+x0+"\n");
-						out.write("20\n"+y0+"\n");
-						out.write("11\n"+x1+"\n");
-						out.write("21\n"+y1+"\n");
+						out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
+						out.write("20\n"+MathHelper.roundOff3(-y0)+"\n");
+						out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
+						out.write("21\n"+MathHelper.roundOff3(-m.y)+"\n");
 					}
-					x0=x1;
-					y0=y1;
+					x0=m.x;
+					y0=m.y;
+					
+					break;
+				case TOOL_CHANGE:
+					// TODO new layer?  m.getColor()
+					break;
 				}
 			}
 			// wrap it up

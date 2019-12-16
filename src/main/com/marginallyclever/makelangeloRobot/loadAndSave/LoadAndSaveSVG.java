@@ -1,15 +1,9 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -35,7 +29,8 @@ import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
-import com.marginallyclever.gcode.GCodeFile;
+import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.ImageManipulator;
@@ -78,93 +73,68 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		Log.info("Loading...");
-		// set up a temporary file
-		File tempFile;
-		try {
-			tempFile = File.createTempFile("temp", ".ngc");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-		tempFile.deleteOnExit();
-		Log.info(Translator.get("Converting") + " " + tempFile.getName());
-
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 	    boolean loadOK=true;
 
-		try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
+		// prepare for exporting
+		machine = robot.getSettings();
+		minX = minY =Double.MAX_VALUE;
+		maxX = maxY =-Double.MAX_VALUE;
+		imageCenterX=imageCenterY=0;
+		scale=1;
+		NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
+		loadOK = parsePathElements(pathNodes,false);
+		if(loadOK) {
+			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
+			loadOK = parsePolylineElements(pathNodes,false);
+		}
+		if(loadOK) {
+			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
+			loadOK = parsePolylineElements(pathNodes,false);
+		}
+		if(loadOK) {
+			imageCenterX = ( maxX + minX ) / 2.0;
+			imageCenterY = -( maxY + minY ) / 2.0;
 
-			// prepare for exporting
-			machine = robot.getSettings();
-			imageStart(out);
+			double imageWidth  = maxX - minX;
+			double imageHeight = maxY - minY;
+
+			// add 2% for margins
+
+			imageWidth += imageWidth * .02;
+			imageHeight += imageHeight * .02;
+
+			double paperHeight = robot.getSettings().getMarginHeight();
+			double paperWidth  = robot.getSettings().getMarginWidth ();
+
+			scale = 1;
+			if(shouldScaleOnLoad) {
+				double innerAspectRatio = imageWidth / imageHeight;
+				double outerAspectRatio = paperWidth / paperHeight;
+				scale = (innerAspectRatio >= outerAspectRatio) ?
+						(paperWidth / imageWidth) :
+						(paperHeight / imageHeight);
+			}
 			
-			minX = minY =Double.MAX_VALUE;
-			maxX = maxY =-Double.MAX_VALUE;
-			imageCenterX=imageCenterY=0;
-			scale=1;
-			NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-			loadOK = parsePathElements(out,pathNodes,false);
+			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
+			loadOK = parsePathElements(pathNodes,true);
 			if(loadOK) {
 				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-				loadOK = parsePolylineElements(out,pathNodes,false);
+				loadOK = parsePolylineElements(pathNodes,true);
 			}
 			if(loadOK) {
 				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-				loadOK = parsePolylineElements(out,pathNodes,false);
+				loadOK = parsePolylineElements(pathNodes,true);
 			}
-			if(loadOK) {
-				imageCenterX = ( maxX + minX ) / 2.0;
-				imageCenterY = -( maxY + minY ) / 2.0;
+		}		    
 
-				double imageWidth  = maxX - minX;
-				double imageHeight = maxY - minY;
-
-				// add 2% for margins
-
-				imageWidth += imageWidth * .02;
-				imageHeight += imageHeight * .02;
-
-				double paperHeight = robot.getSettings().getPaperHeight() * robot.getSettings().getPaperMargin();
-				double paperWidth  = robot.getSettings().getPaperWidth () * robot.getSettings().getPaperMargin();
-
-				scale = 1;
-				if(shouldScaleOnLoad) {
-					double innerAspectRatio = imageWidth / imageHeight;
-					double outerAspectRatio = paperWidth / paperHeight;
-					scale = (innerAspectRatio >= outerAspectRatio) ?
-							(paperWidth / imageWidth) :
-							(paperHeight / imageHeight);
-				}
-				
-				pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
-				loadOK = parsePathElements(out,pathNodes,true);
-				if(loadOK) {
-					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
-					loadOK = parsePolylineElements(out,pathNodes,true);
-				}
-				if(loadOK) {
-					pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
-					loadOK = parsePolylineElements(out,pathNodes,true);
-				}
-			}		    
-			// entities finished. Close up file.
-			imageEnd(out);
-			out.flush();
-			out.close();
-
-			Log.info(loadOK?"Loaded OK!":"Failed to load some elements.");
-			if(loadOK) {
-				LoadAndSaveGCode loader = new LoadAndSaveGCode();
-				InputStream fileInputStream = new FileInputStream(tempFile);
-				loader.load(fileInputStream,robot);
-			}			
-		} catch (IOException e) {
-			e.printStackTrace();
-			loadOK=false;
-		}
+		Log.info(loadOK?"Loaded OK!":"Failed to load some elements.");
+		if(loadOK) {
+			robot.setTurtle(turtle);
+		}			
+		
 
 		return loadOK;
 	}
@@ -182,7 +152,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param pathNodes the source of the elements
 	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePolylineElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
+	protected boolean parsePolylineElements(NodeList pathNodes,boolean write) {
 	    boolean loadOK=true;
 
 	    double previousX,previousY,x,y;
@@ -223,14 +193,15 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					
 					if(first) {
 						if(farEnough) {
-							moveTo(out,x,y,true);
+							turtle.jumpTo(x,y);
 							previousX=x;
 							previousY=y;
 						}
 						first=false;
 					} else {
 						if(i==endI-dirI || farEnough) {
-							moveTo(out,x,y,false);
+							turtle.penDown();
+							turtle.moveTo(x,y);
 							previousX=x;
 							previousY=y;
 						}
@@ -264,11 +235,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param pathNodes the source of the elements
 	 * @param write if true, write gcode.  if false, calculate bounds of rasterized elements.
 	 */
-	protected boolean parsePathElements(Writer out,NodeList pathNodes,boolean write) throws IOException {
+	protected boolean parsePathElements(NodeList pathNodes,boolean write) {
 	    boolean loadOK=true;
 
 	    double x = machine.getHomeX();
 	    double y = machine.getHomeY();
+	    turtle = new Turtle();
+	    turtle.setX(x);
+	    turtle.setY(y);
 		double firstX=0;
 		double firstY=0;
 		
@@ -276,7 +250,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
 	    		System.out.println("Node is a polyline.");
-	    		parsePolylineElements(out,pathNodes,write);
+	    		parsePolylineElements(pathNodes,write);
 	    		continue;
 	    	}
 	    	
@@ -291,7 +265,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				case SVGPathSeg.PATHSEG_CLOSEPATH:
 					{
 						//System.out.println("Close path");
-						if(write) moveTo(out,firstX,firstY,false);
+						if(write) {
+							turtle.penDown();
+							turtle.moveTo(firstX,firstY);
+						}
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:
@@ -302,7 +279,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						y = TY( path.getY() );
 						firstX=x;
 						firstY=y;
-						if(write) moveTo(out,x,y,true);
+						if(write) turtle.jumpTo(x,y);
 						else adjustLimits(x,y);
 					}
 					break;
@@ -312,7 +289,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
-						if(write) moveTo(out,x,y,false);
+						if(write) {
+							turtle.penDown();
+							turtle.moveTo(x,y);
+						}
 						else adjustLimits(x,y);
 					}
 					break;
@@ -396,7 +376,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							
 							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
 								if(write) {
-									moveTo(out,xabc,yabc,false);
+									turtle.penDown();
+									turtle.moveTo(xabc,yabc);
 									x=xabc;
 									y=yabc;
 								}
@@ -482,8 +463,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
 		Log.info("saving...");
-		GCodeFile sourceMaterial = robot.gCode;
-		sourceMaterial.setLinesProcessed(0);
+		turtle = robot.getTurtle();
 
 		machine = robot.getSettings();
 		double left = machine.getPaperLeft();
@@ -491,81 +471,51 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		double top = machine.getPaperTop();
 		double bottom = machine.getPaperBottom();
 		
-		OutputStreamWriter out = new OutputStreamWriter(outputStream);
-		try {
+		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			// header
 			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
 			out.write("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
 			out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+left+" "+bottom+" "+(right-left)+" "+(top-bottom)+"\">\n");
 
-			boolean penUp=true;
-			float x0 = (float) robot.getSettings().getHomeX();
-			float y0 = (float) robot.getSettings().getHomeY();
-			float x1;
-			float y1;
-			
-			String matchUp = robot.getSettings().getPenUpString();
-			String matchDown = robot.getSettings().getPenDownString();
-			if(matchUp.contains(";")) {
-				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
-			}
-			matchUp = matchUp.replaceAll("\n", "");
-			
-			if(matchDown.contains(";")) {
-				matchDown = matchDown.substring(0, matchDown.indexOf(";"));
-			}
-			matchDown = matchDown.replaceAll("\n", "");
-			
-			int total=sourceMaterial.getLinesTotal();
-			Log.info(total+" total lines to save.");
-			for(int i=0;i<total;++i) {
-				String str = sourceMaterial.nextLine();
-				// trim comments
-				if(str.contains(";")) {
-					str = str.substring(0, str.indexOf(";"));
-				}
-				if(str.contains(matchUp)) {
-					penUp=true;
-				}
-				if(str.contains(matchDown)) {
-					penUp=false;
-				}
-				if(str.startsWith("G0") || str.startsWith("G1")) {
-					// move command
-					String[] tokens = str.split(" ");
-					x1=x0;
-					y1=y0;
-					int j;
-					for(j=0;j<tokens.length;++j) {
-						String tok = tokens[j];
-						if(tok.startsWith("X")) {
-							x1=Float.parseFloat(tok.substring(1));
-						} else if(tok.startsWith("Y")) {
-							y1=Float.parseFloat(tok.substring(1));
-						}
+			boolean isUp=true;
+			double x0 = robot.getSettings().getHomeX();
+			double y0 = robot.getSettings().getHomeY();
+
+			for( Turtle.Movement m : turtle.history ) {
+				switch(m.type) {
+				case TRAVEL:
+					if(!isUp) {
+						machine.writePenUp(out);
+						isUp=true;
 					}
-					if(penUp==false && ( x1!=x0 || y1!=y0 ) ) {
-						//double svgX1 = roundOff3(x0 - left);
-						//double svgX2 = roundOff3(x1 - left);
-						//double svgY1 = roundOff3(top - y0);
-						//double svgY2 = roundOff3(top - y1);
-						double svgX1 = roundOff3(x0);
-						double svgX2 = roundOff3(x1);
-						double svgY1 = roundOff3(- y0);
-						double svgY2 = roundOff3(- y1);
+					x0=m.x;
+					y0=m.y;
+					break;
+				case DRAW:
+					if(isUp) {
+						machine.writeMoveTo(out,m.x, m.y,isUp); 
+						machine.writePenDown(out);
+						isUp=false;
+					} else {
 						out.write("  <line");
-						out.write(" x1=\""+svgX1+"\"");
-						out.write(" y1=\""+svgY1+"\"");
-						out.write(" x2=\""+svgX2+"\"");
-						out.write(" y2=\""+svgY2+"\"");
+						out.write(" x1=\""+MathHelper.roundOff3(x0)+"\"");
+						out.write(" y1=\""+MathHelper.roundOff3(-y0)+"\"");
+						out.write(" x2=\""+MathHelper.roundOff3(m.x)+"\"");
+						out.write(" y2=\""+MathHelper.roundOff3(-m.y)+"\"");
 						out.write(" stroke=\"black\"");
 						//out.write(" stroke-width=\"1\"");
 						out.write(" />\n");
 					}
-					x0=x1;
-					y0=y1;
+					x0=m.x;
+					y0=m.y;
+					
+					break;
+				case TOOL_CHANGE:
+					machine.writeChangeTo(out, m.getColor());
+					break;
 				}
 			}
+			
 			// footer
 			out.write("</svg>");
 			// end
@@ -578,16 +528,5 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 		Log.info("done.");
 		return true;
-	}
-
-	/**
-	 * Round a float off to 3 decimal places.
-	 * @param v a value
-	 * @return Value rounded off to 3 decimal places
-	 */
-	public static double roundOff3(double v) {
-		double SCALE = 1000.0f;
-		
-		return Math.round(v*SCALE)/SCALE;
 	}
 }
