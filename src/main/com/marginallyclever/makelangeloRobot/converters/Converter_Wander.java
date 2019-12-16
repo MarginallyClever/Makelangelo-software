@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
@@ -150,7 +151,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		// draw the sorted list of points.
 		Log.info("Drawing points...");
-		turtle.reset();
+		turtle = new Turtle();
 		
 		for(int j=0;j<buckets.size();++j) {
 			Bucket b = buckets.get(j);

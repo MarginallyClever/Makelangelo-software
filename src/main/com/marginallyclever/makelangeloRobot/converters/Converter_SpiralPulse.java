@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -68,8 +69,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		int i;
 		int z = 0;
 		float r2,scale_z,pulse_size,nx,ny;
-		
-		turtle.reset();
+
+		turtle = new Turtle();
 		
 		while (r > toolDiameter) {
 			// find circumference of current circle
@@ -113,7 +114,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 			++numRings;
 		}
 
-		Log.info("yellow", numRings + " rings.");
+		Log.info(numRings + " rings.");
 	}
 
 	public void setIntensity(float floatValue) {

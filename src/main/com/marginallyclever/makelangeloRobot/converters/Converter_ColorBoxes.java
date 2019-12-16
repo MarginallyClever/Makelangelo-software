@@ -15,13 +15,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_ColorBoxes extends ImageConverter {
 	private ColorPalette palette;
-	private float step1;
-	private float step2;
-	private float step4;
+	private double step1;
+	private double step2;
+	private double step4;
 	private int palette_mask;
 	private ColorRGB[] error = null;
 	private ColorRGB[] nexterror = null;
-	private float stepsTotal = 0;
+	private double stepsTotal = 0;
 	private int direction = 1;
 
 	// TODO make this a parameter
@@ -151,7 +151,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	public boolean convert(TransformedImage img,Writer out) throws IOException {
-		float pw = (float)(machine.getPaperWidth() * machine.getPaperMargin());
+		double pw = machine.getMarginWidth();
 
 		// figure out how many boxes we're going to have on this image.
 		step4 = (machine.getPenDiameter());

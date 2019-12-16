@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -405,7 +406,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	// write cell centroids to gcode.
 	protected void writeOutCells() {
-		turtle.reset();
+		turtle = new Turtle();
 		
 		if (graphEdges != null) {
 			// find the tsp point closest to the calibration point

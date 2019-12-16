@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
 import java.io.IOException;
+
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -31,7 +33,7 @@ public class Generator_Border extends ImageGenerator {
 		float xMin = (float)machine.getMarginLeft();
 		float xMax = (float)machine.getMarginRight();
 
-		turtle.reset();
+		turtle = new Turtle();
 		turtle.penUp();
 		turtle.moveTo(xMin,yMax);
 		turtle.penDown();

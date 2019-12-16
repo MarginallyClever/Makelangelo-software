@@ -221,7 +221,7 @@ public class TransformedImage {
 	 * @param y paper-space coordinates of the image
 	 * @return 255 if the image cannot be sampled.  The intensity of the color channel [0...255]
 	 */
-	public int sample1x1(float x, float y) {
+	public int sample1x1(double x, double y) {
 		if (canSampleAt(x, y)) {
 			return sample1x1Unchecked(x, y);
 		}

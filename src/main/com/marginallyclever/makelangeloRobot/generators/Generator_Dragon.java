@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Dragon extends ImageGenerator {
@@ -31,7 +32,7 @@ public class Generator_Dragon extends ImageGenerator {
 		
 	@Override
 	public boolean generate() {
-		turtle.reset();
+		turtle = new Turtle();
 
 		// create the sequence of moves
         sequence = new ArrayList<Integer>();

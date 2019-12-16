@@ -2,6 +2,7 @@ package com.marginallyclever.makelangeloRobot.converters;
 
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
@@ -60,7 +61,7 @@ public class Converter_Boxes extends ImageConverter {
 		double steps = pw / fullStep;
 		if (steps < 1) steps = 1;
 
-		turtle.reset();
+		turtle = new Turtle();
 		
 		// from top to bottom of the image...
 		double x, y, z;

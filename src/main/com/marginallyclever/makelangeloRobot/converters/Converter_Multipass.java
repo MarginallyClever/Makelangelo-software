@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
@@ -66,7 +67,7 @@ public class Converter_Multipass extends ImageConverter {
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
 
-		turtle.reset();
+		turtle = new Turtle();
 		
 		boolean useError=false;
 		

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
@@ -95,7 +96,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		Arrays.sort(intensities, new IntensityComparator());
 
 		// draw darkest lines first.
-		turtle.reset();
+		turtle = new Turtle();
 		
 		for(k=0;k<numberToDraw;++k) {
 			i = intensities[k].i;

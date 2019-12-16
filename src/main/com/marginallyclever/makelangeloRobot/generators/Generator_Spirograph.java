@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -10,8 +11,8 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Spirograph extends ImageGenerator {
-	private float xMax,xMin,yMax,yMin;
-	private float totalScale;
+	private double xMax,xMin,yMax,yMin;
+	private double totalScale;
 
 	private static float pScale = 80; // controls complexity of curve
 	private static int minorRadius = 2; // controls complexity of curve
@@ -79,12 +80,12 @@ public class Generator_Spirograph extends ImageGenerator {
 		
 		// generate the spiral once to find the max/min
 		totalScale=1;
-		turtle.reset();
+		turtle = new Turtle();
 		drawSpirograph(false);
 
 		// scale the step size so the spirograph fits on the paper
-		float paperWidth = (float)(machine.getPaperWidth()  * machine.getPaperMargin());
-		float paperHeight = (float)(machine.getPaperHeight() * machine.getPaperMargin());
+		double paperWidth  = machine.getMarginWidth();
+		double paperHeight = machine.getMarginHeight();
 
 		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
 		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the
@@ -106,12 +107,12 @@ public class Generator_Spirograph extends ImageGenerator {
 			drawingHeight += 2 * -yMin;
 		}
 
-		float largestX = paperWidth/drawingWidth;
-		float largestY = paperHeight/drawingHeight;
+		double largestX = paperWidth/drawingWidth;
+		double largestY = paperHeight/drawingHeight;
 		totalScale =  largestX < largestY ? largestX : largestY;
 
 		// draw the spirograph for real this time
-		turtle.reset();
+		turtle = new Turtle();
 		drawSpirograph(true);
 	    
 	    return true;

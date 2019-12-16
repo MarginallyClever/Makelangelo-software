@@ -4,13 +4,13 @@ import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_KochCurve extends ImageGenerator {
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
-	private float yMin = -7;
+	private double xMax = 7;
+	private double xMin = -7;
+	private double yMax = 7;
+	private double yMin = -7;
 	private static int order = 4; // controls complexity of curve
 
-	private float maxSize;
+	private double maxSize;
 	
 	@Override
 	public String getName() {
@@ -32,8 +32,7 @@ public class Generator_KochCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		float v = Math.max((float)(machine.getPaperWidth() * machine.getPaperMargin()),
-						   (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
+		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
 		xMax = v;
 		yMax = v;
 		xMin = -v;
@@ -41,8 +40,8 @@ public class Generator_KochCurve extends ImageGenerator {
 
 		turtle = new Turtle();
 		
-		float xx = xMax - xMin;
-		float yy = yMax - yMin;
+		double xx = xMax - xMin;
+		double yy = yMax - yMin;
 		maxSize = xx > yy ? xx : yy;
 		
 		// move to starting position
@@ -61,7 +60,7 @@ public class Generator_KochCurve extends ImageGenerator {
 
 
 	// L System tree
-	private void drawTriangle(int n, float distance) {
+	private void drawTriangle(int n, double distance) {
 		if (n == 0) {
 			turtle.forward(distance);
 			return;

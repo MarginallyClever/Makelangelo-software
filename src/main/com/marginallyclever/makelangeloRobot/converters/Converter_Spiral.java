@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -63,8 +64,8 @@ public class Converter_Spiral extends ImageConverter {
 			float h = (float)machine.getMarginHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
-		
-		turtle.reset();
+
+		turtle = new Turtle();
 		
 		double r = maxr, f;
 		double fx, fy;
@@ -99,7 +100,7 @@ public class Converter_Spiral extends ImageConverter {
 			++numRings;
 		}
 
-		Log.info("yellow", numRings + " rings.");
+		Log.info(numRings + " rings.");
 	}
 }
 

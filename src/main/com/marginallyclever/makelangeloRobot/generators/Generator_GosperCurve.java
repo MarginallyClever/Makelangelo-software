@@ -31,8 +31,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		double v = Math.min((machine.getPaperWidth()  * machine.getPaperMargin()),
-				           (machine.getPaperHeight() * machine.getPaperMargin()));
+		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
 
 		turtle = new Turtle();
 		
@@ -44,8 +43,8 @@ public class Generator_GosperCurve extends ImageGenerator {
 		yMin = 0;
 		
 		gosperA(order);
-		
-		turtle.reset();
+
+		turtle = new Turtle();
 
 		// scale the image to fit on the paper
 		double w = xMax-xMin;

@@ -3,6 +3,7 @@
  */
 package com.marginallyclever.makelangeloRobot.generators;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_Maze extends ImageGenerator {
@@ -147,7 +148,7 @@ public class Generator_Maze extends ImageGenerator {
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;
 
-		turtle.reset();
+		turtle = new Turtle();
 		
 		// Draw outside edge
 		turtle.jumpTo(xMin, yMax);

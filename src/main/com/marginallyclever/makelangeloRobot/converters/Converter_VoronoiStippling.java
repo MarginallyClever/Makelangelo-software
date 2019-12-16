@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -367,7 +368,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	 * @param out where to write
 	 */
 	protected void writeOutCells() {
-		turtle.reset();
+		turtle = new Turtle();
 
 		float toolDiameter = machine.getPenDiameter();
 

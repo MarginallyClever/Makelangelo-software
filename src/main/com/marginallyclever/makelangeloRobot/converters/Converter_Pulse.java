@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
@@ -49,11 +50,10 @@ public class Converter_Pulse extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 		
-
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop()   ;
+		double xLeft   = machine.getMarginLeft()  ;
+		double xRight  = machine.getMarginRight() ;
 		
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter() * blockScale;
@@ -61,10 +61,10 @@ public class Converter_Pulse extends ImageConverter {
 		float zigZagSpacing = machine.getPenDiameter();
 
 		// from top to bottom of the image...
-		float x, y, z, scale_z, pulse_size, i = 0;
+		double x, y, z, scale_z, pulse_size, i = 0;
 		double n = 1;
-		
-		turtle.reset();
+
+		turtle = new Turtle();
 		
 		if (direction == 0) {
 			// horizontal

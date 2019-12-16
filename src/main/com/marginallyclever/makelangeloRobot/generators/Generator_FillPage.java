@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
@@ -35,38 +37,36 @@ public class Generator_FillPage extends ImageGenerator {
 		float stepSize = machine.getPenDiameter();
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getPaperBottom() * machine.getPaperMargin();
-		double yTop    = machine.getPaperTop()    * machine.getPaperMargin();
-		double xLeft   = machine.getPaperLeft()   * machine.getPaperMargin();
-		double xRight  = machine.getPaperRight()  * machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop()   ;
+		double xLeft   = machine.getMarginLeft()  ;
+		double xRight  = machine.getMarginRight() ;
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
-		turtle.reset();
-		boolean first=true;
-		turtle.penUp();
+		turtle = new Turtle();
+		Point2D P0=new Point2D();
+		Point2D P1=new Point2D();
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize) {
 			double majorPX = majorX * a;
 			double majorPY = majorY * a;
-			double startPX = majorPX - majorY * radius;
-			double startPY = majorPY + majorX * radius;
-			double endPX   = majorPX + majorY * radius;
-			double endPY   = majorPY - majorX * radius;
-
-			if(first) {
-				turtle.moveTo(startPX,startPY);
-				turtle.penDown();
-				first=false;
-			}
-			if ((i % 2) == 0) 	{
-				turtle.moveTo(startPX, startPY);
-				turtle.moveTo(endPX, endPY);
-			} else {
-				turtle.moveTo(endPX, endPY);
-				turtle.moveTo(startPX, startPY);
+			P0.set( majorPX - majorY * radius,
+					majorPY + majorX * radius);
+			P1.set( majorPX + majorY * radius,
+					majorPY - majorX * radius);
+			if(clipLineToPaperMargin(P0, P1)) {
+				if ((i % 2) == 0) 	{
+					turtle.moveTo(P0.x,P0.y);
+					turtle.penDown();
+					turtle.moveTo(P1.x,P1.y);
+				} else {
+					turtle.moveTo(P1.x,P1.y);
+					turtle.penDown();
+					turtle.moveTo(P0.x,P0.y);
+				}
 			}
 			++i;
 		}

@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -293,7 +294,7 @@ public class Generator_Text extends ImageGenerator {
 	public boolean generate() {
 		String fontName = fontNames[lastFont];
 
-		turtle.reset();
+		turtle = new Turtle();
 		posx=0;
 		posy=0;
 		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
@@ -386,13 +387,13 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 
-	private void textCreateMessageNow(String text) throws IOException {
+	private void textCreateMessageNow(String text) {
 		if (charsPerLine <= 0) return;
 
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);
 
-		turtle.reset();
+		turtle = new Turtle();
 
 		if (draw_bounding_box) {
 			// draw bounding box
@@ -468,7 +469,7 @@ public class Generator_Text extends ImageGenerator {
 		return len;
 	}
 
-	private void textDrawLine(String a1) throws IOException {
+	private void textDrawLine(String a1) {
 		String ud = ALPHABET_FOLDER;
 
 		Log.info( a1 +"("+ a1.length() +")" );
@@ -563,6 +564,9 @@ public class Generator_Text extends ImageGenerator {
 						}
 					}
 				}
+				catch(IOException e) {
+					e.printStackTrace();
+				}
 			} else {
 				// file not found
 				System.out.println("file not found. Making best guess as to where it is.");
@@ -572,7 +576,7 @@ public class Generator_Text extends ImageGenerator {
 		}
 	}
 
-	public void signName() throws IOException {
+	public void signName() {
 		setupTransform();
 
 		textSetAlign(Align.RIGHT);

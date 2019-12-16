@@ -5,9 +5,9 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_HilbertCurve extends ImageGenerator {
 	private float turtleStep = 10.0f;
-	private float xMax = 7;
-	private float xMin = -7;
-	private float yMax = 7;
+	private double xMax = 7;
+	private double xMin = -7;
+	private double yMax = 7;
 	private static int order = 4; // controls complexity of curve
 	
 	@Override
@@ -30,8 +30,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		float v = Math.min((float)(machine.getPaperWidth()  * machine.getPaperMargin()),
-				           (float)(machine.getPaperHeight() * machine.getPaperMargin()))/2.0f;
+		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
 		xMax = v;
 		yMax = v;
 		xMin = -v;

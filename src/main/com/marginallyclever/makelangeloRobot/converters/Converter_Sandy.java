@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import com.marginallyclever.makelangeloRobot.TransformedImage;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.imageFilters.Filter_BlackAndWhite;
 
@@ -39,19 +40,15 @@ public class Converter_Sandy extends ImageConverter {
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		float yBottom, yTop, xLeft, xRight;
+		double yBottom = machine.getLimitBottom();
+		double yTop    = machine.getLimitTop();
+		double xLeft   = machine.getLimitLeft();
+		double xRight  = machine.getLimitRight();
 
-		yBottom = (float)machine.getLimitBottom();
-		yTop    = (float)machine.getLimitTop();
-		xLeft   = (float)machine.getLimitLeft();
-		xRight  = (float)machine.getLimitRight();
-
-		float pBottom, pTop, pLeft, pRight;
-
-		pBottom = ((float) machine.getPaperBottom() + (float) 1.0) * (float) machine.getPaperMargin();
-		pTop = ((float) machine.getPaperTop() - (float) 1.0) * (float) machine.getPaperMargin();
-		pLeft = ((float) machine.getPaperLeft() + (float) 1.0) * (float) machine.getPaperMargin();
-		pRight = ((float) machine.getPaperRight() - (float) 1.0) * (float) machine.getPaperMargin();
+		double pBottom = machine.getMarginBottom() +1.0;
+		double pTop    = machine.getMarginTop()    -1.0;
+		double pLeft   = machine.getMarginLeft()   +1.0;
+		double pRight  = machine.getMarginRight()  -1.0;
 
 		double cx,cy;
 		double last_x=0,last_y=0;
@@ -81,7 +78,7 @@ public class Converter_Sandy extends ImageConverter {
 		double flipSum;
 		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
 
-		turtle.reset();
+		turtle = new Turtle();
 		
 		// make concentric circles that get bigger and bigger.
 		for(r=rMin;r<rMax;r+=rStep) {

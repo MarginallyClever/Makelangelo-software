@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangeloRobot.generators;
 
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -63,8 +64,8 @@ public class Generator_Lissajous extends ImageGenerator {
 	@Override
 	public boolean generate() {
 		// scale the step size so the curve fits on the paper
-		WIDTH = (machine.getPaperWidth()  * machine.getPaperMargin())/2.0;
-		HEIGHT = (machine.getPaperHeight() * machine.getPaperMargin())/2.0;
+		WIDTH = machine.getMarginWidth()/2.0;
+		HEIGHT = machine.getMarginHeight()/2.0;
 
 		drawLissajous(true);
 	    
@@ -78,8 +79,7 @@ public class Generator_Lissajous extends ImageGenerator {
 
 		//x = AX*sin(a*t + delta) + screen_width/2;
 		//y = BX*sin(b*t) + screen_height/2;
-		turtle.reset();
-		turtle.penUp();
+		turtle = new Turtle();
 		
 		for(int t1=0; t1<=numSamples; ++t1) {
 			t = ( Math.PI*2.0 * t1 / (double)numSamples );

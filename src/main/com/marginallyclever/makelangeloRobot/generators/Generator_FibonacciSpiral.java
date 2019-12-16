@@ -55,8 +55,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 
 	@Override
 	public boolean generate() {
-		xMax = (float)(machine.getPaperWidth () * machine.getPaperMargin() /2.0f);
-		yMax = (float)(machine.getPaperHeight() * machine.getPaperMargin() /2.0f);
+		xMax = (float)(machine.getMarginWidth () /2.0f);
+		yMax = (float)(machine.getMarginHeight() /2.0f);
 		System.out.println("xMax="+xMax);
 		System.out.println("yMax="+yMax);
 		

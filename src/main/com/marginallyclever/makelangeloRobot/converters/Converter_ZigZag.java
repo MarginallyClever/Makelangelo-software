@@ -296,12 +296,12 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 	protected void connectTheDots(TransformedImage img) {
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getPaperBottom() * (float)machine.getPaperMargin();
-		float yTop    = (float)machine.getPaperTop()    * (float)machine.getPaperMargin();
-		float xLeft   = (float)machine.getPaperLeft()   * (float)machine.getPaperMargin();
-		float xRight  = (float)machine.getPaperRight()  * (float)machine.getPaperMargin();
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop()   ;
+		double xLeft   = machine.getMarginLeft()  ;
+		double xRight  = machine.getMarginRight() ;
 		
-		float x, y;
+		double x, y;
 		int i;
 		// count the points
 		numPoints = 0;

@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -49,8 +50,8 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		float h2 = (float)machine.getPaperHeight();
 		float w2 = (float)machine.getPaperWidth();
 		separation = (w2<h2) ? w2/4 : h2/4;
-		
-		turtle.reset();
+
+		turtle = new Turtle();
 		
 		Log.info("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
 		Log.info("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
@@ -125,7 +126,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 			++numRings;
 		}
 
-		Log.info("yellow", numRings + " rings.");
+		Log.info(numRings + " rings.");
 	}
 }
 
