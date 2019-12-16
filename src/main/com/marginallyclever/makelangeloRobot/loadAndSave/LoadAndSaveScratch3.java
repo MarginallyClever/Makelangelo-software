@@ -41,6 +41,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
+@SuppressWarnings(value = { "unused" }) // TODO until this is finished
+
 public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSaveFileType {
 	private final String PROJECT_JSON = "project.json";
 	
@@ -75,7 +77,6 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
-	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
 	private JSONObject blocks;
