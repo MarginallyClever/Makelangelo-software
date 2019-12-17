@@ -1,15 +1,10 @@
 package com.marginallyclever.makelangeloRobot.loadAndSave;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -70,8 +65,6 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
-	//private int indent=0;
-	private boolean penUp=false;
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -93,135 +86,96 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		Log.info(Translator.get("FileTypeSB2")+"...");
-		// set up a temporary file
-		File tempGCodeFile;
+
+		machine = robot.getSettings();
+		turtle = new Turtle();
+		
 		try {
-			tempGCodeFile = File.createTempFile("temp", ".ngc");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-		tempGCodeFile.deleteOnExit();
-		Log.info(Translator.get("Converting") + " " + tempGCodeFile.getName());
-
-		try (FileOutputStream fileOutputStream = new FileOutputStream(tempGCodeFile);
-				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8))
-		{
-			if(robot.getSettings().isReverseForGlass()) {
-				Log.info("Flipping for glass...");
+			// open zip file
+        	System.out.println("Searching for project.json...");
+        	
+			ZipInputStream zipInputStream = new ZipInputStream(in);
+			
+			// locate project.json
+			ZipEntry entry;
+			File tempZipFile=null;
+			boolean found=false;
+			while((entry = zipInputStream.getNextEntry())!=null) {
+		        if( entry.getName().equals(PROJECT_JSON) ) {
+		        	System.out.println("Found project.json...");
+		        	
+			        // read buffered stream into temp file.
+		        	tempZipFile = File.createTempFile("project", "json");
+		        	tempZipFile.setReadable(true);
+		        	tempZipFile.setWritable(true);
+		        	tempZipFile.deleteOnExit();
+			        FileOutputStream fos = new FileOutputStream(tempZipFile);
+		    		byte[] buffer = new byte[2048];
+		    		int len;
+	                while ((len = zipInputStream.read(buffer)) > 0) {
+	                    fos.write(buffer, 0, len);
+	                }
+	                fos.close();
+	                found=true;
+	                break;
+		        }
 			}
 
-			machine = robot.getSettings();
-			
-			try {
-				// open zip file
-	        	System.out.println("Searching for project.json...");
-	        	
-				ZipInputStream zipInputStream = new ZipInputStream(in);
-				
-				// locate project.json
-				ZipEntry entry;
-				File tempZipFile=null;
-				boolean found=false;
-				while((entry = zipInputStream.getNextEntry())!=null) {
-			        if( entry.getName().equals(PROJECT_JSON) ) {
-			        	System.out.println("Found project.json...");
-			        	
-				        // read buffered stream into temp file.
-			        	tempZipFile = File.createTempFile("project", "json");
-			        	tempZipFile.setReadable(true);
-			        	tempZipFile.setWritable(true);
-			        	tempZipFile.deleteOnExit();
-				        FileOutputStream fos = new FileOutputStream(tempZipFile);
-			    		byte[] buffer = new byte[2048];
-			    		int len;
-		                while ((len = zipInputStream.read(buffer)) > 0) {
-		                    fos.write(buffer, 0, len);
-		                }
-		                fos.close();
-		                found=true;
-		                break;
-			        }
-				}
-
-				if(found==false) {
-					throw new Exception("SB2 missing project.json");
-				}
-				
-    			// parse JSON
-                System.out.println("Parsing JSON file...");
-                
-	        	JSONParser parser = new JSONParser();
-    			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
-    			// we're done with the tempZipFile now that we have the JSON structure.
-    			tempZipFile.delete();
-    			
-    			// reset the turtle object
-    			turtle = new Turtle();
-    			
-    			// make sure machine state is the default.
-    			imageStart(out);
-    			
-    			readScratchVariables(tree);
-    			readScratchLists(tree);
-
-    			// read the sketch(es)
-    			JSONArray children = (JSONArray)tree.get("children");
-    			if(children==null) throw new Exception("JSON node 'children' missing.");
-    			//System.out.println("found children");
-    			
-    			// look for the first child with a script
-
-    			ListIterator<?> childIter = children.listIterator();
-				JSONArray scripts = null;
-				while( childIter.hasNext() ) {
-    				JSONObject child = (JSONObject)childIter.next();
-    				scripts = (JSONArray)child.get("scripts");
-    				if (scripts != null)
-    					break;
-				}
-    			
-    			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
-    			System.out.println("found  " +scripts.size() + " scripts");
-    			
-    			// extract known elements and convert them to gcode.
-    			ListIterator<?> scriptIter = scripts.listIterator();
-    			// find the script with the green flag
-    			while( scriptIter.hasNext() ) {
-	    			JSONArray scripts0 = (JSONArray)scriptIter.next();
-	    			if( scripts0==null ) continue;
-	    			//System.out.println("scripts0");
-	    			JSONArray scripts02 = (JSONArray)scripts0.get(2);
-	    			if( scripts02==null || scripts02.size()==0 ) continue;
-	    			//System.out.println("scripts02");
-	    			// actual code begins here.
-	    			parseScratchCode(scripts02,out);
-    			}
-
-    			imageEnd(out);
-    			
-    			System.out.println("finished scripts");
-			} catch (Exception e) {
-				Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
-				e.printStackTrace();
-				return false;
+			if(found==false) {
+				throw new Exception("SB2 missing project.json");
 			}
 			
-			// finished. Close up file.
-			out.flush();
-			out.close();
+			// parse JSON
+            System.out.println("Parsing JSON file...");
+            
+        	JSONParser parser = new JSONParser();
+			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
+			// we're done with the tempZipFile now that we have the JSON structure.
+			tempZipFile.delete();
+			
+			readScratchVariables(tree);
+			readScratchLists(tree);
 
-			// now load the gcode.
-			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(tempGCodeFile);
-			loader.load(fileInputStream,robot);
-		} catch (IOException e) {
+			// read the sketch(es)
+			JSONArray children = (JSONArray)tree.get("children");
+			if(children==null) throw new Exception("JSON node 'children' missing.");
+			//System.out.println("found children");
+			
+			// look for the first child with a script
+
+			ListIterator<?> childIter = children.listIterator();
+			JSONArray scripts = null;
+			while( childIter.hasNext() ) {
+				JSONObject child = (JSONObject)childIter.next();
+				scripts = (JSONArray)child.get("scripts");
+				if (scripts != null)
+					break;
+			}
+			
+			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+
+			System.out.println("found  " +scripts.size() + " scripts");
+			
+			// extract known elements and convert them to gcode.
+			ListIterator<?> scriptIter = scripts.listIterator();
+			// find the script with the green flag
+			while( scriptIter.hasNext() ) {
+    			JSONArray scripts0 = (JSONArray)scriptIter.next();
+    			if( scripts0==null ) continue;
+    			//System.out.println("scripts0");
+    			JSONArray scripts02 = (JSONArray)scripts0.get(2);
+    			if( scripts02==null || scripts02.size()==0 ) continue;
+    			//System.out.println("scripts02");
+    			// actual code begins here.
+    			parseScratchCode(scripts02);
+			}
+			
+			System.out.println("finished scripts");
+			robot.setTurtle(turtle);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	
-		tempGCodeFile.delete();
-		
+
 		return true;
 	}
 
@@ -320,7 +274,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	 * @param out where to put the gcode.
 	 * @throws Exception
 	 */
-	private void parseScratchCode(JSONArray script,Writer out) throws Exception {
+	private void parseScratchCode(JSONArray script) throws Exception {
 		if(script==null) return;
 		
 		//for(int j=0;j<indent;++j) System.out.print("  ");
@@ -333,7 +287,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			Object o = (Object)scriptIter.next();
 			if( o instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)o;
-				parseScratchCode(arr,out);
+				parseScratchCode(arr);
 			} else {
 				String name = o.toString();
 				//for(int j=0;j<indent;++j) System.out.print("  ");
@@ -344,7 +298,6 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	    			// reset the turtle object
 	    			turtle = new Turtle();
 	    			// make sure machine state is the default.
-	    			setAbsoluteMode(out);
 					System.out.println("**START**");
 					continue;
 				} else if(name.equals("doRepeat")) {
@@ -353,30 +306,30 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					int count = (int)resolveValue(o2);
 					//System.out.println("Repeat "+count+" times:");
 					for(int i=0;i<count;++i) {
-						parseScratchCode((JSONArray)o3,out);
+						parseScratchCode((JSONArray)o3);
 					}
 				} else if(name.equals("doUntil")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					//System.out.println("Do Until {");
 					while(!resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3,out);
+						parseScratchCode((JSONArray)o3);
 					}
 					//System.out.println("}");
 				} else if(name.equals("doIf")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					if(resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3,out);
+						parseScratchCode((JSONArray)o3);
 					}
 				} else if(name.equals("doIfElse")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					Object o4 = (Object)scriptIter.next();
 					if(resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3,out);
+						parseScratchCode((JSONArray)o3);
 					} else {
-						parseScratchCode((JSONArray)o4,out);
+						parseScratchCode((JSONArray)o4);
 					}
 				} else if(name.equals("append:toList:")) {
 					// "append:toList:", new value, list name 
@@ -413,13 +366,11 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					System.out.println("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
-					penUp=true;
-					this.liftPen(out);
+					turtle.penUp();
 					System.out.println("pen up");
 					continue;
 				} else if(name.equals("putPenDown")) {
-					penUp=false;
-					this.lowerPen(out);
+					turtle.penDown();
 					System.out.println("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
@@ -427,27 +378,22 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					Object o3 = (Object)scriptIter.next();
 					double y = resolveValue(o3);
 					
-					turtle.setX(x);
-					turtle.setY(y);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(x,y);
 					System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setX(turtle.getX()+v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX()+v,turtle.getY());
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setY(turtle.getY()+v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX(),turtle.getY()+v);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.forward(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					System.out.println("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
@@ -462,14 +408,12 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setX(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(v,turtle.getY());
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setY(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX(),v);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();

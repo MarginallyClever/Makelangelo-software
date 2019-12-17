@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot.converters;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
@@ -42,7 +38,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 
 
-	private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction, Writer out) throws IOException {
+	private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction) {
 		ColorRGB oldPixel = new ColorRGB(0, 0, 0);
 		ColorRGB newPixel = new ColorRGB(0, 0, 0);
 		ColorRGB quant_error = new ColorRGB(0, 0, 0);
@@ -72,28 +68,27 @@ public class Converter_ColorBoxes extends ImageConverter {
 
 			// pixel[x][y] := newpixel
 			if (newIndex == palette_mask) {
-				// draw a circle.  the diameter is relative to the intensity.
+				// draw a box.  the size is relative to the intensity.
 				if (draw_filled) {
-					moveTo(out, x + step2 - step2, y + step2 - step2, true);
-					lowerPen(out);
-					moveTo(out, x + step2 + step2, y + step2 - step2, false);
-					moveTo(out, x + step2 + step2, y + step2 + step2, false);
-					moveTo(out, x + step2 - step2, y + step2 + step2, false);
-					moveTo(out, x + step2 - step2, y + step2 - step2, false);
-					moveTo(out, x + step2 + step1, y + step2 - step1, false);
-					moveTo(out, x + step2 + step1, y + step2 + step1, false);
-					moveTo(out, x + step2 - step1, y + step2 + step1, false);
-					moveTo(out, x + step2 - step1, y + step2 - step1, false);
-					moveTo(out, x + step2, y + step2, false);
-					liftPen(out);
+					turtle.jumpTo( x + step2 - step2, y + step2 - step2);
+					turtle.setAngle(0);
+					turtle.forward(step2*2);	turtle.turn(-90);
+					turtle.forward(step2*2);	turtle.turn(-90);
+					turtle.forward(step2*2);	turtle.turn(-90);
+					turtle.forward(step2*2);	turtle.turn(-90);
+					turtle.moveTo( x + step2 - step1, y + step2 - step1);
+					turtle.setAngle(0);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
 				} else {
-					moveTo(out, x + step2 - step1, y + step2 - step1, true);
-					lowerPen(out);
-					moveTo(out, x + step2 + step1, y + step2 - step1, false);
-					moveTo(out, x + step2 + step1, y + step2 + step1, false);
-					moveTo(out, x + step2 - step1, y + step2 + step1, false);
-					moveTo(out, x + step2 - step1, y + step2 - step1, false);
-					liftPen(out);
+					turtle.jumpTo( x + step2 - step1, y + step2 - step1);
+					turtle.setAngle(0);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
+					turtle.forward(step1*2);	turtle.turn(-90);
 				}
 			}
 
@@ -117,7 +112,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	}
 	
 
-	protected void scan(int tool_index, TransformedImage img, Writer out,String colorName,ColorRGB newPenColor) throws IOException {
+	protected void scan(int tool_index, TransformedImage img, String colorName, ColorRGB newPenColor) {
 		palette_mask = tool_index;
 
 		turtle.penUp();
@@ -135,7 +130,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 		
 		direction = 1;
 		for (y = (int)yBottom; y < yTop; y+= step4) {
-			ditherDirection(img, y, error, nexterror, direction, out);
+			ditherDirection(img, y, error, nexterror, direction);
 
 			direction = -direction;
 			ColorRGB[] tmp = error;
@@ -150,7 +145,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img) {
 		double pw = machine.getMarginWidth();
 
 		// figure out how many boxes we're going to have on this image.
@@ -165,10 +160,10 @@ public class Converter_ColorBoxes extends ImageConverter {
 		nexterror = new ColorRGB[(int) Math.ceil(stepsTotal)];
 
 		try {
-			scan(0, img, out,"Black",new ColorRGB(  0,  0,  0));  // black
-			scan(1, img, out,"Red"  ,new ColorRGB(255,  0,  0));  // red
-			scan(2, img, out,"Green",new ColorRGB(  0,255,  0));  // green
-			scan(3, img, out,"Blue" ,new ColorRGB(  0,  0,255));  // blue
+			scan(0, img, "Black",new ColorRGB(  0,  0,  0));  // black
+			scan(1, img, "Red"  ,new ColorRGB(255,  0,  0));  // red
+			scan(2, img, "Green",new ColorRGB(  0,255,  0));  // green
+			scan(3, img, "Blue" ,new ColorRGB(  0,  0,255));  // blue
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

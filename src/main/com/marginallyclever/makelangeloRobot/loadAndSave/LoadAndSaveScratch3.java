@@ -105,131 +105,93 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
 		Log.info(Translator.get("FileTypeSB3")+"...");
-		// set up a temporary file
-		File tempGCodeFile;
+		// reset the turtle object
+		turtle = new Turtle();
+		machine = robot.getSettings();
+			
 		try {
-			tempGCodeFile = File.createTempFile("temp", ".ngc");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-		tempGCodeFile.deleteOnExit();
-		Log.info(Translator.get("Converting") + " " + tempGCodeFile.getName());
-
-		try (FileOutputStream fileOutputStream = new FileOutputStream(tempGCodeFile);
-				Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8))
-		{
-			if(robot.getSettings().isReverseForGlass()) {
-				Log.info("Flipping for glass...");
+			// open zip file
+        	System.out.println("Searching for project.json...");
+        	
+			ZipInputStream zipInputStream = new ZipInputStream(in);
+			
+			// locate project.json
+			ZipEntry entry;
+			File tempZipFile=null;
+			boolean found=false;
+			while((entry = zipInputStream.getNextEntry())!=null) {
+		        if( entry.getName().equals(PROJECT_JSON) ) {
+		        	System.out.println("Found project.json...");
+		        	
+			        // read buffered stream into temp file.
+		        	tempZipFile = File.createTempFile("project", "json");
+		        	tempZipFile.setReadable(true);
+		        	tempZipFile.setWritable(true);
+		        	tempZipFile.deleteOnExit();
+			        FileOutputStream fos = new FileOutputStream(tempZipFile);
+		    		byte[] buffer = new byte[2048];
+		    		int len;
+	                while ((len = zipInputStream.read(buffer)) > 0) {
+	                    fos.write(buffer, 0, len);
+	                }
+	                fos.close();
+	                found=true;
+	                break;
+		        }
 			}
 
-			machine = robot.getSettings();
+			if(found==false) {
+				throw new Exception("SB3 missing project.json");
+			}
 			
-			try {
-				// open zip file
-	        	System.out.println("Searching for project.json...");
-	        	
-				ZipInputStream zipInputStream = new ZipInputStream(in);
-				
-				// locate project.json
-				ZipEntry entry;
-				File tempZipFile=null;
-				boolean found=false;
-				while((entry = zipInputStream.getNextEntry())!=null) {
-			        if( entry.getName().equals(PROJECT_JSON) ) {
-			        	System.out.println("Found project.json...");
-			        	
-				        // read buffered stream into temp file.
-			        	tempZipFile = File.createTempFile("project", "json");
-			        	tempZipFile.setReadable(true);
-			        	tempZipFile.setWritable(true);
-			        	tempZipFile.deleteOnExit();
-				        FileOutputStream fos = new FileOutputStream(tempZipFile);
-			    		byte[] buffer = new byte[2048];
-			    		int len;
-		                while ((len = zipInputStream.read(buffer)) > 0) {
-		                    fos.write(buffer, 0, len);
-		                }
-		                fos.close();
-		                found=true;
-		                break;
-			        }
-				}
-
-				if(found==false) {
-					throw new Exception("SB3 missing project.json");
-				}
-				
-    			// parse JSON
-                System.out.println("Parsing JSON file...");
-                
-	        	JSONParser parser = new JSONParser();
-    			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
-    			// we're done with the tempZipFile now that we have the JSON structure.
-    			tempZipFile.delete();
-    			
-    			// reset the turtle object
-    			turtle = new Turtle();
-    			
-    			// make sure machine state is the default.
-    			imageStart(out);
-    			
-    			if(confirmAtLeastVersion3(tree)==false) {
-    				JOptionPane.showMessageDialog(null, "File must be at least version 3.0.0.");
-    				return false;
-    			}
-    			if(confirmHasPenExtension(tree)==false) {
-    				JOptionPane.showMessageDialog(null, "File must include pen extension.");
-    				return false;
-    			}
-    			
-    			readScratchVariables(tree);
-    			readScratchLists(tree);
-    			readScratchInstructions(tree, out);
-
-    			// read the sketch(es)
-    			JSONArray children = (JSONArray)tree.get("children");
-    			if(children==null) throw new Exception("JSON node 'children' missing.");
-    			//System.out.println("found children");
-    			
-    			// look for the first child with a script
-
-    			ListIterator<?> childIter = children.listIterator();
-				JSONArray scripts = null;
-				while( childIter.hasNext() ) {
-    				JSONObject child = (JSONObject)childIter.next();
-    				scripts = (JSONArray)child.get("scripts");
-    				if (scripts != null)
-    					break;
-				}
-    			
-    			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
-    			System.out.println("found  " +scripts.size() + " scripts");
-    			
-    			imageEnd(out);
-    			
-    			System.out.println("finished scripts");
-			} catch (Exception e) {
-				Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
-				e.printStackTrace();
+			// parse JSON
+            System.out.println("Parsing JSON file...");
+            
+        	JSONParser parser = new JSONParser();
+			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
+			// we're done with the tempZipFile now that we have the JSON structure.
+			tempZipFile.delete();
+			
+			
+			if(confirmAtLeastVersion3(tree)==false) {
+				JOptionPane.showMessageDialog(null, "File must be at least version 3.0.0.");
+				return false;
+			}
+			if(confirmHasPenExtension(tree)==false) {
+				JOptionPane.showMessageDialog(null, "File must include pen extension.");
 				return false;
 			}
 			
-			// finished. Close up file.
-			out.flush();
-			out.close();
+			readScratchVariables(tree);
+			readScratchLists(tree);
+			readScratchInstructions(tree);
 
-			// now load the gcode.
-			LoadAndSaveGCode loader = new LoadAndSaveGCode();
-			InputStream fileInputStream = new FileInputStream(tempGCodeFile);
-			loader.load(fileInputStream,robot);
-		} catch (IOException e) {
+			// read the sketch(es)
+			JSONArray children = (JSONArray)tree.get("children");
+			if(children==null) throw new Exception("JSON node 'children' missing.");
+			//System.out.println("found children");
+			
+			// look for the first child with a script
+			ListIterator<?> childIter = children.listIterator();
+			JSONArray scripts = null;
+			while( childIter.hasNext() ) {
+				JSONObject child = (JSONObject)childIter.next();
+				scripts = (JSONArray)child.get("scripts");
+				if (scripts != null)
+					break;
+			}
+			
+			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+
+			System.out.println("found  " +scripts.size() + " scripts");
+			System.out.println("finished scripts");
+		} catch (Exception e) {
+			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
 			e.printStackTrace();
+			return false;
 		}
-	
-		tempGCodeFile.delete();
-		
+			
+		robot.setTurtle(turtle);
 		return true;
 	}
 
@@ -239,7 +201,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	 * @param tree the JSONObject tree read from the project.json/zip file.
 	 * @throws Exception
 	 */
-	private void readScratchInstructions(JSONObject tree,Writer out) throws Exception {
+	private void readScratchInstructions(JSONObject tree) throws Exception {
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray targets = (JSONArray)tree.get("targets");
 		ListIterator<?> targetIter = targets.listIterator();
@@ -259,7 +221,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 				if(topLevel && opcode.equals("event_whenflagclicked")) {
 					// found!
 					System.out.println("**START**");
-					parseScratchCode(out,k);
+					parseScratchCode(k);
 					System.out.println("**END**");
 				}
 			}
@@ -274,7 +236,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		return (JSONObject)blocks.get(key);
 	}
 	
-	void parseScratchCode(Writer out,Object currentKey) throws Exception {
+	void parseScratchCode(Object currentKey) throws Exception {
 		JSONObject currentBlock = (JSONObject)blocks.get(currentKey);
 		JSONObject inputs;
 		JSONArray substack, condition;
@@ -290,7 +252,6 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 				// reset the turtle object
 				turtle = new Turtle();
 				// make sure machine state is the default.
-				setAbsoluteMode(out);
 				break;
 				
 			// C BLOCKS START
@@ -511,8 +472,6 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					// gcode preamble
 	    			// reset the turtle object
 	    			turtle = new Turtle();
-	    			// make sure machine state is the default.
-	    			setAbsoluteMode(out);
 					System.out.println("**START**");
 					continue;
 				} else if(name.equals("doRepeat")) {
@@ -581,13 +540,11 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					System.out.println("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
-					penUp=true;
-					this.liftPen(out);
+					turtle.penUp();
 					System.out.println("pen up");
 					continue;
 				} else if(name.equals("putPenDown")) {
-					penUp=false;
-					this.lowerPen(out);
+					turtle.penDown();
 					System.out.println("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
@@ -595,27 +552,22 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					Object o3 = (Object)scriptIter.next();
 					double y = resolveValue(o3);
 					
-					turtle.setX(x);
-					turtle.setY(y);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(x,y);
 					System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setX(turtle.getX()+v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX()+v,turtle.getY());
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setY(turtle.getY()+v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX(),turtle.getY()+v);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.forward(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
 					System.out.println("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
@@ -630,14 +582,12 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setX(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(v,turtle.getY());
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.setY(v);
-					this.moveTo(out, turtle.getX(), turtle.getY(), penUp);
+					turtle.moveTo(turtle.getX(),v);
 					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();

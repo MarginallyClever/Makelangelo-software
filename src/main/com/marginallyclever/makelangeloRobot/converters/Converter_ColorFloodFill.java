@@ -5,12 +5,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.LinkedList;
 
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -127,9 +126,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * queue-based flood fill
 	 *
 	 * @param colorIndex
-	 * @throws IOException
 	 */
-	protected void floodFillBlob(int colorIndex, float x, float y, Writer osw) throws IOException {
+	protected void floodFillBlob(int colorIndex, float x, float y) {
 		LinkedList<Point> pointsToVisit = new LinkedList<>();
 		pointsToVisit.add(new Point((int)x, (int)y));
 
@@ -148,12 +146,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			float dy = a.y - lastY;
 			if ((dx * dx + dy * dy) > diameter * diameter * 2.0f) {
 				//System.out.print("Jump at "+x+", "+y+"\n");
-				moveTo(osw, lastX, lastY, true);
-				moveTo(osw, a.x, a.y, true);
-				moveTo(osw, a.x, a.y, false);
+				turtle.jumpTo(a.getX(),a.getY());
 			} else {
 				//System.out.print("Move to "+x+", "+y+"\n");
-				moveTo(osw, a.x, a.y, false);
+				turtle.moveTo(a.x, a.y);
 			}
 			// update the last position.
 			lastX = a.x;
@@ -175,9 +171,8 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * find blobs of color in the original image.  Send that to the flood fill system.
 	 *
 	 * @param colorIndex index into the list of colors at the top of the class
-	 * @throws IOException
 	 */
-	void scanForContiguousBlocks(int colorIndex, Writer osw) throws IOException {
+	void scanForContiguousBlocks(int colorIndex) {
 		ColorRGB originalColor;
 		int quantized_color;
 
@@ -194,7 +189,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 				quantized_color = palette.quantizeIndex(originalColor);
 				if (quantized_color == colorIndex) {
 					// found blob
-					floodFillBlob(colorIndex, x, y, osw);
+					floodFillBlob(colorIndex, x, y);
 					z++;
 					//if(z==20)
 					//            return;
@@ -204,15 +199,13 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		System.out.println("Found " + z + " blobs.");
 	}
 
-	private void scanColor(int i, Writer osw) throws IOException {
+	private void scanColor(int i) {
 		// "please change to tool X and press any key to continue"
-		liftPen(osw);
-		machine.writeChangeToDefaultColor(osw);
-		// Make sure the pen is up for the first move
-
+		turtle.penUp();
+		turtle.setColor(machine.getPenDownColorDefault());
 		Log.info("green", "Color " + i );
 
-		scanForContiguousBlocks(i, osw);
+		scanForContiguousBlocks(i);
 	}
 
 	/**
@@ -220,13 +213,14 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public boolean convert(TransformedImage img) {
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
 		img = blur.filter(img);
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);
 
-
+		turtle=new Turtle();
+		
 		// create a color mask so we don't repeat any pixels
 		BufferedImage bi = new BufferedImage(img.getSourceImage().getWidth(), img.getSourceImage().getHeight(), BufferedImage.TYPE_INT_RGB);
 		imgMask = new TransformedImage(bi);
@@ -234,8 +228,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		Graphics2D g = bi.createGraphics();
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
-
-		setAbsoluteMode(out);
 
 		yBottom = machine.getMarginBottom();
 		yTop    = machine.getMarginTop();
@@ -249,13 +241,13 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		lastX = 0;
 		lastY = 0;
 
-		scanColor(0, out);  // black
-		scanColor(1, out);  // red
-		scanColor(2, out);  // green
-		scanColor(3, out);  // blue
+		scanColor(0);  // black
+		scanColor(1);  // red
+		scanColor(2);  // green
+		scanColor(3);  // blue
 
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		turtle.penUp();
+		
 		return true;
 	}
 }
