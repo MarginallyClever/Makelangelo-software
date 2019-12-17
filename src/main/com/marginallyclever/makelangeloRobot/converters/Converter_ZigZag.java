@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
@@ -276,21 +277,18 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			}
 		}
 
-		imageStart(out);
-		liftPen(out);
-
+		turtle = new Turtle();
+		turtle.jumpTo(points[besti].x, points[besti].y);
 		// move to the first point
 		moveToPoint(out, besti, false);
-		lowerPen(out);
 
 		for (i = 1; i < numPoints; ++i) {
-			moveToPoint(out, (besti + i) % numPoints, false);
+			int v = (besti + i) % numPoints;
+			turtle.moveTo(points[v].x, points[v].y);
 		}
-		moveToPoint(out, besti, false);
+		turtle.jumpTo(points[besti].x, points[besti].y);
 
-		// lift pen and return to home
-		liftPen(out);
-	    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
+		turtle.penUp();
 	}
 
 
