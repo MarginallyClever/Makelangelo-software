@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangeloRobot;
 
-
-import java.io.IOException;
-import java.io.Writer;
-
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
@@ -21,20 +17,12 @@ public abstract class ImageManipulator {
 	
 	// pen position optimizing
 	public Turtle turtle = new Turtle();
-	
 	// threading
 	protected ProgressMonitor pm;
 	protected SwingWorker<Void, Void> swingWorker;
-
 	// helpers
 	protected MakelangeloRobotSettings machine;
 
-	// quickly calculate margin edges for clipping
-	double yTop;
-	double yBottom;
-	double xLeft;
-	double xRight;
-	
 	
 	public void setSwingWorker(SwingWorker<Void, Void> p) {
 		swingWorker = p;
@@ -57,122 +45,32 @@ public abstract class ImageManipulator {
 	}
 
 
-	/**
-	 * insert the machine-specific preamble at the start of the gcode file.
-	 * @param img
-	 * @param out
-	 * @throws IOException
-	 */
-	public void imageStart(Writer out) throws IOException {	
-		machine.writeProgramStart(out);
-		machine.writeChangeToDefaultColor(out);
-		setAbsoluteMode(out);
-		liftPen(out);
-	}
-
-
-	/**
-	 * insert the machine-specific preamble at the start of the gcode file.
-	 * @param img
-	 * @param out
-	 * @throws IOException
-	 */
-	public void imageEnd(Writer out) throws IOException {
-		liftPen(out);
-	    moveTo(out, machine.getHomeX(), machine.getHomeY(),true);
-		machine.writeProgramEnd(out);
-	}
-
-
-	public void liftPen(Writer out) throws IOException {
-		machine.writePenUp(out);
-	}
-
-
-	public void lowerPen(Writer out) throws IOException {
-		machine.writePenDown(out);
-	}
-	
-	protected void setAbsoluteMode(Writer out) throws IOException {
-		machine.writeAbsoluteMode(out);
-	}
-
-	protected void setRelativeMode(Writer out) throws IOException {
-		machine.writeRelativeMode(out);
-	}
-
-
-	/**
-	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
-	 * @param out where to write the gcode
-	 * @param x new coordinate
-	 * @param y new coordinate
-	 * @param liftPenNow new pen state
-	 * @throws IOException on write failure
-	 */
-	protected void moveTo(Writer out, double x, double y, boolean liftPenNow) throws IOException {
-		if (liftPenNow) liftPen(out);
-		else lowerPen(out);
-		
-		moveTo(out,x,y);
-	}
-
-
-	/**
-	 * Create the gcode that will move the robot to a new position.  It does not translate from image space to paper space.
-	 * @param out where to write the gcode
-	 * @param x new coordinate
-	 * @param y new coordinate
-	 * @throws IOException on write failure
-	 */
-	public void moveTo(Writer out, double x, double y) throws IOException {
-		//if(isInsidePaperMargins(x,y)) {
-			machine.writeMoveTo(out, x, y, false);
-		//}
-	}
-
-
 	protected boolean isInsidePaperMargins(double x,double y) {
-		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
-		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
-		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
-		yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
-	
-		if( x < xLeft  ) return false;
-		if( x > xRight ) return false;
-		if( y < yBottom) return false;
-		if( y > yTop   ) return false;
+		if( x < machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON) return false;
+		if( x > machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON) return false;
+		if( y < machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON) return false;
+		if( y > machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON) return false;
 		return true;
 	}
 
 	
 	/**
-	 * Pen has moved from one side of paper margin to another.  Find the point on the edge that is inside and mark that with a pen up or down (as appropriate)
+	 * Clip the line P0-P1 to the paper margins.
 	 * https://stackoverflow.com/questions/626812/most-elegant-way-to-clip-a-line
-	 * @param oldX
-	 * @param oldY
-	 * @param x
-	 * @param y
-	 * @param oldPenUp
-	 * @param penUp
-	 * @throws IOException
+	 * @param P0 start of line
+	 * @param P1 end of line
+	 * @return true if some of the line remains, false if the entire line is cut.
 	 */
 	protected boolean clipLineToPaperMargin(Point2D P0,Point2D P1) {
-		xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
-		xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
-		yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
-		yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
+		double xLeft   = machine.getMarginLeft()  -ImageManipulator.MARGIN_EPSILON;
+		double xRight  = machine.getMarginRight() +ImageManipulator.MARGIN_EPSILON;
+		double yBottom = machine.getMarginBottom()-ImageManipulator.MARGIN_EPSILON;
+		double yTop    = machine.getMarginTop()   +ImageManipulator.MARGIN_EPSILON;
 		
-		return CohenSutherland2DClipper(P0, P1);
-	}
-
-	
-	// line/box clipping
-	boolean CohenSutherland2DClipper(Point2D P0,Point2D P1) {
 		int outCode0,outCode1; 
 		while(true) {
-			outCode0 = outCodes(P0);
-			outCode1 = outCodes(P1);
+			outCode0 = outCodes(P0,xLeft,xRight,yTop,yBottom);
+			outCode1 = outCodes(P1,xLeft,xRight,yTop,yBottom);
 			if( rejectCheck(outCode0,outCode1) ) return false;  // whatever portion is left is completely out
 			if( acceptCheck(outCode0,outCode1) ) return true;  // whatever portion is left is completely in
 			if(outCode0 == 0) {
@@ -200,9 +98,9 @@ public abstract class ImageManipulator {
 				P0.x = xLeft;
 			}
 		} 
-	} 
+	}
 	
-	private int outCodes(Point2D P) {
+	private int outCodes(Point2D P,double xLeft,double xRight,double yTop,double yBottom) {
 		int code = 0;
 		if(P.y > yTop) code += 1; /* code for above */ 
 		else if(P.y < yBottom) code += 2; /* code for below */
