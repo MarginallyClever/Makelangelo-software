@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -204,19 +205,32 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		Log.info("saving...");
 		Turtle turtle = robot.getTurtle();
 		MakelangeloRobotSettings machine = robot.getSettings();
-				
+		DecimalFormat df = new DecimalFormat("##0.00");
+		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			machine.writeProgramStart(out);
-			machine.writeChangeToDefaultColor(out);
+			//machine.writeChangeToDefaultColor(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);
 			boolean isUp=true;
+			
+			float total = turtle.history.size();
+			float soFar=0;
+			int c=0;
+			
 			for(Turtle.Movement m : turtle.history ) {
+				soFar++;
+				
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {
 						machine.writePenUp(out);
 						isUp=true;
+						if(c++>10) {
+							c=0;
+							float p = 100.0f * (soFar/total);
+							out.write("M117 "+df.format(p)+"%\n");
+						}
 					}
 					break;
 				case DRAW:
@@ -226,6 +240,11 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 						isUp=false;
 					}
 					machine.writeMoveTo(out,m.x, m.y,isUp);
+					if(c++>10) {
+						c=0;
+						float p = 100.0f * (soFar/total);
+						out.write("M117 "+df.format(p)+"%\n");
+					}
 					break;
 				case TOOL_CHANGE:
 					machine.writeChangeTo(out, m.getColor());
@@ -234,6 +253,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			}
 			if(!isUp) machine.writePenUp(out);
 			machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
+			out.write("M117 100.00%\n");
 			machine.writeProgramEnd(out);
 			
 			out.flush();
