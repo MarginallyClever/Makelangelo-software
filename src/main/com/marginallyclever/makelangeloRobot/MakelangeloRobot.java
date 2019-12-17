@@ -7,8 +7,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.prefs.Preferences;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,9 +38,9 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
+import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a
@@ -78,6 +80,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	protected Turtle turtle;
 	private ReentrantLock turtleLock;
 
+	private ArrayList<String> drawingCommands;
+	int drawingProgress;
+	
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
 
@@ -104,6 +109,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		setGondolaY(0);
 		turtle = new Turtle();
 		turtleLock = new ReentrantLock();
+		drawingCommands=new ArrayList<String>();
+		drawingProgress=0;
 	}
 
 	public NetworkConnection getConnection() {
@@ -285,9 +292,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void lineError(NetworkConnection arg0, int lineNumber) {
-		if (gCode != null) {
-			gCode.setLinesProcessed(lineNumber);
-		}
+		drawingProgress=lineNumber;
 
 		notifyLineError(lineNumber);
 	}
@@ -473,27 +478,29 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * Take the next line from the file and send it to the robot, if permitted.
 	 */
 	public void sendFileCommand() {
-		if (isRunning() == false || isPaused() == true || gCode == null || gCode.isFileOpened() == false
-				|| (getConnection() != null && isPortConfirmed() == false))
+		int total=drawingCommands.size();
+
+		if (!isRunning() || isPaused() || total==0
+			|| (getConnection() != null && isPortConfirmed() == false)
+			)
 			return;
 
 		// are there any more commands?
-		if (gCode.moreLinesAvailable() == false) {
-			// end of file
+		if(drawingProgress == total) {
+			// no!
 			halt();
 			// bask in the glory
-			int x = gCode.getLinesTotal();
 			if (myPanel != null)
-				myPanel.statusBar.setProgress(x, x);
+				myPanel.statusBar.setProgress(total, total);
 
 			SoundSystem.playDrawingFinishedSound();
 		} else {
-			int lineNumber = gCode.getLinesProcessed();
-			String line = gCode.nextLine();
-			sendLineWithNumberAndChecksum(line, lineNumber);
-
+			String line = drawingCommands.get(drawingProgress);
+			sendLineWithNumberAndChecksum(line, drawingProgress);
+			drawingProgress++;
+			
 			if (myPanel != null)
-				myPanel.statusBar.setProgress(lineNumber, gCode.getLinesTotal());
+				myPanel.statusBar.setProgress(drawingProgress, total);
 			// loop until we find a line that gets sent to the robot, at which
 			// point we'll
 			// pause for the robot to respond. Also stop at end of file.
@@ -501,11 +508,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void startAt(int lineNumber) {
-		if (gCode == null)
-			return;
+		if(drawingCommands.size()==0) return;
 
-		gCode.setLinesProcessed(lineNumber);
-		setLineNumber(gCode.getLinesProcessed());
+		drawingProgress = lineNumber;
+		setLineNumber(lineNumber);
 		setRunning();
 		sendFileCommand();
 	}
@@ -728,6 +734,14 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public void setTurtle(Turtle t) {
 		turtle=t;
+		
+
+		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
+			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
+			exportForDrawing.save(fileOutputStream, this);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public Turtle getTurtle() {
 		return turtle;
@@ -798,8 +812,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 								gl2.glVertex2d(previousMove.x,previousMove.y);
 							}
 							isUp=false;
+						} else {
+							gl2.glVertex2d(m.x,m.y);
 						}
-						gl2.glVertex2d(m.x,m.y);
 						previousMove=m;
 						break;
 					case TOOL_CHANGE:
@@ -809,9 +824,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 								(double)penDownColor.getGreen() / 255.0,
 								(double)penDownColor.getBlue() / 255.0,
 								1);
-						if(previousMove!=null) {
-							gl2.glVertex2d(previousMove.x,previousMove.y);
-						}
 						break;
 					}
 				}
@@ -881,5 +893,26 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	// in mm
 	public void setGondolaY(float gondolaY) {
 		this.gondolaY = gondolaY;
+	}
+
+	public int findLastPenUpBefore(int startAtLine) {
+		int total = drawingCommands.size();
+		if( total==0 ) return 0;
+
+		String toMatch = settings.getPenUpString();
+		
+		int x = startAtLine;
+		if(x >= total) x = total-1;
+		
+		toMatch = toMatch.trim();
+		while(x>1) {
+			String line = drawingCommands.get(x).trim();
+			if(line.equals(toMatch)) {
+				return x;
+			}
+			--x;
+		}
+				
+		return x;
 	}
 }

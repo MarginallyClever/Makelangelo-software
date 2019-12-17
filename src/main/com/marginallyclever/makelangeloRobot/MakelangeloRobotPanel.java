@@ -18,9 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +40,6 @@ import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
 import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
 import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
 import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.RPiCamera;
@@ -575,13 +571,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		int lineNumber = p.lineNumber;
 		if (lineNumber != -1) {
 			if(p.findPreviousPenDown==false) {
-				robot.gCode.setLinesProcessed(lineNumber);
+				robot.drawingProgress=lineNumber;
 				if(p.addPenDownCommand==true) {
 					robot.sendLineToRobot(robot.getSettings().getPenDownString());
 				}
 				robot.startAt(lineNumber);
 			} else {
-				int lineBefore = robot.gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString());
+				int lineBefore = robot.findLastPenUpBefore(lineNumber);
 				robot.startAt(lineBefore);
 			}
 		}
