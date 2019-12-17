@@ -584,7 +584,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 					
 					break;
 				case TOOL_CHANGE:
-					// TODO new layer?  m.getColor()
+					// TODO write out DXF layer using  m.getColor()
 					break;
 				}
 			}
