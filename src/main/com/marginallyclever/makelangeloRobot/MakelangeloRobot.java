@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +33,7 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -735,18 +737,146 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setTurtle(Turtle t) {
 		turtle=t;
 		
-
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this);
+			
+			drawingCommands.clear();
+			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
+		    String line;
+		     
+		    while ((line = reader.readLine()) != null) {
+		        drawingCommands.add(line.trim());
+		    }
+		    reader.close();
+		    
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		
+		estimateTime();
 	}
+	
 	public Turtle getTurtle() {
 		return turtle;
 	}
 
+	protected void estimateTime() {
+		double totalTime=0;
+		
+		if(turtleLock.isLocked()) return;
+		turtleLock.lock();
+		try {
+			
+			boolean isUp=true;
+			double ox=this.settings.getHomeX();
+			double oy=this.settings.getHomeY();
+			double oz=this.settings.getPenUpAngle();
+			
+			for( Turtle.Movement m : turtle.history ) {
+				double nx=ox;
+				double ny=oy;
+				double nz=oz;
+				
+				switch(m.type) {
+				case TRAVEL:
+					if(!isUp) {
+						nz = this.settings.getPenUpAngle();
+						isUp=true;
+					}
+					break;
+				case DRAW:
+					if(isUp) {
+						nz = this.settings.getPenDownAngle();
+						isUp=false;
+					}
+					nx=m.x;
+					ny=m.y;
+					break;
+				case TOOL_CHANGE:
+					break;
+				}
+
+				double dx=nx-ox;
+				double dy=ny-oy;
+				double dz=nz-oz;
+				double length=Math.sqrt(dx*dx+dy*dy+dz*dz);
+				if(length>0) {
+					double accel = settings.getAcceleration();
+					double maxV;
+					if(oz!=nz) {
+						maxV = settings.getZRate();
+					} else if(nz==settings.getPenDownAngle()) maxV = settings.getPenDownFeedRate();
+					else maxV = settings.getPenUpFeedRate();
+					totalTime+=estimateSingleBlock(length,0,0,maxV,accel);
+				}
+				ox=nx;
+				oy=ny;
+				oz=nz;
+			}
+		}
+		finally {
+			turtleLock.unlock();
+		}
+		double seconds = totalTime % 60;
+		totalTime-=seconds;
+		totalTime/=60;
+		int minutes = (int)(totalTime % 60);
+		totalTime-=minutes;
+		totalTime/=60;
+		int hours = (int)totalTime;
+		
+		Log.info("Total time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");
+	}
+	
+	/**
+	 * calculate seconds to move a given length.  Also uses globals feedRate and acceleration 
+	 * @param length mm distance to travel.
+	 * @param startRate mm/s at start of move
+	 * @param endRate mm/s at end of move
+	 * @return time to execute move
+	 */
+	protected double estimateSingleBlock(double length,double startRate,double endRate,double maxV,double accel) {
+		double distanceToAccelerate = ( maxV*maxV - startRate*startRate ) / (2.0 *  accel);
+		double distanceToDecelerate = ( endRate*endRate   - maxV*maxV   ) / (2.0 * -accel);
+		if(distanceToAccelerate+distanceToDecelerate > length) {
+			// we never reach feedRate.
+			double intersection = (2.0 * accel * length - startRate*startRate + endRate*endRate) / (4.0*accel);
+			distanceToAccelerate = intersection;
+			distanceToDecelerate = length-intersection;
+			length = 0;
+		} else {
+			length-=distanceToAccelerate+distanceToDecelerate;
+		}
+		// time at maxV
+		double time = length / maxV;
+		
+		// time accelerating
+		// 0.5att+vt-d=0
+		// using quadratic to solve for t,
+		// t = (-v +/- sqrt(vv+2ad))/a
+		double s;
+		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToAccelerate);
+		double a = (-maxV + s)/accel;
+		double b = (-maxV - s)/accel;
+		double accelTime = a>b? a:b;
+		if(accelTime<0) {
+			accelTime=0;
+		}
+		
+		// time decelerating
+		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToDecelerate);
+		double c = (-maxV + s)/accel;
+		double d = (-maxV - s)/accel;
+		double decelTime = c>d? c:d;
+		if(decelTime<0) {
+			decelTime=0;
+		}
+		
+		// sum total
+		return time+accelTime+decelTime;
+	}
+	
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 	}
@@ -760,7 +890,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
 		} else if(turtle != null) {
-
 			if(turtleLock.isLocked()) return;
 			turtleLock.lock();
 			try {
@@ -768,11 +897,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				ColorRGB penUpColor = this.settings.getPenUpColor();
 				ColorRGB penDownColor = this.settings.getPenDownColorDefault();
 				
-				Turtle.Movement previousMove=null;
-				
 				boolean isUp=true;
 				double ox=this.settings.getHomeX();
 				double oy=this.settings.getHomeY();
+				Movement previousMove=turtle.new Movement(ox,oy,Turtle.MoveType.TRAVEL);				
 	
 				gl2.glBegin(GL2.GL_LINE_STRIP);
 				
@@ -812,9 +940,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 								gl2.glVertex2d(previousMove.x,previousMove.y);
 							}
 							isUp=false;
-						} else {
-							gl2.glVertex2d(m.x,m.y);
 						}
+						gl2.glVertex2d(m.x,m.y);
 						previousMove=m;
 						break;
 					case TOOL_CHANGE:

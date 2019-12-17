@@ -19,7 +19,7 @@ public class Turtle {
 		public MoveType type;
 		public double x,y;  // destination
 		
-		Movement(double x0,double y0,MoveType type0) {
+		public Movement(double x0,double y0,MoveType type0) {
 			x=x0;
 			y=y0;
 			type=type0;

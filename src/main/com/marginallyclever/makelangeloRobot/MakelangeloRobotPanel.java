@@ -81,14 +81,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JComboBox<String> machineChoices;
 	private JButton openConfig;
 	private JPanel machineNumberPanel;
+	
 	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonCapture, buttonGenerate, buttonSaveFile;
-	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancel;
+	
+	// picam controls
+	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
 	private BufferedImage buffImg;
 	private boolean useImage;
 	private RPiCamera piCamera;
 	private int awb, drc, exp, contrast, quality, sharpness;
     private static final int buttonHeight = 25;
-	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+
+    // live controls
+    protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
 	private JButton down100,down10,down1,up1,up10,up100;
@@ -860,16 +865,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(buttonUseCapture, cMain);
 		cMain.gridy++;
 
-		buttonCancel = new JButton(Translator.get("CancelCapture"));
-		buttonCancel.addActionListener(new ActionListener() {
+		buttonCancelCapture = new JButton(Translator.get("CancelCapture"));
+		buttonCancelCapture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();
 				useImage = false;
 			};
 		});
-		buttonCancel.setPreferredSize(new Dimension(89, buttonHeight));
-		buttonCancel.setEnabled(true);
-		panel.add(buttonCancel, cMain);
+		buttonCancelCapture.setPreferredSize(new Dimension(89, buttonHeight));
+		buttonCancelCapture.setEnabled(true);
+		panel.add(buttonCancelCapture, cMain);
 
 //		piCamera.setAWB(AWB.AUTO);	    // Change Automatic White Balance setting to automatic
 //		piCamera.setDRC(DRC.OFF); 			// Turn off Dynamic Range Compression
@@ -983,7 +988,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-		// other app buttons are inaccessible until this dialog closes.
+		// other app buttons are still accessible.
 	}
 
 	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
@@ -1188,5 +1193,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		// nothing can load this type
 		return false;
+	}
+
+
+	public Makelangelo getGui() {
+		return gui;
 	}
 }
