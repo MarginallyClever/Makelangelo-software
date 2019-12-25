@@ -124,4 +124,48 @@ public class Turtle {
 			turtleY + turtleDy * stepSize
 		);
 	}
+
+	/**
+	 * Calculate the limits of drawing lines in this turtle history
+	 * @param top maximum limits
+	 * @param bottom minimum limits
+	 */
+	public void getBounds(Point2D top,Point2D bottom) {
+		bottom.x=Float.MAX_VALUE;
+		bottom.y=Float.MAX_VALUE;
+		top.x=-Float.MAX_VALUE;
+		top.y=-Float.MAX_VALUE;
+		
+		for( Movement m : history ) {
+			switch(m.type) {
+			case DRAW:
+				if(top.x<m.x) top.x=m.x;
+				if(top.y<m.y) top.y=m.y;
+				if(bottom.x>m.x) bottom.x=m.x;
+				if(bottom.y>m.y) bottom.y=m.y;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Scale all draw and move segments by parameters
+	 * @param sx
+	 * @param sy
+	 */
+	public void scale(double sx, double sy) {
+		for( Movement m : history ) {
+			switch(m.type) {
+			case DRAW:
+			case TRAVEL:
+				m.x*=sx;
+				m.y*=sy;
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
