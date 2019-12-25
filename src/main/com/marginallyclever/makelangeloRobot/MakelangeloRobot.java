@@ -33,6 +33,7 @@ import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.makelangelo.CommandLineOptions;
@@ -733,9 +734,107 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public MakelangeloRobotPanel getControlPanel() {
 		return myPanel;
 	}
+	
+	
+	protected void checkResize() {	
+		{
+			int result = JOptionPane.showConfirmDialog(myPanel, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
+			System.out.println(result);
+			if(result == JOptionPane.YES_OPTION) {
+				Point2D top = new Point2D();
+				Point2D bottom = new Point2D();
+				turtle.getBounds(top, bottom);
+				
+				double tw = top.x-bottom.x;
+				double th = top.y-bottom.y;
+				double nh=th;
+				double nw=tw;
+				double w = settings.getMarginWidth();
+				double h = settings.getMarginHeight();
+				double ratioW=1,ratioH=1;
+				ratioH = h/nh;
+				ratioW = w/nw;
+				// use < to fit in the page.
+				double ratio = ratioW<ratioH?ratioW:ratioH;
+				turtle.scale(ratio,ratio);
+			}
+		}
+		{
+			int result = JOptionPane.showConfirmDialog(myPanel, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
+			System.out.println(result);
+			if(result == JOptionPane.YES_OPTION) {
+				Point2D top = new Point2D();
+				Point2D bottom = new Point2D();
+				turtle.getBounds(top, bottom);
+				
+				double tw = top.x-bottom.x;
+				double th = top.y-bottom.y;
+				double nh=th;
+				double nw=tw;
+				double w = settings.getMarginWidth();
+				double h = settings.getMarginHeight();
+				double ratioW=1,ratioH=1;
+				ratioH = h/nh;
+				ratioW = w/nw;
+				// use > to fill the page.
+				double ratio = ratioW>ratioH?ratioW:ratioH;
+				turtle.scale(ratio,ratio);
+			}
+		}
+	}
 
+	protected void checkOptimize() {
+		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
+		System.out.println(result);
+		if(result == JOptionPane.YES_OPTION) {
+			ArrayList<Movement> toKeep = new ArrayList<Movement>();
+			
+			// The goal is to find many pen down moves in a row that are very short
+			// and reduce them to 
+			boolean isUp=true;
+			double ox=settings.getHomeX();
+			double oy=settings.getHomeY();
+			double sum=0;
+			double minimumStepSize=1;
+			
+			for( Movement m : turtle.history ) {
+				switch(m.type) {
+				case DRAW:
+					if(isUp) {
+						isUp=false;
+						sum=0;
+						toKeep.add(m);
+					} else {
+						double dx=m.x-ox;
+						double dy=m.y-oy;
+						sum+=Math.sqrt(dx*dx+dy*dy);
+						if(sum>minimumStepSize) {
+							toKeep.add(m);
+							sum=0;
+						}
+					}
+					ox=m.x;
+					oy=m.y;
+					break;
+				case TRAVEL:
+					toKeep.add(m);
+				default:
+					toKeep.add(m);
+					break;
+				}
+			}
+			int os = turtle.history.size();
+			int ns = toKeep.size();
+			Log.info("was "+os+" is now "+ns);
+			turtle.history = toKeep;
+		}
+	}
+	
 	public void setTurtle(Turtle t) {
 		turtle=t;
+		
+		checkResize();
+		checkOptimize();
 		
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
