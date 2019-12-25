@@ -28,7 +28,11 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
+import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.generators.Generator_Text;
+import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
@@ -36,10 +40,6 @@ import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.generators.Generator_Text;
-import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
-import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
-import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.RPiCamera;
