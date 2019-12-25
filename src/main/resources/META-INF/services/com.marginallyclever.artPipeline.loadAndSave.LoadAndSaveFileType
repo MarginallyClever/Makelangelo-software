@@ -1,0 +1,8 @@
+com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage
+com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveDXF
+com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode
+com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveSVG
+
+com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch2
+#Scratch3 not working yet
+#com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch3
