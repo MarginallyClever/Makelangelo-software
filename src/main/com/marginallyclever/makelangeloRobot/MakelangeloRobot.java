@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
@@ -40,7 +41,6 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
-import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -762,11 +762,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	protected void estimateTime() {
-		double totalTime=0;
-		
 		if(turtleLock.isLocked()) return;
 		turtleLock.lock();
+		
 		try {
+			double totalTime=0;
 			
 			boolean isUp=true;
 			double ox=this.settings.getHomeX();
@@ -794,6 +794,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 					ny=m.y;
 					break;
 				case TOOL_CHANGE:
+					// n remains unchanged, so length is zero.
 					break;
 				}
 
@@ -806,31 +807,36 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 					double maxV;
 					if(oz!=nz) {
 						maxV = settings.getZRate();
-					} else if(nz==settings.getPenDownAngle()) maxV = settings.getPenDownFeedRate();
-					else maxV = settings.getPenUpFeedRate();
+					} else if(nz==settings.getPenDownAngle()) {
+						maxV = settings.getPenDownFeedRate();
+					} else {
+						maxV = settings.getPenUpFeedRate();
+					}
 					totalTime+=estimateSingleBlock(length,0,0,maxV,accel);
 				}
 				ox=nx;
 				oy=ny;
 				oz=nz;
 			}
+			
+			double seconds = totalTime % 60;
+			totalTime-=seconds;
+			totalTime/=60;
+			int minutes = (int)(totalTime % 60);
+			totalTime-=minutes;
+			totalTime/=60;
+			int hours = (int)totalTime;
+			
+			Log.info("Worst case draw time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");	
 		}
 		finally {
 			turtleLock.unlock();
 		}
-		double seconds = totalTime % 60;
-		totalTime-=seconds;
-		totalTime/=60;
-		int minutes = (int)(totalTime % 60);
-		totalTime-=minutes;
-		totalTime/=60;
-		int hours = (int)totalTime;
-		
-		Log.info("Total time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");
 	}
 	
 	/**
 	 * calculate seconds to move a given length.  Also uses globals feedRate and acceleration 
+	 * See http://zonalandeducation.com/mstm/physics/mechanics/kinematics/EquationsForAcceleratedMotion/AlgebraRearrangements/Displacement/DisplacementAccelerationAlgebra.htm
 	 * @param length mm distance to travel.
 	 * @param startRate mm/s at start of move
 	 * @param endRate mm/s at end of move
@@ -839,35 +845,35 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	protected double estimateSingleBlock(double length,double startRate,double endRate,double maxV,double accel) {
 		double distanceToAccelerate = ( maxV*maxV - startRate*startRate ) / (2.0 *  accel);
 		double distanceToDecelerate = ( endRate*endRate   - maxV*maxV   ) / (2.0 * -accel);
-		if(distanceToAccelerate+distanceToDecelerate > length) {
+		double distanceAtTopSpeed = length - distanceToAccelerate - distanceToDecelerate;
+		if(distanceAtTopSpeed<0) {
 			// we never reach feedRate.
 			double intersection = (2.0 * accel * length - startRate*startRate + endRate*endRate) / (4.0*accel);
 			distanceToAccelerate = intersection;
 			distanceToDecelerate = length-intersection;
-			length = 0;
-		} else {
-			length-=distanceToAccelerate+distanceToDecelerate;
+			distanceAtTopSpeed = 0;
 		}
 		// time at maxV
-		double time = length / maxV;
+		double time = distanceAtTopSpeed / maxV;
 		
-		// time accelerating
+		// time accelerating (v=start vel;a=acceleration;d=distance;t=time)
 		// 0.5att+vt-d=0
+		// att+2vt=2d
 		// using quadratic to solve for t,
 		// t = (-v +/- sqrt(vv+2ad))/a
 		double s;
-		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToAccelerate);
-		double a = (-maxV + s)/accel;
-		double b = (-maxV - s)/accel;
+		s = Math.sqrt(startRate*startRate + 2.0*accel*distanceToAccelerate);
+		double a = (-startRate + s)/accel;
+		double b = (-startRate - s)/accel;
 		double accelTime = a>b? a:b;
 		if(accelTime<0) {
 			accelTime=0;
 		}
 		
-		// time decelerating
-		s = Math.sqrt(maxV*maxV + 2.0*accel*distanceToDecelerate);
-		double c = (-maxV + s)/accel;
-		double d = (-maxV - s)/accel;
+		// time decelerating (v=end vel;a=acceleration;d=distance;t=time)
+		s = Math.sqrt(endRate*endRate + 2.0*accel*distanceToDecelerate);
+		double c = (-endRate + s)/accel;
+		double d = (-endRate - s)/accel;
 		double decelTime = c>d? c:d;
 		if(decelTime<0) {
 			decelTime=0;
