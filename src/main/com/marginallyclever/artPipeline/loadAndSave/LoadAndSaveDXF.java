@@ -1,6 +1,5 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,9 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.kabeja.dxf.Bounds;
@@ -48,10 +44,9 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  *
  */
 public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
-	private static boolean shouldScaleOnLoad=true;
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
-	private double scale,imageCenterX,imageCenterY;
+	private double imageCenterX,imageCenterY;
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -73,34 +68,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
-		final JCheckBox checkScale = new JCheckBox(Translator.get("DXFScaleOnLoad"));
 
-		JPanel panel = new JPanel(new GridLayout(0, 1));
-		panel.add(checkScale);
-
-		checkScale.setSelected(shouldScaleOnLoad);
-		//checkInfill.setSelected(shouldInfillOnLoad);
-
-		int result = JOptionPane.showConfirmDialog(robot.getControlPanel(), panel, getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			shouldScaleOnLoad = checkScale.isSelected();
-/* TODO put this in a middle stage
-			toolMinimumPenUpMove = ((Number)chooseMinimumPenUpMove.getValue()).doubleValue();
-			toolMinimumPenDownMove = ((Number)chooseMinimumPenDownMove.getValue()).doubleValue();
-			if(toolMinimumPenUpMove<0) toolMinimumPenUpMove=0;
-			if(toolMinimumPenDownMove<0.1) toolMinimumPenUpMove=0.1;
-			
-			toolMinimumPenUpMoveSq = toolMinimumPenUpMove*toolMinimumPenUpMove;
-			toolMinimumPenDownMoveSq = toolMinimumPenDownMove*toolMinimumPenDownMove;
-*/
-			return loadNow(in,robot);
-		}
-		return false;
-	}
-
-	
 	// count all entities in all layers
 	@SuppressWarnings("unchecked")
 	protected void countAllEntities(DXFDocument doc) {
@@ -192,7 +160,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * @return true if load is successful.
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean loadNow(InputStream in,MakelangeloRobot robot) {
+	@Override
+	public boolean load(InputStream in,MakelangeloRobot robot) {
 		Log.info(Translator.get("FileTypeDXF2")+"...");
 
 		// Read in the DXF file
@@ -207,21 +176,6 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		Bounds bounds = doc.getBounds();
 		imageCenterX = (bounds.getMaximumX() + bounds.getMinimumX()) / 2.0;
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
-		// find the scale to fit the image on the paper without
-		// altering the aspect ratio
-		double imageWidth  = (bounds.getMaximumX() - bounds.getMinimumX());
-		double imageHeight = (bounds.getMaximumY() - bounds.getMinimumY());
-		double paperHeight = robot.getSettings().getMarginHeight();
-		double paperWidth  = robot.getSettings().getMarginWidth ();
-
-		scale = 1;
-		if(shouldScaleOnLoad) {
-			double innerAspectRatio = imageWidth / imageHeight;
-			double outerAspectRatio = paperWidth / paperHeight;
-			scale = (innerAspectRatio >= outerAspectRatio) ?
-					(paperWidth / imageWidth) :
-					(paperHeight / imageHeight);
-		}
 
 		// prepare for exporting
 		machine = robot.getSettings();
@@ -364,10 +318,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	protected double TX(double x) {
-		return (x-imageCenterX) * scale;
+		return (x-imageCenterX);
 	}
 	protected double TY(double y) {
-		return (y-imageCenterY) * scale;
+		return (y-imageCenterY);
 	}
 	
 	protected void parseDXFLine(DXFLine entity) {
