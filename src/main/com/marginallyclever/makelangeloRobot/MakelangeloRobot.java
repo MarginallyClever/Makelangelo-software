@@ -789,12 +789,18 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	/**
 	 * Offers to look for a better route through the turtle history that means fewer travel moves.
 	 */
-	protected void checkReorder() {/*
+	protected void checkReorder() {
+		/*
+		// TODO finish me
 		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
 		System.out.println(result);
 		if(result == JOptionPane.YES_OPTION) {
-			
-		}*/
+			// history is made of changes, travels, and draws
+			// look at the section between two changes.
+			  // look at all pen down moves in the section.
+			    // if two pen down moves share a start/end, then they are connected and belong in a single segment.
+		}
+		*/
 	}
 	
 	/**
