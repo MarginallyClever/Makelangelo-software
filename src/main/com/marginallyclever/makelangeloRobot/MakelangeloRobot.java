@@ -736,6 +736,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 	
 	
+	/**
+	 * Offers to resize your loaded image to fit the margins perfectly.
+	 */
 	protected void checkResize() {	
 		{
 			int result = JOptionPane.showConfirmDialog(myPanel, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
@@ -783,43 +786,67 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		}
 	}
 
-	protected void checkOptimize() {
+	/**
+	 * Offers to look for a better route through the turtle history that means fewer travel moves.
+	 */
+	protected void checkReorder() {/*
+		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
+		System.out.println(result);
+		if(result == JOptionPane.YES_OPTION) {
+			
+		}*/
+	}
+	
+	/**
+	 * Offers to optimize your gcode by chopping out very short line segments.
+	 * It travels the entire path and drops any pen-down segment shorter than 
+	 * minimumStepSize.
+	 */
+	protected void checkDropShortLines() {
 		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
 		System.out.println(result);
 		if(result == JOptionPane.YES_OPTION) {
 			ArrayList<Movement> toKeep = new ArrayList<Movement>();
-			
-			// The goal is to find many pen down moves in a row that are very short
-			// and reduce them to 
+
+			double minimumStepSize=1;
+
 			boolean isUp=true;
 			double ox=settings.getHomeX();
 			double oy=settings.getHomeY();
 			double sum=0;
-			double minimumStepSize=1;
+			double dx,dy;
+			Movement previous=null;
 			
 			for( Movement m : turtle.history ) {
 				switch(m.type) {
 				case DRAW:
-					if(isUp) {
-						isUp=false;
-						sum=0;
+					dx=m.x-ox;
+					dy=m.y-oy;
+					sum+=Math.sqrt(dx*dx+dy*dy);
+					if(isUp || sum>minimumStepSize) {
 						toKeep.add(m);
-					} else {
-						double dx=m.x-ox;
-						double dy=m.y-oy;
-						sum+=Math.sqrt(dx*dx+dy*dy);
-						if(sum>minimumStepSize) {
-							toKeep.add(m);
-							sum=0;
-						}
-					}
+						sum=0;
+					}isUp=false;
 					ox=m.x;
 					oy=m.y;
+					previous=m;
 					break;
 				case TRAVEL:
+					if(!isUp && sum>0 ) {
+						if(previous!=null && previous.type==Turtle.MoveType.DRAW) {
+							toKeep.add(previous);
+						}
+					}
+					isUp=true;
 					toKeep.add(m);
+					ox=m.x;
+					oy=m.y;
+					sum=0;
+					previous=m;
+					break;
 				default:
 					toKeep.add(m);
+					previous=m;
 					break;
 				}
 			}
@@ -834,7 +861,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		turtle=t;
 		
 		checkResize();
-		checkOptimize();
+		checkReorder();
+		checkDropShortLines();
 		
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
@@ -1035,7 +1063,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 						break;
 					case DRAW:
 						if(isUp) {
-							gl2.glVertex2d(m.x,m.y);
 							gl2.glColor4d(
 									(double)penDownColor.getRed() / 255.0,
 									(double)penDownColor.getGreen() / 255.0,
