@@ -25,6 +25,12 @@ public class Turtle {
 			type=type0;
 		}
 		
+		public Movement(Movement m) {
+			this.x=m.x;
+			this.y=m.y;
+			this.type=m.type;
+		}
+
 		public ColorRGB getColor() {
 			return new ColorRGB((int)x);
 		}

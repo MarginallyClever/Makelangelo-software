@@ -1,11 +1,12 @@
 package com.marginallyclever.voronoi;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
+import com.marginallyclever.convenience.Point2D;
 
 
 public class VoronoiCell implements Comparable<VoronoiCell> {
-	public Point2D centroid = new Point2D.Double();
+	public Point2D centroid = new Point2D();
 	public Rectangle2D region;
 	public double weight;
 	public double wx, wy;
@@ -13,12 +14,12 @@ public class VoronoiCell implements Comparable<VoronoiCell> {
 	
 	@Override
 	public int compareTo(VoronoiCell arg0) {
-		double y1 = arg0.centroid.getY();
-		double y0 = centroid.getY();
+		double y1 = arg0.centroid.y;
+		double y0 = centroid.y;
 		int c = Double.compare(y0, y1);
 		if( c == 0 ) {
-			double x1 = arg0.centroid.getX();
-			double x0 = centroid.getX();
+			double x1 = arg0.centroid.x;
+			double x0 = centroid.x;
 			c = Double.compare(x0, x1);
 		}
 		return c;

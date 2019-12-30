@@ -29,11 +29,11 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.artPipeline.ArtPipeline;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.makelangelo.CommandLineOptions;
@@ -77,8 +77,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private boolean penIsUp;
 	private boolean penIsUpBeforePause;
 	private boolean didSetHome;
-	private float gondolaX;
-	private float gondolaY;
+	private float penX;
+	private float penY;
 
 	protected Turtle turtle;
 	private ReentrantLock turtleLock;
@@ -108,8 +108,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		penIsUp = false;
 		penIsUpBeforePause = false;
 		didSetHome = false;
-		setGondolaX(0);
-		setGondolaY(0);
+		setPenX(0);
+		setPenY(0);
 		turtle = new Turtle();
 		turtleLock = new ReentrantLock();
 		drawingCommands=new ArrayList<String>();
@@ -624,23 +624,23 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public void goHome() {
 		sendLineToRobot("G00 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY()));
-		setGondolaX((float) settings.getHomeX());
-		gondolaY = (float) settings.getHomeY();
+		setPenX((float) settings.getHomeX());
+		penY = (float) settings.getHomeY();
 	}
 
 	public void findHome() {
 		this.raisePen();
 		sendLineToRobot("G28");
-		setGondolaX((float) settings.getHomeX());
-		setGondolaY((float) settings.getHomeY());
+		setPenX((float) settings.getHomeX());
+		setPenY((float) settings.getHomeY());
 	}
 
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		// save home position
 		sendLineToRobot("D6 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY()));
-		setGondolaX((float) settings.getHomeX());
-		setGondolaY((float) settings.getHomeY());
+		setPenX((float) settings.getHomeX());
+		setPenY((float) settings.getHomeY());
 		didSetHome = true;
 	}
 
@@ -654,8 +654,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
-		setGondolaX(x);
-		gondolaY = y;
+		setPenX(x);
+		penY = y;
 	}
 
 	/**
@@ -668,8 +668,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
 		sendLineToRobot("G90"); // return to absolute mode
-		setGondolaX(getGondolaX() + dx);
-		gondolaY += dy;
+		setPenX(getGondolaX() + dx);
+		penY += dy;
 	}
 
 	public boolean areMotorsEngaged() {
@@ -677,11 +677,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void movePenToEdgeLeft() {
-		movePenAbsolute((float) settings.getPaperLeft(), gondolaY);
+		movePenAbsolute((float) settings.getPaperLeft(), penY);
 	}
 
 	public void movePenToEdgeRight() {
-		movePenAbsolute((float) settings.getPaperRight(), gondolaY);
+		movePenAbsolute((float) settings.getPaperRight(), penY);
 	}
 
 	public void movePenToEdgeTop() {
@@ -735,140 +735,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		return myPanel;
 	}
 	
-	
-	/**
-	 * Offers to resize your loaded image to fit the margins perfectly.
-	 */
-	protected void checkResize() {	
-		{
-			int result = JOptionPane.showConfirmDialog(myPanel, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
-			System.out.println(result);
-			if(result == JOptionPane.YES_OPTION) {
-				Point2D top = new Point2D();
-				Point2D bottom = new Point2D();
-				turtle.getBounds(top, bottom);
-				
-				double tw = top.x-bottom.x;
-				double th = top.y-bottom.y;
-				double nh=th;
-				double nw=tw;
-				double w = settings.getMarginWidth();
-				double h = settings.getMarginHeight();
-				double ratioW=1,ratioH=1;
-				ratioH = h/nh;
-				ratioW = w/nw;
-				// use < to fit in the page.
-				double ratio = ratioW<ratioH?ratioW:ratioH;
-				turtle.scale(ratio,ratio);
-			}
-		}
-		{
-			int result = JOptionPane.showConfirmDialog(myPanel, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
-			System.out.println(result);
-			if(result == JOptionPane.YES_OPTION) {
-				Point2D top = new Point2D();
-				Point2D bottom = new Point2D();
-				turtle.getBounds(top, bottom);
-				
-				double tw = top.x-bottom.x;
-				double th = top.y-bottom.y;
-				double nh=th;
-				double nw=tw;
-				double w = settings.getMarginWidth();
-				double h = settings.getMarginHeight();
-				double ratioW=1,ratioH=1;
-				ratioH = h/nh;
-				ratioW = w/nw;
-				// use > to fill the page.
-				double ratio = ratioW>ratioH?ratioW:ratioH;
-				turtle.scale(ratio,ratio);
-			}
-		}
-	}
-
-	/**
-	 * Offers to look for a better route through the turtle history that means fewer travel moves.
-	 */
-	protected void checkReorder() {
-		/*
-		// TODO finish me
-		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
-		System.out.println(result);
-		if(result == JOptionPane.YES_OPTION) {
-			// history is made of changes, travels, and draws
-			// look at the section between two changes.
-			  // look at all pen down moves in the section.
-			    // if two pen down moves share a start/end, then they are connected and belong in a single segment.
-		}
-		*/
-	}
-	
-	/**
-	 * Offers to optimize your gcode by chopping out very short line segments.
-	 * It travels the entire path and drops any pen-down segment shorter than 
-	 * minimumStepSize.
-	 */
-	protected void checkDropShortLines() {
-		int result = JOptionPane.showConfirmDialog(myPanel, "Turn many short moves into fewer longer moves?", "Optimize", JOptionPane.YES_NO_OPTION);
-		System.out.println(result);
-		if(result == JOptionPane.YES_OPTION) {
-			ArrayList<Movement> toKeep = new ArrayList<Movement>();
-
-			double minimumStepSize=1;
-
-			boolean isUp=true;
-			double ox=settings.getHomeX();
-			double oy=settings.getHomeY();
-			double sum=0;
-			double dx,dy;
-			Movement previous=null;
-			
-			for( Movement m : turtle.history ) {
-				switch(m.type) {
-				case DRAW:
-					dx=m.x-ox;
-					dy=m.y-oy;
-					sum+=Math.sqrt(dx*dx+dy*dy);
-					if(isUp || sum>minimumStepSize) {
-						toKeep.add(m);
-						sum=0;
-					}isUp=false;
-					ox=m.x;
-					oy=m.y;
-					previous=m;
-					break;
-				case TRAVEL:
-					if(!isUp && sum>0 ) {
-						if(previous!=null && previous.type==Turtle.MoveType.DRAW) {
-							toKeep.add(previous);
-						}
-					}
-					isUp=true;
-					toKeep.add(m);
-					ox=m.x;
-					oy=m.y;
-					sum=0;
-					previous=m;
-					break;
-				default:
-					toKeep.add(m);
-					previous=m;
-					break;
-				}
-			}
-			int os = turtle.history.size();
-			int ns = toKeep.size();
-			Log.info("was "+os+" is now "+ns);
-			turtle.history = toKeep;
-		}
-	}
-	
 	public void setTurtle(Turtle t) {
 		turtle=t;
 		
-		checkResize();
-		checkReorder();
-		checkDropShortLines();
+		ArtPipeline pipeline = new ArtPipeline();
+		pipeline.makeChecks(turtle,settings);
 		
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
@@ -1060,23 +931,20 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 									(double)penUpColor.getGreen() / 255.0,
 									(double)penUpColor.getBlue() / 255.0,
 									showPenUp?1:0);
-							if(previousMove!=null) {
-								gl2.glVertex2d(previousMove.x,previousMove.y);
-							}
+							gl2.glVertex2d(previousMove.x,previousMove.y);
 							gl2.glVertex2d(m.x,m.y);
 						}
 						previousMove=m;
 						break;
 					case DRAW:
 						if(isUp) {
+							gl2.glVertex2d(previousMove.x,previousMove.y);
 							gl2.glColor4d(
 									(double)penDownColor.getRed() / 255.0,
 									(double)penDownColor.getGreen() / 255.0,
 									(double)penDownColor.getBlue() / 255.0,
 									1);
-							if(previousMove!=null) {
-								gl2.glVertex2d(previousMove.x,previousMove.y);
-							}
+							gl2.glVertex2d(previousMove.x,previousMove.y);
 							isUp=false;
 						}
 						gl2.glVertex2d(m.x,m.y);
@@ -1084,11 +952,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 						break;
 					case TOOL_CHANGE:
 						penDownColor = m.getColor();
-						gl2.glColor4d(
-								(double)penDownColor.getRed() / 255.0,
-								(double)penDownColor.getGreen() / 255.0,
-								(double)penDownColor.getBlue() / 255.0,
-								1);
 						break;
 					}
 				}
@@ -1142,22 +1005,22 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	// in mm
 	public float getGondolaX() {
-		return gondolaX;
+		return penX;
 	}
 
 	// in mm
-	public void setGondolaX(float gondolaX) {
-		this.gondolaX = gondolaX;
+	public void setPenX(float gondolaX) {
+		this.penX = gondolaX;
 	}
 
 	// in mm
 	public float getGondolaY() {
-		return gondolaY;
+		return penY;
 	}
 
 	// in mm
-	public void setGondolaY(float gondolaY) {
-		this.gondolaY = gondolaY;
+	public void setPenY(float gondolaY) {
+		this.penY = gondolaY;
 	}
 
 	public int findLastPenUpBefore(int startAtLine) {

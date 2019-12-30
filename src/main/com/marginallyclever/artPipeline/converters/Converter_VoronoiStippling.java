@@ -1,6 +1,5 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -93,9 +93,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		}
 		
 		public double cellToPointSq(Rectangle2D area,VoronoiCell c) {
-			double x = area.getCenterX();
-			double y = area.getCenterY();
-			return c.centroid.distanceSq(x, y);
+			double x = area.getCenterX() - c.centroid.x;
+			double y = area.getCenterY() - c.centroid.y;
+			return x*x + y*y;
 		}
 		
 		// locate the cell under point x,y
@@ -122,19 +122,18 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					double bestD = Double.MAX_VALUE;
 					VoronoiCell bestCell = null;
 					Iterator<VoronoiCell> si = sites.iterator();
-					double x = area.getCenterX();
-					double y = area.getCenterY();
 					while(si.hasNext()) {
 						VoronoiCell c = si.next();
-						double d = c.centroid.distanceSq(x, y);
+						double d = cellToPointSq(area,c);
 						if(bestD>d) {
 							bestD = d;
 							bestCell = c;
 						}
 					}
 					if( bestFound==null ||
-							cellToPointSq(area,bestFound) > cellToPointSq(area,bestCell) )
-					bestFound = bestCell;
+							cellToPointSq(area,bestFound) > cellToPointSq(area,bestCell) ) {
+						bestFound = bestCell;
+					}
 				}
 				return bestFound;
 			}
@@ -283,7 +282,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		while(ci.hasNext()) {
 			VoronoiCell c = ci.next();
 			Point2D p = c.centroid;
-			gl2.glVertex2d(p.getX(),p.getY());
+			gl2.glVertex2d(p.x,p.y);
 		}
 		gl2.glEnd();
 	}
@@ -294,8 +293,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
 			VoronoiCell c = ci.next();
-			double x = c.centroid.getX();
-			double y = c.centroid.getY();
+			double x = c.centroid.x;
+			double y = c.centroid.y;
 			double val = c.weight/255.0;
 			if(val>cutoff) {
 				double r = val * scale;
@@ -332,8 +331,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 					if(Math.random()*255 >= v) break;
 				}
 			}
-			Point2D p = new Point2D.Double(x,y);
-			c.centroid.setLocation(p);
+			c.centroid.set(x,y);
 			cells.add(c);
 		}
 
@@ -375,8 +373,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
 			VoronoiCell c = ci.next();
-			double x = c.centroid.getX();
-			double y = c.centroid.getY();
+			double x = c.centroid.x;
+			double y = c.centroid.y;
 			double val = c.weight/255.0f;
 			if(val<cutoff) continue;
 
@@ -422,8 +420,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
 			VoronoiCell c = ci.next();
-			xValuesIn[i] = c.centroid.getX();
-			yValuesIn[i] = c.centroid.getY();
+			xValuesIn[i] = c.centroid.x;
+			yValuesIn[i] = c.centroid.y;
 			i++;
 			c.resetRegion();
 		}
@@ -509,8 +507,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			} else {
 				c.weight=1;
 				c.hits=1;
-				c.wx = c.centroid.getX();
-				c.wy = c.centroid.getY();
+				c.wx = c.centroid.x;
+				c.wy = c.centroid.y;
 			}
 
 			// make sure centroid can't leave image bounds
@@ -522,8 +520,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				if (c.wy >= yMax   ) c.wy = yMax-1;
 			}
 			
-			double ox = c.centroid.getX();
-			double oy = c.centroid.getY();
+			double ox = c.centroid.x;
+			double oy = c.centroid.y;
 			double dx2 = (c.wx - ox) * 0.25;
 			double dy2 = (c.wy - oy) * 0.25;
 
@@ -533,7 +531,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			double nx = ox + dx2 + (Math.random()-0.5) * w;
 			double ny = oy + dy2 + (Math.random()-0.5) * w;
 			
-			c.centroid.setLocation(nx, ny);
+			c.centroid.set(nx, ny);
 		}
 		return totalMagnitude;
 	}

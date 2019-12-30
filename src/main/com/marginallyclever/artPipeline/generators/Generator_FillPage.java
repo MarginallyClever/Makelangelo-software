@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -48,6 +49,9 @@ public class Generator_FillPage extends ImageGenerator {
 		turtle = new Turtle();
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
+
+		Point2D rMax = new Point2D(machine.getMarginRight(),machine.getMarginTop());
+		Point2D rMin = new Point2D(machine.getMarginLeft(),machine.getMarginBottom());
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize) {
@@ -57,7 +61,7 @@ public class Generator_FillPage extends ImageGenerator {
 					majorPY + majorX * radius);
 			P1.set( majorPX + majorY * radius,
 					majorPY - majorX * radius);
-			if(clipLineToPaperMargin(P0, P1)) {
+			if(Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 				if ((i % 2) == 0) 	{
 					turtle.moveTo(P0.x,P0.y);
 					turtle.penDown();

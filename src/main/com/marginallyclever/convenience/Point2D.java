@@ -13,6 +13,10 @@ public class Point2D {
 		x=x0;
 		y=y0;
 	}
+	public void set(Point2D p) {
+		x=p.x;
+		y=p.y;
+	}
 	public double lengthSquared() {
 		return x*x+y*y;
 	}

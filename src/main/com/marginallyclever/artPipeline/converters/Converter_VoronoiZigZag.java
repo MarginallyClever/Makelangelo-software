@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.converters;
 
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -10,6 +9,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
@@ -132,7 +132,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			gl2.glBegin(GL2.GL_POINTS);
 			for (VoronoiCell c : cells) {
 				Point2D p = c.centroid;
-				gl2.glVertex2d(p.getX(),p.getY());
+				gl2.glVertex2d(p.x,p.y);
 			}
 			gl2.glEnd();
 		}
@@ -142,7 +142,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			gl2.glBegin(GL2.GL_LINE_LOOP);
 			for (i = 0; i < solutionContains; ++i) {
 				VoronoiCell c = cells[solution[i]];
-				gl2.glVertex2d( c.centroid.getX(), c.centroid.getY() );
+				gl2.glVertex2d( c.centroid.x, c.centroid.y );
 			}
 			gl2.glEnd();
 		}
@@ -299,7 +299,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		solutionContains = 0;
 		for (i = 0; i < cells.length; ++i) {
 			VoronoiCell c = cells[i];
-			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
+			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
 			if (v * 5 > minDotSize)
 				solutionContains++;
 		}
@@ -311,7 +311,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			j = 0;
 			for (i = 0; i < cells.length; ++i) {
 				VoronoiCell c = cells[i];
-				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.getX(), (int) c.centroid.getY()) / 255.0f;
+				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
 				if (v * 5 > minDotSize) {
 					solution[j++] = i;
 				}
@@ -344,8 +344,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	protected double calculateWeight(int a, int b) {
 		assert (a >= 0 && a < cells.length);
 		assert (b >= 0 && b < cells.length);
-		double x = cells[a].centroid.getX() - cells[b].centroid.getX();
-		double y = cells[a].centroid.getY() - cells[b].centroid.getY();
+		double x = cells[a].centroid.x - cells[b].centroid.x;
+		double y = cells[a].centroid.y - cells[b].centroid.y;
 		return x * x + y * y;
 	}
 
@@ -375,8 +375,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					if(Math.random()*255 > v) break;
 				}
 			}
-			Point2D p = new Point2D.Double(x,y);
-			cells[used].centroid.setLocation(p);
+			cells[used].centroid.set(x,y);
 			++used;
 		}
 
@@ -415,8 +414,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			double bestw = Float.MAX_VALUE;
 			double x, y, w;
 			for (i = 0; i < solutionContains; ++i) {
-				x = cells[solution[i]].centroid.getX();
-				y = cells[solution[i]].centroid.getY();
+				x = cells[solution[i]].centroid.x;
+				y = cells[solution[i]].centroid.y;
 				w = x * x + y * y;
 				if (w < bestw) {
 					bestw = w;
@@ -427,8 +426,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			// write the entire sequence
 			for (i = 0; i <= solutionContains; ++i) {
 				int v = (besti + i) % solutionContains;
-				x = cells[solution[v]].centroid.getX();
-				y = cells[solution[v]].centroid.getY();
+				x = cells[solution[v]].centroid.x;
+				y = cells[solution[v]].centroid.y;
 				turtle.moveTo(x, y);
 			}
 		}
@@ -440,8 +439,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		// convert the cells to sites used in the Voronoi class.
 		int i;
 		for (i = 0; i < numCells; ++i) {
-			xValuesIn[i] = cells[i].centroid.getX();
-			yValuesIn[i] = cells[i].centroid.getY();
+			xValuesIn[i] = cells[i].centroid.x;
+			yValuesIn[i] = cells[i].centroid.y;
 			cells[i].resetRegion();
 		}
 
@@ -549,8 +548,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			// use the new center
 			if(hits>0)
 			{
-				double ox = c.centroid.getX();
-				double oy = c.centroid.getY();
+				double ox = c.centroid.x;
+				double oy = c.centroid.y;
 				double dx2 = wx - ox;
 				double dy2 = wy - oy;
 
@@ -559,7 +558,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				double nx = ox + dx2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
 				double ny = oy + dy2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
 				
-				c.centroid.setLocation(nx, ny);
+				c.centroid.set(nx, ny);
 			}
 		}
 		return totalMagnitude;

@@ -81,19 +81,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	
 	public LoadAndSaveImage() {
 		converters = ServiceLoader.load(ImageConverter.class);
-		Iterator<ImageConverter> ici = converters.iterator();
 		int i=0;
-		while(ici.hasNext()) {
-			ici.next();
-			i++;
-		}
+		for( @SuppressWarnings("unused") ImageConverter ici : converters ) i++;
 				
 		imageConverterNames = new String[i];
 
 		i=0;
-		ici = converters.iterator();
-		while (ici.hasNext()) {
-			ImageManipulator f = ici.next();
+		for( ImageConverter f : converters ) {
 			imageConverterNames[i++] = f.getName();
 		}
 		
@@ -124,8 +118,14 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		converterOptionsContainer = new JPanel();
 		converterOptionsContainer.setPreferredSize(new Dimension(450,300));
 		
-		conversionStyleOptions.setSelectedIndex(getPreferredDrawStyle());
-		conversionFillOptions.setSelectedIndex(getPreferredFillStyle());
+		int p;
+		p=getPreferredDrawStyle();
+		if(p>=conversionStyleOptions.getItemCount()) p=0;
+		conversionStyleOptions.setSelectedIndex(p);
+
+		p=getPreferredFillStyle();
+		if(p>=conversionFillOptions.getItemCount()) p=0;
+		conversionFillOptions.setSelectedIndex(p);
 		
 		conversionStyleOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
