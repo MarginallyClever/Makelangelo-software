@@ -14,6 +14,10 @@ import com.marginallyclever.makelangelo.Log;
 public class TCPTransportLayer implements TransportLayer {
 	public TCPTransportLayer() {}
 
+	public String getName() {
+		return "TCP/IP";
+	}
+
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */

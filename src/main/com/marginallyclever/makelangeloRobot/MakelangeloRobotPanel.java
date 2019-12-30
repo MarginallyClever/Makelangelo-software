@@ -34,6 +34,7 @@ import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.convenience.SpringUtilities;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Log;
@@ -382,35 +383,30 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JPanel createCommonDriveControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuCommonDriveControls"));
 		JPanel mainPanel = drivePanel.getContentPane();
-		mainPanel.setLayout(new GridBagLayout());
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;
-		c.fill=GridBagConstraints.BOTH;
+		mainPanel.setLayout(new SpringLayout());
 
 		goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
-		goPaperBorder.setPreferredSize(new Dimension(80,20));
-		
 		penUp    = new JButton(Translator.get("PenUp"));
 		penDown  = new JButton(Translator.get("PenDown"));
 		goHome   = new JButton(Translator.get("GoHome"));
 		findHome = new JButton(Translator.get("FindHome"));
 		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
 
-		penUp   .setPreferredSize(new Dimension(100,20));
-		penDown .setPreferredSize(new Dimension(100,20));
-		goHome  .setPreferredSize(new Dimension(100,20));
-		findHome.setPreferredSize(new Dimension(100,20));
-		toggleEngagedMotor.setPreferredSize(new Dimension(100,20));
+		goPaperBorder.setMinimumSize(new Dimension(100,20));
+		penUp   .setMinimumSize(new Dimension(100,20));
+		penDown .setMinimumSize(new Dimension(100,20));
+		goHome  .setMinimumSize(new Dimension(100,20));
+		findHome.setMinimumSize(new Dimension(100,20));
+		toggleEngagedMotor.setMinimumSize(new Dimension(100,20));
 		
-		c.gridx=0;  c.gridy=0;  mainPanel.add(goPaperBorder,c);
-		c.gridx=0;  c.gridy=1;  mainPanel.add(toggleEngagedMotor,c);
+		mainPanel.add(goPaperBorder);
+		mainPanel.add(toggleEngagedMotor);
+		mainPanel.add(penUp);
+		mainPanel.add(penDown);
+		mainPanel.add(goHome);
+		mainPanel.add(findHome);
 		
-		c.gridx=4;  c.gridy=0;  mainPanel.add(penUp,c);
-		c.gridx=4;  c.gridy=1;  mainPanel.add(penDown,c);
-
-		c.gridx=3;  c.gridy=0;  mainPanel.add(goHome,c);
-		c.gridx=3;  c.gridy=1;  mainPanel.add(findHome,c);
+		SpringUtilities.makeCompactGrid(mainPanel, 3, 2, 0, 0, 0, 0);
 		
 		goPaperBorder.addActionListener(this);
 		toggleEngagedMotor.addActionListener(this);

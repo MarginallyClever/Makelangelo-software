@@ -2,14 +2,13 @@ package com.marginallyclever.communications;
 
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
-import com.marginallyclever.communications.tcp.TCPTransportLayer;
-//import com.marginallyclever.communications.tcp.TCPTransportLayer;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -18,13 +17,12 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class ConnectionManager {
-	private SerialTransportLayer serial;
-	@SuppressWarnings("unused")
-	private TCPTransportLayer tcp;
+	private ArrayList<TransportLayer> transportLayers;
 	
 	public ConnectionManager() {
-		serial = new SerialTransportLayer();
-		tcp = new TCPTransportLayer();
+		transportLayers = new ArrayList<TransportLayer>();
+		transportLayers.add(new SerialTransportLayer());
+		//transportLayers.add(new TCPTransportLayer());
 	}
 
 	/**
@@ -37,10 +35,9 @@ public class ConnectionManager {
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();
 		top.add(tabs);
-		// TODO translate me?
-		tabs.addTab("USB", serial.getTransportLayerPanel());
-		// TODO translate me?
-		//tabs.addTab("Wifi", tcp.getTransportLayerPanel());
+		for( TransportLayer t : transportLayers ) {
+			tabs.addTab(t.getName(), t.getTransportLayerPanel());
+		}
 
 		int result = JOptionPane.showConfirmDialog(parent, top, Translator.get("MenuConnect"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {

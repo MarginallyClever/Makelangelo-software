@@ -14,6 +14,7 @@ public class SerialTransportLayerPanel extends TransportLayerPanel {
 	private static final long serialVersionUID = -5048852192781164326L;
 	private SerialTransportLayer layer;
 	private JComboBox<String> connectionComboBox;
+	private static String favorite="";
 	
 	public SerialTransportLayerPanel(SerialTransportLayer serialTransportLayer) {
 		this.layer = serialTransportLayer;
@@ -26,11 +27,12 @@ public class SerialTransportLayerPanel extends TransportLayerPanel {
 	    for(i=0;i<portsDetected.length;++i) {
 	    	connectionComboBox.addItem(portsDetected[i]);
 	    }
-    	//connectionComboBox.setSelectedIndex(i+1);
+		connectionComboBox.setSelectedItem(favorite);
 	}
 
 	@Override
 	public NetworkConnection openConnection() {
-		return layer.openConnection(connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex()));
+		favorite = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+		return layer.openConnection(favorite);
 	}
 }

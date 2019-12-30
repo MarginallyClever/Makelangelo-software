@@ -19,6 +19,10 @@ public class SerialTransportLayer implements TransportLayer {
 
 	public SerialTransportLayer() {}
 
+	public String getName() {
+		return "USB Serial";
+	}
+	
 	/**
 	 * find all available serial ports
 	 *
