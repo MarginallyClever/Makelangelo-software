@@ -6,6 +6,7 @@ import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
@@ -117,7 +118,10 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img) {
 		Point2D P0 = new Point2D(x0,y0);
 		Point2D P1 = new Point2D(x1,y1);
-		if(!clipLineToPaperMargin(P0, P1)) {
+
+		Point2D rMax = new Point2D(machine.getMarginRight(),machine.getMarginTop());
+		Point2D rMin = new Point2D(machine.getMarginLeft(),machine.getMarginBottom());
+		if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 			// entire line clipped
 			return;
 		}
