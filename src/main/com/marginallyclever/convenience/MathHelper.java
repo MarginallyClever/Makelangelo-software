@@ -12,4 +12,24 @@ public class MathHelper {
 		
 		return Math.round(v*SCALE)/SCALE;
 	}
+	
+
+	/**
+	 * @param dx x component
+	 * @param dy y component
+	 * @return Square of length of vector (dx,dy) 
+	 */
+	public static double lengthSquared(double dx,double dy) {
+		return dx*dx+dy*dy;
+	}
+	
+	
+	/**
+	 * @param dx x component
+	 * @param dy y component
+	 * @return Length of vector (dx,dy) 
+	 */
+	public static double length(double dx,double dy) {
+		return (float)Math.sqrt(lengthSquared(dx,dy));
+	}
 }
