@@ -53,17 +53,22 @@ public class Turtle {
 	protected void reset() {
 		turtleX = 0;
 		turtleY = 0;
-		color = new ColorRGB(0,0,0);
 		setAngle(0);
 		penUp();
 		history = new ArrayList<Movement>();
 	}
 
 	public void setColor(ColorRGB c) {
-		if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
-		
-		color.set(c);
+		if(color!=null) {
+			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
+			color.set(c);
+		} else {
+			color = new ColorRGB(c);
+		}
 		history.add( new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE) );
+	}
+	public ColorRGB getColor() {
+		return color;
 	}
 	
 	public void jumpTo(double x,double y) {
