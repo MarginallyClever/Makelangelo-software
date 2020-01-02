@@ -3,8 +3,6 @@ package com.marginallyclever.makelangeloRobot.settings;
 import java.awt.BasicStroke;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,6 +12,7 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
@@ -42,8 +41,6 @@ public final class MakelangeloRobotSettings {
 	static public final float Z_ANGLE_OFF = 90;
 	
 	static public int FIRMWARE_MAX_SEGMENTS = 32;
-	
-	private DecimalFormat df;
 	
 	private String[] configsAvailable;
 	
@@ -131,13 +128,7 @@ public final class MakelangeloRobotSettings {
 	 * @param translator
 	 * @param robot
 	 */
-	public MakelangeloRobotSettings() {
-		// set up number format
-		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
-		otherSymbols.setDecimalSeparator('.');
-		df = new DecimalFormat("#.###",otherSymbols);
-		df.setGroupingUsed(false);
-				
+	public MakelangeloRobotSettings() {				
 		double mh = 835; // mm
 		double mw = 835; // mm
 		
@@ -254,8 +245,8 @@ public final class MakelangeloRobotSettings {
 
 	public String getGCodeConfig() {
 		String result;
-		String xAxis = "M101 A0 T"+df.format(limitRight)+" B"+df.format(limitLeft);
-		String yAxis = "M101 A1 T"+df.format(limitTop)+" B"+df.format(limitBottom);
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
 		String zAxis = "M101 A2 T170 B10";
 		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
@@ -803,23 +794,23 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	public String getPenDownString() {
-		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle());
+		return "G01 F" + StringHelper.formatDouble(zRate) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle());
+		return "G00 F" + StringHelper.formatDouble(zRate) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getPenUpFeedrateString() {
-		return "G00 F" + df.format(getPenUpFeedRate()) + "\n";
+		return "G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n";
 	}
 	
 	public String getPenDownFeedrateString() {
-		return "G00 F" + df.format(getPenDownFeedRate()) + "\n";
+		return "G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n";
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
-		if(penDownColor == newPenDownColor) return;
+		//if(penDownColor == newPenDownColor) return;
 		
 		penDownColor = newPenDownColor;
 		writeChangeToInternal(out);
@@ -833,7 +824,7 @@ public final class MakelangeloRobotSettings {
 	protected void writeChangeToInternal(Writer out) throws IOException {
 		int toolNumber = penDownColor.toInt() & 0xffffff;  // ignore alpha channel
 		out.write("M06 T" + toolNumber + "\n");
-		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
+		out.write("G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 
 		String name="";
 		switch(toolNumber) {
@@ -853,7 +844,7 @@ public final class MakelangeloRobotSettings {
 
 	public void writeChangeTo(Writer out,String name) throws IOException {
 		writeChangeToShared(out,name);
-		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
+		out.write("G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
 	protected void writeChangeToShared(Writer out,String name) throws IOException {
@@ -872,7 +863,7 @@ public final class MakelangeloRobotSettings {
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
 		String command=isUp?"G01":"G00";
 		
-		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + "\n");
+		out.write(command+" X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y) + "\n");
 	}
 
 	// lift the pen
@@ -883,7 +874,7 @@ public final class MakelangeloRobotSettings {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 		
-		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
+		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
 	}
 	
 	// lower the pen
@@ -894,7 +885,7 @@ public final class MakelangeloRobotSettings {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 
-		out.write("G01 F" + df.format(getPenDownFeedRate()) + "\n");
+		out.write("G01 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {

@@ -16,8 +16,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -34,6 +32,7 @@ import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.makelangelo.CommandLineOptions;
@@ -60,8 +59,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private boolean firmwareVersionChecked = false;
 	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
-
-	private DecimalFormat df;
 
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
@@ -94,12 +91,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 
 	public MakelangeloRobot() {
-		// set up number format
-		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
-		otherSymbols.setDecimalSeparator('.');
-		df = new DecimalFormat("#.###", otherSymbols);
-		df.setGroupingUsed(false);
-
 		settings = new MakelangeloRobotSettings();
 		portConfirmed = false;
 		areMotorsEngaged = true;
@@ -389,8 +380,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				sendLineToRobot(lines[i] + "\n");
 			}
 			setHome();
-			sendLineToRobot("G0 F" + df.format(settings.getPenUpFeedRate()) + " A"
-					+ df.format(settings.getAcceleration()) + "\n");
+			sendLineToRobot("G0 F" + StringHelper.formatDouble(settings.getPenUpFeedRate()) + " A"
+					+ StringHelper.formatDouble(settings.getAcceleration()) + "\n");
 		} catch (Exception e) {
 		}
 	}
@@ -454,7 +445,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot("G00 Z" + df.format(testAngle));
+		sendLineToRobot("G00 Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -615,7 +606,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		// get it again in case it was capped.
 		feedRate = settings.getPenDownFeedRate();
 		// tell the robot
-		sendLineToRobot("G00 F" + df.format(feedRate));
+		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
 	}
 
 	public double getCurrentFeedRate() {
@@ -623,7 +614,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void goHome() {
-		sendLineToRobot("G00 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY()));
+		sendLineToRobot("G00 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y" + StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		penY = (float) settings.getHomeY();
 	}
@@ -638,7 +629,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		// save home position
-		sendLineToRobot("D6 X" + df.format(settings.getHomeX()) + " Y" + df.format(settings.getHomeY()));
+		sendLineToRobot("D6 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y" + StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 		didSetHome = true;
@@ -653,7 +644,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * @param y absolute position in mm
 	 */
 	public void movePenAbsolute(float x, float y) {
-		sendLineToRobot("G00 X" + df.format(x) + " Y" + df.format(y));
+		sendLineToRobot("G00 X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
 	}
@@ -666,7 +657,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
-		sendLineToRobot("G00 X" + df.format(dx) + " Y" + df.format(dy));
+		sendLineToRobot("G00 X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getGondolaX() + dx);
 		penY += dy;
@@ -741,6 +732,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		ArtPipeline pipeline = new ArtPipeline();
 		pipeline.makeChecks(turtle,settings);
 		
+		saveCurrentTurtleToDrawing();
+	}
+	
+	public void saveCurrentTurtleToDrawing() {
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this);
