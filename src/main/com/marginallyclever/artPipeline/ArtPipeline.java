@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.MoveType;
 import com.marginallyclever.convenience.Turtle.Movement;
@@ -19,23 +21,190 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {
+	public class ArtLine {
+		public Point2D a,b;
+		public ColorRGB c;
 
+		public ArtLine(Point2D a, Point2D b, ColorRGB c) {
+			super();
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+	}
+	public class ArtSegment {
+		public ArrayList<ArtLine> lines;
+		boolean isClosed;
+		
+		public ArtSegment() {
+			lines = new ArrayList<ArtLine>();
+			isClosed=false;
+		}
+	}
 	/**
 	 * Offers to look for a better route through the turtle history that means fewer travel moves.
 	 */
 	public void checkReorder(Turtle turtle, MakelangeloRobotSettings settings) {
-		// TODO finish me
-		/*
-		int result = JOptionPane.showConfirmDialog(myPanel, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
+		if(turtle.history.size()==0) return;
+		
+		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
 		if(result == JOptionPane.YES_OPTION) {
+			System.out.println("checkReorder() begin");
 			// history is made of changes, travels, and draws
 			// look at the section between two changes.
-			  // look at all pen down moves in the section.
-			    // if two pen down moves share a start/end, then they are connected and belong in a single segment.
+			//   look at all pen down moves in the section.
+   			//     if two pen down moves share a start/end, then they are connected and belong in a single segment.
+			
+			// build a list of all the pen-down lines while remembering their color.
+			ArrayList<ArtLine> originalLines = new ArrayList<ArtLine>();
+			Movement previousMovement=null;
+			ColorRGB color = new ColorRGB(0,0,0);
+			
+			for( Movement m : turtle.history ) {
+				switch(m.type) {
+				case DRAW:
+					if(previousMovement!=null) {
+						ArtLine line = new ArtLine(
+								new Point2D(m.x,m.y),
+								new Point2D(previousMovement.x,previousMovement.y),
+								color);
+						originalLines.add(line);
+					}
+					previousMovement = m;
+					break;
+				case TRAVEL:
+					previousMovement = m;
+					break;
+				case TOOL_CHANGE:
+					color = m.getColor();
+					break;
+				}
+			}
+
+			System.out.println("  Found "+turtle.history.size()+" instructions.");
+			int total = originalLines.size();
+			System.out.println("  Found "+total+" lines.");
+
+			// now sort the lines into contiguous groups.
+			// from any given "active" line, search all remaining lines for a match
+			// if a match is found, add it to the sorted list and make the match into the active line.
+			// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
+			/// TODO sort the lines into subgroups for faster searching?
+			ArrayList<ArtSegment> segments = new ArrayList<ArtSegment>();
+			ArtSegment activeSegment=null;
+			boolean found=false;
+			ArtLine activeLine=null;
+			int sorted=0;
+
+			while(!originalLines.isEmpty()) {
+				if(found==false) {
+					// either this is the first time OR we found no connecting lines.
+					// start a new segment.
+					activeSegment = new ArtSegment();
+					segments.add(activeSegment);
+					// get a new active line
+					activeLine = originalLines.remove(0);
+					activeSegment.lines.add(activeLine);
+					// update our progress.
+					sorted++;
+					System.out.println("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
+				}
+				
+				found=false;
+				// find any line that starts or ends where this line ends.
+				for( ArtLine toSort : originalLines ) {
+					// only compare similar color lines
+					if(toSort.c.equals(activeLine.c)==false) continue;
+					
+					if(thesePointsAreTheSame(toSort.a,activeLine.b)) {
+						// found!
+						// put it in the sorted lines.
+						activeSegment.lines.add(toSort);
+						originalLines.remove(toSort);
+						activeLine = toSort;
+						found=true;
+						sorted++;
+						break;
+					} else if(thesePointsAreTheSame(toSort.b,activeLine.b)) {
+						// found!
+						// oldLine follows active but oldLine is backwards.  flip it.
+						Point2D temp = toSort.b;
+						toSort.b=toSort.a;
+						toSort.a=temp;
+						// put it in the sorted lines.
+						activeSegment.lines.add(toSort);
+						originalLines.remove(toSort);
+						found=true;
+						activeLine = toSort;
+						sorted++;
+						break;
+					}
+				}
+			}
+
+			// all lines are sorted into segments.
+			int closed=0;
+			for( ArtSegment seg : segments ) {
+				seg.isClosed = thesePointsAreTheSame(
+						seg.lines.get(0).a,
+						seg.lines.get(seg.lines.size()-1).b);
+				if(seg.isClosed) closed++;
+			}
+			
+			System.out.println("  Found "+segments.size()+" segments, "+closed+" closed.");
+			
+			// try to reorganize closed segments to shorten travels
+			for( int i=0;i<segments.size()-1;++i ) {
+				ArtSegment a=segments.get(i);
+				ArtSegment b=segments.get(i+1);
+				if(a.isClosed && b.isClosed) {
+					// valid candidate
+				}
+			}
+			
+			// rebuild the turtle history.
+			Turtle t = new Turtle();
+			// I assume the turtle history starts at the home position.
+			t.setX(turtle.history.get(0).x);
+			t.setY(turtle.history.get(0).y);
+			t.penUp();
+			
+			for( ArtSegment seg : segments ) {
+				Point2D previousPoint=null;
+
+				ArtLine first = seg.lines.remove(0);
+				if(first.c!=t.getColor()) {
+					t.setColor(first.c);
+				}
+				t.jumpTo(first.a.x, first.a.y);
+				previousPoint=first.b;
+				
+				for( ArtLine toAdd : seg.lines ) {
+					t.moveTo(toAdd.a.x, toAdd.a.y);
+					previousPoint=toAdd.b;
+				}
+				if(previousPoint!=null) {
+					t.moveTo(previousPoint.x, previousPoint.y);
+				}
+			}
+			
+			System.out.println("  History now "+t.history.size()+" instructions.");
+			turtle.history = t.history;
+			System.out.println("checkReorder() end");
 		}
-		*/
 	}
 
+	public boolean thesePointsAreTheSame(Point2D a,Point2D b) {
+		if(a==b) return true;
+		
+		// close enough ?
+		double dx = a.x-b.x;
+		if(dx>1) return false;
+		double dy = a.y-b.y;
+		if(dy>1) return false;
+		return (MathHelper.lengthSquared(dx, dy)<1e-6); 
+	}
+	
 	/**
 	 * Offers to optimize your gcode by chopping out very short line segments.
 	 * It travels the entire path and drops any pen-down segment shorter than 
