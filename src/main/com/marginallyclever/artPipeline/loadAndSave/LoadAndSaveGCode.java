@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.text.DecimalFormat;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -205,7 +205,6 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		Log.info("saving...");
 		Turtle turtle = robot.getTurtle();
 		MakelangeloRobotSettings machine = robot.getSettings();
-		DecimalFormat df = new DecimalFormat("##0.00");
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			machine.writeProgramStart(out);
@@ -217,6 +216,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			float total = turtle.history.size();
 			float soFar=0;
 			int c=0;
+			Turtle.Movement previousMovement=null;
 			
 			for(Turtle.Movement m : turtle.history ) {
 				soFar++;
@@ -229,22 +229,28 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 						if(c++>10) {
 							c=0;
 							float p = 100.0f * (soFar/total);
-							out.write("M117 "+df.format(p)+"%\n");
+							out.write("M117 "+StringHelper.formatDouble(p)+"%\n");
 						}
 					}
+					previousMovement=m;
 					break;
 				case DRAW:
 					if(isUp) {
-						machine.writeMoveTo(out,m.x, m.y,isUp); 
+						if(previousMovement!=null) {
+							machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true);
+						} else {
+							machine.writeMoveTo(out, m.x, m.y, true);
+						}
 						machine.writePenDown(out);
 						isUp=false;
 					}
-					machine.writeMoveTo(out,m.x, m.y,isUp);
+					machine.writeMoveTo(out,m.x, m.y,false);
 					if(c++>10) {
 						c=0;
 						float p = 100.0f * (soFar/total);
-						out.write("M117 "+df.format(p)+"%\n");
+						out.write("M117 "+StringHelper.formatDouble(p)+"%\n");
 					}
+					previousMovement=m;
 					break;
 				case TOOL_CHANGE:
 					machine.writeChangeTo(out, m.getColor());
