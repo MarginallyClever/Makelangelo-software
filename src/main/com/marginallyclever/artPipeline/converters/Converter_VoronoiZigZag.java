@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.converters;
 
 import java.awt.Rectangle;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,6 +9,7 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
@@ -183,7 +183,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				DecimalFormat flen = new DecimalFormat("#.##");
 				String c;
 				switch (color) {
 				case 0:
@@ -199,7 +198,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 					c = "white";
 					break;
 				}
-				Log.info(c, formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
+				Log.info(c, formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
 			pm.setProgress((int) progress);
