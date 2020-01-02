@@ -4,13 +4,13 @@ package com.marginallyclever.artPipeline.converters;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -66,7 +66,6 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				DecimalFormat flen = new DecimalFormat("#.##");
 				String c;
 				switch (color) {
 				case 0:
@@ -82,7 +81,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 					c = "white";
 					break;
 				}
-				Log.info( c , formatTime(t_elapsed) + ": " + flen.format(len) + "mm");
+				Log.info( c , formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
 			pm.setProgress((int) progress);
