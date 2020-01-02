@@ -30,7 +30,8 @@ import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
-import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -85,6 +86,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		scale=1;
 		
 	    turtle = new Turtle();
+	    turtle.setX(machine.getHomeX());
+	    turtle.setY(machine.getHomeX());
+		turtle.setColor(new ColorRGB(0,0,0));
+		
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
 			Log.info("Failed to load some elements (1)");
@@ -114,6 +119,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					(paperHeight / imageHeight);
 		}
 	    turtle = new Turtle();
+	    turtle.setX(machine.getHomeX());
+	    turtle.setY(machine.getHomeX());
+		turtle.setColor(new ColorRGB(0,0,0));
 		loadOK = parseAll(document);
 		if(!loadOK) {
 			Log.info("Failed to load some elements (2)");
@@ -254,6 +262,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
+						turtle.penDown();
+						
 						// x0,y0 is the first point
 						double x0=x;
 						double y0=y;
@@ -299,11 +309,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					        oldy=yabc;
 						}
 						
-						double steps = (int)Math.ceil(Math.min(length, 10));
-						if(steps==0) steps=1;
+						double steps = (int)Math.ceil(Math.max(Math.min(length, 10),1));
 
 						
-						for(double j=0;j<=1;j+=1.0/steps) {/*
+						for(double j=0;j<1;j+=1.0/steps) {/*
 							// old method
 							double xa = p(x0,x1,j);
 							double ya = p(y0,y1,j);
@@ -328,13 +337,15 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
 							
 							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
-								turtle.penDown();
-								turtle.moveTo(xabc,yabc);
 								x=xabc;
 								y=yabc;
+								turtle.moveTo(xabc,yabc);
+								turtle.moveTo(xabc,yabc);
 								adjustLimits(xabc,yabc);
 							//}
 						}
+						turtle.moveTo(x3,y3);
+						adjustLimits(x3,y3);
 					}
 					break; 
 				default:
@@ -436,7 +447,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {
-						machine.writePenUp(out);
 						isUp=true;
 					}
 					x0=m.x;
@@ -444,15 +454,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case DRAW:
 					if(isUp) {
-						machine.writeMoveTo(out,m.x, m.y,isUp); 
-						machine.writePenDown(out);
 						isUp=false;
 					} else {
 						out.write("  <line");
-						out.write(" x1=\""+MathHelper.roundOff3(x0)+"\"");
-						out.write(" y1=\""+MathHelper.roundOff3(-y0)+"\"");
-						out.write(" x2=\""+MathHelper.roundOff3(m.x)+"\"");
-						out.write(" y2=\""+MathHelper.roundOff3(-m.y)+"\"");
+						out.write(" x1=\""+StringHelper.formatDouble(x0)+"\"");
+						out.write(" y1=\""+StringHelper.formatDouble(-y0)+"\"");
+						out.write(" x2=\""+StringHelper.formatDouble(m.x)+"\"");
+						out.write(" y2=\""+StringHelper.formatDouble(-m.y)+"\"");
 						out.write(" stroke=\"black\"");
 						//out.write(" stroke-width=\"1\"");
 						out.write(" />\n");
@@ -462,7 +470,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					
 					break;
 				case TOOL_CHANGE:
-					machine.writeChangeTo(out, m.getColor());
 					break;
 				}
 			}

@@ -89,6 +89,8 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 
 		machine = robot.getSettings();
 		turtle = new Turtle();
+	    turtle.setX(machine.getHomeX());
+	    turtle.setY(machine.getHomeX());
 		
 		try {
 			// open zip file
@@ -297,6 +299,8 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					// gcode preamble
 	    			// reset the turtle object
 	    			turtle = new Turtle();
+	    		    turtle.setX(machine.getHomeX());
+	    		    turtle.setY(machine.getHomeX());
 	    			// make sure machine state is the default.
 					System.out.println("**START**");
 					continue;
