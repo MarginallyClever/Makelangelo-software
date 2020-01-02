@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -126,6 +127,8 @@ public final class Makelangelo
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
+		System.out.println("Locale="+Locale.getDefault().toString());
+		
 		System.out.println("starting preferences...");
 		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
