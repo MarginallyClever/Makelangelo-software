@@ -493,6 +493,20 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			sendLineWithNumberAndChecksum(line, drawingProgress);
 			drawingProgress++;
 			
+			// TODO update the simulated position to match the real robot?
+			if(line.contains("G0") || line.contains("G1")) {
+				float px = this.getPenX();
+				float py = this.getPenY();
+				
+				String [] tokens = line.split(" ");
+				for( String t : tokens ) {
+					if(t.startsWith("X")) px=Float.parseFloat(t.substring(1));
+					if(t.startsWith("Y")) py=Float.parseFloat(t.substring(1));
+				}
+				this.setPenX(px);
+				this.setPenY(py);
+			}
+			
 			if (myPanel != null)
 				myPanel.statusBar.setProgress(drawingProgress, total);
 			// loop until we find a line that gets sent to the robot, at which
@@ -659,7 +673,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot("G00 X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
-		setPenX(getGondolaX() + dx);
+		setPenX(getPenX() + dx);
 		penY += dy;
 	}
 
@@ -676,11 +690,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void movePenToEdgeTop() {
-		movePenAbsolute(getGondolaX(), (float) settings.getPaperTop());
+		movePenAbsolute(getPenX(), (float) settings.getPaperTop());
 	}
 
 	public void movePenToEdgeBottom() {
-		movePenAbsolute(getGondolaX(), (float) settings.getPaperBottom());
+		movePenAbsolute(getPenX(), (float) settings.getPaperBottom());
 	}
 
 	public void disengageMotors() {
@@ -999,23 +1013,23 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	// in mm
-	public float getGondolaX() {
+	public float getPenX() {
 		return penX;
 	}
 
 	// in mm
-	public void setPenX(float gondolaX) {
-		this.penX = gondolaX;
+	public void setPenX(float px) {
+		this.penX = px;
 	}
 
 	// in mm
-	public float getGondolaY() {
+	public float getPenY() {
 		return penY;
 	}
 
 	// in mm
-	public void setPenY(float gondolaY) {
-		this.penY = gondolaY;
+	public void setPenY(float py) {
+		this.penY = py;
 	}
 
 	public int findLastPenUpBefore(int startAtLine) {

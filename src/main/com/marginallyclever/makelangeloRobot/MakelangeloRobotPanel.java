@@ -519,7 +519,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.movePenToEdgeBottom();
 			robot.movePenToEdgeLeft();
 			robot.movePenToEdgeTop();
-			robot.movePenAbsolute(0, robot.getGondolaY());
+			robot.movePenAbsolute(0, robot.getPenY());
 			robot.raisePen();
 			robot.goHome();
 		}

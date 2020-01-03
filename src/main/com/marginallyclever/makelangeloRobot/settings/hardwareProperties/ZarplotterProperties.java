@@ -61,8 +61,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	protected void paintPenHolderToCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		//double dx, dy;
-		double gx = robot.getGondolaX();
-		double gy = robot.getGondolaY();
+		double gx = robot.getPenX();
+		double gy = robot.getPenY();
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
