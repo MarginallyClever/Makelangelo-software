@@ -98,14 +98,16 @@ public class ArtPipeline {
 
 			while(!originalLines.isEmpty()) {
 				if(found==false) {
-					// either this is the first time OR we found no connecting lines.
+					// either this is the first time OR 
+					// ( we found no connecting lines AND there are still originalLines left )
 					// start a new segment.
 					activeSegment = new ArtSegment();
 					segments.add(activeSegment);
 					// get a new active line
 					activeLine = originalLines.remove(0);
+					// put the active line in the active segment.
 					activeSegment.lines.add(activeLine);
-					// update our progress.
+					// do some metrics
 					sorted++;
 					System.out.println("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
 				}
@@ -116,33 +118,46 @@ public class ArtPipeline {
 					// only compare similar color lines
 					if(toSort.c.equals(activeLine.c)==false) continue;
 					
-					if(thesePointsAreTheSame(toSort.a,activeLine.b)) {
+					// check if there's a match with end A.
+					if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
 						// found!
-						// put it in the sorted lines.
+						// put it in the sorted lines
 						activeSegment.lines.add(toSort);
 						originalLines.remove(toSort);
+						// make it the new segment head
 						activeLine = toSort;
-						found=true;
+						// do some metrics
 						sorted++;
+						// do it all again!
+						found=true;
 						break;
-					} else if(thesePointsAreTheSame(toSort.b,activeLine.b)) {
+					}
+					// check if there's a match with end B.
+					else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
 						// found!
-						// oldLine follows active but oldLine is backwards.  flip it.
+						// oldLine follows active but oldLine is backwards.  flip toSort
 						Point2D temp = toSort.b;
 						toSort.b=toSort.a;
 						toSort.a=temp;
-						// put it in the sorted lines.
+						// then put it in the sorted lines
 						activeSegment.lines.add(toSort);
 						originalLines.remove(toSort);
-						found=true;
+						// and make it the new segment head
 						activeLine = toSort;
+						// do some metrics
 						sorted++;
+						// do it all again!
+						found=true;
 						break;
 					}
+					// else toSort does not connect to activeLine.b.
+					// our grim search continues.
 				}
+				// yea tho we searched every originalLine left, there were no matches to be found.
+				// do it all again from the top.
 			}
 
-			// all lines are sorted into segments.
+			// all original lines are now sorted into segments.
 			int closed=0;
 			for( ArtSegment seg : segments ) {
 				seg.isClosed = thesePointsAreTheSame(
@@ -170,21 +185,17 @@ public class ArtPipeline {
 			t.penUp();
 			
 			for( ArtSegment seg : segments ) {
-				Point2D previousPoint=null;
-
-				ArtLine first = seg.lines.remove(0);
+				ArtLine first = seg.lines.get(0);
+				// change color if needed
 				if(first.c!=t.getColor()) {
 					t.setColor(first.c);
 				}
+				// jump to start of segment
 				t.jumpTo(first.a.x, first.a.y);
-				previousPoint=first.b;
-				
+
+				// follow the segment to its end.
 				for( ArtLine toAdd : seg.lines ) {
-					t.moveTo(toAdd.a.x, toAdd.a.y);
-					previousPoint=toAdd.b;
-				}
-				if(previousPoint!=null) {
-					t.moveTo(previousPoint.x, previousPoint.y);
+					t.moveTo(toAdd.b.x, toAdd.b.y);
 				}
 			}
 			
@@ -382,6 +393,8 @@ public class ArtPipeline {
 	}
 
 	public void makeChecks(Turtle turtle, MakelangeloRobotSettings settings) {
+		if(turtle.history.isEmpty()) return;
+		
 		checkResize(turtle,settings);
 		checkReorder(turtle,settings);
 		checkSimplify(turtle,settings);
