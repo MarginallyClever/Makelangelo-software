@@ -47,6 +47,7 @@ public class Turtle {
 
 	
 	public Turtle() {
+		super();
 		reset();
 	}
 	
@@ -56,6 +57,8 @@ public class Turtle {
 		setAngle(0);
 		penUp();
 		history = new ArrayList<Movement>();
+		// default turtle color is black.
+		setColor(new ColorRGB(0,0,0));
 	}
 
 	public void setColor(ColorRGB c) {
