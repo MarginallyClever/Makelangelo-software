@@ -213,24 +213,14 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			machine.writePenUp(out);
 			boolean isUp=true;
 			
-			float total = turtle.history.size();
-			float soFar=0;
-			int c=0;
 			Turtle.Movement previousMovement=null;
 			
 			for(Turtle.Movement m : turtle.history ) {
-				soFar++;
-				
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {
 						machine.writePenUp(out);
 						isUp=true;
-						if(c++>10) {
-							c=0;
-							float p = 100.0f * (soFar/total);
-							out.write("M117 "+StringHelper.formatDouble(p)+"%\n");
-						}
 					}
 					previousMovement=m;
 					break;
@@ -245,11 +235,6 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 						isUp=false;
 					}
 					machine.writeMoveTo(out,m.x, m.y,false);
-					if(c++>10) {
-						c=0;
-						float p = 100.0f * (soFar/total);
-						out.write("M117 "+StringHelper.formatDouble(p)+"%\n");
-					}
 					previousMovement=m;
 					break;
 				case TOOL_CHANGE:
@@ -259,7 +244,6 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			}
 			if(!isUp) machine.writePenUp(out);
 			machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true);
-			out.write("M117 100.00%\n");
 			machine.writeProgramEnd(out);
 			
 			out.flush();
