@@ -968,7 +968,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 							if(showCount>=first && showCount<last) {
 								gl2.glVertex2d(previousMove.x,previousMove.y);
 							}
-							showCount++;
 							isUp=false;
 						}
 						if(showCount>=first && showCount<last) {
