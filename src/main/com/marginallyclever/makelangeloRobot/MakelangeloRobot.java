@@ -921,6 +921,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				double oy=this.settings.getHomeY();
 				Movement previousMove=turtle.new Movement(ox,oy,Turtle.MoveType.TRAVEL);				
 	
+				int first = 0;
+				int last = turtle.history.size();
+				int showCount=0;
+				
 				gl2.glBegin(GL2.GL_LINE_STRIP);
 				
 				gl2.glColor4d(
@@ -928,7 +932,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 						(double)penUpColor.getGreen() / 255.0,
 						(double)penUpColor.getBlue() / 255.0,
 						showPenUp?1:0);
-				gl2.glVertex2d(ox,oy);
+				if(showCount>=first && showCount<last) {
+					gl2.glVertex2d(ox,oy);
+				}
+				showCount++;
 				
 				for( Turtle.Movement m : turtle.history ) {
 					switch(m.type) {
@@ -940,23 +947,34 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 									(double)penUpColor.getGreen() / 255.0,
 									(double)penUpColor.getBlue() / 255.0,
 									showPenUp?1:0);
-							gl2.glVertex2d(previousMove.x,previousMove.y);
-							gl2.glVertex2d(m.x,m.y);
+							if(showCount>=first && showCount<last) {
+								gl2.glVertex2d(previousMove.x,previousMove.y);
+								gl2.glVertex2d(m.x,m.y);
+							}
+							showCount++;
 						}
 						previousMove=m;
 						break;
 					case DRAW:
 						if(isUp) {
-							gl2.glVertex2d(previousMove.x,previousMove.y);
+							if(showCount>=first && showCount<last) {
+								gl2.glVertex2d(previousMove.x,previousMove.y);
+							}
 							gl2.glColor4d(
 									(double)penDownColor.getRed() / 255.0,
 									(double)penDownColor.getGreen() / 255.0,
 									(double)penDownColor.getBlue() / 255.0,
 									1);
-							gl2.glVertex2d(previousMove.x,previousMove.y);
+							if(showCount>=first && showCount<last) {
+								gl2.glVertex2d(previousMove.x,previousMove.y);
+							}
+							showCount++;
 							isUp=false;
 						}
-						gl2.glVertex2d(m.x,m.y);
+						if(showCount>=first && showCount<last) {
+							gl2.glVertex2d(m.x,m.y);
+						}
+						showCount++;
 						previousMove=m;
 						break;
 					case TOOL_CHANGE:
