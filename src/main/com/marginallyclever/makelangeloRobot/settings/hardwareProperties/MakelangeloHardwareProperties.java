@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
@@ -14,6 +15,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public interface MakelangeloHardwareProperties {
 	public String getVersion();
 	public String getName();
+	
+	public Point2D getHome();
 	
 	public boolean canChangeMachineSize();
 	

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -16,6 +17,13 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
 
+	@Override
+	public Point2D getHome() {
+		double beltLeft = 1025;
+		double beltRight = 1025;
+		
+		return super.FK(beltLeft,beltRight);
+	}
 	
 	@Override
 	public String getVersion() {

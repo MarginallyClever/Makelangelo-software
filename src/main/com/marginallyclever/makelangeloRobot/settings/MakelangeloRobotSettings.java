@@ -2,6 +2,7 @@ package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.BasicStroke;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
@@ -24,17 +26,18 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * TODO move tool names into translations & add a color palette system for quantizing colors.
  */
-public final class MakelangeloRobotSettings {
-	public static final double INCH_TO_CM = 2.54;
+public final class MakelangeloRobotSettings implements Serializable {
 	/**
-	 * measured from "m4 calibration.pdf"
-	 * @since 7.5.0
+	 * 
 	 */
-	public static final float CALIBRATION_MM_FROM_TOP = 217f;
+	private static final long serialVersionUID = -4185946661019573192L;
+
+	public static final double INCH_TO_CM = 2.54;
 	
-	static public final float FEEDRATE_MAX = 100;
-	static public final float FEEDRATE_DEFAULT = 60;
-	static public final float ACCELERATION_MAX = 300;
+	static public final float FEEDRATE_MAX = 100;  // mm/s
+	static public final float FEEDRATE_DEFAULT = 60;  // mm/s
+	
+	static public final float ACCELERATION_MAX = 300;  // mm/s/s
 	
 	static public final float Z_RATE = 500;
 	static public final float Z_ANGLE_ON = 160;
@@ -216,27 +219,21 @@ public final class MakelangeloRobotSettings {
 		return configsAvailable;
 	}
 
+	public Point2D getHome() {
+		return getHardwareProperties().getHome();
+	}
 	/**
 	 * @return home X coordinate in mm
 	 */ 
 	public double getHomeX() {
-		return 0;
+		return getHome().x;
 	}
 	
 	/**
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
-		if(this.hardwareVersion.equals("6")) {
-			// Zarplotter
-			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
-			return 0;
-		} else {
-			float limitTop = (float)getLimitTop();
-			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_MM_FROM_TOP;
-			homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
-			return homeY;
-		}
+		return getHome().y;
 	}
 	
 	public String getGCodeSetPositionAtHome() {
@@ -823,8 +820,6 @@ public final class MakelangeloRobotSettings {
 	
 	protected void writeChangeToInternal(Writer out) throws IOException {
 		int toolNumber = penDownColor.toInt() & 0xffffff;  // ignore alpha channel
-		out.write("M06 T" + toolNumber + "\n");
-		out.write("G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 
 		String name="";
 		switch(toolNumber) {
@@ -836,24 +831,19 @@ public final class MakelangeloRobotSettings {
 		case 0xff00ff: name="magenta";	break;
 		case 0xffff00: name="yellow";	break;
 		case 0xffffff: name="white";	break;
-		default: name= "0x"+Integer.toHexString(penDownColor.toInt());  break;  // display unknown RGB value as hex
-		}		
+		default: name= "0x"+Integer.toHexString(toolNumber);  break;  // display unknown RGB value as hex
+		}
 		
-		writeChangeToShared(out,name);
-	}
-
-	public void writeChangeTo(Writer out,String name) throws IOException {
-		writeChangeToShared(out,name);
-		out.write("G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
-	}
-	
-	protected void writeChangeToShared(Writer out,String name) throws IOException {
 		String changeString = String.format("%-20s", "Change to "+name);
 		String continueString = String.format("%-20s", "Click to continue");
+
+		out.write("M06 T" + toolNumber + "\n");
 		out.write("M117 "+changeString+continueString+"\n");
 		out.write("M300 S60 P250\n");  // beep
 		out.write("M226\n");  // pause for user input
 		out.write("M117\n");  // clear message
+		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + 
+					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
 	public static String padRight(String s, int n) {
