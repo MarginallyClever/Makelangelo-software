@@ -67,8 +67,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	// % from edge of paper.
 	private double paperMargin;
 
-	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
+	@Deprecated
 	private boolean shouldSignName;
 	
 	private String hardwareVersion;
@@ -168,7 +168,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		zOff = Z_ANGLE_OFF;
 		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
 		penUpColor = new ColorRGB(0,255,0); // blue
-		reverseForGlass = false;
 		startingPositionIndex = 4;
 
 		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
@@ -464,10 +463,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return isRegistered;
 	}
 
-	public boolean isReverseForGlass() {
-		return reverseForGlass;
-	}
-
 	/**
 	 * Load the machine configuration
 	 *
@@ -503,7 +498,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperColor = new ColorRGB(r,g,b);
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
 		//setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
 
@@ -587,7 +581,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
 
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
-		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 		
@@ -663,10 +656,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		this.isRegistered = isRegistered;
 	}
 	
-	public void setReverseForGlass(boolean reverseForGlass) {
-		this.reverseForGlass = reverseForGlass;
-	}
-	
+
 	public boolean shouldSignName() {
 		return shouldSignName;
 	}
