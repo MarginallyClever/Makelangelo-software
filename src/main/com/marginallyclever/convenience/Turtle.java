@@ -195,4 +195,23 @@ public class Turtle {
 			}
 		}
 	}
+
+	/**
+	 * Translate all draw and move segments by parameters
+	 * @param sx
+	 * @param sy
+	 */
+	public void translate(double dx, double dy) {
+		for( Movement m : history ) {
+			switch(m.type) {
+			case DRAW:
+			case TRAVEL:
+				m.x+=dx;
+				m.y+=dy;
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
