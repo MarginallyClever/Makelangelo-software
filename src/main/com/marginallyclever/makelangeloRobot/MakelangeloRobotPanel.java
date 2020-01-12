@@ -106,7 +106,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	// pipeline controls
 	private ArtPipelinePanel myArtPipelinePanel;
-	private CollapsiblePanel myArtPipelinePanelContainer;
 	
 	private boolean isConnected;  // has pressed connect button
 	
