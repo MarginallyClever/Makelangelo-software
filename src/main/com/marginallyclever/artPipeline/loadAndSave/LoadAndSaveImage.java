@@ -281,7 +281,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	public void scaleToFillPaper() {
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 
-		float flip = s.isReverseForGlass() ? -1 : 1;
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 
@@ -292,14 +291,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
 		img.setScaleX(f);
-		img.setScaleY(-f * flip);
+		img.setScaleY(-f);
 	}
 
 	
 	public void scaleToFitPaper() {
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 		
-		float flip   = s.isReverseForGlass() ? -1 : 1;
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 		
@@ -310,7 +308,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
 		img.setScaleX(f);
-		img.setScaleY(-f * flip);
+		img.setScaleY(-f);
 	}
 	
 
