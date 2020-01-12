@@ -282,7 +282,8 @@ public class ArtPipeline {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
 		turtle.getBounds(top, bottom);
-		
+
+		// find the scale
 		double tw = top.x-bottom.x;
 		double th = top.y-bottom.y;
 		double nh=th;
@@ -294,6 +295,13 @@ public class ArtPipeline {
 		ratioW = w/nw;
 		// use < to fit in the page.
 		double ratio = ratioW<ratioH?ratioW:ratioH;
+		
+		// and the translation
+		double x = (top.x+bottom.x)/2;
+		double y = (top.y+bottom.y)/2;
+		
+		// and apply
+		turtle.translate(-x,-y);
 		turtle.scale(ratio,ratio);
 	}
 
@@ -313,6 +321,7 @@ public class ArtPipeline {
 		Point2D bottom = new Point2D();
 		turtle.getBounds(top, bottom);
 		
+		// find the scale
 		double tw = top.x-bottom.x;
 		double th = top.y-bottom.y;
 		double nh=th;
@@ -324,6 +333,13 @@ public class ArtPipeline {
 		ratioW = w/nw;
 		// use > to fill the page.
 		double ratio = ratioW>ratioH?ratioW:ratioH;
+		
+		// and the translation
+		double x = (top.x+bottom.x)/2;
+		double y = (top.y+bottom.y)/2;
+		
+		// and apply
+		turtle.translate(-x,-y);
 		turtle.scale(ratio,ratio);
 	}
 
