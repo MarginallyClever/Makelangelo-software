@@ -2,8 +2,7 @@ package com.marginallyclever.artPipeline;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.util.prefs.Preferences;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -13,29 +12,40 @@ import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 
-public class ArtPipelinePanel extends CollapsiblePanel implements ActionListener, ItemListener { 
+public class ArtPipelinePanel extends CollapsiblePanel { 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7525669710478140175L;
 
+	@SuppressWarnings("deprecation")
+	transient private Preferences prefs = PreferencesHelper
+			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+
+	private void setPreferredResizeStyle(int style) {
+		prefs.putInt("Fill Style", style);
+	}
+	private int getPreferredFillStyle() {
+		return prefs.getInt("Fill Style", 0);
+	}
+	private void setPreferredFlipStyle(int style) {
+		prefs.putInt("Flip Style", style);
+	}
+	private int getPreferredFlipStyle() {
+		return prefs.getInt("Flip Style", 0);
+	}
+	
 	transient protected JFrame parentFrame;
 	transient public ArtPipeline myPipeline;
 	
-	private final String [] resizeOptions = { "Don't resize", "Fit inside the margins","Fill the margins" };
 	protected JComboBox<String> resizeOptionsComboBox;
-	// TODO save this in a preference
-	static int resizeOptionsComboBoxIndex=0;
-
+	protected JComboBox<String> flipOptionsComboBox;
 	protected JCheckBox shouldReorderCheckbox;
 	protected JCheckBox shouldSimplifyCheckbox;
 	protected JCheckBox shouldCropCheckbox;
 
-	private final String [] flipOptions = { "Don't flip", "Flip horizontal","Flip vertical" };
-	protected JComboBox<String> flipOptionsComboBox;
-	// TODO save this in a preference
-	static int flipOptionsComboBoxIndex=0;
 	
 	
 	public ArtPipelinePanel(JFrame parentFrame0) {
@@ -48,11 +58,19 @@ public class ArtPipelinePanel extends CollapsiblePanel implements ActionListener
 		//if(shouldResizeFill()) checkResizeFill(turtle,settings);
 		//if(shouldResizeFit()) checkResizeFit(turtle,settings);
 		// TODO translate these strings
+		String[] resizeOptions = new String[3];
+		resizeOptions[1] = Translator.get("ConvertImageResizeNone");
+		resizeOptions[1] = Translator.get("ConvertImageResizeFit");
+		resizeOptions[2] = Translator.get("ConvertImageResizeFill");
 		resizeOptionsComboBox = new JComboBox<String>(resizeOptions);
-		resizeOptionsComboBox.setSelectedIndex(resizeOptionsComboBoxIndex);
+		resizeOptionsComboBox.setSelectedIndex(getPreferredFillStyle());
 
+		String[] flipOptions = new String[3];
+		flipOptions[1] = Translator.get("ConvertImageFlipNone");
+		flipOptions[1] = Translator.get("ConvertImageFlipH");
+		flipOptions[2] = Translator.get("ConvertImageFlipV");
 		flipOptionsComboBox = new JComboBox<String>(flipOptions);
-		flipOptionsComboBox.setSelectedIndex(flipOptionsComboBoxIndex);
+		flipOptionsComboBox.setSelectedIndex(getPreferredFlipStyle());
 		
 		//if(shouldReorder()) checkReorder(turtle,settings);
 		shouldReorderCheckbox = new JCheckBox("Reorder");
@@ -68,18 +86,37 @@ public class ArtPipelinePanel extends CollapsiblePanel implements ActionListener
 		panel.add(shouldReorderCheckbox);
 		panel.add(shouldSimplifyCheckbox);
 		panel.add(shouldCropCheckbox);
-	}
-	
-	@Override
-	public void itemStateChanged(ItemEvent arg0) {
-		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		resizeOptionsComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setPreferredResizeStyle(resizeOptionsComboBox.getSelectedIndex());
+			}
+		});
+		flipOptionsComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setPreferredFlipStyle(flipOptionsComboBox.getSelectedIndex());
+			}
+		});
+		shouldReorderCheckbox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO reprocess turtle
+			}
+		});
+		shouldSimplifyCheckbox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO reprocess turtle
+			}
+		});
+		shouldCropCheckbox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO reprocess turtle
+			}
+		});
 	}
 	
 	public boolean shouldResizeFill() {
