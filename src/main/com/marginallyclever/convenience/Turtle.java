@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -35,6 +36,17 @@ public class Turtle {
 			return new ColorRGB((int)x);
 		}
 	};
+
+	private ReentrantLock lock;
+	public boolean isLocked() {
+		return lock.isLocked();
+	}
+	public void lock() {
+		lock.lock();
+	}
+	public void unlock() {
+		lock.unlock();
+	}
 	
 	public ArrayList<Movement> history;
 
@@ -48,6 +60,7 @@ public class Turtle {
 	
 	public Turtle() {
 		super();
+		lock = new ReentrantLock();
 		reset();
 	}
 	

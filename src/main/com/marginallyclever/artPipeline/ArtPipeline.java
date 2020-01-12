@@ -3,7 +3,6 @@ package com.marginallyclever.artPipeline;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
@@ -397,13 +396,26 @@ public class ArtPipeline {
 	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.isEmpty()) return;
 		
-		if(shouldResizeFill()) resizeFill(turtle,settings);
-		if(shouldResizeFit()) resizeFit(turtle,settings);
-		if(shouldFlipV()) flipV(turtle,settings);
-		if(shouldFlipH()) flipH(turtle,settings);
-		if(shouldReorder()) reorder(turtle,settings);
-		if(shouldSimplify()) simplify(turtle,settings);
-		if(shouldCrop()) cropToPageMargin(turtle,settings);
+		while(turtle.isLocked()) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		turtle.lock();
+		try {
+			if(shouldResizeFill()) resizeFill(turtle,settings);
+			if(shouldResizeFit()) resizeFit(turtle,settings);
+			if(shouldFlipV()) flipV(turtle,settings);
+			if(shouldFlipH()) flipH(turtle,settings);
+			if(shouldReorder()) reorder(turtle,settings);
+			if(shouldSimplify()) simplify(turtle,settings);
+			if(shouldCrop()) cropToPageMargin(turtle,settings);
+		}
+		finally {
+			turtle.unlock();
+		}
 	}
 	
 	public boolean shouldResizeFill() {

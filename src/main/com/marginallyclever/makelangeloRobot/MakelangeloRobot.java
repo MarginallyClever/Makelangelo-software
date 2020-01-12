@@ -19,7 +19,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -78,7 +77,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private float penY;
 
 	protected Turtle turtle;
-	private ReentrantLock turtleLock;
 	private ArtPipeline myPipeline;
 
 
@@ -106,7 +104,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		setPenX(0);
 		setPenY(0);
 		turtle = new Turtle();
-		turtleLock = new ReentrantLock();
 		drawingCommands=new ArrayList<String>();
 		drawingProgress=0;
 	}
@@ -778,8 +775,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	protected void estimateTime() {
-		if(turtleLock.isLocked()) return;
-		turtleLock.lock();
+		if(turtle.isLocked()) return;
+		turtle.lock();
 		
 		try {
 			double totalTime=0;
@@ -846,7 +843,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			Log.info("Worst case draw time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");	
 		}
 		finally {
-			turtleLock.unlock();
+			turtle.unlock();
 		}
 	}
 	
@@ -912,8 +909,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
 		} else if(turtle != null) {
-			if(turtleLock.isLocked()) return;
-			turtleLock.lock();
+			if(turtle.isLocked()) return;
+			turtle.lock();
 			try {
 				boolean showPenUp = GFXPreferences.getShowPenUp();
 				ColorRGB penUpColor = this.settings.getPenUpColor();
@@ -988,7 +985,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				gl2.glEnd();
 			}
 			finally {
-				turtleLock.unlock();
+				turtle.unlock();
 			}
 		}
 	}
