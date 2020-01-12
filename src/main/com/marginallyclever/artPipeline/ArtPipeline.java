@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
@@ -21,188 +22,188 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {
-	public class ArtLine {
+	public class Line2D {
 		public Point2D a,b;
 		public ColorRGB c;
 
-		public ArtLine(Point2D a, Point2D b, ColorRGB c) {
+		public Line2D(Point2D a, Point2D b, ColorRGB c) {
 			super();
 			this.a = a;
 			this.b = b;
 			this.c = c;
 		}
 	}
-	public class ArtSegment {
-		public ArrayList<ArtLine> lines;
+	public class Segment2D {
+		public ArrayList<Line2D> lines;
 		boolean isClosed;
 		
-		public ArtSegment() {
-			lines = new ArrayList<ArtLine>();
+		public Segment2D() {
+			lines = new ArrayList<Line2D>();
 			isClosed=false;
 		}
 	}
+	
+	protected ArtPipelinePanel myPanel;
+	
 	/**
 	 * Offers to look for a better route through the turtle history that means fewer travel moves.
 	 */
-	public void checkReorder(Turtle turtle, MakelangeloRobotSettings settings) {
+	public void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.size()==0) return;
 		
-		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
-		if(result == JOptionPane.YES_OPTION) {
-			System.out.println("checkReorder() begin");
-			// history is made of changes, travels, and draws
-			// look at the section between two changes.
-			//   look at all pen down moves in the section.
-   			//     if two pen down moves share a start/end, then they are connected and belong in a single segment.
-			
-			// build a list of all the pen-down lines while remembering their color.
-			ArrayList<ArtLine> originalLines = new ArrayList<ArtLine>();
-			Movement previousMovement=null;
-			ColorRGB color = new ColorRGB(0,0,0);
-			
-			for( Movement m : turtle.history ) {
-				switch(m.type) {
-				case DRAW:
-					if(previousMovement!=null) {
-						ArtLine line = new ArtLine(
-								new Point2D(m.x,m.y),
-								new Point2D(previousMovement.x,previousMovement.y),
-								color);
-						originalLines.add(line);
-					}
-					previousMovement = m;
-					break;
-				case TRAVEL:
-					previousMovement = m;
-					break;
-				case TOOL_CHANGE:
-					color = m.getColor();
-					break;
+		System.out.println("checkReorder() begin");
+		// history is made of changes, travels, and draws
+		// look at the section between two changes.
+		//   look at all pen down moves in the section.
+		//     if two pen down moves share a start/end, then they are connected and belong in a single segment.
+		
+		// build a list of all the pen-down lines while remembering their color.
+		ArrayList<Line2D> originalLines = new ArrayList<Line2D>();
+		Movement previousMovement=null;
+		ColorRGB color = new ColorRGB(0,0,0);
+		
+		for( Movement m : turtle.history ) {
+			switch(m.type) {
+			case DRAW:
+				if(previousMovement!=null) {
+					Line2D line = new Line2D(
+							new Point2D(m.x,m.y),
+							new Point2D(previousMovement.x,previousMovement.y),
+							color);
+					originalLines.add(line);
 				}
+				previousMovement = m;
+				break;
+			case TRAVEL:
+				previousMovement = m;
+				break;
+			case TOOL_CHANGE:
+				color = m.getColor();
+				break;
 			}
+		}
 
-			System.out.println("  Found "+turtle.history.size()+" instructions.");
-			int total = originalLines.size();
-			System.out.println("  Found "+total+" lines.");
+		System.out.println("  Found "+turtle.history.size()+" instructions.");
+		int total = originalLines.size();
+		System.out.println("  Found "+total+" lines.");
 
-			// now sort the lines into contiguous groups.
-			// from any given "active" line, search all remaining lines for a match
-			// if a match is found, add it to the sorted list and make the match into the active line.
-			// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
-			/// TODO sort the lines into subgroups for faster searching?
-			ArrayList<ArtSegment> segments = new ArrayList<ArtSegment>();
-			ArtSegment activeSegment=null;
-			boolean found=false;
-			ArtLine activeLine=null;
-			int sorted=0;
+		// now sort the lines into contiguous groups.
+		// from any given "active" line, search all remaining lines for a match
+		// if a match is found, add it to the sorted list and make the match into the active line.
+		// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
+		/// TODO sort the lines into subgroups for faster searching?
+		ArrayList<Segment2D> segments = new ArrayList<Segment2D>();
+		Segment2D activeSegment=null;
+		boolean found=false;
+		Line2D activeLine=null;
+		int sorted=0;
 
-			while(!originalLines.isEmpty()) {
-				if(found==false) {
-					// either this is the first time OR 
-					// ( we found no connecting lines AND there are still originalLines left )
-					// start a new segment.
-					activeSegment = new ArtSegment();
-					segments.add(activeSegment);
-					// get a new active line
-					activeLine = originalLines.remove(0);
-					// put the active line in the active segment.
-					activeSegment.lines.add(activeLine);
+		while(!originalLines.isEmpty()) {
+			if(found==false) {
+				// either this is the first time OR 
+				// ( we found no connecting lines AND there are still originalLines left )
+				// start a new segment.
+				activeSegment = new Segment2D();
+				segments.add(activeSegment);
+				// get a new active line
+				activeLine = originalLines.remove(0);
+				// put the active line in the active segment.
+				activeSegment.lines.add(activeLine);
+				// do some metrics
+				sorted++;
+				System.out.println("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
+			}
+			
+			found=false;
+			// find any line that starts or ends where this line ends.
+			for( Line2D toSort : originalLines ) {
+				// only compare similar color lines
+				if(toSort.c.equals(activeLine.c)==false) continue;
+				
+				// check if there's a match with end A.
+				if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
+					// found!
+					// put it in the sorted lines
+					activeSegment.lines.add(toSort);
+					originalLines.remove(toSort);
+					// make it the new segment head
+					activeLine = toSort;
 					// do some metrics
 					sorted++;
-					System.out.println("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
+					// do it all again!
+					found=true;
+					break;
 				}
-				
-				found=false;
-				// find any line that starts or ends where this line ends.
-				for( ArtLine toSort : originalLines ) {
-					// only compare similar color lines
-					if(toSort.c.equals(activeLine.c)==false) continue;
-					
-					// check if there's a match with end A.
-					if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
-						// found!
-						// put it in the sorted lines
-						activeSegment.lines.add(toSort);
-						originalLines.remove(toSort);
-						// make it the new segment head
-						activeLine = toSort;
-						// do some metrics
-						sorted++;
-						// do it all again!
-						found=true;
-						break;
-					}
-					// check if there's a match with end B.
-					else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
-						// found!
-						// oldLine follows active but oldLine is backwards.  flip toSort
-						Point2D temp = toSort.b;
-						toSort.b=toSort.a;
-						toSort.a=temp;
-						// then put it in the sorted lines
-						activeSegment.lines.add(toSort);
-						originalLines.remove(toSort);
-						// and make it the new segment head
-						activeLine = toSort;
-						// do some metrics
-						sorted++;
-						// do it all again!
-						found=true;
-						break;
-					}
-					// else toSort does not connect to activeLine.b.
-					// our grim search continues.
+				// check if there's a match with end B.
+				else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
+					// found!
+					// oldLine follows active but oldLine is backwards.  flip toSort
+					Point2D temp = toSort.b;
+					toSort.b=toSort.a;
+					toSort.a=temp;
+					// then put it in the sorted lines
+					activeSegment.lines.add(toSort);
+					originalLines.remove(toSort);
+					// and make it the new segment head
+					activeLine = toSort;
+					// do some metrics
+					sorted++;
+					// do it all again!
+					found=true;
+					break;
 				}
-				// yea tho we searched every originalLine left, there were no matches to be found.
-				// do it all again from the top.
+				// else toSort does not connect to activeLine.b.
+				// our grim search continues.
 			}
-
-			// all original lines are now sorted into segments.
-			int closed=0;
-			for( ArtSegment seg : segments ) {
-				seg.isClosed = thesePointsAreTheSame(
-						seg.lines.get(0).a,
-						seg.lines.get(seg.lines.size()-1).b);
-				if(seg.isClosed) closed++;
-			}
-			
-			System.out.println("  Found "+segments.size()+" segments, "+closed+" closed.");
-			
-			// try to reorganize closed segments to shorten travels
-			for( int i=0;i<segments.size()-1;++i ) {
-				ArtSegment a=segments.get(i);
-				ArtSegment b=segments.get(i+1);
-				if(a.isClosed && b.isClosed) {
-					// valid candidate
-				}
-			}
-			
-			// rebuild the turtle history.
-			Turtle t = new Turtle();
-			// I assume the turtle history starts at the home position.
-			t.setX(turtle.history.get(0).x);
-			t.setY(turtle.history.get(0).y);
-			t.penUp();
-			
-			for( ArtSegment seg : segments ) {
-				ArtLine first = seg.lines.get(0);
-				// change color if needed
-				if(first.c!=t.getColor()) {
-					t.setColor(first.c);
-				}
-				// jump to start of segment
-				t.jumpTo(first.a.x, first.a.y);
-
-				// follow the segment to its end.
-				for( ArtLine toAdd : seg.lines ) {
-					t.moveTo(toAdd.b.x, toAdd.b.y);
-				}
-			}
-			
-			System.out.println("  History now "+t.history.size()+" instructions.");
-			turtle.history = t.history;
-			System.out.println("checkReorder() end");
+			// yea tho we searched every originalLine left, there were no matches to be found.
+			// do it all again from the top.
 		}
+
+		// all original lines are now sorted into segments.
+		int closed=0;
+		for( Segment2D seg : segments ) {
+			seg.isClosed = thesePointsAreTheSame(
+					seg.lines.get(0).a,
+					seg.lines.get(seg.lines.size()-1).b);
+			if(seg.isClosed) closed++;
+		}
+		
+		System.out.println("  Found "+segments.size()+" segments, "+closed+" closed.");
+		
+		// try to reorganize closed segments to shorten travels
+		for( int i=0;i<segments.size()-1;++i ) {
+			Segment2D a=segments.get(i);
+			Segment2D b=segments.get(i+1);
+			if(a.isClosed && b.isClosed) {
+				// valid candidate
+			}
+		}
+		
+		// rebuild the turtle history.
+		Turtle t = new Turtle();
+		// I assume the turtle history starts at the home position.
+		t.setX(turtle.history.get(0).x);
+		t.setY(turtle.history.get(0).y);
+		t.penUp();
+		
+		for( Segment2D seg : segments ) {
+			Line2D first = seg.lines.get(0);
+			// change color if needed
+			if(first.c!=t.getColor()) {
+				t.setColor(first.c);
+			}
+			// jump to start of segment
+			t.jumpTo(first.a.x, first.a.y);
+
+			// follow the segment to its end.
+			for( Line2D toAdd : seg.lines ) {
+				t.moveTo(toAdd.b.x, toAdd.b.y);
+			}
+		}
+		
+		System.out.println("  History now "+t.history.size()+" instructions.");
+		turtle.history = t.history;
+		System.out.println("checkReorder() end");
 	}
 
 	public boolean thesePointsAreTheSame(Point2D a,Point2D b) {
@@ -221,112 +222,113 @@ public class ArtPipeline {
 	 * It travels the entire path and drops any pen-down segment shorter than 
 	 * minimumStepSize.
 	 */
-	public void checkSimplify(Turtle turtle, MakelangeloRobotSettings settings) {
-		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
-		if(result == JOptionPane.YES_OPTION) {
-			Log.info("checkSimplify() begin");
-			ArrayList<Movement> toKeep = new ArrayList<Movement>();
+	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
+		Log.info("checkSimplify() begin");
+		ArrayList<Movement> toKeep = new ArrayList<Movement>();
 
-			double minimumStepSize=1;
+		double minimumStepSize=1;
 
-			boolean isUp=true;
-			double ox=settings.getHomeX();
-			double oy=settings.getHomeY();
-			double sum=0;
-			double dx,dy;
-			Movement previous=null;
-			
-			for( Movement m : turtle.history ) {
-				switch(m.type) {
-				case DRAW:
-					dx=m.x-ox;
-					dy=m.y-oy;
-					sum+=Math.sqrt(dx*dx+dy*dy);
-					if(isUp || sum>minimumStepSize) {
-						toKeep.add(m);
-						sum=0;
-					}isUp=false;
-					ox=m.x;
-					oy=m.y;
-					previous=m;
-					break;
-				case TRAVEL:
-					if(!isUp && sum>0 ) {
-						if(previous!=null && previous.type==Turtle.MoveType.DRAW) {
-							toKeep.add(previous);
-						}
-					}
-					isUp=true;
+		boolean isUp=true;
+		double ox=settings.getHomeX();
+		double oy=settings.getHomeY();
+		double sum=0;
+		double dx,dy;
+		Movement previous=null;
+		
+		for( Movement m : turtle.history ) {
+			switch(m.type) {
+			case DRAW:
+				dx=m.x-ox;
+				dy=m.y-oy;
+				sum+=Math.sqrt(dx*dx+dy*dy);
+				if(isUp || sum>minimumStepSize) {
 					toKeep.add(m);
-					ox=m.x;
-					oy=m.y;
 					sum=0;
-					previous=m;
-					break;
-				default:
-					toKeep.add(m);
-					previous=m;
-					break;
+				}isUp=false;
+				ox=m.x;
+				oy=m.y;
+				previous=m;
+				break;
+			case TRAVEL:
+				if(!isUp && sum>0 ) {
+					if(previous!=null && previous.type==Turtle.MoveType.DRAW) {
+						toKeep.add(previous);
+					}
 				}
+				isUp=true;
+				toKeep.add(m);
+				ox=m.x;
+				oy=m.y;
+				sum=0;
+				previous=m;
+				break;
+			default:
+				toKeep.add(m);
+				previous=m;
+				break;
 			}
-			int os = turtle.history.size();
-			int ns = toKeep.size();
-			turtle.history = toKeep;
-			Log.info("checkSimplify() end (was "+os+" is now "+ns+")");
 		}
+		int os = turtle.history.size();
+		int ns = toKeep.size();
+		turtle.history = toKeep;
+		Log.info("checkSimplify() end (was "+os+" is now "+ns+")");
 	}
 
 	
 	
 	/**
-	 * Offers to resize your loaded image to fit the margins perfectly.
+	 * Offers to resize your loaded image to fit inside the margins.
 	 */
-	protected void checkResize(Turtle turtle, MakelangeloRobotSettings settings) {	
-		{
-			int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
-			if(result == JOptionPane.YES_OPTION) {
-				Point2D top = new Point2D();
-				Point2D bottom = new Point2D();
-				turtle.getBounds(top, bottom);
-				
-				double tw = top.x-bottom.x;
-				double th = top.y-bottom.y;
-				double nh=th;
-				double nw=tw;
-				double w = settings.getMarginWidth();
-				double h = settings.getMarginHeight();
-				double ratioW=1,ratioH=1;
-				ratioH = h/nh;
-				ratioW = w/nw;
-				// use < to fit in the page.
-				double ratio = ratioW<ratioH?ratioW:ratioH;
-				turtle.scale(ratio,ratio);
-			}
-		}
-		{
-			int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
-			if(result == JOptionPane.YES_OPTION) {
-				Point2D top = new Point2D();
-				Point2D bottom = new Point2D();
-				turtle.getBounds(top, bottom);
-				
-				double tw = top.x-bottom.x;
-				double th = top.y-bottom.y;
-				double nh=th;
-				double nw=tw;
-				double w = settings.getMarginWidth();
-				double h = settings.getMarginHeight();
-				double ratioW=1,ratioH=1;
-				ratioH = h/nh;
-				ratioW = w/nw;
-				// use > to fill the page.
-				double ratio = ratioW>ratioH?ratioW:ratioH;
-				turtle.scale(ratio,ratio);
-			}
-		}
+	protected void resizeFit(Turtle turtle, MakelangeloRobotSettings settings) {	
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		turtle.getBounds(top, bottom);
+		
+		double tw = top.x-bottom.x;
+		double th = top.y-bottom.y;
+		double nh=th;
+		double nw=tw;
+		double w = settings.getMarginWidth();
+		double h = settings.getMarginHeight();
+		double ratioW=1,ratioH=1;
+		ratioH = h/nh;
+		ratioW = w/nw;
+		// use < to fit in the page.
+		double ratio = ratioW<ratioH?ratioW:ratioH;
+		turtle.scale(ratio,ratio);
 	}
 
-	protected void cropTurtleToPageMargin(Turtle turtle, MakelangeloRobotSettings settings) {
+	protected void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
+		turtle.scale(1,-1);
+	}
+
+	protected void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
+		turtle.scale(-1,1);
+	}
+	
+	/**
+	 * Offers to resize your loaded image to fill the margins completely.
+	 */
+	protected void resizeFill(Turtle turtle, MakelangeloRobotSettings settings) {	
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		turtle.getBounds(top, bottom);
+		
+		double tw = top.x-bottom.x;
+		double th = top.y-bottom.y;
+		double nh=th;
+		double nw=tw;
+		double w = settings.getMarginWidth();
+		double h = settings.getMarginHeight();
+		double ratioW=1,ratioH=1;
+		ratioH = h/nh;
+		ratioW = w/nw;
+		// use > to fill the page.
+		double ratio = ratioW>ratioH?ratioW:ratioH;
+		turtle.scale(ratio,ratio);
+	}
+
+	protected void cropToPageMargin(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle==null) return;
 		
 		Log.info("cropTurtleToPageMargin() start");
@@ -392,12 +394,51 @@ public class ArtPipeline {
 		Log.info("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
 	}
 
-	public void makeChecks(Turtle turtle, MakelangeloRobotSettings settings) {
+	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.isEmpty()) return;
 		
-		checkResize(turtle,settings);
-		checkReorder(turtle,settings);
-		checkSimplify(turtle,settings);
-		cropTurtleToPageMargin(turtle,settings);
+		if(shouldResizeFill()) resizeFill(turtle,settings);
+		if(shouldResizeFit()) resizeFit(turtle,settings);
+		if(shouldFlipV()) flipV(turtle,settings);
+		if(shouldFlipH()) flipH(turtle,settings);
+		if(shouldReorder()) reorder(turtle,settings);
+		if(shouldSimplify()) simplify(turtle,settings);
+		if(shouldCrop()) cropToPageMargin(turtle,settings);
+	}
+	
+	public boolean shouldResizeFill() {
+		if(myPanel!=null) return myPanel.shouldResizeFill();
+		int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldResizeFit() {
+		if(myPanel!=null) return myPanel.shouldResizeFit();
+		int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldReorder() {
+		if(myPanel!=null) return myPanel.shouldReorder();
+		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldFlipV() {
+		if(myPanel!=null) return myPanel.shouldFlipV();
+		int result = JOptionPane.showConfirmDialog(null, "Flip vertical?", "Flip", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldFlipH() {
+		if(myPanel!=null) return myPanel.shouldFlipH();
+		int result = JOptionPane.showConfirmDialog(null, "Flip horizonal?", "Flip", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldSimplify() {
+		if(myPanel!=null) return myPanel.shouldSimplify();
+		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
+	}
+	public boolean shouldCrop() {
+		if(myPanel!=null) return myPanel.shouldCrop();
+		int result = JOptionPane.showConfirmDialog(null, "Crop to margins?", "Crop", JOptionPane.YES_NO_OPTION);
+		return (result == JOptionPane.YES_OPTION);
 	}
 }

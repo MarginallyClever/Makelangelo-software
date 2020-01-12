@@ -28,6 +28,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.artPipeline.generators.Generator_Text;
 import com.marginallyclever.artPipeline.generators.ImageGenerator;
@@ -103,6 +104,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 	private JButton toggleEngagedMotor;
 
+	// pipeline controls
+	private ArtPipelinePanel myArtPipelinePanel;
+	private CollapsiblePanel myArtPipelinePanelContainer;
+	
 	private boolean isConnected;  // has pressed connect button
 	
 	public StatusBar statusBar;
@@ -154,6 +159,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(createAxisDrivingControls(),con1);	con1.gridy++;
 		panel.add(createCommonDriveControls(),con1);	con1.gridy++;
 		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
+		panel.add(createArtPipelinePanel(),con1);			con1.gridy++;
 		panel.add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
@@ -276,6 +282,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 
+	private CollapsiblePanel createArtPipelinePanel() {
+		myArtPipelinePanel = new ArtPipelinePanel(gui.getMainFrame());
+		myArtPipelinePanel.setPipeline(robot.getPipeline());
+		
+		return myArtPipelinePanel;
+	}
+	
 	private JPanel createCreativeControlPanel() {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
 		JPanel panel = creativeControlPanel.getContentPane();

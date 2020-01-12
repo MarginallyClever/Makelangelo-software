@@ -79,6 +79,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	protected Turtle turtle;
 	private ReentrantLock turtleLock;
+	private ArtPipeline myPipeline;
+
 
 	private ArrayList<String> drawingCommands;
 	int drawingProgress;
@@ -91,7 +93,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 
 	public MakelangeloRobot() {
+		super();
 		settings = new MakelangeloRobotSettings();
+		myPipeline = new ArtPipeline();
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -743,8 +747,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setTurtle(Turtle t) {
 		turtle=t;
 		
-		ArtPipeline pipeline = new ArtPipeline();
-		pipeline.makeChecks(turtle,settings);
+		myPipeline.processTurtle(turtle,settings);
 		
 		saveCurrentTurtleToDrawing();
 	}
@@ -1068,5 +1071,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		}
 				
 		return x;
+	}
+	
+	public ArtPipeline getPipeline() {
+		return myPipeline;
 	}
 }

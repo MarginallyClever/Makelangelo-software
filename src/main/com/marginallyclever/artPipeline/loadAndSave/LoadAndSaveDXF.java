@@ -192,7 +192,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
 			int color = layer.getColor();
-			System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
+			System.out.println("Found layer " + layer.getName() + "(color index="+color+")");
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<String> entityTypeIter = (Iterator<String>)layer.getDXFEntityTypeIterator();
@@ -200,7 +200,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				continue;
 			}
 
-			turtle.setColor(new ColorRGB(color));
+			// ignore the color index, DXF is dumb.
+			turtle.setColor(new ColorRGB(0,0,0));
 			
 			// Sort the entities on this layer into the buckets.
 			// Buckets are arranged in an XY grid.

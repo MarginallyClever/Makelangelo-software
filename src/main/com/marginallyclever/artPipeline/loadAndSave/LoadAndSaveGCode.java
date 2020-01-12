@@ -9,7 +9,6 @@ import java.util.Scanner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -185,17 +184,6 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		}
 		scanner.close();
 
-/* TODO move this to a middle step
-		if(robot.getSettings().isReverseForGlass()) {
-			Log.info("Flipping for glass...");
-		}
-*/
-/* TODO move this to a middle step
-		estimateDrawTime(settings);
-		Log.info(gcodeParser.estimateCount + Translator.get("LineSegments") + "\n" + (gcodeParser.estimatedLength*0.1f)
-				+ Translator.get("Centimeters") + "\n" + Translator.get("EstimatedTime")
-				+ Log.millisecondsToHumanReadable((long)gcodeParser.estimatedTime) + ".");
-*/
 		robot.setTurtle(turtle);
 		return true;
 	}
