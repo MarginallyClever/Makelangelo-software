@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * static log methods available everywhere
- * @author danroyer
+ * @author dan royer
  * @since 7.3.0
  */
 public class Log {
@@ -57,7 +57,6 @@ public class Log {
 	
 	/**
 	 * wipe the log file
-	 * @author danroyer
 	 */
 	public static void clear() {
 		Path p = FileSystems.getDefault().getPath(LOG_FILE_PATH+LOG_FILE_NAME_HTML);
