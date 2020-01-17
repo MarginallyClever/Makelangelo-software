@@ -7,8 +7,8 @@ import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
-public class Converter_Pulse extends ImageConverter {
-	private static float blockScale = 6.0f;
+public class Converter_Moire extends ImageConverter {
+	private static float blockScale = 1.0f;
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
 	
@@ -19,7 +19,7 @@ public class Converter_Pulse extends ImageConverter {
 
 	@Override
 	public ImageConverterPanel getPanel() {
-		return new Converter_Pulse_Panel(this);
+		return new Converter_Moire_Panel(this);
 	}
 	
 	public float getScale() {
@@ -40,6 +40,7 @@ public class Converter_Pulse extends ImageConverter {
 		if(value>=directionChoices.length) value=directionChoices.length-1;
 		direction = value;
 	}
+
 	
 	protected void convertLine(TransformedImage img,float zigZagSpacing,float halfStep,Point2D a,Point2D b) {		
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
@@ -47,12 +48,25 @@ public class Converter_Pulse extends ImageConverter {
 		dir.scale(1/len);
 		Point2D ortho = new Point2D(-dir.y,dir.x);
 		
-		turtle.jumpTo(
-			a.x + ortho.x*halfStep,
-			a.y + ortho.y*halfStep
-		);
-
-		int n=1;
+		turtle.jumpTo(a.x,a.y);
+		turtle.moveTo(b.x, b.y);
+		
+		for (double p = len; p >= 0; p -= zigZagSpacing) {
+			double x = a.x + dir.x * p; 
+			double y = a.y + dir.y * p; 
+			// read a block of the image and find the average intensity in this block
+			double z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
+			// scale the intensity value
+			double scale_z = (255.0f - z) / 255.0f;
+			//scale_z *= scale_z;  // quadratic curve
+			double pulseSize = halfStep * scale_z;
+			
+			turtle.moveTo(
+				x + ortho.x*pulseSize,
+				y + ortho.y*pulseSize
+			);
+		}
+		
 		for (double p = 0; p <= len; p += zigZagSpacing) {
 			double x = a.x + dir.x * p; 
 			double y = a.y + dir.y * p; 
@@ -64,16 +78,13 @@ public class Converter_Pulse extends ImageConverter {
 			double pulseSize = halfStep * scale_z;
 			
 			turtle.moveTo(
-				x + ortho.x*pulseSize*n,
-				y + ortho.y*pulseSize*n
+				x - ortho.x*pulseSize,
+				y - ortho.y*pulseSize
 			);
-			n = -n;
 		}
 	}
 
 	/**
-	 * Converts images into zigzags in paper space instead of image space
-	 *
 	 * @param img the buffered image to convert
 	 * @throws IOException couldn't open output file
 	 */
@@ -89,12 +100,11 @@ public class Converter_Pulse extends ImageConverter {
 		// figure out how many lines we're going to have on this image.
 		float stepSize = machine.getPenDiameter() * blockScale;
 		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getPenDiameter();
-		float spaceBetweenLines = stepSize;
+		float zigZagSpacing = stepSize;
+		float spaceBetweenLines = stepSize*1.5f;
 
 		// from top to bottom of the image...
-		double x, y = 0;
-		int i=0;
+		double x, y, i = 0;
 
 		Point2D a = new Point2D();
 		Point2D b = new Point2D();

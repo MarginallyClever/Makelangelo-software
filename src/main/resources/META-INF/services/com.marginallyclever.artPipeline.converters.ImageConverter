@@ -1,6 +1,7 @@
 com.marginallyclever.artPipeline.converters.Converter_Boxes
 com.marginallyclever.artPipeline.converters.Converter_CMYK
 com.marginallyclever.artPipeline.converters.Converter_Crosshatch
+com.marginallyclever.artPipeline.converters.Converter_Moire
 com.marginallyclever.artPipeline.converters.Converter_Multipass
 com.marginallyclever.artPipeline.converters.Converter_Pulse
 com.marginallyclever.artPipeline.converters.Converter_RandomLines

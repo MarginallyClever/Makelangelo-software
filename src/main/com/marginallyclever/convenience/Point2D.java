@@ -24,4 +24,9 @@ public class Point2D {
 	public double length() {
 		return Math.sqrt(lengthSquared());
 	}
+	
+	public void scale(double scale) {
+		x*=scale;
+		y*=scale;
+	}
 }
