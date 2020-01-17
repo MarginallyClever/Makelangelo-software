@@ -841,7 +841,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
-		String command=isUp?"G01":"G00";
+		String command=isUp?"G1":"G0";
 		
 		out.write(command+" X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y) + "\n");
 	}
@@ -854,7 +854,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 		
-		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
+		out.write("G0 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
 	}
 	
 	// lower the pen
@@ -865,7 +865,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 
-		out.write("G01 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
+		out.write("G1 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
