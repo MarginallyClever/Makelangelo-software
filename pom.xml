@@ -287,10 +287,13 @@ If you like this project, please support us by buying Marginally Clever products
 	  <version>2.4.0</version>
 	</dependency>
 	
+    <!-- http://kabeja.sourceforge.net/download/download.html -->
     <dependency>
       <groupId>org.kabeja</groupId>
       <artifactId>kabeja</artifactId>
       <version>0.4</version>
+    	<scope>system</scope>
+    	<systemPath>${project.basedir}/local-maven-repo/kabeja-0.4.jar</systemPath>
     </dependency>
     
     <dependency>
