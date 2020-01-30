@@ -55,7 +55,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double xStart = machine.getMarginLeft();
 		double xEnd   = machine.getMarginRight();
 
-		double stepSize = machine.getPenDiameter() * intensity;
+		double stepSize = machine.getDiameter() * intensity;
 		double x, y;
 		boolean flip = true;
 

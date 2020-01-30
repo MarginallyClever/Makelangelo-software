@@ -234,7 +234,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		xLeft   = machine.getMarginLeft();
 		xRight  = machine.getMarginRight();
 		
-		diameter = (int)( machine.getPenDiameter() );
+		diameter = (int)( machine.getDiameter() );
 
 		imgChanged = img;
 

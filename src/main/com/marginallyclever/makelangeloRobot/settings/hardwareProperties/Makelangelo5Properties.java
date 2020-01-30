@@ -356,4 +356,48 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		// move out of way for display
 		out.write("G0 X-300 Y300\n");
 	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateMax() {
+		return 400;
+	}
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateDefault() {
+		return 100;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s^2 [>0]
+	 */
+	@Override
+	public float getAccelerationMax() {
+		return 50;
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return deg/s [>0]
+	 */
+	@Override
+	public float getZRate() {
+		return 50;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
+	 */
+	@Override
+	public float getZAngleOn() {
+		return 40;
+	}
 }

@@ -63,4 +63,18 @@ public interface MakelangeloHardwareProperties {
 	 * @throws IOException
 	 */
 	public void writeProgramEnd(Writer out) throws IOException;
+	
+	// @since hardware m2
+	public float getFeedrateMax();
+	// @since hardware m2
+	public float getFeedrateDefault();
+	// @since hardware m2
+	public float getAccelerationMax();
+	
+	// @since hardware m2
+	public float getZRate();
+	// @since hardware m2
+	public float getZAngleOn();
+	// @since hardware m2
+	public float getZAngleOff();
 }

@@ -15,7 +15,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
 	public final static float FRAME_SIZE= 50f; // cm
-
+	
 	/**
 	 * convert from belt length mm to cartesian position.
 	 * @param beltL
@@ -351,5 +351,58 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	@Override
 	public void writeProgramEnd(Writer out) throws IOException {
 		out.write("; Program End\n");
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateMax() {
+		return 100;
+	}
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateDefault() {
+		return 60;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s^2 [>0]
+	 */
+	@Override
+	public float getAccelerationMax() {
+		return 300;
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return deg/s [>0]
+	 */
+	@Override
+	public float getZRate() {
+		return 500;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
+	 */
+	@Override
+	public float getZAngleOn() {
+		return 160;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return 90 deg.  Middle position on servo. 
+	 */
+	@Override
+	public float getZAngleOff() {
+		return 90;
 	}
 }

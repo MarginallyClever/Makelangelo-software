@@ -34,15 +34,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public static final double INCH_TO_CM = 2.54;
 	
-	static public final float FEEDRATE_MAX = 100;  // mm/s
-	static public final float FEEDRATE_DEFAULT = 60;  // mm/s
-	
-	static public final float ACCELERATION_MAX = 300;  // mm/s/s
-	
-	static public final float Z_RATE = 500;
-	static public final float Z_ANGLE_ON = 160;
-	static public final float Z_ANGLE_OFF = 90;
-	
 	static public int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
@@ -74,35 +65,25 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private String hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
+	
 	private ColorRGB paperColor;
 	
-	private int lookAheadSegments;
+	private int lookAheadSegments;  // >0 and power of two.
 
-	/**
-	 * pen diameter, in mm
-	 */
-	protected float diameter;
-	/**
-	 * pen up servo angle
-	 */
-	protected float zOff;
-	/**
-	 * pen down servo angle
-	 */
-	protected float zOn;
-	/**
-	 * pen servo movement speed
-	 */
-	protected float zRate;
-	
 	protected ColorRGB penDownColorDefault;
 	protected ColorRGB penDownColor;
 	protected ColorRGB penUpColor;
-	// speed control
-	private float maxFeedRate;
-	private float currentFeedRate;
-	private float maxAcceleration;
 	
+	// speed control
+	private float feedRateMax;
+	private float feedRateDefault;
+	private float accelerationMax;
+
+	private float diameter;  // pen diameter (mm, >0)
+	private float zOff;	// pen up servo angle (deg,0...180)
+	private float zOn;	// pen down servo angle (deg,0...180)
+	private float zRate;	// pen servo movement speed (deg/s)
+
 	/**
 	 * top left, bottom center, etc...
 	 *
@@ -157,15 +138,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate = FEEDRATE_MAX;
-		currentFeedRate = FEEDRATE_DEFAULT;
-		maxAcceleration = ACCELERATION_MAX;
-
-		// pen
-		diameter = 0.8f;
-		zRate = Z_RATE;
-		zOn = Z_ANGLE_ON;
-		zOff = Z_ANGLE_OFF;
 		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
 		penUpColor = new ColorRGB(0,255,0); // blue
 		startingPositionIndex = 4;
@@ -174,7 +146,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		
 		// default hardware version is 2
 		setHardwareVersion("2");
-		
+
 		// which configurations are available?
 		try {
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
@@ -206,7 +178,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	
 	
 	public double getAcceleration() {
-		return maxAcceleration;
+		return accelerationMax;
 	}
 
 	/**
@@ -487,7 +459,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 
-		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
+		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
@@ -508,13 +480,13 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
-		zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
-		zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
-		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
+		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(getDiameter()))));
+		setzRate(Float.parseFloat(prefs.get("z_rate", Float.toString(getzRate()))));
+		setzOn(Float.parseFloat(prefs.get("z_on", Float.toString(getzOn()))));
+		setzOff(Float.parseFloat(prefs.get("z_off", Float.toString(getzOff()))));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		maxFeedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(maxFeedRate)));
-		currentFeedRate=Float.valueOf(prefs.get("feed_rate_current",Float.toString(currentFeedRate)));
+		feedRateMax = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateMax)));
+		feedRateDefault=Float.valueOf(prefs.get("feed_rate_current",Float.toString(feedRateDefault)));
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -529,13 +501,13 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		prefs.put("diameter", Float.toString(getPenDiameter()));
-		prefs.put("z_rate", Float.toString(zRate));
-		prefs.put("z_on", Float.toString(zOn));
-		prefs.put("z_off", Float.toString(zOff));
+		prefs.put("diameter", Float.toString(getDiameter()));
+		prefs.put("z_rate", Float.toString(getzRate()));
+		prefs.put("z_on", Float.toString(getzOn()));
+		prefs.put("z_off", Float.toString(getzOff()));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Float.toString(maxFeedRate));
-		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
+		prefs.put("feed_rate", Float.toString(feedRateMax));
+		prefs.put("feed_rate_current", Float.toString(feedRateDefault));
 		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
 		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
 		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
@@ -568,7 +540,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
+		uniqueMachinePreferencesNode.put("acceleration", Double.toString(accelerationMax));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
@@ -590,30 +562,30 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public void setAcceleration(float f) {
-		maxAcceleration = f;
+		accelerationMax = f;
 	}
 	
 	public void setMaxFeedRate(float f) {
-		maxFeedRate = f;
-		if(currentFeedRate > maxFeedRate) {
-			currentFeedRate = maxFeedRate;
+		feedRateMax = f;
+		if(feedRateDefault > feedRateMax) {
+			feedRateDefault = feedRateMax;
 		}
 	}
 	
 	public float getPenUpFeedRate() {
-		return maxFeedRate;
+		return feedRateMax;
 	}
 	
 	public void setCurrentFeedRate(float f) {
 		if (f < 0.001) f = 0.001f;
-		if( f > maxFeedRate) {
-			f = maxFeedRate;
+		if( f > feedRateMax) {
+			f = feedRateMax;
 		}
-		currentFeedRate = f;
+		feedRateDefault = f;
 	}
 	
 	public float getPenDownFeedRate() {
-		return currentFeedRate;
+		return feedRateDefault;
 	}
 	
 	
@@ -699,6 +671,18 @@ public final class MakelangeloRobotSettings implements Serializable {
 		if(!hardwareProperties.canChangeMachineSize()) {
 			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
 		}
+
+		// apply default hardware values
+		feedRateMax = hardwareProperties.getFeedrateMax();
+		feedRateDefault = hardwareProperties.getFeedrateDefault();
+		accelerationMax = hardwareProperties.getAccelerationMax();
+		
+		setzRate(hardwareProperties.getZRate());
+		setzOn(hardwareProperties.getZAngleOn());
+		setzOff(hardwareProperties.getZAngleOff());
+
+		// pen
+		setDiameter(0.8f);
 	}
 	
 	public ColorRGB getPaperColor() {
@@ -734,42 +718,32 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public float getZRate() {
-		return zRate;
+		return getzRate();
 	}
 	
 	public void setZRate(float arg0) {
-		zRate = arg0;
+		setzRate(arg0);
 	}
 	
-	/**
-	 * @return pen diameter, in mm
-	 */
-	public float getPenDiameter() {
-		return diameter;
-	}
 
 	public float getPenDownAngle() {
-		return zOn;
+		return getzOn();
 	}
 
 	public float getPenUpAngle() {
-		return zOff;
+		return getzOff();
 	}
 
 	public void setPenDownAngle(float arg0) {
-		zOn=arg0;
+		setzOn(arg0);
 	}
 
 	public void setPenUpAngle(float arg0) {
-		zOff=arg0;
+		setzOff(arg0);
 	}
 
 	public BasicStroke getStroke() {
-		return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-	}
-
-	public void setDiameter(float d) {
-		diameter = d;
+		return new BasicStroke(getDiameter() * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	}
 
 	public void writeProgramStart(Writer out) throws IOException {	
@@ -781,11 +755,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return "G01 F" + StringHelper.formatDouble(zRate) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return "G01 F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + StringHelper.formatDouble(zRate) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return "G00 F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getPenUpFeedrateString() {
@@ -882,5 +856,38 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public void setLookAheadSegments(int arg0) {
 		this.lookAheadSegments = arg0;
+	}
+
+
+	public void setDiameter(float d) {
+		diameter = d;
+	}
+	
+	public float getDiameter() {
+		return diameter;
+	}
+
+	protected float getzOff() {
+		return zOff;
+	}
+
+	protected void setzOff(float zOff) {
+		this.zOff = zOff;
+	}
+
+	protected float getzOn() {
+		return zOn;
+	}
+
+	protected void setzOn(float zOn) {
+		this.zOn = zOn;
+	}
+
+	protected float getzRate() {
+		return zRate;
+	}
+
+	protected void setzRate(float zRate) {
+		this.zRate = zRate;
 	}
 }

@@ -53,7 +53,7 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	    this.add(p);
 	    
 	    MakelangeloRobotSettings settings = robot.getSettings();
-		penDiameter = new SelectFloat(settings.getPenDiameter());
+		penDiameter = new SelectFloat(settings.getDiameter());
 		maxFeedRate = new SelectFloat(settings.getPenUpFeedRate());
 		currentFeedRate = new SelectFloat(settings.getPenDownFeedRate());
 		penUp = new SelectFloat(settings.getPenUpAngle());

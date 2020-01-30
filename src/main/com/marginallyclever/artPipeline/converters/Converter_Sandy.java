@@ -84,7 +84,7 @@ public class Converter_Sandy extends ImageConverter {
 		for(r=rMin;r<rMax;r+=rStep) {
 			// go around in a circle
 			t=0;
-			t_step = machine.getPenDiameter()/r;
+			t_step = machine.getDiameter()/r;
 			flipSum=0;
 			// go around the circle
 			for(t=0;t<Math.PI*2;t+=t_step) {

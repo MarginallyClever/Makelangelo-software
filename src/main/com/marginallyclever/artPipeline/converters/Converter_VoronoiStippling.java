@@ -368,7 +368,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void writeOutCells() {
 		turtle = new Turtle();
 
-		float toolDiameter = machine.getPenDiameter();
+		float toolDiameter = machine.getDiameter();
 
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
