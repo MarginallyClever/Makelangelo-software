@@ -6,7 +6,7 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>7.22.6</version>
+  <version>7.22.7</version>
   <name>Makelangelo</name>
   <description>A mural drawing robot.
 
@@ -249,6 +249,14 @@ If you like this project, please support us by buying Marginally Clever products
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
+	<!-- https://github.com/java-native/jssc/ -->
+	<dependency>
+	    <groupId>io.github.java-native</groupId>
+	    <artifactId>jssc</artifactId>
+	    <version>2.9.1</version>
+    	<scope>system</scope>
+    	<systemPath>${project.basedir}/local-maven-repo/jssc-2.9.1.jar</systemPath>
+	</dependency>
     <dependency>
 	    <groupId>org.everit.osgi.bundles</groupId>
     	<artifactId>org.everit.osgi.bundles.org.scream3r.jssc</artifactId>
