@@ -35,7 +35,7 @@ public class Generator_FillPage extends ImageGenerator {
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getDiameter();
+		float stepSize = machine.getPenDiameter();
 
 		// from top to bottom of the margin area...
 		double yBottom = machine.getMarginBottom();

@@ -163,7 +163,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 					theta = angle2 - angle1;
 
-					double stepSize=settings.getDiameter();
+					double stepSize=settings.getPenDiameter();
 					double len = Math.abs(theta) * radius;
 					double angle3, scale;
 

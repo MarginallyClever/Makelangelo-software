@@ -63,7 +63,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
 		turtle.setColor(newColor);
 		
-		double toolDiameter = machine.getDiameter();
+		double toolDiameter = machine.getPenDiameter();
 
 		int i, j;
 		int steps = 4;

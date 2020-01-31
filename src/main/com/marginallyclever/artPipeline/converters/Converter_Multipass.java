@@ -49,7 +49,7 @@ public class Converter_Multipass extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getDiameter();
+		float stepSize = machine.getPenDiameter();
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

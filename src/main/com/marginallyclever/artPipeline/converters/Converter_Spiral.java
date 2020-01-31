@@ -44,7 +44,7 @@ public class Converter_Spiral extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double toolDiameter = machine.getDiameter();
+		double toolDiameter = machine.getPenDiameter();
 
 		int i, j;
 		final int steps = 4;

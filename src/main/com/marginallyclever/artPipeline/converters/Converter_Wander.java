@@ -56,7 +56,7 @@ public class Converter_Wander extends ImageConverter {
 	protected int outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
 		turtle.setColor(newColor);
 
-		float stepSize = machine.getDiameter()*5;
+		float stepSize = machine.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
 		float halfStep = stepSize/2;
 

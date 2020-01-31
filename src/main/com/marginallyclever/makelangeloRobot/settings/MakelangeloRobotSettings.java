@@ -480,7 +480,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(getDiameter()))));
+		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(getPenDiameter()))));
 		setzRate(Float.parseFloat(prefs.get("z_rate", Float.toString(getzRate()))));
 		setzOn(Float.parseFloat(prefs.get("z_on", Float.toString(getzOn()))));
 		setzOff(Float.parseFloat(prefs.get("z_off", Float.toString(getzOff()))));
@@ -501,7 +501,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		prefs.put("diameter", Float.toString(getDiameter()));
+		prefs.put("diameter", Float.toString(getPenDiameter()));
 		prefs.put("z_rate", Float.toString(getzRate()));
 		prefs.put("z_on", Float.toString(getzOn()));
 		prefs.put("z_off", Float.toString(getzOff()));
@@ -743,7 +743,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public BasicStroke getStroke() {
-		return new BasicStroke(getDiameter() * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		return new BasicStroke(getPenDiameter() * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	}
 
 	public void writeProgramStart(Writer out) throws IOException {	
@@ -874,7 +874,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		diameter = d;
 	}
 	
-	public float getDiameter() {
+	public float getPenDiameter() {
 		return diameter;
 	}
 
