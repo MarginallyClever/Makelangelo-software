@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
+import java.awt.Dimension;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -32,6 +33,9 @@ public class SelectFloat extends JFormattedTextField {
 	public SelectFloat(float defaultValue) {
 		super();
 		createAndAttachFormatter(Locale.getDefault());
+		Dimension d = this.getPreferredSize();
+		d.height=28;
+		this.setPreferredSize(d);
 		this.setValue(defaultValue);
 	}
 	

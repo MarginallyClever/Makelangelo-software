@@ -3,7 +3,6 @@ package com.marginallyclever.makelangeloRobot.settings;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,6 +12,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.marginallyclever.convenience.GridBagConstraintsLabel;
+import com.marginallyclever.convenience.GridBagConstraintsValue;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectFloat;
@@ -67,86 +68,77 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 	    buttonTestUp.setPreferredSize(s);
 	    buttonTestDown.setPreferredSize(s);
 
-		GridBagConstraints c = new GridBagConstraints();
-		GridBagConstraints d = new GridBagConstraints();
+		GridBagConstraints labelStyle = new GridBagConstraintsLabel();
+		GridBagConstraints valueStyle = new GridBagConstraintsValue();
 
-		c.ipadx=5;
-	    c.ipady=0;
-
-		c.anchor = GridBagConstraints.EAST;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		d.anchor = GridBagConstraints.WEST;
-		d.fill = GridBagConstraints.HORIZONTAL;
-		d.weightx = 50;
 		int y = 0;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("penToolDiameter")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(penDiameter, d);
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("penToolDiameter")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(penDiameter, valueStyle);
 		++y;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("penToolMaxFeedRate")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(maxFeedRate, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel(Translator.get("Rate")), d);
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("penToolMaxFeedRate")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(maxFeedRate, valueStyle);
+		valueStyle.gridx = 2;
+		valueStyle.gridy = y;
+		p.add(new JLabel(Translator.get("Rate")), valueStyle);
 		++y;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("Speed")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(currentFeedRate, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel(Translator.get("Rate")), d);
+		labelStyle.gridx = 0;
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("Speed")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(currentFeedRate, valueStyle);
+		valueStyle.gridx = 2;
+		valueStyle.gridy = y;
+		p.add(new JLabel(Translator.get("Rate")), valueStyle);
 		++y;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("penToolUp")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(penUp, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(buttonTestUp, d);
+		labelStyle.gridx = 0;
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("penToolUp")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(penUp, valueStyle);
+		valueStyle.gridx = 2;
+		valueStyle.gridy = y;
+		p.add(buttonTestUp, valueStyle);
 		++y;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("penToolDown")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(penDown, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(buttonTestDown, d);
+		labelStyle.gridx = 0;
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("penToolDown")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(penDown, valueStyle);
+		valueStyle.gridx = 2;
+		valueStyle.gridy = y;
+		p.add(buttonTestDown, valueStyle);
 		++y;
 
-		c.gridx = 0;
-		c.gridy = y;
-		p.add(new JLabel(Translator.get("penToolLiftSpeed")), c);
-		d.gridx = 1;
-		d.gridy = y;
-		p.add(penZRate, d);
-		d.gridx = 2;
-		d.gridy = y;
-		p.add(new JLabel(Translator.get("RateDeg")), d);
+		labelStyle.gridx = 0;
+		labelStyle.gridy = y;
+		p.add(new JLabel(Translator.get("penToolLiftSpeed")), labelStyle);
+		valueStyle.gridx = 1;
+		valueStyle.gridy = y;
+		p.add(penZRate, valueStyle);
+		valueStyle.gridx = 2;
+		valueStyle.gridy = y;
+		p.add(new JLabel(Translator.get("RateDeg")), valueStyle);
 		++y;
 
-		c.gridwidth = 2;
-		c.insets = new Insets(0, 5, 5, 5);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridy++;
+		//labelStyle.gridwidth = 2;
+		//labelStyle.insets = new Insets(0, 5, 5, 5);
+		//labelStyle.anchor = GridBagConstraints.WEST;
+		//labelStyle.gridy=y;
+		//++y;
 		
 		buttonTestUp.addActionListener(this);
 		buttonTestDown.addActionListener(this);
@@ -154,10 +146,12 @@ public class PanelAdjustPen extends JPanel implements ActionListener {
 		GridBagConstraints cm = new GridBagConstraints();
 		selectPenDownColor = new SelectColor(this,"pen down color",robot.getSettings().getPenDownColor());
 		this.add(selectPenDownColor,cm);
-		c.gridy++;
+		labelStyle.gridy=y;
+		++y;
 		selectPenUpColor = new SelectColor(this,"pen up color",robot.getSettings().getPenUpColor());
 		this.add(selectPenUpColor,cm);
-		c.gridy++;
+		labelStyle.gridy=y;
+		++y;
 	}
 	
 	

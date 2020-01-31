@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.GridBagConstraintsLabel;
+import com.marginallyclever.convenience.GridBagConstraintsValue;
 import com.marginallyclever.makelangelo.Translator;
 
 public class SelectColor extends JPanel implements ActionListener {
@@ -30,29 +32,19 @@ public class SelectColor extends JPanel implements ActionListener {
 	public SelectColor(JComponent parent,String labelValue,ColorRGB defaultValue) {
 		this.parent = parent;
 		this.setLayout(new GridBagLayout());
-		GridBagConstraints labelConstraint = new GridBagConstraints();
-		GridBagConstraints fieldConstraint = new GridBagConstraints();
+		GridBagConstraints labelConstraint = new GridBagConstraintsLabel();
+		GridBagConstraints fieldConstraint = new GridBagConstraintsValue();
+
+		//labelConstraint.insets = new Insets(3,3,3,3);
+
+		//fieldConstraint.insets = new Insets(3,3,3,1);
+
 		GridBagConstraints buttonConstraint = new GridBagConstraints();
-
-		labelConstraint.anchor = GridBagConstraints.WEST;
-		labelConstraint.fill = GridBagConstraints.HORIZONTAL;
-		labelConstraint.gridwidth = 1;
-		labelConstraint.weightx=1;
-		labelConstraint.gridx=0;
-		labelConstraint.gridy=0;
-		labelConstraint.insets = new Insets(3,3,3,3);
-		
-		fieldConstraint.anchor = GridBagConstraints.EAST;
-		fieldConstraint.gridwidth = 1;
-		fieldConstraint.gridx = labelConstraint.gridwidth;
-		fieldConstraint.gridy=0;
-		fieldConstraint.insets = new Insets(3,3,3,1);
-
-		buttonConstraint.anchor = GridBagConstraints.EAST;
+		buttonConstraint.anchor = GridBagConstraints.WEST;
 		buttonConstraint.gridwidth = 1;
 		buttonConstraint.gridx = fieldConstraint.gridwidth + fieldConstraint.gridx;
 		buttonConstraint.gridy=0;
-		buttonConstraint.insets = new Insets(3,0,3,3);
+		buttonConstraint.insets = new Insets(0,0,0,3);
 
 		label = new JLabel(Translator.get(labelValue));
 		this.add(label, labelConstraint);
