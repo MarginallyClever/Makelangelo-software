@@ -38,14 +38,19 @@ public class Turtle {
 	};
 
 	private ReentrantLock lock;
+	
 	public boolean isLocked() {
 		return lock.isLocked();
 	}
+	
 	public void lock() {
 		lock.lock();
 	}
+	
 	public void unlock() {
-		lock.unlock();
+		if(lock.isLocked()) {  // prevents "illegal state exception - no locked"
+			lock.unlock();
+		}
 	}
 	
 	public ArrayList<Movement> history;
