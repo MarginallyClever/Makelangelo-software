@@ -71,6 +71,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	private boolean isRunning;
 	private boolean isPaused;
 	private boolean penIsUp;
+	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
 	private boolean didSetHome;
 	private float penX;
@@ -99,6 +100,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		isRunning = false;
 		isPaused = false;
 		penIsUp = false;
+		penJustMoved = false;
 		penIsUpBeforePause = false;
 		didSetHome = false;
 		setPenX(0);
@@ -437,16 +439,18 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
-		sendLineToRobot(settings.getPenUpFeedrateString());
+		penJustMoved = !penIsUp;
+		penIsUp=true;
 	}
 
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
-		sendLineToRobot(settings.getPenDownFeedrateString());
+		penJustMoved = penIsUp;
+		penIsUp=false;
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot("G00 Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(MakelangeloRobotSettings.COMMAND_MOVE+" Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -588,9 +592,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 		// catch pen up/down status here
 		if (reportedline.startsWith(settings.getPenUpString())) {
+			penJustMoved = !penIsUp;
 			penIsUp = true;
 		}
 		if (reportedline.startsWith(settings.getPenDownString())) {
+			penJustMoved = penIsUp;
 			penIsUp = false;
 		}
 		if (reportedline.startsWith("M17")) {
@@ -659,7 +665,13 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * @param y absolute position in mm
 	 */
 	public void movePenAbsolute(float x, float y) {
-		sendLineToRobot("G00 X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
+		sendLineToRobot(
+				(
+						penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
+								: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE)
+				)
+				+" X" + StringHelper.formatDouble(x)
+				+" Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
 	}
@@ -672,7 +684,13 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
-		sendLineToRobot("G00 X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
+		sendLineToRobot(
+				(
+						penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
+								: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE)
+				)
+				+" X" + StringHelper.formatDouble(dx)
+				+" Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
 		penY += dy;

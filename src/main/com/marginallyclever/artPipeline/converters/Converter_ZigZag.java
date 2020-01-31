@@ -140,8 +140,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public void render(GL2 gl2) {
 		if (points == null || solution == null) return;
 
-		while (lock.isLocked()) ;
-
+		while (lock.isLocked());
 		lock.lock();
 
 		gl2.glColor3f(0, 0, 0);
@@ -250,11 +249,6 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	}
 
 
-	private void moveToPoint(Writer out, int i, boolean isUp) throws IOException {
-		machine.writeMoveTo(out, points[solution[i]].x, points[solution[i]].y,isUp);
-	}
-
-
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
 	 * Since all the points are connected in a single loop,
@@ -277,15 +271,15 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		}
 
 		turtle = new Turtle();
+		// jump to first point
 		turtle.jumpTo(points[besti].x, points[besti].y);
-		// move to the first point
-		moveToPoint(out, besti, false);
-
+		// move through entire list
 		for (i = 1; i < numPoints; ++i) {
 			int v = (besti + i) % numPoints;
 			turtle.moveTo(points[v].x, points[v].y);
 		}
-		turtle.jumpTo(points[besti].x, points[besti].y);
+		// close the loop
+		turtle.moveTo(points[besti].x, points[besti].y);
 
 		turtle.penUp();
 	}

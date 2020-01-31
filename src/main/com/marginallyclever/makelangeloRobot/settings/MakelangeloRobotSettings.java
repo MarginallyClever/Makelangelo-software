@@ -32,12 +32,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
+	public static final String COMMAND_MOVE = "G0";
+	public static final String COMMAND_TRAVEL = "G1";
 	public static final double INCH_TO_CM = 2.54;
-	
-	static public int FIRMWARE_MAX_SEGMENTS = 32;
+	public static final int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
-	
 
 	private ArrayList<MakelangeloRobotSettingsListener> listeners;
 
@@ -755,19 +755,19 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return "G01 F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getPenUpFeedrateString() {
-		return "G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n";
+		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate());
 	}
 	
 	public String getPenDownFeedrateString() {
-		return "G00 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n";
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate());
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
@@ -814,10 +814,19 @@ public final class MakelangeloRobotSettings implements Serializable {
 	     return String.format("%1$-" + n + "s", s);  
 	}
 
-	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
-		String command=isUp?"G1":"G0";
-		
-		out.write(command+" X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y) + "\n");
+	// 7.22.6: feedrate changes here
+	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
+		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
+		if(zMoved) {
+			command = isUp 
+					? getPenUpFeedrateString() 
+					: getPenDownFeedrateString();
+			zMoved=false;
+		}
+		out.write(command
+				+" X" + StringHelper.formatDouble(x)
+				+" Y" + StringHelper.formatDouble(y)
+				+"\n");
 	}
 
 	// lift the pen
@@ -828,7 +837,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 		
-		out.write("G0 F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
+		// moved the feedrate adjust to writeMoveTo() in 7.22.6
+		//out.write(COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
 	}
 	
 	// lower the pen
@@ -839,7 +849,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 
-		out.write("G1 F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
+		// moved the feedrate adjust to writeMoveTo() in 7.22.6
+		//out.write(COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
