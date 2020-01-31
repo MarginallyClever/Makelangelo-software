@@ -22,6 +22,9 @@ import com.marginallyclever.util.PreferencesHelper;
 
 // Custom drawing panel written as an inner class to access the instance variables.
 public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, MouseWheelListener, GLEventListener {
+	private static final float CAMERA_ZFAR = 1000.0f;
+	private static final float CAMERA_ZNEAR = 10.0f;
+
 	static final long serialVersionUID = 2;
 
 	// Use debug pipeline?
@@ -77,7 +80,11 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// gl2.glOrtho(-windowWidth / 2.0d, windowWidth / 2.0d, -windowHeight /
 		// 2.0d, windowHeight / 2.0d, 0.01d, 100.0d);
 
-		glu.gluPerspective(60, (float) windowWidth / (float) windowHeight, 10.0f, 10000.0f);
+		glu.gluPerspective(
+				90,
+				(float) windowWidth / (float) windowHeight,
+				CAMERA_ZNEAR,
+				CAMERA_ZFAR);
 	}
 
 	/**
@@ -212,6 +219,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void zoomIn() {
 		cameraZoom *= 3.5d / 4.0d;
+		if(cameraZoom<CAMERA_ZNEAR) cameraZoom=CAMERA_ZNEAR;
 	}
 
 	/**
@@ -219,8 +227,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	 */
 	public void zoomOut() {
 		cameraZoom *= 4.0d / 3.5d;
+		if(cameraZoom>CAMERA_ZFAR) cameraZoom=CAMERA_ZFAR;
 	}
 
+	public double getZoom() {
+		return cameraZoom;
+	}
+	
 	/**
 	 * set up the correct modelview so the robot appears where it hsould.
 	 *
@@ -229,7 +242,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void paintCamera(GL2 gl2) {
 		gl2.glMatrixMode(GL2.GL_MODELVIEW);
 		gl2.glLoadIdentity();
-		gl2.glTranslated(-cameraOffsetX, cameraOffsetY, -cameraZoom);
+		gl2.glTranslated(-cameraOffsetX, cameraOffsetY,-cameraZoom);
 	}
 
 	/**
@@ -265,13 +278,13 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		gl2.glEnable(GL2.GL_BLEND);
 		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);  
 		
-		
 		paintBackground(gl2);
 		paintCamera(gl2);
 
 		gl2.glPushMatrix();
 
 		if (robot != null) {
+			gl2.glLineWidth((float)cameraZoom);
 			robot.render(gl2);
 		}
 

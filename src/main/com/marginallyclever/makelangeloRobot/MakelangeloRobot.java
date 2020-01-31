@@ -919,6 +919,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void render(GL2 gl2) {
+		float [] lineWidthBuf = new float[1];
+		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
+		float lineWidth = lineWidthBuf[0];
+		//System.out.println("line width="+lineWidth);
+		
 		paintLimits(gl2);
 
 		settings.getHardwareProperties().render(gl2, this);
@@ -933,6 +938,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				boolean showPenUp = GFXPreferences.getShowPenUp();
 				ColorRGB penUpColor = this.settings.getPenUpColor();
 				ColorRGB penDownColor = this.settings.getPenDownColorDefault();
+				float penDiameter = this.settings.getPenDiameter();
 				
 				boolean isUp=true;
 				double ox=this.settings.getHomeX();
@@ -942,7 +948,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				int first = 0;
 				int last = turtle.history.size();
 				int showCount=0;
-				
+
+				float newDiameter = 2*100*penDiameter/lineWidth;
+				gl2.glLineWidth(newDiameter);
 				gl2.glBegin(GL2.GL_LINE_STRIP);
 				
 				gl2.glColor4d(
@@ -1001,6 +1009,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				}
 				
 				gl2.glEnd();
+
+				gl2.glLineWidth(lineWidth);
 			}
 			finally {
 				turtle.unlock();
@@ -1014,6 +1024,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * @param gl2
 	 */
 	private void paintLimits(GL2 gl2) {
+		gl2.glLineWidth(1);
+		
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
@@ -1037,7 +1049,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		// margin settings
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
-		gl2.glLineWidth(1);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(settings.getMarginLeft(), settings.getMarginTop());
 		gl2.glVertex2d(settings.getMarginRight(), settings.getMarginTop());
