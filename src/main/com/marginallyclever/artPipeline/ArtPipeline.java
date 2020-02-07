@@ -1,6 +1,7 @@
 package com.marginallyclever.artPipeline;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -8,7 +9,6 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.MoveType;
 import com.marginallyclever.convenience.Turtle.Movement;
@@ -45,6 +45,13 @@ public class ArtPipeline {
 		public Segment2D() {
 			lines = new ArrayList<Line2D>();
 			isClosed=false;
+		}
+		
+		public void flip() {
+			Collections.reverse(lines);
+			for( Line2D line : lines ) {
+				line.flip();
+			}
 		}
 	}
 	
@@ -103,8 +110,7 @@ public class ArtPipeline {
 		Line2D activeLine=null;
 		int sorted=0;
 		int matched=0;
-		boolean first;
-
+		
 		while(!originalLines.isEmpty()) {
 			if(found==false) {
 				// either this is the first time OR 
@@ -122,13 +128,51 @@ public class ArtPipeline {
 			}
 			
 			found=false;
-			first=true;
 			// find any line that starts or ends where this line ends.
 			for( Line2D toSort : originalLines ) {
 				// only compare similar color lines
 				if(toSort.c.equals(activeLine.c)==false) continue;
 				
-				// check if there's a match with end A.
+				// check if activeLine's end is also toSort's start.
+				if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
+					// put it in the sorted lines
+					activeSegment.lines.add(toSort);
+					originalLines.remove(toSort);
+					// make it the new segment head
+					activeLine = toSort;
+					// do some metrics
+					matched++;
+					// do it all again!
+					found=true;
+					break;
+				}
+				// check if activeLine's end is also toSort's end.
+				else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
+					// yes!  toSort is backwards.  flip toSort
+					toSort.flip();
+					// then put it in the sorted lines
+					activeSegment.lines.add(toSort);
+					originalLines.remove(toSort);
+					// and make it the new segment head
+					activeLine = toSort;
+					// do some metrics
+					matched++;
+					// do it all again!
+					found=true;
+					break;
+				}
+			}
+
+			// set up a reverse pass.
+			activeSegment.flip();
+			// with the activeSegment.lines flipped, activeLine is now pointing at the tail.
+			activeLine = activeSegment.lines.get(activeSegment.lines.size()-1);
+
+			// find any line that starts or ends where this line ends.
+			for( Line2D toSort : originalLines ) {
+				// only compare similar color lines
+				if(toSort.c.equals(activeLine.c)==false) continue;
+				
 				if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
 					// found!
 					// put it in the sorted lines
@@ -145,7 +189,7 @@ public class ArtPipeline {
 				// check if there's a match with end B.
 				else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
 					// found!
-					// oldLine follows active but oldLine is backwards.  flip toSort
+					// oldLine follows activeLine but both are backwards.  flip both
 					toSort.flip();
 					// then put it in the sorted lines
 					activeSegment.lines.add(toSort);
@@ -158,45 +202,7 @@ public class ArtPipeline {
 					found=true;
 					break;
 				}
-				// else toSort does not connect to activeLine.b.
-				// our grim search continues.
-				if(first==true) {
-					if(thesePointsAreTheSame(activeLine.a,toSort.a)) {
-						// found!
-						// oldLine follows activeLine but activeLine is backwards.  flip activeLine
-						activeLine.flip();
-						// put it in the sorted lines
-						activeSegment.lines.add(toSort);
-						originalLines.remove(toSort);
-						// make it the new segment head
-						activeLine = toSort;
-						// do some metrics
-						matched++;
-						// do it all again!
-						found=true;
-						first=false;
-						break;
-					}
-					// check if there's a match with end B.
-					else if(thesePointsAreTheSame(activeLine.a,toSort.b)) {
-						// found!
-						// oldLine follows activeLine but both are backwards.  flip both
-						activeLine.flip();
-						toSort.flip();
-						// then put it in the sorted lines
-						activeSegment.lines.add(toSort);
-						originalLines.remove(toSort);
-						// and make it the new segment head
-						activeLine = toSort;
-						// do some metrics
-						matched++;
-						// do it all again!
-						found=true;
-						first=false;
-						break;
-					}
-				}
-			}
+			}//*/
 			// yea tho we searched every originalLine left, there were no matches to be found.
 			// do it all again from the top.
 		}
@@ -210,14 +216,18 @@ public class ArtPipeline {
 			if(seg.isClosed) closed++;
 		}
 		
-		System.out.println("  Found "+segments.size()+" segments, "+closed+" closed, "+sorted+" sorted, "+matched+" matched.");
-		
-		// try to reorganize closed segments to shorten travels
+		// try to reorganize segments to shorten travels
+		int flipped=0;
 		for( int i=0;i<segments.size()-1;++i ) {
 			Segment2D a=segments.get(i);
 			Segment2D b=segments.get(i+1);
-			if(a.isClosed && b.isClosed) {
-				// valid candidate
+			Line2D bLastLine = b.lines.get(b.lines.size()-1);
+			Point2D aEnd = a.lines.get(0).b;
+			if( distanceBetweenPointsSquared(aEnd,bLastLine.a)>
+				distanceBetweenPointsSquared(aEnd,bLastLine.b) ) {
+				// segment b could be flipped to reduce the travel distance.
+				flipped++;
+				b.flip();
 			}
 		}
 		
@@ -242,12 +252,24 @@ public class ArtPipeline {
 				t.moveTo(toAdd.b.x, toAdd.b.y);
 			}
 		}
+
+		System.out.println("  Found "+segments.size()+" segments,\n"
+				+ "  "+closed+" closed,\n"
+				+ "  "+sorted+" sorted,\n"
+				+ "  "+matched+" matched\n"
+				+ "  "+flipped+" flipped.");
 		
 		System.out.println("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
 		System.out.println("checkReorder() end");
 	}
 
+	public double distanceBetweenPointsSquared(Point2D a,Point2D b) {
+		double dx = a.x-b.x;
+		double dy = a.y-b.y;
+		return MathHelper.lengthSquared(dx, dy); 
+	}
+	
 	public boolean thesePointsAreTheSame(Point2D a,Point2D b) {
 		if(a==b) return true;
 		
