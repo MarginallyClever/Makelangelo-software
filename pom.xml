@@ -387,7 +387,7 @@ If you like this project, please support us by buying Marginally Clever products
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <minimum.maven.version>3</minimum.maven.version>
     <minimum.java.version>1.8</minimum.java.version>
-    <jogl.version>2.3.2</jogl.version>
+    <jogl.version>2.4.0</jogl.version>
     <maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
   </properties>
 
