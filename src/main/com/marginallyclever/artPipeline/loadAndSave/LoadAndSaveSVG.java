@@ -170,12 +170,19 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	boolean first=true;
 			for( int i=0; i<numPoints; ++i ) {
 				SVGPoint  item = (SVGPoint) pointList.getItem(i);
-				double x = TX( item.getX() );
-				double y = TY( item.getY() );
+				boolean doJump=false;
 				
-				adjustLimits(x,y);
 				if(first) {
 					first=false;
+					if(distanceSquared(item,turtle.getX(),turtle.getY())>4) {
+						doJump=true;
+					}
+				}
+
+				double x = TX( item.getX() );
+				double y = TY( item.getY() );
+				adjustLimits(x,y);
+				if(doJump) {
 					turtle.jumpTo(x,y);
 				} else {
 					turtle.moveTo(x,y);
@@ -240,9 +247,15 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						x=firstX=TX( path.getX() );
-						y=firstY=TY( path.getY() );
-						turtle.jumpTo(firstX,firstY);
+						firstX=TX( path.getX() );
+						firstY=TY( path.getY() );
+						if(distanceSquared(firstX,firstY,turtle.getX(),turtle.getY())>4) {
+							turtle.jumpTo(firstX,firstY);
+						} else {
+							turtle.moveTo(firstX, firstY);
+						}
+						x=firstX;
+						y=firstY;
 						adjustLimits(firstX,firstY);
 					}
 					break;
@@ -339,7 +352,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
 								x=xabc;
 								y=yabc;
-								turtle.moveTo(xabc,yabc);
 								turtle.moveTo(xabc,yabc);
 								adjustLimits(xabc,yabc);
 							//}
