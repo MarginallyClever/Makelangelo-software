@@ -235,7 +235,6 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 				}
 			}
 			if(!isUp) machine.writePenUp(out);
-			machine.writeMoveTo(out,machine.getHomeX(), machine.getHomeY(),true,true);
 			machine.writeProgramEnd(out);
 			
 			out.flush();
