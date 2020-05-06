@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
@@ -75,22 +76,19 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
-	private String[] imageConverterNames;
+	private ArrayList<String> imageConverterNames = new ArrayList<String>();
 	private String[] imageFillNames;
 	
 	
 	public LoadAndSaveImage() {
 		converters = ServiceLoader.load(ImageConverter.class);
-		int i=0;
-		for( @SuppressWarnings("unused") ImageConverter ici : converters ) i++;
-				
-		imageConverterNames = new String[i];
-
-		i=0;
-		for( ImageConverter f : converters ) {
-			imageConverterNames[i++] = f.getName();
-		}
 		
+		imageConverterNames.clear();
+		
+		for( @SuppressWarnings("unused") ImageConverter ici : converters ) {
+			imageConverterNames.add(ici.getName());
+		}
+				
 		imageFillNames = new String[2];
 		imageFillNames[0] = Translator.get("ConvertImagePaperFill");
 		imageFillNames[1] = Translator.get("ConvertImagePaperFit");
@@ -112,7 +110,8 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		conversionPanel = new JPanel(new GridBagLayout());
 		
-		conversionStyleOptions = new JComboBox<String>(imageConverterNames);
+		String [] array = (String[]) imageConverterNames.toArray(new String[0]);
+		conversionStyleOptions = new JComboBox<String>(array);
 		conversionFillOptions = new JComboBox<String>(imageFillNames);
 		
 		converterOptionsContainer = new JPanel();
