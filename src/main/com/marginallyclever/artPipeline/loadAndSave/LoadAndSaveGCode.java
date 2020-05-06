@@ -209,6 +209,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {
+						// lift pen up
 						machine.writePenUp(out);
 						isUp=true;
 						zMoved=true;
@@ -217,6 +218,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 					break;
 				case DRAW:
 					if(isUp) {
+						// go to m and put pen down
 						if(previousMovement!=null) {
 							machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
 						} else {
