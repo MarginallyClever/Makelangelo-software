@@ -89,7 +89,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    turtle.setX(machine.getHomeX());
 	    turtle.setY(machine.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
-		
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
 			Log.info("Failed to load some elements (1)");
@@ -237,29 +236,41 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			for (int i = 0; i < pathObjects; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
 				switch( item.getPathSegType() ) {
-				case SVGPathSeg.PATHSEG_CLOSEPATH:
+				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
 					{
 						//System.out.println("Close path");
 						turtle.moveTo(firstX,firstY);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_MOVETO_ABS:
+				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
 					{
 						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						firstX=TX( path.getX() );
-						firstY=TY( path.getY() );
+						firstX = x = TX( path.getX() );
+						firstY = y = TY( path.getY() );
 						if(distanceSquared(firstX,firstY,turtle.getX(),turtle.getY())>4) {
 							turtle.jumpTo(firstX,firstY);
 						} else {
 							turtle.moveTo(firstX, firstY);
 						}
-						x=firstX;
-						y=firstY;
-						adjustLimits(firstX,firstY);
+						adjustLimits(x,y);
+					}
+				break;
+				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
+					{
+						//System.out.println("Move Rel");
+						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
+						firstX = x = TX( path.getX() ) + turtle.getX();
+						firstY = y = TY( path.getY() ) + turtle.getY();
+						if(distanceSquared(firstX,firstY,turtle.getX(),turtle.getY())>4) {
+							turtle.jumpTo(firstX,firstY);
+						} else {
+							turtle.moveTo(firstX, firstY);
+						}
+						adjustLimits(x,y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_LINETO_ABS:
+				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
 					{
 						//System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
@@ -270,7 +281,18 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						adjustLimits(x,y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: 
+				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
+					{
+						//System.out.println("Line REL");
+						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
+						x = TX( path.getX() ) + turtle.getX();
+						y = TY( path.getY() ) + turtle.getY();
+						turtle.penDown();
+						turtle.moveTo(x,y);
+						adjustLimits(x,y);
+					}
+					break;
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
 					{
 						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
@@ -361,7 +383,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					}
 					break; 
 				default:
-					System.out.print(item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = ");
+					System.out.print("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = ");
 					System.out.println(((SVGItem)item).getValueAsString());
 					loadOK=false;
 				}
