@@ -363,7 +363,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	 */
 	@Override
 	public float getFeedrateMax() {
-		return 400;
+		return 100;
 	}
 	/**
 	 * @since software 7.22.6
@@ -398,6 +398,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	 */
 	@Override
 	public float getZAngleOn() {
-		return 40;
+		return 30;
 	}
 }
