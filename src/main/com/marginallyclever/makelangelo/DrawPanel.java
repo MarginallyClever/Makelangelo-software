@@ -256,9 +256,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 
 		// Special handling for the case where the GLJPanel is translucent
 		// and wants to be composited with other Java 2D content
-		if (GLProfile.isAWTAvailable() && (this instanceof com.jogamp.opengl.awt.GLJPanel)
-				&& !((com.jogamp.opengl.awt.GLJPanel) this).isOpaque()
-				&& ((com.jogamp.opengl.awt.GLJPanel) this).shouldPreserveColorBufferIfTranslucent()) {
+		if (GLProfile.isAWTAvailable()
+				&& !isOpaque()
+				&& shouldPreserveColorBufferIfTranslucent()) {
 			gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 		} else {
 			gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
