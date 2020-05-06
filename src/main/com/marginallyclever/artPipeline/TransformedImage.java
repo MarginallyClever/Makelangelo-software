@@ -55,10 +55,8 @@ public class TransformedImage {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
 
-		if (sampleX < 0						)			return false;
-		if (sampleX >= sourceImage.getWidth())			return false;
-		if (sampleY < 0						)			return false;
-		if (sampleY >= sourceImage.getHeight())			return false;
+		if (sampleX < 0 || sampleX >= sourceImage.getWidth ()) return false;
+		if (sampleY < 0 || sampleY >= sourceImage.getHeight()) return false;
 		return true;
 	}
 
@@ -111,6 +109,10 @@ public class TransformedImage {
 		rotationDegrees += degrees;
 	}
 
+	public int sample(double cx, double cy, double radius) {
+		return sample(cx-radius,cy-radius,cx+radius,cy+radius);
+	}
+	
 	/**
 	 * sample the image, taking into account fractions of pixels. left < right, bottom < top.
 	 *
@@ -122,97 +124,78 @@ public class TransformedImage {
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
 		float sampleValue = 0;
-		float sampleSum = 0;
-
-		double xceil = Math.ceil(x0);
-		double xweightstart = (x0 != xceil) ? xceil - x0 : 1;
-
-		double xfloor = Math.floor(x1);
-		double xweightend = (x1 != xceil) ? xfloor - x1 : 0;
-
-		int left = (int) Math.floor(x0);
-		int right = (int) Math.ceil(x1);
-		double s;
-
-		// top edge
-		double yceil = Math.ceil(y0);
-		if (y0 != yceil) {
-			double yweightstart = yceil - y0;
-
-			// left edge
-			if (canSampleAt((float) x0, (float) y0)) {
-				s = xweightstart * yweightstart;
-				sampleValue += sample1x1Unchecked((float) x0, (float) y0) * s;
-				sampleSum += s;
-			}
-
-			for (int i = left; i < right; ++i) {
-				if (canSampleAt(i, (float) y0)) {
-					sampleValue += sample1x1Unchecked(i, (float) y0) * yweightstart;
-					sampleSum += yweightstart;
-				}
-			}
-			// right edge
-			if (canSampleAt(right, (float) y0)) {
-				s = xweightend * yweightstart;
-				sampleValue += sample1x1Unchecked(right, (float) y0) * s;
-				sampleSum += s;
-			}
+		float weightedSum = 0;
+		
+		if(x1<x0) {
+			double temp = x1;
+			x1=x0;
+			x0=temp;
+		}
+		if(y1<y0) {
+			double temp = y1;
+			y1=y0;
+			y0=temp;
 		}
 
-		int bottom = (int) Math.floor(y0);
-		int top = (int) Math.ceil(y1);
-		for (int j = bottom; j < top; ++j) {
-			// left edge
-			if (canSampleAt((float) x0, j)) {
-				sampleValue += sample1x1Unchecked((int) x0, j) * xweightstart;
-				sampleSum += xweightstart;
-			}
+		int left   = (int)Math.floor(x0);
+		int right  = (int)Math.ceil (x1);
+		int bottom = (int)Math.floor(y0);
+		int top    = (int)Math.ceil (y1);
 
-			for (int i = left; i < right; ++i) {
-				if (canSampleAt(i, j)) {
-					sampleValue += sample1x1Unchecked(i, j);
-					sampleSum += 1;
-				}
-			}
-			// right edge
-			if (canSampleAt(right, j)) {
-				sampleValue += sample1x1Unchecked(right, j) * xweightend;
-				sampleSum += xweightend;
-			}
+		// calculate the weight matrix
+		int w = right-left;
+		int h = top-bottom;
+		
+		double [] m = new double[w*h];
+		for(int i=0;i<m.length;++i) {
+			m[i]=1;
 		}
-
 		// bottom edge
-		double yfloor = Math.floor(y1);
-		if (y1 != yfloor) {
-			double yweightend = yfloor - y1;
-
-			// left edge
-			if (canSampleAt((float) x0, (float) y1)) {
-				s = xweightstart * yweightend;
-				sampleValue += sample1x1Unchecked((float) x0, (float) y1) * s;
-				sampleSum += s;
+		if(bottom<y0) {
+			double yWeightStart = y0-bottom;
+			for(int i=0;i<w;++i) {
+				m[i]*=yWeightStart;
 			}
-
-			for (int i = left; i < right; ++i) {
-				if (canSampleAt(i, (float) y1)) {
-					sampleValue += sample1x1Unchecked((float) i, (float) y1) * yweightend;
-					sampleSum += yweightend;
+		}
+		// top edge
+		if(top>y1) {
+			double yWeightEnd = top-y1;
+			for(int i=0;i<w;++i) {
+				m[m.length-w+i]*=yWeightEnd;
+			}
+		}
+		// left edge
+		if(left<x0) {
+			double xWeightStart = x0-left;
+			for(int i=0;i<h;++i) {
+				m[i*w]*=xWeightStart;
+			}
+		}
+		// right edge
+		if(right>x1) {
+			double xWeightEnd = right-x1;
+			for(int i=0;i<h;++i) {
+				m[(i+1)*w-1]*=xWeightEnd;
+			}
+		}
+		
+		int i=0;
+		for(int y=bottom;y<top;++y) {
+			for(int x=left;x<right;++x) {
+				double s = m[i++];
+				if (canSampleAt(x, y)) {
+					sampleValue += sample1x1Unchecked(x,y) * s;
+					weightedSum += s;
 				}
-
-			}
-			// right edge
-			if (canSampleAt(right, (float) y1)) {
-				s = xweightend * yweightend;
-				sampleValue += sample1x1Unchecked(right, (float) y1) * s;
-				sampleSum += s;
 			}
 		}
 
-		if (sampleSum == 0)
+		if (weightedSum == 0)
 			return 255;
 
-		return (int) (sampleValue / sampleSum);
+		double result = sampleValue / weightedSum;
+		
+		return (int)Math.min( Math.max(result, 0), 255 );
 	}
 
 	/**
@@ -251,7 +234,7 @@ public class TransformedImage {
 		double a = 255.0-c.getAlpha();
 		int c2 = (int)(  (255.0 - (double)colorToBlend) * (a / 255.0) + (double)colorToBlend);
 		if(c2>255) c2=255;
-		if(c2<0) c2=0;
+		else if(c2<0) c2=0;
 		return c2;
 	}
 
