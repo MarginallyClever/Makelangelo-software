@@ -239,22 +239,7 @@ public class TransformedImage {
 	}
 
 	public int sample3x3(double x, double y) {
-		int value = 0, weight = 0;
-
-		if (canSampleAt(x - 1, y - 1)) {			value += sample1x1Unchecked(x - 1, y - 1);			weight += 1;		}
-		if (canSampleAt(x    , y - 1)) {			value += sample1x1Unchecked(x    , y - 1);			weight += 1;		}
-		if (canSampleAt(x + 1, y - 1)) {			value += sample1x1Unchecked(x + 1, y - 1);			weight += 1;		}
-		if (canSampleAt(x - 1, y    )) {			value += sample1x1Unchecked(x - 1, y    );			weight += 1;		}
-		if (canSampleAt(x    , y    )) {			value += sample1x1Unchecked(x    , y    );			weight += 1;		}
-		if (canSampleAt(x + 1, y    )) {			value += sample1x1Unchecked(x + 1, y    );			weight += 1;		}
-		if (canSampleAt(x - 1, y + 1)) {			value += sample1x1Unchecked(x - 1, y + 1);			weight += 1;		}
-		if (canSampleAt(x    , y + 1)) {			value += sample1x1Unchecked(x    , y + 1);			weight += 1;		}
-		if (canSampleAt(x + 1, y + 1)) {			value += sample1x1Unchecked(x + 1, y + 1);			weight += 1;		}
-
-		if (weight == 0)
-			return 255;
-
-		return value / weight;
+		return sample(x,y,1);
 	}
 
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
@@ -282,18 +267,17 @@ public class TransformedImage {
 		colorChannel = channel;
 	}
 
-	public void setScaleX(float x) {
+	public void setScale(float x,float y) {
 		scaleX = x;
-	}
-	
-	public void setScaleY(float y) {
 		scaleY = y;
 	}
-
+	
+	@Deprecated
 	public void translateX(float x) {
 		translateX = x;
 	}
 
+	@Deprecated
 	public void translateY(float y) {
 		translateY += y;
 	}

@@ -36,8 +36,6 @@ public class Converter_Multipass extends ImageConverter {
 	
 	/**
 	 * create parallel lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {

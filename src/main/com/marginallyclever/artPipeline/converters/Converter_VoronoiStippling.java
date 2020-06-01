@@ -11,8 +11,8 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
@@ -310,7 +310,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
-		Log.info("Initializing cells");
+		Log.message("Initializing cells");
 
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[numCells];
@@ -363,7 +363,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	/**
 	 * write cell centroids to gcode.
-	 * @param out where to write
 	 */
 	protected void writeOutCells() {
 		turtle = new Turtle();

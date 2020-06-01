@@ -33,8 +33,8 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.converters.ImageConverterPanel;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -85,7 +85,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		
 		imageConverterNames.clear();
 		
-		for( @SuppressWarnings("unused") ImageConverter ici : converters ) {
+		for( ImageConverter ici : converters ) {
 			imageConverterNames.add(ici.getName());
 		}
 				
@@ -206,7 +206,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		imageConverterPanel.loadAndSaveImage = this;
 		converterOptionsContainer.removeAll();
 		if(imageConverterPanel!=null) {
-			Log.info("Converter="+chosenConverter.getName());
+			Log.message("Converter="+chosenConverter.getName());
 			//System.out.println("Adding panel");
 			converterOptionsContainer.add(imageConverterPanel);
 			converterOptionsContainer.invalidate();
@@ -289,8 +289,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		} else {
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
-		img.setScaleX(f);
-		img.setScaleY(-f);
+		img.setScale(f,-f);
 	}
 
 	
@@ -306,8 +305,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		} else {
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
 		}
-		img.setScaleX(f);
-		img.setScaleY(-f);
+		img.setScale(f,-f);
 	}
 	
 
@@ -380,12 +378,12 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					String message = String.format("%d%%.\n", progress);
 					pm.setNote(message);
 					if (swingWorker.isDone()) {
-						Log.info(Translator.get("Finished"));
+						Log.message(Translator.get("Finished"));
 					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
 						if (pm.isCanceled()) {
 							swingWorker.cancel(true);
 						}
-						Log.info(Translator.get("Cancelled"));
+						Log.message(Translator.get("Cancelled"));
 					}
 				}
 			}

@@ -4,8 +4,8 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -38,8 +38,6 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {
@@ -53,11 +51,11 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 
 		turtle = new Turtle();
 		
-		Log.info("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		Log.info("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
-		Log.info("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
-		Log.info("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
-		Log.info("Finishing...");
+		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
+		Log.message("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
+		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
+		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
+		Log.message("Finishing...");
 	}
 
 	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
@@ -126,7 +124,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 			++numRings;
 		}
 
-		Log.info(numRings + " rings.");
+		Log.message(numRings + " rings.");
 	}
 }
 

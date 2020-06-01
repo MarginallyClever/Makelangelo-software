@@ -64,9 +64,6 @@ If you like this project, please support us by buying Marginally Clever products
     </developer>
   </developers>
 
-  <prerequisites>
-    <maven>${minimum.maven.version}</maven>
-  </prerequisites>
   <build>
     <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
 	<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
@@ -220,6 +217,9 @@ If you like this project, please support us by buying Marginally Clever products
             <goals>
               <goal>jar</goal>
             </goals>
+            <configuration> <!-- add this to disable checking -->
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -241,6 +241,7 @@ If you like this project, please support us by buying Marginally Clever products
         </configuration>
       </plugin>
     </plugins>
+    
     <pluginManagement>
       <plugins>
         <plugin>
@@ -261,21 +262,23 @@ If you like this project, please support us by buying Marginally Clever products
         </plugin>
       </plugins>
     </pluginManagement>
+    
   </build>
+  
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
-	<!-- https://github.com/java-native/jssc/ -->
+    
+	<!-- https://mvnrepository.com/artifact/org.scream3r/jssc -->
 	<dependency>
-	    <groupId>io.github.java-native</groupId>
+	    <groupId>org.scream3r</groupId>
 	    <artifactId>jssc</artifactId>
-	    <version>2.9.1</version>
-    	<scope>system</scope>
-    	<systemPath>${project.basedir}/local-maven-repo/jssc-2.9.1.jar</systemPath>
+	    <version>2.8.0</version>
 	</dependency>
+
     <dependency>
 	    <groupId>org.everit.osgi.bundles</groupId>
     	<artifactId>org.everit.osgi.bundles.org.scream3r.jssc</artifactId>
@@ -314,15 +317,13 @@ If you like this project, please support us by buying Marginally Clever products
 	  <version>2.4.0</version>
 	</dependency>
 	
-    <!-- http://kabeja.sourceforge.net/download/download.html -->
-    <dependency>
-      <groupId>org.kabeja</groupId>
-      <artifactId>kabeja</artifactId>
-      <version>0.4</version>
-    	<scope>system</scope>
-    	<systemPath>${project.basedir}/local-maven-repo/kabeja-0.4.jar</systemPath>
-    </dependency>
-    
+    <!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
+	<dependency>
+	    <groupId>net.sourceforge</groupId>
+	    <artifactId>kabeja</artifactId>
+	    <version>0.4</version>
+	</dependency>
+        
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -336,6 +337,11 @@ If you like this project, please support us by buying Marginally Clever products
       <version>1.7.12</version>
 	</dependency>
 
+    <dependency>
+      <groupId>javax.vecmath</groupId>
+      <artifactId>vecmath</artifactId>
+      <version>1.5.2</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/junit/junit -->
 	<dependency>
     <groupId>junit</groupId>
@@ -414,6 +420,10 @@ If you like this project, please support us by buying Marginally Clever products
   	<repository>
   		<id>my-local-repo</id>
   		<url>file://${project.basedir}/java/local-maven-repo</url>
+    </repository>
+    <repository>
+    	<id>openkm</id>
+    	<url>http://maven.openkm.com</url>
     </repository>
   </repositories>
 </project>

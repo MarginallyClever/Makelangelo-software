@@ -33,8 +33,8 @@ import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
@@ -73,7 +73,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
-		Log.info("Loading...");
+		Log.message("Loading...");
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
@@ -91,7 +91,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		turtle.setColor(new ColorRGB(0,0,0));
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
-			Log.info("Failed to load some elements (1)");
+			Log.message("Failed to load some elements (1)");
 			return false;
 		}
 		
@@ -123,7 +123,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		turtle.setColor(new ColorRGB(0,0,0));
 		loadOK = parseAll(document);
 		if(!loadOK) {
-			Log.info("Failed to load some elements (2)");
+			Log.message("Failed to load some elements (2)");
 			return false;
 		}
 		
@@ -458,7 +458,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @return true if save succeeded.
 	 */
 	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
-		Log.info("saving...");
+		Log.message("saving...");
 		turtle = robot.getTurtle();
 
 		machine = robot.getSettings();
@@ -518,7 +518,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		
-		Log.info("done.");
+		Log.message("done.");
 		return true;
 	}
 }

@@ -37,8 +37,6 @@ public class Converter_MagicCircle extends ImageConverter {
 	
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {

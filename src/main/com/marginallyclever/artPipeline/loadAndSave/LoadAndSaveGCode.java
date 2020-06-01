@@ -10,8 +10,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -190,7 +190,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 
 	@Override
 	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
-		Log.info("saving...");
+		Log.message("saving...");
 		Turtle turtle = robot.getTurtle();
 		MakelangeloRobotSettings machine = robot.getSettings();
 		
@@ -247,7 +247,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			return false;
 		}
 		
-		Log.info("done.");
+		Log.message("done.");
 		return true;
 	}
 

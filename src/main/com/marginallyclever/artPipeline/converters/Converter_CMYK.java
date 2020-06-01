@@ -4,8 +4,8 @@ package com.marginallyclever.artPipeline.converters;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 // http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
@@ -34,19 +34,17 @@ public class Converter_CMYK extends ImageConverter {
 	
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.info("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
-		Log.info("Cyan...");		outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
-		Log.info("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
-		Log.info("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
-		Log.info("Finishing...");
+		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
+		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
+		Log.message("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
+		Log.message("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+		Log.message("Finishing...");
 	}
 	
 	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {

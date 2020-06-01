@@ -19,7 +19,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 public abstract class ImageGenerator extends ImageManipulator implements MakelangeloRobotDecorator {
 	/**
 	 * @return true if generate succeeded.
-	 * @param dest the file where the results will be saved.
 	 */
 	public boolean generate() {
 		return false;

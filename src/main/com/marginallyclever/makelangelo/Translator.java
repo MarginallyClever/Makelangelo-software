@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangelo.preferences.LanguagePreferences;
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import com.marginallyclever.util.PreferencesHelper;
@@ -133,13 +134,14 @@ public final class Translator {
 	 */
 	static public void loadLanguages() {
 		try {
-			// iterate and find all language files
 			URI uri = null;
 			try {
 				uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
+			Log.message("Looking for translations in "+uri.toString());
+			
 			Path myPath;
 			if (uri.getScheme().equals("jar")) {
 				FileSystem fileSystem = null;
@@ -166,22 +168,19 @@ public final class Translator {
 				String name = p.toString();
 				//System.out.println("testing "+name);
 				//if( f.isDirectory() || f.isHidden() ) continue;
-				String ext = FilenameUtils.getExtension(name).toLowerCase(); 
-				if( ext.equals("xml") == false ) {
-					continue;
-				}
-	
-				// found an XML file in the /languages folder.  Good sign!
-				++found;
-				name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-				//System.out.println("found: "+name);
-	
-				InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
-				//if( stream != null ) 
-				{
-					TranslatorLanguage lang = new TranslatorLanguage();
-					lang.loadFromInputStream(stream);
-					languages.put(lang.getName(), lang);
+				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
+					// found an XML file in the /languages folder.  Good sign!
+					++found;
+					name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+					//System.out.println("found: "+name);
+		
+					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
+					//if( stream != null ) 
+					{
+						TranslatorLanguage lang = new TranslatorLanguage();
+						lang.loadFromInputStream(stream);
+						languages.put(lang.getName(), lang);
+					}
 				}
 			}
 			//System.out.println("total found: "+found);

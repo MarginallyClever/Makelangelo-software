@@ -23,8 +23,8 @@ import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
@@ -85,7 +85,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	
 	@Override
 	public boolean load(InputStream in,MakelangeloRobot robot) {
-		Log.info(Translator.get("FileTypeSB2")+"...");
+		Log.message(Translator.get("FileTypeSB2")+"...");
 
 		machine = robot.getSettings();
 		turtle = new Turtle();

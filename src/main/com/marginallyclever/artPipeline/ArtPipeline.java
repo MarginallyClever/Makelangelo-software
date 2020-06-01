@@ -12,7 +12,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.MoveType;
 import com.marginallyclever.convenience.Turtle.Movement;
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -59,6 +59,8 @@ public class ArtPipeline {
 	
 	/**
 	 * Offers to look for a better route through the turtle history that means fewer travel moves.
+	 * @param turtle
+	 * @param settings
 	 */
 	public void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.size()==0) return;
@@ -285,9 +287,11 @@ public class ArtPipeline {
 	 * Offers to optimize your gcode by chopping out very short line segments.
 	 * It travels the entire path and drops any pen-down segment shorter than 
 	 * minimumStepSize.
+	 * @param turtle
+	 * @param settings
 	 */
 	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
-		Log.info("checkSimplify() begin");
+		Log.message("checkSimplify() begin");
 		ArrayList<Movement> toKeep = new ArrayList<Movement>();
 
 		double minimumStepSize=1;
@@ -335,13 +339,15 @@ public class ArtPipeline {
 		int os = turtle.history.size();
 		int ns = toKeep.size();
 		turtle.history = toKeep;
-		Log.info("checkSimplify() end (was "+os+" is now "+ns+")");
+		Log.message("checkSimplify() end (was "+os+" is now "+ns+")");
 	}
 
 	
 	
 	/**
 	 * Offers to resize your loaded image to fit inside the margins.
+	 * @param turtle
+	 * @param settings
 	 */
 	protected void resizeFit(Turtle turtle, MakelangeloRobotSettings settings) {	
 		Point2D top = new Point2D();
@@ -370,16 +376,28 @@ public class ArtPipeline {
 		turtle.scale(ratio,ratio);
 	}
 
+	/**
+	 * 
+	 * @param turtle
+	 * @param settings
+	 */
 	protected void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(1,-1);
 	}
 
+	/**
+	 * 
+	 * @param turtle
+	 * @param settings
+	 */
 	protected void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(-1,1);
 	}
 	
 	/**
 	 * Offers to resize your loaded image to fill the margins completely.
+	 * @param turtle
+	 * @param settings
 	 */
 	protected void resizeFill(Turtle turtle, MakelangeloRobotSettings settings) {	
 		Point2D top = new Point2D();
@@ -408,10 +426,15 @@ public class ArtPipeline {
 		turtle.scale(ratio,ratio);
 	}
 
+	/**
+	 * 
+	 * @param turtle
+	 * @param settings
+	 */
 	protected void cropToPageMargin(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle==null) return;
 		
-		Log.info("cropTurtleToPageMargin() start");
+		Log.message("cropTurtleToPageMargin() start");
 
 		ArrayList<Movement> oldHistory = turtle.history;
 		turtle.history = new ArrayList<Movement>();
@@ -471,9 +494,14 @@ public class ArtPipeline {
 		
 		int oldSize= oldHistory.size();
 		int newSize= turtle.history.size();
-		Log.info("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
+		Log.message("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
 	}
 
+	/**
+	 * 
+	 * @param turtle
+	 * @param settings
+	 */
 	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.isEmpty()) return;
 		
@@ -498,37 +526,71 @@ public class ArtPipeline {
 			turtle.unlock();
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldResizeFill() {
 		if(myPanel!=null) return myPanel.shouldResizeFill();
 		int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldResizeFit() {
 		if(myPanel!=null) return myPanel.shouldResizeFit();
 		int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldReorder() {
 		if(myPanel!=null) return myPanel.shouldReorder();
 		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+	
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldFlipV() {
 		if(myPanel!=null) return myPanel.shouldFlipV();
 		int result = JOptionPane.showConfirmDialog(null, "Flip vertical?", "Flip", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+	
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldFlipH() {
 		if(myPanel!=null) return myPanel.shouldFlipH();
 		int result = JOptionPane.showConfirmDialog(null, "Flip horizonal?", "Flip", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+	
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldSimplify() {
 		if(myPanel!=null) return myPanel.shouldSimplify();
 		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
+	
+	/**
+	 * 
+	 * @return true or false
+	 */
 	public boolean shouldCrop() {
 		if(myPanel!=null) return myPanel.shouldCrop();
 		int result = JOptionPane.showConfirmDialog(null, "Crop to margins?", "Crop", JOptionPane.YES_NO_OPTION);

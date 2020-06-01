@@ -186,13 +186,14 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		updateValues();
 	}
 
-	
+	@Override
 	public void stateChanged(ChangeEvent e) {}
-
 
 	/**
 	 * Must match commonPaperSizes
-	 * @return
+	 * @param paperWidth mm
+	 * @param paperHeight mm
+	 * @return the index from the commonPaperSizes list.
 	 */
 	public int getCurrentPaperSizeChoice(double paperWidth,double paperHeight) {
 		int i;
@@ -206,7 +207,8 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		return 0;
 	}
 
-	public void propertyChange(PropertyChangeEvent  e) {
+	@Override
+	public void propertyChange(PropertyChangeEvent e) {
 		if(beingModified) return;
 
 		beingModified=true;

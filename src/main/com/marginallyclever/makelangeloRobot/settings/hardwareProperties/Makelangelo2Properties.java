@@ -18,9 +18,9 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	
 	/**
 	 * convert from belt length mm to cartesian position.
-	 * @param beltL
-	 * @param beltR
-	 * @return
+	 * @param beltL length of belt (mm)
+	 * @param beltR length of belt (mm)
+	 * @return cartesian coordinate 
 	 */
 	public Point2D FK(double beltL, double beltR) {
 		  double limit_ymax = getHeight()/2;

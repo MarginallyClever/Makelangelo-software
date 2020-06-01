@@ -178,7 +178,6 @@ public class CannyEdgeDetector {
 	 * 
 	 * @return the radius of the convolution operation in pixels
 	 */
-	
 	public int getGaussianKernelWidth() {
 		return gaussianKernelWidth;
 	}
@@ -191,7 +190,6 @@ public class CannyEdgeDetector {
 	 * @param gaussianKernelWidth a radius for the convolution operation in
 	 * pixels, at least 2.
 	 */
-	
 	public void setGaussianKernelWidth(int gaussianKernelWidth) {
 		if (gaussianKernelWidth < 2) throw new IllegalArgumentException();
 		this.gaussianKernelWidth = gaussianKernelWidth;
@@ -203,7 +201,6 @@ public class CannyEdgeDetector {
 	 * 
 	 * @return the Gaussian kernel radius in pixels
 	 */
-	
 	public float getGaussianKernelRadius() {
 		return gaussianKernelRadius;
 	}
@@ -211,10 +208,7 @@ public class CannyEdgeDetector {
 	/**
 	 * Sets the radius of the Gaussian convolution kernel used to smooth the
 	 * source image prior to gradient calculation.
-	 * 
-	 * @return a Gaussian kernel radius in pixels, must exceed 0.1f.
 	 */
-	
 	public void setGaussianKernelRadius(float gaussianKernelRadius) {
 		if (gaussianKernelRadius < 0.1f) throw new IllegalArgumentException();
 		this.gaussianKernelRadius = gaussianKernelRadius;
@@ -227,7 +221,6 @@ public class CannyEdgeDetector {
 	 * 
 	 * @return whether the contrast is normalized
 	 */
-	
 	public boolean isContrastNormalized() {
 		return contrastNormalized;
 	}
@@ -237,10 +230,10 @@ public class CannyEdgeDetector {
 	 * @param contrastNormalized true if the contrast should be normalized,
 	 * false otherwise
 	 */
-	
 	public void setContrastNormalized(boolean contrastNormalized) {
 		this.contrastNormalized = contrastNormalized;
 	}
+	
 	
 	// methods
 	

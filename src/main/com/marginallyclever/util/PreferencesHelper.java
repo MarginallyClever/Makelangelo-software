@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 import org.json.JSONObject;
 import org.json.Property;
 
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Helper class to be used when accessing preferences.
@@ -140,7 +140,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			Log.info("node name:"+preferenceNode);
+			Log.message("node name:"+preferenceNode);
 			logKeyValuesForPreferenceNode(preferenceNode);
 			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
 			for (String childNodeName : childrenPreferenceNodeNames) {
@@ -159,7 +159,7 @@ public final class PreferencesHelper {
 	public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
 		final String[] keys = preferenceNode.keys();
 		for (String key : keys) {
-			Log.info("key:"+key+" value:"+ preferenceNode.get(key, null));
+			Log.message("key:"+key+" value:"+ preferenceNode.get(key, null));
 		}
 	}
 
@@ -274,7 +274,7 @@ public final class PreferencesHelper {
 	 */
 	public static void logAncestryable(Ancestryable preferenceNode) {
 		final JSONObject object = new JSONObject(preferenceNode.getChildren());
-		Log.info( object.toString());
+		Log.message( object.toString());
 	}
 
 	/**
@@ -282,7 +282,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Properties> void logPropertiesNode(P properties) {
 		final JSONObject jsonObject = Property.toJSONObject(properties);
-		Log.info( jsonObject.toString());
+		Log.message( jsonObject.toString());
 	}
 
 }

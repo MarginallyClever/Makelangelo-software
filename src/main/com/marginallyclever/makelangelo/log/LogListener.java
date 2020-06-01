@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.log;
 
 public interface LogListener {
 	// decorated HTML message has been logged

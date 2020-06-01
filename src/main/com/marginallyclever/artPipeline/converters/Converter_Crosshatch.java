@@ -32,12 +32,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		return intensity;
 	}
 	
-	/**
-	 * The main entry point
-	 *
-	 * @param img
-	 *            the image to convert.
-	 */
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);

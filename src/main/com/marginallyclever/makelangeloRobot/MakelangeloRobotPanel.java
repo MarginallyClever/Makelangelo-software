@@ -38,10 +38,10 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.SpringUtilities;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.RPiCamera;
@@ -1000,7 +1000,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		chosenGeneratorPanel.makelangeloRobotPanel = this;
 		previewPane.removeAll();
 		if(chosenGeneratorPanel!=null) {
-			Log.info("Generator="+chosenGenerator.getName());
+			Log.message("Generator="+chosenGenerator.getName());
 			previewPane.add(chosenGeneratorPanel);
 			previewPane.invalidate();
 			try {
@@ -1029,7 +1029,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		robot.setDecorator(null);
 		robot.setTurtle(t);
-		Log.info(Translator.get("Finished"));
+		Log.message(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
 	}
@@ -1140,7 +1140,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		if (success == true) {
 			lastFileIn=filename;
-			Log.info(Translator.get("Finished"));
+			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
 			updateButtonAccess();
 			statusBar.clear();
@@ -1155,7 +1155,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * @return true if file was loaded successfully.  false if it failed.
 	 */
 	public boolean openFileOnDemand(String filename) {
-		Log.info(Translator.get("OpeningFile") + filename + "...");
+		Log.message(Translator.get("OpeningFile") + filename + "...");
 		boolean success=false;
 		boolean attempted=false;
 

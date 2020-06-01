@@ -14,6 +14,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.marginallyclever.makelangelo.log.Log;
+
 public class TranslatorLanguage {
 	private String name = "";
 	private String author = "";

@@ -29,10 +29,12 @@ public class SerialTransportLayer implements TransportLayer {
 	 * @return a list of port names
 	 */
 	public String[] listConnections() {
+		portsDetected = SerialPortList.getPortNames();
+		/*
 		String OS = System.getProperty("os.name").toLowerCase();
-
 		if (OS.indexOf("mac") >= 0) {
-			portsDetected = SerialPortList.getPortNames("/dev/");
+			SerialPortList.
+			"/dev/");
 			//System.out.println("OS X");
 		} else if (OS.indexOf("win") >= 0) {
 			portsDetected = SerialPortList.getPortNames("COM");
@@ -43,7 +45,7 @@ public class SerialTransportLayer implements TransportLayer {
 		} else {
 			System.out.println("OS ERROR");
 			System.out.println("OS NAME=" + System.getProperty("os.name"));
-		}
+		}*/
 		return portsDetected;
 	}
 

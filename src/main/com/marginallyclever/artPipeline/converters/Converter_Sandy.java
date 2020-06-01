@@ -30,9 +30,7 @@ public class Converter_Sandy extends ImageConverter {
 		return new Converter_Sandy_Panel(this);
 	}
 	
-	/**
-	 * @param img the image to convert.
-	 */
+	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);

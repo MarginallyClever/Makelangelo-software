@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

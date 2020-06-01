@@ -12,8 +12,8 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
 
@@ -66,22 +66,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				String c;
-				switch (color) {
-				case 0:
-					c = "yellow";
-					break;
-				case 1:
-					c = "blue";
-					break;
-				case 2:
-					c = "red";
-					break;
-				default:
-					c = "white";
-					break;
-				}
-				Log.info( c , formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
+				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
 			pm.setProgress((int) progress);
@@ -166,7 +151,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	private void generateTSP(Writer out) throws IOException {
 		greedyTour();
 
-		Log.info("green","Running Kernighan–Lin optimization...");
+		Log.message("Running Kernighan–Lin optimization...");
 
 		len = getTourLength(solution);
 		old_len = len;
@@ -214,7 +199,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void greedyTour() {
-		Log.info("green","Finding greedy tour solution...");
+		Log.message("Finding greedy tour solution...");
 
 		int i;
 		float w, bestw;
@@ -305,7 +290,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			}
 		}
 
-		Log.info("green", numPoints + " points.");
+		Log.message(numPoints + " points.");
 		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 

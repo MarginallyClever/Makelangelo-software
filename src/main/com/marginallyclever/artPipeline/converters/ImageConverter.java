@@ -57,7 +57,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	/**
 	 * for "run once" converters, return do the entire conversion and write to disk.
 	 * for iterative solvers, the iteration is now done, write to disk.
-	 * @param out the Writer to receive the generated gcode.
 	 */
 	public void finish() {}
 	
@@ -113,7 +112,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * @param stepSize mm level of detail for this line.
 	 * @param channelCutoff only put pen down when color below this amount.
 	 * @param img the image to sample while converting along the line.
-	 * @param out the destination for the gcode generated in the conversion process.
 	 */
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img) {
 		Point2D P0 = new Point2D(x0,y0);
@@ -159,7 +157,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * @param stepSize mm level of detail for this line.
 	 * @param channelCutoff only put pen down when color below this amount.
 	 * @param img the image to sample while converting along the line.
-	 * @param out the destination for the gcode generated in the conversion process.
 	 */
 	protected void convertAlongLineErrorTerms(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,double [] error0,double [] error1,TransformedImage img) {
 		double b;

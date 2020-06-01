@@ -50,8 +50,6 @@ public class Generator_Maze extends ImageGenerator {
 
 	/**
 	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
-	 * @param out
-	 * @throws IOException
 	 */
 	@Override
 	public boolean generate() {

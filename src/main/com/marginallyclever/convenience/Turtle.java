@@ -203,8 +203,8 @@ public class Turtle {
 
 	/**
 	 * Translate all draw and move segments by parameters
-	 * @param sx
-	 * @param sy
+	 * @param dx relative move x
+	 * @param dy relative move y
 	 */
 	public void translate(double dx, double dy) {
 		for( Movement m : history ) {

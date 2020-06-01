@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.io.IOException;
-
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -22,10 +20,6 @@ public class Generator_Border extends ImageGenerator {
 		return new Generator_Empty_Panel(this);
 	}
 
-	/**
-	 * @param out
-	 * @throws IOException
-	 */
 	@Override
 	public boolean generate() {
 		float yMin = (float)machine.getMarginBottom();

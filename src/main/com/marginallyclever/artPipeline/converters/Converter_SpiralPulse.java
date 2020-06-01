@@ -3,8 +3,8 @@ package com.marginallyclever.artPipeline.converters;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -31,8 +31,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
-	 *
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {
@@ -114,7 +112,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 			++numRings;
 		}
 
-		Log.info(numRings + " rings.");
+		Log.message(numRings + " rings.");
 	}
 
 	public void setIntensity(float floatValue) {

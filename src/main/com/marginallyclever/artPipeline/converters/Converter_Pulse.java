@@ -73,10 +73,8 @@ public class Converter_Pulse extends ImageConverter {
 
 	/**
 	 * Converts images into zigzags in paper space instead of image space
-	 *
-	 * @param img the buffered image to convert
-	 * @throws IOException couldn't open output file
 	 */
+	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);

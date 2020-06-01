@@ -9,8 +9,8 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 // create random lines across the image.  Raise and lower the pen to darken the appropriate areas
@@ -74,7 +74,7 @@ public class Converter_Wander extends ImageConverter {
 		double width = xRight - xLeft-1;
 		Point2D a = null;
 		
-		//Log.info("Creating buckets in a Z pattern...");
+		//Log.message("Creating buckets in a Z pattern...");
 		buckets = new LinkedList<Bucket>();
 		int actualPoints=0;
 		double wMod = width/5.0;
@@ -96,7 +96,7 @@ public class Converter_Wander extends ImageConverter {
 			}
 		}
 
-		//Log.info("Finding points...");
+		//Log.message("Finding points...");
 		for(int i=0;i<numberOfLines;++i) {
 			int v, tries=0;
 			double endPX,endPY; 
@@ -123,9 +123,9 @@ public class Converter_Wander extends ImageConverter {
 		}
 
 		// sort the points by nearest neighbor first.
-		Log.info("Sorting "+actualPoints+" points...");
+		Log.message("Sorting "+actualPoints+" points...");
 		for(int j=0;j<buckets.size();++j) {
-			//Log.info(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
+			//Log.message(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
 			a = new Point2D.Double(0,0);
@@ -150,7 +150,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		
 		// draw the sorted list of points.
-		Log.info("Drawing points...");
+		Log.message("Drawing points...");
 		turtle = new Turtle();
 		
 		for(int j=0;j<buckets.size();++j) {
@@ -169,11 +169,11 @@ public class Converter_Wander extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.info("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
-		Log.info("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
-		Log.info("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
-		Log.info("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
-		Log.info("Finishing...");
+		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
+		Log.message("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
+		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
+		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
+		Log.message("Finishing...");
 	}
 	
 	protected void finishBlackAndWhite() {

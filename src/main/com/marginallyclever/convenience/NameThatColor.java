@@ -167,9 +167,10 @@ public class NameThatColor {
 
 	/**
 	 * finds the name of the nearest known color.
-	 * 
-	 * @param target the color to match
-	 * @returns the name of the nearest color.
+	 * @param r0 red component, 0...255
+	 * @param g0 green component, 0...255
+	 * @param b0 blue component, 0...255
+	 * @return the name of the nearest color.
 	 */
 	public String find(float r0,float g0,float b0) {
 		NamedColor best = null;
@@ -198,7 +199,7 @@ public class NameThatColor {
 	 * finds the name of the nearest known color.
 	 * 
 	 * @param target the hex RGB to match
-	 * @returns the name of the nearest color.
+	 * @return the name of the nearest color.
 	 */
 	public String find(long target) {
 		float r0 = red(target);
@@ -213,7 +214,7 @@ public class NameThatColor {
 	 * finds the name of the nearest known color.
 	 * 
 	 * @param target the Color to match
-	 * @returns the name of the nearest color.
+	 * @return the name of the nearest color.
 	 */
 	public String find(Color target) {
 		float r0 = target.getRed();
@@ -228,7 +229,7 @@ public class NameThatColor {
 	 * finds the name of the nearest known color.
 	 * 
 	 * @param target the Color to match
-	 * @returns the name of the nearest color.
+	 * @return the name of the nearest color.
 	 */
 	public String find(ColorRGB target) {
 		float r0 = target.red;

@@ -39,7 +39,6 @@ public class Converter_Boxes extends ImageConverter {
 	
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
-	 * @param img the image to convert.
 	 */
 	@Override
 	public void finish() {

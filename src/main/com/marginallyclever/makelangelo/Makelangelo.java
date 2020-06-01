@@ -40,6 +40,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.makelangelo.log.LogPanel;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -403,7 +405,7 @@ public final class Makelangelo
 		mainFrame.setTransferHandler(myTransferHandler);
 
 		// start animation system
-		animator = new FPSAnimator(30);
+		animator = new FPSAnimator(20);
 		animator.add(drawPanel);
 		animator.start();
 	}
@@ -455,7 +457,7 @@ public final class Makelangelo
 	public void dataAvailable(MakelangeloRobot r, String data) {
 		if (data.endsWith("\n"))
 			data = data.substring(0, data.length() - 1);
-		Log.info("#ffa500", data); // #ffa500 = orange
+		Log.message(data); // #ffa500 = orange
 	}
 
 	@Override
@@ -497,7 +499,7 @@ public final class Makelangelo
 			saveWindowRealEstate();
 			robot.getSettings().saveConfig();
 
-			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as cloas as I can get.
+			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
 
 			// Run this on another thread than the AWT event queue to

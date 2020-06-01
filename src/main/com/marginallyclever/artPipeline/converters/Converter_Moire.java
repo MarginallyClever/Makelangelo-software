@@ -165,10 +165,7 @@ public class Converter_Moire extends ImageConverter {
 		turtle.moveTo(x,y);
 	}
 
-	/**
-	 * @param img the buffered image to convert
-	 * @throws IOException couldn't open output file
-	 */
+	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);

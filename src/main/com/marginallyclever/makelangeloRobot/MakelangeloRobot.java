@@ -35,10 +35,10 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.makelangelo.CommandLineOptions;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -324,7 +324,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		if (!pleaseGetAGUID)
 			return 0;
 
-		Log.info("obtaining UID from server.");
+		Log.message("obtaining UID from server.");
 		try {
 			// Send request
 			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
@@ -334,7 +334,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
 			BufferedReader rd = new BufferedReader(inputStreamReader);
 			String line = rd.readLine();
-			Log.info("Server says: '" + line + "'");
+			Log.message("Server says: '" + line + "'");
 			newUID = Long.parseLong(line);
 			// did read go ok?
 			if (newUID != 0) {
@@ -368,8 +368,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	/**
 	 * Send the machine configuration to the robot.
-	 * 
-	 * @author danroyer
 	 */
 	public void sendConfig() {
 		if (getConnection() != null && !isPortConfirmed())
@@ -608,7 +606,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
-		Log.info("black", line);
+		Log.message(line);
 		line += "\n";
 
 		// send unmodified line
@@ -677,10 +675,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	/**
-	 * @param x
-	 *            relative position in mm
-	 * @param y
-	 *            relative position in mm
+	 * @param dx relative position in mm
+	 * @param dy relative position in mm
 	 */
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
@@ -858,7 +854,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			totalTime/=60;
 			int hours = (int)totalTime;
 			
-			Log.info("Worst case draw time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");	
+			Log.message("Worst case draw time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");	
 		}
 		finally {
 			turtle.unlock();

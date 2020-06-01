@@ -12,8 +12,8 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * @author danroyer
@@ -179,7 +179,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		float x, y;
 		int z = 0;
 
-		Log.info("orange", "Palette color " + palette.getColor(colorIndex).toString() );
+		Log.message("Palette color " + palette.getColor(colorIndex).toString() );
 
 		for (y = (int)yBottom; y < yTop; y += diameter) {
 			for (x = (int)xLeft; x < xRight; x += diameter) {
@@ -203,7 +203,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		// "please change to tool X and press any key to continue"
 		turtle.penUp();
 		turtle.setColor(machine.getPenDownColorDefault());
-		Log.info("green", "Color " + i );
+		Log.message("Color " + i );
 
 		scanForContiguousBlocks(i);
 	}

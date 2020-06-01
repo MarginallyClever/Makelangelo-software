@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.makelangelo.log.Log;
+
 /**
  * Store command line options for use in the app
  * @author Dan Royer
@@ -13,7 +15,7 @@ public class CommandLineOptions {
 
 		for(int i=0;i<argv.length;++i) {
 			String msg = "START OPTION "+argv[i];
-			Log.info(msg);
+			Log.message(msg);
 			System.out.println(msg);
 		}
 	}

@@ -60,7 +60,7 @@ public class ColorPalette {
   /**
    * get the color at a given index.
    * @param index
-   * @return
+   * @return color for a given index
    */
   public ColorRGB getColor(int index) throws IndexOutOfBoundsException {
     return colors.get(index);

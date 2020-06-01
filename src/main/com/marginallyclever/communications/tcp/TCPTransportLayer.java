@@ -3,7 +3,7 @@ package com.marginallyclever.communications.tcp;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Lists available TCP connections and opens a connection of that type to a robot
@@ -31,15 +31,15 @@ public class TCPTransportLayer implements TransportLayer {
 			return null;
 		}
 		*/
-		Log.info("Connecting to "+connectionName);
+		Log.message("Connecting to "+connectionName);
 		//if(connectionName.equals(recentPort)) return null;
 		TCPConnection connection = new TCPConnection(this);
 
 		try {
 			connection.openConnection(connectionName);
-			Log.info("Connect OK");
+			Log.message("Connect OK");
 		} catch (Exception e) {
-			Log.info("Connect FAILED");
+			Log.message("Connect FAILED");
 			e.printStackTrace();
 			return null;
 		}

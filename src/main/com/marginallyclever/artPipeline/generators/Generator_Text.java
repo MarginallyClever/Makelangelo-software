@@ -17,8 +17,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 public class Generator_Text extends ImageGenerator {
@@ -472,7 +472,7 @@ public class Generator_Text extends ImageGenerator {
 	private void textDrawLine(String a1) {
 		String ud = ALPHABET_FOLDER;
 
-		Log.info( a1 +"("+ a1.length() +")" );
+		Log.message( a1 +"("+ a1.length() +")" );
 		
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {
