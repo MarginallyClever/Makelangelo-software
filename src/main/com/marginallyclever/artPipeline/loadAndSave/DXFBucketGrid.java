@@ -1,6 +1,9 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
 import org.kabeja.dxf.helpers.Point;
+
+import com.marginallyclever.makelangelo.log.Log;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +28,7 @@ public class DXFBucketGrid {
 		int totalCells = cellsWide * cellsHigh;
 		assert(totalCells>0);
 		
-		//System.out.println("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
+		//Log.message("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
 		buckets = new ArrayList<DXFBucket>();
 		double dx = bottomRight.getX() - topLeft.getX(); 
 		double dy = bottomRight.getY() - topLeft.getY();
@@ -39,7 +42,7 @@ public class DXFBucketGrid {
 				b.topLeft    .setY( ( y    / (double)cellsHigh) * dy + topLeft.getY());
 				b.bottomRight.setX( ((x+1) / (double)cellsWide) * dx + topLeft.getX());
 				b.bottomRight.setY( ((y+1) / (double)cellsHigh) * dy + topLeft.getY());
-				//System.out.println(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
+				//Log.message(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
 			}
 		}
 	}
@@ -62,7 +65,7 @@ public class DXFBucketGrid {
 				return;
 			}
 		}
-		System.out.println("Not added "+p);
+		Log.message("Not added "+p);
 	}
 	
 	public void countEntitiesInBuckets() {
@@ -72,11 +75,11 @@ public class DXFBucketGrid {
 		while(ib.hasNext()) {
 			DXFBucket b = ib.next();
 			if(b.contents.size()>0) {
-				System.out.println("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
+				Log.message("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
 				total+=b.contents.size();
 			}
 		}
-		System.out.println(total+" total entities in buckets (including duplicates).");
+		Log.message(total+" total entities in buckets (including duplicates).");
 	}
 	
 	/**
@@ -95,8 +98,8 @@ public class DXFBucketGrid {
 				group.addLast(bei.next());
 			}
 		}
-		//System.out.println(groups.size()+ " groups after dump.");
-		//System.out.println(group.entities.size()+ " entities after dump.");
+		//Log.message(groups.size()+ " groups after dump.");
+		//Log.message(group.entities.size()+ " entities after dump.");
 	}
 	
 	@Deprecated
@@ -159,11 +162,11 @@ public class DXFBucketGrid {
 						thisBucket = otherBucket;
 					}
 				}
-				//System.out.println();
+				//Log.message();
 			} while(!sourceBucket.contents.isEmpty());
 		}
 
-		//System.out.println(groups.size()+ " groups after sort.");
+		//Log.message(groups.size()+ " groups after sort.");
 	}
 	
 	/**

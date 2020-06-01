@@ -52,7 +52,7 @@ public class Log {
 			LOG_FILE_PATH+=File.separator;
 		}
 			
-		System.out.println("log dir="+LOG_FILE_PATH);
+		Log.message("log dir="+LOG_FILE_PATH);
 
 		crashReportCheck();
 		deleteOldLog();

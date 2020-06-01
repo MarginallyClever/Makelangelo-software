@@ -8,6 +8,7 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Attempt to generate a magic circle weaving pattern as seen in https://github.com/i-make-robots/weaving_algorithm
@@ -99,7 +100,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		for(k=0;k<numberToDraw;++k) {
 			i = intensities[k].i;
 			j = intensities[k].j;
-			System.out.println(intensities[k].intensity);
+			Log.message(""+intensities[k].intensity);
 			assert(intensities[k].intensity<255);
 			turtle.jumpTo(px[i], py[i]);
 			turtle.moveTo(px[j],py[j]);

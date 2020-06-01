@@ -65,7 +65,7 @@ public class ArtPipeline {
 	public void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.size()==0) return;
 		
-		System.out.println("checkReorder() begin");
+		Log.message("checkReorder() begin");
 		// history is made of changes, travels, and draws
 		// look at the section between two changes.
 		//   look at all pen down moves in the section.
@@ -97,9 +97,9 @@ public class ArtPipeline {
 			}
 		}
 
-		System.out.println("  Found "+turtle.history.size()+" instructions.");
+		Log.message("  Found "+turtle.history.size()+" instructions.");
 		int total = originalLines.size();
-		System.out.println("  Found "+total+" lines.");
+		Log.message("  Found "+total+" lines.");
 
 		// now sort the lines into contiguous groups.
 		// from any given "active" line, search all remaining lines for a match
@@ -126,7 +126,7 @@ public class ArtPipeline {
 				activeSegment.lines.add(activeLine);
 				// do some metrics
 				sorted++;
-				//System.out.println("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
+				//Log.message("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
 			}
 			
 			found=false;
@@ -255,15 +255,15 @@ public class ArtPipeline {
 			}
 		}
 
-		System.out.println("  Found "+segments.size()+" segments,\n"
+		Log.message("  Found "+segments.size()+" segments,\n"
 				+ "  "+closed+" closed,\n"
 				+ "  "+sorted+" sorted,\n"
 				+ "  "+matched+" matched\n"
 				+ "  "+flipped+" flipped.");
 		
-		System.out.println("  History now "+t.history.size()+" instructions.");
+		Log.message("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
-		System.out.println("checkReorder() end");
+		Log.message("checkReorder() end");
 	}
 
 	public double distanceBetweenPointsSquared(Point2D a,Point2D b) {

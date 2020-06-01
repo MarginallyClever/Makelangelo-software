@@ -129,39 +129,39 @@ public final class Makelangelo
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
-		System.out.println("Locale="+Locale.getDefault().toString());
+		Log.message("Locale="+Locale.getDefault().toString());
 		
-		System.out.println("starting preferences...");
+		Log.message("starting preferences...");
 		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
-		System.out.println("starting robot...");
+		Log.message("starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 
-		System.out.println("starting transfer handler...");
+		Log.message("starting transfer handler...");
 		// drag & drop support
 		myTransferHandler = new MakelangeloTransferHandler(robot);
 		
-		System.out.println("starting connection manager...");
+		Log.message("starting connection manager...");
 		// network connections
 		connectionManager = new ConnectionManager();
 	}
 	
 	public void run() {
-		System.out.println("starting translator...");
+		Log.message("starting translator...");
 		Translator.start();
 		
-		System.out.println("starting GUI...");
+		Log.message("starting GUI...");
 		createAndShowGUI();
 
-		System.out.println("checking sharing permissions...");
+		Log.message("checking sharing permissions...");
 		checkSharingPermission();
 
-		System.out.println("checking for updates...");
+		Log.message("checking for updates...");
 		if (preferences.getBoolean("Check for updates", false))
 			checkForUpdate(true);
 	}
@@ -306,8 +306,8 @@ public final class Makelangelo
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				System.out.println("latest release: " + line2 + "; this version: " + VERSION);
-				// System.out.println(inputLine.compareTo(VERSION));
+				Log.message("latest release: " + line2 + "; this version: " + VERSION);
+				// Log.message(inputLine.compareTo(VERSION));
 
 				int comp = line2.compareTo(VERSION);
 				String results;

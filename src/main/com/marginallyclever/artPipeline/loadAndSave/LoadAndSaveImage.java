@@ -197,7 +197,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	
 	private void changeConverter(JComboBox<String> options,MakelangeloRobot robot) {
-		//System.out.println("Changing converter");
+		//Log.message("Changing converter");
 		stopSwingWorker();
 
 		chosenConverter = getConverter(options.getSelectedIndex());
@@ -207,7 +207,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		converterOptionsContainer.removeAll();
 		if(imageConverterPanel!=null) {
 			Log.message("Converter="+chosenConverter.getName());
-			//System.out.println("Adding panel");
+			//Log.message("Adding panel");
 			converterOptionsContainer.add(imageConverterPanel);
 			converterOptionsContainer.invalidate();
 		}
@@ -314,17 +314,17 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			chosenConverter.stopIterating();
 		}
 		if(swingWorker!=null) {
-			//System.out.println("Stopping swingWorker");
+			//Log.message("Stopping swingWorker");
 			if(swingWorker.cancel(true)) {
-				System.out.println("stopped OK");
+				Log.message("stopped OK");
 			} else {
-				System.out.println("stop FAILED");
+				Log.message("stop FAILED");
 			}
 		}
 	}
 
 	protected void createSwingWorker() {
-		//System.out.println("Starting swingWorker");
+		//Log.message("Starting swingWorker");
 
 		machine = chosenRobot.getSettings();
 		
@@ -362,7 +362,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 			@Override
 			public void done() {
-				//System.out.println("swingWorker ended");
+				//Log.message("swingWorker ended");
 				swingWorker=null;
 				MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
 				if(panel!=null) panel.updateButtonAccess();

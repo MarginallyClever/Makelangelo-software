@@ -70,7 +70,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 				}
 
 				//pixel.mul(1.0/sum);
-				//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
+				//if(b==255) Log.message(x+"\t"+y+"\t"+i+"\t"+b);
 				dest.setRGB(x, y, pixel.toInt());
 			}
 		}
@@ -100,7 +100,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 				}
 
 				pixel.mul(1.0 / sum);
-				//if(b==255) System.out.println(x+"\t"+y+"\t"+i+"\t"+b);
+				//if(b==255) Log.message(x+"\t"+y+"\t"+i+"\t"+b);
 				afterBI.setRGB(x, y, pixel.toInt());
 			}
 		}

@@ -10,6 +10,7 @@ import com.marginallyclever.convenience.LineInterpolatorSinCurve;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 public class Converter_Moire extends ImageConverter {
@@ -80,7 +81,7 @@ public class Converter_Moire extends ImageConverter {
 		// adjust to the maximum number used in *this* line.
 		int passesThisLine = (int)(maxPasses * maxPixel);
 
-		//System.out.println(passesThisLine+"/"+maxPasses);
+		//Log.message(passesThisLine+"/"+maxPasses);
 		
 		if(passesThisLine==0) return;  // empty line!
 
@@ -188,7 +189,7 @@ public class Converter_Moire extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		System.out.println("Moire start");
+		Log.message("Moire start");
 		if (direction == 0) {
 			// horizontal
 			yBottom -= h;
@@ -208,7 +209,7 @@ public class Converter_Moire extends ImageConverter {
 				convertLine(img,spaceBetweenLines,halfStep,a,b);
 			}
 		}
-		System.out.println("Moire end");
+		Log.message("Moire end");
 	}
 }
 

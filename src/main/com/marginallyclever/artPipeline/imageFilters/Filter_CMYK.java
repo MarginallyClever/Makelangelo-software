@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import org.junit.Test;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 /**
@@ -131,23 +132,23 @@ public class Filter_CMYK extends ImageFilter {
     }
 
     double histogram_area = 0;
-    //System.out.println("histogram:");
+    //Log.message("histogram:");
     for (i = 1; i < 255; ++i) {
-      System.out.println(i + "=" + histogram[i]);
+      Log.message(i + "=" + histogram[i]);
       histogram_area += histogram[i];
     }
     double histogram_zone = histogram_area / (double) levels;
-    //System.out.println("histogram area: "+histogram_area);
-    //System.out.println("histogram zone: "+histogram_zone);
+    //Log.message("histogram area: "+histogram_area);
+    //Log.message("histogram zone: "+histogram_zone);
 
     double histogram_sum = 0;
     x = 0;
     y = 0;
     for (i = 1; i < 255; ++i) {
       histogram_sum += histogram[i];
-      //System.out.println("mapping "+i+" to "+x);
+      //Log.message("mapping "+i+" to "+x);
       if (histogram_sum > histogram_zone) {
-        //System.out.println("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
+        //Log.message("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
         histogram_sum -= histogram_zone;
         x += (int) (256.0 / (double) levels);
         ++y;
@@ -155,7 +156,7 @@ public class Filter_CMYK extends ImageFilter {
       histogram[i] = x;
     }
 
-    //System.out.println("y="+y+" x="+x);
+    //Log.message("y="+y+" x="+x);
     int pixel, b;
 
     for (y = 0; y < h; ++y) {

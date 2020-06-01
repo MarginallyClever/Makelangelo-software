@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * generates a fibonacci spiral
@@ -57,8 +58,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	public boolean generate() {
 		xMax = (float)(machine.getMarginWidth () /2.0f);
 		yMax = (float)(machine.getMarginHeight() /2.0f);
-		System.out.println("xMax="+xMax);
-		System.out.println("yMax="+yMax);
+		Log.message("xMax="+xMax);
+		Log.message("yMax="+yMax);
 		
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);
@@ -66,11 +67,11 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		// scale the fractal to fit on the page
 		// short side
 		float s1 = fibonacciSequence.peek();
-		System.out.println("s1="+s1);
+		Log.message("s1="+s1);
 		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
 		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
-		System.out.println("s2="+s2);
+		Log.message("s2="+s2);
 		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
 		if(scale1>scale2) scale1=scale2;
@@ -79,14 +80,14 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
-		System.out.println("shortSide="+shortSide);
+		Log.message("shortSide="+shortSide);
 		if( xMax < yMax ) {
-			System.out.println("tall thin");
+			Log.message("tall thin");
 			// tall thin paper, top left corner
 			turtle.moveTo(shortSide,yMax);
 			turtle.turn(180);
 		} else {
-			System.out.println("short wide");
+			Log.message("short wide");
 			// short wide paper, bottom left corner
 			turtle.moveTo(-xMax,shortSide);
 			turtle.turn(-90);

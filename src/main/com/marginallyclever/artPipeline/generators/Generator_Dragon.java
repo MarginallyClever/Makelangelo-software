@@ -51,8 +51,7 @@ public class Generator_Dragon extends ImageGenerator {
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtle.forward(1);
-        }
-        System.out.println();  
+        }  
 	    
 	    return true;
 	}

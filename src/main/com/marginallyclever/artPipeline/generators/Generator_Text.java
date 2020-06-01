@@ -161,7 +161,7 @@ public class Generator_Text extends ImageGenerator {
 		}
 		
 		String[] messagePieces=message.split("\n");
-		System.out.println("lines of text="+messagePieces.length);
+		Log.message("lines of text="+messagePieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
@@ -221,20 +221,20 @@ public class Generator_Text extends ImageGenerator {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				//System.out.println("CLOSE");
+				//Log.message("CLOSE");
 				turtle.moveTo(start[0]-dx, -start[1]-dy);
 				turtle.penUp();
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
-				//System.out.println("LINE");
+				//Log.message("LINE");
 				turtle.moveTo(coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_MOVETO:
-				//System.out.println("MOVE");
+				//Log.message("MOVE");
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
@@ -252,7 +252,7 @@ public class Generator_Text extends ImageGenerator {
 				// B(3,1) = 3 * t * (1 - t)^2
 				// B(3,2) = 3 * t^2 * (1 - t)
 				// B(3,3) = t^3
-				//System.out.println("CUBIC");
+				//Log.message("CUBIC");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					float t1 = (1.0f-t);
@@ -269,7 +269,7 @@ public class Generator_Text extends ImageGenerator {
 				coords2[1] = coords[5];
 				break;
 			case PathIterator.SEG_QUADTO:
-				//System.out.println("QUAD");
+				//Log.message("QUAD");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
@@ -321,13 +321,13 @@ public class Generator_Text extends ImageGenerator {
 
 	public void textSetCharsPerLine(int numChars) {
 		charsPerLine = numChars;
-		//System.out.println("MAX="+numChars);
+		//Log.message("MAX="+numChars);
 	}
 
 
 	public void textFindCharsPerLine(double width) {
 		charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letterWidth + kerning));
-		//System.out.println("MAX="+chars_per_line);
+		//Log.message("MAX="+chars_per_line);
 	}
 
 
@@ -375,10 +375,10 @@ public class Generator_Text extends ImageGenerator {
 			break;
 		}
 		/*
-	    System.out.println(num_lines + " lines");
-	    System.out.println("longest "+len+" chars");
-	    System.out.println("x "+xmin+" to "+xmax);
-	    System.out.println("y "+ymin+" to "+ymax);
+	    Log.message(num_lines + " lines");
+	    Log.message("longest "+len+" chars");
+	    Log.message("x "+xmin+" to "+xmax);
+	    Log.message("y "+ymin+" to "+ymax);
 		 */
 		Rectangle2D r = new Rectangle2D.Float();
 		r.setRect(xmin, ymin, xmax - xmin, ymax - ymin);
@@ -569,9 +569,9 @@ public class Generator_Text extends ImageGenerator {
 				}
 			} else {
 				// file not found
-				System.out.println("file not found. Making best guess as to where it is.");
-				System.out.print(fn);
-				System.out.println(" NOK");
+				Log.message("file not found. Making best guess as to where it is.");
+				Log.message(fn);
+				Log.message(" NOK");
 			}
 		}
 	}

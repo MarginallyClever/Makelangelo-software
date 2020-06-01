@@ -164,7 +164,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGPointShapeElement pathElement = ((SVGPointShapeElement)pathNodes.item( iPathNode ));
 	    	SVGPointList pointList = pathElement.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
-			//System.out.println("New Node has "+pathObjects+" elements.");
+			//Log.message("New Node has "+pathObjects+" elements.");
 			
 	    	boolean first=true;
 			for( int i=0; i<numPoints; ++i ) {
@@ -223,7 +223,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
-	    		System.out.println("Node is a polyline.");
+	    		Log.message("Node is a polyline.");
 	    		parsePolylineElements(pathNodes);
 	    		continue;
 	    	}
@@ -231,20 +231,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGOMPathElement pathElement = ((SVGOMPathElement)pathNodes.item( iPathNode ));
 	    	SVGPathSegList pathList = pathElement.getNormalizedPathSegList();
 	    	int pathObjects = pathList.getNumberOfItems();
-			//System.out.println("Node has "+pathObjects+" elements.");
+			//Log.message("Node has "+pathObjects+" elements.");
 
 			for (int i = 0; i < pathObjects; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
 					{
-						//System.out.println("Close path");
+						//Log.message("Close path");
 						turtle.moveTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
 					{
-						//System.out.println("Move Abs");
+						//Log.message("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() );
 						firstY = y = TY( path.getY() );
@@ -258,7 +258,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
 					{
-						//System.out.println("Move Rel");
+						//Log.message("Move Rel");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() ) + turtle.getX();
 						firstY = y = TY( path.getY() ) + turtle.getY();
@@ -272,7 +272,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
 					{
-						//System.out.println("Line Abs");
+						//Log.message("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
@@ -283,7 +283,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
 					{
-						//System.out.println("Line REL");
+						//Log.message("Line REL");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() ) + turtle.getX();
 						y = TY( path.getY() ) + turtle.getY();
@@ -294,7 +294,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
 					{
-						//System.out.println("Curve Cubic Abs");
+						//Log.message("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
 						turtle.penDown();
@@ -383,8 +383,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					}
 					break; 
 				default:
-					System.out.print("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = ");
-					System.out.println(((SVGItem)item).getValueAsString());
+					Log.message("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
+						+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
 					loadOK=false;
 				}
 			}

@@ -94,7 +94,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		
 		try {
 			// open zip file
-        	System.out.println("Searching for project.json...");
+        	Log.message("Searching for project.json...");
         	
 			ZipInputStream zipInputStream = new ZipInputStream(in);
 			
@@ -104,7 +104,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			boolean found=false;
 			while((entry = zipInputStream.getNextEntry())!=null) {
 		        if( entry.getName().equals(PROJECT_JSON) ) {
-		        	System.out.println("Found project.json...");
+		        	Log.message("Found project.json...");
 		        	
 			        // read buffered stream into temp file.
 		        	tempZipFile = File.createTempFile("project", "json");
@@ -128,7 +128,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			}
 			
 			// parse JSON
-            System.out.println("Parsing JSON file...");
+            Log.message("Parsing JSON file...");
             
         	JSONParser parser = new JSONParser();
 			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
@@ -141,7 +141,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			// read the sketch(es)
 			JSONArray children = (JSONArray)tree.get("children");
 			if(children==null) throw new Exception("JSON node 'children' missing.");
-			//System.out.println("found children");
+			//Log.message("found children");
 			
 			// look for the first child with a script
 
@@ -156,7 +156,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			
 			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
-			System.out.println("found  " +scripts.size() + " scripts");
+			Log.message("found  " +scripts.size() + " scripts");
 			
 			// extract known elements and convert them to gcode.
 			ListIterator<?> scriptIter = scripts.listIterator();
@@ -164,15 +164,15 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			while( scriptIter.hasNext() ) {
     			JSONArray scripts0 = (JSONArray)scriptIter.next();
     			if( scripts0==null ) continue;
-    			//System.out.println("scripts0");
+    			//Log.message("scripts0");
     			JSONArray scripts02 = (JSONArray)scripts0.get(2);
     			if( scripts02==null || scripts02.size()==0 ) continue;
-    			//System.out.println("scripts02");
+    			//Log.message("scripts02");
     			// actual code begins here.
     			parseScratchCode(scripts02);
 			}
 			
-			System.out.println("finished scripts");
+			Log.message("finished scripts");
 			robot.setTurtle(turtle);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -193,7 +193,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		if (variables != null) {
 			ListIterator<?> varIter = variables.listIterator();
 			while( varIter.hasNext() ) {
-				//System.out.println("var:"+elem.toString());
+				//Log.message("var:"+elem.toString());
 				JSONObject elem = (JSONObject)varIter.next();
 				String varName = (String)elem.get("name");
 				Object varValue = (Object)elem.get("value");
@@ -225,7 +225,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		if(listOfLists == null) return;
 		ListIterator<?> listIter = listOfLists.listIterator();
 		while( listIter.hasNext() ) {
-			//System.out.println("var:"+elem.toString());
+			//Log.message("var:"+elem.toString());
 			JSONObject elem = (JSONObject)listIter.next();
 			String listName = (String)elem.get("name");
 			Object contents = (Object)elem.get("contents");
@@ -279,8 +279,8 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	private void parseScratchCode(JSONArray script) throws Exception {
 		if(script==null) return;
 		
-		//for(int j=0;j<indent;++j) System.out.print("  ");
-		//System.out.println("size="+script.size());
+		//for(int j=0;j<indent;++j) Log.message("  ");
+		//Log.message("size="+script.size());
 		//indent++;
 		
 		ListIterator<?> scriptIter = script.listIterator();
@@ -292,8 +292,8 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 				parseScratchCode(arr);
 			} else {
 				String name = o.toString();
-				//for(int j=0;j<indent;++j) System.out.print("  ");
-				//System.out.println(i+"="+name);
+				//for(int j=0;j<indent;++j) Log.message("  ");
+				//Log.message(i+"="+name);
 				
 				if(name.equals("whenGreenFlag")) {
 					// gcode preamble
@@ -302,24 +302,24 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	    		    turtle.setX(machine.getHomeX());
 	    		    turtle.setY(machine.getHomeX());
 	    			// make sure machine state is the default.
-					System.out.println("**START**");
+					Log.message("**START**");
 					continue;
 				} else if(name.equals("doRepeat")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					int count = (int)resolveValue(o2);
-					//System.out.println("Repeat "+count+" times:");
+					//Log.message("Repeat "+count+" times:");
 					for(int i=0;i<count;++i) {
 						parseScratchCode((JSONArray)o3);
 					}
 				} else if(name.equals("doUntil")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					//System.out.println("Do Until {");
+					//Log.message("Do Until {");
 					while(!resolveBoolean((JSONArray)o2)) {
 						parseScratchCode((JSONArray)o3);
 					}
-					//System.out.println("}");
+					//Log.message("}");
 				} else if(name.equals("doIf")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
@@ -367,15 +367,15 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					// dwell - does nothing.
 					Object o2 = (Object)scriptIter.next();
 					double seconds = resolveValue(o2);
-					System.out.println("dwell "+seconds+" seconds.");
+					Log.message("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
 					turtle.penUp();
-					System.out.println("pen up");
+					Log.message("pen up");
 					continue;
 				} else if(name.equals("putPenDown")) {
 					turtle.penDown();
-					System.out.println("pen down");
+					Log.message("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
 					double x = resolveValue(o2);
@@ -383,47 +383,47 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					double y = resolveValue(o3);
 					
 					turtle.moveTo(x,y);
-					System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.moveTo(turtle.getX()+v,turtle.getY());
-					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.moveTo(turtle.getX(),turtle.getY()+v);
-					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.forward(v);
-					System.out.println("Move forward "+v+" mm");
+					Log.message("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					turtle.turn(-degrees);
-					System.out.println("Right "+degrees+" degrees.");
+					Log.message("Right "+degrees+" degrees.");
 				} else if(name.equals("turnLeft:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					turtle.turn(degrees);
-					System.out.println("Left "+degrees+" degrees.");
+					Log.message("Left "+degrees+" degrees.");
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.moveTo(v,turtle.getY());
-					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					turtle.moveTo(turtle.getX(),v);
-					//System.out.println("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					turtle.setAngle(degrees);
-					//System.out.println("Turn to "+degrees);
+					//Log.message("Turn to "+degrees);
 				} else if(name.equals("setVar:to:")) {
 					// set variable
 					String varName = (String)scriptIter.next();
@@ -436,7 +436,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value = v;
-							System.out.println("Set "+varName+" to "+v);
+							Log.message("Set "+varName+" to "+v);
 							foundVar=true;
 						}
 					}
@@ -455,7 +455,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value += v;
-							System.out.println("Change "+varName+" by "+v+" to "+sv.value);
+							Log.message("Change "+varName+" by "+v+" to "+sv.value);
 							foundVar=true;
 						}
 					}

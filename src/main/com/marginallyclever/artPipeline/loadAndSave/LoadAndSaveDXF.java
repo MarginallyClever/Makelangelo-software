@@ -77,16 +77,16 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
 			int color = layer.getColor();
-			System.out.println("Found layer " + layer.getName() + "(RGB="+color+")");
+			Log.message("Found layer " + layer.getName() + "(RGB="+color+")");
 			Iterator<String> entityIter = (Iterator<String>) layer.getDXFEntityTypeIterator();
 			while (entityIter.hasNext()) {
 				String entityType = (String) entityIter.next();
 				List<DXFEntity> entityList = (List<DXFEntity>) layer.getDXFEntities(entityType);
-				System.out.println("Found " + entityList.size() + " of type " + entityType);
+				Log.message("Found " + entityList.size() + " of type " + entityType);
 				entityTotal += entityList.size();
 			}
 		}
-		System.out.println(entityTotal + " total entities.");
+		Log.message(entityTotal + " total entities.");
 	}
 
 	
@@ -192,7 +192,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer) layerIter.next();
 			int color = layer.getColor();
-			System.out.println("Found layer " + layer.getName() + "(color index="+color+")");
+			Log.message("Found layer " + layer.getName() + "(color index="+color+")");
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<String> entityTypeIter = (Iterator<String>)layer.getDXFEntityTypeIterator();
@@ -315,7 +315,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			int after = group.entities.size();
 			totalRemoved += before - after;
 		}
-		if(totalRemoved!=0) System.out.println(totalRemoved+" duplicates removed.");
+		if(totalRemoved!=0) Log.message(totalRemoved+" duplicates removed.");
 	}
 	
 	protected double TX(double x) {

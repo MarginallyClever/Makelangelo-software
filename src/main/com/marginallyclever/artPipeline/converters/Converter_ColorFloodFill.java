@@ -145,10 +145,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			float dx = a.x - lastX;
 			float dy = a.y - lastY;
 			if ((dx * dx + dy * dy) > diameter * diameter * 2.0f) {
-				//System.out.print("Jump at "+x+", "+y+"\n");
+				//Log.message("Jump at "+x+", "+y+"\n");
 				turtle.jumpTo(a.getX(),a.getY());
 			} else {
-				//System.out.print("Move to "+x+", "+y+"\n");
+				//Log.message("Move to "+x+", "+y+"\n");
 				turtle.moveTo(a.x, a.y);
 			}
 			// update the last position.
@@ -196,7 +196,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 				}
 			}
 		}
-		System.out.println("Found " + z + " blobs.");
+		Log.message("Found " + z + " blobs.");
 	}
 
 	private void scanColor(int i) {

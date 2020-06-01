@@ -128,7 +128,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		// long now_time = System.currentTimeMillis();
 		// float dt = (now_time - last_time)*0.001f;
 		// last_time = now_time;
-		// System.out.println(dt);
+		// Log.message(dt);
 
 		// draw the world
 		GL2 gl2 = glautodrawable.getGL().getGL2();

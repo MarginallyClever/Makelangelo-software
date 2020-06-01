@@ -189,7 +189,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	public boolean iterate() {
 		//float totalMagnitude = 
 				evolveCells();
-		//System.out.println(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
+		//Log.message(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
 		return keepIterating;
 	}
 	
@@ -473,7 +473,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			}
 		}
 		if( fails>0 ) {
-			System.out.println(iterations+" failed "+fails+" times");
+			Log.message(iterations+" failed "+fails+" times");
 		}
 
 		Rectangle2D test = new Rectangle2D.Double();

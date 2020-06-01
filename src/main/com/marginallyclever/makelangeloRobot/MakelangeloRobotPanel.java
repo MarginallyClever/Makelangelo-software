@@ -152,7 +152,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			quality = 75;
 			sharpness = 0;
 		} catch (FailedToRunRaspistillException e) {
-			System.out.println("Cannot run raspistill");
+			Log.message("Cannot run raspistill");
 		}
 
 		panel.add(createAxisDrivingControls(),con1);	con1.gridy++;
@@ -838,7 +838,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					piCamera.setSharpness(sharpnessSlider.getValue());
 					piCamera.setTimeout(3000);
 					buffImg = piCamera.takeBufferedStill();
-					System.out.println("Executed this command:\n\t" + piCamera.getPrevCommand());
+					Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
 					ImageIcon icon = new ImageIcon(buffImg);
 					imageLabel.setIcon(icon);
 					buttonUseCapture.setEnabled(true);
@@ -901,13 +901,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		// Take a still image and save it as "/home/pi/Pictures/cameraCapture.jpg"
 
-		System.out.println("We are about to display dialog\n");
+		Log.message("We are about to display dialog\n");
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-//			System.out.println("We are about to take a still image\n");
+//			Log.message("We are about to take a still image\n");
 //			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
-//			System.out.println("New JPG capture saved to:\n\t" + image.getAbsolutePath());
+//			Log.message("New JPG capture saved to:\n\t" + image.getAbsolutePath());
 //			piCamera.turnOffPreview();
 		// setup for reopen
 

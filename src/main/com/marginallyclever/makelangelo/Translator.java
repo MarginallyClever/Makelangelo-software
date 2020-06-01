@@ -75,7 +75,7 @@ public final class Translator {
 		// find the english name of the default language.
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		//System.out.println("Default language = "+defaultLanguage);
+		//Log.message("Default language = "+defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
@@ -166,13 +166,13 @@ public final class Translator {
 			while( it.hasNext() ) {
 				Path p = it.next();
 				String name = p.toString();
-				//System.out.println("testing "+name);
+				//Log.message("testing "+name);
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					// found an XML file in the /languages folder.  Good sign!
 					++found;
 					name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-					//System.out.println("found: "+name);
+					//Log.message("found: "+name);
 		
 					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
 					//if( stream != null ) 
@@ -183,7 +183,7 @@ public final class Translator {
 					}
 				}
 			}
-			//System.out.println("total found: "+found);
+			//Log.message("total found: "+found);
 	
 			if(found==0) {
 				throw new IllegalStateException("No translations found.");
@@ -192,9 +192,9 @@ public final class Translator {
 			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
-			System.out.println("default path requested: "+path);
+			Log.message("default path requested: "+path);
 			URL pathFound = Translator.class.getClassLoader().getResource(path);
-			System.out.println("path found: "+pathFound);
+			Log.message("path found: "+pathFound);
 			try (InputStream s = pathFound.openStream()) {
 				languageContainer.loadFromInputStream(s);
 			} catch (IOException ie) {
@@ -213,7 +213,7 @@ public final class Translator {
 		try {
 			value = languages.get(currentLanguage).get(key);
 		} catch (Exception e) {
-			System.out.println("Translated string missing: "+key);
+			Log.message("Translated string missing: "+key);
 			e.printStackTrace();
 		}
 		return value;

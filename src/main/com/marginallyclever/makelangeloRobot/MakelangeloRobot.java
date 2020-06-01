@@ -918,7 +918,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		float [] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		float lineWidth = lineWidthBuf[0];
-		//System.out.println("line width="+lineWidth);
+		//Log.message("line width="+lineWidth);
 		
 		paintLimits(gl2);
 

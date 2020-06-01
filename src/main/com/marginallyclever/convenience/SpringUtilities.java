@@ -34,6 +34,9 @@ package com.marginallyclever.convenience;
  
 import javax.swing.*;
 import javax.swing.SpringLayout;
+
+import com.marginallyclever.makelangelo.log.Log;
+
 import java.awt.*;
  
 /**
@@ -48,9 +51,9 @@ public class SpringUtilities {
      * minimum, preferred, and maximum sizes.
      */
     public static void printSizes(Component c) {
-        System.out.println("minimumSize = " + c.getMinimumSize());
-        System.out.println("preferredSize = " + c.getPreferredSize());
-        System.out.println("maximumSize = " + c.getMaximumSize());
+        Log.message("minimumSize = " + c.getMinimumSize());
+        Log.message("preferredSize = " + c.getPreferredSize());
+        Log.message("maximumSize = " + c.getMaximumSize());
     }
  
     /**

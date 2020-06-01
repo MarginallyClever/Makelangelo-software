@@ -77,7 +77,7 @@ public class TranslatorLanguage {
 				String value = getTextValue(el, "value");
 
 				// store key/value pairs into a map
-				//System.out.println(language_file +"\t"+key+"\t=\t"+value);
+				//Log.message(language_file +"\t"+key+"\t=\t"+value);
 				strings.put(key, value);
 			}
 		}

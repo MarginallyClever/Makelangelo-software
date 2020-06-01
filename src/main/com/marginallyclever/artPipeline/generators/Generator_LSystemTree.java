@@ -33,7 +33,6 @@ public class Generator_LSystemTree extends ImageGenerator {
 		// do the curve
 		lSystemTree(order, 10);
 
-		System.out.print("\n");
 		return true;
 	}
 

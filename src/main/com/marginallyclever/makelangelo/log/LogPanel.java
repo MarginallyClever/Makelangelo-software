@@ -125,8 +125,6 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		msg = msg.replace("\n", "<br>\n") + "\n";
 		msg = msg.replace("\n\n", "\n");
 		if(msg.length()==0) return;
-
-		//System.out.print(msg);
 		
 		try {
 			long docLen = doc.getLength();
