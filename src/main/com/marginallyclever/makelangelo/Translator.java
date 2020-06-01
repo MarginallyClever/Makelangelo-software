@@ -150,26 +150,31 @@ public final class Translator {
 			Path rootPath = FileSystems.getDefault().getPath(System.getProperty("user.dir"));
 			Log.message("rootDir="+rootPath.toString());
 			
+			// we'll look inside the JAR file first, then look in the working directory.
+			// this way new translation files in the working directory will replace the old
+			// JAR files.
 			int found=0;
 			Stream<Path> walk = Stream.concat(
-					Files.walk(rootPath,1),	// check in the working directory
-					Files.walk(myPath, 1));	// then check inside the JAR file.
+					Files.walk(myPath, 1),	// check inside the JAR file.
+					Files.walk(rootPath,1)	// then check the working directory
+					);
 			Iterator<Path> it = walk.iterator();
 			while( it.hasNext() ) {
 				Path p = it.next();
 				String name = p.toString();
-				Log.message("testing "+name);
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					// found an XML file in the /languages folder.  Good sign!
-					//name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-					Log.message("found: "+name);
-		
-					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
-					if( stream == null ) {
+					String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
+					String actualFilename = "Jar:"+nameInsideJar;
+					File externalFile = new File(name);
+					if(externalFile.exists()) {
 						stream = new FileInputStream(new File(name));
+						actualFilename = name;
 					}
 					if( stream != null ) {
+						Log.message("Found "+actualFilename);
 						TranslatorLanguage lang = new TranslatorLanguage();
 						try {
 							lang.loadFromInputStream(stream);
