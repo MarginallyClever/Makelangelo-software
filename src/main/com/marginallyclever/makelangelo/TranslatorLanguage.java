@@ -101,7 +101,7 @@ public class TranslatorLanguage {
 
 	public String get(String key) {
 		String x = strings.get(key);
-		if (x == null) x = key;
+		if (x == null) x = "Missing:"+key;
 		return x;
 	}
 

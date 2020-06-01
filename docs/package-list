@@ -8,6 +8,7 @@ com.marginallyclever.communications.serial
 com.marginallyclever.communications.tcp
 com.marginallyclever.convenience
 com.marginallyclever.makelangelo
+com.marginallyclever.makelangelo.log
 com.marginallyclever.makelangelo.preferences
 com.marginallyclever.makelangelo.select
 com.marginallyclever.makelangeloRobot
