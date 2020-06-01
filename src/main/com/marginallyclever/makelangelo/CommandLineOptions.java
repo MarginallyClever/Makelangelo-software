@@ -16,7 +16,6 @@ public class CommandLineOptions {
 		for(int i=0;i<argv.length;++i) {
 			String msg = "START OPTION "+argv[i];
 			Log.message(msg);
-			Log.message(msg);
 		}
 	}
 	

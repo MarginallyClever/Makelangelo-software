@@ -45,20 +45,19 @@ public class TranslatorLanguage {
 	}
 
 	/**
-	 * @param defaultLanguageFileFallback
+	 * @param inputStream
 	 */
-	public void loadFromInputStream(InputStream defaultLanguageFileFallback) {
+	public void loadFromInputStream(InputStream inputStream) {
 		final DocumentBuilder db = getDocumentBuilder();
 		if (db == null) {
 			return;
 		}
-		Document dom = null;
 		try {
-			dom = db.parse(defaultLanguageFileFallback);
+			Document dom = db.parse(inputStream);
+			load(dom);
 		} catch (SAXException | IOException e) {
 			Log.error( e.getMessage() );
 		}
-		load(dom);
 	}
 
 	private void load(Document dom) {

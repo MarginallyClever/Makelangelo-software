@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -133,62 +135,74 @@ public final class Translator {
 	 * @throws IllegalStateException No language files found
 	 */
 	static public void loadLanguages() {
-		try {
-			URI uri = null;
-			try {
-				uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+		try {			
+			URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
 			Log.message("Looking for translations in "+uri.toString());
 			
 			Path myPath;
 			if (uri.getScheme().equals("jar")) {
-				FileSystem fileSystem = null;
-				try {
-					fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
 				myPath = fileSystem.getPath(WORKING_DIRECTORY);
 			} else {
 				myPath = Paths.get(uri);
 			}
-			Stream<Path> walk = null;
-			try {
-				walk = Files.walk(myPath, 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	
+
+			Path rootPath = FileSystems.getDefault().getPath(System.getProperty("user.dir"));
+			Log.message("rootDir="+rootPath.toString());
+			
 			int found=0;
+			Stream<Path> walk = Stream.concat(
+					Files.walk(rootPath,1),	// check in the working directory
+					Files.walk(myPath, 1));	// then check inside the JAR file.
 			Iterator<Path> it = walk.iterator();
 			while( it.hasNext() ) {
 				Path p = it.next();
 				String name = p.toString();
-				//Log.message("testing "+name);
+				Log.message("testing "+name);
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					// found an XML file in the /languages folder.  Good sign!
-					++found;
-					name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-					//Log.message("found: "+name);
+					//name = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+					Log.message("found: "+name);
 		
 					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(name);
-					//if( stream != null ) 
-					{
+					if( stream == null ) {
+						stream = new FileInputStream(new File(name));
+					}
+					if( stream != null ) {
 						TranslatorLanguage lang = new TranslatorLanguage();
-						lang.loadFromInputStream(stream);
-						languages.put(lang.getName(), lang);
+						try {
+							lang.loadFromInputStream(stream);
+						} catch(Exception e) {
+							// if the xml file is invalid then an exception can occur.
+							// make sure lang is empty in case of a partial-load failure.
+							lang = new TranslatorLanguage();
+						}
+						
+						if( !lang.getName().isEmpty() && 
+							!lang.getAuthor().isEmpty()) {
+							// we loaded a language file that seems pretty legit.
+							languages.put(lang.getName(), lang);
+							++found;
+						}
 					}
 				}
 			}
+			walk.close();
+			
 			//Log.message("total found: "+found);
 	
 			if(found==0) {
 				throw new IllegalStateException("No translations found.");
 			}
-		} catch (IllegalStateException e) {
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e) {
 			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();

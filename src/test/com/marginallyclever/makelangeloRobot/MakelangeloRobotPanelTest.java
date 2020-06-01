@@ -18,7 +18,6 @@ public class MakelangeloRobotPanelTest {
 		Log.message("testNoMissingGeneratorPanels() begin.");
 		try {
 			Log.message("Translator.start()...");
-			System.out.flush();
 			Translator.start();
 			Log.message("loading service...");
 			System.out.flush();
@@ -29,11 +28,10 @@ public class MakelangeloRobotPanelTest {
 			while(ici.hasNext()) {
 				ImageGenerator c = ici.next();
 				Log.message("Creating panel for "+c.getName());
-				System.out.flush();
 				c.getPanel();
 			}
 		} catch(Exception e) {
-			fail("Missing panel!");
+			fail("Missing panel! "+e.getLocalizedMessage());
 		}
 		Log.message("testNoMissingGeneratorPanels() complete.");
 	}

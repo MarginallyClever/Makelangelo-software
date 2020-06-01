@@ -26,10 +26,10 @@ public class LoadAndSaveImageTest {
 				c.getPanel();
 			}
 		} catch(Exception e) {
-			fail("Missing panel!");
+			fail("Missing panel! "+e.getLocalizedMessage());
 		}
 
-		Log.message("testNoMissingPanels() complese.");
+		Log.message("testNoMissingPanels() complete.");
 	}
 
 }
