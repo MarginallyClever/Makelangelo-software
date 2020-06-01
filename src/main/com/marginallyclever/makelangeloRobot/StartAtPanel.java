@@ -13,8 +13,8 @@ import javax.swing.JPanel;
 
 import org.apache.batik.ext.swing.GridBagConstants;
 
-import com.marginallyclever.makelangelo.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class StartAtPanel extends JPanel {
 	/**

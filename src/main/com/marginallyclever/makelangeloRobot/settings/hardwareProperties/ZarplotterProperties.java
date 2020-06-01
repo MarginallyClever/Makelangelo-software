@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -15,6 +16,11 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
 	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
+	
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
 	
 	@Override
 	public String getVersion() {
@@ -61,8 +67,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	protected void paintPenHolderToCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		//double dx, dy;
-		double gx = robot.getGondolaX();
-		double gy = robot.getGondolaY();
+		double gx = robot.getPenX();
+		double gy = robot.getPenY();
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();

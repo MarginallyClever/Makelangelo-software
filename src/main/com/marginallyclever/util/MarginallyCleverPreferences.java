@@ -20,7 +20,7 @@ import java.util.prefs.Preferences;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Created on 6/7/15.
@@ -66,7 +66,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    */
   public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);
-    Log.info("Instantiating node "+ name);
+    Log.message("Instantiating node "+ name);
     root = new TreeMap<>();
     children = new TreeMap<>();
     try {
@@ -125,7 +125,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    * http://stackoverflow.com/a/24249709
    *
    * @param name
-   * @return
+   * @return preferences
    */
   @NotNull
   @Override
@@ -155,7 +155,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    * @throws ReflectiveOperationException
    */
   private boolean getIsRemoved(AbstractPreferences abstractPreference) throws ReflectiveOperationException {
-    Log.info( abstractPreference.toString() );
+    Log.message( abstractPreference.toString() );
     final Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
     declaredMethod.setAccessible(true);
     Object isRemoved = declaredMethod.invoke(abstractPreference, new Object[]{null});
@@ -295,7 +295,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
   }
 
   /**
-   * @return
+   * @return children
    */
   @Override
   public Map<String, Preferences> getChildren() {
@@ -303,7 +303,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
   }
 
   /**
-   * @return
+   * @return root
    */
   @Override
   public Map<String, String> getRoot() {

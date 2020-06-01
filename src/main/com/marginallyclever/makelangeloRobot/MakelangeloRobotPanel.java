@@ -18,9 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,17 +28,20 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
+import com.marginallyclever.artPipeline.ArtPipelinePanel;
+import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.generators.Generator_Text;
+import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.convenience.SpringUtilities;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
-import com.marginallyclever.makelangeloRobot.generators.ImageGeneratorPanel;
-import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.makelangeloRobot.loadAndSave.LoadAndSaveGCode;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.RPiCamera;
@@ -81,16 +81,21 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
-	private JButton openConfig;
+	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
+	
 	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonCapture, buttonGenerate, buttonSaveFile;
-	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancel;
+	
+	// picam controls
+	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
 	private BufferedImage buffImg;
 	private boolean useImage;
 	private RPiCamera piCamera;
 	private int awb, drc, exp, contrast, quality, sharpness;
     private static final int buttonHeight = 25;
-	protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+
+    // live controls
+    protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
 	private JButton down100,down10,down1,up1,up10,up100;
@@ -99,6 +104,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton goPaperBorder,penUp,penDown;
 	private JButton toggleEngagedMotor;
 
+	// pipeline controls
+	private ArtPipelinePanel myArtPipelinePanel;
+	
 	private boolean isConnected;  // has pressed connect button
 	
 	public StatusBar statusBar;
@@ -133,7 +141,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		//create a picamera
+		// Create a piCamera
 		try {
 			piCamera = new RPiCamera("/home/pi/Pictures");
 			// set the initial parameter settings.
@@ -144,12 +152,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			quality = 75;
 			sharpness = 0;
 		} catch (FailedToRunRaspistillException e) {
-			System.out.println("Cannot run raspistill");
+			Log.message("Cannot run raspistill");
 		}
 
 		panel.add(createAxisDrivingControls(),con1);	con1.gridy++;
 		panel.add(createCommonDriveControls(),con1);	con1.gridy++;
 		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
+		panel.add(createArtPipelinePanel(),con1);			con1.gridy++;
 		panel.add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
@@ -272,6 +281,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 
+	private CollapsiblePanel createArtPipelinePanel() {
+		myArtPipelinePanel = new ArtPipelinePanel(gui.getMainFrame());
+		myArtPipelinePanel.setPipeline(robot.getPipeline());
+		
+		return myArtPipelinePanel;
+	}
+	
 	private JPanel createCreativeControlPanel() {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
 		JPanel panel = creativeControlPanel.getContentPane();
@@ -379,35 +395,30 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JPanel createCommonDriveControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuCommonDriveControls"));
 		JPanel mainPanel = drivePanel.getContentPane();
-		mainPanel.setLayout(new GridBagLayout());
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor=GridBagConstraints.WEST;
-		c.fill=GridBagConstraints.BOTH;
+		mainPanel.setLayout(new SpringLayout());
 
 		goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
-		goPaperBorder.setPreferredSize(new Dimension(80,20));
-		
 		penUp    = new JButton(Translator.get("PenUp"));
 		penDown  = new JButton(Translator.get("PenDown"));
 		goHome   = new JButton(Translator.get("GoHome"));
 		findHome = new JButton(Translator.get("FindHome"));
 		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
 
-		penUp   .setPreferredSize(new Dimension(100,20));
-		penDown .setPreferredSize(new Dimension(100,20));
-		goHome  .setPreferredSize(new Dimension(100,20));
-		findHome.setPreferredSize(new Dimension(100,20));
-		toggleEngagedMotor.setPreferredSize(new Dimension(100,20));
+		goPaperBorder.setMinimumSize(new Dimension(100,20));
+		penUp   .setMinimumSize(new Dimension(100,20));
+		penDown .setMinimumSize(new Dimension(100,20));
+		goHome  .setMinimumSize(new Dimension(100,20));
+		findHome.setMinimumSize(new Dimension(100,20));
+		toggleEngagedMotor.setMinimumSize(new Dimension(100,20));
 		
-		c.gridx=0;  c.gridy=0;  mainPanel.add(goPaperBorder,c);
-		c.gridx=0;  c.gridy=1;  mainPanel.add(toggleEngagedMotor,c);
+		mainPanel.add(goPaperBorder);
+		mainPanel.add(toggleEngagedMotor);
+		mainPanel.add(penUp);
+		mainPanel.add(penDown);
+		mainPanel.add(goHome);
+		mainPanel.add(findHome);
 		
-		c.gridx=4;  c.gridy=0;  mainPanel.add(penUp,c);
-		c.gridx=4;  c.gridy=1;  mainPanel.add(penDown,c);
-
-		c.gridx=3;  c.gridy=0;  mainPanel.add(goHome,c);
-		c.gridx=3;  c.gridy=1;  mainPanel.add(findHome,c);
+		SpringUtilities.makeCompactGrid(mainPanel, 3, 2, 0, 0, 0, 0);
 		
 		goPaperBorder.addActionListener(this);
 		toggleEngagedMotor.addActionListener(this);
@@ -460,10 +471,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			updateMachineChoice();
 		}
 
-		openConfig = new JButton(Translator.get("configureMachine"));
-		openConfig.addActionListener(this);
-		openConfig.setPreferredSize(openConfig.getPreferredSize());
-		machineNumberPanel.add(openConfig,cMachine);
+		buttonOpenSettings = new JButton(Translator.get("configureMachine"));
+		buttonOpenSettings.addActionListener(this);
+		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
+		machineNumberPanel.add(buttonOpenSettings,cMachine);
 		cMachine.gridx++;
 	}
 	
@@ -478,10 +489,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 				openConnection();
 			}
 		}
-		else if (subject == openConfig) {
+		else if (subject == buttonOpenSettings) {
 			Frame frame = (Frame)this.getRootPane().getParent();
 			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
 			m.run();
+			// we can only get here if the robot is connected and not running.
+			// Save the gcode so that updates to settings are applied immediately + automatically.
+			robot.saveCurrentTurtleToDrawing();
 		}
 		else if (subject == buttonNewFile) newFile();
 		else if (subject == buttonCapture) captureFile();
@@ -517,7 +531,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.movePenToEdgeBottom();
 			robot.movePenToEdgeLeft();
 			robot.movePenToEdgeTop();
-			robot.movePenAbsolute(0, robot.getGondolaY());
+			robot.movePenAbsolute(0, robot.getPenY());
 			robot.raisePen();
 			robot.goHome();
 		}
@@ -573,13 +587,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		int lineNumber = p.lineNumber;
 		if (lineNumber != -1) {
 			if(p.findPreviousPenDown==false) {
-				robot.gCode.setLinesProcessed(lineNumber);
+				robot.drawingProgress=lineNumber;
 				if(p.addPenDownCommand==true) {
 					robot.sendLineToRobot(robot.getSettings().getPenDownString());
 				}
 				robot.startAt(lineNumber);
 			} else {
-				int lineBefore = robot.gCode.findLastPenUpBefore(lineNumber,robot.getSettings().getPenUpString());
+				int lineBefore = robot.findLastPenUpBefore(lineNumber);
 				robot.startAt(lineBefore);
 			}
 		}
@@ -608,7 +622,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		if (buttonGenerate != null)
 			buttonGenerate.setEnabled(!isRunning);
 
-		openConfig.setEnabled(!isRunning);
+		buttonOpenSettings.setEnabled(!isRunning);
 
 		buttonStart.setEnabled(isConfirmed && didSetHome && !isRunning);
 		buttonStartAt.setEnabled(isConfirmed && didSetHome && !isRunning);
@@ -650,14 +664,14 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
-		buttonSaveFile.setEnabled(robot!=null && robot.gCode != null && robot.gCode.isLoaded());
+		buttonSaveFile.setEnabled(robot!=null && robot.getTurtle().history.size()>0);
 		
 		this.validate();
 	}
 	
 
 	public void newFile() {
-		robot.setGCode(null);
+		robot.setTurtle(new Turtle());
 		updateButtonAccess();
 	}
 
@@ -666,6 +680,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		openFileOnDemand(lastFileIn);
 	}
 
+	/**
+	 * Raspi camera capture to file for image processing
+	 */
 	private void captureFile() {
         // let's make the image the correct width and height for the paper
 		useImage = false;
@@ -821,7 +838,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 					piCamera.setSharpness(sharpnessSlider.getValue());
 					piCamera.setTimeout(3000);
 					buffImg = piCamera.takeBufferedStill();
-					System.out.println("Executed this command:\n\t" + piCamera.getPrevCommand());
+					Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
 					ImageIcon icon = new ImageIcon(buffImg);
 					imageLabel.setIcon(icon);
 					buttonUseCapture.setEnabled(true);
@@ -862,16 +879,16 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(buttonUseCapture, cMain);
 		cMain.gridy++;
 
-		buttonCancel = new JButton(Translator.get("CancelCapture"));
-		buttonCancel.addActionListener(new ActionListener() {
+		buttonCancelCapture = new JButton(Translator.get("CancelCapture"));
+		buttonCancelCapture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();
 				useImage = false;
 			};
 		});
-		buttonCancel.setPreferredSize(new Dimension(89, buttonHeight));
-		buttonCancel.setEnabled(true);
-		panel.add(buttonCancel, cMain);
+		buttonCancelCapture.setPreferredSize(new Dimension(89, buttonHeight));
+		buttonCancelCapture.setEnabled(true);
+		panel.add(buttonCancelCapture, cMain);
 
 //		piCamera.setAWB(AWB.AUTO);	    // Change Automatic White Balance setting to automatic
 //		piCamera.setDRC(DRC.OFF); 			// Turn off Dynamic Range Compression
@@ -884,21 +901,19 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		// Take a still image and save it as "/home/pi/Pictures/cameraCapture.jpg"
 
-		System.out.println("We are about to display dialog\n");
+		Log.message("We are about to display dialog\n");
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-//			System.out.println("We are about to take a still image\n");
+//			Log.message("We are about to take a still image\n");
 //			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
-//			System.out.println("New JPG capture saved to:\n\t" + image.getAbsolutePath());
+//			Log.message("New JPG capture saved to:\n\t" + image.getAbsolutePath());
 //			piCamera.turnOffPreview();
 		// setup for reopen
 
 		if (useImage) {
-			lastFileIn = "/home/pi/Pictures/capture.jpg";
-
 			// process the image
-			openFileOnDemand(lastFileIn);
+			openFileOnDemand("/home/pi/Pictures/capture.jpg");
 		}
 	}
 
@@ -907,9 +922,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		File lastDir = (lastFileIn==null?null : new File(lastFileIn));
 		JFileChooser fc = new JFileChooser(lastDir);
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
-		while(i.hasNext()) {
-			LoadAndSaveFileType lft = i.next();
+		for( LoadAndSaveFileType lft : imageLoaders ) {
 			if(lft.canLoad()) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
@@ -927,13 +940,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 
 			// figure out which of the loaders was requested.
-			i = imageLoaders.iterator();
-			while(i.hasNext()) {
-				LoadAndSaveFileType loader = i.next();
+			for( LoadAndSaveFileType loader : imageLoaders ) {
 				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
-					lastFileIn = selectedFile;
 					lastFilterIn = selectedFilter;
 					updateButtonAccess();
 					break;
@@ -947,19 +957,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		Iterator<ImageGenerator> ici = imageGenerators.iterator();
 		int i=0;
-		while(ici.hasNext()) {
-			ici.next();
+		for( @SuppressWarnings("unused") ImageGenerator ici : imageGenerators ) {
 			i++;
 		}
 		
 		String[] imageGeneratorNames = new String[i];
 		
 		i=0;
-		ici = imageGenerators.iterator();
-		while (ici.hasNext()) {
-			ImageManipulator f = ici.next();
+		for( ImageManipulator f : imageGenerators ) {
 			imageGeneratorNames[i++] = f.getName();
 		}
 
@@ -985,7 +991,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-		// other app buttons are inaccessible until this dialog closes.
+		// other app buttons are still accessible.
 	}
 
 	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
@@ -994,7 +1000,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		chosenGeneratorPanel.makelangeloRobotPanel = this;
 		previewPane.removeAll();
 		if(chosenGeneratorPanel!=null) {
-			Log.info("Generator="+chosenGenerator.getName());
+			Log.message("Generator="+chosenGenerator.getName());
 			previewPane.add(chosenGeneratorPanel);
 			previewPane.invalidate();
 			try {
@@ -1009,48 +1015,29 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		robot.setDecorator(chosenGenerator);
 		chosenGenerator.setRobot(robot);
 		
-		// where to save temp output file?
-		File tempFile;
-		try {
-			tempFile = File.createTempFile("gcode", ".ngc");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		tempFile.deleteOnExit();
+		// do the work
+		chosenGenerator.generate();
+				
+		Turtle t=chosenGenerator.turtle;
 
-		try {
-			OutputStream fileOutputStream = new FileOutputStream(tempFile);
-			Writer out = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-			chosenGenerator.generate(out);
-			out.flush();
-			out.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-			return;
+		if (robot.getSettings().shouldSignName()) {
+			// Sign name
+			Generator_Text ymh = new Generator_Text();
+			ymh.setRobot(robot);
+			ymh.signName();
+			t.history.addAll(ymh.turtle.history);
 		}
-		
 		robot.setDecorator(null);
-
-		LoadAndSaveGCode loader = new LoadAndSaveGCode();
-		try (final InputStream fileInputStream = new FileInputStream(tempFile)) {
-			loader.load(fileInputStream,robot);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-
-		Log.info(Translator.get("Finished"));
+		robot.setTurtle(t);
+		Log.message(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
 	}
 
 	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		Iterator<ImageGenerator> ici = imageGenerators.iterator();
-		ici = imageGenerators.iterator();
 		int i=0;
-		while(ici.hasNext()) {
-			ImageGenerator chosenGenerator = ici.next();
+		for( ImageGenerator chosenGenerator : imageGenerators ) {
 			if(i==arg0) {
 				return chosenGenerator;
 			}
@@ -1065,9 +1052,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
 		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageSavers.iterator();
-		while(i.hasNext()) {
-			LoadAndSaveFileType lft = i.next();
+		for( LoadAndSaveFileType lft : imageSavers ) {
 			if(lft.canSave()) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
@@ -1085,9 +1070,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			i = imageSavers.iterator();
-			while(i.hasNext()) {
-				LoadAndSaveFileType lft = i.next();
+			for( LoadAndSaveFileType lft : imageSavers ) {
 				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
 				//if(!filter.accept(new File(selectedFile))) {
 				if( !isMatchingFileFilter(selectedFilter,filter) ) {
@@ -1156,7 +1139,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// TODO don't rely on success to be true, load may not have finished yet.
 
 		if (success == true) {
-			Log.info(Translator.get("Finished"));
+			lastFileIn=filename;
+			Log.message(Translator.get("Finished"));
 			SoundSystem.playConversionFinishedSound();
 			updateButtonAccess();
 			statusBar.clear();
@@ -1171,7 +1155,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * @return true if file was loaded successfully.  false if it failed.
 	 */
 	public boolean openFileOnDemand(String filename) {
-		Log.info(Translator.get("OpeningFile") + filename + "...");
+		Log.message(Translator.get("OpeningFile") + filename + "...");
 		boolean success=false;
 		boolean attempted=false;
 
@@ -1206,5 +1190,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		// nothing can load this type
 		return false;
+	}
+
+
+	public Makelangelo getGui() {
+		return gui;
 	}
 }

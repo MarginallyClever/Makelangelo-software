@@ -4,23 +4,21 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.text.DecimalFormat;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {
 	static final long serialVersionUID = 1;
 
 	long t_start;
-	protected DecimalFormat fmt = new DecimalFormat("#0.00");
 	protected String sSoFar = "so far: ";
 	protected String sRemaining = " remaining: ";
 	protected String sElapsed = "";
@@ -106,7 +104,7 @@ public class StatusBar extends JPanel {
 		long remaining = total_time - t_draw_now;
 
 		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
-		mExactly.setText(sofar + "/" + total + " "+fmt.format(100*(double)sofar/(double)total)+"%");
+		mExactly.setText(sofar + "/" + total + " "+StringHelper.formatDouble(100*(double)sofar/(double)total)+"%");
 		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
 	}
 }

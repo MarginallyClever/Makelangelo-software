@@ -160,6 +160,8 @@ implements ActionListener {
   
   
   private void rebuildTabbedPanes() {
+	  // returns tab index or -1 if none selected
+	  int previouslySelectedTab = panes.getSelectedIndex();
 	  panes.removeAll();
 	  
 	  panelAdjustMachine = new PanelAdjustMachine(robot);
@@ -170,6 +172,11 @@ implements ActionListener {
 
 	  panelAdjustPen = new PanelAdjustPen(robot);
 	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen);
+
+	  // if one tab was selected, make sure to reselect it	  
+	  if(previouslySelectedTab!=-1) {
+		  panes.setSelectedIndex(previouslySelectedTab);
+	  }
   }
   
   public void actionPerformed(ActionEvent e) {

@@ -7,33 +7,32 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
+import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.generators.ImageGenerator;
+import com.marginallyclever.makelangelo.log.Log;
 
 public class MakelangeloRobotPanelTest {
 
 	@Test
 	public void testNoMissingGeneratorPanels() {
-		System.out.println("testNoMissingGeneratorPanels() begin.");
+		Log.message("testNoMissingGeneratorPanels() begin.");
 		try {
-			System.out.println("Translator.start()...");
-			System.out.flush();
+			Log.message("Translator.start()...");
 			Translator.start();
-			System.out.println("loading service...");
+			Log.message("loading service...");
 			System.out.flush();
 			ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-			System.out.println("iterating...");
+			Log.message("iterating...");
 			System.out.flush();
 			Iterator<ImageGenerator> ici = imageGenerators.iterator();
 			while(ici.hasNext()) {
 				ImageGenerator c = ici.next();
-				System.out.println("Creating panel for "+c.getName());
-				System.out.flush();
+				Log.message("Creating panel for "+c.getName());
 				c.getPanel();
 			}
 		} catch(Exception e) {
-			fail("Missing panel!");
+			fail("Missing panel! "+e.getLocalizedMessage());
 		}
-		System.out.println("testNoMissingGeneratorPanels() complete.");
+		Log.message("testNoMissingGeneratorPanels() complete.");
 	}
 }

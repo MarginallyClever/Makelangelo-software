@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.marginallyclever.makelangelo.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * Created on 5/10/15.
@@ -38,7 +38,7 @@ public final class PropertiesFileHelper {
 
       //get the property value and print it out
       makelangeloVersionPropertyValue = prop.getProperty("makelangelo.version");
-      Log.info("makelangelo.version="+ makelangeloVersionPropertyValue);
+      Log.message("makelangelo.version="+ makelangeloVersionPropertyValue);
 
     } catch (IllegalStateException | IOException ex) {
       Log.error( ex.getMessage() );

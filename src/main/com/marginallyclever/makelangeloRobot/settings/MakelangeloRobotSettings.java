@@ -1,11 +1,9 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,7 +12,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
@@ -25,28 +26,18 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * TODO move tool names into translations & add a color palette system for quantizing colors.
  */
-public final class MakelangeloRobotSettings {
-	public static final double INCH_TO_CM = 2.54;
+public final class MakelangeloRobotSettings implements Serializable {
 	/**
-	 * measured from "m4 calibration.pdf"
-	 * @since 7.5.0
+	 * 
 	 */
-	public static final float CALIBRATION_MM_FROM_TOP = 217f;
-	
-	static public final float FEEDRATE_MAX = 100;
-	static public final float FEEDRATE_DEFAULT = 60;
-	static public final float ACCELERATION_MAX = 300;
-	
-	static public final float Z_RATE = 500;
-	static public final float Z_ANGLE_ON = 160;
-	static public final float Z_ANGLE_OFF = 90;
-	
-	static public int FIRMWARE_MAX_SEGMENTS = 32;
-	
-	private DecimalFormat df;
+	private static final long serialVersionUID = -4185946661019573192L;
+
+	public static final String COMMAND_MOVE = "G0";
+	public static final String COMMAND_TRAVEL = "G1";
+	public static final double INCH_TO_CM = 2.54;
+	public static final int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
-	
 
 	private ArrayList<MakelangeloRobotSettingsListener> listeners;
 
@@ -67,42 +58,32 @@ public final class MakelangeloRobotSettings {
 	// % from edge of paper.
 	private double paperMargin;
 
-	private boolean reverseForGlass;
 	// for a while the robot would sign it's name at the end of a drawing
+	@Deprecated
 	private boolean shouldSignName;
 	
 	private String hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
-	private Color paperColor;
 	
-	private int lookAheadSegments;
+	private ColorRGB paperColor;
+	
+	private int lookAheadSegments;  // >0 and power of two.
 
-	/**
-	 * pen diameter, in mm
-	 */
-	protected float diameter;
-	/**
-	 * pen up servo angle
-	 */
-	protected float zOff;
-	/**
-	 * pen down servo angle
-	 */
-	protected float zOn;
-	/**
-	 * pen servo movement speed
-	 */
-	protected float zRate;
+	protected ColorRGB penDownColorDefault;
+	protected ColorRGB penDownColor;
+	protected ColorRGB penUpColor;
 	
-	protected Color penDownColorDefault;
-	protected Color penDownColor;
-	protected Color penUpColor;
 	// speed control
-	private float maxFeedRate;
-	private float currentFeedRate;
-	private float maxAcceleration;
-	
+	private float feedRateMax;
+	private float feedRateDefault;
+	private float accelerationMax;
+
+	private float diameter;  // pen diameter (mm, >0)
+	private float zOff;	// pen up servo angle (deg,0...180)
+	private float zOn;	// pen down servo angle (deg,0...180)
+	private float zRate;	// pen servo movement speed (deg/s)
+
 	/**
 	 * top left, bottom center, etc...
 	 *
@@ -127,17 +108,8 @@ public final class MakelangeloRobotSettings {
 	
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
-	 *
-	 * @param translator
-	 * @param robot
 	 */
-	public MakelangeloRobotSettings() {
-		// set up number format
-		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
-		otherSymbols.setDecimalSeparator('.');
-		df = new DecimalFormat("#.###",otherSymbols);
-		df.setGroupingUsed(false);
-				
+	public MakelangeloRobotSettings() {				
 		double mh = 835; // mm
 		double mw = 835; // mm
 		
@@ -148,7 +120,7 @@ public final class MakelangeloRobotSettings {
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
-		paperColor = Color.WHITE;
+		paperColor = new ColorRGB(255,255,255);
 		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 		shouldSignName = false;
@@ -163,25 +135,15 @@ public final class MakelangeloRobotSettings {
 		paperRight = pw/2;
 		paperMargin = 0.9;
 
-		maxFeedRate = FEEDRATE_MAX;
-		currentFeedRate = FEEDRATE_DEFAULT;
-		maxAcceleration = ACCELERATION_MAX;
-
-		// pen
-		diameter = 0.8f;
-		zRate = Z_RATE;
-		zOn = Z_ANGLE_ON;
-		zOff = Z_ANGLE_OFF;
-		penDownColor = penDownColorDefault = Color.BLACK;
-		penUpColor = Color.BLUE;
-		reverseForGlass = false;
+		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
+		penUpColor = new ColorRGB(0,255,0); // blue
 		startingPositionIndex = 4;
 
 		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
 		
 		// default hardware version is 2
 		setHardwareVersion("2");
-		
+
 		// which configurations are available?
 		try {
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
@@ -213,7 +175,7 @@ public final class MakelangeloRobotSettings {
 	
 	
 	public double getAcceleration() {
-		return maxAcceleration;
+		return accelerationMax;
 	}
 
 	/**
@@ -225,27 +187,21 @@ public final class MakelangeloRobotSettings {
 		return configsAvailable;
 	}
 
+	public Point2D getHome() {
+		return getHardwareProperties().getHome();
+	}
 	/**
 	 * @return home X coordinate in mm
 	 */ 
 	public double getHomeX() {
-		return 0;
+		return getHome().x;
 	}
 	
 	/**
 	 * @return home Y coordinate in mm
 	 */
 	public double getHomeY() {
-		if(this.hardwareVersion.equals("6")) {
-			// Zarplotter
-			// 2017-08-13 DR this solution is janky as fuck, hardware version shouldn't be mentioned at this level
-			return 0;
-		} else {
-			float limitTop = (float)getLimitTop();
-			float homeY = limitTop - MakelangeloRobotSettings.CALIBRATION_MM_FROM_TOP;
-			homeY = (float)Math.floor(homeY*1000.0f)/1000.0f;
-			return homeY;
-		}
+		return getHome().y;
 	}
 	
 	public String getGCodeSetPositionAtHome() {
@@ -254,8 +210,8 @@ public final class MakelangeloRobotSettings {
 
 	public String getGCodeConfig() {
 		String result;
-		String xAxis = "M101 A0 T"+df.format(limitRight)+" B"+df.format(limitLeft);
-		String yAxis = "M101 A1 T"+df.format(limitTop)+" B"+df.format(limitBottom);
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
 		String zAxis = "M101 A2 T170 B10";
 		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
@@ -373,20 +329,32 @@ public final class MakelangeloRobotSettings {
 		return configsAvailable.length;
 	}
 
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getPaperBottom() {
-		return paperBottom;
-	}
-
-
 	/**
 	 * @return paper height in mm.
 	 */
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getMarginHeight() {
+		return getMarginTop() - getMarginBottom();
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getMarginWidth() {
+		return getMarginRight() - getMarginLeft();
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getPaperWidth() {
+		return paperRight - paperLeft;
 	}
 
 	/**
@@ -396,22 +364,12 @@ public final class MakelangeloRobotSettings {
 		return paperLeft;
 	}
 
-
-	/**
-	 * @return paper margin %.
-	 */
-	public double getPaperMargin() {
-		return paperMargin;
-	}
-
-
 	/**
 	 * @return paper right edge in mm.
 	 */
 	public double getPaperRight() {
 		return paperRight;
 	}
-
 
 	/**
 	 * @return paper top edge in mm.
@@ -420,12 +378,46 @@ public final class MakelangeloRobotSettings {
 		return paperTop;
 	}
 
+	/**
+	 * @return paper bottom edge in mm.
+	 */
+	public double getPaperBottom() {
+		return paperBottom;
+	}
 
 	/**
-	 * @return paper width in mm.
+	 * @return paper left edge in mm.
 	 */
-	public double getPaperWidth() {
-		return paperRight - paperLeft;
+	public double getMarginLeft() {
+		return getPaperLeft() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper right edge in mm.
+	 */
+	public double getMarginRight() {
+		return getPaperRight() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper top edge in mm.
+	 */
+	public double getMarginTop() {
+		return getPaperTop() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper bottom edge in mm.
+	 */
+	public double getMarginBottom() {
+		return getPaperBottom() * getPaperMargin();
+	}
+
+	/**
+	 * @return paper margin %.
+	 */
+	public double getPaperMargin() {
+		return paperMargin;
 	}
 	
 	public long getUID() {
@@ -438,10 +430,6 @@ public final class MakelangeloRobotSettings {
 
 	public boolean isRegistered() {
 		return isRegistered;
-	}
-
-	public boolean isReverseForGlass() {
-		return reverseForGlass;
 	}
 
 	/**
@@ -468,7 +456,7 @@ public final class MakelangeloRobotSettings {
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 
-		maxAcceleration=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(maxAcceleration)));
+		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
@@ -476,10 +464,9 @@ public final class MakelangeloRobotSettings {
 		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
 		g = uniqueMachinePreferencesNode.getInt("paperColorG", paperColor.getGreen());
 		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
-		paperColor = new Color(r,g,b);
+		paperColor = new ColorRGB(r,g,b);
 
 		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
-		reverseForGlass = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("reverseForGlass", Boolean.toString(reverseForGlass)));
 		//setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
 
@@ -490,34 +477,34 @@ public final class MakelangeloRobotSettings {
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(diameter))));
-		zRate = Float.parseFloat(prefs.get("z_rate", Float.toString(zRate)));
-		zOn = Float.parseFloat(prefs.get("z_on", Float.toString(zOn)));
-		zOff = Float.parseFloat(prefs.get("z_off", Float.toString(zOff)));
+		setDiameter(Float.parseFloat(prefs.get("diameter", Float.toString(getPenDiameter()))));
+		setzRate(Float.parseFloat(prefs.get("z_rate", Float.toString(getzRate()))));
+		setzOn(Float.parseFloat(prefs.get("z_on", Float.toString(getzOn()))));
+		setzOff(Float.parseFloat(prefs.get("z_off", Float.toString(getzOff()))));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		maxFeedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(maxFeedRate)));
-		currentFeedRate=Float.valueOf(prefs.get("feed_rate_current",Float.toString(currentFeedRate)));
+		feedRateMax = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateMax)));
+		feedRateDefault=Float.valueOf(prefs.get("feed_rate_current",Float.toString(feedRateDefault)));
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
-		penDownColor = penDownColorDefault = new Color(r,g,b);
+		penDownColor = penDownColorDefault = new ColorRGB(r,g,b);
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
-		penUpColor = new Color(r,g,b);
+		penUpColor = new ColorRGB(r,g,b);
 	}
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		prefs.put("diameter", Float.toString(getPenDiameter()));
-		prefs.put("z_rate", Float.toString(zRate));
-		prefs.put("z_on", Float.toString(zOn));
-		prefs.put("z_off", Float.toString(zOff));
+		prefs.put("z_rate", Float.toString(getzRate()));
+		prefs.put("z_on", Float.toString(getzOn()));
+		prefs.put("z_off", Float.toString(getzOff()));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Float.toString(maxFeedRate));
-		prefs.put("feed_rate_current", Float.toString(currentFeedRate));
+		prefs.put("feed_rate", Float.toString(feedRateMax));
+		prefs.put("feed_rate_current", Float.toString(feedRateDefault));
 		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
 		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
 		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
@@ -550,7 +537,7 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
+		uniqueMachinePreferencesNode.put("acceleration", Double.toString(accelerationMax));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
@@ -563,7 +550,6 @@ public final class MakelangeloRobotSettings {
 		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
 
 		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
-		uniqueMachinePreferencesNode.put("reverseForGlass", Boolean.toString(reverseForGlass));
 		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 		
@@ -573,30 +559,30 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	public void setAcceleration(float f) {
-		maxAcceleration = f;
+		accelerationMax = f;
 	}
 	
 	public void setMaxFeedRate(float f) {
-		maxFeedRate = f;
-		if(currentFeedRate > maxFeedRate) {
-			currentFeedRate = maxFeedRate;
+		feedRateMax = f;
+		if(feedRateDefault > feedRateMax) {
+			feedRateDefault = feedRateMax;
 		}
 	}
 	
 	public float getPenUpFeedRate() {
-		return maxFeedRate;
+		return feedRateMax;
 	}
 	
 	public void setCurrentFeedRate(float f) {
 		if (f < 0.001) f = 0.001f;
-		if( f > maxFeedRate) {
-			f = maxFeedRate;
+		if( f > feedRateMax) {
+			f = feedRateMax;
 		}
-		currentFeedRate = f;
+		feedRateDefault = f;
 	}
 	
 	public float getPenDownFeedRate() {
-		return currentFeedRate;
+		return feedRateDefault;
 	}
 	
 	
@@ -639,10 +625,7 @@ public final class MakelangeloRobotSettings {
 		this.isRegistered = isRegistered;
 	}
 	
-	public void setReverseForGlass(boolean reverseForGlass) {
-		this.reverseForGlass = reverseForGlass;
-	}
-	
+
 	public boolean shouldSignName() {
 		return shouldSignName;
 	}
@@ -685,77 +668,79 @@ public final class MakelangeloRobotSettings {
 		if(!hardwareProperties.canChangeMachineSize()) {
 			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
 		}
+
+		// apply default hardware values
+		feedRateMax = hardwareProperties.getFeedrateMax();
+		feedRateDefault = hardwareProperties.getFeedrateDefault();
+		accelerationMax = hardwareProperties.getAccelerationMax();
+		
+		setzRate(hardwareProperties.getZRate());
+		setzOn(hardwareProperties.getZAngleOn());
+		setzOff(hardwareProperties.getZAngleOff());
+
+		// pen
+		setDiameter(0.8f);
 	}
 	
-	public Color getPaperColor() {
+	public ColorRGB getPaperColor() {
 		return paperColor;
 	}
 	
-	public void setPaperColor(Color arg0) {
+	public void setPaperColor(ColorRGB arg0) {
 		paperColor = arg0;
 	}
 	
-	public Color getPenDownColorDefault() {
+	public ColorRGB getPenDownColorDefault() {
 		return penDownColorDefault;
 	}
 	
-	public Color getPenDownColor() {
+	public ColorRGB getPenDownColor() {
 		return penDownColor;
 	}
 	
-	public void setPenDownColorDefault(Color arg0) {
+	public void setPenDownColorDefault(ColorRGB arg0) {
 		penDownColorDefault=arg0;
 	}
 	
-	public void setPenDownColor(Color arg0) {
+	public void setPenDownColor(ColorRGB arg0) {
 		penDownColor=arg0;
 	}
 	
-	public void setPenUpColor(Color arg0) {
+	public void setPenUpColor(ColorRGB arg0) {
 		penUpColor=arg0;
 	}
 	
-	public Color getPenUpColor() {
+	public ColorRGB getPenUpColor() {
 		return penUpColor;
 	}
 
 	public float getZRate() {
-		return zRate;
+		return getzRate();
 	}
 	
 	public void setZRate(float arg0) {
-		zRate = arg0;
+		setzRate(arg0);
 	}
 	
-	/**
-	 * @return pen diameter, in mm
-	 */
-	public float getPenDiameter() {
-		return diameter;
-	}
 
 	public float getPenDownAngle() {
-		return zOn;
+		return getzOn();
 	}
 
 	public float getPenUpAngle() {
-		return zOff;
+		return getzOff();
 	}
 
 	public void setPenDownAngle(float arg0) {
-		zOn=arg0;
+		setzOn(arg0);
 	}
 
 	public void setPenUpAngle(float arg0) {
-		zOff=arg0;
+		setzOff(arg0);
 	}
 
 	public BasicStroke getStroke() {
-		return new BasicStroke(diameter * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-	}
-
-	public void setDiameter(float d) {
-		diameter = d;
+		return new BasicStroke(getPenDiameter() * 10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	}
 
 	public void writeProgramStart(Writer out) throws IOException {	
@@ -767,23 +752,23 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	public String getPenDownString() {
-		return "G01 F" + df.format(zRate) + " Z" + df.format(getPenDownAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return "G00 F" + df.format(zRate) + " Z" + df.format(getPenUpAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getPenUpFeedrateString() {
-		return "G00 F" + df.format(getPenUpFeedRate()) + "\n";
+		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate());
 	}
 	
 	public String getPenDownFeedrateString() {
-		return "G00 F" + df.format(getPenDownFeedRate()) + "\n";
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate());
 	}
 
-	public void writeChangeTo(Writer out,Color newPenDownColor) throws IOException {
-		if(penDownColor == newPenDownColor) return;
+	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
+		//if(penDownColor == newPenDownColor) return;
 		
 		penDownColor = newPenDownColor;
 		writeChangeToInternal(out);
@@ -795,9 +780,7 @@ public final class MakelangeloRobotSettings {
 	}
 	
 	protected void writeChangeToInternal(Writer out) throws IOException {
-		int toolNumber = penDownColor.getRGB() & 0xffffff;  // ignore alpha channel
-		out.write("M06 T" + toolNumber + "\n");
-		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
+		int toolNumber = penDownColor.toInt() & 0xffffff;  // ignore alpha channel
 
 		String name="";
 		switch(toolNumber) {
@@ -809,33 +792,38 @@ public final class MakelangeloRobotSettings {
 		case 0xff00ff: name="magenta";	break;
 		case 0xffff00: name="yellow";	break;
 		case 0xffffff: name="white";	break;
-		default: name= "0x"+Integer.toHexString(penDownColor.getRGB());  break;  // display unknown RGB value as hex
-		}		
+		default: name= "0x"+Integer.toHexString(toolNumber);  break;  // display unknown RGB value as hex
+		}
 		
-		writeChangeToShared(out,name);
-	}
-
-	public void writeChangeTo(Writer out,String name) throws IOException {
-		writeChangeToShared(out,name);
-		out.write("G00 F" + df.format(getPenDownFeedRate()) + " A" + df.format(getAcceleration()) + "\n");
-	}
-	
-	protected void writeChangeToShared(Writer out,String name) throws IOException {
 		String changeString = String.format("%-20s", "Change to "+name);
 		String continueString = String.format("%-20s", "Click to continue");
+
+		out.write("M06 T" + toolNumber + "\n");
 		out.write("M117 "+changeString+continueString+"\n");
 		out.write("M300 S60 P250\n");  // beep
 		out.write("M226\n");  // pause for user input
 		out.write("M117\n");  // clear message
+		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + 
+					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
 	public static String padRight(String s, int n) {
 	     return String.format("%1$-" + n + "s", s);  
 	}
 
-	public void writeMoveTo(Writer out, double x, double y,boolean isUp) throws IOException {
-		String command=isUp?"G01":"G00";
-		out.write(command+" X" + df.format(x) + " Y" + df.format(y) + "\n");
+	// 7.22.6: feedrate changes here
+	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
+		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
+		if(zMoved) {
+			command = isUp 
+					? getPenUpFeedrateString() 
+					: getPenDownFeedrateString();
+			zMoved=false;
+		}
+		out.write(command
+				+" X" + StringHelper.formatDouble(x)
+				+" Y" + StringHelper.formatDouble(y)
+				+"\n");
 	}
 
 	// lift the pen
@@ -846,7 +834,8 @@ public final class MakelangeloRobotSettings {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 		
-		out.write("G00 F" + df.format(getPenUpFeedRate()) + "\n");
+		// moved the feedrate adjust to writeMoveTo() in 7.22.6
+		//out.write(COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
 	}
 	
 	// lower the pen
@@ -857,7 +846,8 @@ public final class MakelangeloRobotSettings {
 		// G04 S[milliseconds] P[seconds]
 		//out.write("G04 S1\n");
 
-		out.write("G01 F" + df.format(getPenDownFeedRate()) + "\n");
+		// moved the feedrate adjust to writeMoveTo() in 7.22.6
+		//out.write(COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
@@ -874,5 +864,38 @@ public final class MakelangeloRobotSettings {
 
 	public void setLookAheadSegments(int arg0) {
 		this.lookAheadSegments = arg0;
+	}
+
+
+	public void setDiameter(float d) {
+		diameter = d;
+	}
+	
+	public float getPenDiameter() {
+		return diameter;
+	}
+
+	protected float getzOff() {
+		return zOff;
+	}
+
+	protected void setzOff(float zOff) {
+		this.zOff = zOff;
+	}
+
+	protected float getzOn() {
+		return zOn;
+	}
+
+	protected void setzOn(float zOn) {
+		this.zOn = zOn;
+	}
+
+	protected float getzRate() {
+		return zRate;
+	}
+
+	protected void setzRate(float zRate) {
+		this.zRate = zRate;
 	}
 }

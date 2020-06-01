@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -14,7 +15,53 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
 	public final static float FRAME_SIZE= 50f; // cm
+	
+	/**
+	 * convert from belt length mm to cartesian position.
+	 * @param beltL length of belt (mm)
+	 * @param beltR length of belt (mm)
+	 * @return cartesian coordinate 
+	 */
+	public Point2D FK(double beltL, double beltR) {
+		  double limit_ymax = getHeight()/2;
+		  
+		  // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
+		  double a = beltL;
+		  double b = getWidth();
+		  double c = beltR;
 
+		  // slow, uses trig
+		  // we know law of cosines:   cc = aa + bb -2ab * cos( theta )
+		  // or cc - aa - bb = -2ab * cos( theta )
+		  // or ( aa + bb - cc ) / ( 2ab ) = cos( theta );
+		  // or theta = acos((aa+bb-cc)/(2ab));
+		  // so  x = cos(theta)*l1 + limit_xmin;
+		  // and y = sin(theta)*l1 + limit_ymax;
+		  // and we know that cos(acos(i)) = i
+		  // and we know that sin(acos(i)) = sqrt(1-i*i)
+		  // so y = sin(  acos((aa+bb-cc)/(2ab))  )*l1 + limit_ymax;
+		  double theta = ((a*a+b*b-c*c)/(2.0*a*b));
+		  
+		  double x = theta * a - getWidth()/2;  // theta*a + limit_xmin;
+		  /*
+		  Serial.print("ymax=");   Serial.println(limit_ymax);
+		  Serial.print("theta=");  Serial.println(theta);
+		  Serial.print("a=");      Serial.println(a);
+		  Serial.print("b=");      Serial.println(b);
+		  Serial.print("c=");      Serial.println(c);
+		  Serial.print("S0=");     Serial.println(motorStepArray[0]);
+		  Serial.print("S1=");     Serial.println(motorStepArray[1]);
+		  */
+		  double y = limit_ymax - Math.sqrt( 1.0 - theta * theta ) * a;
+		  
+		  return new Point2D(x,y);
+	}
+	
+	@Override
+	public Point2D getHome() {
+		return FK(1025,1025);  // default calibration length for M2 belts.
+	}
+	
 	@Override
 	public String getVersion() {
 		return "2";
@@ -163,8 +210,8 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	protected void paintPenHolderToCounterweights(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx, dy;
-		double gx = robot.getGondolaX();
-		double gy = robot.getGondolaY();
+		double gx = robot.getPenX();
+		double gy = robot.getPenY();
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -304,5 +351,58 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	@Override
 	public void writeProgramEnd(Writer out) throws IOException {
 		out.write("; Program End\n");
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateMax() {
+		return 100;
+	}
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateDefault() {
+		return 60;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s^2 [>0]
+	 */
+	@Override
+	public float getAccelerationMax() {
+		return 300;
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return deg/s [>0]
+	 */
+	@Override
+	public float getZRate() {
+		return 500;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
+	 */
+	@Override
+	public float getZAngleOn() {
+		return 160;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return 90 deg.  Middle position on servo. 
+	 */
+	@Override
+	public float getZAngleOff() {
+		return 90;
 	}
 }

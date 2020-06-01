@@ -11,14 +11,13 @@ import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import com.marginallyclever.makelangelo.SelectFloat;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustMachine extends JPanel implements ActionListener, PropertyChangeListener {
@@ -34,7 +33,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 	protected JLabel totalServoNeeded;
 	protected JLabel totalStepperNeeded;
 	protected SelectFloat acceleration;
-	protected JCheckBox flipForGlass;
 
 	protected JButton buttonAneg;
 	protected JButton buttonApos;
@@ -189,21 +187,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 			}
 		}
 		
-		// flip for glass
-		{
-			p = new JPanel(new GridBagLayout());
-			this.add(p);
-	
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.CENTER;
-			c.gridx = 0;
-			c.gridy++;
-			c.gridwidth = 2;
-			flipForGlass = new JCheckBox(Translator.get("FlipForGlass"));
-			flipForGlass.setSelected(robot.getSettings().isReverseForGlass());
-			p.add(flipForGlass, c);
-		}
-
 		// always have one extra empty at the end to push everything up.
 		c.weighty = 1;
 		p.add(new JLabel(), c);
@@ -249,7 +232,6 @@ public class PanelAdjustMachine extends JPanel implements ActionListener, Proper
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
-			robot.getSettings().setReverseForGlass(flipForGlass.isSelected());
 			robot.getSettings().setMachineSize(mwf, mhf);
 			robot.getSettings().setAcceleration(accel);
 		}

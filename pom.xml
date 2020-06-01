@@ -6,7 +6,7 @@
 
   <groupId>com.marginallyclever</groupId>
   <artifactId>Makelangelo</artifactId>
-  <version>7.21.0</version>
+  <version>7.23.0</version>
   <name>Makelangelo</name>
   <description>A mural drawing robot.
 
@@ -64,9 +64,6 @@ If you like this project, please support us by buying Marginally Clever products
     </developer>
   </developers>
 
-  <prerequisites>
-    <maven>${minimum.maven.version}</maven>
-  </prerequisites>
   <build>
     <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
 	<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
@@ -172,6 +169,14 @@ If you like this project, please support us by buying Marginally Clever products
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.18.1</version>
+        <configuration>
+	        <systemProperties>
+	        	<property>
+		        	<name>sun.java2d.noddraw</name>
+		        	<value>true</value>
+	        	</property>
+	        </systemProperties>
+        </configuration>
       </plugin>
       <!-- End of plugins defined originally only in Super POM  -->
       <plugin>
@@ -203,6 +208,20 @@ If you like this project, please support us by buying Marginally Clever products
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
+        <configuration>
+          <destDir>${project.basedir}/docs</destDir>
+        </configuration>
+        <executions>
+          <execution>
+            <id>javadoc:jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration> <!-- add this to disable checking -->
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -222,6 +241,7 @@ If you like this project, please support us by buying Marginally Clever products
         </configuration>
       </plugin>
     </plugins>
+    
     <pluginManagement>
       <plugins>
         <plugin>
@@ -242,13 +262,23 @@ If you like this project, please support us by buying Marginally Clever products
         </plugin>
       </plugins>
     </pluginManagement>
+    
   </build>
+  
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
+    
+	<!-- https://mvnrepository.com/artifact/org.scream3r/jssc -->
+	<dependency>
+	    <groupId>org.scream3r</groupId>
+	    <artifactId>jssc</artifactId>
+	    <version>2.8.0</version>
+	</dependency>
+
     <dependency>
 	    <groupId>org.everit.osgi.bundles</groupId>
     	<artifactId>org.everit.osgi.bundles.org.scream3r.jssc</artifactId>
@@ -287,12 +317,13 @@ If you like this project, please support us by buying Marginally Clever products
 	  <version>2.4.0</version>
 	</dependency>
 	
-    <dependency>
-      <groupId>org.kabeja</groupId>
-      <artifactId>kabeja</artifactId>
-      <version>0.4</version>
-    </dependency>
-    
+    <!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
+	<dependency>
+	    <groupId>net.sourceforge</groupId>
+	    <artifactId>kabeja</artifactId>
+	    <version>0.4</version>
+	</dependency>
+        
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -306,6 +337,11 @@ If you like this project, please support us by buying Marginally Clever products
       <version>1.7.12</version>
 	</dependency>
 
+    <dependency>
+      <groupId>javax.vecmath</groupId>
+      <artifactId>vecmath</artifactId>
+      <version>1.5.2</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/junit/junit -->
 	<dependency>
     <groupId>junit</groupId>
@@ -374,13 +410,20 @@ If you like this project, please support us by buying Marginally Clever products
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <minimum.maven.version>3</minimum.maven.version>
+    <minimum.maven.version>3.3.1</minimum.maven.version>
     <minimum.java.version>1.8</minimum.java.version>
-    <jogl.version>2.3.2</jogl.version>
+    <jogl.version>2.4.0</jogl.version>
     <maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
   </properties>
 
-  <repositories><repository><id>my-local-repo</id><url>file://${project.basedir}/java/local-maven-repo</url>
+  <repositories>
+  	<repository>
+  		<id>my-local-repo</id>
+  		<url>file://${project.basedir}/java/local-maven-repo</url>
+    </repository>
+    <repository>
+    	<id>openkm</id>
+    	<url>http://maven.openkm.com</url>
     </repository>
   </repositories>
 </project>

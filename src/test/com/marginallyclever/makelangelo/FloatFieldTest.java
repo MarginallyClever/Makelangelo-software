@@ -4,7 +4,8 @@ import java.util.Locale;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.SelectFloat;
+import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class FloatFieldTest {
 
@@ -14,8 +15,8 @@ public class FloatFieldTest {
 		field.setText("1000.00");
 		assert(field.isEditValid());
 		field.commitEdit();
-		System.out.println("US text="+field.getText());
-		System.out.println("US value="+field.getValue());
+		Log.message("US text="+field.getText());
+		Log.message("US value="+field.getValue());
 		float f = ((Number)field.getValue()).floatValue();
 		assert(f==1000.0);
 	}
@@ -26,8 +27,8 @@ public class FloatFieldTest {
 		field.setText("1000,00");
 		assert(field.isEditValid());
 		field.commitEdit();
-		System.out.println("FR text="+field.getText());
-		System.out.println("FR value="+field.getValue());
+		Log.message("FR text="+field.getText());
+		Log.message("FR value="+field.getValue());
 		float f = ((Number)field.getValue()).floatValue();
 		assert(f==1000.0);
 	}

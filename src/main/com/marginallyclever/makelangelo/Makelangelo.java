@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -39,6 +40,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.makelangelo.log.LogPanel;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -68,7 +71,7 @@ public final class Makelangelo
 	 */
 	public String VERSION;
 	
-	private final String FORUM_URL = "https://www.marginallyclever.com/forums/";
+	private final String FORUM_URL = "https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/";
 
 	// only used on first run.
 	private static int DEFAULT_WINDOW_WIDTH = 1200;
@@ -126,29 +129,39 @@ public final class Makelangelo
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
+		Log.message("Locale="+Locale.getDefault().toString());
+		
+		Log.message("starting preferences...");
 		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
+		Log.message("starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 
+		Log.message("starting transfer handler...");
 		// drag & drop support
 		myTransferHandler = new MakelangeloTransferHandler(robot);
 		
+		Log.message("starting connection manager...");
 		// network connections
 		connectionManager = new ConnectionManager();
 	}
 	
 	public void run() {
+		Log.message("starting translator...");
 		Translator.start();
 		
+		Log.message("starting GUI...");
 		createAndShowGUI();
 
+		Log.message("checking sharing permissions...");
 		checkSharingPermission();
 
+		Log.message("checking for updates...");
 		if (preferences.getBoolean("Check for updates", false))
 			checkForUpdate(true);
 	}
@@ -293,8 +306,8 @@ public final class Makelangelo
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				System.out.println("latest release: " + line2 + "; this version: " + VERSION);
-				// System.out.println(inputLine.compareTo(VERSION));
+				Log.message("latest release: " + line2 + "; this version: " + VERSION);
+				// Log.message(inputLine.compareTo(VERSION));
 
 				int comp = line2.compareTo(VERSION);
 				String results;
@@ -379,7 +392,7 @@ public final class Makelangelo
 	// event-dispatching thread.
 	public void createAndShowGUI() {
 		// Create and set up the window.
-		mainFrame = new JFrame(Translator.get("TitlePrefix"));
+		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
 		mainFrame.setJMenuBar(createMenuBar());
@@ -392,7 +405,7 @@ public final class Makelangelo
 		mainFrame.setTransferHandler(myTransferHandler);
 
 		// start animation system
-		animator = new FPSAnimator(30);
+		animator = new FPSAnimator(20);
 		animator.add(drawPanel);
 		animator.start();
 	}
@@ -444,7 +457,7 @@ public final class Makelangelo
 	public void dataAvailable(MakelangeloRobot r, String data) {
 		if (data.endsWith("\n"))
 			data = data.substring(0, data.length() - 1);
-		Log.info("#ffa500", data); // #ffa500 = orange
+		Log.message(data); // #ffa500 = orange
 	}
 
 	@Override
@@ -486,7 +499,7 @@ public final class Makelangelo
 			saveWindowRealEstate();
 			robot.getSettings().saveConfig();
 
-			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as cloas as I can get.
+			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
 
 			// Run this on another thread than the AWT event queue to

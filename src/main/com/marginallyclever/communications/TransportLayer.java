@@ -7,6 +7,12 @@ package com.marginallyclever.communications;
  * @since v7.1.0.0
  */
 public interface TransportLayer {
+	/**
+	 * 
+	 * @return english name of this transport layer
+	 */
+  public String getName();
+  
   /**
    * opens a connection
    * @param connectionName where to connect

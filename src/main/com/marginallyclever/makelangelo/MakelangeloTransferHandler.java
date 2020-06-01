@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.TransferHandler;
 
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
@@ -31,7 +32,7 @@ public class MakelangeloTransferHandler  extends TransferHandler {
     public boolean canImport(TransferHandler.TransferSupport info) {
         // we only import FileList
         if (!info.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            System.out.println("Does not support files of type(s): "+info.getDataFlavors());
+            Log.message("Does not support files of type(s): "+info.getDataFlavors());
             return false;
         }
         return true;

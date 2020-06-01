@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.Log;
+import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.UnitTestHelper;
@@ -74,24 +74,24 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 		marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
 		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-		System.out.println("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+		Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
 		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		System.out.println("node name: " + machinesPreferenceNode.name());
+		Log.message("node name: " + machinesPreferenceNode.name());
 		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
 		for (String childNodeName : childrenPreferenceNodeNames) {
-			System.out.println("child node name: "+ childNodeName);
+			Log.message("child node name: "+ childNodeName);
 			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
 			Assert.assertTrue(isMachineNameAnInteger);
 			//Machine configurations numbered -1 and below should not exist.
 			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
 			//Assert.assertFalse(isMachineNameLessThanZero);
 			if(isMachineNameLessThanZero) {
-				System.out.println("REMOVED");
+				Log.message("REMOVED");
 				machinesPreferenceNode.remove(childNodeName);
 			}
 		}
 		machinesPreferenceNode.flush();
 		Log.end();
-		System.out.println("end: "+ thisMethodsName);
+		Log.message("end: "+ thisMethodsName);
 	}
 }

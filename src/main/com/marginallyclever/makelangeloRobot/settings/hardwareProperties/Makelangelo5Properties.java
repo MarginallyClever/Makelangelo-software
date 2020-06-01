@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -16,6 +17,13 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
 
+	@Override
+	public Point2D getHome() {
+		double beltLeft = 1025;
+		double beltRight = 1025;
+		
+		return super.FK(beltLeft,beltRight);
+	}
 	
 	@Override
 	public String getVersion() {
@@ -227,8 +235,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	protected void paintPenHolderToCounterweights( GL2 gl2, MakelangeloRobot robot ) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx,dy;
-		double gx = robot.getGondolaX();// / 10;
-		double gy = robot.getGondolaY();// / 10;
+		double gx = robot.getPenX();// / 10;
+		double gy = robot.getPenY();// / 10;
 		
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -338,6 +346,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		Date date = new Date(System.currentTimeMillis());  
 		out.write("; Makelangelo 5\n");
 		out.write("; "+formatter.format(date)+"\n");
+		out.write("G28\n");  // force find home
 	}
 	
 	@Override
@@ -346,5 +355,49 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		out.write("G0 Z90\n");
 		// move out of way for display
 		out.write("G0 X-300 Y300\n");
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateMax() {
+		return 100;
+	}
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateDefault() {
+		return 100;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s^2 [>0]
+	 */
+	@Override
+	public float getAccelerationMax() {
+		return 150;
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return deg/s [>0]
+	 */
+	@Override
+	public float getZRate() {
+		return 80;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
+	 */
+	@Override
+	public float getZAngleOn() {
+		return 30;
 	}
 }

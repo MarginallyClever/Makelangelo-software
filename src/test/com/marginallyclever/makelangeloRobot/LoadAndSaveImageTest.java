@@ -7,28 +7,29 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
+import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.converters.ImageConverter;
+import com.marginallyclever.makelangelo.log.Log;
 
 public class LoadAndSaveImageTest {
 
 	@Test
 	public void testNoMissingPanels() {
-		System.out.println("testNoMissingPanels() begin.");
+		Log.message("testNoMissingPanels() begin.");
 		try {
 			Translator.start();
 			ServiceLoader<ImageConverter> converters = ServiceLoader.load(ImageConverter.class);
 			Iterator<ImageConverter> ici = converters.iterator();
 			while(ici.hasNext()) {
 				ImageConverter c = ici.next();
-				System.out.println("Creating panel for "+c.getName());
+				Log.message("Creating panel for "+c.getName());
 				c.getPanel();
 			}
 		} catch(Exception e) {
-			fail("Missing panel!");
+			fail("Missing panel! "+e.getLocalizedMessage());
 		}
 
-		System.out.println("testNoMissingPanels() complese.");
+		Log.message("testNoMissingPanels() complete.");
 	}
 
 }

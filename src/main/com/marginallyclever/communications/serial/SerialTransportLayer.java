@@ -5,6 +5,8 @@ import org.junit.Test;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
+import com.marginallyclever.makelangelo.log.Log;
+
 import jssc.SerialPortList;
 
 
@@ -19,27 +21,33 @@ public class SerialTransportLayer implements TransportLayer {
 
 	public SerialTransportLayer() {}
 
+	public String getName() {
+		return "USB Serial";
+	}
+	
 	/**
 	 * find all available serial ports
 	 *
 	 * @return a list of port names
 	 */
 	public String[] listConnections() {
+		portsDetected = SerialPortList.getPortNames();
+		/*
 		String OS = System.getProperty("os.name").toLowerCase();
-
 		if (OS.indexOf("mac") >= 0) {
-			portsDetected = SerialPortList.getPortNames("/dev/");
-			//System.out.println("OS X");
+			SerialPortList.
+			"/dev/");
+			//Log.message("OS X");
 		} else if (OS.indexOf("win") >= 0) {
 			portsDetected = SerialPortList.getPortNames("COM");
-			//System.out.println("Windows");
+			//Log.message("Windows");
 		} else if (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0) {
 			portsDetected = SerialPortList.getPortNames("/dev/");
-			//System.out.println("Linux/Unix");
+			//Log.message("Linux/Unix");
 		} else {
-			System.out.println("OS ERROR");
-			System.out.println("OS NAME=" + System.getProperty("os.name"));
-		}
+			Log.message("OS ERROR");
+			Log.message("OS NAME=" + System.getProperty("os.name"));
+		}*/
 		return portsDetected;
 	}
 
@@ -71,7 +79,7 @@ public class SerialTransportLayer implements TransportLayer {
 	public void scanConnections() {
 		String [] connectionNames = listConnections();
 		if(connectionNames.length<=0) {
-			System.out.println("No serial connections found.");
+			Log.message("No serial connections found.");
 			return;
 		}
 		

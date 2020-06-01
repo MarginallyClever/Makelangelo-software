@@ -10,12 +10,12 @@ import java.util.prefs.Preferences;
 public interface Ancestryable {
 
   /**
-   * @return
+   * @return children
    */
   Map<String, Preferences> getChildren();
 
   /**
-   * @return
+   * @return root
    */
   Map<String, String> getRoot();
 

@@ -14,6 +14,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.marginallyclever.makelangelo.log.Log;
+
 public class TranslatorLanguage {
 	private String name = "";
 	private String author = "";
@@ -43,20 +45,19 @@ public class TranslatorLanguage {
 	}
 
 	/**
-	 * @param defaultLanguageFileFallback
+	 * @param inputStream
 	 */
-	public void loadFromInputStream(InputStream defaultLanguageFileFallback) {
+	public void loadFromInputStream(InputStream inputStream) {
 		final DocumentBuilder db = getDocumentBuilder();
 		if (db == null) {
 			return;
 		}
-		Document dom = null;
 		try {
-			dom = db.parse(defaultLanguageFileFallback);
+			Document dom = db.parse(inputStream);
+			load(dom);
 		} catch (SAXException | IOException e) {
 			Log.error( e.getMessage() );
 		}
-		load(dom);
 	}
 
 	private void load(Document dom) {
@@ -75,7 +76,7 @@ public class TranslatorLanguage {
 				String value = getTextValue(el, "value");
 
 				// store key/value pairs into a map
-				//System.out.println(language_file +"\t"+key+"\t=\t"+value);
+				//Log.message(language_file +"\t"+key+"\t=\t"+value);
 				strings.put(key, value);
 			}
 		}
@@ -100,7 +101,7 @@ public class TranslatorLanguage {
 
 	public String get(String key) {
 		String x = strings.get(key);
-		if (x == null) x = key;
+		if (x == null) x = "Missing:"+key;
 		return x;
 	}
 
