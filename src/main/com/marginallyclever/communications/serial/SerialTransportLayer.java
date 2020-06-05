@@ -6,7 +6,7 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
 import com.marginallyclever.makelangelo.log.Log;
-
+import java.util.regex.Pattern;
 import jssc.SerialPortList;
 
 
@@ -31,7 +31,16 @@ public class SerialTransportLayer implements TransportLayer {
 	 * @return a list of port names
 	 */
 	public String[] listConnections() {
-		portsDetected = SerialPortList.getPortNames();
+
+		String OS = System.getProperty("os.name").toLowerCase();
+
+		if (OS.indexOf("mac") >= 0) {
+			// Also list Bluetooth serial connections
+			portsDetected = SerialPortList.getPortNames(Pattern.compile("cu"));
+		} else {
+			portsDetected = SerialPortList.getPortNames();
+		}
+
 		/*
 		String OS = System.getProperty("os.name").toLowerCase();
 		if (OS.indexOf("mac") >= 0) {
