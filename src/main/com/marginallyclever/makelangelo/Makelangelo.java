@@ -254,7 +254,9 @@ public final class Makelangelo
 				KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(buttonZoomIn);
 
-		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"));
+		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+		buttonZoomToFit.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
