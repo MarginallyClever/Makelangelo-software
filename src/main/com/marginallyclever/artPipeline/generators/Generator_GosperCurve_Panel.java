@@ -24,7 +24,7 @@ public class Generator_GosperCurve_Panel extends ImageGeneratorPanel implements 
 		field_order = new SelectInteger(Generator_GosperCurve.getOrder());
 		field_order.getDocument().addDocumentListener(this);
 		setLayout(new GridLayout(0, 1));
-		add(new JLabel(Translator.get("GosperCurveOrder")));
+		add(new JLabel(Translator.get("HilbertCurveOrder")));
 		add(field_order);
 
 	}

@@ -22,7 +22,7 @@ public class Converter_RandomLines_Panel extends ImageConverterPanel implements 
 		this.converter=arg0;
 
 		this.setLayout(new GridLayout(0, 1));
-		this.add(new JLabel(Translator.get("ConverterRandomLinesLineCount")));
+		this.add(new JLabel(Translator.get("ConverterRandomLinesCount")));
 		this.add(sizeField = new SelectInteger(converter.getLineCount()));
 
 		sizeField.addPropertyChangeListener("value",this);

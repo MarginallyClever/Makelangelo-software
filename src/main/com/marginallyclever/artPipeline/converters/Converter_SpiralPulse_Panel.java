@@ -26,7 +26,7 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel implements 
 		this.setLayout(new GridLayout(0, 1));
 
 		this.setLayout(new GridLayout(0,1));
-		this.add(new JLabel(Translator.get("SpiralPulseIntensity")));
+		this.add(new JLabel(Translator.get("ConverterIntensity")));
 		this.add(intensityField = new SelectFloat(converter.getIntensity()));
 		this.add(new JLabel(Translator.get("SpiralPulseSpacing")));
 		this.add(spacingField = new SelectFloat(converter.getSpacing()));

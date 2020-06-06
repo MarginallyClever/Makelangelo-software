@@ -60,8 +60,8 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		// TODO translate these strings
 		String[] resizeOptions = new String[3];
 		resizeOptions[1] = Translator.get("ConvertImageResizeNone");
-		resizeOptions[1] = Translator.get("ConvertImageResizeFit");
-		resizeOptions[2] = Translator.get("ConvertImageResizeFill");
+		resizeOptions[1] = Translator.get("ConvertImagePaperFit");
+		resizeOptions[2] = Translator.get("ConvertImagePaperFill");
 		resizeOptionsComboBox = new JComboBox<String>(resizeOptions);
 		resizeOptionsComboBox.setSelectedIndex(getPreferredFillStyle());
 

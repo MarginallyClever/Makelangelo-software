@@ -315,9 +315,22 @@
 		<value>Conversion options</value>
 		<hint>dialog title</hint>
 	</string>
+	
 	<string>
 		<key>FlipForGlass</key>
 		<value>Flip for glass</value>
+		<hint>conversion options</hint>
+	</string>
+	
+	<string>
+		<key>FlipH</key>
+		<value>Flip horizontal</value>
+		<hint>conversion options</hint>
+	</string>
+	
+	<string>
+		<key>FlipV</key>
+		<value>Flip vertical</value>
 		<hint>conversion options</hint>
 	</string>
 
@@ -1098,7 +1111,7 @@ to check yourself.</value>
 
 	<string>
 		<key>SharePromo</key>
-		<value>Use Twitter &amp; Instagram tag #makelangelo</value>
+		<value>Try these social media tags: #makelangelo #polargraph #plotter #plottertwitter</value>
 		<hint>Your drawing is finished. Share it</hint>
 	</string>
 
@@ -1510,4 +1523,150 @@ to check yourself.</value>
         <value>Verylong</value>
         <hint></hint>
     </string>
+	
+	<string>
+	<key>Choose</key>
+	<value>Choose</value>
+	</string>
+	
+	<string>
+	<key>Import</key>
+	<value>Import</value>
+	</string>
+	
+	<string>
+	<key>Export</key>
+	<value>Export</value>
+	</string>
+	
+	<string>
+	<key>Reset</key>
+	<value>Reset</value>
+	</string>
+	
+	<string>
+	<key>Help</key>
+	<value>Help</value>
+	</string>
+	
+	<string>
+	<key>Help</key>
+	<value>Help</value>
+	</string>
+	
+	<string>
+	<key>Art Pipeline</key>
+	<value>Art Pipeline</value>
+	</string>
+	
+	<string>
+	<key>paper color</key>
+	<value>Paper color</value>
+	</string>
+	
+	<string>
+	<key>Crosshatch</key>
+	<value>Crosshatch</value>
+	</string>
+	
+	<string>
+	<key>MoireName</key>
+	<value>Moire</value>
+	</string>
+	
+	<string>
+	<key></key>
+	<value></value>
+	</string>
+	
+	<string>
+	<key>horizontal</key>
+	<value>Horizontal</value>
+	</string>
+	
+	<string>
+	<key>vertical</key>
+	<value>Vertical</value>
+	</string>
+	
+	<string>
+	<key>Sandy Noble Style</key>
+	<value>Sandy Noble Style</value>
+	</string>
+	
+	<string>
+	<key>ConverterIntensity</key>
+	<value>Intensity</value>
+	</string>
+	
+	<string>
+	<key>top right</key>
+	<value>Top right</value>
+	</string>
+	
+	<string>
+	<key>top left</key>
+	<value>Top left</value>
+	</string>
+	
+	<string>
+	<key>bottom right</key>
+	<value>Bottom right</value>
+	</string>
+	
+	<string>
+	<key>bottom left</key>
+	<value>Bottom left</value>
+	</string>
+	
+	<string>
+	<key>center</key>
+	<value>Center</value>
+	</string>
+	
+	<string>
+	<key>spiralToCorners</key>
+	<value>Spiral to corners</value>
+	</string>
+		
+	<string>
+	<key>SpiralPulseSpacing</key>
+	<value>Space between rings</value>
+	</string>
+	
+	<string>
+	<key>SpiralPulseHeight</key>
+	<value>Pulse height</value>
+	</string>
+		
+	<string>
+	<key>voronoiStipplingCutoff</key>
+	<value>Low-pass cutoff</value>
+	</string>
+	
+	<string>
+	<key>voronoiStipplingDrawBorders</key>
+	<value></value>
+	</string>
+		
+	<string>
+	<key>converterWanderCMYK</key>
+	<value>CMYK?</value>
+	</string>
+		
+	<string>
+	<key>FillPageName</key>
+	<value>Fill page</value>
+	</string>
+		
+	<string>
+	<key>GosperCurveName</key>
+	<value>Gosper curve</value>
+	</string>
+		
+	<string>
+	<key>GosperCurveOrder</key>
+	<value>Order</value>
+	</string>
+	
 </language>
