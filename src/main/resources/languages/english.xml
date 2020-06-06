@@ -32,7 +32,7 @@
 		<value>Delta (0...1)</value>
 		<hint>Lissajous generator</hint>
 	</string>
-	
+
 	<string>
 		<key>SpirographName</key>
 		<value>Spirograph</value>
@@ -63,7 +63,7 @@
 		<value>is epitrochoid</value>
 		<hint>Spirograph generator</hint>
 	</string>
-	
+
 	<string>
 		<key>ConverterRandomLinesName</key>
 		<value>Random lines</value>
@@ -105,6 +105,11 @@
 	</string>
 
 	<string>
+		<key>ConvertImagePaperOriginal</key>
+		<value>Original size</value>
+		<hint>Converter hint</hint>
+	</string>
+	<string>
 		<key>ConvertImagePaperFill</key>
 		<value>Fill entire paper</value>
 		<hint>Converter hint</hint>
@@ -114,50 +119,50 @@
 		<value>Fit image on paper</value>
 		<hint>Converter hint</hint>
 	</string>
-	
+
 	<string>
 		<key>ConverterCMYKName</key>
 		<value>CMYK</value>
 		<hint>CMYK converter hint</hint>
 	</string>
-	
+
 	<string>
 		<key>ConverterCMYKPasses</key>
 		<value>Passes</value>
 		<hint>CMYK converter hint</hint>
 	</string>
-	
+
 	<string>
 		<key>ConverterCMYKNote</key>
 		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
-	
+
 	<string>
 		<key>DXFScaleOnLoad</key>
 		<value>Scale image to fit paper</value>
 		<hint>DXF load option</hint>
 	</string>
-	
+
 	<string>
 		<key>DXFInfillOnLoad</key>
 		<value>Fill in closed areas</value>
 		<hint>DXF load option</hint>
 	</string>
-	
+
 	<string>
 		<key>DXFOptimizeOnLoad</key>
 		<value>Improve route efficiency</value>
 		<hint>DXF load option</hint>
 	</string>
-	
-	
+
+
 	<string>
 		<key>TempFolderLabel</key>
 		<value>Temporary files location:</value>
 		<hint>Where to save temporary files used in gcode management.</hint>
 	</string>
-		
+
 	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
@@ -168,7 +173,7 @@
 		<value>Save</value>
 		<hint>used in many places</hint>
 	</string>
-	
+
 	<string>
 		<key>Load</key>
 		<value>Load</value>
@@ -179,7 +184,7 @@
 		<value>Could not find </value>
 		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
 	</string>
-	
+
 	<string>
 		<key>MachineWidth</key>
 		<value>Machine width</value>
@@ -190,7 +195,7 @@
 		<value>Machine height</value>
 		<hint>Machine settings</hint>
 	</string>
-	
+
 	<string>
 		<key>PaperWidth</key>
 		<value>Paper width</value>
@@ -206,7 +211,7 @@
 		<value>Is landscape?</value>
 		<hint>Paper settings dialog</hint>
 	</string>
-	
+
 	<string>
 		<key>InvertLeft</key>
 		<value>Invert left</value>
@@ -222,7 +227,7 @@
 		<value>Tool type</value>
 		<hint>tool settings</hint>
 	</string>
-	
+
 	<string>
 		<key>PaperSize</key>
 		<value>Paper Size</value>
@@ -238,7 +243,7 @@
 		<value>Acceleration</value>
 		<hint>machine size control panel</hint>
 	</string>
-	
+
 	<string>
 		<key>Left</key>
 		<value>Left</value>
@@ -315,19 +320,24 @@
 		<value>Conversion options</value>
 		<hint>dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>FlipForGlass</key>
 		<value>Flip for glass</value>
 		<hint>conversion options</hint>
 	</string>
-	
+
+
+	<string>
+		<key>FlipNone</key>
+		<value>No Flip</value>
+		<hint>conversion options</hint>
+	</string>
 	<string>
 		<key>FlipH</key>
 		<value>Flip horizontal</value>
 		<hint>conversion options</hint>
 	</string>
-	
 	<string>
 		<key>FlipV</key>
 		<value>Flip vertical</value>
@@ -411,12 +421,12 @@
 	<string>
 		<key>FileTypeScratch2</key>
 		<value>Scratch 2 (SB2)</value>
-		<hint>file open dialog</hint>		
+		<hint>file open dialog</hint>
 	</string>
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3 (SB3)</value>
-		<hint>file open dialog</hint>		
+		<hint>file open dialog</hint>
 	</string>
 	<string>
 		<key>FileTypeSVG</key>
@@ -461,7 +471,7 @@
 		<value>File</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>MenuMetricsTitle</key>
 		<value>Metrics</value>
@@ -691,8 +701,8 @@
 	</string>
 	<string>
 		<key>UpdateCheckFailed</key>
-		<value>Sorry, I failed. Please visit http://www.marginallyclever.com/ 
-to check yourself.</value>
+		<value>Sorry, I failed. Please visit http://www.marginallyclever.com/
+			to check yourself.</value>
 		<hint>check for update dialog</hint>
 	</string>
 
@@ -726,7 +736,7 @@ to check yourself.</value>
 		<value>Check for updates</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>MenuQuit</key>
 		<value>Quit</value>
@@ -738,7 +748,7 @@ to check yourself.</value>
 		<value>Connect</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>MenuHelp</key>
 		<value>Help</value>
@@ -754,7 +764,7 @@ to check yourself.</value>
 		<value>About</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>ButtonConnect</key>
 		<value>Connect</value>
@@ -882,14 +892,14 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-	<key>ShowLog</key>
-	<value>Show Log</value>
-	<hint>menu or dialog title</hint>
+		<key>ShowLog</key>
+		<value>Show Log</value>
+		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-	<key>HideLog</key>
-	<value>Hide Log</value>
-	<hint>menu or dialog title</hint>
+		<key>HideLog</key>
+		<value>Hide Log</value>
+		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>mmNotice</key>
@@ -974,7 +984,7 @@ to check yourself.</value>
 		<key>SierpinskiTriangleName</key>
 		<value>Sierpinski triangle fractal</value>
 		<hint>name of generator</hint>
-	</string>	
+	</string>
 	<string>
 		<key>voronoiStipplingName</key>
 		<value>Voronoi stipples</value>
@@ -985,7 +995,7 @@ to check yourself.</value>
 		<value>Voronoi zigzag</value>
 		<hint>voronoi zigzag generator</hint>
 	</string>
-	
+
 	<string>
 		<key>voronoiStipplingCellCount</key>
 		<value>Number of Cells</value>
@@ -1012,10 +1022,22 @@ to check yourself.</value>
 		<value>Boxxy</value>
 		<hint>Boxxy generator</hint>
 	</string>
-	<string>		<key>BoxGeneratorMaxSize</key>		<value>Max size</value>		<hint>Boxxy generator</hint>	</string>
-	<string>		<key>BoxGeneratorCutoff</key>		<value>Cutoff</value>		<hint>Boxxy generator</hint>	</string>
-	<string>		<key>BoxGeneratorMaxSizeNote</key>		<value>Max size greater than or equal to 1.  Cutoff 0...1</value>		<hint>Boxxy generator</hint>	</string>
-	
+	<string>
+		<key>BoxGeneratorMaxSize</key>
+		<value>Max size</value>
+		<hint>Boxxy generator</hint>
+	</string>
+	<string>
+		<key>BoxGeneratorCutoff</key>
+		<value>Cutoff</value>
+		<hint>Boxxy generator</hint>
+	</string>
+	<string>
+		<key>BoxGeneratorMaxSizeNote</key>
+		<value>Max size greater than or equal to 1. Cutoff 0...1</value>
+		<hint>Boxxy generator</hint>
+	</string>
+
 	<string>
 		<key>CrosshatchName</key>
 		<value>Crosshatch</value>
@@ -1092,7 +1114,7 @@ to check yourself.</value>
 		<value>Spiral CMYK</value>
 		<hint>Spiral generator</hint>
 	</string>
-	
+
 	<string>
 		<key>SpiralPulseName</key>
 		<value>Pulsing Spiral</value>
@@ -1111,7 +1133,7 @@ to check yourself.</value>
 
 	<string>
 		<key>SharePromo</key>
-		<value>Try these social media tags: #makelangelo #polargraph #plotter #plottertwitter</value>
+		<value>Try social media tag #plotter</value>
 		<hint>Your drawing is finished. Share it</hint>
 	</string>
 
@@ -1137,7 +1159,7 @@ to check yourself.</value>
 		<value>Engage</value>
 		<hint>Manual driving dialog</hint>
 	</string>
-	
+
 	<string>
 		<key>AboutHTML</key>
 		<value><![CDATA[
@@ -1156,9 +1178,9 @@ to check yourself.</value>
       </body>
     </html>
     ]]>
-        </value>
-        <hint>HTML for About Dialog</hint>
-    </string>
+		</value>
+		<hint>HTML for About Dialog</hint>
+	</string>
 
 	<string>
 		<key>MenuSettingsRegister</key>
@@ -1237,7 +1259,7 @@ to check yourself.</value>
 		<value>Koch Curve Fractal</value>
 		<hint></hint>
 	</string>
-	
+
 	<string>
 		<key>FibonacciSpiralName</key>
 		<value>Fibonacci Spiral Fractal</value>
@@ -1270,13 +1292,13 @@ to check yourself.</value>
 		<value>Log</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>PaperSize</key>
 		<value>Paper Size</value>
 		<hint>machine size control panel</hint>
 	</string>
-	
+
 	<string>
 		<key>ServoLengthNeeded</key>
 		<value>Servo wire length:</value>
@@ -1302,7 +1324,7 @@ to check yourself.</value>
 		<value># Lines</value>
 		<hint>Wander converter style parameter</hint>
 	</string>
-	
+
 	<string>
 		<key>ConverterMultipassName</key>
 		<value>Multipass</value>
@@ -1318,7 +1340,7 @@ to check yourself.</value>
 		<value>Levels</value>
 		<hint>Multipass converter option</hint>
 	</string>
-	
+
 	<string>
 		<key>firmwareVersionBadTitle</key>
 		<value>Firmware update</value>
@@ -1330,7 +1352,7 @@ to check yourself.</value>
 		<value>Model: </value>
 		<hint>What is the hardware model of this robot?</hint>
 	</string>
-	
+
 	<string>
 		<key>firmwareVersionBadMessage</key>
 		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>v%VERSION%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>
@@ -1373,300 +1395,317 @@ to check yourself.</value>
 		<value>Cancel</value>
 		<hint>Cancel Capture. Don't process.</hint>
 	</string>
-    <string>
-        <key>AWB</key>
-        <value>Automatic White Balance</value>
-        <hint>Image Automatic White Balance setting</hint>
-    </string>
-    <string>
-        <key>DRC</key>
-        <value>Dynamic Range</value>
-        <hint>Image Dynamic Range Setting</hint>
-    </string>
-    <string>
-        <key>Exposure</key>
-        <value>Exposure</value>
-        <hint>Image Exposure Setting</hint>
-    </string>
-    <string>
-        <key>Contrast</key>
-        <value>Contrast</value>
-        <hint>Image Contrast Setting</hint>
-    </string>
-    <string>
-        <key>Quality</key>
-        <value>Quality</value>
-        <hint>Image Quality Setting</hint>
-    </string>
-    <string>
-        <key>Sharpness</key>
-        <value>Sharpness</value>
-        <hint>Image Sharpness Setting</hint>
-    </string>
-    <string>
-        <key>Off</key>
-        <value>Off</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Auto</key>
-        <value>Auto</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Sun</key>
-        <value>Sun</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Cloud</key>
-        <value>Cloud</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Shade</key>
-        <value>Shade</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Tungsten</key>
-        <value>Tungsten</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Fluorescent</key>
-        <value>Fluorescent</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Incandescent</key>
-        <value>Incandescent</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Flash</key>
-        <value>Flash</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Horizon</key>
-        <value>Horizon</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>High</key>
-        <value>High</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Medium</key>
-        <value>Medium</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Low</key>
-        <value>Low</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Antishake</key>
-        <value>Antishake</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Backlight</key>
-        <value>Backlight</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Beach</key>
-        <value>Beach</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Fireworks</key>
-        <value>Fireworks</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>FixedFPS</key>
-        <value>FixedFPS</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Night</key>
-        <value>Night</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>NightPreview</key>
-        <value>NightPreview</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Snow</key>
-        <value>Snow</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Sports</key>
-        <value>Sports</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Spotlight</key>
-        <value>Spotlight</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>Verylong</key>
-        <value>Verylong</value>
-        <hint></hint>
-    </string>
-	
 	<string>
-	<key>Choose</key>
-	<value>Choose</value>
+		<key>AWB</key>
+		<value>Automatic White Balance</value>
+		<hint>Image Automatic White Balance setting</hint>
 	</string>
-	
 	<string>
-	<key>Import</key>
-	<value>Import</value>
+		<key>DRC</key>
+		<value>Dynamic Range</value>
+		<hint>Image Dynamic Range Setting</hint>
 	</string>
-	
 	<string>
-	<key>Export</key>
-	<value>Export</value>
+		<key>Exposure</key>
+		<value>Exposure</value>
+		<hint>Image Exposure Setting</hint>
 	</string>
-	
 	<string>
-	<key>Reset</key>
-	<value>Reset</value>
+		<key>Contrast</key>
+		<value>Contrast</value>
+		<hint>Image Contrast Setting</hint>
 	</string>
-	
 	<string>
-	<key>Help</key>
-	<value>Help</value>
+		<key>Quality</key>
+		<value>Quality</value>
+		<hint>Image Quality Setting</hint>
 	</string>
-	
 	<string>
-	<key>Help</key>
-	<value>Help</value>
+		<key>Sharpness</key>
+		<value>Sharpness</value>
+		<hint>Image Sharpness Setting</hint>
 	</string>
-	
 	<string>
-	<key>Art Pipeline</key>
-	<value>Art Pipeline</value>
+		<key>Off</key>
+		<value>Off</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>paper color</key>
-	<value>Paper color</value>
+		<key>Auto</key>
+		<value>Auto</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>Crosshatch</key>
-	<value>Crosshatch</value>
+		<key>Sun</key>
+		<value>Sun</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>MoireName</key>
-	<value>Moire</value>
+		<key>Cloud</key>
+		<value>Cloud</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key></key>
-	<value></value>
+		<key>Shade</key>
+		<value>Shade</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>horizontal</key>
-	<value>Horizontal</value>
+		<key>Tungsten</key>
+		<value>Tungsten</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>vertical</key>
-	<value>Vertical</value>
+		<key>Fluorescent</key>
+		<value>Fluorescent</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>Sandy Noble Style</key>
-	<value>Sandy Noble Style</value>
+		<key>Incandescent</key>
+		<value>Incandescent</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>ConverterIntensity</key>
-	<value>Intensity</value>
+		<key>Flash</key>
+		<value>Flash</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>top right</key>
-	<value>Top right</value>
+		<key>Horizon</key>
+		<value>Horizon</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>top left</key>
-	<value>Top left</value>
+		<key>High</key>
+		<value>High</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>bottom right</key>
-	<value>Bottom right</value>
+		<key>Medium</key>
+		<value>Medium</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>bottom left</key>
-	<value>Bottom left</value>
+		<key>Low</key>
+		<value>Low</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>center</key>
-	<value>Center</value>
+		<key>Antishake</key>
+		<value>Antishake</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>spiralToCorners</key>
-	<value>Spiral to corners</value>
+		<key>Backlight</key>
+		<value>Backlight</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>SpiralPulseSpacing</key>
-	<value>Space between rings</value>
+		<key>Beach</key>
+		<value>Beach</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>SpiralPulseHeight</key>
-	<value>Pulse height</value>
+		<key>Fireworks</key>
+		<value>Fireworks</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>voronoiStipplingCutoff</key>
-	<value>Low-pass cutoff</value>
+		<key>FixedFPS</key>
+		<value>FixedFPS</value>
+		<hint></hint>
 	</string>
-	
 	<string>
-	<key>voronoiStipplingDrawBorders</key>
-	<value></value>
+		<key>Night</key>
+		<value>Night</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>converterWanderCMYK</key>
-	<value>CMYK?</value>
+		<key>NightPreview</key>
+		<value>NightPreview</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>FillPageName</key>
-	<value>Fill page</value>
+		<key>Snow</key>
+		<value>Snow</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>GosperCurveName</key>
-	<value>Gosper curve</value>
+		<key>Sports</key>
+		<value>Sports</value>
+		<hint></hint>
 	</string>
-		
 	<string>
-	<key>GosperCurveOrder</key>
-	<value>Order</value>
+		<key>Spotlight</key>
+		<value>Spotlight</value>
+		<hint></hint>
 	</string>
-	
+	<string>
+		<key>Verylong</key>
+		<value>Verylong</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Choose</key>
+		<value>Choose</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Import</key>
+		<value>Import</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Export</key>
+		<value>Export</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Reset</key>
+		<value>Reset</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Help</key>
+		<value>Help</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Art Pipeline</key>
+		<value>Art Pipeline</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>paper color</key>
+		<value>Paper color</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Crosshatch</key>
+		<value>Crosshatch</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>MoireName</key>
+		<value>Moire</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>horizontal</key>
+		<value>Horizontal</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>vertical</key>
+		<value>Vertical</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>Sandy Noble Style</key>
+		<value>Sandy Noble Style</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConverterIntensity</key>
+		<value>Intensity</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>top right</key>
+		<value>Top right</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>top left</key>
+		<value>Top left</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>bottom right</key>
+		<value>Bottom right</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>bottom left</key>
+		<value>Bottom left</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>center</key>
+		<value>Center</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>spiralToCorners</key>
+		<value>Spiral to corners</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>SpiralPulseSpacing</key>
+		<value>Space between rings</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>SpiralPulseHeight</key>
+		<value>Pulse height</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>voronoiStipplingCutoff</key>
+		<value>Low-pass cutoff</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>voronoiStipplingDrawBorders</key>
+		<value>Draw borders?</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>converterWanderCMYK</key>
+		<value>CMYK?</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>FillPageName</key>
+		<value>Fill page</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>GosperCurveName</key>
+		<value>Gosper curve</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>GosperCurveOrder</key>
+		<value>Order</value>
+		<hint></hint>
+	</string>
+
 </language>

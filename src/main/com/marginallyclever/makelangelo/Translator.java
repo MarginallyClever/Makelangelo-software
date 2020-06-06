@@ -179,6 +179,7 @@ public final class Translator {
 						try {
 							lang.loadFromInputStream(stream);
 						} catch(Exception e) {
+							Log.error("Failed to load "+actualFilename);
 							// if the xml file is invalid then an exception can occur.
 							// make sure lang is empty in case of a partial-load failure.
 							lang = new TranslatorLanguage();
