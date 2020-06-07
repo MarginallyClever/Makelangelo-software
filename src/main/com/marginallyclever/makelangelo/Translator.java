@@ -74,10 +74,11 @@ public final class Translator {
 	 *
 	 */
 	static public void start() {
-		// find the english name of the default language.
+		Log.message("starting translator...");
+		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		//Log.message("Default language = "+defaultLanguage);
+		Log.message("Default language = "+defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
