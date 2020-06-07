@@ -234,8 +234,8 @@ public final class Translator {
 		try {
 			value = languages.get(currentLanguage).get(key);
 		} catch (Exception e) {
-			Log.message("Translated string missing: "+key);
-			e.printStackTrace();
+			Log.error("Translated string missing: "+key);
+			//e.printStackTrace();
 		}
 		return value;
 	}
