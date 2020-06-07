@@ -55,9 +55,8 @@ import com.marginallyclever.util.PropertiesFileHelper;
 /**
  * The root window of the GUI
  * 
- * @author danroyer
- * @author Peter Colapietro
- * @since 0.0.1?
+ * @author Dan Royer
+ * @since 0.0.1
  */
 public final class Makelangelo
 		implements ActionListener, WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
@@ -155,7 +154,6 @@ public final class Makelangelo
 		Log.message("starting translator...");
 		Translator.start();
 		
-		Log.message("starting GUI...");
 		createAndShowGUI();
 
 		Log.message("checking sharing permissions...");
@@ -393,20 +391,29 @@ public final class Makelangelo
 	// For thread safety, this method should be invoked from the
 	// event-dispatching thread.
 	public void createAndShowGUI() {
-		// Create and set up the window.
+		Log.message("Creating GUI...");
+		
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
+		Log.message("  adding menu bar...");
 		mainFrame.setJMenuBar(createMenuBar());
+		Log.message("  adding content pane...");
 		mainFrame.setContentPane(createContentPane());
+		
+		Log.message("  setting window size...");
 		adjustWindowSize();
+		Log.message("  make visible...");
 		mainFrame.setVisible(true);
+
 		drawPanel.zoomToFitPaper();
 
 		// add the drag & drop support
+		Log.message("  adding transfer handler...");
 		mainFrame.setTransferHandler(myTransferHandler);
 
 		// start animation system
+		Log.message("  starting animator...");
 		animator = new FPSAnimator(20);
 		animator.add(drawPanel);
 		animator.start();
