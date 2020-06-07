@@ -209,6 +209,7 @@ If you like this project, please support us by buying Marginally Clever products
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
         <configuration>
+          <source>8</source> 
           <destDir>${project.basedir}/docs</destDir>
         </configuration>
         <executions>
