@@ -189,12 +189,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 	/**
-	 * position the camera in from of the robot
-	 *
-	 * @param dx
-	 *            change horizontally
-	 * @param dy
-	 *            change vertically
+	 * Reposition the camera
+	 * @param dx change horizontally
+	 * @param dy change vertically
 	 */
 	private void moveCamera(int dx, int dy) {
 		cameraOffsetX += (float) dx * cameraZoom / windowWidth;
@@ -202,9 +199,9 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 
 	/**
-	 * scale the picture of the robot to fake a zoom.
+	 * Scale the picture of the robot to fake a zoom.
 	 *
-	 * @param y
+	 * @param dy zoom amount
 	 */
 	@SuppressWarnings("unused")
 	private void zoomCamera(int dy) {
@@ -235,7 +232,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	}
 	
 	/**
-	 * set up the correct modelview so the robot appears where it hsould.
+	 * set up the correct modelview so the robot appears where it should.
 	 *
 	 * @param gl2
 	 */

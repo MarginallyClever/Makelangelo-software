@@ -36,6 +36,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
@@ -359,15 +360,18 @@ public final class Makelangelo
 		contentPane.setOpaque(true);
 
 		Log.message("  get GL capabilities...");
-		GLProfile glProfile = GLProfile.getDefault();
-		GLCapabilities caps = new GLCapabilities(glProfile);
-		// caps.setSampleBuffers(true);
-		// caps.setHardwareAccelerated(true);
-		// caps.setNumSamples(4);
-		// */
-		
-		Log.message("  create draw panel...");
-		drawPanel = new DrawPanel(caps);
+		try {
+			GLProfile glProfile = GLProfile.getDefault();
+			GLCapabilities caps = new GLCapabilities(glProfile);
+			// caps.setSampleBuffers(true);
+			// caps.setHardwareAccelerated(true);
+			// caps.setNumSamples(4);
+			Log.message("  create draw panel...");
+			drawPanel = new DrawPanel(caps);
+		} catch(GLException e) {
+			Log.error("I failed the very first call to OpenGL.  Are your native libraries missing?");
+			System.exit(1);
+		}
 		
 		Log.message("  set robot...");
 		drawPanel.setRobot(robot);
