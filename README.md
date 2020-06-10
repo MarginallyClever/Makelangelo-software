@@ -10,7 +10,7 @@ This project specifically deals with the GUI: the computer program that makes ru
 
 ## Running
 
-The Makelangelo Java Application requires the [Java Development Kit](https://jdk.java.net) to run. The latest version is the “ready to use” edition.
+The Makelangelo Java Application requires the [Java SE Development Kit 8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) to run.
 
 ## Compiling
 
