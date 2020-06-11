@@ -107,6 +107,8 @@ public class SelectFloat extends Select {
 	}
 
 	public void setValue(float newValue) {
-		field.setText(Float.toString(newValue));
+		if(newValue!=Float.parseFloat(field.getText())) {
+			field.setText(Float.toString(newValue));
+		}
 	}
 }

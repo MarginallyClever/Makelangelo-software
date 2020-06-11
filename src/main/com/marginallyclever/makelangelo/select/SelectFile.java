@@ -12,6 +12,7 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
@@ -27,7 +28,7 @@ public class SelectFile extends Select {
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
 
-		field = new JTextField(defaultValue, 32);
+		field = new JTextField(defaultValue, 16);
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -49,11 +50,7 @@ public class SelectFile extends Select {
 				notifyObservers();
 			}
 		});
-		field.setMinimumSize(new Dimension(80,20));
-		field.setMaximumSize(field.getMinimumSize());
-		field.setPreferredSize(field.getMinimumSize());
-		field.setSize(field.getMinimumSize());
-		field.setBorder(new LineBorder(Color.BLACK));
+		//field.setBorder(new LineBorder(Color.BLACK));
 
 		chooseButton = new JButton("...");
 		chooseButton.addActionListener(new ActionListener() {
@@ -63,8 +60,11 @@ public class SelectFile extends Select {
 			}
 		});
 		
+		JPanel panel2 = new JPanel(new BorderLayout());
+		panel2.add(field,BorderLayout.LINE_END);
+		
 		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.CENTER);
+		panel.add(panel2,BorderLayout.CENTER);
 		panel.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
