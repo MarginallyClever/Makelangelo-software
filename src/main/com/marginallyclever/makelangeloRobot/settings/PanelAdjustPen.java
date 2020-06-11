@@ -40,13 +40,14 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	    add(penDiameter = new SelectFloat(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectFloat(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
 	    add(currentFeedRate = new SelectFloat(Translator.get("Speed"),settings.getPenDownFeedRate()));
-	    add(penUp = new SelectFloat(Translator.get("penToolUp"),settings.getPenUpAngle()));
-	    add(penDown = new SelectFloat(Translator.get("penToolDown"),settings.getPenDownAngle()));
 	    add(penZRate = new SelectFloat(Translator.get("penToolLiftSpeed"),settings.getZRate()));
+	    add(penUp = new SelectFloat(Translator.get("penToolUp"),settings.getPenUpAngle()));
 	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
+	    add(penDown = new SelectFloat(Translator.get("penToolDown"),settings.getPenDownAngle()));
 	    add(buttonTestDown = new SelectButton(Translator.get("penToolTest")));
 		add(selectPenDownColor = new SelectColor(panel,Translator.get("pen down color"),robot.getSettings().getPenDownColor()));
 		add(selectPenUpColor = new SelectColor(panel,Translator.get("pen up color"),robot.getSettings().getPenUpColor()));
+		finish();
 	}
 	
 	

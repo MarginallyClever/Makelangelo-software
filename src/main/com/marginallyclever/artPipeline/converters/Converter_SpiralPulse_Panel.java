@@ -5,11 +5,10 @@ import java.util.Observable;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
-	Converter_SpiralPulse converter;
-	
-	SelectFloat intensityField;	
-	SelectFloat heightField;	
-	SelectFloat spacingField;	
+	private Converter_SpiralPulse converter;
+	private SelectFloat intensityField;	
+	private SelectFloat heightField;	
+	private SelectFloat spacingField;	
 	
 	public Converter_SpiralPulse_Panel(Converter_SpiralPulse arg0) {
 		super();
@@ -19,6 +18,7 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
 		add(intensityField = new SelectFloat("ConverterIntensity",converter.getIntensity()));
 		add(spacingField = new SelectFloat("SpiralPulseSpacing",converter.getSpacing()));
 		add(heightField = new SelectFloat("SpiralPulseHeight",converter.getHeight()));
+		finish();
 	}
 
 	@Override

@@ -17,6 +17,7 @@ public class Converter_Sandy_Panel extends ImageConverterPanel {
 
 		add(sizeField = new SelectInteger(Translator.get("SandyRings"),converter.getScale()));
 		add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
+		finish();
 	}
 
 	@Override

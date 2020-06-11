@@ -14,8 +14,8 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 		
 		this.generator = generator;
 		
-		field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_SierpinskiTriangle.getOrder());
-		add(field_order);
+		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_SierpinskiTriangle.getOrder()));
+		finish();
 	}
 
 	@Override

@@ -7,17 +7,17 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_Multipass_Panel extends ImageConverterPanel {
-	Converter_Multipass converter;
-	
-	SelectFloat   angleField;
-	SelectInteger passesField;
+	private Converter_Multipass converter;
+	private SelectFloat   angleField;
+	private SelectInteger passesField;
 	
 	public Converter_Multipass_Panel(Converter_Multipass arg0) {
 		super();
-		this.converter=arg0;
+		converter=arg0;
 		
 		add(angleField = new SelectFloat(Translator.get("ConverterMultipassAngle"),converter.getAngle()));
 		add(passesField = new SelectInteger(Translator.get("ConverterMultipassLevels"),converter.getPasses()));
+		finish();
 	}
 
 	@Override

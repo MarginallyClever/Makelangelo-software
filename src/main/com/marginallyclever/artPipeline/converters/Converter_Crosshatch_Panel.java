@@ -6,16 +6,15 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class Converter_Crosshatch_Panel extends ImageConverterPanel {
-	Converter_Crosshatch converter;
-	
-	SelectFloat intensityField;
+	private Converter_Crosshatch converter;
+	private	SelectFloat intensityField;
 	
 	public Converter_Crosshatch_Panel(Converter_Crosshatch arg0) {
 		super();
-		this.converter=arg0;
+		converter=arg0;
 		
-		intensityField = new SelectFloat(Translator.get("ConverterIntensity"),converter.getIntensity());
-		this.add(intensityField);
+		add(intensityField = new SelectFloat(Translator.get("ConverterIntensity"),converter.getIntensity()));
+		finish();
 	}
 
 

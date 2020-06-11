@@ -79,7 +79,7 @@ public class PanelAdjustMachine extends SelectPanel {
 				panel.setVisible(false);
 			}
 		}
-		
+		finish();
 		updateLengthNeeded();
 	}
 	

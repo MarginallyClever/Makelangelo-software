@@ -13,10 +13,11 @@ public class Converter_Moire_Panel extends ImageConverterPanel {
 	
 	public Converter_Moire_Panel(Converter_Moire arg0) {
 		super();
-		this.converter=arg0;
+		converter=arg0;
 
-		this.add(sizeField = new SelectFloat(Translator.get("HilbertCurveSize"),converter.getScale()));
-		this.add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
+		add(sizeField = new SelectFloat(Translator.get("HilbertCurveSize"),converter.getScale()));
+		add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
+		finish();
 	}
 
 	@Override

@@ -6,15 +6,15 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Generator_FibonacciSpiral_Panel extends ImageGeneratorPanel {
-	SelectInteger fieldOrder;
-	Generator_FibonacciSpiral generator;
+	private SelectInteger fieldOrder;
+	private Generator_FibonacciSpiral generator;
 	
 	Generator_FibonacciSpiral_Panel(Generator_FibonacciSpiral generator_FibonacciSpiral) {
 		super();
 		this.generator = generator_FibonacciSpiral;
 		
-		fieldOrder = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_Dragon.getOrder());
-		add(fieldOrder);
+		add(fieldOrder = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_Dragon.getOrder()));
+		finish();
 	}
 
 	@Override

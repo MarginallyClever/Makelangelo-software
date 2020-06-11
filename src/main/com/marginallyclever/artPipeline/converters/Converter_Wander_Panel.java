@@ -18,6 +18,7 @@ public class Converter_Wander_Panel extends ImageConverterPanel {
 
 		add(sizeField = new SelectInteger(Translator.get("ConverterWanderLineCount"),converter.getLineCount()));
 		add(cmykField = new SelectBoolean(Translator.get("ConverterWanderCMYK"),converter.isCMYK()));
+		finish();
 	}
 
 	@Override

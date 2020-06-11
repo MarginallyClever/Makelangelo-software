@@ -21,6 +21,7 @@ public class Generator_Text_Panel extends ImageGeneratorPanel {
 		add(fontChoices = new SelectOneOfMany(Translator.get("FontFace"),generator.getFontNames(),generator.getLastFont()));
 		add(size = new SelectInteger(Translator.get("TextSize"),generator.getLastSize()));
 		add(text = new SelectTextArea(Translator.get("TextMessage"),generator.getLastMessage()));
+		finish();
 	}
 
 	@Override

@@ -16,6 +16,7 @@ public class Generator_Maze_Panel extends ImageGeneratorPanel {
 
 		add(field_rows = new SelectInteger(Translator.get("MazeRows"),generator.getRows()));
 		add(field_columns = new SelectInteger(Translator.get("MazeColumns"),generator.getCols()));
+		finish();
 	}
 
 	@Override

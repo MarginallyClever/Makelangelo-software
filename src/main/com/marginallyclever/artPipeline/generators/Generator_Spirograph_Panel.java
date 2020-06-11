@@ -20,17 +20,12 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 		
 		this.generator = generator;
 		
-		field_majorRadius = new SelectInteger(Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius());
-		field_minorRadius = new SelectInteger(Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius());
-		field_pScale = new SelectFloat(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale());
-		field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples());
-		field_isEpitrochoid = new SelectBoolean(Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid());
-		
-		add(field_isEpitrochoid);
-		add(field_majorRadius);
-		add(field_minorRadius);
-		add(field_pScale);
-		add(field_numSamples);
+		add(field_isEpitrochoid = new SelectBoolean(Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
+		add(field_majorRadius = new SelectInteger(Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
+		add(field_minorRadius = new SelectInteger(Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
+		add(field_pScale = new SelectFloat(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
+		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
+		finish();
 	}
 
 	@Override

@@ -13,6 +13,7 @@ public class Converter_Spiral_Panel extends ImageConverterPanel {
 		
 		converter=arg0;
 		add(toCornersField = new SelectBoolean("SpiralToCorners",converter.getToCorners()));
+		finish();
 	}
 
 	@Override

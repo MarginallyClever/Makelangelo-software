@@ -14,6 +14,7 @@ public class Generator_Dragon_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 		
 		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_Dragon.getOrder()));
+		finish();
 	}
 
 	@Override

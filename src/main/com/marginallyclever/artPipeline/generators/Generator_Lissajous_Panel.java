@@ -21,6 +21,7 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 		add(field_b = new SelectInteger(Translator.get("LissajousB"),Generator_Lissajous.getB()));
 		add(field_delta = new SelectFloat(Translator.get("LissajousDelta"),Generator_Lissajous.getDelta()));
 		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Lissajous.getNumSamples()));
+		finish();
 	}
 
 	@Override

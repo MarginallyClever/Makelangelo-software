@@ -6,5 +6,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 public class ImageGeneratorPanel extends SelectPanel {
 	public MakelangeloRobotPanel makelangeloRobotPanel; 
 	
-	protected ImageGeneratorPanel() {}
+	protected ImageGeneratorPanel() {
+		super();
+	}
 }

@@ -24,6 +24,7 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 		add(text_dot_min = new SelectFloat(Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize   ()));
 		add(draw_borders = new SelectBoolean(Translator.get("voronoiStipplingCutoff"),converter.getDrawBorders()));
 		add(field_cutoff = new SelectFloat(Translator.get("voronoiStipplingDrawBorders"),converter.getCutoff  ()));
+		finish();
 	}
 
 	@Override

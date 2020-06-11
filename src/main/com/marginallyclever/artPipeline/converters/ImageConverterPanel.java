@@ -8,6 +8,5 @@ public class ImageConverterPanel extends SelectPanel {
 	
 	protected ImageConverterPanel() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 }

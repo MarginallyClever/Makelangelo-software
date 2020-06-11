@@ -15,6 +15,7 @@ public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 		
 		add(angle = new SelectFloat(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
+		finish();
 	}
 
 	@Override

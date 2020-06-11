@@ -14,8 +14,8 @@ public class Generator_GosperCurve_Panel extends ImageGeneratorPanel {
 		
 		this.generator = generator;
 		
-		;
 		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_GosperCurve.getOrder()));
+		finish();
 	}
 
 	@Override

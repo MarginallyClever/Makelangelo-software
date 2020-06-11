@@ -22,6 +22,7 @@ public class Generator_LSystemTree_Panel extends ImageGeneratorPanel {
 		add(field_branches   = new SelectInteger(Translator.get("LSystemBranches"),generator.getBranches    ()));
 		add(field_orderScale = new SelectFloat(Translator.get("LSystemOrderScale"),(float)generator.getScale()));
 		add(field_angle      = new SelectFloat(Translator.get("LSystemAngle"),(float)generator.getAngle     ()));
+		finish();
 	}
 
 	@Override

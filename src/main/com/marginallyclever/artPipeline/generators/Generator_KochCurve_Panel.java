@@ -15,6 +15,7 @@ public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 		
 		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_KochCurve.getOrder()));
+		finish();
 	}
 
 	@Override

@@ -19,6 +19,7 @@ public class Converter_Boxes_Panel extends ImageConverterPanel {
 		add(boxSize = new SelectInteger(Translator.get("BoxGeneratorMaxSize"),converter.getBoxMasSize()));
 		add(cutoff = new SelectFloat(Translator.get("BoxGeneratorCutoff"),converter.getCutoff()));
 		add(new SelectReadOnlyText(Translator.get("BoxGeneratorMaxSizeNote")));
+		finish();
 	}
 
 	@Override
