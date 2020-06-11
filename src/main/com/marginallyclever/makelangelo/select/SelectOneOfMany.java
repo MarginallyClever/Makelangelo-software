@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 /**
  * A JFormattedTextField that sets itself up to format floating point numbers. 
@@ -20,7 +20,7 @@ public class SelectOneOfMany extends Select {
 	public SelectOneOfMany(String labelKey,String[] options,int defaultValue) {
 		super();
 		
-		label = new JLabel(labelKey,SwingConstants.LEFT);
+		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JComboBox<String>(options); 
 		field.setSelectedIndex(defaultValue);
 
@@ -32,7 +32,7 @@ public class SelectOneOfMany extends Select {
 			}
 		});
 
-		panel.setLayout(new BorderLayout());
+		panel.setBorder(new EmptyBorder(0,0,0,1));
 		panel.add(label,BorderLayout.LINE_START);
 		panel.add(field,BorderLayout.LINE_END);
 	}

@@ -8,7 +8,7 @@ import java.util.Locale;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,13 +33,15 @@ public class SelectFloat extends Select {
 	public SelectFloat(String labelKey, Locale locale, float defaultValue) {
 		super();
 
-		label = new JLabel(labelKey, SwingConstants.LEFT);
+		label = new JLabel(labelKey, JLabel.LEADING);
 		field = new JFormattedTextField();
 		createAndAttachFormatter(locale);
 		Dimension d = field.getPreferredSize();
-		d.height = 28;
+		d.width = 100;
 		field.setPreferredSize(d);
+		field.setMinimumSize(d);
 		field.setValue(defaultValue);
+		field.setHorizontalAlignment(JTextField.RIGHT);
 
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -73,7 +75,6 @@ public class SelectFloat extends Select {
 			}
 		});
 
-		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.LINE_START);
 		panel.add(field, BorderLayout.LINE_END);
 	}

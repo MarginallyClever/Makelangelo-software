@@ -23,8 +23,7 @@ public class SelectButton extends Select {
 			
 		});
 
-		panel.setLayout(new BorderLayout());
-		panel.add(button,BorderLayout.LINE_START);
+		panel.add(button,BorderLayout.CENTER);
 	}
 	
 	public void doClick() {

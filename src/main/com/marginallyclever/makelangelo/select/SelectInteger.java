@@ -2,12 +2,13 @@ package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -26,10 +27,15 @@ public class SelectInteger extends Select {
 	public SelectInteger(String labelKey,Locale locale,int defaultValue) {
 		super();
 		
-		label = new JLabel(labelKey,SwingConstants.LEFT);
+		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JFormattedTextField(); 
 		createAndAttachFormatter(locale);
+		Dimension d = field.getPreferredSize();
+		d.width = 100;
+		field.setPreferredSize(d);
+		field.setMinimumSize(d);
 		field.setValue((Integer)defaultValue);
+		field.setHorizontalAlignment(JTextField.RIGHT);
 
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -63,7 +69,6 @@ public class SelectInteger extends Select {
 			}
 		});
 
-		panel.setLayout(new BorderLayout());
 		panel.add(label,BorderLayout.LINE_START);
 		panel.add(field,BorderLayout.LINE_END);
 	}

@@ -1,30 +1,30 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import com.marginallyclever.convenience.GridBagConstraintsLabel;
-import com.marginallyclever.convenience.GridBagConstraintsValue;
 
 public class SelectTextArea extends Select {
 	private JLabel label;
 	private JTextArea field;
+	private JScrollPane pane;
 	
 	public SelectTextArea(String labelKey,String defaultText) {
 		super();
 		
-		label = new JLabel(labelKey,SwingConstants.LEFT);
+		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JTextArea(defaultText,4,20);
-		
-		panel.setLayout(new GridLayout(0,1));
-		panel.add(label,new GridBagConstraintsLabel());
-		panel.add(field,new GridBagConstraintsValue());
-
+		field.setLineWrap(true);
+		field.setWrapStyleWord(true);
+		field.setBorder(BorderFactory.createLoweredBevelBorder());
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -46,6 +46,26 @@ public class SelectTextArea extends Select {
 				notifyObservers();
 			}
 		});
+		
+		pane = new JScrollPane(field);
+		
+		// resize the jscrollpane if the containing panel resizes
+		panel.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				pane.setSize(panel.getSize());
+				pane.revalidate();
+			}
+			@Override
+			public void componentMoved(ComponentEvent e) {}
+			@Override
+			public void componentShown(ComponentEvent e) {}
+			@Override
+			public void componentHidden(ComponentEvent e) {}
+		});
+		
+		panel.add(label,BorderLayout.PAGE_START);
+		panel.add(pane,BorderLayout.CENTER);
 	}
 
 	public String getText() {

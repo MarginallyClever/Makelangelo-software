@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 public class SelectReadOnlyText extends Select {
 	private JLabel label;
@@ -11,9 +10,8 @@ public class SelectReadOnlyText extends Select {
 	public SelectReadOnlyText(String labelKey) {
 		super();
 		
-		label = new JLabel(labelKey,SwingConstants.LEFT);
+		label = new JLabel("<html>"+ labelKey+"</html>",JLabel.LEADING);
 
-		panel.setLayout(new BorderLayout());
 		panel.add(label,BorderLayout.CENTER);
 	}
 }

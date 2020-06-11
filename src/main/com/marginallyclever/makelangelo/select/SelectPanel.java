@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -27,16 +28,19 @@ public class SelectPanel implements Observer {
 		gbc.gridy  =0;
 		gbc.fill      = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.insets.top   =5;
-		gbc.insets.left  =5;
-		gbc.insets.right =5; 
-		gbc.insets.bottom=5; 
+		gbc.insets.set(5, 5, 5, 5); 
 	}
 	
 	public void add(Select c) {
 		gbc.gridy++;
 		panel.add(c.getPanel(),gbc);
 		c.addObserver(this);
+	}
+	
+	public void finish() {
+		gbc.weighty=1;
+		gbc.gridy++;
+		panel.add(new JLabel(""),gbc);
 	}
 	
 	public JPanel getPanel() {

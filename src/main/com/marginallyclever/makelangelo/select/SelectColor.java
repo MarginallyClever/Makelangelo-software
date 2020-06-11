@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import com.marginallyclever.convenience.ColorRGB;
@@ -28,7 +27,7 @@ public class SelectColor extends Select {
 	public SelectColor(Component parent,String labelValue,ColorRGB defaultValue) {
 		super();
 		
-		label = new JLabel(labelValue,SwingConstants.LEFT);
+		label = new JLabel(labelValue,JLabel.LEADING);
 
 		field = new JLabel("");
 		field.setOpaque(true);
@@ -50,7 +49,6 @@ public class SelectColor extends Select {
 			}
 		});
 		
-		panel.setLayout(new BorderLayout());
 		panel.add(label,BorderLayout.LINE_START);
 		panel.add(field,BorderLayout.CENTER);
 		panel.add(chooseButton,BorderLayout.LINE_END);

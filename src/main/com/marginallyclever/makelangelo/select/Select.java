@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
+import java.awt.BorderLayout;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Observable;
@@ -12,6 +13,7 @@ public class Select extends Observable implements FocusListener {
 	protected Select() {
 		super();
 		panel = new JPanel();
+		panel.setLayout(new BorderLayout(2,0));
 	}
 	
 	@Override

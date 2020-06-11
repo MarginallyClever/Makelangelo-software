@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -11,7 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -23,13 +25,7 @@ public class SelectFile extends Select {
 	public SelectFile(String labelValue,String defaultValue) {
 		super();
 		
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints buttonConstraint = new GridBagConstraints();
-
-		buttonConstraint.anchor = GridBagConstraints.EAST;
-		buttonConstraint.gridwidth = 1;
-
-		label = new JLabel(labelValue,SwingConstants.LEFT);
+		label = new JLabel(labelValue,JLabel.LEADING);
 
 		field = new JTextField(defaultValue, 32);
 		field.getDocument().addDocumentListener(new DocumentListener() {
@@ -53,6 +49,11 @@ public class SelectFile extends Select {
 				notifyObservers();
 			}
 		});
+		field.setMinimumSize(new Dimension(80,20));
+		field.setMaximumSize(field.getMinimumSize());
+		field.setPreferredSize(field.getMinimumSize());
+		field.setSize(field.getMinimumSize());
+		field.setBorder(new LineBorder(Color.BLACK));
 
 		chooseButton = new JButton("...");
 		chooseButton.addActionListener(new ActionListener() {
@@ -62,7 +63,6 @@ public class SelectFile extends Select {
 			}
 		});
 		
-		panel.setLayout(new BorderLayout());
 		panel.add(label,BorderLayout.LINE_START);
 		panel.add(field,BorderLayout.CENTER);
 		panel.add(chooseButton,BorderLayout.LINE_END);
