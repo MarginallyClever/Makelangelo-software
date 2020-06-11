@@ -64,6 +64,8 @@ public class SelectFloat extends Select {
 				try {
 					newNumber = Float.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
+					setChanged();
+					notifyObservers();
 				} catch (NumberFormatException e1) {
 					field.setForeground(Color.RED);
 					return;

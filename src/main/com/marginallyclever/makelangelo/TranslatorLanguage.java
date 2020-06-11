@@ -100,9 +100,11 @@ public class TranslatorLanguage {
 	}
 
 	public String get(String key) {
-		String x = strings.get(key);
-		if (x == null) x = "Missing:"+key;
-		return x;
+		if(strings.containsKey(key)) {
+			return strings.get(key);
+		} else {
+			return "Missing:"+key;
+		}
 	}
 
 

@@ -226,18 +226,11 @@ public final class Translator {
 	}
 
 	/**
-	 * @param key
-	 * @return the translated value for key
+	 * @param name of key to find in translation list
+	 * @return the translated value for key, or "missing:key".
 	 */
 	static public String get(String key) {
-		String value = null;
-		try {
-			value = languages.get(currentLanguage).get(key);
-		} catch (Exception e) {
-			Log.error("Translated string missing: "+key);
-			//e.printStackTrace();
-		}
-		return value;
+		return languages.get(currentLanguage).get(key);
 	}
 
 	/**

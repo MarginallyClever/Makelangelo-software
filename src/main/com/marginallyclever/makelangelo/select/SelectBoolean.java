@@ -1,13 +1,12 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * A JCheckBox that sets itself up to format true/false. 
@@ -26,10 +25,10 @@ public class SelectBoolean extends Select {
 		field = new JCheckBox();
 		field.setSelected(arg0);
 		
-		field.addChangeListener(new ChangeListener() {
+		field.addItemListener(new ItemListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				hasChanged();
+			public void itemStateChanged(ItemEvent e) {
+				setChanged();
 				notifyObservers();
 			}
 		});
@@ -44,7 +43,10 @@ public class SelectBoolean extends Select {
 	}
 
 	public void setSelected(boolean b) {
-		// TODO Auto-generated method stub
-		
+		// calling setSelected() does not fire the itemListener, which means the observer would not fire.
+		if(field.isSelected()!=b) {
+			// causes the observer to fire.
+			field.doClick();
+		}
 	}
 }

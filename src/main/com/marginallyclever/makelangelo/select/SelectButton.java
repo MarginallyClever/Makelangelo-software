@@ -26,4 +26,8 @@ public class SelectButton extends Select {
 		panel.setLayout(new BorderLayout());
 		panel.add(button,BorderLayout.LINE_START);
 	}
+	
+	public void doClick() {
+		button.doClick();
+	}
 }

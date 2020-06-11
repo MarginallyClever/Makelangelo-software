@@ -14,8 +14,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
-import com.marginallyclever.makelangelo.Translator;
-
 /**
  * A JFormattedTextField that sets itself up to format floating point numbers. 
  * @author Dan Royer
@@ -56,6 +54,8 @@ public class SelectInteger extends Select {
 				try {
 					newNumber = Integer.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
+					setChanged();
+					notifyObservers();
 				} catch(NumberFormatException e1) {
 					field.setForeground(Color.RED);
 					return;
@@ -95,6 +95,10 @@ public class SelectInteger extends Select {
 	}
 	
 	public int getValue() {
-		return Integer.getInteger(field.getText());
+		return Integer.parseInt(field.getText());
+	}
+	
+	public void setValue(int arg0) {
+		field.setText(Integer.toString(arg0));
 	}
 }
