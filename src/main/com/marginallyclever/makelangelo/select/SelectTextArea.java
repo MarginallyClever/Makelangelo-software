@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -49,20 +50,16 @@ public class SelectTextArea extends Select {
 		
 		pane = new JScrollPane(field);
 		
-		// resize the jscrollpane if the containing panel resizes
-		panel.addComponentListener(new ComponentListener() {
+		// resize the JScrollPane if the containing panel resizes
+		panel.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				pane.setSize(panel.getSize());
+				pane.setPreferredSize(panel.getSize());
 				pane.revalidate();
 			}
-			@Override
-			public void componentMoved(ComponentEvent e) {}
-			@Override
-			public void componentShown(ComponentEvent e) {}
-			@Override
-			public void componentHidden(ComponentEvent e) {}
 		});
+		pane.setMinimumSize(new Dimension(500, 100));
+		pane.setPreferredSize(new Dimension(200, 350));
 		
 		panel.add(label,BorderLayout.PAGE_START);
 		panel.add(pane,BorderLayout.CENTER);
