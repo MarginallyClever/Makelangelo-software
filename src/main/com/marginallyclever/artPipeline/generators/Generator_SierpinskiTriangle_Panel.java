@@ -4,9 +4,10 @@ import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
-	SelectInteger field_order;
+	SelectSlider field_order;
 	Generator_SierpinskiTriangle generator;
 	
 	Generator_SierpinskiTriangle_Panel(Generator_SierpinskiTriangle generator) {
@@ -14,7 +15,7 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 		
 		this.generator = generator;
 		
-		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_SierpinskiTriangle.getOrder()));
+		add(field_order = new SelectSlider(Translator.get("HilbertCurveOrder"),10,1,Generator_SierpinskiTriangle.getOrder()));
 		finish();
 	}
 
@@ -22,7 +23,7 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		int newOrder = ((Number)field_order.getValue()).intValue();
+		int newOrder = field_order.getValue();
 		if(newOrder<1) newOrder=1;
 		
 		if(newOrder != Generator_SierpinskiTriangle.getOrder()) {

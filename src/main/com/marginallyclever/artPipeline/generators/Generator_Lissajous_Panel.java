@@ -5,22 +5,23 @@ import java.util.Observable;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
-	protected SelectInteger field_a;
-	protected SelectInteger field_b;
-	protected SelectInteger field_numSamples;
-	protected SelectFloat field_delta;
+	protected SelectSlider field_a;
+	protected SelectSlider field_b;
+	protected SelectSlider field_numSamples;
+	protected SelectSlider field_delta;
 	protected Generator_Lissajous generator;
 	
 	Generator_Lissajous_Panel(Generator_Lissajous generator) {
 		super();
 		this.generator = generator;
 
-		add(field_a = new SelectInteger(Translator.get("LissajousA"),Generator_Lissajous.getA()));
-		add(field_b = new SelectInteger(Translator.get("LissajousB"),Generator_Lissajous.getB()));
-		add(field_delta = new SelectFloat(Translator.get("LissajousDelta"),Generator_Lissajous.getDelta()));
-		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Lissajous.getNumSamples()));
+		add(field_a = new SelectSlider(Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
+		add(field_b = new SelectSlider(Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
+		add(field_delta = new SelectSlider(Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
+		add(field_numSamples = new SelectSlider(Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
 		finish();
 	}
 
@@ -30,7 +31,7 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 
 		int newB = field_b.getValue();
 		int newA = field_a.getValue();
-		float newDelta = field_delta.getValue();
+		float newDelta = field_delta.getValue()/1000.0f;
 		int newNumSamples = field_numSamples.getValue();
 
 		if(newB != Generator_Lissajous.getB() ||

@@ -7,6 +7,12 @@ import java.util.Observable;
 
 import javax.swing.JPanel;
 
+/**
+ * Base class for all Select.  A Select is a UI panel item the user can control.
+ * This system provides consistent look and behavior across all elements in the app.
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class Select extends Observable implements FocusListener {
 	protected JPanel panel;
 	

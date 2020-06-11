@@ -9,9 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
 /**
- * A JFormattedTextField that sets itself up to format floating point numbers. 
  * @author Dan Royer
- * @since 7.8.0
+ * @since 7.24.0
  */
 public class SelectOneOfMany extends Select {
 	private JLabel label;

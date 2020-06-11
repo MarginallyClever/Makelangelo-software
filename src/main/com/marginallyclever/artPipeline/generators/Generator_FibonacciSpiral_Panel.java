@@ -3,17 +3,17 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_FibonacciSpiral_Panel extends ImageGeneratorPanel {
-	private SelectInteger fieldOrder;
+	private SelectSlider fieldOrder;
 	private Generator_FibonacciSpiral generator;
 	
 	Generator_FibonacciSpiral_Panel(Generator_FibonacciSpiral generator_FibonacciSpiral) {
 		super();
 		this.generator = generator_FibonacciSpiral;
 		
-		add(fieldOrder = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_Dragon.getOrder()));
+		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
 		finish();
 	}
 

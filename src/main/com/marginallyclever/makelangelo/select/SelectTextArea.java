@@ -12,6 +12,11 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+/**
+ * A text input dialog with some limited formatting options.
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectTextArea extends Select {
 	private JLabel label;
 	private JTextArea field;

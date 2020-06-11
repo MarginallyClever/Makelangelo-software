@@ -13,6 +13,11 @@ import javax.swing.border.EmptyBorder;
 
 import com.marginallyclever.convenience.ColorRGB;
 
+/**
+ * A container for all Select elements, to facilitate formating as a group.
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectPanel implements Observer {
 	protected JPanel panel;
 	private GridBagConstraints gbc;

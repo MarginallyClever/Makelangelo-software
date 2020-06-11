@@ -4,17 +4,18 @@ import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_HilbertCurve_Panel extends ImageGeneratorPanel {
-	private SelectInteger field_order;
+	private SelectSlider fieldOrder;
 	private Generator_HilbertCurve generator;
 	
 	Generator_HilbertCurve_Panel(Generator_HilbertCurve generator) {
 		super();
 		
 		this.generator = generator;
-		
-		add(field_order = new SelectInteger(Translator.get("HilbertCurveOrder"),Generator_HilbertCurve.getOrder()));
+
+		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
 		finish();
 	}
 
@@ -22,7 +23,7 @@ public class Generator_HilbertCurve_Panel extends ImageGeneratorPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		int newOrder = ((Number)field_order.getValue()).intValue();
+		int newOrder = fieldOrder.getValue();
 		if(newOrder<1) newOrder=1;
 		
 		if(newOrder != Generator_HilbertCurve.getOrder()) {

@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 /**
  * A JCheckBox that sets itself up to format true/false. 
  * @author Dan Royer
- * @since 7.8.0
+ * @since 7.24.0
  */
 public class SelectBoolean extends Select {
 	private JLabel label;

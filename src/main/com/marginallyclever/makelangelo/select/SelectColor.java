@@ -14,6 +14,11 @@ import javax.swing.border.LineBorder;
 
 import com.marginallyclever.convenience.ColorRGB;
 
+/**
+ * A color selection dialog
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectColor extends Select {
 	private JLabel label;
 	private JLabel field;

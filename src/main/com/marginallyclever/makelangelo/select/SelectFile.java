@@ -13,6 +13,11 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+/**
+ * A file selection dialog
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectFile extends Select {
 	private JLabel label;
 	private JTextField field;

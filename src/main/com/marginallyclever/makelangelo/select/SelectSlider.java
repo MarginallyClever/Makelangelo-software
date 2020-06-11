@@ -8,7 +8,11 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
+/**
+ * A slider to restrict integer values to the range you want. 
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectSlider extends Select {
 	private JLabel label;
 	private JSlider field;

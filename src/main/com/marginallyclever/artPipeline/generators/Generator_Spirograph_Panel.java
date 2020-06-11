@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 	protected SelectBoolean field_isEpitrochoid;
@@ -25,6 +26,7 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 		add(field_minorRadius = new SelectInteger(Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
 		add(field_pScale = new SelectFloat(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
 		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
+		add(new SelectReadOnlyText("See <a href='https://en.wikipedia.org/wiki/Spirograph'>https://en.wikipedia.org/wiki/Spirograph</a>"));
 		finish();
 	}
 

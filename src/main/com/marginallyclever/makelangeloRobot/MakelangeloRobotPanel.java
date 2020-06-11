@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangeloRobot;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -953,12 +955,15 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	}
 	
 	public void generateImage() {
+		// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
 		final JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+		panel.setLayout(new BorderLayout());
 
+		JPanel cards = new JPanel(new CardLayout());
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
 		int i=0;
-		for( @SuppressWarnings("unused") ImageGenerator ici : imageGenerators ) {
+		for( ImageGenerator ici : imageGenerators ) {
+			cards.add(ici.getPanel().getPanel(),ici.getName());
 			i++;
 		}
 		
@@ -972,20 +977,20 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
 		options.setSelectedIndex(generatorChoice);
 
-		GridBagConstraints c = new GridBagConstraints();
-		final JPanel previewPane = new JPanel();
-		previewPane.setPreferredSize(new Dimension(450,300));
-		
-		options.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				changeGeneratorPanel(previewPane,options);
-		    }
-		});
+		panel.add(options,BorderLayout.PAGE_START);
+		panel.add(cards,BorderLayout.CENTER);
 
-		panel.add(options, c);
-		panel.add(previewPane,c);
+		options.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+			    CardLayout cl = (CardLayout)(cards.getLayout());
+			    cl.show(cards, (String)e.getItem());
+			    
+				changeGeneratorPanel(options.getSelectedIndex());
+			}
+		});
 		
-		changeGeneratorPanel(previewPane,options);
+		changeGeneratorPanel(options.getSelectedIndex());
 		
 		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("MenuGenerate"));
 		dialog.add(panel);
@@ -994,21 +999,18 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		// other app buttons are still accessible.
 	}
 
-	private void changeGeneratorPanel(JPanel previewPane, JComboBox<String> options) {
-		ImageGenerator chosenGenerator = getGenerator(options.getSelectedIndex());
+	private void changeGeneratorPanel(int index) {
+		ImageGeneratorPanel.makelangeloRobotPanel = this;
+		ImageGenerator chosenGenerator = getGenerator(index);
 		ImageGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
-		chosenGeneratorPanel.makelangeloRobotPanel = this;
-		previewPane.removeAll();
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
-			previewPane.add(chosenGeneratorPanel.getPanel());
-			previewPane.invalidate();
+			JPanel p = chosenGeneratorPanel.getPanel();
+			p.setBorder(BorderFactory.createLineBorder(Color.RED));
 			try {
 				regenerate(chosenGenerator);
 			} catch(Exception e){}
 		}
-		previewPane.getParent().validate();
-		previewPane.getParent().repaint();
 	}
 	
 	public void regenerate(ImageGenerator chosenGenerator) {

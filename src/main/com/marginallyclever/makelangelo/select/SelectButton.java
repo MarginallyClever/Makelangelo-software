@@ -1,11 +1,17 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+/**
+ * A button that does nothing until you attach an observer.
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class SelectButton extends Select {
 	private JButton button;
 	

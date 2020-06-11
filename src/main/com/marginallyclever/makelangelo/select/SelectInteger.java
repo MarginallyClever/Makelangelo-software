@@ -16,9 +16,9 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 /**
- * A JFormattedTextField that sets itself up to format floating point numbers. 
+ * A JFormattedTextField that sets itself up to format integers. 
  * @author Dan Royer
- * @since 7.8.0
+ * @since 7.24.0
  */
 public class SelectInteger extends Select {
 	private JLabel label;
