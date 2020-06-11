@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
+import java.security.SecureRandom;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -7,8 +8,9 @@ public class Generator_LSystemTree extends ImageGenerator {
 	private static int order = 4; // controls complexity of curve
 	private static double angleSpan = 120;
 	private static int numBranches = 3;
+	private static int noise = 0;
 	private static double orderScale = 0.76f;
-	
+	private SecureRandom random;
 	float maxSize;
 	
 
@@ -25,6 +27,9 @@ public class Generator_LSystemTree extends ImageGenerator {
 	@Override
 	public boolean generate() {
 		turtle = new Turtle();
+
+		random = new SecureRandom();
+		random.setSeed(0xDEADBEEF);
 		
 		// move to starting position
 		turtle.moveTo(0,-machine.getMarginHeight()/2);
@@ -45,12 +50,18 @@ public class Generator_LSystemTree extends ImageGenerator {
 		if(n>1) {
 			double angleStep = angleSpan / (float)(numBranches-1);
 
+			double oldAngle = turtle.getAngle();
+			double len = distance*orderScale;
 			turtle.turn(-(angleSpan/2.0f));
 			for(int i=0;i<numBranches;++i) {
-				lSystemTree(n-1,distance*orderScale);
-				turtle.turn(angleStep);
+				lSystemTree(n-1,len - len*random.nextDouble()*(noise/100.0f) );
+				if(noise>0) {
+					turtle.turn(angleStep + (random.nextDouble()-0.5)*(noise/100.0f)*angleStep);
+				} else {
+					turtle.turn(angleStep);
+				}
 			}
-			turtle.turn(-(angleSpan/2.0f)-angleStep);
+			turtle.setAngle(oldAngle);
 		}
 		turtle.forward(-distance);
 	}
@@ -82,5 +93,13 @@ public class Generator_LSystemTree extends ImageGenerator {
 	}
 	public int getBranches() {
 		return numBranches;
+	}
+
+	public void setNoise(int value) {
+		noise = value;		
+	}
+
+	public int getNoise() {
+		return noise;		
 	}
 }

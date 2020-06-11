@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_GosperCurve_Panel extends ImageGeneratorPanel {
@@ -15,6 +16,7 @@ public class Generator_GosperCurve_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 
 		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),6,1,Generator_GosperCurve.getOrder()));
+		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>Learn more</a>"));
 		finish();
 	}
 

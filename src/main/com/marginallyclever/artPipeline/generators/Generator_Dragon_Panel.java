@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_Dragon_Panel extends ImageGeneratorPanel {
@@ -14,6 +15,7 @@ public class Generator_Dragon_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 
 		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
+		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Dragon_curve'>Learn more</a>"));
 		finish();
 	}
 

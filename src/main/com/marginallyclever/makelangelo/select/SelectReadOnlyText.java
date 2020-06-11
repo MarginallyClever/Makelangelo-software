@@ -16,8 +16,8 @@ import javax.swing.JLabel;
  * @since 7.24.0
  */
 public class SelectReadOnlyText extends Select {
-	private static final String A_HREF = "<a href=\"";
-	private static final String HREF_CLOSED = "\">";
+	private static final String A_HREF = "<a href='";
+	private static final String HREF_CLOSED = "'>";
 	
 	private JLabel label;
 	

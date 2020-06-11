@@ -4,7 +4,6 @@ import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
-import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 	private SelectFloat angle;

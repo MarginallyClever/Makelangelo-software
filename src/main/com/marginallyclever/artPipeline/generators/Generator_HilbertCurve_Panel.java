@@ -3,7 +3,6 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_HilbertCurve_Panel extends ImageGeneratorPanel {

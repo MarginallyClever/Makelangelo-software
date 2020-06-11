@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
@@ -16,6 +16,7 @@ public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
 		this.generator = generator;
 
 		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
+		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Koch_curve'>Learn more</a>"));
 		finish();
 	}
 

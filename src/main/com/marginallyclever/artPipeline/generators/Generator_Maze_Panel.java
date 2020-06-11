@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_Maze_Panel extends ImageGeneratorPanel {
@@ -18,6 +18,7 @@ public class Generator_Maze_Panel extends ImageGeneratorPanel {
 
 		add(field_rows = new SelectSlider(Translator.get("MazeRows"),100,1,generator.getRows()));
 		add(field_columns = new SelectSlider(Translator.get("MazeColumns"),100,1,generator.getCols()));
+		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>Learn more</a>"));
 		finish();
 	}
 

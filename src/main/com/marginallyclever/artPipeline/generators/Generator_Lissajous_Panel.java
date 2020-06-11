@@ -3,8 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
@@ -22,6 +21,7 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 		add(field_b = new SelectSlider(Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
 		add(field_delta = new SelectSlider(Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
 		add(field_numSamples = new SelectSlider(Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
+		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Lissajous_curve'>Learn more</a>"));
 		finish();
 	}
 
