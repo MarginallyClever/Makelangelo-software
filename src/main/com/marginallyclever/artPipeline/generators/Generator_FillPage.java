@@ -20,7 +20,7 @@ public class Generator_FillPage extends ImageGenerator {
 	static public float getAngle() {
 		return angle;
 	}
-	static public void setAngle(int value) {
+	static public void setAngle(float value) {
 		angle = value;
 	}
 	

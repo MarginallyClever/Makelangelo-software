@@ -11,25 +11,25 @@ public class FloatFieldTest {
 
 	@Test
 	public void testFloatFieldUS() throws Exception {
-		SelectFloat field = new SelectFloat(Locale.US);
-		field.setText("1000.00");
-		assert(field.isEditValid());
-		field.commitEdit();
-		Log.message("US text="+field.getText());
-		Log.message("US value="+field.getValue());
-		float f = ((Number)field.getValue()).floatValue();
-		assert(f==1000.0);
+		SelectFloat field = new SelectFloat("value",Locale.US);
+		//field.setText("1000.00");
+		field.setValue(2000.26f);
+		//assert(field.isEditValid());
+		//field.commitEdit();
+		Log.message("US text="+field.getValue()+" value="+field.getValue());
+		float f = field.getValue();
+		assert(0==Float.compare(f, 2000.26f));
 	}
 
 	@Test
 	public void testFloatFieldEU() throws Exception {
-		SelectFloat field = new SelectFloat(Locale.FRANCE);
-		field.setText("1000,00");
-		assert(field.isEditValid());
-		field.commitEdit();
-		Log.message("FR text="+field.getText());
-		Log.message("FR value="+field.getValue());
-		float f = ((Number)field.getValue()).floatValue();
-		assert(f==1000.0);
+		SelectFloat field = new SelectFloat("value",Locale.FRANCE);
+		//field.setText("1000,00");
+		field.setValue(2000.26f);
+		//assert(field.isEditValid());
+		//field.commitEdit();
+		Log.message("FR text="+field.getValue()+" value="+field.getValue());
+		float f = field.getValue();
+		assert(0==Float.compare(f, 2000.26f));
 	}
 }

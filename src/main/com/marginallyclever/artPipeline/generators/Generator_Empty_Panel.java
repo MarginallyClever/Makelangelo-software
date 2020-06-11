@@ -6,13 +6,5 @@ package com.marginallyclever.artPipeline.generators;
  *
  */
 public class Generator_Empty_Panel extends ImageGeneratorPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
 	Generator_Empty_Panel(ImageGenerator generator) {}
-
-	@Override
-	public void validate() {}
 }

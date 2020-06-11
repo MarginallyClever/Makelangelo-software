@@ -1,56 +1,31 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JLabel;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
-public class Converter_Wander_Panel extends ImageConverterPanel implements PropertyChangeListener, ItemListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Converter_Wander converter;
-	
-	SelectInteger   sizeField;
-	SelectBoolean   cmykField;
+public class Converter_Wander_Panel extends ImageConverterPanel {
+	private Converter_Wander converter;
+	private SelectInteger sizeField;
+	private SelectBoolean cmykField;
 	
 	public Converter_Wander_Panel(Converter_Wander arg0) {
-		this.converter=arg0;
+		super();
+		
+		converter=arg0;
 
-		this.setLayout(new GridLayout(0, 1));
-
-		this.add(new JLabel(Translator.get("ConverterWanderLineCount")));
-		this.add(sizeField = new SelectInteger(converter.getLineCount()));
-
-		this.add(new JLabel(Translator.get("ConverterWanderCMYK")));
-		this.add(cmykField = new SelectBoolean(converter.isCMYK()));
-
-		sizeField.addPropertyChangeListener("value",this);
-		cmykField.addItemListener(this);
+		add(sizeField = new SelectInteger(Translator.get("ConverterWanderLineCount"),converter.getLineCount()));
+		add(cmykField = new SelectBoolean(Translator.get("ConverterWanderCMYK"),converter.isCMYK()));
 	}
 
-	// int field
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
 		converter.setLineCount(((Number)sizeField.getValue()).intValue());
-		converter.setCMYK(cmykField.getValue());
+		converter.setCMYK(cmykField.isSelected());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
-	}
-
-	// checkbox
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		converter.setLineCount(((Number)sizeField.getValue()).intValue());
-		converter.setCMYK(cmykField.getValue());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
-	}
-	
+	}	
 }

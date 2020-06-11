@@ -1,60 +1,30 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
-public class Converter_Sandy_Panel extends ImageConverterPanel implements PropertyChangeListener, ActionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Converter_Sandy converter;
-	
-	SelectInteger sizeField;	
-	JComboBox<String> directionChoices;
+public class Converter_Sandy_Panel extends ImageConverterPanel {
+	private Converter_Sandy converter;
+	private SelectInteger sizeField;	
+	private SelectOneOfMany directionChoices;
 	
 	public Converter_Sandy_Panel(Converter_Sandy arg0) {
-		this.converter=arg0;
+		super();
+		converter=arg0;
 
-		this.setLayout(new GridLayout(0, 1));
-
-		sizeField = new SelectInteger(converter.getScale());
-
-		this.setLayout(new GridLayout(0,1));
-		this.add(new JLabel(Translator.get("SandyRings")));
-		this.add(sizeField);
-
-		directionChoices = new JComboBox<>(converter.getDirections());
-		this.add(directionChoices);
-		directionChoices.setSelectedIndex(converter.getDirectionIndex());
-		
-		sizeField.addPropertyChangeListener("value",this);
-		directionChoices.addActionListener(this);
+		add(sizeField = new SelectInteger(Translator.get("SandyRings"),converter.getScale()));
+		add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
 	}
 
-	private void validateInput() {
+	@Override
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
 		converter.setScale(((Number)sizeField.getValue()).intValue());
 		converter.setDirection(directionChoices.getSelectedIndex());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
-		
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		validateInput();
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		validateInput();
 	}
 }

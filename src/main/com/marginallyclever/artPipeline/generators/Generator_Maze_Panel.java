@@ -1,60 +1,29 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
-public class Generator_Maze_Panel extends ImageGeneratorPanel implements DocumentListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	SelectInteger field_rows,field_columns;
-	Generator_Maze generator;
-	
+public class Generator_Maze_Panel extends ImageGeneratorPanel {
+	private SelectInteger field_rows,field_columns;
+	private Generator_Maze generator;
 	
 	Generator_Maze_Panel(Generator_Maze generator) {
+		super();
+		
 		this.generator = generator;
 
-		field_rows = new SelectInteger();
-		field_rows.setValue(generator.getRows());
-		field_columns = new SelectInteger();
-		field_columns.setValue(generator.getCols());
-		
-		setLayout(new GridLayout(0, 1));
-		add(new JLabel(Translator.get("MazeRows")));
-		add(field_rows);
-		add(new JLabel(Translator.get("MazeColumns")));
-		add(field_columns);
-		
-		field_rows.getDocument().addDocumentListener(this);
-		field_columns.getDocument().addDocumentListener(this);
+		add(field_rows = new SelectInteger(Translator.get("MazeRows"),generator.getRows()));
+		add(field_columns = new SelectInteger(Translator.get("MazeColumns"),generator.getCols()));
 	}
 
 	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validate();
-	}
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
 
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validate();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validate();
-	}
-	
-	@Override
-	public void validate() {
-		generator.setRows(((Number)field_rows.getValue()).intValue());
-		generator.setCols(((Number)field_columns.getValue()).intValue());
+		generator.setRows(field_rows.getValue());
+		generator.setCols(field_columns.getValue());
 		makelangeloRobotPanel.regenerate(generator);
 	}
 }

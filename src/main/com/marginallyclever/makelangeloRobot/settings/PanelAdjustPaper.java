@@ -1,41 +1,23 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class PanelAdjustPaper
-extends JPanel
-implements ActionListener, PropertyChangeListener, ChangeListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 519519372661103125L;
-
+public class PanelAdjustPaper extends SelectPanel {
 	protected MakelangeloRobot robot;
-
-	private JComboBox<String> paperSizes;
+	
+	private SelectOneOfMany paperSizes;
 	private SelectFloat pw, ph;
-	private JButton isLandscape;
+	private SelectBoolean isLandscape;
+	private SelectSlider paperMargin;
 	private boolean beingModified;
 	private SelectColor paperColor;
 	
@@ -50,7 +32,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 			this.height = height;
 		}
 		
-		public String toDescription() {
+		public String toString() {
 			return name+" ("+width+" x "+height+")";
 		}
 	}
@@ -82,112 +64,46 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 		new PaperSize("Arch D",610,914),
 		new PaperSize("Arch E",914,1219),
 		new PaperSize("Arch E1",762,1067)
-		};
-
-	private JSlider paperMargin;
+	};
 
 	public PanelAdjustPaper(MakelangeloRobot robot) {
 		this.robot = robot;
 		
 		beingModified=false;
-		
-	    this.setBorder(BorderFactory.createEmptyBorder(16,16,16,16));
-	    this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-	    
-	    
-		JPanel p = new JPanel(new GridBagLayout());
-		this.add(p);
-		int y=0;
-
-		GridBagConstraints c = new GridBagConstraints();
-		GridBagConstraints d = new GridBagConstraints();
-		d.anchor = GridBagConstraints.WEST;
-		c.anchor = GridBagConstraints.EAST;
-		c.ipadx=5;
-		c.ipady=2;
 
 		// common paper sizes
 		String[] commonPaperNames = new String[commonPaperSizes.length+1];
 		commonPaperNames[0]="---";
 		int i;
 		for(i=0;i<commonPaperSizes.length;++i) {
-			commonPaperNames[i+1] = new String(commonPaperSizes[i].toDescription());
+			commonPaperNames[i+1] = commonPaperSizes[i].toString();
 		}
 		
-		paperSizes = new JComboBox<>(commonPaperNames);
-		paperSizes.addActionListener(this);
-		c.gridx=0;  c.gridy=y;  p.add(new JLabel(Translator.get("PaperSize")),c);
-		d.gridx=1;  d.gridy=y;  d.gridwidth=3;  p.add(paperSizes,d);
-		y++;
-
-		
-		// landscape checkbox
-		//isLandscape = new JCheckBox(Translator.get("isLandscape"), false);
-		isLandscape = new JButton("\u21cb");
-		isLandscape.addActionListener(this);
-		//d.gridx=0;  d.gridy=y;  d.gridwidth=3;  p.add(isLandscape,d);
-		//y++;
-		//c.fill = GridBagConstraints.HORIZONTAL;
-		//c.fill = GridBagConstraints.NONE;
-
-		// manual paper size settings
-		d.gridwidth=1;
-		pw = new SelectFloat();
-		ph = new SelectFloat();
-		//c.gridx=0;  c.gridy=y;  p.add(Box.createGlue(),c);
-		d.gridx=1;  d.gridy=y;  p.add(pw,d); 
-		d.gridx=2;  d.gridy=y;  p.add(isLandscape,d);
-		d.gridx=3;  d.gridy=y;  p.add(ph,d);
-		d.gridx=4;  d.gridy=y;  p.add(new JLabel(Translator.get("Millimeters")),d);
-		y++;
-		Dimension s = pw.getPreferredSize();
-		s.width = 80;
-		pw.setPreferredSize(s);
-		ph.setPreferredSize(s);
-		pw.addPropertyChangeListener(this);
-		ph.addPropertyChangeListener(this);
-
-		
-		// paper margin
-		JPanel marginPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints pm = new GridBagConstraints();
-		paperMargin = new JSlider(JSlider.HORIZONTAL, 0, 50, 100 - (int) (robot.getSettings().getPaperMargin() * 100));
-		paperMargin.setMajorTickSpacing(10);
-		paperMargin.setMinorTickSpacing(5);
-		paperMargin.setPaintTicks(false);
-		paperMargin.setPaintLabels(true);
-		paperMargin.addChangeListener(this);
-		
-		pm.anchor = GridBagConstraints.WEST;
-		JLabel marginLabel = new JLabel(Translator.get("PaperMargin"));
-		marginLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-		//marginLabel.setBorder(BorderFactory.createLineBorder(new Color(0,0,0), 1));
-		marginPanel.add(marginLabel,pm);
-		pm.gridy=0;
-		pm.gridwidth=2;
-		pm.anchor = GridBagConstraints.EAST;
-		//paperMargin.setBorder(BorderFactory.createLineBorder(new Color(0,0,0), 1));
-		marginPanel.add(paperMargin,pm);
-
-		this.add(marginPanel, c);
-		
-		JPanel colorPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints cm = new GridBagConstraints();
-		cm.gridx=0;
-		cm.gridy=0;
-		cm.fill=GridBagConstraints.HORIZONTAL;
-		paperColor = new SelectColor(this,"paper color",robot.getSettings().getPaperColor());
-		colorPanel.add(paperColor,cm);
-		cm.gridy++;
-		
-		c.gridy++;
-		this.add(colorPanel,c);
+		add(paperSizes = new SelectOneOfMany(Translator.get("PaperSize"),commonPaperNames,0));
+		add(pw = new SelectFloat(Translator.get("PaperWidth"),0));
+		add(ph = new SelectFloat(Translator.get("PaperHeight"),0)); 
+		add(isLandscape = new SelectBoolean("\u21cb",false));
+		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),0,50,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
+		add(paperColor = new SelectColor(panel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
 		
 		updateValues();
 	}
+	
+	void updateValues() {
+		double w = robot.getSettings().getPaperWidth();
+		double h = robot.getSettings().getPaperHeight();
 
-	@Override
-	public void stateChanged(ChangeEvent e) {}
+		int i = getCurrentPaperSizeChoice( h, w );
+		if(i!=0) {
+			isLandscape.setSelected(true);
+		} else {
+			i = getCurrentPaperSizeChoice( w, h );
+			isLandscape.setSelected(false);
+		}
+		paperSizes.setSelectedIndex(i);
+		pw.setValue((float)w);
+		ph.setValue((float)h);
+	}
 
 	/**
 	 * Must match commonPaperSizes
@@ -201,18 +117,39 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 			if(paperWidth == commonPaperSizes[i].width && 
 				paperHeight == commonPaperSizes[i].height)
 				return i+1;
-				
 		}
 
 		return 0;
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent e) {
-		if(beingModified) return;
+	public void update(Observable o, Object arg) {
+		// TODO Auto-generated method stub
+		super.update(o, arg);
 
+		if(beingModified) return;
 		beingModified=true;
-		if( e.getSource() == pw || e.getSource() == ph ) {
+		
+		if(o == paperSizes) {
+			final int selectedIndex = paperSizes.getSelectedIndex();
+			if(selectedIndex!= 0) {
+				PaperSize s = commonPaperSizes[selectedIndex-1];
+				float sw = s.width;
+				float sh = s.height;
+				if(isLandscape.isSelected()) {
+					float temp = sw;
+					sw = sh;
+					sh = temp;
+				}
+				pw.setValue(sw);
+				ph.setValue(sh);
+			}
+		} else if(o == isLandscape) {
+			float sw = pw.getValue();
+			float sh = ph.getValue();
+			pw.setValue(sh);
+			ph.setValue(sw);
+		} else if( o == pw || o == ph ) {
 			double w=0;
 			double h=0;
 			try {
@@ -231,60 +168,7 @@ implements ActionListener, PropertyChangeListener, ChangeListener {
 			}
 			paperSizes.setSelectedIndex(i);
 		}
-		beingModified=false;
-	}
-
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
-		if(beingModified) return;
-		beingModified=true;
 		
-		if(subject == paperSizes) {
-			final int selectedIndex = paperSizes.getSelectedIndex();
-			if(selectedIndex!= 0) {
-				PaperSize s = commonPaperSizes[selectedIndex-1];
-				float sw = s.width;
-				float sh = s.height;
-				if(isLandscape.isSelected()) {
-					float temp = sw;
-					sw = sh;
-					sh = temp;
-				}
-				pw.setValue(sw);
-				ph.setValue(sh);
-			}
-		}
-		if( subject == isLandscape ) {
-			String sw = pw.getText();
-			String sh = ph.getText();
-			pw.setValue(Float.parseFloat(sh));
-			ph.setValue(Float.parseFloat(sw));
-		}
-		
-		beingModified=false;
-	}
-
-	public void updateValues() {
-		if(robot==null) return;
-		
-		double w = robot.getSettings().getPaperWidth();
-		double h = robot.getSettings().getPaperHeight();
-
-		beingModified=true;
-		
-		int i = getCurrentPaperSizeChoice( h, w );
-		if(i!=0) {
-			isLandscape.setSelected(true);
-		} else {
-			i = getCurrentPaperSizeChoice( w, h );
-			isLandscape.setSelected(false);
-		}
-		paperSizes.setSelectedIndex(i);
-		pw.setValue(w);
-		ph.setValue(h);
-
 		beingModified=false;
 	}
 	

@@ -1,37 +1,24 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Observable;
 
-import javax.swing.JLabel;
-
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 
-public class Converter_Spiral_Panel extends ImageConverterPanel implements ActionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Converter_Spiral converter;
-	
-	SelectBoolean toCornersField;
+public class Converter_Spiral_Panel extends ImageConverterPanel {
+	private Converter_Spiral converter;
+	private SelectBoolean toCornersField;
 	
 	public Converter_Spiral_Panel(Converter_Spiral arg0) {
-		this.converter=arg0;
-
-		this.setLayout(new GridLayout(0, 1));
-
-		this.setLayout(new GridLayout(0,1));
-		this.add(new JLabel(Translator.get("SpiralToCorners")));
-		this.add(toCornersField = new SelectBoolean(converter.getToCorners()));
+		super();
 		
-		toCornersField.addActionListener(this);
+		converter=arg0;
+		add(toCornersField = new SelectBoolean("SpiralToCorners",converter.getToCorners()));
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
 		converter.setToCorners(toCornersField.isSelected());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}

@@ -1,36 +1,24 @@
 package com.marginallyclever.makelangelo.preferences;
 
-import java.awt.GridBagConstraints;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 
 public class LanguagePreferences {
+	static private SelectPanel panel;
 	static private String[] languageList;
-	static private JComboBox<String> languageOptions;
+	static private SelectOneOfMany languageOptions;
 	
 	
-	static public JPanel buildPanel() {
-		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
+	static SelectPanel buildPanel() {
+		panel = new SelectPanel();
+		
 		languageList = Translator.getLanguageList();
-		languageOptions = new JComboBox<>(languageList);
 		int currentIndex = Translator.getCurrentLanguageIndex();
-		languageOptions.setSelectedIndex(currentIndex);
+		languageOptions = new SelectOneOfMany("Language",languageList,currentIndex);
 		
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		c.gridx = 0;
-		c.gridy = 0;
-		panel.add(languageOptions, c);
-		
-		//FIXME changing language preference works inconsistently until reboot!
+		panel.add(languageOptions);
 		
 		return panel;
 	}
@@ -45,7 +33,7 @@ public class LanguagePreferences {
 	 * TODO when language changes, restart app OR replace all strings with new language.
 	 */
 	static public void chooseLanguage() {
-		JPanel panel = buildPanel();
+		SelectPanel panel = buildPanel();
 
 		int result;
 		do {

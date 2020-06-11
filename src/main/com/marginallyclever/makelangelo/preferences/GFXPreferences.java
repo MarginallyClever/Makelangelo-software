@@ -1,68 +1,33 @@
 package com.marginallyclever.makelangelo.preferences;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class GFXPreferences {
-	static private JPanel panel;
-	static private JCheckBox showPenUpCheckbox;
-	static private JCheckBox antialiasOnCheckbox;
-	static private JCheckBox speedOverQualityCheckbox;
-	static private JCheckBox drawAllWhileRunningCheckbox;
+	static private SelectPanel panel;
+	static private SelectBoolean showPenUpCheckbox;
+	static private SelectBoolean antialiasOnCheckbox;
+	static private SelectBoolean speedOverQualityCheckbox;
+	static private SelectBoolean drawAllWhileRunningCheckbox;
 
 	
-	static public JPanel buildPanel() {
-		panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-		showPenUpCheckbox = new JCheckBox(Translator.get("MenuGraphicsPenUp"));
-		antialiasOnCheckbox = new JCheckBox(Translator.get("MenuGraphicsAntialias"));
-		speedOverQualityCheckbox = new JCheckBox(Translator.get("MenuGraphicsSpeedVSQuality"));
-		drawAllWhileRunningCheckbox = new JCheckBox(Translator.get("MenuGraphicsDrawWhileRunning"));
-
+	static public SelectPanel buildPanel() {
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		showPenUpCheckbox.setSelected(prefs.getBoolean("show pen up", false));
-		antialiasOnCheckbox.setSelected(prefs.getBoolean("antialias", true));
-		speedOverQualityCheckbox.setSelected(prefs.getBoolean("speed over quality", true));
-		drawAllWhileRunningCheckbox.setSelected(prefs.getBoolean("Draw all while running", true));
-	
-		GridBagConstraints c = new GridBagConstraints();
-	
-		int y = 0;
-	
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(showPenUpCheckbox, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(drawAllWhileRunningCheckbox, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(antialiasOnCheckbox, c);
-		y++;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 1;
-		c.gridx = 1;
-		c.gridy = y;
-		panel.add(speedOverQualityCheckbox, c);
-		y++;
+		
+		panel = new SelectPanel();
+		showPenUpCheckbox = new SelectBoolean(Translator.get("MenuGraphicsPenUp"),prefs.getBoolean("show pen up", false));
+		antialiasOnCheckbox = new SelectBoolean(Translator.get("MenuGraphicsAntialias"),prefs.getBoolean("antialias", true));
+		speedOverQualityCheckbox = new SelectBoolean(Translator.get("MenuGraphicsSpeedVSQuality"),prefs.getBoolean("speed over quality", true));
+		drawAllWhileRunningCheckbox = new SelectBoolean(Translator.get("MenuGraphicsDrawWhileRunning"),prefs.getBoolean("Draw all while running", true));
+
+		panel.add(showPenUpCheckbox);
+		panel.add(drawAllWhileRunningCheckbox);
+		panel.add(antialiasOnCheckbox);
+		panel.add(speedOverQualityCheckbox);
 		
 		return panel;
 	}

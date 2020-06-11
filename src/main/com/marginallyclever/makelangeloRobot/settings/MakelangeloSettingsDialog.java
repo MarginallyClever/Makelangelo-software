@@ -165,13 +165,13 @@ implements ActionListener {
 	  panes.removeAll();
 	  
 	  panelAdjustMachine = new PanelAdjustMachine(robot);
-	  panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine);
+	  panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine.getPanel());
 
 	  panelAdjustPaper = new PanelAdjustPaper(robot);
-	  panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper);
+	  panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper.getPanel());
 
 	  panelAdjustPen = new PanelAdjustPen(robot);
-	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen);
+	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen.getPanel());
 
 	  // if one tab was selected, make sure to reselect it	  
 	  if(previouslySelectedTab!=-1) {

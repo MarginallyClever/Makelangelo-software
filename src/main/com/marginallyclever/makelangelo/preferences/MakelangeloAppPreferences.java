@@ -26,7 +26,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class MakelangeloAppPreferences implements ActionListener {
+public class MakelangeloAppPreferences {
 	transient private Makelangelo app;
 	
 	transient private JPanel panel; 
@@ -35,6 +35,8 @@ public class MakelangeloAppPreferences implements ActionListener {
 	transient private JButton buttonReset;
 	
 	public MakelangeloAppPreferences(Makelangelo arg0) {
+		super();
+		
 		app=arg0;
 	}
 	
@@ -48,14 +50,32 @@ public class MakelangeloAppPreferences implements ActionListener {
 
 		buttonImport = new JButton(Translator.get("Import"));
 		panel.add(buttonImport,c);
+		buttonImport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				importPreferences();
+			}
+		});
 		c.gridx++;
 
 		buttonExport = new JButton(Translator.get("Export"));
 		panel.add(buttonExport,c);
+		buttonExport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportPreferences();
+			}
+		});
 		c.gridx++;
 
 		buttonReset = new JButton(Translator.get("Reset"));
 		panel.add(buttonReset,c);
+		buttonReset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resetPreferences();
+			}
+		});
 		c.gridx++;
 
 		c.gridy=1;
@@ -65,10 +85,10 @@ public class MakelangeloAppPreferences implements ActionListener {
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
 		panel.add(pane,c);
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
+		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -86,15 +106,6 @@ public class MakelangeloAppPreferences implements ActionListener {
 		}
 	}
 
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
-		if (subject == buttonExport) exportPreferences();
-		if (subject == buttonImport) importPreferences();
-		if (subject == buttonReset) resetPreferences();
-	}
-	
 	@SuppressWarnings("deprecation")
 	private void exportPreferences() {
 		final JFileChooser fc = new JFileChooser();

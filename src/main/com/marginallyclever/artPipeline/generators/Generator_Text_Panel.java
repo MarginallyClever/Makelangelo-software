@@ -1,86 +1,34 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectTextArea;
 
-public class Generator_Text_Panel extends ImageGeneratorPanel implements DocumentListener, ActionListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	JTextArea text;
-	SelectInteger size;
-	Generator_Text generator;
-	JComboBox<String> fontChoices;
+public class Generator_Text_Panel extends ImageGeneratorPanel {
+	private Generator_Text generator;
+	private SelectOneOfMany fontChoices;
+	private SelectInteger size;
+	private SelectTextArea text;
 	
 	Generator_Text_Panel(Generator_Text generator) {
+		super();
+		
 		this.generator = generator;
 
-		text = new JTextArea(generator.getLastMessage(), 8, 40);
-		size = new SelectInteger(generator.getLastSize());
-		fontChoices = new JComboBox<String>(generator.getFontNames());
-		fontChoices.setSelectedIndex(generator.getLastFont());
+		add(fontChoices = new SelectOneOfMany(Translator.get("FontFace"),generator.getFontNames(),generator.getLastFont()));
+		add(size = new SelectInteger(Translator.get("TextSize"),generator.getLastSize()));
+		add(text = new SelectTextArea(Translator.get("TextMessage"),generator.getLastMessage()));
+	}
 
-		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-		JPanel p;
-		p = new JPanel(new GridLayout(0, 1));
-		p.add(new JLabel(Translator.get("TextSize")),BorderLayout.WEST);
-		p.add(size,BorderLayout.WEST);
-		this.add(p);
-		p = new JPanel(new GridLayout(0, 1));
-		p.add(new JLabel(Translator.get("TextFont")),BorderLayout.WEST);
-		p.add(fontChoices,BorderLayout.WEST);
-		this.add(p);
-		p = new JPanel(new GridLayout(0, 1));
-		p.add(new JLabel(Translator.get("TextMessage")),BorderLayout.WEST);
-		this.add(p);
-		p = new JPanel(new GridLayout(0, 1));
-		p.add(new JScrollPane(text),BorderLayout.WEST);
-		this.add(p);
+	@Override
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
 		
-		text.getDocument().addDocumentListener(this);
-		size.getDocument().addDocumentListener(this);
-		fontChoices.addActionListener(this);
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent arg0) {
-		validate();
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent arg0) {
-		validate();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent arg0) {
-		validate();
-	}
-	
-	public void validate() {
 		generator.setMessage(text.getText());
 		generator.setSize(((Number)size.getValue()).intValue());
-		makelangeloRobotPanel.regenerate(generator);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
 		generator.setFont(fontChoices.getSelectedIndex());
 		makelangeloRobotPanel.regenerate(generator);
 	}

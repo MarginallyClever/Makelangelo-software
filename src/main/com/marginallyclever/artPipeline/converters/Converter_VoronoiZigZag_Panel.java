@@ -1,42 +1,30 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.util.Observable;
 
-import javax.swing.JLabel;
-
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
-public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel implements PropertyChangeListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	SelectInteger text_cells;
-	SelectFloat text_dot_min;
-	Converter_VoronoiZigZag converter;
+public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
+	private SelectInteger numCells;
+	private SelectFloat minDotSize;
+	private Converter_VoronoiZigZag converter;
 	
 	public Converter_VoronoiZigZag_Panel(Converter_VoronoiZigZag converter_VoronoiZigZag) {
-		this.converter = converter_VoronoiZigZag;
+		super();
 		
-		text_cells = new SelectInteger(converter.getNumCells());
-		text_dot_min = new SelectFloat(converter.getMinDotSize());
-
-		this.setLayout(new GridLayout(0, 1));
-		this.add(new JLabel(Translator.get("voronoiStipplingCellCount")));
-		this.add(text_cells);
-		this.add(new JLabel(Translator.get("voronoiStipplingDotMin")));
-		this.add(text_dot_min);
+		converter = converter_VoronoiZigZag;
 		
-		text_cells.addPropertyChangeListener("value",this);
+		add(numCells = new SelectInteger("voronoiStipplingCellCount",converter.getNumCells()));
+		add(minDotSize = new SelectFloat("voronoiStipplingDotMin",converter.getMinDotSize()));
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		converter.setNumCells(((Number)text_cells.getValue()).intValue());
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
+		converter.setNumCells(numCells.getValue());
+		converter.setMinDotSize(minDotSize.getValue());
 		converter.restart();
 	}
 }

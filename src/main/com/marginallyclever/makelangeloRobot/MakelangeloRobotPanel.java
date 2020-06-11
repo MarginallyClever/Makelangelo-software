@@ -1001,7 +1001,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		previewPane.removeAll();
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
-			previewPane.add(chosenGeneratorPanel);
+			previewPane.add(chosenGeneratorPanel.getPanel());
 			previewPane.invalidate();
 			try {
 				regenerate(chosenGenerator);

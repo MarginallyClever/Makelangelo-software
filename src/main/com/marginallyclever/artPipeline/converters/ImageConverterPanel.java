@@ -1,13 +1,13 @@
 package com.marginallyclever.artPipeline.converters;
 
-import javax.swing.JPanel;
-
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 
-public class ImageConverterPanel extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class ImageConverterPanel extends SelectPanel {
 	public LoadAndSaveImage loadAndSaveImage;
+	
+	protected ImageConverterPanel() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 }

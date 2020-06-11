@@ -1,37 +1,28 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JLabel;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
-public class Converter_Crosshatch_Panel extends ImageConverterPanel implements PropertyChangeListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 	Converter_Crosshatch converter;
 	
 	SelectFloat intensityField;
 	
 	public Converter_Crosshatch_Panel(Converter_Crosshatch arg0) {
+		super();
 		this.converter=arg0;
 		
-		intensityField = new SelectFloat(converter.getIntensity());
-
-		setLayout(new GridLayout(0,1));
-		this.add(new JLabel(Translator.get("ConverterIntensity")));
+		intensityField = new SelectFloat(Translator.get("ConverterIntensity"),converter.getIntensity());
 		this.add(intensityField);
-		
-		intensityField.addPropertyChangeListener("value",this);
 	}
 
+
 	@Override
-	public void propertyChange(PropertyChangeEvent arg0) {
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
 		converter.setIntensity(((Number)intensityField.getValue()).floatValue());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}

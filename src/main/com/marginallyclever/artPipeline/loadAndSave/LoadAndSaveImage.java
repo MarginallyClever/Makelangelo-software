@@ -208,7 +208,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		if(imageConverterPanel!=null) {
 			Log.message("Converter="+chosenConverter.getName());
 			//Log.message("Adding panel");
-			converterOptionsContainer.add(imageConverterPanel);
+			converterOptionsContainer.add(imageConverterPanel.getPanel());
 			converterOptionsContainer.invalidate();
 		}
 		

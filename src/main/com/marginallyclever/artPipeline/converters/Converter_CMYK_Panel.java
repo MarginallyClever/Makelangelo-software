@@ -1,38 +1,28 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.awt.GridLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JLabel;
+import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
-public class Converter_CMYK_Panel extends ImageConverterPanel implements PropertyChangeListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Converter_CMYK converter;
-	
-	SelectInteger passesField;
+public class Converter_CMYK_Panel extends ImageConverterPanel {
+	private Converter_CMYK converter;
+	private SelectInteger passesField;
+	private SelectReadOnlyText note;
 	
 	public Converter_CMYK_Panel(Converter_CMYK arg0) {
-		this.converter=arg0;
+		super();
+		converter=arg0;
 		
-		passesField = new SelectInteger(converter.getPasses());
-
-		setLayout(new GridLayout(4,1));
-		this.add(new JLabel(Translator.get("ConverterCMYKPasses")));
-		this.add(passesField);
-		this.add(new JLabel(Translator.get("ConverterCMYKNote")));
-		
-		passesField.addPropertyChangeListener("value",this);
+		add(passesField = new SelectInteger(Translator.get("ConverterCMYKPasses"),converter.getPasses()));
+		add(note = new SelectReadOnlyText(Translator.get("ConverterCMYKNote")));
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent arg0) {
+	public void update(Observable o, Object arg) {
+		super.update(o, arg);
+		
 		converter.setPasses(((Number)passesField.getValue()).intValue());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
