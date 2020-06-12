@@ -76,7 +76,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	public void restart() {
 		if(!keepIterating) {
-			loadAndSave.reconvert();
+			loadAndSaveImage.reconvert();
 			return;
 		}
 		lowNoise=false;

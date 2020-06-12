@@ -24,7 +24,7 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setScale(((Number)sizeField.getValue()).floatValue());
+		converter.setScale(sizeField.getValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}

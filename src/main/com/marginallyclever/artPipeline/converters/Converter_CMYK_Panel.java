@@ -23,7 +23,7 @@ public class Converter_CMYK_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setPasses(((Number)passesField.getValue()).intValue());
+		converter.setPasses(passesField.getValue());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

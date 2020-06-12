@@ -25,7 +25,7 @@ public class Converter_Wander_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setLineCount(((Number)sizeField.getValue()).intValue());
+		converter.setLineCount(sizeField.getValue());
 		converter.setCMYK(cmykField.isSelected());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}	

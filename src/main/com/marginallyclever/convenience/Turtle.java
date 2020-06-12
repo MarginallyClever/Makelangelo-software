@@ -36,6 +36,7 @@ public class Turtle {
 			return new ColorRGB((int)x);
 		}
 	};
+	public ArrayList<Movement> history;
 
 	private ReentrantLock lock;
 	
@@ -48,12 +49,10 @@ public class Turtle {
 	}
 	
 	public void unlock() {
-		if(lock.isLocked()) {  // prevents "illegal state exception - no locked"
+		if(lock.isLocked()) {  // prevents "illegal state exception - not locked"
 			lock.unlock();
 		}
 	}
-	
-	public ArrayList<Movement> history;
 
 	// current state
 	private double turtleX, turtleY;
@@ -69,6 +68,21 @@ public class Turtle {
 		reset();
 	}
 	
+	public Turtle(Turtle t) {
+		this();
+		turtleX = t.turtleX;
+		turtleY = t.turtleY;
+		turtleDx = t.turtleDx;
+		turtleDy = t.turtleDy;
+		angle = t.angle;
+		isUp = t.isUp;
+		t.color.set(t.color);
+
+		for( Movement m : t.history ) {
+			history.add(new Movement(m));
+		}
+	}
+
 	protected void reset() {
 		turtleX = 0;
 		turtleY = 0;

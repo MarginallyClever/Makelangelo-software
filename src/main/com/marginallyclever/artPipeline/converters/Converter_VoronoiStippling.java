@@ -195,7 +195,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	
 	public void restart() {
 		if(!keepIterating) {
-			loadAndSave.reconvert();
+			loadAndSaveImage.reconvert();
 			return;
 		}
 

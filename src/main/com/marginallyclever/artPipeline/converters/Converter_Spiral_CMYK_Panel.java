@@ -20,6 +20,7 @@ public class Converter_Spiral_CMYK_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 
+		converter.setToCorners(toCornersField.isSelected());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

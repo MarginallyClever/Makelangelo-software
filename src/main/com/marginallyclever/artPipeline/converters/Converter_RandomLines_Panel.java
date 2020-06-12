@@ -22,7 +22,7 @@ public class Converter_RandomLines_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setLineCount(((Number)sizeField.getValue()).intValue());
+		converter.setLineCount(sizeField.getValue());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

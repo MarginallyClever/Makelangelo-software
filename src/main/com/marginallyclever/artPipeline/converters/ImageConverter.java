@@ -24,15 +24,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  */
 public abstract class ImageConverter extends ImageManipulator implements MakelangeloRobotDecorator {
 	protected TransformedImage sourceImage;
-	protected LoadAndSaveImage loadAndSave;
 	protected boolean keepIterating=false;
 	protected Texture texture = null;
 
+	public static LoadAndSaveImage loadAndSaveImage;
 
-	public void setLoadAndSave(LoadAndSaveImage arg0) {
-		loadAndSave = arg0;
-	}
-	
 	/**
 	 * set the image to be transformed.
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.

@@ -80,16 +80,14 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	protected Turtle turtle;
 	private ArtPipeline myPipeline;
 
-
 	private ArrayList<String> drawingCommands;
 	int drawingProgress;
-	
+
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
 
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
-
 
 	public MakelangeloRobot() {
 		super();
@@ -106,8 +104,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		setPenX(0);
 		setPenY(0);
 		turtle = new Turtle();
-		drawingCommands=new ArrayList<String>();
-		drawingProgress=0;
+		drawingCommands = new ArrayList<String>();
+		drawingProgress = 0;
 	}
 
 	public NetworkConnection getConnection() {
@@ -115,8 +113,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	/**
-	 * @param c
-	 *            the connection. Use null to close the connection.
+	 * @param c the connection. Use null to close the connection.
 	 */
 	public void openConnection(NetworkConnection c) {
 		assert (c != null);
@@ -212,7 +209,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				last = last.replace("\r\n", "");
 				if (last.startsWith("V")) {
 					String hardwareVersion = last.substring(1);
-					
+
 					this.settings.setHardwareVersion(hardwareVersion);
 					hardwareVersionChecked = true;
 					justNow = true;
@@ -289,7 +286,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void lineError(NetworkConnection arg0, int lineNumber) {
-		drawingProgress=lineNumber;
+		drawingProgress = lineNumber;
 
 		notifyLineError(lineNumber);
 	}
@@ -438,32 +435,32 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
 		penJustMoved = !penIsUp;
-		penIsUp=true;
+		penIsUp = true;
 	}
 
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
 		penJustMoved = penIsUp;
-		penIsUp=false;
+		penIsUp = false;
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(MakelangeloRobotSettings.COMMAND_MOVE+" Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(MakelangeloRobotSettings.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
 	 * removes comments, processes commands robot doesn't handle, add checksum
 	 * information.
 	 *
-	 * @param line
-	 *            command to send
+	 * @param line command to send
 	 */
 	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
 		if (getConnection() == null || !isPortConfirmed() || !isRunning())
 			return;
-		
+
 		line = "N" + lineNumber + " " + line;
-		if(!line.endsWith(";")) line+=';';
+		if (!line.endsWith(";"))
+			line += ';';
 		String checksum = generateChecksum(line);
 		line += checksum;
 
@@ -475,15 +472,13 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 * Take the next line from the file and send it to the robot, if permitted.
 	 */
 	public void sendFileCommand() {
-		int total=drawingCommands.size();
+		int total = drawingCommands.size();
 
-		if (!isRunning() || isPaused() || total==0
-			|| (getConnection() != null && isPortConfirmed() == false)
-			)
+		if (!isRunning() || isPaused() || total == 0 || (getConnection() != null && isPortConfirmed() == false))
 			return;
 
 		// are there any more commands?
-		if(drawingProgress == total) {
+		if (drawingProgress == total) {
 			// no!
 			halt();
 			// bask in the glory
@@ -495,21 +490,23 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			String line = drawingCommands.get(drawingProgress);
 			sendLineWithNumberAndChecksum(line, drawingProgress);
 			drawingProgress++;
-			
+
 			// TODO update the simulated position to match the real robot?
-			if(line.contains("G0") || line.contains("G1")) {
+			if (line.contains("G0") || line.contains("G1")) {
 				float px = this.getPenX();
 				float py = this.getPenY();
-				
-				String [] tokens = line.split(" ");
-				for( String t : tokens ) {
-					if(t.startsWith("X")) px=Float.parseFloat(t.substring(1));
-					if(t.startsWith("Y")) py=Float.parseFloat(t.substring(1));
+
+				String[] tokens = line.split(" ");
+				for (String t : tokens) {
+					if (t.startsWith("X"))
+						px = Float.parseFloat(t.substring(1));
+					if (t.startsWith("Y"))
+						py = Float.parseFloat(t.substring(1));
 				}
 				this.setPenX(px);
 				this.setPenY(py);
 			}
-			
+
 			if (myPanel != null)
 				myPanel.statusBar.setProgress(drawingProgress, total);
 			// loop until we find a line that gets sent to the robot, at which
@@ -519,7 +516,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void startAt(int lineNumber) {
-		if(drawingCommands.size()==0) return;
+		if (drawingCommands.size() == 0)
+			return;
 
 		drawingProgress = lineNumber;
 		setLineNumber(lineNumber);
@@ -530,8 +528,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	/**
 	 * display a dialog asking the user to change the pen
 	 * 
-	 * @param toolNumber
-	 *            a 24 bit RGB color of the new pen.
+	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
 	public void requestUserChangeTool(int toolNumber) {
 		JPanel panel = new JPanel();
@@ -570,8 +567,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	/**
 	 * Sends a single command the robot. Could be anything.
 	 *
-	 * @param line
-	 *            command to send.
+	 * @param line command to send.
 	 * @return <code>true</code> if command was sent to the robot;
 	 *         <code>false</code> otherwise.
 	 */
@@ -633,7 +629,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void goHome() {
-		sendLineToRobot("G00 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y" + StringHelper.formatDouble(settings.getHomeY()));
+		sendLineToRobot("G00 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
+				+ StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		penY = (float) settings.getHomeY();
 	}
@@ -648,7 +645,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeSetPositionAtHome());
 		// save home position
-		sendLineToRobot("D6 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y" + StringHelper.formatDouble(settings.getHomeY()));
+		sendLineToRobot("D6 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
+				+ StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 		didSetHome = true;
@@ -664,12 +662,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot(
-				(
-						penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-								: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE)
-				)
-				+" X" + StringHelper.formatDouble(x)
-				+" Y" + StringHelper.formatDouble(y));
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
+						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
 	}
@@ -681,12 +676,9 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
-				(
-						penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-								: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE)
-				)
-				+" X" + StringHelper.formatDouble(dx)
-				+" Y" + StringHelper.formatDouble(dy));
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
+						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
 		penY += dy;
@@ -754,172 +746,174 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public MakelangeloRobotPanel getControlPanel() {
 		return myPanel;
 	}
-	
+
 	public void setTurtle(Turtle t) {
-		turtle=t;
-		
-		myPipeline.processTurtle(turtle,settings);
-		
+		turtle = t;
+
+		myPipeline.processTurtle(turtle, settings);
+
 		saveCurrentTurtleToDrawing();
 	}
-	
+
 	public void saveCurrentTurtleToDrawing() {
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this);
-			
+
 			drawingCommands.clear();
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
-		    String line;
-		     
-		    while ((line = reader.readLine()) != null) {
-		        drawingCommands.add(line.trim());
-		    }
-		    reader.close();
-		    
-		} catch(IOException e) {
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				drawingCommands.add(line.trim());
+			}
+			reader.close();
+
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		estimateTime();
 	}
-	
+
 	public Turtle getTurtle() {
 		return turtle;
 	}
 
 	protected void estimateTime() {
-		if(turtle.isLocked()) return;
+		if (turtle.isLocked())
+			return;
 		turtle.lock();
-		
+
 		try {
-			double totalTime=0;
-			
-			boolean isUp=true;
-			double ox=this.settings.getHomeX();
-			double oy=this.settings.getHomeY();
-			double oz=this.settings.getPenUpAngle();
-			
-			for( Turtle.Movement m : turtle.history ) {
-				double nx=ox;
-				double ny=oy;
-				double nz=oz;
-				
-				switch(m.type) {
+			double totalTime = 0;
+
+			boolean isUp = true;
+			double ox = this.settings.getHomeX();
+			double oy = this.settings.getHomeY();
+			double oz = this.settings.getPenUpAngle();
+
+			for (Turtle.Movement m : turtle.history) {
+				double nx = ox;
+				double ny = oy;
+				double nz = oz;
+
+				switch (m.type) {
 				case TRAVEL:
-					if(!isUp) {
+					if (!isUp) {
 						nz = this.settings.getPenUpAngle();
-						isUp=true;
+						isUp = true;
 					}
 					break;
 				case DRAW:
-					if(isUp) {
+					if (isUp) {
 						nz = this.settings.getPenDownAngle();
-						isUp=false;
+						isUp = false;
 					}
-					nx=m.x;
-					ny=m.y;
+					nx = m.x;
+					ny = m.y;
 					break;
 				case TOOL_CHANGE:
 					// n remains unchanged, so length is zero.
 					break;
 				}
 
-				double dx=nx-ox;
-				double dy=ny-oy;
-				double dz=nz-oz;
-				double length=Math.sqrt(dx*dx+dy*dy+dz*dz);
-				if(length>0) {
+				double dx = nx - ox;
+				double dy = ny - oy;
+				double dz = nz - oz;
+				double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+				if (length > 0) {
 					double accel = settings.getAcceleration();
 					double maxV;
-					if(oz!=nz) {
+					if (oz != nz) {
 						maxV = settings.getZRate();
-					} else if(nz==settings.getPenDownAngle()) {
+					} else if (nz == settings.getPenDownAngle()) {
 						maxV = settings.getPenDownFeedRate();
 					} else {
 						maxV = settings.getPenUpFeedRate();
 					}
-					totalTime+=estimateSingleBlock(length,0,0,maxV,accel);
+					totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
 				}
-				ox=nx;
-				oy=ny;
-				oz=nz;
+				ox = nx;
+				oy = ny;
+				oz = nz;
 			}
-			
+
 			double seconds = totalTime % 60;
-			totalTime-=seconds;
-			totalTime/=60;
-			int minutes = (int)(totalTime % 60);
-			totalTime-=minutes;
-			totalTime/=60;
-			int hours = (int)totalTime;
-			
-			Log.message("Worst case draw time="+hours+"h"+minutes+"m"+(int)(seconds)+"s.");	
-		}
-		finally {
+			totalTime -= seconds;
+			totalTime /= 60;
+			int minutes = (int) (totalTime % 60);
+			totalTime -= minutes;
+			totalTime /= 60;
+			int hours = (int) totalTime;
+
+			Log.message("Worst case draw time=" + hours + "h" + minutes + "m" + (int) (seconds) + "s.");
+		} finally {
 			turtle.unlock();
 		}
 	}
-	
+
 	/**
-	 * calculate seconds to move a given length.  Also uses globals feedRate and acceleration 
-	 * See http://zonalandeducation.com/mstm/physics/mechanics/kinematics/EquationsForAcceleratedMotion/AlgebraRearrangements/Displacement/DisplacementAccelerationAlgebra.htm
-	 * @param length mm distance to travel.
+	 * calculate seconds to move a given length. Also uses globals feedRate and
+	 * acceleration See
+	 * http://zonalandeducation.com/mstm/physics/mechanics/kinematics/EquationsForAcceleratedMotion/AlgebraRearrangements/Displacement/DisplacementAccelerationAlgebra.htm
+	 * 
+	 * @param length    mm distance to travel.
 	 * @param startRate mm/s at start of move
-	 * @param endRate mm/s at end of move
+	 * @param endRate   mm/s at end of move
 	 * @return time to execute move
 	 */
-	protected double estimateSingleBlock(double length,double startRate,double endRate,double maxV,double accel) {
-		double distanceToAccelerate = ( maxV*maxV - startRate*startRate ) / (2.0 *  accel);
-		double distanceToDecelerate = ( endRate*endRate   - maxV*maxV   ) / (2.0 * -accel);
+	protected double estimateSingleBlock(double length, double startRate, double endRate, double maxV, double accel) {
+		double distanceToAccelerate = (maxV * maxV - startRate * startRate) / (2.0 * accel);
+		double distanceToDecelerate = (endRate * endRate - maxV * maxV) / (2.0 * -accel);
 		double distanceAtTopSpeed = length - distanceToAccelerate - distanceToDecelerate;
-		if(distanceAtTopSpeed<0) {
+		if (distanceAtTopSpeed < 0) {
 			// we never reach feedRate.
-			double intersection = (2.0 * accel * length - startRate*startRate + endRate*endRate) / (4.0*accel);
+			double intersection = (2.0 * accel * length - startRate * startRate + endRate * endRate) / (4.0 * accel);
 			distanceToAccelerate = intersection;
-			distanceToDecelerate = length-intersection;
+			distanceToDecelerate = length - intersection;
 			distanceAtTopSpeed = 0;
 		}
 		// time at maxV
 		double time = distanceAtTopSpeed / maxV;
-		
+
 		// time accelerating (v=start vel;a=acceleration;d=distance;t=time)
 		// 0.5att+vt-d=0
 		// att+2vt=2d
 		// using quadratic to solve for t,
 		// t = (-v +/- sqrt(vv+2ad))/a
 		double s;
-		s = Math.sqrt(startRate*startRate + 2.0*accel*distanceToAccelerate);
-		double a = (-startRate + s)/accel;
-		double b = (-startRate - s)/accel;
-		double accelTime = a>b? a:b;
-		if(accelTime<0) {
-			accelTime=0;
+		s = Math.sqrt(startRate * startRate + 2.0 * accel * distanceToAccelerate);
+		double a = (-startRate + s) / accel;
+		double b = (-startRate - s) / accel;
+		double accelTime = a > b ? a : b;
+		if (accelTime < 0) {
+			accelTime = 0;
 		}
-		
+
 		// time decelerating (v=end vel;a=acceleration;d=distance;t=time)
-		s = Math.sqrt(endRate*endRate + 2.0*accel*distanceToDecelerate);
-		double c = (-endRate + s)/accel;
-		double d = (-endRate - s)/accel;
-		double decelTime = c>d? c:d;
-		if(decelTime<0) {
-			decelTime=0;
+		s = Math.sqrt(endRate * endRate + 2.0 * accel * distanceToDecelerate);
+		double c = (-endRate + s) / accel;
+		double d = (-endRate - s) / accel;
+		double decelTime = c > d ? c : d;
+		if (decelTime < 0) {
+			decelTime = 0;
 		}
-		
+
 		// sum total
-		return time+accelTime+decelTime;
+		return time + accelTime + decelTime;
 	}
-	
+
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 	}
 
 	public void render(GL2 gl2) {
-		float [] lineWidthBuf = new float[1];
+		float[] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		float lineWidth = lineWidthBuf[0];
-		//Log.message("line width="+lineWidth);
-		
+		// Log.message("line width="+lineWidth);
+
 		paintLimits(gl2);
 
 		settings.getHardwareProperties().render(gl2, this);
@@ -927,89 +921,95 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
-		} else if(turtle != null) {
-			if(turtle.isLocked()) return;
-			turtle.lock();
+		} else if (turtle != null) {
+			if (turtle.isLocked())
+				return;
 			try {
+				turtle.lock();
 				boolean showPenUp = GFXPreferences.getShowPenUp();
-				ColorRGB penUpColor = this.settings.getPenUpColor();
-				ColorRGB penDownColor = this.settings.getPenDownColorDefault();
-				float penDiameter = this.settings.getPenDiameter();
-				
-				boolean isUp=true;
-				double ox=this.settings.getHomeX();
-				double oy=this.settings.getHomeY();
-				Movement previousMove=turtle.new Movement(ox,oy,Turtle.MoveType.TRAVEL);				
-	
+				ColorRGB penUpColor = settings.getPenUpColor();
+				ColorRGB penDownColor = settings.getPenDownColorDefault();
+				float penDiameter = settings.getPenDiameter();
+
+				boolean isUp = true;
+				double ox = settings.getHomeX();
+				double oy = settings.getHomeY();
+				Movement previousMove = turtle.new Movement(ox, oy, Turtle.MoveType.TRAVEL);
+
 				int first = 0;
 				int last = turtle.history.size();
-				int showCount=0;
+				int showCount = 0;
 
-				float newDiameter = 2*100*penDiameter/lineWidth;
+				float newDiameter = 2 * 100 * penDiameter / lineWidth;
+				
 				gl2.glLineWidth(newDiameter);
 				gl2.glBegin(GL2.GL_LINE_STRIP);
-				
-				gl2.glColor4d(
-						(double)penUpColor.getRed() / 255.0,
-						(double)penUpColor.getGreen() / 255.0,
-						(double)penUpColor.getBlue() / 255.0,
-						showPenUp?1:0);
-				if(showCount>=first && showCount<last) {
-					gl2.glVertex2d(ox,oy);
-				}
-				showCount++;
-				
-				for( Turtle.Movement m : turtle.history ) {
-					switch(m.type) {
-					case TRAVEL:
-						if(!isUp) {
-							isUp=true;
-							gl2.glColor4d(
-									(double)penUpColor.getRed() / 255.0,
-									(double)penUpColor.getGreen() / 255.0,
-									(double)penUpColor.getBlue() / 255.0,
-									showPenUp?1:0);
-							if(showCount>=first && showCount<last) {
-								gl2.glVertex2d(previousMove.x,previousMove.y);
-								gl2.glVertex2d(m.x,m.y);
+				try {
+					gl2.glColor4d((double) penUpColor.getRed() / 255.0, (double) penUpColor.getGreen() / 255.0,
+							(double) penUpColor.getBlue() / 255.0, showPenUp ? 1 : 0);
+					if (showCount >= first && showCount < last) {
+						gl2.glVertex2d(ox, oy);
+					}
+					showCount++;
+	
+					for (Turtle.Movement m : turtle.history) {
+						if(m==null) {
+							throw new NullPointerException();
+						}
+						switch (m.type) {
+						case TRAVEL:
+							if (!isUp) {
+								isUp = true;
+								gl2.glColor4d((double) penUpColor.getRed() / 255.0, (double) penUpColor.getGreen() / 255.0,
+										(double) penUpColor.getBlue() / 255.0, showPenUp ? 1 : 0);
+								if (showCount >= first && showCount < last) {
+									gl2.glVertex2d(previousMove.x, previousMove.y);
+									gl2.glVertex2d(m.x, m.y);
+								}
+								showCount++;
+							}
+							previousMove = m;
+							break;
+						case DRAW:
+							if (isUp) {
+								if (showCount >= first && showCount < last) {
+									gl2.glVertex2d(previousMove.x, previousMove.y);
+								}
+								gl2.glColor4d((double) penDownColor.getRed() / 255.0,
+										(double) penDownColor.getGreen() / 255.0, (double) penDownColor.getBlue() / 255.0,
+										1);
+								if (showCount >= first && showCount < last) {
+									gl2.glVertex2d(previousMove.x, previousMove.y);
+								}
+								isUp = false;
+							}
+							if (showCount >= first && showCount < last) {
+								gl2.glVertex2d(m.x, m.y);
 							}
 							showCount++;
+							previousMove = m;
+							break;
+						case TOOL_CHANGE:
+							penDownColor = m.getColor();
+							break;
 						}
-						previousMove=m;
-						break;
-					case DRAW:
-						if(isUp) {
-							if(showCount>=first && showCount<last) {
-								gl2.glVertex2d(previousMove.x,previousMove.y);
-							}
-							gl2.glColor4d(
-									(double)penDownColor.getRed() / 255.0,
-									(double)penDownColor.getGreen() / 255.0,
-									(double)penDownColor.getBlue() / 255.0,
-									1);
-							if(showCount>=first && showCount<last) {
-								gl2.glVertex2d(previousMove.x,previousMove.y);
-							}
-							isUp=false;
-						}
-						if(showCount>=first && showCount<last) {
-							gl2.glVertex2d(m.x,m.y);
-						}
-						showCount++;
-						previousMove=m;
-						break;
-					case TOOL_CHANGE:
-						penDownColor = m.getColor();
-						break;
 					}
 				}
-				
-				gl2.glEnd();
-
-				gl2.glLineWidth(lineWidth);
+				catch(Exception e) {
+					//Log.error(e.getMessage());
+				}
+				finally {
+					gl2.glEnd();
+					gl2.glLineWidth(lineWidth);
+				}
+			}
+			catch(Exception e) {
+				Log.error(e.getMessage());
 			}
 			finally {
-				turtle.unlock();
+				if(turtle.isLocked()) {
+					turtle.unlock();
+				}
 			}
 		}
 	}
@@ -1021,7 +1021,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	 */
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
-		
+
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
@@ -1031,10 +1031,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		gl2.glEnd();
 
 		ColorRGB c = settings.getPaperColor();
-		gl2.glColor3d(
-				(double)c.getRed() / 255.0,
-				(double)c.getGreen() / 255.0,
-				(double)c.getBlue() / 255.0);
+		gl2.glColor3d((double) c.getRed() / 255.0, (double) c.getGreen() / 255.0, (double) c.getBlue() / 255.0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
@@ -1076,25 +1073,27 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public int findLastPenUpBefore(int startAtLine) {
 		int total = drawingCommands.size();
-		if( total==0 ) return 0;
+		if (total == 0)
+			return 0;
 
 		String toMatch = settings.getPenUpString();
-		
+
 		int x = startAtLine;
-		if(x >= total) x = total-1;
-		
+		if (x >= total)
+			x = total - 1;
+
 		toMatch = toMatch.trim();
-		while(x>1) {
+		while (x > 1) {
 			String line = drawingCommands.get(x).trim();
-			if(line.equals(toMatch)) {
+			if (line.equals(toMatch)) {
 				return x;
 			}
 			--x;
 		}
-				
+
 		return x;
 	}
-	
+
 	public ArtPipeline getPipeline() {
 		return myPipeline;
 	}

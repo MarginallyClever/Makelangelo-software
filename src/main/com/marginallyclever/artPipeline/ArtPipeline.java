@@ -509,7 +509,9 @@ public class ArtPipeline {
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				Log.message("processTurtle wait interrupted.");
+				return;
 			}
 		}
 		turtle.lock();

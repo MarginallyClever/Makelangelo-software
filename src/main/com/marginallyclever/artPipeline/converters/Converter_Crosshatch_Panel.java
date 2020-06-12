@@ -22,7 +22,7 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setIntensity(((Number)intensityField.getValue()).floatValue());
+		converter.setIntensity(intensityField.getValue());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }
