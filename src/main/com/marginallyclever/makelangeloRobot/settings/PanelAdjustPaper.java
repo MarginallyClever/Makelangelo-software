@@ -83,7 +83,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		add(pw = new SelectFloat(Translator.get("PaperWidth"),0));
 		add(ph = new SelectFloat(Translator.get("PaperHeight"),0)); 
 		add(isLandscape = new SelectBoolean("\u21cb",false));
-		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),0,50,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
+		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
 		add(paperColor = new SelectColor(panel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
 		finish();
 		updateValues();
