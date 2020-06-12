@@ -23,9 +23,12 @@ import javax.swing.text.NumberFormatter;
 public class SelectInteger extends Select {
 	private JLabel label;
 	private JFormattedTextField field;
+	private int value;
 
 	public SelectInteger(String labelKey,Locale locale,int defaultValue) {
 		super();
+		
+		value = defaultValue;
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JFormattedTextField(); 
@@ -55,13 +58,16 @@ public class SelectInteger extends Select {
 			
 			public void validate() {
 				@SuppressWarnings("unused")
-				double newNumber;
+				int newNumber;
 				
 				try {
 					newNumber = Integer.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
-					setChanged();
-					notifyObservers();
+					if(value != newNumber) {
+						value = newNumber;
+						setChanged();
+						notifyObservers();
+					}
 				} catch(NumberFormatException e1) {
 					field.setForeground(Color.RED);
 					return;
@@ -99,8 +105,11 @@ public class SelectInteger extends Select {
 		field.setEditable(false);
 	}
 	
+	/**
+	 * @return last valid integer typed into field.
+	 */
 	public int getValue() {
-		return Integer.parseInt(field.getText());
+		return value;
 	}
 	
 	public void setValue(int arg0) {

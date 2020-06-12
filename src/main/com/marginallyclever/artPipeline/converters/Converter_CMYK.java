@@ -4,6 +4,7 @@ package com.marginallyclever.artPipeline.converters;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.log.Log;
 
@@ -40,6 +41,8 @@ public class Converter_CMYK extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
+		turtle = new Turtle();
+		
 		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
 		Log.message("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
@@ -56,8 +59,7 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter()*passes;
-		if (stepSize < 1) stepSize = 1;
+		double stepSize = machine.getPenDiameter()*(double)passes/2.0;
 
 		// from top to bottom of the margin area...
 		double height  = machine.getMarginTop() - machine.getMarginBottom();

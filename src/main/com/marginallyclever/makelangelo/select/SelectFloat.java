@@ -23,6 +23,7 @@ import javax.swing.text.NumberFormatter;
 public class SelectFloat extends Select {
 	private JLabel label;
 	private JFormattedTextField field;
+	private double value;
 
 	protected SelectFloat() {
 		super();
@@ -32,6 +33,8 @@ public class SelectFloat extends Select {
 	public SelectFloat(String labelKey, Locale locale, float defaultValue) {
 		super();
 
+		value = defaultValue;
+		
 		label = new JLabel(labelKey, JLabel.LEADING);
 		field = new JFormattedTextField();
 		createAndAttachFormatter(locale);
@@ -45,28 +48,34 @@ public class SelectFloat extends Select {
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
+				if(arg0.getLength()==0) return;
 				validate();
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
+				if(arg0.getLength()==0) return;
 				validate();
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
+				if(arg0.getLength()==0) return;
 				validate();
 			}
 
 			public void validate() {
 				@SuppressWarnings("unused")
-				double newNumber;
+				float newNumber;
 
 				try {
 					newNumber = Float.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
-					setChanged();
-					notifyObservers();
+					if(value != newNumber) {
+						value = newNumber;
+						setChanged();
+						notifyObservers();
+					}
 				} catch (NumberFormatException e1) {
 					field.setForeground(Color.RED);
 					return;
@@ -101,8 +110,11 @@ public class SelectFloat extends Select {
 		field.setEditable(false);
 	}
 
+	/**
+	 * @return last valid value typed into field
+	 */
 	public float getValue() {
-		return Float.valueOf(field.getText());
+		return (float)value;
 	}
 
 	public void setValue(float newValue) {

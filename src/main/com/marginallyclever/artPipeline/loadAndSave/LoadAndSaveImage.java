@@ -119,30 +119,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		for( ImageConverter ici : converters ) {
 			cards.add(ici.getPanel().getPanel(),ici.getName());
 		}
-		
-		int p;
-		p=getPreferredDrawStyle();
-		if(p>=styleNames.getItemCount()) p=0;
-		styleNames.setSelectedIndex(p);
-
-		p=getPreferredFillStyle();
-		if(p>=fillNames.getItemCount()) p=0;
-		fillNames.setSelectedIndex(p);
-		
-		styleNames.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-			    CardLayout cl = (CardLayout)(cards.getLayout());
-			    cl.show(cards, (String)e.getItem());
-				changeConverter(styleNames.getSelectedIndex());
-		    }
-		});
-		fillNames.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				changeConverter(styleNames.getSelectedIndex());
-		    }
-		});
 
 		GridBagConstraints c = new GridBagConstraints();
 		int y = 0;
@@ -182,21 +158,44 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		cards.setPreferredSize(new Dimension(449,325));
 		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
 		conversionPanel.add(cards,c);
+
+		int p;
+		p=getPreferredFillStyle();
+		if(p>=fillNames.getItemCount()) p=0;
+		fillNames.setSelectedIndex(p);
 		
-		changeConverter(styleNames.getSelectedIndex());
+		styleNames.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+			    CardLayout cl = (CardLayout)(cards.getLayout());
+			    cl.show(cards, (String)e.getItem());
+				changeConverter(styleNames.getSelectedIndex());
+		    }
+		});
+		
+		fillNames.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				changeConverter(styleNames.getSelectedIndex());
+		    }
+		});
+		
+		p=getPreferredDrawStyle();
+		if(p>=styleNames.getItemCount()) p=0;
+		styleNames.setSelectedIndex(p);
 		
 		int result = JOptionPane.showConfirmDialog(parent, conversionPanel, Translator.get("ConversionOptions"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			wasCancelled=false;
-			stopSwingWorker();
 			setPreferredDrawStyle(styleNames.getSelectedIndex());
 			setPreferredFillStyle(fillNames.getSelectedIndex());
 			return true;
 		} else {
 			wasCancelled=true;
-			stopSwingWorker();
 		}
+		
+		stopSwingWorker();
 
 		return false;
 	}
@@ -217,7 +216,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			default: break;
 		}
 		
-		createSwingWorker();
+		startSwingWorker();
 	}
 	
 	public void reconvert() {
@@ -320,7 +319,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 	}
 
-	protected void createSwingWorker() {
+	protected void startSwingWorker() {
 		//Log.message("Starting swingWorker");
 
 		machine = chosenRobot.getSettings();

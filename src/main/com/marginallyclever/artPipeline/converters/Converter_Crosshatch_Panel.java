@@ -3,17 +3,17 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 	private Converter_Crosshatch converter;
-	private	SelectFloat intensityField;
+	private	SelectSlider intensityField;
 	
 	public Converter_Crosshatch_Panel(Converter_Crosshatch arg0) {
 		super();
 		converter=arg0;
 		
-		add(intensityField = new SelectFloat(Translator.get("ConverterIntensity"),converter.getIntensity()));
+		add(intensityField = new SelectSlider(Translator.get("ConverterIntensity"),200,1,(int)(converter.getIntensity()*10.0)));
 		finish();
 	}
 
@@ -22,7 +22,7 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setIntensity(intensityField.getValue());
+		converter.setIntensity((float)intensityField.getValue()/10.0f);
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}
 }

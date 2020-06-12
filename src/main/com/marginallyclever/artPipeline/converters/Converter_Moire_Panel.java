@@ -8,14 +8,14 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
 public class Converter_Moire_Panel extends ImageConverterPanel {
 	private Converter_Moire converter;
-	private SelectFloat sizeField;	
+	private SelectFloat scaleField;	
 	private SelectOneOfMany directionChoices;
 	
 	public Converter_Moire_Panel(Converter_Moire arg0) {
 		super();
 		converter=arg0;
 
-		add(sizeField = new SelectFloat(Translator.get("HilbertCurveSize"),converter.getScale()));
+		add(scaleField = new SelectFloat(Translator.get("HilbertCurveSize"),converter.getScale()));
 		add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
 		finish();
 	}
@@ -25,7 +25,7 @@ public class Converter_Moire_Panel extends ImageConverterPanel {
 		// TODO Auto-generated method stub
 		super.update(o, arg);
 		
-		converter.setScale(sizeField.getValue());
+		converter.setScale(scaleField.getValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
 	}

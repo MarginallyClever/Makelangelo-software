@@ -24,7 +24,7 @@ public class Converter_Sandy_Panel extends ImageConverterPanel {
 	@Override
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
-		
+
 		converter.setScale(sizeField.getValue());
 		converter.setDirection(directionChoices.getSelectedIndex());
 		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();

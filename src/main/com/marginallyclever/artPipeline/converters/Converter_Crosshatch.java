@@ -2,6 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -37,6 +38,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
+		turtle = new Turtle();
+		
 		double leveladd = 255.0 / 6.0;
 		double level = leveladd;
 

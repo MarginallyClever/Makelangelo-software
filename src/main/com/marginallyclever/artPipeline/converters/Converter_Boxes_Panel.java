@@ -3,7 +3,6 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Converter_Boxes_Panel extends ImageConverterPanel {
@@ -15,9 +14,8 @@ public class Converter_Boxes_Panel extends ImageConverterPanel {
 		super();
 		this.converter=arg0;
 		
-		add(boxSize = new SelectSlider(Translator.get("BoxGeneratorMaxSize"),20,1,converter.getBoxMasSize()));
+		add(boxSize = new SelectSlider(Translator.get("BoxGeneratorMaxSize"),40,1,converter.getBoxMasSize()));
 		add(cutoff = new SelectSlider(Translator.get("BoxGeneratorCutoff"),255,0,converter.getCutoff()));
-		add(new SelectReadOnlyText(Translator.get("BoxGeneratorMaxSizeNote")));
 		finish();
 	}
 

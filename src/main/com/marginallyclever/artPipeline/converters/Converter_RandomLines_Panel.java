@@ -11,7 +11,6 @@ public class Converter_RandomLines_Panel extends ImageConverterPanel {
 	
 	public Converter_RandomLines_Panel(Converter_RandomLines arg0) {
 		super();
-		
 		converter=arg0;
 		
 		add(sizeField = new SelectInteger(Translator.get("ConverterRandomLinesCount"),converter.getLineCount()));
