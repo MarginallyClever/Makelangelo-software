@@ -31,14 +31,17 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		int oldC = converter.getNumCells();
-		converter.setNumCells(text_cells.getValue());
-		int newC = converter.getNumCells();
-		converter.setMinDotSize(text_dot_min.getValue());
-		converter.setMaxDotSize(text_dot_max.getValue());
-		converter.setCutoff(field_cutoff.getValue());
 		converter.setDrawBorders(draw_borders.isSelected());
-		if(newC!=oldC) {
+		
+		boolean goAgain = (converter.getNumCells() != text_cells.getValue())
+						| (converter.getMinDotSize() != text_cells.getValue())
+						| (converter.getMaxDotSize() != text_cells.getValue())
+						| (converter.getCutoff() != text_cells.getValue());
+		if(goAgain) {
+			converter.setNumCells(text_cells.getValue());
+			converter.setMinDotSize(text_dot_min.getValue());
+			converter.setMaxDotSize(text_dot_max.getValue());
+			converter.setCutoff(field_cutoff.getValue());
 			converter.restart();
 		}
 	}

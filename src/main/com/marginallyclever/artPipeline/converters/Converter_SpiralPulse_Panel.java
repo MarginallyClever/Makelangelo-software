@@ -28,6 +28,6 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
 		converter.setIntensity(intensityField.getValue());
 		converter.setSpacing(spacingField.getValue());
 		converter.setHeight(heightField.getValue());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

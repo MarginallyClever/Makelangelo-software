@@ -25,6 +25,6 @@ public class Converter_Boxes_Panel extends ImageConverterPanel {
 		
 		converter.setBoxMaxSize(boxSize.getValue());
 		converter.setCutoff(cutoff.getValue());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

@@ -27,6 +27,6 @@ public class Converter_Moire_Panel extends ImageConverterPanel {
 		
 		converter.setScale(scaleField.getValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

@@ -24,8 +24,11 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	public void update(Observable o, Object arg) {
 		super.update(o, arg);
 		
-		converter.setNumCells(numCells.getValue());
-		converter.setMinDotSize(minDotSize.getValue());
-		converter.restart();
+		if( numCells.getValue() != converter.getNumCells() ||
+			minDotSize.getValue() != converter.getMinDotSize() ) {
+			converter.setNumCells(numCells.getValue());
+			converter.setMinDotSize(minDotSize.getValue());
+			converter.restart();
+		}
 	}
 }

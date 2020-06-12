@@ -29,6 +29,15 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 
 	public static LoadAndSaveImage loadAndSaveImage;
 
+	public void restart() {
+		if(!keepIterating) {
+			if(loadAndSaveImage!=null) {
+				loadAndSaveImage.reconvert();
+			}
+			return;
+		}
+	}
+	
 	/**
 	 * set the image to be transformed.
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.

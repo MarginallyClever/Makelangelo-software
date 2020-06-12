@@ -26,6 +26,6 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 
 		converter.setScale(sizeField.getValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

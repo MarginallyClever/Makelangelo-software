@@ -3,7 +3,6 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.Observable;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
@@ -27,6 +26,6 @@ public class Converter_Sandy_Panel extends ImageConverterPanel {
 
 		converter.setScale(sizeField.getValue());
 		converter.setDirection(directionChoices.getSelectedIndex());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

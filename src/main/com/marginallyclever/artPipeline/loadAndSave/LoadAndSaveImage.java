@@ -201,13 +201,16 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	
 	private void changeConverter(int index) {
+		ImageConverter requestedConverter = getConverter(index);
+		if(requestedConverter== chosenConverter) return;
+
 		//Log.message("Changing converter");
 		stopSwingWorker();
 
 		ImageConverterPanel.loadAndSaveImage = this;
 		ImageConverter.loadAndSaveImage = this;
 		
-		chosenConverter = getConverter(index);
+		chosenConverter = requestedConverter;
 		Log.message("Converter="+chosenConverter.getName());
 		
 		switch(fillNames.getSelectedIndex()) {

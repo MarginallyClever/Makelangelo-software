@@ -57,7 +57,6 @@ public class SelectInteger extends Select {
 			}
 			
 			public void validate() {
-				@SuppressWarnings("unused")
 				int newNumber;
 				
 				try {

@@ -26,6 +26,6 @@ public class Converter_Multipass_Panel extends ImageConverterPanel {
 		
 		converter.setAngle(angleField.getValue());
 		converter.setPasses(passesField.getValue());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

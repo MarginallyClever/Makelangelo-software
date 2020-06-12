@@ -23,6 +23,6 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 		super.update(o, arg);
 		
 		converter.setIntensity((float)intensityField.getValue()/10.0f);
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

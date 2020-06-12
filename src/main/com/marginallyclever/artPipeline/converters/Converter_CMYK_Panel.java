@@ -24,6 +24,6 @@ public class Converter_CMYK_Panel extends ImageConverterPanel {
 		super.update(o, arg);
 		
 		converter.setPasses(passesField.getValue());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }

@@ -65,7 +65,6 @@ public class SelectFloat extends Select {
 			}
 
 			public void validate() {
-				@SuppressWarnings("unused")
 				float newNumber;
 
 				try {

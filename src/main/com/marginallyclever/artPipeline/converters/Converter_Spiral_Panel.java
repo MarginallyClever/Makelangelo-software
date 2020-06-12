@@ -21,6 +21,6 @@ public class Converter_Spiral_Panel extends ImageConverterPanel {
 		super.update(o, arg);
 		
 		converter.setToCorners(toCornersField.isSelected());
-		if(loadAndSaveImage!=null) loadAndSaveImage.reconvert();
+		converter.restart();
 	}
 }
