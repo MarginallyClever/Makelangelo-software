@@ -77,7 +77,7 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	 * draw the results as the calculation is being performed.
 	 */
 	public void render(GL2 gl2) {
-		if(texture==null ) {
+		if( texture==null ) {
 			if( sourceImage!=null) {
 				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
 			}

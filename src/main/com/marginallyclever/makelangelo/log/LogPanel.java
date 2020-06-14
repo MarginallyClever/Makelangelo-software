@@ -6,21 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -31,9 +26,8 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	MakelangeloRobot robot;
 	
 	// logging
-	private JTextPane logArea;
-	private HTMLEditorKit kit;
-	private HTMLDocument doc;
+	private JList<String> logArea;
+	private DefaultListModel<String> listModel;
 	private JScrollPane logPane;
 
 	// command line
@@ -48,44 +42,9 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		// log panel
 		Log.addListener(this);
 
-		logArea = new JTextPane();
-		logArea.setEditable(false);
-		kit = new HTMLEditorKit();
-		doc = new HTMLDocument();
-		logArea.setEditorKit(kit);
-		logArea.setDocument(doc);
-		DefaultCaret caret = (DefaultCaret) logArea.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		listModel = new DefaultListModel<String>();
+		logArea = new JList<String>(listModel);
 		logPane = new JScrollPane(logArea); 
-				
-		Logger logger = Logger.getLogger("");
-		Handler logHandler = new Handler() {
-			@Override
-			public void publish(LogRecord record) {
-				// TODO Auto-generated method stub
-
-			    if (!isLoggable(record))
-			      return;
-			    String message = getFormatter().format(record);
-			    try {
-					kit.insertHTML(doc, doc.getLength(), message, 0, 0, null);
-				} catch (BadLocationException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			    logArea.validate();
-			}
-
-			@Override
-			public void flush() {}
-
-			@Override
-			public void close() throws SecurityException {}	
-		};
-		logHandler.setFormatter(new LogFormatterHTML());
-		logger.addHandler(logHandler);
-		
-
 
 		// Now put all the parts together
 		this.setLayout(new GridBagLayout());
@@ -105,9 +64,6 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		con1.weightx=1;
 		con1.weighty=0;
 		this.add(getTextInputField(),con1);
-		
-		// lastly, clear the log
-		//clearLog();
 	}
 
 
@@ -126,28 +82,11 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		msg = msg.replace("\n\n", "\n");
 		if(msg.length()==0) return;
 		
-		try {
-			long docLen = doc.getLength();
-			long caretPosition = logArea.getCaretPosition();
-			
-			kit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
-			
-			int over_length = 0;
-			String startingText ="";
-			if(docLen>LOG_LENGTH) {
-				startingText = doc.getText(0, 1000);
-				over_length = startingText.indexOf("\n")+1;
-			}
-			// don't let the log grow forever
-			doc.remove(0, over_length);
-			
-			if(docLen==caretPosition) {
-				logArea.setCaretPosition(doc.getLength());
-			}
-		} catch (BadLocationException | IOException e) {
-			// FIXME failure here logs new error, causes infinite loop?
-			Log.error("Logging error: "+e.getMessage());
+		listModel.addElement(msg);
+		if(listModel.size()>LOG_LENGTH) {
+			listModel.remove(0);
 		}
+		logArea.ensureIndexIsVisible(listModel.getSize()-1);
 	}
 
 
@@ -254,13 +193,7 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 	}
 */
 	public void clearLog() {
-		try {
-			doc.replace(0, doc.getLength(), "", null);
-			kit.insertHTML(doc, 0, "", 0, 0, null);
-			//logPane.getVerticalScrollBar().setValue(logPane.getVerticalScrollBar().getMaximum());
-		} catch (BadLocationException | IOException e) {
-
-		}
+		listModel.removeAllElements();
 	}
 	
 	// The user has done something. respond to it.

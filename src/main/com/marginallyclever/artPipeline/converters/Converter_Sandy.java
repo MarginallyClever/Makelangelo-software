@@ -4,6 +4,7 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.log.Log;
 
 
 public class Converter_Sandy extends ImageConverter {
@@ -74,56 +75,66 @@ public class Converter_Sandy extends ImageConverter {
 		double pulseFlip=1;
 		double t,t_step;
 		double flipSum;
-		double pulseSize = rStep*0.5;//r_step * 0.6 * scale_z;
+		double pulseSize = rStep*0.5 - machine.getPenDiameter()/2;//r_step * 0.6 * scale_z;
 
 		turtle = new Turtle();
+		turtle.lock();
+		Log.message("Sandy started.");
+		//Thread.dumpStack();
 		
-		// make concentric circles that get bigger and bigger.
-		for(r=rMin;r<rMax;r+=rStep) {
-			// go around in a circle
-			t=0;
-			t_step = machine.getPenDiameter()/r;
-			flipSum=0;
-			// go around the circle
-			for(t=0;t<Math.PI*2;t+=t_step) {
-				dx = Math.cos(t_dir *t);
-				dy = Math.sin(t_dir *t);
-				x = cx + dx * r;
-				y = cy + dy * r;
-				if(!isInsidePaperMargins(x,y)) {
-					if(wasDrawing) {
-						turtle.jumpTo(last_x,last_y);
-						wasDrawing=false;
+		try {
+			// make concentric circles that get bigger and bigger.
+			for(r=rMin;r<rMax;r+=rStep) {
+				// go around in a circle
+				t=0;
+				t_step = machine.getPenDiameter()/r;
+				flipSum=0;
+				// go around the circle
+				for(t=0;t<Math.PI*2;t+=t_step) {
+					dx = Math.cos(t_dir *t);
+					dy = Math.sin(t_dir *t);
+					x = cx + dx * r;
+					y = cy + dy * r;
+					if(!isInsidePaperMargins(x,y)) {
+						if(wasDrawing) {
+							turtle.jumpTo(last_x,last_y);
+							wasDrawing=false;
+						}
+						continue;
 					}
-					continue;
-				}
-
-				last_x=x;
-				last_y=y;
-				// read a block of the image and find the average intensity in this block
-				z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
-				// scale the intensity value
-				if(z<0) z=0;
-				if(z>255) z=255;
-				scaleZ = (255.0 -  z) / 255.0;
-
-				if(wasDrawing == false) {
-					turtle.jumpTo(last_x,last_y);
-					wasDrawing=true;
-				}
-
-				turtle.moveTo(	x + dx * pulseSize*pulseFlip,
-								y + dy * pulseSize*pulseFlip);
-				
-				flipSum+=scaleZ;
-				if(flipSum >= 1) {
-					flipSum-=1;
-					pulseFlip = -pulseFlip;
+	
+					last_x=x;
+					last_y=y;
+					// read a block of the image and find the average intensity in this block
+					z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
+					// scale the intensity value
+					if(z<0) z=0;
+					if(z>255) z=255;
+					scaleZ = (255.0 -  z) / 255.0;
+	
+					if(wasDrawing == false) {
+						turtle.jumpTo(last_x,last_y);
+						wasDrawing=true;
+					}
+	
 					turtle.moveTo(	x + dx * pulseSize*pulseFlip,
 									y + dy * pulseSize*pulseFlip);
+					
+					flipSum+=scaleZ;
+					if(flipSum >= 1) {
+						flipSum-=1;
+						pulseFlip = -pulseFlip;
+						turtle.moveTo(	x + dx * pulseSize*pulseFlip,
+										y + dy * pulseSize*pulseFlip);
+					}
 				}
+				t_dir=-t_dir;
 			}
-			t_dir=-t_dir;
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			turtle.unlock();
+			Log.message("Sandy finished.");
 		}
 	}
 
