@@ -134,16 +134,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	protected boolean parseAll(Document document) {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		NodeList pathNodes = documentElement.getElementsByTagName( "path" );
-		boolean loadOK = parsePathElements(pathNodes);
-		if(loadOK) {
-			pathNodes = documentElement.getElementsByTagName( "polyline" );
-			loadOK = parsePolylineElements(pathNodes);
-		}
-		if(loadOK) {
-			pathNodes = documentElement.getElementsByTagName( "polygon" );
-			loadOK = parsePolylineElements(pathNodes);
-		}
+		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path" ));
+		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
+		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon" ));
+		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "rect" ));
+		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "circle" ));
 		return loadOK;
 	}
 
