@@ -78,7 +78,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 
-		// prepare for exporting
+		// prepare for importing
 		machine = robot.getSettings();
 		minX = minY =Double.MAX_VALUE;
 		maxX = maxY =-Double.MAX_VALUE;
@@ -132,14 +132,16 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	protected boolean parseAll(Document document) {
-		NodeList pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "path" );
+		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
+
+		NodeList pathNodes = documentElement.getElementsByTagName( "path" );
 		boolean loadOK = parsePathElements(pathNodes);
 		if(loadOK) {
-			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polyline" );
+			pathNodes = documentElement.getElementsByTagName( "polyline" );
 			loadOK = parsePolylineElements(pathNodes);
 		}
 		if(loadOK) {
-			pathNodes = ((SVGOMSVGElement)document.getDocumentElement()).getElementsByTagName( "polygon" );
+			pathNodes = documentElement.getElementsByTagName( "polygon" );
 			loadOK = parsePolylineElements(pathNodes);
 		}
 		return loadOK;
