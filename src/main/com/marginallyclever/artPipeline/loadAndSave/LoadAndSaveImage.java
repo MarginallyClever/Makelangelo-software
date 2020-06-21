@@ -62,9 +62,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private static JComboBox<String> fillNames;
 	private JPanel cards;
 	
-	/**
-	 * Set of image file extensions.
-	 */
+	// Set of image file extensions.
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 	static {
 		IMAGE_FILE_EXTENSIONS = new HashSet<>();
@@ -80,6 +78,9 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	private ArrayList<String> imageConverterNames = new ArrayList<String>();
 	private String[] imageFillNames;
 	
+	private ArrayList<SwingWorker<Void, Void>> workerList = new ArrayList<SwingWorker<Void, Void>>();
+	private int workerCount = 0;
+
 	
 	public LoadAndSaveImage() {
 		converters = ServiceLoader.load(ImageConverter.class);
@@ -270,9 +271,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		return true;
 	}
 
-	/**
-	 * adjust image to fill the paper
-	 */
+	// adjust image to fill the paper
 	public void scaleToFillPaper() {
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
 
@@ -287,7 +286,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		}
 		img.setScale(f,-f);
 	}
-
 	
 	public void scaleToFitPaper() {
 		MakelangeloRobotSettings s = chosenRobot.getSettings();
@@ -304,9 +302,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		img.setScale(f,-f);
 	}
 	
-	private ArrayList<SwingWorker<Void, Void>> workerList = new ArrayList<SwingWorker<Void, Void>>();
-	private int workerCount = 0;
-
 	protected void stopSwingWorker() {
 		chosenRobot.setDecorator(null);
 		if(chosenConverter!=null) {
