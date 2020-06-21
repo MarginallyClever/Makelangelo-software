@@ -749,9 +749,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public void setTurtle(Turtle t) {
 		turtle = new Turtle(t);
-
 		myPipeline.processTurtle(turtle, settings);
-
 		saveCurrentTurtleToDrawing();
 	}
 
