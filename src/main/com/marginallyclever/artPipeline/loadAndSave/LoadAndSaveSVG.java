@@ -137,14 +137,16 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path" ));
 		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
 		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon" ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "rect" ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "circle" ));
+		if(loadOK) loadOK = parseRectElements(documentElement.getElementsByTagName( "rect" ));
+		if(loadOK) loadOK = parseCircleElements(documentElement.getElementsByTagName( "circle" ));
+		if(loadOK) loadOK = parseEllipseElements(documentElement.getElementsByTagName( "ellipse" ));
 		return loadOK;
 	}
 
 	protected double TX(double x) {
 		return ( x - imageCenterX ) * scale;
 	}
+	
 	protected double TY(double y) {
 		return ( y - imageCenterY ) * -scale;
 	}
@@ -158,14 +160,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-	    	SVGPointShapeElement pathElement = ((SVGPointShapeElement)pathNodes.item( iPathNode ));
+	    	SVGPointShapeElement pathElement = (SVGPointShapeElement)pathNodes.item( iPathNode );
 	    	SVGPointList pointList = pathElement.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//Log.message("New Node has "+pathObjects+" elements.");
 			
 	    	boolean first=true;
 			for( int i=0; i<numPoints; ++i ) {
-				SVGPoint  item = (SVGPoint) pointList.getItem(i);
+				SVGPoint item = (SVGPoint)pointList.getItem(i);
 				boolean doJump=false;
 				
 				if(first) {
@@ -203,6 +205,65 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		double dy=y-previousY;
 		
 		return dx*dx+dy*dy;
+	}
+	
+	protected boolean parseRectElements(NodeList node) {
+		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
+		try {
+			float x = Float.parseFloat(element.getAttribute("x"));
+			float y = Float.parseFloat(element.getAttribute("y"));
+			float w = Float.parseFloat(element.getAttribute("width"));
+			float h = Float.parseFloat(element.getAttribute("height"));
+			turtle.jumpTo(TX(x  ),TY(y  ));
+			turtle.moveTo(TX(x+w),TY(y  ));
+			turtle.moveTo(TX(x+w),TY(y+h));
+			turtle.moveTo(TX(x  ),TY(y+h));
+			turtle.moveTo(TX(x  ),TY(y  ));
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	protected boolean parseCircleElements(NodeList node) {
+		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
+		try {
+			double cx = Double.parseDouble(element.getAttribute("cx"));
+			double cy = Double.parseDouble(element.getAttribute("cy"));
+			double r  = Double.parseDouble(element.getAttribute("r"));
+			turtle.jumpTo(TX(cx+r),TY(cy));
+			for(double i=1;i<40;++i) {  // hard coded 40?  gross!
+				double v = (Math.PI*2.0) * (i/40.0);
+				double s=r*Math.sin(v);
+				double c=r*Math.cos(v);
+				turtle.moveTo(TX(cx+c),TY(cy+s));
+			}
+			turtle.moveTo(TX(cx+r),TY(cy));
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	protected boolean parseEllipseElements(NodeList node) {
+		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
+		try {
+			double cx = Double.parseDouble(element.getAttribute("cx"));
+			double cy = Double.parseDouble(element.getAttribute("cy"));
+			double rx = Double.parseDouble(element.getAttribute("rx"));
+			double ry = Double.parseDouble(element.getAttribute("ry"));
+			turtle.jumpTo(TX(cx+rx),TY(cy));
+			for(double i=1;i<40;++i) {  // hard coded 40?  gross!
+				double v = (Math.PI*2.0) * (i/40.0);
+				double s=ry*Math.sin(v);
+				double c=rx*Math.cos(v);
+				turtle.moveTo(TX(cx+c),TY(cy+s));
+			}
+			turtle.moveTo(TX(cx+rx),TY(cy));
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
