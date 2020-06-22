@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -159,9 +160,9 @@ public class SelectTests {
 	public void testFloat() {
 		// test contructor(s)
 		SelectFloat b = new SelectFloat("test",0);
-		assertTrue(b.getValue()==0);
+		assertEquals(0.0f,b.getValue());
 		b = new SelectFloat("test2",0.1f);
-		assertTrue(b.getValue()==0.1f);
+		assertEquals(0.1f,b.getValue());
 		
 		panel.add(b);
 		
@@ -176,7 +177,7 @@ public class SelectTests {
 		
 		b.setValue(0.2f);
 		assertTrue(testObservation>0);
-		assertTrue(b.getValue()==0.2f);	
+		assertEquals(0.2f,b.getValue());	
 	}
 	
 	@Test
