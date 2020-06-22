@@ -32,6 +32,7 @@ import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -48,7 +49,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	protected boolean shouldScaleOnLoad = true;
 	
-	protected double maxX,minX,maxY,minY;
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 	
@@ -81,8 +81,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 		// prepare for importing
 		machine = robot.getSettings();
-		minX = minY =Double.MAX_VALUE;
-		maxX = maxY =-Double.MAX_VALUE;
 		imageCenterX=imageCenterY=0;
 		scale=1;
 		
@@ -96,11 +94,15 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			return false;
 		}
 		
-		imageCenterX = ( maxX + minX ) / 2.0;
-		imageCenterY = -( maxY + minY ) / 2.0;
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		
+		turtle.getBounds(top, bottom);
+		imageCenterX = ( top.x + bottom.x ) / 2.0;
+		imageCenterY = -( top.y + bottom.y ) / 2.0;
 
-		double imageWidth  = maxX - minX;
-		double imageHeight = maxY - minY;
+		double imageWidth  = top.x - bottom.x;
+		double imageHeight = top.y - bottom.y;
 
 		// add 2% for margins
 
@@ -180,7 +182,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 				double x = TX( item.getX() );
 				double y = TY( item.getY() );
-				adjustLimits(x,y);
 				if(doJump) {
 					turtle.jumpTo(x,y);
 				} else {
@@ -224,9 +225,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				turtle.moveTo(TX(x+w),TY(y+h));
 				turtle.moveTo(TX(x  ),TY(y+h));
 				turtle.moveTo(TX(x  ),TY(y  ));
-				
-				adjustLimits(TX(x  ),TY(y  ));
-				adjustLimits(TX(x+w),TY(y+h));
 		    }
 		} catch(Exception e) {
 			return false;
@@ -244,13 +242,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
 				if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
 				turtle.jumpTo(TX(cx+r),TY(cy));
-				adjustLimits(TX(cx+r),TY(cy));
 				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
 					double v = (Math.PI*2.0) * (i/40.0);
 					double s=r*Math.sin(v);
 					double c=r*Math.cos(v);
 					turtle.moveTo(TX(cx+c),TY(cy+s));
-					adjustLimits(TX(cx+c),TY(cy+s));
 				}
 				turtle.moveTo(TX(cx+r),TY(cy));
 		    }
@@ -271,13 +267,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
 				if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
 				turtle.jumpTo(TX(cx+rx),TY(cy));
-				adjustLimits(TX(cx+rx),TY(cy));
 				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
 					double v = (Math.PI*2.0) * (i/40.0);
 					double s=ry*Math.sin(v);
 					double c=rx*Math.cos(v);
 					turtle.moveTo(TX(cx+c),TY(cy+s));
-					adjustLimits(TX(cx+c),TY(cy+s));
 				}
 				turtle.moveTo(TX(cx+rx),TY(cy));
 		    }
@@ -332,9 +326,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						} else {
 							turtle.moveTo(firstX, firstY);
 						}
-						adjustLimits(x,y);
 					}
-				break;
+					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
 					{
 						//Log.message("Move Rel");
@@ -346,7 +339,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						} else {
 							turtle.moveTo(firstX, firstY);
 						}
-						adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
@@ -355,9 +347,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
-						turtle.penDown();
 						turtle.moveTo(x,y);
-						adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
@@ -366,17 +356,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() ) + turtle.getX();
 						y = TY( path.getY() ) + turtle.getY();
-						turtle.penDown();
 						turtle.moveTo(x,y);
-						adjustLimits(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
 					{
 						//Log.message("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
-
-						turtle.penDown();
 						
 						// x0,y0 is the first point
 						double x0=x;
@@ -454,30 +440,22 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 								x=xabc;
 								y=yabc;
 								turtle.moveTo(xabc,yabc);
-								adjustLimits(xabc,yabc);
 							//}
 						}
 						turtle.moveTo(x3,y3);
-						adjustLimits(x3,y3);
 					}
 					break; 
 				default:
 					Log.message("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
 						+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
 					loadOK=false;
+					break;
 				}
 			}
 		}
 	    return loadOK;
 	}
 	
-	
-	protected void adjustLimits(double x,double y) {
-		if(minX>x) minX = x;
-		if(maxX<x) maxX = x;
-		if(minY>y) minY = y;
-		if(maxY<y) maxY = y;
-	}
 
 	protected double p(double a,double b,double fraction) {
 		return ( b - a ) * fraction + a;

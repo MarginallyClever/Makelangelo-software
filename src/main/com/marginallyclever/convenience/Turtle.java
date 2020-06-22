@@ -183,16 +183,16 @@ public class Turtle {
 		top.y=-Float.MAX_VALUE;
 		
 		for( Movement m : history ) {
-			switch(m.type) {
-			case DRAW:
+			//switch(m.type) {
+			//case DRAW:
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
 				if(bottom.y>m.y) bottom.y=m.y;
-				break;
-			default:
-				break;
-			}
+				//break;
+			//default:
+//				break;
+			//}
 		}
 	}
 
