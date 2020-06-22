@@ -19,6 +19,7 @@ import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SVGItem;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPathSeg;
@@ -208,17 +209,25 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	protected boolean parseRectElements(NodeList node) {
-		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
 		try {
-			float x = Float.parseFloat(element.getAttribute("x"));
-			float y = Float.parseFloat(element.getAttribute("y"));
-			float w = Float.parseFloat(element.getAttribute("width"));
-			float h = Float.parseFloat(element.getAttribute("height"));
-			turtle.jumpTo(TX(x  ),TY(y  ));
-			turtle.moveTo(TX(x+w),TY(y  ));
-			turtle.moveTo(TX(x+w),TY(y+h));
-			turtle.moveTo(TX(x  ),TY(y+h));
-			turtle.moveTo(TX(x  ),TY(y  ));
+		    int pathNodeCount = node.getLength();
+		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+				Element element = (Element)node.item( iPathNode );
+				double x=0,y=0;
+				
+				if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
+				if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
+				double w = Double.parseDouble(element.getAttribute("width"));
+				double h = Double.parseDouble(element.getAttribute("height"));
+				turtle.jumpTo(TX(x  ),TY(y  ));
+				turtle.moveTo(TX(x+w),TY(y  ));
+				turtle.moveTo(TX(x+w),TY(y+h));
+				turtle.moveTo(TX(x  ),TY(y+h));
+				turtle.moveTo(TX(x  ),TY(y  ));
+				
+				adjustLimits(TX(x  ),TY(y  ));
+				adjustLimits(TX(x+w),TY(y+h));
+		    }
 		} catch(Exception e) {
 			return false;
 		}
@@ -226,19 +235,25 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	protected boolean parseCircleElements(NodeList node) {
-		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
 		try {
-			double cx = Double.parseDouble(element.getAttribute("cx"));
-			double cy = Double.parseDouble(element.getAttribute("cy"));
-			double r  = Double.parseDouble(element.getAttribute("r"));
-			turtle.jumpTo(TX(cx+r),TY(cy));
-			for(double i=1;i<40;++i) {  // hard coded 40?  gross!
-				double v = (Math.PI*2.0) * (i/40.0);
-				double s=r*Math.sin(v);
-				double c=r*Math.cos(v);
-				turtle.moveTo(TX(cx+c),TY(cy+s));
-			}
-			turtle.moveTo(TX(cx+r),TY(cy));
+		    int pathNodeCount = node.getLength();
+		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+				Element element = (Element)node.item( iPathNode );
+				double cx=0,cy=0,r=0;
+				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+				if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
+				turtle.jumpTo(TX(cx+r),TY(cy));
+				adjustLimits(TX(cx+r),TY(cy));
+				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
+					double v = (Math.PI*2.0) * (i/40.0);
+					double s=r*Math.sin(v);
+					double c=r*Math.cos(v);
+					turtle.moveTo(TX(cx+c),TY(cy+s));
+					adjustLimits(TX(cx+c),TY(cy+s));
+				}
+				turtle.moveTo(TX(cx+r),TY(cy));
+		    }
 		} catch(Exception e) {
 			return false;
 		}
@@ -246,20 +261,26 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	protected boolean parseEllipseElements(NodeList node) {
-		org.w3c.dom.Element element = (org.w3c.dom.Element)node.item( 0 );
 		try {
-			double cx = Double.parseDouble(element.getAttribute("cx"));
-			double cy = Double.parseDouble(element.getAttribute("cy"));
-			double rx = Double.parseDouble(element.getAttribute("rx"));
-			double ry = Double.parseDouble(element.getAttribute("ry"));
-			turtle.jumpTo(TX(cx+rx),TY(cy));
-			for(double i=1;i<40;++i) {  // hard coded 40?  gross!
-				double v = (Math.PI*2.0) * (i/40.0);
-				double s=ry*Math.sin(v);
-				double c=rx*Math.cos(v);
-				turtle.moveTo(TX(cx+c),TY(cy+s));
-			}
-			turtle.moveTo(TX(cx+rx),TY(cy));
+		    int pathNodeCount = node.getLength();
+		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+				Element element = (Element)node.item( iPathNode );
+				double cx=0,cy=0,rx=0,ry=0;
+				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+				if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
+				if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
+				turtle.jumpTo(TX(cx+rx),TY(cy));
+				adjustLimits(TX(cx+rx),TY(cy));
+				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
+					double v = (Math.PI*2.0) * (i/40.0);
+					double s=ry*Math.sin(v);
+					double c=rx*Math.cos(v);
+					turtle.moveTo(TX(cx+c),TY(cy+s));
+					adjustLimits(TX(cx+c),TY(cy+s));
+				}
+				turtle.moveTo(TX(cx+rx),TY(cy));
+		    }
 		} catch(Exception e) {
 			return false;
 		}
