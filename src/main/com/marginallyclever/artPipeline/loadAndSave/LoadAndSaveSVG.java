@@ -137,12 +137,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	protected boolean parseAll(Document document) {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path" ));
+		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path"     ));
 		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon" ));
-		if(loadOK) loadOK = parseRectElements(documentElement.getElementsByTagName( "rect" ));
-		if(loadOK) loadOK = parseCircleElements(documentElement.getElementsByTagName( "circle" ));
-		if(loadOK) loadOK = parseEllipseElements(documentElement.getElementsByTagName( "ellipse" ));
+		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
+		if(loadOK) loadOK = parseLineElements(    documentElement.getElementsByTagName( "line"     ));
+		if(loadOK) loadOK = parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
+		if(loadOK) loadOK = parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
+		if(loadOK) loadOK = parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
 		return loadOK;
 	}
 
@@ -209,6 +210,28 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return dx*dx+dy*dy;
 	}
 	
+	
+	protected boolean parseLineElements(NodeList node) {
+		try {
+		    int pathNodeCount = node.getLength();
+		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+				Element element = (Element)node.item( iPathNode );
+				double x1=0,y1=0;
+				double x2=0,y2=0;
+				
+				if(element.hasAttribute("x1")) x1 = Double.parseDouble(element.getAttribute("x1"));
+				if(element.hasAttribute("y1")) y1 = Double.parseDouble(element.getAttribute("y1"));
+				if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
+				if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));;
+				turtle.jumpTo(TX(x1),TY(y1));
+				turtle.moveTo(TX(x2),TY(y2));
+		    }
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	protected boolean parseRectElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
