@@ -232,22 +232,68 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return true;
 	}
 
+	/**
+	 * Draw rectangles that may have rounded corners.
+	 * given corners
+	 *    x0 x1 x2 x3
+	 * y0    a  b
+	 * y1 c  i  j  d
+	 * y2 e  m  k  f
+	 * y3    g  h
+	 * draw a-b-d-f-h-g-e-c-a.
+	 * 
+	 * See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
+	 * @param node
+	 * @return
+	 */
 	protected boolean parseRectElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 				Element element = (Element)node.item( iPathNode );
 				double x=0,y=0;
+				double rx=0,ry=0;
 				
 				if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
 				if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
+				
+				if(element.hasAttribute("rx")) {
+					rx = Double.parseDouble(element.getAttribute("rx"));
+					if(element.hasAttribute("ry")) {
+						ry = Double.parseDouble(element.getAttribute("ry"));
+					} else {
+						// ry defaults to rx if specified
+						ry = rx;
+					}
+				} else if(element.hasAttribute("ry")) {
+					// rx defaults to ry if specified
+					rx = ry = Double.parseDouble(element.getAttribute("ry"));
+					
+				}
 				double w = Double.parseDouble(element.getAttribute("width"));
 				double h = Double.parseDouble(element.getAttribute("height"));
-				turtle.jumpTo(TX(x  ),TY(y  ));
-				turtle.moveTo(TX(x+w),TY(y  ));
-				turtle.moveTo(TX(x+w),TY(y+h));
-				turtle.moveTo(TX(x  ),TY(y+h));
-				turtle.moveTo(TX(x  ),TY(y  ));
+				
+				double x0=x;	double x1=x+rx;		double x2=x+w-rx;	double x3=x+w;
+				double y0=y;	double y1=y+ry;		double y2=y+h-ry;	double y3=y+h;
+
+				// jump to a
+				turtle.jumpTo(TX(x1),TY(y0));
+				// a to b
+				//turtle.moveTo(TX(x2),TY(y0));
+				// b to d around j
+				arcTurtle(turtle, x2,y1, rx,ry, -0.5,0.0);
+				// d to f
+				//turtle.moveTo(TX(x3),TY(y2));
+				// f to h around k 
+				arcTurtle(turtle, x2,y2, rx,ry, 0.0,0.5);
+				// h to g
+				//turtle.moveTo(TX(x1),TY(y3));
+				// g to e around m
+				arcTurtle(turtle, x1,y2, rx,ry, -1.5,-1.0);
+				// e to c
+				//turtle.moveTo(TX(x0),TY(y1));
+				// c to a round i
+				arcTurtle(turtle, x1,y1, rx,ry, -1.0,-0.5);
 		    }
 		} catch(Exception e) {
 			return false;
@@ -255,6 +301,35 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param turtle 
+	 * @param cx center position
+	 * @param cy center position
+	 * @param rx radius on X
+	 * @param ry radius on Y
+	 * @param p0 radian start angle.
+	 * @param p1 radian end angle.
+	 */
+	protected void arcTurtle(Turtle turtle,double cx,double cy,double rx,double ry,double p0,double p1) {
+		double steps=1;
+		if(rx>0 && ry>0) {
+			double r = rx>ry?rx:ry;
+			double circ = Math.PI*r*2.0;  // radius to circumference 
+			steps = Math.ceil(circ/4.0);  // 1/4 circumference
+			steps = Math.max(steps,1);
+		}
+		System.out.println("steps="+steps);
+		steps = steps/4;
+		for(double p = 0;p<=steps;++p) {
+			double pFraction = Math.PI * ((p1-p0)*(p/steps) + p0);
+			double c = Math.cos(pFraction) * rx;
+			double s = Math.sin(pFraction) * ry;
+			System.out.println("c"+c+"\ts"+s);
+			turtle.moveTo(TX(cx+c), TY(cy+s));
+		}
+	}
+	
 	protected boolean parseCircleElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
