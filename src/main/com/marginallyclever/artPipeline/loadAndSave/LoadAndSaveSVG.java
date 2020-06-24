@@ -168,26 +168,17 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGPointList pointList = pathElement.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//Log.message("New Node has "+pathObjects+" elements.");
-			
-	    	boolean first=true;
-			for( int i=0; i<numPoints; ++i ) {
-				SVGPoint item = (SVGPoint)pointList.getItem(i);
-				boolean doJump=false;
-				
-				if(first) {
-					first=false;
-					if(distanceSquared(item,turtle.getX(),turtle.getY())>4) {
-						doJump=true;
-					}
-				}
 
-				double x = TX( item.getX() );
-				double y = TY( item.getY() );
-				if(doJump) {
-					turtle.jumpTo(x,y);
-				} else {
-					turtle.moveTo(x,y);
-				}
+			SVGPoint item = (SVGPoint)pointList.getItem(0);
+			double x = TX( item.getX() );
+			double y = TY( item.getY() );
+			turtle.jumpTo(x,y);
+			
+			for( int i=1; i<numPoints; ++i ) {
+				item = (SVGPoint)pointList.getItem(i);
+				x = TX( item.getX() );
+				y = TY( item.getY() );
+				turtle.moveTo(x,y);
 			}
 		}
 	    return loadOK;
@@ -273,27 +264,20 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				double w = Double.parseDouble(element.getAttribute("width"));
 				double h = Double.parseDouble(element.getAttribute("height"));
 				
-				double x0=x;	double x1=x+rx;		double x2=x+w-rx;	double x3=x+w;
-				double y0=y;	double y1=y+ry;		double y2=y+h-ry;	double y3=y+h;
+				//double x0=x;
+				double x1=x+rx;
+				double x2=x+w-rx;
+				//double x3=x+w;
+				double y0=y;
+				double y1=y+ry;
+				double y2=y+h-ry;
+				//double y3=y+h;
 
-				// jump to a
 				turtle.jumpTo(TX(x1),TY(y0));
-				// a to b
-				//turtle.moveTo(TX(x2),TY(y0));
-				// b to d around j
-				arcTurtle(turtle, x2,y1, rx,ry, -0.5,0.0);
-				// d to f
-				//turtle.moveTo(TX(x3),TY(y2));
-				// f to h around k 
-				arcTurtle(turtle, x2,y2, rx,ry, 0.0,0.5);
-				// h to g
-				//turtle.moveTo(TX(x1),TY(y3));
-				// g to e around m
-				arcTurtle(turtle, x1,y2, rx,ry, -1.5,-1.0);
-				// e to c
-				//turtle.moveTo(TX(x0),TY(y1));
-				// c to a round i
-				arcTurtle(turtle, x1,y1, rx,ry, -1.0,-0.5);
+				arcTurtle(turtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0); 
+				arcTurtle(turtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5);
+				arcTurtle(turtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0);
+				arcTurtle(turtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5);
 		    }
 		} catch(Exception e) {
 			return false;
@@ -319,13 +303,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			steps = Math.ceil(circ/4.0);  // 1/4 circumference
 			steps = Math.max(steps,1);
 		}
-		System.out.println("steps="+steps);
 		steps = steps/4;
 		for(double p = 0;p<=steps;++p) {
-			double pFraction = Math.PI * ((p1-p0)*(p/steps) + p0);
+			double pFraction = ((p1-p0)*(p/steps) + p0);
 			double c = Math.cos(pFraction) * rx;
 			double s = Math.sin(pFraction) * ry;
-			System.out.println("c"+c+"\ts"+s);
 			turtle.moveTo(TX(cx+c), TY(cy+s));
 		}
 	}
@@ -419,11 +401,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() );
 						firstY = y = TY( path.getY() );
-						if(distanceSquared(firstX,firstY,turtle.getX(),turtle.getY())>4) {
-							turtle.jumpTo(firstX,firstY);
-						} else {
-							turtle.moveTo(firstX, firstY);
-						}
+						turtle.jumpTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
@@ -432,11 +410,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() ) + turtle.getX();
 						firstY = y = TY( path.getY() ) + turtle.getY();
-						if(distanceSquared(firstX,firstY,turtle.getX(),turtle.getY())>4) {
-							turtle.jumpTo(firstX,firstY);
-						} else {
-							turtle.moveTo(firstX, firstY);
-						}
+						turtle.jumpTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
