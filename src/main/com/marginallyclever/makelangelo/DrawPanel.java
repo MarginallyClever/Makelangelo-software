@@ -153,6 +153,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		}
 		cameraOffsetX = 0;
 		cameraOffsetY = 0;
+		
+		repaint();
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -196,6 +198,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private void moveCamera(int dx, int dy) {
 		cameraOffsetX += (float) dx * cameraZoom / windowWidth;
 		cameraOffsetY += (float) dy * cameraZoom / windowHeight;
+		repaint();
 	}
 
 	/**
@@ -209,6 +212,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 		cameraZoom += zoomAmount;
 		if (cameraZoom < 0.1)
 			cameraZoom = 0.1;
+		
+		repaint();
 	}
 
 	/**
@@ -217,6 +222,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void zoomIn() {
 		cameraZoom *= 3.5d / 4.0d;
 		if(cameraZoom<CAMERA_ZNEAR) cameraZoom=CAMERA_ZNEAR;
+		
+		repaint();
 	}
 
 	/**
@@ -225,6 +232,8 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	public void zoomOut() {
 		cameraZoom *= 4.0d / 3.5d;
 		if(cameraZoom>CAMERA_ZFAR) cameraZoom=CAMERA_ZFAR;
+		
+		repaint();
 	}
 
 	public double getZoom() {
