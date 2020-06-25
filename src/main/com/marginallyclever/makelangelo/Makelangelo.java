@@ -434,7 +434,7 @@ public final class Makelangelo
 
 		// start animation system
 		Log.message("  starting animator...");
-		animator = new FPSAnimator(20);
+		animator = new FPSAnimator(1);
 		animator.add(drawPanel);
 		animator.start();
 	}
