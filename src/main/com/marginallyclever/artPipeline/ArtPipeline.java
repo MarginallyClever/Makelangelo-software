@@ -24,6 +24,7 @@ public class ArtPipeline {
 	public class Line2D {
 		public Point2D a,b;
 		public ColorRGB c;
+		public boolean flag;
 
 		public Line2D(Point2D a, Point2D b, ColorRGB c) {
 			super();
@@ -38,11 +39,11 @@ public class ArtPipeline {
 			a=c;
 		}
 	}
-	public class Segment2D {
+	public class Sequence2D {
 		public ArrayList<Line2D> lines;
 		boolean isClosed;
 		
-		public Segment2D() {
+		public Sequence2D() {
 			lines = new ArrayList<Line2D>();
 			isClosed=false;
 		}
@@ -69,20 +70,22 @@ public class ArtPipeline {
 		// history is made of changes, travels, and draws
 		// look at the section between two changes.
 		//   look at all pen down moves in the section.
-		//     if two pen down moves share a start/end, then they are connected and belong in a single segment.
+		//     if two pen down moves share a start/end, then they are connected in sequence.
 		
 		// build a list of all the pen-down lines while remembering their color.
 		ArrayList<Line2D> originalLines = new ArrayList<Line2D>();
 		Movement previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
+
+		Log.message("  Found "+turtle.history.size()+" instructions.");
 		
 		for( Movement m : turtle.history ) {
 			switch(m.type) {
 			case DRAW:
 				if(previousMovement!=null) {
 					Line2D line = new Line2D(
-							new Point2D(m.x,m.y),
 							new Point2D(previousMovement.x,previousMovement.y),
+							new Point2D(m.x,m.y),
 							color);
 					originalLines.add(line);
 				}
@@ -97,140 +100,76 @@ public class ArtPipeline {
 			}
 		}
 
-		Log.message("  Found "+turtle.history.size()+" instructions.");
-		int total = originalLines.size();
-		Log.message("  Found "+total+" lines.");
+		Log.message("  Converted to "+originalLines.size()+" lines.");
+
+		final double EPSILON = 0.1;
+		final double EPSILON2 = EPSILON*EPSILON;
+
+		// remove duplicate lines.
+		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
+		
+		for(int a=0;a<originalLines.size();++a) {
+			Line2D aa = originalLines.get(a);
+			int b;
+			for(b=a+1;b<originalLines.size();++b) {
+				Line2D bb = originalLines.get(b);
+				if( distanceBetweenPointsSquared(aa.a, bb.a)<EPSILON2 &&
+					distanceBetweenPointsSquared(aa.b, bb.b)<EPSILON2 ) {
+					break;
+				}
+				if( distanceBetweenPointsSquared(aa.a, bb.b)<EPSILON2 &&
+					distanceBetweenPointsSquared(aa.b, bb.a)<EPSILON2 ) {
+					break;
+				}
+			}
+			if(b==originalLines.size()) {
+				// aa does not match any line in the list.
+				newLines.add(aa);
+			}
+		}
+		
+		int duplicates = originalLines.size() - newLines.size();
+		originalLines = newLines;
+		Log.message("  - "+duplicates+" duplicates = "+originalLines.size()+" lines.");
 
 		// now sort the lines into contiguous groups.
 		// from any given "active" line, search all remaining lines for a match
 		// if a match is found, add it to the sorted list and make the match into the active line.
 		// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
-		/// TODO sort the lines into subgroups for faster searching?
-		ArrayList<Segment2D> segments = new ArrayList<Segment2D>();
-		Segment2D activeSegment=null;
-		boolean found=false;
-		Line2D activeLine=null;
-		int sorted=0;
-		int matched=0;
+		// TODO sort the lines into subgroups for faster searching?
+		ArrayList<Line2D> segments = new ArrayList<Line2D>();
+		Line2D activeLine=originalLines.remove(0);
+		segments.add(activeLine);
+		Point2D p = activeLine.b;
 		
 		while(!originalLines.isEmpty()) {
-			if(found==false) {
-				// either this is the first time OR 
-				// ( we found no connecting lines AND there are still originalLines left )
-				// start a new segment.
-				activeSegment = new Segment2D();
-				segments.add(activeSegment);
-				// get a new active line
-				activeLine = originalLines.remove(0);
-				// put the active line in the active segment.
-				activeSegment.lines.add(activeLine);
-				// do some metrics
-				sorted++;
-				//Log.message("  "+StringHelper.formatDouble(100*(double)sorted/(double)total)+"%");
-			}
+			double d;
+			double bestD = Double.MAX_VALUE;
+			Line2D bestLine = null;
 			
-			found=false;
-			// find any line that starts or ends where this line ends.
+			boolean flip=false;
 			for( Line2D toSort : originalLines ) {
-				// only compare similar color lines
-				if(toSort.c.equals(activeLine.c)==false) continue;
-				
-				// check if activeLine's end is also toSort's start.
-				if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
-					// put it in the sorted lines
-					activeSegment.lines.add(toSort);
-					originalLines.remove(toSort);
-					// make it the new segment head
-					activeLine = toSort;
-					// do some metrics
-					matched++;
-					// do it all again!
-					found=true;
-					break;
+				//if(toSort.c.equals(activeLine.c)==false) continue;
+
+				d = distanceBetweenPointsSquared(p, toSort.a);
+				if(bestD > d) {
+					bestD = d;
+					bestLine = toSort;
+					flip=false;
 				}
-				// check if activeLine's end is also toSort's end.
-				else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
-					// yes!  toSort is backwards.  flip toSort
-					toSort.flip();
-					// then put it in the sorted lines
-					activeSegment.lines.add(toSort);
-					originalLines.remove(toSort);
-					// and make it the new segment head
-					activeLine = toSort;
-					// do some metrics
-					matched++;
-					// do it all again!
-					found=true;
-					break;
+				d = distanceBetweenPointsSquared(p, toSort.b);
+				if(bestD > d) {
+					bestD = d;
+					bestLine = toSort;
+					flip=true;
 				}
 			}
-
-			// set up a reverse pass.
-			activeSegment.flip();
-			// with the activeSegment.lines flipped, activeLine is now pointing at the tail.
-			activeLine = activeSegment.lines.get(activeSegment.lines.size()-1);
-
-			// find any line that starts or ends where this line ends.
-			for( Line2D toSort : originalLines ) {
-				// only compare similar color lines
-				if(toSort.c.equals(activeLine.c)==false) continue;
-				
-				if(thesePointsAreTheSame(activeLine.b,toSort.a)) {
-					// found!
-					// put it in the sorted lines
-					activeSegment.lines.add(toSort);
-					originalLines.remove(toSort);
-					// make it the new segment head
-					activeLine = toSort;
-					// do some metrics
-					matched++;
-					// do it all again!
-					found=true;
-					break;
-				}
-				// check if there's a match with end B.
-				else if(thesePointsAreTheSame(activeLine.b,toSort.b)) {
-					// found!
-					// oldLine follows activeLine but both are backwards.  flip both
-					toSort.flip();
-					// then put it in the sorted lines
-					activeSegment.lines.add(toSort);
-					originalLines.remove(toSort);
-					// and make it the new segment head
-					activeLine = toSort;
-					// do some metrics
-					matched++;
-					// do it all again!
-					found=true;
-					break;
-				}
-			}//*/
-			// yea tho we searched every originalLine left, there were no matches to be found.
-			// do it all again from the top.
-		}
-
-		// all original lines are now sorted into segments.
-		int closed=0;
-		for( Segment2D seg : segments ) {
-			seg.isClosed = thesePointsAreTheSame(
-					seg.lines.get(0).a,
-					seg.lines.get(seg.lines.size()-1).b);
-			if(seg.isClosed) closed++;
-		}
-		
-		// try to reorganize segments to shorten travels
-		int flipped=0;
-		for( int i=0;i<segments.size()-1;++i ) {
-			Segment2D a=segments.get(i);
-			Segment2D b=segments.get(i+1);
-			Line2D bLastLine = b.lines.get(b.lines.size()-1);
-			Point2D aEnd = a.lines.get(0).b;
-			if( distanceBetweenPointsSquared(aEnd,bLastLine.a)>
-				distanceBetweenPointsSquared(aEnd,bLastLine.b) ) {
-				// segment b could be flipped to reduce the travel distance.
-				flipped++;
-				b.flip();
-			}
+			// now we have the best line.
+			originalLines.remove(bestLine);
+			if(flip) bestLine.flip();
+			activeLine=bestLine;
+			segments.add(activeLine);
+			p = activeLine.b;
 		}
 		
 		// rebuild the turtle history.
@@ -238,29 +177,20 @@ public class ArtPipeline {
 		// I assume the turtle history starts at the home position.
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
-		t.penUp();
 		
-		for( Segment2D seg : segments ) {
-			Line2D head = seg.lines.get(0);
+		for( Line2D seg : segments ) {
 			// change color if needed
-			if(head.c!=t.getColor()) {
-				t.setColor(head.c);
+			if(seg.c!=t.getColor()) {
+				t.setColor(seg.c);
 			}
-			// jump to start of segment
-			t.jumpTo(head.a.x, head.a.y);
-
-			// follow the segment to its end.
-			for( Line2D toAdd : seg.lines ) {
-				t.moveTo(toAdd.b.x, toAdd.b.y);
+			double dx = seg.a.x - t.getX();
+			double dy = seg.a.y - t.getY();
+			if(dx*dx+dy*dy > EPSILON*EPSILON) {
+				t.jumpTo(seg.a.x,seg.a.y);
 			}
+			t.moveTo(seg.b.x,seg.b.y);
 		}
 
-		Log.message("  Found "+segments.size()+" segments,\n"
-				+ "  "+closed+" closed,\n"
-				+ "  "+sorted+" sorted,\n"
-				+ "  "+matched+" matched\n"
-				+ "  "+flipped+" flipped.");
-		
 		Log.message("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
 		Log.message("checkReorder() end");
@@ -272,15 +202,15 @@ public class ArtPipeline {
 		return MathHelper.lengthSquared(dx, dy); 
 	}
 	
-	public boolean thesePointsAreTheSame(Point2D a,Point2D b) {
+	public boolean thesePointsAreTheSame(Point2D a,Point2D b,double epsilon) {
 		if(a==b) return true;
 		
 		// close enough ?
 		double dx = a.x-b.x;
-		if(dx>1) return false;
 		double dy = a.y-b.y;
-		if(dy>1) return false;
-		return (MathHelper.lengthSquared(dx, dy)<1e-6); 
+		//if(dx*dx>epsilon*epsilon) return false;
+		//if(dy*dy>epsilon*epsilon) return false;
+		return MathHelper.lengthSquared(dx, dy)<=epsilon*epsilon; 
 	}
 	
 	/**
