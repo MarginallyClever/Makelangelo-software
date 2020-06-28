@@ -34,9 +34,17 @@ public class ArtPipeline {
 		}
 		
 		public void flip() {
-			Point2D c=b;
+			Point2D temp=b;
 			b=a;
-			a=c;
+			a=temp;
+		}
+		public String toString() {
+			return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
+		}
+		public double physicalLengthSquared() {
+			double dx=a.x-b.x;
+			double dy=a.y-b.y;
+			return dx*dx + dy*dy;
 		}
 	}
 	public class Sequence2D {
@@ -49,7 +57,11 @@ public class ArtPipeline {
 		}
 		
 		public void flip() {
-			Collections.reverse(lines);
+			try {
+				Collections.reverse(lines);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 			for( Line2D line : lines ) {
 				line.flip();
 			}
@@ -87,7 +99,9 @@ public class ArtPipeline {
 							new Point2D(previousMovement.x,previousMovement.y),
 							new Point2D(m.x,m.y),
 							color);
-					originalLines.add(line);
+					if(line.physicalLengthSquared()>0) {
+						originalLines.add(line);
+					}
 				}
 				previousMovement = m;
 				break;
@@ -105,9 +119,9 @@ public class ArtPipeline {
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
 
-		// remove duplicate lines.
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
+		// remove duplicate lines.
 		for(int a=0;a<originalLines.size();++a) {
 			Line2D aa = originalLines.get(a);
 			int b;
@@ -137,58 +151,107 @@ public class ArtPipeline {
 		// if a match is found, add it to the sorted list and make the match into the active line.
 		// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
 		// TODO sort the lines into subgroups for faster searching?
-		ArrayList<Line2D> segments = new ArrayList<Line2D>();
-		Line2D activeLine=originalLines.remove(0);
-		segments.add(activeLine);
-		Point2D p = activeLine.b;
+		ArrayList<Sequence2D> segments = new ArrayList<Sequence2D>();
+		Sequence2D activeSequence=null;
+		Line2D activeLine=null;
+		
+		// found tracks how many times we flip the active sequence.
+		// when it is 2 we have never flipped the sequence - we're still looking for more matches to the tail.
+		// when it is 1 we have flipped once - we are now matching to the tail of the flipped sequence (aka the head).
+		// when it is 0 we have flipped twice, there can be no more matches, start a new sequence.
+		int found=0;
+		double EPSILON_CONNECTED=2;  // TODO make this user-tweakable
+		
+		double d, bestD;
+		Point2D p;
+		Line2D bestLine;
+		boolean bestFlip;
 		
 		while(!originalLines.isEmpty()) {
-			double d;
-			double bestD = Double.MAX_VALUE;
-			Line2D bestLine = null;
+			if(found==0) {
+				activeSequence = new Sequence2D();
+				segments.add(activeSequence);
+				activeLine=originalLines.remove(0);
+				activeSequence.lines.add(activeLine);
+				found=2;
+			}
+
+			p = activeLine.b;
+			bestD = Double.MAX_VALUE;
+			bestLine = null;
+			bestFlip=false;
 			
-			boolean flip=false;
 			for( Line2D toSort : originalLines ) {
-				//if(toSort.c.equals(activeLine.c)==false) continue;
+				if(toSort.c.equals(activeLine.c)==false) continue;
 
 				d = distanceBetweenPointsSquared(p, toSort.a);
 				if(bestD > d) {
 					bestD = d;
 					bestLine = toSort;
-					flip=false;
+					bestFlip=false;
 				}
 				d = distanceBetweenPointsSquared(p, toSort.b);
 				if(bestD > d) {
 					bestD = d;
 					bestLine = toSort;
-					flip=true;
+					bestFlip=true;
 				}
 			}
+			
 			// now we have the best line.
-			originalLines.remove(bestLine);
-			if(flip) bestLine.flip();
-			activeLine=bestLine;
-			segments.add(activeLine);
-			p = activeLine.b;
+			if(bestD<EPSILON_CONNECTED) {
+				// match is close enough to be added to this sequence.
+				originalLines.remove(bestLine);
+				if(bestFlip) bestLine.flip();
+				activeSequence.lines.add(activeLine);
+				activeLine=bestLine;
+			} else {
+				// match is too far.  nothing found.
+				found--;
+				// flip the whole sequence.
+				// found==1 I'll match to the other end.
+				// found==0 I'll be done with this sequence and return it to the original state.
+				activeSequence.flip();
+				int s = activeSequence.lines.size();
+				activeLine = activeSequence.lines.get(s-1);
+			}
 		}
 		
+		Log.message(segments.size() + " sequences.");
 		// rebuild the turtle history.
 		Turtle t = new Turtle();
 		// I assume the turtle history starts at the home position.
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
+
+		//ColorRGB [] test = {new ColorRGB(255,0,0),new ColorRGB(0,255,0),new ColorRGB(0,255,255),new ColorRGB(255,0,255),new ColorRGB(255,255,0)};
+		//int testX=0;
 		
-		for( Line2D seg : segments ) {
-			// change color if needed
-			if(seg.c!=t.getColor()) {
-				t.setColor(seg.c);
+		for( Sequence2D seg : segments ) {
+			int s = seg.lines.size();
+			Line2D first = seg.lines.get(0);
+			Line2D last = seg.lines.get(s-1);
+			double len=distanceBetweenPointsSquared(first.a, last.b);
+			boolean closed = s>1 && len<EPSILON_CONNECTED;
+			Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
+			if(s==1 && len==0.0) {
+				Log.message("ZERO? "+first.toString());
+				Log.message("   vs "+last.toString());
 			}
-			double dx = seg.a.x - t.getX();
-			double dy = seg.a.y - t.getY();
-			if(dx*dx+dy*dy > EPSILON*EPSILON) {
-				t.jumpTo(seg.a.x,seg.a.y);
+			//if(s==1) first.c.set(test[(testX++)%test.length]);
+			
+			boolean isFirst=true;
+			for( Line2D line : seg.lines ) {
+				// change color if needed
+				if(line.c!=t.getColor()) {
+					t.setColor(line.c);
+				}
+				if(isFirst) {
+					isFirst=false;
+					t.jumpTo(line.a.x,line.a.y);
+				}
+				t.moveTo(line.b.x,line.b.y);
 			}
-			t.moveTo(seg.b.x,seg.b.y);
 		}
 
 		Log.message("  History now "+t.history.size()+" instructions.");
@@ -196,10 +259,16 @@ public class ArtPipeline {
 		Log.message("checkReorder() end");
 	}
 
-	public double distanceBetweenPointsSquared(Point2D a,Point2D b) {
+	public double distanceBetweenPointsSquared(Turtle.Movement a,Turtle.Movement b) {
 		double dx = a.x-b.x;
 		double dy = a.y-b.y;
 		return MathHelper.lengthSquared(dx, dy); 
+	}
+
+	public double distanceBetweenPointsSquared(Point2D a,Point2D b) {
+		double dx = a.x-b.x;
+		double dy = a.y-b.y;
+		return dx*dx + dy*dy; 
 	}
 	
 	public boolean thesePointsAreTheSame(Point2D a,Point2D b,double epsilon) {
