@@ -110,10 +110,11 @@ public class ArtPipeline {
 		
 		for (int a = 0; a < originalLines.size(); ++a) {
 			Line2D aa = originalLines.get(a);
-			int b = newLines.size();
+			int b = 0;
+			int end = newLines.size();
 			boolean isDuplicate = false;
 
-			while (b-- > 0) {
+			while (b < end) {
 				Line2D bb = newLines.get(b);
 
 				// Check if the distance between lines aa and bb is small.
@@ -125,7 +126,8 @@ public class ArtPipeline {
 					isDuplicate = true;
 					break;
 				}
-
+				
+				++b;
 			}
 
 			// Only add if this line (or this line in reverse) is not already in newLines
@@ -145,7 +147,7 @@ public class ArtPipeline {
 		// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
 		// TODO sort the lines into subgroups for faster searching?
 		ArrayList<Line2D> segments = new ArrayList<Line2D>();
-		Line2D activeLine=originalLines.remove(0);
+		Line2D activeLine = originalLines.remove(0);
 		segments.add(activeLine);
 		Point2D p = activeLine.b;
 		
