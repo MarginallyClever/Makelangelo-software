@@ -185,7 +185,7 @@ public class ArtPipeline {
 			}
 			double dx = seg.a.x - t.getX();
 			double dy = seg.a.y - t.getY();
-			if(dx*dx+dy*dy > EPSILON*EPSILON) {
+			if(dx*dx+dy*dy > EPSILON2) {
 				t.jumpTo(seg.a.x,seg.a.y);
 			}
 			t.moveTo(seg.b.x,seg.b.y);
