@@ -150,57 +150,53 @@ public class ArtPipeline {
 		Line2D activeLine = originalLines.remove(0);
 		segments.add(activeLine);
 		Point2D p = activeLine.b;
-		
-		while(!originalLines.isEmpty()) {
+
+		while (!originalLines.isEmpty()) {
 			double d;
 			double bestD = Double.MAX_VALUE;
-			Line2D bestLine = null;
-			
-			boolean flip=false;
-			for( Line2D toSort : originalLines ) {
-				//if(toSort.c.equals(activeLine.c)==false) continue;
+			int bestLineIndex = 0;
 
-				d = distanceBetweenPointsSquared(p, toSort.a);
-				if(bestD > d) {
+			for (int candidateLineIndex = 0; candidateLineIndex < originalLines.size(); ++candidateLineIndex) {
+				Line2D candidateLine = originalLines.get(candidateLineIndex);
+				// if(candidateLine.c.equals(activeLine.c)==false) continue;
+
+				d = distanceBetweenPointsSquared(p, candidateLine.a);
+				if (bestD > d) {
 					bestD = d;
-					bestLine = toSort;
-					flip=false;
+					bestLineIndex = candidateLineIndex;
 				}
-				d = distanceBetweenPointsSquared(p, toSort.b);
-				if(bestD > d) {
-					bestD = d;
-					bestLine = toSort;
-					flip=true;
+				d = distanceBetweenPointsSquared(p, candidateLine.b);
+				if (bestD > d) {
+					candidateLine.flip();
+					bestLineIndex = candidateLineIndex;
 				}
 			}
 			// now we have the best line.
-			originalLines.remove(bestLine);
-			if(flip) bestLine.flip();
-			activeLine=bestLine;
+			activeLine = originalLines.remove(bestLineIndex);
 			segments.add(activeLine);
 			p = activeLine.b;
 		}
-		
+
 		// rebuild the turtle history.
 		Turtle t = new Turtle();
 		// I assume the turtle history starts at the home position.
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
-		
-		for( Line2D seg : segments ) {
+
+		for (Line2D seg : segments) {
 			// change color if needed
-			if(seg.c!=t.getColor()) {
+			if (seg.c != t.getColor()) {
 				t.setColor(seg.c);
 			}
 			double dx = seg.a.x - t.getX();
 			double dy = seg.a.y - t.getY();
-			if(dx*dx+dy*dy > EPSILON2) {
-				t.jumpTo(seg.a.x,seg.a.y);
+			if (dx * dx + dy * dy > EPSILON2) {
+				t.jumpTo(seg.a.x, seg.a.y);
 			}
-			t.moveTo(seg.b.x,seg.b.y);
+			t.moveTo(seg.b.x, seg.b.y);
 		}
 
-		Log.message("  History now "+t.history.size()+" instructions.");
+		Log.message("  History now " + t.history.size() + " instructions.");
 		turtle.history = t.history;
 		Log.message("checkReorder() end");
 	}
