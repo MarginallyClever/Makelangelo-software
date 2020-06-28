@@ -34,9 +34,9 @@ public class ArtPipeline {
 		}
 		
 		public void flip() {
-			Point2D temp=this.b;
-			this.b=a;
-			this.a=temp;
+			Point2D temp=b;
+			b=a;
+			a=temp;
 		}
 		public String toString() {
 			return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
@@ -118,7 +118,7 @@ public class ArtPipeline {
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
-/*
+
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
 		// remove duplicate lines.
@@ -145,7 +145,7 @@ public class ArtPipeline {
 		int duplicates = originalLines.size() - newLines.size();
 		originalLines = newLines;
 		Log.message("  - "+duplicates+" duplicates = "+originalLines.size()+" lines.");
-
+		/*
 		// now sort the lines into contiguous groups.
 		// from any given "active" line, search all remaining lines for a match
 		// if a match is found, add it to the sorted list and make the match into the active line.
@@ -261,20 +261,21 @@ public class ArtPipeline {
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
 		
-//		ArrayList<Line2D> segments = originalLines;
 		ArrayList<Line2D> segments = new ArrayList<Line2D>();
 		
 		Point2D lastPosition = new Point2D(t.getX(), t.getY());
 		
-		while(!originalLines.isEmpty()) {
+		// Greedy match lines,
+		// from lastPosition to the closest end or start point of another line
+		while(!newLines.isEmpty()) {
 			double bestD = Double.MAX_VALUE;
 			int bestCandidateIndex = 0;
 			int candidateIndex = 0;
-			int end = originalLines.size();
+			int end = newLines.size();
 			boolean shouldFlip = false;
 			
 			while (candidateIndex < end) {
-				Line2D candidateLine = originalLines.get(candidateIndex);
+				Line2D candidateLine = newLines.get(candidateIndex);
 				double distanceToPointA = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
 				double distanceToPointB = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
 				boolean shouldFlipCandidate = distanceToPointB < distanceToPointA;
@@ -289,7 +290,7 @@ public class ArtPipeline {
 				++candidateIndex;
 			}
 			
-			Line2D bestCandidate = originalLines.remove(bestCandidateIndex);
+			Line2D bestCandidate = newLines.remove(bestCandidateIndex);
 			if(shouldFlip) {
 				bestCandidate.flip();
 			}
