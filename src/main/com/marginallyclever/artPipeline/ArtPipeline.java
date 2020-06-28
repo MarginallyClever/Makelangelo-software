@@ -202,17 +202,6 @@ public class ArtPipeline {
 		return MathHelper.lengthSquared(dx, dy); 
 	}
 	
-	public boolean thesePointsAreTheSame(Point2D a,Point2D b,double epsilon) {
-		if(a==b) return true;
-		
-		// close enough ?
-		double dx = a.x-b.x;
-		double dy = a.y-b.y;
-		//if(dx*dx>epsilon*epsilon) return false;
-		//if(dy*dy>epsilon*epsilon) return false;
-		return MathHelper.lengthSquared(dx, dy)<=epsilon*epsilon; 
-	}
-	
 	/**
 	 * Offers to optimize your gcode by chopping out very short line segments.
 	 * It travels the entire path and drops any pen-down segment shorter than 
