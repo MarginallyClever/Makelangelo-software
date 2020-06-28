@@ -34,9 +34,9 @@ public class ArtPipeline {
 		}
 		
 		public void flip() {
-			Point2D temp=b;
-			b=a;
-			a=temp;
+			Point2D temp=this.b;
+			this.b=a;
+			this.a=temp;
 		}
 		public String toString() {
 			return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
@@ -118,7 +118,7 @@ public class ArtPipeline {
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
-
+/*
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
 		// remove duplicate lines.
@@ -252,6 +252,63 @@ public class ArtPipeline {
 				}
 				t.moveTo(line.b.x,line.b.y);
 			}
+		}
+		*/
+		
+		// rebuild the turtle history.
+		Turtle t = new Turtle();
+		// I assume the turtle history starts at the home position.
+		t.setX(turtle.history.get(0).x);
+		t.setY(turtle.history.get(0).y);
+		
+//		ArrayList<Line2D> segments = originalLines;
+		ArrayList<Line2D> segments = new ArrayList<Line2D>();
+		
+		Point2D lastPosition = new Point2D(t.getX(), t.getY());
+		
+		while(!originalLines.isEmpty()) {
+			double bestD = Double.MAX_VALUE;
+			int bestCandidateIndex = 0;
+			int candidateIndex = 0;
+			int end = originalLines.size();
+			boolean shouldFlip = false;
+			
+			while (candidateIndex < end) {
+				Line2D candidateLine = originalLines.get(candidateIndex);
+				double distanceToPointA = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
+				double distanceToPointB = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
+				boolean shouldFlipCandidate = distanceToPointB < distanceToPointA;
+				double smallestCandidateDistance = shouldFlipCandidate ? distanceToPointB : distanceToPointA;
+				
+				if(smallestCandidateDistance < bestD) {
+					shouldFlip = shouldFlipCandidate;
+					bestD = smallestCandidateDistance;
+					bestCandidateIndex = candidateIndex;
+				}
+				
+				++candidateIndex;
+			}
+			
+			Line2D bestCandidate = originalLines.remove(bestCandidateIndex);
+			if(shouldFlip) {
+				bestCandidate.flip();
+			}
+			
+			segments.add(bestCandidate);
+			lastPosition = bestCandidate.b;
+		}
+		
+		for( Line2D seg : segments ) {
+			// change color if needed
+			if(seg.c!=t.getColor()) {
+				t.setColor(seg.c);
+			}
+			double dx = seg.a.x - t.getX();
+			double dy = seg.a.y - t.getY();
+			if(dx*dx+dy*dy > EPSILON2) {
+				t.jumpTo(seg.a.x,seg.a.y);
+			}
+			t.moveTo(seg.b.x,seg.b.y);
 		}
 
 		Log.message("  History now "+t.history.size()+" instructions.");
