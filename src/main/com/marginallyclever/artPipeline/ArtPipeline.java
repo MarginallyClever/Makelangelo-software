@@ -108,21 +108,28 @@ public class ArtPipeline {
 		// remove duplicate lines.
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
-		for(int a=0;a<originalLines.size();++a) {
+		for (int a = 0; a < originalLines.size(); ++a) {
 			Line2D aa = originalLines.get(a);
-			int b;
-			for(b=a+1;b<originalLines.size();++b) {
-				Line2D bb = originalLines.get(b);
-				if( distanceBetweenPointsSquared(aa.a, bb.a)<EPSILON2 &&
-					distanceBetweenPointsSquared(aa.b, bb.b)<EPSILON2 ) {
+			int b = newLines.size();
+			boolean isDuplicate = false;
+
+			while (b-- > 0) {
+				Line2D bb = newLines.get(b);
+
+				// Check if the distance between lines aa and bb is small.
+				// Also check the line in reverse.
+				if ((distanceBetweenPointsSquared(aa.a, bb.a) < EPSILON2
+						&& distanceBetweenPointsSquared(aa.b, bb.b) < EPSILON2)
+						|| (distanceBetweenPointsSquared(aa.a, bb.b) < EPSILON2
+								&& distanceBetweenPointsSquared(aa.b, bb.a) < EPSILON2)) {
+					isDuplicate = true;
 					break;
 				}
-				if( distanceBetweenPointsSquared(aa.a, bb.b)<EPSILON2 &&
-					distanceBetweenPointsSquared(aa.b, bb.a)<EPSILON2 ) {
-					break;
-				}
+
 			}
-			if(b==originalLines.size()) {
+
+			// Only add if this line (or this line in reverse) is not already in newLines
+			if (!isDuplicate) {
 				// aa does not match any line in the list.
 				newLines.add(aa);
 			}
