@@ -118,6 +118,7 @@ public class ArtPipeline {
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
+		double EPSILON_CONNECTED=2;  // TODO make this user-tweakable
 
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
@@ -203,7 +204,7 @@ public class ArtPipeline {
 			}
 			double dx = seg.a.x - t.getX();
 			double dy = seg.a.y - t.getY();
-			if(dx*dx+dy*dy > EPSILON2) {
+			if(dx*dx+dy*dy > EPSILON_CONNECTED) {
 				t.jumpTo(seg.a.x,seg.a.y);
 			}
 			t.moveTo(seg.b.x,seg.b.y);
