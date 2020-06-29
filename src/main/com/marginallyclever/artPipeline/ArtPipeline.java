@@ -78,7 +78,7 @@ public class ArtPipeline {
 	public void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.size()==0) return;
 		
-		Log.message("checkReorder() begin");
+		Log.message("reorder() begin");
 		// history is made of changes, travels, and draws
 		// look at the section between two changes.
 		//   look at all pen down moves in the section.
@@ -233,30 +233,27 @@ public class ArtPipeline {
 			Line2D last = seg.lines.get(s-1);
 			double len=distanceBetweenPointsSquared(first.a, last.b);
 			boolean closed = s>1 && len<EPSILON_CONNECTED;
-			Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
+			/*Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
 			if(s==1 && len==0.0) {
 				Log.message("ZERO? "+first.toString());
 				Log.message("   vs "+last.toString());
 			}
-			//if(s==1) first.c.set(test[(testX++)%test.length]);
+			//if(s==1) first.c.set(test[(testX++)%test.length]);*/
 			
-			boolean isFirst=true;
+			// change color if needed
+			if(first.c!=t.getColor()) {
+				t.setColor(first.c);
+			}
+			t.jumpTo(first.a.x,first.a.y);
+			
 			for( Line2D line : seg.lines ) {
-				// change color if needed
-				if(line.c!=t.getColor()) {
-					t.setColor(line.c);
-				}
-				if(isFirst) {
-					isFirst=false;
-					t.jumpTo(line.a.x,line.a.y);
-				}
 				t.moveTo(line.b.x,line.b.y);
 			}
 		}
 
 		Log.message("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
-		Log.message("checkReorder() end");
+		Log.message("reorder() end");
 	}
 
 	public double distanceBetweenPointsSquared(Turtle.Movement a,Turtle.Movement b) {
