@@ -40,9 +40,6 @@ public class Converter_Crosshatch extends ImageConverter {
 
 		turtle = new Turtle();
 		
-		double leveladd = 255.0 / 6.0;
-		double level = leveladd;
-
 		// if the image were projected on the paper, where would the top left
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
@@ -66,6 +63,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		
 		boolean useError=false;
 		// vertical
+		double level = 4*Math.pow(2,5);
+
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if (flip) {
 				if(!useError) convertAlongLine(xStart, y, xEnd, y, stepSize, level,img);
@@ -81,7 +80,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level += leveladd;
+		level = 4*Math.pow(2,4);
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}
@@ -102,7 +101,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level += leveladd;
+		level = 4*Math.pow(2,3);
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}
@@ -150,7 +149,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level += leveladd;
+		level = 4*Math.pow(2,2);
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}

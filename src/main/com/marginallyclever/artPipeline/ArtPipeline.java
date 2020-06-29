@@ -228,17 +228,19 @@ public class ArtPipeline {
 		//int testX=0;
 		
 		for( Sequence2D seg : segments ) {
-			int s = seg.lines.size();
 			Line2D first = seg.lines.get(0);
+			/*
+			int s = seg.lines.size();
 			Line2D last = seg.lines.get(s-1);
 			double len=distanceBetweenPointsSquared(first.a, last.b);
 			boolean closed = s>1 && len<EPSILON_CONNECTED;
-			/*Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
+			Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
 			if(s==1 && len==0.0) {
 				Log.message("ZERO? "+first.toString());
 				Log.message("   vs "+last.toString());
 			}
-			//if(s==1) first.c.set(test[(testX++)%test.length]);*/
+			//if(s==1) first.c.set(test[(testX++)%test.length]);
+			*/
 			
 			// change color if needed
 			if(first.c!=t.getColor()) {
