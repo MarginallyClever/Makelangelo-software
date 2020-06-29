@@ -169,8 +169,14 @@ public class ArtPipeline {
 				Line2D candidateLine = newLines.get(candidateIndex);
 				double distanceToPointA = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
 				double distanceToPointB = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
-				boolean shouldFlipCandidate = distanceToPointB < distanceToPointA;
-				double smallestCandidateDistance = shouldFlipCandidate ? distanceToPointB : distanceToPointA;
+				
+				boolean shouldFlipCandidate = false;
+				double smallestCandidateDistance = distanceToPointA;
+				
+				if(distanceToPointB < distanceToPointA) {
+					shouldFlipCandidate = true;
+					smallestCandidateDistance = distanceToPointB;
+				}
 				
 				if(smallestCandidateDistance < bestD) {
 					shouldFlip = shouldFlipCandidate;
