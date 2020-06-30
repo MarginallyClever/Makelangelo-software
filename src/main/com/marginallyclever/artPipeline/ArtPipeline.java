@@ -118,16 +118,20 @@ public class ArtPipeline {
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
-		double EPSILON_CONNECTED=2;  // TODO make this user-tweakable
+		double EPSILON_CONNECTED=2;  // TODO: make this user-tweakable. Is it in millimeters?
 
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
+		// TODO: dedupe should be optional so user can reorder without dedupe, or dedupe without reorder
 		// remove duplicate lines.
 		for(int a=0;a<originalLines.size();++a) {
 			Line2D aa = originalLines.get(a);
 			int b;
 			for(b=a+1;b<originalLines.size();++b) {
 				Line2D bb = originalLines.get(b);
+				// TODO: currently checking only if the start and end points of two lines are close.
+				// But should also check if one line is completly inside another and merge them.
+				// Or if they are parallel and overlap partially, then the overlappng part shouldn't be added.
 				if( distanceBetweenPointsSquared(aa.a, bb.a)<EPSILON2 &&
 					distanceBetweenPointsSquared(aa.b, bb.b)<EPSILON2 ) {
 					break;
@@ -147,19 +151,18 @@ public class ArtPipeline {
 		originalLines = newLines;
 		Log.message("  - "+duplicates+" duplicates = "+originalLines.size()+" lines.");
 		
-		// rebuild the turtle history.
 		Turtle t = new Turtle();
 		// I assume the turtle history starts at the home position.
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
 		
-		ArrayList<Line2D> segments = new ArrayList<Line2D>();
+		ArrayList<Line2D> orderedLines = new ArrayList<Line2D>();
 		
 		Point2D lastPosition = new Point2D(t.getX(), t.getY());
 		
-		// Greedy match lines,
-		// from lastPosition to the closest end or start point of another line
+		// Greedy reorder lines
 		while(!newLines.isEmpty()) {
+			// Continue for as long as there are lines to reorder
 			double bestD = Double.MAX_VALUE;
 			int bestCandidateIndex = 0;
 			int candidateIndex = 0;
@@ -167,19 +170,25 @@ public class ArtPipeline {
 			boolean shouldFlip = false;
 			
 			while (candidateIndex < end) {
+				// Check all remaining lines, and pick the one with the start or end point
+				// closest to lastPosition (the end point of the previous line).
 				Line2D candidateLine = newLines.get(candidateIndex);
-				double distanceToPointA = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
-				double distanceToPointB = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
+				double distanceToStartPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
+				double distanceToEndPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
 				
 				boolean shouldFlipCandidate = false;
-				double smallestCandidateDistance = distanceToPointA;
+				double smallestCandidateDistance = distanceToStartPoint;
 				
-				if(distanceToPointB < distanceToPointA) {
+				if(distanceToEndPoint < distanceToStartPoint) {
+					// The end point is closer than the start point.
+					// Line should be flipped if it's the best candidate in this iteration.
 					shouldFlipCandidate = true;
-					smallestCandidateDistance = distanceToPointB;
+					smallestCandidateDistance = distanceToEndPoint;
 				}
 				
 				if(smallestCandidateDistance < bestD) {
+					// This line outperforms the previous candidate,
+					// use values from this line instead
 					shouldFlip = shouldFlipCandidate;
 					bestD = smallestCandidateDistance;
 					bestCandidateIndex = candidateIndex;
@@ -188,26 +197,39 @@ public class ArtPipeline {
 				++candidateIndex;
 			}
 			
+			// Found line closest to lastPosition,
+			// remove it from the pool
 			Line2D bestCandidate = newLines.remove(bestCandidateIndex);
 			if(shouldFlip) {
+				// Distance is shortest when this line is flipped
 				bestCandidate.flip();
 			}
 			
-			segments.add(bestCandidate);
+			// And add it to the list of reordered lines.
+			orderedLines.add(bestCandidate);
+			// Start next iteration where current line ends.
 			lastPosition = bestCandidate.b;
 		}
 		
-		for( Line2D seg : segments ) {
+		// Rebuild the turtle history.
+		for( Line2D line : orderedLines ) {
 			// change color if needed
-			if(seg.c!=t.getColor()) {
-				t.setColor(seg.c);
+			if(line.c!=t.getColor()) {
+				t.setColor(line.c);
 			}
-			double dx = seg.a.x - t.getX();
-			double dy = seg.a.y - t.getY();
-			if(dx*dx+dy*dy > EPSILON_CONNECTED) {
-				t.jumpTo(seg.a.x,seg.a.y);
+			
+			Point2D currentPosition = new Point2D(t.getX(), t.getY());
+			if(distanceBetweenPointsSquared(currentPosition, line.a) > EPSILON_CONNECTED) {
+				// The previous line ends too far from the start point of this line,
+				// need to make a travel with the pen up to the start point of this line.
+				t.jumpTo(line.a.x,line.a.y);
+			} else {
+				// The previous line ends close to the start point of this line,
+				// so there's no need to go to the start point of this line since the pen is practically there.
+				// The start point of this line will be skipped.
 			}
-			t.moveTo(seg.b.x,seg.b.y);
+			// Make a pen down move to the end of this line
+			t.moveTo(line.b.x,line.b.y);
 		}
 
 		Log.message("  History now "+t.history.size()+" instructions.");
