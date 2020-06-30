@@ -118,6 +118,7 @@ public class ArtPipeline {
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
+		double EPSILON_CONNECTED=2;  // TODO make this user-tweakable
 
 		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
 		
@@ -145,112 +146,68 @@ public class ArtPipeline {
 		int duplicates = originalLines.size() - newLines.size();
 		originalLines = newLines;
 		Log.message("  - "+duplicates+" duplicates = "+originalLines.size()+" lines.");
-
-		// now sort the lines into contiguous groups.
-		// from any given "active" line, search all remaining lines for a match
-		// if a match is found, add it to the sorted list and make the match into the active line.
-		// repeat until all lines exhausted.  this is O(n*n) hard and pretty slow.
-		// TODO sort the lines into subgroups for faster searching?
-		ArrayList<Sequence2D> segments = new ArrayList<Sequence2D>();
-		Sequence2D activeSequence=null;
-		Line2D activeLine=null;
 		
-		// found tracks how many times we flip the active sequence.
-		// when it is 2 we have never flipped the sequence - we're still looking for more matches to the tail.
-		// when it is 1 we have flipped once - we are now matching to the tail of the flipped sequence (aka the head).
-		// when it is 0 we have flipped twice, there can be no more matches, start a new sequence.
-		int found=0;
-		double EPSILON_CONNECTED=2;  // TODO make this user-tweakable
-		
-		double d, bestD;
-		Point2D p;
-		Line2D bestLine;
-		boolean bestFlip;
-		
-		while(!originalLines.isEmpty()) {
-			if(found==0) {
-				activeSequence = new Sequence2D();
-				segments.add(activeSequence);
-				activeLine=originalLines.remove(0);
-				activeSequence.lines.add(activeLine);
-				found=2;
-			}
-
-			p = activeLine.b;
-			bestD = Double.MAX_VALUE;
-			bestLine = null;
-			bestFlip=false;
-			
-			for( Line2D toSort : originalLines ) {
-				if(toSort.c.equals(activeLine.c)==false) continue;
-
-				d = distanceBetweenPointsSquared(p, toSort.a);
-				if(bestD > d) {
-					bestD = d;
-					bestLine = toSort;
-					bestFlip=false;
-				}
-				d = distanceBetweenPointsSquared(p, toSort.b);
-				if(bestD > d) {
-					bestD = d;
-					bestLine = toSort;
-					bestFlip=true;
-				}
-			}
-			
-			// now we have the best line.
-			if(bestD<EPSILON_CONNECTED) {
-				// match is close enough to be added to this sequence.
-				originalLines.remove(bestLine);
-				if(bestFlip) bestLine.flip();
-				activeSequence.lines.add(activeLine);
-				activeLine=bestLine;
-			} else {
-				// match is too far.  nothing found.
-				found--;
-				// flip the whole sequence.
-				// found==1 I'll match to the other end.
-				// found==0 I'll be done with this sequence and return it to the original state.
-				activeSequence.flip();
-				int s = activeSequence.lines.size();
-				activeLine = activeSequence.lines.get(s-1);
-			}
-		}
-		
-		Log.message(segments.size() + " sequences.");
 		// rebuild the turtle history.
 		Turtle t = new Turtle();
 		// I assume the turtle history starts at the home position.
 		t.setX(turtle.history.get(0).x);
 		t.setY(turtle.history.get(0).y);
-
-		//ColorRGB [] test = {new ColorRGB(255,0,0),new ColorRGB(0,255,0),new ColorRGB(0,255,255),new ColorRGB(255,0,255),new ColorRGB(255,255,0)};
-		//int testX=0;
 		
-		for( Sequence2D seg : segments ) {
-			Line2D first = seg.lines.get(0);
-			/*
-			int s = seg.lines.size();
-			Line2D last = seg.lines.get(s-1);
-			double len=distanceBetweenPointsSquared(first.a, last.b);
-			boolean closed = s>1 && len<EPSILON_CONNECTED;
-			Log.message("Sequence " + seg.lines.size()+(closed?" closed":"")+" lines. "+len);
-			if(s==1 && len==0.0) {
-				Log.message("ZERO? "+first.toString());
-				Log.message("   vs "+last.toString());
-			}
-			//if(s==1) first.c.set(test[(testX++)%test.length]);
-			*/
+		ArrayList<Line2D> segments = new ArrayList<Line2D>();
+		
+		Point2D lastPosition = new Point2D(t.getX(), t.getY());
+		
+		// Greedy match lines,
+		// from lastPosition to the closest end or start point of another line
+		while(!newLines.isEmpty()) {
+			double bestD = Double.MAX_VALUE;
+			int bestCandidateIndex = 0;
+			int candidateIndex = 0;
+			int end = newLines.size();
+			boolean shouldFlip = false;
 			
+			while (candidateIndex < end) {
+				Line2D candidateLine = newLines.get(candidateIndex);
+				double distanceToPointA = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
+				double distanceToPointB = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
+				
+				boolean shouldFlipCandidate = false;
+				double smallestCandidateDistance = distanceToPointA;
+				
+				if(distanceToPointB < distanceToPointA) {
+					shouldFlipCandidate = true;
+					smallestCandidateDistance = distanceToPointB;
+				}
+				
+				if(smallestCandidateDistance < bestD) {
+					shouldFlip = shouldFlipCandidate;
+					bestD = smallestCandidateDistance;
+					bestCandidateIndex = candidateIndex;
+				}
+				
+				++candidateIndex;
+			}
+			
+			Line2D bestCandidate = newLines.remove(bestCandidateIndex);
+			if(shouldFlip) {
+				bestCandidate.flip();
+			}
+			
+			segments.add(bestCandidate);
+			lastPosition = bestCandidate.b;
+		}
+		
+		for( Line2D seg : segments ) {
 			// change color if needed
-			if(first.c!=t.getColor()) {
-				t.setColor(first.c);
+			if(seg.c!=t.getColor()) {
+				t.setColor(seg.c);
 			}
-			t.jumpTo(first.a.x,first.a.y);
-			
-			for( Line2D line : seg.lines ) {
-				t.moveTo(line.b.x,line.b.y);
+			double dx = seg.a.x - t.getX();
+			double dy = seg.a.y - t.getY();
+			if(dx*dx+dy*dy > EPSILON_CONNECTED) {
+				t.jumpTo(seg.a.x,seg.a.y);
 			}
+			t.moveTo(seg.b.x,seg.b.y);
 		}
 
 		Log.message("  History now "+t.history.size()+" instructions.");
