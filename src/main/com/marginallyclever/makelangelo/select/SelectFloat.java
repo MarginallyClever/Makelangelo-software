@@ -3,18 +3,14 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.Locale;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
+import com.marginallyclever.convenience.StringHelper;
 
 
 /**
@@ -24,8 +20,8 @@ import javax.swing.text.NumberFormatter;
  */
 public class SelectFloat extends Select {
 	private JLabel label;
-	private JFormattedTextField field;
-	private double value;
+	private JTextField field;
+	private float value;
 
 	public SelectFloat(String labelKey, Locale locale, float defaultValue) {
 		super();
@@ -33,13 +29,13 @@ public class SelectFloat extends Select {
 		value = defaultValue;
 		
 		label = new JLabel(labelKey, JLabel.LEADING);
-		createAndAttachFormatter(locale);
+		field = new JTextField();
+		
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-		field.setValue(defaultValue);
-		field.setFocusLostBehavior(JFormattedTextField.PERSIST);
+		field.setText(StringHelper.formatFloat(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		
 		field.getDocument().addDocumentListener(new DocumentListener() {
@@ -65,8 +61,8 @@ public class SelectFloat extends Select {
 				float newNumber;
 
 				try {
-					newNumber = (float)(double)field.getFormatter().stringToValue(field.getText());
-				} catch (ParseException e) {
+					newNumber = Float.valueOf(field.getText());
+				} catch (NumberFormatException e) {
 					field.setForeground(Color.RED);
 					return;
 				}
@@ -100,35 +96,21 @@ public class SelectFloat extends Select {
 		this("", Locale.getDefault(), 0);
 	}
 
-	protected void createAndAttachFormatter(Locale locale) {
-		DecimalFormat nFloat = (DecimalFormat)DecimalFormat.getInstance(locale);
-		nFloat.setMinimumFractionDigits(1);
-		nFloat.setMaximumFractionDigits(3);
-		nFloat.setDecimalSeparatorAlwaysShown(true);
-		nFloat.setGroupingUsed(false);
-
-		NumberFormatter nff = new NumberFormatter(nFloat);
-		DefaultFormatterFactory factory = new DefaultFormatterFactory(nff);
-		field = new JFormattedTextField(factory);
-	}
-
 	public void setReadOnly() {
 		field.setEditable(false);
 	}
 
-	/**
-	 * @return last valid value typed into field
-	 */
+	// @return last valid value typed into field
 	public float getValue() {
-		return (float)value;
+		return value;
 	}
 
 	public void setValue(float newValue) {
-		//float oldValue = (float)field.getValue();
-		//if(newValue!=oldValue) {
+		if(newValue!=value) {
+			value = newValue;
 			//Log.message("new "+newValue+" old "+oldValue);
-			field.setValue(newValue);
-		//}
+			field.setText(StringHelper.formatFloat(newValue));
+		}
 	}
 	
 	public String getText() {
