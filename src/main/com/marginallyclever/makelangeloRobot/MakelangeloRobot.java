@@ -241,7 +241,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
-		long newUID = 0;
+		long newUID = -1;
 		if (lines.length > 0) {
 			try {
 				newUID = Long.parseLong(lines[0]);
@@ -250,8 +250,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 			}
 		}
 
-		// new robots have UID=0
-		if (newUID == 0) {
+		// new robots have UID<=0
+		if (newUID <= 0) {
 			newUID = getNewRobotUID();
 		}
 
