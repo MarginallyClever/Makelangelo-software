@@ -46,6 +46,18 @@ public class ArtPipeline {
 			double dy=a.y-b.y;
 			return dx*dx + dy*dy;
 		}
+		
+		public double ptSegDistSq(Point2D point) {
+			// The distance measured is the distance between the specified point,
+			// and the closest point between the start and end points of line a. 
+			return java.awt.geom.Line2D.ptSegDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
+		}
+		
+		public double ptLineDistSq(Point2D point) {
+			// The distance measured is the distance between the specified point,
+			// and the closest point on the infinite extension of line a.
+			return java.awt.geom.Line2D.ptLineDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
+		}
 	}
 	public class Sequence2D {
 		public ArrayList<Line2D> lines;
@@ -69,6 +81,22 @@ public class ArtPipeline {
 	}
 	
 	protected ArtPipelinePanel myPanel;
+	
+	private void extendLine(Line2D targetLine, Point2D extPoint) {
+		// extPoint is supposed to be a point which lies (almost) on the infinite extension of targetLine
+		double newLengthA = distanceBetweenPointsSquared(targetLine.a, extPoint);
+		double newLengthB = distanceBetweenPointsSquared(targetLine.b, extPoint);
+		double currentLength = targetLine.physicalLengthSquared();
+		
+		// Maximize length of target line by replacing the start or end point with the extPoint		
+		if(newLengthA > currentLength && newLengthA > newLengthB) {
+			// Draw line from targetLine.a to extPoint
+			targetLine.b = extPoint;
+		} else if(newLengthB > currentLength) {
+			// Draw line from extPoint to targetLine.b 
+			targetLine.a = extPoint;
+		}
+	}
 	
 	/**
 	 * Offers to look for a better route through the turtle history that means fewer travel moves.
@@ -113,43 +141,107 @@ public class ArtPipeline {
 				break;
 			}
 		}
+		
+		int nrOfOriginalLines = originalLines.size();
 
-		Log.message("  Converted to "+originalLines.size()+" lines.");
+		Log.message("  Converted to "+nrOfOriginalLines+" lines.");
 
 		final double EPSILON = 0.1;
 		final double EPSILON2 = EPSILON*EPSILON;
-		double EPSILON_CONNECTED=2;  // TODO: make this user-tweakable. Is it in millimeters?
+		double EPSILON_CONNECTED=0.5;  // TODO: make this user-tweakable. Is it in millimeters? 
 
-		ArrayList<Line2D> newLines = new ArrayList<Line2D>();
+		ArrayList<Line2D> uniqueLines = new ArrayList<Line2D>();
 		
 		// TODO: dedupe should be optional so user can reorder without dedupe, or dedupe without reorder
 		// remove duplicate lines.
-		for(int a=0;a<originalLines.size();++a) {
-			Line2D aa = originalLines.get(a);
-			int b;
-			for(b=a+1;b<originalLines.size();++b) {
-				Line2D bb = originalLines.get(b);
-				// TODO: currently checking only if the start and end points of two lines are close.
-				// But should also check if one line is completly inside another and merge them.
-				// Or if they are parallel and overlap partially, then the overlappng part shouldn't be added.
-				if( distanceBetweenPointsSquared(aa.a, bb.a)<EPSILON2 &&
-					distanceBetweenPointsSquared(aa.b, bb.b)<EPSILON2 ) {
-					break;
+		// TODO: how to handle duplicate lines with different colors? 
+
+		for(Line2D candidateLine : originalLines) {
+			int b = 0;
+			int end = uniqueLines.size();
+			boolean isDuplicate = false;
+			Line2D lineToReplace = null;
+			
+			// Compare this line to all the lines previously marked as non-duplicate
+			while (b < end) {
+				Line2D uniqueLine = uniqueLines.get(b);	
+				++b;
+				
+				// Check first if lines are (almost) parallel
+				/*
+				double dx1 = uniqueLine.b.x - uniqueLine.a.x;
+				double dy1 = uniqueLine.b.y - uniqueLine.a.y;
+				double dx2 = candidateLine.b.x - candidateLine.a.x;
+				double dy2 = candidateLine.b.y - candidateLine.a.y;
+				
+				double cosAngle = Math.abs((dx1 * dx2 + dy1 * dy2) / Math.sqrt((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2)));
+				
+				// Check if lines have the same angle with a tolerance of 0.25 degrees
+				if(cosAngle < 0.99999048) {
+					// Not parallel, check remaining lines for duplicates
+					continue;
 				}
-				if( distanceBetweenPointsSquared(aa.a, bb.b)<EPSILON2 &&
-					distanceBetweenPointsSquared(aa.b, bb.a)<EPSILON2 ) {
+				*/
+				
+				// Check if lines are (almost) colinear
+				if(uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 && uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2){
+					// Both lines are (almost) colinear,
+					// if they touch they can be merged
+					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
+					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
+					boolean uniqueStartsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.a) < EPSILON2;
+					boolean uniqueEndsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.b) < EPSILON2;
+					
+					if(candidateStartsCloseToUnique) {
+						isDuplicate = true;
+						
+						if(candidateEndsCloseToUnique) {
+							// Candidate doesn't add anything which isn't already covered by the unique line.
+							// No further action needed.
+							
+							// TODO: extend the line, to ensure no gaps will arise due to the configured tolerance?
+							// extendLine(uniqueLine, candidateLine.a);
+							// extendLine(uniqueLine, candidateLine.b);
+						} else {
+							// Partial overlap, extend uniqueLine
+							extendLine(uniqueLine, candidateLine.b);
+						}
+					} else if(candidateEndsCloseToUnique) {
+						isDuplicate = true;
+						// Partial overlap, extend uniqueLine
+						extendLine(uniqueLine, candidateLine.a);						
+					} else if(uniqueStartsCloseToCandidate) {
+						if(uniqueEndsCloseToCandidate) {
+							// The candidateLine covers more than the unique line already added,
+							// replace uniqueLine with candidateLine.
+							lineToReplace = uniqueLine;
+							// No further action needed.
+						} else {
+							isDuplicate = true;
+							// Partial overlap, extend uniqueLine
+							extendLine(uniqueLine, candidateLine.a);
+						}
+					} else {
+						// No match, check remaining lines for duplicates
+						continue;
+					}
+					
+					// Match found, no need to continue search
 					break;
 				}
 			}
-			if(b==originalLines.size()) {
-				// aa does not match any line in the list.
-				newLines.add(aa);
+			
+			if(!isDuplicate) {
+				if(lineToReplace != null) {
+					uniqueLines.remove(lineToReplace);
+				}
+				// candidateLine does not match any line in the list.
+				uniqueLines.add(candidateLine);					
 			}
 		}
 		
-		int duplicates = originalLines.size() - newLines.size();
-		originalLines = newLines;
-		Log.message("  - "+duplicates+" duplicates = "+originalLines.size()+" lines.");
+		int duplicates = nrOfOriginalLines - uniqueLines.size();
+		Log.message("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
 		
 		Turtle t = new Turtle();
 		// I assume the turtle history starts at the home position.
@@ -161,18 +253,18 @@ public class ArtPipeline {
 		Point2D lastPosition = new Point2D(t.getX(), t.getY());
 		
 		// Greedy reorder lines
-		while(!newLines.isEmpty()) {
+		while(!uniqueLines.isEmpty()) {
 			// Continue for as long as there are lines to reorder
 			double bestD = Double.MAX_VALUE;
 			int bestCandidateIndex = 0;
 			int candidateIndex = 0;
-			int end = newLines.size();
+			int end = uniqueLines.size();
 			boolean shouldFlip = false;
 			
 			while (candidateIndex < end) {
 				// Check all remaining lines, and pick the one with the start or end point
 				// closest to lastPosition (the end point of the previous line).
-				Line2D candidateLine = newLines.get(candidateIndex);
+				Line2D candidateLine = uniqueLines.get(candidateIndex);
 				double distanceToStartPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
 				double distanceToEndPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
 				
@@ -199,7 +291,7 @@ public class ArtPipeline {
 			
 			// Found line closest to lastPosition,
 			// remove it from the pool
-			Line2D bestCandidate = newLines.remove(bestCandidateIndex);
+			Line2D bestCandidate = uniqueLines.remove(bestCandidateIndex);
 			if(shouldFlip) {
 				// Distance is shortest when this line is flipped
 				bestCandidate.flip();
