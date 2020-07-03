@@ -101,7 +101,7 @@ public final class Makelangelo
 	private Splitter splitUpDown;
 
 	// OpenGL window
-	private DrawPanel drawPanel;
+	private PreviewPanel drawPanel;
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
 	// Bottom of window
@@ -367,7 +367,7 @@ public final class Makelangelo
 			// caps.setHardwareAccelerated(true);
 			// caps.setNumSamples(4);
 			Log.message("  create draw panel...");
-			drawPanel = new DrawPanel(caps);
+			drawPanel = new PreviewPanel(caps);
 		} catch(GLException e) {
 			Log.error("I failed the very first call to OpenGL.  Are your native libraries missing?");
 			System.exit(1);

@@ -21,7 +21,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.util.PreferencesHelper;
 
 // Custom drawing panel written as an inner class to access the instance variables.
-public class DrawPanel extends GLJPanel implements MouseListener, MouseInputListener, MouseWheelListener, GLEventListener {
+public class PreviewPanel extends GLJPanel implements MouseListener, MouseInputListener, MouseWheelListener, GLEventListener {
 	private static final float CAMERA_ZFAR = 1000.0f;
 	private static final float CAMERA_ZNEAR = 10.0f;
 
@@ -50,7 +50,7 @@ public class DrawPanel extends GLJPanel implements MouseListener, MouseInputList
 	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 	
 
-	public DrawPanel(GLCapabilities caps) {
+	public PreviewPanel(GLCapabilities caps) {
 		super(caps);
 		addMouseMotionListener(this);
 		addMouseListener(this);
