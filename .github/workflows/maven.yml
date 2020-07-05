@@ -4,7 +4,10 @@ on: push
 
 jobs:
   build:
-
+    branches:
+      - master
+      - dev
+        
     runs-on: windows-latest
 
     steps:
@@ -32,7 +35,7 @@ jobs:
       run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
       
     # from https://github.com/marketplace/actions/deploy-nightly
-    - name: Deploy Windows release
+    - name: Deploy universal release
       #if: matrix.os == 'windows-latest'
       uses: WebFreak001/deploy-nightly@v1.0.1
       env:
@@ -43,6 +46,6 @@ jobs:
         upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/28176830/assets{?name,label}
         release_id: 28176830 # same as above (id can just be taken out the upload_url, it's used to find old releases)
         asset_path: ./target/to-upload.jar # path to archive to upload
-        asset_name: makelangelo_windows-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_name: makelangelo-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
