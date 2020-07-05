@@ -1,15 +1,14 @@
 name: Java CI with Maven
 
-on: push
-
-jobs:
-  build:
+on:
+  push:
     branches:
       - master
       - dev
-        
-    runs-on: windows-latest
 
+jobs:
+  build:
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
 
