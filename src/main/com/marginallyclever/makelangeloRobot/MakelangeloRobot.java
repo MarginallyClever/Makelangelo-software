@@ -1095,4 +1095,8 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public ArtPipeline getPipeline() {
 		return myPipeline;
 	}
+
+	public boolean isPenIsUp() {
+		return penIsUp;
+	}
 }

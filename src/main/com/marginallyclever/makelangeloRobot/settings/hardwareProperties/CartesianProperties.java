@@ -68,6 +68,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 		//double dx, dy;
 		double gx = robot.getPenX();
 		double gy = robot.getPenY();
+		double gz = (robot.isPenIsUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -97,6 +98,15 @@ public class CartesianProperties extends Makelangelo2Properties {
 		
 		gl2.glPushMatrix();		gl2.glTranslated(right, gy, 0);		gl2.glRotated(0, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
 		gl2.glPushMatrix();		gl2.glTranslated(gx   , gy, 0);		gl2.glRotated(0, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
+
+		// gondola
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		float f;
+		for (f = 0; f < 2.0 * Math.PI; f += 0.3f) {
+			gl2.glVertex2d(gx + Math.cos(f) * (4+gz), gy + Math.sin(f) * (4+gz));
+		}
+		gl2.glEnd();
 	}
 	
 	@Override
