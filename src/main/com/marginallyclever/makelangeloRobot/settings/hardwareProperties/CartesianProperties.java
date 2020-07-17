@@ -128,7 +128,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 	@Override
 	protected void paintMotors(GL2 gl2,MakelangeloRobotSettings settings) {
 		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
+		//double bottom = settings.getLimitBottom();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
 
