@@ -629,7 +629,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	}
 
 	public void goHome() {
-		sendLineToRobot("G00 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
+		sendLineToRobot("G00 F"+StringHelper.formatDouble(getCurrentFeedRate())+" X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
 				+ StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		penY = (float) settings.getHomeY();
