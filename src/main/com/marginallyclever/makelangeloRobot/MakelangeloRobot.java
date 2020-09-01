@@ -954,13 +954,17 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 						if(m==null) {
 							throw new NullPointerException();
 						}
+						boolean inShow = (showCount >= first && showCount < last);
 						switch (m.type) {
 						case TRAVEL:
 							if (!isUp) {
 								isUp = true;
-								gl2.glColor4d((double) penUpColor.getRed() / 255.0, (double) penUpColor.getGreen() / 255.0,
-										(double) penUpColor.getBlue() / 255.0, showPenUp ? 1 : 0);
-								if (showCount >= first && showCount < last) {
+								gl2.glColor4d(
+										(double) penUpColor.getRed() / 255.0,
+										(double) penUpColor.getGreen() / 255.0,
+										(double) penUpColor.getBlue() / 255.0,
+										showPenUp ? 1 : 0);
+								if (inShow) {
 									gl2.glVertex2d(previousMove.x, previousMove.y);
 									gl2.glVertex2d(m.x, m.y);
 								}
@@ -970,18 +974,20 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 							break;
 						case DRAW:
 							if (isUp) {
-								if (showCount >= first && showCount < last) {
+								if (inShow) {
 									gl2.glVertex2d(previousMove.x, previousMove.y);
 								}
-								gl2.glColor4d((double) penDownColor.getRed() / 255.0,
-										(double) penDownColor.getGreen() / 255.0, (double) penDownColor.getBlue() / 255.0,
+								gl2.glColor4d(
+										(double) penDownColor.getRed() / 255.0,
+										(double) penDownColor.getGreen() / 255.0,
+										(double) penDownColor.getBlue() / 255.0,
 										1);
-								if (showCount >= first && showCount < last) {
+								if (inShow) {
 									gl2.glVertex2d(previousMove.x, previousMove.y);
 								}
 								isUp = false;
 							}
-							if (showCount >= first && showCount < last) {
+							if (inShow) {
 								gl2.glVertex2d(m.x, m.y);
 							}
 							showCount++;
