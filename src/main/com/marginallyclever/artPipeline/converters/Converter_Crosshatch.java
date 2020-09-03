@@ -2,6 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.Histogram;
 import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -60,10 +61,22 @@ public class Converter_Crosshatch extends ImageConverter {
 		
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
+		Histogram hist = new Histogram();
+		
+		hist.getGreyHistogramOf(img.getSourceImage());
+		//*
+		double [] levels = hist.getLevelsMapped( new double[] { 192.0/255.0, 128.0/255.0, 64.0/255.0, 32.0/255.0 } );
+		/*/
+		double [] levels = {
+			4*Math.pow(2,5),
+			4*Math.pow(2,4),
+			4*Math.pow(2,3),
+			4*Math.pow(2,2),
+		};//*/
 		
 		boolean useError=false;
 		// vertical
-		double level = 4*Math.pow(2,5);
+		double level = levels[0];
 
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if (flip) {
@@ -80,7 +93,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level = 4*Math.pow(2,4);
+		level = levels[1];
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}
@@ -101,7 +114,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level = 4*Math.pow(2,3);
+		level = levels[2];
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}
@@ -149,7 +162,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			flip = !flip;
 		}
 
-		level = 4*Math.pow(2,2);
+		level = levels[3];
 		for(int j=0;j<error0.length;++j) {
 			error0[j]=error1[j]=0;
 		}
