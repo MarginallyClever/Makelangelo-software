@@ -1,4 +1,4 @@
-﻿# Makelangelo #
+# Makelangelo 
 
 http://www.makelangelo.com/
 
@@ -23,3 +23,4 @@ Thank you!
 ## Special thanks ##
 
 Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
+# thanks for your visit.
