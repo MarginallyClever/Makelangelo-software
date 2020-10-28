@@ -1,16 +1,16 @@
 package com.marginallyclever.makelangelo;
 
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import org.junit.jupiter.api.*;
+import org.junit.Test;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
@@ -20,7 +20,7 @@ public class SelectTests {
 	private SelectPanel panel;
 	private int testObservation; 
 	
-	@BeforeAll
+	@Before
 	static public void beforeAll() {
 		frame = new JFrame("Select Test");
 		//2. Optional: What happens when the frame closes?
@@ -160,9 +160,9 @@ public class SelectTests {
 	public void testFloat() {
 		// test contructor(s)
 		SelectFloat b = new SelectFloat("test",0);
-		assertEquals(0.0f,b.getValue());
+		assertEquals(0.0f,b.getValue(),1e-6);
 		b = new SelectFloat("test2",0.1f);
-		assertEquals(0.1f,b.getValue());
+		assertEquals(0.1f,b.getValue(),1e-6);
 		
 		panel.add(b);
 		
@@ -177,7 +177,7 @@ public class SelectTests {
 		
 		b.setValue(0.2f);
 		assertTrue(testObservation>0);
-		assertEquals(0.2f,b.getValue());	
+		assertEquals(0.2f,b.getValue(),1e-6);	
 	}
 	
 	@Test

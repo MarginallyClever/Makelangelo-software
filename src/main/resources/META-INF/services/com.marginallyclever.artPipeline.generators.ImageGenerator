@@ -3,6 +3,7 @@ com.marginallyclever.artPipeline.generators.Generator_Dragon
 com.marginallyclever.artPipeline.generators.Generator_FibonacciSpiral
 com.marginallyclever.artPipeline.generators.Generator_FillPage
 com.marginallyclever.artPipeline.generators.Generator_GosperCurve
+com.marginallyclever.artPipeline.generators.Generator_GraphPaper
 com.marginallyclever.artPipeline.generators.Generator_HilbertCurve
 com.marginallyclever.artPipeline.generators.Generator_KochCurve
 com.marginallyclever.artPipeline.generators.Generator_Lissajous
