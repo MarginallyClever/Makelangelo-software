@@ -64,6 +64,13 @@ If you like this project, please support us by buying Marginally Clever products
     </developer>
   </developers>
 
+	<pluginRepositories>
+	   <pluginRepository> 
+	    <id>maven2</id> 
+	    <url>https://repo.maven.apache.org/maven2/</url> 
+	  </pluginRepository> 
+	</pluginRepositories>
+
   <build>
     <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
 	<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
@@ -227,11 +234,11 @@ If you like this project, please support us by buying Marginally Clever products
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>2.8</version>
-      </plugin>
+      </plugin><!-- 
       <plugin>
-        <groupId>org.pitest</groupId>
+	    <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
-        <version>1.1.7</version>
+        <version>1.5.2</version>
         <configuration>
           <targetClasses>
             <param>com.marginallyclever*</param>
@@ -240,7 +247,7 @@ If you like this project, please support us by buying Marginally Clever products
             <param>com.marginallyclever*</param>
           </targetTests>
         </configuration>
-      </plugin>
+      </plugin> -->
     </plugins>
     
     <pluginManagement>
@@ -344,11 +351,12 @@ If you like this project, please support us by buying Marginally Clever products
       <version>1.5.2</version>
     </dependency>
     
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
 	<dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<version>[4.13.1,)</version>
-		<!-- <scope>test</scope> -->
+	    <groupId>org.junit.jupiter</groupId>
+	    <artifactId>junit-jupiter-engine</artifactId>
+	    <version>5.0.2</version>
+	    <scope>test</scope>
 	</dependency>
     
     <!-- used by PreferenceHelper -->

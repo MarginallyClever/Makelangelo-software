@@ -943,8 +943,11 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				gl2.glLineWidth(newDiameter);
 				gl2.glBegin(GL2.GL_LINE_STRIP);
 				try {
-					gl2.glColor4d((double) penUpColor.getRed() / 255.0, (double) penUpColor.getGreen() / 255.0,
-							(double) penUpColor.getBlue() / 255.0, showPenUp ? 1 : 0);
+					gl2.glColor4d(
+							(double) penUpColor.getRed() / 255.0,
+							(double) penUpColor.getGreen() / 255.0,
+							(double) penUpColor.getBlue() / 255.0,
+							showPenUp ? 1 : 0);
 					if (showCount >= first && showCount < last) {
 						gl2.glVertex2d(ox, oy);
 					}

@@ -17,7 +17,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * LoadGCode loads gcode into memory. 
- * @author Admin
+ * @author Dan Royer
  *
  */
 public class LoadAndSaveGCode implements LoadAndSaveFileType {
@@ -200,14 +200,13 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			machine.writeProgramStart(out);
-			//machine.writeChangeToDefaultColor(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);
 			boolean isUp=true;
 			
 			Turtle.Movement previousMovement=null;
-			
-			for(Turtle.Movement m : turtle.history ) {
+			for(int i=0;i<turtle.history.size();++i) {
+				Turtle.Movement m = turtle.history.get(i);
 				boolean zMoved=false;
 				
 				switch(m.type) {
@@ -254,7 +253,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		Log.message("done.");
 		return true;
 	}
-
+	
 	@Override
 	public boolean canLoad() {
 		return true;

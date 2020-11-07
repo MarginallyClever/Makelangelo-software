@@ -1,16 +1,12 @@
 package com.marginallyclever.makelangelo;
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
@@ -20,7 +16,7 @@ public class SelectTests {
 	private SelectPanel panel;
 	private int testObservation; 
 	
-	@Before
+	@BeforeAll
 	static public void beforeAll() {
 		frame = new JFrame("Select Test");
 		//2. Optional: What happens when the frame closes?

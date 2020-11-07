@@ -36,6 +36,72 @@ public class Converter_Crosshatch extends ImageConverter {
 	
 	@Override
 	public void finish() {
+		finish1();
+		//finish2();
+	}
+	
+	public void finish2() {
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		TransformedImage img = bw.filter(sourceImage);
+
+		turtle = new Turtle();
+		
+		finishPass(new int[]{15* 2,15* 4},0  ,img);
+		finishPass(new int[]{15* 6,15* 8},90 ,img);
+		finishPass(new int[]{15*10,15*12},45 ,img);
+		finishPass(new int[]{15*14,15*15},135,img);
+	}
+	
+	protected void finishPass(int [] passes,double angleDeg,TransformedImage img) {
+		double dx = Math.cos(Math.toRadians(angleDeg));
+		double dy = Math.sin(Math.toRadians(angleDeg));
+
+		// figure out how many lines we're going to have on this image.
+		float stepSize = machine.getPenDiameter()*2;
+		if (stepSize < 1) stepSize = 1;
+
+		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
+		// Lift the pen any time the color value is > level (128 or more).
+
+		// from top to bottom of the margin area...
+		double yBottom = machine.getMarginBottom();
+		double yTop    = machine.getMarginTop();
+		double xLeft   = machine.getMarginLeft();
+		double xRight  = machine.getMarginRight();
+		double height = yTop - yBottom;
+		double width = xRight - xLeft;
+		double maxLen = Math.sqrt(width*width+height*height);
+		double [] error0 = new double[(int)Math.ceil(maxLen)];
+		double [] error1 = new double[(int)Math.ceil(maxLen)];
+
+		boolean useError=false;
+		
+		int i=0;
+		for(double a = -maxLen;a<maxLen;a+=stepSize) {
+			double px = dx * a;
+			double py = dy * a;
+			double x0 = px - dy * maxLen;
+			double y0 = py + dx * maxLen;
+			double x1 = px + dy * maxLen;
+			double y1 = py - dx * maxLen;
+		
+			double l2 = passes[(i % passes.length)];
+			if ((i % 2) == 0) {
+				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
+				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
+			} else {
+				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize, l2, img);
+				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img);
+			}
+			for(int j=0;j<error0.length;++j) {
+				error0[j]=error1[error0.length-1-j];
+				error1[error0.length-1-j]=0;
+			}
+			++i;
+		}
+	}
+	
+	protected void finish1() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 

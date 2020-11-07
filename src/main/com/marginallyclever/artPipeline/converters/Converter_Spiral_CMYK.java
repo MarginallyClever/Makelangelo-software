@@ -52,7 +52,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		turtle = new Turtle();
 		
 		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		Log.message("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
+		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
 		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
 		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
 		Log.message("Finishing...");
@@ -87,6 +87,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		double fx, fy;
 		boolean wasInside = false;
 		int numRings = 0;
+		int downMoves = 0;
 		j = 0;
 		while (r > toolDiameter) {
 			++j;
@@ -113,8 +114,12 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 						e.printStackTrace();
 					}
 					
-					if(z<level) turtle.penDown();
-					else turtle.penUp();
+					if(z<level) {
+						turtle.penDown();
+						downMoves++;
+					} else {
+						turtle.penUp();
+					}
 					turtle.moveTo(fx, fy);
 				}
 
@@ -124,6 +129,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 			++numRings;
 		}
 
+		Log.message(downMoves + " down moves.");
 		Log.message(numRings + " rings.");
 	}
 }

@@ -592,12 +592,40 @@ public class ArtPipeline {
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
 			if(shouldCrop()) cropToPageMargin(turtle,settings);
+			removeRedundantToolChanges(turtle);
 		}
 		finally {
 			turtle.unlock();
 		}
 	}
 
+	protected void removeRedundantToolChanges(Turtle t) {
+		ArrayList<Turtle.Movement> toKeep = new ArrayList<Turtle.Movement>();
+		int size=t.history.size();
+		for(int i=0;i<size;++i) {
+			Turtle.Movement mi = t.history.get(i);
+			if(mi.type != Turtle.MoveType.TOOL_CHANGE) {
+				toKeep.add(mi);
+				continue;
+			}
+			// we found a tool change.
+			// between this and the next tool change/eof are there any draw commands?
+			boolean found=false;
+			for(int j=i+1;j<size;++j) {
+				Turtle.Movement mj = t.history.get(j);
+				if(mj.type == Turtle.MoveType.TOOL_CHANGE) break;
+				if(mj.type == Turtle.MoveType.DRAW) {
+					found=true;
+					break;
+				}
+			}
+			if(found) {
+				toKeep.add(mi);
+			}
+		}
+		t.history = toKeep;
+	}
+	
 	/**
 	 * 
 	 * @return true or false

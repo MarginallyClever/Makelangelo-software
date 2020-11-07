@@ -104,7 +104,6 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 		}	
 	}
 	
-
 	/**
 	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
 	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
