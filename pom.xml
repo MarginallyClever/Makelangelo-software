@@ -355,7 +355,7 @@ If you like this project, please support us by buying Marginally Clever products
 	<dependency>
 	    <groupId>org.junit.jupiter</groupId>
 	    <artifactId>junit-jupiter-engine</artifactId>
-	    <version>5.0.2</version>
+	    <version>[4.13.1,)</version>
 	    <scope>test</scope>
 	</dependency>
     
