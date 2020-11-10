@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 import org.json.JSONObject;
 import org.json.Property;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 /**
  * Helper class to be used when accessing preferences.

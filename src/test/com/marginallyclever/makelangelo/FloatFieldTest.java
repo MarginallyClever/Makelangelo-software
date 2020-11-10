@@ -9,7 +9,7 @@ import java.util.Observer;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
 public class FloatFieldTest {

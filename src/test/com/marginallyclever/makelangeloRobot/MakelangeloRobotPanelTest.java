@@ -8,8 +8,8 @@ import java.util.ServiceLoader;
 import org.junit.Test;
 
 import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 
 public class MakelangeloRobotPanelTest {
 

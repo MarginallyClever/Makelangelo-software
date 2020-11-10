@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.UnitTestHelper;

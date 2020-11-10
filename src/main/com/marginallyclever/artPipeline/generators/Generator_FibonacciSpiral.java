@@ -3,8 +3,8 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.Stack;
 
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * generates a fibonacci spiral

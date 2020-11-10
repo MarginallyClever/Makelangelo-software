@@ -29,8 +29,8 @@ import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**

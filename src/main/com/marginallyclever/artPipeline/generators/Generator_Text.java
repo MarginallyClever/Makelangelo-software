@@ -17,8 +17,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 
 
 public class Generator_Text extends ImageGenerator {

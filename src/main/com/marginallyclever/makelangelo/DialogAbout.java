@@ -15,7 +15,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.io.IOUtils;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 public class DialogAbout {	
 	/**

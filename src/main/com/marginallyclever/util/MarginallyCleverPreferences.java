@@ -20,7 +20,7 @@ import java.util.prefs.Preferences;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 /**
  * Created on 6/7/15.

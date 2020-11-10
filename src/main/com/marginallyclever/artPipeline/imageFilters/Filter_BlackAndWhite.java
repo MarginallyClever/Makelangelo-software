@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.imageFilters;
 import java.awt.image.BufferedImage;
 
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 /**
  * Converts an image to N shades of grey.

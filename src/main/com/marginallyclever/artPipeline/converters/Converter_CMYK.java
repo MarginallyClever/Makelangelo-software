@@ -5,8 +5,8 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 
 
 // http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html

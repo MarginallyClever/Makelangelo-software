@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 /**
  * Store command line options for use in the app

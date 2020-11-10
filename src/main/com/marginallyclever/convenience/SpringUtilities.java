@@ -35,7 +35,7 @@ package com.marginallyclever.convenience;
 import javax.swing.*;
 import javax.swing.SpringLayout;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 import java.awt.*;
  

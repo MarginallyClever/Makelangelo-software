@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 import org.junit.Test;
 
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 
 /**

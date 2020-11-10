@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.loadAndSave;
 
 import org.kabeja.dxf.helpers.Point;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;

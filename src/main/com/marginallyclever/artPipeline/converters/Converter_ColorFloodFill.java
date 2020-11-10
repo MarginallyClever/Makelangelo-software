@@ -12,8 +12,8 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.log.Log;
 
 /**
  * @author danroyer

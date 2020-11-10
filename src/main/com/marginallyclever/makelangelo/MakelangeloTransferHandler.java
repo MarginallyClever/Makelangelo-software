@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.TransferHandler;
 
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**

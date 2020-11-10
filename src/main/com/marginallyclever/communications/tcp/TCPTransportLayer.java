@@ -3,7 +3,7 @@ package com.marginallyclever.communications.tcp;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.makelangelo.log.Log;
+import com.marginallyclever.convenience.log.Log;
 
 /**
  * Lists available TCP connections and opens a connection of that type to a robot

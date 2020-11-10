@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.log;
+package com.marginallyclever.convenience.log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +14,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +63,13 @@ public class Log {
 		BasicConfigurator.configureDefaultContext();
 		
 		write(PROGRAM_START_STRING);
-		write("OS="+System.getProperty("os.name").toLowerCase());
+		write("------------------------");
+		Properties p = System.getProperties();
+		Set<String> names = p.stringPropertyNames();
+		for(String n : names) {
+			write(n+" = "+p.get(n));
+		}
+		write("------------------------");
 	}
 	
 	public static void end() {
