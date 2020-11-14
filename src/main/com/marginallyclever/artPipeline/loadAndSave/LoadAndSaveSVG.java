@@ -85,8 +85,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		scale=1;
 		
 	    turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+	    turtle.setX((-machine.getPaperLeft()+machine.getPaperLeft())/2.0f);
+	    turtle.setY((-machine.getPaperBottom()+machine.getPaperTop())/2.0f);
 		turtle.setColor(new ColorRGB(0,0,0));
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
