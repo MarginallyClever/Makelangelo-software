@@ -15,7 +15,7 @@ public class PanelAdjustPaper extends SelectPanel {
 	protected MakelangeloRobot robot;
 	
 	private SelectOneOfMany paperSizes;
-	private SelectFloat pw, ph;
+	private SelectFloat pw, ph,sx,sy;
 	private SelectBoolean isLandscape;
 	private SelectSlider paperMargin;
 	private boolean beingModified;
@@ -80,8 +80,14 @@ public class PanelAdjustPaper extends SelectPanel {
 		}
 		
 		add(paperSizes = new SelectOneOfMany(Translator.get("PaperSize"),commonPaperNames,0));
-		add(pw = new SelectFloat(Translator.get("PaperWidth"),0));
-		add(ph = new SelectFloat(Translator.get("PaperHeight"),0)); 
+		double top = robot.getSettings().getPaperTop();
+		double bot = robot.getSettings().getPaperBottom();
+		double left = robot.getSettings().getPaperLeft();
+		double right = robot.getSettings().getPaperRight();
+		add(pw = new SelectFloat(Translator.get("PaperWidth"),(float)(right-left)));
+		add(ph = new SelectFloat(Translator.get("PaperHeight"),(float)(top-bot))); 
+		add(sx = new SelectFloat("Shift X",(float)(left+right)/2.0f)); 
+		add(sy = new SelectFloat("Shift y",(float)(top+bot)/2.0f)); 
 		add(isLandscape = new SelectBoolean("\u21cb",false));
 		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
 		add(paperColor = new SelectColor(panel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
