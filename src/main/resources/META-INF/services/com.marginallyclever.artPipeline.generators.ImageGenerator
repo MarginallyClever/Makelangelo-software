@@ -9,6 +9,7 @@ com.marginallyclever.artPipeline.generators.Generator_KochCurve
 com.marginallyclever.artPipeline.generators.Generator_Lissajous
 com.marginallyclever.artPipeline.generators.Generator_LSystemTree
 com.marginallyclever.artPipeline.generators.Generator_Maze
+com.marginallyclever.artPipeline.generators.Generator_Package
 com.marginallyclever.artPipeline.generators.Generator_SierpinskiTriangle
 com.marginallyclever.artPipeline.generators.Generator_Spirograph
 com.marginallyclever.artPipeline.generators.Generator_Text
