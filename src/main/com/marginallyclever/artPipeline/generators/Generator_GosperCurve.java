@@ -67,8 +67,8 @@ public class Generator_GosperCurve extends ImageGenerator {
 			yMin*=f;
 		}
 		// adjust the start position to center the image
-		double x = (xMax+xMin)/-2;
-		double y = (yMax+yMin)/-2;
+		double x = (xMax+xMin-machine.getPaperLeft()-machine.getPaperRight())/-2;
+		double y = (yMax+yMin-machine.getPaperTop()-machine.getPaperBottom())/-2;
 		
 		// move to starting position
 		turtle.penUp();

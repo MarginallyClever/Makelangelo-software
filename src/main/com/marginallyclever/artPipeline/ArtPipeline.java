@@ -586,7 +586,7 @@ public class ArtPipeline {
 		turtle.lock();
 		try {
 			if(shouldResizeFill()) resizeFill(turtle,settings);
-			if(shouldResizeFit()) resizeFit(turtle,settings);
+//			if(shouldResizeFit()) resizeFit(turtle,settings);
 			if(shouldFlipV()) flipV(turtle,settings);
 			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldReorder()) reorder(turtle,settings);

@@ -181,6 +181,8 @@ public class PanelAdjustPaper extends SelectPanel {
 	public void save() {
 		double pwf = ((Number)pw.getValue()).doubleValue();
 		double phf = ((Number)ph.getValue()).doubleValue();
+		double shiftxf = ((Number)sx.getValue()).doubleValue();
+		double shiftyf = ((Number)sy.getValue()).doubleValue();
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
@@ -188,7 +190,7 @@ public class PanelAdjustPaper extends SelectPanel {
 
 		if (data_is_sane) {
 			MakelangeloRobotSettings s = robot.getSettings();
-			s.setPaperSize(pwf,phf);
+			s.setPaperSize(pwf,phf,shiftxf,shiftyf);
 			s.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
