@@ -188,8 +188,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public Point2D getHome() {
-//		return getHardwareProperties().getHome();
-		return new Point2D(0,limitBottom);
+		return getHardwareProperties().getHome();
 	}
 	/**
 	 * @return home X coordinate in mm
@@ -211,13 +210,10 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public String getGCodeConfig() {
 		String result;
-		double beltlen=Math.sqrt(Math.pow(getHomeX()-limitLeft,2)+Math.pow(limitTop-limitBottom,2));
-		String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
-		
 		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
 		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
 		String zAxis = "M101 A2 T170 B10";
-		result = xAxis+"\n"+yAxis+"\n"+zAxis+"\n"+belt; 
+		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
 	}
 
@@ -618,11 +614,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 		this.paperMargin = paperMargin;	
 	}
 
-	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		this.paperLeft = -width/2 + shiftx;
-		this.paperRight = width/2 + shiftx;
-		this.paperTop = height/2 + shifty;
-		this.paperBottom = -height/2+shifty;
+	public void setPaperSize(double width, double height) {
+		this.paperLeft = -width/2;
+		this.paperRight = width/2;
+		this.paperTop = height/2;
+		this.paperBottom = -height/2;
 	}
 	
 	public void setRegistered(boolean isRegistered) {
