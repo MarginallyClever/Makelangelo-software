@@ -413,37 +413,6 @@ public class ArtPipeline {
 
 	
 	
-	/**
-	 * Offers to resize your loaded image to fit inside the margins.
-	 * @param turtle
-	 * @param settings
-	 */
-	protected void resizeFit(Turtle turtle, MakelangeloRobotSettings settings) {	
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
-		turtle.getBounds(top, bottom);
-
-		// find the scale
-		double tw = top.x-bottom.x;
-		double th = top.y-bottom.y;
-		double nh=th;
-		double nw=tw;
-		double w = settings.getMarginWidth();
-		double h = settings.getMarginHeight();
-		double ratioW=1,ratioH=1;
-		ratioH = h/nh;
-		ratioW = w/nw;
-		// use < to fit in the page.
-		double ratio = ratioW<ratioH?ratioW:ratioH;
-		
-		// and the translation
-		double x = (top.x+bottom.x)/2;
-		double y = (top.y+bottom.y)/2;
-		
-		// and apply
-		turtle.translate(-x,-y);
-		turtle.scale(ratio,ratio);
-	}
 
 	/**
 	 * 
@@ -468,31 +437,41 @@ public class ArtPipeline {
 	 * @param turtle
 	 * @param settings
 	 */
-	protected void resizeFill(Turtle turtle, MakelangeloRobotSettings settings) {	
+	protected void fitToPaper(Turtle turtle, MakelangeloRobotSettings settings,boolean keepAspect) {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
-		turtle.getBounds(top, bottom);
+		turtle.getBounds(top, bottom); // image bounds
 		
 		// find the scale
-		double tw = top.x-bottom.x;
-		double th = top.y-bottom.y;
-		double nh=th;
-		double nw=tw;
-		double w = settings.getMarginWidth();
-		double h = settings.getMarginHeight();
+		double iw = top.x-bottom.x; // image width
+		double ih = top.y-bottom.y; // image height
+		double pw = settings.getPaperRight()-settings.getPaperLeft();
+		double ph = settings.getPaperTop()-settings.getPaperBottom();
+		double px = (settings.getPaperRight()+settings.getPaperLeft())*0.5;
+		double py = (settings.getPaperTop()+settings.getPaperBottom())*0.5;
 		double ratioW=1,ratioH=1;
-		ratioH = h/nh;
-		ratioW = w/nw;
+		ratioH = ph/ih;
+		ratioW = pw/iw;
+		ratioH  *= (1-settings.getPaperMargin()*0.01);
+		ratioW  *= (1-settings.getPaperMargin()*0.01);
 		// use > to fill the page.
-		double ratio = ratioW>ratioH?ratioW:ratioH;
 		
 		// and the translation
-		double x = (top.x+bottom.x)/2;
-		double y = (top.y+bottom.y)/2;
+		double ix = (top.x+bottom.x)*0.5;
+		double iy = (top.y+bottom.y)*0.5;
 		
 		// and apply
-		turtle.translate(-x,-y);
-		turtle.scale(ratio,ratio);
+		turtle.translate(-ix,-iy);
+		if(keepAspect == true)
+		{
+			double ratio=Math.min(ratioW, ratioH);
+			turtle.scale(ratio,ratio);
+		}
+		else
+		{
+			turtle.scale(ratioW,ratioH);
+		}
+		turtle.translate(px,py);
 	}
 
 	/**
@@ -571,8 +550,16 @@ public class ArtPipeline {
 	 * @param turtle
 	 * @param settings
 	 */
+	MakelangeloRobotSettings last_settings = null;
+	Turtle last_turtle = null;
+
 	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
+		if(turtle == null) turtle=last_turtle;
+		if(settings == null) settings=last_settings;
+		if(turtle == null) return;
 		if(turtle.history.isEmpty()) return;
+		last_settings=settings;
+		last_turtle=turtle;
 		
 		while(turtle.isLocked()) {
 			try {
@@ -585,13 +572,13 @@ public class ArtPipeline {
 		}
 		turtle.lock();
 		try {
-			if(shouldResizeFill()) resizeFill(turtle,settings);
-			if(shouldResizeFit()) resizeFit(turtle,settings);
+			if(shouldCrop()) cropToPageMargin(turtle,settings);
 			if(shouldFlipV()) flipV(turtle,settings);
 			if(shouldFlipH()) flipH(turtle,settings);
+			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
+			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
-			if(shouldCrop()) cropToPageMargin(turtle,settings);
 			removeRedundantToolChanges(turtle);
 		}
 		finally {

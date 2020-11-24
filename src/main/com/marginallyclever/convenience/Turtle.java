@@ -3,6 +3,9 @@ package com.marginallyclever.convenience;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.marginallyclever.convenience.Turtle.MoveType;
+import com.marginallyclever.convenience.log.Log;
+
 
 /**
  * A simple turtle implementation to make generating pictures and learning programming easier.
@@ -181,18 +184,24 @@ public class Turtle {
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
 		top.y=-Float.MAX_VALUE;
+		Movement old=null;
 		
 		for( Movement m : history ) {
-			//switch(m.type) {
-			//case DRAW:
+			if(m.type == MoveType.DRAW)
+			{
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
 				if(bottom.y>m.y) bottom.y=m.y;
-				//break;
-			//default:
-//				break;
-			//}
+				if(old != null)
+				{
+					if(top.x<old.x) top.x=old.x;
+					if(top.y<old.y) top.y=old.y;
+					if(bottom.x>old.x) bottom.x=old.x;
+					if(bottom.y>old.y) bottom.y=old.y;
+				}
+			}
+			old=m;
 		}
 	}
 
@@ -232,5 +241,24 @@ public class Turtle {
 				break;
 			}
 		}
+	}
+
+	public void showExtent() {
+		int i;
+		double xmin=0,xmax=0,ymin=0,ymax=0;
+		int first=1;
+		for(i=0;i<history.size();i++)
+		{
+			Movement mov=history.get(i);
+			if (mov.type == MoveType.DRAW)
+			{
+				if(first == 1 || mov.x < xmin) xmin=mov.x;
+				if(first == 1 || mov.y < ymin) ymin=mov.y;
+				if(first == 1 || mov.x > xmax) xmax=mov.x;
+				if(first == 1 || mov.y > ymax) ymax=mov.y;
+				first=0;
+			}
+		}
+		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
 	}
 }
