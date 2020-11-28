@@ -473,7 +473,25 @@ public class ArtPipeline {
 		}
 		turtle.translate(px,py);
 	}
+	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
+		int i;
+		double x,y,xn,yn;
+		double ang=settings.getRotation();
+		double refang=settings.getRotationRef();
+		double c=Math.cos((ang-refang)*Math.PI/180.0);
+		double s=Math.sin((ang-refang)*Math.PI/180.0);
 
+		for(i=0;i<turtle.history.size();i++)
+		{
+			x=turtle.history.get(i).x;
+			y=turtle.history.get(i).y;
+			xn=x*c-y*s;
+		    yn=x*s+y*c;
+			turtle.history.get(i).x=xn;
+			turtle.history.get(i).y=yn;
+		}
+		settings.setRotationRef(ang);
+	}
 	/**
 	 * 
 	 * @param turtle
@@ -572,6 +590,11 @@ public class ArtPipeline {
 		}
 		turtle.lock();
 		try {
+			double ang=settings.getRotation();
+			if(ang != 0.0)
+			{
+				rotatePicture(turtle,settings);
+			}
 			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
 			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
 			if(shouldFlipV()) flipV(turtle,settings);
