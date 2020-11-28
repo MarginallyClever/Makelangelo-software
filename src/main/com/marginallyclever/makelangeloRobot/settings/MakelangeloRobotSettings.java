@@ -614,11 +614,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 		this.paperMargin = paperMargin;	
 	}
 
-	public void setPaperSize(double width, double height) {
-		this.paperLeft = -width/2;
-		this.paperRight = width/2;
-		this.paperTop = height/2;
-		this.paperBottom = -height/2;
+	public void setPaperSize(double width, double height, double shiftx, double shifty) {
+		this.paperLeft = -width/2 + shiftx;
+		this.paperRight = width/2 + shiftx;
+		this.paperTop = height/2 + shifty;
+		this.paperBottom = -height/2+shifty;
 	}
 	
 	public void setRegistered(boolean isRegistered) {

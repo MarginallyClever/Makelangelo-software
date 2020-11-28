@@ -30,18 +30,19 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
-		xMax = v;
-		yMax = v;
-		xMin = -v;
+		double width=machine.getPaperRight()-machine.getPaperLeft();
+		double height=machine.getPaperTop()-machine.getPaperBottom();
+		double size=Math.min(width, height);
 
 		turtle = new Turtle();
-		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
+		turtleStep = (float) (size / (Math.pow(2, order)));
 
 		// move to starting position
 		turtle.moveTo(
-				-xMax + turtleStep / 2,
-				-yMax + turtleStep / 2);
+				  turtleStep / 2-size/2+(machine.getPaperLeft()+machine.getPaperRight())/2 ,
+				  turtleStep / 2-size/2+(machine.getPaperTop()+machine.getPaperBottom())/2 );
+		
+
 		turtle.penDown();
 		hilbert(order);
 	    

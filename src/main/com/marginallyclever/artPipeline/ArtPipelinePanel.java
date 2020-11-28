@@ -91,6 +91,7 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				setPreferredResizeStyle(resizeOptionsComboBox.getSelectedIndex());
+				myPipeline.processTurtle(null,null);
 			}
 		});
 		flipOptionsComboBox.addActionListener(new ActionListener() {
@@ -102,19 +103,19 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		shouldReorderCheckbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO reprocess turtle
+				myPipeline.processTurtle(null,null);
 			}
 		});
 		shouldSimplifyCheckbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO reprocess turtle
+				myPipeline.processTurtle(null,null);
 			}
 		});
 		shouldCropCheckbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO reprocess turtle
+				myPipeline.processTurtle(null,null);
 			}
 		});
 	}
