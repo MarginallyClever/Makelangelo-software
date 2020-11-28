@@ -572,13 +572,13 @@ public class ArtPipeline {
 		}
 		turtle.lock();
 		try {
-			if(shouldCrop()) cropToPageMargin(turtle,settings);
-			if(shouldFlipV()) flipV(turtle,settings);
-			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
 			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
+			if(shouldFlipV()) flipV(turtle,settings);
+			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
+			if(shouldCrop()) cropToPageMargin(turtle,settings);
 			removeRedundantToolChanges(turtle);
 		}
 		finally {
