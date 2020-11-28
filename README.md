@@ -8,7 +8,9 @@ Makelangelo is a polargraph mural drawing robot.  It is intended to teach studen
 
 This project specifically deals with the GUI: the computer program that makes running the robot friendly and easy.  It pairs really well with Makelangelo-firmware, the code in the brain of the robot that receives instructions and moves the motors.
 
-If you would like to compile the code yourself, please see https://github.com/MarginallyClever/Makelangelo/wiki/Home/
+Try our instantly-updated test builds: https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly
+
+Build and tweak the project: https://github.com/MarginallyClever/Makelangelo/wiki/Home/
 
 For everything else, please visit the forums at https://marginallyclever.com/forums/
 
