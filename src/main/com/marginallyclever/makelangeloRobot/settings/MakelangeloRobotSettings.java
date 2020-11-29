@@ -188,8 +188,10 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public Point2D getHome() {
-//		return getHardwareProperties().getHome();
-		return new Point2D(0,limitBottom);
+		if(hardwareVersion.equals("0")) {
+			return new Point2D(0,limitBottom);
+		}
+		return getHardwareProperties().getHome();
 	}
 	/**
 	 * @return home X coordinate in mm
@@ -211,8 +213,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public String getGCodeConfig() {
 		String result;
-		double beltlen=Math.sqrt(Math.pow(getHomeX()-limitLeft,2)+Math.pow(limitTop-limitBottom,2));
-		String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
+		String belt="";
+		if(hardwareVersion.equals("0")) {
+			double beltlen=Math.sqrt(Math.pow(getHomeX()-limitLeft,2)+Math.pow(limitTop-limitBottom,2));
+			belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
+		}
 		
 		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
 		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
