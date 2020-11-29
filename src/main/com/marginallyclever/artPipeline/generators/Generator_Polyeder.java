@@ -16,7 +16,6 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 public class Generator_Polyeder extends ImageGenerator {
-	
 	int size=100;
 	int flap=10;
 	int modelid=0;
@@ -30,7 +29,7 @@ public class Generator_Polyeder extends ImageGenerator {
 		public String name;
 		public int []instructions;
 	}
-	
+
 	ArrayList<Model> models=null;
 
 	void addModel(String name,int [] instructions)
@@ -40,7 +39,7 @@ public class Generator_Polyeder extends ImageGenerator {
 		m.instructions=instructions;
 		models.add(m);
 	}
-	
+
 	public String [] getModelNames()
 	{
 		String [] result = new String[models.size()];
@@ -49,9 +48,9 @@ public class Generator_Polyeder extends ImageGenerator {
 			result[i]=models.get(i).name;
 		}
 		return result;
-	
+
 	}
-	
+
 	@Override
 	public ImageGeneratorPanel getPanel() {
 		if(models == null)
@@ -64,8 +63,8 @@ public class Generator_Polyeder extends ImageGenerator {
 			addModel("Icosaedron",new int[] {3,3,3,0,1,3,3,3,0,1,3,3,3,0,1,3,3,3,0,1,3,3,3,0,1,1,3,0,1,3,0,1,3,0,1,3,0,1,3,0,1,0});
 			addModel("Cuboctahedron",new int[] {4,3,4,0,3,0,1,1,1,3,4,0,3,0,1,1,1,3,4,0,3,0,4,0,0,0,1,1,3,4,0,3,0,1,1,1});
 			addModel("Rhombicosidodecahedron",new int[] {5,4,3,0,4,0,3,0,1,1,5,0,4,0,5,0,4,0,1,3,0,1,4,0,1,1,1,1,4,3,0,4,0,3,0,1,1,5,0,4,0,5,0,1,1,1,1,4,3,0,1,1,1,0,3,1,0,4,1,1,0,3,1,0
-					,4,1,5,1,4,0,1,3,1,0,4,1,5,1,4,1,1,3,1,0,4,1,1,1,1,3,1,1,4,0,1,1,3,0,1 
-					,4,1,5,1,4,0,1,3,1,0,4,1,5,1,4,1,1,3,1,0,4,1,1,1,1,3,1,1,4,0,1,1,3,0,1 
+					,4,1,5,1,4,0,1,3,1,0,4,1,5,1,4,1,1,3,1,0,4,1,1,1,1,3,1,1,4,0,1,1,3,0,1
+					,4,1,5,1,4,0,1,3,1,0,4,1,5,1,4,1,1,3,1,0,4,1,1,1,1,3,1,1,4,0,1,1,3,0,1
 					,4,0,5,0,4,0,1,3,1,0,4,0,5,0,4,0,1,1,1,1,1,4,3,0,1,1,1,3,0,1
 					,4,0,5,0,4,0,1,3,0,1,4,0,1,1,1,1
 					});
@@ -81,7 +80,7 @@ public class Generator_Polyeder extends ImageGenerator {
 		return new Generator_Polyeder_Panel(this);
 	}
 
-	
+
 	public class Transform {
 		Point2D org;
 		double xabs,yabs,x_x,x_y,y_x,y_y;
@@ -93,7 +92,7 @@ public class Generator_Polyeder extends ImageGenerator {
 			x_x=y_y=1;
 			x_y=y_x=0;
 		}
-		
+
 		Point2D trans(Point2D pt)
 		{
 			Point2D a=new Point2D();
@@ -101,7 +100,7 @@ public class Generator_Polyeder extends ImageGenerator {
 			a.y=org.y+pt.x*x_y+pt.y*y_y;
 			return a;
 		}
-		
+
 		Transform dup()
 		{
 			Transform t1=new Transform();
@@ -141,7 +140,7 @@ public class Generator_Polyeder extends ImageGenerator {
 	}
 
 	int instructionptr;
-	
+
 	void gen_poly(Transform t)
 	{
 		int i;
@@ -149,24 +148,24 @@ public class Generator_Polyeder extends ImageGenerator {
 		if(modelid < 0 || modelid >= models.size()) return;
 		if(instructionptr >= models.get(modelid).instructions.length) return;
 		int code=models.get(modelid).instructions[instructionptr++];
-		
+
 		if(code == 1)
 		{
 			Point2D pos=new Point2D();
 			Point2D abspos;
-			
+
 			pos.x=0;
 			pos.y=size/2;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
-			
+
 			turtle.penDown();
-			
+
 			pos.x=-flap;
 			pos.y=size/2-flap;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
-			
+
 			pos.y=-pos.y;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
@@ -175,23 +174,23 @@ public class Generator_Polyeder extends ImageGenerator {
 			pos.y=-size/2;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
-			
+
 			turtle.penUp();
 
-			
+
 		}
-		
+
 		if(code >= 3 && code <= 8)
 		{
 			t.walk(new Point2D(-size/(2*Math.tan(Math.PI/code)),0));
 			double r=size/(2*Math.sin(Math.PI/code));
 			for(i=0;i<=code;i++)
-			{	
+			{
 				double ang=2*Math.PI*(i-0.5)/(double)code;
 				Point2D pos=new Point2D();
 				pos.x=r*Math.cos(ang);
 				pos.y=r*Math.sin(ang);
-			
+
 				Point2D abspos=t.trans(pos);
 				turtle.moveTo(abspos.x,abspos.y);
 				if( i == 0) turtle.penDown();
@@ -206,30 +205,30 @@ public class Generator_Polyeder extends ImageGenerator {
 				t1.rotate(Math.PI);
 				gen_poly(t1);
 			}
-			
-			
+
+
 		}
-		
+
 	}
-	
+
 	@Override
 	public boolean generate() {
-	
+
 		instructionptr=0;
-		
+
 		turtle = new Turtle();
 		turtle.penUp();
-		
+
 		Transform t = new Transform();
 		Log.message("start");
 		gen_poly(t);
 
 
-		
+
 	    return true;
 	}
 
-	
+
 	public int getLastSize() {
 		return size;
 	}
@@ -244,15 +243,15 @@ public class Generator_Polyeder extends ImageGenerator {
 
 	public void setSize(int intValue) {
 		this.size=intValue;
-		
+
 	}
 
 	public void setFlap(int intValue) {
 		this.flap=intValue;
-		
+
 	}
 	public void setModel(int intValue) {
 		this.modelid=intValue;
-		
+
 	}
 }
