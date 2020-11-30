@@ -10,6 +10,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+
 public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -436,12 +437,15 @@ public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	}
 
 	@Override
-        public String getGCodeConfig(MakelangeloRobotSettings settings) {
-		String result=super.getGCodeConfig(settings);
-		double beltlen=Math.sqrt(Math.pow(settings.getHomeX()-settings.getLimitLeft(),2)+Math.pow(settings.getLimitTop()-settings.getLimitBottom(),2));
-                String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
-                result = result+"\n"+belt;
-                return result;
-        }
+    public String getGCodeConfig(MakelangeloRobotSettings settings) {
+		String result = super.getGCodeConfig(settings);
+		double beltlen = Math.sqrt(
+						Math.pow(settings.getHomeX()-settings.getLimitLeft(),2)+
+						Math.pow(settings.getLimitTop()-settings.getLimitBottom(),2)
+						);
+        String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
+        result +="\n"+belt;
+        return result;
+    }
 
 }

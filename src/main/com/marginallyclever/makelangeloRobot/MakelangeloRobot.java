@@ -378,8 +378,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				sendLineToRobot(lines[i] + "\n");
 			}
 			setHome();
-			sendLineToRobot("G0 F" + StringHelper.formatDouble(settings.getPenUpFeedRate()) + " A"
-					+ StringHelper.formatDouble(settings.getAcceleration()) + "\n");
+			sendLineToRobot("G0"
+					+" F" + StringHelper.formatDouble(settings.getPenUpFeedRate()) 
+					+" A" + StringHelper.formatDouble(settings.getAcceleration())
+					+"\n");
 		} catch (Exception e) {
 		}
 	}
