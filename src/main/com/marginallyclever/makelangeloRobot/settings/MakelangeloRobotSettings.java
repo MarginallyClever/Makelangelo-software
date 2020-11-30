@@ -212,7 +212,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return getHardwareProperties().getGCodeConfig(this);
 	}
 
-
 	public String getAbsoluteMode() {
 		return "G90";
 	}
@@ -220,7 +219,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 	public String getRelativeMode() {
 		return "G91";
 	}
-
 
 	public int getKnownMachineIndex() {
 		String [] list = getKnownMachineNames();
