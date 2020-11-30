@@ -55,6 +55,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
+	private double rotation;
+	private double rotationref;
 	// % from edge of paper.
 	private double paperMargin;
 
@@ -208,10 +210,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return "G92 X"+getHomeX()+" Y"+getHomeY();
 	}
 
+	// return the strings that will tell a makelangelo robot its physical limits.
 	public String getGCodeConfig() {
 		String result;
-		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
-		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft  );
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop  )+" B"+StringHelper.formatDouble(limitBottom);
 		String zAxis = "M101 A2 T170 B10";
 		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
@@ -455,6 +458,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
+		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation",Double.toString(rotation)));
+		rotationref = 0;
 
 		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
@@ -544,6 +549,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
 		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
+		uniqueMachinePreferencesNode.putDouble("rotation", rotation);
 		
 		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
 		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
@@ -898,4 +904,22 @@ public final class MakelangeloRobotSettings implements Serializable {
 	protected void setzRate(float zRate) {
 		this.zRate = zRate;
 	}
+
+	public double getRotation() {
+		return this.rotation;
+	}
+
+	public void setRotation(double rot) {
+		this.rotation=rot;
+	}
+
+	public void setRotationRef(double ang) {
+		this.rotationref=ang;
+		
+	}
+
+	public double getRotationRef() {
+		return this.rotationref;
+	}
+
 }
