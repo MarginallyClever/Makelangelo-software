@@ -55,6 +55,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
+	private double rotation;
+	private double rotationref;
 	// % from edge of paper.
 	private double paperMargin;
 
@@ -456,6 +458,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
+		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation",Double.toString(rotation)));
+		rotationref = 0;
 
 		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
@@ -545,6 +549,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
 		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
 		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
+		uniqueMachinePreferencesNode.putDouble("rotation", rotation);
 		
 		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
 		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
@@ -899,4 +904,22 @@ public final class MakelangeloRobotSettings implements Serializable {
 	protected void setzRate(float zRate) {
 		this.zRate = zRate;
 	}
+
+	public double getRotation() {
+		return this.rotation;
+	}
+
+	public void setRotation(double rot) {
+		this.rotation=rot;
+	}
+
+	public void setRotationRef(double ang) {
+		this.rotationref=ang;
+		
+	}
+
+	public double getRotationRef() {
+		return this.rotationref;
+	}
+
 }

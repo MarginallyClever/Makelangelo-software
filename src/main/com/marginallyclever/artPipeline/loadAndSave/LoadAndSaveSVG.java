@@ -35,7 +35,6 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -50,7 +49,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	protected boolean shouldScaleOnLoad = true;
 	
-	protected double scale,imageCenterX,imageCenterY,plotCenterX, plotCenterY;
+	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 	
 	@Override
@@ -83,12 +82,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		// prepare for importing
 		machine = robot.getSettings();
 		imageCenterX=imageCenterY=0;
-		plotCenterX=plotCenterY=0;
-		scale=1.0;
+		scale=1;
 		
 	    turtle = new Turtle();
-	    turtle.setX(0);
-	    turtle.setY(0);
+	    turtle.setX(machine.getHomeX());
+	    turtle.setY(machine.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
@@ -101,9 +99,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		
 		turtle.getBounds(top, bottom);
 		imageCenterX = ( top.x + bottom.x ) / 2.0;
-		imageCenterY = ( top.y + bottom.y ) / 2.0;
-		plotCenterX = ( machine.getPaperLeft()+machine.getPaperRight() ) / 2.0;
-		plotCenterY = ( machine.getPaperTop()+machine.getPaperBottom()) / 2.0;
+		imageCenterY = -( top.y + bottom.y ) / 2.0;
 
 		double imageWidth  = top.x - bottom.x;
 		double imageHeight = top.y - bottom.y;
@@ -113,8 +109,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		imageWidth += imageWidth * .02;
 		imageHeight += imageHeight * .02;
 
-		double paperHeight = robot.getSettings().getPaperTop()-robot.getSettings().getPaperBottom();
-		double paperWidth = robot.getSettings().getPaperRight()-robot.getSettings().getPaperLeft();
+		double paperHeight = robot.getSettings().getMarginHeight();
+		double paperWidth  = robot.getSettings().getMarginWidth ();
 
 		scale = 1;
 		if(shouldScaleOnLoad) {
@@ -125,8 +121,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					(paperHeight / imageHeight);
 		}
 	    turtle = new Turtle();
-	    turtle.setX(0.0);
-	    turtle.setY(0.0);
+	    turtle.setX(machine.getHomeX());
+	    turtle.setY(machine.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
 		loadOK = parseAll(document);
 		if(!loadOK) {
@@ -152,11 +148,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	protected double TX(double x) {
-		return ( x - imageCenterX ) * scale+plotCenterX;
+		return ( x - imageCenterX ) * scale;
 	}
 	
 	protected double TY(double y) {
-		return ( y - imageCenterY ) * scale+plotCenterY;
+		return ( y - imageCenterY ) * -scale;
 	}
 	
 	/**

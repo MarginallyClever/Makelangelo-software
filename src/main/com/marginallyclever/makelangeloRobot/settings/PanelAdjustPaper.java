@@ -15,7 +15,7 @@ public class PanelAdjustPaper extends SelectPanel {
 	protected MakelangeloRobot robot;
 	
 	private SelectOneOfMany paperSizes;
-	private SelectFloat pw, ph,sx,sy;
+	private SelectFloat pw, ph,sx,sy,ang;
 	private SelectBoolean isLandscape;
 	private SelectSlider paperMargin;
 	private boolean beingModified;
@@ -84,10 +84,12 @@ public class PanelAdjustPaper extends SelectPanel {
 		double bot = robot.getSettings().getPaperBottom();
 		double left = robot.getSettings().getPaperLeft();
 		double right = robot.getSettings().getPaperRight();
+		double rot = robot.getSettings().getRotation();
 		add(pw = new SelectFloat(Translator.get("PaperWidth"),(float)(right-left)));
 		add(ph = new SelectFloat(Translator.get("PaperHeight"),(float)(top-bot))); 
 		add(sx = new SelectFloat("Shift X",(float)(left+right)/2.0f)); 
 		add(sy = new SelectFloat("Shift y",(float)(top+bot)/2.0f)); 
+		add(ang = new SelectFloat("Rotation",(float)rot));
 		add(isLandscape = new SelectBoolean("\u21cb",false));
 		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
 		add(paperColor = new SelectColor(panel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
@@ -183,6 +185,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		double phf = ((Number)ph.getValue()).doubleValue();
 		double shiftxf = ((Number)sx.getValue()).doubleValue();
 		double shiftyf = ((Number)sy.getValue()).doubleValue();
+		double rot = ((Number)ang.getValue()).doubleValue();
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
@@ -191,6 +194,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		if (data_is_sane) {
 			MakelangeloRobotSettings s = robot.getSettings();
 			s.setPaperSize(pwf,phf,shiftxf,shiftyf);
+			s.setRotation(rot);
 			s.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;

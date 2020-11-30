@@ -1019,6 +1019,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		// do the work
 		chosenGenerator.generate();
+		robot.getSettings().setRotationRef(0);
 				
 		Turtle t=chosenGenerator.turtle;
 
