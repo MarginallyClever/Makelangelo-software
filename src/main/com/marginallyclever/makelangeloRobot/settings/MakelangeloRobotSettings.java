@@ -208,10 +208,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return "G92 X"+getHomeX()+" Y"+getHomeY();
 	}
 
+	// return the strings that will tell a makelangelo robot its physical limits.
 	public String getGCodeConfig() {
 		String result;
-		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft);
-		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop)+" B"+StringHelper.formatDouble(limitBottom);
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft  );
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop  )+" B"+StringHelper.formatDouble(limitBottom);
 		String zAxis = "M101 A2 T170 B10";
 		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
 		return result;
