@@ -932,7 +932,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 				boolean isUp = true;
 				double ox = settings.getHomeX();
 				double oy = settings.getHomeY();
-				Movement previousMove = turtle.new Movement(ox, oy, Turtle.MoveType.TRAVEL);
+				Movement previousMove = new Movement(ox, oy, Turtle.MoveType.TRAVEL);
 
 				int first = 0;
 				int last = turtle.history.size();

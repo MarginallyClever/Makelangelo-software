@@ -2,6 +2,8 @@ package com.marginallyclever.artPipeline;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
@@ -412,6 +414,198 @@ public class ArtPipeline {
 	}
 
 	
+	public class PointBranch {
+		PointBranch(double x, double y) {
+			this.x = x;
+			this.y = y;
+			begs = new ArrayList<LineSegment>();
+			ends = new ArrayList<LineSegment>();
+			ur = ul = br = bl = null;
+		}
+
+		double x, y;
+		ArrayList<LineSegment> begs;
+		ArrayList<LineSegment> ends;
+		PointBranch ur, ul, br, bl;
+	}
+
+	public class LineSegment {
+		PointBranch begind, endind;
+		int tool;
+	}
+
+	HashMap<Integer, PointBranch> pb_root;
+
+	PointBranch findPoint(int color, double x, double y) {
+		PointBranch ptr;
+		ptr = pb_root.get(Integer.valueOf(color));
+		if (ptr == null) {
+			ptr = new PointBranch(x, y);
+			pb_root.put(Integer.valueOf(color), ptr);
+			return ptr;
+		}
+		while (ptr != null) {
+			if(Math.abs(ptr.x-x) < 0.1 && Math.abs(ptr.y-y) < 0.1)
+				return ptr;
+			if (y >= ptr.y) {
+				if (x >= ptr.x) {
+					if (ptr.ur == null)
+						return ptr.ur = new PointBranch(x, y);
+					ptr = ptr.ur;
+				} else {
+					if (ptr.ul == null)
+						return ptr.ul = new PointBranch(x, y);
+					ptr = ptr.ul;
+				}
+			} else {
+				if (x >= ptr.x) {
+					if (ptr.br == null)
+						return ptr.br = new PointBranch(x, y);
+					ptr = ptr.br;
+				} else {
+					if (ptr.bl == null)
+						return ptr.bl = new PointBranch(x, y);
+					ptr = ptr.bl;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public void simplify1(Turtle turtle, MakelangeloRobotSettings settings) {
+		int os, ns;
+		int i, j, k;
+		double x,y;
+		PointBranch ind = null, oldind = null;
+		int tool = 0;
+		Log.message("checkSimplify() begin");
+		os = turtle.history.size();
+		pb_root = new HashMap<Integer, PointBranch>();
+
+		ArrayList<LineSegment> segments = new ArrayList<LineSegment>();
+		// convert turtle into simple segments
+		for (i = 0; i < turtle.history.size(); i++) {
+			Movement pt = turtle.history.get(i);
+			x=Math.floor(pt.x/0.001)*0.001;
+			y=Math.floor(pt.y/0.001)*0.001;
+			switch (pt.type) {
+			case DRAW:
+				ind = findPoint(tool, x, y);
+				LineSegment seg = new LineSegment();
+				seg.begind = oldind;
+				seg.endind = ind;
+				seg.tool = tool;
+				oldind.begs.add(seg);
+				ind.ends.add(seg);
+				segments.add(seg);
+				break;
+			case TOOL_CHANGE:
+				tool = (int) (pt.x);
+				break;
+			case TRAVEL:
+				ind = findPoint(tool, x, y);
+				break;
+
+			}
+			oldind = ind;
+		}
+		// delete duplicate segments
+		for (i = 0; i < segments.size(); i++) {
+			LineSegment seg = segments.get(i);
+			if (seg.tool == -1)
+				continue; // aleady invalid
+			PointBranch begin = seg.begind;
+
+			// parallel
+			for (j = 0; j < begin.begs.size(); j++) {
+				LineSegment seg1 = begin.begs.get(j);
+				if (seg1 == seg || seg1.tool == -1)
+					continue;
+				PointBranch end = seg1.endind;
+				for (k = 0; k < end.ends.size(); k++) {
+					LineSegment seg2 = end.ends.get(k);
+					if (seg2 == seg || seg2.tool == -1)
+						continue;
+
+					if (
+							seg2.endind == seg.endind)
+					{
+						// seg2 is parallel to seg, skip it
+						seg2.tool = -1;
+					}
+				}
+			}
+
+			// antiparallel
+			for (j = 0; j <  begin.ends.size(); j++) {
+				LineSegment seg1 = begin.ends.get(j);
+				if (seg1.tool == -1)
+					continue;
+				PointBranch end = seg1.begind;
+				for (k = 0; k < end.begs.size(); k++) {
+					LineSegment seg2 = end.begs.get(k);
+					if (seg2 == seg || seg2.tool == -1)
+						continue;
+
+					if (seg2.begind == seg.endind && seg2.endind == seg.begind)
+					{
+						// seg2 is parallel to seg, skip it
+						seg2.tool = -1;
+					}
+				}
+			}
+		}
+
+		// chain the segments and convert the segments to turtle again
+		turtle.history.clear();
+		turtle.penUp();
+		// process each color once
+		Iterator<Integer> it = pb_root.keySet().iterator();
+		while (it.hasNext()) {
+			tool = it.next().intValue();
+			turtle.history.add(new Movement(tool, 0/* tool diameter? */, MoveType.TOOL_CHANGE));
+
+			int done = 1;
+			while (done == 1) {
+				done = 0;
+				PointBranch pos = null;
+				
+				for (i = 0; i < segments.size(); i++) {
+					LineSegment seg = segments.get(i);
+					if (seg.tool == -1 ||  seg.tool != tool)
+						continue;
+					pos = seg.begind;
+					turtle.history.add(new Movement(pos.x, pos.y, MoveType.TRAVEL));
+					turtle.penDown();
+
+					do {
+						pos = seg.endind;
+						turtle.history.add(new Movement(pos.x, pos.y, MoveType.DRAW));
+						seg.tool = -1;
+						done = 1;
+
+						seg = null;
+						for (j = 0; j < pos.begs.size(); j++) {
+							if (pos.begs.get(j).tool != -1) {
+								seg = pos.begs.get(j);
+								break;
+							}
+						}
+						if (seg == null) {
+							break;
+						}
+					} while (true);
+					turtle.penUp();
+				}
+			}
+		}
+
+		ns = turtle.history.size();
+		Log.message("checkSimplify() end (was " + os + " is now " + ns + ")");
+	}
+
+	
 	
 
 	/**
@@ -512,19 +706,19 @@ public class ArtPipeline {
 						
 						if(startCropped && endCropped) {
 							// crosses rectangle, both ends out.
-							turtle.history.add(turtle.new Movement(P0.x,P0.y,MoveType.TRAVEL));
+							turtle.history.add(new Movement(P0.x,P0.y,MoveType.TRAVEL));
 							turtle.history.add(m);
-							Movement m2=turtle.new Movement(P1.x,P1.y,m.type);
+							Movement m2=new Movement(P1.x,P1.y,m.type);
 							turtle.history.add(m2);
 						} else if(!startCropped && !endCropped) {
 							turtle.history.add(m);
 						} else if(endCropped) {
 							// end cropped, leaving the rectangle
-							Movement m2=turtle.new Movement(P1.x,P1.y,m.type);
+							Movement m2=new Movement(P1.x,P1.y,m.type);
 							turtle.history.add(m2);
 						} else {
 							// start cropped, coming back into rectangle
-							turtle.history.add(turtle.new Movement(P0.x,P0.y,MoveType.TRAVEL));
+							turtle.history.add(new Movement(P0.x,P0.y,MoveType.TRAVEL));
 							turtle.history.add(m);
 						}
 					}

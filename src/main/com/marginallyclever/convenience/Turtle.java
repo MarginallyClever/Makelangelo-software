@@ -3,7 +3,6 @@ package com.marginallyclever.convenience;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.marginallyclever.convenience.Turtle.MoveType;
 import com.marginallyclever.convenience.log.Log;
 
 
@@ -19,7 +18,7 @@ public class Turtle {
 		TOOL_CHANGE;
 	}
 	
-	public class Movement {
+	public static class Movement {
 		public MoveType type;
 		public double x,y;  // destination
 		
