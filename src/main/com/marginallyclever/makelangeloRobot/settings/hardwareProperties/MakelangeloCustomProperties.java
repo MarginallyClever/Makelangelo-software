@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 public class MakelangeloCustomProperties extends Makelangelo3Properties {
@@ -15,6 +17,12 @@ public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
+
+	@Override
+	public Point2D getHome(MakelangeloRobotSettings settings) {
+		return new Point2D(0,settings.getLimitBottom());
+	}
+
 	@Override
 	public String getVersion() {
 		return "0";
@@ -426,4 +434,14 @@ public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	public float getZAngleOn() {
 		return 30;
 	}
+
+	@Override
+        public String getGCodeConfig(MakelangeloRobotSettings settings) {
+		String result=super.getGCodeConfig(settings);
+		double beltlen=Math.sqrt(Math.pow(settings.getHomeX()-settings.getLimitLeft(),2)+Math.pow(settings.getLimitTop()-settings.getLimitBottom(),2));
+                String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
+                result = result+"\n"+belt;
+                return result;
+        }
+
 }

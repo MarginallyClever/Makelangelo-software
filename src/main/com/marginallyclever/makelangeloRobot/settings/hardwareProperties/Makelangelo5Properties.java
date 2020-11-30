@@ -18,7 +18,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	public final static double MOTOR_WIDTH = 42;
 
 	@Override
-	public Point2D getHome() {
+	public Point2D getHome(MakelangeloRobotSettings settings) {
 		double beltLeft = 1025;
 		double beltRight = 1025;
 		
