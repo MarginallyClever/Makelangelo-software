@@ -12,7 +12,7 @@ import com.marginallyclever.convenience.log.Log;
  * @author Admin
  *
  */
-public class Turtle {
+public class Turtle implements Cloneable {
 	public enum MoveType {
 		TRAVEL,  // move without drawing
 		DRAW,  // move while drawing
@@ -42,20 +42,6 @@ public class Turtle {
 	public ArrayList<Movement> history;
 
 	private ReentrantLock lock;
-	
-	public boolean isLocked() {
-		return lock.isLocked();
-	}
-	
-	public void lock() {
-		lock.lock();
-	}
-	
-	public void unlock() {
-		if(lock.isLocked()) {  // prevents "illegal state exception - not locked"
-			lock.unlock();
-		}
-	}
 
 	// current state
 	private double turtleX, turtleY;
@@ -86,6 +72,18 @@ public class Turtle {
 		}
 	}
 
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Turtle t = (Turtle)super.clone();
+		for( Movement m : history ) {
+			t.history.add(new Movement(m));
+		}
+		return t;
+	}
+	
+	/**
+	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 */
 	protected void reset() {
 		turtleX = 0;
 		turtleY = 0;
@@ -94,6 +92,23 @@ public class Turtle {
 		history = new ArrayList<Movement>();
 		// default turtle color is black.
 		setColor(new ColorRGB(0,0,0));
+	}
+	
+	// multithreading lock safety
+	public boolean isLocked() {
+		return lock.isLocked();
+	}
+	
+	// multithreading lock safety
+	public void lock() {
+		lock.lock();
+	}
+	
+	// multithreading lock safety
+	public void unlock() {
+		if(lock.isLocked()) {  // prevents "illegal state exception - not locked"
+			lock.unlock();
+		}
 	}
 
 	public void setColor(ColorRGB c) {
@@ -105,26 +120,45 @@ public class Turtle {
 		}
 		history.add( new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE) );
 	}
+	
 	public ColorRGB getColor() {
 		return color;
 	}
 	
+	/**
+	 * Absolute position change, make sure pen is up before move and put pen down after move.
+	 * @param x  
+	 * @param y 
+	 */
 	public void jumpTo(double x,double y) {
 		penUp();
 		moveTo(x,y);
 		penDown();
 	}
 	
+	/**
+	 * Absolute position change, do not adjust pen status
+	 * @param x  
+	 * @param y 
+	 */
 	public void moveTo(double x,double y) {
 		turtleX=x;
 		turtleY=y;
 		history.add( new Movement(x, y, isUp ? MoveType.TRAVEL : MoveType.DRAW) );
 	}
 	
+	/**
+	 * Absolute position
+	 * @param arg0 x axis
+	 */
 	public void setX(double arg0) {
 		moveTo(arg0,turtleY);
 	}
 	
+	/**
+	 * Absolute position
+	 * @param arg0 y axis
+	 */
 	public void setY(double arg0) {
 		moveTo(turtleX,arg0);
 	}
@@ -145,19 +179,28 @@ public class Turtle {
 		isUp=false;
 	}
 	
+	/**
+	 * @return true if pen is up
+	 */
 	public boolean isUp() {
 		return isUp;
 	}
 
+	/**
+	 * Relative turn
+	 * @param degrees
+	 */
 	public void turn(double degrees) {
 		setAngle(angle+degrees);
 	}
 
+	// Get absolute angle degrees
 	public double getAngle() {
 		return angle;
 	}
 	
 	/**
+	 * Set absolute angle
 	 * @param degrees degrees
 	 */
 	public void setAngle(double degrees) {
@@ -167,6 +210,10 @@ public class Turtle {
 		turtleDy = Math.sin(radians);
 	}
 
+	/**
+	 * Relative move forward/back
+	 * @param stepSize
+	 */
 	public void forward(double stepSize) {
 		moveTo(
 			turtleX + turtleDx * stepSize,
@@ -243,6 +290,9 @@ public class Turtle {
 		}
 	}
 
+	/**
+	 * Log smallest bounding rectangle for Turtle path.
+	 */
 	public void showExtent() {
 		int i;
 		double xmin=0,xmax=0,ymin=0,ymax=0;
