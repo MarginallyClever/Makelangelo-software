@@ -5,9 +5,6 @@ import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_HilbertCurve extends ImageGenerator {
 	private float turtleStep = 10.0f;
-	private double xMax = 7;
-	private double xMin = -7;
-	private double yMax = 7;
 	private static int order = 4; // controls complexity of curve
 	
 	@Override

@@ -3,7 +3,6 @@ package com.marginallyclever.convenience;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.marginallyclever.convenience.Turtle.MoveType;
 import com.marginallyclever.convenience.log.Log;
 
 

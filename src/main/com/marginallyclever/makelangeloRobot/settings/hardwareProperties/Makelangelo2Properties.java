@@ -7,6 +7,7 @@ import java.util.Date;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -58,7 +59,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 	
 	@Override
-	public Point2D getHome() {
+	public Point2D getHome(MakelangeloRobotSettings settings) {
 		return FK(1025,1025);  // default calibration length for M2 belts.
 	}
 	
@@ -404,5 +405,16 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	@Override
 	public float getZAngleOff() {
 		return 90;
+	}
+
+	@Override
+	public String getGCodeConfig(MakelangeloRobotSettings settings)
+	{
+		String result;
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(settings.getLimitRight())+" B"+StringHelper.formatDouble(settings.getLimitLeft());
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(settings.getLimitTop())+" B"+StringHelper.formatDouble(settings.getLimitBottom());
+		String zAxis = "M101 A2 T170 B10";
+		result = xAxis+"\n"+yAxis+"\n"+zAxis;
+		return result;
 	}
 }

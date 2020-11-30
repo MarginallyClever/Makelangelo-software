@@ -190,7 +190,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public Point2D getHome() {
-		return getHardwareProperties().getHome();
+		return getHardwareProperties().getHome(this);
 	}
 	/**
 	 * @return home X coordinate in mm
@@ -212,14 +212,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	// return the strings that will tell a makelangelo robot its physical limits.
 	public String getGCodeConfig() {
-		String result;
-		String xAxis = "M101 A0 T"+StringHelper.formatDouble(limitRight)+" B"+StringHelper.formatDouble(limitLeft  );
-		String yAxis = "M101 A1 T"+StringHelper.formatDouble(limitTop  )+" B"+StringHelper.formatDouble(limitBottom);
-		String zAxis = "M101 A2 T170 B10";
-		result = xAxis+"\n"+yAxis+"\n"+zAxis; 
-		return result;
+		return getHardwareProperties().getGCodeConfig(this);
 	}
-
 
 	public String getAbsoluteMode() {
 		return "G90";
@@ -228,7 +222,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 	public String getRelativeMode() {
 		return "G91";
 	}
-
 
 	public int getKnownMachineIndex() {
 		String [] list = getKnownMachineNames();

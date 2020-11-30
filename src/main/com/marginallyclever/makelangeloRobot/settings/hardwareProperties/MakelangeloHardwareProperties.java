@@ -6,6 +6,7 @@ import java.io.Writer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Properties of each Makelangelo version. These are non-configurable features
@@ -19,7 +20,7 @@ public interface MakelangeloHardwareProperties {
 
 	public String getName();
 
-	public Point2D getHome();
+	public Point2D getHome(MakelangeloRobotSettings settings);
 
 	public boolean canChangeMachineSize();
 
@@ -57,19 +58,19 @@ public interface MakelangeloHardwareProperties {
 	public void render(GL2 gl2, MakelangeloRobot robot);
 
 	/**
-	 * hardware specific gcode at the start of a program
-	 * 
+	 * hardware specific gcode included at the start of each program
 	 * @param out
 	 * @throws IOException
 	 */
 	public void writeProgramStart(Writer out) throws IOException;
 
 	/**
-	 * hardware specific gcode at the end of a program
-	 * 
+	 * Hardware specific gcode sent on connect
 	 * @param out
 	 * @throws IOException
 	 */
+	public String getGCodeConfig(MakelangeloRobotSettings settings);
+
 	public void writeProgramEnd(Writer out) throws IOException;
 
 	// @since hardware m2
