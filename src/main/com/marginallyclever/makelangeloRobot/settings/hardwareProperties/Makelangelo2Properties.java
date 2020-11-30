@@ -408,8 +408,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 
 	@Override
-	public String getGCodeConfig(MakelangeloRobotSettings settings)
-	{
+	public String getGCodeConfig(MakelangeloRobotSettings settings) {
 		String result;
 		String xAxis = "M101 A0 T"+StringHelper.formatDouble(settings.getLimitRight())+" B"+StringHelper.formatDouble(settings.getLimitLeft());
 		String yAxis = "M101 A1 T"+StringHelper.formatDouble(settings.getLimitTop())+" B"+StringHelper.formatDouble(settings.getLimitBottom());
