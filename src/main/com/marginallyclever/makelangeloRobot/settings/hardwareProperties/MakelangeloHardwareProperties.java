@@ -58,16 +58,14 @@ public interface MakelangeloHardwareProperties {
 	public void render(GL2 gl2, MakelangeloRobot robot);
 
 	/**
-	 * hardware specific gcode at the start of a program
-	 * 
+	 * hardware specific gcode included at the start of each program
 	 * @param out
 	 * @throws IOException
 	 */
 	public void writeProgramStart(Writer out) throws IOException;
 
 	/**
-	 * hardware specific gcode at the end of a program
-	 * 
+	 * Hardware specific gcode sent on connect
 	 * @param out
 	 * @throws IOException
 	 */
@@ -92,6 +90,4 @@ public interface MakelangeloHardwareProperties {
 
 	// @since hardware m2
 	public float getZAngleOff();
-
-
 }
