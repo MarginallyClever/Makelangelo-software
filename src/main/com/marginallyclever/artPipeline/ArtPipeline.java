@@ -477,7 +477,7 @@ public class ArtPipeline {
 		int os, ns;
 		int i, j;
 		double x,y;
-		PointBranch ind = null, oldind = null;
+		PointBranch ind = null, oldind = null,tmp;
 		int tool = 0;
 		Log.message("checkSimplify() begin");
 		os = turtle.history.size();
@@ -487,6 +487,7 @@ public class ArtPipeline {
 		// convert turtle into simple segments
 		for (i = 0; i < turtle.history.size(); i++) {
 			Movement pt = turtle.history.get(i);
+			// make equal points sit in equal bins
 			x=Math.floor(pt.x/0.001)*0.001;
 			y=Math.floor(pt.y/0.001)*0.001;
 			switch (pt.type) {
@@ -518,8 +519,12 @@ public class ArtPipeline {
 			PointBranch begin = seg.begind;
 
 			// parallel
-			for (j = 0; j < begin.begs.size(); j++) {
-				LineSegment seg1 = begin.begs.get(j);
+			Iterator<LineSegment> it;
+			LineSegment seg1;
+			it=begin.begs.iterator();
+			while(it.hasNext())
+			{
+				seg1=it.next();
 				if (seg1 == seg || seg1.tool == -1)
 					continue;
 				if(seg1.endind == seg.endind)
@@ -527,8 +532,10 @@ public class ArtPipeline {
 			}
 
 			// antiparallel
-			for (j = 0; j <  begin.ends.size(); j++) {
-				LineSegment seg1 = begin.ends.get(j);
+			it=begin.ends.iterator();
+			while(it.hasNext())
+			{
+				seg1=it.next();
 				if (seg1.tool == -1)
 					continue;
 				if(seg1.begind == seg.endind)
@@ -569,12 +576,12 @@ public class ArtPipeline {
 					act_dist2=new Point2D(seg.endind.x-lastpoint.x,seg.endind.y-lastpoint.y).lengthSquared();
 					if(nearest == null || act_dist2 < nearest_dist2)
 					{
-						nearest_dist2=act_dist2;
+							nearest_dist2=act_dist2;
 							nearest=seg;
 							reversed=true;
 					}
 				}
-				if(nearest == null)
+				if(nearest == null) // no more segments in this color
 					break;
 
 				LineSegment seg=nearest;
@@ -588,62 +595,65 @@ public class ArtPipeline {
 				turtle.penDown();
 //				Log.message("down on "+pos.x+"/"+pos.y);
 
+				oldpos=pos;
 				do {
-					oldpos=pos;
-					if(col != null)
-					{
-						if(colreversed) pos = col.begind;
-						else pos = col.endind;
-						col.tool = -1;
-						turtle.history.remove(turtle.history.size()-1);
-//						Log.message("fast move to "+pos.x+"/"+pos.y);
-					}
-					else
-					{
-						if(reversed) pos = seg.begind;
-						else pos = seg.endind;
-						seg.tool = -1;
-//						Log.message("move to "+pos.x+"/"+pos.y);
-					}
-					turtle.history.add(new Movement(pos.x, pos.y, MoveType.DRAW));
 					
-
+					if(reversed) pos = seg.begind;
+					else pos = seg.endind;
+					seg.tool = -1;
+					turtle.history.add(new Movement(pos.x, pos.y, MoveType.DRAW));
 					
 					double lx=0,ly=0,px,py,dist;
 					seg = null;
 					col = null;
 					lx=pos.x-oldpos.x;
 					ly=pos.y-oldpos.y;
-					for (j = 0; j < pos.begs.size(); j++) { 
-						if (pos.begs.get(j).tool != -1) {
-							seg = pos.begs.get(j);
-							reversed=false;
-							px=seg.endind.x-oldpos.x;
-							py=seg.endind.y-oldpos.y;
-							dist=(lx*py-ly*px)/Math.sqrt(lx*lx+ly*ly);
-							if(Math.abs(dist) < 0.001)
-							{
-								col=seg;
-								colreversed=false;
-							}
+					Iterator<LineSegment> it1;
+					LineSegment seg1;
+
+
+					it1=pos.begs.iterator();
+					while(it1.hasNext()) {
+						seg1=it1.next();
+						if (seg1.tool == -1) continue;
+						seg = seg1;
+						reversed=false;
+						tmp=seg.endind;
+						
+						px=tmp.x - oldpos.x;
+						py=tmp.y - oldpos.y;
+						dist=(lx*py-ly*px)/Math.sqrt(lx*lx+ly*ly);
+						if(Math.abs(dist) < 0.001) // colinear
+						{
+							col=seg;
+							colreversed=false;
 						}
 					}
-					for (j = 0; j < pos.ends.size(); j++) { 
-						if (pos.ends.get(j).tool != -1) {
-							seg = pos.ends.get(j);
-							reversed=true;
-							px=seg.begind.x-oldpos.x;
-							py=seg.begind.y-oldpos.y;
-							dist=(lx*py-ly*px)/Math.sqrt(lx*lx+ly*ly);
-							if(Math.abs(dist) < 0.001)
-							{
-								col=seg;
-								colreversed=true;
-							}
-							
+
+					it1=pos.ends.iterator();
+					while(it1.hasNext())	{
+						seg1=it1.next();
+						if (seg1.tool == -1) continue;
+						seg = seg1;
+						reversed=true;
+						tmp = seg.begind;
+						
+						px=tmp.x - oldpos.x;
+						py=tmp.y - oldpos.y;
+						dist=(lx*py-ly*px)/Math.sqrt(lx*lx+ly*ly);
+						if(Math.abs(dist) < 0.001) // colinear
+						{
+							col=seg;
+							colreversed=true;
 						}
-					
 					}
+					if(col != null)
+					{
+						seg=col;
+						reversed=colreversed;
+						turtle.history.remove(turtle.history.size()-1);
+					}
+					oldpos=pos;
 				} while (seg != null);
 				
 				turtle.penUp();
@@ -846,7 +856,7 @@ public class ArtPipeline {
 			if(shouldFlipV()) flipV(turtle,settings);
 			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldReorder()) reorder(turtle,settings);
-			if(shouldSimplify()) simplify1(turtle,settings);
+			if(shouldSimplify()) simplify(turtle,settings);
 			if(shouldCrop()) cropToPageMargin(turtle,settings);
 			removeRedundantToolChanges(turtle);
 		}
