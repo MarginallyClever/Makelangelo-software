@@ -285,6 +285,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		
 		ListIterator<?> scriptIter = script.listIterator();
 		// find the script with the green flag
+		// assumes only one green flag per script.
 		while( scriptIter.hasNext() ) {
 			Object o = (Object)scriptIter.next();
 			if( o instanceof JSONArray ) {
@@ -468,6 +469,11 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 					// Ignore this Scratch command
 				} else if(name.equals("show")) {
 					// Ignore this Scratch command
+				/*
+				 } else if(name.equals("whenIReceive")) {
+				 
+				 } else if(name.equals("broadcast")) {
+				 */
 				} else {
 					throw new Exception("Unsupported Scratch block '"+name+"'");
 				}
