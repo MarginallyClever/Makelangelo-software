@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience;
 
+
 public class LineInterpolatorSinCurve extends LineInterpolator {
 	double amplitude=1;
 	double scale=1;
