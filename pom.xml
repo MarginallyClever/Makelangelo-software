@@ -424,15 +424,4 @@ If you like this project, please support us by buying Marginally Clever products
     <jogl.version>2.4.0-rc-20200307</jogl.version>
     <maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
   </properties>
-
-  <repositories>
-  	<repository>
-  		<id>my-local-repo</id>
-  		<url>file://${project.basedir}/local-maven-repo</url>
-    </repository>
-    <repository>
-    	<id>openkm</id>
-    	<url>http://maven.openkm.com</url>
-    </repository>
-  </repositories>
 </project>
