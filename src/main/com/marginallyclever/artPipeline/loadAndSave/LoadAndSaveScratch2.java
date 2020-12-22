@@ -6,14 +6,15 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -65,6 +66,8 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
+	private Map<String,JSONArray> subRoutines = new HashMap<String,JSONArray>();
+	private int indent;
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -91,6 +94,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		turtle = new Turtle();
 	    turtle.setX(machine.getHomeX());
 	    turtle.setY(machine.getHomeX());
+	    indent=0;
 		
 		try {
 			// open zip file
@@ -156,21 +160,40 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			
 			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
-			Log.message("found  " +scripts.size() + " scripts");
+			Log.message("found  " +scripts.size() + " top-level event scripts");
 			
-			// extract known elements and convert them to gcode.
+			JSONArray greenFlagScript = null;
+			
+			// extract known elements and convert them to turtle commands.
 			ListIterator<?> scriptIter = scripts.listIterator();
-			// find the script with the green flag
+			// find the first script with a green flag.
 			while( scriptIter.hasNext() ) {
     			JSONArray scripts0 = (JSONArray)scriptIter.next();
     			if( scripts0==null ) continue;
-    			//Log.message("scripts0");
     			JSONArray scripts02 = (JSONArray)scripts0.get(2);
     			if( scripts02==null || scripts02.size()==0 ) continue;
-    			//Log.message("scripts02");
-    			// actual code begins here.
-    			parseScratchCode(scripts02);
+    			// look inside the script at the first block, which gives the type.
+    			Object scriptContents = scripts02.get(0);
+    			if( ( scriptContents instanceof JSONArray ) ) {
+    				Object scriptHead = ((JSONArray)scriptContents).get(0);
+    				
+	    			String firstType = (String)scriptHead;
+					if(firstType.equals("whenGreenFlag")) {
+						Log.message("Found green flag script");
+						if( greenFlagScript != null ) {
+							throw new Exception("More than one green flag script");
+						}
+						greenFlagScript = scripts02;
+					} else if(firstType.equals("whenIReceive")) {
+		    			String firstName = (String)((JSONArray)scriptContents).get(1);
+						Log.message("Found subroutine "+firstName);
+		    			subRoutines.put(firstName, ((JSONArray)scriptContents));
+					}
+    			}
 			}
+
+			// actual code begins here.
+			parseScratchCode(greenFlagScript);
 			
 			Log.message("finished scripts");
 			robot.setTurtle(turtle);
@@ -223,11 +246,13 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		scratchLists = new LinkedList<ScratchList>();
 		JSONArray listOfLists = (JSONArray)tree.get("lists");
 		if(listOfLists == null) return;
+		Log.message("Found "+listOfLists.size()+" lists.");
 		ListIterator<?> listIter = listOfLists.listIterator();
 		while( listIter.hasNext() ) {
 			//Log.message("var:"+elem.toString());
 			JSONObject elem = (JSONObject)listIter.next();
-			String listName = (String)elem.get("name");
+			String listName = (String)elem.get("listName");
+			Log.message("  Found list "+listName);
 			Object contents = (Object)elem.get("contents");
 			ScratchList list = new ScratchList(listName);
 			// fill the list with any given contents
@@ -257,7 +282,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		}
 	}
 	
-	private int getListID(Object obj) throws Exception {
+	private int getListByID(Object obj) throws Exception {
 		if(!(obj instanceof String)) throw new Exception("List name not a string.");
 		String listName = obj.toString();
 		ListIterator<ScratchList> iter = scratchLists.listIterator();
@@ -270,216 +295,222 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		throw new Exception("List '"+listName+"' not found.");
 	}
 	
+	private String getIndent() {
+		String str="";
+		for(int j=0;j<indent;++j) str+="  ";
+		return str;
+	}
+	
 	/**
-	 * read the elements of a JSON array describing Scratch code and parse it into gcode.
+	 * read the elements of a JSON array describing Scratch code and parse it into turtle commands.
 	 * @param script valid JSONArray of Scratch commands.
-	 * @param out where to put the gcode.
 	 * @throws Exception
 	 */
 	private void parseScratchCode(JSONArray script) throws Exception {
 		if(script==null) return;
 		
-		//for(int j=0;j<indent;++j) Log.message("  ");
-		//Log.message("size="+script.size());
-		//indent++;
+		//Log.message(getIndent()+"{");  //"[size="+script.size()+"]"
+		indent++;
 		
 		ListIterator<?> scriptIter = script.listIterator();
-		// find the script with the green flag
-		// assumes only one green flag per script.
+		// Find the script with the green flag.  Assumes only one green flag per script.
 		while( scriptIter.hasNext() ) {
 			Object o = (Object)scriptIter.next();
 			if( o instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)o;
 				parseScratchCode(arr);
-			} else {
-				String name = o.toString();
-				//for(int j=0;j<indent;++j) Log.message("  ");
-				//Log.message(i+"="+name);
-				
-				if(name.equals("whenGreenFlag")) {
-					// gcode preamble
-	    			// reset the turtle object
-	    			turtle = new Turtle();
-	    		    turtle.setX(machine.getHomeX());
-	    		    turtle.setY(machine.getHomeX());
-	    			// make sure machine state is the default.
-					Log.message("**START**");
-					continue;
-				} else if(name.equals("doRepeat")) {
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					int count = (int)resolveValue(o2);
-					//Log.message("Repeat "+count+" times:");
-					for(int i=0;i<count;++i) {
-						parseScratchCode((JSONArray)o3);
-					}
-				} else if(name.equals("doUntil")) {
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					//Log.message("Do Until {");
-					while(!resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3);
-					}
-					//Log.message("}");
-				} else if(name.equals("doIf")) {
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					if(resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3);
-					}
-				} else if(name.equals("doIfElse")) {
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					Object o4 = (Object)scriptIter.next();
-					if(resolveBoolean((JSONArray)o2)) {
-						parseScratchCode((JSONArray)o3);
-					} else {
-						parseScratchCode((JSONArray)o4);
-					}
-				} else if(name.equals("append:toList:")) {
-					// "append:toList:", new value, list name 
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					double value = resolveValue(o2);
-					scratchLists.get(getListID(o3)).contents.add(value);
-				} else if(name.equals("deleteLine:ofList:")) {
-					// "deleteLine:ofList:", index, list name 
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					int listIndex = (int)resolveListIndex(o2,o3);
-					scratchLists.get(getListID(o3)).contents.remove(listIndex);
-				} else if(name.equals("insert:at:ofList:")) {
-					// "insert:at:ofList:", new value, index, list name 
-					Object o4 = (Object)scriptIter.next();
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					double newValue = resolveValue(o4);
-					int listIndex = (int)resolveListIndex(o2,o3);
-					scratchLists.get(getListID(o3)).contents.add(listIndex,newValue);
-				} else if(name.equals("setLine:ofList:to:")) {
-					// "setLine:ofList:to:", index, list name, new value
-					Object o4 = (Object)scriptIter.next();
-					Object o2 = (Object)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					double newValue = resolveValue(o4);
-					int listIndex = (int)resolveListIndex(o2,o3);
-					scratchLists.get(getListID(o3)).contents.set(listIndex,newValue);
-				} else if(name.equals("wait:elapsed:from:")) {
-					// dwell - does nothing.
-					Object o2 = (Object)scriptIter.next();
-					double seconds = resolveValue(o2);
-					Log.message("dwell "+seconds+" seconds.");
-					continue;
-				} else if(name.equals("putPenUp")) {
-					turtle.penUp();
-					Log.message("pen up");
-					continue;
-				} else if(name.equals("putPenDown")) {
-					turtle.penDown();
-					Log.message("pen down");
-				} else if(name.equals("gotoX:y:")) {
-					Object o2 = (Object)scriptIter.next();
-					double x = resolveValue(o2);
-					Object o3 = (Object)scriptIter.next();
-					double y = resolveValue(o3);
-					
-					turtle.moveTo(x,y);
-					Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
-				} else if(name.equals("changeXposBy:")) {
-					Object o2 = (Object)scriptIter.next();
-					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX()+v,turtle.getY());
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
-				} else if(name.equals("changeYposBy:")) {
-					Object o2 = (Object)scriptIter.next();
-					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX(),turtle.getY()+v);
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
-				} else if(name.equals("forward:")) {
-					Object o2 = (Object)scriptIter.next();
-					double v = resolveValue(o2);
-					turtle.forward(v);
-					Log.message("Move forward "+v+" mm");
-				} else if(name.equals("turnRight:")) {
-					Object o2 = (Object)scriptIter.next();
-					double degrees = resolveValue(o2);
-					turtle.turn(-degrees);
-					Log.message("Right "+degrees+" degrees.");
-				} else if(name.equals("turnLeft:")) {
-					Object o2 = (Object)scriptIter.next();
-					double degrees = resolveValue(o2);
-					turtle.turn(degrees);
-					Log.message("Left "+degrees+" degrees.");
-				} else if(name.equals("xpos:")) {
-					Object o2 = (Object)scriptIter.next();
-					double v = resolveValue(o2);
-					turtle.moveTo(v,turtle.getY());
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
-				} else if(name.equals("ypos:")) {
-					Object o2 = (Object)scriptIter.next();
-					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX(),v);
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
-				} else if(name.equals("heading:")) {
-					Object o2 = (Object)scriptIter.next();
-					double degrees = resolveValue(o2);
-					turtle.setAngle(degrees);
-					//Log.message("Turn to "+degrees);
-				} else if(name.equals("setVar:to:")) {
-					// set variable
-					String varName = (String)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					float v = (float)resolveValue(o3);
-
-					boolean foundVar=false;
-					ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
-					while(svi.hasNext()) {
-						ScratchVariable sv = svi.next();
-						if(sv.name.equals(varName)) {
-							sv.value = v;
-							Log.message("Set "+varName+" to "+v);
-							foundVar=true;
-						}
-					}
-					if(foundVar==false) {
-						throw new Exception("Variable '"+varName+"' not found.");
-					}
-				} else if(name.equals("changeVar:by:")) {
-					// set variable
-					String varName = (String)scriptIter.next();
-					Object o3 = (Object)scriptIter.next();
-					float v = (float)resolveValue(o3);
-
-					boolean foundVar=false;
-					ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
-					while(svi.hasNext()) {
-						ScratchVariable sv = svi.next();
-						if(sv.name.equals(varName)) {
-							sv.value += v;
-							Log.message("Change "+varName+" by "+v+" to "+sv.value);
-							foundVar=true;
-						}
-					}
-					if(foundVar==false) {
-						throw new Exception("Variable '"+varName+"' not found.");
-					}
-				} else if(name.equals("clearPenTrails")) {
-					// Ignore this Scratch command
-				} else if(name.equals("hide")) {
-					// Ignore this Scratch command
-				} else if(name.equals("show")) {
-					// Ignore this Scratch command
-				/*
-				 } else if(name.equals("whenIReceive")) {
-				 
-				 } else if(name.equals("broadcast")) {
-				 */
-				} else {
-					throw new Exception("Unsupported Scratch block '"+name+"'");
+				continue;
+			}
+			
+			String name = o.toString();
+			//Log.message(getIndent()+name);
+			
+			if(name.equals("whenGreenFlag")) {
+				continue;
+			} else if(name.equals("whenIReceive")) {
+				// skip the name of the whenIReceive script.
+				scriptIter.next();
+				continue;
+			} else if(name.equals("doBroadcastAndWait")) {
+				Object o2 = (Object)scriptIter.next();
+				//Log.message(getIndent()+"broadcast "+(String)o2);
+				JSONArray arr = subRoutines.get(o2);
+				parseScratchCode(arr);
+			} else if(name.equals("stopScripts")) {
+				//Log.message(getIndent()+"stop");
+				break;
+			} else if(name.equals("doRepeat")) {
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				int count = (int)resolveValue(o2);
+				//Log.message(getIndent()+"Repeat "+count+" times:");
+				for(int i=0;i<count;++i) {
+					parseScratchCode((JSONArray)o3);
 				}
+			} else if(name.equals("doUntil")) {
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				//Log.message(getIndent()+"Do Until");
+				while(!resolveBoolean((JSONArray)o2)) {
+					parseScratchCode((JSONArray)o3);
+				}
+			} else if(name.equals("doIf")) {
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				if(resolveBoolean((JSONArray)o2)) {
+					//Log.message(getIndent()+"if(true)");
+					parseScratchCode((JSONArray)o3);
+				}
+			} else if(name.equals("doIfElse")) {
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				Object o4 = (Object)scriptIter.next();
+				if(resolveBoolean((JSONArray)o2)) {
+					//Log.message(getIndent()+"if(true)");
+					parseScratchCode((JSONArray)o3);
+				} else {
+					//Log.message(getIndent()+"if(false)");
+					parseScratchCode((JSONArray)o4);
+				}
+			} else if(name.equals("append:toList:")) {
+				// "append:toList:", new value, list name 
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				double value = resolveValue(o2);
+				scratchLists.get(getListByID(o3)).contents.add(value);
+			} else if(name.equals("deleteLine:ofList:")) {
+				// "deleteLine:ofList:", index, list name 
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				int listIndex = (int)resolveListIndex(o2,o3);
+				scratchLists.get(getListByID(o3)).contents.remove(listIndex);
+			} else if(name.equals("insert:at:ofList:")) {
+				// "insert:at:ofList:", new value, index, list name 
+				Object o4 = (Object)scriptIter.next();
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				double newValue = resolveValue(o4);
+				int listIndex = (int)resolveListIndex(o2,o3);
+				scratchLists.get(getListByID(o3)).contents.add(listIndex,newValue);
+			} else if(name.equals("setLine:ofList:to:")) {
+				// "setLine:ofList:to:", index, list name, new value
+				Object o4 = (Object)scriptIter.next();
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				double newValue = resolveValue(o4);
+				int listIndex = (int)resolveListIndex(o2,o3);
+				scratchLists.get(getListByID(o3)).contents.set(listIndex,newValue);
+			} else if(name.equals("wait:elapsed:from:")) {
+				// dwell - does nothing.
+				Object o2 = (Object)scriptIter.next();
+				double seconds = resolveValue(o2);
+				Log.message(getIndent()+"dwell "+seconds+" seconds.");
+				continue;
+			} else if(name.equals("putPenUp")) {
+				turtle.penUp();
+				Log.message(getIndent()+"pen up");
+				continue;
+			} else if(name.equals("putPenDown")) {
+				turtle.penDown();
+				Log.message(getIndent()+"pen down");
+			} else if(name.equals("gotoX:y:")) {
+				Object o2 = (Object)scriptIter.next();
+				double x = resolveValue(o2);
+				Object o3 = (Object)scriptIter.next();
+				double y = resolveValue(o3);
+				
+				turtle.moveTo(x,y);
+				Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+			} else if(name.equals("changeXposBy:")) {
+				Object o2 = (Object)scriptIter.next();
+				double v = resolveValue(o2);
+				turtle.moveTo(turtle.getX()+v,turtle.getY());
+				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+			} else if(name.equals("changeYposBy:")) {
+				Object o2 = (Object)scriptIter.next();
+				double v = resolveValue(o2);
+				turtle.moveTo(turtle.getX(),turtle.getY()+v);
+				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+			} else if(name.equals("forward:")) {
+				Object o2 = (Object)scriptIter.next();
+				double v = resolveValue(o2);
+				turtle.forward(v);
+				Log.message(getIndent()+"Move forward "+v+" mm");
+			} else if(name.equals("turnRight:")) {
+				Object o2 = (Object)scriptIter.next();
+				double degrees = resolveValue(o2);
+				turtle.turn(-degrees);
+				Log.message(getIndent()+"Right "+degrees+" degrees.");
+			} else if(name.equals("turnLeft:")) {
+				Object o2 = (Object)scriptIter.next();
+				double degrees = resolveValue(o2);
+				turtle.turn(degrees);
+				Log.message(getIndent()+"Left "+degrees+" degrees.");
+			} else if(name.equals("xpos:")) {
+				Object o2 = (Object)scriptIter.next();
+				double v = resolveValue(o2);
+				turtle.moveTo(v,turtle.getY());
+				Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+			} else if(name.equals("ypos:")) {
+				Object o2 = (Object)scriptIter.next();
+				double v = resolveValue(o2);
+				turtle.moveTo(turtle.getX(),v);
+				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+			} else if(name.equals("heading:")) {
+				Object o2 = (Object)scriptIter.next();
+				double degrees = resolveValue(o2);
+				turtle.setAngle(degrees);
+				//Log.message(getIndent()+"Turn to "+degrees);
+			} else if(name.equals("setVar:to:")) {
+				// set variable
+				String varName = (String)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				float v = (float)resolveValue(o3);
+
+				boolean foundVar=false;
+				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
+				while(svi.hasNext()) {
+					ScratchVariable sv = svi.next();
+					if(sv.name.equals(varName)) {
+						sv.value = v;
+						//Log.message(getIndent()+"Set "+varName+" to "+v);
+						foundVar=true;
+					}
+				}
+				if(foundVar==false) {
+					throw new Exception("Variable '"+varName+"' not found.");
+				}
+			} else if(name.equals("changeVar:by:")) {
+				// set variable
+				String varName = (String)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				float v = (float)resolveValue(o3);
+
+				boolean foundVar=false;
+				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
+				while(svi.hasNext()) {
+					ScratchVariable sv = svi.next();
+					if(sv.name.equals(varName)) {
+						sv.value += v;
+						//Log.message(getIndent()+"Change "+varName+" by "+v+" to "+sv.value);
+						foundVar=true;
+					}
+				}
+				if(foundVar==false) {
+					throw new Exception("Variable '"+varName+"' not found.");
+				}
+			} else if(name.equals("clearPenTrails")) {
+				// Ignore this Scratch command
+			} else if(name.equals("hide")) {
+				// Ignore this Scratch command
+			} else if(name.equals("show")) {
+				// Ignore this Scratch command
+			} else {
+				throw new Exception("Unsupported Scratch block '"+name+"'");
 			}
 		}
-		//indent--;
+		indent--;
+		//Log.message(getIndent()+"}");
 	}
 	
 	/**
@@ -609,6 +640,14 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 				float b = (float)resolveValue(o3);
 				return a-b;
 			}
+			if(firstName.equals("%")) {
+				// modulus
+				Object o2 = (Object)scriptIter.next();
+				Object o3 = (Object)scriptIter.next();
+				float a = (float)resolveValue(o2);
+				float b = (float)resolveValue(o3);
+				return a%b;
+			}
 			if(firstName.equals("randomFrom:to:")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
@@ -658,14 +697,14 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			}
 			if(firstName.equals("lineCountOfList:")) {
 				String listName = (String)scriptIter.next();
-				return scratchLists.get(getListID(listName)).contents.size();
+				return scratchLists.get(getListByID(listName)).contents.size();
 			}
 			if(firstName.equals("getLine:ofList:")) {
 				Object o2 = scriptIter.next();
 				Object o3 = scriptIter.next();
 				int listIndex = resolveListIndex(o2,o3);
 				String listName = (String)o3;
-				ScratchList list = scratchLists.get(getListID(listName)); 
+				ScratchList list = scratchLists.get(getListByID(listName)); 
 
 				return list.contents.get(listIndex);
 			}
@@ -684,16 +723,21 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	 * @throws Exception
 	 */
 	private int resolveListIndex(Object o2,Object o3) throws Exception {
-		String index = (String)o2;
-		String listName = (String)o3;
-		ScratchList list = scratchLists.get(getListID(listName)); 
 		int listIndex;
-		if(index.equals("last")) {
-			listIndex = list.contents.size()-1;
-		} else if(index.equals("random")) {
-			listIndex = (int) (Math.random() * list.contents.size());
+		
+		if(o2 instanceof String) {
+			String index = (String)o2;
+			String listName = (String)o3;
+			ScratchList list = scratchLists.get(getListByID(listName));
+			if(index.equals("last")) {
+				listIndex = list.contents.size()-1;
+			} else if(index.equals("random")) {
+				listIndex = (int) (Math.random() * list.contents.size());
+			} else {
+				listIndex = Integer.parseInt(index);
+			}
 		} else {
-			listIndex = Integer.parseInt(index);
+			listIndex = (int)resolveValue(o2);
 		}
 
 		return listIndex;
