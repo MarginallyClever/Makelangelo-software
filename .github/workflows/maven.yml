@@ -17,6 +17,14 @@ jobs:
       with:
         java-version: 1.8
 
+    # this sucks and will break
+    - name: install missing Kabeja jar
+      run: mvn install:install-file -Dfile=~/local-maven-repo/kabeja-0.4.jar -DgroupId=net.sourceforge -DartifactId=kabeja -Dversion=0.4 -Dpackaging=jar -DgeneratePom=true
+
+    # this sucks and will break
+    - name: install missing Jogamp-fat jar
+      run: mvn install:install-file -Dfile=~/local-maven-repo/jogamp-fat-2.4.0.jar -DgroupId=org.jogamp.fat -DartifactId=jogamp-fat -Dversion=2.4.0-rc-20200307 -Dpackaging=jar -DgeneratePom=true
+      
     # from https://github.com/marketplace/actions/cache
     - name: Cache Maven packages
       uses: actions/cache@v2
