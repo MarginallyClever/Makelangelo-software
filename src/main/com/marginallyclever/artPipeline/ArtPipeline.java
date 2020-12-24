@@ -146,7 +146,7 @@ public class ArtPipeline {
 
 		Log.message("  Converted to "+nrOfOriginalLines+" lines.");
 
-		final double EPSILON = 0.1;
+		final double EPSILON = 0.01;
 		final double EPSILON2 = EPSILON*EPSILON;
 		double EPSILON_CONNECTED=0.5;  // TODO: make this user-tweakable. Is it in millimeters? 
 
