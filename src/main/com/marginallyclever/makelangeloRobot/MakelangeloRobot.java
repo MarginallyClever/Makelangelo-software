@@ -27,6 +27,7 @@ import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.ArtPipeline;
+import com.marginallyclever.artPipeline.ArtPipelineListener;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
@@ -52,7 +53,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener {
+public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
@@ -93,6 +94,7 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 		super();
 		settings = new MakelangeloRobotSettings();
 		myPipeline = new ArtPipeline();
+		myPipeline.addListener(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -752,7 +754,6 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 	public void setTurtle(Turtle t) {
 		turtle = new Turtle(t);
 		myPipeline.processTurtle(turtle, settings);
-		saveCurrentTurtleToDrawing();
 	}
 
 	public void saveCurrentTurtleToDrawing() {
@@ -1109,5 +1110,10 @@ public class MakelangeloRobot implements NetworkConnectionListener {
 
 	public boolean isPenIsUp() {
 		return penIsUp;
+	}
+
+	@Override
+	public void turtleFinished(Turtle t) {
+		saveCurrentTurtleToDrawing();		
 	}
 }

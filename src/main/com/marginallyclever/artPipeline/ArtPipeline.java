@@ -21,6 +21,11 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {
+	/** 
+	 * line segments with color 
+	 * @author Dan Royer
+	 *
+	 */
 	public class Line2D {
 		public Point2D a,b;
 		public ColorRGB c;
@@ -59,6 +64,14 @@ public class ArtPipeline {
 			return java.awt.geom.Line2D.ptLineDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
 		}
 	}
+	
+	/**
+	 * A sequence of 2D lines forming a polyline.
+	 * the end of line [n] should match the start of line [n+1].
+	 * if end of [last] matches start of [0] then this is a closed loop.
+	 * @author Dan Royer
+	 *
+	 */
 	public class Sequence2D {
 		public ArrayList<Line2D> lines;
 		boolean isClosed;
@@ -81,6 +94,22 @@ public class ArtPipeline {
 	}
 	
 	protected ArtPipelinePanel myPanel;
+	
+	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
+	
+	public void addListener(ArtPipelineListener arg0) {
+		listeners.add(arg0);
+	}
+	
+	public void removeListener(ArtPipelineListener arg0) {
+		listeners.remove(arg0);
+	}
+	
+	public void notifyListenersTurtleFinished(Turtle t) {
+		for(ArtPipelineListener p : listeners) {
+			p.turtleFinished(t);
+		}
+	}
 	
 	private void extendLine(Line2D targetLine, Point2D extPoint) {
 		// extPoint is supposed to be a point which lies (almost) on the infinite extension of targetLine
@@ -326,6 +355,7 @@ public class ArtPipeline {
 
 		Log.message("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
+		// TODO show updated drawing time.
 		Log.message("reorder() end");
 	}
 
@@ -360,7 +390,7 @@ public class ArtPipeline {
 	 * @param settings
 	 */
 	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
-		Log.message("checkSimplify() begin");
+		Log.message("simplify() begin");
 		ArrayList<Movement> toKeep = new ArrayList<Movement>();
 
 		double minimumStepSize=1;
@@ -408,7 +438,7 @@ public class ArtPipeline {
 		int os = turtle.history.size();
 		int ns = toKeep.size();
 		turtle.history = toKeep;
-		Log.message("checkSimplify() end (was "+os+" is now "+ns+")");
+		Log.message("simplify() end (was "+os+" is now "+ns+")");
 	}
 
 	
@@ -606,6 +636,7 @@ public class ArtPipeline {
 		}
 		finally {
 			turtle.unlock();
+			notifyListenersTurtleFinished(turtle);
 		}
 	}
 
