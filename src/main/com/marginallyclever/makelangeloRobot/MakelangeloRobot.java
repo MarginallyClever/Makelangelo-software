@@ -79,10 +79,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private float penY;
 
 	protected Turtle turtle;
+	
 	private ArtPipeline myPipeline;
 
+	// this list of gcode commands is store separate from the Turtle.
 	private ArrayList<String> drawingCommands;
-	int drawingProgress;
+	// what line in drawingCommands is going to be sent next?
+	protected int drawingProgress;
 
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
@@ -438,14 +441,22 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
+		rememberRaisedPen();
+	}
+	
+	protected void rememberRaisedPen() {
 		penJustMoved = !penIsUp;
 		penIsUp = true;
+	}
+	
+	protected void rememberLoweredPen() {
+		penJustMoved = penIsUp;
+		penIsUp = false;
 	}
 
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
-		penJustMoved = penIsUp;
-		penIsUp = false;
+		rememberLoweredPen();
 	}
 
 	public void testPenAngle(double testAngle) {
@@ -585,31 +596,28 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			String[] lines = line.split(";");
 			reportedline = lines[0];
 		}
-		if (reportedline.trim().isEmpty())
+		if (reportedline.trim().isEmpty()) {
+			// nothing to send
 			return false;
+		}
 
 		// catch pen up/down status here
 		if (reportedline.startsWith(settings.getPenUpString())) {
-			penJustMoved = !penIsUp;
-			penIsUp = true;
+			rememberRaisedPen();
 		}
 		if (reportedline.startsWith(settings.getPenDownString())) {
-			penJustMoved = penIsUp;
-			penIsUp = false;
+			rememberLoweredPen();
 		}
 		if (reportedline.startsWith("M17")) {
-			// engage motors
 			myPanel.motorsHaveBeenEngaged();
 		}
 		if (reportedline.startsWith("M18")) {
-			// disengage motors
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
 		Log.message(line);
 		line += "\n";
 
-		// send unmodified line
 		try {
 			getConnection().sendMessage(line);
 		} catch (Exception e) {
@@ -756,6 +764,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		myPipeline.processTurtle(turtle, settings);
 	}
 
+	/**
+	 * Copy the most recent turtle to the drawing output buffer.
+	 */
 	public void saveCurrentTurtleToDrawing() {
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
@@ -769,7 +780,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				drawingCommands.add(line.trim());
 			}
 			reader.close();
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
