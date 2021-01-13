@@ -591,7 +591,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			return false;
 
 		String reportedline = line;
-		// does it have a checksum? hide it in the log
+		// does it have a checksum? hide it from the log
 		if (reportedline.contains(";")) {
 			String[] lines = line.split(";");
 			reportedline = lines[0];
@@ -601,7 +601,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			return false;
 		}
 
-		// catch pen up/down status here
+		// remember important status changes
+		
 		if (reportedline.startsWith(settings.getPenUpString())) {
 			rememberRaisedPen();
 		}
@@ -615,8 +616,12 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			myPanel.motorsHaveBeenDisengaged();
 		}
 
-		Log.message(line);
-		line += "\n";
+		Log.message(reportedline);
+		
+		// make sure the line has a return on the end
+		if(!line.endsWith("\n")) {
+			line += "\n";
+		}
 
 		try {
 			getConnection().sendMessage(line);
