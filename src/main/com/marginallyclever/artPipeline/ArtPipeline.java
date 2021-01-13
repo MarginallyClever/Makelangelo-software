@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -21,78 +20,6 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {
-	/** 
-	 * line segments with color 
-	 * @author Dan Royer
-	 *
-	 */
-	public class Line2D {
-		public Point2D a,b;
-		public ColorRGB c;
-		public boolean flag;
-
-		public Line2D(Point2D a, Point2D b, ColorRGB c) {
-			super();
-			this.a = a;
-			this.b = b;
-			this.c = c;
-		}
-		
-		public void flip() {
-			Point2D temp=b;
-			b=a;
-			a=temp;
-		}
-		public String toString() {
-			return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
-		}
-		public double physicalLengthSquared() {
-			double dx=a.x-b.x;
-			double dy=a.y-b.y;
-			return dx*dx + dy*dy;
-		}
-		
-		public double ptSegDistSq(Point2D point) {
-			// The distance measured is the distance between the specified point,
-			// and the closest point between the start and end points of line a. 
-			return java.awt.geom.Line2D.ptSegDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
-		}
-		
-		public double ptLineDistSq(Point2D point) {
-			// The distance measured is the distance between the specified point,
-			// and the closest point on the infinite extension of line a.
-			return java.awt.geom.Line2D.ptLineDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
-		}
-	}
-	
-	/**
-	 * A sequence of 2D lines forming a polyline.
-	 * the end of line [n] should match the start of line [n+1].
-	 * if end of [last] matches start of [0] then this is a closed loop.
-	 * @author Dan Royer
-	 *
-	 */
-	public class Sequence2D {
-		public ArrayList<Line2D> lines;
-		boolean isClosed;
-		
-		public Sequence2D() {
-			lines = new ArrayList<Line2D>();
-			isClosed=false;
-		}
-		
-		public void flip() {
-			try {
-				Collections.reverse(lines);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-			for( Line2D line : lines ) {
-				line.flip();
-			}
-		}
-	}
-	
 	protected ArtPipelinePanel myPanel;
 	
 	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
