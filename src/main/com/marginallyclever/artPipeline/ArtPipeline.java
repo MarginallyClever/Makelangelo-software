@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.Turtle;
@@ -38,7 +39,7 @@ public class ArtPipeline {
 		}
 	}
 	
-	private void extendLine(Line2D targetLine, Point2D extPoint) {
+	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
 		// extPoint is supposed to be a point which lies (almost) on the infinite extension of targetLine
 		double newLengthA = distanceBetweenPointsSquared(targetLine.a, extPoint);
 		double newLengthB = distanceBetweenPointsSquared(targetLine.b, extPoint);
@@ -69,7 +70,7 @@ public class ArtPipeline {
 		//     if two pen down moves share a start/end, then they are connected in sequence.
 		
 		// build a list of all the pen-down lines while remembering their color.
-		ArrayList<Line2D> originalLines = new ArrayList<Line2D>();
+		ArrayList<LineSegment2D> originalLines = new ArrayList<LineSegment2D>();
 		Movement previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
@@ -79,7 +80,7 @@ public class ArtPipeline {
 			switch(m.type) {
 			case DRAW:
 				if(previousMovement!=null) {
-					Line2D line = new Line2D(
+					LineSegment2D line = new LineSegment2D(
 							new Point2D(previousMovement.x,previousMovement.y),
 							new Point2D(m.x,m.y),
 							color);
@@ -106,43 +107,28 @@ public class ArtPipeline {
 		final double EPSILON2 = EPSILON*EPSILON;
 		double EPSILON_CONNECTED=0.5;  // TODO: make this user-tweakable. Is it in millimeters? 
 
-		ArrayList<Line2D> uniqueLines = new ArrayList<Line2D>();
+		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 		
 		// TODO: dedupe should be optional so user can reorder without dedupe, or dedupe without reorder
 		// remove duplicate lines.
 		// TODO: how to handle duplicate lines with different colors? 
 
-		for(Line2D candidateLine : originalLines) {
+		for(LineSegment2D candidateLine : originalLines) {
 			int b = 0;
 			int end = uniqueLines.size();
 			boolean isDuplicate = false;
-			Line2D lineToReplace = null;
+			LineSegment2D lineToReplace = null;
 			
 			// Compare this line to all the lines previously marked as non-duplicate
 			while (b < end) {
-				Line2D uniqueLine = uniqueLines.get(b);	
+				LineSegment2D uniqueLine = uniqueLines.get(b);	
 				++b;
 				
-				// Check first if lines are (almost) parallel
-				/*
-				double dx1 = uniqueLine.b.x - uniqueLine.a.x;
-				double dy1 = uniqueLine.b.y - uniqueLine.a.y;
-				double dx2 = candidateLine.b.x - candidateLine.a.x;
-				double dy2 = candidateLine.b.y - candidateLine.a.y;
-				
-				double cosAngle = Math.abs((dx1 * dx2 + dy1 * dy2) / Math.sqrt((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2)));
-				
-				// Check if lines have the same angle with a tolerance of 0.25 degrees
-				if(cosAngle < 0.99999048) {
-					// Not parallel, check remaining lines for duplicates
-					continue;
-				}
-				*/
-				
 				// Check if lines are (almost) colinear
-				if(uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 && uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2){
-					// Both lines are (almost) colinear,
-					// if they touch they can be merged
+				if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
+					uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
+					// Both lines are (almost) colinear, if they touch or overlap then I have a candidate.
+					// measure where the points are relative to each other.
 					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
 					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
 					boolean uniqueStartsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.a) < EPSILON2;
@@ -200,12 +186,18 @@ public class ArtPipeline {
 		Log.message("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
 		
 		Turtle t = new Turtle();
-		// I assume the turtle history starts at the home position.
-		t.setX(turtle.history.get(0).x);
-		t.setY(turtle.history.get(0).y);
 		
-		ArrayList<Line2D> orderedLines = new ArrayList<Line2D>();
+		if(!uniqueLines.isEmpty()) {
+			LineSegment2D first = uniqueLines.remove(0);
+			t.setX(first.b.x);
+			t.setY(first.b.y);
+		} else {
+			// I assume the turtle history starts at the home position.
+			t.setX(turtle.history.get(0).x);
+			t.setY(turtle.history.get(0).y);
+		}
 		
+		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		Point2D lastPosition = new Point2D(t.getX(), t.getY());
 		
 		// Greedy reorder lines
@@ -213,14 +205,13 @@ public class ArtPipeline {
 			// Continue for as long as there are lines to reorder
 			double bestD = Double.MAX_VALUE;
 			int bestCandidateIndex = 0;
-			int candidateIndex = 0;
 			int end = uniqueLines.size();
 			boolean shouldFlip = false;
 			
-			while (candidateIndex < end) {
+			for(int candidateIndex = 0; candidateIndex < end; ++candidateIndex ) {
 				// Check all remaining lines, and pick the one with the start or end point
 				// closest to lastPosition (the end point of the previous line).
-				Line2D candidateLine = uniqueLines.get(candidateIndex);
+				LineSegment2D candidateLine = uniqueLines.get(candidateIndex);
 				double distanceToStartPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.a);
 				double distanceToEndPoint = distanceBetweenPointsSquared(lastPosition, candidateLine.b);
 				
@@ -240,14 +231,14 @@ public class ArtPipeline {
 					shouldFlip = shouldFlipCandidate;
 					bestD = smallestCandidateDistance;
 					bestCandidateIndex = candidateIndex;
+					
+					if(smallestCandidateDistance<EPSILON2) break;
 				}
-				
-				++candidateIndex;
 			}
 			
 			// Found line closest to lastPosition,
 			// remove it from the pool
-			Line2D bestCandidate = uniqueLines.remove(bestCandidateIndex);
+			LineSegment2D bestCandidate = uniqueLines.remove(bestCandidateIndex);
 			if(shouldFlip) {
 				// Distance is shortest when this line is flipped
 				bestCandidate.flip();
@@ -260,7 +251,7 @@ public class ArtPipeline {
 		}
 		
 		// Rebuild the turtle history.
-		for( Line2D line : orderedLines ) {
+		for( LineSegment2D line : orderedLines ) {
 			// change color if needed
 			if(line.c!=t.getColor()) {
 				t.setColor(line.c);

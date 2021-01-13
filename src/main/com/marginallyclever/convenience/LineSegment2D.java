@@ -1,21 +1,18 @@
-package com.marginallyclever.artPipeline;
-
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
+package com.marginallyclever.convenience;
 
 /** 
  * line segments with color 
  * @author Dan Royer
  *
  */
-public class Line2D {
+public class LineSegment2D {
 	public Point2D a, b;
 	
 	public ColorRGB c;
 	// used while processing line segments.
 	public boolean flag;
 
-	public Line2D(Point2D a, Point2D b, ColorRGB c) {
+	public LineSegment2D(Point2D a, Point2D b, ColorRGB c) {
 		super();
 		this.a = a;
 		this.b = b;

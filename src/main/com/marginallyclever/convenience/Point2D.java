@@ -29,4 +29,14 @@ public class Point2D {
 		x*=scale;
 		y*=scale;
 	}
+	
+	public double distanceSquared(Point2D p) {
+		double dx = x-p.x;
+		double dy = y-p.y;
+		return dx*dx + dy*dy;
+	}
+
+	public double distance(Point2D p) {
+		return Math.sqrt(distanceSquared(p));
+	}
 }

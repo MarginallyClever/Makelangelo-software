@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline;
+package com.marginallyclever.convenience;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,11 +11,11 @@ import java.util.Collections;
  *
  */
 public class Sequence2D {
-	public ArrayList<Line2D> lines;
+	public ArrayList<LineSegment2D> lines;
 	public boolean isClosed;
 	
 	public Sequence2D() {
-		lines = new ArrayList<Line2D>();
+		lines = new ArrayList<LineSegment2D>();
 		isClosed=false;
 	}
 	
@@ -25,7 +25,7 @@ public class Sequence2D {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		for( Line2D line : lines ) {
+		for( LineSegment2D line : lines ) {
 			line.flip();
 		}
 	}
