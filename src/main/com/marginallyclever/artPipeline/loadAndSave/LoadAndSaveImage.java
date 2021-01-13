@@ -318,7 +318,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 
 	protected void startSwingWorker() {
-		//Log.message("Starting swingWorker");
+		Log.message("Starting swingWorker 1");
 
 		machine = chosenRobot.getSettings();
 		
@@ -327,35 +327,45 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		chosenConverter.setImage(img);
 		chosenRobot.setDecorator(chosenConverter);
 		
+		
 		swingWorker = new SwingWorker<Void, Void>() {
+			public int loopCount;
+			
 			@Override
 			public Void doInBackground() {
+				Log.message("Starting swingWorker 2");
+				
+				loopCount=0;
 				chosenConverter.setSwingWorker(swingWorker);
 
 				pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 				pm.setProgress(0);
 				pm.setMillisToPopup(0);
 				
-				while(!isCancelled() && chosenConverter.iterate()) {
+				boolean keepIterating=false;
+				
+				do {
+					loopCount++;
+					keepIterating = chosenConverter.iterate();
 					try {
 						Thread.sleep(5);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						//e.printStackTrace();
-						Log.message("LoadAndSaveImage iterate interrupted.");
+						Log.message("swingWorker interrupted.");
 						break;
 					}
-				}
+				} while(!isCancelled() && keepIterating);
 				chosenRobot.setDecorator(null);
 				
 				pm.setProgress(100);
 				if(pm!=null) pm.close();
 				
 				if(isCancelled()==false) {
-					Log.message("swingWorker finishing");
+					Log.message("swingWorker finishing.");
 					chosenConverter.finish();
 					Turtle t=chosenConverter.turtle;
 					chosenRobot.setTurtle(t);
+				} else {
+					Log.message("swingWorder cancelled.");
 				}
 
 				return null;
@@ -363,7 +373,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 
 			@Override
 			public void done() {
-				Log.message("swingWorker ended");
+				Log.message("swingWorker ended after "+loopCount+" iteration(s).");
 				workerList.remove(swingWorker);
 				workerCount--;
 				Log.message("removed worker.  "+workerCount+"/"+workerList.size()+" workers now.");
@@ -384,7 +394,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					if (swingWorker.isDone()) {
 						Log.message(Translator.get("Finished"));
 					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
-						if (pm.isCanceled()) {
+						if(pm.isCanceled()) {
 							swingWorker.cancel(true);
 						}
 						Log.message(Translator.get("Cancelled"));
