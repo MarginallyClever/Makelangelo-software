@@ -110,6 +110,8 @@ public class ArtPipeline {
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 		
 		// TODO: dedupe should be optional so user can reorder without dedupe, or dedupe without reorder
+		boolean removeDuplicates = true;
+		
 		// remove duplicate lines.
 		// TODO: how to handle duplicate lines with different colors? 
 
@@ -119,57 +121,60 @@ public class ArtPipeline {
 			boolean isDuplicate = false;
 			LineSegment2D lineToReplace = null;
 			
-			// Compare this line to all the lines previously marked as non-duplicate
-			while (b < end) {
-				LineSegment2D uniqueLine = uniqueLines.get(b);	
-				++b;
+			if( removeDuplicates ) {
 				
-				// Check if lines are (almost) colinear
-				if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
-					uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
-					// Both lines are (almost) colinear, if they touch or overlap then I have a candidate.
-					// measure where the points are relative to each other.
-					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
-					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
-					boolean uniqueStartsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.a) < EPSILON2;
-					boolean uniqueEndsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.b) < EPSILON2;
+				// Compare this line to all the lines previously marked as non-duplicate
+				while (b < end) {
+					LineSegment2D uniqueLine = uniqueLines.get(b);	
+					++b;
 					
-					if(candidateStartsCloseToUnique) {
-						isDuplicate = true;
+					// Check if lines are (almost) colinear
+					if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
+						uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
+						// Both lines are (almost) colinear, if they touch or overlap then I have a candidate.
+						// measure where the points are relative to each other.
+						boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
+						boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
+						boolean uniqueStartsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.a) < EPSILON2;
+						boolean uniqueEndsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.b) < EPSILON2;
 						
-						if(candidateEndsCloseToUnique) {
-							// Candidate doesn't add anything which isn't already covered by the unique line.
-							// No further action needed.
+						if(candidateStartsCloseToUnique) {
+							isDuplicate = true;
 							
-							// TODO: extend the line, to ensure no gaps will arise due to the configured tolerance?
-							// extendLine(uniqueLine, candidateLine.a);
-							// extendLine(uniqueLine, candidateLine.b);
-						} else {
-							// Partial overlap, extend uniqueLine
-							extendLine(uniqueLine, candidateLine.b);
-						}
-					} else if(candidateEndsCloseToUnique) {
-						isDuplicate = true;
-						// Partial overlap, extend uniqueLine
-						extendLine(uniqueLine, candidateLine.a);						
-					} else if(uniqueStartsCloseToCandidate) {
-						if(uniqueEndsCloseToCandidate) {
-							// The candidateLine covers more than the unique line already added,
-							// replace uniqueLine with candidateLine.
-							lineToReplace = uniqueLine;
-							// No further action needed.
-						} else {
+							if(candidateEndsCloseToUnique) {
+								// Candidate doesn't add anything which isn't already covered by the unique line.
+								// No further action needed.
+								
+								// TODO: extend the line, to ensure no gaps will arise due to the configured tolerance?
+								// extendLine(uniqueLine, candidateLine.a);
+								// extendLine(uniqueLine, candidateLine.b);
+							} else {
+								// Partial overlap, extend uniqueLine
+								extendLine(uniqueLine, candidateLine.b);
+							}
+						} else if(candidateEndsCloseToUnique) {
 							isDuplicate = true;
 							// Partial overlap, extend uniqueLine
-							extendLine(uniqueLine, candidateLine.a);
+							extendLine(uniqueLine, candidateLine.a);						
+						} else if(uniqueStartsCloseToCandidate) {
+							if(uniqueEndsCloseToCandidate) {
+								// The candidateLine covers more than the unique line already added,
+								// replace uniqueLine with candidateLine.
+								lineToReplace = uniqueLine;
+								// No further action needed.
+							} else {
+								isDuplicate = true;
+								// Partial overlap, extend uniqueLine
+								extendLine(uniqueLine, candidateLine.a);
+							}
+						} else {
+							// No match, check remaining lines for duplicates
+							continue;
 						}
-					} else {
-						// No match, check remaining lines for duplicates
-						continue;
+						
+						// Match found, no need to continue search
+						break;
 					}
-					
-					// Match found, no need to continue search
-					break;
 				}
 			}
 			
@@ -185,10 +190,13 @@ public class ArtPipeline {
 		int duplicates = nrOfOriginalLines - uniqueLines.size();
 		Log.message("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
 		
+		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
+
 		Turtle t = new Turtle();
 		
 		if(!uniqueLines.isEmpty()) {
 			LineSegment2D first = uniqueLines.remove(0);
+			orderedLines.add(first);
 			t.setX(first.b.x);
 			t.setY(first.b.y);
 		} else {
@@ -197,7 +205,6 @@ public class ArtPipeline {
 			t.setY(turtle.history.get(0).y);
 		}
 		
-		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		Point2D lastPosition = new Point2D(t.getX(), t.getY());
 		
 		// Greedy reorder lines
@@ -273,7 +280,6 @@ public class ArtPipeline {
 
 		Log.message("  History now "+t.history.size()+" instructions.");
 		turtle.history = t.history;
-		// TODO show updated drawing time.
 		Log.message("reorder() end");
 	}
 
@@ -313,6 +319,7 @@ public class ArtPipeline {
 
 		double minimumStepSize=1;
 
+		// start assuming pen is up at home position
 		boolean isUp=true;
 		double ox=settings.getHomeX();
 		double oy=settings.getHomeY();
@@ -327,12 +334,13 @@ public class ArtPipeline {
 				dy=m.y-oy;
 				sum+=Math.sqrt(dx*dx+dy*dy);
 				if(isUp || sum>minimumStepSize) {
+					// pen has just been put down OR move is large enough to be important
 					toKeep.add(m);
 					sum=0;
-				}isUp=false;
-				ox=m.x;
-				oy=m.y;
-				previous=m;
+					ox=m.x;
+					oy=m.y;
+				}
+				isUp=false;
 				break;
 			case TRAVEL:
 				if(!isUp && sum>0 ) {
@@ -345,13 +353,12 @@ public class ArtPipeline {
 				ox=m.x;
 				oy=m.y;
 				sum=0;
-				previous=m;
 				break;
 			default:
 				toKeep.add(m);
-				previous=m;
 				break;
 			}
+			previous=m;
 		}
 		int os = turtle.history.size();
 		int ns = toKeep.size();
