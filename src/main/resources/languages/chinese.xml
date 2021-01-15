@@ -462,7 +462,7 @@
 	</string>
 	<string>
 		<key>MenuAnimate</key>
-		<value>动画控制</value>
+		<value>绘图控制</value>
 		<hint>context sensitive menu</hint>
 	</string>
 
@@ -1527,7 +1527,7 @@
 	</string>
 	<string>
 		<key>Snow</key>
-		<value>Snow景</value>
+		<value>雪景</value>
 		<hint></hint>
 	</string>
 	<string>
