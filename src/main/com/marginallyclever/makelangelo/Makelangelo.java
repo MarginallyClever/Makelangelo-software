@@ -35,16 +35,14 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLException;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
+import com.marginallyclever.makelangelo.preview.Camera;
+import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -81,6 +79,7 @@ public final class Makelangelo
 
 	private MakelangeloAppPreferences appPreferences;
 	private ConnectionManager connectionManager;
+	private Camera camera;
 	private MakelangeloRobot robot;
 
 	// GUI elements
@@ -101,16 +100,11 @@ public final class Makelangelo
 	private Splitter splitUpDown;
 
 	// OpenGL window
-	private PreviewPanel drawPanel;
+	private PreviewPanel previewPanel;
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
 	// Bottom of window
 	private LogPanel logPanel;
-
-	private FPSAnimator animator;
-
-	// Drag & drop support
-	private MakelangeloTransferHandler myTransferHandler;
 
 	public static void main(String[] argv) {
 		Log.start();
@@ -131,22 +125,21 @@ public final class Makelangelo
 	public Makelangelo() {
 		Log.message("Locale="+Locale.getDefault().toString());
 		
-		Log.message("starting preferences...");
+		Log.message("Starting preferences...");
 		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
-		Log.message("starting robot...");
+		Log.message("Starting camera...");
+		camera = new Camera();
+		
+		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 
-		Log.message("starting transfer handler...");
-		// drag & drop support
-		myTransferHandler = new MakelangeloTransferHandler(robot);
-		
-		Log.message("starting connection manager...");
+		Log.message("Starting connection manager...");
 		// network connections
 		connectionManager = new ConnectionManager();
 	}
@@ -182,12 +175,13 @@ public final class Makelangelo
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		if (subject == buttonZoomIn)
-			drawPanel.zoomIn();
-		if (subject == buttonZoomOut)
-			drawPanel.zoomOut();
-		if (subject == buttonZoomToFit)
-			drawPanel.zoomToFitPaper();
+		if (subject == buttonExit)					onClose();
+		if (subject == buttonAdjustPreferences) 	appPreferences.run();
+		if (subject == buttonZoomIn)				camera.zoomIn();
+		if (subject == buttonZoomOut)				camera.zoomOut();
+		if (subject == buttonZoomToFit)				camera.zoomToFitPaper();
+		if (subject == buttonAbout)					(new DialogAbout()).display(this.mainFrame,this.VERSION);
+		if (subject == buttonCheckForUpdate)		checkForUpdate(false);
 		if( subject == buttonForums) {
 			try {
 				java.awt.Desktop.getDesktop().browse(URI.create(this.FORUM_URL));
@@ -195,15 +189,6 @@ public final class Makelangelo
 				e1.printStackTrace();
 			}
 		}
-		if (subject == buttonAbout)
-			(new DialogAbout()).display(this.mainFrame,this.VERSION);
-		if (subject == buttonAdjustPreferences) {
-			appPreferences.run();
-		}
-		if (subject == buttonCheckForUpdate)
-			checkForUpdate(false);
-		if (subject == buttonExit)
-			onClose();
 	}
 
 	/**
@@ -359,22 +344,10 @@ public final class Makelangelo
 		contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		Log.message("  get GL capabilities...");
-		try {
-			GLProfile glProfile = GLProfile.getDefault();
-			GLCapabilities caps = new GLCapabilities(glProfile);
-			// caps.setSampleBuffers(true);
-			// caps.setHardwareAccelerated(true);
-			// caps.setNumSamples(4);
-			Log.message("  create draw panel...");
-			drawPanel = new PreviewPanel(caps);
-		} catch(GLException e) {
-			Log.error("I failed the very first call to OpenGL.  Are your native libraries missing?");
-			System.exit(1);
-		}
-		
-		Log.message("  set robot...");
-		drawPanel.setRobot(robot);
+		Log.message("  create PreviewPanel...");
+		previewPanel = new PreviewPanel();
+		previewPanel.setCamera(camera);
+		previewPanel.addListener(robot);
 
 		Log.message("  assign panel to robot...");
 		robotPanel = robot.createControlPanel(this);
@@ -385,7 +358,7 @@ public final class Makelangelo
 		// major layout
 		Log.message("  vertical split...");
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		splitLeftRight.add(drawPanel);
+		splitLeftRight.add(previewPanel);
 		splitLeftRight.add(robotPanel);
 
 		Log.message("  horizontal split...");
@@ -427,16 +400,10 @@ public final class Makelangelo
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
 
-		drawPanel.zoomToFitPaper();
+		camera.zoomToFitPaper();
 
 		Log.message("  adding drag & drop support...");
-		mainFrame.setTransferHandler(myTransferHandler);
-
-		// start animation system
-		Log.message("  starting animator...");
-		animator = new FPSAnimator(1);
-		animator.add(drawPanel);
-		animator.start();
+		mainFrame.setTransferHandler(new MakelangeloTransferHandler(robot));
 	}
 
 	private void adjustWindowSize() {
@@ -471,8 +438,8 @@ public final class Makelangelo
 
 	@Override
 	public void portConfirmed(MakelangeloRobot r) {
-		if (drawPanel != null)
-			drawPanel.repaint();
+		if (previewPanel != null)
+			previewPanel.repaint();
 	}
 
 	@Override
@@ -497,14 +464,14 @@ public final class Makelangelo
 
 	@Override
 	public void disconnected(MakelangeloRobot r) {
-		if (drawPanel != null)
-			drawPanel.repaint();
+		if (previewPanel != null)
+			previewPanel.repaint();
 		SoundSystem.playDisconnectSound();
 	}
 
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
-		if (drawPanel != null)
-			drawPanel.repaint();
+		if (previewPanel != null)
+			previewPanel.repaint();
 	}
 
 	public NetworkConnection requestNewConnection() {
@@ -521,7 +488,7 @@ public final class Makelangelo
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 
 		if (result == JOptionPane.YES_OPTION) {
-			drawPanel.setRobot(null);
+			previewPanel.removeListener(robot);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowRealEstate();
 			robot.getSettings().saveConfig();
@@ -534,7 +501,7 @@ public final class Makelangelo
 			// exiting
 			new Thread(new Runnable() {
 				public void run() {
-					animator.stop();
+					previewPanel.stop();
 					mainFrame.dispose();
 				}
 			}).start();

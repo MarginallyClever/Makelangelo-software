@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.converters;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Histogram;
-import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

@@ -33,8 +33,9 @@ import org.kabeja.parser.ParserBuilder;
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -540,7 +541,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			matchDown = matchDown.replaceAll("\n", "");
 			
 			
-			for( Turtle.Movement m : turtle.history ) {
+			for( TurtleMove m : turtle.history ) {
 				switch(m.type) {
 				case TRAVEL:
 					isUp=true;

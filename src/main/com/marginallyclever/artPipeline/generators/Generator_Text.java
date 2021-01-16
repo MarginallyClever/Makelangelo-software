@@ -16,8 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 

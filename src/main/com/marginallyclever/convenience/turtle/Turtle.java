@@ -1,44 +1,20 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.convenience.turtle;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 
 
 /**
  * A simple turtle implementation to make generating pictures and learning programming easier.
- * @author Admin
+ * @author Dan Royer
  *
  */
 public class Turtle implements Cloneable {
-	public enum MoveType {
-		TRAVEL,  // move without drawing
-		DRAW,  // move while drawing
-		TOOL_CHANGE;
-	}
-	
-	public class Movement {
-		public MoveType type;
-		public double x,y;  // destination
-		
-		public Movement(double x0,double y0,MoveType type0) {
-			x=x0;
-			y=y0;
-			type=type0;
-		}
-		
-		public Movement(Movement m) {
-			this.x=m.x;
-			this.y=m.y;
-			this.type=m.type;
-		}
-
-		public ColorRGB getColor() {
-			return new ColorRGB((int)x);
-		}
-	};
-	public ArrayList<Movement> history;
+	public ArrayList<TurtleMove> history;
 
 	private ReentrantLock lock;
 
@@ -66,16 +42,16 @@ public class Turtle implements Cloneable {
 		isUp = t.isUp;
 		t.color.set(t.color);
 
-		for( Movement m : t.history ) {
-			history.add(new Movement(m));
+		for( TurtleMove m : t.history ) {
+			history.add(new TurtleMove(m));
 		}
 	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		Turtle t = (Turtle)super.clone();
-		for( Movement m : history ) {
-			t.history.add(new Movement(m));
+		for( TurtleMove m : history ) {
+			t.history.add(new TurtleMove(m));
 		}
 		return t;
 	}
@@ -88,7 +64,7 @@ public class Turtle implements Cloneable {
 		turtleY = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<Movement>();
+		history = new ArrayList<TurtleMove>();
 		// default turtle color is black.
 		setColor(new ColorRGB(0,0,0));
 	}
@@ -117,7 +93,7 @@ public class Turtle implements Cloneable {
 		} else {
 			color = new ColorRGB(c);
 		}
-		history.add( new Movement(c.toInt(),0/*tool diameter?*/,MoveType.TOOL_CHANGE) );
+		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMoveType.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
@@ -143,7 +119,7 @@ public class Turtle implements Cloneable {
 	public void moveTo(double x,double y) {
 		turtleX=x;
 		turtleY=y;
-		history.add( new Movement(x, y, isUp ? MoveType.TRAVEL : MoveType.DRAW) );
+		history.add( new TurtleMove(x, y, isUp ? TurtleMoveType.TRAVEL : TurtleMoveType.DRAW) );
 	}
 	
 	/**
@@ -230,10 +206,10 @@ public class Turtle implements Cloneable {
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
 		top.y=-Float.MAX_VALUE;
-		Movement old=null;
+		TurtleMove old=null;
 		
-		for( Movement m : history ) {
-			if(m.type == MoveType.DRAW)
+		for( TurtleMove m : history ) {
+			if(m.type == TurtleMoveType.DRAW)
 			{
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
@@ -257,7 +233,7 @@ public class Turtle implements Cloneable {
 	 * @param sy
 	 */
 	public void scale(double sx, double sy) {
-		for( Movement m : history ) {
+		for( TurtleMove m : history ) {
 			switch(m.type) {
 			case DRAW:
 			case TRAVEL:
@@ -276,7 +252,7 @@ public class Turtle implements Cloneable {
 	 * @param dy relative move y
 	 */
 	public void translate(double dx, double dy) {
-		for( Movement m : history ) {
+		for( TurtleMove m : history ) {
 			switch(m.type) {
 			case DRAW:
 			case TRAVEL:
@@ -296,11 +272,9 @@ public class Turtle implements Cloneable {
 		int i;
 		double xmin=0,xmax=0,ymin=0,ymax=0;
 		int first=1;
-		for(i=0;i<history.size();i++)
-		{
-			Movement mov=history.get(i);
-			if (mov.type == MoveType.DRAW)
-			{
+		for(i=0;i<history.size();i++) {
+			TurtleMove mov=history.get(i);
+			if (mov.type == TurtleMoveType.DRAW) {
 				if(first == 1 || mov.x < xmin) xmin=mov.x;
 				if(first == 1 || mov.y < ymin) ymin=mov.y;
 				if(first == 1 || mov.x > xmax) xmax=mov.x;
@@ -309,5 +283,65 @@ public class Turtle implements Cloneable {
 			}
 		}
 		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
+	}
+	
+	public void render(TurtleRenderer tr) {
+		if(isLocked()) return;
+		try {
+			lock();
+			
+			TurtleMove previousMove = null;
+			
+			// the first and last command to show (in case we want to isolate part of the drawing)
+			int first = 0;
+			int last = history.size();
+			// where we're at in the drawing (to check if we're between first & last)
+			int showCount = 0;
+			
+			try {
+				tr.start();
+				showCount++;
+
+				for (TurtleMove m : history) {
+					if(m==null) {
+						throw new NullPointerException();
+					}
+					boolean inShow = (showCount >= first && showCount < last);
+					switch (m.type) {
+					case TRAVEL:
+						if (inShow && previousMove != null) {
+							tr.travel(previousMove, m);
+						}
+						showCount++;
+						previousMove = m;
+						break;
+					case DRAW:
+						if (inShow && previousMove != null) {
+							tr.draw(previousMove, m);
+						}
+						showCount++;
+						previousMove = m;
+						break;
+					case TOOL_CHANGE:
+						tr.setPenDownColor(m.getColor());
+						break;
+					}
+				}
+			}
+			catch(Exception e) {
+				//Log.error(e.getMessage());
+			}
+			finally {
+				tr.end();
+			}
+		}
+		catch(Exception e) {
+			Log.error(e.getMessage());
+		}
+		finally {
+			if(isLocked()) {
+				unlock();
+			}
+		}
 	}
 }

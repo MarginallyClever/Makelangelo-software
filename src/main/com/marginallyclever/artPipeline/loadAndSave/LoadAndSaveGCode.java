@@ -9,8 +9,9 @@ import java.util.Scanner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -204,9 +205,9 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 			machine.writePenUp(out);
 			boolean isUp=true;
 			
-			Turtle.Movement previousMovement=null;
+			TurtleMove previousMovement=null;
 			for(int i=0;i<turtle.history.size();++i) {
-				Turtle.Movement m = turtle.history.get(i);
+				TurtleMove m = turtle.history.get(i);
 				boolean zMoved=false;
 				
 				switch(m.type) {

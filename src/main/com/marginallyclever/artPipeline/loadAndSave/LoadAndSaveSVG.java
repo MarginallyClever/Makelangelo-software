@@ -34,8 +34,9 @@ import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
@@ -606,7 +607,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			double x0 = robot.getSettings().getHomeX();
 			double y0 = robot.getSettings().getHomeY();
 
-			for( Turtle.Movement m : turtle.history ) {
+			for( TurtleMove m : turtle.history ) {
 				switch(m.type) {
 				case TRAVEL:
 					if(!isUp) {

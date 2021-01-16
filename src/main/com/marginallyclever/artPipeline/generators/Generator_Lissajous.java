@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
-import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

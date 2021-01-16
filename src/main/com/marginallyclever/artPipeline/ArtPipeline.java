@@ -9,10 +9,10 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.convenience.Turtle.MoveType;
-import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.convenience.turtle.TurtleMoveType;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -71,12 +71,12 @@ public class ArtPipeline {
 		
 		// build a list of all the pen-down lines while remembering their color.
 		ArrayList<LineSegment2D> originalLines = new ArrayList<LineSegment2D>();
-		Movement previousMovement=null;
+		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
 		Log.message("  Found "+turtle.history.size()+" instructions.");
 		
-		for( Movement m : turtle.history ) {
+		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case DRAW:
 				if(previousMovement!=null) {
@@ -108,13 +108,11 @@ public class ArtPipeline {
 		double EPSILON_CONNECTED=0.5;  // TODO: make this user-tweakable. Is it in millimeters? 
 
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
-		
+
+		// remove duplicate lines.
 		// TODO: dedupe should be optional so user can reorder without dedupe, or dedupe without reorder
 		boolean removeDuplicates = true;
 		
-		// remove duplicate lines.
-		// TODO: how to handle duplicate lines with different colors? 
-
 		for(LineSegment2D candidateLine : originalLines) {
 			int b = 0;
 			int end = uniqueLines.size();
@@ -283,7 +281,7 @@ public class ArtPipeline {
 		Log.message("reorder() end");
 	}
 
-	public double distanceBetweenPointsSquared(Turtle.Movement a,Turtle.Movement b) {
+	public double distanceBetweenPointsSquared(TurtleMove a,TurtleMove b) {
 		double dx = a.x-b.x;
 		double dy = a.y-b.y;
 		return MathHelper.lengthSquared(dx, dy); 
@@ -315,7 +313,7 @@ public class ArtPipeline {
 	 */
 	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
 		Log.message("simplify() begin");
-		ArrayList<Movement> toKeep = new ArrayList<Movement>();
+		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 
 		double minimumStepSize=1;
 
@@ -325,9 +323,9 @@ public class ArtPipeline {
 		double oy=settings.getHomeY();
 		double sum=0;
 		double dx,dy;
-		Movement previous=null;
+		TurtleMove previous=null;
 		
-		for( Movement m : turtle.history ) {
+		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case DRAW:
 				dx=m.x-ox;
@@ -344,7 +342,7 @@ public class ArtPipeline {
 				break;
 			case TRAVEL:
 				if(!isUp && sum>0 ) {
-					if(previous!=null && previous.type==Turtle.MoveType.DRAW) {
+					if(previous!=null && previous.type==TurtleMoveType.DRAW) {
 						toKeep.add(previous);
 					}
 				}
@@ -457,8 +455,8 @@ public class ArtPipeline {
 		
 		Log.message("cropTurtleToPageMargin() start");
 
-		ArrayList<Movement> oldHistory = turtle.history;
-		turtle.history = new ArrayList<Movement>();
+		ArrayList<TurtleMove> oldHistory = turtle.history;
+		turtle.history = new ArrayList<TurtleMove>();
 		
 		// limits we will need for rectangle
 		Point2D rMax = new Point2D(settings.getMarginRight(),settings.getMarginTop());
@@ -467,9 +465,9 @@ public class ArtPipeline {
 		Point2D P0 = new Point2D(); 
 		Point2D P1 = new Point2D(); 
 		
-		Movement prev=null;
+		TurtleMove prev=null;
 		
-		for( Movement m : oldHistory ) {
+		for( TurtleMove m : oldHistory ) {
 			switch(m.type) {
 			case DRAW:
 			case TRAVEL:
@@ -485,19 +483,19 @@ public class ArtPipeline {
 						
 						if(startCropped && endCropped) {
 							// crosses rectangle, both ends out.
-							turtle.history.add(turtle.new Movement(P0.x,P0.y,MoveType.TRAVEL));
+							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
 							turtle.history.add(m);
-							Movement m2=turtle.new Movement(P1.x,P1.y,m.type);
+							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
 							turtle.history.add(m2);
 						} else if(!startCropped && !endCropped) {
 							turtle.history.add(m);
 						} else if(endCropped) {
 							// end cropped, leaving the rectangle
-							Movement m2=turtle.new Movement(P1.x,P1.y,m.type);
+							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
 							turtle.history.add(m2);
 						} else {
 							// start cropped, coming back into rectangle
-							turtle.history.add(turtle.new Movement(P0.x,P0.y,MoveType.TRAVEL));
+							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
 							turtle.history.add(m);
 						}
 					}
@@ -566,11 +564,11 @@ public class ArtPipeline {
 	}
 
 	protected void removeRedundantToolChanges(Turtle t) {
-		ArrayList<Turtle.Movement> toKeep = new ArrayList<Turtle.Movement>();
+		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 		int size=t.history.size();
 		for(int i=0;i<size;++i) {
-			Turtle.Movement mi = t.history.get(i);
-			if(mi.type != Turtle.MoveType.TOOL_CHANGE) {
+			TurtleMove mi = t.history.get(i);
+			if(mi.type != TurtleMoveType.TOOL_CHANGE) {
 				toKeep.add(mi);
 				continue;
 			}
@@ -578,9 +576,9 @@ public class ArtPipeline {
 			// between this and the next tool change/eof are there any draw commands?
 			boolean found=false;
 			for(int j=i+1;j<size;++j) {
-				Turtle.Movement mj = t.history.get(j);
-				if(mj.type == Turtle.MoveType.TOOL_CHANGE) break;
-				if(mj.type == Turtle.MoveType.DRAW) {
+				TurtleMove mj = t.history.get(j);
+				if(mj.type == TurtleMoveType.TOOL_CHANGE) break;
+				if(mj.type == TurtleMoveType.DRAW) {
 					found=true;
 					break;
 				}

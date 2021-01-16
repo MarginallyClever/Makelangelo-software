@@ -11,8 +11,8 @@ import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 

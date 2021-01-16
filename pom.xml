@@ -323,13 +323,14 @@ If you like this project, please support us by buying Marginally Clever products
 	  <groupId>org.jogamp.fat</groupId>
 	  <artifactId>jogamp-fat</artifactId>
 	  <version>2.4.0-rc-20200307</version>
+	  
 	</dependency>
 	
     <!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
 	<dependency>
 	    <groupId>net.sourceforge</groupId>
 	    <artifactId>kabeja</artifactId>
-	    <version>0.4</version>
+	    <version>0.4</version>	
 	</dependency>
         
     <dependency>
@@ -416,6 +417,17 @@ If you like this project, please support us by buying Marginally Clever products
 	    <version>1.9</version>
 	</dependency>
   </dependencies>
+  
+  <repositories>
+  	<repository>
+  		<id>my-local-repo</id>
+  		<url>file://${project.basedir}/java/local-maven-repo</url>
+    </repository>
+    <repository>
+    	<id>openkm</id>
+    	<url>http://maven.openkm.com</url>
+    </repository>
+  </repositories>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -8,8 +8,8 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 

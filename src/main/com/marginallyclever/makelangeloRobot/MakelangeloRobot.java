@@ -33,14 +33,16 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.Turtle;
-import com.marginallyclever.convenience.Turtle.Movement;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
+import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.preferences.GFXPreferences;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
@@ -53,7 +55,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener {
+public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
@@ -809,7 +811,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			double oy = this.settings.getHomeY();
 			double oz = this.settings.getPenUpAngle();
 
-			for (Turtle.Movement m : turtle.history) {
+			for (TurtleMove m : turtle.history) {
 				double nx = ox;
 				double ny = oy;
 				double nz = oz;
@@ -925,125 +927,23 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public void render(GL2 gl2) {
-		float[] lineWidthBuf = new float[1];
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		float lineWidth = lineWidthBuf[0];
-		// Log.message("line width="+lineWidth);
-
+		// outside physical limits
 		paintLimits(gl2);
-
+		paintPaper(gl2);
+		paintMargins(gl2);
+		
+		// hardware features
 		settings.getHardwareProperties().render(gl2, this);
 
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
 		} else if (turtle != null) {
-			if (turtle.isLocked())
-				return;
-			try {
-				turtle.lock();
-				boolean showPenUp = GFXPreferences.getShowPenUp();
-				ColorRGB penUpColor = settings.getPenUpColor();
-				ColorRGB penDownColor = settings.getPenDownColorDefault();
-				float penDiameter = settings.getPenDiameter();
-
-				boolean isUp = true;
-				double ox = settings.getHomeX();
-				double oy = settings.getHomeY();
-				Movement previousMove = turtle.new Movement(ox, oy, Turtle.MoveType.TRAVEL);
-
-				int first = 0;
-				int last = turtle.history.size();
-				int showCount = 0;
-
-				float newDiameter = 2 * 100 * penDiameter / lineWidth;
-				
-				gl2.glLineWidth(newDiameter);
-				gl2.glBegin(GL2.GL_LINE_STRIP);
-				try {
-					gl2.glColor4d(
-							(double) penUpColor.getRed() / 255.0,
-							(double) penUpColor.getGreen() / 255.0,
-							(double) penUpColor.getBlue() / 255.0,
-							showPenUp ? 1 : 0);
-					if (showCount >= first && showCount < last) {
-						gl2.glVertex2d(ox, oy);
-					}
-					showCount++;
-	
-					for (Turtle.Movement m : turtle.history) {
-						if(m==null) {
-							throw new NullPointerException();
-						}
-						boolean inShow = (showCount >= first && showCount < last);
-						switch (m.type) {
-						case TRAVEL:
-							if (!isUp) {
-								isUp = true;
-								gl2.glColor4d(
-										(double) penUpColor.getRed() / 255.0,
-										(double) penUpColor.getGreen() / 255.0,
-										(double) penUpColor.getBlue() / 255.0,
-										showPenUp ? 1 : 0);
-								if (inShow) {
-									gl2.glVertex2d(previousMove.x, previousMove.y);
-									gl2.glVertex2d(m.x, m.y);
-								}
-								showCount++;
-							}
-							previousMove = m;
-							break;
-						case DRAW:
-							if (isUp) {
-								if (inShow) {
-									gl2.glVertex2d(previousMove.x, previousMove.y);
-								}
-								gl2.glColor4d(
-										(double) penDownColor.getRed() / 255.0,
-										(double) penDownColor.getGreen() / 255.0,
-										(double) penDownColor.getBlue() / 255.0,
-										1);
-								if (inShow) {
-									gl2.glVertex2d(previousMove.x, previousMove.y);
-								}
-								isUp = false;
-							}
-							if (inShow) {
-								gl2.glVertex2d(m.x, m.y);
-							}
-							showCount++;
-							previousMove = m;
-							break;
-						case TOOL_CHANGE:
-							penDownColor = m.getColor();
-							break;
-						}
-					}
-				}
-				catch(Exception e) {
-					//Log.error(e.getMessage());
-				}
-				finally {
-					gl2.glEnd();
-					gl2.glLineWidth(lineWidth);
-				}
-			}
-			catch(Exception e) {
-				Log.error(e.getMessage());
-			}
-			finally {
-				if(turtle.isLocked()) {
-					turtle.unlock();
-				}
-			}
+			TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
+			turtle.render(tr);
 		}
 	}
 
-	/**
-	 * draw the machine edges and paper edges
-	 *
-	 * @param gl2
-	 */
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
 
@@ -1054,17 +954,23 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
 		gl2.glEnd();
-
+	}
+	
+	private void paintPaper(GL2 gl2) {
 		ColorRGB c = settings.getPaperColor();
-		gl2.glColor3d((double) c.getRed() / 255.0, (double) c.getGreen() / 255.0, (double) c.getBlue() / 255.0);
+		gl2.glColor3d(
+				(double)c.getRed() / 255.0, 
+				(double)c.getGreen() / 255.0, 
+				(double)c.getBlue() / 255.0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
 		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
 		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
 		gl2.glEnd();
-
-		// margin settings
+	}
+	
+	private void paintMargins(GL2 gl2) {
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -1129,6 +1035,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	@Override
 	public void turtleFinished(Turtle t) {
+		// TODO t is not passed to saving?  how does this even work?
 		saveCurrentTurtleToDrawing();		
 	}
 }

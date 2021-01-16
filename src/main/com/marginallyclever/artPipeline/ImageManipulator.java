@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 

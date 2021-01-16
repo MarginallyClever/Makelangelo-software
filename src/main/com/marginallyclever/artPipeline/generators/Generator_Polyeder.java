@@ -4,8 +4,8 @@ package com.marginallyclever.artPipeline.generators;
 import java.util.ArrayList;
 
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.Turtle;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

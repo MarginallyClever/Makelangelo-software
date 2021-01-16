@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline;
 
-import com.marginallyclever.convenience.Turtle;
+import com.marginallyclever.convenience.turtle.Turtle;
 
 public interface ArtPipelineListener {
 	/**

@@ -1,7 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
 import java.security.SecureRandom;
-import com.marginallyclever.convenience.Turtle;
+
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 public class Generator_LSystemTree extends ImageGenerator {

@@ -7,7 +7,7 @@ import com.jogamp.opengl.GL2;
  * WYSIWYG progress, while the filters might show conversion while-you-wait
  * updates.
  *
- * @author danroyer
+ * @author Dan Royer
  * @since 7.1.4
  */
 public abstract interface MakelangeloRobotDecorator {
