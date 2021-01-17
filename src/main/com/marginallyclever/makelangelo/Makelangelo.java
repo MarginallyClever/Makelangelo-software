@@ -20,25 +20,36 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -86,6 +97,15 @@ public final class Makelangelo extends TransferHandler
 	private Camera camera;
 	private MakelangeloRobot robot;
 
+	protected String lastFileIn = "";
+	public String getLastFileIn() {
+		return lastFileIn;
+	}
+
+	protected FileFilter lastFilterIn = null;
+	protected String lastFileOut = "";
+	protected FileFilter lastFilterOut = null;
+	
 	// GUI elements
 	private JFrame mainFrame = null;
 	private JPanel contentPane;
@@ -334,13 +354,6 @@ public final class Makelangelo extends TransferHandler
 		 * ex.printStackTrace(); } System.exit(0); }
 		 */
 
-	/**
-	 * Rebuild the contents of the menu based on current program state
-	 */
-	public void updateMenuBar() {
-		if (robotPanel != null)
-			robotPanel.updateButtonAccess();
-	}
 
 	public Container createContentPane() {
 		Log.message("create content pane...");
@@ -363,7 +376,7 @@ public final class Makelangelo extends TransferHandler
 		Log.message("  vertical split...");
 		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
 		splitLeftRight.add(previewPanel);
-		splitLeftRight.add(robotPanel);
+		splitLeftRight.add(new JScrollPane(robotPanel));
 
 		Log.message("  horizontal split...");
 		splitUpDown = new Splitter(JSplitPane.VERTICAL_SPLIT);
@@ -571,8 +584,6 @@ public final class Makelangelo extends TransferHandler
         // recommended to explicitly call canImport from importData (see java documentation)
         if(!canImport(info)) return false;
         
-        if(robot.getControlPanel()==null) return false;
-
         // Get the fileList that is being dropped.
         List<?> data = null;
         try {
@@ -588,9 +599,178 @@ public final class Makelangelo extends TransferHandler
         
         String filename = ((File)data.get(0)).getAbsolutePath();
 
-        // Load the file.
-        return robot.getControlPanel().openFileOnDemand(filename);
+        return openFileOnDemand(filename);
     }
+	
+
+
+	/**
+	 * Open a file with a given LoadAndSaveFileType plugin.  
+	 * The loader might spawn a new thread and return before the load is actually finished.
+	 * @param filename absolute path of the file to load
+	 * @param loader the plugin to use
+	 * @return true if load is successful.
+	 */
+	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
+		boolean success = false;
+		try (final InputStream fileInputStream = new FileInputStream(filename)) {
+			success=loader.load(fileInputStream,robot);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		// TODO don't rely on success to be true, load may not have finished yet.
+		if (success == true) {
+			lastFileIn=filename;
+			SoundSystem.playConversionFinishedSound();
+			if( robot.getControlPanel() != null ) {
+				robot.getControlPanel().updateButtonAccess();
+				robot.getControlPanel().statusBar.clear();
+			}
+		}
+		
+		return success;
+	}
+	
+	/**
+	 * User has asked that a file be opened.
+	 * @param filename the file to be opened.
+	 * @return true if file was loaded successfully.  false if it failed.
+	 */
+	public boolean openFileOnDemand(String filename) {
+		Log.message(Translator.get("OpeningFile") + filename + "...");
+
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
+		while(i.hasNext()) {
+			LoadAndSaveFileType loader = i.next();
+			if(!loader.canLoad()) continue;  // TODO feels redundant given the next line
+			if(!loader.canLoad(filename)) continue;
+			
+			return openFileOnDemandWithLoader(filename,loader);
+		}
+		
+		Log.error(Translator.get("UnknownFileType"));
+		return false;
+	}
+
+	
+	public void reopenLastFile() {
+		openFileOnDemand(lastFileIn);
+	}
+
+	public void openFile() {
+		// list available loaders
+		File lastDir = (lastFileIn==null?null : new File(lastFileIn));
+		JFileChooser fc = new JFileChooser(lastDir);
+		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+		for( LoadAndSaveFileType lft : imageLoaders ) {
+			if(lft.canLoad()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
+		}
+		
+		// no wild card filter, please.
+		fc.setAcceptAllFileFilterUsed(false);
+		// remember the last path & filter used.
+		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
+		
+		// run the dialog
+		if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+			String selectedFile = fc.getSelectedFile().getAbsolutePath();
+			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
+
+			// figure out which of the loaders was requested.
+			for( LoadAndSaveFileType loader : imageLoaders ) {
+				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
+				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
+				if(success) {
+					lastFilterIn = selectedFilter;
+					if( robot.getControlPanel() != null ) {
+						robot.getControlPanel().updateButtonAccess();
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
+		if(!a.getDescription().equals(b.getDescription())) return false;
+		String [] aa = a.getExtensions();
+		String [] bb = b.getExtensions();
+		if(aa.length!=bb.length) return false;
+		for(int i=0;i<aa.length;++i) {
+			if(!aa[i].equals(bb[i])) return false;
+		}
+		return true;
+	}
+	
+	public void saveFileDialog() {
+		// list all the known savable file types.
+		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
+		JFileChooser fc = new JFileChooser(lastDir);
+		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
+		for( LoadAndSaveFileType lft : imageSavers ) {
+			if(lft.canSave()) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
+			}
+		}
+		
+		// do not allow wild card (*.*) file extensions
+		fc.setAcceptAllFileFilterUsed(false);
+		// remember the last path & filter used.
+		if(lastFilterOut!=null) fc.setFileFilter(lastFilterOut);
+		
+		// run the dialog
+		if (fc.showSaveDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+			String selectedFile = fc.getSelectedFile().getAbsolutePath();
+			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
+			
+			// figure out which of the savers was requested.
+			for( LoadAndSaveFileType lft : imageSavers ) {
+				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
+				//if(!filter.accept(new File(selectedFile))) {
+				if( !isMatchingFileFilter(selectedFilter,filter) ) {
+					continue;
+				}
+					
+				// make sure a valid extension is added to the file.
+				String selectedFileLC = selectedFile.toLowerCase();
+				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
+				boolean foundExtension=false;
+				for(String ext : exts) {
+					if (selectedFileLC.endsWith('.'+ext.toLowerCase())) {
+						foundExtension=true;
+						break;
+					}
+				}
+				if(!foundExtension) {
+					selectedFile+='.'+exts[0];
+				}
+
+				// try to save now.
+				boolean success = false;
+				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
+					success=lft.save(fileOutputStream,robot);
+				} catch(IOException e) {
+					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
+					//e.printStackTrace();
+				}
+				if(success==true) {
+					lastFileOut = selectedFile;
+					lastFilterOut = selectedFilter;
+					if( robot.getControlPanel() != null ) {
+						robot.getControlPanel().updateButtonAccess();
+					}
+					break;
+				}					
+			}
+			// No file filter was found.  Wait, what?!
+		}
+	}
 }
 
 /**

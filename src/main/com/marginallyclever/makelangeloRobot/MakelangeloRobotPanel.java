@@ -13,22 +13,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.artPipeline.ImageManipulator;
@@ -40,27 +29,23 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.SpringUtilities;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.PiCaptureAction;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
-import com.hopding.jrpicam.RPiCamera;
-import com.hopding.jrpicam.enums.AWB;
-import com.hopding.jrpicam.enums.DRC;
-import com.hopding.jrpicam.enums.Encoding;
-import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 
 /**
  * Control panel for a Makelangelo robot
  *
- * @author dan royer
+ * @author Dan Royer
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JScrollPane implements ActionListener, ItemListener {
+public class MakelangeloRobotPanel extends JPanel implements ActionListener, ItemListener {
 	/**
 	 *
 	 */
@@ -68,17 +53,13 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	// god objects ?
 	protected MakelangeloRobot robot;
-	protected Makelangelo gui;
+	protected Makelangelo makelangeloApp;
 
 	// connect menu
 	private CollapsiblePanel connectionPanel;
 	private JButton buttonConnect;
 	
 	// machine options
-	protected String lastFileIn = null;
-	protected FileFilter lastFilterIn = null;
-	protected String lastFileOut = null;
-	protected FileFilter lastFilterOut = null;
 	protected int generatorChoice = 0;
 	
 	private String[] machineConfigurations;
@@ -86,15 +67,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonCapture, buttonGenerate, buttonSaveFile;
-	
-	// picam controls
-	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
-	private BufferedImage buffImg;
-	private boolean useImage;
-	private RPiCamera piCamera;
-	private int awb, drc, exp, contrast, quality, sharpness;
-    private static final int buttonHeight = 25;
+	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
+
+	private PiCaptureAction piCameraCaptureAction;
+	private JButton buttonCapture;
 
     // live controls
     protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
@@ -119,13 +95,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	 * @param robot
 	 */
 	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
-		this.gui = gui;
+		this.makelangeloApp = gui;
 		this.robot = robot;
 		
+		this.removeAll();
 		this.setBorder(BorderFactory.createEmptyBorder());
-
-		JPanel panel = new JPanel(new GridBagLayout());
-		this.setViewportView(panel);
+		setLayout(new GridBagLayout());
 
 		GridBagConstraints con1 = new GridBagConstraints();
 		con1.gridx = 0;
@@ -135,41 +110,33 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		panel.add(createConnectPanel(), con1);		con1.gridy++;
+		add(createConnectPanel(), con1);		con1.gridy++;
 		
 		// settings
 		machineNumberPanel = new JPanel(new GridBagLayout());
 		updateMachineNumberPanel();
-		panel.add(machineNumberPanel, con1);
+		add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		// Create a piCamera
 		try {
-			piCamera = new RPiCamera("/home/pi/Pictures");
-			// set the initial parameter settings.
-			awb = 1;  // Auto
-			drc = 1;  // High
-			exp = 11; // VeryLong
-			contrast = 0;
-			quality = 75;
-			sharpness = 0;
+			piCameraCaptureAction = new PiCaptureAction(gui, Translator.get("MenuCaptureImage"));	
 		} catch (FailedToRunRaspistillException e) {
 			Log.message("Cannot run raspistill");
 		}
 
-		panel.add(createAxisDrivingControls(),con1);	con1.gridy++;
-		panel.add(createCommonDriveControls(),con1);	con1.gridy++;
-		panel.add(createCreativeControlPanel(), con1);	con1.gridy++;
-		panel.add(createArtPipelinePanel(),con1);			con1.gridy++;
-		panel.add(createAnimationPanel(),con1);			con1.gridy++;
+		add(createAxisDrivingControls(),con1);	con1.gridy++;
+		add(createCommonDriveControls(),con1);	con1.gridy++;
+		add(createCreativeControlPanel(), con1);	con1.gridy++;
+		add(createArtPipelinePanel(),con1);			con1.gridy++;
+		add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
-		panel.add(statusBar, con1);
+		add(statusBar, con1);
 		con1.gridy++;
 
 		// always have one extra empty at the end to push everything up.
 		con1.weighty = 1;
-		panel.add(new JLabel(), con1);
+		add(new JLabel(), con1);
 		
 		// lastly, set the button states
 		updateButtonAccess();
@@ -231,8 +198,9 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		updateButtonAccess();
 	}
 	
+	
 	protected void openConnection() {
-		NetworkConnection s = gui.requestNewConnection();
+		NetworkConnection s = makelangeloApp.requestNewConnection();
 		if(s!=null) {
 			buttonConnect.setText(Translator.get("ButtonDisconnect"));
 			buttonConnect.setForeground(Color.RED);
@@ -284,7 +252,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	
 
 	private CollapsiblePanel createArtPipelinePanel() {
-		myArtPipelinePanel = new ArtPipelinePanel(gui.getMainFrame());
+		myArtPipelinePanel = new ArtPipelinePanel(makelangeloApp.getMainFrame());
 		myArtPipelinePanel.setPipeline(robot.getPipeline());
 		
 		return myArtPipelinePanel;
@@ -307,11 +275,12 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		panel.add(buttonNewFile, con1);
 		con1.gridy++;
 
-		if (piCamera != null) {
-            buttonCapture = new JButton(Translator.get("MenuCaptureImage"));
-            buttonCapture.addActionListener(this);
+		if (piCameraCaptureAction != null) {
+            buttonCapture = new JButton(piCameraCaptureAction);
             panel.add(buttonCapture, con1);
             con1.gridy++;
+        } else {
+        	buttonCapture = null;
         }
 
 		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
@@ -500,11 +469,10 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 			robot.saveCurrentTurtleToDrawing();
 		}
 		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonCapture) captureFile();
-		else if (subject == buttonOpenFile) openFile();
-		else if (subject == buttonReopenFile) reopenFile();
+		else if (subject == buttonOpenFile) makelangeloApp.openFile();
+		else if (subject == buttonReopenFile) makelangeloApp.reopenLastFile();
 		else if (subject == buttonGenerate) generateImage();
-		else if (subject == buttonSaveFile) saveFileDialog();
+		else if (subject == buttonSaveFile) makelangeloApp.saveFileDialog();
 		else if (subject == buttonStart) robot.startAt(0);
 		else if (subject == buttonStartAt) startAt();
 		else if (subject == buttonPause) {
@@ -584,7 +552,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 	protected void startAt() {
 		StartAtPanel p = new StartAtPanel();
-		if(p.run(gui.getMainFrame())==false) return;
+		if(p.run(makelangeloApp.getMainFrame())==false) return;
 
 		int lineNumber = p.lineNumber;
 		if (lineNumber != -1) {
@@ -637,11 +605,11 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		buttonNewFile.setEnabled(!isRunning);
-		if (piCamera != null) {
+		if(buttonCapture != null) {
             buttonCapture.setEnabled(!isRunning);
         }
 		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && lastFileIn!=null && !lastFileIn.isEmpty());
+		buttonReopenFile.setEnabled(!isRunning && !makelangeloApp.getLastFileIn().isEmpty());
 		buttonGenerate.setEnabled(!isRunning);
 
 		down100.setEnabled(isConfirmed && !isRunning);
@@ -675,283 +643,6 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 	public void newFile() {
 		robot.setTurtle(new Turtle());
 		updateButtonAccess();
-	}
-
-	
-	private void reopenFile() {
-		openFileOnDemand(lastFileIn);
-	}
-
-	/**
-	 * Raspi camera capture to file for image processing
-	 */
-	private void captureFile() {
-        // let's make the image the correct width and height for the paper
-		useImage = false;
-        int captureH = 650;
-        int captureW = (int) ((double) captureH * robot.getSettings().getPaperWidth() / robot.getSettings().getPaperHeight());
-
-		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("CaptureImageTitle"), true);
-        dialog.setLocation(gui.getMainFrame().getLocation());
-
-        final JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		final GridBagConstraints cMain = new GridBagConstraints();
-		cMain.fill=GridBagConstraints.HORIZONTAL;
-		cMain.anchor=GridBagConstraints.NORTH;
-		cMain.gridx=0;
-		cMain.gridy=0;
-        cMain.gridheight = 1;
-        cMain.gridwidth = 1;
-
-		// create a frame to adjust the image
-
-		panel.setBounds(1024, 100, 700, captureH);
-
-        // if you add more things to the right side, you must increase this.
-        cMain.gridheight = 16;
-        JLabel imageLabel = new JLabel();
-        imageLabel.setPreferredSize(new Dimension(captureW, captureH));
-  		panel.add(imageLabel, cMain);
-        cMain.gridheight = 1;
-
-        // all controls to the right
-		cMain.gridx++;
-
-		JLabel label = new JLabel(Translator.get("AWB"));
-		label.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(label, cMain);
-		cMain.gridy++;
-
-		String[] awbComboBoxChoices = {
-		        Translator.get("Off"),
-                Translator.get("Auto"),
-                Translator.get("Sun"),
-                Translator.get("Cloud"),
-                Translator.get("Shade"),
-                Translator.get("Tungsten"),
-                Translator.get("Fluorescent"),
-                Translator.get("Incandescent"),
-                Translator.get("Flash"),
-                Translator.get("Horizon") };
-		JComboBox<String> awbComboBox = new JComboBox<>(awbComboBoxChoices);
-		awbComboBox.setPreferredSize(new Dimension(100,buttonHeight));
-		awbComboBox.setSelectedIndex(awb);
-		panel.add(awbComboBox, cMain);
-		cMain.gridy++;
-
-		JLabel lblNewLabel = new JLabel(Translator.get("DRC"));
-		lblNewLabel.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(lblNewLabel, cMain);
-		cMain.gridy++;
-
-		String[] drcComboBoxChoices = {
-                Translator.get("Off"),
-                Translator.get("High"),
-                Translator.get("Medium"),
-                Translator.get("Low") };
-		JComboBox<String> drcComboBox = new JComboBox<>(drcComboBoxChoices);
-		drcComboBox.setPreferredSize(new Dimension(100,buttonHeight));
-		drcComboBox.setSelectedIndex(drc);
-		panel.add(drcComboBox, cMain);
-		cMain.gridy++;
-
-		JLabel label_1 = new JLabel(Translator.get("Exposure"));
-		label_1.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(label_1, cMain);
-		cMain.gridy++;
-
-		String[] expComboBoxChoices = {
-                Translator.get("Antishake"),
-                Translator.get("Auto"),
-                Translator.get("Backlight"),
-                Translator.get("Beach"),
-                Translator.get("Fireworks"),
-                Translator.get("FixedFPS"),
-                Translator.get("Night"),
-                Translator.get("NightPreview"),
-                Translator.get("Snow"),
-                Translator.get("Sports"),
-                Translator.get("Spotlight"),
-                Translator.get("Verylong") };
-		JComboBox<String> expComboBox = new JComboBox<>(expComboBoxChoices);
-//		expComboBox.setBounds(584, 362, 90, 20);
-		expComboBox.setPreferredSize(new Dimension(100,buttonHeight));
-		expComboBox.setSelectedIndex(exp);
-		panel.add(expComboBox, cMain);
-		cMain.gridy++;
-
-		JLabel lblContrast = new JLabel(Translator.get("Contrast"));
-//		lblContrast.setBounds(588, 393, 67, 14);
-		lblContrast.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(lblContrast, cMain);
-		cMain.gridy++;
-
-		JSlider contrastSlider = new JSlider();
-		contrastSlider.setMinimum(-100);
-//		contrastSlider.setBounds(588, 418, 90, 23);
-		contrastSlider.setValue(contrast);
-		panel.add(contrastSlider, cMain);
-		cMain.gridy++;
-
-		JLabel lblQuality = new JLabel(Translator.get("Quality"));
-//		lblQuality.setBounds(588, 452, 46, 14);
-		lblQuality.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(lblQuality, cMain);
-		cMain.gridy++;
-
-		JSlider qualitySlider = new JSlider();
-		qualitySlider.setValue(quality);
-//		qualitySlider.setBounds(584, 477, 90, 29);
-		panel.add(qualitySlider, cMain);
-		cMain.gridy++;
-
-		JLabel lblSharpness = new JLabel(Translator.get("Sharpness"));
-//		lblSharpness.setBounds(585, 517, 66, 14);
-		lblSharpness.setPreferredSize(new Dimension(100,buttonHeight));
-		panel.add(lblSharpness, cMain);
-		cMain.gridy++;
-
-		JSlider sharpnessSlider = new JSlider();
-		sharpnessSlider.setMinimum(-100);
-		sharpnessSlider.setValue(sharpness);
-//		sharpnessSlider.setBounds(588, 542, 90, 23);
-		panel.add(sharpnessSlider, cMain);
-		cMain.gridy++;
-
-		// I need 3 buttons one for Capture and one for Use if we have captured an image and one to just Cancel
-
-        // a little space between everything else
-        cMain.insets = new Insets(10,0,0,0);  //top padding
-
-        buttonCaptureImage = new JButton(Translator.get("CaptureImage"));
-		buttonCaptureImage.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					piCamera.turnOnPreview(gui.getMainFrame().getLocationOnScreen().x + 50, gui.getMainFrame().getLocationOnScreen().y + 100, captureW, captureH);
-					piCamera.setAWB(AWB.valueOf(((String) awbComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setDRC(DRC.valueOf(((String) drcComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setExposure(Exposure.valueOf(((String) expComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setEncoding(Encoding.JPG);
-					piCamera.setWidth(captureW);
-					piCamera.setHeight(captureH);
-					piCamera.setContrast(contrastSlider.getValue());
-					piCamera.setQuality(qualitySlider.getValue());
-					piCamera.setSharpness(sharpnessSlider.getValue());
-					piCamera.setTimeout(3000);
-					buffImg = piCamera.takeBufferedStill();
-					Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
-					ImageIcon icon = new ImageIcon(buffImg);
-					imageLabel.setIcon(icon);
-					buttonUseCapture.setEnabled(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		buttonCaptureImage.setPreferredSize(new Dimension(89, buttonHeight));
-		panel.add(buttonCaptureImage, cMain);
-		cMain.gridy++;
-        cMain.insets = new Insets(2,0,0,0);  //top padding
-
-		buttonUseCapture = new JButton(Translator.get("UseCapture"));
-		buttonUseCapture.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// we like this image, save off the parameters used.
-				awb = awbComboBox.getSelectedIndex();
-				drc = drcComboBox.getSelectedIndex();
-				exp = expComboBox.getSelectedIndex();
-				contrast = contrastSlider.getValue();
-				quality = qualitySlider.getValue();
-				sharpness = sharpnessSlider.getValue();
-
-				File saveFile = new File("/home/pi/Pictures/capture.jpg");
-				try {
-					ImageIO.write(buffImg, "jpg", saveFile);
-					useImage = true;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				dialog.dispose();
-			};
-		});
-		buttonUseCapture.setPreferredSize(new Dimension(89, buttonHeight));
-		buttonUseCapture.setEnabled(false);
-		panel.add(buttonUseCapture, cMain);
-		cMain.gridy++;
-
-		buttonCancelCapture = new JButton(Translator.get("CancelCapture"));
-		buttonCancelCapture.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.dispose();
-				useImage = false;
-			};
-		});
-		buttonCancelCapture.setPreferredSize(new Dimension(89, buttonHeight));
-		buttonCancelCapture.setEnabled(true);
-		panel.add(buttonCancelCapture, cMain);
-
-//		piCamera.setAWB(AWB.AUTO);	    // Change Automatic White Balance setting to automatic
-//		piCamera.setDRC(DRC.OFF); 			// Turn off Dynamic Range Compression
-//		piCamera.setContrast(100); 			// Set maximum contrast
-//		piCamera.setSharpness(100);		    // Set maximum sharpness
-//		piCamera.setQuality(100); 		    // Set maximum quality
-//		piCamera.setTimeout(10000);		    // Wait 1 second to take the image
-//		piCamera.turnOnPreview(200, 200, captureW, captureH);            // Turn on image preview
-//		piCamera.setEncoding(Encoding.JPG); // Change encoding of images to PNG
-
-		// Take a still image and save it as "/home/pi/Pictures/cameraCapture.jpg"
-
-		Log.message("We are about to display dialog\n");
-		dialog.add(panel);
-		dialog.pack();
-		dialog.setVisible(true);
-//			Log.message("We are about to take a still image\n");
-//			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
-//			Log.message("New JPG capture saved to:\n\t" + image.getAbsolutePath());
-//			piCamera.turnOffPreview();
-		// setup for reopen
-
-		if (useImage) {
-			// process the image
-			openFileOnDemand("/home/pi/Pictures/capture.jpg");
-		}
-	}
-
-	public void openFile() {
-		// list available loaders
-		File lastDir = (lastFileIn==null?null : new File(lastFileIn));
-		JFileChooser fc = new JFileChooser(lastDir);
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageLoaders ) {
-			if(lft.canLoad()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-		}
-		
-		// no wild card filter, please.
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last path & filter used.
-		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-		
-		// run the dialog
-		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-
-			// figure out which of the loaders was requested.
-			for( LoadAndSaveFileType loader : imageLoaders ) {
-				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
-				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
-				if(success) {
-					lastFilterIn = selectedFilter;
-					updateButtonAccess();
-					break;
-				}
-			}
-		}
 	}
 	
 	public void generateImage() {
@@ -992,7 +683,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		changeGeneratorPanel(options.getSelectedIndex());
 		
-		JDialog dialog = new JDialog(gui.getMainFrame(),Translator.get("MenuGenerate"));
+		JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("MenuGenerate"));
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
@@ -1049,154 +740,8 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		throw new IndexOutOfBoundsException();
 	}
-	
-	public void saveFileDialog() {
-		// list all the known savable file types.
-		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
-		JFileChooser fc = new JFileChooser(lastDir);
-		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageSavers ) {
-			if(lft.canSave()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-		}
-		
-		// do not allow wild card (*.*) file extensions
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last path & filter used.
-		if(lastFilterOut!=null) fc.setFileFilter(lastFilterOut);
-		
-		// run the dialog
-		if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-			
-			// figure out which of the savers was requested.
-			for( LoadAndSaveFileType lft : imageSavers ) {
-				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
-				//if(!filter.accept(new File(selectedFile))) {
-				if( !isMatchingFileFilter(selectedFilter,filter) ) {
-					continue;
-				}
-					
-				// make sure a valid extension is added to the file.
-				String selectedFileLC = selectedFile.toLowerCase();
-				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
-				boolean foundExtension=false;
-				for(String ext : exts) {
-					if (selectedFileLC.endsWith('.'+ext.toLowerCase())) {
-						foundExtension=true;
-						break;
-					}
-				}
-				if(!foundExtension) {
-					selectedFile+='.'+exts[0];
-				}
-
-				// try to save now.
-				boolean success = false;
-				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,robot);
-				} catch(IOException e) {
-					JOptionPane.showMessageDialog(gui.getMainFrame(), "Save failed: "+e.getMessage());
-					//e.printStackTrace();
-				}
-				if(success==true) {
-					lastFileOut = selectedFile;
-					lastFilterOut = selectedFilter;
-					updateButtonAccess();
-					break;
-				}					
-			}
-			// No file filter was found.  Wait, what?!
-		}
-	}
-
-	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
-		if(!a.getDescription().equals(b.getDescription())) return false;
-		String [] aa = a.getExtensions();
-		String [] bb = b.getExtensions();
-		if(aa.length!=bb.length) return false;
-		for(int i=0;i<aa.length;++i) {
-			if(!aa[i].equals(bb[i])) return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Open a file with a given LoadAndSaveFileType plugin.  
-	 * The loader might spawn a new thread and return before the load is actually finished.
-	 * @param filename absolute path of the file to load
-	 * @param loader the plugin to use
-	 * @return true if load is successful.
-	 */
-	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
-		boolean success = false;
-		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream,robot);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-
-		// TODO don't rely on success to be true, load may not have finished yet.
-
-		if (success == true) {
-			lastFileIn=filename;
-			Log.message(Translator.get("Finished"));
-			SoundSystem.playConversionFinishedSound();
-			updateButtonAccess();
-			statusBar.clear();
-		}
-		
-		return success;
-	}
-	
-	/**
-	 * User has asked that a file be opened.
-	 * @param filename the file to be opened.
-	 * @return true if file was loaded successfully.  false if it failed.
-	 */
-	public boolean openFileOnDemand(String filename) {
-		Log.message(Translator.get("OpeningFile") + filename + "...");
-		boolean success=false;
-		boolean attempted=false;
-
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
-		while(i.hasNext()) {
-			LoadAndSaveFileType loader = i.next();
-			if(!loader.canLoad()) continue;
-			if(!loader.canLoad(filename)) continue;
-			
-			attempted=true;
-			success=openFileOnDemandWithLoader(filename,loader);
-			if(success==true) break;
-		}
-		
-		if(attempted == false) {
-			Log.error(Translator.get("UnknownFileType"));
-		}
-		
-		return success;
-	}
-	/*
-	public boolean canLoad(String filename) {
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
-		while(i.hasNext()) {
-			LoadAndSaveFileType loader = i.next();
-			if(!loader.canLoad()) continue;
-			if(!loader.canLoad(filename)) continue;
-			// potentially yes, we can load this type.
-			return true;
-		}
-		// nothing can load this type
-		return false;
-	}*/
-
 
 	public Makelangelo getGui() {
-		return gui;
+		return makelangeloApp;
 	}
 }
