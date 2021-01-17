@@ -428,12 +428,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		isRunning = false;
 		isPaused = false;
 		raisePen();
+		
 		if (myPanel != null)
 			myPanel.updateButtonAccess();
 	}
 
 	public void setRunning() {
 		isRunning = true;
+		
 		if (myPanel != null)
 			myPanel.statusBar.start();
 		if (myPanel != null)
@@ -612,10 +614,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			rememberLoweredPen();
 		}
 		if (reportedline.startsWith("M17")) {
-			myPanel.motorsHaveBeenEngaged();
+			if( myPanel != null ) {
+				myPanel.motorsHaveBeenEngaged();
+			}
 		}
 		if (reportedline.startsWith("M18")) {
-			myPanel.motorsHaveBeenDisengaged();
+			if( myPanel != null ) {
+				myPanel.motorsHaveBeenDisengaged();
+			}
 		}
 
 		Log.message(reportedline);
