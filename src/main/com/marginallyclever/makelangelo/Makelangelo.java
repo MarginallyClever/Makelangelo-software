@@ -12,17 +12,21 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
@@ -34,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
@@ -57,7 +62,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo
+public final class Makelangelo extends TransferHandler
 		implements ActionListener, WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
 	static final long serialVersionUID = 1L;
 
@@ -403,7 +408,7 @@ public final class Makelangelo
 		camera.zoomToFitPaper();
 
 		Log.message("  adding drag & drop support...");
-		mainFrame.setTransferHandler(new MakelangeloTransferHandler(robot));
+		mainFrame.setTransferHandler(this);
 	}
 
 	private void adjustWindowSize() {
@@ -546,6 +551,45 @@ public final class Makelangelo
 	public MakelangeloRobot getRobot() {
 		return robot;
 	}
+	
+	@Override
+    public boolean canImport(TransferHandler.TransferSupport info) {
+        // we only import FileList
+        if (!info.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            Log.message("Does not support files of type(s): "+info.getDataFlavors());
+            return false;
+        }
+        return true;
+    }
+    
+	@Override
+    public boolean importData(TransferHandler.TransferSupport info) {
+    	// only accept drops
+        if (!info.isDrop()) return false;
+        
+        // recommended to explicitely call canImport from importData (see java documentation)
+        if(!canImport(info)) return false;
+        
+        if(robot.getControlPanel()==null) return false;
+
+        // Get the fileList that is being dropped.
+        List<?> data = null;
+        try {
+        	data = (List<?>)info.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+        } 
+        catch (Exception e) {
+        	return false;
+        }
+
+        if(data==null) return false;
+        // accept only one file at a time.
+        if(data.size()!=1) return false;
+        
+        String filename = ((File)data.get(0)).getAbsolutePath();
+
+        // Load the file.
+        return robot.getControlPanel().openFileOnDemand(filename);
+    }
 }
 
 /**
