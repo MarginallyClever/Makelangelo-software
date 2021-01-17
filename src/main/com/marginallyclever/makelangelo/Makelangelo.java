@@ -13,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -552,6 +551,7 @@ public final class Makelangelo extends TransferHandler
 		return robot;
 	}
 	
+	// transfer handler
 	@Override
     public boolean canImport(TransferHandler.TransferSupport info) {
         // we only import FileList
@@ -561,13 +561,14 @@ public final class Makelangelo extends TransferHandler
         }
         return true;
     }
-    
+
+	// transfer handler
 	@Override
     public boolean importData(TransferHandler.TransferSupport info) {
     	// only accept drops
         if (!info.isDrop()) return false;
         
-        // recommended to explicitely call canImport from importData (see java documentation)
+        // recommended to explicitly call canImport from importData (see java documentation)
         if(!canImport(info)) return false;
         
         if(robot.getControlPanel()==null) return false;

@@ -1180,7 +1180,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		
 		return success;
 	}
-	
+	/*
 	public boolean canLoad(String filename) {
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
 		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
@@ -1193,7 +1193,7 @@ public class MakelangeloRobotPanel extends JScrollPane implements ActionListener
 		}
 		// nothing can load this type
 		return false;
-	}
+	}*/
 
 
 	public Makelangelo getGui() {
