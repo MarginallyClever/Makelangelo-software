@@ -24,6 +24,10 @@ public class ArtPipeline {
 	protected ArtPipelinePanel myPanel;
 	
 	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
+
+	protected MakelangeloRobotSettings lastSettings = null;
+	protected Turtle lastTurtle = null;
+
 	
 	public void addListener(ArtPipelineListener arg0) {
 		listeners.add(arg0);
@@ -521,16 +525,15 @@ public class ArtPipeline {
 	 * @param turtle
 	 * @param settings
 	 */
-	MakelangeloRobotSettings last_settings = null;
-	Turtle last_turtle = null;
-
 	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
-		if(turtle == null) turtle=last_turtle;
-		if(settings == null) settings=last_settings;
+		if(turtle == null) turtle=lastTurtle;
+		if(settings == null) settings=lastSettings;
+		lastSettings=settings;
+		lastTurtle=turtle;
+		
 		if(turtle == null) return;
 		if(turtle.history.isEmpty()) return;
-		last_settings=settings;
-		last_turtle=turtle;
+		
 		
 		while(turtle.isLocked()) {
 			try {
