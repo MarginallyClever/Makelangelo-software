@@ -707,7 +707,7 @@ public final class Makelangelo extends TransferHandler
 		return true;
 	}
 	
-	public void saveFileDialog() {
+	public void saveFile() {
 		// list all the known savable file types.
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);

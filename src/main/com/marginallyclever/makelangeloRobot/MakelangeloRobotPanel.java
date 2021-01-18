@@ -29,7 +29,6 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.SpringUtilities;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangelo.PiCaptureAction;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
@@ -368,7 +367,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		JPanel mainPanel = drivePanel.getContentPane();
 		mainPanel.setLayout(new SpringLayout());
 
-		goPaperBorder = new JButton(Translator.get("GoPaperBorder"));
+		goPaperBorder = new JButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
 		penUp    = new JButton(Translator.get("PenUp"));
 		penDown  = new JButton(Translator.get("PenDown"));
 		goHome   = new JButton(Translator.get("GoHome"));
@@ -391,7 +390,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		
 		SpringUtilities.makeCompactGrid(mainPanel, 3, 2, 0, 0, 0, 0);
 		
-		goPaperBorder.addActionListener(this);
 		toggleEngagedMotor.addActionListener(this);
 		penUp.addActionListener(this);
 		penDown.addActionListener(this);
@@ -472,7 +470,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		else if (subject == buttonOpenFile) makelangeloApp.openFile();
 		else if (subject == buttonReopenFile) makelangeloApp.reopenLastFile();
 		else if (subject == buttonGenerate) generateImage();
-		else if (subject == buttonSaveFile) makelangeloApp.saveFileDialog();
+		else if (subject == buttonSaveFile) makelangeloApp.saveFile();
 		else if (subject == buttonStart) robot.startAt(0);
 		else if (subject == buttonStartAt) startAt();
 		else if (subject == buttonPause) {
@@ -493,17 +491,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		else if (subject == setHome ) {
 			robot.setHome();
 			updateButtonAccess();
-		}
-		else if (subject == goPaperBorder) {
-			robot.movePenToEdgeTop();
-			robot.lowerPen();
-			robot.movePenToEdgeRight();
-			robot.movePenToEdgeBottom();
-			robot.movePenToEdgeLeft();
-			robot.movePenToEdgeTop();
-			robot.movePenAbsolute(0, robot.getPenY());
-			robot.raisePen();
-			robot.goHome();
 		}
 		else if (subject == penUp   ) robot.raisePen();
 		else if (subject == penDown ) robot.lowerPen();

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -27,6 +27,8 @@ import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Raspi camera capture to file for image processing
