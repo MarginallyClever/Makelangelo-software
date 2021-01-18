@@ -234,6 +234,21 @@ public final class Translator {
 	}
 
 	/**
+	 * Translates a string and fills in some details.  A %1 is replaced with the first parameter, %2 with the second, and so on.
+	 * @param name of key to find in translation list
+	 * @return the translated value for key, or "missing:key".
+	 */
+	static public String get(String key,String [] params) {
+		String modified = get(key);
+		int n=1;
+		for(String p : params) {
+			modified = modified.replaceAll("%"+n, p);
+			++n;
+		}
+		return modified;
+	}
+
+	/**
 	 * @return the list of language names
 	 */
 	static public String[] getLanguageList() {
