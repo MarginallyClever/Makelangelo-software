@@ -163,7 +163,7 @@ public class Log {
 		
 		msg = sdf.format(Calendar.getInstance().getTime())+" "+msg;
 		
-		System.out.println(msg);
+		//System.out.println(msg);
 		//logger.info(msg);
 		
 		try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream("log.txt", true), StandardCharsets.UTF_8)) {
