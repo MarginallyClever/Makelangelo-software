@@ -797,15 +797,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			e.printStackTrace();
 		}
 
-		Log.message("Old method ");
-		printTimeEstimate(estimateTime());
+		Log.message("Old method "+printTimeEstimate(estimateTime()));
 		
-		Log.message("New method ");
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
-		printTimeEstimate(m.getTimeEstimate(turtle, settings));
+		Log.message("New method "+printTimeEstimate(m.getTimeEstimate(turtle, settings)));
 	}
 	
-	protected void printTimeEstimate(double totalTime) {
+	protected String printTimeEstimate(double totalTime) {
 		double seconds = totalTime % 60;
 		totalTime -= seconds;
 		totalTime /= 60;
@@ -814,7 +812,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		totalTime /= 60;
 		int hours = (int) totalTime;
 
-		Log.message("Estimate =" + hours + "h" + minutes + "m" + (int) (seconds) + "s.");
+		return "Estimate =" + hours + "h" + minutes + "m" + (int) (seconds) + "s.";
 	}
 
 	public Turtle getTurtle() {

@@ -439,7 +439,7 @@ public class MakelangeloFirmwareSimulation {
 			}
 			while(queue.size()>MAX_SEGMENTS) {
 				MakelangeloFirmwareSimulationSegment s= queue.remove(0);
-				s.report();
+				//s.report();
 				sum += s.end_s;// - s.start_s;
 			}
 		}
