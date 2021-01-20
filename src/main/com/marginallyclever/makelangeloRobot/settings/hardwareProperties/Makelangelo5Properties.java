@@ -380,7 +380,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	 */
 	@Override
 	public float getAccelerationMax() {
-		return 150;
+		return 1250;
 	}
 
 	/**
