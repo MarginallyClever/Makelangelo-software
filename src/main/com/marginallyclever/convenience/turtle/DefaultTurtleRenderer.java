@@ -31,11 +31,9 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 		
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		lineWidth = lineWidthBuf[0];
-		// Log.message("line width="+lineWidth);
 
 		float newDiameter = 2.0f * 100.0f * penDiameter / lineWidth;
 		gl2.glLineWidth(newDiameter);
-		
 		gl2.glBegin(GL2.GL_LINES);
 	}
 
