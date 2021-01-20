@@ -797,21 +797,39 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			e.printStackTrace();
 		}
 
-		estimateTime();
+		Log.message("Old method ");
+		printTimeEstimate(estimateTime());
+		
+		Log.message("New method ");
+		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
+		printTimeEstimate(m.getTimeEstimate(turtle, settings));
+	}
+	
+	protected void printTimeEstimate(double totalTime) {
+		double seconds = totalTime % 60;
+		totalTime -= seconds;
+		totalTime /= 60;
+		int minutes = (int) (totalTime % 60);
+		totalTime -= minutes;
+		totalTime /= 60;
+		int hours = (int) totalTime;
+
+		Log.message("Estimate =" + hours + "h" + minutes + "m" + (int) (seconds) + "s.");
 	}
 
 	public Turtle getTurtle() {
 		return turtle;
 	}
 
-	protected void estimateTime() {
+	protected double estimateTime() {
+		double totalTime = 0;
+		
 		if (turtle.isLocked())
-			return;
+			return totalTime;
+		
 		turtle.lock();
 
 		try {
-			double totalTime = 0;
-
 			boolean isUp = true;
 			double ox = this.settings.getHomeX();
 			double oy = this.settings.getHomeY();
@@ -862,19 +880,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				oy = ny;
 				oz = nz;
 			}
-
-			double seconds = totalTime % 60;
-			totalTime -= seconds;
-			totalTime /= 60;
-			int minutes = (int) (totalTime % 60);
-			totalTime -= minutes;
-			totalTime /= 60;
-			int hours = (int) totalTime;
-
-			Log.message("Worst case draw time=" + hours + "h" + minutes + "m" + (int) (seconds) + "s.");
 		} finally {
 			turtle.unlock();
 		}
+		
+		return totalTime;
 	}
 
 	/**
@@ -933,6 +943,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public void render(GL2 gl2) {
+		float[] lineWidthBuf = new float[1];
+		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
+		
 		// outside physical limits
 		paintLimits(gl2);
 		paintPaper(gl2);
@@ -941,6 +954,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		// hardware features
 		settings.getHardwareProperties().render(gl2, this);
 
+		gl2.glLineWidth(lineWidthBuf[0]);
+		
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);

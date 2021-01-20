@@ -12,9 +12,9 @@ public class Camera {
 
 
 	// scale + position
-	private double offsetX = 0.0d;
-	private double offsetY = 0.0d;
-	private double zoom = 1.0d;
+	private double offsetX = 0.0;
+	private double offsetY = 0.0;
+	private double zoom = 1.0;
 	
 	private double width, height;
 
