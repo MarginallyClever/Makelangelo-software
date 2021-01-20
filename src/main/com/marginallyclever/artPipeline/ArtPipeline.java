@@ -368,8 +368,6 @@ public class ArtPipeline {
 		Log.message("simplify() end (was "+os+" is now "+ns+")");
 	}
 
-	
-	
 
 	/**
 	 * 
@@ -430,6 +428,8 @@ public class ArtPipeline {
 		}
 		turtle.translate(px,py);
 	}
+	
+	
 	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
 		int i;
 		double x,y,xn,yn;
@@ -449,6 +449,8 @@ public class ArtPipeline {
 		}
 		settings.setRotationRef(ang);
 	}
+	
+	
 	/**
 	 * 
 	 * @param turtle
@@ -520,6 +522,7 @@ public class ArtPipeline {
 		Log.message("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
 	}
 
+	
 	/**
 	 * 
 	 * @param turtle
