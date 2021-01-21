@@ -16,10 +16,10 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.24.0
  */
 public class MakelangeloFirmwareSimulation {
-	public static final int MAX_SEGMENTS = 32;
+	public static final int MAX_SEGMENTS = 8;
 	public static final double MIN_SEGMENT_TIME = 25000.0/1000000.0;
-	public static final double MAX_FEEDRATE = 200;   // mm/s
-	public static final double MAX_ACCELERATION = 500;  // mm/s/s
+	public static final double MAX_FEEDRATE = 200.0;   // mm/s
+	public static final double MAX_ACCELERATION = 1250.0;  // mm/s/s
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
 	public static final int SEGMENTS_PER_SECOND = 8;
 	public static final double [] MAX_JERK = { 8, 8, 0.3 };
