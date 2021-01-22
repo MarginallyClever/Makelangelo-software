@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -23,11 +24,11 @@ public class SelectOneOfMany extends Select {
 		field = new JComboBox<String>(options); 
 		field.setSelectedIndex(defaultValue);
 
+		final Select parent = this;
 		field.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setChanged();
-				notifyObservers();
+				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null, field.getSelectedIndex()));
 			}
 		});
 

@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -8,6 +8,10 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private SelectFloat text_dot_max;
 	private SelectFloat text_dot_min;
 	private SelectFloat field_cutoff;
@@ -28,8 +32,8 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		converter.setDrawBorders(draw_borders.isSelected());
 		

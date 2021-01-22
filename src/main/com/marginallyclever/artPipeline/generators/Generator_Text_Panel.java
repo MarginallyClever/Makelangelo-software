@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -8,6 +8,10 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
 
 public class Generator_Text_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Generator_Text generator;
 	private SelectOneOfMany fontChoices;
 	private SelectInteger size;
@@ -25,8 +29,8 @@ public class Generator_Text_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		generator.setMessage(text.getText());
 		generator.setSize(((Number)size.getValue()).intValue());

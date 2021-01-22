@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
 
@@ -56,10 +56,11 @@ public class SelectTests {
 
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
+				
 			}
 		});
 		
@@ -80,9 +81,9 @@ public class SelectTests {
 
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -111,9 +112,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -140,9 +141,9 @@ public class SelectTests {
 
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -164,9 +165,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -188,9 +189,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -216,9 +217,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -241,9 +242,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});
@@ -267,9 +268,9 @@ public class SelectTests {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});

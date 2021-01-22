@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.util.Observable;
-
+import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectColor;
@@ -12,6 +11,11 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustPaper extends SelectPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected MakelangeloRobot robot;
 	
 	private SelectOneOfMany paperSizes;
@@ -92,7 +96,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		add(ang = new SelectFloat("Rotation",(float)rot));
 		add(isLandscape = new SelectBoolean("\u21cb",false));
 		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
-		add(paperColor = new SelectColor(panel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
+		add(paperColor = new SelectColor(interiorPanel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
 		finish();
 		updateValues();
 	}
@@ -131,12 +135,13 @@ public class PanelAdjustPaper extends SelectPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 
 		if(beingModified) return;
 		beingModified=true;
+		
+		Object o = evt.getSource();
 		
 		if(o == paperSizes) {
 			final int selectedIndex = paperSizes.getSelectedIndex();

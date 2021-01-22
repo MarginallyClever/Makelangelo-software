@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -25,11 +26,13 @@ public class SelectBoolean extends Select {
 		field = new JCheckBox();
 		field.setSelected(arg0);
 		field.setBorder(new EmptyBorder(0,0,0,0));
+		final Select parent = this;
 		field.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				setChanged();
-				notifyObservers();
+				boolean newValue = field.isSelected();
+				boolean oldValue = !newValue;
+				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", oldValue, newValue));
 			}
 		});
 

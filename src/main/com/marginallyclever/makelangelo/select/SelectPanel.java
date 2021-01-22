@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,18 +18,22 @@ import com.marginallyclever.convenience.ColorRGB;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class SelectPanel implements Observer {
-	protected JPanel panel;
+public class SelectPanel extends JPanel implements PropertyChangeListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2141566275423257798L;
+	
+	protected JPanel interiorPanel = new JPanel();
 	private GridBagConstraints gbc;
 	
 	public SelectPanel() {
 		super();
 		
-		panel = new JPanel();
-		//p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		panel.setLayout(new GridBagLayout());
-		//p.setBorder(new LineBorder(Color.RED));
-		panel.setBorder(new EmptyBorder(5,5,5,5));
+		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
+		interiorPanel.setLayout(new GridBagLayout());
+		//interiorPanel.setBorder(new LineBorder(Color.RED));
+		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
 
 		gbc = new GridBagConstraints();
 		gbc.weightx=1;
@@ -38,26 +42,26 @@ public class SelectPanel implements Observer {
 		gbc.fill      = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
+		
+		add(interiorPanel);
 	}
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		panel.add(c.getPanel(),gbc);
-		c.addObserver(this);
+		interiorPanel.add(c.getPanel(),gbc);
+		c.addPropertyChangeListener(this);
 	}
 	
 	public void finish() {
 		gbc.weighty=1;
 		gbc.gridy++;
-		panel.add(new JLabel(""),gbc);
+		interiorPanel.add(new JLabel(""),gbc);
 	}
 	
 	public JPanel getPanel() {
-		return panel;
+		return interiorPanel;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {}
 	
 	/**
 	 * Run this to visually examine every panel element and how they look in next to each other.
@@ -68,7 +72,6 @@ public class SelectPanel implements Observer {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		SelectPanel panel = new SelectPanel();
-		frame.getContentPane().add(panel.getPanel());
 		SelectBoolean a = new SelectBoolean("AAAAAAAAAAA",false);
 		SelectButton b = new SelectButton("B");
 		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
@@ -95,8 +98,14 @@ public class SelectPanel implements Observer {
 		// test finish
 		panel.finish();
 		panel.getPanel().setPreferredSize(new Dimension(400,600));
-		
+
+		frame.getContentPane().add(panel.getPanel());
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// TODO Auto-generated method stub
 	} 
 }

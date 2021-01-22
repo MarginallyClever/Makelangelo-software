@@ -3,10 +3,9 @@ package com.marginallyclever.makelangelo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
-
 import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
@@ -24,9 +23,9 @@ public class FloatFieldTest {
 		
 		// test observer fires
 		testObservation=0;
-		b.addObserver(new Observer() {
+		b.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void update(Observable o, Object arg) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				++testObservation;
 			}
 		});

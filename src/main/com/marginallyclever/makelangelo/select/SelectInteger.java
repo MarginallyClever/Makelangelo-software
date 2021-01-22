@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -40,6 +41,7 @@ public class SelectInteger extends Select {
 		field.setValue((Integer)defaultValue);
 		field.setHorizontalAlignment(JTextField.RIGHT);
 
+		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -63,9 +65,8 @@ public class SelectInteger extends Select {
 					newNumber = Integer.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newNumber) {
+						notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
 						value = newNumber;
-						setChanged();
-						notifyObservers();
 					}
 				} catch(NumberFormatException e1) {
 					field.setForeground(Color.RED);

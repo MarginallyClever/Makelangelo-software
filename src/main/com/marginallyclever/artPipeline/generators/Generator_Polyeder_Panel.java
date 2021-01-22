@@ -1,12 +1,16 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
 public class Generator_Polyeder_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Generator_Polyeder generator;
 	private SelectInteger size;
 	private SelectInteger flap;
@@ -25,8 +29,8 @@ public class Generator_Polyeder_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		generator.setSize(((Number)size.getValue()).intValue());
 		generator.setFlap(((Number)flap.getValue()).intValue());

@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -9,6 +9,10 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected SelectBoolean field_isEpitrochoid;
 	protected SelectInteger field_majorRadius;
 	protected SelectInteger field_minorRadius;
@@ -31,8 +35,8 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		int newMajorRadius = field_majorRadius.getValue();
 		int newMinorRadius = field_minorRadius.getValue();

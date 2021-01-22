@@ -41,6 +41,19 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectButton;
+import com.marginallyclever.makelangelo.select.SelectColor;
+import com.marginallyclever.makelangelo.select.SelectFile;
+import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.select.SelectTextArea;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,42 +66,43 @@ import java.util.Vector;
  * The user-triggered collapsable panel containing the component (trigger) in the titled border
  */
 public class CollapsiblePanel extends JPanel {
-   /**
+	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5513516713428527183L;
 
-		public interface CollapeListener extends java.util.EventListener {
-                public void collaped();
-                public void expanded();
-        }
+	final static int COLLAPSED = 0, EXPANDED = 1; // image States
+    
 
-        Vector<CollapeListener> collapeListeners;
+	public interface CollapeListener extends java.util.EventListener {
+        public void collaped();
+        public void expanded();
+	}
+    protected Vector<CollapeListener> collapeListeners;
 
-    //Border
-    CollapsableTitledBorder border; // includes upper left component and line type
-    //Border collapsedBorderLine = BorderFactory.createEmptyBorder(2, 2, 2, 2); // no border
-    Border collapsedBorderLine = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
-    Border expandedBorderLine = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED); // because this is null, default is used, etched lowered border on MAC
+    // Border
+    protected CollapsableTitledBorder border; // includes upper left component and line type
+    // Border collapsedBorderLine = BorderFactory.createEmptyBorder(2, 2, 2, 2); // no border
+    protected Border collapsedBorderLine = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+    protected Border expandedBorderLine = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED); // because this is null, default is used, etched lowered border on MAC
 
-    //Title
-    AbstractButton titleComponent; // displayed in the titled border
+    // Title
+    protected AbstractButton titleComponent; // displayed in the titled border
 
-    //Expand/Collapse button
-    final static int COLLAPSED = 0, EXPANDED = 1; // image States
-    ImageIcon[] iconArrow = createExpandAndCollapseIcon();
-    JButton arrow = createArrowButton();
+    // Expand/Collapse button
+    protected ImageIcon[] iconArrow = createExpandAndCollapseIcon();
+    protected JButton arrow = createArrowButton();
 
-    //Content Pane
-    JPanel panel;
+    // Content Pane
+    protected SelectPanel panel;
 
-    //Container State
-    boolean collapsed; // stores curent state of the collapsable panel
+    // Container State
+    protected boolean isCollapsed;
 
     /**
-     * Constructor for an option button controlled collapsable panel.
+     * Constructor for an option button controlled collapsible panel.
      * This is useful when a group of options each have unique sub contents. The radio buttons should be created,
-     * grouped, and then used to construct their own collapsable panels. This way choosing a different option in
+     * grouped, and then used to construct their own collapsible panels. This way choosing a different option in
      * the same option group will collapse all unselected options. Expanded panels draw a border around the
      * contents and through the radio button in the fashion of a titled border.
      *
@@ -97,7 +111,7 @@ public class CollapsiblePanel extends JPanel {
     public CollapsiblePanel(JRadioButton component) {
         component.addItemListener(new CollapsiblePanel.ExpandAndCollapseAction());
         titleComponent = component;
-        collapsed = !component.isSelected();
+        isCollapsed = !component.isSelected();
         commonConstructor();
     }
 
@@ -111,7 +125,7 @@ public class CollapsiblePanel extends JPanel {
     public CollapsiblePanel(String text) {
         arrow.setText(text);
         titleComponent = arrow;
-        collapsed = false;
+        isCollapsed = false;
         commonConstructor();
     }
 
@@ -119,28 +133,26 @@ public class CollapsiblePanel extends JPanel {
      * Sets layout, creates the content panel and adds it and the title component to the container,
      * all constructors have this procedure in common.
      */
-    private void commonConstructor () {
+    private void commonConstructor() {
         setLayout(new BorderLayout());
 
-        panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-
+        panel = new SelectPanel();
         add(titleComponent, BorderLayout.CENTER);
         add(panel, BorderLayout.CENTER);
 
         collapeListeners = new Vector<CollapeListener>();
 
-        setCollapsed(collapsed);
+        setCollapsed(isCollapsed);
 
         placeTitleComponent();
     }
 
     public void addCollapeListener(CollapeListener collapeListener) {
-            this.collapeListeners.add(collapeListener);
+    	this.collapeListeners.add(collapeListener);
     }
 
     public boolean removeCollapeListener(CollapeListener collapeListener) {
-            return this.collapeListeners.remove(collapeListener);
+    	return this.collapeListeners.remove(collapeListener);
     }
 
     /**
@@ -165,7 +177,7 @@ public class CollapsiblePanel extends JPanel {
      *
      * @return panel The content panel
      */
-    public JPanel getContentPane() {
+    public SelectPanel getContentPane() {
         return panel;
     }
 
@@ -177,7 +189,7 @@ public class CollapsiblePanel extends JPanel {
      * @param collapse When set to true, the panel is collapsed, else it is expanded
      */
     public void setCollapsed(boolean collapse) {
-        collapsed = collapse;
+        isCollapsed = collapse;
         if (collapse) {
             //collapse the panel, remove content and set border to empty border
             remove(panel);
@@ -185,9 +197,8 @@ public class CollapsiblePanel extends JPanel {
             border = new CollapsableTitledBorder(collapsedBorderLine, titleComponent);
 
             for(CollapeListener collapeListener : collapeListeners) {
-                    collapeListener.collaped();
+            	collapeListener.collaped();
             }
-
         } else {
             //expand the panel, add content and set border to titled border
             add(panel, BorderLayout.CENTER);
@@ -195,9 +206,8 @@ public class CollapsiblePanel extends JPanel {
             border = new CollapsableTitledBorder(expandedBorderLine, titleComponent);
 
             for(CollapeListener collapeListener : collapeListeners) {
-                    collapeListener.expanded();
+                collapeListener.expanded();
             }
-
         }
         setBorder(border);
         updateUI();
@@ -209,7 +219,7 @@ public class CollapsiblePanel extends JPanel {
      * @return collapsed Returns true if the panel is collapsed and false if it is expanded
      */
     public boolean isCollapsed() {
-        return collapsed;
+        return isCollapsed;
     }
 
     /**
@@ -237,7 +247,7 @@ public class CollapsiblePanel extends JPanel {
      *
      * @return button Button which is used in the titled border component
      */
-    private JButton createArrowButton () {
+    private JButton createArrowButton() {
         JButton button = new JButton("arrow", iconArrow[COLLAPSED]);
         button.setBorder(BorderFactory.createEmptyBorder(0,1,5,1));
         button.setVerticalTextPosition(AbstractButton.CENTER);
@@ -265,9 +275,11 @@ public class CollapsiblePanel extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e) {
             setCollapsed(!isCollapsed());
         }
+		
         public void itemStateChanged(ItemEvent e) {
             setCollapsed(!isCollapsed());
         }
@@ -444,4 +456,47 @@ public class CollapsiblePanel extends JPanel {
             return compR;
         }
     }
+    
+	/**
+	 * Run this to visually examine every panel element and how they look in next to each other.
+	 * @param args ignored
+	 */
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("Collapsible Panel");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
+		CollapsiblePanel cpanel = new CollapsiblePanel("Interior");
+		
+		SelectPanel panel2 = cpanel.getContentPane();
+		SelectBoolean a = new SelectBoolean("AAAAAAAAAAA",false);
+		SelectButton b = new SelectButton("B");
+		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
+		SelectFile d = new SelectFile("D",null);
+		SelectFloat e = new SelectFloat("E",0.0f);
+		SelectInteger f = new SelectInteger("FFF",0);
+		String [] list = {"cars","trains","planes","boats","rockets"};
+		SelectOneOfMany g = new SelectOneOfMany("G",list,0);
+		String ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+		SelectReadOnlyText h = new SelectReadOnlyText("H "+ipsum);
+		SelectSlider i = new SelectSlider("I",200,0,100);
+		SelectTextArea j = new SelectTextArea("J",ipsum);
+		
+		panel2.add(a);
+		panel2.add(b);
+		panel2.add(c);
+		panel2.add(d);
+		panel2.add(e);
+		panel2.add(f);
+		panel2.add(g);
+		panel2.add(h);
+		panel2.add(i);
+		panel2.add(j);
+		// test finish
+		panel2.finish();
+		panel2.getPanel().setPreferredSize(new Dimension(400,600));
+
+		frame.getContentPane().add(cpanel);
+		frame.pack();
+		frame.setVisible(true);
+	} 
 }

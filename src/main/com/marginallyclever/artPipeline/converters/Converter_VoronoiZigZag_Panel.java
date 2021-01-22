@@ -1,11 +1,15 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5791313991426136610L;
 	private SelectInteger numCells;
 	private SelectFloat minDotSize;
 	private Converter_VoronoiZigZag converter;
@@ -21,8 +25,8 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		if( numCells.getValue() != converter.getNumCells() ||
 			minDotSize.getValue() != converter.getMinDotSize() ) {

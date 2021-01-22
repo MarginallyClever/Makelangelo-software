@@ -55,6 +55,8 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
+		if(!showPenUp) return;
+		
 		gl2.glColor3d(
 				colorTravel.getRed() / 255.0,
 				colorTravel.getGreen() / 255.0,

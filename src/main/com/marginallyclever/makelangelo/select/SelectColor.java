@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
@@ -30,7 +32,7 @@ public class SelectColor extends Select {
 	 * @param labelValue
 	 * @param defaultValue
 	 */
-	public SelectColor(Component parent,String labelValue,ColorRGB defaultValue) {
+	public SelectColor(Component parentComponent,String labelValue,ColorRGB defaultValue) {
 		super();
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
@@ -45,13 +47,13 @@ public class SelectColor extends Select {
 		field.setBorder(new LineBorder(Color.BLACK));
 
 		chooseButton = new JButton("...");
+		final Select parent = this;
 		chooseButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Color c = JColorChooser.showDialog(parent, label.getText(), field.getBackground());
+				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
 				field.setBackground(c);
-				setChanged();
-				notifyObservers();
+				notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",null,null));
 			}
 		});
 
@@ -70,7 +72,6 @@ public class SelectColor extends Select {
 	
 	public void setColor(ColorRGB c) {
 		field.setBackground(new Color(c.red,c.green,c.blue));
-		setChanged();
-		notifyObservers();
+		notifyPropertyChangeListeners(new PropertyChangeEvent(this,"color",null,null));
 	}
 }

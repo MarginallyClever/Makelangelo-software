@@ -62,12 +62,6 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 		this.add(getTextInputField(),con1);
 	}
 
-
-	public void finalize() throws Throwable  {
-		super.finalize();
-		Log.removeListener(this);
-	}
-
 	// appends a message to the log tab and system out.
 	@Override
 	public void logEvent(String msg) {

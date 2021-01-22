@@ -12,6 +12,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 
 public class PanelAdjustPen extends SelectPanel implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected MakelangeloRobot robot;
 	
 	protected SelectFloat penDiameter;
@@ -45,8 +50,8 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
 	    add(penDown = new SelectFloat(Translator.get("penToolDown"),settings.getPenDownAngle()));
 	    add(buttonTestDown = new SelectButton(Translator.get("penToolTest")));
-		add(selectPenDownColor = new SelectColor(panel,Translator.get("pen down color"),robot.getSettings().getPenDownColor()));
-		add(selectPenUpColor = new SelectColor(panel,Translator.get("pen up color"),robot.getSettings().getPenUpColor()));
+		add(selectPenDownColor = new SelectColor(interiorPanel,Translator.get("pen down color"),robot.getSettings().getPenDownColor()));
+		add(selectPenUpColor = new SelectColor(interiorPanel,Translator.get("pen up color"),robot.getSettings().getPenUpColor()));
 		finish();
 	}
 	

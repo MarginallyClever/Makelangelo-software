@@ -1,53 +1,44 @@
 package com.marginallyclever.artPipeline;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
+/**
+ * 
+ * @author Dan Royer
+ *
+ */
+@SuppressWarnings("deprecation")
 public class ArtPipelinePanel extends CollapsiblePanel { 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7525669710478140175L;
-
-	@SuppressWarnings("deprecation")
-	transient private Preferences prefs = PreferencesHelper
-			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-
-	private void setPreferredResizeStyle(int style) {
-		prefs.putInt("Fill Style", style);
-	}
-	private int getPreferredFillStyle() {
-		return prefs.getInt("Fill Style", 0);
-	}
-	private void setPreferredFlipStyle(int style) {
-		prefs.putInt("Flip Style", style);
-	}
-	private int getPreferredFlipStyle() {
-		return prefs.getInt("Flip Style", 0);
-	}
 	
 	transient protected JFrame parentFrame;
 	transient public ArtPipeline myPipeline;
 	
-	protected JComboBox<String> resizeOptionsComboBox;
-	protected JComboBox<String> flipOptionsComboBox;
-	protected JCheckBox shouldReorderCheckbox;
-	protected JCheckBox shouldSimplifyCheckbox;
-	protected JCheckBox shouldCropCheckbox;
+	protected SelectOneOfMany resize;
+	protected SelectOneOfMany flip;
+	protected SelectBoolean reorder;
+	protected SelectBoolean simplify;
+	protected SelectBoolean crop;
+	
 
-	
-	
+	transient private Preferences prefs = PreferencesHelper
+			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+
 	public ArtPipelinePanel(JFrame parentFrame0) {
 		super(Translator.get("Art Pipeline"));
 
@@ -57,95 +48,132 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		
 		//if(shouldResizeFill()) checkResizeFill(turtle,settings);
 		//if(shouldResizeFit()) checkResizeFit(turtle,settings);
-		// TODO translate these strings
-		String[] resizeOptions = new String[3];
-		resizeOptions[0] = Translator.get("ConvertImagePaperOriginal");
-		resizeOptions[1] = Translator.get("ConvertImagePaperFit");
-		resizeOptions[2] = Translator.get("ConvertImagePaperFill");
-		resizeOptionsComboBox = new JComboBox<String>(resizeOptions);
-		resizeOptionsComboBox.setSelectedIndex(getPreferredFillStyle());
-
-		String[] flipOptions = new String[3];
-		flipOptions[1] = Translator.get("FlipNone");
-		flipOptions[1] = Translator.get("FlipH");
-		flipOptions[2] = Translator.get("FlipV");
-		flipOptionsComboBox = new JComboBox<String>(flipOptions);
-		flipOptionsComboBox.setSelectedIndex(getPreferredFlipStyle());
+		String[] resizeOptions = {
+				Translator.get("ConvertImagePaperOriginal"),
+				Translator.get("ConvertImagePaperFit"),
+				Translator.get("ConvertImagePaperFill")
+		};
+		resize = new SelectOneOfMany(Translator.get("Resize"),resizeOptions,getPreferredFillStyle());
+		
+		String[] flipOptions = {
+			Translator.get("FlipNone"),
+			Translator.get("FlipH"),
+			Translator.get("FlipV"),
+			Translator.get("FlipH") +" + "+ Translator.get("FlipV")
+		};
+		flip = new SelectOneOfMany(Translator.get("Flip"),flipOptions,getPreferredFlipStyle());
 		
 		//if(shouldReorder()) checkReorder(turtle,settings);
-		shouldReorderCheckbox = new JCheckBox("Reorder");
+		reorder = new SelectBoolean(Translator.get("Reorder"),true);
+		
 		//if(shouldSimplify()) checkSimplify(turtle,settings);
-		shouldSimplifyCheckbox = new JCheckBox("Simplify");
+		simplify = new SelectBoolean(Translator.get("Simplify"),true);
+		
 		//if(shouldCrop()) cropTurtleToPageMargin(turtle,settings);
-		shouldCropCheckbox = new JCheckBox("Crop to margins");
+		crop = new SelectBoolean(Translator.get("Crop to margins"),true);
 		
-		JPanel panel = getContentPane();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(resizeOptionsComboBox);
-		panel.add(flipOptionsComboBox);
-		panel.add(shouldReorderCheckbox);
-		panel.add(shouldSimplifyCheckbox);
-		panel.add(shouldCropCheckbox);
+		SelectPanel panel = getContentPane();
+		panel.add(resize);
+		panel.add(flip);
+		panel.add(reorder);
+		panel.add(simplify);
+		panel.add(crop);
+		panel.invalidate();
 		
-		resizeOptionsComboBox.addActionListener(new ActionListener() {
+		resize.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				setPreferredResizeStyle(resizeOptionsComboBox.getSelectedIndex());
+			public void propertyChange(PropertyChangeEvent evt) {
+				setPreferredResizeStyle(resize.getSelectedIndex());
 				myPipeline.processTurtle(null,null);
 			}
 		});
-		flipOptionsComboBox.addActionListener(new ActionListener() {
+		flip.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				setPreferredFlipStyle(flipOptionsComboBox.getSelectedIndex());
-			}
-		});
-		shouldReorderCheckbox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void propertyChange(PropertyChangeEvent evt) {
+				setPreferredFlipStyle(flip.getSelectedIndex());
 				myPipeline.processTurtle(null,null);
 			}
 		});
-		shouldSimplifyCheckbox.addActionListener(new ActionListener() {
+		reorder.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void propertyChange(PropertyChangeEvent evt) {
 				myPipeline.processTurtle(null,null);
 			}
 		});
-		shouldCropCheckbox.addActionListener(new ActionListener() {
+		simplify.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void propertyChange(PropertyChangeEvent evt) {
+				myPipeline.processTurtle(null,null);
+			}
+		});
+		crop.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
 				myPipeline.processTurtle(null,null);
 			}
 		});
 	}
 	
 	public boolean shouldResizeFill() {
-		return resizeOptionsComboBox.getSelectedIndex()==2;
+		return resize.getSelectedIndex()==2;
 	}
 	public boolean shouldResizeFit() {
-		return resizeOptionsComboBox.getSelectedIndex()==1;
+		return resize.getSelectedIndex()==1;
 	}
 	public boolean shouldReorder() {
-		return shouldReorderCheckbox.isSelected();
+		return reorder.isSelected();
 	}
 	public boolean shouldFlipV() {
-		return flipOptionsComboBox.getSelectedIndex()==2;
+		int i = flip.getSelectedIndex();
+		return i==2 || i==3;
 	}
 	public boolean shouldFlipH() {
-		return flipOptionsComboBox.getSelectedIndex()==1;
+		int i = flip.getSelectedIndex();
+		return i==1 || i==3;
 	}
 	public boolean shouldSimplify() {
-		return shouldSimplifyCheckbox.isSelected();
+		return simplify.isSelected();
 	}
 	public boolean shouldCrop() {
-		return shouldCropCheckbox.isSelected();
+		return crop.isSelected();
 	}
-
+	
+	private void setPreferredResizeStyle(int style) {
+		prefs.putInt("Fill Style", style);
+	}
+	
+	private int getPreferredFillStyle() {
+		return prefs.getInt("Fill Style", 0);
+	}
+	
+	private void setPreferredFlipStyle(int style) {
+		prefs.putInt("Flip Style", style);
+	}
+	
+	private int getPreferredFlipStyle() {
+		return prefs.getInt("Flip Style", 0);
+	}
+	
 	public void setPipeline(ArtPipeline pipeline) {
 		myPipeline = pipeline;
 		if(myPipeline!=null) {
 			myPipeline.myPanel = this;
 		}
 	}
+	/**
+	 * Run this to visually examine every panel element and how they look in next to each other.
+	 * @param args ignored
+	 */
+	public static void main(String[] args) {
+		Translator.start();
+		JFrame frame = new JFrame("Art Pipeline Panel");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		ArtPipelinePanel p = new ArtPipelinePanel(frame);
+		p.getContentPane().getPanel().setPreferredSize(new Dimension(400,600));
+		frame.add(p);
+		
+		frame.pack();
+		frame.setVisible(true);
+	} 
 }

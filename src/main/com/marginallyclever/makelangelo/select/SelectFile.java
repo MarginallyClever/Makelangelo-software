@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -29,6 +30,7 @@ public class SelectFile extends Select {
 		label = new JLabel(labelValue,JLabel.LEADING);
 
 		field = new JTextField(defaultValue, 16);
+		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -46,8 +48,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				setChanged();
-				notifyObservers();
+				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null,null));
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));

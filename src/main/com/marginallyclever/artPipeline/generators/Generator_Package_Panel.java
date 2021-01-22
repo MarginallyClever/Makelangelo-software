@@ -1,11 +1,15 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Generator_Package_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1668021610842701532L;
 	private Generator_Package generator;
 	private SelectInteger width;
 	private SelectInteger length;
@@ -23,8 +27,8 @@ public class Generator_Package_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		generator.setWidth(((Number)width.getValue()).intValue());
 		generator.setHeight(((Number)height.getValue()).intValue());

@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.util.Observable;
-
+import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFloat;
@@ -10,6 +9,11 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 public class PanelAdjustMachine extends SelectPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected MakelangeloRobot robot;
 
 	protected SelectFloat machineWidth, machineHeight;
@@ -76,7 +80,7 @@ public class PanelAdjustMachine extends SelectPanel {
 			add(buttonBpos = new SelectButton(Translator.get("JogOut")));
 	
 			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
-				panel.setVisible(false);
+				interiorPanel.setVisible(false);
 			}
 		}
 		finish();
@@ -117,8 +121,9 @@ public class PanelAdjustMachine extends SelectPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
+		Object o = evt.getSource();
 
 		// jog motors
 		     if(o == buttonApos) robot.jogLeftMotorOut();

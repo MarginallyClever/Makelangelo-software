@@ -8,6 +8,10 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
 public class StartAtPanel extends SelectPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public int lineNumber;
 	public boolean findPreviousPenDown;
 	public boolean addPenDownCommand;

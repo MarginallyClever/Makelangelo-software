@@ -1,12 +1,16 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_Multipass_Panel extends ImageConverterPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Converter_Multipass converter;
 	private SelectFloat   angleField;
 	private SelectInteger passesField;
@@ -21,8 +25,8 @@ public class Converter_Multipass_Panel extends ImageConverterPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		converter.setAngle(angleField.getValue());
 		converter.setPasses(passesField.getValue());

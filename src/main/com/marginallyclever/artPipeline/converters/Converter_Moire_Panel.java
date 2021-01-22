@@ -1,12 +1,15 @@
 package com.marginallyclever.artPipeline.converters;
 
-import java.util.Observable;
-
+import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
 public class Converter_Moire_Panel extends ImageConverterPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Converter_Moire converter;
 	private SelectFloat scaleField;	
 	private SelectOneOfMany directionChoices;
@@ -21,9 +24,8 @@ public class Converter_Moire_Panel extends ImageConverterPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		converter.setScale(scaleField.getValue());
 		converter.setDirectionIndex(directionChoices.getSelectedIndex());

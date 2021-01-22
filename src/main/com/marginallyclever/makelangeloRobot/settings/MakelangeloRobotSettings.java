@@ -647,7 +647,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 			while(i.hasNext()) {
 				MakelangeloHardwareProperties hw = i.next();
 				if(hw.getVersion().equals(version)) {
-					hardwareProperties = hw.getClass().newInstance();
+					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
 					newVersion = version;
 					break;
 				}

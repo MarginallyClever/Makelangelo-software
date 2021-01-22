@@ -254,18 +254,18 @@ public final class Makelangelo extends TransferHandler
 		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
 		buttonZoomOut.addActionListener(this);
 		buttonZoomOut.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		menu.add(buttonZoomOut);
 
 		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.addActionListener(this);
 		buttonZoomIn.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		menu.add(buttonZoomIn);
 
 		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		buttonZoomToFit.addActionListener(this);
 		menu.add(buttonZoomToFit);
 
@@ -348,11 +348,11 @@ public final class Makelangelo extends TransferHandler
 	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
 	 * java/
 	 *//*
-		 * private void downloadUpdate() { String[] run =
-		 * {"java","-jar","updater/update.jar"}; try {
-		 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
-		 * ex.printStackTrace(); } System.exit(0); }
-		 */
+	 * private void downloadUpdate() { String[] run =
+	 * {"java","-jar","updater/update.jar"}; try {
+	 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
+	 * ex.printStackTrace(); } System.exit(0); }
+	 */
 
 
 	public Container createContentPane() {
@@ -388,10 +388,6 @@ public final class Makelangelo extends TransferHandler
 		Log.message("  tweak...");
 		splitUpDown.setResizeWeight(0.9);
 		splitUpDown.setOneTouchExpandable(true);
-		splitUpDown.setDividerLocation(800);
-		// Dimension minimumSize = new Dimension(100, 100);
-		// splitLeftRight.setMinimumSize(minimumSize);
-		// logPanel.setMinimumSize(minimumSize);
 
 		return contentPane;
 	}

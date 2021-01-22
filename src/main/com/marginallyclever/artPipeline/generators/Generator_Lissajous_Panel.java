@@ -1,12 +1,16 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected SelectSlider field_a;
 	protected SelectSlider field_b;
 	protected SelectSlider field_numSamples;
@@ -26,8 +30,8 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 
 		int newB = field_b.getValue();
 		int newA = field_a.getValue();

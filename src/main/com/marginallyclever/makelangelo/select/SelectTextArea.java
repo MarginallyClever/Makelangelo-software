@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -30,6 +31,7 @@ public class SelectTextArea extends Select {
 		field.setLineWrap(true);
 		field.setWrapStyleWord(true);
 		field.setBorder(BorderFactory.createLoweredBevelBorder());
+		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -47,8 +49,9 @@ public class SelectTextArea extends Select {
 			}
 			
 			void validate() {
-				setChanged();
-				notifyObservers();
+				// TODO don't leave these null
+				PropertyChangeEvent evt = new PropertyChangeEvent(parent,"field",null,null); 
+				notifyPropertyChangeListeners(evt);
 			}
 		});
 		

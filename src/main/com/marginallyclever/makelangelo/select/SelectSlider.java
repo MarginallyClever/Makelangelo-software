@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -28,13 +29,15 @@ public class SelectSlider extends Select {
 		field.setMaximum(top);
 		field.setMinimum(bottom);
 		field.setMinorTickSpacing(1);
+		final Select parent = this;
 		field.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 		        int n = field.getValue();
+
+		        notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",null,n));
+				
 		        value.setText(Integer.toString(n));
-		        setChanged();
-		        notifyObservers();
 			}
 		});
 		field.setValue(defaultValue);

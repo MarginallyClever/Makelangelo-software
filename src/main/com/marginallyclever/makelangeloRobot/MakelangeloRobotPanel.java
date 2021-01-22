@@ -7,12 +7,13 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -33,6 +34,8 @@ import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectButton;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
@@ -55,8 +58,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	protected Makelangelo makelangeloApp;
 
 	// connect menu
-	private CollapsiblePanel connectionPanel;
-	private JButton buttonConnect;
+	private SelectPanel connectionPanel;
+	private SelectButton buttonConnect;
 	
 	// machine options
 	protected int generatorChoice = 0;
@@ -66,20 +69,21 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private JButton buttonOpenFile, buttonReopenFile, buttonNewFile, buttonGenerate, buttonSaveFile;
+	private SelectButton buttonNewFile, buttonOpenFile, buttonReopenFile, buttonGenerate, buttonSaveFile;
 
 	private PiCaptureAction piCameraCaptureAction;
-	private JButton buttonCapture;
+	private SelectButton buttonCapture;
 
     // live controls
-    protected JButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+    protected SelectButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
 	private JButton down100,down10,down1,up1,up10,up100;
 	private JButton left100,left10,left1,right1,right10,right100;
-	private JButton goHome,findHome,setHome;
-	private JButton goPaperBorder,penUp,penDown;
-	private JButton toggleEngagedMotor;
+	private JButton setHome;
+	private SelectButton goHome,findHome;
+	private SelectButton goPaperBorder,penUp,penDown;
+	private SelectButton toggleEngagedMotor;
 
 	// pipeline controls
 	private ArtPipelinePanel myArtPipelinePanel;
@@ -109,7 +113,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		add(createConnectPanel(), con1);		con1.gridy++;
+		add(createConnectPanel(), con1);
+		con1.gridy++;
 		
 		// settings
 		machineNumberPanel = new JPanel(new GridBagLayout());
@@ -166,23 +171,22 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 
 
 	protected JPanel createConnectPanel() {
-		connectionPanel = new CollapsiblePanel(Translator.get("MenuConnect"));
-		JPanel contents =connectionPanel.getContentPane();
-		
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=1;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTH;
-		
-        buttonConnect = new JButton(Translator.get("ButtonConnect"));
-        buttonConnect.addActionListener(this);
+		connectionPanel = new SelectPanel();
+				
+        buttonConnect = new SelectButton(Translator.get("ButtonConnect"));
+        buttonConnect.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(isConnected) {
+					closeConnection();
+				} else {
+					openConnection();
+				}
+			}
+		});
         buttonConnect.setForeground(Color.GREEN);
 
-		contents.add(buttonConnect,con1);
-		con1.gridy++;
+        connectionPanel.add(buttonConnect);
 
 	    return connectionPanel;
 	}
@@ -226,25 +230,52 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		robot.getSettings().loadConfig(newUID);
 	}
 
-	
+
 	private JPanel createAnimationPanel() {
 		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuAnimate"));
-		JPanel drivePanel = animationPanel.getContentPane();
+		SelectPanel animationInterior = animationPanel.getContentPane();
 		
-		drivePanel.setLayout(new GridLayout(4,1));
-		buttonStart = new JButton(Translator.get("Start"));
-		buttonStartAt = new JButton(Translator.get("StartAtLine"));
-		buttonPause = new JButton(Translator.get("Pause"));
-		buttonHalt = new JButton(Translator.get("Halt"));
-		buttonStart.addActionListener(this);
-		buttonStartAt.addActionListener(this);
-		buttonPause.addActionListener(this);
-		buttonHalt.addActionListener(this);
+		buttonStart = new SelectButton(Translator.get("Start"));
+		buttonStartAt = new SelectButton(Translator.get("StartAtLine"));
+		buttonPause = new SelectButton(Translator.get("Pause"));
+		buttonHalt = new SelectButton(Translator.get("Halt"));
+		buttonStart.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.startAt(0);
+			}
+		});
+		buttonStartAt.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				startAt();
+			}
+		});
+		buttonPause.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				// toggle pause
+				if (robot.isPaused() == true) {
+					buttonPause.setText(Translator.get("Pause"));
+					robot.unPause();
+					robot.sendFileCommand();
+				} else {
+					buttonPause.setText(Translator.get("Unpause"));
+					robot.pause();
+				}
+			}
+		});
+		buttonHalt.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.halt();	
+			}
+		});
 
-		drivePanel.add(buttonStart);
-		drivePanel.add(buttonStartAt);
-		drivePanel.add(buttonPause);
-		drivePanel.add(buttonHalt);
+		animationInterior.add(buttonStart);
+		animationInterior.add(buttonStartAt);
+		animationInterior.add(buttonPause);
+		animationInterior.add(buttonHalt);
 		
 		return animationPanel;
 	}
@@ -259,56 +290,69 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	
 	private JPanel createCreativeControlPanel() {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
-		JPanel panel = creativeControlPanel.getContentPane();
-		
-		GridBagConstraints con1 = new GridBagConstraints();
-		con1.gridx=0;
-		con1.gridy=0;
-		con1.weightx=1;
-		con1.weighty=1;
-		con1.fill=GridBagConstraints.HORIZONTAL;
-		con1.anchor=GridBagConstraints.NORTH;
+		SelectPanel panel = creativeControlPanel.getContentPane();
 
-		buttonNewFile = new JButton(Translator.get("MenuNewFile"));
-		buttonNewFile.addActionListener(this);
-		panel.add(buttonNewFile, con1);
-		con1.gridy++;
 
 		if (piCameraCaptureAction != null) {
-            buttonCapture = new JButton(piCameraCaptureAction);
-            panel.add(buttonCapture, con1);
-            con1.gridy++;
+            buttonCapture = new SelectButton(piCameraCaptureAction);
+            panel.add(buttonCapture);
         } else {
         	buttonCapture = null;
         }
-
-		buttonOpenFile = new JButton(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener(this);
-		panel.add(buttonOpenFile, con1);
-		con1.gridy++;
 		
-		buttonReopenFile = new JButton(Translator.get("MenuReopenFile"));
-		buttonReopenFile.addActionListener(this);
-		panel.add(buttonReopenFile, con1);
-		con1.gridy++;
 
-		buttonGenerate = new JButton(Translator.get("MenuGenerate"));
-		buttonGenerate.addActionListener(this);
-		panel.add(buttonGenerate, con1);
-		con1.gridy++;
+		buttonNewFile = new SelectButton(Translator.get("MenuNewFile"));
+		panel.add(buttonNewFile);
+		buttonNewFile.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				newFile();
+			}
+		});
+		
+		buttonOpenFile = new SelectButton(Translator.get("MenuOpenFile"));
+		panel.add(buttonOpenFile);
+		buttonOpenFile.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				makelangeloApp.openFile();
+			}
+		});
+		
+		buttonReopenFile = new SelectButton(Translator.get("MenuReopenFile"));
+		panel.add(buttonReopenFile);
+		buttonReopenFile.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				makelangeloApp.reopenLastFile();
+			}
+		});
 
-		buttonSaveFile = new JButton(Translator.get("MenuSaveGCODEAs"));
-		buttonSaveFile.addActionListener(this);
-		panel.add(buttonSaveFile, con1);
-		con1.gridy++;
+		buttonGenerate = new SelectButton(Translator.get("MenuGenerate"));
+		panel.add(buttonGenerate);
+		buttonGenerate.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				generateImage();
+			}
+		});
+
+		buttonSaveFile = new SelectButton(Translator.get("MenuSaveGCODEAs"));
+		panel.add(buttonSaveFile);
+		buttonSaveFile.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				makelangeloApp.saveFile();	
+			}
+		});
 		
 		return creativeControlPanel;
 	}
 	
 	private CollapsiblePanel createAxisDrivingControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
-		JPanel mainPanel = drivePanel.getContentPane();
-		mainPanel.setLayout(new GridBagLayout());
+		JPanel driveInterior = drivePanel.getContentPane();
+		driveInterior.setLayout(new GridBagLayout());
 		final GridBagConstraints cMain = new GridBagConstraints();
 		cMain.fill=GridBagConstraints.HORIZONTAL;
 		cMain.anchor=GridBagConstraints.NORTH;
@@ -318,7 +362,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		// manual axis driving
 		JPanel axisControl = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		mainPanel.add(axisControl,cMain);
+		driveInterior.add(axisControl,cMain);
 		cMain.gridy++;
 
 		setHome = createTightJButton(Translator.get("SetHome"));
@@ -363,45 +407,70 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	}
 	
 	private JPanel createCommonDriveControls() {
-		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuCommonDriveControls"));
-		JPanel mainPanel = drivePanel.getContentPane();
-		mainPanel.setLayout(new SpringLayout());
+		CollapsiblePanel commonControlsPanel = new CollapsiblePanel(Translator.get("MenuCommonDriveControls"));
+		SelectPanel commonInterior = commonControlsPanel.getContentPane();
 
-		goPaperBorder = new JButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
-		penUp    = new JButton(Translator.get("PenUp"));
-		penDown  = new JButton(Translator.get("PenDown"));
-		goHome   = new JButton(Translator.get("GoHome"));
-		findHome = new JButton(Translator.get("FindHome"));
-		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+		goPaperBorder = new SelectButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
+		penUp    = new SelectButton(Translator.get("PenUp"));
+		penDown  = new SelectButton(Translator.get("PenDown"));
+		goHome   = new SelectButton(Translator.get("GoHome"));
+		findHome = new SelectButton(Translator.get("FindHome"));
+		toggleEngagedMotor = new SelectButton(Translator.get("DisengageMotors"));
+		
+		commonInterior.add(goPaperBorder);
+		commonInterior.add(toggleEngagedMotor);
+		commonInterior.add(penUp);
+		commonInterior.add(penDown);
+		commonInterior.add(goHome);
+		commonInterior.add(findHome);
+		
+		SpringUtilities.makeCompactGrid(commonInterior, 3, 2, 0, 0, 0, 0);
+		
+		toggleEngagedMotor.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(robot.areMotorsEngaged() ) {
+					disengageMotors();
+				} else {
+					engageMotors();
+				}
+			}
+		});
+		penUp.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.raisePen();
+			}
+		});
+		penDown.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.lowerPen();
+			}
+		});
+		
+		goHome.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.goHome();	
+			}
+		});
+		findHome.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.findHome();
+			}
+		});
 
-		goPaperBorder.setMinimumSize(new Dimension(100,20));
-		penUp   .setMinimumSize(new Dimension(100,20));
-		penDown .setMinimumSize(new Dimension(100,20));
-		goHome  .setMinimumSize(new Dimension(100,20));
-		findHome.setMinimumSize(new Dimension(100,20));
-		toggleEngagedMotor.setMinimumSize(new Dimension(100,20));
+		commonControlsPanel.setCollapsed(true);
 		
-		mainPanel.add(goPaperBorder);
-		mainPanel.add(toggleEngagedMotor);
-		mainPanel.add(penUp);
-		mainPanel.add(penDown);
-		mainPanel.add(goHome);
-		mainPanel.add(findHome);
-		
-		SpringUtilities.makeCompactGrid(mainPanel, 3, 2, 0, 0, 0, 0);
-		
-		toggleEngagedMotor.addActionListener(this);
-		penUp.addActionListener(this);
-		penDown.addActionListener(this);
-		goHome.addActionListener(this);
-		findHome.addActionListener(this);
-
-		return drivePanel;
+		return commonControlsPanel;
 	}
 
 	
 	/**
-	 * Refresh the list of available machine settings.  If we are connected to a machine, select that setting and disable the selection.
+	 * Refresh the list of available known machines. 
+	 * If we are connected to a machine, select that machine number and disable the ability to change selection.
 	 */
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
@@ -441,7 +510,17 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		}
 
 		buttonOpenSettings = new JButton(Translator.get("configureMachine"));
-		buttonOpenSettings.addActionListener(this);
+		buttonOpenSettings.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Frame frame = (Frame)getRootPane().getParent();
+				MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
+				m.run();
+				// we can only get here if the robot is connected and not running.
+				// Save the gcode so that updates to settings are applied immediately + automatically.
+				robot.saveCurrentTurtleToDrawing();
+			}
+		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
 		machineNumberPanel.add(buttonOpenSettings,cMachine);
 		cMachine.gridx++;
@@ -450,57 +529,12 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	// The user has done something. respond to it.
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
-
-		if( subject == buttonConnect ) {
-			if(isConnected) {
-				closeConnection();
-			} else {
-				openConnection();
-			}
-		}
-		else if (subject == buttonOpenSettings) {
-			Frame frame = (Frame)this.getRootPane().getParent();
-			MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
-			m.run();
-			// we can only get here if the robot is connected and not running.
-			// Save the gcode so that updates to settings are applied immediately + automatically.
-			robot.saveCurrentTurtleToDrawing();
-		}
-		else if (subject == buttonNewFile) newFile();
-		else if (subject == buttonOpenFile) makelangeloApp.openFile();
-		else if (subject == buttonReopenFile) makelangeloApp.reopenLastFile();
-		else if (subject == buttonGenerate) generateImage();
-		else if (subject == buttonSaveFile) makelangeloApp.saveFile();
-		else if (subject == buttonStart) robot.startAt(0);
-		else if (subject == buttonStartAt) startAt();
-		else if (subject == buttonPause) {
-			// toggle pause
-			if (robot.isPaused() == true) {
-				buttonPause.setText(Translator.get("Pause"));
-				robot.unPause();
-				robot.sendFileCommand();
-			} else {
-				buttonPause.setText(Translator.get("Unpause"));
-				robot.pause();
-			}
-			return;
-		}
-		else if (subject == buttonHalt) robot.halt();		
-		else if (subject == goHome  ) robot.goHome();
-		else if (subject == findHome) robot.findHome();
-		else if (subject == setHome ) {
+		
+		if (subject == setHome ) {
 			robot.setHome();
 			updateButtonAccess();
 		}
-		else if (subject == penUp   ) robot.raisePen();
-		else if (subject == penDown ) robot.lowerPen();
-		else if (subject == toggleEngagedMotor) {
-			if(robot.areMotorsEngaged() ) {
-				disengageMotors();
-			} else {
-				engageMotors();
-			}
-		} else {
+		else {
 			float dx=0;
 			float dy=0;
 			

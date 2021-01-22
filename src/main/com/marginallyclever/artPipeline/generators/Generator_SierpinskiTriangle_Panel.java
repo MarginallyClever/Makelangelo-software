@@ -1,12 +1,16 @@
 package com.marginallyclever.artPipeline.generators;
 
-import java.util.Observable;
+import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	SelectSlider field_order;
 	Generator_SierpinskiTriangle generator;
 	
@@ -21,8 +25,8 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		super.update(o, arg);
+	public void propertyChange(PropertyChangeEvent evt) {
+		super.propertyChange(evt);
 		
 		int newOrder = field_order.getValue();
 		if(newOrder<1) newOrder=1;
