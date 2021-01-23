@@ -7,6 +7,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
 
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -160,11 +161,13 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 			myPipeline.myPanel = this;
 		}
 	}
+	
 	/**
 	 * Run this to visually examine every panel element and how they look in next to each other.
 	 * @param args ignored
 	 */
 	public static void main(String[] args) {
+		Log.start();
 		Translator.start();
 		JFrame frame = new JFrame("Art Pipeline Panel");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
