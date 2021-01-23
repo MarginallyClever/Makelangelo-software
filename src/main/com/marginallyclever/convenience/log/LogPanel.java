@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience.log;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,18 +9,25 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-@SuppressWarnings("serial")
-public class LogPanel extends JPanel implements LogListener, ActionListener, KeyListener {
+
+public class LogPanel extends JPanel implements LogListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2753297349917155256L;
+
 	public static final int LOG_LENGTH = 5000;
 	
-	MakelangeloRobot robot;
+	protected MakelangeloRobot robot;
 	
 	// logging
 	private JList<String> logArea;
@@ -82,76 +90,89 @@ public class LogPanel extends JPanel implements LogListener, ActionListener, Key
 
 	private JPanel getTextInputField() {
 		textInputArea = new JPanel();
-		textInputArea.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
 
 		commandLineText = new JTextField(0);
-		//commandLineText.setPreferredSize(new Dimension(10, 10));
+		commandLineText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					sendCommand();
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {}
+		});
+		
 		commandLineSend = new JButton(Translator.get("Send"));
-		clearLog = new JButton(Translator.get("Clear"));
-		//commandLineSend.setHorizontalAlignment(SwingConstants.EAST);
+		commandLineSend.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendCommand();
+			}
+		});
+		
+		clearLog = new JButton(Translator.get("ClearLog"));
+		clearLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clearLog();
+			}
+		});
+
+
+		textInputArea.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
 		c.gridwidth=4;
 		c.weightx=1;
 		c.fill=GridBagConstraints.HORIZONTAL;
 		c.gridx=c.gridy=0;
 		textInputArea.add(commandLineText,c);
+		
 		c.gridwidth=1;
 		c.gridx=4;
 		c.weightx=0;
 		textInputArea.add(commandLineSend,c);
+		
 		c.gridwidth=1;
 		c.gridx=5;
 		c.weightx=0;
 		textInputArea.add(clearLog,c);
 		
-		commandLineText.addKeyListener(this);
-		commandLineSend.addActionListener(this);
-		clearLog.addActionListener(this);
-
 		//textInputArea.setMinimumSize(new Dimension(100,50));
 		//textInputArea.setMaximumSize(new Dimension(10000,50));
 
 		return textInputArea;
 	}
 	
-	@Override
-	public void keyTyped(KeyEvent e) {}
-
-	/**
-	 * Handle the key-pressed event from the text field.
-	 */
-	@Override
-	public void keyPressed(KeyEvent e) {}
-
-	/**
-	 * Handle the key-released event from the text field.
-	 */
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			sendCommand();
-		}
-	}
 	
 	public void clearLog() {
 		listModel.removeAllElements();
 	}
 	
-	// The user has done something. respond to it.
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
-		
-		if(subject == commandLineSend) {
-			sendCommand();
-		}
-		if(subject == clearLog) {
-			clearLog();
-		}
-	}
 
 	public void sendCommand() {
-		robot.sendLineToRobot(commandLineText.getText());
+		if(robot != null) {
+			robot.sendLineToRobot(commandLineText.getText());
+		}
 		commandLineText.setText("");
+	}
+
+	// test separate 
+	public static void main(String[] args) {
+		Log.start();
+		Translator.start();
+		JFrame frame = new JFrame("Log");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setPreferredSize(new Dimension(600,400));
+		
+		frame.add(new LogPanel(null));
+		
+		frame.pack();
+		frame.setVisible(true);
 	}
 }
