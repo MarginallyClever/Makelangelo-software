@@ -124,7 +124,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		try {
 			piCameraCaptureAction = new PiCaptureAction(gui, Translator.get("MenuCaptureImage"));	
 		} catch (FailedToRunRaspistillException e) {
-			Log.message("Cannot run raspistill");
+			Log.message("Raspistill unavailable.");
 		}
 
 		add(createAxisDrivingControls(),con1);	con1.gridy++;
