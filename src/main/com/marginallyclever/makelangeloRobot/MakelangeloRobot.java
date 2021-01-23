@@ -781,6 +781,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	 * Copy the most recent turtle to the drawing output buffer.
 	 */
 	public void saveCurrentTurtleToDrawing() {
+		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this);
@@ -791,6 +792,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 			while ((line = reader.readLine()) != null) {
 				drawingCommands.add(line.trim());
+				++lineCount;
 			}
 			reader.close();
 		} catch (IOException e) {
@@ -800,19 +802,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		Log.message("Old method "+printTimeEstimate(estimateTime()));
 		
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
-		Log.message("New method "+printTimeEstimate(m.getTimeEstimate(turtle, settings)));
+		double newEstimate= m.getTimeEstimate(turtle, settings);
+		Log.message("New method "+printTimeEstimate(newEstimate));
+		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
 	}
 	
-	protected String printTimeEstimate(double totalTime) {
-		double seconds = totalTime % 60;
-		totalTime -= seconds;
-		totalTime /= 60;
-		int minutes = (int) (totalTime % 60);
-		totalTime -= minutes;
-		totalTime /= 60;
-		int hours = (int) totalTime;
-
-		return "Estimate =" + hours + "h" + minutes + "m" + (int) (seconds) + "s.";
+	protected String printTimeEstimate(double seconds) {
+		return "Estimate =" + Log.secondsToHumanReadable(seconds);
 	}
 
 	public Turtle getTurtle() {

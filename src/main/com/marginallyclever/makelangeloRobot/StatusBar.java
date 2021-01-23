@@ -18,14 +18,13 @@ import com.marginallyclever.makelangelo.Translator;
 public class StatusBar extends JPanel {
 	static final long serialVersionUID = 1;
 
-	long t_start;
-	protected String sSoFar = "so far: ";
-	protected String sRemaining = " remaining: ";
+	protected long t_start;
+	protected final String sSoFar = "so far: ";
+	protected final String sRemaining = " remaining: ";
 	protected String sElapsed = "";
 	protected Translator translator;
-	protected JLabel mFinished;
-	protected JLabel mExactly;
-	protected JLabel mRemaining;
+	protected JLabel mLines;
+	protected JLabel mTime;
 	protected JProgressBar bar;
 
 
@@ -34,9 +33,8 @@ public class StatusBar extends JPanel {
 		setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 		setLayout(new GridBagLayout());
 
-		mFinished = new JLabel("", SwingConstants.LEFT);
-		mExactly = new JLabel("", SwingConstants.CENTER);
-		mRemaining = new JLabel("", SwingConstants.RIGHT);
+		mLines = new JLabel("", SwingConstants.LEFT);
+		mTime = new JLabel("", SwingConstants.RIGHT);
 
 		bar = new JProgressBar();
 
@@ -51,13 +49,12 @@ public class StatusBar extends JPanel {
 		add(bar,c);
 		c.gridy++;
 
-		c.weightx = 0;
+		c.weightx = 1;
 		c.gridwidth=1;
-		add(mFinished,c);
+		add(mLines,c);
 		c.gridx++;
-		add(mExactly,c);
-		c.gridx++;
-		add(mRemaining,c);
+		c.weightx = 0;
+		add(mTime,c);
 		c.gridy++;
 		
 		c.gridx=0;
@@ -84,15 +81,19 @@ public class StatusBar extends JPanel {
 	}
 
 	public void clear() {
-		mFinished.setText("");
-		mExactly.setText("");
-		mRemaining.setText("");
+		mLines.setText("");
+		mTime.setText("");
 	}
 
 	public void start() {
 		t_start = System.currentTimeMillis();
 	}
 
+	/**
+	 * Set progress bar
+	 * @param sofar number of gcode lines processed.
+	 * @param total number of gcode lines total.
+	 */
 	public void setProgress(long sofar, long total) {
 		if (total <= 0) return;
 		
@@ -103,9 +104,22 @@ public class StatusBar extends JPanel {
 		long total_time = (long) ((float) t_draw_now * (float) total / (float) sofar);
 		long remaining = total_time - t_draw_now;
 
-		mFinished.setText(Log.millisecondsToHumanReadable(t_draw_now));
-		mExactly.setText(sofar + "/" + total + " "+StringHelper.formatDouble(100*(double)sofar/(double)total)+"%");
-		mRemaining.setText(Log.millisecondsToHumanReadable(remaining));
+		mLines.setText(sofar + " / " + total + " "+StringHelper.formatDouble(100*(double)sofar/(double)total)+"%");
+		mTime.setText(Log.millisecondsToHumanReadable(t_draw_now) + " / " + Log.millisecondsToHumanReadable(remaining));
+	}
+
+	/**
+	 * Set progress bar
+	 * @param seconds total estimated drawing time
+	 */
+	public void setProgressEstimate(double seconds, long totalLines) {
+		if(seconds <= 0) return;
+		
+		bar.setMaximum(100);
+		bar.setValue(50);
+
+		mLines.setText(0 + " / " + totalLines + " "+StringHelper.formatDouble(0)+"%");
+		mTime.setText("0s / "+Log.secondsToHumanReadable(seconds));
 	}
 }
 

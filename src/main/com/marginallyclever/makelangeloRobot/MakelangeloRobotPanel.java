@@ -27,7 +27,6 @@ import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
-import com.marginallyclever.convenience.SpringUtilities;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
@@ -423,8 +422,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		commonInterior.add(penDown);
 		commonInterior.add(goHome);
 		commonInterior.add(findHome);
-		
-		SpringUtilities.makeCompactGrid(commonInterior, 3, 2, 0, 0, 0, 0);
 		
 		toggleEngagedMotor.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
