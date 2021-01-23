@@ -180,6 +180,11 @@ public class Log {
 	}
 
 
+	
+	public static String secondsToHumanReadable(double totalTime) {
+		return millisecondsToHumanReadable((long)(totalTime*1000));
+	}
+	
 	/**
 	 * Turns milliseconds into h:m:s
 	 * @param millis milliseconds
