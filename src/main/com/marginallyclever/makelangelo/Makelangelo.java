@@ -46,6 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -73,7 +74,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @since 0.0.1
  */
 public final class Makelangelo extends TransferHandler
-		implements ActionListener, WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
+		implements WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -84,52 +85,35 @@ public final class Makelangelo extends TransferHandler
 	 */
 	public String VERSION;
 	
-	private final String FORUM_URL = "https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/";
-
+	private final static String FORUM_URL = "https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/";
 	// only used on first run.
-	private static int DEFAULT_WINDOW_WIDTH = 1200;
-	private static int DEFAULT_WINDOW_HEIGHT = 1020;
+	private final static int DEFAULT_WINDOW_WIDTH = 1200;
+	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	private Preferences preferences;
-
 	private MakelangeloAppPreferences appPreferences;
+	
 	private ConnectionManager connectionManager;
+	
 	private Camera camera;
 	private MakelangeloRobot robot;
 
 	protected String lastFileIn = "";
-	public String getLastFileIn() {
-		return lastFileIn;
-	}
-
 	protected FileFilter lastFilterIn = null;
 	protected String lastFileOut = "";
 	protected FileFilter lastFilterOut = null;
 	
 	// GUI elements
 	private JFrame mainFrame = null;
-	private JPanel contentPane;
-
-	// Top of window
-	private JMenuBar menuBar;
-	// file menu
-	private JMenuItem buttonAdjustPreferences, buttonCheckForUpdate, buttonExit;
-	// view menu
-	private JMenuItem buttonZoomIn, buttonZoomOut, buttonZoomToFit;
-	// help menu
-	private JMenuItem buttonForums, buttonAbout;
-
-	// main window layout
-	private Splitter splitLeftRight;
-	private Splitter splitUpDown;
-
+	// only allow one log frame
+	private JFrame logFrame = null;
+	
 	// OpenGL window
 	private PreviewPanel previewPanel;
+	
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
-	// Bottom of window
-	private LogPanel logPanel;
-
+	
 	public static void main(String[] argv) {
 		Log.start();
 		CommandLineOptions.setFromMain(argv);
@@ -193,27 +177,6 @@ public final class Makelangelo extends TransferHandler
 			MetricsPreferences.setAllowedToShare(dialogResult == JOptionPane.YES_OPTION);
 		}
 	}
-	
-	// The user has done something. respond to it.
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object subject = e.getSource();
-
-		if (subject == buttonExit)					onClose();
-		if (subject == buttonAdjustPreferences) 	appPreferences.run();
-		if (subject == buttonZoomIn)				camera.zoomIn();
-		if (subject == buttonZoomOut)				camera.zoomOut();
-		if (subject == buttonZoomToFit)				camera.zoomToFitPaper();
-		if (subject == buttonAbout)					(new DialogAbout()).display(this.mainFrame,this.VERSION);
-		if (subject == buttonCheckForUpdate)		checkForUpdate(false);
-		if( subject == buttonForums) {
-			try {
-				java.awt.Desktop.getDesktop().browse(URI.create(this.FORUM_URL));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
-	}
 
 	/**
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
@@ -223,7 +186,7 @@ public final class Makelangelo extends TransferHandler
 	public JMenuBar createMenuBar() {
 		Log.message("Create menu bar");
 
-		menuBar = new JMenuBar();
+		JMenuBar menuBar = new JMenuBar();
 
 		JMenu menu;
 
@@ -232,18 +195,33 @@ public final class Makelangelo extends TransferHandler
 		menu = new JMenu(Translator.get("MenuMakelangelo"));
 		menuBar.add(menu);
 
-		buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener(this);
+		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
+		buttonAdjustPreferences.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				appPreferences.run();
+			}
+		});
 		menu.add(buttonAdjustPreferences);
 
-		buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener(this);
+		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
+		buttonCheckForUpdate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				checkForUpdate(false);
+			}
+		});
 		menu.add(buttonCheckForUpdate);
 
 		menu.addSeparator();
 
-		buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener(this);
+		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
+		buttonExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onClose();
+			}
+		});
 		menu.add(buttonExit);
 
 		// view menu
@@ -251,35 +229,96 @@ public final class Makelangelo extends TransferHandler
 		menu = new JMenu(Translator.get("MenuPreview"));
 		menuBar.add(menu);
 		
-		buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
-		buttonZoomOut.addActionListener(this);
-		buttonZoomOut.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
+		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		buttonZoomOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomOut();
+			};
+		});
 		menu.add(buttonZoomOut);
 
-		buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
-		buttonZoomIn.addActionListener(this);
-		buttonZoomIn.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		buttonZoomIn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomIn();
+			};
+		});
 		menu.add(buttonZoomIn);
-
-		buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
-		buttonZoomToFit.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
-		buttonZoomToFit.addActionListener(this);
+		
+		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+		buttonZoomToFit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomToFitPaper();
+			};
+		});
 		menu.add(buttonZoomToFit);
+		
+		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ViewLog"));
+		buttonViewLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(logFrame == null) {
+					logFrame = new JFrame(Translator.get("Log"));
+					logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					logFrame.setPreferredSize(new Dimension(600,400));
+					logFrame.add(new LogPanel(robot));
+					logFrame.pack();
+					logFrame.addWindowListener(new WindowListener() {
+						@Override
+						public void windowOpened(WindowEvent e) {}
+						@Override
+						public void windowIconified(WindowEvent e) {}
+						@Override
+						public void windowDeiconified(WindowEvent e) {}
+						@Override
+						public void windowDeactivated(WindowEvent e) {}
+						@Override
+						public void windowClosing(WindowEvent e) {}
+						@Override
+						public void windowClosed(WindowEvent e) {
+							logFrame=null;
+						}
+						@Override
+						public void windowActivated(WindowEvent e) {}
+					});
+				}
+				logFrame.setVisible(true);
+			}
+		});
+		menu.add(buttonViewLog);
 
 		// help menu
 		Log.message("  help...");
 		menu = new JMenu(Translator.get("Help"));
 		menuBar.add(menu);
 
-		buttonForums = new JMenuItem(Translator.get("MenuForums"));
-		buttonForums.addActionListener(this);
+		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
+		buttonForums.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		menu.add(buttonForums);
 		
-		buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener(this);
+		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
+		buttonAbout.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DialogAbout a = new DialogAbout();
+				a.display(mainFrame,VERSION);
+			}
+		});
 		menu.add(buttonAbout);
 		
 		// finish
@@ -326,7 +365,7 @@ public final class Makelangelo extends TransferHandler
 				String results;
 				if (comp > 0) {
 					results = Translator.get("UpdateNotice");
-					// TODO downloadUpdate(), flashNewFirmwareToRobot();
+					// TODO downloadUthatpdate(), flashNewFirmwareToRobot();
 				} else if (comp < 0)
 					results = "This version is from the future?!";
 				else
@@ -358,7 +397,7 @@ public final class Makelangelo extends TransferHandler
 	public Container createContentPane() {
 		Log.message("create content pane...");
 
-		contentPane = new JPanel(new BorderLayout());
+		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
 		Log.message("  create PreviewPanel...");
@@ -369,25 +408,13 @@ public final class Makelangelo extends TransferHandler
 		Log.message("  assign panel to robot...");
 		robotPanel = robot.createControlPanel(this);
 
-		Log.message("  create log panel...");
-		logPanel = new LogPanel(robot);
-
 		// major layout
 		Log.message("  vertical split...");
-		splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+		Splitter splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
 		splitLeftRight.add(previewPanel);
 		splitLeftRight.add(new JScrollPane(robotPanel));
 
-		Log.message("  horizontal split...");
-		splitUpDown = new Splitter(JSplitPane.VERTICAL_SPLIT);
-		splitUpDown.add(splitLeftRight);
-		splitUpDown.add(logPanel);
-
-		contentPane.add(splitUpDown, BorderLayout.CENTER);
-
-		Log.message("  tweak...");
-		splitUpDown.setResizeWeight(0.9);
-		splitUpDown.setOneTouchExpandable(true);
+		contentPane.add(splitLeftRight, BorderLayout.CENTER);
 
 		return contentPane;
 	}
@@ -396,17 +423,25 @@ public final class Makelangelo extends TransferHandler
 	// event-dispatching thread.
 	public void createAndShowGUI() {
 		Log.message("Creating GUI...");
-		
+
+		//JFrame.setDefaultLookAndFeelDecorated(true);  // ugly!
+
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
+		
+        try {
+        	// weird but less ugly.
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
 		
 		JMenuBar bar = createMenuBar();
 		Log.message("  adding menu bar...");
 		mainFrame.setJMenuBar(bar);
 		
-		Container contentPane = createContentPane();
-		mainFrame.setContentPane(contentPane);
+		mainFrame.setContentPane(createContentPane());
 		
 		adjustWindowSize();
 		
@@ -457,7 +492,7 @@ public final class Makelangelo extends TransferHandler
 
 	@Override
 	public void firmwareVersionBad(MakelangeloRobot r, long versionFound) {
-		(new DialogBadFirmwareVersion()).display(this.mainFrame, Long.toString(versionFound));
+		(new DialogBadFirmwareVersion()).display(mainFrame, Long.toString(versionFound));
 	}
 
 	@Override
@@ -621,7 +656,6 @@ public final class Makelangelo extends TransferHandler
 			SoundSystem.playConversionFinishedSound();
 			if( robot.getControlPanel() != null ) {
 				robot.getControlPanel().updateButtonAccess();
-				robot.getControlPanel().statusBar.clear();
 			}
 		}
 		
@@ -766,6 +800,10 @@ public final class Makelangelo extends TransferHandler
 			}
 			// No file filter was found.  Wait, what?!
 		}
+	}
+	
+	public String getLastFileIn() {
+		return lastFileIn;
 	}
 }
 
