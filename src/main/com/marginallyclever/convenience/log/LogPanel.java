@@ -40,9 +40,7 @@ public class LogPanel extends JPanel implements LogListener {
 	private JButton commandLineSend;
 	private JButton clearLog;
 	
-	public LogPanel(MakelangeloRobot robot) {
-		this.robot = robot;
-
+	public LogPanel() {
 		// log panel
 		Log.addListener(this);
 
@@ -62,7 +60,6 @@ public class LogPanel extends JPanel implements LogListener {
 		con1.anchor=GridBagConstraints.NORTHWEST;
 		this.add(logPane,con1);
 		con1.gridy++;
-
 
 		con1.fill=GridBagConstraints.HORIZONTAL;
 		con1.weightx=1;
@@ -155,6 +152,10 @@ public class LogPanel extends JPanel implements LogListener {
 	}
 	
 
+	public void setRobot(MakelangeloRobot robot) {
+		this.robot = robot;
+	}
+	
 	public void sendCommand() {
 		if(robot != null) {
 			robot.sendLineToRobot(commandLineText.getText());
@@ -170,7 +171,7 @@ public class LogPanel extends JPanel implements LogListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(600,400));
 		
-		frame.add(new LogPanel(null));
+		frame.add(new LogPanel());
 		
 		frame.pack();
 		frame.setVisible(true);

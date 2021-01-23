@@ -56,7 +56,7 @@ public class Log {
 			
 		System.out.println("log dir="+LOG_FILE_PATH);
 
-		crashReportCheck();
+		boolean hadCrashed = crashReportCheck();
 		deleteOldLog();
 		
 		logger = LoggerFactory.getLogger(Makelangelo.class);
@@ -70,13 +70,16 @@ public class Log {
 			write(n+" = "+p.get(n));
 		}
 		write("------------------------");
+		if(hadCrashed) {
+			Log.message("Crash detected on previous run");
+		}
 	}
 	
 	public static void end() {
 		logger.info(PROGRAM_END_STRING);
 	}
 	
-	private static void crashReportCheck() {
+	private static boolean crashReportCheck() {
 		File oldLogFile = new File(LOG_FILE_PATH+LOG_FILE_NAME_TXT);
 		if( oldLogFile.exists() ) {
 			// read last line of file
@@ -85,8 +88,11 @@ public class Log {
 			if(!ending.contains(PROGRAM_END_STRING)) {
 				// add a crashed message
 				//sendLog();
-			} // else no problem
+				
+				return true;
+			}
 		}
+		return false;
 	}
 	
 	/**
@@ -180,7 +186,6 @@ public class Log {
 	}
 
 
-	
 	public static String secondsToHumanReadable(double totalTime) {
 		return millisecondsToHumanReadable((long)(totalTime*1000));
 	}

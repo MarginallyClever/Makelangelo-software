@@ -107,6 +107,7 @@ public final class Makelangelo extends TransferHandler
 	private JFrame mainFrame = null;
 	// only allow one log frame
 	private JFrame logFrame = null;
+	private LogPanel logPanel = null;
 	
 	// OpenGL window
 	private PreviewPanel previewPanel;
@@ -131,6 +132,10 @@ public final class Makelangelo extends TransferHandler
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
+		Translator.start();
+		
+		logPanel = new LogPanel();
+		
 		Log.message("Locale="+Locale.getDefault().toString());
 		
 		Log.message("Starting preferences...");
@@ -146,15 +151,14 @@ public final class Makelangelo extends TransferHandler
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
-
+		logPanel.setRobot(robot);
+		
 		Log.message("Starting connection manager...");
 		// network connections
 		connectionManager = new ConnectionManager();
 	}
 	
 	public void run() {
-		Translator.start();
-		
 		createAndShowGUI();
 		
 		checkSharingPermission();
@@ -165,7 +169,7 @@ public final class Makelangelo extends TransferHandler
 
 	// check if we need to ask about sharing
 	protected void checkSharingPermission() {
-		Log.message("checking sharing permissions...");
+		Log.message("Checking sharing permissions...");
 		
 		final String SHARING_CHECK_STRING = "Last version sharing checked";
 		
@@ -267,7 +271,7 @@ public final class Makelangelo extends TransferHandler
 					logFrame = new JFrame(Translator.get("Log"));
 					logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					logFrame.setPreferredSize(new Dimension(600,400));
-					logFrame.add(new LogPanel(robot));
+					logFrame.add(logPanel);
 					logFrame.pack();
 					logFrame.addWindowListener(new WindowListener() {
 						@Override
@@ -652,7 +656,6 @@ public final class Makelangelo extends TransferHandler
 
 		// TODO don't rely on success to be true, load may not have finished yet.
 		if (success == true) {
-			lastFileIn=filename;
 			SoundSystem.playConversionFinishedSound();
 			if( robot.getControlPanel() != null ) {
 				robot.getControlPanel().updateButtonAccess();
@@ -690,9 +693,10 @@ public final class Makelangelo extends TransferHandler
 	}
 
 	public void openFile() {
+		// create the chooser
+		JFileChooser fc = new JFileChooser();
+		
 		// list available loaders
-		File lastDir = (lastFileIn==null?null : new File(lastFileIn));
-		JFileChooser fc = new JFileChooser(lastDir);
 		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
 		for( LoadAndSaveFileType lft : imageLoaders ) {
 			if(lft.canLoad()) {
@@ -703,8 +707,10 @@ public final class Makelangelo extends TransferHandler
 		
 		// no wild card filter, please.
 		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last path & filter used.
+		// remember the last filter used, if any
 		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
+		// remember the last path used, if any
+		fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
 		
 		// run the dialog
 		if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -717,6 +723,7 @@ public final class Makelangelo extends TransferHandler
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
 					lastFilterIn = selectedFilter;
+					lastFileIn = selectedFile;
 					if( robot.getControlPanel() != null ) {
 						robot.getControlPanel().updateButtonAccess();
 					}
