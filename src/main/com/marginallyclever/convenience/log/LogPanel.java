@@ -38,7 +38,6 @@ public class LogPanel extends JPanel implements LogListener {
 	private JPanel textInputArea;
 	private JTextField commandLineText;
 	private JButton commandLineSend;
-	private JButton clearLog;
 	
 	public LogPanel() {
 		// log panel
@@ -87,7 +86,14 @@ public class LogPanel extends JPanel implements LogListener {
 
 	private JPanel getTextInputField() {
 		textInputArea = new JPanel();
+		textInputArea.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
 
+		c.gridwidth=4;
+		c.weightx=1;
+		c.fill=GridBagConstraints.HORIZONTAL;
+		c.gridx=c.gridy=0;
+		
 		commandLineText = new JTextField(0);
 		commandLineText.addKeyListener(new KeyListener() {
 			@Override
@@ -103,6 +109,7 @@ public class LogPanel extends JPanel implements LogListener {
 			@Override
 			public void keyPressed(KeyEvent e) {}
 		});
+		textInputArea.add(commandLineText,c);
 		
 		commandLineSend = new JButton(Translator.get("Send"));
 		commandLineSend.addActionListener(new ActionListener() {
@@ -111,34 +118,24 @@ public class LogPanel extends JPanel implements LogListener {
 				sendCommand();
 			}
 		});
+		c.gridwidth=1;
+		c.gridx=4;
+		c.weightx=0;
+		textInputArea.add(commandLineSend,c);
+
 		
-		clearLog = new JButton(Translator.get("ClearLog"));
+		/*
+		JButton clearLog = new JButton(Translator.get("ClearLog"));
 		clearLog.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearLog();
 			}
 		});
-
-
-		textInputArea.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		c.gridwidth=4;
-		c.weightx=1;
-		c.fill=GridBagConstraints.HORIZONTAL;
-		c.gridx=c.gridy=0;
-		textInputArea.add(commandLineText,c);
-		
-		c.gridwidth=1;
-		c.gridx=4;
-		c.weightx=0;
-		textInputArea.add(commandLineSend,c);
-		
 		c.gridwidth=1;
 		c.gridx=5;
 		c.weightx=0;
-		textInputArea.add(clearLog,c);
+		textInputArea.add(clearLog,c);*/
 		
 		//textInputArea.setMinimumSize(new Dimension(100,50));
 		//textInputArea.setMaximumSize(new Dimension(10000,50));
