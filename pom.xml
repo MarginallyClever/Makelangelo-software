@@ -116,7 +116,7 @@ If you like this project, please support us by buying Marginally Clever products
               <SplashScreen-Image>splash.png</SplashScreen-Image>
             </manifestEntries>
             <manifest>
-              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+              <mainClass>com.marginallyclever.makelangelo.MakelangeloApp</mainClass>
                   <addClasspath>true</addClasspath>
             </manifest>
           </archive>
@@ -159,7 +159,7 @@ If you like this project, please support us by buying Marginally Clever products
               <SplashScreen-Image>splash.png</SplashScreen-Image>
             </manifestEntries>
             <manifest>
-              <mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+              <mainClass>com.marginallyclever.makelangelo.MakelangeloApp</mainClass>
                   <addClasspath>true</addClasspath>
             </manifest>
           </archive>

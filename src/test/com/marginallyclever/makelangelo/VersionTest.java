@@ -10,7 +10,7 @@ public class VersionTest {
 	public void checkVersion() throws IllegalStateException {
 		Log.start();
 		
-		Makelangelo m = new Makelangelo();
+		MakelangeloApp m = new MakelangeloApp();
 		
 		String [] toks = m.VERSION.split("\\.");
 		if(toks.length!=3) {

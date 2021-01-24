@@ -30,7 +30,7 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloApp;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
@@ -54,7 +54,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 
 	// god objects ?
 	protected MakelangeloRobot robot;
-	protected Makelangelo makelangeloApp;
+	protected MakelangeloApp makelangeloApp;
 
 	// connect menu
 	private SelectPanel connectionPanel;
@@ -96,7 +96,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	 * @param gui
 	 * @param robot
 	 */
-	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
+	public MakelangeloRobotPanel(MakelangeloApp gui, MakelangeloRobot robot) {
 		this.makelangeloApp = gui;
 		this.robot = robot;
 		
@@ -759,7 +759,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		throw new IndexOutOfBoundsException();
 	}
 
-	public Makelangelo getGui() {
+	public MakelangeloApp getGui() {
 		return makelangeloApp;
 	}
 }

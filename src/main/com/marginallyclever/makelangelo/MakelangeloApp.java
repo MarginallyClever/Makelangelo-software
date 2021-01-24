@@ -73,7 +73,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler
+public final class MakelangeloApp extends TransferHandler
 		implements WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
 	static final long serialVersionUID = 1L;
 
@@ -124,14 +124,14 @@ public final class Makelangelo extends TransferHandler
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				Makelangelo makelangeloProgram = new Makelangelo();
+				MakelangeloApp makelangeloProgram = new MakelangeloApp();
 				makelangeloProgram.run();
 			}
 		});
 	}
 
 	@SuppressWarnings("deprecation")
-	public Makelangelo() {
+	public MakelangeloApp() {
 		Translator.start();
 		
 		logPanel = new LogPanel();
@@ -143,23 +143,22 @@ public final class Makelangelo extends TransferHandler
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
-		Log.message("Starting camera...");
-		camera = new Camera();
-		
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
 		logPanel.setRobot(robot);
-		
+
+		Log.message("Starting camera...");
+		camera = new Camera();
 		Log.message("Starting connection manager...");
 		// network connections
 		connectionManager = new ConnectionManager();
 	}
 	
 	public void run() {
-		createAndShowGUI();
+		createAppWindow();
 		
 		checkSharingPermission();
 
@@ -184,7 +183,6 @@ public final class Makelangelo extends TransferHandler
 
 	/**
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
-	 * 
 	 * @return the refreshed menu bar
 	 */
 	public JMenuBar createMenuBar() {
@@ -233,7 +231,7 @@ public final class Makelangelo extends TransferHandler
 		menu = new JMenu(Translator.get("MenuPreview"));
 		menuBar.add(menu);
 		
-		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"));
+		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 		buttonZoomOut.addActionListener(new ActionListener() {
 			@Override
@@ -258,7 +256,9 @@ public final class Makelangelo extends TransferHandler
 		buttonZoomToFit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				camera.zoomToFitPaper();
+				camera.zoomToFit(
+						robot.getSettings().getPaperWidth(),
+						robot.getSettings().getPaperHeight());
 			};
 		});
 		menu.add(buttonZoomToFit);
@@ -423,23 +423,24 @@ public final class Makelangelo extends TransferHandler
 		return contentPane;
 	}
 
-	// For thread safety, this method should be invoked from the
-	// event-dispatching thread.
-	public void createAndShowGUI() {
+	/**
+	 *  For thread safety this method should be invoked from the event-dispatching thread.
+	 */
+	public void createAppWindow() {
 		Log.message("Creating GUI...");
 
+		// overall look and feel 1
 		//JFrame.setDefaultLookAndFeelDecorated(true);  // ugly!
 
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(this);
 		
+		// overall look and feel 2
         try {
         	// weird but less ugly.
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        	e.printStackTrace();
-        }
+        } catch (Exception e) {}
 		
 		JMenuBar bar = createMenuBar();
 		Log.message("  adding menu bar...");
@@ -448,11 +449,13 @@ public final class Makelangelo extends TransferHandler
 		mainFrame.setContentPane(createContentPane());
 		
 		adjustWindowSize();
+
+		camera.zoomToFit(
+				robot.getSettings().getPaperWidth(),
+				robot.getSettings().getPaperHeight());
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
-
-		camera.zoomToFitPaper();
 
 		Log.message("  adding drag & drop support...");
 		mainFrame.setTransferHandler(this);

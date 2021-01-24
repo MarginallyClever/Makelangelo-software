@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MakelangeloApp;
 
 /**
  * Created on 5/10/15.
@@ -28,7 +28,7 @@ public final class PropertiesFileHelper {
   public static String getMakelangeloVersionPropertyValue() throws IllegalStateException {
     final Properties prop = new Properties();
     String makelangeloVersionPropertyValue = "";
-    try (final InputStream input = Makelangelo.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {
+    try (final InputStream input = MakelangeloApp.class.getClassLoader().getResourceAsStream(MAKELANGELO_PROPERTIES_FILENAME)) {
       if (input == null) {
         final String unableToFilePropertiesFileErrorMessage = "Sorry, unable to find " + MAKELANGELO_PROPERTIES_FILENAME;
         throw new IllegalStateException(unableToFilePropertiesFileErrorMessage);
