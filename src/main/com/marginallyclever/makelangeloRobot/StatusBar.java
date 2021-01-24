@@ -116,7 +116,7 @@ public class StatusBar extends JPanel {
 		if(seconds <= 0) return;
 		
 		bar.setMaximum(100);
-		bar.setValue(50);
+		bar.setValue(0);
 
 		mLines.setText(0 + " / " + totalLines + " "+StringHelper.formatDouble(0)+"%");
 		mTime.setText("0s / "+Log.secondsToHumanReadable(seconds));
