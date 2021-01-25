@@ -6,6 +6,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * Panel for {@link Generator_Dragon}
+ * @author Dan Royer
+ *
+ */
 public class Generator_Dragon_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

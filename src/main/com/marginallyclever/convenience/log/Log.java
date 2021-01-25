@@ -20,7 +20,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.makelangelo.MakelangeloApp;
+import com.marginallyclever.makelangelo.Makelangelo;
 
 import ch.qos.logback.classic.BasicConfigurator;
 
@@ -59,7 +59,7 @@ public class Log {
 		boolean hadCrashed = crashReportCheck();
 		deleteOldLog();
 		
-		logger = LoggerFactory.getLogger(MakelangeloApp.class);
+		logger = LoggerFactory.getLogger(Makelangelo.class);
 		BasicConfigurator.configureDefaultContext();
 		
 		write(PROGRAM_START_STRING);

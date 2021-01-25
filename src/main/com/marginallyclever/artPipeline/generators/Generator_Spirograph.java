@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.Translator;
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
  * See https://linuxgazette.net/133/luana.html
- * @author Admin
+ * @author Dan Royer
  *
  */
 public class Generator_Spirograph extends ImageGenerator {

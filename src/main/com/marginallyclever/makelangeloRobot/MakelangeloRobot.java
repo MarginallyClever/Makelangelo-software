@@ -39,7 +39,7 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
-import com.marginallyclever.makelangelo.MakelangeloApp;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
@@ -763,7 +763,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return settings;
 	}
 
-	public MakelangeloRobotPanel createControlPanel(MakelangeloApp gui) {
+	public MakelangeloRobotPanel createControlPanel(Makelangelo gui) {
 		myPanel = new MakelangeloRobotPanel(gui, this);
 		return myPanel;
 	}

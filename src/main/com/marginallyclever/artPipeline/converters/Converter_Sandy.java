@@ -7,6 +7,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
+/**
+ * 
+ * @author Dan Royer
+ */
 public class Converter_Sandy extends ImageConverter {
 	private static int blockScale=150;
 	private static int direction=0;

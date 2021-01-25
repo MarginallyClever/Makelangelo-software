@@ -6,6 +6,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
+/**
+ * Completely fills the page with ink.
+ * @author Dan Royer
+ */
 public class Generator_FillPage extends ImageGenerator {
 	private static float angle = 0;
 

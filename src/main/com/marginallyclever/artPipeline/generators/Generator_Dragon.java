@@ -7,6 +7,10 @@ import java.util.List;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * Dragon fractal
+ * @author Dan Royer
+ */
 public class Generator_Dragon extends ImageGenerator {
 	private static int order = 12; // controls complexity of curve
 

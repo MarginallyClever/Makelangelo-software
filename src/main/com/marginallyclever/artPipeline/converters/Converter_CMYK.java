@@ -9,7 +9,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
-// http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
+/**
+ * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
+ * @author Dan Royer
+ */
 public class Converter_CMYK extends ImageConverter {
 	static protected int passes=1;
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.

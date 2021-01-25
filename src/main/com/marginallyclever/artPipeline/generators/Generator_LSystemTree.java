@@ -5,6 +5,10 @@ import java.security.SecureRandom;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * L System fractal
+ * @author Dan Royer
+ */
 public class Generator_LSystemTree extends ImageGenerator {
 	private static int order = 4; // controls complexity of curve
 	private static double angleSpan = 120;

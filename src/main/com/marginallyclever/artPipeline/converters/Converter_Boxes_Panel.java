@@ -4,6 +4,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * GUI for {@link Converter_Boxes}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Boxes_Panel extends ImageConverterPanel {
 	/**
 	 * 

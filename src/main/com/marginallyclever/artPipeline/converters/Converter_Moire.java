@@ -13,6 +13,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
+/**
+ * 
+ * @author Dan Royer
+ */
 public class Converter_Moire extends ImageConverter {
 	private static float blockScale = 4.0f;
 	private static int direction = 0;

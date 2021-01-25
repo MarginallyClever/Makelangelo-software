@@ -4,6 +4,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * GUI for {@link Converter_Crosshatch}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 	/**
 	 * 

@@ -3,6 +3,10 @@ package com.marginallyclever.artPipeline.generators;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * Hilbert Curve fractal.
+ * @author Dan Royer
+ */
 public class Generator_HilbertCurve extends ImageGenerator {
 	private float turtleStep = 10.0f;
 	private double xMax = 7;

@@ -3,6 +3,10 @@ package com.marginallyclever.artPipeline.generators;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * Gosper curve fractal.
+ * @author Dan Royer
+ */
 public class Generator_GosperCurve extends ImageGenerator {
 	private double turtleStep = 10.0f;
 	private double xMax = 0;

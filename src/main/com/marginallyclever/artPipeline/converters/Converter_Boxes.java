@@ -6,7 +6,11 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
-
+/**
+ * A grid of boxes across the paper, and make the boxes bigger if the image is darker in that area.
+ * @author Dan Royer
+ *
+ */
 public class Converter_Boxes extends ImageConverter {
 	public static int boxMaxSize=4; // 0.8*5
 	public static int cutoff=127;

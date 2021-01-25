@@ -7,6 +7,11 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
 
+/**
+ * Panel for {@link Generator_Text}
+ * @author Dan Royer
+ *
+ */
 public class Generator_Text_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

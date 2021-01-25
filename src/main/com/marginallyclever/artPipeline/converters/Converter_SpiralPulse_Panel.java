@@ -4,6 +4,11 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
+/**
+ * GUI for {@link Converter_SpiralPulse}
+ * @author Dan Royer
+ *
+ */
 public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
 	/**
 	 * 

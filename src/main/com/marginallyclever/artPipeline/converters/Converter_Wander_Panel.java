@@ -6,6 +6,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
+/**
+ * GUI for {@link Converter_Wander}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Wander_Panel extends ImageConverterPanel {
 	/**
 	 * 

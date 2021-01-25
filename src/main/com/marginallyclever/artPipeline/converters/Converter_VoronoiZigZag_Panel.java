@@ -5,6 +5,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
+/**
+ * GUI for {@link Converter_VoronoiZigZag}
+ * @author Dan Royer
+ *
+ */
 public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	/**
 	 * 

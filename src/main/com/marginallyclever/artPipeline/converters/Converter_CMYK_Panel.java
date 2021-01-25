@@ -5,6 +5,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
+/**
+ * GUI for {@link Converter_CMYK}
+ * @author Dan Royer
+ *
+ */
 public class Converter_CMYK_Panel extends ImageConverterPanel {
 	/**
 	 * 

@@ -3,6 +3,10 @@ package com.marginallyclever.artPipeline.generators;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * Koch Curve fractal
+ * @author Dan Royer
+ */
 public class Generator_KochCurve extends ImageGenerator {
 	private double xMax = 7;
 	private double xMin = -7;

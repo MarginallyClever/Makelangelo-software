@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
 
 /**
  * generates a fibonacci spiral
- * @author danroyer
+ * @author dan royer
  *
  */
 public class Generator_FibonacciSpiral extends ImageGenerator {

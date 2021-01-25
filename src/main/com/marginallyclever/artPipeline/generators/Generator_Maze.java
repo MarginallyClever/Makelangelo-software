@@ -1,18 +1,22 @@
-/*
- * https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
- */
 package com.marginallyclever.artPipeline.generators;
 
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
+/**
+ * Makes a "well formed" maze.
+ * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+ * @author Dan Royer
+ */
 public class Generator_Maze extends ImageGenerator {
+	// MazeCells are the rooms separted by MazeWalls
 	protected class MazeCell {
 		int x, y;
 		boolean visited;
 		boolean onStack;
 	}
 
+	// MazeWalls separate MazeCells
 	protected class MazeWall {
 		int cellA, cellB;
 		boolean removed;

@@ -5,6 +5,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
+/**
+ * GUI for {@link Converter_Pulse}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Pulse_Panel extends ImageConverterPanel {
 	/**
 	 * 

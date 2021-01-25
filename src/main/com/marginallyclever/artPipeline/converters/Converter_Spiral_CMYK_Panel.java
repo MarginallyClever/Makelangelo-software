@@ -4,6 +4,11 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 
+/**
+ * GUI for {@link Converter_Spiral_CMYK}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Spiral_CMYK_Panel extends ImageConverterPanel {
 	/**
 	 * 

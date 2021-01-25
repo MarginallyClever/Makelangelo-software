@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Use the filename given in the constructor as a basis for the gcode filename,
  * but change the extension to .ngc
  *
- * @author Dan
+ * @author Dan Royer
  */
 public class Converter_Crosshatch extends ImageConverter {
 	private static float intensity=2.0f;

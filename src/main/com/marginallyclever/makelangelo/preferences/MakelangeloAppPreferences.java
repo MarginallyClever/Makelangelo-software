@@ -22,19 +22,19 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.MakelangeloApp;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class MakelangeloAppPreferences {
-	transient private MakelangeloApp app;
+	transient private Makelangelo app;
 	
 	transient private JPanel panel; 
 	transient private JButton buttonExport;
 	transient private JButton buttonImport;
 	transient private JButton buttonReset;
 	
-	public MakelangeloAppPreferences(MakelangeloApp arg0) {
+	public MakelangeloAppPreferences(Makelangelo arg0) {
 		super();
 		
 		app=arg0;

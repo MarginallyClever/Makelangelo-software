@@ -5,6 +5,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * GUI for {@link Converter_Sandy}
+ * @author Dan Royer
+ *
+ */
 public class Converter_Sandy_Panel extends ImageConverterPanel {
 	/**
 	 * 

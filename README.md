@@ -1,25 +1,20 @@
-﻿# Makelangelo #
+﻿# Makelangelo Software
 
-http://www.makelangelo.com/
+Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the [Makelangelo Robot](http://www.makelangelo.com/).
 
-A mural drawing robot and a gentle introduction to 3D printing.
+It pairs really well with [Makelangelo-firmware](https://github.com/MarginallyClever/Makelangelo-firmware), the code in the brain of the robot that receives instructions and moves the motors.  
 
-Makelangelo is a polargraph mural drawing robot.  It is intended to teach students about programming, physics, trigonometry, and electronics in a fun, goal-oriented way.  Makelangelo is scalable: our test models have ranged from 30cm^2 to 300cm^2.
+## Where to go from here
 
-This project specifically deals with the GUI: the computer program that makes running the robot friendly and easy.  It pairs really well with Makelangelo-firmware, the code in the brain of the robot that receives instructions and moves the motors.
+**Run the app** by double-clicking the .jar file to get started.
 
-Try our instantly-updated test builds: https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly
+**Trouble?**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
 
-Build and tweak the project: https://github.com/MarginallyClever/Makelangelo/wiki/Home/
+**Go further** and [join our Discord group](https://discord.gg/QtvHqAv8yp)
 
-For everything else, please visit the forums at https://marginallyclever.com/forums/
-
-## Show support ##
+## Thank you
 
 Did this program help you?  Like Open Source software?  Want to show support?
 Donate what you can to help speed up development at https://www.marginallyclever.com/product/makelangelo-software/
-Thank you!
 
-## Special thanks ##
-
-Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by "Hektor":http://hektor.ch/ by Jürg Lehni and Uli Franke.
+Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by [Hektor](http://hektor.ch/) by Jürg Lehni and Uli Franke.

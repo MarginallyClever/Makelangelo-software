@@ -20,7 +20,11 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
-
+/**
+ * Your message here.  understands font families, styles, sizes, and alignment
+ * @author Dan Royer
+ *
+ */
 public class Generator_Text extends ImageGenerator {
 	// text properties
 	private float kerning = 5.0f;

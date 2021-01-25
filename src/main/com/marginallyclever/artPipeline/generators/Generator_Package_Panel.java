@@ -5,6 +5,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
+/**
+ * Panel for {@link Generator_Package}
+ * @author Dan Royer
+ *
+ */
 public class Generator_Package_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

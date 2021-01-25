@@ -44,6 +44,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private double xMin, xMax;
 	private int iterations;
 
+	/**
+	 * @author Dan Royer
+	 */
 	protected class QuadGraph {
 		public Rectangle2D bounds;
 		public ArrayList<VoronoiCell> sites;

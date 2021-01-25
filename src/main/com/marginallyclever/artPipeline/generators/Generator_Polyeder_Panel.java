@@ -6,6 +6,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
+/**
+ * Panel for {@link Generator_Polyeder}
+ * @author Dan Royer
+ *
+ */
 public class Generator_Polyeder_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

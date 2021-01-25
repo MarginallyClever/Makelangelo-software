@@ -5,6 +5,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
+/**
+ * Panel for {@link Generator_GraphPaper}
+ * @author Dan Royer
+ *
+ */
 public class Generator_GraphPaper_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

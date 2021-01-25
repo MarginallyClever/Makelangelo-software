@@ -27,7 +27,7 @@ import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.MakelangeloApp;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -45,19 +45,19 @@ public class PiCaptureAction extends AbstractAction {
 	
 	// picam controls
 	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
-	private MakelangeloApp makelangeloApp;
+	private Makelangelo makelangeloApp;
 	private BufferedImage buffImg;
 	private boolean useImage;
 	private int awb, drc, exp, contrast, quality, sharpness;
 	
 
-	public PiCaptureAction(MakelangeloApp gui,String text) throws FailedToRunRaspistillException {
+	public PiCaptureAction(Makelangelo gui,String text) throws FailedToRunRaspistillException {
 		super(text);
 		makelangeloApp=gui;
         setup();
 	}
 	
-    public PiCaptureAction(MakelangeloApp gui,String text, ImageIcon icon,
+    public PiCaptureAction(Makelangelo gui,String text, ImageIcon icon,
                       String desc, Integer mnemonic) throws FailedToRunRaspistillException {
         super(text, icon);
         putValue(SHORT_DESCRIPTION, desc);

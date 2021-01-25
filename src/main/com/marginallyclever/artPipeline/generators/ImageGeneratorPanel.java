@@ -3,6 +3,11 @@ package com.marginallyclever.artPipeline.generators;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
+/**
+ * All generators have a panel with options.  This is their shared root.
+ * @author Dan Royer
+ *
+ */
 public class ImageGeneratorPanel extends SelectPanel {
 	/**
 	 * 

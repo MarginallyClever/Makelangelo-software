@@ -16,8 +16,8 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * @author danroyer
- * @since at least 7.1.4
+ * @author Dan Royer
+ * @since 7.1.4
  */
 public class Converter_ColorFloodFill extends ImageConverter {
 	private ColorPalette palette;

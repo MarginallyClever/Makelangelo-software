@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
 /**
  * Attempt to generate a magic circle weaving pattern as seen in https://github.com/i-make-robots/weaving_algorithm
  *
- * @author Dan
+ * @author Dan Royer
  */
 public class Converter_MagicCircle extends ImageConverter {
 	private static int numberOfPoints = 200;
@@ -24,11 +24,17 @@ public class Converter_MagicCircle extends ImageConverter {
 		return Translator.get("MagicCircleName");
 	}
 
+	/**
+	 * @author Dan Royer
+	 */
 	private class LineIntensity {
 		public int i,j;
 		public int intensity=512;
 	}
 
+	/**
+	 * @author Dan Royer
+	 */
 	public class IntensityComparator implements Comparator<LineIntensity> {
 		@Override
 		public int compare(LineIntensity o1, LineIntensity o2) {

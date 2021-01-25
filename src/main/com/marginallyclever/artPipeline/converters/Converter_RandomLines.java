@@ -6,7 +6,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
-// create random lines across the image.  Raise and lower the pen to darken the appropriate areas
+/**
+ * create random lines across the image.  Raise and lower the pen to darken the appropriate areas
+ * @author Dan Royer
+ */
 public class Converter_RandomLines extends ImageConverter {
 	static protected int numLines = 2500;
 	

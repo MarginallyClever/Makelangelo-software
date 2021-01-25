@@ -4,6 +4,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
+/**
+ * GUI for {@link Converter_RandomLines}
+ * @author Dan Royer
+ *
+ */
 public class Converter_RandomLines_Panel extends ImageConverterPanel {
 	/**
 	 * 

@@ -7,6 +7,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
+/**
+ * 1cm and 10cm grid lines
+ * @author Dan Royer
+ */
 public class Generator_GraphPaper extends ImageGenerator {
 	private static float angle = 0;
 

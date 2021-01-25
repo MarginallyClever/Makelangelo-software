@@ -9,7 +9,10 @@ import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_Invert;
 import com.marginallyclever.makelangelo.Translator;
 
-
+/**
+ * 
+ * @author Dan Royer
+ */
 public class Converter_CannyEdge extends ImageConverter {
 	@Override
 	public String getName() {

@@ -7,6 +7,11 @@ import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
+/**
+ * GUI for {@link Converter_VoronoiStippling}
+ * @author Dan Royer
+ *
+ */
 public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 	/**
 	 * 

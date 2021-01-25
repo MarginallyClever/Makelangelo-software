@@ -11,6 +11,7 @@ The following is a set of guidelines for contributing.  These are just guideline
 - Code of conduct
 
 ## Reporting bugs
+
 Please use the Github [Issues](https://github.com/MarginallyClever/Makelangelo-software/issues) and fill out the template to make good bug reports.
 
 ## Contributing new code

@@ -6,6 +6,11 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * Panel for {@link Generator_GosperCurve}
+ * @author Dan Royer
+ *
+ */
 public class Generator_GosperCurve_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

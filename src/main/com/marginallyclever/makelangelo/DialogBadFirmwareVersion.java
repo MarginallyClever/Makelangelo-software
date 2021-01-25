@@ -21,7 +21,7 @@ public class DialogBadFirmwareVersion {
 	 * <p>
 	 * The summation of {@link String#length()} for each of the respective values retrieved with the
 	 * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link Translator} keys,
-	 * in conjunction with {@link MakelangeloApp#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
+	 * in conjunction with {@link Makelangelo#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
 	 * </p>
 	 *
 	 * @return An HTML string used for the About Message Dialog.

@@ -6,6 +6,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
+/**
+ * 
+ * @author Dan Royer
+ */
 public class Converter_Multipass extends ImageConverter {
 	static private float angle=0;
 	static private int passes=4;

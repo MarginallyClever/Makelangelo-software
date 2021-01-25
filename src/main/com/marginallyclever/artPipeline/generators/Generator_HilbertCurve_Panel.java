@@ -5,6 +5,11 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
+/**
+ * Panel for {@link Generator_HilbertCurve}
+ * @author Dan Royer
+ *
+ */
 public class Generator_HilbertCurve_Panel extends ImageGeneratorPanel {
 	/**
 	 * 

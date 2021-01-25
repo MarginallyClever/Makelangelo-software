@@ -7,7 +7,8 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 /**
- * @author Dan
+ * 
+ * @author Dan Royer
  */
 public class Converter_ColorBoxes extends ImageConverter {
 	private ColorPalette palette;

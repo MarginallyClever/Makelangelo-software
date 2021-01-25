@@ -8,6 +8,11 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
+/**
+ * Panel for {@link Generator_Spirograph}
+ * @author Dan Royer
+ *
+ */
 public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 	/**
 	 * 
