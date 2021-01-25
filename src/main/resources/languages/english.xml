@@ -322,29 +322,6 @@
 	</string>
 
 	<string>
-		<key>FlipForGlass</key>
-		<value>Flip for glass</value>
-		<hint>conversion options</hint>
-	</string>
-
-
-	<string>
-		<key>FlipNone</key>
-		<value>No Flip</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>FlipH</key>
-		<value>Flip horizontal</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>FlipV</key>
-		<value>Flip vertical</value>
-		<hint>conversion options</hint>
-	</string>
-
-	<string>
 		<key>Start</key>
 		<value>Start</value>
 		<hint>As in "start drawing"</hint>
@@ -891,6 +868,7 @@
 		<value>Zoom to fit</value>
 		<hint>menu or dialog title</hint>
 	</string>
+	
 	<string>
 		<key>ShowLog</key>
 		<value>Show Log</value>
@@ -1708,4 +1686,47 @@
 		<hint></hint>
 	</string>
 
+	<string>
+		<key>Resize</key>
+		<value>Resize</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
+		<key>Flip</key>
+		<value>Resize</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
+		<key>FlipNone</key>
+		<value>No Flip</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
+		<key>FlipH</key>
+		<value>Flip horizontal</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
+		<key>FlipV</key>
+		<value>Flip vertical</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	
+	<string>
+		<key>Reorder</key>
+		<value>Reorder</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	
+	<string>
+		<key>Simplify</key>
+		<value>Simplify</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
+		<key>Crop to margins</key>
+		<value>Crop to margins</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	
 </language>

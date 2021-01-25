@@ -263,7 +263,7 @@ public final class MakelangeloApp extends TransferHandler
 		});
 		menu.add(buttonZoomToFit);
 		
-		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ViewLog"));
+		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
 		buttonViewLog.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
