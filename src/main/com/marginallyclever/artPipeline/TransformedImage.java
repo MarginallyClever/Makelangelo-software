@@ -114,7 +114,7 @@ public class TransformedImage {
 	}
 	
 	/**
-	 * sample the image, taking into account fractions of pixels. left < right, bottom < top.
+	 * Sample the image, taking into account fractions of pixels. left must be less than right, bottom must be less than top.
 	 *
 	 * @param x0 left
 	 * @param y0 top

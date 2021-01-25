@@ -28,7 +28,7 @@ public class SelectColor extends Select {
 	
 	/**
 	 * 
-	 * @param parent a component (JFrame, JPanel) that owns the color selection dialog
+	 * @param parentComponent a component (JFrame, JPanel) that owns the color selection dialog
 	 * @param labelValue
 	 * @param defaultValue
 	 */

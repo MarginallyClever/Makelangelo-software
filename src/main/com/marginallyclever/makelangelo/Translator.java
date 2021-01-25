@@ -32,7 +32,7 @@ import com.marginallyclever.util.PreferencesHelper;
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
  *
- * @author dan royer
+ * @author Dan Royer
  * @author Peter Colapietro
  * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
@@ -226,7 +226,7 @@ public final class Translator {
 	}
 
 	/**
-	 * @param name of key to find in translation list
+	 * @param key name of key to find in translation list
 	 * @return the translated value for key, or "missing:key".
 	 */
 	static public String get(String key) {
@@ -234,8 +234,10 @@ public final class Translator {
 	}
 
 	/**
-	 * Translates a string and fills in some details.  A %1 is replaced with the first parameter, %2 with the second, and so on.
-	 * @param name of key to find in translation list
+	 * Translates a string and fills in some details.  String contains the special character sequence "%N", where N is the n-th parameter passed to get()
+	 * A %1 is replaced with the first parameter, %2 with the second, and so on.  There is no escape character.
+	 * @param key name of key to find in translation list
+	 * @param params 
 	 * @return the translated value for key, or "missing:key".
 	 */
 	static public String get(String key,String [] params) {

@@ -24,7 +24,7 @@ import com.marginallyclever.util.PreferencesHelper;
 /**
  * All the hardware settings for a single plotter robot.  Does not store state information.  
  * @author Dan Royer
- * TODO move tool names into translations & add a color palette system for quantizing colors.
+ * TODO move tool names into translations and add a color palette system for quantizing colors.
  */
 public final class MakelangeloRobotSettings implements Serializable {
 	/**

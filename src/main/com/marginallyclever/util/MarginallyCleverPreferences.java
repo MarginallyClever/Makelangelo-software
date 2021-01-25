@@ -59,10 +59,10 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    * @param parent the parent of this preference node, or null if this
    *               is the root.
    * @param name   the name of this preference node, relative to its parent,
-   *               or <tt>""</tt> if this is the root.
-   * @throws IllegalArgumentException if <tt>name</tt> contains a slash
-   *                                  (<tt>'/'</tt>),  or <tt>parent</tt> is <tt>null</tt> and
-   *                                  name isn't <tt>""</tt>.
+   *               or &lg;tt&gt;""&lg;/tt&gt; if this is the root.
+   * @throws IllegalArgumentException if &lg;tt&gt;name&lg;/tt&gt; contains a slash
+   *                                  (&lg;tt&gt;'/'&lg;/tt&gt;),  or &lg;tt&gt;parent&lg;/tt&gt; is &lg;tt&gt;null&lg;/tt&gt; and
+   *                                  name isn't &lg;tt&gt;""&lg;/tt&gt;.
    */
   public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);

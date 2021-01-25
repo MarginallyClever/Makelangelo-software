@@ -51,7 +51,7 @@ public interface MakelangeloHardwareProperties {
 	public float getHeight();
 
 	/**
-	 * custom look & feel for each version
+	 * custom look and feel for each version
 	 * 
 	 * @param gl2
 	 */
@@ -66,11 +66,16 @@ public interface MakelangeloHardwareProperties {
 
 	/**
 	 * Hardware specific gcode sent on connect
-	 * @param out
-	 * @throws IOException
+	 * @param settings
+	 * @return
 	 */
 	public String getGCodeConfig(MakelangeloRobotSettings settings);
 
+	/**
+	 * hardware specific gcode at the end of each program
+	 * @param out
+	 * @throws IOException
+	 */
 	public void writeProgramEnd(Writer out) throws IOException;
 
 	// @since hardware m2

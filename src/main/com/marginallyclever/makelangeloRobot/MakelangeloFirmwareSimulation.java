@@ -110,8 +110,10 @@ public class MakelangeloFirmwareSimulation {
 	}*/
 
 	/**
-	 * add this destination to the queue and attempt to optimize travel between destinations. 
-	 * @param command
+	 * Add this destination to the queue and attempt to optimize travel between destinations. 
+	 * @param to destination
+	 * @param feedrate velocity (mm/s)
+	 * @param acceleration (mm/s/s)
 	 */
 	protected void addDestination2(final Vector3d to, double feedrate, double acceleration) {
 		Vector3d delta = new Vector3d();
@@ -134,7 +136,9 @@ public class MakelangeloFirmwareSimulation {
 	
 	/**
 	 * add this destination to the queue and attempt to optimize travel between destinations. 
-	 * @param command
+	 * @param to detination
+	 * @param feedrate velocity (mm/s)
+	 * @param acceleration (mm/s/s)
 	 */
 	protected void addDestination(final Vector3d to, double feedrate, double acceleration) {
 		poseTo=to;
