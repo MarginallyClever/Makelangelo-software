@@ -218,6 +218,7 @@ If you like this project, please support us by buying Marginally Clever products
 					<source>8</source>
 					<destDir>${project.basedir}/docs</destDir>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+        			<doclint>none</doclint>
 				</configuration>
 				<executions>
 					<execution>
@@ -225,9 +226,6 @@ If you like this project, please support us by buying Marginally Clever products
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<configuration> <!-- add this to disable checking -->
-							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
