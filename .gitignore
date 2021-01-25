@@ -48,3 +48,7 @@ java/.project
 latex/
 html/
 /build/
+
+## packaging
+packaging/*.zip
+packaging/Makelangelo/*.jar
