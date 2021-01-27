@@ -46,13 +46,13 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JPanel implements ActionListener, ItemListener {
+public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -4703402918904039337L;
 
-	// god objects ?
+	// god objects?
 	protected MakelangeloRobot robot;
 	protected Makelangelo makelangeloApp;
 
@@ -111,7 +111,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 		con1.fill = GridBagConstraints.HORIZONTAL;
 		con1.anchor = GridBagConstraints.NORTHWEST;
 
-		add(createConnectPanel(), con1);
+		add(createConnectSubPanel(), con1);
 		con1.gridy++;
 		
 		// settings
@@ -168,7 +168,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	}
 
 
-	protected JPanel createConnectPanel() {
+	protected JPanel createConnectSubPanel() {
 		connectionPanel = new SelectPanel();
 				
         buttonConnect = new SelectButton(Translator.get("ButtonConnect"));
@@ -176,9 +176,22 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
-					closeConnection();
+					robot.halt();
+					robot.closeConnection();
+					buttonConnect.setText(Translator.get("ButtonConnect"));
+					buttonConnect.setForeground(Color.GREEN);
+					isConnected=false;
+					updateButtonAccess();
 				} else {
-					openConnection();
+					NetworkConnection s = makelangeloApp.requestNewConnection();
+					if(s!=null) {
+						buttonConnect.setText(Translator.get("ButtonDisconnect"));
+						buttonConnect.setForeground(Color.RED);
+						robot.openConnection( s );
+						//updateMachineNumberPanel();
+						//updateButtonAccess();
+						isConnected=true;
+					}
 				}
 			}
 		});
@@ -189,38 +202,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	    return connectionPanel;
 	}
 
-	
-	protected void closeConnection() {
-		robot.halt();
-		robot.closeConnection();
-		buttonConnect.setText(Translator.get("ButtonConnect"));
-		buttonConnect.setForeground(Color.GREEN);
-		isConnected=false;
-		updateButtonAccess();
-	}
-	
-	
-	protected void openConnection() {
-		NetworkConnection s = makelangeloApp.requestNewConnection();
-		if(s!=null) {
-			buttonConnect.setText(Translator.get("ButtonDisconnect"));
-			buttonConnect.setForeground(Color.RED);
-			robot.openConnection( s );
-			//updateMachineNumberPanel();
-			//updateButtonAccess();
-			isConnected=true;
-		}
-	}
-	
-
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		Object subject = e.getSource();
-
-		if(subject == machineChoices && e.getStateChange()==ItemEvent.SELECTED) {
-			updateMachineChoice();
-		}
-	}
 	
 	protected void updateMachineChoice() {
 		int selectedIndex = machineChoices.getSelectedIndex();
@@ -426,9 +407,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(robot.areMotorsEngaged() ) {
-					disengageMotors();
+					robot.disengageMotors();
 				} else {
-					engageMotors();
+					robot.engageMotors();
 				}
 			}
 		});
@@ -495,7 +476,14 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			else if( robot.isPortConfirmed() == false ) state=true;
 			
 			machineChoices.setEnabled( state );
-			machineChoices.addItemListener(this);
+			machineChoices.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if(e.getStateChange()==ItemEvent.SELECTED) {
+						updateMachineChoice();
+					}
+				}
+			});
 
 			int index = robot.getSettings().getKnownMachineIndex();
 			if( index<0 ) index=0;
@@ -551,14 +539,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			if(dx!=0 || dy!=0) robot.movePenRelative(dx,dy);
 		}
 	}
-
-	protected void disengageMotors() {
-		robot.disengageMotors();
-	}
-
-	protected void engageMotors() {
-		robot.engageMotors();
-	}
 	
 	public void motorsHaveBeenDisengaged() {
 		toggleEngagedMotor.setText(Translator.get("EngageMotors"));
@@ -585,14 +565,13 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			}
 		}
 	}
+	
 
-	/**
-	 * the moment a robot is confirmed to have connected 
-	 */
+	// the moment a robot is confirmed to have connected
 	public void onConnect() {
 		updateMachineNumberPanel();
 		updateButtonAccess();
-		engageMotors();
+		robot.engageMotors();
 	}
 	
 	public void updateButtonAccess() {
