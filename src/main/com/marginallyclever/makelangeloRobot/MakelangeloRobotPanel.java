@@ -92,7 +92,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 	public StatusBar statusBar;
 
 	/**
-	 * 
 	 * @param gui
 	 * @param robot
 	 */
@@ -127,8 +126,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Ite
 			Log.message("Raspistill unavailable.");
 		}
 
-		add(createAxisDrivingControls(),con1);	con1.gridy++;
-		add(createCommonDriveControls(),con1);	con1.gridy++;
+		add(createAxisDrivingControls(),con1);		con1.gridy++;
+		add(createCommonDriveControls(),con1);		con1.gridy++;
 		add(createCreativeControlPanel(), con1);	con1.gridy++;
 		add(createArtPipelinePanel(),con1);			con1.gridy++;
 		add(createAnimationPanel(),con1);			con1.gridy++;

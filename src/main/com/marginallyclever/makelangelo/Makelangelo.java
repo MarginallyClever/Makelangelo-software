@@ -78,14 +78,12 @@ public final class Makelangelo extends TransferHandler
 	static final long serialVersionUID = 1L;
 
 	/**
-	 * software VERSION. Defined in src/resources/makelangelo.properties and
-	 * uses Maven's resource filtering to update the VERSION based upon VERSION
-	 * defined in POM.xml. In this way we only define the VERSION once and
-	 * prevent violating DRY.
+	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the VERSION based upon VERSION
+	 * defined in POM.xml. In this way we only define the VERSION once and prevent violating DRY.
 	 */
 	public String VERSION;
 	
-	private final static String FORUM_URL = "https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/";
+	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
 	// only used on first run.
 	private final static int DEFAULT_WINDOW_WIDTH = 1200;
 	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
