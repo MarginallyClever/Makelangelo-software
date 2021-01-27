@@ -52,6 +52,10 @@ public class PanelAdjustMachine extends SelectPanel {
 			add(totalBeltNeeded = new SelectFloat(Translator.get("BeltLengthNeeded"),0));
 			add(totalServoNeeded = new SelectFloat(Translator.get("ServoLengthNeeded"),0));
 
+			totalStepperNeeded.setReadOnly();
+			totalBeltNeeded.setReadOnly();
+			totalServoNeeded.setReadOnly();
+
 			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
 				machineWidth.setReadOnly();
 				machineHeight.setReadOnly();
@@ -131,7 +135,8 @@ public class PanelAdjustMachine extends SelectPanel {
 		else if(o == buttonBpos) robot.jogRightMotorOut();
 		else if(o == buttonBneg) robot.jogRightMotorIn();
 		else {
-			updateLengthNeeded();
+			System.out.println("update Length?");
+			//updateLengthNeeded();
 		}
 	}
 }
