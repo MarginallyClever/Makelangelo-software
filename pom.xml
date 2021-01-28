@@ -8,11 +8,9 @@
 	<artifactId>Makelangelo</artifactId>
 	<version>7.24.2</version>
 	<name>Makelangelo</name>
-	<description>A mural drawing robot.
+	<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
 
-More technically, a wall-hanging polargraph robot.
-
-If you like this project, please support us by buying Marginally Clever products.</description>
+It pairs really well with Makelangelo-firmware, the code in the brain of the robot that receives instructions and moves the motors.  </description>
 	<url>http://www.makelangelo.com/</url>
 
 	<issueManagement>
@@ -95,10 +93,9 @@ If you like this project, please support us by buying Marginally Clever products
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
-					<source>${minimum.java.version}</source>
-					<target>${minimum.java.version}</target>
+					<release>${minimum.java.version}</release>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
 					<compilerArgs>
 						<compilerArg>-Xlint:unchecked</compilerArg>
@@ -138,7 +135,7 @@ If you like this project, please support us by buying Marginally Clever products
 			<!-- Beginning of plugins defined originally only in Super POM -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.6.1</version>
+				<version>3.1.0</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -150,7 +147,7 @@ If you like this project, please support us by buying Marginally Clever products
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -242,19 +239,19 @@ If you like this project, please support us by buying Marginally Clever products
 			<plugins>
 				<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.5.5</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.10</version>
+					<version>3.1.2</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.2</version>
+					<version>2.5.3</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.8</version>
+					<version>3.0.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -420,7 +417,7 @@ If you like this project, please support us by buying Marginally Clever products
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.3.1</minimum.maven.version>
-		<minimum.java.version>15</minimum.java.version>
+		<minimum.java.version>11</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 	</properties>
