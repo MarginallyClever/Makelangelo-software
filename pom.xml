@@ -190,7 +190,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.4</version>
+				<version>3.0.0-M3</version>
 				<executions>
 					<execution>
 						<id>enforce-java</id>
