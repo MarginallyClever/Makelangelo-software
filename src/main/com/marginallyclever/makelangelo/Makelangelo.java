@@ -69,7 +69,14 @@ import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
 /**
- * The root window of the GUI
+ * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
+ * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
+ * 
+ * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (ImageGenerators), or 
+ * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA) into vectors (ImageConverters).
+ * 
+ * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
+ * the mark on the paper.  This knowledge helps the app to create better gcode.  
  * 
  * @author Dan Royer
  * @since 0.0.1
