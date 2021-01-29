@@ -101,6 +101,8 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 						<compilerArg>-Xlint:unchecked</compilerArg>
 						<compilerArg>-Xlint:deprecation</compilerArg>
 					</compilerArgs>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -162,15 +164,15 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.7</version>
+				<version>3.2.0</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.4</version>
+				<version>3.9.1</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.1</version>
+				<version>3.0.0-M5</version>
 				<configuration>
 					<systemProperties>
 						<property>
@@ -262,7 +264,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
+			<version>2.8.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.scream3r/jssc -->
@@ -282,19 +284,19 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
+			<version>4.5.13</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.7</version>
+			<version>4.4.14</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.5.3</version>
+			<version>4.5.13</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/de.sciss/jrpicam -->
@@ -341,7 +343,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>[4.13.1,)</version>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -349,7 +351,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20150729</version>
+			<version>20201115</version>
 		</dependency>
 
 		<!-- used in LoadAndSaveSB2 -->
@@ -362,13 +364,13 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>15.0</version>
+			<version>20.1.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
-			<version>1.4.0</version>
+			<version>1.7</version>
 		</dependency>
 		<!-- SVG loading -->
 		<!-- https://mvnrepository.com/artifact/batik/batik-xml -->
@@ -401,6 +403,12 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<artifactId>batik-bridge</artifactId>
 			<version>1.9</version>
 		</dependency>
+		
+		<dependency>
+	        <groupId>xml-apis</groupId>
+	        <artifactId>xml-apis</artifactId>
+	        <version>1.4.01</version>
+	    </dependency>
 	</dependencies>
 
 	<repositories>
