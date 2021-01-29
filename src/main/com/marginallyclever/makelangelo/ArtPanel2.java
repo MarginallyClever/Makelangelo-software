@@ -1,12 +1,23 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
+import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
 public class ArtPanel2 {
@@ -21,9 +32,41 @@ public class ArtPanel2 {
 		
 		JPanel rootPanel = new JPanel();
 		rootPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+		rootPanel.setLayout(new BoxLayout(rootPanel,BoxLayout.LINE_AXIS));
 		
 		SelectPanel firstLayer = new SelectPanel();
-		rootPanel.add(firstLayer);
+		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+		HashMap<SelectButton,JPanel> mani = new HashMap<SelectButton,JPanel>(); 
+		
+		for( ImageGenerator generator : imageGenerators ) {
+			SelectButton b = new SelectButton(generator.getName()); 
+			mani.put(b,generator.getPanel().getPanel());
+			firstLayer.add(b);
+			b.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					JPanel p = mani.get(b);
+					p.setMaximumSize(new Dimension(100,10000));
+					for(SelectButton n : mani.keySet() ) {
+						n.setForeground(Color.BLACK);
+					}
+					b.setForeground(Color.BLUE);
+					while(rootPanel.getComponentCount()>1) {
+						rootPanel.remove(1);
+					}
+					rootPanel.add(new JScrollPane(p,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+					//rootPanel.add(Box.createHorizontalGlue());
+					rootPanel.invalidate();
+					rootPanel.revalidate();
+				}
+			});
+		}
+		
+		JScrollPane pane = new JScrollPane(firstLayer,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		pane.setMaximumSize(new Dimension(800,10000));
+		
+		rootPanel.add(pane);
+		rootPanel.add(Box.createHorizontalGlue());
 		
 		// add image manipulators
 		
