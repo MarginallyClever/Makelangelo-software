@@ -47,7 +47,8 @@ java/.project
 ## Auto generated documentation
 latex/
 html/
-/build/
+build/
+docs/
 
 ## packaging
 packaging/*.zip
