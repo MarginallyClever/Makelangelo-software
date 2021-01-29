@@ -10,10 +10,6 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
 public class ArtPanel2 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1L;
 	protected JFrame parentFrame;
 	
 	public ArtPanel2() {
