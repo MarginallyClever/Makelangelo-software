@@ -10,6 +10,7 @@ package com.marginallyclever.makelangelo;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -135,6 +136,7 @@ public final class Makelangelo extends TransferHandler
 		logPanel = new LogPanel();
 		
 		Log.message("Locale="+Locale.getDefault().toString());
+		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
 		Log.message("Starting preferences...");
 		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
