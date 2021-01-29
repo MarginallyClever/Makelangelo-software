@@ -1349,6 +1349,11 @@
 		<hint>Generator_Text_Panel</hint>
 	</string>
 	<string>
+		<key>FontFace</key>
+		<value>Typeface</value>
+		<hint>Generator_Text_Panel</hint>
+	</string>
+	<string>
 		<key>TextMessage</key>
 		<value>Message</value>
 		<hint>Generator_Text_Panel</hint>
@@ -1727,6 +1732,24 @@
 		<key>Crop to margins</key>
 		<value>Crop to margins</value>
 		<hint>Art Pipeline</hint>
+	</string>
+
+	<string>
+		<key>GraphPaperName</key>
+		<value>Graph Paper</value>
+		<hint>Generator</hint>
+	</string>
+	
+	<string>
+		<key>Package</key>
+		<value>Papercraft Box</value>
+		<hint>Generator</hint>
+	</string>
+
+	<string>
+		<key>Polyeder</key>
+		<value>Papercraft Polyhedron</value>
+		<hint>Generator</hint>
 	</string>
 	
 </language>
