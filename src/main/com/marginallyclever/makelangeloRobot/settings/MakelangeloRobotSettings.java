@@ -105,8 +105,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 */
 	private int startingPositionIndex;
 
-	private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-
 	
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
@@ -148,6 +146,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 		// which configurations are available?
 		try {
+			Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
 		} catch (Exception e) {
 			Log.error( e.getMessage() );
@@ -165,6 +164,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	
 	public void createNewUID(long newUID) {
 		// make sure a topLevelMachinesPreferenceNode node is created
+		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		topLevelMachinesPreferenceNode.node(Long.toString(newUID));
 		
 		// if this is a new robot UID, update the list of available configurations
@@ -441,7 +441,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	protected void loadConfigFromLocal() {
-		final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
+		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
 		limitTop    = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
 		limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
 		limitLeft   = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
@@ -530,7 +531,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	protected void saveConfigToLocal() {
-		final Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
+		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
 		uniqueMachinePreferencesNode.put("limit_top", Double.toString(limitTop));
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));

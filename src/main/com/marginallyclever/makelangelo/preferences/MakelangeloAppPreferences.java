@@ -148,6 +148,7 @@ public class MakelangeloAppPreferences {
 				Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 				prefs.removeNode();
 				Preferences.userRoot().flush();
+				PreferencesHelper.start();
 			} catch (BackingStoreException e1) {
 				Log.error(e1.getMessage());
 			}

@@ -22,11 +22,10 @@ import com.marginallyclever.convenience.log.Log;
  * @since v7.1.4
  */
 public final class PreferencesHelper {
-
 	/**
 	 * Internal mapping of all Makelangelo preference nodes.
 	 */
-	private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+	private static Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
 	/**
 	 * Future Makelagelo root preference node path name.
@@ -72,12 +71,11 @@ public final class PreferencesHelper {
 
 	/**
 	 * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
-	 *
-	 * See <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
 	 */
-	static {
-		final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
-		final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
+	@SuppressWarnings("unchecked")
+	static public void start() {
+		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
+		Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
 		//FIXME write unit test/tool to view import/export machine configurations.
 		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);
 		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); 
@@ -95,9 +93,25 @@ public final class PreferencesHelper {
 		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
-		@SuppressWarnings("unchecked")
-		final Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
+		
+		Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
 		CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
+	}
+
+	/**
+	 * Enumeration used when getting a specific preference node.
+	 * See #getPreferenceNode(MakelangeloPreferenceKey)
+	 */
+	public enum MakelangeloPreferenceKey {
+		GRAPHICS,
+		MACHINES,
+		LANGUAGE,
+		SOUND,
+		FILE,
+		METRICS,
+		@Deprecated
+		LEGACY_MAKELANGELO_ROOT,
+		//MAKELANGELO_ROOT
 	}
 
 	/**
@@ -116,22 +130,6 @@ public final class PreferencesHelper {
 	@SuppressWarnings("unchecked")
 	public static <P extends Preferences> P getPreferenceNode(MakelangeloPreferenceKey key) {
 		return (P) CLASS_TO_PREFERENCE_NODE_MAP.get(key);
-	}
-
-	/**
-	 * Enumeration used when getting a specific preference node.
-	 * See #getPreferenceNode(MakelangeloPreferenceKey)
-	 */
-	public enum MakelangeloPreferenceKey {
-		GRAPHICS,
-		MACHINES,
-		LANGUAGE,
-		SOUND,
-		FILE,
-		METRICS,
-		@Deprecated
-		LEGACY_MAKELANGELO_ROOT,
-		//MAKELANGELO_ROOT
 	}
 
 	/**

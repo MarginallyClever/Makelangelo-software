@@ -49,10 +49,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private GLU glu;
 	private FPSAnimator animator;
 
-	// graphics preferences
-	private Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
-	
 	public PreviewPanel() {
 		super();
 		
@@ -202,7 +199,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		GL2 gl2 = glautodrawable.getGL().getGL2();
 
 		// set some render quality options
-		if(prefs.getBoolean("antialias", true)) {
+		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		if(prefs != null && prefs.getBoolean("antialias", true)) {
 			gl2.glEnable(GL2.GL_LINE_SMOOTH);
 			gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
 			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);

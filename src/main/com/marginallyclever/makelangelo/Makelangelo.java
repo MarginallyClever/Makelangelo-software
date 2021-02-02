@@ -96,7 +96,6 @@ public final class Makelangelo extends TransferHandler
 	private final static int DEFAULT_WINDOW_WIDTH = 1200;
 	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
-	private Preferences preferences;
 	private MakelangeloAppPreferences appPreferences;
 	
 	private ConnectionManager connectionManager;
@@ -123,6 +122,7 @@ public final class Makelangelo extends TransferHandler
 	
 	public static void main(String[] argv) {
 		Log.start();
+		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
 		
 		// Schedule a job for the event-dispatching thread:
@@ -146,7 +146,7 @@ public final class Makelangelo extends TransferHandler
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
 		Log.message("Starting preferences...");
-		preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
@@ -169,6 +169,7 @@ public final class Makelangelo extends TransferHandler
 		
 		checkSharingPermission();
 
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		if (preferences.getBoolean("Check for updates", false))
 			checkForUpdate(true);
 	}
@@ -179,6 +180,7 @@ public final class Makelangelo extends TransferHandler
 		
 		final String SHARING_CHECK_STRING = "Last version sharing checked";
 		
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		String v = preferences.get(SHARING_CHECK_STRING,"0");
 		int comparison = VERSION.compareTo(v);
 		if(comparison!=0) {
@@ -470,7 +472,9 @@ public final class Makelangelo extends TransferHandler
 
 	private void adjustWindowSize() {
 		Log.message("adjust window size...");
-		
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+
 		int width = preferences.getInt("Default window width", DEFAULT_WINDOW_WIDTH);
 		int height = preferences.getInt("Default window height", DEFAULT_WINDOW_HEIGHT);
 
@@ -481,6 +485,7 @@ public final class Makelangelo extends TransferHandler
 		if (width > screenSize.width || height > screenSize.height) {
 			width = screenSize.width;
 			height = screenSize.height;
+
 			preferences.putInt("Default window width", width);
 			preferences.putInt("Default window height", height);
 		}
@@ -575,6 +580,8 @@ public final class Makelangelo extends TransferHandler
 	 */
 	private void saveWindowRealEstate() {
 		Dimension size = this.mainFrame.getSize();
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+
 		preferences.putInt("Default window width", size.width);
 		preferences.putInt("Default window height", size.height);
 
