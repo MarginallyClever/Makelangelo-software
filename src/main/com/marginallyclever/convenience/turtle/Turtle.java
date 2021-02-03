@@ -290,7 +290,6 @@ public class Turtle implements Cloneable {
 		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
 	}
 	
-	// TODO move this to TurtleRenderer?
 	public void render(TurtleRenderer tr) {
 		if(isLocked()) return;
 		try {
