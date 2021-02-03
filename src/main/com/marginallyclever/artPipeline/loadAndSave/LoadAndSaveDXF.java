@@ -542,13 +542,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			
 			
 			for( TurtleMove m : turtle.history ) {
-				switch(m.type) {
-				case TRAVEL:
+				if(m.isUp) {
 					isUp=true;
-					x0=m.x;
-					y0=m.y;
-					break;
-				case DRAW:
+				} else {
 					if(isUp) isUp=false;
 					else {
 						out.write("0\nLINE\n");
@@ -558,14 +554,9 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 						out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
 						out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
 					}
-					x0=m.x;
-					y0=m.y;
-					
-					break;
-				case TOOL_CHANGE:
-					// TODO write out DXF layer using  m.getColor()
-					break;
 				}
+				x0=m.x;
+				y0=m.y;
 			}
 			// wrap it up
 			out.write("0\nENDSEC\n");

@@ -12,7 +12,6 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
-import com.marginallyclever.convenience.turtle.TurtleMoveType;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -81,8 +80,7 @@ public class ArtPipeline {
 		Log.message("  Found "+turtle.history.size()+" instructions.");
 		
 		for( TurtleMove m : turtle.history ) {
-			switch(m.type) {
-			case DRAW:
+			if(!m.isUp) {
 				if(previousMovement!=null) {
 					LineSegment2D line = new LineSegment2D(
 							new Point2D(previousMovement.x,previousMovement.y),
@@ -92,15 +90,8 @@ public class ArtPipeline {
 						originalLines.add(line);
 					}
 				}
-				previousMovement = m;
-				break;
-			case TRAVEL:
-				previousMovement = m;
-				break;
-			case TOOL_CHANGE:
-				color = m.getColor();
-				break;
 			}
+			previousMovement = m;
 		}
 		
 		int nrOfOriginalLines = originalLines.size();
@@ -330,8 +321,8 @@ public class ArtPipeline {
 		TurtleMove previous=null;
 		
 		for( TurtleMove m : turtle.history ) {
-			switch(m.type) {
-			case DRAW:
+			if(!m.isUp) {
+				// draw
 				dx=m.x-ox;
 				dy=m.y-oy;
 				sum+=Math.sqrt(dx*dx+dy*dy);
@@ -343,10 +334,10 @@ public class ArtPipeline {
 					oy=m.y;
 				}
 				isUp=false;
-				break;
-			case TRAVEL:
+			} else {
+				// travel
 				if(!isUp && sum>0 ) {
-					if(previous!=null && previous.type==TurtleMoveType.DRAW) {
+					if(previous!=null && !previous.isUp) {
 						toKeep.add(previous);
 					}
 				}
@@ -355,10 +346,6 @@ public class ArtPipeline {
 				ox=m.x;
 				oy=m.y;
 				sum=0;
-				break;
-			default:
-				toKeep.add(m);
-				break;
 			}
 			previous=m;
 		}
@@ -474,45 +461,34 @@ public class ArtPipeline {
 		TurtleMove prev=null;
 		
 		for( TurtleMove m : oldHistory ) {
-			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
-				if(prev!=null) {
-					P0.set(prev.x, prev.y);
-					P1.set(m.x, m.y);
-					boolean result = Clipper2D.clipLineToRectangle(P0,P1,rMax,rMin);
-					// !result means full crop, do nothing.
-					if(result) {
-						// partial crop.  Which end(s)?
-						boolean startCropped=MathHelper.lengthSquared(P0.x-prev.x, P0.y-prev.y)>1e-8;
-						boolean   endCropped=MathHelper.lengthSquared(P1.x-   m.x, P1.y-   m.y)>1e-8;
-						
-						if(startCropped && endCropped) {
-							// crosses rectangle, both ends out.
-							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
-							turtle.history.add(m);
-							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
-							turtle.history.add(m2);
-						} else if(!startCropped && !endCropped) {
-							turtle.history.add(m);
-						} else if(endCropped) {
-							// end cropped, leaving the rectangle
-							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
-							turtle.history.add(m2);
-						} else {
-							// start cropped, coming back into rectangle
-							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
-							turtle.history.add(m);
-						}
+			if(prev!=null) {
+				P0.set(prev.x, prev.y);
+				P1.set(m.x, m.y);
+				boolean result = Clipper2D.clipLineToRectangle(P0,P1,rMax,rMin);
+				// !result means full crop, do nothing.
+				if(result) {
+					// partial crop.  Which end(s)?
+					boolean startCropped=MathHelper.lengthSquared(P0.x-prev.x, P0.y-prev.y)>1e-8;
+					boolean   endCropped=MathHelper.lengthSquared(P1.x-   m.x, P1.y-   m.y)>1e-8;
+					
+					if(startCropped && endCropped) {
+						// crosses rectangle, both ends out.
+						turtle.history.add(new TurtleMove(P0.x,P0.y,true));
+						turtle.history.add(m);
+						turtle.history.add(new TurtleMove(P1.x,P1.y,false));
+					} else if(!startCropped && !endCropped) {
+						turtle.history.add(m);
+					} else if(endCropped) {
+						// end cropped, leaving the rectangle
+						turtle.history.add(new TurtleMove(P1.x,P1.y,false));
+					} else {
+						// start cropped, coming back into rectangle
+						turtle.history.add(new TurtleMove(P0.x,P0.y,true));
+						turtle.history.add(m);
 					}
 				}
-				prev=m;
-				
-				break;
-			default:
-				turtle.history.add(m);
-				break;
 			}
+			prev=m;
 		}
 		
 		// There may be some dumb travel moves left. (several travels in a row.)
@@ -561,39 +537,11 @@ public class ArtPipeline {
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
 			if(shouldCrop()) cropToPageMargin(turtle,settings);
-			removeRedundantToolChanges(turtle);
 		}
 		finally {
 			turtle.unlock();
 			notifyListenersTurtleFinished(turtle);
 		}
-	}
-
-	protected void removeRedundantToolChanges(Turtle t) {
-		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
-		int size=t.history.size();
-		for(int i=0;i<size;++i) {
-			TurtleMove mi = t.history.get(i);
-			if(mi.type != TurtleMoveType.TOOL_CHANGE) {
-				toKeep.add(mi);
-				continue;
-			}
-			// we found a tool change.
-			// between this and the next tool change/eof are there any draw commands?
-			boolean found=false;
-			for(int j=i+1;j<size;++j) {
-				TurtleMove mj = t.history.get(j);
-				if(mj.type == TurtleMoveType.TOOL_CHANGE) break;
-				if(mj.type == TurtleMoveType.DRAW) {
-					found=true;
-					break;
-				}
-			}
-			if(found) {
-				toKeep.add(mi);
-			}
-		}
-		t.history = toKeep;
 	}
 	
 	/**

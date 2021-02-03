@@ -3,6 +3,8 @@ package com.marginallyclever.convenience.turtle;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.vecmath.Vector2d;
+
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -23,8 +25,15 @@ public class Turtle implements Cloneable {
 	private double turtleDx, turtleDy;
 	private double angle;
 	private boolean isUp;
+	
+	// tail tip color.  only one per Turtle.
 	private ColorRGB color;
+	
+	// tail tip radius.
+	private double radius;
 
+	private Vector2d limitMax = new Vector2d();
+	private Vector2d limitMin = new Vector2d();
 	
 	public Turtle() {
 		super();
@@ -50,6 +59,9 @@ public class Turtle implements Cloneable {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		Turtle t = (Turtle)super.clone();
+		limitMax = (Vector2d)limitMax.clone();
+		limitMin = (Vector2d)limitMin.clone();
+		
 		for( TurtleMove m : history ) {
 			t.history.add(new TurtleMove(m));
 		}
@@ -67,6 +79,15 @@ public class Turtle implements Cloneable {
 		history = new ArrayList<TurtleMove>();
 		// default turtle color is black.
 		setColor(new ColorRGB(0,0,0));
+		setRadius(1.0);
+	}
+	
+	public void setRadius(double r) {
+		radius=r;
+	}
+	
+	public double getRadius() { 
+		return radius;
 	}
 	
 	// multithreading lock safety
@@ -93,7 +114,6 @@ public class Turtle implements Cloneable {
 		} else {
 			color = new ColorRGB(c);
 		}
-		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMoveType.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
@@ -119,7 +139,7 @@ public class Turtle implements Cloneable {
 	public void moveTo(double x,double y) {
 		turtleX=x;
 		turtleY=y;
-		history.add( new TurtleMove(x, y, isUp ? TurtleMoveType.TRAVEL : TurtleMoveType.DRAW) );
+		history.add( new TurtleMove(x, y, isUp) );
 	}
 	
 	/**
@@ -209,8 +229,7 @@ public class Turtle implements Cloneable {
 		TurtleMove old=null;
 		
 		for( TurtleMove m : history ) {
-			if(m.type == TurtleMoveType.DRAW)
-			{
+			if(!m.isUp) {
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
@@ -234,15 +253,8 @@ public class Turtle implements Cloneable {
 	 */
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
-				m.x*=sx;
-				m.y*=sy;
-				break;
-			default:
-				break;
-			}
+			m.x*=sx;
+			m.y*=sy;
 		}
 	}
 
@@ -253,15 +265,8 @@ public class Turtle implements Cloneable {
 	 */
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
-				m.x+=dx;
-				m.y+=dy;
-				break;
-			default:
-				break;
-			}
+			m.x+=dx;
+			m.y+=dy;
 		}
 	}
 
@@ -274,7 +279,7 @@ public class Turtle implements Cloneable {
 		int first=1;
 		for(i=0;i<history.size();i++) {
 			TurtleMove mov=history.get(i);
-			if (mov.type == TurtleMoveType.DRAW) {
+			if(!mov.isUp) {
 				if(first == 1 || mov.x < xmin) xmin=mov.x;
 				if(first == 1 || mov.y < ymin) ymin=mov.y;
 				if(first == 1 || mov.x > xmax) xmax=mov.x;
@@ -285,6 +290,7 @@ public class Turtle implements Cloneable {
 		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
 	}
 	
+	// TODO move this to TurtleRenderer?
 	public void render(TurtleRenderer tr) {
 		if(isLocked()) return;
 		try {
@@ -298,42 +304,31 @@ public class Turtle implements Cloneable {
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
 			
-			try {
-				tr.start();
-				showCount++;
+			tr.start();
+			
+			showCount++;
 
-				for (TurtleMove m : history) {
-					if(m==null) {
-						throw new NullPointerException();
+			for (TurtleMove m : history) {
+				boolean inShow = (showCount >= first && showCount < last);
+				if(m.isUp) {
+					// travel move
+					if (inShow && previousMove != null) {
+						tr.travel(previousMove, m);
 					}
-					boolean inShow = (showCount >= first && showCount < last);
-					switch (m.type) {
-					case TRAVEL:
-						if (inShow && previousMove != null) {
-							tr.travel(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case DRAW:
-						if (inShow && previousMove != null) {
-							tr.draw(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case TOOL_CHANGE:
-						tr.setPenDownColor(m.getColor());
-						break;
+					showCount++;
+					previousMove = m;
+				} else {
+					// draw move
+					if (inShow && previousMove != null) {
+						tr.draw(previousMove, m);
 					}
+					showCount++;
+					previousMove = m;
+					break;
 				}
 			}
-			catch(Exception e) {
-				//Log.error(e.getMessage());
-			}
-			finally {
-				tr.end();
-			}
+			
+			tr.end();
 		}
 		catch(Exception e) {
 			Log.error(e.getMessage());

@@ -608,15 +608,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			double y0 = robot.getSettings().getHomeY();
 
 			for( TurtleMove m : turtle.history ) {
-				switch(m.type) {
-				case TRAVEL:
+				if(m.isUp) {
 					if(!isUp) {
 						isUp=true;
 					}
-					x0=m.x;
-					y0=m.y;
-					break;
-				case DRAW:
+				} else {
 					if(isUp) {
 						isUp=false;
 					} else {
@@ -629,13 +625,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						//out.write(" stroke-width=\"1\"");
 						out.write(" />\n");
 					}
-					x0=m.x;
-					y0=m.y;
-					
-					break;
-				case TOOL_CHANGE:
-					break;
 				}
+				x0=m.x;
+				y0=m.y;
 			}
 			
 			// footer

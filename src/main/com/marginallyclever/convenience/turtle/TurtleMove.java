@@ -2,20 +2,25 @@ package com.marginallyclever.convenience.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
 
+/**
+ * TurtleMoves describe the path of turtle motion.
+ * @author Dan Royer
+ *
+ */
 public class TurtleMove {
-	public TurtleMoveType type;
+	public boolean isUp;
 	public double x,y;  // destination
 	
-	public TurtleMove(double x0,double y0,TurtleMoveType type0) {
-		x=x0;
-		y=y0;
-		type=type0;
+	public TurtleMove(double x,double y,boolean isUp) {
+		this.x=x;
+		this.y=y;
+		this.isUp=isUp;
 	}
 	
 	public TurtleMove(TurtleMove m) {
 		this.x=m.x;
 		this.y=m.y;
-		this.type=m.type;
+		this.isUp=m.isUp;
 	}
 
 	public ColorRGB getColor() {

@@ -834,24 +834,18 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				double ny = oy;
 				double nz = oz;
 
-				switch (m.type) {
-				case TRAVEL:
+				if(m.isUp) {
 					if (!isUp) {
 						nz = this.settings.getPenUpAngle();
 						isUp = true;
 					}
-					break;
-				case DRAW:
+				} else {
 					if (isUp) {
 						nz = this.settings.getPenDownAngle();
 						isUp = false;
 					}
 					nx = m.x;
 					ny = m.y;
-					break;
-				case TOOL_CHANGE:
-					// n remains unchanged, so length is zero.
-					break;
 				}
 
 				double dx = nx - ox;

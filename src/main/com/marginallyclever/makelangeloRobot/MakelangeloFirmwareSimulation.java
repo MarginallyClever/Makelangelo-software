@@ -419,28 +419,15 @@ public class MakelangeloFirmwareSimulation {
 		double sum=0;
 		
 		for(TurtleMove m : t.history) {
-			switch(m.type) {
-			case DRAW:
-				if(isUp) {
-					isUp=false;
-					addDestination2(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
-				}
-				addDestination2(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
-				lx=m.x;
-				ly=m.y;
-				break;
-			case TRAVEL: 
-				if(!isUp) {
-					isUp=true;
-					addDestination2(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
-				}
-				addDestination2(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
-				lx=m.x;
-				ly=m.y;
-				break;
-			default:
-				break;
+			if(m.isUp != isUp) {
+				// when pen changes move servo finger
+				isUp=m.isUp;
+				addDestination2(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
 			}
+			addDestination2(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
+			lx=m.x;
+			ly=m.y;
+			
 			while(queue.size()>MAX_SEGMENTS) {
 				MakelangeloFirmwareSimulationSegment s= queue.remove(0);
 				//s.report();
