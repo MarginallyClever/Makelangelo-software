@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Histogram;
@@ -35,39 +37,44 @@ public class Converter_Crosshatch extends ImageConverter {
 	}
 	
 	@Override
-	public void finish() {
-		finish1();
-		//finish2();
+	public ArrayList<Turtle> finish() {
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
+		turtleList.add(finish1());
+		// turtleList.add(finish2());
+		return turtleList;
 	}
 	
-	public void finish2() {
+	public Turtle finish2() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
-		finishPass(new int[]{15* 2,15* 4},0  ,img);
-		finishPass(new int[]{15* 6,15* 8},90 ,img);
-		finishPass(new int[]{15*10,15*12},45 ,img);
-		finishPass(new int[]{15*14,15*15},135,img);
+		finishPass(turtle,new int[]{15* 2,15* 4},0  ,img);
+		finishPass(turtle,new int[]{15* 6,15* 8},90 ,img);
+		finishPass(turtle,new int[]{15*10,15*12},45 ,img);
+		finishPass(turtle,new int[]{15*14,15*15},135,img);
+		
+		return turtle;
 	}
 	
-	protected void finishPass(int [] passes,double angleDeg,TransformedImage img) {
+	protected void finishPass(Turtle turtle,int [] passes,double angleDeg,TransformedImage img) {
 		double dx = Math.cos(Math.toRadians(angleDeg));
 		double dy = Math.sin(Math.toRadians(angleDeg));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter()*2;
+		double stepSize = 2.0;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);
@@ -87,11 +94,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		
 			double l2 = passes[(i % passes.length)];
 			if ((i % 2) == 0) {
-				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x0, y0, x1, y1, stepSize, l2, img);
+				else convertAlongLineErrorTerms(turtle,x0,y0,x1,y1,stepSize,l2,error0,error1,img);
 			} else {
-				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x1, y1, x0, y0, stepSize, l2, img);
+				else convertAlongLineErrorTerms(turtle,x1,y1,x0,y0,stepSize,l2,error0,error1,img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -101,22 +108,25 @@ public class Converter_Crosshatch extends ImageConverter {
 		}
 	}
 	
-	protected void finish1() {
+	protected Turtle finish1() {
+		if(sourceImage==null) return null;
+		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		// if the image were projected on the paper, where would the top left
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		double yStart = machine.getMarginBottom();
-		double yEnd   = machine.getMarginTop();
-		double xStart = machine.getMarginLeft();
-		double xEnd   = machine.getMarginRight();
+		double [] bounds = img.getBounds();		
+		double yStart = bounds[TransformedImage.BOTTOM];
+		double yEnd   = bounds[TransformedImage.TOP];
+		double xStart = bounds[TransformedImage.LEFT];
+		double xEnd   = bounds[TransformedImage.RIGHT];
 
-		double stepSize = machine.getPenDiameter() * intensity;
+		double stepSize = 2.0 * intensity;
 		double x, y;
 		boolean flip = true;
 
@@ -146,11 +156,11 @@ public class Converter_Crosshatch extends ImageConverter {
 
 		for (y = yStart; y <= yEnd; y += stepSize) {
 			if (flip) {
-				if(!useError) convertAlongLine(xStart, y, xEnd, y, stepSize, level,img);
-				else convertAlongLineErrorTerms(xStart, y, xEnd, y, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,xStart, y, xEnd, y, stepSize, level,img);
+				else convertAlongLineErrorTerms(turtle,xStart, y, xEnd, y, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(xEnd, y, xStart, y, stepSize, level, img);
-				else convertAlongLineErrorTerms(xEnd, y, xStart, y, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,xEnd, y, xStart, y, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,xEnd, y, xStart, y, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -167,11 +177,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		// horizontal
 		for (x = xStart; x <= xEnd; x += stepSize) {
 			if (flip) {
-				if(!useError) convertAlongLine(x, yStart, x, yEnd, stepSize, level, img);
-				else convertAlongLineErrorTerms(x, yStart, x, yEnd, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x, yStart, x, yEnd, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x, yStart, x, yEnd, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x, yEnd, x, yStart, stepSize, level, img);
-				else convertAlongLineErrorTerms(x, yEnd, x, yStart, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x, yEnd, x, yStart, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x, yEnd, x, yStart, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -215,11 +225,11 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img);
-				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x3, y3, x4, y4, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x3, y3, x4, y4, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img);
-				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x4, y4, x3, y3, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x4, y4, x3, y3, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -251,11 +261,11 @@ public class Converter_Crosshatch extends ImageConverter {
 			double y4 = py - len;
 
 			if (flip) {
-				if(!useError) convertAlongLine(x3, y3, x4, y4, stepSize, level, img);
-				else convertAlongLineErrorTerms(x3, y3, x4, y4, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x3, y3, x4, y4, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x3, y3, x4, y4, stepSize, level,error0,error1, img);
 			} else {
-				if(!useError) convertAlongLine(x4, y4, x3, y3, stepSize, level, img);
-				else convertAlongLineErrorTerms(x4, y4, x3, y3, stepSize, level,error0,error1, img);
+				if(!useError) convertAlongLine(turtle,x4, y4, x3, y3, stepSize, level, img);
+				else convertAlongLineErrorTerms(turtle,x4, y4, x3, y3, stepSize, level,error0,error1, img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -263,6 +273,8 @@ public class Converter_Crosshatch extends ImageConverter {
 			}
 			flip = !flip;
 		}
+		
+		return turtle;
 	}
 }
 

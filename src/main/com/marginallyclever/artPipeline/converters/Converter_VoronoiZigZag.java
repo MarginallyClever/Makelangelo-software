@@ -1,6 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -63,15 +64,16 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
-		
-		yBottom = machine.getMarginBottom();
-		yTop    = machine.getMarginTop();
-		xLeft   = machine.getMarginLeft();
-		xRight  = machine.getMarginRight();
+
+		double [] bounds = img.getBounds();
+		yBottom = bounds[TransformedImage.BOTTOM];
+		yTop    = bounds[TransformedImage.TOP];
+		xLeft   = bounds[TransformedImage.LEFT];
+		xRight  = bounds[TransformedImage.RIGHT];
 		
 		keepIterating=true;
-		restart();
 		renderMode = 0;
+		restart();
 	}
 
 	public void restart() {
@@ -101,9 +103,11 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
 		keepIterating=false;
-		writeOutCells();
+		turtleList.add(writeOutCells());
+		return turtleList;
 	}
 
 	@Override
@@ -204,12 +208,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		int start, end, j, best_end;
 		double a, b, c, d, temp_diff, best_diff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < solutionContains * 2 - 2 && !threadWorker.isCancelled() && !pm.isCanceled(); ++start) {
 			a = calculateWeight(solution[ti(start)], solution[ti(start + 1)]);
 			best_end = -1;
 			best_diff = 0;
 
-			for (end = start + 2; end < start + solutionContains && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end < start + solutionContains && !threadWorker.isCancelled() && !pm.isCanceled(); ++end) {
 				// before
 				b = calculateWeight(solution[ti(end)], solution[ti(end - 1)]);
 				// after
@@ -223,7 +227,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				}
 			}
 
-			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !threadWorker.isCancelled() && !pm.isCanceled()) {
 				once = true;
 				// do the flip
 				int begin = start + 1;
@@ -388,8 +392,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	// write cell centroids to gcode.
-	protected void writeOutCells() {
-		turtle = new Turtle();
+	protected Turtle writeOutCells() {
+		Turtle turtle = new Turtle();
 		
 		if (graphEdges != null) {
 			// find the tsp point closest to the calibration point
@@ -415,6 +419,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				turtle.moveTo(x, y);
 			}
 		}
+		
+		return turtle;
 	}
 
 	// I have a set of points. I want a list of cell borders.

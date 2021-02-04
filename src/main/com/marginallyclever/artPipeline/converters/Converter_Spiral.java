@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
@@ -37,12 +39,14 @@ public class Converter_Spiral extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = 1.0;
 
 		int i, j;
 		final int steps = 4;
@@ -50,17 +54,23 @@ public class Converter_Spiral extends ImageConverter {
 		double level;
 		int z = 0;
 
-		float maxr;
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
+		double w = xRight - xLeft;
+		double h = yTop - yBottom;
+		
+		double maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getMarginHeight();
-			float w2 = (float)machine.getMarginWidth();
-			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
+			maxr = (Math.sqrt(h*h + w*w) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
-			float w = (float)machine.getMarginWidth()/2.0f;
-			float h = (float)machine.getMarginHeight()/2.0f;
-			maxr = (float)( h < w ? h : w );
+			w/=2.0f;
+			h/=2.0f;
+			maxr = ( h < w ? h : w );
 		}
 
 		turtle = new Turtle();
@@ -80,8 +90,8 @@ public class Converter_Spiral extends ImageConverter {
 				f = Math.PI * 2.0 * (double)i / (double)circumference;
 				fx = Math.cos(f) * r;
 				fy = Math.sin(f) * r;
-				
-				boolean isInside = isInsidePaperMargins(fx, fy);
+
+				boolean isInside = (fx>=xLeft && fx<xRight && fy>=yBottom && fy<yTop);
 				if(isInside) {
 					try {
 						z = img.sample3x3(fx, fy);
@@ -99,6 +109,10 @@ public class Converter_Spiral extends ImageConverter {
 		}
 
 		Log.message(numRings + " rings.");
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

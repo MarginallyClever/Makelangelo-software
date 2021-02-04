@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Point2D;
@@ -12,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Pulse extends ImageConverter {
-	private static float blockScale = 6.0f;
+	private static double blockScale = 6.0;
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
 	
@@ -26,7 +28,7 @@ public class Converter_Pulse extends ImageConverter {
 		return new Converter_Pulse_Panel(this);
 	}
 	
-	public float getScale() {
+	public double getScale() {
 		return blockScale;
 	}
 	public void setScale(float value) {
@@ -45,7 +47,7 @@ public class Converter_Pulse extends ImageConverter {
 		direction = value;
 	}
 	
-	protected void convertLine(TransformedImage img,float zigZagSpacing,float halfStep,Point2D a,Point2D b) {		
+	protected void convertLine(Turtle turtle,TransformedImage img,double zigZagSpacing,double halfStep,Point2D a,Point2D b) {		
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1/len);
@@ -79,20 +81,23 @@ public class Converter_Pulse extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-		
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter() * blockScale;
-		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getPenDiameter();
-		float spaceBetweenLines = stepSize;
+		double stepSize = 1.0 * blockScale;
+		double halfStep = stepSize / 2.0f;
+		double zigZagSpacing = 1.0;
+		double spaceBetweenLines = stepSize;
 
 		// from top to bottom of the image...
 		double x, y = 0;
@@ -111,11 +116,11 @@ public class Converter_Pulse extends ImageConverter {
 				if ((i % 2) == 0) {
 					a.set(xLeft,y);
 					b.set(xRight,y);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
+					convertLine(turtle,img,zigZagSpacing,halfStep,a,b);
 				} else {
 					a.set(xRight,y);
 					b.set(xLeft,y);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
+					convertLine(turtle,img,zigZagSpacing,halfStep,a,b);
 				}
 			}
 		} else {
@@ -126,14 +131,18 @@ public class Converter_Pulse extends ImageConverter {
 				if ((i % 2) == 0) {
 					a.set(x,yBottom);
 					b.set(x,yTop);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
+					convertLine(turtle,img,zigZagSpacing,halfStep,a,b);
 				} else {
 					a.set(x,yTop);
 					b.set(x,yBottom);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
+					convertLine(turtle,img,zigZagSpacing,halfStep,a,b);
 				}
 			}
 		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

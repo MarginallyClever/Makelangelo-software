@@ -9,7 +9,7 @@ import com.marginallyclever.makelangelo.Translator;
  * L System fractal
  * @author Dan Royer
  */
-public class Generator_LSystemTree extends ImageGenerator {
+public class Generator_LSystemTree extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
 	private static double angleSpan = 120;
 	private static int numBranches = 3;
@@ -30,25 +30,25 @@ public class Generator_LSystemTree extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
-		turtle = new Turtle();
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
 
 		random = new SecureRandom();
 		random.setSeed(0xDEADBEEF);
 		
 		// move to starting position
-		turtle.moveTo(0,-machine.getMarginHeight()/2);
+		turtle.moveTo(0,-100);
 		turtle.turn(90);
 		turtle.penDown();
 		// do the curve
-		lSystemTree(order, 10);
+		lSystemTree(turtle,order, 10);
 
-		return true;
+		return turtle;
 	}
 
 
 	// recursive L System tree fractal
-	private void lSystemTree(int n, double distance) {
+	private void lSystemTree(Turtle turtle,int n, double distance) {
 		if (n == 0) return;
 
 		turtle.forward(distance);
@@ -59,7 +59,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 			double len = distance*orderScale;
 			turtle.turn(-(angleSpan/2.0f));
 			for(int i=0;i<numBranches;++i) {
-				lSystemTree(n-1,len - len*random.nextDouble()*(noise/100.0f) );
+				lSystemTree(turtle,n-1,len - len*random.nextDouble()*(noise/100.0f) );
 				if(noise>0) {
 					turtle.turn(angleStep + (random.nextDouble()-0.5)*(noise/100.0f)*angleStep);
 				} else {

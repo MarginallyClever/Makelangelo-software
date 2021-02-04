@@ -55,15 +55,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
+	
 	private double rotation;
-	private double rotationref;
+	
 	// % from edge of paper.
 	private double paperMargin;
 
-	// for a while the robot would sign it's name at the end of a drawing
-	@Deprecated
-	private boolean shouldSignName;
-	
 	private String hardwareVersion;
 	private MakelangeloHardwareProperties hardwareProperties;
 
@@ -123,7 +120,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperColor = new ColorRGB(255,255,255);
 		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
-		shouldSignName = false;
 		
 		// paper area
 		double pw = 420 * 0.1; // cm
@@ -453,7 +449,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation",Double.toString(rotation)));
-		rotationref = 0;
 
 		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
@@ -626,10 +621,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 		this.isRegistered = isRegistered;
 	}
 	
-
-	public boolean shouldSignName() {
-		return shouldSignName;
-	}
 
 	public String getHardwareVersion() {
 		return hardwareVersion;
@@ -907,14 +898,4 @@ public final class MakelangeloRobotSettings implements Serializable {
 	public void setRotation(double rot) {
 		this.rotation=rot;
 	}
-
-	public void setRotationRef(double ang) {
-		this.rotationref=ang;
-		
-	}
-
-	public double getRotationRef() {
-		return this.rotationref;
-	}
-
 }

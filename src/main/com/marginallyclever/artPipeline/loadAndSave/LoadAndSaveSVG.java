@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -30,7 +32,7 @@ import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
-import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.TurtleManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
@@ -45,7 +47,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
-public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
 	protected boolean shouldScaleOnLoad = true;
@@ -74,22 +76,21 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,Turtle turtle) {
 		Log.message("Loading...");
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 
 		// prepare for importing
-		machine = robot.getSettings();
 		imageCenterX=imageCenterY=0;
 		scale=1;
 		
-	    turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+		turtle.reset();
+	    turtle.setX(turtle.getX());
+	    turtle.setY(turtle.getX());
 		turtle.setColor(new ColorRGB(0,0,0));
-		boolean loadOK = parseAll(document);
+		boolean loadOK = parseAll(turtle,document);
 		if(!loadOK) {
 			Log.message("Failed to load some elements (1)");
 			return false;
@@ -110,8 +111,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		imageWidth += imageWidth * .02;
 		imageHeight += imageHeight * .02;
 
-		double paperHeight = robot.getSettings().getMarginHeight();
-		double paperWidth  = robot.getSettings().getMarginWidth ();
+		double paperHeight = turtle.getMarginHeight();
+		double paperWidth  = turtle.getMarginWidth();
 
 		scale = 1;
 		if(shouldScaleOnLoad) {
@@ -122,29 +123,28 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					(paperHeight / imageHeight);
 		}
 	    turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+	    turtle.setX(turtle.getX());
+	    turtle.setY(turtle.getX());
 		turtle.setColor(new ColorRGB(0,0,0));
-		loadOK = parseAll(document);
+		loadOK = parseAll(turtle,document);
 		if(!loadOK) {
 			Log.message("Failed to load some elements (2)");
 			return false;
 		}
 		
-		robot.setTurtle(turtle);
 		return true;
 	}
 	
-	protected boolean parseAll(Document document) {
+	protected boolean parseAll(Turtle turtle,Document document) {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		if(loadOK) loadOK = parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		if(loadOK) loadOK = parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		if(loadOK) loadOK = parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		if(loadOK) loadOK = parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
+		boolean    loadOK = parsePathElements(    turtle,documentElement.getElementsByTagName( "path"     ));
+		if(loadOK) loadOK = parsePolylineElements(turtle,documentElement.getElementsByTagName( "polyline" ));
+		if(loadOK) loadOK = parsePolylineElements(turtle,documentElement.getElementsByTagName( "polygon"  ));
+		if(loadOK) loadOK = parseLineElements(    turtle,documentElement.getElementsByTagName( "line"     ));
+		if(loadOK) loadOK = parseRectElements(    turtle,documentElement.getElementsByTagName( "rect"     ));
+		if(loadOK) loadOK = parseCircleElements(  turtle,documentElement.getElementsByTagName( "circle"   ));
+		if(loadOK) loadOK = parseEllipseElements( turtle,documentElement.getElementsByTagName( "ellipse"  ));
 		return loadOK;
 	}
 
@@ -160,7 +160,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	protected boolean parsePolylineElements(NodeList pathNodes) {
+	protected boolean parsePolylineElements(Turtle turtle,NodeList pathNodes) {
 	    boolean loadOK=true;
 		
 	    int pathNodeCount = pathNodes.getLength();
@@ -203,7 +203,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	
-	protected boolean parseLineElements(NodeList node) {
+	protected boolean parseLineElements(Turtle turtle,NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -238,7 +238,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param node
 	 * @return
 	 */
-	protected boolean parseRectElements(NodeList node) {
+	protected boolean parseRectElements(Turtle turtle,NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -313,7 +313,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		}
 	}
 	
-	protected boolean parseCircleElements(NodeList node) {
+	protected boolean parseCircleElements(Turtle turtle,NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -337,7 +337,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return true;
 	}
 
-	protected boolean parseEllipseElements(NodeList node) {
+	protected boolean parseEllipseElements(Turtle turtle,NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -366,7 +366,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * Parse through all the SVG path elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	protected boolean parsePathElements(NodeList pathNodes) {
+	protected boolean parsePathElements(Turtle turtle,NodeList pathNodes) {
 	    boolean loadOK=true;
 
 	    double x=turtle.getX();
@@ -378,7 +378,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
 	    		Log.message("Node is a polyline.");
-	    		parsePolylineElements(pathNodes);
+	    		parsePolylineElements(turtle,pathNodes);
 	    		continue;
 	    	}
 	    	
@@ -587,47 +587,52 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param robot the robot from which the data is obtained
 	 * @return true if save succeeded.
 	 */
-	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
-		turtle = robot.getTurtle();
-
-		machine = robot.getSettings();
-		double left = machine.getPaperLeft();
-		double right = machine.getPaperRight();
-		double top = machine.getPaperTop();
-		double bottom = machine.getPaperBottom();
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
+			Turtle firstTurtle = turtles.get(0);
+			// TODO find the actual bounds
+			double left = firstTurtle.getMarginLeft();
+			double right = firstTurtle.getMarginRight();
+			double top = firstTurtle.getMarginTop();
+			double bottom = firstTurtle.getMarginBottom();
+			
 			// header
 			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
 			out.write("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
 			out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+left+" "+bottom+" "+(right-left)+" "+(top-bottom)+"\">\n");
 
 			boolean isUp=true;
-			double x0 = robot.getSettings().getHomeX();
-			double y0 = robot.getSettings().getHomeY();
-
-			for( TurtleMove m : turtle.history ) {
-				if(m.isUp) {
-					if(!isUp) {
-						isUp=true;
-					}
-				} else {
-					if(isUp) {
-						isUp=false;
+			double x0 = firstTurtle.getX();
+			double y0 = firstTurtle.getY();
+			for( Turtle t : turtles ) {
+				String colorName = t.getColor().toString();
+				double dia = 1.0;
+				
+				for( TurtleMove m : t.history ) {
+					if(m.isUp) {
+						if(!isUp) {
+							isUp=true;
+						}
 					} else {
-						out.write("  <line");
-						out.write(" x1=\""+StringHelper.formatDouble(x0)+"\"");
-						out.write(" y1=\""+StringHelper.formatDouble(-y0)+"\"");
-						out.write(" x2=\""+StringHelper.formatDouble(m.x)+"\"");
-						out.write(" y2=\""+StringHelper.formatDouble(-m.y)+"\"");
-						out.write(" stroke=\"black\"");
-						//out.write(" stroke-width=\"1\"");
-						out.write(" />\n");
+						if(isUp) {
+							isUp=false;
+						} else {
+							out.write("  <line");
+							out.write(" x1=\""+StringHelper.formatDouble(x0)+"\"");
+							out.write(" y1=\""+StringHelper.formatDouble(-y0)+"\"");
+							out.write(" x2=\""+StringHelper.formatDouble(m.x)+"\"");
+							out.write(" y2=\""+StringHelper.formatDouble(-m.y)+"\"");
+							out.write(" stroke=\"+"+colorName+"\"");
+							out.write(" stroke-width=\""+dia+"\"");
+							out.write(" />\n");
+						}
 					}
+					x0=m.x;
+					y0=m.y;
 				}
-				x0=m.x;
-				y0=m.y;
+				
 			}
 			
 			// footer

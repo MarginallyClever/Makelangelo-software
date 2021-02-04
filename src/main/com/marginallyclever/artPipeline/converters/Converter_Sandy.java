@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
@@ -36,23 +38,26 @@ public class Converter_Sandy extends ImageConverter {
 	}
 	
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		double yBottom = machine.getLimitBottom();
-		double yTop    = machine.getLimitTop();
-		double xLeft   = machine.getLimitLeft();
-		double xRight  = machine.getLimitRight();
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 
-		double pBottom = machine.getMarginBottom() +1.0;
-		double pTop    = machine.getMarginTop()    -1.0;
-		double pLeft   = machine.getMarginLeft()   +1.0;
-		double pRight  = machine.getMarginRight()  -1.0;
-
+		double pBottom = bounds[TransformedImage.BOTTOM]+1;
+		double pTop    = bounds[TransformedImage.TOP]   -1;
+		double pLeft   = bounds[TransformedImage.LEFT]  +1;
+		double pRight  = bounds[TransformedImage.RIGHT] -1;
+		
 		double cx,cy;
 		double last_x=0,last_y=0;
 
@@ -73,13 +78,14 @@ public class Converter_Sandy extends ImageConverter {
 		double rMax = Math.sqrt(dx*dx+dy*dy);
 		double rMin = 0;
 
+		double radius = 1.0;
 		double rStep = (rMax-rMin)/(double)blockScale;
 		double r;
 		double t_dir=1;
 		double pulseFlip=1;
 		double t,t_step;
 		double flipSum;
-		double pulseSize = rStep*0.5 - machine.getPenDiameter()/2;//r_step * 0.6 * scale_z;
+		double pulseSize = rStep*0.5 - radius;//r_step * 0.6 * scale_z;
 
 		turtle = new Turtle();
 		turtle.lock();
@@ -91,7 +97,7 @@ public class Converter_Sandy extends ImageConverter {
 			for(r=rMin;r<rMax;r+=rStep) {
 				// go around in a circle
 				t=0;
-				t_step = machine.getPenDiameter()/r;
+				t_step = radius/r;
 				flipSum=0;
 				// go around the circle
 				for(t=0;t<Math.PI*2;t+=t_step) {
@@ -99,7 +105,7 @@ public class Converter_Sandy extends ImageConverter {
 					dy = Math.sin(t_dir *t);
 					x = cx + dx * r;
 					y = cy + dy * r;
-					if(!isInsidePaperMargins(x,y)) {
+					if(x<xLeft || x >=xRight || y <yBottom || y>=yTop) {
 						if(wasDrawing) {
 							turtle.jumpTo(last_x,last_y);
 							wasDrawing=false;
@@ -140,6 +146,10 @@ public class Converter_Sandy extends ImageConverter {
 			turtle.unlock();
 			Log.message("Sandy finished.");
 		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 
 	public int getScale() {

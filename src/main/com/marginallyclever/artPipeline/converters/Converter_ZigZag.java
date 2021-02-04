@@ -2,8 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 
 import java.awt.Point;
-import java.io.IOException;
-import java.io.Writer;
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
@@ -79,12 +78,12 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public int flipTests() {
 		int start, end, j, once = 0;
 
-		for (start = 0; start < numPoints - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < numPoints - 2 && !threadWorker.isCancelled() && !pm.isCanceled(); ++start) {
 			float a = calculateWeight(solution[start], solution[start + 1]);
 			int best_end = -1;
 			double best_diff = 0;
 
-			for (end = start + 2; end <= numPoints && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end <= numPoints && !threadWorker.isCancelled() && !pm.isCanceled(); ++end) {
 				// before
 				float b = calculateWeight(solution[end], solution[end - 1]);
 				// after
@@ -98,7 +97,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				}
 			}
 
-			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !threadWorker.isCancelled() && !pm.isCanceled()) {
 				once = 1;
 				// do the flip
 				int begin = start + 1;
@@ -121,7 +120,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		return once;
 	}
 
-
+	@Override
 	public void render(GL2 gl2) {
 		if (points == null || solution == null) return;
 
@@ -148,7 +147,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	}
 
 
-	private void generateTSP(Writer out) throws IOException {
+	private void generateTSP(Turtle turtle) {
 		greedyTour();
 
 		Log.message("Running Kernighan–Lin optimization...");
@@ -162,7 +161,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		updateProgress(len, 2);
 
 		int once = 1;
-		while (once == 1 && t_elapsed < time_limit && !swingWorker.isCancelled()) {
+		while (once == 1 && t_elapsed < time_limit && !threadWorker.isCancelled()) {
 			once = 0;
 			//@TODO: make these optional for the very thorough people
 			//once|=transposeForwardTest();
@@ -173,7 +172,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			updateProgress(len, 2);
 		}
 
-		convertAndSaveToGCode(out);
+		convertAndSaveToGCode(turtle);
 	}
 
 
@@ -239,7 +238,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	 * Since all the points are connected in a single loop,
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
-	private void convertAndSaveToGCode(Writer out) throws IOException {
+	private void convertAndSaveToGCode(Turtle turtle) {
 		// find the tsp point closest to the calibration point
 		int i;
 		int besti = -1;
@@ -255,7 +254,8 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			}
 		}
 
-		turtle = new Turtle();
+		turtle.reset();
+		
 		// jump to first point
 		turtle.jumpTo(points[besti].x, points[besti].y);
 		// move through entire list
@@ -270,12 +270,13 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	}
 
 
-	protected void connectTheDots(TransformedImage img) {
+	protected void connectTheDots(Turtle turtle,TransformedImage img) {
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		
 		double x, y;
 		int i;
@@ -307,27 +308,28 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 			}
 		}
 	}
+	
 
-	/**
-	 * The main entry point
-	 *
-	 * @param img the image to convert.
-	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	@Override
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
 		// Dither
 		Filter_DitherFloydSteinberg fs = new Filter_DitherFloydSteinberg();
 		img = fs.filter(img);
 
 		// connect the dots
-		connectTheDots(img);
+		connectTheDots(turtle,img);
 		// Shorten the line that connects the dots
-		generateTSP(out);
-
-		return true;
+		generateTSP(turtle);
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

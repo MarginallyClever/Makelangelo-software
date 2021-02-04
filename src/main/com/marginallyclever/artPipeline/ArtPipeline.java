@@ -418,23 +418,18 @@ public class ArtPipeline {
 	
 	
 	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
-		int i;
-		double x,y,xn,yn;
 		double ang=settings.getRotation();
-		double refang=settings.getRotationRef();
-		double c=Math.cos((ang-refang)*Math.PI/180.0);
-		double s=Math.sin((ang-refang)*Math.PI/180.0);
+		if(ang == 0.0) return; 
+			
+		double c=Math.cos(ang*Math.PI/180.0);
+		double s=Math.sin(ang*Math.PI/180.0);
 
-		for(i=0;i<turtle.history.size();i++)
-		{
-			x=turtle.history.get(i).x;
-			y=turtle.history.get(i).y;
-			xn=x*c-y*s;
-		    yn=x*s+y*c;
-			turtle.history.get(i).x=xn;
-			turtle.history.get(i).y=yn;
+		for( TurtleMove m : turtle.history ) { 
+			double x=m.x;
+			double y=m.y;
+			m.x=x*c-y*s;
+			m.y=x*s+y*c;
 		}
-		settings.setRotationRef(ang);
 	}
 	
 	
@@ -525,18 +520,14 @@ public class ArtPipeline {
 		}
 		turtle.lock();
 		try {
-			double ang=settings.getRotation();
-			if(ang != 0.0)
-			{
-				rotatePicture(turtle,settings);
-			}
+			rotatePicture(turtle,settings);/*
 			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
 			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
 			if(shouldFlipV()) flipV(turtle,settings);
 			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
-			if(shouldCrop()) cropToPageMargin(turtle,settings);
+			if(shouldCrop()) cropToPageMargin(turtle,settings);*/
 		}
 		finally {
 			turtle.unlock();

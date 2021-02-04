@@ -35,7 +35,7 @@ public class SelectTests {
 	@BeforeEach
 	public void beforeEach() {
 		panel = new SelectPanel();
-		frame.getContentPane().add(panel.getPanel());
+		frame.getContentPane().add(panel.getInteriorPanel());
 	}
 	
 	@AfterEach

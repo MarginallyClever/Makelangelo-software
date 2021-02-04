@@ -23,7 +23,7 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 		super();
 		converter=arg0;
 
-		add(sizeField = new SelectFloat(Translator.get("HilbertCurveSize"),converter.getScale()));
+		add(sizeField = new SelectFloat(Translator.get("HilbertCurveSize"),(float)converter.getScale()));
 		add(directionChoices = new SelectOneOfMany(Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
 		finish();
 	}

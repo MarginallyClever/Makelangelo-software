@@ -85,10 +85,10 @@ public class MakelangeloAppPreferences {
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
 		panel.add(pane,c);
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel().getInteriorPanel());
+		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel().getInteriorPanel());
+		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel().getInteriorPanel());
+		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getInteriorPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

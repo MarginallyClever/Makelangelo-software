@@ -58,7 +58,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		interiorPanel.add(new JLabel(""),gbc);
 	}
 	
-	public JPanel getPanel() {
+	public JPanel getInteriorPanel() {
 		return interiorPanel;
 	}
 
@@ -97,9 +97,9 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		panel.add(j);
 		// test finish
 		panel.finish();
-		panel.getPanel().setPreferredSize(new Dimension(400,600));
+		panel.getInteriorPanel().setPreferredSize(new Dimension(400,600));
 
-		frame.getContentPane().add(panel.getPanel());
+		frame.getContentPane().add(panel.getInteriorPanel());
 		frame.pack();
 		frame.setVisible(true);
 	}

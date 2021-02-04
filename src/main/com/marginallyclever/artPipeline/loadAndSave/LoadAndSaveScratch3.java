@@ -27,7 +27,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.TurtleManipulator;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -43,7 +43,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveScratch3 extends TurtleManipulator implements LoadAndSaveFileType {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -84,6 +84,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 
 	//private int indent=0;
 	private boolean penUp=false;
+	private Turtle turtle;
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -103,11 +104,11 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,Turtle destinationTurtle) {
 		Log.message(Translator.get("FileTypeSB3")+"...");
 		// reset the turtle object
-		turtle = new Turtle();
-		machine = robot.getSettings();
+		turtle = destinationTurtle;
+		turtle.reset();
 			
 		try {
 			// open zip file
@@ -190,8 +191,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			e.printStackTrace();
 			return false;
 		}
-			
-		robot.setTurtle(turtle);
+		
 		return true;
 	}
 
@@ -249,8 +249,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			// START OF SCRIPT
 			case "event_whenflagclicked":
 				// gcode preamble
-				// reset the turtle object
-				turtle = new Turtle();
+				turtle.reset();
 				// make sure machine state is the default.
 				break;
 				
@@ -864,7 +863,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		return true;
 	}
 
@@ -876,5 +875,10 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	@Override
 	public boolean canSave() {
 		return false;
+	}
+
+	@Override
+	public String getName() {
+		return Translator.get("LoadScratch3");
 	}
 }

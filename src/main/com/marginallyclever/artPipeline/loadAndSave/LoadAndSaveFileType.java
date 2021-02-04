@@ -2,9 +2,11 @@ package com.marginallyclever.artPipeline.loadAndSave;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
@@ -50,13 +52,14 @@ public interface LoadAndSaveFileType {
 	 * @param robot machine hardware settings to use in loading process
 	 * @return true if load successful.
 	 */
-	public boolean load(InputStream inputStream,MakelangeloRobot robot);
+	public boolean load(InputStream inputStream,Turtle turtle);
 	
 	/**
 	 * attempt to save makelangelo instructions to a given stream
 	 * @param outputStream destination
+	 * @param turtles the agnostic set of instructions
 	 * @param robot machine hardware settings to use in loading process
 	 * @return true if save successful.
 	 */
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot);
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot);
 }

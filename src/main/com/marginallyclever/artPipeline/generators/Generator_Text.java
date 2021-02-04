@@ -25,7 +25,10 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Text extends ImageGenerator {
+public class Generator_Text extends TurtleGenerator {
+	private double width=100;
+	private double height=100;
+	
 	// text properties
 	private float kerning = 5.0f;
 	private float letterWidth = 10.0f;
@@ -105,25 +108,23 @@ public class Generator_Text extends ImageGenerator {
 		return new Generator_Text_Panel(this);
 	}
 	
-	protected void setupTransform() {
-		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
-		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
+	protected void setupTransform(Turtle turtle) {
+		double imageHeight = height;
+		double imageWidth = width;
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > machine.getPaperWidth()) {
-			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > width) {
+			float resize = (float) width / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = machine.getPaperWidth();
+			newWidth = width;
 		}
-		if (newHeight > machine.getPaperHeight()) {
-			float resize = (float) machine.getPaperHeight() / (float) newHeight;
+		if (newHeight > height) {
+			float resize = (float) height / (float) newHeight;
 			newWidth *= resize;
-			newHeight = machine.getPaperHeight();
+			newHeight = height;
 		}
-		newWidth *= machine.getPaperMargin();
-		newHeight *= machine.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -132,25 +133,23 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 
-	protected void setupTransform(int width, int height) {
+	protected void setupTransform(Turtle turtle,int width, int height) {
 		int imageHeight = height;
 		int imageWidth = width;
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > machine.getPaperWidth()) {
-			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > width) {
+			float resize = (float) width / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = machine.getPaperWidth();
+			newWidth = width;
 		}
-		if (newHeight > machine.getPaperHeight()) {
-			float resize = (float) machine.getPaperHeight() / (float) newHeight;
+		if (newHeight > height) {
+			float resize = (float) height / (float) newHeight;
 			newWidth *= resize;
-			newHeight = machine.getPaperHeight();
+			newHeight = height;
 		}
-		newWidth *= machine.getPaperMargin();
-		newHeight *= machine.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -159,7 +158,7 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	
-	private void writeBeautifulMessage(String fontName,int fontSize, String message) {
+	private void writeBeautifulMessage(Turtle turtle,String fontName,int fontSize, String message) {
 		if(message.length()<=0) {
 			return;
 		}
@@ -204,13 +203,13 @@ public class Generator_Text extends ImageGenerator {
 			//Shape s = textLayout.getOutline(null);
 			//Rectangle bounds = s.getBounds();
 
-			writeBeautifulString(font,frc,piece, dx, dy);
+			writeBeautifulString(turtle,font,frc,piece, dx, dy);
 			
 			dy += fontSize;//bounds.getHeight();
 		}
 	}
 	
-	private void writeBeautifulString(Font font, FontRenderContext frc,String text,float dx, float dy) { 
+	private void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,float dx, float dy) { 
 		TextLayout textLayout = new TextLayout(text,font,frc);
 		Shape s = textLayout.getOutline(null);		
 		PathIterator pi = s.getPathIterator(null);
@@ -295,18 +294,19 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
 		String fontName = fontNames[lastFont];
 
-		turtle = new Turtle();
 		posx=0;
 		posy=0;
-		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
+		textFindCharsPerLine(100);
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
-		writeBeautifulMessage(fontName,lastSize,lastMessage);
+		writeBeautifulMessage(turtle,fontName,lastSize,lastMessage);
 
-	    return true;
+	    return turtle;
 	}
 	
 	public void textSetPosition(float x, float y) {
@@ -391,13 +391,11 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 
-	private void textCreateMessageNow(String text) {
+	private void textCreateMessageNow(Turtle turtle,String text) {
 		if (charsPerLine <= 0) return;
 
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);
-
-		turtle = new Turtle();
 
 		if (draw_bounding_box) {
 			// draw bounding box
@@ -426,7 +424,7 @@ public class Generator_Text extends ImageGenerator {
 				turtle.moveTo(message_start, turtle.getY() + interline);
 			}
 
-			textDrawLine(lines[i]);
+			textDrawLine(turtle,lines[i]);
 		}
 		
 		turtle.penUp();
@@ -473,7 +471,7 @@ public class Generator_Text extends ImageGenerator {
 		return len;
 	}
 
-	private void textDrawLine(String a1) {
+	private void textDrawLine(Turtle turtle,String a1) {
 		String ud = ALPHABET_FOLDER;
 
 		Log.message( a1 +"("+ a1.length() +")" );
@@ -580,18 +578,18 @@ public class Generator_Text extends ImageGenerator {
 		}
 	}
 
-	public void signName() {
-		setupTransform();
+	public void signName(Turtle turtle,String message) {
+		setupTransform(turtle);
 
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition(
-				(float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
-				(float)(machine.getPaperHeight()*10.0f*machine.getPaperMargin()));
+				(float)(100*10.0f),
+				(float)(100*10.0f));
 
 		textSetCharsPerLine(25);
 
-		textCreateMessageNow( "Makelangelo #" + Long.toString(machine.getUID()) );
+		textCreateMessageNow(turtle, message );
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.");
 	}
 }

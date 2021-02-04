@@ -1,6 +1,8 @@
 package com.marginallyclever.artPipeline.converters;
 
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -45,26 +47,28 @@ public class Converter_Boxes extends ImageConverter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		if(sourceImage ==null ) return null;
+		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		Turtle turtle = new Turtle();
+		
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = machine.getPenDiameter()*boxMaxSize;
-		double fullStep = d;
+		double fullStep = 2.0*boxMaxSize;
 		double halfStep = fullStep / 2.0f;
 		
 		double steps = pw / fullStep;
 		if (steps < 1) steps = 1;
-
-		turtle = new Turtle();
 		
 		// from top to bottom of the image...
 		double x, y, z;
@@ -80,22 +84,7 @@ public class Converter_Boxes extends ImageConverter {
 					double scaleZ =  (255.0f - z) / 255.0;
 					double pulseSize = (halfStep) * scaleZ *0.9;
 					if (scaleZ > cutoff/255.0) {
-						double xmin = x + halfStep - pulseSize;
-						double xmax = x + halfStep + pulseSize;
-						double ymin = y + halfStep - pulseSize;
-						double ymax = y + halfStep + pulseSize;
-						// Draw a square.  the diameter is relative to the intensity.
-						turtle.jumpTo(xmin, ymin);
-						turtle.moveTo(xmax, ymin);
-						turtle.moveTo(xmax, ymax);
-						turtle.moveTo(xmin, ymax);
-						turtle.moveTo(xmin, ymin);
-						// fill in the square
-						boolean flip = false;
-						for(double yy=ymin;yy<ymax;yy+=d) {
-							turtle.moveTo(flip?xmin:xmax,yy);
-							flip = !flip;
-						}
+						drawFilledBox(turtle,x,y,halfStep,pulseSize);
 					}
 				}
 			} else {
@@ -107,25 +96,35 @@ public class Converter_Boxes extends ImageConverter {
 					double scaleZ = (255.0f - z) / 255.0f;
 					double pulseSize = (halfStep - 0.5f) * scaleZ;
 					if (pulseSize > cutoff/255.0) {
-						double xmin = x - halfStep - pulseSize;
-						double xmax = x - halfStep + pulseSize;
-						double ymin = y + halfStep - pulseSize;
-						double ymax = y + halfStep + pulseSize;
-						// draw a square.  the diameter is relative to the intensity.
-						turtle.jumpTo(xmin, ymin);
-						turtle.moveTo(xmax, ymin);
-						turtle.moveTo(xmax, ymax);
-						turtle.moveTo(xmin, ymax);
-						turtle.moveTo(xmin, ymin);
-						// fill in the square
-						boolean flip = false;
-						for(double yy=ymin;yy<ymax;yy+=d) {
-							turtle.moveTo(flip?xmin:xmax,yy);
-							flip = !flip;
-						}
+						drawFilledBox(turtle,x,y,halfStep,pulseSize);
 					}
 				}
 			}
+		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
+	}
+	
+	protected void drawFilledBox(Turtle turtle,double x,double y,double halfStep,double pulseSize) {
+		double d = 2.0*boxMaxSize;
+		
+		double xmin = x - halfStep - pulseSize;
+		double xmax = x - halfStep + pulseSize;
+		double ymin = y + halfStep - pulseSize;
+		double ymax = y + halfStep + pulseSize;
+		// draw a square.  the diameter is relative to the intensity.
+		turtle.jumpTo(xmin, ymin);
+		turtle.moveTo(xmax, ymin);
+		turtle.moveTo(xmax, ymax);
+		turtle.moveTo(xmin, ymax);
+		turtle.moveTo(xmin, ymin);
+		// fill in the square
+		boolean flip = false;
+		for(double yy=ymin;yy<ymax;yy+=d) {
+			turtle.moveTo(flip?xmin:xmax,yy);
+			flip = !flip;
 		}
 	}
 }

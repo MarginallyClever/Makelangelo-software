@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Gosper curve fractal.
  * @author Dan Royer
  */
-public class Generator_GosperCurve extends ImageGenerator {
+public class Generator_GosperCurve extends TurtleGenerator {
 	private double turtleStep = 10.0f;
 	private double xMax = 0;
 	private double xMin = 0;
@@ -34,10 +34,10 @@ public class Generator_GosperCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
 
-		turtle = new Turtle();
+		double v = 100;
 		
 		turtleStep = 10;
 		
@@ -46,7 +46,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 		yMax = 0;
 		yMin = 0;
 		
-		gosperA(order);
+		gosperA(turtle,order);
 
 		turtle = new Turtle();
 
@@ -79,61 +79,61 @@ public class Generator_GosperCurve extends ImageGenerator {
 		turtle.moveTo(x,y);
 		turtle.penDown();
 		// do the curve
-		gosperA(order);
+		gosperA(turtle,order);
 	    
-	    return true;
+	    return turtle;
 	}
 
 
 	// Gosper curve A = A-B--B+A++AA+B-
-	private void gosperA(int n) {
+	private void gosperA(Turtle turtle,int n) {
 		if (n == 0) {
-			gosperForward();
+			gosperForward(turtle);
 			return;
 		}
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		gosperA(n-1);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 	}
 
 
 	// Gosper curve B = +A-BB--B-A++A+B
-	public void gosperB(int n) {
+	public void gosperB(Turtle turtle,int n) {
 		if (n == 0) {
-			gosperForward();
+			gosperForward(turtle);
 			return;
 		}
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(-60);
-		gosperB(n-1);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 	}
 
 
-	public void gosperForward() {
+	public void gosperForward(Turtle turtle) {
 		turtle.forward(turtleStep);
 		if(xMax<turtle.getX()) xMax=turtle.getX();
 		if(xMin>turtle.getX()) xMin=turtle.getX();

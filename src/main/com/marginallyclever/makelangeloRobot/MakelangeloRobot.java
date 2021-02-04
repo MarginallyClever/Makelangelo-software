@@ -7,12 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -28,7 +24,6 @@ import javax.swing.border.LineBorder;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.ArtPipeline;
 import com.marginallyclever.artPipeline.ArtPipelineListener;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
@@ -780,11 +775,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	/**
 	 * Copy the most recent turtle to the drawing output buffer.
 	 */
-	public void saveCurrentTurtleToDrawing() {
+	public void saveCurrentTurtleToDrawing() {/*
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
-			exportForDrawing.save(fileOutputStream, this);
+			exportForDrawing.save(fileOutputStream, myTurtles, this);
 
 			drawingCommands.clear();
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
@@ -804,7 +799,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
 		double newEstimate= m.getTimeEstimate(turtle, settings);
 		Log.message("New method "+printTimeEstimate(newEstimate));
-		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
+		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);*/
 	}
 	
 	protected String printTimeEstimate(double seconds) {
@@ -930,6 +925,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		decorator = arg0;
 	}
 
+	// from PreviewListener
+	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);

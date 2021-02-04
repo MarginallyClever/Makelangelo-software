@@ -53,12 +53,12 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	
-	protected void convertLine(TransformedImage img,float spaceBetweenLines,float halfStep,Point2D a,Point2D b) {
+	protected void convertLine(Turtle turtle,TransformedImage img,double spaceBetweenLines,double halfStep,Point2D a,Point2D b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
 		
 		double CUTOFF = 1.0/255.0;
-		double iterStepSize = 0.002;//machine.getPenDiameter()/2;
+		double iterStepSize = 0.002;//turtle.getPenDiameter()/2;
 		
 		// examine the line once.  all Z values will be in the range 0...1
 		ArrayList<Double> zList = new ArrayList<Double>();
@@ -80,7 +80,7 @@ public class Converter_Moire extends ImageConverter {
 		}
 		
 		// find the maximum number of passes for any given line
-		double pd = machine.getPenDiameter()*0.7;
+		double pd = 1;
 		int maxPasses = (int)Math.floor( spaceBetweenLines / pd )-1;
 		// adjust to the maximum number used in *this* line.
 		int passesThisLine = (int)(maxPasses * maxPixel);
@@ -140,13 +140,13 @@ public class Converter_Moire extends ImageConverter {
 								zi2 = zList.listIterator(ziStart);
 								for(zc=ziStart; zc<ziEnd; ++zc) {
 									z = zi2.next();
-									lineInternal(maxPulseNow,z,line,zc*iterStepSize);
+									lineInternal(turtle,maxPulseNow,z,line,zc*iterStepSize);
 								}
 							} else {
 								zi2 = zList.listIterator(ziEnd);
 								for(zc=ziEnd-1; zc>=ziStart; --zc) {
 									z = zi2.previous();
-									lineInternal(maxPulseNow,z,line,zc*iterStepSize);
+									lineInternal(turtle,maxPulseNow,z,line,zc*iterStepSize);
 								}
 							}
 							direction=-direction;
@@ -159,7 +159,7 @@ public class Converter_Moire extends ImageConverter {
 		}
 	}
 	
-	protected void lineInternal(double maxPulseNow,double z,LineInterpolator line,double t) {
+	protected void lineInternal(Turtle turtle,double maxPulseNow,double z,LineInterpolator line,double t) {
 		double pulseSize = maxPulseNow * z;
 		Point2D p = new Point2D();
 		Point2D n = new Point2D();
@@ -171,20 +171,23 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-		
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 
 		double h=yTop-yBottom;
 		double w=xRight-xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		float halfStep = machine.getPenDiameter();
+		double halfStep = 1.0;
 		float spaceBetweenLines = blockScale;
 
 		// from top to bottom of the image...
@@ -201,7 +204,7 @@ public class Converter_Moire extends ImageConverter {
 			for (double y = yBottom; y < yTop; y += spaceBetweenLines) {
 				a.set(xRight,y);
 				b.set(xLeft,y);
-				convertLine(img,spaceBetweenLines,halfStep,a,b);
+				convertLine(turtle,img,spaceBetweenLines,halfStep,a,b);
 			}
 		} else {
 			// vertical
@@ -210,10 +213,14 @@ public class Converter_Moire extends ImageConverter {
 			for (double x = xLeft; x < xRight; x += spaceBetweenLines) {
 				a.set(x,yTop);
 				b.set(x,yBottom);
-				convertLine(img,spaceBetweenLines,halfStep,a,b);
+				convertLine(turtle,img,spaceBetweenLines,halfStep,a,b);
 			}
 		}
 		Log.message("Moire end");
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

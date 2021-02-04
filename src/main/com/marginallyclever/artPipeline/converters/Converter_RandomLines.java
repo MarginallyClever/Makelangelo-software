@@ -23,13 +23,13 @@ public class Converter_RandomLines extends ImageConverter {
 		return new Converter_RandomLines_Panel(this);
 	}
 	
-	public void finish() {
+	public void finish(Turtle turtle) {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
 
-		float stepSize = machine.getPenDiameter()*5;
+		double stepSize = 2.5;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -37,14 +37,15 @@ public class Converter_RandomLines extends ImageConverter {
 		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getMarginBottom();
-		float yTop    = (float)machine.getMarginTop()   ;
-		float xLeft   = (float)machine.getMarginLeft()  ;
-		float xRight  = (float)machine.getMarginRight() ;
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 
-		turtle = new Turtle();
+		turtle.reset();
 		turtle.moveTo(0, yTop);
 
 		double startPX = 0; 
@@ -56,7 +57,7 @@ public class Converter_RandomLines extends ImageConverter {
 			double endPX = xLeft   + (Math.random() * dx)+0.5; 
 			double endPY = yBottom + (Math.random() * dy)+0.5; 
 
-			convertAlongLine(startPX,startPY,endPX,endPY,stepSize,level,img);
+			convertAlongLine(turtle,startPX,startPY,endPX,endPY,stepSize,level,img);
 			
 			startPX = endPX;
 			startPY = endPY;

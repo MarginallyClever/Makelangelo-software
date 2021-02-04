@@ -10,8 +10,8 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Lissajous extends ImageGenerator {
-	private double WIDTH,HEIGHT;
+public class Generator_Lissajous extends TurtleGenerator {
+	private double WIDTH, HEIGHT;
 
 	private static double delta = Math.PI/6;
 	private static int a = 11;
@@ -62,24 +62,26 @@ public class Generator_Lissajous extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
 		// scale the step size so the curve fits on the paper
-		WIDTH = machine.getMarginWidth()/2.0;
-		HEIGHT = machine.getMarginHeight()/2.0;
+		WIDTH = 100;
+		HEIGHT = 100;
 
-		drawLissajous(true);
+		drawLissajous(turtle,true);
 	    
-	    return true;
+	    return turtle;
 	}
 	
 	// see https://www.openprocessing.org/sketch/26608/
 	// based on code by Javier Romero (http://www.fjromero.com/processing/lissajous/)
-	protected void drawLissajous(boolean write) {
+	protected void drawLissajous(Turtle turtle,boolean write) {
 		double x,y,t;
 
 		//x = AX*sin(a*t + delta) + screen_width/2;
 		//y = BX*sin(b*t) + screen_height/2;
-		turtle = new Turtle();
+		turtle.reset();
 		
 		for(int t1=0; t1<=numSamples; ++t1) {
 			t = ( Math.PI*2.0 * t1 / (double)numSamples );

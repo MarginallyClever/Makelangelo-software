@@ -1,55 +1,36 @@
 package com.marginallyclever.artPipeline;
 
+
+import java.util.ArrayList;
+
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
 /**
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class ImageManipulator {		
-	// pen position optimizing
-	public Turtle turtle = new Turtle();
+public abstract class TurtleManipulator {	
 	// threading
 	protected ProgressMonitor pm;
-	protected SwingWorker<Void, Void> swingWorker;
-	// helpers
-	protected MakelangeloRobotSettings machine;
-
+	protected SwingWorker<ArrayList<Turtle>, Void> threadWorker;
 	
-	public void setSwingWorker(SwingWorker<Void, Void> p) {
-		swingWorker = p;
+	
+	public void setThreadWorker(SwingWorker<ArrayList<Turtle>, Void> p) {
+		threadWorker = p;
 	}
 
 	public void setProgressMonitor(ProgressMonitor p) {
 		pm = p;
 	}
 	
-	public void setRobot(MakelangeloRobot robot) {
-		machine = robot.getSettings();
-	}
-
-
 	/**
 	 * @return the translated name of the manipulator.
 	 */
-	public String getName() {
-		return "Unnamed";
-	}
-
-
-	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < machine.getMarginLeft()  ) return false;
-		if( x > machine.getMarginRight() ) return false;
-		if( y < machine.getMarginBottom()) return false;
-		if( y > machine.getMarginTop()   ) return false;
-		return true;
-	}
+	abstract public String getName();
 }
 
 /**

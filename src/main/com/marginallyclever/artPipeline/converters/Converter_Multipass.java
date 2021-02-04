@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -42,7 +44,9 @@ public class Converter_Multipass extends ImageConverter {
 	 * create parallel lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
@@ -51,7 +55,7 @@ public class Converter_Multipass extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter();
+		double stepSize = 1.0;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -59,10 +63,11 @@ public class Converter_Multipass extends ImageConverter {
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);
@@ -84,11 +89,11 @@ public class Converter_Multipass extends ImageConverter {
 		
 			double l2 = level * (1 + (i % passes));
 			if ((i % 2) == 0) {
-				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x0, y0, x1, y1, stepSize, l2, img);
+				else convertAlongLineErrorTerms(turtle,x0,y0,x1,y1,stepSize,l2,error0,error1,img);
 			} else {
-				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x1, y1, x0, y0, stepSize, l2, img);
+				else convertAlongLineErrorTerms(turtle,x1,y1,x0,y0,stepSize,l2,error0,error1,img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -96,6 +101,10 @@ public class Converter_Multipass extends ImageConverter {
 			}
 			++i;
 		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

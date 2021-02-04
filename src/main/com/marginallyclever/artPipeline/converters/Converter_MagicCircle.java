@@ -1,6 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -46,24 +47,32 @@ public class Converter_MagicCircle extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		turtle = new Turtle();
+		turtle.reset();
 		
 		int numLines = numberOfPoints * numberOfPoints / 2;
 		LineIntensity [] intensities = new LineIntensity[numLines*2];
 		double [] px = new double[numberOfPoints];
 		double [] py = new double[numberOfPoints];
 		
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = 1.0;
 
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
+		
 		// find the largest circle that still fits in the image.
-		double w = machine.getMarginWidth()/2.0f;
-		double h = machine.getMarginHeight()/2.0f;
-		double maxr = ( h < w ? h : w );
+		double height  = yTop-yBottom;
+		double width   = xRight-xLeft;
+		double maxr = ( height < width ? height : width );
 
 		
 		int i,j,k;
@@ -114,6 +123,10 @@ public class Converter_MagicCircle extends ImageConverter {
 			turtle.moveTo(px[j],py[j]);
 		}
 		turtle.penUp();
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

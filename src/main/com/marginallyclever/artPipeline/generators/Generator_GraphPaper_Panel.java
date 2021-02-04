@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
 /**
  * Panel for {@link Generator_GraphPaper}
  * @author Dan Royer
- *
+ * TODO graph paper needs to offer measurements for the grid size
  */
 public class Generator_GraphPaper_Panel extends ImageGeneratorPanel {
 	/**

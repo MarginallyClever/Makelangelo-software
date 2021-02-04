@@ -21,9 +21,8 @@ import java.util.ServiceLoader;
 import javax.swing.*;
 
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
-import com.marginallyclever.artPipeline.ImageManipulator;
-import com.marginallyclever.artPipeline.generators.Generator_Text;
-import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.generators.TurtleGenerator;
 import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
@@ -637,6 +636,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	
 
 	public void newFile() {
+		Turtle t = makelangeloApp.getSelectedTurtle();
+		t.reset();
 		robot.setTurtle(new Turtle());
 		updateButtonAccess();
 	}
@@ -647,17 +648,17 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		panel.setLayout(new BorderLayout());
 
 		JPanel cards = new JPanel(new CardLayout());
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+		ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
 		int i=0;
-		for( ImageGenerator ici : imageGenerators ) {
-			cards.add(ici.getPanel().getPanel(),ici.getName());
+		for( TurtleGenerator ici : imageGenerators ) {
+			cards.add(ici.getPanel().getInteriorPanel(),ici.getName());
 			i++;
 		}
 		
 		String[] imageGeneratorNames = new String[i];
 		
 		i=0;
-		for( ImageManipulator f : imageGenerators ) {
+		for( TurtleManipulator f : imageGenerators ) {
 			imageGeneratorNames[i++] = f.getName();
 		}
 
@@ -688,46 +689,45 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 
 	private void changeGeneratorPanel(int index) {
 		ImageGeneratorPanel.makelangeloRobotPanel = this;
-		ImageGenerator chosenGenerator = getGenerator(index);
+		
+		Turtle t = makelangeloApp.getSelectedTurtle();
+		
+		TurtleGenerator chosenGenerator = getGenerator(index);
 		ImageGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
-			JPanel p = chosenGeneratorPanel.getPanel();
+			JPanel p = chosenGeneratorPanel.getInteriorPanel();
 			p.setBorder(BorderFactory.createLineBorder(Color.RED));
 			try {
-				regenerate(chosenGenerator);
+				regenerate(chosenGenerator,t);
 			} catch(Exception e){}
 		}
 	}
 	
-	public void regenerate(ImageGenerator chosenGenerator) {
+	
+	/**
+	 * restart the Generator
+	 * @param chosenGenerator
+	 * @param t
+	 */
+	public void regenerate(TurtleGenerator chosenGenerator,Turtle t) {
 		robot.setDecorator(chosenGenerator);
-		chosenGenerator.setRobot(robot);
 		
 		// do the work
+		t.reset();
 		chosenGenerator.generate();
-		robot.getSettings().setRotationRef(0);
-				
-		Turtle t=chosenGenerator.turtle;
-
-		if (robot.getSettings().shouldSignName()) {
-			// Sign name
-			Generator_Text ymh = new Generator_Text();
-			ymh.setRobot(robot);
-			ymh.signName();
-			t.history.addAll(ymh.turtle.history);
-		}
+		
 		robot.setDecorator(null);
-		robot.setTurtle(t);
+		
 		Log.message(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
 	}
 
-	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+	private TurtleGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
+		ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
 		int i=0;
-		for( ImageGenerator chosenGenerator : imageGenerators ) {
+		for( TurtleGenerator chosenGenerator : imageGenerators ) {
 			if(i==arg0) {
 				return chosenGenerator;
 			}

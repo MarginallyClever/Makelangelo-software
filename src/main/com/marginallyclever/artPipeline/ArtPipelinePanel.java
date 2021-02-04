@@ -173,7 +173,7 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		ArtPipelinePanel p = new ArtPipelinePanel(frame);
-		p.getContentPane().getPanel().setPreferredSize(new Dimension(400,600));
+		p.getContentPane().getInteriorPanel().setPreferredSize(new Dimension(400,600));
 		frame.add(p);
 		
 		frame.pack();

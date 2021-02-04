@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
  * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
  * @author Dan Royer
  */
-public class Generator_Maze extends ImageGenerator {
+public class Generator_Maze extends TurtleGenerator {
 	// MazeCells are the rooms separted by MazeWalls
 	protected class MazeCell {
 		int x, y;
@@ -22,7 +22,8 @@ public class Generator_Maze extends ImageGenerator {
 		boolean removed;
 	}
 
-	protected static int rows = 5, columns = 5;
+	protected static int rows = 10;
+	protected static int columns = 10;
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
@@ -56,7 +57,7 @@ public class Generator_Maze extends ImageGenerator {
 	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
 	 */
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
 		// build the cells
 		cells = new MazeCell[rows * columns];
 
@@ -136,21 +137,22 @@ public class Generator_Maze extends ImageGenerator {
 		}
 
 		// draw the maze
-		drawMaze();
+		Turtle turtle = new Turtle();
+		drawMaze(turtle);
 	    
-	    return true;
+	    return turtle;
 	}
 
-	private void drawMaze() {
-		yMin = (float)machine.getMarginBottom();
-		yMax = (float)machine.getMarginTop();
-		xMin = (float)machine.getMarginLeft();
-		xMax = (float)machine.getMarginRight();
+	private void drawMaze(Turtle turtle) {
+		yMin = -100;
+		yMax = 100;
+		xMin = -100;
+		xMax = 100;
 		
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;
 
-		turtle = new Turtle();
+		turtle.reset();
 		
 		// Draw outside edge
 		turtle.jumpTo(xMin, yMax);

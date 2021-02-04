@@ -11,9 +11,9 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  *
  */
-public class Generator_FibonacciSpiral extends ImageGenerator {
-	private float xMax = 70;
-	private float yMax = 70;
+public class Generator_FibonacciSpiral extends TurtleGenerator {
+	private float xMax = 100;
+	private float yMax = 100;
 	private static int order = 7; // controls complexity of curve
 
 	private Stack<Integer> fibonacciSequence;
@@ -55,9 +55,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
-		xMax = (float)(machine.getMarginWidth () /2.0f);
-		yMax = (float)(machine.getMarginHeight() /2.0f);
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
 		Log.message("xMax="+xMax);
 		Log.message("yMax="+yMax);
 		
@@ -98,15 +97,15 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 		// do the curve, one square at a time.
 		while(!fibonacciSequence.isEmpty()) {
 			int o = fibonacciSequence.pop();
-			fibonacciCell(o*scale1);
+			fibonacciCell(turtle,o*scale1);
 		}
 			    
-	    return true;
+	    return turtle;
 	}
 
 
 	// L System tree
-	private void fibonacciCell(float size) {
+	private void fibonacciCell(Turtle turtle,float size) {
 		// make the square around the cell
 		turtle.forward(size);
 		turtle.turn(90);

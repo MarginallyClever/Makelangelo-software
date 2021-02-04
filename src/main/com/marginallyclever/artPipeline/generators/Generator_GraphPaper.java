@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.generators;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -11,7 +10,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * 1cm and 10cm grid lines
  * @author Dan Royer
  */
-public class Generator_GraphPaper extends ImageGenerator {
+public class Generator_GraphPaper extends TurtleGenerator {
 	private static float angle = 0;
 
 	MakelangeloRobotPanel robotPanel;
@@ -35,27 +34,28 @@ public class Generator_GraphPaper extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
-		turtle = new Turtle();
-		turtle.setColor(new ColorRGB(255,0,0));
-		lines(10,0);
-		lines(10,90);
-		turtle.setColor(new ColorRGB(0,0,0));
-		lines(100,0);
-		lines(100,90);
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
 		
-		return true;
+		lines(turtle,10,0);
+		lines(turtle,10,90);
+		// TODO add me back in?
+		//turtle.setColor(new ColorRGB(0,0,0));
+		//lines(turtle,100,0);
+		//lines(turtle,100,90);
+		
+		return turtle;
 	}
 
-	protected void lines(float stepSize_mm,int angle_deg) {
+	protected void lines(Turtle turtle,float stepSize_mm,int angle_deg) {
 		double majorX = Math.cos(Math.toRadians(angle_deg));
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double yBottom = -100;
+		double yTop    = 100;
+		double xLeft   = -100;
+		double xRight  = 100;
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
@@ -63,8 +63,8 @@ public class Generator_GraphPaper extends ImageGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(machine.getMarginRight(),machine.getMarginTop());
-		Point2D rMin = new Point2D(machine.getMarginLeft(),machine.getMarginBottom());
+		Point2D rMax = new Point2D(xRight,yTop);
+		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize_mm) {

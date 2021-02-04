@@ -2,6 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
@@ -48,29 +49,34 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		if(isCMYK) {
-			finishCMYK();
+			finishCMYK(turtle);
 		} else {
-			finishBlackAndWhite();
+			finishBlackAndWhite(turtle);
 		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 
-	protected int outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
-		turtle.setColor(newColor);
-
-		float stepSize = machine.getPenDiameter()*5;
+	protected int outputChannel(Turtle turtle,TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
+		double stepSize = 2.5;
 		if (stepSize < 1) stepSize = 1;
-		float halfStep = stepSize/2;
+		double halfStep = stepSize/2;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;
@@ -130,7 +136,7 @@ public class Converter_Wander extends ImageConverter {
 		for(int j=0;j<buckets.size();++j) {
 			//Log.message(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
-			// assume we start at the center of the image, for those machines with no pen up option.
+			// assume we start at the center of the image, for those turtles with no pen up option.
 			a = new Point2D.Double(0,0);
 			
 			Bucket b = buckets.get(j);
@@ -168,23 +174,27 @@ public class Converter_Wander extends ImageConverter {
 		return actualPoints;
 	}
 	
-	protected void finishCMYK() {
+	protected void finishCMYK(Turtle turtle) {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
-		Log.message("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
+		Log.message("Yellow...");
+		outputChannel(turtle,cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
+		Log.message("Cyan...");
+		outputChannel(turtle,cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
+		Log.message("Magenta...");
+		outputChannel(turtle,cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
+		Log.message("Black...");
+		outputChannel(turtle,cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
 		Log.message("Finishing...");
 	}
 	
-	protected void finishBlackAndWhite() {
+	protected void finishBlackAndWhite(Turtle turtle) {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 		
-		outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0);
+		outputChannel(turtle,img,new ColorRGB(0,0,0),numLines,255.0/4.0);
 	}
 	
 

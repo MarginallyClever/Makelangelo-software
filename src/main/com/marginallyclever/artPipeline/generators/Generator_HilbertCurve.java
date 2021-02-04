@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Hilbert Curve fractal.
  * @author Dan Royer
  */
-public class Generator_HilbertCurve extends ImageGenerator {
+public class Generator_HilbertCurve extends TurtleGenerator {
 	private float turtleStep = 10.0f;
 	private double xMax = 7;
 	private double xMin = -7;
@@ -33,13 +33,15 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
+		double v = 100;
 		xMax = v;
 		yMax = v;
 		xMin = -v;
 
-		turtle = new Turtle();
+		turtle.reset();
 		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
 
 		// move to starting position
@@ -47,42 +49,42 @@ public class Generator_HilbertCurve extends ImageGenerator {
 				-xMax + turtleStep / 2,
 				-yMax + turtleStep / 2);
 		turtle.penDown();
-		hilbert(order);
+		hilbert(turtle,order);
 	    
-	    return true;
+	    return turtle;
 	}
 
 
 	// Hilbert curve
-	private void hilbert(int n) {
+	private void hilbert(Turtle turtle,int n) {
 		if (n == 0) return;
 		turtle.turn(90);
-		treblih( n - 1);
+		treblih(turtle, n - 1);
 		turtle.forward(turtleStep);
 		turtle.turn(-90);
-		hilbert( n - 1);
+		hilbert(turtle, n - 1);
 		turtle.forward(turtleStep);
-		hilbert( n - 1);
+		hilbert(turtle, n - 1);
 		turtle.turn(-90);
 		turtle.forward(turtleStep);
-		treblih( n - 1);
+		treblih(turtle, n - 1);
 		turtle.turn(90);
 	}
 
 
 	// evruc trebliH
-	public void treblih(int n) {
+	public void treblih(Turtle turtle,int n) {
 		if (n == 0) return;
 		turtle.turn(-90);
-		hilbert( n - 1);
+		hilbert(turtle, n - 1);
 		turtle.forward(turtleStep);
 		turtle.turn(90);
-		treblih( n - 1);
+		treblih(turtle, n - 1);
 		turtle.forward(turtleStep);
-		treblih( n - 1);
+		treblih(turtle, n - 1);
 		turtle.turn(90);
 		turtle.forward(turtleStep);
-		hilbert( n - 1);
+		hilbert(turtle, n - 1);
 		turtle.turn(-90);
 	}
 }

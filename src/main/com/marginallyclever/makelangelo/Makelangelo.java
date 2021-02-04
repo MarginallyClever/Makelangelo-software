@@ -8,7 +8,6 @@ package com.marginallyclever.makelangelo;
 // io functions
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -30,6 +29,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -51,11 +51,15 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.converters.Converter_Crosshatch;
+import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
@@ -72,7 +76,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
  * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
  * 
- * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (ImageGenerators), or 
+ * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (TurtleGenerators), or 
  * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA) into vectors (ImageConverters).
  * 
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
@@ -103,6 +107,8 @@ public final class Makelangelo extends TransferHandler
 	private Camera camera;
 	private MakelangeloRobot robot;
 
+	private ArrayList<Turtle> myTurtles;
+	
 	protected String lastFileIn = "";
 	protected FileFilter lastFilterIn = null;
 	protected String lastFileOut = "";
@@ -124,23 +130,33 @@ public final class Makelangelo extends TransferHandler
 		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
+		Makelangelo makelangeloProgram = new Makelangelo();
 		
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Makelangelo makelangeloProgram = new Makelangelo();
-				makelangeloProgram.run();
-			}
-		});
+		if(GraphicsEnvironment.isHeadless()) {
+			// TODO 
+		} else {
+			// Schedule a job for the event-dispatching thread:
+			// creating and showing this application's GUI.
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					makelangeloProgram.runHeadFirst();
+				}
+			});
+		}
 	}
 
 	public Makelangelo() {
+		super();
+
+		myTurtles = new ArrayList<Turtle>();
+		// by default start with one turtle.
+		myTurtles.add(new Turtle());
+		
 		Translator.start();
 		
 		logPanel = new LogPanel();
-		
+
 		Log.message("Locale="+Locale.getDefault().toString());
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
@@ -156,14 +172,46 @@ public final class Makelangelo extends TransferHandler
 		robot.getSettings().addListener(this);
 		logPanel.setRobot(robot);
 
+		{
+			// temp
+			//TurtleGenerator g = new Generator_Dragon();
+			//TurtleGenerator g = new Generator_FibonacciSpiral();
+			//TurtleGenerator g = new Generator_FillPage();
+			//TurtleGenerator g = new Generator_GosperCurve();
+			//TurtleGenerator g = new Generator_GraphPaper();
+			//TurtleGenerator g = new Generator_HilbertCurve();
+			//TurtleGenerator g = new Generator_KochCurve();
+			//TurtleGenerator g = new Generator_Lissajous();
+			//TurtleGenerator g = new Generator_LSystemTree();
+			//TurtleGenerator g = new Generator_Maze();
+			//TurtleGenerator g = new Generator_Package();
+			//TurtleGenerator g = new Generator_Polyeder();
+			//TurtleGenerator g = new Generator_SierpinskiTriangle();
+			//TurtleGenerator g = new Generator_Spirograph();
+			//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
+			//myTurtles.add(g.generate());
+						
+			TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
+			owl.rotateAbsolute(25);
+			owl.setScale(0.5, 0.5);
+			ImageConverter c = new Converter_Crosshatch();
+			c.setImage(owl);
+			myTurtles.addAll(c.finish());
+			
+			if(myTurtles.size()>0) {
+				robot.setTurtle(myTurtles.get(myTurtles.size()-1));
+			}
+		}
+		
 		Log.message("Starting camera...");
 		camera = new Camera();
-		Log.message("Starting connection manager...");
+		
 		// network connections
+		Log.message("Starting connection manager...");
 		connectionManager = new ConnectionManager();
 	}
 	
-	public void run() {
+	public void runHeadFirst() {
 		createAppWindow();
 		
 		checkSharingPermission();
@@ -201,137 +249,144 @@ public final class Makelangelo extends TransferHandler
 		JMenu menu;
 
 		// File menu
-		Log.message("  file...");
-		menu = new JMenu(Translator.get("MenuMakelangelo"));
-		menuBar.add(menu);
+		{
+			Log.message("  file...");
+			menu = new JMenu(Translator.get("MenuMakelangelo"));
+			menuBar.add(menu);
+	
+			JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
+			buttonAdjustPreferences.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					appPreferences.run();
+				}
+			});
+			menu.add(buttonAdjustPreferences);
+	
+			JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
+			buttonCheckForUpdate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					checkForUpdate(false);
+				}
+			});
+			menu.add(buttonCheckForUpdate);
+	
+			menu.addSeparator();
+	
+			JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
+			buttonExit.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					onClose();
+				}
+			});
+			menu.add(buttonExit);
+		}
 
-		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				appPreferences.run();
-			}
-		});
-		menu.add(buttonAdjustPreferences);
-
-		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkForUpdate(false);
-			}
-		});
-		menu.add(buttonCheckForUpdate);
-
-		menu.addSeparator();
-
-		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onClose();
-			}
-		});
-		menu.add(buttonExit);
-
+		
 		// view menu
-		Log.message("  view...");
-		menu = new JMenu(Translator.get("MenuPreview"));
-		menuBar.add(menu);
-		
-		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
-		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		buttonZoomOut.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomOut();
-			};
-		});
-		menu.add(buttonZoomOut);
-
-		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
-		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		buttonZoomIn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomIn();
-			};
-		});
-		menu.add(buttonZoomIn);
-		
-		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
-		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		buttonZoomToFit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomToFit(
-						robot.getSettings().getPaperWidth(),
-						robot.getSettings().getPaperHeight());
-			};
-		});
-		menu.add(buttonZoomToFit);
-		
-		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(logFrame == null) {
-					logFrame = new JFrame(Translator.get("Log"));
-					logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					logFrame.setPreferredSize(new Dimension(600,400));
-					logFrame.add(logPanel);
-					logFrame.pack();
-					logFrame.addWindowListener(new WindowListener() {
-						@Override
-						public void windowOpened(WindowEvent e) {}
-						@Override
-						public void windowIconified(WindowEvent e) {}
-						@Override
-						public void windowDeiconified(WindowEvent e) {}
-						@Override
-						public void windowDeactivated(WindowEvent e) {}
-						@Override
-						public void windowClosing(WindowEvent e) {}
-						@Override
-						public void windowClosed(WindowEvent e) {
-							logFrame=null;
-						}
-						@Override
-						public void windowActivated(WindowEvent e) {}
-					});
+		{
+			Log.message("  view...");
+			menu = new JMenu(Translator.get("MenuPreview"));
+			menuBar.add(menu);
+			
+			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
+			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomOut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					camera.zoomOut();
+				};
+			});
+			menu.add(buttonZoomOut);
+	
+			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomIn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					camera.zoomIn();
+				};
+			});
+			menu.add(buttonZoomIn);
+			
+			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomToFit.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					camera.zoomToFit(
+							robot.getSettings().getPaperWidth(),
+							robot.getSettings().getPaperHeight());
+				};
+			});
+			menu.add(buttonZoomToFit);
+			
+			JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
+			buttonViewLog.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(logFrame == null) {
+						logFrame = new JFrame(Translator.get("Log"));
+						logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						logFrame.setPreferredSize(new Dimension(600,400));
+						logFrame.add(logPanel);
+						logFrame.pack();
+						logFrame.addWindowListener(new WindowListener() {
+							@Override
+							public void windowOpened(WindowEvent e) {}
+							@Override
+							public void windowIconified(WindowEvent e) {}
+							@Override
+							public void windowDeiconified(WindowEvent e) {}
+							@Override
+							public void windowDeactivated(WindowEvent e) {}
+							@Override
+							public void windowClosing(WindowEvent e) {}
+							@Override
+							public void windowClosed(WindowEvent e) {
+								logFrame=null;
+							}
+							@Override
+							public void windowActivated(WindowEvent e) {}
+						});
+					}
+					logFrame.setVisible(true);
 				}
-				logFrame.setVisible(true);
-			}
-		});
-		menu.add(buttonViewLog);
-
+			});
+			menu.add(buttonViewLog);
+		}
+		
 		// help menu
-		Log.message("  help...");
-		menu = new JMenu(Translator.get("Help"));
-		menuBar.add(menu);
-
-		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
-		buttonForums.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
-				} catch (IOException e1) {
-					e1.printStackTrace();
+		{
+			Log.message("  help...");
+			menu = new JMenu(Translator.get("Help"));
+			menuBar.add(menu);
+	
+			JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
+			buttonForums.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
-			}
-		});
-		menu.add(buttonForums);
-		
-		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogAbout a = new DialogAbout();
-				a.display(mainFrame,VERSION);
-			}
-		});
-		menu.add(buttonAbout);
+			});
+			menu.add(buttonForums);
+			
+			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
+			buttonAbout.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DialogAbout a = new DialogAbout();
+					a.display(mainFrame,VERSION);
+				}
+			});
+			menu.add(buttonAbout);
+		}
 		
 		// finish
 		Log.message("  finish...");
@@ -394,6 +449,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
+	
 	/**
 	 * See
 	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
@@ -405,31 +461,6 @@ public final class Makelangelo extends TransferHandler
 	 * ex.printStackTrace(); } System.exit(0); }
 	 */
 
-
-	public Container createContentPane() {
-		Log.message("create content pane...");
-
-		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.setOpaque(true);
-
-		Log.message("  create PreviewPanel...");
-		previewPanel = new PreviewPanel();
-		previewPanel.setCamera(camera);
-		previewPanel.addListener(robot);
-
-		Log.message("  assign panel to robot...");
-		robotPanel = robot.createControlPanel(this);
-
-		// major layout
-		Log.message("  vertical split...");
-		Splitter splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		splitLeftRight.add(previewPanel);
-		splitLeftRight.add(new JScrollPane(robotPanel));
-
-		contentPane.add(splitLeftRight, BorderLayout.CENTER);
-
-		return contentPane;
-	}
 
 	/**
 	 *  For thread safety this method should be invoked from the event-dispatching thread.
@@ -453,8 +484,29 @@ public final class Makelangelo extends TransferHandler
 		JMenuBar bar = createMenuBar();
 		Log.message("  adding menu bar...");
 		mainFrame.setJMenuBar(bar);
-		
-		mainFrame.setContentPane(createContentPane());
+
+		{
+			Log.message("create content pane...");
+			JPanel contentPane = new JPanel(new BorderLayout());
+			contentPane.setOpaque(true);
+	
+			Log.message("  create PreviewPanel...");
+			previewPanel = new PreviewPanel();
+			previewPanel.setCamera(camera);
+			previewPanel.addListener(robot);
+	
+			Log.message("  assign panel to robot...");
+			robotPanel = robot.createControlPanel(this);
+	
+			// major layout
+			Log.message("  vertical split...");
+			Splitter splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+			splitLeftRight.add(previewPanel);
+			splitLeftRight.add(new JScrollPane(robotPanel));
+	
+			contentPane.add(splitLeftRight, BorderLayout.CENTER);
+			mainFrame.setContentPane(contentPane);
+		}
 		
 		adjustWindowSize();
 
@@ -521,12 +573,10 @@ public final class Makelangelo extends TransferHandler
 	}
 
 	@Override
-	public void sendBufferEmpty(MakelangeloRobot r) {
-	}
+	public void sendBufferEmpty(MakelangeloRobot r) {}
 
 	@Override
-	public void lineError(MakelangeloRobot r, int lineNumber) {
-	}
+	public void lineError(MakelangeloRobot r, int lineNumber) {}
 
 	@Override
 	public void disconnected(MakelangeloRobot r) {
@@ -665,7 +715,7 @@ public final class Makelangelo extends TransferHandler
 	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
 		boolean success = false;
 		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream,robot);
+			success=loader.load(fileInputStream,getSelectedTurtle());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -740,6 +790,7 @@ public final class Makelangelo extends TransferHandler
 				if(success) {
 					lastFilterIn = selectedFilter;
 					lastFileIn = selectedFile;
+					
 					if( robot.getControlPanel() != null ) {
 						robot.getControlPanel().updateButtonAccess();
 					}
@@ -807,7 +858,7 @@ public final class Makelangelo extends TransferHandler
 				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,robot);
+					success=lft.save(fileOutputStream,myTurtles,robot);
 				} catch(IOException e) {
 					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
 					//e.printStackTrace();
@@ -827,6 +878,20 @@ public final class Makelangelo extends TransferHandler
 	
 	public String getLastFileIn() {
 		return lastFileIn;
+	}
+	
+	/**
+	 * Adds a new turtle to the tail of the myTurtles list. 
+	 * @return the newly created Turtle.
+	 */
+	public Turtle addTurtle() {
+		Turtle t = new Turtle();
+		myTurtles.add(t);
+		return t;
+	}
+
+	public Turtle getSelectedTurtle() {
+		return myTurtles.get(myTurtles.size()-1);
 	}
 }
 

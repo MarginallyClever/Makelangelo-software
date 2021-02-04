@@ -3,8 +3,6 @@ package com.marginallyclever.convenience.turtle;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.vecmath.Vector2d;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -29,17 +27,17 @@ public class Turtle implements Cloneable {
 	// tail tip color.  only one per Turtle.
 	private ColorRGB color;
 	
-	// tail tip radius.
-	private double radius;
-
-	private Vector2d limitMax = new Vector2d();
-	private Vector2d limitMin = new Vector2d();
 	
 	public Turtle() {
 		super();
 		lock = new ReentrantLock();
+
+		// default turtle color is black.
+		setColor(new ColorRGB(0,0,0));
+		
 		reset();
 	}
+	
 	
 	public Turtle(Turtle t) {
 		this();
@@ -59,8 +57,6 @@ public class Turtle implements Cloneable {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		Turtle t = (Turtle)super.clone();
-		limitMax = (Vector2d)limitMax.clone();
-		limitMin = (Vector2d)limitMin.clone();
 		
 		for( TurtleMove m : history ) {
 			t.history.add(new TurtleMove(m));
@@ -69,25 +65,15 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 * Erases history and resets all parameters.  Called by constructor.
+	 * Does not reset turtle tail color or radius.
 	 */
-	protected void reset() {
+	public void reset() {
 		turtleX = 0;
 		turtleY = 0;
 		setAngle(0);
 		penUp();
 		history = new ArrayList<TurtleMove>();
-		// default turtle color is black.
-		setColor(new ColorRGB(0,0,0));
-		setRadius(1.0);
-	}
-	
-	public void setRadius(double r) {
-		radius=r;
-	}
-	
-	public double getRadius() { 
-		return radius;
 	}
 	
 	// multithreading lock safety
@@ -323,7 +309,6 @@ public class Turtle implements Cloneable {
 					}
 					showCount++;
 					previousMove = m;
-					break;
 				}
 			}
 			

@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @since 7.24.0
  *
  */
-public class Generator_Polyeder extends ImageGenerator {
+public class Generator_Polyeder extends TurtleGenerator {
 	/**
 	 * Helper class that describe a solid
 	 * @author Guenther Sohler
@@ -165,7 +165,7 @@ public class Generator_Polyeder extends ImageGenerator {
 		return new Generator_Polyeder_Panel(this);
 	}
 
-	void geneneratePolygonStep(Transform t) {
+	void geneneratePolygonStep(Turtle turtle,Transform t) {
 		int i;
 		if(models == null) return;
 		if(modelid < 0 || modelid >= models.size()) return;
@@ -230,24 +230,24 @@ public class Generator_Polyeder extends ImageGenerator {
 				t1.walk(new Point2D(size/(2*Math.tan(Math.PI/code)),0));
 				t1.rotate(Math.PI);
 				// recursion.
-				geneneratePolygonStep(t1);
+				geneneratePolygonStep(turtle,t1);
 			}
 		}
 	}
 
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
 		instructionPtr=0;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		turtle.penUp();
 
 		Transform t = new Transform();
 		Log.message("start");
-		geneneratePolygonStep(t);
+		geneneratePolygonStep(turtle,t);
 		Log.message("end");
 
-	    return true;
+	    return turtle;
 	}
 
 

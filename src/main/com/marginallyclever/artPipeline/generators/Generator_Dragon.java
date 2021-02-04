@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Dragon fractal
  * @author Dan Royer
  */
-public class Generator_Dragon extends ImageGenerator {
+public class Generator_Dragon extends TurtleGenerator {
 	private static int order = 12; // controls complexity of curve
 
 	private List<Integer> sequence;
@@ -35,8 +35,8 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
-		turtle = new Turtle();
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
 
 		// create the sequence of moves
         sequence = new ArrayList<Integer>();
@@ -57,6 +57,6 @@ public class Generator_Dragon extends ImageGenerator {
             turtle.forward(1);
         }  
 	    
-	    return true;
+	    return turtle;
 	}
 }

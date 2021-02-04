@@ -8,7 +8,9 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Border extends ImageGenerator {
+public class Generator_Border extends TurtleGenerator {
+	double width=100;
+	double height=100;
 	
 	@Override
 	public String getName() {
@@ -21,13 +23,15 @@ public class Generator_Border extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
-		float yMin = (float)machine.getMarginBottom();
-		float yMax = (float)machine.getMarginTop();
-		float xMin = (float)machine.getMarginLeft();
-		float xMax = (float)machine.getMarginRight();
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
+		double yMin = -height/2;
+		double yMax =  height/2;
+		double xMin = -width/2;
+		double xMax =  width/2;
 
-		turtle = new Turtle();
+		turtle.reset();
 		turtle.penUp();
 		turtle.moveTo(xMin,yMax);
 		turtle.penDown();
@@ -36,7 +40,8 @@ public class Generator_Border extends ImageGenerator {
 		turtle.moveTo(xMax,yMin);
 		turtle.moveTo(xMin,yMin);
 		turtle.moveTo(xMin,yMax);
+		turtle.penUp();
 		
-	    return true;
+	    return turtle;
 	}
 }

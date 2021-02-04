@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Spirograph extends ImageGenerator {
+public class Generator_Spirograph extends TurtleGenerator {
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
 
@@ -72,7 +72,7 @@ public class Generator_Spirograph extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;
 		xMin = Float.POSITIVE_INFINITY;
@@ -80,12 +80,13 @@ public class Generator_Spirograph extends ImageGenerator {
 		
 		// generate the spiral once to find the max/min
 		totalScale=1;
-		turtle = new Turtle();
-		drawSpirograph(false);
+		
+		Turtle turtle = new Turtle();
+		drawSpirograph(turtle,false);
 
 		// scale the step size so the spirograph fits on the paper
-		double paperWidth  = machine.getMarginWidth();
-		double paperHeight = machine.getMarginHeight();
+		double paperWidth  = 100;
+		double paperHeight = 100;
 
 		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
 		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the
@@ -112,13 +113,13 @@ public class Generator_Spirograph extends ImageGenerator {
 		totalScale =  largestX < largestY ? largestX : largestY;
 
 		// draw the spirograph for real this time
-		turtle = new Turtle();
-		drawSpirograph(true);
+		turtle.reset();
+		drawSpirograph(turtle,true);
 	    
-	    return true;
+	    return turtle;
 	}
 	
-	protected void drawSpirograph(boolean write) {
+	protected void drawSpirograph(Turtle turtle,boolean write) {
 		float x=0,y=0;
 		
 		float dRadius,pScale1,pScale2;

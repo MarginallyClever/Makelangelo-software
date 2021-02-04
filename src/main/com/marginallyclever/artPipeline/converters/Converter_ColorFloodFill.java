@@ -5,11 +5,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
-import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -20,23 +20,16 @@ import com.marginallyclever.makelangelo.Translator;
  * @since 7.1.4
  */
 public class Converter_ColorFloodFill extends ImageConverter {
-	private ColorPalette palette;
 	private float diameter;
 	private float lastX, lastY;
+	private float colorEpsilon = 64;
 	private TransformedImage imgChanged;
 	private TransformedImage imgMask;
 
 	protected double yBottom , yTop, xLeft, xRight;
 
 
-	public Converter_ColorFloodFill() {
-		palette = new ColorPalette();
-		palette.addColor(new ColorRGB(  0,   0,   0));
-		palette.addColor(new ColorRGB(255,   0,   0));
-		palette.addColor(new ColorRGB(  0, 255,   0));
-		palette.addColor(new ColorRGB(  0,   0, 255));
-		palette.addColor(new ColorRGB(255, 255, 255));
-	}
+	public Converter_ColorFloodFill() {}
 
 	@Override
 	public String getName() {
@@ -73,7 +66,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	}
 
 	protected void setMaskTouched(float x0, float y0, float x1, float y1) {
-		
 		int c = (new ColorRGB(255, 255, 255)).toInt();
 		for (float y = y0; y < y1; ++y) {
 			for (float x = x0; x < x1; ++x) {
@@ -95,14 +87,14 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * @param g
 	 * @return the average color in the region.  if nothing is sampled, return white.
 	 */
-	protected ColorRGB takeImageSampleBlock(float x2, float y2, float f, float g) {
+	protected ColorRGB takeImageSampleBlock(Turtle turtle,float x2, float y2, float f, float g) {
 		// point sampling
 		ColorRGB value = new ColorRGB(0, 0, 0);
 		int sum = 0;
 
 		for (float y = y2; y < g; ++y) {
 			for (float x = x2; x < f; ++x) {
-				if(isInsidePaperMargins(x, y) && imgChanged.canSampleAt(x, y)) {
+				if(imgChanged.canSampleAt(x, y)) {
 					value.add(new ColorRGB(imgChanged.sample1x1(x, y)));
 					++sum;
 				}
@@ -115,10 +107,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	}
 
 
-	protected boolean doesQuantizedBlockMatch(int color_index, float x, float y) {
-		ColorRGB original_color = takeImageSampleBlock((int) x, (int) y, (int) (x + diameter), (int) (y + diameter));
-		int quantized_color = palette.quantizeIndex(original_color);
-		return (quantized_color == color_index);
+	protected boolean doesColorMatch(Turtle turtle,float x, float y) {
+		ColorRGB originalColor = takeImageSampleBlock(turtle,(int) x, (int) y, (int) (x + diameter), (int) (y + diameter));
+		double d = originalColor.diff(turtle.getColor());
+		return (d < colorEpsilon);
 	}
 
 
@@ -127,7 +119,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param colorIndex
 	 */
-	protected void floodFillBlob(int colorIndex, float x, float y) {
+	protected void floodFillBlob(Turtle turtle,float x, float y) {
 		LinkedList<Point> pointsToVisit = new LinkedList<>();
 		pointsToVisit.add(new Point((int)x, (int)y));
 
@@ -137,7 +129,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			a = pointsToVisit.removeLast();
 
 			if (getMaskTouched(a.x,a.y)) continue;
-			if (!doesQuantizedBlockMatch(colorIndex, a.x, a.y)) continue;
+			if (!doesColorMatch(turtle,a.x, a.y)) continue;
 			// mark this spot as visited.
 			setMaskTouched(a.x, a.y, (int)(a.x + diameter), (int)(a.y + diameter));
 
@@ -172,24 +164,20 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param colorIndex index into the list of colors at the top of the class
 	 */
-	void scanForContiguousBlocks(int colorIndex) {
-		ColorRGB originalColor;
-		int quantized_color;
-
-		float x, y;
+	void scanForContiguousBlocks(Turtle turtle) {
 		int z = 0;
 
-		Log.message("Palette color " + palette.getColor(colorIndex).toString() );
+		Log.message("Palette color " + turtle.getColor().toString() );
 
-		for (y = (int)yBottom; y < yTop; y += diameter) {
-			for (x = (int)xLeft; x < xRight; x += diameter) {
+		for(float y = (int)yBottom; y < yTop; y += diameter) {
+			for(float x = (int)xLeft; x < xRight; x += diameter) {
 				if (getMaskTouched(x, y)) continue;
 
-				originalColor = takeImageSampleBlock(x, y, x + diameter, y + diameter);
-				quantized_color = palette.quantizeIndex(originalColor);
-				if (quantized_color == colorIndex) {
+				ColorRGB originalColor = takeImageSampleBlock(turtle,x, y, x + diameter, y + diameter);
+				double d = originalColor.diff(turtle.getColor());
+				if (d < colorEpsilon) {
 					// found blob
-					floodFillBlob(colorIndex, x, y);
+					floodFillBlob(turtle, x, y);
 					z++;
 					//if(z==20)
 					//            return;
@@ -199,13 +187,9 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		Log.message("Found " + z + " blobs.");
 	}
 
-	private void scanColor(int i) {
-		// "please change to tool X and press any key to continue"
+	private void scanColor(Turtle turtle) {
 		turtle.penUp();
-		turtle.setColor(machine.getPenDownColorDefault());
-		Log.message("Color " + i );
-
-		scanForContiguousBlocks(i);
+		scanForContiguousBlocks(turtle);
 	}
 
 	/**
@@ -213,14 +197,13 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img) {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
-		img = blur.filter(img);
+		TransformedImage img = blur.filter(sourceImage);
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);
 
-		turtle=new Turtle();
-		
 		// create a color mask so we don't repeat any pixels
 		BufferedImage bi = new BufferedImage(img.getSourceImage().getWidth(), img.getSourceImage().getHeight(), BufferedImage.TYPE_INT_RGB);
 		imgMask = new TransformedImage(bi);
@@ -229,26 +212,25 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
-		yBottom = machine.getMarginBottom();
-		yTop    = machine.getMarginTop();
-		xLeft   = machine.getMarginLeft();
-		xRight  = machine.getMarginRight();
+		yBottom = 100;
+		yTop    = 100;
+		xLeft   = -100;
+		xRight  = -100;
 		
-		diameter = (int)( machine.getPenDiameter() );
+		diameter = (int)( 2.0 );
 
 		imgChanged = img;
 
 		lastX = 0;
 		lastY = 0;
 
-		scanColor(0);  // black
-		scanColor(1);  // red
-		scanColor(2);  // green
-		scanColor(3);  // blue
+		scanColor(turtle);
 
 		turtle.penUp();
 		
-		return true;
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 }
 

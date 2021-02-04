@@ -22,7 +22,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.TurtleManipulator;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -33,7 +33,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveScratch2 extends TurtleManipulator implements LoadAndSaveFileType {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -87,13 +87,12 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,Turtle turtle) {
 		Log.message(Translator.get("FileTypeSB2")+"...");
 
-		machine = robot.getSettings();
-		turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+		turtle.reset();
+	    turtle.setX(turtle.getX());
+	    turtle.setY(turtle.getY());
 	    indent=0;
 		
 		try {
@@ -196,7 +195,6 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			parseScratchCode(greenFlagScript);
 			
 			Log.message("finished scripts");
-			robot.setTurtle(turtle);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -744,7 +742,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		return true;
 	}
 
@@ -756,5 +754,10 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	@Override
 	public boolean canSave() {
 		return false;
+	}
+
+	@Override
+	public String getName() {
+		return Translator.get("LoadScratch2");
 	}
 }

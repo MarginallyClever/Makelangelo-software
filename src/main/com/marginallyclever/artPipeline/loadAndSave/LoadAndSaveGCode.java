@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -57,10 +58,9 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	}
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
-		Turtle turtle = new Turtle();
-		MakelangeloRobotSettings settings = robot.getSettings();
-		ColorRGB penDownColor = settings.getPenDownColorDefault();
+	public boolean load(InputStream in,Turtle turtle) {
+		turtle.reset();
+		ColorRGB penDownColor = turtle.getColor();
 		double scaleXY=1;
 		boolean isAbsolute=true;
 		
@@ -71,8 +71,9 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 				// lose anything after a ; because it's a comment 
 				String[] pieces = line.split(";");
 				if (pieces.length == 0) continue;
-				// the line isn't empty.
-	
+				
+				// the line isn't empty.  Split by spaces.
+				// TODO some poorly formated gcode might not have spaces between letters.  do we care?
 				String[] tokens = pieces[0].split("\\s");
 				if (tokens.length == 0) continue;
 				
@@ -105,9 +106,10 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 					}
 				}
 	
+				turtle.penUp();
 				double nx = turtle.getX();
 				double ny = turtle.getY();
-				double nz = turtle.isUp() ? settings.getPenUpAngle() : settings.getPenDownAngle();
+				double nz = 90;
 				double ni = nx;
 				double nj = ny;
 				double ox=nx;
@@ -164,7 +166,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	
 						theta = angle2 - angle1;
 	
-						double stepSize=settings.getPenDiameter();
+						double stepSize=1.0;
 						double len = Math.abs(theta) * radius;
 						double angle3, scale;
 	
@@ -189,50 +191,50 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		}
 		scanner.close();
 
-		robot.setTurtle(turtle);
 		return true;
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
-		Turtle turtle = robot.getTurtle();
-		MakelangeloRobotSettings machine = robot.getSettings();
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
+			MakelangeloRobotSettings machine = robot.getSettings();
 			machine.writeProgramStart(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);
 			boolean isUp=true;
 			
-			TurtleMove previousMovement=null;
-			for(int i=0;i<turtle.history.size();++i) {
-				TurtleMove m = turtle.history.get(i);
-				boolean zMoved=false;
-				if(m.isUp) {
-					if(!isUp) {
-						// lift pen up
-						machine.writePenUp(out);
-						isUp=true;
-						zMoved=true;
-					}
-				} else {
-					if(isUp) {
-						// go to m and put pen down
-						if(previousMovement!=null) {
-							machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
-						} else {
-							machine.writeMoveTo(out, m.x, m.y, true,true);
+			for( Turtle t : turtles ) {
+				TurtleMove previousMovement=null;
+				machine.writeChangeTo(out,t.getColor());
+				for( TurtleMove m : t.history ) {
+					boolean zMoved=false;
+					if(m.isUp) {
+						if(!isUp) {
+							// lift pen up
+							machine.writePenUp(out);
+							isUp=true;
+							zMoved=true;
 						}
-						machine.writePenDown(out);
-						isUp=false;
-						zMoved=true;
+					} else {
+						if(isUp) {
+							// go to m and put pen down
+							if(previousMovement!=null) {
+								machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
+							} else {
+								machine.writeMoveTo(out, m.x, m.y, true,true);
+							}
+							machine.writePenDown(out);
+							isUp=false;
+							zMoved=true;
+						}
+						machine.writeMoveTo(out,m.x, m.y,false,zMoved);
 					}
-					machine.writeMoveTo(out,m.x, m.y,false,zMoved);
+					previousMovement=m;
 				}
-				previousMovement=m;
+				if(!isUp) machine.writePenUp(out);
 			}
-			if(!isUp) machine.writePenUp(out);
 			machine.writeProgramEnd(out);
 			
 			out.flush();

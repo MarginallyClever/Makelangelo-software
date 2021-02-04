@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.TurtleManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.log.Log;
@@ -38,14 +39,13 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
  *
  */
-public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveDXF extends TurtleManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
@@ -185,7 +185,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,Turtle turtle) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
 
 		// Read in the DXF file
@@ -202,14 +202,8 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
 
 		// prepare for exporting
-		machine = robot.getSettings();
-		turtle = new Turtle();
+		turtle.reset();
 
-		previousX = machine.getHomeX();
-		previousY = machine.getHomeY();
-		turtle.setX(previousX);
-		turtle.setY(previousY);
-		
 
 		// convert each entity
 		Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
@@ -252,24 +246,23 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 				DXFGroup g = groupIter.next();
 				Iterator<DXFBucketEntity> ents = g.entities.iterator();
 				while(ents.hasNext()) {
-					parseEntity(ents.next().entity);
+					parseEntity(turtle,ents.next().entity);
 				}
 			}
 		}
-
-		robot.setTurtle(turtle);
+		
 		return true;
 	}
 
-	protected void parseEntity(DXFEntity e) {
+	protected void parseEntity(Turtle turtle,DXFEntity e) {
 		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-			parseDXFLine((DXFLine)e);
+			parseDXFLine(turtle,(DXFLine)e);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
 			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-			parseDXFPolyline(polyLine);
+			parseDXFPolyline(turtle,polyLine);
 		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
 				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			parseDXFPolyline((DXFPolyline)e);
+			parseDXFPolyline(turtle,(DXFPolyline)e);
 		}
 	}
 	
@@ -349,7 +342,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		return (y-imageCenterY);
 	}
 	
-	protected void parseDXFLine(DXFLine entity) {
+	protected void parseDXFLine(Turtle turtle,DXFLine entity) {
 		Point start = entity.getStartPoint();
 		Point end = entity.getEndPoint();
 
@@ -364,13 +357,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		double dx2 = previousX - x2;
 		double dy2 = previousY - y2;
 		if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-			parseDXFLineEnds(x,y,x2,y2);
+			parseDXFLineEnds(turtle,x,y,x2,y2);
 		} else {
-			parseDXFLineEnds(x2,y2,x,y);
+			parseDXFLineEnds(turtle,x2,y2,x,y);
 		}
 	}
 	
-	protected void parseDXFLineEnds(double x,double y,double x2,double y2) {
+	protected void parseDXFLineEnds(Turtle turtle,double x,double y,double x2,double y2) {
 		turtle.jumpTo(x,y);
 		turtle.moveTo(x2,y2);
 		previousX = x2;
@@ -378,10 +371,10 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	
-	protected void parseDXFPolyline(DXFPolyline entity) {
+	protected void parseDXFPolyline(Turtle turtle,DXFPolyline entity) {
 		if(entity.isClosed()) {
 			// only one end to care about
-			parseDXFPolylineForward(entity);
+			parseDXFPolylineForward(turtle,entity);
 		} else {
 			// which end is closest to the previous (x,y)?
 			int n = entity.getVertexCount()-1;
@@ -397,15 +390,15 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			double dy2 = y2 - previousY;
 			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
 				// first point is closer
-				parseDXFPolylineForward(entity);
+				parseDXFPolylineForward(turtle,entity);
 			} else {
 				// last point is closer
-				parseDXFPolylineBackward(entity);
+				parseDXFPolylineBackward(turtle,entity);
 			}
 		}
 	}
 	
-	protected void parseDXFPolylineForward(DXFPolyline entity) {
+	protected void parseDXFPolylineForward(Turtle turtle,DXFPolyline entity) {
 		boolean first = true;
 		int c = entity.getVertexCount();
 		int count = c + (entity.isClosed()?1:0);
@@ -415,12 +408,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			v = entity.getVertex(j % c);
 			x = TX(v.getX());
 			y = TY(v.getY());
-			parsePolylineShared(x,y,first,j<count-1);
+			parsePolylineShared(turtle,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parseDXFPolylineBackward(DXFPolyline entity) {
+	protected void parseDXFPolylineBackward(Turtle turtle,DXFPolyline entity) {
 		boolean first = true;
 		int c = entity.getVertexCount();
 		int count = c + (entity.isClosed()?1:0);
@@ -430,12 +423,12 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			v = entity.getVertex((c*2-1-j) % c);
 			x = TX(v.getX());
 			y = TY(v.getY());
-			parsePolylineShared(x,y,first,j<count-1);
+			parsePolylineShared(turtle,x,y,first,j<count-1);
 			first = false;
 		}
 	}
 	
-	protected void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
+	protected void parsePolylineShared(Turtle turtle,double x,double y,boolean first,boolean notLast) {
 		if (first == true) {
 			turtle.jumpTo(x,y);
 		} else {
@@ -453,28 +446,28 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * @param robot the robot from which the data is obtained
 	 * @return true if save succeeded.
 	 */
-	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
-		Turtle turtle = robot.getTurtle();
-		MakelangeloRobotSettings settings = robot.getSettings();
-		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
+			Turtle firstTurtle = turtles.get(0);
+			// TODO find the actual bounds
+			
 			// header
 			out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
 			out.write("0\nSECTION\n");
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
 			out.write("9\n$INSBASE\n");
-			out.write("10\n"+settings.getPaperLeft()+"\n");
-			out.write("20\n"+settings.getPaperBottom()+"\n");
+			out.write("10\n"+firstTurtle.getMarginLeft()+"\n");
+			out.write("20\n"+firstTurtle.getMarginBottom()+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMIN\n");
-			out.write("10\n"+settings.getPaperLeft()+"\n");
-			out.write("20\n"+settings.getPaperBottom()+"\n");
+			out.write("10\n"+firstTurtle.getMarginLeft()+"\n");
+			out.write("20\n"+firstTurtle.getMarginBottom()+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMAX\n");
-			out.write("10\n"+settings.getPaperRight()+"\n");
-			out.write("20\n"+settings.getPaperTop()+"\n");
+			out.write("10\n"+firstTurtle.getMarginRight()+"\n");
+			out.write("20\n"+firstTurtle.getMarginTop()+"\n");
 			out.write("30\n0.0\n");
 			out.write("0\nENDSEC\n");
 
@@ -524,39 +517,27 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 			out.write("2\nENTITIES\n");
 
 			boolean isUp=true;
-			double x0 = settings.getHomeX();
-			double y0 = settings.getHomeY();
-			
-			String matchUp = settings.getPenUpString();
-			String matchDown = settings.getPenDownString();
-			
-			if(matchUp.contains(";")) {
-				matchUp = matchUp.substring(0, matchUp.indexOf(";"));
-			}
-			matchUp = matchUp.replaceAll("\n", "");
-
-			if(matchDown.contains(";")) {
-				matchDown = matchDown.substring(0, matchDown.indexOf(";"));
-			}
-			matchDown = matchDown.replaceAll("\n", "");
-			
-			
-			for( TurtleMove m : turtle.history ) {
-				if(m.isUp) {
-					isUp=true;
-				} else {
-					if(isUp) isUp=false;
-					else {
-						out.write("0\nLINE\n");
-						out.write("8\n1\n");  // layer 1
-						out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
-						out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
-						out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
-						out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
+			double x0 = firstTurtle.getX();
+			double y0 = firstTurtle.getY();
+						
+			for( Turtle t : turtles ) {
+				for( TurtleMove m : t.history ) {
+					if(m.isUp) {
+						isUp=true;
+					} else {
+						if(isUp) isUp=false;
+						else {
+							out.write("0\nLINE\n");
+							out.write("8\n1\n");  // layer 1
+							out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
+							out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
+							out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
+							out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
+						}
 					}
+					x0=m.x;
+					y0=m.y;
 				}
-				x0=m.x;
-				y0=m.y;
 			}
 			// wrap it up
 			out.write("0\nENDSEC\n");

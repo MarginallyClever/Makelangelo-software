@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer 2016-12-12
  *
  */
-public class Generator_SierpinskiTriangle extends ImageGenerator {
+public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;
 	private static int order = 4; // controls complexity of curve
@@ -33,9 +33,11 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
-		xMax = machine.getMarginWidth()/2.0f;
-		yMax = machine.getMarginHeight()/2.0f;
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
+		xMax = 100;
+		yMax = -100;
 		xMin = -xMax;
 		yMin = -yMax;
 
@@ -56,26 +58,26 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 		turtle.penDown();
 		// do the curve
 		if( (order&1) == 0 ) {
-			drawCurve(order, maxSize,-60);
+			drawCurve(turtle,order, maxSize,-60);
 		} else {
 			turtle.turn(60);
-			drawCurve(order, maxSize,-60);
+			drawCurve(turtle,order, maxSize,-60);
 		}
 
-		return true;
+		return turtle;
 	}
 
 
-	private void drawCurve(int n, double distance,double angle) {
+	private void drawCurve(Turtle turtle,int n, double distance,double angle) {
 		if (n == 0) {
 			turtle.forward(distance);
 			return;
 		}
 		
-		drawCurve(n-1,distance/2.0f,-angle);
+		drawCurve(turtle,n-1,distance/2.0f,-angle);
 		turtle.turn(angle);
-		drawCurve(n-1,distance/2.0f,angle);
+		drawCurve(turtle,n-1,distance/2.0f,angle);
 		turtle.turn(angle);
-		drawCurve(n-1,distance/2.0f,-angle);
+		drawCurve(turtle,n-1,distance/2.0f,-angle);
 	}
 }

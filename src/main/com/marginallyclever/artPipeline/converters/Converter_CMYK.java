@@ -1,6 +1,8 @@
 package com.marginallyclever.artPipeline.converters;
 
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
@@ -40,20 +42,24 @@ public class Converter_CMYK extends ImageConverter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		turtle = new Turtle();
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
-		Log.message("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+		Log.message("Yellow...");		turtleList.add(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
+		Log.message("Cyan...");			turtleList.add(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));
+		Log.message("Magenta...");		turtleList.add(outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255)));
+		Log.message("Black...");		turtleList.add(outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0)));
 		Log.message("Finishing...");
+		
+		return turtleList;
 	}
 	
-	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {
+	protected Turtle outputChannel(TransformedImage img,float angle,ColorRGB newColor) {
+		Turtle turtle = new Turtle();
+		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
@@ -62,11 +68,18 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = machine.getPenDiameter()*(double)passes/2.0;
+		double stepSize = (double)passes;
 
 		// from top to bottom of the margin area...
-		double height  = machine.getMarginTop() - machine.getMarginBottom();
-		double width   = machine.getMarginRight() - machine.getMarginLeft();
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
+		
+		double height  = yTop-yBottom;
+		double width   = xRight-xLeft;
+		
 		double maxLen  = Math.sqrt(width*width+height*height);
 
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
@@ -88,11 +101,11 @@ public class Converter_CMYK extends ImageConverter {
 
 			double cutoff=channelCutoff[i%channelCutoff.length];
 			if ((i % 2) == 0) {
-				if(!useError) convertAlongLine(x0,y0,x1,y1,stepSize,cutoff,img);
-				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,cutoff,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x0,y0,x1,y1,stepSize,cutoff,img);
+				else convertAlongLineErrorTerms(turtle,x0,y0,x1,y1,stepSize,cutoff,error0,error1,img);
 			} else {
-				if(!useError) convertAlongLine(x1,y1,x0,y0,stepSize,cutoff,img);
-				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,cutoff,error0,error1,img);
+				if(!useError) convertAlongLine(turtle,x1,y1,x0,y0,stepSize,cutoff,img);
+				else convertAlongLineErrorTerms(turtle,x1,y1,x0,y0,stepSize,cutoff,error0,error1,img);
 			}
 			
 			for(int j=0;j<error0.length;++j) {
@@ -101,6 +114,7 @@ public class Converter_CMYK extends ImageConverter {
 			}
 			++i;
 		}
+		return turtle;
 	}
 }
 

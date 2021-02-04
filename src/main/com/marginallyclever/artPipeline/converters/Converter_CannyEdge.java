@@ -1,12 +1,12 @@
 package com.marginallyclever.artPipeline.converters;
 
 
-import java.io.IOException;
-import java.io.Writer;
+import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_Invert;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -24,11 +24,14 @@ public class Converter_CannyEdge extends ImageConverter {
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	@Override
+	public ArrayList<Turtle> finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		TransformedImage img = bw.filter(sourceImage);
 
+		Turtle turtle = new Turtle();
+		
 		//create the detector
 		CannyEdgeDetector detector = new CannyEdgeDetector();
 
@@ -46,7 +49,6 @@ public class Converter_CannyEdge extends ImageConverter {
 		edges = inv.filter(edges);
 		
 		// Now we have a bitmap of the edges.  How to turn that into vectors?
-		
 /*
 		// Set up the conversion from image space to paper space, select the current tool, etc.
 		imageStart(edges, out);
@@ -111,7 +113,10 @@ public class Converter_CannyEdge extends ImageConverter {
 			liftPen(out);
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    }*/
-		return true;
+		
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
+		turtleList.add(turtle);
+		return turtleList;
 	}
 }
 

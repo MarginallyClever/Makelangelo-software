@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
@@ -33,40 +35,48 @@ public class Converter_SpiralPulse extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = 1.0;
 
-		float maxr;
+		double [] bounds = img.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
+		double w = xRight - xLeft;
+		double h = yTop - yBottom;
+		
+		double maxr;
 		
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getMarginHeight();
-			float w2 = (float)machine.getMarginWidth();
-			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
+			maxr = (Math.sqrt(h*h + w*w) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the margin.
-			float w = (float)(machine.getMarginWidth())/2.0f;
-			float h = (float)(machine.getMarginHeight())/2.0f;
-			maxr = (float)( h < w ? h : w );
+			w/=2;
+			h/=2;
+			maxr = ( h < w ? h : w );
 		}
 		
-		float r = maxr-(float)toolDiameter*5.0f, f;
-		float fx, fy;
+		double r = maxr-toolDiameter*5.0, f;
+		double fx, fy;
 		int numRings = 0;
-		float stepSize = machine.getPenDiameter() * height;
-		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getPenDiameter();
+		double stepSize = toolDiameter * height;
+		double halfStep = stepSize / 2.0f;
+		double zigZagSpacing = toolDiameter;
 		int n=1;
-		float PULSE_MINIMUM = 0.1f;
-		float ringSize = halfStep*spacing;
+		double PULSE_MINIMUM = 0.1f;
+		double ringSize = halfStep*spacing;
 		boolean init = false;
 		int i;
 		int z = 0;
-		float r2,scale_z,pulse_size,nx,ny;
+		double r2,scale_z,pulse_size,nx,ny;
 
 		turtle = new Turtle();
 		
@@ -83,8 +93,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 				fx = (float)Math.cos(f) * r2;
 				fy = (float)Math.sin(f) * r2;
 				// clip to paper boundaries
-				if( isInsidePaperMargins(fx, fy) )
-				{
+				boolean isInside = (fx>=xLeft && fx<xRight && fy>=yBottom && fy<yTop);
+				if(isInside) {
 					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
 					scale_z = (255.0f - z) / 255.0f;
 					pulse_size = halfStep * scale_z;
@@ -113,6 +123,10 @@ public class Converter_SpiralPulse extends ImageConverter {
 		}
 
 		Log.message(numRings + " rings.");
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 
 	public void setIntensity(float floatValue) {

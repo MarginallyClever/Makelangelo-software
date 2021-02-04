@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
@@ -40,28 +42,33 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 
-		double separation; 
-		float h2 = (float)machine.getPaperHeight();
-		float w2 = (float)machine.getPaperWidth();
-		separation = (w2<h2) ? w2/4 : h2/4;
+		double [] bounds = sourceImage.getBounds();
+		double h2 = bounds[TransformedImage.TOP] - bounds[TransformedImage.BOTTOM];
+		double w2 = bounds[TransformedImage.RIGHT] - bounds[TransformedImage.LEFT];
+		double separation = (w2<h2) ? w2/4 : h2/4;
 
-		turtle = new Turtle();
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
+		Log.message("Yellow...");		list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation));
+		Log.message("Cyan...");			list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation));
+		Log.message("Magenta...");		list.add(outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation));
+		Log.message("Black...");		list.add(outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation));
 		Log.message("Finishing...");
+		
+		return list;
 	}
 
-	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
+	protected Turtle outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
+		Turtle turtle = new Turtle();
+		
 		turtle.setColor(newColor);
 		
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = 2.0;
 
 		int i, j;
 		int steps = 4;
@@ -69,17 +76,23 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		double level;
 		int z = 0;
 
-		float maxr;
+		double [] bounds = sourceImage.getBounds();
+		double yBottom = bounds[TransformedImage.BOTTOM];
+		double yTop    = bounds[TransformedImage.TOP];
+		double xLeft   = bounds[TransformedImage.LEFT];
+		double xRight  = bounds[TransformedImage.RIGHT];
+		double h2 = yTop - yBottom;
+		double w2 = xRight - xLeft;
+
+		double maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getMarginHeight();
-			float w2 = (float)machine.getMarginWidth();
-			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
+			maxr = (Math.sqrt(h2 * h2 + w2 * w2) + 1.0);
 		} else {
 			// do the largest circle that still fits in the image.
-			float w = (float)machine.getMarginWidth()/2.0f;
-			float h = (float)machine.getMarginHeight()/2.0f;
-			maxr = (float)( h < w ? h : w );
+			double w = w2/2.0;
+			double h = h2/2.0;
+			maxr = ( h < w ? h : w );
 		}
 
 		
@@ -100,8 +113,8 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 				f = Math.PI * 2.0f * (double)i / circumference;
 				fx = cx+Math.cos(f) * r;
 				fy = cy+Math.sin(f) * r;
-				
-				boolean isInside = isInsidePaperMargins(fx, fy);
+
+				boolean isInside = (fx>=xLeft && fx<xRight && fy>=yBottom && fy<yTop);
 				if(isInside != wasInside) {
 					turtle.moveTo(fx,fy);
 					turtle.penUp();
@@ -131,6 +144,8 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 
 		Log.message(downMoves + " down moves.");
 		Log.message(numRings + " rings.");
+		
+		return turtle;
 	}
 }
 

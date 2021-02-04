@@ -10,8 +10,14 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * Completely fills the page with ink.
  * @author Dan Royer
  */
-public class Generator_FillPage extends ImageGenerator {
+public class Generator_FillPage extends TurtleGenerator {
 	private static float angle = 0;
+	
+	private double stepSize = 2.0;
+	private double yBottom = -100;
+	private double yTop    = 100;
+	private double xLeft   = -100;
+	private double xRight  = 100;
 
 	MakelangeloRobotPanel robotPanel;
 	
@@ -34,18 +40,14 @@ public class Generator_FillPage extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public Turtle generate() {
+		Turtle turtle = new Turtle();
+		
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter();
-
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
@@ -54,8 +56,8 @@ public class Generator_FillPage extends ImageGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(machine.getMarginRight(),machine.getMarginTop());
-		Point2D rMin = new Point2D(machine.getMarginLeft(),machine.getMarginBottom());
+		Point2D rMax = new Point2D(xRight,yTop);
+		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize) {
@@ -79,6 +81,6 @@ public class Generator_FillPage extends ImageGenerator {
 			++i;
 		}
 	    
-	    return true;
+	    return turtle;
 	}
 }

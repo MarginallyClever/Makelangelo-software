@@ -179,11 +179,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
-		
-		yMin = machine.getMarginBottom();
-		yMax = machine.getMarginTop();
-		xMin = machine.getMarginLeft();
-		xMax = machine.getMarginRight();
+
+		double [] bounds = sourceImage.getBounds();
+		yMin = bounds[TransformedImage.BOTTOM];
+		yMax = bounds[TransformedImage.TOP];
+		xMin = bounds[TransformedImage.LEFT];
+		xMax = bounds[TransformedImage.RIGHT];
 
 		keepIterating=true;
 		restart();
@@ -211,9 +212,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public void finish() {
+	public ArrayList<Turtle> finish() {
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
 		keepIterating=false;
-		writeOutCells();
+		turtleList.add(writeOutCells());
+		return turtleList;
 	}
 
 	@Override
@@ -367,10 +370,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	/**
 	 * write cell centroids to gcode.
 	 */
-	protected void writeOutCells() {
-		turtle = new Turtle();
+	protected Turtle writeOutCells() {
+		Turtle turtle = new Turtle();
 
-		float toolDiameter = machine.getPenDiameter();
+		double toolDiameter = 1.0;
 
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
@@ -382,7 +385,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 			double r = val * (maxDotSize-minDotSize);
 
-			double newX=0,newY=0;
+			double fx=0,fy=0;
 			boolean first=true;
 			// filled circles
 			while (r > 0) {
@@ -391,15 +394,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				if (detail > 20) detail = 20;
 				for (float j = 0; j <= detail; ++j) {
 					double v = Math.PI * 2.0f * j / detail;
-					newX = x + r * Math.cos(v);
-					newY = y + r * Math.sin(v);
+					fx = x + r * Math.cos(v);
+					fy = y + r * Math.sin(v);
 					if(first) {
-						if(isInsidePaperMargins(newX,newY)) {
-							turtle.jumpTo(newX, newY);
-							first=false;
-						}
+						turtle.jumpTo(fx, fy);
+						first=false;
 					} else {
-						turtle.moveTo(newX, newY);
+						turtle.moveTo(fx, fy);
 					}
 				}
 				r -= toolDiameter;
@@ -408,6 +409,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				turtle.penUp();
 			}
 		}
+		return turtle;
 	}
 
 
