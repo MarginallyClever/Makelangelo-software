@@ -1,12 +1,6 @@
 package com.marginallyclever.artPipeline;
 
-
-import java.util.ArrayList;
-
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-
-import com.marginallyclever.convenience.turtle.Turtle;
 
 
 /**
@@ -16,10 +10,10 @@ import com.marginallyclever.convenience.turtle.Turtle;
 public abstract class TurtleManipulator {	
 	// threading
 	protected ProgressMonitor pm;
-	protected SwingWorker<ArrayList<Turtle>, Void> threadWorker;
+	protected TurtleSwingWorker threadWorker;
 	
 	
-	public void setThreadWorker(SwingWorker<ArrayList<Turtle>, Void> p) {
+	public void setThreadWorker(TurtleSwingWorker p) {
 		threadWorker = p;
 	}
 

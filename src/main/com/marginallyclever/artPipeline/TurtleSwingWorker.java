@@ -1,6 +1,9 @@
 package com.marginallyclever.artPipeline;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
@@ -20,6 +23,17 @@ public class TurtleSwingWorker extends SwingWorker<ArrayList<Turtle>,Void> {
 		super();
 		chosenConverter = c;
 		progressMonitor = pm;
+		
+		addPropertyChangeListener(new PropertyChangeListener() {
+			// Invoked when task's progress property changes.
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (Objects.equals("progress", evt.getPropertyName())) {
+					int progress = (Integer) evt.getNewValue();
+					pm.setProgress(progress);
+					pm.setNote(String.format("%d%%.\n", progress));
+				}
+			}
+		});
 	}
 
 	@Override
@@ -60,10 +74,6 @@ public class TurtleSwingWorker extends SwingWorker<ArrayList<Turtle>,Void> {
 		ArrayList<Turtle> list = get();
 
 		Log.message("Thread ended after "+loopCount+" iteration(s).");
-		workerList.remove(threadWorker);
-		workerCount--;
-		Log.message("Removed worker.  "+workerCount+"/"+workerList.size()+" workers now.");
-		threadWorker=null;
 		
 		MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
 		if(panel!=null) panel.updateButtonAccess();
