@@ -332,10 +332,10 @@ public class TransformedImage {
 		double oh=sourceImage.getHeight()/2.0;
 
 		Point3d [] corners = { 
-			new Point3d(ow,oh,0),
-			new Point3d(-ow,oh,0),
-			new Point3d(-ow,-oh,0),
-			new Point3d(ow,-oh,0)
+			new Point3d( ow, oh,1),
+			new Point3d(-ow, oh,1),
+			new Point3d(-ow,-oh,1),
+			new Point3d( ow,-oh,1)
 		};
 		double xMin = Double.MAX_VALUE;
 		double xMax = Double.MIN_VALUE;

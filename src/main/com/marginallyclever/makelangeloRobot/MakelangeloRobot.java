@@ -75,12 +75,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private float penX;
 	private float penY;
 
-	protected Turtle turtle;
+	protected ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 	
 	private ArtPipeline myPipeline;
 
 	// this list of gcode commands is store separate from the Turtle.
-	private ArrayList<String> drawingCommands;
+	private ArrayList<String> drawingCommands = new ArrayList<String>();
+	
 	// what line in drawingCommands is going to be sent next?
 	protected int drawingProgress;
 
@@ -105,8 +106,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		didSetHome = false;
 		setPenX(0);
 		setPenY(0);
-		turtle = new Turtle();
-		drawingCommands = new ArrayList<String>();
 		drawingProgress = 0;
 	}
 
@@ -767,9 +766,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return myPanel;
 	}
 
-	public void setTurtle(Turtle t) {
-		turtle = new Turtle(t);
-		myPipeline.processTurtle(turtle, settings);
+	public void setTurtles(ArrayList<Turtle> list) {
+		turtles.clear();
+		turtles.addAll(list);
+		//myPipeline.processTurtle(turtle, settings);
+	}
+
+	public ArrayList<Turtle> getTurtles() {
+		return turtles;
 	}
 
 	/**
@@ -806,65 +810,63 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return "Estimate =" + Log.secondsToHumanReadable(seconds);
 	}
 
-	public Turtle getTurtle() {
-		return turtle;
-	}
-
 	protected double estimateTime() {
 		double totalTime = 0;
 		
-		if (turtle.isLocked())
-			return totalTime;
+		for( Turtle turtle : turtles ) {
+			if(turtle.isLocked())
+				return totalTime;
 		
-		turtle.lock();
-
-		try {
-			boolean isUp = true;
-			double ox = this.settings.getHomeX();
-			double oy = this.settings.getHomeY();
-			double oz = this.settings.getPenUpAngle();
-
-			for (TurtleMove m : turtle.history) {
-				double nx = ox;
-				double ny = oy;
-				double nz = oz;
-
-				if(m.isUp) {
-					if (!isUp) {
-						nz = this.settings.getPenUpAngle();
-						isUp = true;
-					}
-				} else {
-					if (isUp) {
-						nz = this.settings.getPenDownAngle();
-						isUp = false;
-					}
-					nx = m.x;
-					ny = m.y;
-				}
-
-				double dx = nx - ox;
-				double dy = ny - oy;
-				double dz = nz - oz;
-				double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-				if (length > 0) {
-					double accel = settings.getAcceleration();
-					double maxV;
-					if (oz != nz) {
-						maxV = settings.getZRate();
-					} else if (nz == settings.getPenDownAngle()) {
-						maxV = settings.getPenDownFeedRate();
+			turtle.lock();
+	
+			try {
+				boolean isUp = true;
+				double ox = this.settings.getHomeX();
+				double oy = this.settings.getHomeY();
+				double oz = this.settings.getPenUpAngle();
+	
+				for (TurtleMove m : turtle.history) {
+					double nx = ox;
+					double ny = oy;
+					double nz = oz;
+	
+					if(m.isUp) {
+						if (!isUp) {
+							nz = this.settings.getPenUpAngle();
+							isUp = true;
+						}
 					} else {
-						maxV = settings.getPenUpFeedRate();
+						if (isUp) {
+							nz = this.settings.getPenDownAngle();
+							isUp = false;
+						}
+						nx = m.x;
+						ny = m.y;
 					}
-					totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
+	
+					double dx = nx - ox;
+					double dy = ny - oy;
+					double dz = nz - oz;
+					double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+					if (length > 0) {
+						double accel = settings.getAcceleration();
+						double maxV;
+						if (oz != nz) {
+							maxV = settings.getZRate();
+						} else if (nz == settings.getPenDownAngle()) {
+							maxV = settings.getPenDownFeedRate();
+						} else {
+							maxV = settings.getPenUpFeedRate();
+						}
+						totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
+					}
+					ox = nx;
+					oy = ny;
+					oz = nz;
 				}
-				ox = nx;
-				oy = ny;
-				oz = nz;
-			}
-		} finally {
-			turtle.unlock();
+			} finally {
+				turtle.unlock();
+			}	
 		}
 		
 		return totalTime;
@@ -944,9 +946,12 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
-		} else if (turtle != null) {
-			TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
-			turtle.render(tr);
+		} else {
+			for( Turtle t : turtles ) {
+				TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
+				tr.setPenDownColor(t.getColor());
+				t.render(tr);
+			}
 		}
 	}
 

@@ -629,7 +629,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
 
-		buttonSaveFile.setEnabled(robot!=null && robot.getTurtle().history.size()>0);
+		buttonSaveFile.setEnabled(robot!=null);
 		
 		this.validate();
 	}

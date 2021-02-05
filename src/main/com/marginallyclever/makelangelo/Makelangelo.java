@@ -52,7 +52,20 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.converters.Converter_Boxes;
+import com.marginallyclever.artPipeline.converters.Converter_CMYK;
 import com.marginallyclever.artPipeline.converters.Converter_Crosshatch;
+import com.marginallyclever.artPipeline.converters.Converter_MagicCircle;
+import com.marginallyclever.artPipeline.converters.Converter_Moire;
+import com.marginallyclever.artPipeline.converters.Converter_Multipass;
+import com.marginallyclever.artPipeline.converters.Converter_Pulse;
+import com.marginallyclever.artPipeline.converters.Converter_RandomLines;
+import com.marginallyclever.artPipeline.converters.Converter_Sandy;
+import com.marginallyclever.artPipeline.converters.Converter_Spiral;
+import com.marginallyclever.artPipeline.converters.Converter_SpiralPulse;
+import com.marginallyclever.artPipeline.converters.Converter_Spiral_CMYK;
+import com.marginallyclever.artPipeline.converters.Converter_Wander;
+import com.marginallyclever.artPipeline.converters.Converter_ZigZag;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.ConnectionManager;
@@ -190,16 +203,40 @@ public final class Makelangelo extends TransferHandler
 			//TurtleGenerator g = new Generator_Spirograph();
 			//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
 			//myTurtles.add(g.generate());
-						
+			
 			TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
-			owl.rotateAbsolute(25);
-			owl.setScale(0.5, 0.5);
-			ImageConverter c = new Converter_Crosshatch();
+			//owl.rotateAbsolute(-25);
+			owl.setScale(0.2, 0.2);
+			
+			//ImageConverter c = new Converter_Boxes();
+			//ImageConverter c = new Converter_CMYK();
+			//ImageConverter c = new Converter_Crosshatch();
+			//ImageConverter c = new Converter_MagicCircle();
+			//ImageConverter c = new Converter_Moire();
+			//ImageConverter c = new Converter_Multipass();
+			//ImageConverter c = new Converter_Pulse();
+			
+			ImageConverter c = new Converter_RandomLines();
+			//ImageConverter c2 = new Converter_Sandy();
+			owl.setTranslateY(120);
 			c.setImage(owl);
 			myTurtles.addAll(c.finish());
+
+			ImageConverter c2 = new Converter_Spiral_CMYK();
+			owl.setTranslateY(-240);
+			c2.setImage(owl);
+			myTurtles.addAll(c2.finish());
+			
+			////ImageConverter c = new Converter_Spiral_CMYK();
+			//ImageConverter c = new Converter_Spiral();
+			//ImageConverter c = new Converter_SpiralPulse();
+			//ImageConverter c = new Converter_Wander();
+			//ImageConverter c = new Converter_ZigZag();
+			//c.setImage(owl);
+			//myTurtles.addAll(c.finish());
 			
 			if(myTurtles.size()>0) {
-				robot.setTurtle(myTurtles.get(myTurtles.size()-1));
+				robot.setTurtles(myTurtles);
 			}
 		}
 		

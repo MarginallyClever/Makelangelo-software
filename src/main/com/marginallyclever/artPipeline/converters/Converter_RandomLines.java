@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.converters;
 
+import java.util.ArrayList;
+
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -23,7 +25,10 @@ public class Converter_RandomLines extends ImageConverter {
 		return new Converter_RandomLines_Panel(this);
 	}
 	
-	public void finish(Turtle turtle) {
+	@Override
+	public ArrayList<Turtle> finish() {
+		Turtle turtle = new Turtle();
+		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
@@ -62,6 +67,10 @@ public class Converter_RandomLines extends ImageConverter {
 			startPX = endPX;
 			startPY = endPY;
 		}
+		
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		return list;
 	}
 	
 

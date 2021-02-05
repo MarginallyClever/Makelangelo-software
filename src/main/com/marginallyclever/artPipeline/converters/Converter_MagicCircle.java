@@ -13,12 +13,12 @@ import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Attempt to generate a magic circle weaving pattern as seen in https://github.com/i-make-robots/weaving_algorithm
- *
+ * Probably never going to work - the calculation time is insane.
  * @author Dan Royer
  */
 public class Converter_MagicCircle extends ImageConverter {
-	private static int numberOfPoints = 200;
-	private static int numberToDraw = 10000;
+	private static int numberOfPoints = 188;
+	private static int numberToDraw = 5000;
 
 	@Override
 	public String getName() {
@@ -53,15 +53,13 @@ public class Converter_MagicCircle extends ImageConverter {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
-
-		turtle.reset();
 		
 		int numLines = numberOfPoints * numberOfPoints / 2;
 		LineIntensity [] intensities = new LineIntensity[numLines*2];
 		double [] px = new double[numberOfPoints];
 		double [] py = new double[numberOfPoints];
 		
-		double toolDiameter = 1.0;
+		double toolDiameter = 10.0;
 
 		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];
