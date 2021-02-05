@@ -30,7 +30,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_KochCurve_Panel(this);
 	}
 	

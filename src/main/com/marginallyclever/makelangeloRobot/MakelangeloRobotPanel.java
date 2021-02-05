@@ -21,9 +21,9 @@ import java.util.ServiceLoader;
 import javax.swing.*;
 
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.artPipeline.generators.TurtleGenerator;
-import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
+import com.marginallyclever.artPipeline.generators.TurtleGeneratorPanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -658,7 +658,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		String[] imageGeneratorNames = new String[i];
 		
 		i=0;
-		for( TurtleManipulator f : imageGenerators ) {
+		for( TurtleNode f : imageGenerators ) {
 			imageGeneratorNames[i++] = f.getName();
 		}
 
@@ -688,12 +688,12 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 
 	private void changeGeneratorPanel(int index) {
-		ImageGeneratorPanel.makelangeloRobotPanel = this;
+		TurtleGeneratorPanel.makelangeloRobotPanel = this;
 		
 		Turtle t = makelangeloApp.getSelectedTurtle();
 		
 		TurtleGenerator chosenGenerator = getGenerator(index);
-		ImageGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
+		TurtleGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
 			JPanel p = chosenGeneratorPanel.getInteriorPanel();

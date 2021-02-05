@@ -30,7 +30,7 @@ public class Generator_Dragon extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Dragon_Panel(this);
 	}
 		

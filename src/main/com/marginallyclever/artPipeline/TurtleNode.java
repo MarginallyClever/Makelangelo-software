@@ -7,7 +7,7 @@ import javax.swing.ProgressMonitor;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class TurtleManipulator {	
+public abstract class TurtleNode {	
 	// threading
 	protected ProgressMonitor pm;
 	protected TurtleSwingWorker threadWorker;

@@ -18,7 +18,7 @@ public class Generator_Border extends TurtleGenerator {
 	}
 
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Empty_Panel(this);
 	}
 

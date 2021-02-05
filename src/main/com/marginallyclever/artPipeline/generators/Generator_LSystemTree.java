@@ -25,7 +25,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_LSystemTree_Panel(this);
 	}
 	

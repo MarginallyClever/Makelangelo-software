@@ -28,7 +28,7 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_SierpinskiTriangle_Panel(this);
 	}
 	

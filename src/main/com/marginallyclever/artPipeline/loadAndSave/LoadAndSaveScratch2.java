@@ -22,7 +22,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -33,7 +33,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public class LoadAndSaveScratch2 extends TurtleManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileType {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {

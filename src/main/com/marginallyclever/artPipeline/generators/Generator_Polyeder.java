@@ -159,7 +159,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 	}
 
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		// rebuild the list of models here if you want to dynamically add more.
 		
 		return new Generator_Polyeder_Panel(this);

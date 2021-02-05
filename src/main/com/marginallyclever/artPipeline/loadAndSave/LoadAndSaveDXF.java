@@ -31,7 +31,7 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
@@ -46,7 +46,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
-public class LoadAndSaveDXF extends TurtleManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;

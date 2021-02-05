@@ -67,7 +67,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Spirograph_Panel(this);
 	}
 		

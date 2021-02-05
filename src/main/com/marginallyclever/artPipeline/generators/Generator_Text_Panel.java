@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.select.SelectTextArea;
  * @author Dan Royer
  *
  */
-public class Generator_Text_Panel extends ImageGeneratorPanel {
+public class Generator_Text_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

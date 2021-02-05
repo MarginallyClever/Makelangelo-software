@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
  * @author Dan Royer
  *
  */
-public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
+public class Generator_KochCurve_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */
@@ -33,12 +33,7 @@ public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
 		
-		int newOrder = fieldOrder.getValue();
-		if(newOrder<1) newOrder=1;
-		
-		if(newOrder != Generator_KochCurve.getOrder()) {
-			Generator_KochCurve.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
-		}
+		Generator_KochCurve.setOrder(fieldOrder.getValue());
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

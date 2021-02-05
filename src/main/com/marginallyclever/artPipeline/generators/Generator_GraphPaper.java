@@ -29,7 +29,7 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_GraphPaper_Panel(this);
 	}
 	

@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
  * @author Dan Royer
  * TODO graph paper needs to offer measurements for the grid size
  */
-public class Generator_GraphPaper_Panel extends ImageGeneratorPanel {
+public class Generator_GraphPaper_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
  * @author Dan Royer
  *
  */
-public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
+public class Generator_Spirograph_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */
@@ -43,23 +43,11 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
 		
-		int newMajorRadius = field_majorRadius.getValue();
-		int newMinorRadius = field_minorRadius.getValue();
-		float newPScale = field_pScale.getValue();
-		int newNumSamples = field_numSamples.getValue();
-		boolean newEpitrochoid = field_isEpitrochoid.isSelected();
-
-		if(newMajorRadius != Generator_Spirograph.getMajorRadius() ||
-			newMinorRadius != Generator_Spirograph.getMinorRadius() ||
-			newPScale != Generator_Spirograph.getPScale() ||
-			newNumSamples != Generator_Spirograph.getNumSamples() ||
-			newEpitrochoid != Generator_Spirograph.getEpitrochoid() ) {
-			Generator_Spirograph.setMajorRadius(newMajorRadius);
-			Generator_Spirograph.setMinorRadius(newMinorRadius);
-			Generator_Spirograph.setPScale(newPScale);
-			Generator_Spirograph.setNumSamples(newNumSamples);
-			Generator_Spirograph.setEpitrochoid(newEpitrochoid);
-			makelangeloRobotPanel.regenerate(generator);
-		}
+		Generator_Spirograph.setMajorRadius(field_majorRadius.getValue());
+		Generator_Spirograph.setMinorRadius(field_minorRadius.getValue());
+		Generator_Spirograph.setPScale(field_pScale.getValue());
+		Generator_Spirograph.setNumSamples(field_numSamples.getValue());
+		Generator_Spirograph.setEpitrochoid( field_isEpitrochoid.isSelected());
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

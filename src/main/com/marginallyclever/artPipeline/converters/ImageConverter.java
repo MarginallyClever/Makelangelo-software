@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline.converters;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 
 import java.util.ArrayList;
 
@@ -24,12 +24,13 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  * @author Dan Royer
  *
  */
-public abstract class ImageConverter extends TurtleManipulator implements MakelangeloRobotDecorator {
+public abstract class ImageConverter extends TurtleNode implements MakelangeloRobotDecorator {
 	protected TransformedImage sourceImage;
 	protected boolean keepIterating=false;
 
 	public static LoadAndSaveImage loadAndSaveImage;
 
+	@Override
 	public void restart() {
 		if(!keepIterating) {
 			if(loadAndSaveImage!=null) {

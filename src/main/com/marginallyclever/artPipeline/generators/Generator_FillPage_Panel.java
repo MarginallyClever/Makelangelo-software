@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
  * @author Dan Royer
  *
  */
-public class Generator_FillPage_Panel extends ImageGeneratorPanel {
+public class Generator_FillPage_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

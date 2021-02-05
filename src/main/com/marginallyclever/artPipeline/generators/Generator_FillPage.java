@@ -35,7 +35,7 @@ public class Generator_FillPage extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_FillPage_Panel(this);
 	}
 	

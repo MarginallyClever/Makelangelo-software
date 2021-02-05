@@ -5,7 +5,7 @@ package com.marginallyclever.artPipeline.generators;
  * @author Dan Royer
  *
  */
-public class Generator_Empty_Panel extends ImageGeneratorPanel {
+public class Generator_Empty_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

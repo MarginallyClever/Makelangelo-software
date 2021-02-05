@@ -57,7 +57,7 @@ public class Generator_Lissajous extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Lissajous_Panel(this);
 	}
 		

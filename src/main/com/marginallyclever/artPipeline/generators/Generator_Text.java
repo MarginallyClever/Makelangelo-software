@@ -104,7 +104,7 @@ public class Generator_Text extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Text_Panel(this);
 	}
 	

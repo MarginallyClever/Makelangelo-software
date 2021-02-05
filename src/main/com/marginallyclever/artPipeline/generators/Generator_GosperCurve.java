@@ -29,7 +29,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_GosperCurve_Panel(this);
 	}
 	

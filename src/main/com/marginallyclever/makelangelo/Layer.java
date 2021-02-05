@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.convenience.turtle.Turtle;
 
 public class Layer {
-	public TurtleManipulator manipulator;
+	public TurtleNode manipulator;
 	public Turtle result;
 
 	public Layer() {

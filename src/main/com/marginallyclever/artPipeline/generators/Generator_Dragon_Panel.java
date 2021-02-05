@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
  * @author Dan Royer
  *
  */
-public class Generator_Dragon_Panel extends ImageGeneratorPanel {
+public class Generator_Dragon_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

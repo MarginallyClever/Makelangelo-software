@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
@@ -47,7 +47,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
-public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveSVG extends TurtleNode implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
 	protected double scale,imageCenterX,imageCenterY;

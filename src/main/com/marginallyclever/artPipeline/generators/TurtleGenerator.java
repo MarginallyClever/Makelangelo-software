@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.generators;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
@@ -17,7 +17,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  * @author dan royer
  *
  */
-public abstract class TurtleGenerator extends TurtleManipulator implements MakelangeloRobotDecorator {
+public abstract class TurtleGenerator extends TurtleNode implements MakelangeloRobotDecorator {
 	/**
 	 * @return a Turtle containing the path generated.  Null on failure.
 	 */
@@ -26,7 +26,7 @@ public abstract class TurtleGenerator extends TurtleManipulator implements Makel
 	/**
 	 * @return the gui panel with options for this manipulator
 	 */
-	abstract public ImageGeneratorPanel getPanel();
+	abstract public TurtleGeneratorPanel getPanel();
 	
 	/**
 	 * live preview as the system is generating.

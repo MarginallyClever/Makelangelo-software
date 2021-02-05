@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
  * @author Dan Royer
  *
  */
-public class Generator_Package_Panel extends ImageGeneratorPanel {
+public class Generator_Package_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

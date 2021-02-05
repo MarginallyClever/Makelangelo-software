@@ -21,7 +21,7 @@ public class Generator_Package extends TurtleGenerator {
 	}
 
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Package_Panel(this);
 	}
 

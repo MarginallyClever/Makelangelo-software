@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
  * @author Dan Royer
  *
  */
-public class Generator_Polyeder_Panel extends ImageGeneratorPanel {
+public class Generator_Polyeder_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */

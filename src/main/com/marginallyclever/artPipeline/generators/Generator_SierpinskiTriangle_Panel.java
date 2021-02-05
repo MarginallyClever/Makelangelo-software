@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
  * @author Dan Royer
  *
  */
-public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
+public class Generator_SierpinskiTriangle_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */
@@ -33,12 +33,7 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
 		
-		int newOrder = field_order.getValue();
-		if(newOrder<1) newOrder=1;
-		
-		if(newOrder != Generator_SierpinskiTriangle.getOrder()) {
-			Generator_SierpinskiTriangle.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
-		}
+		Generator_SierpinskiTriangle.setOrder(field_order.getValue());
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

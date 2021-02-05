@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
  * @author Dan Royer
  *
  */
-public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
+public class Generator_Lissajous_Panel extends TurtleGeneratorPanel {
 	/**
 	 * 
 	 */
@@ -38,20 +38,10 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
 
-		int newB = field_b.getValue();
-		int newA = field_a.getValue();
-		float newDelta = field_delta.getValue()/1000.0f;
-		int newNumSamples = field_numSamples.getValue();
-
-		if(newB != Generator_Lissajous.getB() ||
-			newA != Generator_Lissajous.getA() ||
-			newDelta != Generator_Lissajous.getDelta() ||
-			newNumSamples != Generator_Lissajous.getNumSamples() ) {
-			Generator_Lissajous.setB(newB);
-			Generator_Lissajous.setA(newA);
-			Generator_Lissajous.setDelta(newDelta);
-			Generator_Lissajous.setNumSamples(newNumSamples);
-			makelangeloRobotPanel.regenerate(generator);
-		}
+		Generator_Lissajous.setB(field_b.getValue());
+		Generator_Lissajous.setA(field_a.getValue());
+		Generator_Lissajous.setDelta(field_delta.getValue()/1000.0f);
+		Generator_Lissajous.setNumSamples(field_numSamples.getValue());
+		makelangeloRobotPanel.regenerate(generator);
 	}
 }

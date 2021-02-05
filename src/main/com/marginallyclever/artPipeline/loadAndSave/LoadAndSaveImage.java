@@ -31,7 +31,7 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.TurtleManipulator;
+import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.artPipeline.TurtleSwingWorker;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
@@ -49,7 +49,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  *
  */
-public class LoadAndSaveImage extends TurtleManipulator implements LoadAndSaveFileType {
+public class LoadAndSaveImage extends TurtleNode implements LoadAndSaveFileType {
 	
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
@@ -188,7 +188,6 @@ public class LoadAndSaveImage extends TurtleManipulator implements LoadAndSaveFi
 		//Log.message("Changing converter");
 		stopSwingWorker();
 
-		ImageConverterPanel.loadAndSaveImage = this;
 		ImageConverter.loadAndSaveImage = this;
 		
 		chosenConverter = requestedConverter;

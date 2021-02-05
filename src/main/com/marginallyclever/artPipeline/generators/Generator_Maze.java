@@ -49,7 +49,7 @@ public class Generator_Maze extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_Maze_Panel(this);
 	}
 

@@ -24,7 +24,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	}
 
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_FibonacciSpiral_Panel(this);
 	}
 

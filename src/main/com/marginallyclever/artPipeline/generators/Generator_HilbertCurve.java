@@ -28,7 +28,7 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 	}
 	
 	@Override
-	public ImageGeneratorPanel getPanel() {
+	public TurtleGeneratorPanel getPanel() {
 		return new Generator_HilbertCurve_Panel(this);
 	}
 	
