@@ -34,6 +34,7 @@ import org.kabeja.parser.ParserBuilder;
 import com.marginallyclever.artPipeline.TurtleManipulator;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
@@ -448,6 +449,21 @@ public class LoadAndSaveDXF extends TurtleManipulator implements LoadAndSaveFile
 	 */
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
+
+		// find the bounding box of all turtles.
+		Point2D totalBottom = new Point2D(Double.MAX_VALUE,Double.MAX_VALUE);
+		Point2D totalTop = new Point2D(Double.MIN_VALUE,Double.MIN_VALUE);
+		Point2D bottom = new Point2D();
+		Point2D top = new Point2D();
+
+		for( Turtle t : turtles ) {
+			t.getBounds(top, bottom);
+			totalBottom.x = Math.min(bottom.x, totalBottom.x);
+			totalBottom.y = Math.min(bottom.y, totalBottom.y);
+			totalTop.x = Math.max(bottom.x, totalTop.x);
+			totalTop.y = Math.max(bottom.y, totalTop.y);
+		}
+		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			Turtle firstTurtle = turtles.get(0);
 			// TODO find the actual bounds
@@ -458,16 +474,16 @@ public class LoadAndSaveDXF extends TurtleManipulator implements LoadAndSaveFile
 			out.write("2\nHEADER\n");
 			out.write("9\n$ACADVER\n1\nAC1006\n");
 			out.write("9\n$INSBASE\n");
-			out.write("10\n"+firstTurtle.getMarginLeft()+"\n");
-			out.write("20\n"+firstTurtle.getMarginBottom()+"\n");
+			out.write("10\n"+totalBottom.x+"\n");
+			out.write("20\n"+totalBottom.y+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMIN\n");
-			out.write("10\n"+firstTurtle.getMarginLeft()+"\n");
-			out.write("20\n"+firstTurtle.getMarginBottom()+"\n");
+			out.write("10\n"+totalBottom.x+"\n");
+			out.write("20\n"+totalBottom.y+"\n");
 			out.write("30\n0.0\n");
 			out.write("9\n$EXTMAX\n");
-			out.write("10\n"+firstTurtle.getMarginRight()+"\n");
-			out.write("20\n"+firstTurtle.getMarginTop()+"\n");
+			out.write("10\n"+totalTop.x+"\n");
+			out.write("20\n"+totalTop.y+"\n");
 			out.write("30\n0.0\n");
 			out.write("0\nENDSEC\n");
 
