@@ -78,9 +78,6 @@ public class LoadAndSaveImage extends TurtleManipulator implements LoadAndSaveFi
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private ArrayList<String> imageConverterNames = new ArrayList<String>();
 	
-	private ArrayList<SwingWorker<ArrayList<Turtle>,Void>> workerList = new ArrayList<SwingWorker<ArrayList<Turtle>,Void>>();
-	private int workerCount = 0;
-
 	
 	public LoadAndSaveImage() {
 		converters = ServiceLoader.load(ImageConverter.class);
@@ -220,7 +217,6 @@ public class LoadAndSaveImage extends TurtleManipulator implements LoadAndSaveFi
 	}
 	
 
-
 	/**
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
@@ -295,22 +291,7 @@ public class LoadAndSaveImage extends TurtleManipulator implements LoadAndSaveFi
 		chosenConverter.setImage(img);
 
 		threadWorker = new TurtleSwingWorker(chosenConverter,pm);
-
-		threadWorker.addPropertyChangeListener(new PropertyChangeListener() {
-			// Invoked when task's progress property changes.
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (Objects.equals("progress", evt.getPropertyName())) {
-					int progress = (Integer) evt.getNewValue();
-					pm.setProgress(progress);
-					pm.setNote(String.format("%d%%.\n", progress));
-				}
-			}
-		});
 		
-		workerList.add(threadWorker);
-		workerCount++;
-		Log.message("added worker.  "+workerCount+"/"+workerList.size()+" workers now.");
-
 		threadWorker.execute();
 	}
 	
