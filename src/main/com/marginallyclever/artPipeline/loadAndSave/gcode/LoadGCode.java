@@ -1,39 +1,46 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.loadAndSave.gcode;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
  * LoadGCode loads gcode into memory. 
  * @author Dan Royer
  *
  */
-public class LoadAndSaveGCode implements LoadAndSaveFileType {
+public class LoadGCode extends TurtleNode implements LoadAndSaveFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
 	}
+	
+	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
+	}
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
+		return false;
 	}
 
 	@Override
@@ -58,8 +65,10 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	}
 	
 	@Override
-	public boolean load(InputStream in,Turtle turtle) {
-		turtle.reset();
+	public boolean load(InputStream in) {
+		Turtle turtle = new Turtle();
+		setTurtleResult(null);
+		
 		ColorRGB penDownColor = turtle.getColor();
 		double scaleXY=1;
 		boolean isAbsolute=true;
@@ -191,71 +200,17 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 		}
 		scanner.close();
 
+		setTurtleResult(turtle);
 		return true;
 	}
 
 	@Override
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
-		Log.message("saving...");
-		
-		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			MakelangeloRobotSettings machine = robot.getSettings();
-			machine.writeProgramStart(out);
-			machine.writeAbsoluteMode(out);
-			machine.writePenUp(out);
-			boolean isUp=true;
-			
-			for( Turtle t : turtles ) {
-				TurtleMove previousMovement=null;
-				machine.writeChangeTo(out,t.getColor());
-				for( TurtleMove m : t.history ) {
-					boolean zMoved=false;
-					if(m.isUp) {
-						if(!isUp) {
-							// lift pen up
-							machine.writePenUp(out);
-							isUp=true;
-							zMoved=true;
-						}
-					} else {
-						if(isUp) {
-							// go to m and put pen down
-							if(previousMovement!=null) {
-								machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
-							} else {
-								machine.writeMoveTo(out, m.x, m.y, true,true);
-							}
-							machine.writePenDown(out);
-							isUp=false;
-							zMoved=true;
-						}
-						machine.writeMoveTo(out,m.x, m.y,false,zMoved);
-					}
-					previousMovement=m;
-				}
-				if(!isUp) machine.writePenUp(out);
-			}
-			machine.writeProgramEnd(out);
-			
-			out.flush();
-			out.close();
-		}
-		catch(IOException e) {
-			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
-			return false;
-		}
-		
-		Log.message("done.");
-		return true;
-	}
-	
-	@Override
-	public boolean canLoad() {
-		return true;
+		return false;
 	}
 
 	@Override
-	public boolean canSave() {
-		return true;
+	public String getName() {
+		return Translator.get("LoadGCODE");
 	}
 }

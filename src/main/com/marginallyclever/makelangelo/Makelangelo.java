@@ -54,7 +54,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.converters.Converter_CMYK;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -681,10 +681,10 @@ public final class Makelangelo extends TransferHandler
 	 * @param loader the plugin to use
 	 * @return true if load is successful.
 	 */
-	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
+	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFile loader) {
 		boolean success = false;
 		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream,getSelectedTurtle());
+			success=loader.load(fileInputStream);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -708,10 +708,10 @@ public final class Makelangelo extends TransferHandler
 	public boolean openFileOnDemand(String filename) {
 		Log.message(Translator.get("OpeningFile") + filename + "...");
 
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadAndSaveFile> imageLoaders = ServiceLoader.load(LoadAndSaveFile.class);
+		Iterator<LoadAndSaveFile> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadAndSaveFileType loader = i.next();
+			LoadAndSaveFile loader = i.next();
 			if(!loader.canLoad()) continue;  // TODO feels redundant given the next line
 			if(!loader.canLoad(filename)) continue;
 			
@@ -732,8 +732,8 @@ public final class Makelangelo extends TransferHandler
 		JFileChooser fc = new JFileChooser();
 		
 		// list available loaders
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageLoaders ) {
+		ServiceLoader<LoadAndSaveFile> imageLoaders = ServiceLoader.load(LoadAndSaveFile.class);
+		for( LoadAndSaveFile lft : imageLoaders ) {
 			if(lft.canLoad()) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
@@ -753,7 +753,7 @@ public final class Makelangelo extends TransferHandler
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 
 			// figure out which of the loaders was requested.
-			for( LoadAndSaveFileType loader : imageLoaders ) {
+			for( LoadAndSaveFile loader : imageLoaders ) {
 				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
 				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 				if(success) {
@@ -784,8 +784,8 @@ public final class Makelangelo extends TransferHandler
 		// list all the known savable file types.
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
-		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageSavers ) {
+		ServiceLoader<LoadAndSaveFile> imageSavers = ServiceLoader.load(LoadAndSaveFile.class);
+		for( LoadAndSaveFile lft : imageSavers ) {
 			if(lft.canSave()) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
@@ -803,7 +803,7 @@ public final class Makelangelo extends TransferHandler
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			for( LoadAndSaveFileType lft : imageSavers ) {
+			for( LoadAndSaveFile lft : imageSavers ) {
 				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
 				//if(!filter.accept(new File(selectedFile))) {
 				if( !isMatchingFileFilter(selectedFilter,filter) ) {

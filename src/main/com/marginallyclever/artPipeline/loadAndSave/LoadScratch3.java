@@ -43,9 +43,9 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadAndSaveScratch3 extends TurtleNode implements LoadAndSaveFileType {
+public class LoadScratch3 extends TurtleNode implements LoadAndSaveFile {
 	private final String PROJECT_JSON = "project.json";
-	
+		
 	private class ScratchVariable {
 		public String name;
 		public String uniqueID;
@@ -104,11 +104,12 @@ public class LoadAndSaveScratch3 extends TurtleNode implements LoadAndSaveFileTy
 
 	
 	@Override
-	public boolean load(InputStream in,Turtle destinationTurtle) {
+	public boolean load(InputStream in) {
 		Log.message(Translator.get("FileTypeSB3")+"...");
 		// reset the turtle object
-		turtle = destinationTurtle;
-		turtle.reset();
+		setTurtleResult(null);
+		
+		Turtle turtle = new Turtle();
 			
 		try {
 			// open zip file
@@ -192,9 +193,10 @@ public class LoadAndSaveScratch3 extends TurtleNode implements LoadAndSaveFileTy
 			return false;
 		}
 		
+		setTurtleResult(turtle);
+		
 		return true;
 	}
-
 
 	/**
 	 * parse blocks in scratch

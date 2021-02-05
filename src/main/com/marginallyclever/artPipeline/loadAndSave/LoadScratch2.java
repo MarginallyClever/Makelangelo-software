@@ -33,7 +33,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileType {
+public class LoadScratch2 extends TurtleNode implements LoadAndSaveFile {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -63,7 +63,6 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 	
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch2"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
-	private Turtle turtle;
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
 	private Map<String,JSONArray> subRoutines = new HashMap<String,JSONArray>();
@@ -87,12 +86,12 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 
 	
 	@Override
-	public boolean load(InputStream in,Turtle turtle) {
+	public boolean load(InputStream in) {
 		Log.message(Translator.get("FileTypeSB2")+"...");
 
-		turtle.reset();
-	    turtle.setX(turtle.getX());
-	    turtle.setY(turtle.getY());
+		setTurtleResult(null);
+		
+		Turtle turtle = new Turtle();
 	    indent=0;
 		
 		try {
@@ -192,13 +191,14 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 			}
 
 			// actual code begins here.
-			parseScratchCode(greenFlagScript);
+			parseScratchCode(turtle,greenFlagScript);
 			
 			Log.message("finished scripts");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		setTurtleResult(turtle);
 		return true;
 	}
 
@@ -304,7 +304,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 	 * @param script valid JSONArray of Scratch commands.
 	 * @throws Exception
 	 */
-	private void parseScratchCode(JSONArray script) throws Exception {
+	private void parseScratchCode(Turtle turtle,JSONArray script) throws Exception {
 		if(script==null) return;
 		
 		//Log.message(getIndent()+"{");  //"[size="+script.size()+"]"
@@ -316,7 +316,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 			Object o = (Object)scriptIter.next();
 			if( o instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)o;
-				parseScratchCode(arr);
+				parseScratchCode(turtle,arr);
 				continue;
 			}
 			
@@ -333,75 +333,75 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				Object o2 = (Object)scriptIter.next();
 				//Log.message(getIndent()+"broadcast "+(String)o2);
 				JSONArray arr = subRoutines.get(o2);
-				parseScratchCode(arr);
+				parseScratchCode(turtle,arr);
 			} else if(name.equals("stopScripts")) {
 				//Log.message(getIndent()+"stop");
 				break;
 			} else if(name.equals("doRepeat")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				int count = (int)resolveValue(o2);
+				int count = (int)reslolveValue(turtle,o2);
 				//Log.message(getIndent()+"Repeat "+count+" times:");
 				for(int i=0;i<count;++i) {
-					parseScratchCode((JSONArray)o3);
+					parseScratchCode(turtle,(JSONArray)o3);
 				}
 			} else if(name.equals("doUntil")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
 				//Log.message(getIndent()+"Do Until");
-				while(!resolveBoolean((JSONArray)o2)) {
-					parseScratchCode((JSONArray)o3);
+				while(!resolveBoolean(turtle,(JSONArray)o2)) {
+					parseScratchCode(turtle,(JSONArray)o3);
 				}
 			} else if(name.equals("doIf")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				if(resolveBoolean((JSONArray)o2)) {
+				if(resolveBoolean(turtle,(JSONArray)o2)) {
 					//Log.message(getIndent()+"if(true)");
-					parseScratchCode((JSONArray)o3);
+					parseScratchCode(turtle,(JSONArray)o3);
 				}
 			} else if(name.equals("doIfElse")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
 				Object o4 = (Object)scriptIter.next();
-				if(resolveBoolean((JSONArray)o2)) {
+				if(resolveBoolean(turtle,(JSONArray)o2)) {
 					//Log.message(getIndent()+"if(true)");
-					parseScratchCode((JSONArray)o3);
+					parseScratchCode(turtle,(JSONArray)o3);
 				} else {
 					//Log.message(getIndent()+"if(false)");
-					parseScratchCode((JSONArray)o4);
+					parseScratchCode(turtle,(JSONArray)o4);
 				}
 			} else if(name.equals("append:toList:")) {
 				// "append:toList:", new value, list name 
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				double value = resolveValue(o2);
+				double value = reslolveValue(turtle,o2);
 				scratchLists.get(getListByID(o3)).contents.add(value);
 			} else if(name.equals("deleteLine:ofList:")) {
 				// "deleteLine:ofList:", index, list name 
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				int listIndex = (int)resolveListIndex(o2,o3);
+				int listIndex = (int)resolveListIndex(turtle,o2,o3);
 				scratchLists.get(getListByID(o3)).contents.remove(listIndex);
 			} else if(name.equals("insert:at:ofList:")) {
 				// "insert:at:ofList:", new value, index, list name 
 				Object o4 = (Object)scriptIter.next();
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				double newValue = resolveValue(o4);
-				int listIndex = (int)resolveListIndex(o2,o3);
+				double newValue = reslolveValue(turtle,o4);
+				int listIndex = (int)resolveListIndex(turtle,o2,o3);
 				scratchLists.get(getListByID(o3)).contents.add(listIndex,newValue);
 			} else if(name.equals("setLine:ofList:to:")) {
 				// "setLine:ofList:to:", index, list name, new value
 				Object o4 = (Object)scriptIter.next();
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				double newValue = resolveValue(o4);
-				int listIndex = (int)resolveListIndex(o2,o3);
+				double newValue = reslolveValue(turtle,o4);
+				int listIndex = (int)resolveListIndex(turtle,o2,o3);
 				scratchLists.get(getListByID(o3)).contents.set(listIndex,newValue);
 			} else if(name.equals("wait:elapsed:from:")) {
 				// dwell - does nothing.
 				Object o2 = (Object)scriptIter.next();
-				double seconds = resolveValue(o2);
+				double seconds = reslolveValue(turtle,o2);
 				Log.message(getIndent()+"dwell "+seconds+" seconds.");
 				continue;
 			} else if(name.equals("putPenUp")) {
@@ -413,57 +413,57 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				Log.message(getIndent()+"pen down");
 			} else if(name.equals("gotoX:y:")) {
 				Object o2 = (Object)scriptIter.next();
-				double x = resolveValue(o2);
+				double x = reslolveValue(turtle,o2);
 				Object o3 = (Object)scriptIter.next();
-				double y = resolveValue(o3);
+				double y = reslolveValue(turtle,o3);
 				
 				turtle.moveTo(x,y);
 				Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("changeXposBy:")) {
 				Object o2 = (Object)scriptIter.next();
-				double v = resolveValue(o2);
+				double v = reslolveValue(turtle,o2);
 				turtle.moveTo(turtle.getX()+v,turtle.getY());
 				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("changeYposBy:")) {
 				Object o2 = (Object)scriptIter.next();
-				double v = resolveValue(o2);
+				double v = reslolveValue(turtle,o2);
 				turtle.moveTo(turtle.getX(),turtle.getY()+v);
 				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("forward:")) {
 				Object o2 = (Object)scriptIter.next();
-				double v = resolveValue(o2);
+				double v = reslolveValue(turtle,o2);
 				turtle.forward(v);
 				Log.message(getIndent()+"Move forward "+v+" mm");
 			} else if(name.equals("turnRight:")) {
 				Object o2 = (Object)scriptIter.next();
-				double degrees = resolveValue(o2);
+				double degrees = reslolveValue(turtle,o2);
 				turtle.turn(-degrees);
 				Log.message(getIndent()+"Right "+degrees+" degrees.");
 			} else if(name.equals("turnLeft:")) {
 				Object o2 = (Object)scriptIter.next();
-				double degrees = resolveValue(o2);
+				double degrees = reslolveValue(turtle,o2);
 				turtle.turn(degrees);
 				Log.message(getIndent()+"Left "+degrees+" degrees.");
 			} else if(name.equals("xpos:")) {
 				Object o2 = (Object)scriptIter.next();
-				double v = resolveValue(o2);
+				double v = reslolveValue(turtle,o2);
 				turtle.moveTo(v,turtle.getY());
 				Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("ypos:")) {
 				Object o2 = (Object)scriptIter.next();
-				double v = resolveValue(o2);
+				double v = reslolveValue(turtle,o2);
 				turtle.moveTo(turtle.getX(),v);
 				//Log.message(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("heading:")) {
 				Object o2 = (Object)scriptIter.next();
-				double degrees = resolveValue(o2);
+				double degrees = reslolveValue(turtle,o2);
 				turtle.setAngle(degrees);
 				//Log.message(getIndent()+"Turn to "+degrees);
 			} else if(name.equals("setVar:to:")) {
 				// set variable
 				String varName = (String)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float v = (float)resolveValue(o3);
+				float v = (float)reslolveValue(turtle,o3);
 
 				boolean foundVar=false;
 				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
@@ -482,7 +482,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				// set variable
 				String varName = (String)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float v = (float)resolveValue(o3);
+				float v = (float)reslolveValue(turtle,o3);
 
 				boolean foundVar=false;
 				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
@@ -517,7 +517,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 	 * @return the calculated final value.
 	 * @throws Exception
 	 */
-	private boolean resolveBoolean(Object obj) throws Exception {
+	private boolean resolveBoolean(Turtle turtle,Object obj) throws Exception {
 		if(!(obj instanceof JSONArray)) {
 			throw new Exception("Parse error (resolveBoolean not array)");
 		}
@@ -528,37 +528,37 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 		if(name.equals(">")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			double a = resolveValue(o2);
-			double b = resolveValue(o3);
+			double a = reslolveValue(turtle,o2);
+			double b = reslolveValue(turtle,o3);
 			return a > b;
 		}
 		if(name.equals("<")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			double a = resolveValue(o2);
-			double b = resolveValue(o3);
+			double a = reslolveValue(turtle,o2);
+			double b = reslolveValue(turtle,o3);
 			return a < b;
 		}
 		if(name.equals("=")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			double a = resolveValue(o2);
-			double b = resolveValue(o3);
+			double a = reslolveValue(turtle,o2);
+			double b = reslolveValue(turtle,o3);
 			return a == b; 
 		}
 		if(name.equals("not")) {
 			Object o2 = (Object)scriptIter.next();
-			return !resolveBoolean(o2);
+			return !resolveBoolean(turtle,o2);
 		}
 		if(name.equals("&")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			return resolveBoolean(o2) && resolveBoolean(o3);
+			return resolveBoolean(turtle,o2) && resolveBoolean(turtle,o3);
 		}
 		if(name.equals("|")) {
 			Object o2 = (Object)scriptIter.next();
 			Object o3 = (Object)scriptIter.next();
-			return resolveBoolean(o2) || resolveBoolean(o3);
+			return resolveBoolean(turtle,o2) || resolveBoolean(turtle,o3);
 		}
 		
 		throw new Exception("Parse error (resolveBoolean unsupported)");
@@ -570,7 +570,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 	 * @return the calculated final value.
 	 * @throws Exception
 	 */
-	private double resolveValue(Object obj) throws Exception {
+	private double reslolveValue(Turtle turtle,Object obj) throws Exception {
 		if(obj instanceof String) {
 			// probably a variable
 			String firstName = obj.toString();
@@ -610,47 +610,47 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				// divide
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
+				float a = (float)reslolveValue(turtle,o2);
+				float b = (float)reslolveValue(turtle,o3);
 				return a/b;
 			}
 			if(firstName.equals("*")) {
 				// multiply
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
+				float a = (float)reslolveValue(turtle,o2);
+				float b = (float)reslolveValue(turtle,o3);
 				return a*b;
 			}
 			if(firstName.equals("+")) {
 				// add
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
+				float a = (float)reslolveValue(turtle,o2);
+				float b = (float)reslolveValue(turtle,o3);
 				return a+b;
 			}
 			if(firstName.equals("-")) {
 				// subtract
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
+				float a = (float)reslolveValue(turtle,o2);
+				float b = (float)reslolveValue(turtle,o3);
 				return a-b;
 			}
 			if(firstName.equals("%")) {
 				// modulus
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
+				float a = (float)reslolveValue(turtle,o2);
+				float b = (float)reslolveValue(turtle,o3);
 				return a%b;
 			}
 			if(firstName.equals("randomFrom:to:")) {
 				Object o2 = (Object)scriptIter.next();
 				Object o3 = (Object)scriptIter.next();
-				int a = (int)resolveValue(o2);
-				int b = (int)resolveValue(o3);
+				int a = (int)reslolveValue(turtle,o2);
+				int b = (int)reslolveValue(turtle,o3);
 				if(a>b) {
 					int c = b;
 					b=a;
@@ -674,7 +674,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				String functionName = (String)scriptIter.next();
 				Object o2 = (Object)scriptIter.next();
 				
-				float a = (float)resolveValue(o2);
+				float a = (float)reslolveValue(turtle,o2);
 
 				if(functionName.equals("abs")) return (float)Math.abs(a);
 				if(functionName.equals("floor")) return (float)Math.floor(a);
@@ -700,14 +700,14 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 			if(firstName.equals("getLine:ofList:")) {
 				Object o2 = scriptIter.next();
 				Object o3 = scriptIter.next();
-				int listIndex = resolveListIndex(o2,o3);
+				int listIndex = resolveListIndex(turtle,o2,o3);
 				String listName = (String)o3;
 				ScratchList list = scratchLists.get(getListByID(listName)); 
 
 				return list.contents.get(listIndex);
 			}
 			
-			return resolveValue(first);
+			return reslolveValue(turtle,first);
 		}
 
 		throw new Exception("Parse error (resolveValue)");
@@ -720,7 +720,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 	 * @return the resolved value as an integer.
 	 * @throws Exception
 	 */
-	private int resolveListIndex(Object o2,Object o3) throws Exception {
+	private int resolveListIndex(Turtle turtle,Object o2,Object o3) throws Exception {
 		int listIndex;
 		
 		if(o2 instanceof String) {
@@ -735,7 +735,7 @@ public class LoadAndSaveScratch2 extends TurtleNode implements LoadAndSaveFileTy
 				listIndex = Integer.parseInt(index);
 			}
 		} else {
-			listIndex = (int)resolveValue(o2);
+			listIndex = (int)reslolveValue(turtle,o2);
 		}
 
 		return listIndex;

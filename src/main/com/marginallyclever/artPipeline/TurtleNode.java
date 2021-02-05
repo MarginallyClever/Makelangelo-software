@@ -2,6 +2,8 @@ package com.marginallyclever.artPipeline;
 
 import javax.swing.ProgressMonitor;
 
+import com.marginallyclever.convenience.turtle.Turtle;
+
 
 /**
  * shared methods for image manipulation (generating, converting, or filtering)
@@ -12,7 +14,23 @@ public abstract class TurtleNode {
 	protected ProgressMonitor pm;
 	protected TurtleSwingWorker threadWorker;
 	
+	/**
+	 * When this {@code TurtleNode} has finished it's task, the result (if any) is stored in turtleResult.
+	 */
+	protected Turtle turtleResult;
 	
+	/**
+	 * Get the results of running this {@code TurtleNode}.
+	 * @return
+	 */
+	public Turtle getTurtleResult() {
+		return turtleResult;
+	}
+
+	protected void setTurtleResult(Turtle turtle2) {
+		turtleResult = turtle2;
+	}
+
 	public void setThreadWorker(TurtleSwingWorker p) {
 		threadWorker = p;
 	}
@@ -22,7 +40,7 @@ public abstract class TurtleNode {
 	}
 	
 	/**
-	 * @return the translated name of the manipulator.
+	 * @return the translated name of the {@code TurtleNode}.
 	 */
 	abstract public String getName();
 }

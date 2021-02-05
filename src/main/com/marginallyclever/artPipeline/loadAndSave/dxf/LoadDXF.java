@@ -1,9 +1,7 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.loadAndSave.dxf;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -32,21 +30,19 @@ import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.MathHelper;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
- * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
+ * Reads in DXF file and converts it to a Turtle.
  * @author Dan Royer
- *
+ * @since 7.25.0
  */
-public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
+public class LoadDXF extends TurtleNode implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
@@ -60,6 +56,15 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 	}
 
 	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
+	}
+	@Override
 	public boolean canLoad(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".dxf"));
@@ -67,8 +72,7 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 
 	@Override
 	public boolean canSave(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".dxf"));
+		return false;
 	}
 
 
@@ -186,9 +190,11 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean load(InputStream in,Turtle turtle) {
+	public boolean load(InputStream in) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
-
+		Turtle turtle = new Turtle();
+		setTurtleResult(null);
+		
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
 		try {
@@ -201,10 +207,6 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 		Bounds bounds = doc.getBounds();
 		imageCenterX = (bounds.getMaximumX() + bounds.getMinimumX()) / 2.0;
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
-
-		// prepare for exporting
-		turtle.reset();
-
 
 		// convert each entity
 		Iterator<DXFLayer> layerIter = doc.getDXFLayerIterator();
@@ -252,6 +254,7 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 			}
 		}
 		
+		setTurtleResult(turtle);
 		return true;
 	}
 
@@ -439,133 +442,16 @@ public class LoadAndSaveDXF extends TurtleNode implements LoadAndSaveFileType {
 		previousX = x;
 		previousY = y;
 	}
-	
-	@Override
+
+
 	/**
 	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
 	 * @param outputStream where to write the data
 	 * @param robot the robot from which the data is obtained
 	 * @return true if save succeeded.
 	 */
+	@Override
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
-		Log.message("saving...");
-
-		Point2D totalBottom = new Point2D();
-		Point2D totalTop = new Point2D();
-		Turtle.getBounds(turtles,totalTop,totalBottom);
-		
-		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			Turtle firstTurtle = turtles.get(0);
-			// TODO find the actual bounds
-			
-			// header
-			out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
-			out.write("0\nSECTION\n");
-			out.write("2\nHEADER\n");
-			out.write("9\n$ACADVER\n1\nAC1006\n");
-			out.write("9\n$INSBASE\n");
-			out.write("10\n"+totalBottom.x+"\n");
-			out.write("20\n"+totalBottom.y+"\n");
-			out.write("30\n0.0\n");
-			out.write("9\n$EXTMIN\n");
-			out.write("10\n"+totalBottom.x+"\n");
-			out.write("20\n"+totalBottom.y+"\n");
-			out.write("30\n0.0\n");
-			out.write("9\n$EXTMAX\n");
-			out.write("10\n"+totalTop.x+"\n");
-			out.write("20\n"+totalTop.y+"\n");
-			out.write("30\n0.0\n");
-			out.write("0\nENDSEC\n");
-
-			// tables section
-			out.write("0\nSECTION\n");
-			out.write("2\nTABLES\n");
-			// line type
-			out.write("0\nTABLE\n");
-			out.write("2\nLTYPE\n");
-			out.write("70\n1\n");
-			out.write("0\nLTYPE\n");
-			out.write("2\nCONTINUOUS\n");
-			out.write("70\n64\n");
-			out.write("3\nSolid line\n");
-			out.write("72\n65\n");
-			out.write("73\n0\n");
-			out.write("40\n0.000\n");
-			out.write("0\nENDTAB\n");
-			// layers
-			out.write("0\nTABLE\n");
-			out.write("2\nLAYER\n");
-			out.write("70\n6\n");
-			out.write("0\nLAYER\n");
-			out.write("2\n1\n");
-			out.write("70\n64\n");
-			out.write("62\n7\n");
-			out.write("6\nCONTINUOUS\n");
-			out.write("0\nLAYER\n");
-			out.write("2\n2\n");
-			out.write("70\n64\n");
-			out.write("62\n7\n");
-			out.write("6\nCONTINUOUS\n");
-			out.write("0\nENDTAB\n");
-			out.write("0\nTABLE\n");
-			out.write("2\nSTYLE\n");
-			out.write("70\n0\n");
-			out.write("0\nENDTAB\n");
-			// end tables
-			out.write("0\nENDSEC\n");
-
-			// empty blocks section (good form?)
-			out.write("0\nSECTION\n");
-			out.write("0\nBLOCKS\n");
-			out.write("0\nENDSEC\n");
-			// now the lines
-			out.write("0\nSECTION\n");
-			out.write("2\nENTITIES\n");
-
-			boolean isUp=true;
-			double x0 = firstTurtle.getX();
-			double y0 = firstTurtle.getY();
-						
-			for( Turtle t : turtles ) {
-				for( TurtleMove m : t.history ) {
-					if(m.isUp) {
-						isUp=true;
-					} else {
-						if(isUp) isUp=false;
-						else {
-							out.write("0\nLINE\n");
-							out.write("8\n1\n");  // layer 1
-							out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
-							out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
-							out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
-							out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
-						}
-					}
-					x0=m.x;
-					y0=m.y;
-				}
-			}
-			// wrap it up
-			out.write("0\nENDSEC\n");
-			out.write("0\nEOF\n");
-			out.flush();
-		}
-		catch(IOException e) {
-			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
-			return false;
-		}
-		
-		Log.message("done.");
-		return true;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return true;
+		return false;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.artPipeline.loadAndSave.LoadImage;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -28,13 +28,13 @@ public abstract class ImageConverter extends TurtleNode implements MakelangeloRo
 	protected TransformedImage sourceImage;
 	protected boolean keepIterating=false;
 
-	public static LoadAndSaveImage loadAndSaveImage;
+	public static LoadImage loadAndSaveImage;
 
 	@Override
 	public void restart() {
 		if(!keepIterating) {
 			if(loadAndSaveImage!=null) {
-				loadAndSaveImage.reconvert();
+				loadAndSaveImage.restart();
 			}
 			return;
 		}

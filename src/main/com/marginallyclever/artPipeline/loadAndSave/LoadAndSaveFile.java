@@ -14,7 +14,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public interface LoadAndSaveFileType {
+public interface LoadAndSaveFile {
 	/**
 	 * @return returns a FileNameExtensionFilter with the extensions supported by this filter.
 	 */
@@ -52,7 +52,7 @@ public interface LoadAndSaveFileType {
 	 * @param robot machine hardware settings to use in loading process
 	 * @return true if load successful.
 	 */
-	public boolean load(InputStream inputStream,Turtle turtle);
+	public boolean load(InputStream inputStream);
 	
 	/**
 	 * attempt to save makelangelo instructions to a given stream

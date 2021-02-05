@@ -430,11 +430,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	public void setRunning() {
 		isRunning = true;
 		
-		if (myPanel != null)
+		if (myPanel != null) {
 			myPanel.statusBar.start();
-		if (myPanel != null)
-			myPanel.updateButtonAccess(); // disables all the manual driving
-											// buttons
+			myPanel.updateButtonAccess(); // disables all the manual driving buttons
+		}
 	}
 
 	public void raisePen() {

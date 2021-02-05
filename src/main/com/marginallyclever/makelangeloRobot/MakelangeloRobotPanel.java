@@ -24,7 +24,7 @@ import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.artPipeline.generators.TurtleGenerator;
 import com.marginallyclever.artPipeline.generators.TurtleGeneratorPanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -144,8 +144,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 
 
-	protected List<LoadAndSaveFileType> loadFileSavers() {
-		return new ArrayList<LoadAndSaveFileType>();
+	protected List<LoadAndSaveFile> loadFileSavers() {
+		return new ArrayList<LoadAndSaveFile>();
 	}
 
 
