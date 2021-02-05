@@ -638,7 +638,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	public void newFile() {
 		Turtle t = makelangeloApp.getSelectedTurtle();
 		t.reset();
-		robot.setTurtle(new Turtle());
+		robot.setTurtles( new ArrayList<Turtle>() );
 		updateButtonAccess();
 	}
 	
