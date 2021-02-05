@@ -13,7 +13,6 @@ com.marginallyclever.artPipeline.converters.Converter_VoronoiStippling
 com.marginallyclever.artPipeline.converters.Converter_VoronoiZigZag
 com.marginallyclever.artPipeline.converters.Converter_Wander
 
-#com.marginallyclever.artPipeline.converters.Converter_ColorBoxes
 #com.marginallyclever.artPipeline.converters.Converter_ColorFloodFill
 #com.marginallyclever.artPipeline.converters.Converter_MagicCircle
 #com.marginallyclever.artPipeline.converters.Converter_ZigZag

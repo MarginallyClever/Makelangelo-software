@@ -46,23 +46,22 @@ import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * {@code ImageLoad} uses an InputStream of data to create a {@code TransformedImage}.
- * 
  * @author Dan Royer
  *
  */
 public class LoadImage extends TurtleNode implements LoadAndSaveFile {
-	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper
-			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-
+	// The loaded image remains here after loading.
+	private TransformedImage img;
+	
 	private ServiceLoader<ImageConverter> converters;
 	private ImageConverter chosenConverter;
-	private TransformedImage img;
+	
 	private JPanel conversionPanel;
 	/**
 	 * A collection of panels from each {@code ImageConverter}.
 	 */
 	private JPanel cards;
+	
 
 	// Set of image file extensions.
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
@@ -266,11 +265,17 @@ public class LoadImage extends TurtleNode implements LoadAndSaveFile {
 		threadWorker.execute();
 	}
 
+	@SuppressWarnings("deprecation")
 	private void setPreferredDrawStyle(int style) {
+		Preferences prefs = PreferencesHelper
+				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		prefs.putInt("Draw Style", style);
 	}
 
+	@SuppressWarnings("deprecation")
 	private int getPreferredDrawStyle() {
+		Preferences prefs = PreferencesHelper
+				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		return prefs.getInt("Draw Style", 0);
 	}
 

@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.converters;
+package com.marginallyclever.artPipeline.deprecated;
 
 
 import java.awt.Color;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;

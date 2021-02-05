@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.converters;
+package com.marginallyclever.artPipeline.deprecated;
 
 
 import java.awt.Point;
@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.convenience.StringHelper;
@@ -22,6 +23,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  *
  * @author Dan
  */
+@Deprecated
 public class Converter_ZigZag extends ImageConverter implements MakelangeloRobotDecorator {
 	// processing tools
 	long t_elapsed, t_start;

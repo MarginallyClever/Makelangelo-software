@@ -11,10 +11,10 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * Interface for the service handler
- * @author Admin
+ * @author Dan Royer
  *
  */
-public interface LoadAndSaveFile {
+public abstract interface LoadAndSaveFile {
 	/**
 	 * @return returns a FileNameExtensionFilter with the extensions supported by this filter.
 	 */

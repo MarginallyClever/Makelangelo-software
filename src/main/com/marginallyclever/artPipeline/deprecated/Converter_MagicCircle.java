@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.converters;
+package com.marginallyclever.artPipeline.deprecated;
 
 
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -16,6 +17,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Probably never going to work - the calculation time is insane.
  * @author Dan Royer
  */
+@Deprecated
 public class Converter_MagicCircle extends ImageConverter {
 	private static int numberOfPoints = 188;
 	private static int numberToDraw = 5000;
