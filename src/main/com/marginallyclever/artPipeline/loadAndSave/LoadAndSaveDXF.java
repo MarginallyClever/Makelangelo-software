@@ -450,19 +450,9 @@ public class LoadAndSaveDXF extends TurtleManipulator implements LoadAndSaveFile
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
 
-		// find the bounding box of all turtles.
-		Point2D totalBottom = new Point2D(Double.MAX_VALUE,Double.MAX_VALUE);
-		Point2D totalTop = new Point2D(Double.MIN_VALUE,Double.MIN_VALUE);
-		Point2D bottom = new Point2D();
-		Point2D top = new Point2D();
-
-		for( Turtle t : turtles ) {
-			t.getBounds(top, bottom);
-			totalBottom.x = Math.min(bottom.x, totalBottom.x);
-			totalBottom.y = Math.min(bottom.y, totalBottom.y);
-			totalTop.x = Math.max(bottom.x, totalTop.x);
-			totalTop.y = Math.max(bottom.y, totalTop.y);
-		}
+		Point2D totalBottom = new Point2D();
+		Point2D totalTop = new Point2D();
+		Turtle.getBounds(turtles,totalTop,totalBottom);
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			Turtle firstTurtle = turtles.get(0);

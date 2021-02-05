@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience.turtle;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.marginallyclever.convenience.ColorRGB;
@@ -321,6 +322,27 @@ public class Turtle implements Cloneable {
 			if(isLocked()) {
 				unlock();
 			}
+		}
+	}
+
+	/**
+	 * Find the bounding box of all turtles.
+	 * @param turtles list of turtles to bound
+	 * @param totalTop where to store the top/right corner
+	 * @param totalBottom where to store the bottom/left corner
+	 */
+	static public void getBounds(List<Turtle> turtles,Point2D totalTop,Point2D totalBottom) {
+		totalBottom.set(Double.MAX_VALUE,Double.MAX_VALUE);
+		totalTop.set(Double.MIN_VALUE,Double.MIN_VALUE);
+		Point2D bottom = new Point2D();
+		Point2D top = new Point2D();
+
+		for( Turtle t : turtles ) {
+			t.getBounds(top, bottom);
+			totalBottom.x = Math.min(bottom.x, totalBottom.x);
+			totalBottom.y = Math.min(bottom.y, totalBottom.y);
+			totalTop.x = Math.max(bottom.x, totalTop.x);
+			totalTop.y = Math.max(bottom.y, totalTop.y);
 		}
 	}
 }

@@ -50,8 +50,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
-	protected boolean shouldScaleOnLoad = true;
-	
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 	
@@ -111,17 +109,6 @@ public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFile
 		imageWidth += imageWidth * .02;
 		imageHeight += imageHeight * .02;
 
-		double paperHeight = turtle.getMarginHeight();
-		double paperWidth  = turtle.getMarginWidth();
-
-		scale = 1;
-		if(shouldScaleOnLoad) {
-			double innerAspectRatio = imageWidth / imageHeight;
-			double outerAspectRatio = paperWidth / paperHeight;
-			scale = (innerAspectRatio >= outerAspectRatio) ?
-					(paperWidth / imageWidth) :
-					(paperHeight / imageHeight);
-		}
 	    turtle = new Turtle();
 	    turtle.setX(turtle.getX());
 	    turtle.setY(turtle.getX());
@@ -589,14 +576,17 @@ public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFile
 	 */
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		Log.message("saving...");
-		
+
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			Turtle firstTurtle = turtles.get(0);
-			// TODO find the actual bounds
-			double left = firstTurtle.getMarginLeft();
-			double right = firstTurtle.getMarginRight();
-			double top = firstTurtle.getMarginTop();
-			double bottom = firstTurtle.getMarginBottom();
+			// Find the actual bounds
+			Point2D totalBottom = new Point2D();
+			Point2D totalTop = new Point2D();
+			Turtle.getBounds(turtles,totalTop,totalBottom);
+			
+			double top = totalTop.y;
+			double right = totalTop.x;
+			double bottom = totalBottom.y;
+			double left = totalBottom.x;
 			
 			// header
 			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
@@ -604,6 +594,7 @@ public class LoadAndSaveSVG extends TurtleManipulator implements LoadAndSaveFile
 			out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+left+" "+bottom+" "+(right-left)+" "+(top-bottom)+"\">\n");
 
 			boolean isUp=true;
+			Turtle firstTurtle = turtles.get(0);
 			double x0 = firstTurtle.getX();
 			double y0 = firstTurtle.getY();
 			for( Turtle t : turtles ) {
