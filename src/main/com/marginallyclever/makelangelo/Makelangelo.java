@@ -52,20 +52,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.converters.Converter_Boxes;
 import com.marginallyclever.artPipeline.converters.Converter_CMYK;
-import com.marginallyclever.artPipeline.converters.Converter_Crosshatch;
-import com.marginallyclever.artPipeline.converters.Converter_MagicCircle;
-import com.marginallyclever.artPipeline.converters.Converter_Moire;
-import com.marginallyclever.artPipeline.converters.Converter_Multipass;
-import com.marginallyclever.artPipeline.converters.Converter_Pulse;
-import com.marginallyclever.artPipeline.converters.Converter_RandomLines;
-import com.marginallyclever.artPipeline.converters.Converter_Sandy;
-import com.marginallyclever.artPipeline.converters.Converter_Spiral;
-import com.marginallyclever.artPipeline.converters.Converter_SpiralPulse;
-import com.marginallyclever.artPipeline.converters.Converter_Spiral_CMYK;
-import com.marginallyclever.artPipeline.converters.Converter_Wander;
-import com.marginallyclever.artPipeline.converters.Converter_ZigZag;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.communications.ConnectionManager;
@@ -185,62 +172,6 @@ public final class Makelangelo extends TransferHandler
 		robot.getSettings().addListener(this);
 		logPanel.setRobot(robot);
 
-		{
-			// temp
-			//TurtleGenerator g = new Generator_Dragon();
-			//TurtleGenerator g = new Generator_FibonacciSpiral();
-			//TurtleGenerator g = new Generator_FillPage();
-			//TurtleGenerator g = new Generator_GosperCurve();
-			//TurtleGenerator g = new Generator_GraphPaper();
-			//TurtleGenerator g = new Generator_HilbertCurve();
-			//TurtleGenerator g = new Generator_KochCurve();
-			//TurtleGenerator g = new Generator_Lissajous();
-			//TurtleGenerator g = new Generator_LSystemTree();
-			//TurtleGenerator g = new Generator_Maze();
-			//TurtleGenerator g = new Generator_Package();
-			//TurtleGenerator g = new Generator_Polyeder();
-			//TurtleGenerator g = new Generator_SierpinskiTriangle();
-			//TurtleGenerator g = new Generator_Spirograph();
-			//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
-			//myTurtles.add(g.generate());
-			
-			TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
-			owl.rotateAbsolute(-25);
-			owl.setScale(0.5, 0.5);
-			
-			//ImageConverter c = new Converter_Boxes();
-			ImageConverter c = new Converter_CMYK();
-			//ImageConverter c = new Converter_Crosshatch();
-			//ImageConverter c = new Converter_MagicCircle();
-			//ImageConverter c = new Converter_Moire();
-			//ImageConverter c = new Converter_Multipass();
-			//ImageConverter c = new Converter_Pulse();
-			/*
-			ImageConverter c = new Converter_RandomLines();
-			//ImageConverter c2 = new Converter_Sandy();
-			owl.setTranslateY(120);
-			c.setImage(owl);
-			myTurtles.addAll(c.finish());
-
-			ImageConverter c2 = new Converter_Spiral_CMYK();
-			owl.setTranslateY(-240);
-			c2.setImage(owl);
-			myTurtles.addAll(c2.finish());
-			*/
-			//ImageConverter c = new Converter_Spiral_CMYK();
-			//ImageConverter c = new Converter_Spiral();
-			//ImageConverter c = new Converter_SpiralPulse();
-			//ImageConverter c = new Converter_Wander();
-			//ImageConverter c = new Converter_ZigZag();
-			
-			c.setImage(owl);
-			myTurtles.addAll(c.finish());
-			
-			if(myTurtles.size()>0) {
-				robot.setTurtles(myTurtles);
-			}
-		}
-		
 		Log.message("Starting camera...");
 		camera = new Camera();
 		
@@ -930,6 +861,63 @@ public final class Makelangelo extends TransferHandler
 
 	public Turtle getSelectedTurtle() {
 		return myTurtles.get(myTurtles.size()-1);
+	}
+	
+
+	public void testGeneratorsAndConverters() {
+		// temp
+		//TurtleGenerator g = new Generator_Dragon();
+		//TurtleGenerator g = new Generator_FibonacciSpiral();
+		//TurtleGenerator g = new Generator_FillPage();
+		//TurtleGenerator g = new Generator_GosperCurve();
+		//TurtleGenerator g = new Generator_GraphPaper();
+		//TurtleGenerator g = new Generator_HilbertCurve();
+		//TurtleGenerator g = new Generator_KochCurve();
+		//TurtleGenerator g = new Generator_Lissajous();
+		//TurtleGenerator g = new Generator_LSystemTree();
+		//TurtleGenerator g = new Generator_Maze();
+		//TurtleGenerator g = new Generator_Package();
+		//TurtleGenerator g = new Generator_Polyeder();
+		//TurtleGenerator g = new Generator_SierpinskiTriangle();
+		//TurtleGenerator g = new Generator_Spirograph();
+		//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
+		//myTurtles.add(g.generate());
+		
+		TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
+		owl.rotateAbsolute(-25);
+		owl.setScale(0.5, 0.5);
+		
+		//ImageConverter c = new Converter_Boxes();
+		ImageConverter c = new Converter_CMYK();
+		//ImageConverter c = new Converter_Crosshatch();
+		//ImageConverter c = new Converter_MagicCircle();
+		//ImageConverter c = new Converter_Moire();
+		//ImageConverter c = new Converter_Multipass();
+		//ImageConverter c = new Converter_Pulse();
+		/*
+		ImageConverter c = new Converter_RandomLines();
+		//ImageConverter c2 = new Converter_Sandy();
+		owl.setTranslateY(120);
+		c.setImage(owl);
+		myTurtles.addAll(c.finish());
+
+		ImageConverter c2 = new Converter_Spiral_CMYK();
+		owl.setTranslateY(-240);
+		c2.setImage(owl);
+		myTurtles.addAll(c2.finish());
+		*/
+		//ImageConverter c = new Converter_Spiral_CMYK();
+		//ImageConverter c = new Converter_Spiral();
+		//ImageConverter c = new Converter_SpiralPulse();
+		//ImageConverter c = new Converter_Wander();
+		//ImageConverter c = new Converter_ZigZag();
+		
+		c.setImage(owl);
+		myTurtles.addAll(c.finish());
+		
+		if(myTurtles.size()>0) {
+			robot.setTurtles(myTurtles);
+		}
 	}
 }
 
