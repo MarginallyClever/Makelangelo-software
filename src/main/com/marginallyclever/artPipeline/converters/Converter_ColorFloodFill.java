@@ -16,9 +16,11 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
+ * @Deprecated because it will not work accurately with TransformedImages. 
  * @author Dan Royer
  * @since 7.1.4
  */
+@Deprecated
 public class Converter_ColorFloodFill extends ImageConverter {
 	private float diameter;
 	private float lastX, lastY;
