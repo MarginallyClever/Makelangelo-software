@@ -37,17 +37,14 @@ public class Generator_Text extends TurtleGenerator {
 	private float padding = 5.0f;
 	static final String ALPHABET_FOLDER = "ALPHABET/";
 	private int charsPerLine = 25;
-	private boolean draw_bounding_box = false;
+	private boolean drawBoundingBox = false;
 
 	// text position and alignment
-	public enum VAlign {
-		TOP, MIDDLE, BOTTOM
-	}
+	public enum AlignV {TOP, MIDDLE, BOTTOM}
+	public enum AlignH {LEFT, CENTER, RIGHT}
 
-	public enum Align {LEFT, CENTER, RIGHT}
-
-	private VAlign align_vertical = VAlign.MIDDLE;
-	private Align align_horizontal = Align.CENTER;
+	private AlignV alignVertical = AlignV.MIDDLE;
+	private AlignH alignHorizontal = AlignH.CENTER;
 	private float posx = 0;
 	private float posy = 0;
 
@@ -302,8 +299,8 @@ public class Generator_Text extends TurtleGenerator {
 		posx=0;
 		posy=0;
 		textFindCharsPerLine(100);
-		textSetAlign(Align.CENTER);
-		textSetVAlign(VAlign.MIDDLE);
+		textSetAlign(AlignH.CENTER);
+		textSetVAlign(AlignV.MIDDLE);
 		writeBeautifulMessage(turtle,fontName,lastSize,lastMessage);
 
 	    return turtle;
@@ -314,12 +311,12 @@ public class Generator_Text extends TurtleGenerator {
 		posy = y;
 	}
 
-	public void textSetAlign(Align x) {
-		align_horizontal = x;
+	public void textSetAlign(AlignH x) {
+		alignHorizontal = x;
 	}
 
-	public void textSetVAlign(VAlign x) {
-		align_vertical = x;
+	public void textSetVAlign(AlignV x) {
+		alignVertical = x;
 	}
 
 
@@ -349,7 +346,7 @@ public class Generator_Text extends TurtleGenerator {
 		float w = padding * 2 + (letterWidth + kerning) * len - kerning;
 		float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
 
-		switch (align_horizontal) {
+		switch (alignHorizontal) {
 		case LEFT:
 			xmax = posx + w;
 			xmin = posx;
@@ -364,7 +361,7 @@ public class Generator_Text extends TurtleGenerator {
 			break;
 		}
 
-		switch (align_vertical) {
+		switch (alignVertical) {
 		case BOTTOM:
 			ymax = posy + h;
 			ymin = posy;
@@ -397,7 +394,7 @@ public class Generator_Text extends TurtleGenerator {
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);
 
-		if (draw_bounding_box) {
+		if (drawBoundingBox) {
 			// draw bounding box
 			turtle.moveTo(r.getMinX(),r.getMinY());
 			turtle.penDown();
@@ -581,8 +578,8 @@ public class Generator_Text extends TurtleGenerator {
 	public void signName(Turtle turtle,String message) {
 		setupTransform(turtle);
 
-		textSetAlign(Align.RIGHT);
-		textSetVAlign(VAlign.BOTTOM);
+		textSetAlign(AlignH.RIGHT);
+		textSetVAlign(AlignV.BOTTOM);
 		textSetPosition(
 				(float)(100*10.0f),
 				(float)(100*10.0f));
