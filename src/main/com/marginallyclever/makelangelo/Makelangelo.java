@@ -205,17 +205,17 @@ public final class Makelangelo extends TransferHandler
 			//myTurtles.add(g.generate());
 			
 			TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
-			//owl.rotateAbsolute(-25);
-			owl.setScale(0.2, 0.2);
+			owl.rotateAbsolute(-25);
+			owl.setScale(0.5, 0.5);
 			
 			//ImageConverter c = new Converter_Boxes();
-			//ImageConverter c = new Converter_CMYK();
+			ImageConverter c = new Converter_CMYK();
 			//ImageConverter c = new Converter_Crosshatch();
 			//ImageConverter c = new Converter_MagicCircle();
 			//ImageConverter c = new Converter_Moire();
 			//ImageConverter c = new Converter_Multipass();
 			//ImageConverter c = new Converter_Pulse();
-			
+			/*
 			ImageConverter c = new Converter_RandomLines();
 			//ImageConverter c2 = new Converter_Sandy();
 			owl.setTranslateY(120);
@@ -226,14 +226,15 @@ public final class Makelangelo extends TransferHandler
 			owl.setTranslateY(-240);
 			c2.setImage(owl);
 			myTurtles.addAll(c2.finish());
-			
-			////ImageConverter c = new Converter_Spiral_CMYK();
+			*/
+			//ImageConverter c = new Converter_Spiral_CMYK();
 			//ImageConverter c = new Converter_Spiral();
 			//ImageConverter c = new Converter_SpiralPulse();
 			//ImageConverter c = new Converter_Wander();
 			//ImageConverter c = new Converter_ZigZag();
-			//c.setImage(owl);
-			//myTurtles.addAll(c.finish());
+			
+			c.setImage(owl);
+			myTurtles.addAll(c.finish());
 			
 			if(myTurtles.size()>0) {
 				robot.setTurtles(myTurtles);

@@ -50,20 +50,21 @@ public class Converter_Wander extends ImageConverter {
 
 	@Override
 	public ArrayList<Turtle> finish() {
-		Turtle turtle = new Turtle();
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		
 		if(isCMYK) {
-			finishCMYK(turtle);
+			list.addAll(finishCMYK());
 		} else {
-			finishBlackAndWhite(turtle);
+			list.addAll(finishBlackAndWhite());
 		}
 		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
 		return list;
 	}
 
-	protected int outputChannel(Turtle turtle,TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
+	protected Turtle outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
+		Turtle turtle = new Turtle();
+		turtle.setColor(newColor);
+		
 		double stepSize = 2.5;
 		if (stepSize < 1) stepSize = 1;
 		double halfStep = stepSize/2;
@@ -171,30 +172,33 @@ public class Converter_Wander extends ImageConverter {
 			}
 		}
 		
-		return actualPoints;
+		return turtle;
 	}
 	
-	protected void finishCMYK(Turtle turtle) {
+	protected ArrayList<Turtle> finishCMYK() {
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.message("Yellow...");
-		outputChannel(turtle,cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
-		Log.message("Cyan...");
-		outputChannel(turtle,cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
-		Log.message("Magenta...");
-		outputChannel(turtle,cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
-		Log.message("Black...");
-		outputChannel(turtle,cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
+		Log.message("Yellow...");	list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0));
+		Log.message("Cyan...");		list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0));
+		Log.message("Magenta...");	list.add(outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0));
+		Log.message("Black...");	list.add(outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0));
 		Log.message("Finishing...");
+		
+		return list;
 	}
 	
-	protected void finishBlackAndWhite(Turtle turtle) {
+	protected ArrayList<Turtle> finishBlackAndWhite() {
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 		
-		outputChannel(turtle,img,new ColorRGB(0,0,0),numLines,255.0/4.0);
+		list.add(outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0));
+		return list;
 	}
 	
 
