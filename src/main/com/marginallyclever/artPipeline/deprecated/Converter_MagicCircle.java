@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
+import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;

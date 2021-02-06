@@ -3,8 +3,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Polyeder_Panel;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -21,7 +21,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @since 7.24.0
  *
  */
-public class Generator_Polyeder extends TurtleNode {
+public class Generator_Polyeder extends Node {
 	/**
 	 * Helper class that describe a solid
 	 * @author Guenther Sohler
@@ -162,7 +162,7 @@ public class Generator_Polyeder extends TurtleNode {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// rebuild the list of models here if you want to dynamically add more.
 		
 		return new Generator_Polyeder_Panel(this);

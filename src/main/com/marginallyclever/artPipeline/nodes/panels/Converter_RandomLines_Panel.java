@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Converter_RandomLines;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
  * @author Dan Royer
  *
  */
-public class Converter_RandomLines_Panel extends TurtleNodePanel {
+public class Converter_RandomLines_Panel extends NodePanel {
 	/**
 	 * 
 	 */

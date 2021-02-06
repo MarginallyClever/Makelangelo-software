@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Converter_Spiral_CMYK;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 
@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectBoolean;
  * @author Dan Royer
  *
  */
-public class Converter_Spiral_CMYK_Panel extends TurtleNodePanel {
+public class Converter_Spiral_CMYK_Panel extends NodePanel {
 	/**
 	 * 
 	 */

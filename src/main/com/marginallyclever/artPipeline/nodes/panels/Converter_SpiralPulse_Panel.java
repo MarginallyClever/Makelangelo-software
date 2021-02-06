@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Converter_SpiralPulse;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 
@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
  * @author Dan Royer
  *
  */
-public class Converter_SpiralPulse_Panel extends TurtleNodePanel {
+public class Converter_SpiralPulse_Panel extends NodePanel {
 	/**
 	 * 
 	 */

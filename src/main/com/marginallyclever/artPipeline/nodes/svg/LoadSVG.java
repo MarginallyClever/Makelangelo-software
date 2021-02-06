@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave.svg;
+package com.marginallyclever.artPipeline.nodes.svg;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +31,9 @@ import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -47,7 +47,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  * @Since 7.25.0
  */
-public class LoadSVG extends TurtleNode implements LoadAndSaveFile {
+public class LoadSVG extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
 	protected double scale,imageCenterX,imageCenterY;
@@ -578,7 +578,7 @@ public class LoadSVG extends TurtleNode implements LoadAndSaveFile {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

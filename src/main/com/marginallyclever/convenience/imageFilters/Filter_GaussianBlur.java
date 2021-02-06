@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.imageFilters;
+package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.TransformedImage;
 
 
 /**

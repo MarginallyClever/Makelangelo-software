@@ -31,11 +31,11 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;

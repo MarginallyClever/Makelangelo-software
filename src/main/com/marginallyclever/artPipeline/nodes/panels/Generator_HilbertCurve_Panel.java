@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Generator_HilbertCurve;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
  * @author Dan Royer
  *
  */
-public class Generator_HilbertCurve_Panel extends TurtleNodePanel {
+public class Generator_HilbertCurve_Panel extends NodePanel {
 	/**
 	 * 
 	 */

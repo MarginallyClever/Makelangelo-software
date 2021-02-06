@@ -3,13 +3,13 @@ package com.marginallyclever.artPipeline.nodes;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Moire_Panel;
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -31,7 +31,7 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		return new Converter_Moire_Panel(this);
 	}
 	

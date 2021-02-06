@@ -8,14 +8,14 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * @author Dan Royer
  *
  */
-public class TurtleNodePanel extends SelectPanel {
+public class NodePanel extends SelectPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	static public MakelangeloRobotPanel makelangeloRobotPanel; 
 	
-	protected TurtleNodePanel() {
+	protected NodePanel() {
 		super();
 	}
 }

@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Generator_Text;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -14,7 +14,7 @@ import com.marginallyclever.makelangelo.select.SelectTextArea;
  * @author Dan Royer
  *
  */
-public class Generator_Text_Panel extends TurtleNodePanel {
+public class Generator_Text_Panel extends NodePanel {
 	/**
 	 * 
 	 */

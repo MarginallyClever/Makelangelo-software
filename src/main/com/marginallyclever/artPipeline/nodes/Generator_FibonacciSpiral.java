@@ -3,8 +3,8 @@ package com.marginallyclever.artPipeline.nodes;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -15,7 +15,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  *
  */
-public class Generator_FibonacciSpiral extends TurtleNode {
+public class Generator_FibonacciSpiral extends Node {
 	private float xMax = 100;
 	private float yMax = 100;
 	private static int order = 7; // controls complexity of curve
@@ -28,7 +28,7 @@ public class Generator_FibonacciSpiral extends TurtleNode {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		return new Generator_FibonacciSpiral_Panel(this);
 	}
 

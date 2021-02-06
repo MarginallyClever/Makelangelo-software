@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.nodes;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,8 +27,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -44,7 +44,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadScratch3 extends TurtleNode implements LoadAndSaveFile {
+public class LoadScratch3 extends Node implements LoadAndSaveFile {
 	private final String PROJECT_JSON = "project.json";
 		
 	private class ScratchVariable {
@@ -888,7 +888,7 @@ public class LoadScratch3 extends TurtleNode implements LoadAndSaveFile {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

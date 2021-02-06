@@ -1,8 +1,8 @@
-package com.marginallyclever.artPipeline.imageFilters;
+package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.Color;
 
-import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.convenience.TransformedImage;
 
 /**
  * Filters modify a BufferedImage.

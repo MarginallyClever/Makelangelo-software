@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
@@ -11,7 +12,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class TurtleNode implements MakelangeloRobotDecorator {
+public abstract class Node implements MakelangeloRobotDecorator {
 	// used internally for iterating on long jobs.  Could be promoted to whomsoever manages the thread for this node.
 	private boolean keepIterating=false;
 
@@ -45,7 +46,7 @@ public abstract class TurtleNode implements MakelangeloRobotDecorator {
 	/**
 	 * @return the gui panel with options for this manipulator
 	 */
-	public abstract TurtleNodePanel getPanel();
+	public abstract NodePanel getPanel();
 	
 	
 	/**

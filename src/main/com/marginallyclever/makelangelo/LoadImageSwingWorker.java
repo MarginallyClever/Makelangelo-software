@@ -8,7 +8,7 @@ import java.util.Objects;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -22,7 +22,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 @Deprecated
 public class LoadImageSwingWorker extends SwingWorker<ArrayList<Turtle>,Void> {
 	public int loopCount;
-	protected TurtleNode chosenConverter;
+	protected Node chosenConverter;
 	protected ProgressMonitor progressMonitor;
 	
 	public LoadImageSwingWorker(ImageConverter c,ProgressMonitor pm) {

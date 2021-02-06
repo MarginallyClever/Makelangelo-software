@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
-import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -21,12 +21,12 @@ public class MakelangeloRobotPanelTest {
 			Translator.start();
 			Log.message("loading service...");
 			System.out.flush();
-			ServiceLoader<TurtleNode> imageGenerators = ServiceLoader.load(TurtleNode.class);
+			ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
 			Log.message("iterating...");
 			System.out.flush();
-			Iterator<TurtleNode> ici = imageGenerators.iterator();
+			Iterator<Node> ici = imageGenerators.iterator();
 			while(ici.hasNext()) {
-				TurtleNode c = ici.next();
+				Node c = ici.next();
 				Log.message("Creating panel for "+c.getName());
 				c.getPanel();
 			}

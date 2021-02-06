@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Maze_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
  * @author Dan Royer
  */
-public class Generator_Maze extends TurtleNode {
+public class Generator_Maze extends Node {
 	// MazeCells are the rooms separted by MazeWalls
 	protected class MazeCell {
 		int x, y;
@@ -54,7 +54,7 @@ public class Generator_Maze extends TurtleNode {
 	}
 	
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		return new Generator_Maze_Panel(this);
 	}
 

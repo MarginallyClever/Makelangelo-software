@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Spirograph_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -15,7 +15,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Spirograph extends TurtleNode {
+public class Generator_Spirograph extends Node {
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
 
@@ -72,7 +72,7 @@ public class Generator_Spirograph extends TurtleNode {
 	}
 	
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		return new Generator_Spirograph_Panel(this);
 	}
 		

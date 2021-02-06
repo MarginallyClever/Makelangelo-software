@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave.gcode;
+package com.marginallyclever.artPipeline.nodes.gcode;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,9 +7,9 @@ import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -21,7 +21,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  *
  */
-public class LoadGCode extends TurtleNode implements LoadAndSaveFile {
+public class LoadGCode extends Node implements LoadAndSaveFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
 	
 	@Override
@@ -218,7 +218,7 @@ public class LoadGCode extends TurtleNode implements LoadAndSaveFile {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

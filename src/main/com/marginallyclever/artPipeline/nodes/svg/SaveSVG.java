@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave.svg;
+package com.marginallyclever.artPipeline.nodes.svg;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
@@ -25,7 +25,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  * @Since 7.25.0
  */
-public class SaveSVG extends TurtleNode implements LoadAndSaveFile {
+public class SaveSVG extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
 	protected double scale,imageCenterX,imageCenterY;
@@ -139,7 +139,7 @@ public class SaveSVG extends TurtleNode implements LoadAndSaveFile {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

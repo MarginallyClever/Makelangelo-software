@@ -3,8 +3,8 @@ package com.marginallyclever.artPipeline.nodes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_LSystemTree_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * L System fractal
  * @author Dan Royer
  */
-public class Generator_LSystemTree extends TurtleNode {
+public class Generator_LSystemTree extends Node {
 	private static int order = 4; // controls complexity of curve
 	private static double angleSpan = 120;
 	private static int numBranches = 3;
@@ -29,7 +29,7 @@ public class Generator_LSystemTree extends TurtleNode {
 	}
 	
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		return new Generator_LSystemTree_Panel(this);
 	}
 	

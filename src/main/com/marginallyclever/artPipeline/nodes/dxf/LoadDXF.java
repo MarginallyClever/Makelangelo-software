@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave.dxf;
+package com.marginallyclever.artPipeline.nodes.dxf;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,9 +29,9 @@ import org.kabeja.parser.ParseException;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -43,7 +43,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Dan Royer
  * @since 7.25.0
  */
-public class LoadDXF extends TurtleNode implements LoadAndSaveFile {
+public class LoadDXF extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
@@ -459,7 +459,7 @@ public class LoadDXF extends TurtleNode implements LoadAndSaveFile {
 	}
 
 	@Override
-	public TurtleNodePanel getPanel() {
+	public NodePanel getPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

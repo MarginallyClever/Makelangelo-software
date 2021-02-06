@@ -21,9 +21,9 @@ import java.util.ServiceLoader;
 import javax.swing.*;
 
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -647,9 +647,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		panel.setLayout(new BorderLayout());
 
 		JPanel cards = new JPanel(new CardLayout());
-		ServiceLoader<TurtleNode> imageGenerators = ServiceLoader.load(TurtleNode.class);
+		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
 		int i=0;
-		for( TurtleNode ici : imageGenerators ) {
+		for( Node ici : imageGenerators ) {
 			cards.add(ici.getPanel().getInteriorPanel(),ici.getName());
 			i++;
 		}
@@ -657,7 +657,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		String[] imageGeneratorNames = new String[i];
 		
 		i=0;
-		for( TurtleNode f : imageGenerators ) {
+		for( Node f : imageGenerators ) {
 			imageGeneratorNames[i++] = f.getName();
 		}
 
@@ -685,12 +685,12 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 
 	private void changeGeneratorPanel(int index) {
-		TurtleNodePanel.makelangeloRobotPanel = this;
+		NodePanel.makelangeloRobotPanel = this;
 		
 		Turtle t = makelangeloApp.getSelectedTurtle();
 		
-		TurtleNode chosenGenerator = getGenerator(index);
-		TurtleNodePanel chosenGeneratorPanel = chosenGenerator.getPanel();
+		Node chosenGenerator = getGenerator(index);
+		NodePanel chosenGeneratorPanel = chosenGenerator.getPanel();
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
 			JPanel p = chosenGeneratorPanel.getInteriorPanel();
@@ -707,7 +707,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	 * @param chosenGenerator
 	 * @param t
 	 */
-	public void regenerate(TurtleNode chosenGenerator,Turtle t) {
+	public void regenerate(Node chosenGenerator,Turtle t) {
 		robot.setDecorator(chosenGenerator);
 		
 		// do the work
@@ -721,10 +721,10 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		updateButtonAccess();
 	}
 
-	private TurtleNode getGenerator(int arg0) throws IndexOutOfBoundsException {
-		ServiceLoader<TurtleNode> imageGenerators = ServiceLoader.load(TurtleNode.class);
+	private Node getGenerator(int arg0) throws IndexOutOfBoundsException {
+		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
 		int i=0;
-		for( TurtleNode chosenGenerator : imageGenerators ) {
+		for( Node chosenGenerator : imageGenerators ) {
 			if(i==arg0) {
 				return chosenGenerator;
 			}

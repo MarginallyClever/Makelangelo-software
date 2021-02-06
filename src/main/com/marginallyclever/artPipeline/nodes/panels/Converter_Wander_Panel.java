@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Converter_Wander;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
  * @author Dan Royer
  *
  */
-public class Converter_Wander_Panel extends TurtleNodePanel {
+public class Converter_Wander_Panel extends NodePanel {
 	/**
 	 * 
 	 */

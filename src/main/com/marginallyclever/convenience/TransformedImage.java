@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline;
+package com.marginallyclever.convenience;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,7 @@ import javax.vecmath.Point3d;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
-import com.marginallyclever.artPipeline.imageFilters.ImageFilter;
+import com.marginallyclever.convenience.imageFilters.ImageFilter;
 
 /**
  * TransformedImage is a BufferedImage, scaled, rotated, and translated

@@ -1,18 +1,18 @@
 package com.marginallyclever.artPipeline.nodes.panels;
 
-import com.marginallyclever.artPipeline.TurtleNode;
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.NodePanel;
 
 /**
  * Blank panel for generators that have no options.
  * @author Dan Royer
  *
  */
-public class Generator_Empty_Panel extends TurtleNodePanel {
+public class Generator_Empty_Panel extends NodePanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Generator_Empty_Panel(TurtleNode generator) {}
+	public Generator_Empty_Panel(Node generator) {}
 }

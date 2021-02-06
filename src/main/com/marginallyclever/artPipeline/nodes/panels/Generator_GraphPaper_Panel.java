@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Generator_GraphPaper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.select.SelectFloat;
  * @author Dan Royer
  * TODO graph paper needs to offer measurements for the grid size
  */
-public class Generator_GraphPaper_Panel extends TurtleNodePanel {
+public class Generator_GraphPaper_Panel extends NodePanel {
 	/**
 	 * 
 	 */
