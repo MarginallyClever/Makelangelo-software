@@ -7,8 +7,8 @@ import java.util.Comparator;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -50,7 +50,7 @@ public class Converter_MagicCircle extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public ArrayList<Turtle> finish() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		// black and white
@@ -124,10 +124,11 @@ public class Converter_MagicCircle extends ImageConverter {
 			turtle.moveTo(px[j],py[j]);
 		}
 		turtle.penUp();
-		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		return list;
+
+		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
+		turtleList.add(turtle);
+		setTurtleResult(turtleList);
+		return false;
 	}
 }
 

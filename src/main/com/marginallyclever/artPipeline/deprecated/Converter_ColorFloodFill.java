@@ -10,8 +10,8 @@ import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;

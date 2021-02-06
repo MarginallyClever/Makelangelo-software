@@ -1,31 +1,40 @@
 package com.marginallyclever.artPipeline;
 
+import java.util.ArrayList;
+
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
 
 /**
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class TurtleNode {
+public abstract class TurtleNode implements MakelangeloRobotDecorator {
 	// used internally for iterating on long jobs.  Could be promoted to whomsoever manages the thread for this node.
 	private boolean keepIterating=false;
+
+	/**
+	 * When this {@code TurtleNode} starts it might need a sourceImage.
+	 */
+	protected TransformedImage sourceImage;
 	
 	/**
 	 * When this {@code TurtleNode} has finished it's task, the result (if any) is stored in turtleResult.
 	 */
-	protected Turtle turtleResult;
-	
+	protected ArrayList<Turtle> turtleResult;
+
 	/**
 	 * Get the results of running this {@code TurtleNode}.
 	 * @return
 	 */
-	public Turtle getTurtleResult() {
+	public ArrayList<Turtle> getTurtleResult() {
 		return turtleResult;
 	}
 
-	protected void setTurtleResult(Turtle turtle2) {
-		turtleResult = turtle2;
+	protected void setTurtleResult(ArrayList<Turtle> list) {
+		turtleResult = list;
 	}
 	
 	/**
@@ -62,6 +71,19 @@ public abstract class TurtleNode {
 	
 	public void setKeepIterating(boolean state) {
 		keepIterating=state;
+	}
+	
+	/**
+	 * set the image to be transformed.
+	 * @param turtle the <code>com.marginallyclever.convenience.turtle.Turtle</code>
+	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
+	 */
+	public void setImage(TransformedImage img) {
+		sourceImage=img;
+	}
+	
+	@Override
+	public void render(GL2 gl2) {
 	}
 }
 

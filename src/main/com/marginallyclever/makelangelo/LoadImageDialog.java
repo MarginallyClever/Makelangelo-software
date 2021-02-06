@@ -33,10 +33,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TurtleNode;
 import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.TurtleSwingWorker;
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
@@ -53,9 +52,9 @@ import com.marginallyclever.util.PreferencesHelper;
 public class LoadImageDialog implements LoadAndSaveFile {
 	// threading
 	protected ProgressMonitor pm;
-	protected TurtleSwingWorker threadWorker;
+	protected LoadImageSwingWorker threadWorker;
 	
-	public void setThreadWorker(TurtleSwingWorker p) {
+	public void setThreadWorker(LoadImageSwingWorker p) {
 		threadWorker = p;
 	}
 
@@ -185,7 +184,6 @@ public class LoadImageDialog implements LoadAndSaveFile {
 
 		// Log.message("Changing converter");
 		stopSwingWorker();
-		ImageConverter.loadImage = this;
 		chosenConverter = requestedConverter;
 		Log.message("Converter=" + chosenConverter.getName());
 
@@ -273,7 +271,7 @@ public class LoadImageDialog implements LoadAndSaveFile {
 		chosenConverter.setProgressMonitor(pm);
 		chosenConverter.setImage(img);
 
-		threadWorker = new TurtleSwingWorker(chosenConverter, pm);
+		threadWorker = new LoadImageSwingWorker(chosenConverter, pm);
 
 		threadWorker.execute();
 	}

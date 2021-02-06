@@ -201,7 +201,9 @@ public class LoadGCode extends TurtleNode implements LoadAndSaveFile {
 		}
 		scanner.close();
 
-		setTurtleResult(turtle);
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		setTurtleResult(list);
 		return true;
 	}
 

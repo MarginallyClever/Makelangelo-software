@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
-import com.marginallyclever.artPipeline.converters.ImageConverter;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 

@@ -52,9 +52,9 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.converters.Converter_CMYK;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.Converter_CMYK;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -913,7 +913,11 @@ public final class Makelangelo extends TransferHandler
 		//ImageConverter c = new Converter_ZigZag();
 		
 		c.setImage(owl);
-		myTurtles.addAll(c.finish());
+		for(int i=0;i<100;++i) {
+			c.iterate();
+			if(!c.getKeepIterating()) break;
+		}
+		myTurtles.addAll(c.getTurtleResult());
 		
 		if(myTurtles.size()>0) {
 			robot.setTurtles(myTurtles);

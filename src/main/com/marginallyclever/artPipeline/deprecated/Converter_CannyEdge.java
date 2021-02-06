@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_Invert;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -27,7 +27,7 @@ public class Converter_CannyEdge extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	@Override
-	public ArrayList<Turtle> finish() {
+	public boolean iterate() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
@@ -118,7 +118,8 @@ public class Converter_CannyEdge extends ImageConverter {
 		
 		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
 		turtleList.add(turtle);
-		return turtleList;
+		setTurtleResult(turtleList);
+		return false;
 	}
 
 	@Override

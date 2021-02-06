@@ -118,7 +118,9 @@ public class LoadSVG extends TurtleNode implements LoadAndSaveFile {
 			return false;
 		}
 
-		setTurtleResult(turtle);
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		setTurtleResult(list);
 		
 		return true;
 	}

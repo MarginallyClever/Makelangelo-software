@@ -8,9 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.TurtleNodePanel;
-import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -81,12 +81,12 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public int flipTests() {
 		int start, end, j, once = 0;
 
-		for (start = 0; start < numPoints - 2 && !threadWorker.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < numPoints - 2 /*&& !threadWorker.isCancelled() && !pm.isCanceled()*/; ++start) {
 			float a = calculateWeight(solution[start], solution[start + 1]);
 			int best_end = -1;
 			double best_diff = 0;
 
-			for (end = start + 2; end <= numPoints && !threadWorker.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end <= numPoints /*&& !threadWorker.isCancelled() && !pm.isCanceled()*/; ++end) {
 				// before
 				float b = calculateWeight(solution[end], solution[end - 1]);
 				// after
@@ -100,7 +100,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				}
 			}
 
-			if (best_end != -1 && !threadWorker.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 /*&& !threadWorker.isCancelled() && !pm.isCanceled()*/) {
 				once = 1;
 				// do the flip
 				int begin = start + 1;
@@ -164,7 +164,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		updateProgress(len, 2);
 
 		int once = 1;
-		while (once == 1 && t_elapsed < time_limit && !threadWorker.isCancelled()) {
+		while (once == 1 && t_elapsed < time_limit /*&& !threadWorker.isCancelled() && !pm.isCanceled()*/) {
 			once = 0;
 			//@TODO: make these optional for the very thorough people
 			//once|=transposeForwardTest();
@@ -314,7 +314,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	
 
 	@Override
-	public ArrayList<Turtle> finish() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		// make black & white
@@ -332,7 +332,15 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		
 		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		list.add(turtle);
-		return list;
+		setTurtleResult(list);
+		return false;
+	}
+
+
+	@Override
+	public void setImage(TransformedImage img) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

@@ -254,8 +254,10 @@ public class LoadDXF extends TurtleNode implements LoadAndSaveFile {
 				}
 			}
 		}
-		
-		setTurtleResult(turtle);
+
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		setTurtleResult(list);
 		return true;
 	}
 

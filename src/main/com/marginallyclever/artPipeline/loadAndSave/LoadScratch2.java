@@ -199,7 +199,9 @@ public class LoadScratch2 extends TurtleNode implements LoadAndSaveFile {
 			e.printStackTrace();
 		}
 
-		setTurtleResult(turtle);
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		list.add(turtle);
+		setTurtleResult(list);
 		return true;
 	}
 
