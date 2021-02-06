@@ -20,6 +20,10 @@ public class Converter_SpiralPulse extends ImageConverter {
 	private static float spacing = 2.5f;
 	private static float height = 4.0f;
 	
+	public Converter_SpiralPulse() {
+		super();
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralPulseName");

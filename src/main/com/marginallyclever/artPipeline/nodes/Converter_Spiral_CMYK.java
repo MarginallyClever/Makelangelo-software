@@ -1,8 +1,7 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Spiral_CMYK_Panel;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.TransformedImage;
@@ -22,6 +21,19 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_Spiral_CMYK extends ImageConverter {
 	private static boolean convertToCorners = true;  // draw the spiral right out to the edges of the square bounds.
 
+	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
+	
+	public Converter_Spiral_CMYK() {
+		super();
+		outputs.remove(outputTurtle);
+		outputs.add(outputTurtleY);
+		outputs.add(outputTurtleC);
+		outputs.add(outputTurtleM);
+		outputs.add(outputTurtle);
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralCMYKName");
@@ -45,7 +57,6 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	 */
 	@Override
 	public boolean iterate() {
-		
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage.getValue());
 
@@ -54,10 +65,10 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		double w2 = bounds[TransformedImage.RIGHT] - bounds[TransformedImage.LEFT];
 		double separation = (w2<h2) ? w2/4 : h2/4;
 
-		Log.message("Yellow...");		list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation));
-		Log.message("Cyan...");			list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation));
-		Log.message("Magenta...");		list.add(outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation));
-		Log.message("Black...");		list.add(outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation));
+		Log.message("Yellow...");		outputTurtleY.setValue(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation));
+		Log.message("Cyan...");			outputTurtleC.setValue(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation));
+		Log.message("Magenta...");		outputTurtleM.setValue(outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation));
+		Log.message("Black...");		outputTurtle .setValue(outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation));
 		Log.message("Finishing...");
 
 		return false;

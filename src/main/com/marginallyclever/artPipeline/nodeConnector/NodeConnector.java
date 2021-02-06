@@ -1,5 +1,7 @@
 package com.marginallyclever.artPipeline.nodeConnector;
 
+import java.lang.reflect.ParameterizedType;
+
 /**
  * {@link NodeConnector} describes the inputs and outputs of each {@link Node}.  One output may connect to many inputs.
  * The {@link NodeConnector#isDirty} flag indicates when the value in this connector is out of date.
@@ -8,15 +10,13 @@ package com.marginallyclever.artPipeline.nodeConnector;
  *
  */
 public class NodeConnector<T> {
-	private String typeName;
-
+	private final Class<T> persistentClass;
+	
 	public String getType() {
-		return typeName;
+		return persistentClass.getSimpleName();
 	}
 
-	public void setType(String name) {
-		this.typeName = name;
-	}
+	public void setType(String name) {}
 	
 	// The current value.
 	private T value;
@@ -24,8 +24,11 @@ public class NodeConnector<T> {
 	// Has this peg been updated recently?
 	public boolean isDirty;
 	
+	@SuppressWarnings("unchecked")
 	public NodeConnector() {
 		super();
+		persistentClass = (Class<T>) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
 	public void setValue(T v) {

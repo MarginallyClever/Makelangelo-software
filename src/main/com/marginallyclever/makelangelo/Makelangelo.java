@@ -51,10 +51,23 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.Node;
+import com.marginallyclever.artPipeline.deprecated.Converter_MagicCircle;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnector;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
+import com.marginallyclever.artPipeline.nodes.Converter_Boxes;
 import com.marginallyclever.artPipeline.nodes.Converter_CMYK;
+import com.marginallyclever.artPipeline.nodes.Converter_Crosshatch;
+import com.marginallyclever.artPipeline.nodes.Converter_Moire;
+import com.marginallyclever.artPipeline.nodes.Converter_Multipass;
+import com.marginallyclever.artPipeline.nodes.Converter_RandomLines;
+import com.marginallyclever.artPipeline.nodes.Converter_Sandy;
+import com.marginallyclever.artPipeline.nodes.Converter_Spiral;
+import com.marginallyclever.artPipeline.nodes.Converter_SpiralPulse;
+import com.marginallyclever.artPipeline.nodes.Converter_Spiral_CMYK;
+import com.marginallyclever.artPipeline.nodes.Generator_Dragon;
+import com.marginallyclever.artPipeline.nodes.Generator_FibonacciSpiral;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.communications.ConnectionManager;
@@ -129,7 +142,7 @@ public final class Makelangelo extends TransferHandler
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
 	
-	public static void main(String[] argv) {
+	public static void main(String[] argv) throws Exception {
 		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
@@ -149,7 +162,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
-	public Makelangelo() {
+	public Makelangelo() throws Exception {
 		super();
 
 		myTurtles = new ArrayList<Turtle>();
@@ -175,6 +188,8 @@ public final class Makelangelo extends TransferHandler
 		robot.getSettings().addListener(this);
 		logPanel.setRobot(robot);
 
+		testGeneratorsAndConverters();
+		
 		Log.message("Starting camera...");
 		camera = new Camera();
 		
@@ -867,58 +882,45 @@ public final class Makelangelo extends TransferHandler
 	}
 	
 
-	public void testGeneratorsAndConverters() {
-		// temp
-		//TurtleGenerator g = new Generator_Dragon();
-		//TurtleGenerator g = new Generator_FibonacciSpiral();
-		//TurtleGenerator g = new Generator_FillPage();
-		//TurtleGenerator g = new Generator_GosperCurve();
-		//TurtleGenerator g = new Generator_GraphPaper();
-		//TurtleGenerator g = new Generator_HilbertCurve();
-		//TurtleGenerator g = new Generator_KochCurve();
-		//TurtleGenerator g = new Generator_Lissajous();
-		//TurtleGenerator g = new Generator_LSystemTree();
-		//TurtleGenerator g = new Generator_Maze();
-		//TurtleGenerator g = new Generator_Package();
-		//TurtleGenerator g = new Generator_Polyeder();
-		//TurtleGenerator g = new Generator_SierpinskiTriangle();
-		//TurtleGenerator g = new Generator_Spirograph();
-		//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
-		//myTurtles.add(g.generate());
-		
-		TransformedImage owl = TransformedImage.loadImage("C:\\Users\\aggra\\Documents\\GitHub\\makelangelo-software\\src\\test\\resources\\owl.jpg");
+	public void testGeneratorsAndConverters() throws Exception {
+		TransformedImage owl = TransformedImage.loadImage(".\\src\\test\\resources\\owl.jpg");
 		owl.rotateAbsolute(-25);
 		owl.setScale(0.5, 0.5);
 		
+		//Node c = new Generator_Dragon();
+		Node c = new Generator_FibonacciSpiral();
+		//Node c = new Generator_FillPage();
+		//Node c = new Generator_GosperCurve();
+		//Node c = new Generator_GraphPaper();
+		//Node c = new Generator_HilbertCurve();
+		//Node c = new Generator_KochCurve();
+		//Node c = new Generator_Lissajous();
+		//Node c = new Generator_LSystemTree();
+		//Node c = new Generator_Maze();
+		//Node c = new Generator_Package();
+		//Node c = new Generator_Polyeder();
+		//Node c = new Generator_SierpinskiTriangle();
+		//Node c = new Generator_Spirograph();
+		//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
+		
 		//ImageConverter c = new Converter_Boxes();
-		ImageConverter c = new Converter_CMYK();
+		//ImageConverter c = new Converter_CMYK();
 		//ImageConverter c = new Converter_Crosshatch();
-		//ImageConverter c = new Converter_MagicCircle();
 		//ImageConverter c = new Converter_Moire();
 		//ImageConverter c = new Converter_Multipass();
 		//ImageConverter c = new Converter_Pulse();
-		/*
-		ImageConverter c = new Converter_RandomLines();
-		//ImageConverter c2 = new Converter_Sandy();
-		owl.setTranslateY(120);
-		c.setImage(owl);
-		myTurtles.addAll(c.finish());
-
-		ImageConverter c2 = new Converter_Spiral_CMYK();
-		owl.setTranslateY(-240);
-		c2.setImage(owl);
-		myTurtles.addAll(c2.finish());
-		*/
+		//ImageConverter c = new Converter_RandomLines();
+		//ImageConverter c = new Converter_Sandy();
 		//ImageConverter c = new Converter_Spiral_CMYK();
 		//ImageConverter c = new Converter_Spiral();
 		//ImageConverter c = new Converter_SpiralPulse();
-		//ImageConverter c = new Converter_Wander();
-		//ImageConverter c = new Converter_ZigZag();
+		
+		System.out.println("Node name "+c.getName());
 		
 		for(NodeConnector<?> nc : c.inputs ) {
+			System.out.println("Node input "+nc.getType());
 			if(nc.getType().equals(NodeConnectorTransformedImage.NAME)) {
 				((NodeConnectorTransformedImage)nc).setValue(owl);
-				break;
 			};
 		}
 		
@@ -928,6 +930,7 @@ public final class Makelangelo extends TransferHandler
 		}
 		
 		for(NodeConnector<?> nc : c.outputs ) {
+			System.out.println("Node output "+nc.getType());
 			if(nc.getType().equals(NodeConnectorTurtle.NAME)) {
 				myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 			}
@@ -935,6 +938,8 @@ public final class Makelangelo extends TransferHandler
 		
 		if(myTurtles.size()>0) {
 			robot.setTurtles(myTurtles);
+		} else {
+			throw new Exception("No turtles found!");
 		}
 	}
 }

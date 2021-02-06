@@ -27,9 +27,11 @@ public class Converter_CMYK extends ImageConverter {
 	
 	public Converter_CMYK() {
 		super();
+		outputs.remove(outputTurtle);
+		outputs.add(outputTurtleY);
 		outputs.add(outputTurtleC);
 		outputs.add(outputTurtleM);
-		outputs.add(outputTurtleY);
+		outputs.add(outputTurtle);
 	}
 	
 	@Override
@@ -58,10 +60,10 @@ public class Converter_CMYK extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage.getValue());
 		
-		Log.message("Yellow...");		this.outputTurtleY.setValue(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
-		Log.message("Cyan...");			this.outputTurtleC.setValue(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));
-		Log.message("Magenta...");		this.outputTurtleM.setValue(outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255)));
-		Log.message("Black...");		this.outputTurtle.setValue(outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0)));
+		Log.message("Yellow...");		outputTurtleY.setValue(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
+		Log.message("Cyan...");			outputTurtleC.setValue(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));
+		Log.message("Magenta...");		outputTurtleM.setValue(outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255)));
+		Log.message("Black...");		outputTurtle .setValue(outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0)));
 		Log.message("Finishing...");
 
 		return false;

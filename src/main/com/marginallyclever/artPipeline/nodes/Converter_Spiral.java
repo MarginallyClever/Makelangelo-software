@@ -17,13 +17,6 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Spiral extends ImageConverter {
 	private static boolean convertToCorners = true;  // draw the spiral right out to the edges of the square bounds.
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
-	
-	public Converter_Spiral() {
-		super();
-		outputs.add(outputTurtle);
-	}
 	
 	@Override
 	public String getName() {

@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
  * @author Dan Royer
  *
  */
+@Deprecated
 public class Converter_Wander_Panel extends NodePanel {
 	/**
 	 * 
