@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;

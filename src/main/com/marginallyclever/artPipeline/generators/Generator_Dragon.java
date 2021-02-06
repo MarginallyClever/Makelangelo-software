@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Dragon_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -11,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Dragon fractal
  * @author Dan Royer
  */
-public class Generator_Dragon extends TurtleGenerator {
+public class Generator_Dragon extends TurtleNode {
 	private static int order = 12; // controls complexity of curve
 
 	private List<Integer> sequence;
@@ -30,12 +33,14 @@ public class Generator_Dragon extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_Dragon_Panel(this);
 	}
 		
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
+		setTurtleResult(null);
+		
 		Turtle turtle = new Turtle();
 
 		// create the sequence of moves
@@ -56,7 +61,9 @@ public class Generator_Dragon extends TurtleGenerator {
             turtle.turn(turn * 90);
             turtle.forward(1);
         }  
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 }

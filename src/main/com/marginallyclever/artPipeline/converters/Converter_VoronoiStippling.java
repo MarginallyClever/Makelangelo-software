@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_VoronoiStippling_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -170,7 +172,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_VoronoiStippling_Panel(this);
 	}
 
@@ -186,27 +188,24 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		xMin = bounds[TransformedImage.LEFT];
 		xMax = bounds[TransformedImage.RIGHT];
 
-		keepIterating=true;
+		setKeepIterating(true);
 		restart();
 	}
 	
+	@Override
 	public boolean iterate() {
 		//float totalMagnitude = 
 				evolveCells();
 		//Log.message(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
-		return keepIterating;
+		return getKeepIterating();
 	}
 	
+	@Override
 	public void restart() {
-		if(!keepIterating) {
-			loadAndSaveImage.restart();
-			return;
-		}
-		
 		while(lock.isLocked());
 		lock.lock();
 		iterations=0;
-		keepIterating=true;
+		setKeepIterating(true);
 		initializeCells(0.5);
 		lock.unlock();
 	}
@@ -214,7 +213,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	@Override
 	public ArrayList<Turtle> finish() {
 		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
-		keepIterating=false;
+		setKeepIterating(false);
 		turtleList.add(writeOutCells());
 		return turtleList;
 	}
@@ -544,7 +543,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		if(value<1) value=1;
 		if(numCells!=value) {
 			numCells = value;
-			if(keepIterating) {
+			if(getKeepIterating()) {
 				restart();
 			}
 		}

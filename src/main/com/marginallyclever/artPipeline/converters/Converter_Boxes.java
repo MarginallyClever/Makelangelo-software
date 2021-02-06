@@ -4,6 +4,8 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_Boxes_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,8 +26,8 @@ public class Converter_Boxes extends ImageConverter {
 
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Boxes_Panel(this);
+	public TurtleNodePanel getPanel() {
+		return (TurtleNodePanel)new Converter_Boxes_Panel(this);
 	}
 
 	public void setBoxMaxSize(int arg0) {

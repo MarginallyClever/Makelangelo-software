@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -759,5 +760,11 @@ public class LoadScratch2 extends TurtleNode implements LoadAndSaveFile {
 	@Override
 	public String getName() {
 		return Translator.get("LoadScratch2");
+	}
+
+	@Override
+	public TurtleNodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

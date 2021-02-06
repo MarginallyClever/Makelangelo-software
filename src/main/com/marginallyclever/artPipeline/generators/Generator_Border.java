@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Empty_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -8,7 +11,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Border extends TurtleGenerator {
+public class Generator_Border extends TurtleNode {
 	double width=100;
 	double height=100;
 	
@@ -18,12 +21,14 @@ public class Generator_Border extends TurtleGenerator {
 	}
 
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_Empty_Panel(this);
 	}
 
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
+		setTurtleResult(null);
+		
 		Turtle turtle = new Turtle();
 		
 		double yMin = -height/2;
@@ -42,6 +47,8 @@ public class Generator_Border extends TurtleGenerator {
 		turtle.moveTo(xMin,yMax);
 		turtle.penUp();
 		
-	    return turtle;
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 }

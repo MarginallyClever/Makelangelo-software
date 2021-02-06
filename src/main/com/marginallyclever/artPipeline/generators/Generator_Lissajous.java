@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Lissajous_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -10,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Lissajous extends TurtleGenerator {
+public class Generator_Lissajous extends TurtleNode {
 	private double WIDTH, HEIGHT;
 
 	private static double delta = Math.PI/6;
@@ -57,12 +60,12 @@ public class Generator_Lissajous extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_Lissajous_Panel(this);
 	}
 		
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		// scale the step size so the curve fits on the paper
@@ -70,8 +73,10 @@ public class Generator_Lissajous extends TurtleGenerator {
 		HEIGHT = 100;
 
 		drawLissajous(turtle,true);
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 	
 	// see https://www.openprocessing.org/sketch/26608/

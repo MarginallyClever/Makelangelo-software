@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.convenience.ColorRGB;

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
@@ -181,5 +182,11 @@ public class SaveDXF extends TurtleNode implements LoadAndSaveFile {
 		
 		Log.message("done.");
 		return true;
+	}
+
+	@Override
+	public TurtleNodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

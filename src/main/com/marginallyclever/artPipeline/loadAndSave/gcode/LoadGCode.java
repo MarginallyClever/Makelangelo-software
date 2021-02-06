@@ -8,6 +8,7 @@ import java.util.Scanner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
@@ -212,5 +213,11 @@ public class LoadGCode extends TurtleNode implements LoadAndSaveFile {
 	@Override
 	public String getName() {
 		return Translator.get("LoadGCODE");
+	}
+
+	@Override
+	public TurtleNodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

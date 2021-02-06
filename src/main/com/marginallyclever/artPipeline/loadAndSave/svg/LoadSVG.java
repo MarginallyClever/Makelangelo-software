@@ -32,6 +32,7 @@ import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
@@ -572,5 +573,11 @@ public class LoadSVG extends TurtleNode implements LoadAndSaveFile {
 	@Override
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		return false;
+	}
+
+	@Override
+	public TurtleNodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_SierpinskiTriangle_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -8,7 +11,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer 2016-12-12
  *
  */
-public class Generator_SierpinskiTriangle extends TurtleGenerator {
+public class Generator_SierpinskiTriangle extends TurtleNode {
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;
 	private static int order = 4; // controls complexity of curve
@@ -28,12 +31,12 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_SierpinskiTriangle_Panel(this);
 	}
 	
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		xMax = 100;
@@ -64,7 +67,9 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 			drawCurve(turtle,order, maxSize,-60);
 		}
 
-		return turtle;
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 
 

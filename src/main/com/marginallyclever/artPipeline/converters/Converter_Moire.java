@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_Moire_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
@@ -29,7 +31,7 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_Moire_Panel(this);
 	}
 	

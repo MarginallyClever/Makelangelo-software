@@ -16,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Text_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -25,7 +28,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Text extends TurtleGenerator {
+public class Generator_Text extends TurtleNode {
 	private double width=100;
 	private double height=100;
 	
@@ -101,7 +104,7 @@ public class Generator_Text extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_Text_Panel(this);
 	}
 	
@@ -291,7 +294,7 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		String fontName = fontNames[lastFont];
@@ -303,7 +306,9 @@ public class Generator_Text extends TurtleGenerator {
 		textSetVAlign(AlignV.MIDDLE);
 		writeBeautifulMessage(turtle,fontName,lastSize,lastMessage);
 
-	    return turtle;
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 	
 	public void textSetPosition(float x, float y) {

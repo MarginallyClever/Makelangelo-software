@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_KochCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -7,7 +10,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Koch Curve fractal
  * @author Dan Royer
  */
-public class Generator_KochCurve extends TurtleGenerator {
+public class Generator_KochCurve extends TurtleNode {
 	private double xMax = 7;
 	private double xMin = -7;
 	private double yMax = 7;
@@ -30,12 +33,12 @@ public class Generator_KochCurve extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_KochCurve_Panel(this);
 	}
 	
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		double v = 100;
@@ -54,8 +57,10 @@ public class Generator_KochCurve extends TurtleGenerator {
 		
 		turtle.penDown();
 		drawTriangle(turtle,order, maxSize);
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 
 

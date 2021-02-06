@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_GraphPaper_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -10,7 +13,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * 1cm and 10cm grid lines
  * @author Dan Royer
  */
-public class Generator_GraphPaper extends TurtleGenerator {
+public class Generator_GraphPaper extends TurtleNode {
 	private static float angle = 0;
 
 	MakelangeloRobotPanel robotPanel;
@@ -29,12 +32,12 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_GraphPaper_Panel(this);
 	}
 	
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		lines(turtle,10,0);
@@ -43,8 +46,10 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		//turtle.setColor(new ColorRGB(0,0,0));
 		//lines(turtle,100,0);
 		//lines(turtle,100,90);
+
+		setTurtleResult(turtle);
 		
-		return turtle;
+	    return false;
 	}
 
 	protected void lines(Turtle turtle,float stepSize_mm,int angle_deg) {

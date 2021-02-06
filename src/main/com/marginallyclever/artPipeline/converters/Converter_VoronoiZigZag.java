@@ -7,6 +7,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_VoronoiZigZag_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -55,7 +57,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_VoronoiZigZag_Panel(this);
 	}
 	
@@ -71,18 +73,18 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		xLeft   = bounds[TransformedImage.LEFT];
 		xRight  = bounds[TransformedImage.RIGHT];
 		
-		keepIterating=true;
+		setKeepIterating(true);
 		renderMode = 0;
 		restart();
 	}
 
 	public void restart() {
-		if(!keepIterating) {
-			loadAndSaveImage.restart();
+		if(!getKeepIterating()) {
+			loadImage.restart();
 			return;
 		}
 		lowNoise=false;
-		keepIterating=true;
+		setKeepIterating(true);
 		initializeCells(0.5);
 	}
 	
@@ -99,13 +101,13 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				Log.message("Running Lin/Kerighan optimization...");
 			}			
 		}
-		return keepIterating;
+		return getKeepIterating();
 	}
 
 	@Override
 	public ArrayList<Turtle> finish() {
 		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
-		keepIterating=false;
+		setKeepIterating(false);
 		turtleList.add(writeOutCells());
 		return turtleList;
 	}
@@ -161,7 +163,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		// once|=transposeForwardTest();
 		// once|=transposeBackwardTest();
 
-		keepIterating = flipTests();
+		setKeepIterating(flipTests());
 	}
 
 	public String formatTime(long millis) {

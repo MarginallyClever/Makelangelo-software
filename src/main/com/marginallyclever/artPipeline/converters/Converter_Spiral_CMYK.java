@@ -3,6 +3,8 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_Spiral_CMYK_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
@@ -26,7 +28,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_Spiral_CMYK_Panel(this);
 	}
 

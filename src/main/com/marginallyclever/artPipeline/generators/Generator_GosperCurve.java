@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_GosperCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -7,7 +10,7 @@ import com.marginallyclever.makelangelo.Translator;
  * Gosper curve fractal.
  * @author Dan Royer
  */
-public class Generator_GosperCurve extends TurtleGenerator {
+public class Generator_GosperCurve extends TurtleNode {
 	private double turtleStep = 10.0f;
 	private double xMax = 0;
 	private double xMin = 0;
@@ -29,12 +32,12 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_GosperCurve_Panel(this);
 	}
 	
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 
 		double v = 100;
@@ -80,8 +83,10 @@ public class Generator_GosperCurve extends TurtleGenerator {
 		turtle.penDown();
 		// do the curve
 		gosperA(turtle,order);
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 
 

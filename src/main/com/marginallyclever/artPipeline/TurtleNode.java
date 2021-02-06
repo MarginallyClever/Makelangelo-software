@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline;
 
-import javax.swing.ProgressMonitor;
-
 import com.marginallyclever.convenience.turtle.Turtle;
 
 
@@ -9,10 +7,9 @@ import com.marginallyclever.convenience.turtle.Turtle;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class TurtleNode {	
-	// threading
-	protected ProgressMonitor pm;
-	protected TurtleSwingWorker threadWorker;
+public abstract class TurtleNode {
+	// used internally for iterating on long jobs.  Could be promoted to whomsoever manages the thread for this node.
+	private boolean keepIterating=false;
 	
 	/**
 	 * When this {@code TurtleNode} has finished it's task, the result (if any) is stored in turtleResult.
@@ -30,19 +27,42 @@ public abstract class TurtleNode {
 	protected void setTurtleResult(Turtle turtle2) {
 		turtleResult = turtle2;
 	}
-
-	public void setThreadWorker(TurtleSwingWorker p) {
-		threadWorker = p;
-	}
-
-	public void setProgressMonitor(ProgressMonitor p) {
-		pm = p;
-	}
 	
 	/**
 	 * @return the translated name of the {@code TurtleNode}.
 	 */
 	abstract public String getName();
+
+	/**
+	 * @return the gui panel with options for this manipulator
+	 */
+	public abstract TurtleNodePanel getPanel();
+	
+	
+	/**
+	 * Inputs have been updated, please start over.
+	 */
+	public void restart() {}
+	
+	/**
+	 * run one step of an iterative process.
+	 * @return true if conversion should iterate again.
+	 */
+	public boolean iterate() {
+		return false;
+	}
+	
+	public void stopIterating() {
+		keepIterating=false;
+	}
+	
+	public boolean getKeepIterating() {
+		return keepIterating;
+	}
+	
+	public void setKeepIterating(boolean state) {
+		keepIterating=state;
+	}
 }
 
 /**

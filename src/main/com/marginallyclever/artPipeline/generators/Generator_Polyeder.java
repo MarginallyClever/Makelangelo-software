@@ -3,6 +3,9 @@ package com.marginallyclever.artPipeline.generators;
 
 import java.util.ArrayList;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Polyeder_Panel;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -18,7 +21,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @since 7.24.0
  *
  */
-public class Generator_Polyeder extends TurtleGenerator {
+public class Generator_Polyeder extends TurtleNode {
 	/**
 	 * Helper class that describe a solid
 	 * @author Guenther Sohler
@@ -159,7 +162,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 	}
 
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		// rebuild the list of models here if you want to dynamically add more.
 		
 		return new Generator_Polyeder_Panel(this);
@@ -236,7 +239,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 	}
 
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		instructionPtr=0;
 
 		Turtle turtle = new Turtle();
@@ -247,7 +250,9 @@ public class Generator_Polyeder extends TurtleGenerator {
 		geneneratePolygonStep(turtle,t);
 		Log.message("end");
 
-	    return turtle;
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 
 

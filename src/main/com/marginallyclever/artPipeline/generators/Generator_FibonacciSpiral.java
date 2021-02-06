@@ -2,6 +2,9 @@ package com.marginallyclever.artPipeline.generators;
 
 import java.util.Stack;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -11,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  *
  */
-public class Generator_FibonacciSpiral extends TurtleGenerator {
+public class Generator_FibonacciSpiral extends TurtleNode {
 	private float xMax = 100;
 	private float yMax = 100;
 	private static int order = 7; // controls complexity of curve
@@ -24,7 +27,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	}
 
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_FibonacciSpiral_Panel(this);
 	}
 
@@ -55,7 +58,9 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	}
 
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
+		setTurtleResult(null);
+		
 		Turtle turtle = new Turtle();
 		Log.message("xMax="+xMax);
 		Log.message("yMax="+yMax);
@@ -99,8 +104,10 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 			int o = fibonacciSequence.pop();
 			fibonacciCell(turtle,o*scale1);
 		}
-			    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 
 

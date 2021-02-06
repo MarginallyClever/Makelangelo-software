@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_DitherFloydSteinberg;

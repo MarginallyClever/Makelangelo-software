@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_FillPage_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -10,7 +13,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * Completely fills the page with ink.
  * @author Dan Royer
  */
-public class Generator_FillPage extends TurtleGenerator {
+public class Generator_FillPage extends TurtleNode {
 	private static float angle = 0;
 	
 	private double stepSize = 2.0;
@@ -35,12 +38,12 @@ public class Generator_FillPage extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_FillPage_Panel(this);
 	}
 	
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
 		double majorX = Math.cos(Math.toRadians(angle));
@@ -80,7 +83,9 @@ public class Generator_FillPage extends TurtleGenerator {
 			}
 			++i;
 		}
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 }

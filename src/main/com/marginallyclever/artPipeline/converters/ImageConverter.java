@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.loadAndSave.LoadImage;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.LoadImageDialog;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
 /**
@@ -25,20 +25,8 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  *
  */
 public abstract class ImageConverter extends TurtleNode implements MakelangeloRobotDecorator {
+	// input parameter
 	protected TransformedImage sourceImage;
-	protected boolean keepIterating=false;
-
-	public static LoadImage loadAndSaveImage;
-
-	@Override
-	public void restart() {
-		if(!keepIterating) {
-			if(loadAndSaveImage!=null) {
-				loadAndSaveImage.restart();
-			}
-			return;
-		}
-	}
 	
 	/**
 	 * set the image to be transformed.
@@ -49,32 +37,16 @@ public abstract class ImageConverter extends TurtleNode implements MakelangeloRo
 		sourceImage=img;
 	}
 	
-	/**
-	 * run one "step" of an iterative image conversion process.
-	 * @return true if conversion should iterate again.
-	 */
-	public boolean iterate() {
-		return false;
-	}
-	
-	public void stopIterating() {
-		keepIterating=false;
-	}
-	
+
+	public static LoadImageDialog loadImage;
+
 	/**
 	 * for "run once" converters, return do the entire conversion and write to disk.
 	 * for iterative solvers, the iteration is now done, write to disk.
 	 * @return the list of turtles created, if any.
 	 */
 	abstract public ArrayList<Turtle> finish();
-	
-	/**
-	 * @return the gui panel with options for this manipulator
-	 */
-	public ImageConverterPanel getPanel() {
-		return null;
-	}
-	
+		
 	/**
 	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
 	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.

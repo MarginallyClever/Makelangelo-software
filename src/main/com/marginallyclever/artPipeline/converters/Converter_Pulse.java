@@ -3,6 +3,8 @@ package com.marginallyclever.artPipeline.converters;
 import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_Pulse_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -24,7 +26,7 @@ public class Converter_Pulse extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_Pulse_Panel(this);
 	}
 	

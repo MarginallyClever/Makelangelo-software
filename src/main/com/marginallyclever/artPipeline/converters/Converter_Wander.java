@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.TransformedImage;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.converters.panels.Converter_Wander_Panel;
 import com.marginallyclever.artPipeline.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.ColorRGB;
@@ -44,7 +46,7 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Converter_Wander_Panel(this);
 	}
 

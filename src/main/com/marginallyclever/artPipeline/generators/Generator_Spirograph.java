@@ -1,5 +1,8 @@
 package com.marginallyclever.artPipeline.generators;
 
+import com.marginallyclever.artPipeline.TurtleNode;
+import com.marginallyclever.artPipeline.TurtleNodePanel;
+import com.marginallyclever.artPipeline.generators.panels.Generator_Spirograph_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -10,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Spirograph extends TurtleGenerator {
+public class Generator_Spirograph extends TurtleNode {
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
 
@@ -67,12 +70,12 @@ public class Generator_Spirograph extends TurtleGenerator {
 	}
 	
 	@Override
-	public TurtleGeneratorPanel getPanel() {
+	public TurtleNodePanel getPanel() {
 		return new Generator_Spirograph_Panel(this);
 	}
 		
 	@Override
-	public Turtle generate() {
+	public boolean iterate() {
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;
 		xMin = Float.POSITIVE_INFINITY;
@@ -115,8 +118,10 @@ public class Generator_Spirograph extends TurtleGenerator {
 		// draw the spirograph for real this time
 		turtle.reset();
 		drawSpirograph(turtle,true);
-	    
-	    return turtle;
+
+		setTurtleResult(turtle);
+		
+	    return false;
 	}
 	
 	protected void drawSpirograph(Turtle turtle,boolean write) {
