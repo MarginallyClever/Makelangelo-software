@@ -71,7 +71,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
-			pm.setProgress((int) progress);
+			//pm.setProgress((int) progress);
 		}
 	}
 
