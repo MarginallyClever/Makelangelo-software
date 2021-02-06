@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Maze_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -32,7 +31,14 @@ public class Generator_Maze extends Node {
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_Maze() {
+		super();
+		outputs.add(outputTurtle);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("MazeName");
@@ -145,9 +151,7 @@ public class Generator_Maze extends Node {
 		Turtle turtle = new Turtle();
 		drawMaze(turtle);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

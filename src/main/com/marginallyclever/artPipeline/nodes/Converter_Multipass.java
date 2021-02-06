@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Multipass_Panel;
 import com.marginallyclever.convenience.TransformedImage;
@@ -51,7 +49,7 @@ public class Converter_Multipass extends ImageConverter {
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 		
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
@@ -104,9 +102,7 @@ public class Converter_Multipass extends ImageConverter {
 			++i;
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }

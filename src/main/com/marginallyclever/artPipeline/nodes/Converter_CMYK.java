@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_CMYK_Panel;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.TransformedImage;
@@ -14,13 +13,24 @@ import com.marginallyclever.makelangelo.Translator;
 
 
 /**
- * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
+ * Color values are from 0...255 inclusive.  255 is white, 0 is black.
+ * Lift the pen any time the color value is > cutoff
+ * @see http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
  */
 public class Converter_CMYK extends ImageConverter {
 	static protected int passes=1;
-	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
-	// Lift the pen any time the color value is > cutoff
+
+	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
+	
+	public Converter_CMYK() {
+		super();
+		outputs.add(outputTurtleC);
+		outputs.add(outputTurtleM);
+		outputs.add(outputTurtleY);
+	}
 	
 	@Override
 	public String getName() {
@@ -46,17 +56,14 @@ public class Converter_CMYK extends ImageConverter {
 	@Override
 	public boolean iterate() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(sourceImage.getValue());
 		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		
-		Log.message("Yellow...");		list.add(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
-		Log.message("Cyan...");			list.add(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));
-		Log.message("Magenta...");		list.add(outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255)));
-		Log.message("Black...");		list.add(outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0)));
+		Log.message("Yellow...");		this.outputTurtleY.setValue(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
+		Log.message("Cyan...");			this.outputTurtleC.setValue(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));
+		Log.message("Magenta...");		this.outputTurtleM.setValue(outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255)));
+		Log.message("Black...");		this.outputTurtle.setValue(outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0)));
 		Log.message("Finishing...");
 
-		setTurtleResult(list);
 		return false;
 	}
 	

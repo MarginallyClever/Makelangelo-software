@@ -319,7 +319,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		// Dither
 		Filter_DitherFloydSteinberg fs = new Filter_DitherFloydSteinberg();
@@ -341,6 +341,13 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public void setImage(TransformedImage img) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public NodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

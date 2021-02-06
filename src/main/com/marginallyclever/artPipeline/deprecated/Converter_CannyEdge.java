@@ -1,8 +1,6 @@
 package com.marginallyclever.artPipeline.deprecated;
 
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.TransformedImage;
@@ -30,7 +28,7 @@ public class Converter_CannyEdge extends ImageConverter {
 	public boolean iterate() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		Turtle turtle = new Turtle();
 		
@@ -116,9 +114,7 @@ public class Converter_CannyEdge extends ImageConverter {
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    }*/
 		
-		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
-		turtleList.add(turtle);
-		setTurtleResult(turtleList);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 

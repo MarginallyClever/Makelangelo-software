@@ -32,6 +32,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
 public class Converter_VoronoiStippling extends ImageConverter implements MakelangeloRobotDecorator {
 	private ReentrantLock lock = new ReentrantLock();
 
+	private TransformedImage img;
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private ArrayList<VoronoiCell> cells = new ArrayList<VoronoiCell>();
 	private List<VoronoiGraphEdge> graphEdges = null;
@@ -177,41 +178,32 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 
 	@Override
-	public void setImage(TransformedImage img) {
-		// make black & white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		sourceImage = bw.filter(img);
-
-		double [] bounds = sourceImage.getBounds();
-		yMin = bounds[TransformedImage.BOTTOM];
-		yMax = bounds[TransformedImage.TOP];
-		xMin = bounds[TransformedImage.LEFT];
-		xMax = bounds[TransformedImage.RIGHT];
-
-		setKeepIterating(true);
-		restart();
-	}
-	
-	@Override
 	public boolean iterate() {
 		//float totalMagnitude = 
 		evolveCells();
 		//Log.message(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
-
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(writeOutCells());
-		setTurtleResult(list);
 
 		return getKeepIterating();
 	}
 	
 	@Override
 	public void restart() {
-		while(lock.isLocked());
-		lock.lock();
+		setKeepIterating(true);
+
+		// make black & white
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		img = bw.filter(sourceImage.getValue());
+
+		double [] bounds = img.getBounds();
+		yMin = bounds[TransformedImage.BOTTOM];
+		yMax = bounds[TransformedImage.TOP];
+		xMin = bounds[TransformedImage.LEFT];
+		xMax = bounds[TransformedImage.RIGHT];
+
 		iterations=0;
 		setKeepIterating(true);
 		initializeCells(0.5);
+		
 		lock.unlock();
 	}
 
@@ -313,7 +305,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	// set some starting points in a grid
 	protected void initializeCells(double minDistanceBetweenSites) {
 		Log.message("Initializing cells");
-
+		
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[numCells];
 		yValuesIn = new double[numCells];
@@ -328,8 +320,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 			for(int i=0;i<30;++i) {
 				x = xMin + Math.random()*(xMax-xMin);
 				y = yMin + Math.random()*(yMax-yMin);
-				if(sourceImage.canSampleAt((float)x, (float)y)) {
-					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+				if(img.canSampleAt((float)x, (float)y)) {
+					float v = img.sample1x1Unchecked((float)x, (float)y);
 					if(Math.random()*255 >= v) break;
 				}
 			}
@@ -366,7 +358,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	/**
 	 * write cell centroids to gcode.
 	 */
-	protected Turtle writeOutCells() {
+	protected void writeOutCells() {
 		Turtle turtle = new Turtle();
 
 		double toolDiameter = 1.0;
@@ -405,7 +397,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				turtle.penUp();
 			}
 		}
-		return turtle;
+		outputTurtle.setValue(turtle);
 	}
 
 
@@ -444,7 +436,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 	protected void adjustCell(VoronoiCell c,double x,double y) {
 		c.hits++;
-		double sampleWeight = 255.0 - sourceImage.sample1x1Unchecked( (float)x, (float)y );
+		double sampleWeight = 255.0 - img.sample1x1Unchecked( (float)x, (float)y );
 		c.weight += sampleWeight;
 		c.wx += x * sampleWeight;
 		c.wy += y * sampleWeight;
@@ -481,7 +473,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		double v=5;
 		for(y=yMin; y<=yMax; ++y) {			
 			for(x=xMin; x<=xMax; ++x) {
-				if(!sourceImage.canSampleAt((float)x, (float)y)) continue;
+				if(!img.canSampleAt((float)x, (float)y)) continue;
 				// binary search over the cells to find the best fit.
 				
 				test.setRect(x-v, y-v, v*2, v*2);
@@ -540,11 +532,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		if(value<1) value=1;
 		if(numCells!=value) {
 			numCells = value;
-			if(getKeepIterating()) {
-				restart();
-			}
+			restart();
 		}
 	}
+	
 	public int getNumCells() {
 		return numCells;
 	}

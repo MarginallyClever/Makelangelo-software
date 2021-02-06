@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Sandy_Panel;
 import com.marginallyclever.convenience.TransformedImage;
@@ -44,7 +42,7 @@ public class Converter_Sandy extends ImageConverter {
 		Turtle turtle = new Turtle();
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
@@ -149,9 +147,7 @@ public class Converter_Sandy extends ImageConverter {
 			Log.message("Sandy finished.");
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 

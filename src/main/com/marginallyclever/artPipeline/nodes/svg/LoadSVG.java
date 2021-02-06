@@ -33,6 +33,7 @@ import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
@@ -52,6 +53,13 @@ public class LoadSVG extends Node implements LoadAndSaveFile {
 	
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public LoadSVG() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() { return "SVG"; }
@@ -76,8 +84,6 @@ public class LoadSVG extends Node implements LoadAndSaveFile {
 	@Override
 	public boolean load(InputStream in) {
 		Log.message("Loading...");
-		
-		setTurtleResult(null);
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
@@ -118,9 +124,7 @@ public class LoadSVG extends Node implements LoadAndSaveFile {
 			return false;
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 		return true;
 	}

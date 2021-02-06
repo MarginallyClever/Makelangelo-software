@@ -47,22 +47,19 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	public boolean iterate() {
 		
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(sourceImage.getValue());
 
-		double [] bounds = sourceImage.getBounds();
+		double [] bounds = sourceImage.getValue().getBounds();
 		double h2 = bounds[TransformedImage.TOP] - bounds[TransformedImage.BOTTOM];
 		double w2 = bounds[TransformedImage.RIGHT] - bounds[TransformedImage.LEFT];
 		double separation = (w2<h2) ? w2/4 : h2/4;
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		
 		Log.message("Yellow...");		list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation));
 		Log.message("Cyan...");			list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation));
 		Log.message("Magenta...");		list.add(outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation));
 		Log.message("Black...");		list.add(outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation));
 		Log.message("Finishing...");
 
-		setTurtleResult(list);
 		return false;
 	}
 
@@ -79,7 +76,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		double level;
 		int z = 0;
 
-		double [] bounds = sourceImage.getBounds();
+		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];
 		double yTop    = bounds[TransformedImage.TOP];
 		double xLeft   = bounds[TransformedImage.LEFT];

@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_HilbertCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -18,7 +17,14 @@ public class Generator_HilbertCurve extends Node {
 	private double xMin = -7;
 	private double yMax = 7;
 	private static int order = 4; // controls complexity of curve
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_HilbertCurve() {
+		super();
+		outputs.add(outputTurtle);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("HilbertCurveName");
@@ -56,10 +62,7 @@ public class Generator_HilbertCurve extends Node {
 		turtle.penDown();
 		hilbert(turtle,order);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 

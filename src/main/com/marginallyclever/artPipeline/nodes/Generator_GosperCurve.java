@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_GosperCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,7 +18,14 @@ public class Generator_GosperCurve extends Node {
 	private double yMax = 0;
 	private double yMin = 0;
 	private static int order = 4; // controls complexity of curve
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_GosperCurve() {
+		super();
+		outputs.add(outputTurtle);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("GosperCurveName");
@@ -86,10 +92,7 @@ public class Generator_GosperCurve extends Node {
 		// do the curve
 		gosperA(turtle,order);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 

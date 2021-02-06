@@ -1,8 +1,7 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Spiral_Panel;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
@@ -19,6 +18,13 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_Spiral extends ImageConverter {
 	private static boolean convertToCorners = true;  // draw the spiral right out to the edges of the square bounds.
 
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Converter_Spiral() {
+		super();
+		outputs.add(outputTurtle);
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralName");
@@ -46,7 +52,7 @@ public class Converter_Spiral extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		double toolDiameter = 1.0;
 
@@ -112,9 +118,7 @@ public class Converter_Spiral extends ImageConverter {
 
 		Log.message(numRings + " rings.");
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }

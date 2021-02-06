@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Text_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -57,8 +57,13 @@ public class Generator_Text extends Node {
 	private static int lastSize = 20;
 	private static Font [] fontList;
 	private static String [] fontNames;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
-	public Generator_Text() {		
+	public Generator_Text() {
+		super();
+		outputs.add(outputTurtle);
+		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		fontList = ge.getAllFonts();
@@ -307,9 +312,7 @@ public class Generator_Text extends Node {
 		textSetVAlign(AlignV.MIDDLE);
 		writeBeautifulMessage(turtle,fontName,lastSize,lastMessage);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

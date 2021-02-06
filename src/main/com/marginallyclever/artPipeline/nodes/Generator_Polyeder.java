@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Polyeder_Panel;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -112,8 +113,12 @@ public class Generator_Polyeder extends Node {
 
 	public int instructionPtr;
 
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+
+	
 	public Generator_Polyeder() {
 		super();
+		outputs.add(outputTurtle);
 		
 		models=new ArrayList<Model>();
 		addModel("Cube",new int[] {4,4,1,1,1,4,0,1,0,4,1,1,1,4,0,4,0,0,0,0});
@@ -250,9 +255,7 @@ public class Generator_Polyeder extends Node {
 		geneneratePolygonStep(turtle,t);
 		Log.message("end");
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

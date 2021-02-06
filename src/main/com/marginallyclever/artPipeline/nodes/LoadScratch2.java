@@ -24,6 +24,7 @@ import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -68,6 +69,13 @@ public class LoadScratch2 extends Node implements LoadAndSaveFile {
 	private LinkedList<ScratchList> scratchLists;
 	private Map<String,JSONArray> subRoutines = new HashMap<String,JSONArray>();
 	private int indent;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public LoadScratch2() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -89,8 +97,6 @@ public class LoadScratch2 extends Node implements LoadAndSaveFile {
 	@Override
 	public boolean load(InputStream in) {
 		Log.message(Translator.get("FileTypeSB2")+"...");
-
-		setTurtleResult(null);
 		
 		Turtle turtle = new Turtle();
 	    indent=0;
@@ -199,9 +205,7 @@ public class LoadScratch2 extends Node implements LoadAndSaveFile {
 			e.printStackTrace();
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return true;
 	}
 

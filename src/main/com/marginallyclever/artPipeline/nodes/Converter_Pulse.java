@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Pulse_Panel;
 import com.marginallyclever.convenience.Point2D;
@@ -87,7 +85,7 @@ public class Converter_Pulse extends ImageConverter {
 		Turtle turtle = new Turtle();
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];
@@ -142,9 +140,7 @@ public class Converter_Pulse extends ImageConverter {
 			}
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }

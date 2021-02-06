@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_SpiralPulse_Panel;
 import com.marginallyclever.convenience.TransformedImage;
@@ -42,7 +40,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		double toolDiameter = 1.0;
 
@@ -126,9 +124,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 
 		Log.message(numRings + " rings.");
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 

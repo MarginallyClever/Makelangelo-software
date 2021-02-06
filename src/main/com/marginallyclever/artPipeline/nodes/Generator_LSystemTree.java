@@ -1,10 +1,9 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_LSystemTree_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -21,7 +20,14 @@ public class Generator_LSystemTree extends Node {
 	private static double orderScale = 0.76f;
 	private SecureRandom random;
 	float maxSize;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_LSystemTree() {
+		super();
+		outputs.add(outputTurtle);
+	}
+
 
 	@Override
 	public String getName() {
@@ -47,10 +53,7 @@ public class Generator_LSystemTree extends Node {
 		// do the curve
 		lSystemTree(turtle,order, 10);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 

@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FillPage_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
@@ -25,7 +24,13 @@ public class Generator_FillPage extends Node {
 	private double xRight  = 100;
 
 	MakelangeloRobotPanel robotPanel;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_FillPage() {
+		super();
+		outputs.add(outputTurtle);
+	}
 
 	@Override
 	public String getName() {
@@ -86,10 +91,7 @@ public class Generator_FillPage extends Node {
 			++i;
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 }

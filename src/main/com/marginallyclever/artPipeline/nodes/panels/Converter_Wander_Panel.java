@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodes.Converter_Wander;
+import com.marginallyclever.artPipeline.deprecated.Converter_Wander;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;

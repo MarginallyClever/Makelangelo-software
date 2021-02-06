@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.deprecated;
 
 
 import java.awt.geom.Point2D;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Wander_Panel;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.TransformedImage;
@@ -20,6 +21,7 @@ import com.marginallyclever.makelangelo.Translator;
  * create random lines across the image.  Raise and lower the pen to darken the appropriate areas
  * @author Dan Royer
  */
+@Deprecated
 public class Converter_Wander extends ImageConverter {
 	static protected int numLines = 9000;
 	static protected boolean isCMYK = false;
@@ -59,8 +61,6 @@ public class Converter_Wander extends ImageConverter {
 		} else {
 			list.addAll(finishBlackAndWhite());
 		}
-
-		setTurtleResult(list);
 
 		return false;
 	}
@@ -183,7 +183,7 @@ public class Converter_Wander extends ImageConverter {
 		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(sourceImage.getValue());
 		
 		Log.message("Yellow...");	list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0));
 		Log.message("Cyan...");		list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0));
@@ -199,7 +199,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 		
 		list.add(outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0));
 		return list;

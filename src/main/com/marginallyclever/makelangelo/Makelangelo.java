@@ -51,6 +51,9 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnector;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.Converter_CMYK;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
@@ -912,12 +915,23 @@ public final class Makelangelo extends TransferHandler
 		//ImageConverter c = new Converter_Wander();
 		//ImageConverter c = new Converter_ZigZag();
 		
-		c.setImage(owl);
+		for(NodeConnector<?> nc : c.inputs ) {
+			if(nc.getType().equals(NodeConnectorTransformedImage.NAME)) {
+				((NodeConnectorTransformedImage)nc).setValue(owl);
+				break;
+			};
+		}
+		
 		for(int i=0;i<100;++i) {
 			c.iterate();
 			if(!c.getKeepIterating()) break;
 		}
-		myTurtles.addAll(c.getTurtleResult());
+		
+		for(NodeConnector<?> nc : c.outputs ) {
+			if(nc.getType().equals(NodeConnectorTurtle.NAME)) {
+				myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+			}
+		}
 		
 		if(myTurtles.size()>0) {
 			robot.setTurtles(myTurtles);

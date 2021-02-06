@@ -1,8 +1,6 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Boxes_Panel;
 import com.marginallyclever.convenience.TransformedImage;
@@ -54,11 +52,11 @@ public class Converter_Boxes extends ImageConverter {
 	
 	@Override
 	public boolean iterate() {
-		if(sourceImage ==null) return false;
+		if(sourceImage.getValue() == null) return false;
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		Turtle turtle = new Turtle();
 		
@@ -108,9 +106,7 @@ public class Converter_Boxes extends ImageConverter {
 			}
 		}
 		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 	

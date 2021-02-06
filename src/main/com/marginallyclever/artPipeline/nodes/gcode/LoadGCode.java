@@ -9,6 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
@@ -23,6 +24,13 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 public class LoadGCode extends Node implements LoadAndSaveFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public LoadGCode() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -68,7 +76,6 @@ public class LoadGCode extends Node implements LoadAndSaveFile {
 	@Override
 	public boolean load(InputStream in) {
 		Turtle turtle = new Turtle();
-		setTurtleResult(null);
 		
 		ColorRGB penDownColor = turtle.getColor();
 		double scaleXY=1;
@@ -201,9 +208,7 @@ public class LoadGCode extends Node implements LoadAndSaveFile {
 		}
 		scanner.close();
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return true;
 	}
 

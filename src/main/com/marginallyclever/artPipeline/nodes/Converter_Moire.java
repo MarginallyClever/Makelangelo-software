@@ -22,7 +22,7 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_Moire extends ImageConverter {
 	private static float blockScale = 4.0f;
 	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
+	private String[] directionChoices = new String[] {Translator.get("horizontal"), Translator.get("vertical") }; 
 	
 	
 	@Override
@@ -177,7 +177,7 @@ public class Converter_Moire extends ImageConverter {
 		Turtle turtle = new Turtle();
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];
@@ -220,9 +220,7 @@ public class Converter_Moire extends ImageConverter {
 		}
 		Log.message("Moire end");
 		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }

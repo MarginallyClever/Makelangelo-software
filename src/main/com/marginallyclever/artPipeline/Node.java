@@ -3,37 +3,40 @@ package com.marginallyclever.artPipeline;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnector;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
 
 /**
- * shared methods for image manipulation (generating, converting, or filtering)
- * @author Dan
+ * @author Dan Royer
+ * @since 7.25.0
  */
 public abstract class Node implements MakelangeloRobotDecorator {
+	// TODO make this not public
+	public ArrayList<NodeConnector<?>> inputs = new ArrayList<NodeConnector<?>>(); 
+	// TODO make this not public
+	public ArrayList<NodeConnector<?>> outputs = new ArrayList<NodeConnector<?>>(); 
+
+	/**
+	 * When this {@link Node} has finished it's task, the result (if any) is stored in turtleResult.
+	 */
+	@Deprecated
+	protected ArrayList<Turtle> turtleResult;
+	
 	// used internally for iterating on long jobs.  Could be promoted to whomsoever manages the thread for this node.
 	private boolean keepIterating=false;
 
 	/**
-	 * When this {@code TurtleNode} starts it might need a sourceImage.
-	 */
-	protected TransformedImage sourceImage;
-	
-	/**
-	 * When this {@code TurtleNode} has finished it's task, the result (if any) is stored in turtleResult.
-	 */
-	protected ArrayList<Turtle> turtleResult;
-
-	/**
-	 * Get the results of running this {@code TurtleNode}.
+	 * Get the results of running this {@link Node}.
 	 * @return
 	 */
+	@Deprecated
 	public ArrayList<Turtle> getTurtleResult() {
 		return turtleResult;
 	}
 
+	@Deprecated
 	protected void setTurtleResult(ArrayList<Turtle> list) {
 		turtleResult = list;
 	}
@@ -74,18 +77,8 @@ public abstract class Node implements MakelangeloRobotDecorator {
 		keepIterating=state;
 	}
 	
-	/**
-	 * set the image to be transformed.
-	 * @param turtle the <code>com.marginallyclever.convenience.turtle.Turtle</code>
-	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
-	 */
-	public void setImage(TransformedImage img) {
-		sourceImage=img;
-	}
-	
 	@Override
-	public void render(GL2 gl2) {
-	}
+	public void render(GL2 gl2) {}
 }
 
 /**

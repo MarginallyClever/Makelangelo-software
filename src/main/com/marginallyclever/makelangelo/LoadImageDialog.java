@@ -268,7 +268,7 @@ public class LoadImageDialog implements LoadAndSaveFile {
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
 
-		chosenConverter.setProgressMonitor(pm);
+		//chosenConverter.setProgressMonitor(pm);
 		chosenConverter.setImage(img);
 
 		threadWorker = new LoadImageSwingWorker(chosenConverter, pm);

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Dragon_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,6 +20,13 @@ public class Generator_Dragon extends Node {
 
 	private List<Integer> sequence;
 
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_Dragon() {
+		super();
+		outputs.add(outputTurtle);
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("DragonName");
@@ -39,8 +47,6 @@ public class Generator_Dragon extends Node {
 		
 	@Override
 	public boolean iterate() {
-		setTurtleResult(null);
-		
 		Turtle turtle = new Turtle();
 
 		// create the sequence of moves
@@ -62,10 +68,7 @@ public class Generator_Dragon extends Node {
             turtle.forward(1);
         }  
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 }

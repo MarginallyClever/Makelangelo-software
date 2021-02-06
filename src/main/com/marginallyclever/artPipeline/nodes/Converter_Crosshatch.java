@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Crosshatch_Panel;
 import com.marginallyclever.convenience.Histogram;
@@ -40,17 +38,15 @@ public class Converter_Crosshatch extends ImageConverter {
 	
 	@Override
 	public boolean iterate() {
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(finish1());
-		// turtleList.add(finish2());
-
-		setTurtleResult(list);
+		outputTurtle.setValue(finish1());
+		// outputTurtle.setValue(finish2());
+		
 		return false;
 	}
 	
 	public Turtle finish2() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		Turtle turtle = new Turtle();
 		
@@ -116,7 +112,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		if(sourceImage==null) return null;
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(sourceImage.getValue());
 
 		Turtle turtle = new Turtle();
 		

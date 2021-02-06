@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_GraphPaper_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
@@ -19,7 +18,14 @@ public class Generator_GraphPaper extends Node {
 	private static float angle = 0;
 
 	MakelangeloRobotPanel robotPanel;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	public Generator_GraphPaper() {
+		super();
+		outputs.add(outputTurtle);
+	}
+
 
 	@Override
 	public String getName() {
@@ -49,10 +55,7 @@ public class Generator_GraphPaper extends Node {
 		//lines(turtle,100,0);
 		//lines(turtle,100,90);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 

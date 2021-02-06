@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_SierpinskiTriangle_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -17,6 +16,13 @@ public class Generator_SierpinskiTriangle extends Node {
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;
 	private static int order = 4; // controls complexity of curve
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_SierpinskiTriangle() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() {
@@ -69,9 +75,7 @@ public class Generator_SierpinskiTriangle extends Node {
 			drawCurve(turtle,order, maxSize,-60);
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

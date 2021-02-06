@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Empty_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -16,6 +15,13 @@ import com.marginallyclever.makelangelo.Translator;
 public class Generator_Border extends Node {
 	double width=100;
 	double height=100;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_Border() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() {
@@ -28,9 +34,7 @@ public class Generator_Border extends Node {
 	}
 
 	@Override
-	public boolean iterate() {
-		setTurtleResult(null);
-		
+	public boolean iterate() {		
 		Turtle turtle = new Turtle();
 		
 		double yMin = -height/2;
@@ -48,11 +52,8 @@ public class Generator_Border extends Node {
 		turtle.moveTo(xMin,yMin);
 		turtle.moveTo(xMin,yMax);
 		turtle.penUp();
-		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 }

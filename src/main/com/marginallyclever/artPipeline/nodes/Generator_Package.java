@@ -1,10 +1,9 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Package_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -19,6 +18,13 @@ public class Generator_Package extends Node {
 	int width=200;
 	int length=100;
 	int height=50;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_Package() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() {
@@ -93,9 +99,7 @@ public class Generator_Package extends Node {
 		drawRect(turtle,x2,y5-1,x3,y5+1); // lasche
 		drawRect(turtle,x2+20,y1,x3-20,y2); // lasche
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

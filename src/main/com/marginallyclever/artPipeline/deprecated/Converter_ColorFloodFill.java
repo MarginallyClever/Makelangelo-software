@@ -204,7 +204,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	public ArrayList<Turtle> finish() {
 		Turtle turtle = new Turtle();
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
-		TransformedImage img = blur.filter(sourceImage);
+		TransformedImage img = blur.filter(sourceImage.getValue());
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);
 
@@ -235,6 +235,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		list.add(turtle);
 		return list;
+	}
+
+	@Override
+	public NodePanel getPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

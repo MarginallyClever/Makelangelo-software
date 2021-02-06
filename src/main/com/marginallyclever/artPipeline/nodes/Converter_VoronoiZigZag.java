@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,7 +31,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
 	private VoronoiCell[] cells = new VoronoiCell[1];
-	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 3000;
 	private static float minDotSize = 1.0f;
@@ -51,6 +49,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 
 	private double yBottom, yTop, xLeft, xRight;
 	
+	TransformedImage img;
+	
 	@Override
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
@@ -62,10 +62,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 	
 	@Override
-	public void setImage(TransformedImage img) {
+	public void restart() {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		sourceImage = bw.filter(img);
+		img = bw.filter(sourceImage.getValue());
 
 		double [] bounds = img.getBounds();
 		yBottom = bounds[TransformedImage.BOTTOM];
@@ -75,11 +75,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		
 		setKeepIterating(true);
 		renderMode = 0;
-		restart();
-	}
-
-	@Override
-	public void restart() {
+		
 		lowNoise=false;
 		setKeepIterating(true);
 		initializeCells(0.5);
@@ -98,10 +94,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				Log.message("Running Lin/Kerighan optimization...");
 			}			
 		}
-		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(writeOutCells());
-		setTurtleResult(list);
 
 		return getKeepIterating();
 	}
@@ -283,7 +275,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		solutionContains = 0;
 		for (i = 0; i < cells.length; ++i) {
 			VoronoiCell c = cells[i];
-			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+			float v = 1.0f - (float) img.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
 			if (v * 5 > minDotSize)
 				solutionContains++;
 		}
@@ -295,7 +287,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			j = 0;
 			for (i = 0; i < cells.length; ++i) {
 				VoronoiCell c = cells[i];
-				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+				float v = 1.0f - (float) img.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
 				if (v * 5 > minDotSize) {
 					solution[j++] = i;
 				}
@@ -354,8 +346,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			for(int i=0;i<30;++i) {
 				x = xLeft   + Math.random()*(xRight-xLeft);
 				y = yBottom + Math.random()*(yTop-yBottom);
-				if(sourceImage.canSampleAt((float)x, (float)y)) {
-					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+				if(img.canSampleAt((float)x, (float)y)) {
+					float v = img.sample1x1Unchecked((float)x, (float)y);
 					if(Math.random()*255 > v) break;
 				}
 			}
@@ -388,7 +380,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	}
 
 	// write cell centroids to gcode.
-	protected Turtle writeOutCells() {
+	protected void writeOutCells() {
 		Turtle turtle = new Turtle();
 		
 		if (graphEdges != null) {
@@ -415,8 +407,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				turtle.moveTo(x, y);
 			}
 		}
-		
-		return turtle;
+
+		outputTurtle.setValue(turtle);
 	}
 
 	// I have a set of points. I want a list of cell borders.
@@ -493,10 +485,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 			for (y = minY; y <= maxY; y +=stepSize) {
 				for (x = minX; x <= maxX; x +=stepSize) {
 					if (c.region.contains(x,y)) {
-						if(sourceImage.canSampleAt((float)x, (float)y)) 
+						if(img.canSampleAt((float)x, (float)y)) 
 						{
 							hits++;
-							sampleWeight = 255.0f - (float)sourceImage.sample1x1Unchecked( (float)x, (float)y );
+							sampleWeight = 255.0f - (float)img.sample1x1Unchecked( (float)x, (float)y );
 							totalCellWeight += sampleWeight;
 							wx += (x) * sampleWeight;
 							wy += (y) * sampleWeight;

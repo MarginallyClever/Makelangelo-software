@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.Node;
-
-import java.util.ArrayList;
-
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.TransformedImage;
@@ -19,7 +18,16 @@ import com.marginallyclever.convenience.turtle.Turtle;
  * @author Dan Royer
  *
  */
-public abstract class ImageConverter extends Node {		
+public abstract class ImageConverter extends Node {
+	protected NodeConnectorTransformedImage sourceImage = new NodeConnectorTransformedImage();
+	protected NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	
+	protected ImageConverter() {
+		inputs.add(sourceImage);
+		outputs.add(outputTurtle);
+	}
+	
 	/**
 	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
 	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.

@@ -1,9 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
-
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Spirograph_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,6 +23,13 @@ public class Generator_Spirograph extends Node {
 	private static int majorRadius = 100; // controls complexity of curve
 	private static int numSamples = 2000;
 	private static boolean isEpitrochoid = false;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_Spirograph() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() {
@@ -121,9 +127,7 @@ public class Generator_Spirograph extends Node {
 		turtle.reset();
 		drawSpirograph(turtle,true);
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}

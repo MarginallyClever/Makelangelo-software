@@ -31,6 +31,7 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
@@ -47,6 +48,12 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public LoadDXF() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() { return "DXF"; }
@@ -194,7 +201,6 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	public boolean load(InputStream in) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
 		Turtle turtle = new Turtle();
-		setTurtleResult(null);
 		
 		// Read in the DXF file
 		Parser parser = ParserBuilder.createDefaultParser();
@@ -255,9 +261,7 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 			}
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+		outputTurtle.setValue(turtle);
 		return true;
 	}
 

@@ -1,10 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -21,6 +21,13 @@ public class Generator_FibonacciSpiral extends Node {
 	private static int order = 7; // controls complexity of curve
 
 	private Stack<Integer> fibonacciSequence;
+
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	public Generator_FibonacciSpiral() {
+		super();
+		outputs.add(outputTurtle);
+	}
 	
 	@Override
 	public String getName() {
@@ -60,8 +67,6 @@ public class Generator_FibonacciSpiral extends Node {
 
 	@Override
 	public boolean iterate() {
-		setTurtleResult(null);
-		
 		Turtle turtle = new Turtle();
 		Log.message("xMax="+xMax);
 		Log.message("yMax="+yMax);
@@ -106,10 +111,7 @@ public class Generator_FibonacciSpiral extends Node {
 			fibonacciCell(turtle,o*scale1);
 		}
 
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
-		
+		outputTurtle.setValue(turtle);
 	    return false;
 	}
 
