@@ -1,10 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Sandy_Panel;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 

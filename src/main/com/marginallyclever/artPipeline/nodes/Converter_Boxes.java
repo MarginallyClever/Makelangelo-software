@@ -1,10 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Boxes_Panel;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -14,8 +15,13 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Converter_Boxes extends ImageConverter {
-	public static int boxMaxSize=4; // 0.8*5
-	public static int cutoff=127;
+	// only consider intensity above the lowpass value.
+	private NodeConnectorInt inputLowpass = new NodeConnectorInt(127);
+	// how big should the largest box be?
+	private NodeConnectorInt inputMaxBoxSize = new NodeConnectorInt(4);
+	
+	public int boxMaxSize;
+	public int cutoff;
 
 	Turtle turtle;
 	
@@ -29,25 +35,12 @@ public class Converter_Boxes extends ImageConverter {
 	public NodePanel getPanel() {
 		return (NodePanel)new Converter_Boxes_Panel(this);
 	}
-
-	public void setBoxMaxSize(int arg0) {
-		boxMaxSize=arg0;
-	}
-	
-	public int getBoxMasSize() {
-		return boxMaxSize;
-	}
-	
-	public void setCutoff(int arg0) {
-		cutoff = arg0; 
-	}
-	public int getCutoff() {
-		return cutoff;
-	}
 	
 	@Override
 	public void restart() {
 		turtle = new Turtle();
+		boxMaxSize = inputMaxBoxSize.getValue();
+		cutoff=  inputLowpass.getValue();
 	}
 	
 	@Override

@@ -2,12 +2,12 @@ package com.marginallyclever.artPipeline.nodes.fractals;
 
 import java.util.Stack;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 

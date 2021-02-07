@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Wander_Panel;
 import com.marginallyclever.convenience.ColorRGB;
@@ -13,6 +12,7 @@ import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 

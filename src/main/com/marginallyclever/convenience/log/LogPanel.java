@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 
 public class LogPanel extends JPanel implements LogListener {

@@ -51,43 +51,27 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.deprecated.Converter_MagicCircle;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnector;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.Converter_Boxes;
-import com.marginallyclever.artPipeline.nodes.Converter_CMYK;
-import com.marginallyclever.artPipeline.nodes.Converter_Crosshatch;
-import com.marginallyclever.artPipeline.nodes.Converter_Moire;
-import com.marginallyclever.artPipeline.nodes.Converter_Multipass;
-import com.marginallyclever.artPipeline.nodes.Converter_RandomLines;
-import com.marginallyclever.artPipeline.nodes.Converter_Sandy;
-import com.marginallyclever.artPipeline.nodes.Converter_Spiral;
-import com.marginallyclever.artPipeline.nodes.Converter_SpiralPulse;
-import com.marginallyclever.artPipeline.nodes.Converter_Spiral_CMYK;
-import com.marginallyclever.artPipeline.nodes.Generator_Border;
-import com.marginallyclever.artPipeline.nodes.Generator_Text;
-import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.artPipeline.nodes.fractals.Generator_Dragon;
-import com.marginallyclever.artPipeline.nodes.fractals.Generator_FibonacciSpiral;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnector;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettingsListener;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobotListener;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettingsListener;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -165,7 +149,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
-	public Makelangelo() throws Exception {
+	public Makelangelo() {
 		super();
 
 		myTurtles = new ArrayList<Turtle>();
@@ -885,7 +869,7 @@ public final class Makelangelo extends TransferHandler
 	}
 	
 
-	public void testGeneratorsAndConverters() throws Exception {
+	public void testGeneratorsAndConverters() {
 		TransformedImage owl = TransformedImage.loadImage(".\\src\\test\\resources\\owl.jpg");
 		owl.rotateAbsolute(-25);
 		owl.setScale(0.5, 0.5);
@@ -943,7 +927,7 @@ public final class Makelangelo extends TransferHandler
 		if(myTurtles.size()>0) {
 			robot.setTurtles(myTurtles);
 		} else {
-			throw new Exception("No turtles found!");
+			System.out.println("No turtles found!");
 		}
 	}
 }

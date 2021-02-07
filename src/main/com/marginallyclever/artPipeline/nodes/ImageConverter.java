@@ -1,11 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.turtle.Turtle;
 
 /**

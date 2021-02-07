@@ -1,32 +1,38 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_CMYK_Panel;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 
 /**
+ * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
  * Color values are from 0...255 inclusive.  255 is white, 0 is black.
  * Lift the pen any time the color value is > cutoff
  * @see http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
  */
 public class Converter_CMYK extends ImageConverter {
-	static protected int passes=1;
-
+	// TODO explain me
+	private NodeConnectorInt inputStepSize = new NodeConnectorInt(1);
+	// cyan channel
 	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	// magenta channel
 	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	// yellow channel
 	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
 	
 	public Converter_CMYK() {
 		super();
+		inputs.add(inputStepSize);
 		outputs.remove(outputTurtle);
 		outputs.add(outputTurtleY);
 		outputs.add(outputTurtleC);
@@ -44,17 +50,6 @@ public class Converter_CMYK extends ImageConverter {
 		return new Converter_CMYK_Panel(this);
 	}
 	
-	public int getPasses() {
-		return passes;
-	}
-	public void setPasses(int value) {
-		if(passes<1) passes=1;
-		passes=value;
-	}
-	
-	/**
-	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
-	 */
 	@Override
 	public boolean iterate() {
 		Filter_CMYK cmyk = new Filter_CMYK();
@@ -80,7 +75,7 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = (double)passes;
+		double stepSize = (double)inputStepSize.getValue();
 
 		// from top to bottom of the margin area...
 		double [] bounds = img.getBounds();

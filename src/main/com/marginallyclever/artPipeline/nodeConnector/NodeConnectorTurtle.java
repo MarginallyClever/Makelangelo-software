@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.nodeConnector;
 
+import com.marginallyclever.convenience.nodes.NodeConnector;
 import com.marginallyclever.convenience.turtle.Turtle;
 
 /**

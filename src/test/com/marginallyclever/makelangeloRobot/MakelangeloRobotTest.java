@@ -2,7 +2,7 @@ package com.marginallyclever.makelangeloRobot;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
 
 public class MakelangeloRobotTest {

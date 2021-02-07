@@ -1,33 +1,46 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Spirograph_Panel;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
- * See https://linuxgazette.net/133/luana.html
+ * @see <a href='https://linuxgazette.net/133/luana.html'>https://linuxgazette.net/133/luana.html</a>
  * @author Dan Royer
  *
  */
 public class Generator_Spirograph extends Node {
+	// controls complexity of curve
+	private NodeConnectorDouble pScale = new NodeConnectorDouble(80.0);
+	// controls complexity of curve
+	private NodeConnectorInt minorRadius = new NodeConnectorInt(2);
+	// controls complexity of curve
+	private NodeConnectorInt majorRadius = new NodeConnectorInt(100);
+	// resolution of curve
+	private NodeConnectorInt numSamples = new NodeConnectorInt(2000);
+	// style
+	private NodeConnectorBoolean isEpitrochoid = new NodeConnectorBoolean(false);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
-
-	private static float pScale = 80; // controls complexity of curve
-	private static int minorRadius = 2; // controls complexity of curve
-	private static int majorRadius = 100; // controls complexity of curve
-	private static int numSamples = 2000;
-	private static boolean isEpitrochoid = false;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Spirograph() {
 		super();
+		inputs.add(pScale);
+		inputs.add(minorRadius);
+		inputs.add(majorRadius);
+		inputs.add(numSamples);
+		inputs.add(isEpitrochoid);
 		outputs.add(outputTurtle);
 	}
 	
@@ -36,47 +49,6 @@ public class Generator_Spirograph extends Node {
 		return Translator.get("SpirographName");
 	}
 
-	static public boolean getEpitrochoid() {
-		return isEpitrochoid;
-	}
-	
-	static public void setEpitrochoid(boolean arg0)	{
-		isEpitrochoid = arg0;
-	}
-
-	static public int getMajorRadius() {
-		return majorRadius;
-	}
-	
-	static public void setMajorRadius(int arg0)	{
-		majorRadius = arg0;
-	}
-
-	static public int getMinorRadius() {
-		return minorRadius;
-	}
-	
-	static public void setMinorRadius(int arg0) {
-		minorRadius = arg0;
-	}
-	
-	static public float getPScale() {
-		return pScale;
-	}
-	
-	static public void setPScale(float arg0) {
-		pScale = arg0;
-	}
-	
-	static public int getNumSamples() {
-		return numSamples;
-	}
-	
-	static public void setNumSamples(int arg0) {
-		if(numSamples<1) numSamples=1;
-		numSamples = arg0;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_Spirograph_Panel(this);
@@ -133,50 +105,49 @@ public class Generator_Spirograph extends Node {
 	}
 	
 	protected void drawSpirograph(Turtle turtle,boolean write) {
-		float x=0,y=0;
+		double x=0,y=0;
 		
-		float dRadius,pScale1,pScale2;
+		double dRadius,pScale1,pScale2;
 		
-		if(isEpitrochoid) {
-			dRadius = majorRadius+minorRadius;
-			pScale1 = -pScale;
-			pScale2 = pScale;
+		if(isEpitrochoid.getValue()) {
+			dRadius = majorRadius.getValue()+minorRadius.getValue();
+			pScale1 = -pScale.getValue();
+			pScale2 = pScale.getValue();
 		} else {
 			// hypotrochoid
-			dRadius = majorRadius-minorRadius;
-			pScale1 = pScale;
-			pScale2 = pScale;
+			dRadius = majorRadius.getValue()-minorRadius.getValue();
+			pScale1 = pScale.getValue();
+			pScale2 = pScale.getValue();
 		}
 		
-		float t = 0;
-
-		// move to starting position
-		x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
-		y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
-		turtle.moveTo(totalScale*x, totalScale*y);
-		turtle.penDown();
+		double t = 0;
+		double v = dRadius*t/minorRadius.getValue();
 
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
-		// https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
-		double period = lcm(majorRadius,minorRadius)/majorRadius;
-		double periodRadians = Math.PI*2.0*(double)period/(double)numSamples;
+		double period = lcm(majorRadius.getValue(),minorRadius.getValue()) / majorRadius.getValue();
+		double periodRadians = Math.PI*2.0*period/numSamples.getValue();
 		
-		for(float t1 = 0; t1<=numSamples;++t1) {
-			t = (float)( t1 * periodRadians );
-			x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
-			y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
+		for(int t1 = 0; t1<=numSamples.getValue();++t1) {
+			t = (double)t1 * periodRadians;
+			v = dRadius*t/minorRadius.getValue();
+			x = dRadius*Math.cos(t) + pScale1*Math.cos(v);
+			y = dRadius*Math.sin(t) - pScale2*Math.sin(v);
 
 			turtle.moveTo(totalScale*x, totalScale*y);
+			turtle.penDown();
 			// we are calculating max/min
 			if(xMin>x) xMin=x;
 			if(xMax<x) xMax=x;
 			if(yMin>y) yMin=y;
 			if(yMax<y) yMax=y;
 		}
+		turtle.penUp();
 	}
 	
 	/**
 	 * greatest common divider
+	 * TODO move to convenience?
+	 * @see https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
 	 * @param a
 	 * @param b
 	 * @return greatest common divider
@@ -193,6 +164,7 @@ public class Generator_Spirograph extends Node {
 	
 	/**
 	 * least common multiplier
+	 * @see https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
 	 * @param a
 	 * @param b
 	 * @return least common multiplier

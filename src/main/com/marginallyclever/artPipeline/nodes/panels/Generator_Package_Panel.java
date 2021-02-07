@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.Generator_Package;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 

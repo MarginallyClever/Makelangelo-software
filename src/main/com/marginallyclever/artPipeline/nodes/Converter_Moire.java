@@ -3,7 +3,6 @@ package com.marginallyclever.artPipeline.nodes;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Moire_Panel;
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
@@ -11,6 +10,8 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -20,7 +21,10 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Moire extends ImageConverter {
-	private static float blockScale = 4.0f;
+	// height of zigzag.  should probably be less than spacing.  >=1
+	private NodeConnectorDouble inputHeight = new NodeConnectorDouble(6.0);
+	
+	// TODO select-one-of-many
 	private static int direction = 0;
 	private String[] directionChoices = new String[] {Translator.get("horizontal"), Translator.get("vertical") }; 
 	
@@ -35,13 +39,6 @@ public class Converter_Moire extends ImageConverter {
 		return new Converter_Moire_Panel(this);
 	}
 	
-	public float getScale() {
-		return blockScale;
-	}
-	public void setScale(float value) {
-		if(value<1) value=1;
-		blockScale = value;
-	}
 	public String[] getDirections() {
 		return directionChoices;
 	}
@@ -190,7 +187,7 @@ public class Converter_Moire extends ImageConverter {
 		
 		// figure out how many lines we're going to have on this image.
 		double halfStep = 1.0;
-		float spaceBetweenLines = blockScale;
+		double spaceBetweenLines = inputHeight.getValue();
 
 		// from top to bottom of the image...
 		Point2D a = new Point2D();

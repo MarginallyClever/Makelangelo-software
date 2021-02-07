@@ -1,9 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Lissajous_Panel;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -15,17 +17,30 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Lissajous extends Node {
-	private double WIDTH, HEIGHT;
+	// controls complexity of curve
+	private NodeConnectorDouble inputDelta = new NodeConnectorDouble(1.0/6.0);
+	// controls complexity of curve
+	private NodeConnectorInt inputA = new NodeConnectorInt(200);
+	// controls complexity of curve
+	private NodeConnectorInt inputB = new NodeConnectorInt(200);
+	// quality of curve
+	private NodeConnectorInt inputSamples = new NodeConnectorInt(2000);
 
-	private static double delta = Math.PI/6;
-	private static int a = 11;
-	private static int b = 8; // controls complexity of curve
-	private static int numSamples = 2000;
+	// scale the step size so the curve fits on the paper
+	// TODO make parameter?
+	private final double WIDTH=100, HEIGHT=100;
+
+	private double delta;
+	private double a,b;
+	private int numSamples = 2000;
 
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Lissajous() {
 		super();
+		inputs.add(inputA);
+		inputs.add(inputB);
+		inputs.add(inputSamples);
 		outputs.add(outputTurtle);
 	}
 
@@ -34,39 +49,6 @@ public class Generator_Lissajous extends Node {
 		return Translator.get("LissajousName");
 	}
 
-	static public int getA() {
-		return a;
-	}
-	
-	static public void setA(int arg0)	{
-		a = arg0;
-	}
-
-	static public int getB() {
-		return b;
-	}
-	
-	static public void setB(int arg0)	{
-		b = arg0;
-	}
-
-	static public float getDelta() {
-		return (float)delta;
-	}
-	
-	static public void setDelta(float arg0)	{
-		delta = arg0;
-	}
-	
-	static public int getNumSamples() {
-		return numSamples;
-	}
-	
-	static public void setNumSamples(int arg0) {
-		if(numSamples<1) numSamples=1;
-		numSamples = arg0;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_Lissajous_Panel(this);
@@ -76,9 +58,9 @@ public class Generator_Lissajous extends Node {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
-		// scale the step size so the curve fits on the paper
-		WIDTH = 100;
-		HEIGHT = 100;
+		a = inputA.getValue();
+		b = inputB.getValue();
+		delta = inputDelta.getValue();
 
 		drawLissajous(turtle,true);
 

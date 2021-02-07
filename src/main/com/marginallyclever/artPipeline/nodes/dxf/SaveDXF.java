@@ -8,16 +8,16 @@ import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 /**
  * Saves a Turtle to DXF format.

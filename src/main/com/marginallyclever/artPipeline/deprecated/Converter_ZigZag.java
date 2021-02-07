@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
 
 
 /**

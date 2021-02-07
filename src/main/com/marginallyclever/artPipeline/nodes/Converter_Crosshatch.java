@@ -1,22 +1,21 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Crosshatch_Panel;
 import com.marginallyclever.convenience.Histogram;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename,
- * but change the extension to .ngc
- *
+ * generate crosshatch pattern over an image, with more lines in darker areas.
  * @author Dan Royer
  */
 public class Converter_Crosshatch extends ImageConverter {
-	private static float intensity=2.0f;
+	// detail of scan.  lower number is more detail.  >0
+	private NodeConnectorDouble inputStepSize = new NodeConnectorDouble(2.0);
 	
 	@Override
 	public String getName() {
@@ -28,14 +27,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		return new Converter_Crosshatch_Panel(this);
 	}
 
-	public void setIntensity(float arg0) {
-		intensity=arg0;
-	}
-	
-	public float getIntensity() {
-		return intensity;
-	}
-	
 	@Override
 	public boolean iterate() {
 		outputTurtle.setValue(finish1());
@@ -126,7 +117,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double xStart = bounds[TransformedImage.LEFT];
 		double xEnd   = bounds[TransformedImage.RIGHT];
 
-		double stepSize = 2.0 * intensity;
+		double stepSize = 2.0 * inputStepSize.getValue();
 		double x, y;
 		boolean flip = true;
 

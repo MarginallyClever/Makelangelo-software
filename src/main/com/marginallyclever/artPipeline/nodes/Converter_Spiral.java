@@ -1,22 +1,26 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Spiral_Panel;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
- *
- * @author Dan
+ * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
+ * @author Dan Royer
  */
 public class Converter_Spiral extends ImageConverter {
-	private static boolean convertToCorners = true;  // draw the spiral right out to the edges of the square bounds.
+	// draw the spiral right out to the edges of the square bounds.
+	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean(true);
+	
+	public Converter_Spiral() {
+		super();
+		inputs.add(convertToCorners);
+	}
 	
 	@Override
 	public String getName() {
@@ -28,17 +32,6 @@ public class Converter_Spiral extends ImageConverter {
 		return new Converter_Spiral_Panel(this);
 	}
 
-	public boolean getToCorners() {
-		return convertToCorners;
-	}
-	
-	public void setToCorners(boolean arg0) {
-		convertToCorners=arg0;
-	}
-	
-	/**
-	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
-	 */
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
@@ -64,7 +57,7 @@ public class Converter_Spiral extends ImageConverter {
 		double h = yTop - yBottom;
 		
 		double maxr;
-		if (convertToCorners) {
+		if (convertToCorners.getValue()) {
 			// go right to the corners
 			maxr = (Math.sqrt(h*h + w*w) + 1.0f);
 		} else {

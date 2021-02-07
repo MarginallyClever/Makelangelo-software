@@ -2,9 +2,9 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_Dragon;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_FibonacciSpiral;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;

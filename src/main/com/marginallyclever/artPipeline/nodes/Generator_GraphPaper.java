@@ -1,23 +1,21 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorDouble;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_GraphPaper_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * 1cm and 10cm grid lines
  * @author Dan Royer
  */
 public class Generator_GraphPaper extends Node {
-	// controls complexity of curve
+	// mm between grid lines
 	private NodeConnectorDouble spacing_mm = new NodeConnectorDouble(10.0);
 	// result
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();

@@ -7,20 +7,15 @@ import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Text_Panel;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodeConnectorString;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -30,38 +25,41 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Text extends Node {
-	private double width=100;
-	private double height=100;
+	//private double width=100;
+	//private double height=100;
 	
 	// text properties
-	private float kerning = 5.0f;
-	private float letterWidth = 10.0f;
-	private float letterHeight = 20.0f;
-	private float lineSpacing = 5.0f;
-	private float padding = 5.0f;
-	static final String ALPHABET_FOLDER = "ALPHABET/";
-	private int charsPerLine = 25;
-	private boolean drawBoundingBox = false;
+	//private double kerning = 5.0f;
+	//private double letterWidth = 10.0f;
+	//private double padding = 5.0f;
 
 	// text position and alignment
-	public enum AlignV {TOP, MIDDLE, BOTTOM}
-	public enum AlignH {LEFT, CENTER, RIGHT}
+	static public enum AlignV {TOP, MIDDLE, BOTTOM}
+	static public enum AlignH {LEFT, CENTER, RIGHT}
 
-	private AlignV alignVertical = AlignV.MIDDLE;
-	private AlignH alignHorizontal = AlignH.CENTER;
-	private float posx = 0;
-	private float posy = 0;
+	//private AlignV alignVertical = AlignV.MIDDLE;
+	//private AlignH alignHorizontal = AlignH.CENTER;
+	//private double posx = 0;
+	//private double posy = 0;
+	//private double letterHeight = 20.0f;
+	//private double lineSpacing = 5.0f;
+	//private static final String ALPHABET_FOLDER = "ALPHABET/";
+	//private int charsPerLine = 25;
+	//private boolean drawBoundingBox = false;
 
-	private static String lastMessage = "";
-	private static int lastFont = 0;
-	private static int lastSize = 20;
+	private NodeConnectorString inputMessage = new NodeConnectorString("");
+	private NodeConnectorInt inputFontPointSize = new NodeConnectorInt(20);
+
 	private static Font [] fontList;
 	private static String [] fontNames;
+	private static int lastFont = 0;
 
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Text() {
 		super();
+		inputs.add(inputMessage);
+		inputs.add(inputFontPointSize);
 		outputs.add(outputTurtle);
 		
 		// build list of fonts
@@ -89,21 +87,6 @@ public class Generator_Text extends Node {
 	}
 	
 	
-	public int getLastSize() {
-		return lastSize;
-	}
-	public void setSize(int size) {
-		if(size<1)size=1;
-		lastSize=size;
-	}
-	
-	public String getLastMessage() {
-		return lastMessage;
-	}
-	public void setMessage(String msg) {
-		lastMessage = msg;
-	}
-
 	@Override
 	public String getName() {
 		return Translator.get("YourMsgHereName");
@@ -113,7 +96,8 @@ public class Generator_Text extends Node {
 	public NodePanel getPanel() {
 		return new Generator_Text_Panel(this);
 	}
-	
+	/*
+	@Deprecated
 	protected void setupTransform(Turtle turtle) {
 		double imageHeight = height;
 		double imageWidth = width;
@@ -122,23 +106,23 @@ public class Generator_Text extends Node {
 		double newHeight = imageHeight;
 
 		if (imageWidth > width) {
-			float resize = (float) width / (float) imageWidth;
+			double resize = (double) width / (double) imageWidth;
 			newHeight *= resize;
 			newWidth = width;
 		}
 		if (newHeight > height) {
-			float resize = (float) height / (float) newHeight;
+			double resize = (double) height / (double) newHeight;
 			newWidth *= resize;
 			newHeight = height;
 		}
 
-		textFindCharsPerLine(newWidth);
+		//textFindCharsPerLine(newWidth);
 
-		posx = 0;
-		posy = 0;
+		//posx = 0;
+		//posy = 0;
 	}
 
-
+	@Deprecated
 	protected void setupTransform(Turtle turtle,int width, int height) {
 		int imageHeight = height;
 		int imageWidth = width;
@@ -147,24 +131,24 @@ public class Generator_Text extends Node {
 		double newHeight = imageHeight;
 
 		if (imageWidth > width) {
-			float resize = (float) width / (float) imageWidth;
+			double resize = (double) width / (double) imageWidth;
 			newHeight *= resize;
 			newWidth = width;
 		}
 		if (newHeight > height) {
-			float resize = (float) height / (float) newHeight;
+			double resize = (double) height / (double) newHeight;
 			newWidth *= resize;
 			newHeight = height;
 		}
 
-		textFindCharsPerLine(newWidth);
+		//textFindCharsPerLine(newWidth);
 
-		posx = 0;
-		posy = 0;
+		//posx = 0;
+		//posy = 0;
 	}
-
+*/
 	
-	private void writeBeautifulMessage(Turtle turtle,String fontName,int fontSize, String message) {
+	private void writeBeautifulMessage(Turtle turtle,String fontName,int fontPointSize, String message) {
 		if(message.length()<=0) {
 			return;
 		}
@@ -172,12 +156,12 @@ public class Generator_Text extends Node {
 		String[] messagePieces=message.split("\n");
 		Log.message("lines of text="+messagePieces.length);
 		
-		Font font = new Font(fontName, Font.PLAIN, fontSize);
+		Font font = new Font(fontName, Font.PLAIN, fontPointSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
 
-		float yTotal=0;
-		float yFirstStep = 0;
-		float xMax=0;
+		double yTotal=0;
+		double yFirstStep = 0;
+		double xMax=0;
 		int p;
 		for(p=0;p<messagePieces.length;++p) {
 			String piece = messagePieces[p];
@@ -186,21 +170,21 @@ public class Generator_Text extends Node {
 			Shape s = textLayout.getOutline(null);
 			Rectangle bounds = s.getBounds();
 			yTotal += bounds.getHeight();
-			if(yFirstStep==0) yFirstStep = (float)bounds.getHeight();
-			if(xMax < bounds.getWidth()) xMax = (float)bounds.getWidth();
+			if(yFirstStep==0) yFirstStep = (double)bounds.getHeight();
+			if(xMax < bounds.getWidth()) xMax = (double)bounds.getWidth();
 		}
 /*
 		// display bounding box
-		float dx = xMax/2.0f;
-		float dy = -(yTotal+yFirstStep/2.0f)/2.0f;
+		double dx = xMax/2.0f;
+		double dy = -(yTotal+yFirstStep/2.0f)/2.0f;
 		turtle.jumpTo(-dx, dy);
 		turtle.moveTo( dx, dy);
 		turtle.moveTo( dx,-dy);
 		turtle.moveTo(-dx,-dy);
 		turtle.moveTo(-dx, dy);
 */
-		float dx = xMax / 2.0f;
-		float dy = -yTotal/2.0f+yFirstStep/2.0f;
+		double dx = xMax / 2.0f;
+		double dy = -yTotal/2.0f+yFirstStep/2.0f;
 
 		for(p=0;p<messagePieces.length;++p) {
 			String piece = messagePieces[p];
@@ -211,19 +195,19 @@ public class Generator_Text extends Node {
 
 			writeBeautifulString(turtle,font,frc,piece, dx, dy);
 			
-			dy += fontSize;//bounds.getHeight();
+			dy += fontPointSize;//bounds.getHeight();
 		}
 	}
 	
-	private void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,float dx, float dy) { 
+	private void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,double dx, double dy) { 
 		TextLayout textLayout = new TextLayout(text,font,frc);
 		Shape s = textLayout.getOutline(null);		
 		PathIterator pi = s.getPathIterator(null);
 		
-		float [] coords = new float[6];
-		float [] coords2 = new float[6];
-		float [] start = new float[6];
-		float n,i;
+		double [] coords = new double[6];
+		double [] coords2 = new double[6];
+		double [] start = new double[6];
+		double n,i;
 		n = 5;
 		
 		while(pi.isDone() == false ) {
@@ -263,14 +247,14 @@ public class Generator_Text extends Node {
 				// B(3,3) = t^3
 				//Log.message("CUBIC");
 				for(i=0;i<n;++i) {
-					float t = i/n;
-					float t1 = (1.0f-t);
-					float a = t1*t1*t1;
-					float b = 3*t*t1*t1;
-					float c = 3*t*t*t1;
-					float d = t*t*t;
-					float x = coords2[0]*a + coords[0]*b + coords[2]*c + coords[4]*d;
-					float y = coords2[1]*a + coords[1]*b + coords[3]*c + coords[5]*d;
+					double t = i/n;
+					double t1 = (1.0f-t);
+					double a = t1*t1*t1;
+					double b = 3*t*t1*t1;
+					double c = 3*t*t*t1;
+					double d = t*t*t;
+					double x = coords2[0]*a + coords[0]*b + coords[2]*c + coords[4]*d;
+					double y = coords2[1]*a + coords[1]*b + coords[3]*c + coords[5]*d;
 					turtle.moveTo(x-dx,-y-dy);
 				}
 				turtle.moveTo(coords[4]-dx,-coords[5]-dy);
@@ -280,14 +264,14 @@ public class Generator_Text extends Node {
 			case PathIterator.SEG_QUADTO:
 				//Log.message("QUAD");
 				for(i=0;i<n;++i) {
-					float t = i/n;
+					double t = i/n;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
-					float u = (1.0f-t);
-					float tt=u*u;
-					float ttt=2.0f*t*u;
-					float tttt=t*t;
-					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
-					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
+					double u = (1.0f-t);
+					double tt=u*u;
+					double ttt=2.0f*t*u;
+					double tttt=t*t;
+					double x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
+					double y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
 					turtle.moveTo(x-dx,-y-dy);
 				}
 				turtle.moveTo(coords[2]-dx,-coords[3]-dy);
@@ -303,21 +287,19 @@ public class Generator_Text extends Node {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
-		String fontName = fontNames[lastFont];
-
-		posx=0;
-		posy=0;
-		textFindCharsPerLine(100);
-		textSetAlign(AlignH.CENTER);
-		textSetVAlign(AlignV.MIDDLE);
-		writeBeautifulMessage(turtle,fontName,lastSize,lastMessage);
+		//posx=0;
+		//posy=0;
+		//textFindCharsPerLine(100);
+		//textSetAlign(AlignH.CENTER);
+		//textSetVAlign(AlignV.MIDDLE);
+		writeBeautifulMessage(turtle,fontNames[lastFont],inputFontPointSize.getValue(),inputMessage.getValue());
 
 		outputTurtle.setValue(turtle);
 		
 	    return false;
 	}
-	
-	public void textSetPosition(float x, float y) {
+	/*
+	public void textSetPosition(double x, double y) {
 		posx = x;
 		posy = y;
 	}
@@ -338,7 +320,7 @@ public class Generator_Text extends Node {
 
 
 	public void textFindCharsPerLine(double width) {
-		charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letterWidth + kerning));
+		charsPerLine = (int) Math.floor((double) (width * 10.0f - padding * 2.0f) / (double) (letterWidth + kerning));
 		//Log.message("MAX="+chars_per_line);
 	}
 
@@ -347,15 +329,16 @@ public class Generator_Text extends Node {
 	 * calculate the smallest rectangle that would fit around the string of text
 	 * @param text the message to fit around
 	 * @return a Rectangle2D that describes the minimum fit
-	 */
+	 *//*
+	@Deprecated
 	private Rectangle2D textCalculateBounds(String text) {
 		String[] lines = textWrapToLength(text);
 		int len = textLongestLine(lines);
 
 		int num_lines = lines.length;
-		float h = padding * 2 + (letterHeight + lineSpacing) * num_lines;//- line_spacing; removed because of letters that hang below the line
-		float w = padding * 2 + (letterWidth + kerning) * len - kerning;
-		float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
+		double h = padding * 2 + (letterHeight + lineSpacing) * num_lines;//- line_spacing; removed because of letters that hang below the line
+		double w = padding * 2 + (letterWidth + kerning) * len - kerning;
+		double xmax = 0, xmin = 0, ymax = 0, ymin = 0;
 
 		switch (alignHorizontal) {
 		case LEFT:
@@ -386,19 +369,19 @@ public class Generator_Text extends Node {
 			ymin = posy - h;
 			break;
 		}
-		/*
-	    Log.message(num_lines + " lines");
-	    Log.message("longest "+len+" chars");
-	    Log.message("x "+xmin+" to "+xmax);
-	    Log.message("y "+ymin+" to "+ymax);
-		 */
+
+	    //Log.message(num_lines + " lines");
+	    //Log.message("longest "+len+" chars");
+	    //Log.message("x "+xmin+" to "+xmax);
+	    //Log.message("y "+ymin+" to "+ymax);
+
 		Rectangle2D r = new Rectangle2D.Float();
 		r.setRect(xmin, ymin, xmax - xmin, ymax - ymin);
 
 		return r;
 	}
 
-
+	@Deprecated
 	private void textCreateMessageNow(Turtle turtle,String text) {
 		if (charsPerLine <= 0) return;
 
@@ -418,9 +401,9 @@ public class Generator_Text extends Node {
 
 		// move to first line height
 		// assumes we are still G90
-		float message_start = (float) r.getMinX() + padding;
-		float firstline = (float) r.getMinY() - (padding + letterHeight);
-		float interline = -(letterHeight + lineSpacing);
+		double message_start = (double) r.getMinX() + padding;
+		double firstline = (double) r.getMinY() - (padding + letterHeight);
+		double interline = -(letterHeight + lineSpacing);
 
 		turtle.moveTo(message_start, firstline);
 
@@ -479,6 +462,7 @@ public class Generator_Text extends Node {
 		return len;
 	}
 
+	@Deprecated
 	private void textDrawLine(Turtle turtle,String a1) {
 		String ud = ALPHABET_FOLDER;
 
@@ -562,11 +546,11 @@ public class Generator_Text extends Node {
 								String c = st.nextToken();
 								if (c.startsWith("X")) {
 									// translate coordinates
-									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									final double x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
 									turtle.moveTo(turtle.getX()+x, turtle.getY());
 								} else if (c.startsWith("Y")) {
 									// translate coordinates
-									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+									final double y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
 									turtle.moveTo(turtle.getX(), turtle.getY()+y);
 								}
 							}
@@ -586,18 +570,18 @@ public class Generator_Text extends Node {
 		}
 	}
 
+	@Deprecated
 	public void signName(Turtle turtle,String message) {
 		setupTransform(turtle);
 
 		textSetAlign(AlignH.RIGHT);
 		textSetVAlign(AlignV.BOTTOM);
-		textSetPosition(
-				(float)(100*10.0f),
-				(float)(100*10.0f));
+		textSetPosition(100*10.0,100*10.0);
 
 		textSetCharsPerLine(25);
 
-		textCreateMessageNow(turtle, message );
+		//textCreateMessageNow(turtle, message);
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.");
 	}
+	*/
 }

@@ -8,11 +8,11 @@ import java.util.Objects;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
 
 /**
  * 

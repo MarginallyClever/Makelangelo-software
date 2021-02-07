@@ -14,8 +14,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 

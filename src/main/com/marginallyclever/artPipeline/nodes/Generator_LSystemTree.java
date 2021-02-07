@@ -1,10 +1,13 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import java.security.SecureRandom;
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
+
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_LSystemTree_Panel;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -13,21 +16,38 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Generator_LSystemTree extends Node {
-	private static int order = 4; // controls complexity of curve
-	private static double angleSpan = 120;
-	private static int numBranches = 3;
-	private static int noise = 0;
-	private static double orderScale = 0.76f;
-	private SecureRandom random;
-	float maxSize;
-
+	// random seed
+	private NodeConnectorInt inputSeed = new NodeConnectorInt(0xDEADBEEF);
+	// resursion depth
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	// resursion width
+	private NodeConnectorInt inputBranches = new NodeConnectorInt(3);
+	// variation
+	private NodeConnectorInt inputNoise = new NodeConnectorInt(0);
+	// how far branches can spread
+	private NodeConnectorDouble inputAngleSpan = new NodeConnectorDouble(120.0);
+	// how far branches can spread
+	private NodeConnectorDouble inputOrderScale = new NodeConnectorDouble(0.76);
+	// results
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
+	private int order;
+	private int numBranches;
+	private int noise;
+	private double angleSpan;
+	private double orderScale;
+	private SecureRandom random;
 	
 	public Generator_LSystemTree() {
 		super();
+		inputs.add(inputSeed);
+		inputs.add(inputOrder);
+		inputs.add(inputBranches);
+		inputs.add(inputNoise);
+		inputs.add(inputAngleSpan);
+		inputs.add(inputOrderScale);
 		outputs.add(outputTurtle);
 	}
-
 
 	@Override
 	public String getName() {
@@ -42,10 +62,16 @@ public class Generator_LSystemTree extends Node {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-
-		random = new SecureRandom();
-		random.setSeed(0xDEADBEEF);
 		
+		random = new SecureRandom();
+		random.setSeed(inputSeed.getValue());
+		
+		order = inputOrder.getValue();
+		numBranches = inputBranches.getValue();
+		noise = inputNoise.getValue();
+		angleSpan = inputAngleSpan.getValue();
+		orderScale = inputOrderScale.getValue();
+				
 		// move to starting position
 		turtle.moveTo(0,-100);
 		turtle.turn(90);

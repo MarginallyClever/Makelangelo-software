@@ -1,32 +1,34 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Spiral_CMYK_Panel;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
- *  
+ * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
  * Inspired by reddit user bosny
- * 
- * @author Dan
+ * @author Dan Royer
  */
 public class Converter_Spiral_CMYK extends ImageConverter {
-	private static boolean convertToCorners = true;  // draw the spiral right out to the edges of the square bounds.
-
+	// draw the spiral right out to the edges of the square bounds.
+	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean(true);
+	// cyan channel
 	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	// magenta channel
 	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	// yellow channel
 	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
 	
 	public Converter_Spiral_CMYK() {
 		super();
+		inputs.add(convertToCorners);
 		outputs.remove(outputTurtle);
 		outputs.add(outputTurtleY);
 		outputs.add(outputTurtleC);
@@ -43,18 +45,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	public NodePanel getPanel() {
 		return new Converter_Spiral_CMYK_Panel(this);
 	}
-
-	public boolean getToCorners() {
-		return convertToCorners;
-	}
 	
-	public void setToCorners(boolean arg0) {
-		convertToCorners=arg0;
-	}
-	
-	/**
-	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
-	 */
 	@Override
 	public boolean iterate() {
 		Filter_CMYK cmyk = new Filter_CMYK();
@@ -96,7 +87,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		double w2 = xRight - xLeft;
 
 		double maxr;
-		if (convertToCorners) {
+		if (convertToCorners.getValue()) {
 			// go right to the corners
 			maxr = (Math.sqrt(h2 * h2 + w2 * w2) + 1.0);
 		} else {

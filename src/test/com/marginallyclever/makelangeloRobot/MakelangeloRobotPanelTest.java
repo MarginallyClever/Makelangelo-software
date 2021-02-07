@@ -7,8 +7,8 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
-import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.makelangelo.Translator;
 
 public class MakelangeloRobotPanelTest {

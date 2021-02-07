@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.nodes.panels;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodes.Converter_VoronoiZigZag;
+import com.marginallyclever.artPipeline.nodes.voronoi.Converter_VoronoiZigZag;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 

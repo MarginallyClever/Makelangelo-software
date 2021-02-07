@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodes.panels;
 
-import com.marginallyclever.artPipeline.Node;
-import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.convenience.nodes.Node;
+import com.marginallyclever.convenience.nodes.NodePanel;
 
 /**
  * Blank panel for generators that have no options.

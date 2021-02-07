@@ -1,9 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.NodePanel;
 import com.marginallyclever.artPipeline.nodes.panels.Converter_Multipass_Panel;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
+import com.marginallyclever.convenience.nodes.NodeConnectorInt;
+import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -13,8 +15,10 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Multipass extends ImageConverter {
-	static private float angle=0;
-	static private int passes=4;
+	// angle.  0-360
+	private NodeConnectorDouble inputAngle = new NodeConnectorDouble(0.0);
+	// number of graduated passes. >=1
+	private NodeConnectorInt inputPasses = new NodeConnectorInt(4);
 	
 	@Override
 	public String getName() {
@@ -24,20 +28,6 @@ public class Converter_Multipass extends ImageConverter {
 	@Override
 	public NodePanel getPanel() {
 		return new Converter_Multipass_Panel(this);
-	}
-	
-	public float getAngle() {
-		return angle;
-	}
-	public void setAngle(float value) {
-		angle = value;
-	}
-	public int getPasses() {
-		return passes;
-	}
-	public void setPasses(int value) {
-		if(passes<1) passes=1;
-		passes=value;
 	}
 	
 	/**
@@ -51,13 +41,15 @@ public class Converter_Multipass extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage.getValue());
 		
-		double dx = Math.cos(Math.toRadians(angle));
-		double dy = Math.sin(Math.toRadians(angle));
+		double r = Math.toRadians(inputAngle.getValue());
+		double dx = Math.cos(r);
+		double dy = Math.sin(r);
 
 		// figure out how many lines we're going to have on this image.
 		double stepSize = 1.0;
 		if (stepSize < 1) stepSize = 1;
 
+		double passes = inputPasses.getValue();
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
 		double level = 255.0 / (double)(passes+1);
