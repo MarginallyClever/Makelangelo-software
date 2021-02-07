@@ -1,41 +1,37 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_SierpinskiTriangle_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
- * @author Dan Royer 2016-12-12
+ * @see <a href='https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve'>Wikipedia</a>
+ * @author Dan Royer 
+ * @since 2016-12-12
  *
  */
 public class Generator_SierpinskiTriangle extends Node {
-	private double xMax, xMin, yMax, yMin;
-	private double maxSize;
-	private static int order = 4; // controls complexity of curve
-
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	// results
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
+	private double xMax, xMin, yMax, yMin;
+	private double maxSize;
+		
 	public Generator_SierpinskiTriangle() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("SierpinskiTriangleName");
-	}
-
-
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<1) order=1;
-		Generator_SierpinskiTriangle.order = order;
 	}
 	
 	@Override
@@ -68,6 +64,8 @@ public class Generator_SierpinskiTriangle extends Node {
 		}
 		turtle.penDown();
 		// do the curve
+		int order = inputOrder.getValue();
+		
 		if( (order&1) == 0 ) {
 			drawCurve(turtle,order, maxSize,-60);
 		} else {

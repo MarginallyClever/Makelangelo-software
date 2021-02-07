@@ -2,6 +2,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorDouble;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Empty_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -13,13 +14,15 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Border extends Node {
-	double width=100;
-	double height=100;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	NodeConnectorDouble width = new NodeConnectorDouble(100.0); 
+	NodeConnectorDouble height = new NodeConnectorDouble(100.0);
+	
+	NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Border() {
 		super();
+		inputs.add(width);
+		inputs.add(height);
 		outputs.add(outputTurtle);
 	}
 	
@@ -37,10 +40,10 @@ public class Generator_Border extends Node {
 	public boolean iterate() {		
 		Turtle turtle = new Turtle();
 		
-		double yMin = -height/2;
-		double yMax =  height/2;
-		double xMin = -width/2;
-		double xMax =  width/2;
+		double yMin = -height.getValue()/2;
+		double yMax =  height.getValue()/2;
+		double xMin = -width.getValue()/2;
+		double xMax =  width.getValue()/2;
 
 		turtle.reset();
 		turtle.penUp();

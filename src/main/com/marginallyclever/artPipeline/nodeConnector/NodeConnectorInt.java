@@ -7,10 +7,7 @@ package com.marginallyclever.artPipeline.nodeConnector;
  *
  */
 public class NodeConnectorInt extends NodeConnector<Integer> {
-	static public final String NAME = "Integer";
-	
-	public NodeConnectorInt() {
-		super();
-		setType(NAME);
+	public NodeConnectorInt(Integer d) {
+		super(d);
 	}
 }

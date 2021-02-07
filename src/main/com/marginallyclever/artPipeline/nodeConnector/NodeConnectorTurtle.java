@@ -9,10 +9,11 @@ import com.marginallyclever.convenience.turtle.Turtle;
  *
  */
 public class NodeConnectorTurtle extends NodeConnector<Turtle> {
-	static public final String NAME = "Turtle";
-	
 	public NodeConnectorTurtle() {
 		super();
-		setType(NAME);
+	}
+
+	public NodeConnectorTurtle(Turtle d) {
+		super(d);
 	}
 }

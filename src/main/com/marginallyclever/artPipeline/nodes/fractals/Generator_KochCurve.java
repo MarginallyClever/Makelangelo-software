@@ -1,7 +1,8 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_KochCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -12,18 +13,20 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Generator_KochCurve extends Node {
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	private double xMax = 7;
 	private double xMin = -7;
 	private double yMax = 7;
 	private double yMin = -7;
-	private static int order = 4; // controls complexity of curve
-
 	private double maxSize;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_KochCurve() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 	
@@ -32,14 +35,6 @@ public class Generator_KochCurve extends Node {
 		return Translator.get("KochTreeName");
 	}
 
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<1) order=1;
-		Generator_KochCurve.order = order;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_KochCurve_Panel(this);
@@ -64,7 +59,7 @@ public class Generator_KochCurve extends Node {
 		turtle.turn(90);
 		
 		turtle.penDown();
-		drawTriangle(turtle,order, maxSize);
+		drawTriangle(turtle,inputOrder.getValue(), maxSize);
 
 		outputTurtle.setValue(turtle);
 		

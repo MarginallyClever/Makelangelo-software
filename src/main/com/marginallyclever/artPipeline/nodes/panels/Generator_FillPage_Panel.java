@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.nodes.panels;
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.NodePanel;
-import com.marginallyclever.artPipeline.nodes.Generator_FillPage;
+import com.marginallyclever.artPipeline.nodes.fractals.Generator_FillPage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectFloat;
 

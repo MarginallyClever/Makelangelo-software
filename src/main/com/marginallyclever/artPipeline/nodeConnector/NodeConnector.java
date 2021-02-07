@@ -31,6 +31,11 @@ public class NodeConnector<T> {
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
+	public NodeConnector(T defaultValue) {
+		this();
+		value = defaultValue;
+	}
+	
 	public void setValue(T v) {
 		value=v;
 		isDirty=true;

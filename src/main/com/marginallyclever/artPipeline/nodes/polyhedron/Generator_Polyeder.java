@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.polyhedron;
 
 
 import java.util.ArrayList;
@@ -23,104 +23,28 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Polyeder extends Node {
-	/**
-	 * Helper class that describe a solid
-	 * @author Guenther Sohler
-	 * @since 7.24.0
-	 */
-	public class Model {
-		public String name;
-		public int []instructions;
-	}
-
-	/**
-	 * Helper class for making relative movements along a path to draw each solid
-	 * @author Guenther Sohler
-	 * @since 7.24.0
-	 */
-	public class Transform {
-		public Point2D org;
-		public double xabs,yabs,x_x,x_y,y_x,y_y;
-		
-		public Transform()
-		{
-			org = new Point2D();
-			org.x=0;
-			org.y=0;
-			x_x=y_y=1;
-			x_y=y_x=0;
-		}
-
-		public Point2D trans(Point2D pt)
-		{
-			Point2D a=new Point2D();
-			a.x=org.x+pt.x*x_x+pt.y*y_x;
-			a.y=org.y+pt.x*x_y+pt.y*y_y;
-			return a;
-		}
-
-		public Transform dup()
-		{
-			Transform t1=new Transform();
-			t1.org.x=org.x;
-			t1.org.y=org.y;
-			t1.x_x=x_x;
-			t1.x_y=x_y;
-			t1.y_x=y_x;
-			t1.y_y=y_y;
-			return t1;
-		}
-		
-		public void walk(Point2D d)
-		{
-			org.x += d.x*x_x + d.y*y_x;
-			org.y += d.x*x_y + d.y*y_y;
-		}
-		
-		public void rotate(double ang)
-		{
-			double x_xn,x_yn,y_xn,y_yn;
-
-			double s = Math.sin(ang);
-			double c = Math.cos(ang);
-			
-			x_xn=x_x*c-x_y*s;
-		    x_yn=x_x*s+x_y*c;
-		    x_x=x_xn;
-		    x_y=x_yn;
-
-		    y_xn=y_x*c-y_y*s;
-		    y_yn=y_x*s+y_y*c;
-		    y_x=y_xn;
-		    y_y=y_yn;
-
-		}
-		
-		public void dump()
-		{
-			Log.message(""+org.x+"/"+org.y+" x:"+x_x+"/"+x_y+" "+" y:"+y_x+"/"+y_y+" ");
-		}
-	}
-	
 	// length of a long side
 	protected int size=100;
+	
 	// size of fold + glue flap 
 	protected int flap=10;
+
+	// list of all available model shapes
+	protected ArrayList<PolyederModel> models=null;
 	// selected model
 	protected int modelid=0;
-	// list of all available model shapes
-	protected ArrayList<Model> models=null;
-
-	public int instructionPtr;
 
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+
+
+	public int instructionPtr;
 
 	
 	public Generator_Polyeder() {
 		super();
 		outputs.add(outputTurtle);
 		
-		models=new ArrayList<Model>();
+		models=new ArrayList<PolyederModel>();
 		addModel("Cube",new int[] {4,4,1,1,1,4,0,1,0,4,1,1,1,4,0,4,0,0,0,0});
 		addModel("Tetrahedron", new int [] {3,3,1,0,3,1,0,3,1,0});
 		addModel("Octahedron",new int[] {3,3,0,3,0,1,3,0,1,3,3,1,3,1,1,3,0,1});
@@ -149,7 +73,7 @@ public class Generator_Polyeder extends Node {
 
 	void addModel(String name,int [] instructions)
 	{
-		Model m = new Model();
+		PolyederModel m = new PolyederModel();
 		m.name=name;
 		m.instructions=instructions;
 		models.add(m);
@@ -173,7 +97,7 @@ public class Generator_Polyeder extends Node {
 		return new Generator_Polyeder_Panel(this);
 	}
 
-	void geneneratePolygonStep(Turtle turtle,Transform t) {
+	void geneneratePolygonStep(Turtle turtle,PolyederTransform t) {
 		int i;
 		if(models == null) return;
 		if(modelid < 0 || modelid >= models.size()) return;
@@ -233,7 +157,7 @@ public class Generator_Polyeder extends Node {
 			for(i=(instructionPtr>1)?1:0;i<code;i++)
 			{
 				Log.message("turn "+i);
-				Transform t1=t.dup();
+				PolyederTransform t1=t.dup();
 				t1.rotate(2*Math.PI*i/(double)code);
 				t1.walk(new Point2D(size/(2*Math.tan(Math.PI/code)),0));
 				t1.rotate(Math.PI);
@@ -250,7 +174,7 @@ public class Generator_Polyeder extends Node {
 		Turtle turtle = new Turtle();
 		turtle.penUp();
 
-		Transform t = new Transform();
+		PolyederTransform t = new PolyederTransform();
 		Log.message("start");
 		geneneratePolygonStep(turtle,t);
 		Log.message("end");

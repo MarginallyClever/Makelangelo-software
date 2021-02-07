@@ -1,7 +1,8 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.maze;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Maze_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -9,30 +10,20 @@ import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Makes a "well formed" maze.
- * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+ * @see <a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker'>Wikipedia</a>
  * @author Dan Royer
  */
 public class Generator_Maze extends Node {
-	// MazeCells are the rooms separted by MazeWalls
-	protected class MazeCell {
-		int x, y;
-		boolean visited;
-		boolean onStack;
-	}
+	// controls complexity of curve
+	private NodeConnectorInt rows = new NodeConnectorInt(10);
+	// controls complexity of curve
+	private NodeConnectorInt cols = new NodeConnectorInt(10);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 
-	// MazeWalls separate MazeCells
-	protected class MazeWall {
-		int cellA, cellB;
-		boolean removed;
-	}
-
-	protected static int rows = 10;
-	protected static int columns = 10;
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Maze() {
 		super();
@@ -44,21 +35,6 @@ public class Generator_Maze extends Node {
 		return Translator.get("MazeName");
 	}
 
-	public int getRows() {
-		return rows;
-	}
-	public void setRows(int arg0) {
-		if(arg0<1) arg0=1;
-		rows=arg0;
-	}
-	public int getCols() {
-		return columns;
-	}
-	public void setCols(int arg0) {
-		if(arg0<1) arg0=1;
-		columns=arg0;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_Maze_Panel(this);
@@ -69,12 +45,15 @@ public class Generator_Maze extends Node {
 	 */
 	@Override
 	public boolean iterate() {
+		int rowCount = rows.getValue();
+		int colCount = cols.getValue();
+		
 		// build the cells
-		cells = new MazeCell[rows * columns];
+		cells = new MazeCell[rowCount * colCount];
 
 		int x, y, i = 0;
-		for (y = 0; y < rows; ++y) {
-			for (x = 0; x < columns; ++x) {
+		for (y = 0; y < rowCount; ++y) {
+			for (x = 0; x < colCount; ++x) {
 				cells[i] = new MazeCell();
 				cells[i].visited = false;
 				cells[i].onStack = false;
@@ -85,24 +64,24 @@ public class Generator_Maze extends Node {
 		}
 
 		// build the graph
-		walls = new MazeWall[((rows - 1) * columns) + ((columns - 1) * rows)];
+		walls = new MazeWall[((rowCount - 1) * colCount) + ((colCount - 1) * rowCount)];
 		i = 0;
-		for (y = 0; y < rows; ++y) {
-			for (x = 0; x < columns; ++x) {
-				if (x < columns - 1) {
+		for (y = 0; y < rowCount; ++y) {
+			for (x = 0; x < colCount; ++x) {
+				if (x < colCount - 1) {
 					// vertical wall between horizontal cells
 					walls[i] = new MazeWall();
 					walls[i].removed = false;
-					walls[i].cellA = y * columns + x;
-					walls[i].cellB = y * columns + x + 1;
+					walls[i].cellA = y * colCount + x;
+					walls[i].cellB = y * colCount + x + 1;
 					++i;
 				}
-				if (y < rows - 1) {
+				if (y < rowCount - 1) {
 					// horizontal wall between vertical cells
 					walls[i] = new MazeWall();
 					walls[i].removed = false;
-					walls[i].cellA = y * columns + x;
-					walls[i].cellB = y * columns + x + columns;
+					walls[i].cellA = y * colCount + x;
+					walls[i].cellB = y * colCount + x + colCount;
 					++i;
 				}
 			}
@@ -157,13 +136,16 @@ public class Generator_Maze extends Node {
 	}
 
 	private void drawMaze(Turtle turtle) {
+		int rowCount = rows.getValue();
+		int colCount = cols.getValue();
+		
 		yMin = -100;
 		yMax = 100;
 		xMin = -100;
 		xMax = 100;
 		
-		float w = (xMax - xMin) / columns;
-		float h = (yMax - yMin) / rows;
+		float w = (xMax - xMin) / colCount;
+		float h = (yMax - yMin) / rowCount;
 
 		turtle.reset();
 		
@@ -206,6 +188,9 @@ public class Generator_Maze extends Node {
 	}
 
 	private int chooseUnvisitedNeighbor(int currentCell) {
+		int rowCount = rows.getValue();
+		int colCount = cols.getValue();
+		
 		int x = cells[currentCell].x;
 		int y = cells[currentCell].y;
 
@@ -217,16 +202,16 @@ public class Generator_Maze extends Node {
 			candidates[found++] = currentCell - 1;
 		}
 		// right
-		if (x < columns - 1 && !cells[currentCell + 1].visited) {
+		if (x < colCount - 1 && !cells[currentCell + 1].visited) {
 			candidates[found++] = currentCell + 1;
 		}
 		// up
-		if (y > 0 && !cells[currentCell - columns].visited) {
-			candidates[found++] = currentCell - columns;
+		if (y > 0 && !cells[currentCell - colCount].visited) {
+			candidates[found++] = currentCell - colCount;
 		}
 		// down
-		if (y < rows - 1 && !cells[currentCell + columns].visited) {
-			candidates[found++] = currentCell + columns;
+		if (y < rowCount - 1 && !cells[currentCell + colCount].visited) {
+			candidates[found++] = currentCell + colCount;
 		}
 
 		if (found == 0)

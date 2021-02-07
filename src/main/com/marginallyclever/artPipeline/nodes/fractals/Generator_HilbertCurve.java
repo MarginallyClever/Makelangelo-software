@@ -1,7 +1,8 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_HilbertCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -12,30 +13,25 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Generator_HilbertCurve extends Node {
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	private float turtleStep = 10.0f;
 	private double xMax = 7;
 	private double xMin = -7;
 	private double yMax = 7;
-	private static int order = 4; // controls complexity of curve
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_HilbertCurve() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
 		return Translator.get("HilbertCurveName");
-	}
-
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<1) order=1;
-		Generator_HilbertCurve.order = order;
 	}
 	
 	@Override
@@ -53,14 +49,14 @@ public class Generator_HilbertCurve extends Node {
 		xMin = -v;
 
 		turtle.reset();
-		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
+		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, inputOrder.getValue())));
 
 		// move to starting position
 		turtle.moveTo(
 				-xMax + turtleStep / 2,
 				-yMax + turtleStep / 2);
 		turtle.penDown();
-		hilbert(turtle,order);
+		hilbert(turtle,inputOrder.getValue());
 
 		outputTurtle.setValue(turtle);
 	    return false;

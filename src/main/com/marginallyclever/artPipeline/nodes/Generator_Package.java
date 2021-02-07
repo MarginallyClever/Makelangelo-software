@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Package_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -14,15 +15,20 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_Package extends Node {
-	
-	int width=200;
-	int length=100;
-	int height=50;
-
+	// shape of box
+	private NodeConnectorInt width = new NodeConnectorInt(200);
+	// shape of box
+	private NodeConnectorInt length = new NodeConnectorInt(100);
+	// shape of box
+	private NodeConnectorInt height = new NodeConnectorInt(50);
+	// results
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Package() {
 		super();
+		inputs.add(width);
+		inputs.add(length);
+		inputs.add(height);
 		outputs.add(outputTurtle);
 	}
 	
@@ -57,22 +63,25 @@ public class Generator_Package extends Node {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
+		int w = width.getValue();
+		int h = height.getValue();
+		int len = length.getValue();
 		
-		int ytot=2*width+3*height+20;
-		int xtot=length+2*height;
+		int ytot=2*w+3*h+20;
+		int xtot=len+2*h;
 		
 		int x1=-xtot/2;
-		int x2=x1+height;
-		int x3=x2+length;
-		int x4=x3+height;
+		int x2=x1+h;
+		int x3=x2+len;
+		int x4=x3+h;
 		
 		int y1=-ytot/2;
 		int y2=y1+20;
-		int y3=y2+width;
-		int y4=y3+height;
-		int y5=y4+width;
-		int y6=y5+height;
-		int y7=y6+height+5;
+		int y3=y2+w;
+		int y4=y3+h;
+		int y5=y4+w;
+		int y6=y5+h;
+		int y7=y6+h+5;
 		
 
 		turtle.penUp();
@@ -102,32 +111,5 @@ public class Generator_Package extends Node {
 		outputTurtle.setValue(turtle);
 		
 	    return false;
-	}
-
-	
-	public int getLastWidth() {
-		return width;
-	}
-
-	public int getLastHeight() {
-		return height;
-	}
-
-	public int getLastLength() {
-		return length;
-	}
-
-	public void setWidth(int intValue) {
-		this.width=intValue;
-		
-	}
-
-	public void setHeight(int intValue) {
-		this.height=intValue;
-		
-	}
-	public void setLength(int intValue) {
-		this.length=intValue;
-		
 	}
 }

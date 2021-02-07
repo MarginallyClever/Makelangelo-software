@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_Dragon_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -16,14 +17,17 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Generator_Dragon extends Node {
-	private static int order = 12; // controls complexity of curve
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(12);
+	// result
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 
 	private List<Integer> sequence;
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Dragon() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 	
@@ -32,14 +36,6 @@ public class Generator_Dragon extends Node {
 		return Translator.get("DragonName");
 	}
 
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int value) {
-		if(value<1) value=1;
-		order = value;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_Dragon_Panel(this);
@@ -51,7 +47,7 @@ public class Generator_Dragon extends Node {
 
 		// create the sequence of moves
         sequence = new ArrayList<Integer>();
-        for (int i = 0; i < order; i++) {
+        for (int i = 0; i < inputOrder.getValue(); i++) {
             List<Integer> copy = new ArrayList<Integer>(sequence);
             Collections.reverse(copy);
             sequence.add(1);

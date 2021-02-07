@@ -1,7 +1,8 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_GosperCurve_Panel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -12,31 +13,26 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Generator_GosperCurve extends Node {
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	private double turtleStep = 10.0f;
 	private double xMax = 0;
 	private double xMin = 0;
 	private double yMax = 0;
 	private double yMin = 0;
-	private static int order = 4; // controls complexity of curve
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_GosperCurve() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
 		return Translator.get("GosperCurveName");
-	}
-
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<1) order=1;
-		Generator_GosperCurve.order = order;
 	}
 	
 	@Override
@@ -57,7 +53,7 @@ public class Generator_GosperCurve extends Node {
 		yMax = 0;
 		yMin = 0;
 		
-		gosperA(turtle,order);
+		gosperA(turtle,inputOrder.getValue());
 
 		turtle = new Turtle();
 
@@ -90,7 +86,7 @@ public class Generator_GosperCurve extends Node {
 		turtle.moveTo(x,y);
 		turtle.penDown();
 		// do the curve
-		gosperA(turtle,order);
+		gosperA(turtle,inputOrder.getValue());
 
 		outputTurtle.setValue(turtle);
 	    return false;

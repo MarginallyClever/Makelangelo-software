@@ -1,21 +1,24 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorDouble;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FillPage_Panel;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 
 /**
  * Completely fills the page with ink.
  * @author Dan Royer
  */
 public class Generator_FillPage extends Node {
-	private static float angle = 0;
+	// controls complexity of curve
+	private NodeConnectorDouble inputAngle = new NodeConnectorDouble(0.0);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	private double stepSize = 2.0;
 	private double yBottom = -100;
@@ -23,25 +26,15 @@ public class Generator_FillPage extends Node {
 	private double xLeft   = -100;
 	private double xRight  = 100;
 
-	MakelangeloRobotPanel robotPanel;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
-	
 	public Generator_FillPage() {
 		super();
+		inputs.add(inputAngle);
 		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
 		return Translator.get("FillPageName");
-	}
-
-	static public float getAngle() {
-		return angle;
-	}
-	static public void setAngle(float value) {
-		angle = value;
 	}
 	
 	@Override
@@ -53,8 +46,9 @@ public class Generator_FillPage extends Node {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
-		double majorX = Math.cos(Math.toRadians(angle));
-		double majorY = Math.sin(Math.toRadians(angle));
+		double r = Math.toRadians(inputAngle.getValue());
+		double majorX = Math.cos(r);
+		double majorY = Math.sin(r);
 
 		// figure out how many lines we're going to have on this image.
 		// from top to bottom of the margin area...

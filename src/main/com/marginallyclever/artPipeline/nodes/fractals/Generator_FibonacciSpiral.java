@@ -1,9 +1,10 @@
-package com.marginallyclever.artPipeline.nodes;
+package com.marginallyclever.artPipeline.nodes.fractals;
 
 import java.util.Stack;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
@@ -16,16 +17,18 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Generator_FibonacciSpiral extends Node {
+	// controls complexity of curve
+	private NodeConnectorInt inputOrder = new NodeConnectorInt(7);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	private float xMax = 100;
 	private float yMax = 100;
-	private static int order = 7; // controls complexity of curve
-
 	private Stack<Integer> fibonacciSequence;
-
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_FibonacciSpiral() {
 		super();
+		inputs.add(inputOrder);
 		outputs.add(outputTurtle);
 	}
 	
@@ -38,15 +41,6 @@ public class Generator_FibonacciSpiral extends Node {
 	public NodePanel getPanel() {
 		return new Generator_FibonacciSpiral_Panel(this);
 	}
-
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<3) order=1;
-		Generator_FibonacciSpiral.order = order;
-	}
-
 
 	private void buildFibonacciSequence(int order) {
 		fibonacciSequence = new Stack<Integer>();
@@ -72,7 +66,7 @@ public class Generator_FibonacciSpiral extends Node {
 		Log.message("yMax="+yMax);
 		
 		// build the Fibonacci sequence.
-		buildFibonacciSequence(order);
+		buildFibonacciSequence(inputOrder.getValue());
 		
 		// scale the fractal to fit on the page
 		// short side

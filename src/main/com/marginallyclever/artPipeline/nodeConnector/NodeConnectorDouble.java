@@ -7,10 +7,11 @@ package com.marginallyclever.artPipeline.nodeConnector;
  *
  */
 public class NodeConnectorDouble extends NodeConnector<Double> {
-	static public final String NAME = "Double";
-	
 	public NodeConnectorDouble() {
 		super();
-		setType(NAME);
+	}
+	
+	public NodeConnectorDouble(Double d) {
+		super(d);
 	}
 }

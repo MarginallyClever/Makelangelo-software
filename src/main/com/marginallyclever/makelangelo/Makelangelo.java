@@ -66,10 +66,13 @@ import com.marginallyclever.artPipeline.nodes.Converter_Sandy;
 import com.marginallyclever.artPipeline.nodes.Converter_Spiral;
 import com.marginallyclever.artPipeline.nodes.Converter_SpiralPulse;
 import com.marginallyclever.artPipeline.nodes.Converter_Spiral_CMYK;
-import com.marginallyclever.artPipeline.nodes.Generator_Dragon;
-import com.marginallyclever.artPipeline.nodes.Generator_FibonacciSpiral;
+import com.marginallyclever.artPipeline.nodes.Generator_Border;
+import com.marginallyclever.artPipeline.nodes.Generator_Text;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.fractals.Generator_Dragon;
+import com.marginallyclever.artPipeline.nodes.fractals.Generator_FibonacciSpiral;
+import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.TransformedImage;
@@ -886,9 +889,10 @@ public final class Makelangelo extends TransferHandler
 		TransformedImage owl = TransformedImage.loadImage(".\\src\\test\\resources\\owl.jpg");
 		owl.rotateAbsolute(-25);
 		owl.setScale(0.5, 0.5);
-		
+
+		//Node c = new Generator_Border();
 		//Node c = new Generator_Dragon();
-		Node c = new Generator_FibonacciSpiral();
+		//Node c = new Generator_FibonacciSpiral();
 		//Node c = new Generator_FillPage();
 		//Node c = new Generator_GosperCurve();
 		//Node c = new Generator_GraphPaper();
@@ -899,9 +903,9 @@ public final class Makelangelo extends TransferHandler
 		//Node c = new Generator_Maze();
 		//Node c = new Generator_Package();
 		//Node c = new Generator_Polyeder();
-		//Node c = new Generator_SierpinskiTriangle();
+		Node c = new Generator_SierpinskiTriangle();
 		//Node c = new Generator_Spirograph();
-		//Generator_Text g = new Generator_Text(); g.setMessage("Hello, World!");
+		//Generator_Text c = new Generator_Text(); c.setMessage("Hello, World!");
 		
 		//ImageConverter c = new Converter_Boxes();
 		//ImageConverter c = new Converter_CMYK();
@@ -919,7 +923,7 @@ public final class Makelangelo extends TransferHandler
 		
 		for(NodeConnector<?> nc : c.inputs ) {
 			System.out.println("Node input "+nc.getType());
-			if(nc.getType().equals(NodeConnectorTransformedImage.NAME)) {
+			if(nc.getType().equals("TransformedImage")) {
 				((NodeConnectorTransformedImage)nc).setValue(owl);
 			};
 		}
@@ -931,7 +935,7 @@ public final class Makelangelo extends TransferHandler
 		
 		for(NodeConnector<?> nc : c.outputs ) {
 			System.out.println("Node output "+nc.getType());
-			if(nc.getType().equals(NodeConnectorTurtle.NAME)) {
+			if(nc.getType().equals("Turtle")) {
 				myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 			}
 		}

@@ -2,6 +2,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.Node;
 import com.marginallyclever.artPipeline.NodePanel;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorDouble;
+import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorInt;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.panels.Generator_GraphPaper_Panel;
 import com.marginallyclever.convenience.Clipper2D;
@@ -15,30 +17,23 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * @author Dan Royer
  */
 public class Generator_GraphPaper extends Node {
-	private static float angle = 0;
-
-	MakelangeloRobotPanel robotPanel;
-
+	// controls complexity of curve
+	private NodeConnectorDouble spacing_mm = new NodeConnectorDouble(10.0);
+	// result
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	
 	
 	public Generator_GraphPaper() {
 		super();
+		inputs.add(spacing_mm);
 		outputs.add(outputTurtle);
 	}
-
 
 	@Override
 	public String getName() {
 		return Translator.get("GraphPaperName");
 	}
 
-	static public float getAngle() {
-		return angle;
-	}
-	static public void setAngle(float value) {
-		angle = value;
-	}
-	
 	@Override
 	public NodePanel getPanel() {
 		return new Generator_GraphPaper_Panel(this);
@@ -48,18 +43,14 @@ public class Generator_GraphPaper extends Node {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
-		lines(turtle,10,0);
-		lines(turtle,10,90);
-		// TODO add me back in?
-		//turtle.setColor(new ColorRGB(0,0,0));
-		//lines(turtle,100,0);
-		//lines(turtle,100,90);
+		lines(turtle,spacing_mm.getValue(),0);
+		lines(turtle,spacing_mm.getValue(),90);
 
 		outputTurtle.setValue(turtle);
 	    return false;
 	}
 
-	protected void lines(Turtle turtle,float stepSize_mm,int angle_deg) {
+	protected void lines(Turtle turtle,double stepSize_mm,int angle_deg) {
 		double majorX = Math.cos(Math.toRadians(angle_deg));
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
