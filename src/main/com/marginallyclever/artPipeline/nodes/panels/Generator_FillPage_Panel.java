@@ -4,8 +4,8 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_FillPage;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectDouble;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
 
 /**
  * Panel for {@link Generator_FillPage}
@@ -17,7 +17,7 @@ public class Generator_FillPage_Panel extends NodePanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private SelectFloat angle;
+	private SelectDouble angle;
 	private Generator_FillPage generator;
 	
 	public Generator_FillPage_Panel(Generator_FillPage generator) {
@@ -25,7 +25,7 @@ public class Generator_FillPage_Panel extends NodePanel {
 		
 		this.generator = generator;
 
-		add(angle = new SelectFloat(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
+		add(angle = new SelectDouble(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
 		finish();
 	}
 

@@ -18,9 +18,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_FibonacciSpiral extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(7);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_FibonacciSpiral.inputOrder",7);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("Generator_FibonacciSpiral.NodeConnectorTurtle");
 	
 	private float xMax = 100;
 	private float yMax = 100;

@@ -14,9 +14,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_GosperCurve extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_GosperCurve.inputOrder",4);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double turtleStep = 10.0f;
 	private double xMax = 0;

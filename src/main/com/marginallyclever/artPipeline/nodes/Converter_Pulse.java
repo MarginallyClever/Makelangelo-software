@@ -16,7 +16,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Pulse extends ImageConverter {
 	// height of zigzag.  should probably be less than spacing.  >=1
-	private NodeConnectorDouble inputHeight = new NodeConnectorDouble(6.0);
+	private NodeConnectorDouble inputHeight = new NodeConnectorDouble("Converter_Pulse.inputHeight",6.0);
 	
 	// TODO select-one-of-many
 	private static int direction = 0;
@@ -82,7 +82,7 @@ public class Converter_Pulse extends ImageConverter {
 		Turtle turtle = new Turtle();
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];

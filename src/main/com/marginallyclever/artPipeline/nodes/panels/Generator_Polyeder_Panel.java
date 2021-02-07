@@ -4,9 +4,9 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.polyhedron.Generator_Polyeder;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectInteger;
+import com.marginallyclever.convenience.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 
 /**
  * Panel for {@link Generator_Polyeder}

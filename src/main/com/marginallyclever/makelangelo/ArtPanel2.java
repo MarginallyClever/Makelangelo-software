@@ -16,8 +16,8 @@ import javax.swing.JScrollPane;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.makelangelo.select.SelectButton;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.convenience.select.SelectButton;
+import com.marginallyclever.convenience.select.SelectPanel;
 
 public class ArtPanel2 {
 	protected JFrame parentFrame;

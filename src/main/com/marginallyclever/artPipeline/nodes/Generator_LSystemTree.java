@@ -17,19 +17,19 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_LSystemTree extends Node {
 	// random seed
-	private NodeConnectorInt inputSeed = new NodeConnectorInt(0xDEADBEEF);
+	private NodeConnectorInt inputSeed = new NodeConnectorInt("Generator_LSystemTree.inputSeed",0xDEADBEEF);
 	// resursion depth
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_LSystemTree.inputOrder",4);
 	// resursion width
-	private NodeConnectorInt inputBranches = new NodeConnectorInt(3);
+	private NodeConnectorInt inputBranches = new NodeConnectorInt("Generator_LSystemTree.inputBranches",3);
 	// variation
-	private NodeConnectorInt inputNoise = new NodeConnectorInt(0);
+	private NodeConnectorInt inputNoise = new NodeConnectorInt("Generator_LSystemTree.inputNoise",0);
 	// how far branches can spread
-	private NodeConnectorDouble inputAngleSpan = new NodeConnectorDouble(120.0);
+	private NodeConnectorDouble inputAngleSpan = new NodeConnectorDouble("Generator_LSystemTree.inputAngleSpan",120.0);
 	// how far branches can spread
-	private NodeConnectorDouble inputOrderScale = new NodeConnectorDouble(0.76);
+	private NodeConnectorDouble inputOrderScale = new NodeConnectorDouble("Generator_LSystemTree.inputOrderScale",0.76);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private int order;
 	private int numBranches;

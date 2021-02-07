@@ -8,11 +8,11 @@ import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.select.SelectBoolean;
+import com.marginallyclever.convenience.select.SelectOneOfMany;
+import com.marginallyclever.convenience.select.SelectPanel;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**

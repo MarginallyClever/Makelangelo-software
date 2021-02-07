@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.robot.settings;
 
 import java.beans.PropertyChangeEvent;
+
+import com.marginallyclever.convenience.select.SelectButton;
+import com.marginallyclever.convenience.select.SelectDouble;
+import com.marginallyclever.convenience.select.SelectPanel;
+import com.marginallyclever.convenience.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.select.SelectButton;
-import com.marginallyclever.makelangelo.select.SelectFloat;
-import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 public class PanelAdjustMachine extends SelectPanel {
 	/**
@@ -16,11 +17,11 @@ public class PanelAdjustMachine extends SelectPanel {
 
 	protected MakelangeloRobot robot;
 
-	protected SelectFloat machineWidth, machineHeight;
-	protected SelectFloat totalBeltNeeded;
-	protected SelectFloat totalServoNeeded;
-	protected SelectFloat totalStepperNeeded;
-	protected SelectFloat acceleration;
+	protected SelectDouble machineWidth, machineHeight;
+	protected SelectDouble totalBeltNeeded;
+	protected SelectDouble totalServoNeeded;
+	protected SelectDouble totalStepperNeeded;
+	protected SelectDouble acceleration;
 
 	protected SelectButton buttonAneg;
 	protected SelectButton buttonApos;
@@ -38,8 +39,8 @@ public class PanelAdjustMachine extends SelectPanel {
 			float w = (float)(robot.getSettings().getLimitRight() - robot.getSettings().getLimitLeft());
 			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom());
 			
-			machineWidth = new SelectFloat(Translator.get("MachineWidth"),w);
-			machineHeight = new SelectFloat(Translator.get("MachineHeight"),h);
+			machineWidth = new SelectDouble(Translator.get("MachineWidth"),w);
+			machineHeight = new SelectDouble(Translator.get("MachineHeight"),h);
 
 			add(machineWidth);
 			//add(new JLabel("mm"));
@@ -48,9 +49,9 @@ public class PanelAdjustMachine extends SelectPanel {
 			//machineWidth.setPreferredSize(s);
 			//machineHeight.setPreferredSize(s);
 	
-			add(totalStepperNeeded = new SelectFloat(Translator.get("StepperLengthNeeded"),0));
-			add(totalBeltNeeded = new SelectFloat(Translator.get("BeltLengthNeeded"),0));
-			add(totalServoNeeded = new SelectFloat(Translator.get("ServoLengthNeeded"),0));
+			add(totalStepperNeeded = new SelectDouble(Translator.get("StepperLengthNeeded"),0));
+			add(totalBeltNeeded = new SelectDouble(Translator.get("BeltLengthNeeded"),0));
+			add(totalServoNeeded = new SelectDouble(Translator.get("ServoLengthNeeded"),0));
 
 			totalStepperNeeded.setReadOnly();
 			totalBeltNeeded.setReadOnly();
@@ -65,7 +66,7 @@ public class PanelAdjustMachine extends SelectPanel {
 		
 		// Acceleration
 		{
-			acceleration = new SelectFloat(Translator.get("AdjustAcceleration"),(float)robot.getSettings().getAcceleration());
+			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)robot.getSettings().getAcceleration());
 
 			if(robot.getSettings().getHardwareProperties().canAccelerate()) {
 				add(acceleration);

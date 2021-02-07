@@ -48,7 +48,7 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public LoadDXF() {
 		super();

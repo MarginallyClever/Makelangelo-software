@@ -7,11 +7,11 @@ package com.marginallyclever.convenience.nodes;
  *
  */
 public class NodeConnectorDouble extends NodeConnector<Double> {
-	public NodeConnectorDouble() {
-		super();
+	public NodeConnectorDouble(String newName) {
+		super(newName);
 	}
 	
-	public NodeConnectorDouble(Double d) {
-		super(d);
+	public NodeConnectorDouble(String newName,Double d) {
+		super(newName,d);
 	}
 }

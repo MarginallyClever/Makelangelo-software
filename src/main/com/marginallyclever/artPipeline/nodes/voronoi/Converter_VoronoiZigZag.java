@@ -63,7 +63,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	public void restart() {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(sourceImage.getValue());
+		img = bw.filter(inputImage.getValue());
 
 		double [] bounds = img.getBounds();
 		yBottom = bounds[TransformedImage.BOTTOM];

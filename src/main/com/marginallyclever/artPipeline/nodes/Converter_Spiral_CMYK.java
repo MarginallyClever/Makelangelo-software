@@ -18,13 +18,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Spiral_CMYK extends ImageConverter {
 	// draw the spiral right out to the edges of the square bounds.
-	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean(true);
+	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean("Converter_Spiral_CMYK.toCorners",true);
 	// cyan channel
-	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle("Converter_Spiral_CMYK.outputTurtleC");
 	// magenta channel
-	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle("Converter_Spiral_CMYK.outputTurtleM");
 	// yellow channel
-	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle("Converter_Spiral_CMYK.outputTurtleY");
 	
 	public Converter_Spiral_CMYK() {
 		super();
@@ -49,9 +49,9 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	@Override
 	public boolean iterate() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage.getValue());
+		cmyk.filter(inputImage.getValue());
 
-		double [] bounds = sourceImage.getValue().getBounds();
+		double [] bounds = inputImage.getValue().getBounds();
 		double h2 = bounds[TransformedImage.TOP] - bounds[TransformedImage.BOTTOM];
 		double w2 = bounds[TransformedImage.RIGHT] - bounds[TransformedImage.LEFT];
 		double separation = (w2<h2) ? w2/4 : h2/4;

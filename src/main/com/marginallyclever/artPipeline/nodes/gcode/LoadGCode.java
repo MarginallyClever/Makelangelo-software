@@ -25,7 +25,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 public class LoadGCode extends Node implements LoadAndSaveFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public LoadGCode() {
 		super();

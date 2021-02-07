@@ -4,8 +4,8 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.Converter_RandomLines;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectInteger;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
 
 /**
  * GUI for {@link Converter_RandomLines}

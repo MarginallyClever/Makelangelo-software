@@ -26,14 +26,14 @@ import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectButton;
+import com.marginallyclever.convenience.select.SelectPanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
-import com.marginallyclever.makelangelo.select.SelectButton;
-import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 
 /**

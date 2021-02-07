@@ -18,14 +18,16 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Lissajous extends Node {
 	// controls complexity of curve
-	private NodeConnectorDouble inputDelta = new NodeConnectorDouble(1.0/6.0);
+	private NodeConnectorDouble inputDelta = new NodeConnectorDouble("Generator_Lissajous.inputDelta",1.0/6.0);
 	// controls complexity of curve
-	private NodeConnectorInt inputA = new NodeConnectorInt(200);
+	private NodeConnectorInt inputA = new NodeConnectorInt("Generator_Lissajous.inputA",200);
 	// controls complexity of curve
-	private NodeConnectorInt inputB = new NodeConnectorInt(200);
+	private NodeConnectorInt inputB = new NodeConnectorInt("Generator_Lissajous.inpuinputBtDelta",200);
 	// quality of curve
-	private NodeConnectorInt inputSamples = new NodeConnectorInt(2000);
-
+	private NodeConnectorInt inputSamples = new NodeConnectorInt("Generator_Lissajous.inputSamples",2000);
+	// results
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
+	
 	// scale the step size so the curve fits on the paper
 	// TODO make parameter?
 	private final double WIDTH=100, HEIGHT=100;
@@ -34,7 +36,6 @@ public class Generator_Lissajous extends Node {
 	private double a,b;
 	private int numSamples = 2000;
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
 	
 	public Generator_Lissajous() {
 		super();

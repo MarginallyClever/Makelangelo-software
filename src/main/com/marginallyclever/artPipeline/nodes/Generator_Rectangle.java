@@ -15,16 +15,16 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Rectangle extends Node {
 	// width of box
-	NodeConnectorDouble width = new NodeConnectorDouble(100.0);
+	NodeConnectorDouble inputWidth = new NodeConnectorDouble("Generator_Rectangle.inputWidth",100.0);
 	// height of box
-	NodeConnectorDouble height = new NodeConnectorDouble(100.0);
+	NodeConnectorDouble inputHeight = new NodeConnectorDouble("Generator_Rectangle.inputHeight",100.0);
 	
-	NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("Generator_Rectangle.inputOrder");
 	
 	public Generator_Rectangle() {
 		super();
-		inputs.add(width);
-		inputs.add(height);
+		inputs.add(inputWidth);
+		inputs.add(inputHeight);
 		outputs.add(outputTurtle);
 	}
 	
@@ -42,10 +42,10 @@ public class Generator_Rectangle extends Node {
 	public boolean iterate() {		
 		Turtle turtle = new Turtle();
 		
-		double yMin = -height.getValue()/2;
-		double yMax =  height.getValue()/2;
-		double xMin = -width.getValue()/2;
-		double xMax =  width.getValue()/2;
+		double yMin = -inputHeight.getValue()/2;
+		double yMax =  inputHeight.getValue()/2;
+		double xMin = -inputWidth.getValue()/2;
+		double xMax =  inputWidth.getValue()/2;
 
 		turtle.reset();
 		turtle.penUp();

@@ -190,7 +190,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(sourceImage.getValue());
+		img = bw.filter(inputImage.getValue());
 
 		double [] bounds = img.getBounds();
 		yMin = bounds[TransformedImage.BOTTOM];

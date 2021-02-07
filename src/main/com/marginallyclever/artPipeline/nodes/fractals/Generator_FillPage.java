@@ -16,9 +16,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_FillPage extends Node {
 	// controls complexity of curve
-	private NodeConnectorDouble inputAngle = new NodeConnectorDouble(0.0);
+	private NodeConnectorDouble inputAngle = new NodeConnectorDouble("Generator_FillPage.inputAngle",0.0);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double stepSize = 2.0;
 	private double yBottom = -100;

@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.Converter_Spiral;
 import com.marginallyclever.convenience.nodes.NodePanel;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.convenience.select.SelectBoolean;
 
 /**
  * GUI for {@link Converter_Spiral}

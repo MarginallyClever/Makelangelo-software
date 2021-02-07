@@ -16,19 +16,19 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Package extends Node {
 	// shape of box
-	private NodeConnectorInt width = new NodeConnectorInt(200);
+	private NodeConnectorInt inputWidth = new NodeConnectorInt("Generator_Package.inputWidth",200);
 	// shape of box
-	private NodeConnectorInt length = new NodeConnectorInt(100);
+	private NodeConnectorInt inputLength = new NodeConnectorInt("Generator_Package.inputLength",100);
 	// shape of box
-	private NodeConnectorInt height = new NodeConnectorInt(50);
+	private NodeConnectorInt inputHeight = new NodeConnectorInt("Generator_Package.inputHeight",50);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public Generator_Package() {
 		super();
-		inputs.add(width);
-		inputs.add(length);
-		inputs.add(height);
+		inputs.add(inputWidth);
+		inputs.add(inputLength);
+		inputs.add(inputHeight);
 		outputs.add(outputTurtle);
 	}
 	
@@ -63,9 +63,9 @@ public class Generator_Package extends Node {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		int w = width.getValue();
-		int h = height.getValue();
-		int len = length.getValue();
+		int w = inputWidth.getValue();
+		int h = inputHeight.getValue();
+		int len = inputLength.getValue();
 		
 		int ytot=2*w+3*h+20;
 		int xtot=len+2*h;

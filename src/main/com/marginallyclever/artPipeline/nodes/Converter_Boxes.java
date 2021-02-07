@@ -16,9 +16,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Boxes extends ImageConverter {
 	// only consider intensity above the lowpass value.
-	private NodeConnectorInt inputLowpass = new NodeConnectorInt(127);
+	private NodeConnectorInt inputLowpass = new NodeConnectorInt("Generator_Dragon.inputLowpass",127);
 	// how big should the largest box be?
-	private NodeConnectorInt inputMaxBoxSize = new NodeConnectorInt(4);
+	private NodeConnectorInt inputMaxBoxSize = new NodeConnectorInt("Generator_Dragon.inputMaxBoxSize",4);
 	
 	public int boxMaxSize;
 	public int cutoff;
@@ -45,11 +45,11 @@ public class Converter_Boxes extends ImageConverter {
 	
 	@Override
 	public boolean iterate() {
-		if(sourceImage.getValue() == null) return false;
+		if(inputImage.getValue() == null) return false;
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		Turtle turtle = new Turtle();
 		

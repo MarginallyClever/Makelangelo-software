@@ -15,7 +15,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Crosshatch extends ImageConverter {
 	// detail of scan.  lower number is more detail.  >0
-	private NodeConnectorDouble inputStepSize = new NodeConnectorDouble(2.0);
+	private NodeConnectorDouble inputStepSize = new NodeConnectorDouble("Converter_Crosshatch.inputStepSize",2.0);
 	
 	@Override
 	public String getName() {
@@ -37,7 +37,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	
 	public Turtle finish2() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		Turtle turtle = new Turtle();
 		
@@ -100,10 +100,10 @@ public class Converter_Crosshatch extends ImageConverter {
 	}
 	
 	protected Turtle finish1() {
-		if(sourceImage==null) return null;
+		if(inputImage==null) return null;
 		
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		Turtle turtle = new Turtle();
 		

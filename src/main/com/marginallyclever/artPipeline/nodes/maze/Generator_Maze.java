@@ -15,11 +15,11 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Maze extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt rows = new NodeConnectorInt(10);
+	private NodeConnectorInt inputRows = new NodeConnectorInt("Generator_Maze.inputRows",10);
 	// controls complexity of curve
-	private NodeConnectorInt cols = new NodeConnectorInt(10);
+	private NodeConnectorInt inputCols = new NodeConnectorInt("Generator_Maze.inputCols",10);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
@@ -45,8 +45,8 @@ public class Generator_Maze extends Node {
 	 */
 	@Override
 	public boolean iterate() {
-		int rowCount = rows.getValue();
-		int colCount = cols.getValue();
+		int rowCount = inputRows.getValue();
+		int colCount = inputCols.getValue();
 		
 		// build the cells
 		cells = new MazeCell[rowCount * colCount];
@@ -136,8 +136,8 @@ public class Generator_Maze extends Node {
 	}
 
 	private void drawMaze(Turtle turtle) {
-		int rowCount = rows.getValue();
-		int colCount = cols.getValue();
+		int rowCount = inputRows.getValue();
+		int colCount = inputCols.getValue();
 		
 		yMin = -100;
 		yMax = 100;
@@ -188,8 +188,8 @@ public class Generator_Maze extends Node {
 	}
 
 	private int chooseUnvisitedNeighbor(int currentCell) {
-		int rowCount = rows.getValue();
-		int colCount = cols.getValue();
+		int rowCount = inputRows.getValue();
+		int colCount = inputCols.getValue();
 		
 		int x = cells[currentCell].x;
 		int y = cells[currentCell].y;

@@ -4,9 +4,9 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectReadOnlyText;
+import com.marginallyclever.convenience.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
 
 /**
  * Panel for {@link Generator_SierpinskiTriangle}

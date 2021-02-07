@@ -14,9 +14,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_HilbertCurve extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_HilbertCurve.inputOrder",4);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private float turtleStep = 10.0f;
 	private double xMax = 7;

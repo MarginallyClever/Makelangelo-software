@@ -57,6 +57,7 @@ import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
@@ -474,7 +475,7 @@ public final class Makelangelo extends TransferHandler
 	
 			// major layout
 			Log.message("  vertical split...");
-			Splitter splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
+			MyJSplitPane splitLeftRight = new MyJSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			splitLeftRight.add(previewPanel);
 			splitLeftRight.add(new JScrollPane(robotPanel));
 	

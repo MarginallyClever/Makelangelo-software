@@ -7,7 +7,11 @@ package com.marginallyclever.convenience.nodes;
  *
  */
 public class NodeConnectorInt extends NodeConnector<Integer> {
-	public NodeConnectorInt(Integer d) {
-		super(d);
+	public NodeConnectorInt(String newName) {
+		super(newName);
+	}
+	
+	public NodeConnectorInt(String newName,Integer d) {
+		super(newName,d);
 	}
 }

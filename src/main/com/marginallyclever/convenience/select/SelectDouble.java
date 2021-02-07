@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.select;
+package com.marginallyclever.convenience.select;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,16 +15,16 @@ import com.marginallyclever.convenience.StringHelper;
 
 
 /**
- * A JFormattedTextField that sets itself up to format floating point numbers.
+ * A JFormattedTextField that sets itself up to format doubles.
  * @author Dan Royer
  * @since 7.24.0
  */
-public class SelectFloat extends Select {
+public class SelectDouble extends Select {
 	private JLabel label;
 	private JTextField field;
-	private float value;
+	private double value;
 
-	public SelectFloat(String labelKey, Locale locale, float defaultValue) {
+	public SelectDouble(String labelKey, Locale locale, double defaultValue) {
 		super();
 
 		value = defaultValue;
@@ -36,7 +36,7 @@ public class SelectFloat extends Select {
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-		field.setText(StringHelper.formatFloat(defaultValue));
+		field.setText(StringHelper.formatDouble(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
@@ -59,10 +59,10 @@ public class SelectFloat extends Select {
 			}
 
 			public void validate() {
-				float newNumber;
+				double newNumber;
 
 				try {
-					newNumber = Float.valueOf(field.getText());
+					newNumber = Double.valueOf(field.getText());
 				} catch (NumberFormatException e) {
 					field.setForeground(Color.RED);
 					return;
@@ -80,19 +80,19 @@ public class SelectFloat extends Select {
 		panel.add(field, BorderLayout.LINE_END);
 	}
 
-	public SelectFloat(String labelKey, Locale locale) {
+	public SelectDouble(String labelKey, Locale locale) {
 		this(labelKey, locale, 0);
 	}
 
-	public SelectFloat(String labelKey, float defaultValue) {
+	public SelectDouble(String labelKey, double defaultValue) {
 		this(labelKey, Locale.getDefault(), defaultValue);
 	}
 
-	public SelectFloat(String labelKey) {
+	public SelectDouble(String labelKey) {
 		this(labelKey, Locale.getDefault(), 0);
 	}
 
-	protected SelectFloat() {
+	protected SelectDouble() {
 		this("", Locale.getDefault(), 0);
 	}
 
@@ -101,14 +101,14 @@ public class SelectFloat extends Select {
 	}
 
 	// @return last valid value typed into field
-	public float getValue() {
+	public double getValue() {
 		return value;
 	}
 
-	public void setValue(float newValue) {
+	public void setValue(double newValue) {
 		if(newValue!=value) {
 			//Log.message("new "+newValue+" old "+oldValue);
-			field.setText(StringHelper.formatFloat(newValue));
+			field.setText(StringHelper.formatDouble(newValue));
 		}
 	}
 	

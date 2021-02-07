@@ -15,7 +15,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Spiral extends ImageConverter {
 	// draw the spiral right out to the edges of the square bounds.
-	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean(true);
+	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean("Converter_Spiral.toCorners",true);
 	
 	public Converter_Spiral() {
 		super();
@@ -38,7 +38,7 @@ public class Converter_Spiral extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		double toolDiameter = 1.0;
 

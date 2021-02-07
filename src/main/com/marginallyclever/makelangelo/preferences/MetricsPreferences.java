@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.preferences;
 
 import java.util.prefs.Preferences;
 
+import com.marginallyclever.convenience.select.SelectBoolean;
+import com.marginallyclever.convenience.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class MetricsPreferences {

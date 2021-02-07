@@ -16,14 +16,14 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_GraphPaper extends Node {
 	// mm between grid lines
-	private NodeConnectorDouble spacing_mm = new NodeConnectorDouble(10.0);
+	private NodeConnectorDouble inputSpacingMm = new NodeConnectorDouble("Generator_GraphPaper.inputSpacingMm",10.0);
 	// result
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	
 	public Generator_GraphPaper() {
 		super();
-		inputs.add(spacing_mm);
+		inputs.add(inputSpacingMm);
 		outputs.add(outputTurtle);
 	}
 
@@ -41,8 +41,8 @@ public class Generator_GraphPaper extends Node {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 		
-		lines(turtle,spacing_mm.getValue(),0);
-		lines(turtle,spacing_mm.getValue(),90);
+		lines(turtle,inputSpacingMm.getValue(),0);
+		lines(turtle,inputSpacingMm.getValue(),90);
 
 		outputTurtle.setValue(turtle);
 	    return false;

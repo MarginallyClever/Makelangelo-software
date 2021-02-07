@@ -4,8 +4,8 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.Generator_GraphPaper;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectDouble;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
 
 /**
  * Panel for {@link Generator_GraphPaper}
@@ -17,7 +17,7 @@ public class Generator_GraphPaper_Panel extends NodePanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private SelectFloat angle;
+	private SelectDouble angle;
 	private Generator_GraphPaper generator;
 	
 	public Generator_GraphPaper_Panel(Generator_GraphPaper generator_GraphPaper) {
@@ -25,7 +25,7 @@ public class Generator_GraphPaper_Panel extends NodePanel {
 		
 		this.generator = generator_GraphPaper;
 
-		add(angle = new SelectFloat(Translator.get("HilbertCurveOrder"),Generator_GraphPaper.getAngle()));
+		add(angle = new SelectDouble(Translator.get("HilbertCurveOrder"),Generator_GraphPaper.getAngle()));
 		finish();
 	}
 

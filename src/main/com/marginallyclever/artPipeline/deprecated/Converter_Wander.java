@@ -183,7 +183,7 @@ public class Converter_Wander extends ImageConverter {
 		ArrayList<Turtle> list = new ArrayList<Turtle>();
 		
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage.getValue());
+		cmyk.filter(inputImage.getValue());
 		
 		Log.message("Yellow...");	list.add(outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0));
 		Log.message("Cyan...");		list.add(outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0));
@@ -199,7 +199,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 		
 		list.add(outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0));
 		return list;

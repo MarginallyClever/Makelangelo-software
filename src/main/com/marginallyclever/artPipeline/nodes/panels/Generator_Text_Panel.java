@@ -4,10 +4,10 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.Generator_Text;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectInteger;
+import com.marginallyclever.convenience.select.SelectOneOfMany;
+import com.marginallyclever.convenience.select.SelectTextArea;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectTextArea;
 
 /**
  * Panel for {@link Generator_Text}

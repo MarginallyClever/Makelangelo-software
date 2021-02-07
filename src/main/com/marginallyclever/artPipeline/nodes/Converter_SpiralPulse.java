@@ -18,13 +18,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_SpiralPulse extends ImageConverter {
 	// draw the spiral right out to the edges of the square bounds.
-	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean(true);
+	private NodeConnectorBoolean convertToCorners = new NodeConnectorBoolean("Converter_SpiralPulse.toCorners",true);
 	// increase to tighten zigzags.  0.1-3.0
-	private NodeConnectorDouble inputDensity = new NodeConnectorDouble(1.2);
+	private NodeConnectorDouble inputDensity = new NodeConnectorDouble("Converter_SpiralPulse.inputDensity",1.2);
 	// space between rings of spiral.  0.5-10.0
-	private NodeConnectorDouble inputSpacing = new NodeConnectorDouble(2.5);
+	private NodeConnectorDouble inputSpacing = new NodeConnectorDouble("Converter_SpiralPulse.inputSpacing",2.5);
 	// height of zigzag.  should probably be less than spacing.  1-10
-	private NodeConnectorDouble inputHeight = new NodeConnectorDouble(4.0);
+	private NodeConnectorDouble inputHeight = new NodeConnectorDouble("Converter_SpiralPulse.inputHeight",4.0);
 	
 	
 	public Converter_SpiralPulse() {
@@ -51,7 +51,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		double toolDiameter = 1.0;
 

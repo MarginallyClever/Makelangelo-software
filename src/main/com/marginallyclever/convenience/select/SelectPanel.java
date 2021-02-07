@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.select;
+package com.marginallyclever.convenience.select;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -76,7 +76,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		SelectButton b = new SelectButton("B");
 		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
 		SelectFile d = new SelectFile("D",null);
-		SelectFloat e = new SelectFloat("E",0.0f);
+		SelectDouble e = new SelectDouble("E",0.0f);
 		SelectInteger f = new SelectInteger("FFF",0);
 		String [] list = {"cars","trains","planes","boats","rockets"};
 		SelectOneOfMany g = new SelectOneOfMany("G",list,0);

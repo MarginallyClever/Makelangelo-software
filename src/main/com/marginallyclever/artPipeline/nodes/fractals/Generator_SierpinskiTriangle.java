@@ -16,9 +16,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_SierpinskiTriangle extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(4);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_SierpinskiTriangle.inputOrder",4);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;

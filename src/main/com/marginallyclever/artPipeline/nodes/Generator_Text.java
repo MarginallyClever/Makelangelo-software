@@ -47,14 +47,14 @@ public class Generator_Text extends Node {
 	//private int charsPerLine = 25;
 	//private boolean drawBoundingBox = false;
 
-	private NodeConnectorString inputMessage = new NodeConnectorString("");
-	private NodeConnectorInt inputFontPointSize = new NodeConnectorInt(20);
+	private NodeConnectorString inputMessage = new NodeConnectorString("Generator_Text.inputMessage","");
+	private NodeConnectorInt inputFontPointSize = new NodeConnectorInt("ImageConverter.outputTurtle",20);
 
 	private static Font [] fontList;
 	private static String [] fontNames;
 	private static int lastFont = 0;
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public Generator_Text() {
 		super();

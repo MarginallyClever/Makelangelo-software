@@ -204,7 +204,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	public ArrayList<Turtle> finish() {
 		Turtle turtle = new Turtle();
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
-		TransformedImage img = blur.filter(sourceImage.getValue());
+		TransformedImage img = blur.filter(inputImage.getValue());
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);
 

@@ -9,16 +9,16 @@ import java.util.Locale;
 import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.convenience.select.SelectDouble;
 
 public class FloatFieldTest {
 	protected int testObservation;
 	
 	protected void testFloatField() throws Exception {
 		// test contructor(s)
-		SelectFloat b = new SelectFloat("test",0);
+		SelectDouble b = new SelectDouble("test",0);
 		assertEquals(0.0f,b.getValue(),1e-6);
-		b = new SelectFloat("test2",0.1f);
+		b = new SelectDouble("test2",0.1f);
 		assertEquals(0.1f,b.getValue(),1e-6);
 		
 		// test observer fires

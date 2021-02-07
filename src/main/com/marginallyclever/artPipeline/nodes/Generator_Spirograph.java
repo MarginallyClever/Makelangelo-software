@@ -19,28 +19,28 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Spirograph extends Node {
 	// controls complexity of curve
-	private NodeConnectorDouble pScale = new NodeConnectorDouble(80.0);
+	private NodeConnectorDouble inputPScale = new NodeConnectorDouble("Generator_Spirograph.inputPScale",80.0);
 	// controls complexity of curve
-	private NodeConnectorInt minorRadius = new NodeConnectorInt(2);
+	private NodeConnectorInt inputMinorRadius = new NodeConnectorInt("Generator_Spirograph.inputMinorRadius",2);
 	// controls complexity of curve
-	private NodeConnectorInt majorRadius = new NodeConnectorInt(100);
+	private NodeConnectorInt inputMajorRadius = new NodeConnectorInt("Generator_Spirograph.inputMajorRadius",100);
 	// resolution of curve
-	private NodeConnectorInt numSamples = new NodeConnectorInt(2000);
+	private NodeConnectorInt inputNumSamples = new NodeConnectorInt("Generator_Spirograph.inputNumSamples",2000);
 	// style
-	private NodeConnectorBoolean isEpitrochoid = new NodeConnectorBoolean(false);
+	private NodeConnectorBoolean inputIsEpitrochoid = new NodeConnectorBoolean("Generator_Spirograph.inputIsEpitrochoid",false);
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
 	
 	public Generator_Spirograph() {
 		super();
-		inputs.add(pScale);
-		inputs.add(minorRadius);
-		inputs.add(majorRadius);
-		inputs.add(numSamples);
-		inputs.add(isEpitrochoid);
+		inputs.add(inputPScale);
+		inputs.add(inputMinorRadius);
+		inputs.add(inputMajorRadius);
+		inputs.add(inputNumSamples);
+		inputs.add(inputIsEpitrochoid);
 		outputs.add(outputTurtle);
 	}
 	
@@ -109,27 +109,27 @@ public class Generator_Spirograph extends Node {
 		
 		double dRadius,pScale1,pScale2;
 		
-		if(isEpitrochoid.getValue()) {
-			dRadius = majorRadius.getValue()+minorRadius.getValue();
-			pScale1 = -pScale.getValue();
-			pScale2 = pScale.getValue();
+		if(inputIsEpitrochoid.getValue()) {
+			dRadius = inputMajorRadius.getValue()+inputMinorRadius.getValue();
+			pScale1 = -inputPScale.getValue();
+			pScale2 = inputPScale.getValue();
 		} else {
 			// hypotrochoid
-			dRadius = majorRadius.getValue()-minorRadius.getValue();
-			pScale1 = pScale.getValue();
-			pScale2 = pScale.getValue();
+			dRadius = inputMajorRadius.getValue()-inputMinorRadius.getValue();
+			pScale1 = inputPScale.getValue();
+			pScale2 = inputPScale.getValue();
 		}
 		
 		double t = 0;
-		double v = dRadius*t/minorRadius.getValue();
+		double v = dRadius*t/inputMinorRadius.getValue();
 
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
-		double period = lcm(majorRadius.getValue(),minorRadius.getValue()) / majorRadius.getValue();
-		double periodRadians = Math.PI*2.0*period/numSamples.getValue();
+		double period = lcm(inputMajorRadius.getValue(),inputMinorRadius.getValue()) / inputMajorRadius.getValue();
+		double periodRadians = Math.PI*2.0*period/inputNumSamples.getValue();
 		
-		for(int t1 = 0; t1<=numSamples.getValue();++t1) {
+		for(int t1 = 0; t1<=inputNumSamples.getValue();++t1) {
 			t = (double)t1 * periodRadians;
-			v = dRadius*t/minorRadius.getValue();
+			v = dRadius*t/inputMinorRadius.getValue();
 			x = dRadius*Math.cos(t) + pScale1*Math.cos(v);
 			y = dRadius*Math.sin(t) - pScale2*Math.sin(v);
 

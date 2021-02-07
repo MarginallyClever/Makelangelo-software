@@ -7,11 +7,11 @@ package com.marginallyclever.convenience.nodes;
  *
  */
 public class NodeConnectorBoolean extends NodeConnector<Boolean> {
-	public NodeConnectorBoolean() {
-		super();
+	public NodeConnectorBoolean(String newName) {
+		super(newName);
 	}
 
-	public NodeConnectorBoolean(Boolean d) {
-		super(d);
+	public NodeConnectorBoolean(String newName,Boolean d) {
+		super(newName,d);
 	}
 }

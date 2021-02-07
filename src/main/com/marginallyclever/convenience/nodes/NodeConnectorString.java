@@ -7,7 +7,10 @@ package com.marginallyclever.convenience.nodes;
  *
  */
 public class NodeConnectorString extends NodeConnector<String> {
-	public NodeConnectorString(String d) {
-		super(d);
+	public NodeConnectorString(String newName,String defaultValue) {
+		super(newName,defaultValue);
+	}
+	public NodeConnectorString(String newName) {
+		super(newName,"");
 	}
 }

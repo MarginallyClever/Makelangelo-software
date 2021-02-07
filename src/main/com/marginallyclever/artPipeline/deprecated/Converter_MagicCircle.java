@@ -55,7 +55,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 		
 		int numLines = numberOfPoints * numberOfPoints / 2;
 		LineIntensity [] intensities = new LineIntensity[numLines*2];

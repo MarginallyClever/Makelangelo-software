@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.select;
+package com.marginallyclever.convenience.select;
 
 import java.awt.BorderLayout;
 import java.awt.event.FocusEvent;
@@ -14,7 +14,7 @@ import javax.swing.JPanel;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class Select implements FocusListener {
+public abstract class Select implements FocusListener {
 	protected JPanel panel;
 	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	

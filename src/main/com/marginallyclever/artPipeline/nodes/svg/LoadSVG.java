@@ -54,7 +54,7 @@ public class LoadSVG extends Node implements LoadAndSaveFile {
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public LoadSVG() {
 		super();

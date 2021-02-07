@@ -18,9 +18,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Dragon extends Node {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt(12);
+	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_Dragon.outputTurtle",12);
 	// result
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 	private List<Integer> sequence;
 

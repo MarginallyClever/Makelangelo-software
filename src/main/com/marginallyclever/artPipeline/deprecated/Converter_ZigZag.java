@@ -319,7 +319,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		// Dither
 		Filter_DitherFloydSteinberg fs = new Filter_DitherFloydSteinberg();

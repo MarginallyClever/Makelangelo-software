@@ -16,9 +16,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Multipass extends ImageConverter {
 	// angle.  0-360
-	private NodeConnectorDouble inputAngle = new NodeConnectorDouble(0.0);
+	private NodeConnectorDouble inputAngle = new NodeConnectorDouble("Converter_Multipass.inputAngle",0.0);
 	// number of graduated passes. >=1
-	private NodeConnectorInt inputPasses = new NodeConnectorInt(4);
+	private NodeConnectorInt inputPasses = new NodeConnectorInt("Converter_Multipass.inputPasses",4);
 	
 	@Override
 	public String getName() {
@@ -39,7 +39,7 @@ public class Converter_Multipass extends ImageConverter {
 		
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 		
 		double r = Math.toRadians(inputAngle.getValue());
 		double dx = Math.cos(r);

@@ -34,7 +34,7 @@ public class Generator_Polyeder extends Node {
 	// selected model
 	protected int modelid=0;
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 
 	public int instructionPtr;

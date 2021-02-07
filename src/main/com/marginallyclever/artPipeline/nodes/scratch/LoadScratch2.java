@@ -38,7 +38,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  */
 public class LoadScratch2 extends Node implements LoadAndSaveFile {
 	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle();
+	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 	private final String PROJECT_JSON = "project.json";
 	

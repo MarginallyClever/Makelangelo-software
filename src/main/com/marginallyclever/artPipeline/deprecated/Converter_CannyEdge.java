@@ -28,7 +28,7 @@ public class Converter_CannyEdge extends ImageConverter {
 	public boolean iterate() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage.getValue());
+		TransformedImage img = bw.filter(inputImage.getValue());
 
 		Turtle turtle = new Turtle();
 		

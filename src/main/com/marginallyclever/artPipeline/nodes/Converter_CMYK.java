@@ -22,13 +22,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_CMYK extends ImageConverter {
 	// TODO explain me
-	private NodeConnectorInt inputStepSize = new NodeConnectorInt(1);
+	private NodeConnectorInt inputStepSize = new NodeConnectorInt("Converter_CMYK.inputStepSize",1);
 	// cyan channel
-	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle("Converter_CMYK.outputTurtleC");
 	// magenta channel
-	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle("Converter_CMYK.outputTurtleM");
 	// yellow channel
-	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle();
+	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle("Converter_CMYK.outputTurtleY");
 	
 	public Converter_CMYK() {
 		super();
@@ -53,7 +53,7 @@ public class Converter_CMYK extends ImageConverter {
 	@Override
 	public boolean iterate() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage.getValue());
+		cmyk.filter(inputImage.getValue());
 		
 		Log.message("Yellow...");		outputTurtleY.setValue(outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0)));
 		Log.message("Cyan...");			outputTurtleC.setValue(outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255)));

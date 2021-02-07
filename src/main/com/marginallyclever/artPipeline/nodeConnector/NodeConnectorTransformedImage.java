@@ -4,11 +4,11 @@ import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.nodes.NodeConnector;
 
 public class NodeConnectorTransformedImage extends NodeConnector<TransformedImage> {
-	public NodeConnectorTransformedImage() {
-		super();
+	public NodeConnectorTransformedImage(String newName) {
+		super(newName);
 	}
 	
-	public NodeConnectorTransformedImage(TransformedImage d) {
-		super(d);
+	public NodeConnectorTransformedImage(String newName,TransformedImage d) {
+		super(newName,d);
 	}
 }

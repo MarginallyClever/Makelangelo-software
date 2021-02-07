@@ -10,29 +10,38 @@ import java.lang.reflect.ParameterizedType;
  *
  */
 public class NodeConnector<T> {
+	// the name of this connector node, which is also used for the name of each UX dialog element.
+	private String name;
+	
+	// helpful text to explain this input. 
+	private String description = "";
+	
+	// To obtain the name of class T (which is normally erased at run time)
 	private final Class<T> persistentClass;
-	
-	public String getType() {
-		return persistentClass.getSimpleName();
-	}
 
-	public void setType(String name) {}
-	
 	// The current value.
 	private T value;
 	
 	// Has this peg been updated recently?
 	public boolean isDirty;
 	
+	public String getType() {
+		return persistentClass.getSimpleName();
+	}
+
+	public void setType(String newTypeName) {}
+	
+	
 	@SuppressWarnings("unchecked")
-	public NodeConnector() {
+	protected NodeConnector(String newName) {
 		super();
+		setName(newName);
 		persistentClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
-	public NodeConnector(T defaultValue) {
-		this();
+	protected NodeConnector(String name,T defaultValue) {
+		this(name);
 		value = defaultValue;
 	}
 	
@@ -43,5 +52,21 @@ public class NodeConnector<T> {
 	
 	public T getValue() {
 		return value;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	private void setName(String newName) {
+		this.name = newName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

@@ -4,9 +4,9 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.artPipeline.nodes.Converter_CMYK;
 import com.marginallyclever.convenience.nodes.NodePanel;
+import com.marginallyclever.convenience.select.SelectInteger;
+import com.marginallyclever.convenience.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 /**
  * GUI for {@link Converter_CMYK}
